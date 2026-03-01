@@ -1,0 +1,137 @@
+﻿{
+    "schema_version":  "1.0.0",
+    "repo_profile":  "Quant",
+    "failed_exit_code":  0,
+    "run_id":  "20260301_231833",
+    "logs_dir":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs",
+    "ended_utc":  "2026-03-01T15:18:36Z",
+    "failed_gate":  "",
+    "resolved_config":  {
+                            "repo_profile":  "Quant",
+                            "repo_root":  "E:\\Code\\Quant",
+                            "scan_root":  "E:\\Code\\Quant",
+                            "traceability_path":  "E:\\Code\\Quant\\docs\\pm_to_code_traceability.yaml",
+                            "dispatch_manifest_path":  "E:\\Code\\Quant\\docs\\context\\dispatch_manifest.json",
+                            "worker_reply_path":  "E:\\Code\\Quant\\docs\\context\\worker_reply_packet.json",
+                            "worker_aggregate_path":  "E:\\Code\\Quant\\docs\\context\\worker_status_aggregate.json",
+                            "escalation_path":  "E:\\Code\\Quant\\docs\\context\\escalation_events.json",
+                            "digest_path":  "E:\\Code\\Quant\\docs\\context\\ceo_bridge_digest.md",
+                            "orphan_include":  [
+                                                   "*.py",
+                                                   "*.ps1",
+                                                   "*.ts",
+                                                   "*.tsx",
+                                                   "*.js",
+                                                   "*.jsx",
+                                                   "*.yaml",
+                                                   "*.yml"
+                                               ],
+                            "skip_orphan_gate":  false,
+                            "skip_dispatch_gate":  false
+                        },
+    "repo_root":  "E:\\Code\\Quant",
+    "started_utc":  "2026-03-01T15:18:33Z",
+    "result":  "PASS",
+    "gates":  [
+                  {
+                      "gate":  "G01_context_build",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G01_context_build.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\build_context_packet.py --repo-root E:\\Code\\Quant",
+                      "ended_utc":  "2026-03-01T15:18:34Z",
+                      "started_utc":  "2026-03-01T15:18:34Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G02_context_validate",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G02_context_validate.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\build_context_packet.py --repo-root E:\\Code\\Quant --validate",
+                      "ended_utc":  "2026-03-01T15:18:34Z",
+                      "started_utc":  "2026-03-01T15:18:34Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G03_worker_status_aggregate",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G03_worker_status_aggregate.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\aggregate_worker_status.py --scan-root E:\\Code\\Quant --output E:\\Code\\Quant\\docs\\context\\worker_status_aggregate.json --escalation-output E:\\Code\\Quant\\docs\\context\\escalation_events.json",
+                      "ended_utc":  "2026-03-01T15:18:34Z",
+                      "started_utc":  "2026-03-01T15:18:34Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G04_traceability_gate",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G04_traceability_gate.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\validate_traceability.py --input E:\\Code\\Quant\\docs\\pm_to_code_traceability.yaml --strict --require-test",
+                      "ended_utc":  "2026-03-01T15:18:34Z",
+                      "started_utc":  "2026-03-01T15:18:34Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G05_evidence_hash_gate",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G05_evidence_hash_gate.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\validate_evidence_hashes.py --input E:\\Code\\Quant\\docs\\pm_to_code_traceability.yaml --evidence-dir E:\\Code\\Quant\\docs\\context\\evidence_hashes",
+                      "ended_utc":  "2026-03-01T15:18:34Z",
+                      "started_utc":  "2026-03-01T15:18:34Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G06_worker_reply_gate",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G06_worker_reply_gate.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\validate_worker_reply_packet.py --input E:\\Code\\Quant\\docs\\context\\worker_reply_packet.json --repo-root E:\\Code\\Quant --require-existing-paths",
+                      "ended_utc":  "2026-03-01T15:18:34Z",
+                      "started_utc":  "2026-03-01T15:18:34Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G07_orphan_change_gate",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G07_orphan_change_gate.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\validate_orphan_changes.py --traceability E:\\Code\\Quant\\docs\\pm_to_code_traceability.yaml --since-commit HEAD --include *.py --include *.ps1 --include *.ts --include *.tsx --include *.js --include *.jsx --include *.yaml --include *.yml",
+                      "ended_utc":  "2026-03-01T15:18:35Z",
+                      "started_utc":  "2026-03-01T15:18:35Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G08_dispatch_lifecycle_gate",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G08_dispatch_lifecycle_gate.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\validate_dispatch_acks.py --manifest E:\\Code\\Quant\\docs\\context\\dispatch_manifest.json --scan-root E:\\Code\\Quant --timeout-minutes 10",
+                      "ended_utc":  "2026-03-01T15:18:36Z",
+                      "started_utc":  "2026-03-01T15:18:35Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G09_build_ceo_digest",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G09_build_ceo_digest.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\build_ceo_bridge_digest.py --sources E:\\Code\\Quant\\docs\\context\\worker_status_aggregate.json,E:\\Code\\Quant\\docs\\pm_to_code_traceability.yaml,E:\\Code\\Quant\\docs\\context\\escalation_events.json,E:\\Code\\Quant\\docs\\context\\worker_reply_packet.json --output E:\\Code\\Quant\\docs\\context\\ceo_bridge_digest.md",
+                      "ended_utc":  "2026-03-01T15:18:36Z",
+                      "started_utc":  "2026-03-01T15:18:36Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  },
+                  {
+                      "gate":  "G10_digest_freshness_gate",
+                      "log_path":  "E:\\Code\\Quant\\docs\\context\\phase_end_logs\\20260301_231833_G10_digest_freshness_gate.log",
+                      "command":  "C:\\Python314\\python.exe E:\\Code\\SOP\\quant_current_scope\\scripts\\validate_digest_freshness.py --input E:\\Code\\Quant\\docs\\context\\ceo_bridge_digest.md --ttl-minutes 60",
+                      "ended_utc":  "2026-03-01T15:18:36Z",
+                      "started_utc":  "2026-03-01T15:18:36Z",
+                      "exit_code":  0,
+                      "status":  "PASS",
+                      "message":  ""
+                  }
+              ]
+}

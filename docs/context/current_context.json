@@ -1,11 +1,13 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-03-01T14:10:29Z",
+  "generated_at_utc": "2026-03-01T15:18:34Z",
   "source_files": [
     "docs/decision log.md",
+    "docs/handover/phase0_handover.md",
     "docs/handover/phase20_handover.md",
     "docs/handover/phase31_handover.md",
     "docs/lessonss.md",
+    "docs/phase_brief/phase0-brief.md",
     "docs/phase_brief/phase10-brief.md",
     "docs/phase_brief/phase11-brief.md",
     "docs/phase_brief/phase12-brief.md",

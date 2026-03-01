@@ -1,0 +1,12 @@
+{
+  "generated_utc": "2026-03-01T15:18:34.631747Z",
+  "workers": [],
+  "summary": {
+    "total_workers": 0,
+    "executing": 0,
+    "idle": 0,
+    "stale": 0,
+    "escalated": 0,
+    "overall_health": "OK"
+  }
+}
