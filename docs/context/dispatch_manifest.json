@@ -1,0 +1,9 @@
+{
+    "tasks":  [
+
+              ],
+    "dispatch_id":  "DISP-BOOTSTRAP-20260301",
+    "command_plan_hash_sha256":  "sha256:bootstrap",
+    "ack_deadline_utc":  "2026-03-02T15:17:57Z",
+    "schema_version":  "1.0.0"
+}
