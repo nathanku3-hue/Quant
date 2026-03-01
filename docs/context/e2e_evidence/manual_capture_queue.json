@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-03-01T13:32:29Z",
+  "task_id": "T31",
+  "drop_dir": "C:\\Users\\Lenovo\\OneDrive\\\u684c\u9762\\Evidence_Drop_Quant",
+  "evidence_dir": "E:\\Code\\Quant\\docs\\context\\e2e_evidence",
+  "items": [
+    {
+      "id": "manual1",
+      "name": "CEO Paste Test",
+      "task_id": "T31",
+      "criteria": "CEO Bridge Digest successfully pasted without formatting breaks",
+      "file_pattern": "^T31_manual1_[A-Za-z0-9._-]+_\\d{8}\\.(png|jpg|jpeg|webp)$",
+      "status": "PENDING",
+      "created_at_utc": "2026-03-01T13:19:25Z",
+      "warned_at_utc": null,
+      "blocked_at_utc": null,
+      "received_at_utc": null,
+      "evidence_file": null,
+      "evidence_sha256": null
+    },
+    {
+      "id": "manual2",
+      "name": "CommandPlan Round-Trip",
+      "task_id": "T31",
+      "criteria": "JSON dispatch manifest processed and acknowledged by workers",
+      "file_pattern": "^T31_manual2_[A-Za-z0-9._-]+_\\d{8}\\.(png|jpg|jpeg|webp)$",
+      "status": "PENDING",
+      "created_at_utc": "2026-03-01T13:19:25Z",
+      "warned_at_utc": null,
+      "blocked_at_utc": null,
+      "received_at_utc": null,
+      "evidence_file": null,
+      "evidence_sha256": null
+    },
+    {
+      "id": "manual3",
+      "name": "Digest Readability",
+      "task_id": "T31",
+      "criteria": "Expert Verdict Matrix renders correctly as a readable table",
+      "file_pattern": "^T31_manual3_[A-Za-z0-9._-]+_\\d{8}\\.(png|jpg|jpeg|webp)$",
+      "status": "PENDING",
+      "created_at_utc": "2026-03-01T13:19:25Z",
+      "warned_at_utc": null,
+      "blocked_at_utc": null,
+      "received_at_utc": null,
+      "evidence_file": null,
+      "evidence_sha256": null
+    }
+  ]
+}

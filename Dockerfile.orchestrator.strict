@@ -1,0 +1,56 @@
+# syntax=docker/dockerfile:1.7
+
+ARG PYTHON_BASE_REF=python:3.12-slim@sha256:42f1689d6d6b906c7e829f9d9ec38491550344ac9adc01e464ff9a08df1ffb48
+FROM ${PYTHON_BASE_REF} AS runtime
+
+ARG DEBIAN_SNAPSHOT=20260220T000000Z
+ARG CA_CERTIFICATES_VERSION=20230311+deb12u1
+ARG LIBGCC_S1_VERSION=12.2.0-14+deb12u1
+ARG LIBSTDCXX6_VERSION=12.2.0-14+deb12u1
+ARG LIBGOMP1_VERSION=12.2.0-14+deb12u1
+ARG REQUIREMENTS_LOCK_SHA256=950750baf22977b902955cf03a913af2964accf9a9178021e799701ee177b25f
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_ROOT_USER_ACTION=ignore \
+    TZ=UTC \
+    VIRTUAL_ENV=/opt/venv \
+    PATH="/opt/venv/bin:${PATH}"
+
+WORKDIR /app
+
+COPY requirements.lock /tmp/requirements.lock
+
+RUN set -eux; \
+    . /etc/os-release; \
+    codename="${VERSION_CODENAME}"; \
+    printf 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/%s %s main\n' "${DEBIAN_SNAPSHOT}" "${codename}" > /etc/apt/sources.list; \
+    printf 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/%s %s-security main\n' "${DEBIAN_SNAPSHOT}" "${codename}" >> /etc/apt/sources.list; \
+    apt-get -o Acquire::Check-Valid-Until=false update; \
+    apt-get install --yes --no-install-recommends \
+        "ca-certificates=${CA_CERTIFICATES_VERSION}" \
+        "libgcc-s1=${LIBGCC_S1_VERSION}" \
+        "libstdc++6=${LIBSTDCXX6_VERSION}" \
+        "libgomp1=${LIBGOMP1_VERSION}"; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+    echo "${REQUIREMENTS_LOCK_SHA256}  /tmp/requirements.lock" | sha256sum --check --strict -; \
+    python -m venv "${VIRTUAL_ENV}"; \
+    pip install --upgrade "pip==25.0.1"; \
+    pip install --requirement /tmp/requirements.lock --only-binary=:all:; \
+    rm -f /tmp/requirements.lock
+
+COPY main_bot_orchestrator.py /app/main_bot_orchestrator.py
+COPY core /app/core
+COPY execution /app/execution
+COPY scripts /app/scripts
+
+RUN set -eux; \
+    mkdir -p /app/.venv/Scripts; \
+    ln -sf /opt/venv/bin/python /app/.venv/Scripts/python.exe
+
+CMD ["python", "main_bot_orchestrator.py"]

@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-03-01T14:10:29Z",
+  "source_files": [
+    "docs/decision log.md",
+    "docs/handover/phase20_handover.md",
+    "docs/handover/phase31_handover.md",
+    "docs/lessonss.md",
+    "docs/phase_brief/phase10-brief.md",
+    "docs/phase_brief/phase11-brief.md",
+    "docs/phase_brief/phase12-brief.md",
+    "docs/phase_brief/phase13-brief.md",
+    "docs/phase_brief/phase14-brief.md",
+    "docs/phase_brief/phase15-brief.md",
+    "docs/phase_brief/phase16-brief.md",
+    "docs/phase_brief/phase17-brief.md",
+    "docs/phase_brief/phase18-brief.md",
+    "docs/phase_brief/phase19-brief.md",
+    "docs/phase_brief/phase20-brief.md",
+    "docs/phase_brief/phase21-brief.md",
+    "docs/phase_brief/phase23-brief.md",
+    "docs/phase_brief/phase24-brief.md",
+    "docs/phase_brief/phase25-brief.md",
+    "docs/phase_brief/phase26-brief.md",
+    "docs/phase_brief/phase27-brief.md",
+    "docs/phase_brief/phase28-brief.md",
+    "docs/phase_brief/phase30-brief.md",
+    "docs/phase_brief/phase31-brief.md",
+    "docs/phase_brief/phase9-brief.md"
+  ],
+  "active_phase": 31,
+  "what_was_done": [
+    "Phase 31 locked Stream 1 PiT truth-layer controls and Stream 5 strict execution telemetry acceptance boundaries with SAW recheck PASS.",
+    "Orchestrator reconciliation was hardened with timeout-bounded fail-loud ambiguity handling and deterministic duplicate-CID fail-closed logic.",
+    "Phase-end smoke validated orchestrator initialization and controlled shutdown sequence without runtime mutation."
+  ],
+  "what_is_locked": [
+    "Success acceptance invariant: `ok=True` requires authoritative bounded receipt fields and broker identity (`client_order_id`, `filled_qty`, `filled_avg_price`, valid `execution_ts`, fill bound to intended qty`).",
+    "Sparse or malformed `ok=True` payloads never promote success without reconciliation.",
+    "Stream 1 active t-1 selector path remains enforced; retired helper is no longer callable in runtime path."
+  ],
+  "what_is_next": [
+    "Resolve inherited full-repo Phase 15 integration failure to clear governance gate.",
+    "Execute Phase 32 backlog: exception taxonomy split, routing diagnostics tail, reconciliation timeout soak/cancellation hardening, UTF-8 wedge, UID drift."
+  ],
+  "first_command": "`.venv\\Scripts\\python -m pytest tests/test_phase15_integration.py::test_phase15_weights_respect_regime_cap -q -vv`",
+  "next_todos": [
+    "inherited failure fix -> exception taxonomy split -> routing diagnostics completion -> timeout soak/cancellation hardening -> UTF-8/UID backlog closure."
+  ]
+}

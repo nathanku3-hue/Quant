@@ -1,0 +1,484 @@
+Connecting to WRDS...
+Loading library list...
+Done
+Connected.
+Found 7 BvD-related libraries: ['bvd', 'bvd_amadeus_trial', 'bvd_bvdbankf', 'bvd_bvdbankf_trial', 'bvd_orbis_trial', 'bvd_osiris', 'bvdsamp']
+Scanning 333 tables in bvd...
+Approximately 2175509 rows in bvd.activities_l.
+Approximately 12993896 rows in bvd.activities_m.
+Approximately 85912832 rows in bvd.activities_s.
+Approximately 425556 rows in bvd.activities_v.
+Approximately 538260 rows in bvd.amadeus_l.
+Approximately 3085764 rows in bvd.amadeus_m.
+Approximately 1 rows in bvd.amadeus_qvards.
+Approximately 22121564 rows in bvd.amadeus_s.
+Approximately 116693 rows in bvd.amadeus_v.
+Approximately 531844 rows in bvd.auditors_l.
+Approximately 1088415 rows in bvd.auditors_m.
+Approximately 2339723 rows in bvd.auditors_s.
+Approximately 140641 rows in bvd.auditors_v.
+Approximately 329170 rows in bvd.bankers_l.
+Approximately 1307739 rows in bvd.bankers_m.
+Approximately 3200733 rows in bvd.bankers_s.
+Approximately 88478 rows in bvd.bankers_v.
+Approximately 148625 rows in bvd.bvdbankf_accounting_information.
+Approximately 507610 rows in bvd.bvdbankf_all_curr_shh_1st_level.
+Approximately 517691 rows in bvd.bvdbankf_all_subs_1st_level.
+Approximately 36996 rows in bvd.bvdbankf_annual_stock_data.
+Approximately 36453 rows in bvd.bvdbankf_annual_stock_valuation.
+Approximately 135946 rows in bvd.bvdbankf_basic_shareholder_info.
+Approximately 400546 rows in bvd.bvdbankf_branches.
+Approximately 135942 rows in bvd.bvdbankf_contact_info.
+Approximately 3630 rows in bvd.bvdbankf_curr_stock_valuation.
+Approximately 4034 rows in bvd.bvdbankf_current_stock_data.
+Approximately 1473085 rows in bvd.bvdbankf_detailed_format.
+Approximately 1520121 rows in bvd.bvdbankf_dmc.
+Approximately 9148 rows in bvd.bvdbankf_giin.
+Approximately 812728 rows in bvd.bvdbankf_global_format_ratios.
+Approximately 1473006 rows in bvd.bvdbankf_global_standard_format.
+Approximately 62883 rows in bvd.bvdbankf_hq.
+Approximately 378319 rows in bvd.bvdbankf_identifiers.
+Approximately 496207 rows in bvd.bvdbankf_ind_classifications.
+Approximately 1206053 rows in bvd.bvdbankf_interims.
+Approximately 6270874 rows in bvd.bvdbankf_isin_all.
+Approximately 812898 rows in bvd.bvdbankf_key_financials.
+Library: bvd | Table: bvdbankf_key_financials | Row Count: 812898 | Matched Columns: ['opre', 'toas']
+Approximately 163582 rows in bvd.bvdbankf_legal_info.
+Approximately 17021 rows in bvd.bvdbankf_lei.
+Approximately 55034 rows in bvd.bvdbankf_monthly_information.
+Approximately 271965 rows in bvd.bvdbankf_overviews.
+Approximately 2552142 rows in bvd.bvdbankf_regulatory_environment.
+Approximately 140578 rows in bvd.bvdbankf_security_and_price_info.
+Approximately 538260 rows in bvd.company_l.
+Approximately 3083858 rows in bvd.company_m.
+Approximately 22121052 rows in bvd.company_s.
+Approximately 116693 rows in bvd.company_v.
+Approximately 4580250 rows in bvd.financials_l.
+Library: bvd | Table: financials_l | Row Count: 4580250 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 24406840 rows in bvd.financials_m.
+Library: bvd | Table: financials_m | Row Count: 24406840 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 130063856 rows in bvd.financials_s.
+Library: bvd | Table: financials_s | Row Count: 130063856 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 1106663 rows in bvd.financials_v.
+Library: bvd | Table: financials_v | Row Count: 1106663 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 370682 rows in bvd.ish_duo_guo_l.
+Approximately 1774596 rows in bvd.ish_duo_guo_m.
+Approximately 11168554 rows in bvd.ish_duo_guo_s.
+Approximately 86363 rows in bvd.ish_duo_guo_v.
+Approximately 2360723 rows in bvd.managers_l.
+Approximately 7587488 rows in bvd.managers_m.
+Approximately 29517050 rows in bvd.managers_s.
+Approximately 963234 rows in bvd.managers_v.
+Approximately 2275369 rows in bvd.ob_additional_company_info_l.
+Approximately 13807970 rows in bvd.ob_additional_company_info_m.
+Approximately 95652520 rows in bvd.ob_additional_company_info_s.
+Approximately 5691581 rows in bvd.ob_all_addresses_l.
+Approximately 41971432 rows in bvd.ob_all_addresses_m.
+Approximately 597764288 rows in bvd.ob_all_addresses_s.
+Approximately 11371084 rows in bvd.ob_all_cur_shh_1st_level_l.
+Approximately 38670948 rows in bvd.ob_all_cur_shh_1st_level_lm.
+Approximately 181098512 rows in bvd.ob_all_cur_shh_1st_level_lms.
+Approximately 27305800 rows in bvd.ob_all_cur_shh_1st_level_m.
+Approximately 142444048 rows in bvd.ob_all_cur_shh_1st_level_s.
+Approximately 6293384 rows in bvd.ob_all_subs_first_level_l.
+Approximately 11712662 rows in bvd.ob_all_subs_first_level_lm.
+Approximately 24724172 rows in bvd.ob_all_subs_first_level_lms.
+Approximately 5419408 rows in bvd.ob_all_subs_first_level_m.
+Approximately 13015976 rows in bvd.ob_all_subs_first_level_s.
+Approximately 788463 rows in bvd.ob_auditors_current_l.
+Approximately 1113847 rows in bvd.ob_auditors_current_m.
+Approximately 2665211 rows in bvd.ob_auditors_current_s.
+Approximately 1128642 rows in bvd.ob_bankers_current_l.
+Approximately 2859720 rows in bvd.ob_bankers_current_m.
+Approximately 6553084 rows in bvd.ob_bankers_current_s.
+Approximately 707733 rows in bvd.ob_bankers_previous_l.
+Approximately 1443023 rows in bvd.ob_bankers_previous_m.
+Approximately 3883097 rows in bvd.ob_bankers_previous_s.
+Approximately 771861 rows in bvd.ob_banks_g_fins_eur_int_l.
+Approximately 182316 rows in bvd.ob_banks_g_fins_eur_int_m.
+Approximately 42682 rows in bvd.ob_banks_g_fins_eur_int_s.
+Approximately 521454 rows in bvd.ob_banks_g_fins_eur_l.
+Approximately 100728 rows in bvd.ob_banks_g_fins_eur_m.
+Approximately 696425 rows in bvd.ob_banks_g_fins_eur_s.
+Approximately 771861 rows in bvd.ob_banks_g_fins_int_l.
+Approximately 182316 rows in bvd.ob_banks_g_fins_int_m.
+Approximately 42682 rows in bvd.ob_banks_g_fins_int_s.
+Approximately 521454 rows in bvd.ob_banks_g_fins_l.
+Approximately 100728 rows in bvd.ob_banks_g_fins_m.
+Approximately 696425 rows in bvd.ob_banks_g_fins_s.
+Approximately 771861 rows in bvd.ob_banks_g_fins_usd_int_l.
+Approximately 954177 rows in bvd.ob_banks_g_fins_usd_int_lm.
+Approximately 996859 rows in bvd.ob_banks_g_fins_usd_int_lms.
+Approximately 182316 rows in bvd.ob_banks_g_fins_usd_int_m.
+Approximately 42682 rows in bvd.ob_banks_g_fins_usd_int_s.
+Approximately 521454 rows in bvd.ob_banks_g_fins_usd_l.
+Approximately 622182 rows in bvd.ob_banks_g_fins_usd_lm.
+Approximately 1318607 rows in bvd.ob_banks_g_fins_usd_lms.
+Approximately 100728 rows in bvd.ob_banks_g_fins_usd_m.
+Approximately 696425 rows in bvd.ob_banks_g_fins_usd_s.
+Approximately 1872798 rows in bvd.ob_basic_shareholder_info_l.
+Approximately 7546323 rows in bvd.ob_basic_shareholder_info_m.
+Approximately 61432096 rows in bvd.ob_basic_shareholder_info_s.
+Approximately 4935064 rows in bvd.ob_branches_l.
+Approximately 5791955 rows in bvd.ob_branches_m.
+Approximately 13544031 rows in bvd.ob_branches_s.
+Approximately 1251739 rows in bvd.ob_cflow_non_us_ind_eur_int_l.
+Approximately 53821 rows in bvd.ob_cflow_non_us_ind_eur_int_m.
+Approximately 18882 rows in bvd.ob_cflow_non_us_ind_eur_int_s.
+Approximately 1033417 rows in bvd.ob_cflow_non_us_ind_eur_l.
+Approximately 48972 rows in bvd.ob_cflow_non_us_ind_eur_m.
+Approximately 16206 rows in bvd.ob_cflow_non_us_ind_eur_s.
+Approximately 1251739 rows in bvd.ob_cflow_non_us_ind_int_l.
+Approximately 53821 rows in bvd.ob_cflow_non_us_ind_int_m.
+Approximately 18882 rows in bvd.ob_cflow_non_us_ind_int_s.
+Approximately 1033417 rows in bvd.ob_cflow_non_us_ind_l.
+Approximately 48972 rows in bvd.ob_cflow_non_us_ind_m.
+Approximately 16206 rows in bvd.ob_cflow_non_us_ind_s.
+Approximately 1251739 rows in bvd.ob_cflow_non_us_ind_usd_int_l.
+Approximately 53821 rows in bvd.ob_cflow_non_us_ind_usd_int_m.
+Approximately 18882 rows in bvd.ob_cflow_non_us_ind_usd_int_s.
+Approximately 1033417 rows in bvd.ob_cflow_non_us_ind_usd_l.
+Approximately 48972 rows in bvd.ob_cflow_non_us_ind_usd_m.
+Approximately 16206 rows in bvd.ob_cflow_non_us_ind_usd_s.
+Approximately 338563 rows in bvd.ob_cflow_us_ind_eur_int_l.
+Approximately 33592 rows in bvd.ob_cflow_us_ind_eur_int_m.
+Approximately 37509 rows in bvd.ob_cflow_us_ind_eur_int_s.
+Approximately 189915 rows in bvd.ob_cflow_us_ind_eur_l.
+Approximately 14165 rows in bvd.ob_cflow_us_ind_eur_m.
+Approximately 14792 rows in bvd.ob_cflow_us_ind_eur_s.
+Approximately 338563 rows in bvd.ob_cflow_us_ind_interim_l.
+Approximately 33592 rows in bvd.ob_cflow_us_ind_interim_m.
+Approximately 37509 rows in bvd.ob_cflow_us_ind_interim_s.
+Approximately 189915 rows in bvd.ob_cflow_us_ind_l.
+Approximately 14165 rows in bvd.ob_cflow_us_ind_m.
+Approximately 14792 rows in bvd.ob_cflow_us_ind_s.
+Approximately 338563 rows in bvd.ob_cflow_us_ind_usd_int_l.
+Approximately 33592 rows in bvd.ob_cflow_us_ind_usd_int_m.
+Approximately 37509 rows in bvd.ob_cflow_us_ind_usd_int_s.
+Approximately 189915 rows in bvd.ob_cflow_us_ind_usd_l.
+Approximately 14165 rows in bvd.ob_cflow_us_ind_usd_m.
+Approximately 14792 rows in bvd.ob_cflow_us_ind_usd_s.
+Approximately 4101656 rows in bvd.ob_contact_info_l.
+Approximately 34686764 rows in bvd.ob_contact_info_m.
+Approximately 527215104 rows in bvd.ob_contact_info_s.
+Approximately 2634919 rows in bvd.ob_controlling_shareholders_l.
+Approximately 7168222 rows in bvd.ob_controlling_shareholders_m.
+Approximately 62076128 rows in bvd.ob_controlling_shareholders_s.
+Approximately 1771461 rows in bvd.ob_detailed_fmt_ind_eur_int_l.
+Approximately 97449 rows in bvd.ob_detailed_fmt_ind_eur_int_m.
+Approximately 61098 rows in bvd.ob_detailed_fmt_ind_eur_int_s.
+Approximately 1418608 rows in bvd.ob_detailed_fmt_ind_eur_l.
+Approximately 77140 rows in bvd.ob_detailed_fmt_ind_eur_m.
+Approximately 35057 rows in bvd.ob_detailed_fmt_ind_eur_s.
+Approximately 1771461 rows in bvd.ob_detailed_fmt_ind_int_l.
+Approximately 97449 rows in bvd.ob_detailed_fmt_ind_int_m.
+Approximately 61098 rows in bvd.ob_detailed_fmt_ind_int_s.
+Approximately 1418608 rows in bvd.ob_detailed_fmt_ind_l.
+Approximately 77140 rows in bvd.ob_detailed_fmt_ind_m.
+Approximately 35057 rows in bvd.ob_detailed_fmt_ind_s.
+Approximately 1771461 rows in bvd.ob_detailed_fmt_ind_usd_int_l.
+Approximately 97449 rows in bvd.ob_detailed_fmt_ind_usd_int_m.
+Approximately 61098 rows in bvd.ob_detailed_fmt_ind_usd_int_s.
+Approximately 1418608 rows in bvd.ob_detailed_fmt_ind_usd_l.
+Approximately 77140 rows in bvd.ob_detailed_fmt_ind_usd_m.
+Approximately 35057 rows in bvd.ob_detailed_fmt_ind_usd_s.
+Approximately 12617587 rows in bvd.ob_dmc_current_only_l.
+Approximately 37051356 rows in bvd.ob_dmc_current_only_m.
+Approximately 267817088 rows in bvd.ob_dmc_current_only_s.
+Approximately 20009876 rows in bvd.ob_dmc_previous_l.
+Approximately 40573748 rows in bvd.ob_dmc_previous_m.
+Approximately 303395264 rows in bvd.ob_dmc_previous_s.
+Approximately 1 rows in bvd.ob_entities_l.
+Approximately 1 rows in bvd.ob_entities_m.
+Approximately 1 rows in bvd.ob_entities_s.
+Approximately 66539 rows in bvd.ob_hq_l.
+Approximately 392542 rows in bvd.ob_hq_m.
+Approximately 40595496 rows in bvd.ob_hq_s.
+Approximately 10720809 rows in bvd.ob_identifiers_l.
+Approximately 75268304 rows in bvd.ob_identifiers_m.
+Approximately 1021620928 rows in bvd.ob_identifiers_s.
+Approximately 1656107 rows in bvd.ob_ind_g_fins_eur_int_l.
+Library: bvd | Table: ob_ind_g_fins_eur_int_l | Row Count: 1656107 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 94714 rows in bvd.ob_ind_g_fins_eur_int_m.
+Library: bvd | Table: ob_ind_g_fins_eur_int_m | Row Count: 94714 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 62984 rows in bvd.ob_ind_g_fins_eur_int_s.
+Library: bvd | Table: ob_ind_g_fins_eur_int_s | Row Count: 62984 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 18249270 rows in bvd.ob_ind_g_fins_eur_l.
+Library: bvd | Table: ob_ind_g_fins_eur_l | Row Count: 18249270 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 79743128 rows in bvd.ob_ind_g_fins_eur_m.
+Library: bvd | Table: ob_ind_g_fins_eur_m | Row Count: 79743128 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 497385440 rows in bvd.ob_ind_g_fins_eur_s.
+Library: bvd | Table: ob_ind_g_fins_eur_s | Row Count: 497385440 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 1656107 rows in bvd.ob_ind_g_fins_int_l.
+Library: bvd | Table: ob_ind_g_fins_int_l | Row Count: 1656107 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 94714 rows in bvd.ob_ind_g_fins_int_m.
+Library: bvd | Table: ob_ind_g_fins_int_m | Row Count: 94714 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 62984 rows in bvd.ob_ind_g_fins_int_s.
+Library: bvd | Table: ob_ind_g_fins_int_s | Row Count: 62984 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 18289256 rows in bvd.ob_ind_g_fins_l.
+Library: bvd | Table: ob_ind_g_fins_l | Row Count: 18289256 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 79552208 rows in bvd.ob_ind_g_fins_m.
+Library: bvd | Table: ob_ind_g_fins_m | Row Count: 79552208 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 496648384 rows in bvd.ob_ind_g_fins_s.
+Library: bvd | Table: ob_ind_g_fins_s | Row Count: 496648384 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 1656107 rows in bvd.ob_ind_g_fins_usd_int_l.
+Library: bvd | Table: ob_ind_g_fins_usd_int_l | Row Count: 1656107 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 94714 rows in bvd.ob_ind_g_fins_usd_int_m.
+Library: bvd | Table: ob_ind_g_fins_usd_int_m | Row Count: 94714 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 62984 rows in bvd.ob_ind_g_fins_usd_int_s.
+Library: bvd | Table: ob_ind_g_fins_usd_int_s | Row Count: 62984 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 18282404 rows in bvd.ob_ind_g_fins_usd_l.
+Library: bvd | Table: ob_ind_g_fins_usd_l | Row Count: 18282404 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 79524520 rows in bvd.ob_ind_g_fins_usd_m.
+Library: bvd | Table: ob_ind_g_fins_usd_m | Row Count: 79524520 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 497586816 rows in bvd.ob_ind_g_fins_usd_s.
+Library: bvd | Table: ob_ind_g_fins_usd_s | Row Count: 497586816 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 10115358 rows in bvd.ob_industry_classifications_l.
+Approximately 104046864 rows in bvd.ob_industry_classifications_m.
+Approximately 925466880 rows in bvd.ob_industry_classifications_s.
+Approximately 101111 rows in bvd.ob_ins_g_fins_eur_l.
+Approximately 12666 rows in bvd.ob_ins_g_fins_eur_m.
+Approximately 1632 rows in bvd.ob_ins_g_fins_eur_s.
+Approximately 101111 rows in bvd.ob_ins_g_fins_l.
+Approximately 12666 rows in bvd.ob_ins_g_fins_m.
+Approximately 1632 rows in bvd.ob_ins_g_fins_s.
+Approximately 101111 rows in bvd.ob_ins_g_fins_usd_l.
+Approximately 113777 rows in bvd.ob_ins_g_fins_usd_lm.
+Approximately 115409 rows in bvd.ob_ins_g_fins_usd_lms.
+Approximately 12666 rows in bvd.ob_ins_g_fins_usd_m.
+Approximately 1632 rows in bvd.ob_ins_g_fins_usd_s.
+Approximately 18053506 rows in bvd.ob_key_financials_eur_l.
+Library: bvd | Table: ob_key_financials_eur_l | Row Count: 18053506 | Matched Columns: ['opre', 'toas']
+Approximately 75467568 rows in bvd.ob_key_financials_eur_m.
+Library: bvd | Table: ob_key_financials_eur_m | Row Count: 75467568 | Matched Columns: ['opre', 'toas']
+Approximately 427100128 rows in bvd.ob_key_financials_eur_s.
+Library: bvd | Table: ob_key_financials_eur_s | Row Count: 427100128 | Matched Columns: ['opre', 'toas']
+Approximately 18056610 rows in bvd.ob_key_financials_l.
+Library: bvd | Table: ob_key_financials_l | Row Count: 18056610 | Matched Columns: ['opre', 'toas']
+Approximately 75520064 rows in bvd.ob_key_financials_m.
+Library: bvd | Table: ob_key_financials_m | Row Count: 75520064 | Matched Columns: ['opre', 'toas']
+Approximately 426935328 rows in bvd.ob_key_financials_s.
+Library: bvd | Table: ob_key_financials_s | Row Count: 426935328 | Matched Columns: ['opre', 'toas']
+Approximately 18047592 rows in bvd.ob_key_financials_usd_l.
+Library: bvd | Table: ob_key_financials_usd_l | Row Count: 18047592 | Matched Columns: ['opre', 'toas']
+Approximately 75495008 rows in bvd.ob_key_financials_usd_m.
+Library: bvd | Table: ob_key_financials_usd_m | Row Count: 75495008 | Matched Columns: ['opre', 'toas']
+Approximately 426786336 rows in bvd.ob_key_financials_usd_s.
+Library: bvd | Table: ob_key_financials_usd_s | Row Count: 426786336 | Matched Columns: ['opre', 'toas']
+Approximately 4101241 rows in bvd.ob_legal_info_l.
+Approximately 34681092 rows in bvd.ob_legal_info_m.
+Approximately 526560672 rows in bvd.ob_legal_info_s.
+Approximately 69891 rows in bvd.ob_other_advisors_current_l.
+Approximately 25866 rows in bvd.ob_other_advisors_current_m.
+Approximately 1629964 rows in bvd.ob_other_advisors_current_s.
+Approximately 3065981 rows in bvd.ob_overviews_l.
+Approximately 1110771 rows in bvd.ob_overviews_m.
+Approximately 865132 rows in bvd.ob_overviews_s.
+Approximately 3995604 rows in bvd.ob_trade_description_l.
+Approximately 32539044 rows in bvd.ob_trade_description_m.
+Approximately 403224320 rows in bvd.ob_trade_description_s.
+Approximately 4099792 rows in bvd.ob_w_company_id_table_l.
+Approximately 38794804 rows in bvd.ob_w_company_id_table_lm.
+Approximately 565643456 rows in bvd.ob_w_company_id_table_lms.
+Approximately 34691136 rows in bvd.ob_w_company_id_table_m.
+Approximately 526819232 rows in bvd.ob_w_company_id_table_s.
+Approximately 7570970 rows in bvd.ob_w_company_profiles_l.
+Approximately 76538104 rows in bvd.ob_w_company_profiles_lm.
+Approximately 929080064 rows in bvd.ob_w_company_profiles_lms.
+Approximately 68977776 rows in bvd.ob_w_company_profiles_m.
+Approximately 852621632 rows in bvd.ob_w_company_profiles_s.
+Approximately 2026642 rows in bvd.ob_w_ind_g_fins_cfl_usd_int_l.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_int_l | Row Count: 2026642 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 2156352 rows in bvd.ob_w_ind_g_fins_cfl_usd_int_lm.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_int_lm | Row Count: 2156352 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 2253708 rows in bvd.ob_w_ind_g_fins_cfl_usd_int_lms.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_int_lms | Row Count: 2253708 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 128933 rows in bvd.ob_w_ind_g_fins_cfl_usd_int_m.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_int_m | Row Count: 128933 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 96055 rows in bvd.ob_w_ind_g_fins_cfl_usd_int_s.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_int_s | Row Count: 96055 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 18257752 rows in bvd.ob_w_ind_g_fins_cfl_usd_l.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_l | Row Count: 18257752 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 97896176 rows in bvd.ob_w_ind_g_fins_cfl_usd_lm.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_lm | Row Count: 97896176 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 595087808 rows in bvd.ob_w_ind_g_fins_cfl_usd_lms.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_lms | Row Count: 595087808 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 79560680 rows in bvd.ob_w_ind_g_fins_cfl_usd_m.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_m | Row Count: 79560680 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 497284096 rows in bvd.ob_w_ind_g_fins_cfl_usd_s.
+Library: bvd | Table: ob_w_ind_g_fins_cfl_usd_s | Row Count: 497284096 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 1 rows in bvd.orbis_qvards.
+Approximately 87677 rows in bvd.os_activ_asicuscde.
+Approximately 131611 rows in bvd.os_activ_ftinclas.
+Approximately 105495 rows in bvd.os_activ_nace2scde.
+Approximately 103145 rows in bvd.os_activ_nacescde.
+Approximately 106947 rows in bvd.os_activ_naics12cde.
+Approximately 147585 rows in bvd.os_activ_paics12cod.
+Approximately 12814 rows in bvd.os_activ_pnace2cd.
+Approximately 12818 rows in bvd.os_activ_pnacecd.
+Approximately 148317 rows in bvd.os_activ_psicuscde.
+Approximately 42344 rows in bvd.os_do.
+Approximately 97331 rows in bvd.os_fin_bnk.
+Approximately 1650821 rows in bvd.os_fin_ind.
+Approximately 13873 rows in bvd.os_fin_ins.
+Approximately 148240 rows in bvd.os_gen.
+Approximately 491219 rows in bvd.os_gen_advisor.
+Approximately 1068275 rows in bvd.os_gen_manager.
+Approximately 51496 rows in bvd.os_io.
+Approximately 3703286 rows in bvd.os_shh.
+Approximately 228111 rows in bvd.os_stock_exchanges.
+Approximately 107705 rows in bvd.os_stock_header.
+Approximately 25156 rows in bvd.os_stock_indexes.
+Approximately 14709307 rows in bvd.os_stock_monthly.
+Approximately 1010833 rows in bvd.os_stock_ratios.
+Approximately 5345385 rows in bvd.os_stock_weekly.
+Approximately 2227014 rows in bvd.os_sub.
+Approximately 55131 rows in bvd.os_uo.
+Approximately 1 rows in bvd.osiris_qvards.
+Approximately 510572 rows in bvd.overview_l.
+Approximately 316264 rows in bvd.overview_m.
+Approximately 146705 rows in bvd.overview_s.
+Approximately 114216 rows in bvd.overview_v.
+Approximately 1343811 rows in bvd.shareholders_l.
+Approximately 5601155 rows in bvd.shareholders_m.
+Approximately 24957406 rows in bvd.shareholders_s.
+Approximately 1993534 rows in bvd.shareholders_v.
+Approximately 1 rows in bvd.stock_annual_l.
+Approximately 1 rows in bvd.stock_annual_m.
+Approximately 1 rows in bvd.stock_annual_s.
+Approximately 44472 rows in bvd.stock_annual_v.
+Approximately 1 rows in bvd.stock_current_l.
+Approximately 1 rows in bvd.stock_current_m.
+Approximately 1 rows in bvd.stock_current_s.
+Approximately 7601 rows in bvd.stock_current_v.
+Approximately 1 rows in bvd.stock_indexes_l.
+Approximately 1 rows in bvd.stock_indexes_m.
+Approximately 1 rows in bvd.stock_indexes_s.
+Approximately 3019 rows in bvd.stock_indexes_v.
+Approximately 1 rows in bvd.stock_info_l.
+Approximately 1 rows in bvd.stock_info_m.
+Approximately 1 rows in bvd.stock_info_s.
+Approximately 8919 rows in bvd.stock_info_v.
+Approximately 1 rows in bvd.stock_monthly_l.
+Approximately 1 rows in bvd.stock_monthly_m.
+Approximately 1 rows in bvd.stock_monthly_s.
+Approximately 99787 rows in bvd.stock_monthly_v.
+Approximately 1 rows in bvd.stock_places_l.
+Approximately 1 rows in bvd.stock_places_m.
+Approximately 1 rows in bvd.stock_places_s.
+Approximately 30881 rows in bvd.stock_places_v.
+Approximately 1 rows in bvd.stock_weekly_l.
+Approximately 1 rows in bvd.stock_weekly_m.
+Approximately 1 rows in bvd.stock_weekly_s.
+Approximately 373957 rows in bvd.stock_weekly_v.
+Approximately 879197 rows in bvd.subsidiaries_l.
+Approximately 1351053 rows in bvd.subsidiaries_m.
+Approximately 2350083 rows in bvd.subsidiaries_s.
+Approximately 955006 rows in bvd.subsidiaries_v.
+Approximately 387893 rows in bvd.websites_l.
+Approximately 1684504 rows in bvd.websites_m.
+Approximately 5741161 rows in bvd.websites_s.
+Approximately 90843 rows in bvd.websites_v.
+Scanning 3 tables in bvd_amadeus_trial...
+Approximately 1 rows in bvd_amadeus_trial.amadeus_qvards.
+Approximately 920 rows in bvd_amadeus_trial.trial_amadeus_financials_v.
+Library: bvd_amadeus_trial | Table: trial_amadeus_financials_v | Row Count: 920 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 100 rows in bvd_amadeus_trial.trial_amadeus_v.
+Scanning 27 tables in bvd_bvdbankf...
+Approximately 148625 rows in bvd_bvdbankf.bvdbankf_accounting_information.
+Approximately 507610 rows in bvd_bvdbankf.bvdbankf_all_curr_shh_1st_level.
+Approximately 517691 rows in bvd_bvdbankf.bvdbankf_all_subs_1st_level.
+Approximately 36996 rows in bvd_bvdbankf.bvdbankf_annual_stock_data.
+Approximately 36453 rows in bvd_bvdbankf.bvdbankf_annual_stock_valuation.
+Approximately 135946 rows in bvd_bvdbankf.bvdbankf_basic_shareholder_info.
+Approximately 400546 rows in bvd_bvdbankf.bvdbankf_branches.
+Approximately 135942 rows in bvd_bvdbankf.bvdbankf_contact_info.
+Approximately 3630 rows in bvd_bvdbankf.bvdbankf_curr_stock_valuation.
+Approximately 4034 rows in bvd_bvdbankf.bvdbankf_current_stock_data.
+Approximately 1473085 rows in bvd_bvdbankf.bvdbankf_detailed_format.
+Approximately 1520121 rows in bvd_bvdbankf.bvdbankf_dmc.
+Approximately 9148 rows in bvd_bvdbankf.bvdbankf_giin.
+Approximately 812728 rows in bvd_bvdbankf.bvdbankf_global_format_ratios.
+Approximately 1473006 rows in bvd_bvdbankf.bvdbankf_global_standard_format.
+Approximately 62883 rows in bvd_bvdbankf.bvdbankf_hq.
+Approximately 378319 rows in bvd_bvdbankf.bvdbankf_identifiers.
+Approximately 496207 rows in bvd_bvdbankf.bvdbankf_ind_classifications.
+Approximately 1206053 rows in bvd_bvdbankf.bvdbankf_interims.
+Approximately 6270874 rows in bvd_bvdbankf.bvdbankf_isin_all.
+Approximately 812898 rows in bvd_bvdbankf.bvdbankf_key_financials.
+Library: bvd_bvdbankf | Table: bvdbankf_key_financials | Row Count: 812898 | Matched Columns: ['opre', 'toas']
+Approximately 163582 rows in bvd_bvdbankf.bvdbankf_legal_info.
+Approximately 17021 rows in bvd_bvdbankf.bvdbankf_lei.
+Approximately 55034 rows in bvd_bvdbankf.bvdbankf_monthly_information.
+Approximately 271965 rows in bvd_bvdbankf.bvdbankf_overviews.
+Approximately 2552142 rows in bvd_bvdbankf.bvdbankf_regulatory_environment.
+Approximately 140578 rows in bvd_bvdbankf.bvdbankf_security_and_price_info.
+Scanning 6 tables in bvd_bvdbankf_trial...
+Approximately 83 rows in bvd_bvdbankf_trial.bvdbankf_bank.
+Approximately 272 rows in bvd_bvdbankf_trial.bvdbankf_financials.
+Approximately 83 rows in bvd_bvdbankf_trial.bvdbankf_ish_guo_duo.
+Approximately 1 rows in bvd_bvdbankf_trial.bvdbankf_qvards.
+Approximately 95 rows in bvd_bvdbankf_trial.bvdbankf_stock_annual.
+Approximately 835 rows in bvd_bvdbankf_trial.bvdbankf_subsidiaries.
+Scanning 9 tables in bvd_orbis_trial...
+Approximately 961 rows in bvd_orbis_trial.ob_all_cur_shh_1st_level_lms.
+Approximately 2548 rows in bvd_orbis_trial.ob_all_subs_first_level_lms.
+Approximately 84 rows in bvd_orbis_trial.ob_banks_g_fins_usd_int_lms.
+Approximately 171 rows in bvd_orbis_trial.ob_banks_g_fins_usd_lms.
+Approximately 138 rows in bvd_orbis_trial.ob_ins_g_fins_usd_lms.
+Approximately 106 rows in bvd_orbis_trial.ob_w_company_id_table_lms.
+Approximately 152 rows in bvd_orbis_trial.ob_w_ind_g_fins_cfl_usd_int_lms.
+Library: bvd_orbis_trial | Table: ob_w_ind_g_fins_cfl_usd_int_lms | Row Count: 152 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 241 rows in bvd_orbis_trial.ob_w_ind_g_fins_cfl_usd_lms.
+Library: bvd_orbis_trial | Table: ob_w_ind_g_fins_cfl_usd_lms | Row Count: 241 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 1 rows in bvd_orbis_trial.orbis_qvards.
+Scanning 27 tables in bvd_osiris...
+Approximately 87677 rows in bvd_osiris.os_activ_asicuscde.
+Approximately 131611 rows in bvd_osiris.os_activ_ftinclas.
+Approximately 105495 rows in bvd_osiris.os_activ_nace2scde.
+Approximately 103145 rows in bvd_osiris.os_activ_nacescde.
+Approximately 106947 rows in bvd_osiris.os_activ_naics12cde.
+Approximately 147585 rows in bvd_osiris.os_activ_paics12cod.
+Approximately 12814 rows in bvd_osiris.os_activ_pnace2cd.
+Approximately 12818 rows in bvd_osiris.os_activ_pnacecd.
+Approximately 148317 rows in bvd_osiris.os_activ_psicuscde.
+Approximately 42344 rows in bvd_osiris.os_do.
+Approximately 97331 rows in bvd_osiris.os_fin_bnk.
+Approximately 1650821 rows in bvd_osiris.os_fin_ind.
+Approximately 13873 rows in bvd_osiris.os_fin_ins.
+Approximately 148240 rows in bvd_osiris.os_gen.
+Approximately 491219 rows in bvd_osiris.os_gen_advisor.
+Approximately 1068275 rows in bvd_osiris.os_gen_manager.
+Approximately 51496 rows in bvd_osiris.os_io.
+Approximately 3703286 rows in bvd_osiris.os_shh.
+Approximately 228111 rows in bvd_osiris.os_stock_exchanges.
+Approximately 107705 rows in bvd_osiris.os_stock_header.
+Approximately 25156 rows in bvd_osiris.os_stock_indexes.
+Approximately 14709307 rows in bvd_osiris.os_stock_monthly.
+Approximately 1010833 rows in bvd_osiris.os_stock_ratios.
+Approximately 5345385 rows in bvd_osiris.os_stock_weekly.
+Approximately 2227014 rows in bvd_osiris.os_sub.
+Approximately 55131 rows in bvd_osiris.os_uo.
+Approximately 1 rows in bvd_osiris.osiris_qvards.
+Scanning 18 tables in bvdsamp...
+Approximately 1 rows in bvdsamp.amadeus_qvards.
+Approximately 83 rows in bvdsamp.bvdbankf_bank.
+Approximately 272 rows in bvdsamp.bvdbankf_financials.
+Approximately 83 rows in bvdsamp.bvdbankf_ish_guo_duo.
+Approximately 1 rows in bvdsamp.bvdbankf_qvards.
+Approximately 95 rows in bvdsamp.bvdbankf_stock_annual.
+Approximately 835 rows in bvdsamp.bvdbankf_subsidiaries.
+Approximately 961 rows in bvdsamp.ob_all_cur_shh_1st_level_lms.
+Approximately 2548 rows in bvdsamp.ob_all_subs_first_level_lms.
+Approximately 84 rows in bvdsamp.ob_banks_g_fins_usd_int_lms.
+Approximately 171 rows in bvdsamp.ob_banks_g_fins_usd_lms.
+Approximately 138 rows in bvdsamp.ob_ins_g_fins_usd_lms.
+Approximately 106 rows in bvdsamp.ob_w_company_id_table_lms.
+Approximately 152 rows in bvdsamp.ob_w_ind_g_fins_cfl_usd_int_lms.
+Library: bvdsamp | Table: ob_w_ind_g_fins_cfl_usd_int_lms | Row Count: 152 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 241 rows in bvdsamp.ob_w_ind_g_fins_cfl_usd_lms.
+Library: bvdsamp | Table: ob_w_ind_g_fins_cfl_usd_lms | Row Count: 241 | Matched Columns: ['opre', 'ibaq', 'toas', 'stok']
+Approximately 1 rows in bvdsamp.orbis_qvards.
+Approximately 920 rows in bvdsamp.trial_amadeus_financials_v.
+Library: bvdsamp | Table: trial_amadeus_financials_v | Row Count: 920 | Matched Columns: ['opre', 'toas', 'stok']
+Approximately 100 rows in bvdsamp.trial_amadeus_v.

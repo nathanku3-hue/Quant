@@ -1,0 +1,71 @@
+======================================================================
+BLOCK 1: Current top-8 from Patch B slice
+======================================================================
+  1. CSCO    score=5e+07  ratio=5e+07  mah=1.3937
+  2. USO     score=5e+07  ratio=5e+07  mah=1.4359
+  3. WBA     score=5e+07  ratio=5e+07  mah=2.0941
+  4. PLUG    score=24.71  ratio=24.71  mah=3.7751
+  5. AVGO    score=13.29  ratio=13.29  mah=3.7345
+  6. LCID    score=13.04  ratio=13.04  mah=2.3772
+  7. BB      score=12.92  ratio=12.92  mah=3.6576
+  8. NVAX    score=12.61  ratio=12.61  mah=2.7189
+
+======================================================================
+BLOCK 2: Raw feature values from features.parquet on 2024-12-24
+ (These are the INPUTS to z-scoring before Mahalanobis)
+======================================================================
+Ticker  cap_cyc  res_mom  yz_vol  amihud   z_moat  inv_qua  disc_cd  z_dem  comp_sc
+  MU       0.0643  -0.2357  0.2950  0.0000    0.036   -0.105    0.140  -0.031  -2.8230
+  CIEN     0.0884   0.2846  0.2385  0.0000   -0.043    0.096    0.275  -0.022   0.4157
+  LRCX     0.2198  -0.1994  0.1738  0.0000    0.291    0.006    0.275  -0.034  -1.3731
+  AMAT     0.0702  -0.2928  0.1275  0.0000    0.199   -0.105   -0.007  -0.033  -1.3643
+  KLAC     0.1248  -0.2919  0.1082  0.0000    0.342   -0.088   -0.013  -0.034  -1.1585
+  CSCO    -0.0438   0.0822  0.0513  0.0000    0.063   -0.312   -0.162  -0.021   1.3427
+  USO      0.1935   0.0619  0.0714  0.0000    0.238    0.401    0.275  -0.059   1.0277
+  WBA      0.0821   0.0889  0.2855  0.0000   -0.057    0.379    0.275  -0.025  -1.0729
+  PLUG    -0.0037   0.1405  0.4127  0.0000   -0.267    0.322    0.275  -0.035  -2.1439
+  AVGO    -0.3834   0.2240  0.3693  0.0000    0.015   -2.017   -0.978  0.010  -1.2568
+
+======================================================================
+BLOCK 3: L2 distance from anchor centroid (MU,CIEN,LRCX,AMAT,KLAC)
+======================================================================
+Anchor centroid:
+  capital_cycle_score: 0.1135
+  resid_mom_60d: -0.1470
+  yz_vol_20d: 0.1886
+  amihud_20d: 0.0000
+  z_moat: 0.1652
+  z_inventory_quality_proxy: -0.0392
+  z_discipline_cond: 0.1339
+  z_demand: -0.0307
+
+Ticker  L2-dist  verdict
+  MU       0.2064  CLOSE (<2.5)  (ANCHOR)
+  CIEN     0.5206  CLOSE (<2.5)  (ANCHOR)
+  LRCX     0.2282  CLOSE (<2.5)  (ANCHOR)
+  AMAT     0.2288  CLOSE (<2.5)  (ANCHOR)
+  KLAC     0.2877  CLOSE (<2.5)  (ANCHOR)
+  CSCO     0.5181  CLOSE (<2.5)  
+  USO      0.5328  CLOSE (<2.5)  
+  WBA      0.5569  CLOSE (<2.5)  
+  PLUG     0.6951  CLOSE (<2.5)  
+  AVGO     2.3641  CLOSE (<2.5)  
+
+======================================================================
+BLOCK 4: Saturation root cause — approximate r_cyc from Mahalanobis dist
+ (from sample CSV mahalanobis_k_cyc column)
+======================================================================
+  MU      not in sample CSV
+  CIEN    not in sample CSV
+  LRCX    not in sample CSV
+  AMAT    not in sample CSV
+  KLAC    not in sample CSV
+  CSCO    mah_dist=1.3937  r_cyc_approx=0.378605  odds_approx=0.6093  score=5e+07
+  USO     mah_dist=1.4359  r_cyc_approx=0.356664  odds_approx=0.5544  score=5e+07
+  WBA     mah_dist=2.0941  r_cyc_approx=0.111628  odds_approx=0.1257  score=5e+07
+  PLUG    mah_dist=3.7751  r_cyc_approx=0.000804  odds_approx=0.000805  score=24.71
+  AVGO    mah_dist=3.7345  r_cyc_approx=0.000936  odds_approx=0.0009373  score=13.29
+
+KEY INSIGHT: tickers with small mah_dist get r_cyc->1.0 -> saturation at 5e7
+Anchors (MU/CIEN/LRCX/AMAT/KLAC) that have HIGHER mah_dist get LOWER r_cyc -> lower score
+This confirms: the 3-component centroid is dominated by tickers closer to it than the anchors.

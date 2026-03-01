@@ -1,0 +1,32 @@
+
+=== Phase 62-G/H: Infinity Governor Backtest (1990 - 2000 (Dot-Com Boom)) ===
+[CSCO | RULE OF 100 SUPERCYCLE] B&H:  49410.1% | Infinity Gov:  32075.9% | Alpha: -17334.2%
+[MSFT | RULE OF 100 SUPERCYCLE] B&H:   3489.7% | Infinity Gov:   3587.2% | Alpha:    +97.6%
+[INTC | RULE OF 100 SUPERCYCLE] B&H:   2744.6% | Infinity Gov:   1982.5% | Alpha:   -762.1%
+[ORCL | RULE OF 100 SUPERCYCLE] B&H:   4935.4% | Infinity Gov:   1674.9% | Alpha:  -3260.6%
+[QCOM | RULE OF 100 SUPERCYCLE] B&H:   7369.3% | Infinity Gov:   4088.4% | Alpha:  -3281.0%
+[  GE | TRACTOR (SLOW DRIFT)] B&H:   1047.9% | Infinity Gov:   1050.9% | Alpha:     +3.0%
+[  KO | TRACTOR (SLOW DRIFT)] B&H:    631.4% | Infinity Gov:    692.7% | Alpha:    +61.4%
+[ XOM | TRACTOR (SLOW DRIFT)] B&H:    424.7% | Infinity Gov:    414.0% | Alpha:    -10.7%
+[  PG | TRACTOR (SLOW DRIFT)] B&H:    454.3% | Infinity Gov:    465.6% | Alpha:    +11.3%
+[ IBM | TRACTOR (SLOW DRIFT)] B&H:    361.5% | Infinity Gov:    356.0% | Alpha:     -5.5%
+
+--- 1990 - 2000 (Dot-Com Boom) VERDICT ---
+Average Super Cycle Execution Alpha :  -4908.0%
+Average Tractor Execution Alpha     :    +11.9%
+
+=== Phase 62-G/H: Infinity Governor Backtest (2000 - 2010 (Lost Decade / Housing Bubble)) ===
+[AAPL | RULE OF 100 SUPERCYCLE] B&H:   1159.2% | Infinity Gov:    896.5% | Alpha:   -262.8%
+[AMZN | RULE OF 100 SUPERCYCLE] B&H:    140.1% | Infinity Gov:    215.8% | Alpha:    +75.8%
+[EBAY | RULE OF 100 SUPERCYCLE] B&H:     79.8% | Infinity Gov:     24.8% | Alpha:    -55.0%
+[NVDA | RULE OF 100 SUPERCYCLE] B&H:    283.2% | Infinity Gov:    198.3% | Alpha:    -84.9%
+Skipping ATVI - insufficient data
+[ XOM | TRACTOR (SLOW DRIFT)] B&H:    132.5% | Infinity Gov:    135.2% | Alpha:     +2.7%
+[ WMT | TRACTOR (SLOW DRIFT)] B&H:    -10.1% | Infinity Gov:     -4.4% | Alpha:     +5.7%
+[  PG | TRACTOR (SLOW DRIFT)] B&H:     50.8% | Infinity Gov:     50.8% | Alpha:     +0.0%
+[ JNJ | TRACTOR (SLOW DRIFT)] B&H:     69.3% | Infinity Gov:     69.3% | Alpha:     +0.0%
+[ PFE | TRACTOR (SLOW DRIFT)] B&H:    -24.0% | Infinity Gov:    -38.1% | Alpha:    -14.1%
+
+--- 2000 - 2010 (Lost Decade / Housing Bubble) VERDICT ---
+Average Super Cycle Execution Alpha :    -81.7%
+Average Tractor Execution Alpha     :     -1.1%

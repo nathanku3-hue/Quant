@@ -1,0 +1,15 @@
+.git
+.gitignore
+.codex/
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.tmp
+
+logs/
+data/raw/
+data/processed/
+docs/research/

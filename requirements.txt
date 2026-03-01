@@ -1,0 +1,15 @@
+# Lock mirror of pyproject.toml ([project.dependencies] + dev pytest).
+# Update pyproject.toml first, then mirror here in the same change.
+alpaca-trade-api==3.2.0
+duckdb==1.4.4
+joblib==1.5.2
+numpy==2.4.2
+pandas==2.2.3
+pandas-datareader==0.10.0
+plotly==6.5.2
+pyarrow==23.0.0
+scipy==1.17.0
+statsmodels==0.14.5
+streamlit==1.54.0
+yfinance==1.2.0
+pytest==9.0.2

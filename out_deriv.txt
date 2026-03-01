@@ -1,0 +1,13 @@
+=== Phase 64: Derivative Engine Backtest (The Physics of LEAPs) ===
+
+--- 1990-2000 (Dot-Com) ERA ---
+[MSFT] Stock B&H:   3322.5% (MDD:  -65.2%) | Geo-Derivative Strat:   3718.4% (MDD:  -96.2%) | Alpha:   +395.9%
+[CSCO] Stock B&H:  42269.1% (MDD:  -54.4%) | Geo-Derivative Strat: 357812.8% (MDD:  -91.2%) | Alpha: +315543.7%
+
+--- 2000-2010 (Lost Decade) ERA ---
+[AAPL] Stock B&H:   1191.4% (MDD:  -81.8%) | Geo-Derivative Strat:   -421.7% (MDD: -393.5%) | Alpha:  -1613.1%
+[AMZN] Stock B&H:    171.0% (MDD:  -92.9%) | Geo-Derivative Strat:    -99.8% (MDD: -100.0%) | Alpha:   -270.8%
+
+--- 2010-2020 (Quantitative Easing) ERA ---
+[NVDA] Stock B&H:   3316.5% (MDD:  -56.0%) | Geo-Derivative Strat:   2242.5% (MDD:  -90.9%) | Alpha:  -1074.0%
+[TSLA] Stock B&H:  16665.9% (MDD:  -60.6%) | Geo-Derivative Strat:  23247.7% (MDD:  -95.8%) | Alpha:  +6581.8%

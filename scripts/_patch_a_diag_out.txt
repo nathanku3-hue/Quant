@@ -1,0 +1,26 @@
+Universe size on 2024-12-24: 389
+
+Seed tickers present: ['CIEN', 'MU']
+      ticker pool_action  posterior_cyclical  posterior_defensive  posterior_junk  odds_score    odds_ratio  mahalanobis_k_cyc
+61999   CIEN        WAIT            0.394463             0.180876        0.424661   17.727534  5.000000e+07           2.001141
+37695     MU        WAIT            0.817113             0.024013        0.158874   17.727534  5.000000e+07           1.480650
+
+R_anchor.mean(axis=0): cyc=0.6058, def=0.1024, junk=0.2918
+k_cyc (argmax): 0
+k_cyc_components (>0.05): [0, 1, 2]
+k_cyc_components (>0.33): [0]
+k_cyc_components (>max*0.5): [0]
+
+If k_cyc_components=[0]: r_cyc_multi = R[:,0].sum => posterior_cyclical only
+If k_cyc_components=[0,1,2]: r_cyc_multi = sum of all 3 = 1.0 (SATURATION)
+
+--- Top-8 LONG rows ---
+     ticker pool_action  posterior_cyclical  posterior_defensive  posterior_junk  odds_score    odds_ratio  mahalanobis_k_cyc
+6447    IBM        LONG            0.182262             0.483119        0.334619   17.727534  5.000000e+07           1.435404
+991     HON        LONG            0.121918             0.520445        0.357637   17.727534  5.000000e+07           1.827466
+495    ORCL        LONG            0.364991             0.321217        0.313793   17.727534  5.000000e+07           0.845601
+743    MSFT        LONG            0.148409             0.516036        0.335555   17.727534  5.000000e+07           1.661301
+4463     GE        LONG            0.388585             0.316367        0.295047   17.727534  5.000000e+07           0.856491
+5207   NXPI        LONG            0.415846             0.297976        0.286177   17.727534  5.000000e+07           0.900344
+3471    XOM        LONG            0.137510             0.563150        0.299340   17.727534  5.000000e+07           1.743827
+2975     KO        LONG            0.156861             0.537954        0.305184   17.727534  5.000000e+07           1.683714

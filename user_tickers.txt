@@ -1,0 +1,10 @@
+Fetching Financial Matrix...
+
+--- The Final 'Opportunity Gate' Matrix ---
+Ticker   | Regime               | Score  | Fourier Phase                | Demand     | Pricing    | Margin    
+-------------------------------------------------------------------------------------------------------------------
+MRVL     | Super Cycle (Q1)     | 100    | Main Ramping Wave            | +3.41%     | +1.19%     | +2.82%    
+CLS      | Super Cycle (Q1)     | 100    | Main Ramping Wave            | +10.39%    | +0.21%     | +0.41%    
+RBRK     | Super Cycle (Q1)     | 100    | Stealth Accumulation         | +13.01%    | +1.05%     | +8.93%    
+CEG      | Super Cycle (Q1)     | 100    | Phase Reversal Approaching   | +7.69%     | +0.55%     | +13.98%   
+NBIS     | Empty Calorie (Q3)   | 20     | Phase Reversal Approaching   | +45.08%    | -4.24%     | +12.17%   

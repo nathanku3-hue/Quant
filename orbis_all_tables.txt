@@ -1,0 +1,294 @@
+
+
+--- ob_w_company_id_table_lms ---
+                        name  nullable              type                                                                                           comment
+0                      bvdid      True           VARCHAR                                                                                     BVD ID NUMBER
+1                   prevname      True           VARCHAR                                                                             PREVIOUS COMPANY NAME
+2                   namechdt      True              DATE                                                                                  NAME CHANGE DATE
+3              namechdt_year      True  DOUBLE PRECISION                                            Year part of NAME CHANGE DATE (created from NAMECHDT )
+4              namechdt_char      True           VARCHAR                                          Text format of NAME CHANGE DATE (created from NAMECHDT )
+5                    akaname      True           VARCHAR                                                                                ALSO KNOWN AS NAME
+6        historic_status_str      True           VARCHAR                                                                                            STATUS
+7        historic_statusdate      True              DATE                                                                                       STATUS DATE
+8   historic_statusdate_year      True  DOUBLE PRECISION                                      Year part of STATUS DATE (created from HISTORIC_STATUSDATE )
+9   historic_statusdate_char      True           VARCHAR                                    Text format of STATUS DATE (created from HISTORIC_STATUSDATE )
+10                   slegalf      True           VARCHAR                                                                           STANDARDISED LEGAL FORM
+11                  legalfrm      True           VARCHAR                                                                               NATIONAL LEGAL FORM
+12        wocomatch_hasmatch      True           VARCHAR                                   SAME OR SIMILAR NAME IN THE LEXISNEXIS WORLDCOMPLIANCE DATABASE
+13                   dateinc      True              DATE                                                                             DATE OF INCORPORATION
+14              dateinc_year      True  DOUBLE PRECISION                                        Year part of DATE OF INCORPORATION (created from DATEINC )
+15              dateinc_char      True           VARCHAR                                      Text format of DATE OF INCORPORATION (created from DATEINC )
+16                  stateinc      True           VARCHAR                                                                    STATE OF INCORPORATION (IN US)
+17                    _40025      True           VARCHAR                                                                                    TYPE OF ENTITY
+18          filing_exemption      True           VARCHAR                                                                        REASON OF FILING EXEMPTION
+19       category_of_company      True           VARCHAR                                                                           CATEGORY OF THE COMPANY
+20                    listed      True           VARCHAR                                                                          LISTED/DELISTED/UNLISTED
+21             delisted_date      True              DATE                                                                                     DELISTED DATE
+22        delisted_date_year      True  DOUBLE PRECISION                                          Year part of DELISTED DATE (created from DELISTED_DATE )
+23        delisted_date_char      True           VARCHAR                                        Text format of DELISTED DATE (created from DELISTED_DATE )
+24          delisted_comment      True           VARCHAR                                                                                  DELISTED COMMENT
+25                  mainexch      True           VARCHAR                                                                                     MAIN EXCHANGE
+26                  ipo_date      True              DATE                                                                                          IPO DATE
+27             ipo_date_year      True  DOUBLE PRECISION                                                    Year part of IPO DATE (created from IPO_DATE )
+28             ipo_date_char      True           VARCHAR                                                  Text format of IPO DATE (created from IPO_DATE )
+29                nofinflags      True           VARCHAR                                                                         NO RECENT FINANCIALS FLAG
+30              histrecflags      True           VARCHAR                                                                            HISTORICAL RECORD FLAG
+31            historicaldate      True              DATE                                                                           HISTORICAL RECORD SINCE
+32       historicaldate_char      True           VARCHAR                             Text format of HISTORICAL RECORD SINCE (created from HISTORICALDATE )
+33            source_ip_name      True           VARCHAR                                                                              INFORMATION PROVIDER
+34                   lei_lei      True           VARCHAR                                                                     LEI (LEGAL ENTITY IDENTIFIER)
+35                 sd_ticker      True           VARCHAR                                                                                     TICKER SYMBOL
+36                   sd_isin      True           VARCHAR                                                                                       ISIN NUMBER
+37             name_internat      True           VARCHAR                                                                                     NAME_INTERNAT
+38               name_native      True           VARCHAR                                                                                       NAME_NATIVE
+39             addr_internat      True           VARCHAR                                                                 STREET, NO., BUILDING ETC, LINE 1
+40               addr_native      True           VARCHAR                                                        STREET, NO., BUILDING ETC, LINE 1 (NATIVE)
+41            addr2_internat      True           VARCHAR                                                                 STREET, NO., BUILDING ETC, LINE 2
+42              addr2_native      True           VARCHAR                                                        STREET, NO., BUILDING ETC, LINE 2 (NATIVE)
+43            addr3_internat      True           VARCHAR                                                                 STREET, NO., BUILDING ETC, LINE 3
+44              addr3_native      True           VARCHAR                                                        STREET, NO., BUILDING ETC, LINE 3 (NATIVE)
+45            addr4_internat      True           VARCHAR                                                                 STREET, NO., BUILDING ETC, LINE 4
+46              addr4_native      True           VARCHAR                                                        STREET, NO., BUILDING ETC, LINE 4 (NATIVE)
+47                  postcode      True           VARCHAR                                                                                          POSTCODE
+48             city_internat      True           VARCHAR                                                                                              CITY
+49               city_native      True           VARCHAR                                                                                     CITY (NATIVE)
+50                   country      True           VARCHAR                                                                                           COUNTRY
+51                   ctryiso      True           VARCHAR                                                                                  COUNTRY ISO CODE
+52                metro_area      True           VARCHAR                                                                         METROPOLITAN AREA (IN US)
+53                  state_us      True           VARCHAR                                                               STATE OR PROVINCE (IN US OR CANADA)
+54                    county      True           VARCHAR                                                                          COUNTY (IN US OR CANADA)
+55                     phone      True           VARCHAR                                                                                  TELEPHONE NUMBER
+56                       fax      True           VARCHAR                                                                                        FAX NUMBER
+57                   website      True           VARCHAR                                                                                   WEBSITE ADDRESS
+58                     email      True           VARCHAR                                                                                    E-MAIL ADDRESS
+59         region_in_country      True           VARCHAR                                                                                 REGION IN COUNTRY
+60          type_reg_country      True           VARCHAR                                                                         TYPE OF REGION IN COUNTRY
+61                     nuts1      True           VARCHAR                                                                                             NUTS1
+62                     nuts2      True           VARCHAR                                                                                             NUTS2
+63                     nuts3      True           VARCHAR                                                                                             NUTS3
+64            dataset_source      True  DOUBLE PRECISION  dataset source, created by WRDS, bvdid in legal_info (100), identifiers (10) or contact_info (1)
+
+--- ob_w_ind_g_fins_cfl_usd_lms ---
+                            name  nullable              type                                                                           comment
+0                          bvdid      True           VARCHAR                                                                     BVD ID NUMBER
+1            category_of_company      True           VARCHAR                                                           CATEGORY OF THE COMPANY
+2                        ctryiso      True           VARCHAR                                                                  COUNTRY ISO CODE
+3                       conscode      True           VARCHAR                                                                CONSOLIDATION CODE
+4                    filing_type      True           VARCHAR                                                                       FILING TYPE
+5                       closdate      True              DATE                                                                      CLOSING DATE
+6                  closdate_year      True  DOUBLE PRECISION                                Year part of CLOSING DATE (created from CLOSDATE )
+7                  closdate_char      True           VARCHAR                              Text format of CLOSING DATE (created from CLOSDATE )
+8                      nr_months      True           VARCHAR                           NUMBER OF MONTHS-from global financials and ratios data
+9                      audstatus      True           VARCHAR                               AUDIT STATUS-from global financials and ratios data
+10                   accpractice      True           VARCHAR                        ACCOUNTING PRACTICE-from global financials and ratios data
+11                        source      True           VARCHAR                                            SOURCE (FOR PUBLICLY QUOTED COMPANIES)
+12                    orig_units      True           VARCHAR                             ORIGINAL UNITS-from global financials and ratios data
+13                 orig_currency      True           VARCHAR                          ORIGINAL CURRENCY-from global financials and ratios data
+14                      exchrate      True  DOUBLE PRECISION       EXCHANGE RATE FROM ORIGINAL CURRENCY-from global financials and ratios data
+15                          fias      True  DOUBLE PRECISION                                                                      FIXED ASSETS
+16                          ifas      True  DOUBLE PRECISION                                                           INTANGIBLE FIXED ASSETS
+17                          tfas      True  DOUBLE PRECISION                                                             TANGIBLE FIXED ASSETS
+18                          ofas      True  DOUBLE PRECISION                                                                OTHER FIXED ASSETS
+19                          cuas      True  DOUBLE PRECISION                                                                    CURRENT ASSETS
+20                          stok      True  DOUBLE PRECISION                                                                             STOCK
+21                          debt      True  DOUBLE PRECISION                                                                           DEBTORS
+22                          ocas      True  DOUBLE PRECISION                                                              OTHER CURRENT ASSETS
+23                          cash      True  DOUBLE PRECISION                                                            CASH & CASH EQUIVALENT
+24                          toas      True  DOUBLE PRECISION                                                                      TOTAL ASSETS
+25                          shfd      True  DOUBLE PRECISION                                                                SHAREHOLDERS FUNDS
+26                          capi      True  DOUBLE PRECISION                                                                           CAPITAL
+27                          osfd      True  DOUBLE PRECISION                                                          OTHER SHAREHOLDERS FUNDS
+28                          ncli      True  DOUBLE PRECISION                                                           NON-CURRENT LIABILITIES
+29                          ltdb      True  DOUBLE PRECISION                                                                    LONG TERM DEBT
+30                          oncl      True  DOUBLE PRECISION                                                     OTHER NON-CURRENT LIABILITIES
+31                          prov      True  DOUBLE PRECISION                                                                        PROVISIONS
+32                          culi      True  DOUBLE PRECISION                                                               CURRENT LIABILITIES
+33                          loan      True  DOUBLE PRECISION                                                                             LOANS
+34                          cred      True  DOUBLE PRECISION                                                                         CREDITORS
+35                          ocli      True  DOUBLE PRECISION                                                         OTHER CURRENT LIABILITIES
+36                          tshf      True  DOUBLE PRECISION                                                       TOTAL SHAREH. FUNDS & LIAB.
+37                          wkca      True  DOUBLE PRECISION                                                                   WORKING CAPITAL
+38                          ncas      True  DOUBLE PRECISION                                                                NET CURRENT ASSETS
+39                          enva      True  DOUBLE PRECISION                                                                  ENTERPRISE VALUE
+40                          empl      True  DOUBLE PRECISION                                                               NUMBER OF EMPLOYEES
+41                          opre      True  DOUBLE PRECISION                                                      OPERATING REVENUE (TURNOVER)
+42                          turn      True  DOUBLE PRECISION                                                                             SALES
+43                          cost      True  DOUBLE PRECISION                                                               COSTS OF GOODS SOLD
+44                          gros      True  DOUBLE PRECISION                                                                      GROSS PROFIT
+45                          oope      True  DOUBLE PRECISION                                                          OTHER OPERATING EXPENSES
+46                          oppl      True  DOUBLE PRECISION                                                             OPERATING P/L [=EBIT]
+47                          fire      True  DOUBLE PRECISION                                                                 FINANCIAL REVENUE
+48                          fiex      True  DOUBLE PRECISION                                                                FINANCIAL EXPENSES
+49                          fipl      True  DOUBLE PRECISION                                                                     FINANCIAL P/L
+50                          plbt      True  DOUBLE PRECISION                                                                    P/L BEFORE TAX
+51                          taxa      True  DOUBLE PRECISION                                                                          TAXATION
+52                          plat      True  DOUBLE PRECISION                                                                     P/L AFTER TAX
+53                          exre      True  DOUBLE PRECISION                                                           EXTR. AND OTHER REVENUE
+54                          exex      True  DOUBLE PRECISION                                                          EXTR. AND OTHER EXPENSES
+55                          extr      True  DOUBLE PRECISION                                                               EXTR. AND OTHER P/L
+56                            pl      True  DOUBLE PRECISION                                                      P/L FOR PERIOD [=NET INCOME]
+57                          expt      True  DOUBLE PRECISION                                                                    EXPORT REVENUE
+58                          mate      True  DOUBLE PRECISION                                                                    MATERIAL COSTS
+59                          staf      True  DOUBLE PRECISION                                                                COSTS OF EMPLOYEES
+60                          depr      True  DOUBLE PRECISION                                                       DEPRECIATION & AMORTIZATION
+61                          inte      True  DOUBLE PRECISION                                                                     INTEREST PAID
+62                            rd      True  DOUBLE PRECISION                                                   RESEARCH & DEVELOPMENT EXPENSES
+63                            cf      True  DOUBLE PRECISION                                                                         CASH FLOW
+64                            av      True  DOUBLE PRECISION                                                                       ADDED VALUE
+65                          ebta      True  DOUBLE PRECISION                                                                            EBITDA
+66                          rshf      True  DOUBLE PRECISION                                                      ROE USING P/L BEFORE TAX (%)
+67                          rcem      True  DOUBLE PRECISION                                                     ROCE USING P/L BEFORE TAX (%)
+68                          rtas      True  DOUBLE PRECISION                                                      ROA USING P/L BEFORE TAX (%)
+69                           roe      True  DOUBLE PRECISION                                                          ROE USING NET INCOME (%)
+70                          roce      True  DOUBLE PRECISION                                                         ROCE USING NET INCOME (%)
+71                           roa      True  DOUBLE PRECISION                                                          ROA USING NET INCOME (%)
+72                          prma      True  DOUBLE PRECISION                                                                 PROFIT MARGIN (%)
+73                          grma      True  DOUBLE PRECISION                                                                  GROSS MARGIN (%)
+74                          etma      True  DOUBLE PRECISION                                                                 EBITDA MARGIN (%)
+75                          ebma      True  DOUBLE PRECISION                                                                   EBIT MARGIN (%)
+76                          cfop      True  DOUBLE PRECISION                                                 CASH FLOW / OPERATING REVENUE (%)
+77                          evet      True  DOUBLE PRECISION                                                     ENTERPRISE VALUE / EBITDA (X)
+78                          mkcf      True  DOUBLE PRECISION                                        MARKET CAP / CASH FLOW FROM OPERATIONS (X)
+79                           nat      True  DOUBLE PRECISION                                                           NET ASSETS TURNOVER (X)
+80                            ic      True  DOUBLE PRECISION                                                                INTEREST COVER (X)
+81                          stot      True  DOUBLE PRECISION                                                                STOCK TURNOVER (X)
+82                          coll      True  DOUBLE PRECISION                                                          COLLECTION PERIOD (DAYS)
+83                          crpe      True  DOUBLE PRECISION                                                              CREDIT PERIOD (DAYS)
+84                          exop      True  DOUBLE PRECISION                                            EXPORT REVENUE / OPERATING REVENUE (%)
+85                          rdop      True  DOUBLE PRECISION                                              R&D EXPENSES / OPERATING REVENUE (%)
+86                          curr      True  DOUBLE PRECISION                                                                 CURRENT RATIO (X)
+87                          liqr      True  DOUBLE PRECISION                                                               LIQUIDITY RATIO (X)
+88                          shlq      True  DOUBLE PRECISION                                                  SHAREHOLDERS LIQUIDITY RATIO (X)
+89                          solr      True  DOUBLE PRECISION                                                  SOLVENCY RATIO (ASSET BASED) (%)
+90                          soll      True  DOUBLE PRECISION                                              SOLVENCY RATIO (LIABILITY BASED) (%)
+91                          gear      True  DOUBLE PRECISION                                                                       GEARING (%)
+92                           ppe      True  DOUBLE PRECISION                                                          PROFIT PER EMPLOYEE (TH)
+93                           tpe      True  DOUBLE PRECISION                                               OPERATING REVENUE PER EMPLOYEE (TH)
+94                           sct      True  DOUBLE PRECISION                                        COSTS OF EMPLOYEES / OPERATING REVENUE (%)
+95                           ace      True  DOUBLE PRECISION                                                     AVERAGE COST OF EMPLOYEE (TH)
+96                          sfpe      True  DOUBLE PRECISION                                              SHAREHOLDERS FUNDS PER EMPLOYEE (TH)
+97                          wcpe      True  DOUBLE PRECISION                                                 WORKING CAPITAL PER EMPLOYEE (TH)
+98                          tape      True  DOUBLE PRECISION                                                    TOTAL ASSETS PER EMPLOYEE (TH)
+99                      df_oprev      True           VARCHAR                                                       ESTIMATED OPERATING REVENUE
+100                 df_employees      True           VARCHAR                                                               ESTIMATED EMPLOYEES
+101  op_rev_original_range_value      True           VARCHAR                                            OPERATING REVENUE ORIGINAL RANGE VALUE
+102         emp_orig_range_value      True           VARCHAR                                                    EMPLOYEES ORIGINAL RANGE VALUE
+103           cashflow_nr_months      True           VARCHAR                                             NUMBER OF MONTHS - from cashflow data
+104           cashflow_audstatus      True           VARCHAR                                                 AUDIT STATUS - from cashflow data
+105         cashflow_accpractice      True           VARCHAR                                          ACCOUNTING PRACTICE - from cashflow data
+106          cashflow_orig_units      True           VARCHAR                                               ORIGINAL UNITS - from cashflow data
+107       cashflow_orig_currency      True           VARCHAR                                            ORIGINAL CURRENCY - from cashflow data
+108            cashflow_exchrate      True  DOUBLE PRECISION                        EXCHANGE RATE FROM ORIGINAL CURRENCY  - from cashflow data
+109                         onet      True  DOUBLE PRECISION                                                                        NET INCOME
+110                         sdep      True  DOUBLE PRECISION                                                                      DEPRECIATION
+111                         odpl      True  DOUBLE PRECISION                                                                         DEPLETION
+112                         sded      True  DOUBLE PRECISION                                                            DEPRECIATION/DEPLETION
+113                         oami      True  DOUBLE PRECISION                                                       AMORTIZATION OF INTANGIBLES
+114                         oama      True  DOUBLE PRECISION                                                 AMORTIZATION OF ACQUISITION COSTS
+115                         samt      True  DOUBLE PRECISION                                                                      AMORTIZATION
+116                         obdt      True  DOUBLE PRECISION                                                                    DEFERRED TAXES
+117                         oacg      True  DOUBLE PRECISION                                                                 ACCOUNTING CHANGE
+118                         oido      True  DOUBLE PRECISION                                                           DISCONTINUED OPERATIONS
+119                         otra      True  DOUBLE PRECISION                                                                EXTRAORDINARY ITEM
+120                         ouie      True  DOUBLE PRECISION                                                                     UNUSUAL ITEMS
+121                         oprd      True  DOUBLE PRECISION                                                                     PURCHASED R&D
+122                         oeia      True  DOUBLE PRECISION                                                       EQUITY IN NET EARNINGS/LOSS
+123                         onci      True  DOUBLE PRECISION                                                              OTHER NON-CASH ITEMS
+124                         snci      True  DOUBLE PRECISION                                                                    NON-CASH ITEMS
+125                         ocrc      True  DOUBLE PRECISION                                                                     CASH RECEIPTS
+126                         ocpd      True  DOUBLE PRECISION                                                                     CASH PAYMENTS
+127                         oacr      True  DOUBLE PRECISION                                                               ACCOUNTS RECEIVABLE
+128                         oitl      True  DOUBLE PRECISION                                                                       INVENTORIES
+129                         oppy      True  DOUBLE PRECISION                                                                  PREPAID EXPENSES
+130                         ooas      True  DOUBLE PRECISION                                                                      OTHER ASSETS
+131                         oapb      True  DOUBLE PRECISION                                                                  ACCOUNTS PAYABLE
+132                         oaex      True  DOUBLE PRECISION                                                                  ACCRUED EXPENSES
+133                         opba      True  DOUBLE PRECISION                                                                   PAYABLE/ACCRUED
+134                         otxp      True  DOUBLE PRECISION                                                                     TAXES PAYABLE
+135                         oolb      True  DOUBLE PRECISION                                                                 OTHER LIABILITIES
+136                         ooal      True  DOUBLE PRECISION                                                   OTHER ASSETS & LIABILITIES, NET
+137                         oocf      True  DOUBLE PRECISION                                                         OTHER OPERATING CASH FLOW
+138                         socf      True  DOUBLE PRECISION                                                        CHANGES IN WORKING CAPITAL
+139                         otlo      True  DOUBLE PRECISION                                              TOTAL CASH FROM OPERATING ACTIVITIES
+140                         icex      True  DOUBLE PRECISION                                                          PURCHASE OF FIXED ASSETS
+141                         iiaq      True  DOUBLE PRECISION                                               PURCHASE/ACQUISITION OF INTANGIBLES
+142                         isdc      True  DOUBLE PRECISION                                                        SOFTWARE DEVELOPMENT COSTS
+143                         scex      True  DOUBLE PRECISION                                                              CAPITAL EXPENDITURES
+144                         ibaq      True  DOUBLE PRECISION                                                           ACQUISITION OF BUSINESS
+145                         isob      True  DOUBLE PRECISION                                                                  SALE OF BUSINESS
+146                         isfa      True  DOUBLE PRECISION                                                              SALE OF FIXED ASSETS
+147                         iins      True  DOUBLE PRECISION                                                       SALE/MATURITY OF INVESTMENT
+148                         iivn      True  DOUBLE PRECISION                                                                   INVESTMENT, NET
+149                         iinp      True  DOUBLE PRECISION                                                           PURCHASE OF INVESTMENTS
+150                         isoi      True  DOUBLE PRECISION                                                                SALE OF INTANGIBLE
+151                         iian      True  DOUBLE PRECISION                                                                   INTANGIBLE, NET
+152                         iicf      True  DOUBLE PRECISION                                                         OTHER INVESTING CASH FLOW
+153                         sicf      True  DOUBLE PRECISION                                            OTHER INVESTING CASH FLOW ITEMS, TOTAL
+154                         itli      True  DOUBLE PRECISION                                              TOTAL CASH FROM INVESTING ACTIVITIES
+155                         ffcf      True  DOUBLE PRECISION                                                         OTHER FINANCING CASH FLOW
+156                         sfcf      True  DOUBLE PRECISION                                                         FINANCING CASH FLOW ITEMS
+157                         fdpc      True  DOUBLE PRECISION                                                      CASH DIVIDENDS PAID - COMMON
+158                         fdpp      True  DOUBLE PRECISION                                                   CASH DIVIDENDS PAID - PREFERRED
+159                         fcdp      True  DOUBLE PRECISION                                                         TOTAL CASH DIVIDENDS PAID
+160                         fsic      True  DOUBLE PRECISION                                                           SALE/ISSUANCE OF COMMON
+161                         frrc      True  DOUBLE PRECISION                                                   REPURCHASE/RETIREMENT OF COMMON
+162                         fcsn      True  DOUBLE PRECISION                                                                 COMMON STOCK, NET
+163                         fsip      True  DOUBLE PRECISION                                                        SALE/ISSUANCE OF PREFERRED
+164                         frrp      True  DOUBLE PRECISION                                                REPURCHASE/RETIREMENT OF PREFERRED
+165                         fpsn      True  DOUBLE PRECISION                                                              PREFERRED STOCK, NET
+166                         fscp      True  DOUBLE PRECISION                                                 SALE/ISSUANCE OF COMMON/PREFERRED
+167                         frcp      True  DOUBLE PRECISION                                           REPURCH./RETIREMENT OF COMMON/PREFERRED
+168                         fopx      True  DOUBLE PRECISION                                                                 OPTIONS EXERCISED
+169                         fwcv      True  DOUBLE PRECISION                                                                WARRANTS CONVERTED
+170                         ftst      True  DOUBLE PRECISION                                                                    TREASURY STOCK
+171                         fpss      True  DOUBLE PRECISION                                               ISSUANCE (RETIREMENT) OF STOCK, NET
+172                         fsdi      True  DOUBLE PRECISION                                                            SHORT TERM DEBT ISSUED
+173                         fsdr      True  DOUBLE PRECISION                                                         SHORT TERM DEBT REDUCTION
+174                         fsdn      True  DOUBLE PRECISION                                                              SHORT TERM DEBT, NET
+175                         fldi      True  DOUBLE PRECISION                                                             LONG TERM DEBT ISSUED
+176                         fldr      True  DOUBLE PRECISION                                                          LONG TERM DEBT REDUCTION
+177                         fldn      True  DOUBLE PRECISION                                                               LONG TERM DEBT, NET
+178                         ftdi      True  DOUBLE PRECISION                                                                 TOTAL DEBT ISSUED
+179                         ftdr      True  DOUBLE PRECISION                                                              TOTAL DEBT REDUCTION
+180                         fprd      True  DOUBLE PRECISION                                                ISSUANCE (RETIREMENT) OF DEBT, NET
+181                         ftlf      True  DOUBLE PRECISION                                              TOTAL CASH FROM FINANCING ACTIVITIES
+182                         sfee      True  DOUBLE PRECISION                                                          FOREIGN EXCHANGE EFFECTS
+183                         sncc      True  DOUBLE PRECISION                                                                NET CHANGE IN CASH
+184                         sncb      True  DOUBLE PRECISION                                                      NET CASH - BEGINNING BALANCE
+185                         snce      True  DOUBLE PRECISION                                                         NET CASH - ENDING BALANCE
+186                    sdep_supp      True  DOUBLE PRECISION                                                        DEPRECIATION, SUPPLEMENTAL
+187                         scip      True  DOUBLE PRECISION                                                  CASH INTEREST PAID, SUPPLEMENTAL
+188                         sctp      True  DOUBLE PRECISION                                                     CASH TAXES PAID, SUPPLEMENTAL
+189                      _315500      True  DOUBLE PRECISION                                                        NET INCOME / STARTING LINE
+190                      _315501      True  DOUBLE PRECISION                                            DEPRECIATION, DEPLETION & AMORTIZATION
+191                      _315502      True  DOUBLE PRECISION                                                        DEPRECIATION AND DEPLETION
+192                      _315503      True  DOUBLE PRECISION                                                 AMORTIZATION OF INTANGIBLE ASSETS
+193                      _315504      True  DOUBLE PRECISION                                              DEF. INC. TAXES & INVEST. TAX CREDIT
+194                      _315505      True  DOUBLE PRECISION                                                                   OTHER CASH FLOW
+195                      _315506      True  DOUBLE PRECISION                                  FUNDS FROM OPERATIONS BEFORE WC CHANGES & EXTRA.
+196                      _315508      True  DOUBLE PRECISION                                                            DEC/INC IN RECEIVABLES
+197                      _315509      True  DOUBLE PRECISION                                                            DEC/INC IN INVENTORIES
+198                      _315510      True  DOUBLE PRECISION                                                       INC/DEC IN ACCOUNTS PAYABLE
+199                      _315511      True  DOUBLE PRECISION                                                         INC/DEC IN OTHER ACCRUALS
+200                      _315512      True  DOUBLE PRECISION                                               DEC/INC IN OTHER ASSETS/LIABILITIES
+201                      _315513      True  DOUBLE PRECISION                                                               EXTRAORDINARY ITEMS
+202                      _315507      True  DOUBLE PRECISION                                                   FUNDS FROM OTHER OP. ACTIVITIES
+203                      _315514      True  DOUBLE PRECISION                                                NET CASH FROM OPERATING ACTIVITIES
+204                      _315515      True  DOUBLE PRECISION                                                         ADDITIONS TO FIXED ASSETS
+205                      _315516      True  DOUBLE PRECISION                                          INCREASE/DECREASE OTHER LONG TERM ASSETS
+206                      _315517      True  DOUBLE PRECISION                                                  INCREASE/DECREASE IN INVESTMENTS
+207                      _315518      True  DOUBLE PRECISION                                             NET CASH USED BY INVESTING ACTIVITIES
+208                      _315519      True  DOUBLE PRECISION                                                           INC/DEC IN ST BORROWING
+209                      _315520      True  DOUBLE PRECISION                                                    INC/DEC IN LONG TERM BORROWING
+210                      _315521      True  DOUBLE PRECISION                                   NET PROCEEDS FROM SALE/ISSUE COM. & PREF. STOCK
+211                      _315522      True  DOUBLE PRECISION                                                      SHAREHOLDERS` EQUITY RESERVE
+212                      _315524      True  DOUBLE PRECISION                                                           COMMON DIVIDENDS (CASH)
+213                      _315525      True  DOUBLE PRECISION                                                        PREFERRED DIVIDENDS (CASH)
+214                      _315523      True  DOUBLE PRECISION                                                       CASH DIVIDENDS PAID - TOTAL
+215                      _315526      True  DOUBLE PRECISION                                           OTHER SOURCE/USE - FINANCING ACTIVITIES
+216                      _315528      True  DOUBLE PRECISION                                 NET CASH PROVIDED BY/USED IN FINANCING ACTIVITIES
+217                      _315529      True  DOUBLE PRECISION                                                   EFFECT OF EXCHANGE RATE ON CASH
+218                      _315530      True  DOUBLE PRECISION                                                  INC/DEC IN CASH & ST INVESTMENTS
+219                      _315531      True  DOUBLE PRECISION                                           CASH & EQUIVALENTS AT BEGINNING OF YEAR
+220                      _315532      True  DOUBLE PRECISION                                                 CASH & EQUIVALENTS AT END OF YEAR
+221          has_cashflow_tables      True  DOUBLE PRECISION  WRDS created var, 1: for this bvdid-console-closdate,there are cashflow table(s)

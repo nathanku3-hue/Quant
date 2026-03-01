@@ -1,0 +1,29 @@
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+logs/
+tmp/
+tmp_*/
+*.log
+*.jsonl
+
+# Generated data artifacts
+data/raw/
+data/processed/
+data/*.csv
+data/*.zip
+data/*.lock
+data/backtest_results.json
+data/fresh_finds.json
+data/last_scan_state.json
+data/watchlist.json

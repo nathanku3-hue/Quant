@@ -1,0 +1,14 @@
+=== Phase 64-B: Derivative Engine + Macro Gate Backtest ===
+Fetching Macro Data (^TNX, VWEHX, VFISX)...
+
+--- 1990-2000 (Dot-Com) ERA ---
+[MSFT] Stock B&H:   3322.5% (MDD:  -65.2%) | 3-Pillar LEAP Strat:   1388.2% (MDD:  -64.5%) | Alpha:  -1934.3%
+[CSCO] Stock B&H:  42269.2% (MDD:  -54.4%) | 3-Pillar LEAP Strat:  61357.0% (MDD:  -58.0%) | Alpha: +19087.9%
+
+--- 2000-2010 (Lost Decade) ERA ---
+[AAPL] Stock B&H:   1191.4% (MDD:  -81.8%) | 3-Pillar LEAP Strat:   3089.8% (MDD:  -80.4%) | Alpha:  +1898.4%
+[AMZN] Stock B&H:    171.0% (MDD:  -92.9%) | 3-Pillar LEAP Strat:     -2.7% (MDD:  -94.3%) | Alpha:   -173.7%
+
+--- 2010-2020 (Quantitative Easing) ERA ---
+[NVDA] Stock B&H:   3316.5% (MDD:  -56.0%) | 3-Pillar LEAP Strat:    860.6% (MDD:  -89.4%) | Alpha:  -2455.9%
+[TSLA] Stock B&H:  16665.9% (MDD:  -60.6%) | 3-Pillar LEAP Strat:  16831.7% (MDD:  -89.9%) | Alpha:   +165.8%

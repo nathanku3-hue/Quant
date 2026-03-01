@@ -1,0 +1,152 @@
+{
+    "timestamp": "2026-02-25T08:12:21.875887Z",
+    "batch_id": "a57cceaa-a637-42c6-9104-2f930b0fed0c",
+    "strategy": "ALPHA_SOVEREIGN_V1",
+    "portfolio_value_basis": 100000.0,
+    "execution_orders": [
+        {
+            "client_order_id": "MU-a57cceaa",
+            "ticker": "MU",
+            "action": "BUY",
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 100,
+                "urgency": "HIGH",
+                "hf_scalar": 5,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        },
+        {
+            "client_order_id": "GOOGL-a57cceaa",
+            "ticker": "GOOGL",
+            "action": "BUY",
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 100,
+                "urgency": "HIGH",
+                "hf_scalar": 0,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        },
+        {
+            "client_order_id": "AMD-a57cceaa",
+            "ticker": "AMD",
+            "action": "BUY",
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 100,
+                "urgency": "HIGH",
+                "hf_scalar": 5,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        },
+        {
+            "client_order_id": "CIEN-a57cceaa",
+            "ticker": "CIEN",
+            "action": "BUY",
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 100,
+                "urgency": "HIGH",
+                "hf_scalar": 0,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        },
+        {
+            "client_order_id": "SNDK-a57cceaa",
+            "ticker": "SNDK",
+            "action": "BUY",
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 100,
+                "urgency": "HIGH",
+                "hf_scalar": 0,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        },
+        {
+            "client_order_id": "CLS-a57cceaa",
+            "ticker": "CLS",
+            "action": "BUY",
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 100,
+                "urgency": "HIGH",
+                "hf_scalar": 0,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        },
+        {
+            "client_order_id": "CEG-a57cceaa",
+            "ticker": "CEG",
+            "action": "BUY",
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 100,
+                "urgency": "HIGH",
+                "hf_scalar": 0,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        },
+        {
+            "client_order_id": "VRT-a57cceaa",
+            "ticker": "VRT",
+            "action": "BUY",
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 100,
+                "urgency": "HIGH",
+                "hf_scalar": 0,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        },
+        {
+            "client_order_id": "ETN-a57cceaa",
+            "ticker": "ETN",
+            "action": "BUY",
+            "order_type": "LIMIT",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Bid_Ask_Mid",
+            "strategy_metadata": {
+                "score": 90,
+                "urgency": "MEDIUM",
+                "hf_scalar": 0,
+                "physics_regime": "Turnaround (Q2)"
+            }
+        },
+        {
+            "client_order_id": "RBRK-a57cceaa",
+            "ticker": "RBRK",
+            "action": "BUY",
+            "order_type": "LIMIT",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.1",
+            "limit_price": "Bid_Ask_Mid",
+            "strategy_metadata": {
+                "score": 90,
+                "urgency": "MEDIUM",
+                "hf_scalar": -10,
+                "physics_regime": "Super Cycle (Q1)"
+            }
+        }
+    ],
+    "risk_checks": {
+        "max_single_position": 0.2,
+        "buying_power_check": "PASSED"
+    }
+}

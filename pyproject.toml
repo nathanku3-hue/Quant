@@ -1,0 +1,32 @@
+[project]
+name = "terminal-zero"
+version = "0.1.0"
+description = "Local-first quantitative research console"
+readme = "docs/prd.md"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "alpaca-trade-api==3.2.0",
+    "duckdb==1.4.4",
+    "joblib==1.5.2",
+    "numpy==2.4.2",
+    "pandas==2.2.3",
+    "pandas-datareader==0.10.0",
+    "plotly==6.5.2",
+    "pyarrow==23.0.0",
+    "scipy==1.17.0",
+    "statsmodels==0.14.5",
+    "streamlit==1.54.0",
+    "yfinance==1.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-q"
+cache_dir = ".venv/.pytest_cache"
+

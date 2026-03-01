@@ -1,0 +1,43 @@
+{
+    "timestamp": "2026-03-01T08:21:49Z",
+    "batch_id": "20260301-23ddd147a0fddb6c",
+    "strategy": "ALPHA_SOVEREIGN_V1",
+    "portfolio_value_basis": 100000.0,
+    "execution_orders": [
+        {
+            "client_order_id": "20260301-AAPL-BUY",
+            "trade_day": "20260301",
+            "ticker": "AAPL",
+            "action": "BUY",
+            "target_weight": 0.2,
+            "order_type": "MARKET",
+            "quantity_calc": "PORTFOLIO_VALUE * 0.20000000",
+            "limit_price": "Market",
+            "strategy_metadata": {
+                "score": 95,
+                "urgency": "HIGH",
+                "hf_scalar": 0,
+                "physics_regime": "GREEN"
+            }
+        }
+    ],
+    "risk_checks": {
+        "max_single_position": 0.2,
+        "total_weight_allocated": 0.2,
+        "order_count": 1,
+        "buying_power_check": "NOT_EVALUATED"
+    },
+    "security_controls": {
+        "egress_allowlist_suffixes": [
+            "alpaca.markets",
+            "wrds-pgdata.wharton.upenn.edu",
+            "financialmodelingprep.com",
+            "discord.com"
+        ],
+        "hmac_key_version": "v1",
+        "hmac_key_activated_at_utc": "2026-03-01T00:00:00Z",
+        "hmac_rotation_days": 1,
+        "hmac_legal_hold": true,
+        "hmac_rotation_due": false
+    }
+}

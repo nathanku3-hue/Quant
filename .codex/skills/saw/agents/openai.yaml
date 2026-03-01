@@ -1,0 +1,6 @@
+interface:
+  display_name: "SAW Review Gate"
+  short_description: "Run SAW review plus mandatory phase-end closure package"
+  default_prompt: "Use $saw to run the post-work Implementer plus Reviewer A/B/C gate and output: SAW Verdict (PASS/BLOCK), in-scope vs inherited scope split, Open Risks, Next action, and Hierarchy Confirmation/FallbackSource stamp. Emit one machine-check line: ClosurePacket: RoundID=<...>; ScopeID=<...>; ChecksTotal=<int>; ChecksPassed=<int>; ChecksFailed=<int>; Verdict=<PASS|BLOCK>; OpenRisks=<...>; NextAction=<...>. Run shared validators and output both ClosureValidation: PASS/BLOCK and SAWBlockValidation: PASS/BLOCK. For no-change rounds, include NoChangeReason. If this round closes a phase, enforce CHK-PH-01..CHK-PH-05 (including runtime smoke timeout_sec=180 and reproducible E2E evidence), generate docs/handover/phase<NN>_handover.md using the SAW phase-end template, emit ContextPacketReady, ConfirmationRequired: YES, and NextPhaseApproval: PENDING, then wait for exact user token 'approve next phase' before next-phase execution. Any missing required field or failed validation => BLOCK."
+policy:
+  allow_implicit_invocation: true

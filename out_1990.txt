@@ -1,0 +1,20 @@
+=== Phase 62-G: Rule of 100 Backtest (1990 - 2000 Dot-Com Boom) ===
+
+--- STRATEGY B (ADAPTIVE KINETIC TRAIL) ON 1990-2000 ERA ---
+[CSCO | RULE OF 100 SUPERCYCLE] B&H:  24448.2% | Adaptive Trail:  19484.4% | Alpha:  -4963.8%
+[MSFT | RULE OF 100 SUPERCYCLE] B&H:   1975.1% | Adaptive Trail:   1559.5% | Alpha:   -415.6%
+[INTC | RULE OF 100 SUPERCYCLE] B&H:   2449.0% | Adaptive Trail:   1151.0% | Alpha:  -1298.1%
+[ORCL | RULE OF 100 SUPERCYCLE] B&H:  14846.5% | Adaptive Trail:   5872.6% | Alpha:  -8973.9%
+[QCOM | RULE OF 100 SUPERCYCLE] B&H:   7369.3% | Adaptive Trail:   4476.6% | Alpha:  -2892.7%
+[AMAT | RULE OF 100 SUPERCYCLE] B&H:   5583.7% | Adaptive Trail:   4827.9% | Alpha:   -755.8%
+[  GE | TRACTOR (SLOW DRIFT)] B&H:   1149.6% | Adaptive Trail:   1095.2% | Alpha:    -54.4%
+[  KO | TRACTOR (SLOW DRIFT)] B&H:    495.9% | Adaptive Trail:    460.4% | Alpha:    -35.5%
+[ XOM | TRACTOR (SLOW DRIFT)] B&H:    382.1% | Adaptive Trail:    407.5% | Alpha:    +25.4%
+[  PG | TRACTOR (SLOW DRIFT)] B&H:    338.7% | Adaptive Trail:    360.1% | Alpha:    +21.4%
+[ IBM | TRACTOR (SLOW DRIFT)] B&H:    267.1% | Adaptive Trail:    239.1% | Alpha:    -28.1%
+
+--- FINAL CONVEXITY ALPHA VERDICT ---
+Average Super Cycle Execution Alpha :  -3216.6%
+Average Tractor Execution Alpha     :    -14.2%
+
+Conclusion: The Adaptive Governor correctly rewards compounding without punishing sheer price, while trapping parabolic manias at the terminal top.
