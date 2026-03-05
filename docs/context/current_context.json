@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-03-01T15:18:34Z",
+  "generated_at_utc": "2026-03-02T07:19:03Z",
   "source_files": [
     "docs/decision log.md",
     "docs/handover/phase0_handover.md",
@@ -34,7 +34,8 @@
   "what_was_done": [
     "Phase 31 locked Stream 1 PiT truth-layer controls and Stream 5 strict execution telemetry acceptance boundaries with SAW recheck PASS.",
     "Orchestrator reconciliation was hardened with timeout-bounded fail-loud ambiguity handling and deterministic duplicate-CID fail-closed logic.",
-    "Phase-end smoke validated orchestrator initialization and controlled shutdown sequence without runtime mutation."
+    "Phase-end smoke validated orchestrator initialization and controlled shutdown sequence without runtime mutation.",
+    "Full matrix promotion gate is now green with immutable artifacts (`status=0`, `597/597` matrix clear)."
   ],
   "what_is_locked": [
     "Success acceptance invariant: `ok=True` requires authoritative bounded receipt fields and broker identity (`client_order_id`, `filled_qty`, `filled_avg_price`, valid `execution_ts`, fill bound to intended qty`).",
@@ -42,11 +43,11 @@
     "Stream 1 active t-1 selector path remains enforced; retired helper is no longer callable in runtime path."
   ],
   "what_is_next": [
-    "Resolve inherited full-repo Phase 15 integration failure to clear governance gate.",
-    "Execute Phase 32 backlog: exception taxonomy split, routing diagnostics tail, reconciliation timeout soak/cancellation hardening, UTF-8 wedge, UID drift."
+    "Execute Phase 32 SRE backlog immediately: reconciliation-timeout soaks, UTF-8 decode wedges, DuckDB flush optimization.",
+    "Continue Phase 32 backlog: exception taxonomy split, routing diagnostics tail, UID drift closure."
   ],
-  "first_command": "`.venv\\Scripts\\python -m pytest tests/test_phase15_integration.py::test_phase15_weights_respect_regime_cap -q -vv`",
+  "first_command": "start Phase 32 Step 1 soak suite for reconciliation timeout/cancellation resiliency.",
   "next_todos": [
-    "inherited failure fix -> exception taxonomy split -> routing diagnostics completion -> timeout soak/cancellation hardening -> UTF-8/UID backlog closure."
+    "reconciliation-timeout soaks -> UTF-8 wedge closure -> DuckDB flush optimization -> exception taxonomy split -> routing diagnostics tail -> UID drift closure."
   ]
 }

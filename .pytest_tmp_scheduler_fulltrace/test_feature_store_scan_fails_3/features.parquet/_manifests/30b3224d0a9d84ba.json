@@ -1,0 +1,31 @@
+{
+  "cache_policy": {
+    "stale_while_revalidate_sec": 0,
+    "tombstone_priority": "enforced"
+  },
+  "commit_id": "30b3224d0a9d84ba",
+  "commit_mode": "incremental_upsert",
+  "committed_at_utc": "2026-03-02T06:36:50.410206+00:00",
+  "gc_policy": {
+    "retention_hours_min": 24
+  },
+  "partitions": {
+    "year=2024/month=02": {
+      "file": "E:\\Code\\Quant\\.pytest_tmp_scheduler_fulltrace\\test_feature_store_scan_fails_3\\features.parquet.__versions\\30b3224d0a9d84ba\\year=2024\\month=02\\part-000.parquet",
+      "sha256": "3e68222ed3717a7212f2b895e26d4ce780ae9e646298a70a3f037d05d41c0bc2",
+      "size_bytes": 2393
+    }
+  },
+  "previous_commit_id": "5aa9301d51ddffac",
+  "tombstones": [
+    {
+      "file": "E:\\Code\\Quant\\.pytest_tmp_scheduler_fulltrace\\test_feature_store_scan_fails_3\\features.parquet.__versions\\5aa9301d51ddffac\\year=2024\\month=02\\part-000.parquet",
+      "partition": "year=2024/month=02",
+      "reason": "replaced_partition"
+    }
+  ],
+  "touched_partitions": [
+    "year=2024/month=02"
+  ],
+  "version": "v2"
+}

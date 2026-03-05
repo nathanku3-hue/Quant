@@ -1,0 +1,11 @@
+{
+    "defaults": [
+        "AAPL",
+        "MSFT",
+        "SPY"
+    ],
+    "user_added": [
+        "NVDA",
+        "TSLA"
+    ]
+}

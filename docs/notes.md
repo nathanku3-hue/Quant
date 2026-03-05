@@ -2451,9 +2451,10 @@ Date: 2026-03-01
 - Shutdown sequence:
   - set stop signal,
   - best-effort synchronous flush attempts until deadline,
-  - if `pending_bytes > 0` after deadline => raise `RuntimeError("telemetry spool shutdown fail-closed: ...")`.
+  - if any of `{pending_bytes > 0, buffer_drop_count > 0, last_flush_error != none}` after deadline
+    => raise `MicrostructureFlushError("telemetry spool shutdown fail-closed: ...")`.
 - Intent:
-  - remove silent buffered-data loss on shutdown while lock contention persists.
+  - remove silent buffered-data loss and sink-error suppression on shutdown.
 - Implementation path:
   - `execution/microstructure.py` (`_TelemetrySpooler.stop`, `_shutdown_execution_microstructure_spoolers`)
 
@@ -2691,3 +2692,68 @@ Date: 2026-03-01
     - Reviewer A PASS,
     - Reviewer B PASS,
     - Reviewer C PASS.
+
+## Phase 32 Step 4 Exception Taxonomy Split Addendum (2026-03-02)
+
+### 1) Binary broker-exception taxonomy (`main_bot_orchestrator.py`)
+- Canonical classes:
+  - `TERMINAL`: hard business/validation/auth rejects (fail-closed now).
+  - `TRANSIENT`: network/timeout/service/rate-limit errors (bounded retry).
+- Classifier contract:
+  - `exception_class := _classify_broker_exception(exc)` where `exception_class in {"TERMINAL","TRANSIENT"}`.
+  - unknown exception patterns default to `TRANSIENT` (bounded retry safety).
+
+### 2) Deterministic routing contract (`execute_orders_with_idempotent_retry`)
+- Batch exception path:
+  - `if TERMINAL -> error=FAILED_REJECTED, exception_class=TERMINAL, bypass retry loop`.
+  - `if TRANSIENT -> bounded retry; on exhaustion error=retry_exhausted, exception_class=TRANSIENT`.
+- Row-level broker-result path:
+  - classify terminal/transient before retry token evaluation.
+  - terminal precedence rule:
+    - if classifier returns `TERMINAL`, fail closed immediately even when error text also contains retryable tokens.
+  - `if non-retryable error text and terminal classification -> FAILED_REJECTED` (no raw free-form pass-through).
+  - `retry_exhausted` outputs are emitted via one shared builder so canonical fields are stable across all transient exhaustion branches.
+
+### 3) Canonical output schema
+- Terminal fail-closed:
+  - `{"ok":false,"error":"FAILED_REJECTED","exception_class":"TERMINAL","canonical_reason":...,"rejection_reason":...,"client_order_id":...,"attempt":...}`
+- Transient exhausted:
+  - `{"ok":false,"error":"retry_exhausted","exception_class":"TRANSIENT","canonical_reason":...,"last_error":...,"client_order_id":...,"attempt":...}`
+
+### 4) Bounded zero-timeout lookup safety
+- Reconciliation timeout guard:
+  - `effective_timeout := max(timeout_seconds, 0.01)`
+- Intent:
+  - remove synchronous `timeout<=0` lookup execution path that could stall on hanging broker lookups.
+
+## Phase 32 Step 1 (2026-03-02) - Reconciliation Timeout Soak and Thread Isolation
+
+### 1) Cooperative cancellation semantics (`main_bot_orchestrator.py`)
+- Lookup timeout wrapper now attempts cooperative cancellation when broker adapter exposes `cancel_event`.
+- Canonical taxonomy:
+  - `lookup_cancelled` when lookup raises `asyncio.CancelledError`,
+  - `lookup_timeout:<seconds>s` when timed-out worker exits but does not emit explicit cancel/exception,
+  - `lookup_timeout:<seconds>s:uncooperative` when worker remains alive beyond timeout path.
+
+### 2) Sticky lookup issue precedence (`main_bot_orchestrator.py`)
+- Reconciliation polling now preserves the highest-priority lookup issue across poll cycles.
+- Contract:
+  - once a `lookup_*` issue appears, later generic states (`reconciliation_receipt_unavailable`, `non_authoritative_reconciliation_receipt`) cannot overwrite forensic taxonomy.
+  - `:uncooperative` timeout is terminal for the current reconciliation attempt to avoid spawning additional stuck lookup workers.
+
+### 3) Dedicated reconciliation quarantine sink (`main_bot_orchestrator.py`)
+- Added durable JSONL quarantine writer for lookup timeout/cancel/exception families only.
+- Writer contract:
+  - lock-serialized append via sidecar `.lock`,
+  - low-level append write (`O_APPEND`) + `fsync`,
+  - parent-dir fsync on first create where supported,
+  - schema-stable payload with `schema_version=1`.
+
+### 4) Synthetic chaos + isolation coverage (`tests/test_main_bot_orchestrator.py`)
+- Added synthetic chaos broker with deterministic cancel-aware hanging lookup.
+- Added regressions:
+  - timeout path quarantines with `:uncooperative`,
+  - cooperative cancellation path surfaces `lookup_cancelled` and quarantines deterministically,
+  - mixed-poll precedence keeps `lookup_cancelled`,
+  - blocked reconciliation lookup does not block telemetry spool append/flush,
+  - concurrent quarantine writers remain lossless and parseable.

@@ -1,0 +1,25 @@
+{
+  "decision": {
+    "action": "BLOCK",
+    "metrics": {},
+    "reason": "risk interceptor error: no pricing for AAPL",
+    "reason_code": "risk_check_error"
+  },
+  "order": {
+    "client_order_id": "cid-risk-fail-closed",
+    "limit_price": null,
+    "order_type": "market",
+    "qty": 1,
+    "side": "buy",
+    "symbol": "AAPL"
+  },
+  "portfolio_state": {
+    "equity": 1000.0,
+    "positions": {
+      "MSFT": 1.0
+    },
+    "symbol_volatility": {},
+    "volatility_by_symbol": {}
+  },
+  "timestamp_utc": "2026-03-02T06:35:31.401Z"
+}

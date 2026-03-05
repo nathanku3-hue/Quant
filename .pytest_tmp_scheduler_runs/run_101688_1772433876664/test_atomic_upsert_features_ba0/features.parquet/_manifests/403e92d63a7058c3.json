@@ -1,0 +1,44 @@
+{
+  "cache_policy": {
+    "stale_while_revalidate_sec": 0,
+    "tombstone_priority": "enforced"
+  },
+  "commit_id": "403e92d63a7058c3",
+  "commit_mode": "incremental_upsert",
+  "committed_at_utc": "2026-03-02T06:46:05.927335+00:00",
+  "gc_policy": {
+    "retention_hours_min": 24
+  },
+  "partitions": {
+    "year=2024/month=01": {
+      "file": "E:\\Code\\Quant\\.pytest_tmp_scheduler_runs\\run_101688_1772433876664\\test_atomic_upsert_features_ba0\\features.parquet.__versions\\403e92d63a7058c3\\year=2024\\month=01\\part-000.parquet",
+      "sha256": "b2292eb4b63116b1de3a475c821acf6b5e12370184b4eb8e993e0405247f1b5e",
+      "size_bytes": 2393
+    },
+    "year=2024/month=02": {
+      "file": "E:\\Code\\Quant\\.pytest_tmp_scheduler_runs\\run_101688_1772433876664\\test_atomic_upsert_features_ba0\\features.parquet.__versions\\403e92d63a7058c3\\year=2024\\month=02\\part-000.parquet",
+      "sha256": "6225a674ba017e75efcf4ed56c80fccaf06f8dfd24feb1a32136adbfd03609f6",
+      "size_bytes": 2409
+    }
+  },
+  "previous_commit_id": "c7a7e8f7703aa8cb",
+  "tombstones": [
+    {
+      "file": "E:\\Code\\Quant\\.pytest_tmp_scheduler_runs\\run_101688_1772433876664\\test_atomic_upsert_features_ba0\\features.parquet.__versions\\c7a7e8f7703aa8cb\\year=2024\\month=01\\part-000.parquet",
+      "partition": "year=2024/month=01",
+      "reason": "replaced_partition",
+      "retained_until_utc": "2026-03-03T06:46:05.732805+00:00"
+    },
+    {
+      "file": "E:\\Code\\Quant\\.pytest_tmp_scheduler_runs\\run_101688_1772433876664\\test_atomic_upsert_features_ba0\\features.parquet.__versions\\c7a7e8f7703aa8cb\\year=2024\\month=02\\part-000.parquet",
+      "partition": "year=2024/month=02",
+      "reason": "replaced_partition",
+      "retained_until_utc": "2026-03-03T06:46:05.732805+00:00"
+    }
+  ],
+  "touched_partitions": [
+    "year=2024/month=01",
+    "year=2024/month=02"
+  ],
+  "version": "v2"
+}

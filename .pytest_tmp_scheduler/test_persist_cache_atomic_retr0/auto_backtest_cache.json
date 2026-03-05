@@ -1,0 +1,19 @@
+{
+  "config": {
+    "atr_period": 20,
+    "cost_bps": 0.001,
+    "ma_lookback": 200,
+    "max_positions": 50,
+    "min_price": 5.0,
+    "stop_lookback": 22,
+    "vol_target": 0.15
+  },
+  "config_fingerprint": "ef20aedf8148c3dd5e46178538bcc697a804b07766b1ebe6b05015967c4a2f60",
+  "last_finished_at": null,
+  "last_run_key": null,
+  "last_started_at": null,
+  "run_attempted": false,
+  "run_attempted_for_key": null,
+  "status": "idle",
+  "version": 1
+}

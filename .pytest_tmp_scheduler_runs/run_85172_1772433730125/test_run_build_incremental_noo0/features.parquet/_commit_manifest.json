@@ -1,0 +1,21 @@
+{
+  "cache_policy": {
+    "stale_while_revalidate_sec": 0,
+    "tombstone_priority": "enforced"
+  },
+  "commit_id": "ab43c72ef641d123",
+  "commit_mode": "full_rebuild",
+  "committed_at_utc": "2026-03-02T06:42:53.340038+00:00",
+  "previous_commit_id": null,
+  "tombstones": [
+    {
+      "cache_policy": "tombstone_over_cache",
+      "partition": "year=2026/month=03",
+      "reason": "replaced_partition"
+    }
+  ],
+  "touched_partitions": [
+    "year=2026/month=03"
+  ],
+  "version": "v1"
+}

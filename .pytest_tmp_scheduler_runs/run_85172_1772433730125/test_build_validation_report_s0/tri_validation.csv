@@ -1,0 +1,2 @@
+check_type,ticker,event_date,metric,value,pass,notes
+split_continuity,AAPL,2020-08-31,tri_minus_total_ret,8.673617379884035e-18,True,tri_pct_change=0.010000; expected_ret=0.010000; legacy_pct_change=-0.750000; split_ratio=4.0

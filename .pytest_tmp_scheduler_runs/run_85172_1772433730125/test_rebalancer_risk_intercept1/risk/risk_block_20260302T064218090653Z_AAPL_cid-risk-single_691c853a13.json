@@ -1,0 +1,27 @@
+{
+  "decision": {
+    "action": "BLOCK",
+    "metrics": {
+      "limit": 0.3,
+      "symbol": "AAPL",
+      "weight": 0.5
+    },
+    "reason": "single-asset weight breach AAPL=0.5000 > 0.3000",
+    "reason_code": "max_single_asset_weight"
+  },
+  "order": {
+    "client_order_id": "cid-risk-single",
+    "limit_price": null,
+    "order_type": "market",
+    "qty": 1,
+    "side": "buy",
+    "symbol": "AAPL"
+  },
+  "portfolio_state": {
+    "equity": 1000.0,
+    "positions": {},
+    "symbol_volatility": {},
+    "volatility_by_symbol": {}
+  },
+  "timestamp_utc": "2026-03-02T06:42:18.090Z"
+}

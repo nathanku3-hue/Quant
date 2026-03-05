@@ -1,7 +1,7 @@
 # Phase 31 Brief - Sovereign Execution Hardening
 
 Date: 2026-03-01
-Status: Active (Round 1 SAW reconciliation complete)
+Status: Completed (Governance PASS: 597/597 Matrix Clear; Phase 32 handshake active)
 
 L1: Backtest/Execution Platform Reliability
 L2 Streams: Backend, Data, Ops
@@ -17,7 +17,7 @@ L3 Stage Flow: Planning -> Executing -> Iterate Loop -> Final Verification -> CI
 - Out of scope:
   - new strategy alpha research,
   - broker API expansion,
-  - full-phase closeout handover/context refresh.
+  - full-phase closeout handover/context refresh (initial round scope; superseded by 2026-03-02 closeout extension).
 
 ## Acceptance Checks
 - CHK-01: Replay check+append is atomic across processes and replay duplicates are rejected fail-closed.
@@ -229,13 +229,13 @@ L3 Stage Flow: Planning -> Executing -> Iterate Loop -> Final Verification -> CI
     - Reviewer B PASS,
     - Reviewer C PASS.
 
-## Round Update (2026-03-01) - Phase 31 Closeout Protocol
-- Status: In Progress (artifact sealed; governance gate blocked by inherited full-repo failure).
+## Round Update (2026-03-02) - Phase 31 Final Governance Promotion
+- Status: Completed (artifact sealed; governance gate PASS).
 - Closeout checks executed:
-  - CHK-PH31-01 Full-repo matrix:
-    - `.venv\Scripts\python -m pytest --maxfail=1` -> BLOCK (`472 passed, 1 failed, 2 warnings in 50.94s`).
-    - evidence: `docs/context/e2e_evidence/phase31_chk_ph_01_pytest.log`.
-    - failing test: `tests/test_phase15_integration.py::test_phase15_weights_respect_regime_cap` (`strategies/alpha_engine.py:488` single-day precomputed-field requirement violation).
+  - CHK-PH31-01 Full-repo matrix (detached immutable capture):
+    - `.venv\Scripts\python docs\context\e2e_evidence\phase31_full_matrix_wrapper.py` -> PASS (`597 passed, 5 warnings in 102.74s`).
+    - gate artifact: `docs/context/e2e_evidence/phase31_full_matrix_final.status` (`0`).
+    - evidence: `docs/context/e2e_evidence/phase31_full_matrix_final.log`.
   - CHK-PH31-02 Runtime smoke:
     - controlled dry-run of `main_bot_orchestrator.main()` with patched schedule loop -> PASS (`SMOKE_OK run_scanners=1 run_pending=1`).
     - evidence: `docs/context/e2e_evidence/phase31_chk_ph_02_smoke.log`.
@@ -246,12 +246,18 @@ L3 Stage Flow: Planning -> Executing -> Iterate Loop -> Final Verification -> CI
   - CHK-PH31-04 Stream 1/5 isolation matrix:
     - `.venv\Scripts\python -m pytest tests/test_main_bot_orchestrator.py tests/test_execution_controls.py tests/test_execution_microstructure.py tests/test_main_console.py --maxfail=1` -> PASS (`198 passed in 7.37s`).
     - evidence: `docs/context/e2e_evidence/phase31_chk_ph_04_stream_matrix.log`.
-- Phase 32 carryover lock:
+- Immutable proof:
+  - `phase31_full_matrix_final.status` sha256: `13BF7B3039C63BF5A50491FA3CFD8EB4E699D1BA1436315AEF9CBE5711530354`.
+  - `phase31_full_matrix_final.log` sha256: `30D4C70C36E3DB0168A957C54290168E750E87BD02B03890C2A6526572B3C609`.
+- Phase 32 immediate SRE handshake:
+  - reconciliation-timeout soaks + cancellation hardening,
+  - UTF-8 decode wedge reconciliation,
+  - DuckDB flush optimization.
+- Remaining Phase 32 backlog:
   - batch exception taxonomy split (transient vs non-transient),
   - routing diagnostics tail,
-  - UTF-8 decode wedge backlog,
   - UID drift backlog,
-  - inherited Phase 15 integration failure triage/fix.
+  - continue telemetry/ops hardening follow-through from SRE handshake outputs.
 
 ## Round Update (2026-03-01) - Stream 5 SAW Reconciliation (D-209)
 - Status: Completed (SAW PASS for Stream 5 scope).

@@ -1,0 +1,27 @@
+{
+  "current_release": {
+    "deployed_at": "2026-03-01T09:00:00Z",
+    "release_ref": "ghcr.io/terminal-zero/quant:2026.03.01@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "version": "2026.03.01"
+  },
+  "last_action": "candidate_staged",
+  "last_candidate_release": {
+    "deployed_at": "2026-03-01T09:00:00Z",
+    "release_ref": "ghcr.io/terminal-zero/quant:2026.03.01@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "version": "2026.03.01"
+  },
+  "last_probe": null,
+  "pending_release": {
+    "deployed_at": "2026-03-01T09:00:00Z",
+    "release_ref": "ghcr.io/terminal-zero/quant:2026.03.01@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "version": "2026.03.01"
+  },
+  "previous_release": {
+    "deployed_at": "2026-02-28T00:00:00Z",
+    "release_ref": "ghcr.io/terminal-zero/quant:2026.02.28@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "version": "2026.02.28"
+  },
+  "schema_version": 1,
+  "status": "pending_probe",
+  "updated_at": "2026-03-01T09:00:00Z"
+}

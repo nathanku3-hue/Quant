@@ -1,0 +1,1 @@
+{"captured_at_utc":"2026-03-02T06:35:35.566Z","byte_offset":0,"reason":"schema_row_not_object","line":"{\"record_type\": \"order\", \"row\": \"not-an-object\"}"}

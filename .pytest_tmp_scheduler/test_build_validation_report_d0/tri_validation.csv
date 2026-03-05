@@ -1,0 +1,2 @@
+check_type,ticker,event_date,metric,value,pass,notes
+dividend_capture,XOM,,tri_minus_legacy_1y,0.09999999999999987,True,tri_1y=0.200000; legacy_1y=0.100000

@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-03-02T06:35:20Z",
+  "source_files": [
+    "docs/decision log.md",
+    "docs/handover/phase7_handover.md",
+    "docs/lessonss.md",
+    "docs/phase_brief/phase7-brief.md"
+  ],
+  "active_phase": 7,
+  "what_was_done": [
+    "Implemented context bootstrap."
+  ],
+  "what_is_locked": [
+    "Schema key order is fixed."
+  ],
+  "what_is_next": [
+    "Add CI smoke command."
+  ],
+  "first_command": ".venv\\Scripts\\python scripts/build_context_packet.py",
+  "next_todos": [
+    "Add context packet smoke check in CI.",
+    "ConfirmationRequired: YES"
+  ]
+}

@@ -143,50 +143,58 @@ class AlphaEngine:
         )
         out = out.sort_values(["permno", "date"])
 
-        if "adv20" not in out.columns:
-            out["adv20"] = (
-                out.groupby("permno", sort=False)["dollar_volume"]
-                .rolling(window=20, min_periods=20)
-                .mean()
-                .reset_index(level=0, drop=True)
-            )
-        else:
-            out["adv20"] = pd.to_numeric(out["adv20"], errors="coerce")
+        def _coerce_finite(values: pd.Series) -> pd.Series:
+            numeric = pd.to_numeric(values, errors="coerce")
+            return numeric.where(np.isfinite(numeric), np.nan)
+
+        def _merge_precomputed(column: str, derived: pd.Series, *, allow_ffill: bool = True) -> pd.Series:
+            derived_clean = _coerce_finite(derived)
+            if column in out.columns:
+                provided = _coerce_finite(out[column])
+                merged = provided.where(provided.notna(), derived_clean)
+            else:
+                merged = derived_clean
+            if allow_ffill:
+                merged = merged.groupby(out["permno"], sort=False).ffill()
+            return merged
+
+        adv20_derived = (
+            out.groupby("permno", sort=False)["dollar_volume"]
+            .rolling(window=20, min_periods=20)
+            .mean()
+            .reset_index(level=0, drop=True)
+        )
+        out["adv20"] = _merge_precomputed("adv20", adv20_derived)
 
         if cfg.use_adaptive_rsi:
-            if "rsi_threshold" in out.columns:
-                out["rsi_threshold"] = pd.to_numeric(out["rsi_threshold"], errors="coerce")
-            else:
-                # PIT-safe threshold: use lagged rolling percentile so today's threshold
-                # is computed from historical RSI values only (excludes today's RSI).
-                out["rsi_threshold"] = (
-                    out.groupby("permno", sort=False)["rsi_14d"]
-                    .rolling(
-                        window=cfg.adaptive_rsi_window,
-                        min_periods=cfg.adaptive_rsi_min_periods,
-                    )
-                    .quantile(cfg.adaptive_rsi_percentile)
-                    .reset_index(level=0, drop=True)
+            # PIT-safe threshold: use lagged rolling percentile so today's threshold
+            # is computed from historical RSI values only (excludes today's RSI).
+            rsi_threshold_derived = (
+                out.groupby("permno", sort=False)["rsi_14d"]
+                .rolling(
+                    window=cfg.adaptive_rsi_window,
+                    min_periods=cfg.adaptive_rsi_min_periods,
                 )
-                out["rsi_threshold"] = out.groupby("permno", sort=False)["rsi_threshold"].shift(1)
+                .quantile(cfg.adaptive_rsi_percentile)
+                .reset_index(level=0, drop=True)
+            )
+            rsi_threshold_derived = rsi_threshold_derived.groupby(out["permno"], sort=False).shift(1)
+            out["rsi_threshold"] = _merge_precomputed("rsi_threshold", rsi_threshold_derived)
         else:
             out["rsi_threshold"] = float(cfg.static_rsi_threshold)
 
-        if "prev_rsi" not in out.columns:
-            out["prev_rsi"] = out.groupby("permno", sort=False)["rsi_14d"].shift(1)
-        else:
-            out["prev_rsi"] = pd.to_numeric(out["prev_rsi"], errors="coerce")
-        if "prior_50d_high" not in out.columns:
-            close = pd.to_numeric(out["adj_close"], errors="coerce")
-            out["prior_50d_high"] = (
-                close.groupby(out["permno"], sort=False)
-                .rolling(window=50, min_periods=50)
-                .max()
-                .reset_index(level=0, drop=True)
-            )
-            out["prior_50d_high"] = out.groupby("permno", sort=False)["prior_50d_high"].shift(1)
-        else:
-            out["prior_50d_high"] = pd.to_numeric(out["prior_50d_high"], errors="coerce")
+        prev_rsi_derived = out.groupby("permno", sort=False)["rsi_14d"].shift(1)
+        out["prev_rsi"] = _merge_precomputed("prev_rsi", prev_rsi_derived)
+
+        close = pd.to_numeric(out["adj_close"], errors="coerce")
+        prior_50d_high_derived = (
+            close.groupby(out["permno"], sort=False)
+            .rolling(window=50, min_periods=50)
+            .max()
+            .reset_index(level=0, drop=True)
+        )
+        prior_50d_high_derived = prior_50d_high_derived.groupby(out["permno"], sort=False).shift(1)
+        out["prior_50d_high"] = _merge_precomputed("prior_50d_high", prior_50d_high_derived)
         return out
 
     def _atr_multiplier(self, market_vol: float | None, regime_state: str) -> float:
@@ -492,9 +500,6 @@ class AlphaEngine:
                     "Provide multi-day history or precompute these fields before calling build_daily_plan_from_snapshot."
                 )
         else:
-            drop_cols = [c for c in self.SNAPSHOT_PRECOMPUTED_COLUMNS if c in snap.columns]
-            if drop_cols:
-                snap = snap.drop(columns=drop_cols)
             snap = self._compute_adv20_and_threshold(snap.sort_values(["date", "permno"]))
 
         snap = snap[snap["date"] == dt].copy()

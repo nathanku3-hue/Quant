@@ -1,10 +1,10 @@
-# SAW Report: Phase 31 Closeout Protocol (Round 8)
+# SAW Report: Phase 31 Closeout Protocol (Round 8, Finalized 2026-03-02)
 
 Hierarchy Confirmation: Approved | Session: current-thread | Trigger: phase-end-closeout | Domains: Stream 1 Truth Layer, Stream 5 Execution Telemetry, Ops Evidence
 
 RoundID: R20260301-PH31-CLOSEOUT-R8
 ScopeID: PH31-CLOSEOUT-PROTOCOL-R8
-Scope: Execute phase-end protocol checks (full-repo matrix, orchestrator smoke, context packet refresh), publish handover artifact, and reconcile SAW reviewer findings.
+Scope: Execute phase-end protocol checks, finalize immutable full-matrix promotion evidence, publish governance PASS state, and issue Phase 32 SRE handshake.
 
 Ownership Check:
 - Implementer: Codex (parent)
@@ -12,6 +12,13 @@ Ownership Check:
 - Reviewer B (final): `Hooke` (`019ca9bd-f9d5-7180-b0bf-fc233de95976`)
 - Reviewer C (final): `Ohm` (`019ca9bd-f9ef-7fd3-8a36-ff7aa881202e`)
 - Result: implementer and reviewer roles are distinct.
+
+Reconciliation Recheck (2026-03-02):
+- Implementer recheck: `Lorentz` (`019cad65-c859-7653-ad0b-22fb8cf51f52`) -> PASS.
+- Reviewer A recheck: `Noether` (`019cad65-c886-7e50-8d5a-1e006c2bf2c3`) -> PASS.
+- Reviewer B recheck: `Russell` (`019cad5a-bd2c-7913-a17c-fe7d2407c722`) -> PASS.
+- Reviewer C recheck: `Planck` (`019cad60-e464-7a11-801b-413a8efcf004`) -> PASS.
+- Recheck result: previously reported documentation-order and risk-register drift findings are resolved in-scope.
 
 Acceptance Checks:
 - CHK-01: Full-repo matrix executed and failure evidence captured.
@@ -21,6 +28,7 @@ Acceptance Checks:
 - CHK-05: Locked Stream 5 invariant text aligned with D-209 (`client_order_id` included).
 - CHK-06: Evidence index links resolve to existing artifacts only.
 - CHK-07: SAW reviewer rechecks return no unresolved in-scope Critical/High findings.
+- CHK-08: Immutable promotion artifacts (`status=0`, full matrix log) are embedded in handover + SAW closeout.
 
 SAW Verdict: PASS
 
@@ -35,11 +43,9 @@ Scope Split Summary:
 - in-scope:
   - phase-end protocol execution and evidence publication.
   - handover/context packet closeout consistency.
+  - immutable promotion proof embed and governance status promotion.
 - inherited out-of-scope:
-  - unresolved full-repo failing test in untouched strategy path:
-    - `tests/test_phase15_integration.py::test_phase15_weights_respect_regime_cap`,
-    - failure in `strategies/alpha_engine.py:488`,
-    - carried to Phase 32 Step 1 (Owner: Strategy).
+  - no unresolved inherited Critical/High findings remain at closeout.
 
 Document Changes Showing:
 1. `docs/handover/phase31_handover.md`
@@ -81,7 +87,11 @@ Document Sorting (GitHub-optimized):
 8. `docs/saw_reports/saw_phase31_closeout_round8_20260301.md`
 
 Evidence:
-- `.venv\Scripts\python -m pytest --maxfail=1` -> BLOCK (`472 passed, 1 failed, 2 warnings in 50.94s`), artifact `docs/context/e2e_evidence/phase31_chk_ph_01_pytest.log`.
+- superseded pre-promotion matrix (historical): `.venv\Scripts\python -m pytest --maxfail=1` -> `472 passed, 1 failed, 2 warnings in 50.94s`, artifact `docs/context/e2e_evidence/phase31_chk_ph_01_pytest.log`.
+- promotion gate matrix (authoritative): `.venv\Scripts\python docs\context\e2e_evidence\phase31_full_matrix_wrapper.py` -> PASS (`597 passed, 5 warnings in 102.74s`), artifacts `docs/context/e2e_evidence/phase31_full_matrix_final.status` (`0`) and `docs/context/e2e_evidence/phase31_full_matrix_final.log`.
+- immutable hashes:
+  - `phase31_full_matrix_final.status` sha256 `13BF7B3039C63BF5A50491FA3CFD8EB4E699D1BA1436315AEF9CBE5711530354`.
+  - `phase31_full_matrix_final.log` sha256 `30D4C70C36E3DB0168A957C54290168E750E87BD02B03890C2A6526572B3C609`.
 - `.venv\Scripts\python -m pytest tests/test_main_bot_orchestrator.py tests/test_execution_controls.py tests/test_execution_microstructure.py tests/test_main_console.py --maxfail=1` -> PASS (`198 passed in 7.37s`), artifact `docs/context/e2e_evidence/phase31_chk_ph_04_stream_matrix.log`.
 - controlled orchestrator smoke command -> PASS (`SMOKE_OK run_scanners=1 run_pending=1`), artifact `docs/context/e2e_evidence/phase31_chk_ph_02_smoke.log`.
 - `.venv\Scripts\python scripts/build_context_packet.py --repo-root .` -> PASS.
@@ -92,14 +102,17 @@ Evidence:
   - Reviewer C PASS.
 
 Open Risks:
-- Inherited out-of-scope high remains unresolved and blocks governance PASS:
-  - `tests/test_phase15_integration.py::test_phase15_weights_respect_regime_cap` (`strategies/alpha_engine.py:488`).
-  - Owner: Strategy.
-  - Target milestone: Phase 32 Step 1.
+- Phase 32 SRE backlog execution risk (expected follow-through work, not governance blocker):
+  - reconciliation-timeout soaks + cancellation hardening.
+  - UTF-8 decode wedge reconciliation.
+  - DuckDB flush optimization.
+  - batch exception taxonomy split (transient vs non-transient) in `execute_orders(...)`.
+  - routing diagnostics tail.
+  - UID drift closure.
 
 Next action:
-- Obtain explicit user acceptance to carry the inherited Phase 15 regression into Phase 32 while marking Phase 31 artifact sealed with governance state `BLOCK`.
+- Start Phase 32 immediately with canonical sequence: timeout soaks -> UTF-8 wedges -> DuckDB flush optimization -> exception taxonomy split -> routing diagnostics tail -> UID drift closure.
 
-ClosurePacket: RoundID=R20260301-PH31-CLOSEOUT-R8; ScopeID=PH31-CLOSEOUT-PROTOCOL-R8; ChecksTotal=7; ChecksPassed=7; ChecksFailed=0; Verdict=PASS; OpenRisks=inherited_phase15_integration_failure_owner_strategy_target_phase32_step1; NextAction=request_user_acceptance_for_phase31_block_carryover_to_phase32
+ClosurePacket: RoundID=R20260301-PH31-CLOSEOUT-R8; ScopeID=PH31-CLOSEOUT-PROTOCOL-R8; ChecksTotal=8; ChecksPassed=8; ChecksFailed=0; Verdict=PASS; OpenRisks=phase32_sre_and_ops_backlog_timeout_utf8_duckdb_taxonomy_routing_uid; NextAction=start_phase32_canonical_backlog_sequence_immediately
 ClosureValidation: PASS
 SAWBlockValidation: PASS

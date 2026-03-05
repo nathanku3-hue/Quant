@@ -89,7 +89,7 @@ def main() -> int:
         _print_errors(checks)
         return 1
 
-    cmd = [sys.executable, "-m", "streamlit", "run", "app.py", *sys.argv[1:]]
+    cmd = [sys.executable, "-m", "streamlit", "run", "dashboard.py", *sys.argv[1:]]
     return subprocess.call(cmd, cwd=_project_root())
 
 

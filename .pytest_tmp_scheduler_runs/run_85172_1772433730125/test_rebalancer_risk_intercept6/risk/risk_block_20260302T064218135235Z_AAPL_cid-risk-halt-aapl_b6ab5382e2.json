@@ -1,0 +1,28 @@
+{
+  "decision": {
+    "action": "BLOCK",
+    "metrics": {
+      "vix": 55.0,
+      "vix_kill_switch": 45.0
+    },
+    "reason": "buy entries blocked while VIX=55.00 exceeds 45.00",
+    "reason_code": "vix_kill_switch"
+  },
+  "order": {
+    "client_order_id": "cid-risk-halt-aapl",
+    "limit_price": null,
+    "order_type": "market",
+    "qty": 1,
+    "side": "buy",
+    "symbol": "AAPL"
+  },
+  "portfolio_state": {
+    "equity": 1000.0,
+    "positions": {
+      "MSFT": 1.0
+    },
+    "symbol_volatility": {},
+    "volatility_by_symbol": {}
+  },
+  "timestamp_utc": "2026-03-02T06:42:18.135Z"
+}

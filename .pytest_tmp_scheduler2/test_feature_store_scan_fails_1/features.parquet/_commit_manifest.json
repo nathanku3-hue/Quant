@@ -1,0 +1,27 @@
+{
+  "cache_policy": {
+    "stale_while_revalidate_sec": 0,
+    "tombstone_priority": "enforced"
+  },
+  "commit_id": "8c72effb6e46fd9d",
+  "commit_mode": "full_rebuild",
+  "committed_at_utc": "2026-03-01T18:40:17.275757+00:00",
+  "previous_commit_id": null,
+  "tombstones": [
+    {
+      "cache_policy": "tombstone_over_cache",
+      "partition": "year=2024/month=01",
+      "reason": "replaced_partition"
+    },
+    {
+      "cache_policy": "tombstone_over_cache",
+      "partition": "year=2024/month=02",
+      "reason": "replaced_partition"
+    }
+  ],
+  "touched_partitions": [
+    "year=2024/month=01",
+    "year=2024/month=02"
+  ],
+  "version": "v1"
+}

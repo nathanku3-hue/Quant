@@ -1,0 +1,29 @@
+{
+  "decision": {
+    "action": "BLOCK",
+    "metrics": {
+      "limit": 0.6,
+      "sector": "TECH",
+      "weight": 0.65
+    },
+    "reason": "sector weight breach TECH=0.6500 > 0.6000",
+    "reason_code": "max_sector_weight"
+  },
+  "order": {
+    "client_order_id": "cid-risk-sector",
+    "limit_price": null,
+    "order_type": "market",
+    "qty": 1,
+    "side": "buy",
+    "symbol": "AAPL"
+  },
+  "portfolio_state": {
+    "equity": 1000.0,
+    "positions": {
+      "MSFT": 4.0
+    },
+    "symbol_volatility": {},
+    "volatility_by_symbol": {}
+  },
+  "timestamp_utc": "2026-03-01T18:40:01.049Z"
+}

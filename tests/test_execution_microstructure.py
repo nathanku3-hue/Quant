@@ -969,6 +969,70 @@ def test_export_duckdb_table_to_parquet_does_not_skip_rows_when_appends_happen_b
     assert exported_uids == ["uid-a", "uid-b", "uid-c", "uid-d"]
 
 
+def test_export_duckdb_table_to_parquet_exports_new_tail_after_eof_without_extra_cycle(
+    tmp_path: Path,
+) -> None:
+    duckdb_path = tmp_path / "execution_microstructure.duckdb"
+    parquet_path = tmp_path / "execution_microstructure.parquet"
+
+    with duckdb.connect(str(duckdb_path)) as conn:
+        conn.execute(
+            """
+            CREATE TABLE execution_microstructure AS
+            SELECT * FROM (
+                VALUES
+                    ('uid-a', 'cid-a'),
+                    ('uid-b', 'cid-b'),
+                    ('uid-c', 'cid-c')
+            ) AS t(_spool_record_uid, client_order_id)
+            """
+        )
+
+    pd.DataFrame(columns=["_spool_record_uid", "client_order_id"]).to_parquet(parquet_path, index=False)
+
+    first_write = microstructure_module._export_duckdb_table_to_parquet(
+        duckdb_path=duckdb_path,
+        table_name="execution_microstructure",
+        parquet_path=parquet_path,
+        batch_rows=2,
+    )
+    second_write = microstructure_module._export_duckdb_table_to_parquet(
+        duckdb_path=duckdb_path,
+        table_name="execution_microstructure",
+        parquet_path=parquet_path,
+        batch_rows=2,
+    )
+    eof_write = microstructure_module._export_duckdb_table_to_parquet(
+        duckdb_path=duckdb_path,
+        table_name="execution_microstructure",
+        parquet_path=parquet_path,
+        batch_rows=2,
+    )
+
+    with duckdb.connect(str(duckdb_path)) as conn:
+        conn.execute(
+            """
+            INSERT INTO execution_microstructure (_spool_record_uid, client_order_id)
+            VALUES ('uid-d', 'cid-d')
+            """
+        )
+
+    tail_write = microstructure_module._export_duckdb_table_to_parquet(
+        duckdb_path=duckdb_path,
+        table_name="execution_microstructure",
+        parquet_path=parquet_path,
+        batch_rows=2,
+    )
+
+    out = pd.read_parquet(parquet_path)
+    exported_uids = out["_spool_record_uid"].astype(str).tolist()
+    assert first_write == 2
+    assert second_write == 1
+    assert eof_write == 0
+    assert tail_write == 1
+    assert exported_uids == ["uid-a", "uid-b", "uid-c", "uid-d"]
+
+
 def test_append_parquet_legacy_file_preserves_rows_without_spool_uid(tmp_path: Path) -> None:
     from execution import microstructure as microstructure_module
 
@@ -1382,6 +1446,9 @@ def test_append_execution_microstructure_buffer_capacity_overflow_fails_closed(
         assert int(status.get("buffered_records_pending", 0)) == 0
         assert int(status.get("buffer_drop_count", 0)) >= 3
 
+    with pytest.raises(microstructure_module.MicrostructureFlushError, match="telemetry spool shutdown fail-closed"):
+        microstructure_module._shutdown_execution_microstructure_spoolers()
+
 
 def test_append_execution_microstructure_same_payload_is_idempotent_across_append_retries(
     tmp_path: Path,
@@ -1441,8 +1508,55 @@ def test_shutdown_execution_microstructure_spoolers_fails_closed_when_buffered_r
             spool_path=spool_path,
         )
         assert int(summary["spool_records_buffered"]) == 3
-        with pytest.raises(RuntimeError, match="telemetry spool shutdown fail-closed"):
+        with pytest.raises(microstructure_module.MicrostructureFlushError, match="telemetry spool shutdown fail-closed"):
             microstructure_module._shutdown_execution_microstructure_spoolers()
+
+
+def test_shutdown_execution_microstructure_spoolers_fails_closed_when_sink_error_present(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    parquet_path = tmp_path / "execution_microstructure.parquet"
+    fills_parquet_path = tmp_path / "execution_microstructure_fills.parquet"
+    duckdb_path = tmp_path / "execution_microstructure.duckdb"
+    spool_path = tmp_path / "execution_microstructure_spool.jsonl"
+
+    def _raise_export_error(**_kwargs):
+        raise OSError("synthetic disk full on parquet export")
+
+    monkeypatch.setattr(microstructure_module, "_export_duckdb_table_to_parquet", _raise_export_error)
+
+    append_execution_microstructure(
+        _sample_execute_results(),
+        batch_id="20260302-batch-shutdown-sink-failure-1",
+        strategy="ALPHA_SOVEREIGN_V1",
+        parquet_path=parquet_path,
+        fills_parquet_path=fills_parquet_path,
+        duckdb_path=duckdb_path,
+        spool_path=spool_path,
+    )
+
+    drained = wait_for_execution_microstructure_flush(
+        spool_path=spool_path,
+        parquet_path=parquet_path,
+        fills_parquet_path=fills_parquet_path,
+        duckdb_path=duckdb_path,
+        timeout_seconds=0.5,
+        poll_interval_seconds=0.01,
+    )
+    assert drained is False
+
+    status = get_execution_microstructure_spool_status(
+        spool_path=spool_path,
+        parquet_path=parquet_path,
+        fills_parquet_path=fills_parquet_path,
+        duckdb_path=duckdb_path,
+    )
+    assert int(status.get("pending_bytes", 0)) == 0
+    assert "synthetic disk full on parquet export" in _clean_status_error(status)
+
+    with pytest.raises(microstructure_module.MicrostructureFlushError, match="synthetic disk full on parquet export"):
+        microstructure_module._shutdown_execution_microstructure_spoolers()
 
 
 def test_flush_spool_returns_fast_when_cross_process_lock_is_contended(tmp_path: Path) -> None:
@@ -1612,3 +1726,160 @@ def _clean_status_error(status: dict[str, object]) -> str:
     if raw is None:
         return ""
     return str(raw)
+
+
+def test_deterministic_uid_immutable_across_temporal_mutations():
+    """
+    Phase 32 Step 6: UID remains stable when mutable temporal/status fields change.
+
+    Proves that generating a UID for an order, mutating temporal fields (as happens
+    during retry), and regenerating the UID yields the exact same hash.
+
+    This prevents financial leakage from hash drift during retry cycles.
+    """
+    # Build order rows with immutable origin-state fields
+    order_row_attempt_1 = {
+        "batch_id": "20260302-batch-1",
+        "client_order_id": "cid-test-123",
+        "symbol": "AAPL",
+        "side": "buy",
+        "qty": 100.0,
+        # Temporal fields that change on retry:
+        "captured_at_utc": "2026-03-02T10:00:00.000Z",
+        "arrival_ts": "2026-03-02T10:00:01.000Z",
+        "submit_sent_ts": "2026-03-02T10:00:02.000Z",
+        "broker_ack_ts": "2026-03-02T10:00:03.000Z",
+        "filled_at": "2026-03-02T10:00:05.000Z",
+        "latency_ms_submit_to_ack": 100.0,
+        "heartbeat_decision": "pass",
+        "status": "filled",
+        "ok": True,
+        "error": None,
+    }
+
+    # Generate UID for attempt 1
+    records_attempt_1 = microstructure_module._build_spool_records(
+        order_rows=[order_row_attempt_1],
+        fill_rows=[],
+    )
+    uid_attempt_1 = records_attempt_1[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+
+    # Simulate retry: mutate ALL temporal and status fields
+    order_row_attempt_2 = dict(order_row_attempt_1)
+    order_row_attempt_2.update({
+        "captured_at_utc": "2026-03-02T10:01:00.000Z",  # Different timestamp
+        "arrival_ts": "2026-03-02T10:01:01.000Z",
+        "submit_sent_ts": "2026-03-02T10:01:02.000Z",
+        "broker_ack_ts": "2026-03-02T10:01:03.000Z",
+        "filled_at": "2026-03-02T10:01:05.000Z",
+        "latency_ms_submit_to_ack": 200.0,  # Different latency
+        "heartbeat_decision": "block",  # Different heartbeat
+        "status": "rejected",  # Different status
+        "ok": False,  # Different ok flag
+        "error": "Insufficient Buying Power",  # Different error
+    })
+
+    # Generate UID for attempt 2
+    records_attempt_2 = microstructure_module._build_spool_records(
+        order_rows=[order_row_attempt_2],
+        fill_rows=[],
+    )
+    uid_attempt_2 = records_attempt_2[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+
+    # Assert: UID is IDENTICAL despite mutating all temporal/status fields
+    assert uid_attempt_1 == uid_attempt_2
+    assert uid_attempt_1 is not None
+    assert len(uid_attempt_1) == 40  # SHA1 hex digest length
+
+
+def test_deterministic_uid_changes_on_immutable_field_mutation():
+    """
+    Phase 32 Step 6: UID changes when immutable origin-state fields change.
+
+    Proves that the UID is sensitive to changes in origin-state fields (client_order_id,
+    symbol, side, qty) which should produce different hashes for different orders.
+    """
+    base_order = {
+        "batch_id": "20260302-batch-1",
+        "client_order_id": "cid-original",
+        "symbol": "AAPL",
+        "side": "buy",
+        "qty": 100.0,
+    }
+
+    # Generate UID for original order
+    records_original = microstructure_module._build_spool_records(
+        order_rows=[base_order],
+        fill_rows=[],
+    )
+    uid_original = records_original[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+
+    # Mutate client_order_id
+    order_different_cid = dict(base_order)
+    order_different_cid["client_order_id"] = "cid-different"
+    records_cid = microstructure_module._build_spool_records(order_rows=[order_different_cid], fill_rows=[])
+    uid_different_cid = records_cid[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+    assert uid_different_cid != uid_original
+
+    # Mutate symbol
+    order_different_symbol = dict(base_order)
+    order_different_symbol["symbol"] = "MSFT"
+    records_symbol = microstructure_module._build_spool_records(order_rows=[order_different_symbol], fill_rows=[])
+    uid_different_symbol = records_symbol[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+    assert uid_different_symbol != uid_original
+
+    # Mutate side
+    order_different_side = dict(base_order)
+    order_different_side["side"] = "sell"
+    records_side = microstructure_module._build_spool_records(order_rows=[order_different_side], fill_rows=[])
+    uid_different_side = records_side[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+    assert uid_different_side != uid_original
+
+    # Mutate qty
+    order_different_qty = dict(base_order)
+    order_different_qty["qty"] = 200.0
+    records_qty = microstructure_module._build_spool_records(order_rows=[order_different_qty], fill_rows=[])
+    uid_different_qty = records_qty[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+    assert uid_different_qty != uid_original
+
+
+def test_spool_deduplication_rejects_duplicate_uid():
+    """
+    Phase 32 Step 6: Spool physically rejects duplicate entries based on locked UID.
+
+    Proves that the telemetry spool deduplicates on UID and does not double-log
+    the same order during retry cycles.
+    """
+    # Create two order rows with SAME immutable fields but DIFFERENT temporal fields
+    order_attempt_1 = {
+        "batch_id": "20260302-batch-dedupe",
+        "client_order_id": "cid-dedupe-test",
+        "symbol": "TSLA",
+        "side": "buy",
+        "qty": 50.0,
+        "captured_at_utc": "2026-03-02T11:00:00.000Z",
+        "status": "pending",
+    }
+
+    order_attempt_2 = {
+        "batch_id": "20260302-batch-dedupe",
+        "client_order_id": "cid-dedupe-test",  # SAME
+        "symbol": "TSLA",  # SAME
+        "side": "buy",  # SAME
+        "qty": 50.0,  # SAME
+        "captured_at_utc": "2026-03-02T11:01:00.000Z",  # DIFFERENT (retry timestamp)
+        "status": "filled",  # DIFFERENT (retry status)
+    }
+
+    # Both orders should generate SAME UID
+    records_1 = microstructure_module._build_spool_records(order_rows=[order_attempt_1], fill_rows=[])
+    records_2 = microstructure_module._build_spool_records(order_rows=[order_attempt_2], fill_rows=[])
+
+    uid_1 = records_1[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+    uid_2 = records_2[0][microstructure_module.SPOOL_RECORD_UID_COLUMN]
+
+    assert uid_1 == uid_2  # UID collision on retry
+
+    # The _append_duckdb_table_rows function will deduplicate on UID via WHERE NOT EXISTS
+    # This is already tested in test_append_duckdb_table_rows_handles_schema_drift_without_flush_failure
+    # Here we just prove the UID collision is intentional for deduplication

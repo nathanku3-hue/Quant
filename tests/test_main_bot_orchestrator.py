@@ -1,12 +1,19 @@
 from __future__ import annotations
 
+import asyncio
+import json
 import subprocess
+import threading
 import time
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 import main_bot_orchestrator as mod
+from execution.microstructure import _shutdown_execution_microstructure_spoolers
+from execution.microstructure import append_execution_microstructure
+from execution.microstructure import wait_for_execution_microstructure_flush
 from execution.rebalancer import PortfolioRebalancer
 
 
@@ -891,6 +898,8 @@ def test_execute_orders_with_idempotent_retry_marks_retry_exhausted_after_max_at
     assert len(broker.submit_calls) == 2
     assert results[0]["result"]["ok"] is False
     assert results[0]["result"]["error"] == "retry_exhausted"
+    assert results[0]["result"]["exception_class"] == "TRANSIENT"
+    assert results[0]["result"]["canonical_reason"] == "transient_error:retryable_broker_result"
     assert results[0]["result"]["attempt"] == 2
 
 
@@ -964,6 +973,8 @@ def test_execute_orders_with_idempotent_retry_fails_closed_when_batch_raises_unt
     assert len(results) == 1
     assert results[0]["result"]["ok"] is False
     assert results[0]["result"]["error"] == "retry_exhausted"
+    assert results[0]["result"]["exception_class"] == "TRANSIENT"
+    assert results[0]["result"]["canonical_reason"] == "transient_exception:RuntimeError"
     assert results[0]["result"]["last_error"] == "batch_exception:RuntimeError"
     assert results[0]["result"]["attempt"] == 2
 
@@ -997,8 +1008,53 @@ def test_execute_orders_with_idempotent_retry_fails_non_retryable_error_without_
 
     assert len(broker.submit_calls) == 1
     assert results[0]["result"]["ok"] is False
-    assert results[0]["result"]["error"] == "insufficient buying power"
+    assert results[0]["result"]["error"] == "FAILED_REJECTED"
+    assert results[0]["result"]["exception_class"] == "TERMINAL"
+    assert results[0]["result"]["canonical_reason"] == "terminal_error:non_retryable_broker_result"
+    assert results[0]["result"]["rejection_reason"] == "insufficient buying power"
     assert results[0]["result"]["attempt"] == 1
+
+
+class _MixedTokenTerminalBroker(_RiskContextMixin):
+    def __init__(self) -> None:
+        self.submit_calls: list[dict[str, object]] = []
+
+    def submit_order(self, symbol: str, qty: int, side: str, client_order_id: str | None = None) -> dict:
+        payload = {
+            "symbol": str(symbol).upper(),
+            "qty": int(qty),
+            "side": str(side).lower(),
+            "client_order_id": str(client_order_id),
+        }
+        self.submit_calls.append(payload)
+        return {
+            "ok": False,
+            "error": "401 unauthorized connection reset",
+            "client_order_id": str(client_order_id),
+        }
+
+
+def test_execute_orders_with_idempotent_retry_terminal_classification_precedes_retry_tokens():
+    broker = _MixedTokenTerminalBroker()
+    rebalancer = PortfolioRebalancer(broker=broker)
+    orders = [{"symbol": "MSFT", "qty": 1, "side": "buy", "client_order_id": "cid-terminal-precedence"}]
+
+    results = mod.execute_orders_with_idempotent_retry(
+        rebalancer,
+        orders,
+        max_attempts=3,
+        retry_sleep_seconds=0.0,
+    )
+
+    assert len(broker.submit_calls) == 1
+    assert len(results) == 1
+    result = results[0]["result"]
+    assert result["ok"] is False
+    assert result["error"] == "FAILED_REJECTED"
+    assert result["exception_class"] == "TERMINAL"
+    assert result["canonical_reason"] == "terminal_error:non_retryable_broker_result"
+    assert result["rejection_reason"] == "401 unauthorized connection reset"
+    assert result["attempt"] == 1
 
 
 class _TerminalUnfilledNoRetryRebalancer:
@@ -2344,16 +2400,102 @@ class _SlowLookupBroker(_RiskContextMixin):
         return None
 
 
+class _SyntheticChaosLookupBroker(_RiskContextMixin):
+    def __init__(self, *, max_block_seconds: float = 1.0) -> None:
+        self.lookup_calls: list[str] = []
+        self.cancelled_calls: list[str] = []
+        self.lookup_started = threading.Event()
+        self.lookup_released = threading.Event()
+        self.max_block_seconds = float(max_block_seconds)
+
+    def get_order_by_client_order_id(
+        self,
+        client_order_id: str,
+        *,
+        cancel_event: threading.Event | None = None,
+    ) -> dict[str, object] | None:
+        cid = str(client_order_id)
+        self.lookup_calls.append(cid)
+        self.lookup_started.set()
+        deadline = time.monotonic() + max(self.max_block_seconds, 0.01)
+        while time.monotonic() <= deadline:
+            if cancel_event is not None and cancel_event.is_set():
+                self.cancelled_calls.append(cid)
+                self.lookup_released.set()
+                raise asyncio.CancelledError("synthetic_lookup_cancelled")
+            time.sleep(0.001)
+        self.lookup_released.set()
+        return None
+
+
+class _TimeoutThenUnavailableLookupBroker(_RiskContextMixin):
+    def __init__(self) -> None:
+        self.lookup_calls: list[str] = []
+        self._lookup_count = 0
+
+    def get_order_by_client_order_id(
+        self,
+        client_order_id: str,
+        *,
+        cancel_event: threading.Event | None = None,
+    ) -> dict[str, object] | None:
+        cid = str(client_order_id)
+        self.lookup_calls.append(cid)
+        self._lookup_count += 1
+        if self._lookup_count == 1:
+            deadline = time.monotonic() + 0.5
+            while time.monotonic() <= deadline:
+                if cancel_event is not None and cancel_event.is_set():
+                    raise asyncio.CancelledError("synthetic_lookup_cancelled_once")
+                time.sleep(0.001)
+        return None
+
+
+def _sample_execute_results_for_heartbeat() -> list[dict[str, object]]:
+    return [
+        {
+            "order": {
+                "client_order_id": "cid-isolation-heartbeat-1",
+                "symbol": "AAPL",
+                "side": "buy",
+                "qty": 1,
+                "order_type": "market",
+                "arrival_ts": "2026-03-02T15:30:00.100Z",
+                "arrival_price": 100.0,
+            },
+            "result": {
+                "ok": True,
+                "order_id": "ord-isolation-heartbeat-1",
+                "status": "filled",
+                "submit_sent_ts": "2026-03-02T15:30:00.150Z",
+                "broker_ack_ts": "2026-03-02T15:30:00.220Z",
+                "filled_at": "2026-03-02T15:30:00.600Z",
+                "fill_summary": {
+                    "fill_count": 1,
+                    "fill_qty": 1.0,
+                    "fill_notional": 100.2,
+                    "fill_vwap": 100.2,
+                    "first_fill_ts": "2026-03-02T15:30:00.600Z",
+                    "last_fill_ts": "2026-03-02T15:30:00.600Z",
+                },
+            },
+        }
+    ]
+
+
 def test_execute_orders_with_idempotent_retry_times_out_reconciliation_lookup_and_surfaces_issue(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ):
     broker = _SlowLookupBroker(delay_seconds=0.05)
     rebalancer = _OkTrueSparsePayloadRebalancer(broker=broker)
     orders = [{"symbol": "AAPL", "qty": 1, "side": "buy", "client_order_id": "cid-lookup-timeout"}]
+    quarantine_path = tmp_path / "reconciliation_quarantine_timeout.jsonl"
 
     monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_MAX_POLLS", 2)
     monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_POLL_SLEEP_SECONDS", 0.0)
     monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_LOOKUP_TIMEOUT_SECONDS", 0.01)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_QUARANTINE_PATH", str(quarantine_path))
 
     with pytest.raises(mod.AmbiguousExecutionError, match="lookup_timeout"):
         mod.execute_orders_with_idempotent_retry(
@@ -2364,7 +2506,292 @@ def test_execute_orders_with_idempotent_retry_times_out_reconciliation_lookup_an
         )
 
     assert rebalancer.calls == 1
-    assert broker.lookup_calls == ["cid-lookup-timeout", "cid-lookup-timeout"]
+    assert broker.lookup_calls == ["cid-lookup-timeout"]
+    quarantine_rows = mod._read_quarantine_jsonl_safe(quarantine_path)
+    assert len(quarantine_rows) == 1
+    assert str(quarantine_rows[0]["reconciliation_issue"]).startswith("lookup_timeout:")
+    assert str(quarantine_rows[0]["reconciliation_issue"]).endswith(":uncooperative")
+    assert str(quarantine_rows[0]["client_order_id"]) == "cid-lookup-timeout"
+    assert int(quarantine_rows[0]["schema_version"]) == 1
+    assert set(quarantine_rows[0].keys()) == {
+        "attempt",
+        "client_order_id",
+        "order",
+        "quarantined_at_utc",
+        "reconciliation_issue",
+        "reconciliation_issue_family",
+        "schema_version",
+        "source",
+    }
+    assert set(quarantine_rows[0]["order"].keys()) == {"limit_price", "order_type", "qty", "side", "symbol"}
+
+
+def test_execute_orders_with_idempotent_retry_cooperatively_cancels_lookup_and_quarantines(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+):
+    broker = _SyntheticChaosLookupBroker()
+    rebalancer = _OkTrueSparsePayloadRebalancer(broker=broker)
+    orders = [{"symbol": "AAPL", "qty": 1, "side": "buy", "client_order_id": "cid-lookup-cancelled"}]
+    quarantine_path = tmp_path / "reconciliation_quarantine_cancelled.jsonl"
+
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_MAX_POLLS", 1)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_POLL_SLEEP_SECONDS", 0.0)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_LOOKUP_TIMEOUT_SECONDS", 0.01)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_QUARANTINE_PATH", str(quarantine_path))
+
+    with pytest.raises(mod.AmbiguousExecutionError, match="lookup_cancelled"):
+        mod.execute_orders_with_idempotent_retry(
+            rebalancer,  # type: ignore[arg-type]
+            orders,
+            max_attempts=1,
+            retry_sleep_seconds=0.0,
+        )
+
+    assert rebalancer.calls == 1
+    assert broker.lookup_calls == ["cid-lookup-cancelled"]
+    assert broker.cancelled_calls == ["cid-lookup-cancelled"]
+    assert broker.lookup_released.wait(timeout=1.0)
+    quarantine_rows = mod._read_quarantine_jsonl_safe(quarantine_path)
+    assert len(quarantine_rows) == 1
+    assert str(quarantine_rows[0]["reconciliation_issue"]) == "lookup_cancelled"
+    assert str(quarantine_rows[0]["reconciliation_issue_family"]) == "lookup_cancelled"
+    assert str(quarantine_rows[0]["source"]) == "ok_true_missing_required_fields"
+    assert int(quarantine_rows[0]["schema_version"]) == 1
+
+
+def test_reconciliation_lookup_block_does_not_wedge_microstructure_spool_flush(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+):
+    broker = _SyntheticChaosLookupBroker(max_block_seconds=2.0)
+    rebalancer = _OkTrueSparsePayloadRebalancer(broker=broker)
+    quarantine_path = tmp_path / "reconciliation_quarantine_isolation.jsonl"
+    orders = [{"symbol": "AAPL", "qty": 1, "side": "buy", "client_order_id": "cid-lookup-isolation"}]
+
+    telemetry_parquet = tmp_path / "execution_microstructure.parquet"
+    telemetry_fills_parquet = tmp_path / "execution_microstructure_fills.parquet"
+    telemetry_duckdb = tmp_path / "execution_microstructure.duckdb"
+    telemetry_spool = tmp_path / "execution_microstructure_spool.jsonl"
+
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_MAX_POLLS", 1)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_POLL_SLEEP_SECONDS", 0.0)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_LOOKUP_TIMEOUT_SECONDS", 0.30)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_QUARANTINE_PATH", str(quarantine_path))
+
+    captured: dict[str, BaseException] = {}
+
+    def _run_lookup_path() -> None:
+        try:
+            mod.execute_orders_with_idempotent_retry(
+                rebalancer,  # type: ignore[arg-type]
+                orders,
+                max_attempts=1,
+                retry_sleep_seconds=0.0,
+            )
+        except BaseException as exc:
+            captured["exception"] = exc
+
+    execution_thread = threading.Thread(target=_run_lookup_path, daemon=True)
+    execution_thread.start()
+    assert broker.lookup_started.wait(timeout=1.0)
+
+    try:
+        summary = append_execution_microstructure(
+            _sample_execute_results_for_heartbeat(),
+            batch_id="20260302-batch-thread-isolation",
+            strategy="ALPHA_SOVEREIGN_V1",
+            parquet_path=telemetry_parquet,
+            fills_parquet_path=telemetry_fills_parquet,
+            duckdb_path=telemetry_duckdb,
+            spool_path=telemetry_spool,
+        )
+        assert int(summary["spool_records_appended"]) > 0
+        drained = wait_for_execution_microstructure_flush(
+            spool_path=telemetry_spool,
+            parquet_path=telemetry_parquet,
+            fills_parquet_path=telemetry_fills_parquet,
+            duckdb_path=telemetry_duckdb,
+            timeout_seconds=5.0,
+        )
+        assert drained is True
+    finally:
+        _shutdown_execution_microstructure_spoolers()
+
+    execution_thread.join(timeout=2.0)
+    assert execution_thread.is_alive() is False
+    assert isinstance(captured.get("exception"), mod.AmbiguousExecutionError)
+    assert broker.cancelled_calls == ["cid-lookup-isolation"]
+    quarantine_rows = mod._read_quarantine_jsonl_safe(quarantine_path)
+    assert len(quarantine_rows) == 1
+    assert str(quarantine_rows[0]["reconciliation_issue"]) == "lookup_cancelled"
+
+
+def test_execute_orders_with_idempotent_retry_preserves_lookup_taxonomy_across_mixed_polls(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+):
+    broker = _TimeoutThenUnavailableLookupBroker()
+    rebalancer = _OkTrueSparsePayloadRebalancer(broker=broker)
+    orders = [{"symbol": "AAPL", "qty": 1, "side": "buy", "client_order_id": "cid-lookup-sticky-issue"}]
+    quarantine_path = tmp_path / "reconciliation_quarantine_sticky_issue.jsonl"
+
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_MAX_POLLS", 2)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_POLL_SLEEP_SECONDS", 0.0)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_LOOKUP_TIMEOUT_SECONDS", 0.01)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_QUARANTINE_PATH", str(quarantine_path))
+
+    with pytest.raises(mod.AmbiguousExecutionError, match="lookup_cancelled"):
+        mod.execute_orders_with_idempotent_retry(
+            rebalancer,  # type: ignore[arg-type]
+            orders,
+            max_attempts=1,
+            retry_sleep_seconds=0.0,
+        )
+
+    assert rebalancer.calls == 1
+    assert broker.lookup_calls == ["cid-lookup-sticky-issue", "cid-lookup-sticky-issue"]
+    quarantine_rows = mod._read_quarantine_jsonl_safe(quarantine_path)
+    assert len(quarantine_rows) == 1
+    assert str(quarantine_rows[0]["reconciliation_issue"]) == "lookup_cancelled"
+    assert str(quarantine_rows[0]["reconciliation_issue_family"]) == "lookup_cancelled"
+
+
+def test_reconciliation_quarantine_append_is_lossless_under_concurrent_writers(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+):
+    quarantine_path = tmp_path / "reconciliation_quarantine_concurrent.jsonl"
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_QUARANTINE_PATH", str(quarantine_path))
+
+    writer_threads = 4
+    writes_per_thread = 20
+    errors: list[str] = []
+    errors_lock = threading.Lock()
+
+    def _write_rows(thread_idx: int) -> None:
+        for row_idx in range(writes_per_thread):
+            issue = mod._append_reconciliation_quarantine_entry(
+                client_order_id=f"cid-concurrent-{thread_idx}-{row_idx}",
+                order={"symbol": "AAPL", "side": "buy", "qty": 1, "order_type": "market", "limit_price": None},
+                reconciliation_issue="lookup_timeout:0.010s:uncooperative",
+                attempt=1,
+                source=f"concurrency-writer-{thread_idx}",
+            )
+            if issue:
+                with errors_lock:
+                    errors.append(issue)
+
+    threads = [
+        threading.Thread(target=_write_rows, args=(thread_idx,), daemon=True)
+        for thread_idx in range(writer_threads)
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=5.0)
+        assert thread.is_alive() is False
+
+    assert errors == []
+    rows = mod._read_quarantine_jsonl_safe(quarantine_path)
+    assert len(rows) == writer_threads * writes_per_thread
+
+
+def test_read_quarantine_jsonl_safe_handles_malformed_utf8(tmp_path: Path):
+    """
+    Phase 32 Step 2: UTF-8 decode wedge reconciliation.
+
+    Proves that _read_quarantine_jsonl_safe() handles malformed UTF-8 bytes
+    gracefully using errors='replace' instead of wedging with UnicodeDecodeError.
+
+    This ensures ingestion/replay boundaries remain operational when external
+    sources (broker responses, process snapshots) introduce corrupted data.
+    """
+    quarantine_path = tmp_path / "reconciliation_quarantine.jsonl"
+
+    # Create deterministic malformed UTF-8 fixture:
+    # - Row 1: valid UTF-8 with ASCII-safe JSON
+    # - Row 2: malformed UTF-8 byte sequence (0xFF is invalid in UTF-8)
+    # - Row 3: valid UTF-8 again to prove recovery
+    expected_keys = {
+        "attempt",
+        "client_order_id",
+        "order",
+        "quarantined_at_utc",
+        "reconciliation_issue",
+        "reconciliation_issue_family",
+        "schema_version",
+        "source",
+    }
+    row1 = (
+        '{"schema_version":1,"quarantined_at_utc":"2026-03-02T15:30:00.000Z","client_order_id":"cid-valid-1",'
+        '"reconciliation_issue":"lookup_timeout:5s:uncooperative","reconciliation_issue_family":"lookup_timeout",'
+        '"attempt":1,"source":"mock_broker_payload","order":{"symbol":"AAPL","side":"buy","qty":1,'
+        '"order_type":"market","limit_price":null}}\n'
+    )
+    # Deterministic mock broker payload fixture containing invalid UTF-8 bytes (0xFF, 0xFE).
+    mock_broker_payload_malformed_bytes = (
+        b'{"schema_version":1,"quarantined_at_utc":"2026-03-02T15:30:00.100Z","client_order_id":"cid-malformed",'
+        b'"reconciliation_issue":"error_\xff\xfe_invalid","reconciliation_issue_family":"lookup_exception",'
+        b'"attempt":1,"source":"mock_broker_payload","order":{"symbol":"AAPL","side":"buy","qty":1,'
+        b'"order_type":"market","limit_price":null}}\n'
+    )
+    row3 = (
+        '{"schema_version":1,"quarantined_at_utc":"2026-03-02T15:30:00.200Z","client_order_id":"cid-valid-2",'
+        '"reconciliation_issue":"lookup_cancelled","reconciliation_issue_family":"lookup_cancelled",'
+        '"attempt":1,"source":"mock_broker_payload","order":{"symbol":"AAPL","side":"buy","qty":1,'
+        '"order_type":"market","limit_price":null}}\n'
+    )
+
+    # Write malformed fixture using binary mode to preserve invalid UTF-8
+    with quarantine_path.open("wb") as f:
+        f.write(row1.encode("utf-8"))
+        f.write(mock_broker_payload_malformed_bytes)
+        f.write(row3.encode("utf-8"))
+
+    # Prove unsafe read wedges with UnicodeDecodeError
+    with pytest.raises(UnicodeDecodeError):
+        quarantine_path.read_text(encoding="utf-8")
+
+    # Prove safe reader handles malformed bytes gracefully
+    rows = mod._read_quarantine_jsonl_safe(quarantine_path)
+
+    assert len(rows) == 3
+    assert rows[0]["client_order_id"] == "cid-valid-1"
+    assert rows[0]["schema_version"] == 1
+    assert set(rows[0].keys()) == expected_keys
+    assert rows[0]["reconciliation_issue"] == "lookup_timeout:5s:uncooperative"
+
+    # Row 2: malformed bytes replaced with U+FFFD replacement character (\ufffd)
+    assert rows[1]["client_order_id"] == "cid-malformed"
+    assert "\ufffd" in rows[1]["reconciliation_issue"]  # Replacement character present
+    assert rows[1]["schema_version"] == 1
+    assert set(rows[1].keys()) == expected_keys
+    assert rows[1]["source"] == "mock_broker_payload"
+    assert rows[1]["attempt"] == 1
+    assert rows[1]["order"]["symbol"] == "AAPL"
+    assert rows[1]["order"]["side"] == "buy"
+
+    assert rows[2]["client_order_id"] == "cid-valid-2"
+    assert rows[2]["schema_version"] == 1
+    assert set(rows[2].keys()) == expected_keys
+    assert rows[2]["reconciliation_issue"] == "lookup_cancelled"
+
+
+def test_read_quarantine_jsonl_safe_skips_malformed_json_lines(tmp_path: Path):
+    quarantine_path = tmp_path / "reconciliation_quarantine_malformed_json.jsonl"
+    payload = (
+        '{"schema_version":1,"client_order_id":"cid-valid-a","reconciliation_issue":"lookup_cancelled"}\n'
+        '{"schema_version":1,"client_order_id":"cid-broken-json","reconciliation_issue":"lookup_timeout"\n'
+        '{"schema_version":1,"client_order_id":"cid-valid-b","reconciliation_issue":"lookup_exception:RuntimeError"}\n'
+    )
+    quarantine_path.write_text(payload, encoding="utf-8")
+
+    rows = mod._read_quarantine_jsonl_safe(quarantine_path)
+
+    assert len(rows) == 2
+    assert rows[0]["client_order_id"] == "cid-valid-a"
+    assert rows[1]["client_order_id"] == "cid-valid-b"
 
 
 def test_execute_orders_with_idempotent_retry_skips_lookup_when_reconciliation_budget_is_zero(
@@ -2385,5 +2812,217 @@ def test_execute_orders_with_idempotent_retry_skips_lookup_when_reconciliation_b
             retry_sleep_seconds=0.0,
         )
 
+
+def test_execute_orders_terminal_exception_bypasses_retry_immediately():
+    """
+    Phase 32 Step 4: TERMINAL exceptions bypass retry loop and fail-closed immediately.
+
+    Proves that hard rejections ("Insufficient Buying Power", validation errors) do not
+    trigger infinite retry loops that would freeze capital allocation.
+    """
+
+    class TerminalExceptionBroker:
+        """Mock broker that raises TERMINAL exception (validation error)."""
+
+        def __init__(self):
+            self.call_count = 0
+
+        def execute_orders(self, orders: list[dict], dry_run: bool = False) -> list[dict]:
+            self.call_count += 1
+            raise ValueError("Insufficient Buying Power")
+
+    class TerminalRebalancer:
+        def __init__(self, broker):
+            self.broker = broker
+
+        def execute_orders(self, orders: list[dict], dry_run: bool = False) -> list[dict]:
+            return self.broker.execute_orders(orders, dry_run)
+
+    broker = TerminalExceptionBroker()
+    rebalancer = TerminalRebalancer(broker)
+    orders = [{"symbol": "AAPL", "qty": 100, "side": "buy", "client_order_id": "cid-terminal"}]
+
+    # Execute with max_attempts=3 to prove retry is bypassed
+    results = mod.execute_orders_with_idempotent_retry(
+        rebalancer,  # type: ignore[arg-type]
+        orders,
+        max_attempts=3,
+        retry_sleep_seconds=0.0,
+    )
+
+    # Assert broker was called ONLY ONCE (no retry attempts)
+    assert broker.call_count == 1
+
+    # Assert result is FAILED_REJECTED with TERMINAL classification
+    assert len(results) == 1
+    result = results[0]["result"]
+    assert result["ok"] is False
+    assert result["error"] == "FAILED_REJECTED"
+    assert result["canonical_reason"] == "terminal_exception:ValueError"
+    assert "Insufficient Buying Power" in result["rejection_reason"]
+    assert result["exception_class"] == "TERMINAL"
+    assert result["attempt"] == 1  # Failed on first attempt, no retry
+
+
+def test_execute_orders_transient_exception_retries_with_backoff():
+    """
+    Phase 32 Step 4: TRANSIENT exceptions trigger bounded retry loop.
+
+    Proves that transient network errors ("Connection Reset by Peer") are retried
+    with exponential backoff before marking as retry_exhausted.
+    """
+
+    class TransientExceptionBroker:
+        """Mock broker that raises TRANSIENT exception (network error)."""
+
+        def __init__(self):
+            self.call_count = 0
+
+        def execute_orders(self, orders: list[dict], dry_run: bool = False) -> list[dict]:
+            self.call_count += 1
+            raise ConnectionResetError("Connection reset by peer")
+
+    class TransientRebalancer:
+        def __init__(self, broker):
+            self.broker = broker
+
+        def execute_orders(self, orders: list[dict], dry_run: bool = False) -> list[dict]:
+            return self.broker.execute_orders(orders, dry_run)
+
+    broker = TransientExceptionBroker()
+    rebalancer = TransientRebalancer(broker)
+    orders = [{"symbol": "AAPL", "qty": 10, "side": "buy", "client_order_id": "cid-transient"}]
+
+    # Execute with max_attempts=3 to prove retry loop is triggered
+    results = mod.execute_orders_with_idempotent_retry(
+        rebalancer,  # type: ignore[arg-type]
+        orders,
+        max_attempts=3,
+        retry_sleep_seconds=0.0,
+    )
+
+    # Assert broker was called 3 TIMES (full retry loop)
+    assert broker.call_count == 3
+
+    # Assert result is retry_exhausted with TRANSIENT classification
+    assert len(results) == 1
+    result = results[0]["result"]
+    assert result["ok"] is False
+    assert result["error"] == "retry_exhausted"
+    assert result["canonical_reason"] == "transient_exception:ConnectionResetError"
+    assert result["exception_class"] == "TRANSIENT"
+    assert result["attempt"] == 3  # Exhausted all retry attempts
+
+
+def test_classify_broker_exception_terminal_cases():
+    """
+    Phase 32 Step 4: Verify TERMINAL exception classification.
+
+    Tests deterministic mapping of validation/business-logic errors to TERMINAL.
+    """
+    # Validation errors
+    assert mod._classify_broker_exception(ValueError("invalid qty")) == "TERMINAL"
+    assert mod._classify_broker_exception(TypeError("invalid type")) == "TERMINAL"
+
+    # Broker rejections
+    assert mod._classify_broker_exception(RuntimeError("Insufficient Buying Power")) == "TERMINAL"
+    assert mod._classify_broker_exception(RuntimeError("Invalid Symbol: XYZ")) == "TERMINAL"
+    assert mod._classify_broker_exception(RuntimeError("Market Closed")) == "TERMINAL"
+
+    # HTTP 4xx errors
+    class Http400Error(Exception):
+        pass
+
+    assert mod._classify_broker_exception(Http400Error("400 Bad Request")) == "TERMINAL"
+    assert mod._classify_broker_exception(RuntimeError("401 Unauthorized")) == "TERMINAL"
+
+
+def test_classify_broker_exception_transient_cases():
+    """
+    Phase 32 Step 4: Verify TRANSIENT exception classification.
+
+    Tests deterministic mapping of network/infrastructure errors to TRANSIENT.
+    """
+    # Connection errors
+    assert mod._classify_broker_exception(ConnectionResetError("connection reset")) == "TRANSIENT"
+    assert mod._classify_broker_exception(BrokenPipeError("broken pipe")) == "TRANSIENT"
+    assert mod._classify_broker_exception(ConnectionError("connection failed")) == "TRANSIENT"
+
+    # Timeout errors
+    assert mod._classify_broker_exception(TimeoutError("request timeout")) == "TRANSIENT"
+    assert mod._classify_broker_exception(RuntimeError("timed out after 30s")) == "TRANSIENT"
+
+    # HTTP 5xx errors
+    assert mod._classify_broker_exception(RuntimeError("503 Service Unavailable")) == "TRANSIENT"
+    assert mod._classify_broker_exception(RuntimeError("502 Bad Gateway")) == "TRANSIENT"
+
+    # Rate limiting (transient - back off and retry)
+    assert mod._classify_broker_exception(RuntimeError("429 Too Many Requests")) == "TRANSIENT"
+
+    # Unknown exceptions default to TRANSIENT (fail-safe)
+    assert mod._classify_broker_exception(RuntimeError("unknown error")) == "TRANSIENT"
+
+
+def test_execute_orders_with_idempotent_retry_zero_lookup_timeout_remains_bounded(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+):
+    broker = _SlowLookupBroker(delay_seconds=0.25)
+    rebalancer = _OkTrueSparsePayloadRebalancer(broker=broker)
+    orders = [{"symbol": "AAPL", "qty": 1, "side": "buy", "client_order_id": "cid-zero-timeout"}]
+    quarantine_path = tmp_path / "reconciliation_quarantine_zero_timeout.jsonl"
+
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_MAX_POLLS", 1)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_POLL_SLEEP_SECONDS", 0.0)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_LOOKUP_TIMEOUT_SECONDS", 0.0)
+    monkeypatch.setattr(mod, "EXECUTION_RECONCILIATION_QUARANTINE_PATH", str(quarantine_path))
+
+    started = time.perf_counter()
+    with pytest.raises(mod.AmbiguousExecutionError, match="lookup_timeout"):
+        mod.execute_orders_with_idempotent_retry(
+            rebalancer,  # type: ignore[arg-type]
+            orders,
+            max_attempts=1,
+            retry_sleep_seconds=0.0,
+        )
+    elapsed = time.perf_counter() - started
+
+    assert elapsed < 0.2
     assert rebalancer.calls == 1
-    assert broker.lookup_calls == []
+    assert broker.lookup_calls == ["cid-zero-timeout"]
+    quarantine_rows = mod._read_quarantine_jsonl_safe(quarantine_path)
+    assert len(quarantine_rows) == 1
+    assert str(quarantine_rows[0]["reconciliation_issue"]).startswith("lookup_timeout:0.010s")
+
+
+def test_execute_orders_terminal_exception_logs_canonical_reason(monkeypatch: pytest.MonkeyPatch):
+    class _TerminalBroker:
+        def execute_orders(self, orders: list[dict], dry_run: bool = False) -> list[dict]:
+            raise ValueError("Insufficient Buying Power")
+
+    class _TerminalRebalancer:
+        def __init__(self) -> None:
+            self.broker = _TerminalBroker()
+
+        def execute_orders(self, orders: list[dict], dry_run: bool = False) -> list[dict]:
+            return self.broker.execute_orders(orders, dry_run)
+
+    logged: list[str] = []
+
+    def _capture_log(message: str, *args: object) -> None:
+        logged.append(str(message % args if args else message))
+
+    monkeypatch.setattr(mod.logging, "error", _capture_log)
+
+    results = mod.execute_orders_with_idempotent_retry(
+        _TerminalRebalancer(),  # type: ignore[arg-type]
+        [{"symbol": "AAPL", "qty": 1, "side": "buy", "client_order_id": "cid-terminal-log"}],
+        max_attempts=3,
+        retry_sleep_seconds=0.0,
+    )
+
+    assert len(results) == 1
+    result = results[0]["result"]
+    assert result["error"] == "FAILED_REJECTED"
+    assert result["canonical_reason"] == "terminal_exception:ValueError"
+    assert any("terminal_exception:ValueError" in line for line in logged)

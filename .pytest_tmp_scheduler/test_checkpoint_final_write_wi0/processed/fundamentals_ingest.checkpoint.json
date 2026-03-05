@@ -1,0 +1,1 @@
+{"version": 1, "scope": "Custom", "custom_list": "AAPL", "targets": ["AAPL"], "processed_tickers": ["AAPL"], "permno_map": {"AAPL": 10001}, "tickers_with_data": 1, "rows_in_partial": 1, "stage": "final_write", "created_at": "2026-02-01T00:00:00", "updated_at": "2026-02-01T00:00:00"}

@@ -1,0 +1,26 @@
+{
+  "decision": {
+    "action": "BLOCK",
+    "metrics": {
+      "limit": 0.1,
+      "var_proxy": 0.165
+    },
+    "reason": "VaR proxy breach 0.1650 > 0.1000",
+    "reason_code": "var_proxy"
+  },
+  "order": {
+    "client_order_id": "cid-risk-var",
+    "limit_price": null,
+    "order_type": "market",
+    "qty": 2,
+    "side": "buy",
+    "symbol": "AAPL"
+  },
+  "portfolio_state": {
+    "equity": 1000.0,
+    "positions": {},
+    "symbol_volatility": {},
+    "volatility_by_symbol": {}
+  },
+  "timestamp_utc": "2026-03-02T06:39:09.376Z"
+}

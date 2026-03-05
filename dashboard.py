@@ -10,6 +10,7 @@ import json
 import signal
 import subprocess
 import datetime
+import atexit
 from pathlib import Path
 from functools import reduce
 from filelock import FileLock
@@ -17,6 +18,14 @@ from core.release_metadata import build_release_cache_fingerprint
 from core.dashboard_control_plane import coerce_proxy_numeric
 from core.dashboard_control_plane import derive_hf_proxy_data_health
 from core.dashboard_control_plane import ensure_payload_data_health
+from core.data_orchestrator import get_macro_features
+from views.regime_view import render_regime_banner_from_macro
+from views.auto_backtest_view import render_auto_backtest_view
+from views.optimizer_view import render_optimizer_view
+from views.drift_monitor_view import render_drift_monitor_view
+from core.drift_alert_manager import DriftAlertManager
+from core.drift_detector import DriftDetector
+from core.dashboard_escalation import initialize_escalation_manager
 # st_autorefresh removed in V3.10 — replaced by @st.fragment(run_every=)
 
 # --- Phase 2: Backtest Cache + PID Infrastructure ---
@@ -151,6 +160,124 @@ def _load_cached_scan_payload(path: Path) -> dict | None:
     if not isinstance(proxy, dict):
         return None
     return payload
+
+
+def _coerce_weight_series(raw_weights) -> pd.Series | None:
+    if raw_weights is None:
+        return None
+
+    if isinstance(raw_weights, pd.Series):
+        series = raw_weights.copy()
+    elif isinstance(raw_weights, dict):
+        series = pd.Series(raw_weights, dtype="float64")
+    elif isinstance(raw_weights, list):
+        tmp: dict[str, float] = {}
+        for row in raw_weights:
+            if isinstance(row, dict):
+                asset = row.get("ticker") or row.get("asset") or row.get("symbol")
+                weight = row.get("weight")
+                if asset is not None and weight is not None:
+                    tmp[str(asset)] = weight
+        series = pd.Series(tmp, dtype="float64")
+    else:
+        return None
+
+    series = pd.to_numeric(series, errors="coerce").dropna()
+    if series.empty:
+        return None
+
+    total = float(series.sum())
+    if abs(total) < 1e-12:
+        return None
+
+    return (series / total).sort_index()
+
+
+def _load_weight_series_from_json(path: Path) -> pd.Series | None:
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+    candidates = []
+    if isinstance(payload, dict):
+        candidates.extend(
+            [
+                payload.get("weights"),
+                payload.get("baseline_weights"),
+                payload.get("live_weights"),
+                payload.get("expected_allocation"),
+                payload.get("allocation"),
+                payload.get("latest"),
+                payload,
+            ]
+        )
+    else:
+        candidates.append(payload)
+
+    for candidate in candidates:
+        series = _coerce_weight_series(candidate)
+        if series is not None:
+            return series
+    return None
+
+
+def _load_baseline_from_latest_pointer() -> tuple[pd.Series | None, dict | None]:
+    """
+    Load baseline weights and metadata from latest pointer.
+
+    Phase 33A Step 7: Loads baseline from pointer-based registry structure.
+
+    Returns:
+        (weights, metadata) tuple
+        - weights: pd.Series of expected allocation (normalized)
+        - metadata: dict with baseline_id, strategy_name, created_at
+    """
+    latest_path = Path("data/backtest_baselines/latest.json")
+    if not latest_path.exists():
+        return None, None
+
+    try:
+        pointer = json.loads(latest_path.read_text())
+        baseline_id = pointer.get("baseline_id")
+        if not baseline_id:
+            return None, None
+
+        # Load expected allocation from parquet
+        allocation_path = Path(f"data/backtest_baselines/{baseline_id}/expected_allocation.parquet")
+        if not allocation_path.exists():
+            return None, None
+
+        allocation_df = pd.read_parquet(allocation_path)
+
+        # Get latest allocation (last row)
+        if allocation_df.empty:
+            return None, None
+
+        latest_weights = allocation_df.iloc[-1]  # Last rebalance
+        weights = _coerce_weight_series(latest_weights)
+
+        # Load metadata
+        metadata_path = Path(f"data/backtest_baselines/{baseline_id}/metadata.json")
+        metadata = None
+        if metadata_path.exists():
+            raw_metadata = json.loads(metadata_path.read_text())
+            # Map execution_timestamp -> created_at for drift monitor view compatibility
+            metadata = {
+                "baseline_id": raw_metadata.get("baseline_id"),
+                "strategy_name": raw_metadata.get("strategy_name"),
+                "strategy_version": raw_metadata.get("strategy_version"),
+                "created_at": raw_metadata.get("execution_timestamp"),  # Key mapping
+            }
+
+        return weights, metadata
+
+    except Exception as e:
+        import logging
+        logging.warning(f"Failed to load baseline from latest pointer: {e}")
+        return None, None
 
 # --- Sector & Proxy Mapping ---
 SECTOR_MAP = {
@@ -609,7 +736,46 @@ if payload is None:
 if not payload:
     st.error("Engine failed to boot and no cache available.")
     st.stop()
-    
+
+# --- Load Institutional-Grade Parquet Data (for Tabs 3 & 5) ---
+# Dashboard uses custom yfinance scanning for alpha discovery (Tabs 1,2,4)
+# But Tab 3 (Backtest) and Tab 5 (Portfolio) require TRI-based institutional data
+parquet_data_available = False
+prices_wide = pd.DataFrame()
+returns_wide = pd.DataFrame()
+ticker_map_parquet = {}
+sector_map_parquet = None
+fundamentals_wide = None
+
+try:
+    from core.data_orchestrator import load_unified_data
+
+    # Attempt to load historical parquet data
+    unified_package = load_unified_data(
+        mode="historical",
+        top_n=2000,
+        start_year=2000,
+        universe_mode="top_liquid",
+    )
+
+    prices_wide = unified_package.prices
+    returns_wide = unified_package.returns
+    ticker_map_parquet = unified_package.ticker_map
+    sector_map_parquet = unified_package.sector_map
+    fundamentals_wide = unified_package.fundamentals
+
+    # Check if data loaded successfully
+    if not prices_wide.empty and not returns_wide.empty:
+        parquet_data_available = True
+        st.sidebar.success(f"✅ Parquet TRI data loaded: {prices_wide.shape[1]} tickers")
+    else:
+        st.sidebar.warning("⚠️ Parquet data empty - Tabs 3 & 5 in placeholder mode")
+
+except Exception as e:
+    st.sidebar.warning(f"⚠️ Parquet data unavailable: {type(e).__name__}")
+    st.sidebar.caption("Tabs 3 & 5 will display placeholders. Custom alpha scanning (Tabs 1,2,4) unaffected.")
+    # Continue with yfinance-only mode
+
 # Process Payload
 df_scan = pd.DataFrame(payload.get("data", []))
 proxy_data = payload.get("proxy", {})
@@ -656,12 +822,24 @@ else:
     time_str = f"{hours} hours ago"
 
 # --- Sidebar ---
+# --- Calculate health status for sidebar badge ---
+health_status = str(data_health.get("status", "DEGRADED")).upper()
+health_ratio = data_health.get("degraded_count", 0) / max(data_health.get("total_signals", 1), 1)
+
+# --- Sidebar ---
 with st.sidebar:
     st.markdown(f"**Last Sync:** {time_str}")
     if st.button("🔄 Force Engine Refresh", type="primary"):
         run_and_save_scan()
         st.rerun()
-        
+
+    # Compact health badge
+    badge_color = "#00cc66" if health_status == "HEALTHY" else "#ffb020"
+    st.markdown(
+        f'<span style="color:{badge_color};">● {health_status}</span>',
+        unsafe_allow_html=True
+    )
+
     st.divider()
     st.header("🛡️ Hedge Harvester")
     hedge_ticker = st.text_input("Enter Ticker for Collar:", value="MU").upper()
@@ -697,90 +875,73 @@ if os.path.exists(FRESH_FINDS_FILE):
 # --- Header ---
 st.title("🎯 The Sovereign Cockpit")
 st.markdown(f"Full Auto Execution Mode | Proxy Integrity Lock <span style='color:#888;font-size:0.9em;'>(Updated: {time_str})</span>", unsafe_allow_html=True)
-
-health_status = str(data_health.get("status", "DEGRADED")).upper()
 health_ratio = float(data_health.get("degraded_ratio", 1.0))
 health_ratio = max(0.0, min(1.0, health_ratio))
-health_pct = int(round(health_ratio * 100))
-badge_color = "#00cc66" if health_status == "HEALTHY" else "#ffb020"
-badge_background = "rgba(0,204,102,0.12)" if health_status == "HEALTHY" else "rgba(255,176,32,0.12)"
-st.markdown(
-    f"""
-    <div style="display:inline-flex; align-items:center; gap:8px; border:1px solid {badge_color}; border-radius:999px; padding:4px 10px; margin: 0 0 8px 0; background:{badge_background};">
-        <span style="font-size:0.78rem; color:#888; text-transform:uppercase;">Data Health</span>
-        <span style="font-size:0.82rem; font-weight:700; color:{badge_color};">{health_status}</span>
-        <span style="font-size:0.78rem; color:#aaa;">Degraded: {health_pct}%</span>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-with st.expander("Data Health details", expanded=False):
-    degraded_count = int(data_health.get("degraded_count", 0))
-    total_signals = int(data_health.get("total_signals", 0))
-    st.caption(f"Signals degraded: {degraded_count}/{total_signals}")
-    signal_rows = []
-    for signal in data_health.get("signals", []):
-        signal_rows.append(
-            {
-                "Signal": str(signal.get("signal", "")),
-                "Status": str(signal.get("status", "")),
-                "Reason": str(signal.get("reason", "")),
-                "Span": str(signal.get("span", "")),
-            }
-        )
-    if signal_rows:
-        st.dataframe(pd.DataFrame(signal_rows), hide_index=True, use_container_width=True)
-    else:
-        st.caption("No proxy signals available.")
 
 macro = fetch_macro_score()
 breadth, breadth_color = get_breadth_status()
 
-if macro:
-    score = macro['score']
-    
-    # Execution Rule
-    if score >= 80:
-        if "HEALTHY" not in breadth:
-            regime = "1.00x (Margin Restricted)"
-            color = "#00cc66"
+# --- FR-041 Governor: Persistent Regime Banner (Institutional Standard) ---
+# Load institutional-grade macro features for RegimeManager
+try:
+    macro_features = get_macro_features(prefer_tri=True)
+    # Use most recent date from available data
+    if not macro_features.empty and 'date' in macro_features.columns:
+        macro_features = macro_features.set_index('date')
+    render_regime_banner_from_macro(
+        macro=macro_features,
+        index=macro_features.index,
+        title="FR-041 Governor",
+        simplified=True,  # Progressive disclosure: 3 visible metrics
+    )
+except Exception as e:
+    # Fallback: Show legacy macro gravity score if RegimeManager unavailable
+    st.warning(f"⚠️ FR-041 Governor unavailable ({type(e).__name__}). Displaying legacy macro score.")
+    if macro:
+        score = macro['score']
+
+        # Execution Rule (Legacy)
+        if score >= 80:
+            if "HEALTHY" not in breadth:
+                regime = "1.00x (Margin Restricted)"
+                color = "#00cc66"
+            else:
+                regime = "1.25x (Leveraged Expansion)"
+                color = "#00FFAA"
+        elif score >= 50:
+            if "HEALTHY" not in breadth:
+                regime = "0.80x (Breadth Trim)"
+                color = "#00cc66"
+            else:
+                regime = "1.00x (Strategic Deploy)"
+                color = "#00cc66"
+        elif score >= 30:
+            regime = "0.50x (Defensive Core)"
+            color = "#FFD700"
         else:
-            regime = "1.25x (Leveraged Expansion)"
-            color = "#00FFAA"
-    elif score >= 50:
-        if "HEALTHY" not in breadth:
-            regime = "0.80x (Breadth Trim)"
-            color = "#00cc66" 
-        else:
-            regime = "1.00x (Strategic Deploy)"
-            color = "#00cc66"
-    elif score >= 30:
-        regime = "0.50x (Defensive Core)"
-        color = "#FFD700"
-    else:
-        regime = "0.00x (Liquidity Vacuum)"
-        color = "#ff4444"
-        
-    st.markdown(f"""
-    <div style="padding:15px; border:1px solid {color}; border-radius:5px; background-color:rgba(0,0,0,0.2); margin-bottom: 20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <h4 style="margin:0; color:#aaa; font-size:0.9rem; text-transform:uppercase;">MACRO GRAVITY SCORE</h4>
-                <div style="font-size: 2.5rem; font-weight: 800; color:{color}; line-height: 1;">{score} <span style="font-size:1rem; color:#888;">/ 100</span></div>
-                <div style="margin-top: 5px; font-size: 0.9rem;">
-                    <b>BREADTH (Internal):</b> <span style="color:{breadth_color}; font-weight:bold;">{breadth}</span>
+            regime = "0.00x (Liquidity Vacuum)"
+            color = "#ff4444"
+
+        st.markdown(f"""
+        <div style="padding:15px; border:1px solid {color}; border-radius:5px; background-color:rgba(0,0,0,0.2); margin-bottom: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h4 style="margin:0; color:#aaa; font-size:0.9rem; text-transform:uppercase;">MACRO GRAVITY SCORE (LEGACY)</h4>
+                    <div style="font-size: 2.5rem; font-weight: 800; color:{color}; line-height: 1;">{score} <span style="font-size:1rem; color:#888;">/ 100</span></div>
+                    <div style="margin-top: 5px; font-size: 0.9rem;">
+                        <b>BREADTH (Internal):</b> <span style="color:{breadth_color}; font-weight:bold;">{breadth}</span>
+                    </div>
                 </div>
-            </div>
-            <div style="text-align: right;">
-                <h4 style="margin:0; color:#aaa; font-size:0.9rem; text-transform:uppercase;">ALLOWABLE EXPOSURE</h4>
-                <div style="font-size: 1.5rem; font-weight: 600; color:{color};">{regime}</div>
-                <div style="font-size: 0.8rem; color:#888; margin-top:5px;">
-                    Rates: {macro['rate_score']}/50 | Credit: {macro['credit_score']}/50
+                <div style="text-align: right;">
+                    <h4 style="margin:0; color:#aaa; font-size:0.9rem; text-transform:uppercase;">ALLOWABLE EXPOSURE</h4>
+                    <div style="font-size: 1.5rem; font-weight: 600; color:{color};">{regime}</div>
+                    <div style="font-size: 0.8rem; color:#888; margin-top:5px;">
+                        Rates: {macro['rate_score']}/50 | Credit: {macro['credit_score']}/50
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
 if drone_count > 0:
     st.info(f"🛸 **DRONE INTEL:** {drone_count} New Targets Detected dynamically by Scout Drone (Last Sweep: {drone_timestamp})")
@@ -800,8 +961,63 @@ def rate_weight(val):
 df_scan['SortWeight'] = df_scan['Rating'].apply(rate_weight)
 df_scan = df_scan.sort_values(by=['SortWeight', 'Score'], ascending=[True, False]).drop(columns=['SortWeight'])
 
-# --- Layout: TABS ---
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Ticker Pool & Proxies", "🔬 Daily Scan", "📈 Divergence Backtest", "🧩 Modular Strategies"])
+# --- Drift Monitor setup (shared across sidebar + Tab 6) ---
+drift_alert_manager = None
+drift_detector = None
+baseline_weights, baseline_metadata = _load_baseline_from_latest_pointer()
+live_weights = _load_weight_series_from_json(Path("data/live_positions/latest.json"))
+
+if live_weights is None:
+    live_candidate = st.session_state.get("live_weights")
+    if live_candidate is None:
+        live_candidate = st.session_state.get("optimizer_weights")
+    live_weights = _coerce_weight_series(live_candidate)
+
+try:
+    drift_alert_manager = DriftAlertManager(db_path=Path("data/drift_alerts.duckdb"))
+    drift_detector = DriftDetector(sigma_threshold=2.0)
+
+    # Phase 33B Slice 4.3: Escalation manager initialization (extracted to shared function)
+    initialize_escalation_manager(
+        alert_manager=drift_alert_manager,
+        session_state=st.session_state,
+    )
+
+except Exception as exc:
+    with st.sidebar:
+        st.warning(f"⚠️ Drift monitor disabled: {type(exc).__name__}")
+
+if drift_alert_manager is not None:
+    try:
+        sidebar_alerts = drift_alert_manager.get_active_alerts()
+        sidebar_level = "GREEN"
+        if sidebar_alerts:
+            level_rank = {"GREEN": 0, "YELLOW": 1, "RED": 2}
+            sidebar_level = max(
+                (str(alert.alert_level).upper() for alert in sidebar_alerts),
+                key=level_rank.get,
+            )
+        with st.sidebar:
+            if sidebar_level == "RED":
+                st.error(f"🔴 Drift: {len(sidebar_alerts)} active")
+            elif sidebar_level == "YELLOW":
+                st.warning(f"🟡 Drift: {len(sidebar_alerts)} active")
+            else:
+                st.success("🟢 Drift: clear")
+    except Exception:
+        # Keep optional sidebar indicator fail-safe.
+        pass
+
+# --- Layout: TABS (Phase 3: Unified Command Center) ---
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    "📊 Ticker Pool & Proxies",
+    "🏥 Data Health",           # NEW
+    "🔍 Drift Monitor",          # PROMOTED
+    "🔬 Daily Scan",
+    "📈 Backtest Lab",           # KEEP (moved to tab5)
+    "🧩 Modular Strategies",
+    "💼 Portfolio Builder",
+])
 
 # ==========================================
 # TAB 1: TICKER POOL & PROXY MONITOR
@@ -948,9 +1164,56 @@ with tab1:
     )
 
 # ==========================================
-# TAB 2: DAILY SCAN (CONFLUENCE)
+# TAB 2: DATA HEALTH MONITOR
 # ==========================================
 with tab2:
+    st.header("🏥 Data Health Monitor")
+
+    # Move Data Health content here (was lines 870-901)
+    health_pct = int(round(health_ratio * 100))
+    badge_color = "#00cc66" if health_status == "HEALTHY" else "#ffb020"
+    badge_background = "rgba(0,204,102,0.12)" if health_status == "HEALTHY" else "rgba(255,176,32,0.12)"
+    st.markdown(
+        f"""
+        <div style="display:inline-flex; align-items:center; gap:8px; border:1px solid {badge_color}; border-radius:999px; padding:4px 10px; margin: 0 0 8px 0; background:{badge_background};">
+            <span style="font-size:0.78rem; color:#888; text-transform:uppercase;">Data Health</span>
+            <span style="font-size:0.82rem; font-weight:700; color:{badge_color};">{health_status}</span>
+            <span style="font-size:0.78rem; color:#aaa;">Degraded: {health_pct}%</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    degraded_count = int(data_health.get("degraded_count", 0))
+    total_signals = int(data_health.get("total_signals", 0))
+    st.caption(f"Signals degraded: {degraded_count}/{total_signals}")
+
+    signal_rows = []
+    for signal in data_health.get("signals", []):
+        signal_rows.append(
+            {
+                "Signal": str(signal.get("signal", "")),
+                "Status": str(signal.get("status", "")),
+                "Reason": str(signal.get("reason", "")),
+                "Span": str(signal.get("span", "")),
+            }
+        )
+    if signal_rows:
+        st.dataframe(pd.DataFrame(signal_rows), hide_index=True, use_container_width=True)
+    else:
+        st.caption("No proxy signals available.")
+
+# ==========================================
+# TAB 3: DRIFT MONITOR (PROMOTED)
+# ==========================================
+with tab3:
+    from views.drift_monitor_view import render_drift_monitor_view
+    render_drift_monitor_view()
+
+# ==========================================
+# TAB 4: DAILY SCAN (CONFLUENCE)
+# ==========================================
+with tab4:
     st.subheader("Confluence Grid (Fundamental Resonance vs. Technical Extension)")
     
     lens_view = st.radio("Toggle Lens:", ["🌍 Macro View (Decluttered)", "🎯 Sniper View (High-Alpha Dispersion)"], horizontal=True)
@@ -1016,43 +1279,62 @@ with tab2:
         if "Sniper" in lens_view:
             combined_df = combined_df.sort_values(['Score', 'Delta_Margin'], ascending=[False, False]).reset_index(drop=True)
             
-            def calculate_plot_y(df):
+            def calculate_plot_y_deterministic(df):
+                """
+                Calculate Y positions with deterministic jitter.
+
+                Prevents label flicker across Streamlit reruns by using
+                ticker hash + date seed for stable positioning.
+
+                Returns:
+                    display_y: List of Y positions
+                    labels: List of ticker labels
+                """
+                import hashlib
+                from datetime import datetime as dt
+
                 display_y = []
                 placed_points = []
                 labels = []
-                
-                # Quota per column in the crowded Y>90 band
-                col_quota = {}
-                
+
+                # Deterministic seed from date (stable within day)
+                date_seed = dt.now().strftime("%Y-%m-%d")
+
                 for _, r in df.iterrows():
                     ticker = r['Ticker']
                     base_y = r['Score']
                     fund_bonus = (r.get('Delta_Margin', 0) * 100) + (r.get('Delta_Demand', 0) * 20)
                     target_y = base_y + fund_bonus
-                    
+
                     x_pos = float(r['Tech_Support_Dist'])
-                    placed = False
-                    
-                    # The Repel Ladder: vertically bump if within collision box (made Box wider for text)
-                    max_iter = 30
+
+                    # Deterministic jitter from ticker hash
+                    ticker_hash = int(hashlib.md5(f"{ticker}{date_seed}".encode()).hexdigest(), 16)
+                    x_jitter = (ticker_hash % 100) / 100.0 - 0.5  # Range: [-0.5, 0.5]
+
+                    # Reduced collision detection (prevent tall stacking)
+                    max_iter = 10  # Was 30
+                    collision_threshold = 1.5
+                    vertical_bump = 1.5
+
                     for _ in range(max_iter):
                         collision = False
                         for (px, py) in placed_points:
-                            if abs(px - x_pos) < 1.2 and abs(py - target_y) < 3.0:
+                            if abs(px - x_pos) < collision_threshold and abs(py - target_y) < collision_threshold:
                                 collision = True
-                                target_y += 3.0
+                                target_y += vertical_bump
+                                x_pos += x_jitter * 0.3  # Horizontal spread on collision
                                 break
                         if not collision:
-                            placed = True
                             break
-                            
+
                     placed_points.append((x_pos, target_y))
                     display_y.append(target_y)
                     labels.append(ticker)
-                        
+
                 return display_y, labels
 
-            display_ys, text_labels = calculate_plot_y(combined_df)
+            display_ys, text_labels = calculate_plot_y_deterministic(combined_df)
             combined_df['Display_Score'] = display_ys
             combined_df['Text_Label'] = text_labels
             y_range = [80, max(120, combined_df['Display_Score'].max() + 5)]
@@ -1269,13 +1551,9 @@ with tab2:
     else:
         st.info("No viable assets currently scoring > 0 to plot on the Confluence Grid.")
 
-# ==========================================
-# TAB 3: BACKTEST VISUALIZATION
-# ==========================================
-with tab3:
-    st.subheader("Historical Phase Reversal (Divergence Exits)")
-    st.markdown("Visualizing the dominance of **Strategy B (5% Trailing Stop from Divergence)**.")
-    
+def _render_legacy_backtest_table():
+    """Render legacy static backtest table (fallback when parquet unavailable)."""
+    st.markdown("### Historical Phase Reversal Evidence (Static)")
     backtest_data = {
         "Asset": ["CSCO (2000)", "QCOM (2000)", "NVDA (2021)"],
         "Lag (Months)": [2, 2, 2],
@@ -1285,27 +1563,66 @@ with tab3:
         "Strategy C (Put Hedging)": [26.0, 215.0, 50.0]
     }
     bt_df = pd.DataFrame(backtest_data)
-    
+
     st.dataframe(bt_df.style.format({
         "Max drawdown if Held (%)": "{:.2f}%",
         "Strategy A (Left-Side Sell)": "+{:.2f}%",
         "Strategy B (Right-Side 5% Stop)": "+{:.2f}%",
         "Strategy C (Put Hedging)": "+{:.2f}%"
     }), use_container_width=True, hide_index=True)
-    
-    bt_melted = bt_df.melt(id_vars="Asset", value_vars=["Strategy A (Left-Side Sell)", "Strategy B (Right-Side 5% Stop)", "Strategy C (Put Hedging)"], var_name="Strategy", value_name="ROI (%)")
-    
+
+    bt_melted = bt_df.melt(
+        id_vars="Asset",
+        value_vars=["Strategy A (Left-Side Sell)", "Strategy B (Right-Side 5% Stop)", "Strategy C (Put Hedging)"],
+        var_name="Strategy",
+        value_name="ROI (%)"
+    )
+
     fig_bar = px.bar(
-        bt_melted, 
-        x="Asset", 
-        y="ROI (%)", 
-        color="Strategy", 
+        bt_melted,
+        x="Asset",
+        y="ROI (%)",
+        color="Strategy",
         barmode="group",
-        title="Exit Execution ROI",
+        title="Exit Execution ROI Comparison (Historical Evidence)",
         color_discrete_sequence=["#555555", "#00ff88", "#ff4444"]
     )
     fig_bar.update_layout(template="plotly_dark", height=500)
     st.plotly_chart(fig_bar, use_container_width=True)
+
+
+# ==========================================
+# TAB 5: BACKTEST LAB (Interactive Runner)
+# ==========================================
+with tab5:
+    st.subheader("📈 Backtest Lab: Interactive Strategy Validation")
+    st.markdown("Run backtests with PID tracking and live result display. "
+                "Uses institutional-grade TRI data for accurate performance measurement.")
+
+    # Check if parquet data available for interactive backtest
+    if parquet_data_available and not prices_wide.empty and not returns_wide.empty:
+        try:
+            # Load macro features for backtest context
+            macro_features = get_macro_features(prefer_tri=True)
+
+            # Activate interactive backtest runner
+            st.success("✅ **Institutional TRI Data Active** - Interactive backtest runner enabled")
+            render_auto_backtest_view(prices_wide, returns_wide, macro_features)
+
+        except Exception as e:
+            st.error(f"⚠️ Backtest Lab activation failed: {type(e).__name__}: {e}")
+            st.caption("Falling back to static backtest results...")
+
+            # Fallback to static results
+            _render_legacy_backtest_table()
+    else:
+        # Placeholder mode (parquet data not loaded)
+        st.info("🔧 **Backtest Lab: Data Dependency Not Met**\n\n"
+                "Interactive backtest runner requires historical TRI data from parquet files.\n\n"
+                "**Current Status:** Parquet data unavailable (check sidebar for details).\n\n"
+                "**Showing:** Legacy static backtest results below.")
+
+        _render_legacy_backtest_table()
 
 # ==========================================
 # TAB 4: MODULAR STRATEGIES (V3.1 — Notion-Like Matrix)
@@ -1375,9 +1692,20 @@ STRATEGY_REGISTRY = {
     },
 }
 
-with tab4:
+with tab6:
     st.header("🧩 Modular Strategies Matrix")
     st.markdown("Click a strategy row to view its physics. Edit below. All rows filter with implicit AND.")
+
+    # Cache formula strings only (not st.latex renders)
+    @st.cache_data
+    def get_strategy_formulas() -> dict[str, str]:
+        """Cache formula strings from STRATEGY_REGISTRY."""
+        return {name: strat["core_math"] for name, strat in STRATEGY_REGISTRY.items()}
+
+    # Load once per session
+    if "formulas_loaded" not in st.session_state:
+        st.session_state.formula_cache = get_strategy_formulas()
+        st.session_state.formulas_loaded = True
 
     # --- Version guard: force rebuild on schema or release digest change ---
     _V3_VERSION = "3.9"
@@ -1555,7 +1883,11 @@ with tab4:
 
             if show_all or clicked_col == "Strategy":
                 st.markdown("**🎯 Strategy — Core Math:**")
-                st.latex(s["core_math"])
+                formula = st.session_state.formula_cache.get(sel_strat, "")
+                if formula:
+                    st.latex(formula)  # Render fresh (not cached)
+                else:
+                    st.caption("No formula available")
             if show_all or clicked_col == "Entry":
                 st.markdown(f"**📥 Entry:** `{s['entry']}`")
             if show_all or clicked_col == "Exit":
@@ -1622,6 +1954,67 @@ with tab4:
         st.caption("👆 Click a row to view all formulas, or click a specific column cell to focus.")
 
 
+# ==========================================
+# TAB 7: PORTFOLIO BUILDER (Optional PM Tools)
+# ==========================================
+with tab7:
+    st.subheader("💼 Portfolio Builder: Mean-Variance Optimization")
+    st.markdown("Construct optimal portfolios with sector constraints and regime-aware allocation.")
+
+    # Check if parquet data + fundamentals available
+    if parquet_data_available and fundamentals_wide is not None:
+        try:
+            # Extract selected tickers from current scan results
+            selected_tickers = list(df_scan["Ticker"].values) if 'Ticker' in df_scan.columns else []
+
+            st.success("✅ **Fundamentals Data Active** - Portfolio Builder enabled")
+
+            # Activate Portfolio Builder
+            render_optimizer_view(
+                prices_wide=prices_wide,
+                ticker_map=ticker_map_parquet,
+                sector_map=sector_map_parquet,
+                selected_tickers=selected_tickers[:20],  # Limit to top 20 for performance
+            )
+
+        except Exception as e:
+            st.error(f"⚠️ Portfolio Builder activation failed: {type(e).__name__}: {e}")
+            st.caption("Falling back to placeholder mode...")
+            _render_portfolio_builder_placeholder()
+
+    else:
+        # Placeholder mode (fundamentals not available)
+        _render_portfolio_builder_placeholder()
+
+
+def _render_portfolio_builder_placeholder():
+    """Render Portfolio Builder placeholder when fundamentals unavailable."""
+    st.info("🔧 **Portfolio Builder: Data Dependency Not Met**\n\n"
+            "Portfolio optimization requires fundamentals data (sector classifications, "
+            "market cap, financial ratios). \n\n"
+            "**Current Status:** "
+            + ("Parquet data loaded but fundamentals missing. " if parquet_data_available else "Parquet data unavailable. ")
+            + "Run fundamentals updater to enable.\n\n"
+            "**Alternative:** Use Tab 4 (Modular Strategies) for signal-based allocation.")
+
+    # Placeholder preview
+    st.divider()
+    st.caption("**Preview: Portfolio Builder Features (Available When Fundamentals Loaded)**")
+
+    preview_cols = st.columns(3)
+    with preview_cols[0]:
+        st.markdown("**📊 Mean-Variance Optimization**")
+        st.caption("- Efficient frontier calculation\n- Max Sharpe / Min Vol portfolios\n- Custom risk tolerance slider")
+
+    with preview_cols[1]:
+        st.markdown("**🎯 Constraint Management**")
+        st.caption("- Sector exposure limits\n- Position size caps\n- Long-only / long-short toggle")
+
+    with preview_cols[2]:
+        st.markdown("**🧬 Regime Integration**")
+        st.caption("- Auto-scale exposure by FR-041 state\n- Defensive tilt in RED regime\n- Leverage boost in GREEN regime")
+
+
 
     # --- 5. Combined Execution Logic ---
     st.divider()
@@ -1676,5 +2069,4 @@ with tab4:
             qual_view = qualifying[qual_cols].copy()
             qual_view["Current_Price"] = qual_view["Current_Price"].map("${:.2f}".format)
             st.dataframe(qual_view, use_container_width=True, hide_index=True)
-
 

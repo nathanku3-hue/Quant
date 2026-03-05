@@ -325,3 +325,27 @@ class RegimeManager:
             bocpd_prob=bocpd_prob.astype(float),
             reason=pd.Series(reasons, index=idx, dtype=object),
         )
+
+    def get_regime_snapshot(
+        self,
+        macro: pd.DataFrame | None,
+        idx: pd.Index,
+    ) -> dict:
+        """
+        Phase 33 Step 2: Export current regime state for drift detection.
+
+        Returns the most recent regime state snapshot including:
+        - governor_state: "RED" | "AMBER" | "GREEN"
+        - target_exposure: float (0.0 to max_exposure)
+        - bocpd_prob: float (0.0 to 1.0)
+        - market_state: "NEG" | "NEUT" | "POS"
+        - matrix_exposure: float
+        - throttle_score: float
+        - composite_z: float
+        - reason: str (diagnostic string)
+
+        This snapshot is used by DriftDetector to validate that live regime
+        matches backtest regime assumptions.
+        """
+        result = self.evaluate(macro, idx)
+        return result.latest()

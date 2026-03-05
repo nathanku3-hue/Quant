@@ -1,0 +1,74 @@
+{
+  "build_seconds": 0.049455300002591684,
+  "built_at_utc": "2026-03-01T18:39:58.848246+00:00",
+  "columns": [
+    "date",
+    "permno",
+    "ticker",
+    "release_date",
+    "published_at",
+    "roic",
+    "operating_margin_q",
+    "operating_margin_delta_q",
+    "gross_margin_q",
+    "gm_accel_q",
+    "capex_sales_q",
+    "delta_capex_sales",
+    "book_to_bill_proxy_q",
+    "dso_q",
+    "delta_dso_q",
+    "revenue_inventory_q",
+    "delta_revenue_inventory",
+    "sales_growth_q",
+    "sales_accel_q",
+    "op_margin_accel_q",
+    "bloat_q",
+    "net_investment_q",
+    "cogs_q",
+    "receivables_q",
+    "deferred_revenue_q",
+    "delta_deferred_revenue_q",
+    "asset_growth_yoy",
+    "roe_q",
+    "eps_q",
+    "eps_ttm",
+    "eps_growth_yoy",
+    "revenue_growth_yoy",
+    "ev_ebitda",
+    "leverage_ratio",
+    "rd_intensity",
+    "oancf_ttm",
+    "ebitda_ttm",
+    "quality_pass"
+  ],
+  "output_path": "E:\\Code\\Quant\\.pytest_tmp_scheduler2\\test_daily_panel_respects_rest0\\daily_fundamentals_panel.parquet",
+  "panel_max_date": "2021-09-30",
+  "panel_min_date": "2021-05-10",
+  "row_count": 134,
+  "source_signature": {
+    "fundamentals_file": {
+      "exists": true,
+      "mtime_ns": 1772390398776517300,
+      "size": 24273
+    },
+    "fundamentals_stats": {
+      "max_ingested_at": "2021-08-20 12:00:00",
+      "max_published_at": "2021-08-20",
+      "permno_count": 2,
+      "row_count": 3
+    },
+    "max_date": null,
+    "min_date": null,
+    "patch_file": {
+      "exists": false,
+      "mtime_ns": 0,
+      "size": 0
+    },
+    "prices_file": {
+      "exists": true,
+      "mtime_ns": 1772390398780013100,
+      "size": 4408
+    }
+  },
+  "version": "v1"
+}

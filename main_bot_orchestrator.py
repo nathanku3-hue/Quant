@@ -1,3 +1,4 @@
+import asyncio
 import schedule
 import time
 import subprocess
@@ -8,8 +9,15 @@ import math
 import json
 import hashlib
 import threading
+import inspect
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, TypedDict
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import fcntl
 
 from execution.rebalancer import PortfolioRebalancer
 
@@ -23,6 +31,14 @@ EXECUTION_RETRY_SLEEP_SECONDS = 0.5
 EXECUTION_RECONCILIATION_MAX_POLLS = 3
 EXECUTION_RECONCILIATION_POLL_SLEEP_SECONDS = 0.25
 EXECUTION_RECONCILIATION_LOOKUP_TIMEOUT_SECONDS = 2.0
+EXECUTION_RECONCILIATION_LOOKUP_MIN_TIMEOUT_SECONDS = 0.01
+EXECUTION_RECONCILIATION_LOOKUP_CANCEL_GRACE_SECONDS = 0.05
+EXECUTION_RECONCILIATION_QUARANTINE_PATH = os.path.join(
+    "docs",
+    "context",
+    "e2e_evidence",
+    "reconciliation_quarantine.jsonl",
+)
 _RETRYABLE_ERROR_TOKENS = (
     "timeout",
     "timed out",
@@ -358,29 +374,249 @@ def _poll_lookup_with_timeout(
     client_order_id: str,
     timeout_seconds: float,
 ) -> tuple[Any, str]:
-    if timeout_seconds <= 0.0:
-        try:
-            return lookup(client_order_id), ""
-        except Exception as exc:
-            return None, f"lookup_exception:{exc.__class__.__name__}:{exc}"
+    supports_cancel_event = False
+    try:
+        signature = inspect.signature(lookup)
+        if any(
+            parameter.kind == inspect.Parameter.VAR_KEYWORD
+            for parameter in signature.parameters.values()
+        ):
+            supports_cancel_event = True
+        else:
+            cancel_parameter = signature.parameters.get("cancel_event")
+            supports_cancel_event = cancel_parameter is not None and cancel_parameter.kind in {
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                inspect.Parameter.KEYWORD_ONLY,
+            }
+    except (TypeError, ValueError):
+        supports_cancel_event = False
+
+    cancel_event = threading.Event()
+
+    def _call_lookup() -> Any:
+        if supports_cancel_event:
+            return lookup(client_order_id, cancel_event=cancel_event)
+        return lookup(client_order_id)
+
+    effective_timeout = max(float(timeout_seconds), float(EXECUTION_RECONCILIATION_LOOKUP_MIN_TIMEOUT_SECONDS))
 
     state: dict[str, Any] = {}
 
     def _invoke_lookup() -> None:
         try:
-            state["result"] = lookup(client_order_id)
+            state["result"] = _call_lookup()
+        except asyncio.CancelledError:
+            state["error"] = "lookup_cancelled"
         except Exception as exc:
             state["error"] = f"lookup_exception:{exc.__class__.__name__}:{exc}"
 
     thread = threading.Thread(target=_invoke_lookup, daemon=True)
     thread.start()
-    thread.join(timeout_seconds)
+    thread.join(effective_timeout)
 
     if thread.is_alive():
-        return None, f"lookup_timeout:{timeout_seconds:.3f}s"
+        if supports_cancel_event:
+            cancel_event.set()
+            thread.join(max(float(EXECUTION_RECONCILIATION_LOOKUP_CANCEL_GRACE_SECONDS), 0.0))
+        if "error" in state and not thread.is_alive():
+            return None, str(state["error"])
+        if thread.is_alive():
+            return None, f"lookup_timeout:{effective_timeout:.3f}s:uncooperative"
+        return None, f"lookup_timeout:{effective_timeout:.3f}s"
     if "error" in state:
         return None, str(state["error"])
     return state.get("result"), ""
+
+
+def _lookup_issue_requires_quarantine(lookup_issue: str) -> bool:
+    issue = _clean_optional_str(lookup_issue)
+    if issue == "lookup_cancelled":
+        return True
+    return issue.startswith("lookup_timeout:") or issue.startswith("lookup_exception:")
+
+
+def _lookup_issue_priority(lookup_issue: str) -> int:
+    issue = _clean_optional_str(lookup_issue)
+    if issue.startswith("lookup_timeout:") and issue.endswith(":uncooperative"):
+        return 4
+    if issue == "lookup_cancelled":
+        return 3
+    if issue.startswith("lookup_timeout:"):
+        return 2
+    if issue.startswith("lookup_exception:"):
+        return 1
+    return 0
+
+
+def _prefer_lookup_issue(current_issue: str, candidate_issue: str) -> str:
+    if _lookup_issue_priority(candidate_issue) >= _lookup_issue_priority(current_issue):
+        return candidate_issue
+    return current_issue
+
+
+def _lookup_issue_is_uncooperative_timeout(lookup_issue: str) -> bool:
+    issue = _clean_optional_str(lookup_issue)
+    return issue.startswith("lookup_timeout:") and issue.endswith(":uncooperative")
+
+
+def _fsync_parent_dir_if_possible(path: Path) -> None:
+    try:
+        fd = os.open(str(path), os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    except OSError:
+        pass
+    finally:
+        os.close(fd)
+
+
+def _acquire_quarantine_lock(lock_handle: Any, *, timeout_seconds: float = 2.0) -> None:
+    deadline = time.monotonic() + max(float(timeout_seconds), 0.0)
+    while True:
+        try:
+            if os.name == "nt":
+                lock_handle.seek(0)
+                msvcrt.locking(lock_handle.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return
+        except OSError:
+            if time.monotonic() >= deadline:
+                raise TimeoutError("reconciliation_quarantine_lock_timeout")
+            time.sleep(0.01)
+
+
+def _release_quarantine_lock(lock_handle: Any) -> None:
+    try:
+        if os.name == "nt":
+            lock_handle.seek(0)
+            msvcrt.locking(lock_handle.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+    except OSError:
+        return
+
+
+def _append_reconciliation_quarantine_entry(
+    *,
+    client_order_id: str,
+    order: dict[str, Any],
+    reconciliation_issue: str,
+    attempt: int,
+    source: str,
+) -> str:
+    path = Path(str(EXECUTION_RECONCILIATION_QUARANTINE_PATH))
+    lock_path = path.with_suffix(f"{path.suffix}.lock")
+    path_preexists = path.exists()
+    payload = {
+        "schema_version": 1,
+        "quarantined_at_utc": datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z"),
+        "client_order_id": _clean_optional_str(client_order_id),
+        "reconciliation_issue": _clean_optional_str(reconciliation_issue),
+        "reconciliation_issue_family": _clean_optional_str(reconciliation_issue).split(":", 1)[0],
+        "attempt": int(attempt),
+        "source": _clean_optional_str(source),
+        "order": {
+            "symbol": _clean_optional_str(order.get("symbol", "")).upper(),
+            "side": _clean_optional_str(order.get("side", "")).lower(),
+            "qty": order.get("qty"),
+            "order_type": _clean_optional_str(order.get("order_type", "")).lower() or "market",
+            "limit_price": order.get("limit_price"),
+        },
+    }
+    encoded = json.dumps(payload, sort_keys=True, ensure_ascii=True, separators=(",", ":")).encode("utf-8") + b"\n"
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with lock_path.open("a+b") as lock_handle:
+            _acquire_quarantine_lock(lock_handle)
+            try:
+                fd = os.open(str(path), os.O_APPEND | os.O_CREAT | os.O_WRONLY)
+                try:
+                    os.write(fd, encoded)
+                    os.fsync(fd)
+                finally:
+                    os.close(fd)
+            finally:
+                _release_quarantine_lock(lock_handle)
+        if not path_preexists:
+            _fsync_parent_dir_if_possible(path.parent)
+        return ""
+    except Exception as exc:
+        logging.error(
+            "Failed to append reconciliation quarantine entry for client_order_id=%s: %s",
+            client_order_id,
+            exc,
+        )
+        return f"quarantine_write_exception:{exc.__class__.__name__}:{exc}"
+
+
+def _read_quarantine_jsonl_safe(path: Path) -> list[dict[str, Any]]:
+    """
+    Read quarantine JSONL file with fail-closed UTF-8 decode error handling.
+
+    Uses errors='replace' to convert malformed UTF-8 bytes to U+FFFD replacement
+    character instead of wedging with UnicodeDecodeError. This ensures that
+    ingestion/replay boundaries remain operational even when external sources
+    (broker responses, process snapshots) introduce corrupted data.
+
+    Returns:
+        List of parsed JSON rows. Rows with invalid JSON are skipped with logging.
+    """
+    if not path.exists():
+        return []
+    try:
+        raw_text = path.read_text(encoding="utf-8", errors="replace")
+    except Exception as exc:
+        logging.error(
+            "Failed to read quarantine file at %s: %s",
+            path,
+            exc,
+        )
+        return []
+    rows: list[dict[str, Any]] = []
+    for line_num, line in enumerate(raw_text.splitlines(), start=1):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            row = json.loads(line)
+            if isinstance(row, dict):
+                rows.append(row)
+        except json.JSONDecodeError as exc:
+            logging.warning(
+                "Skipping malformed JSON at %s line %d: %s",
+                path,
+                line_num,
+                exc,
+            )
+            continue
+    return rows
+
+
+def _augment_reconciliation_issue_with_quarantine(
+    *,
+    client_order_id: str,
+    order: dict[str, Any],
+    reconciliation_issue: str,
+    attempt: int,
+    source: str,
+) -> str:
+    if not _lookup_issue_requires_quarantine(reconciliation_issue):
+        return reconciliation_issue
+    quarantine_issue = _append_reconciliation_quarantine_entry(
+        client_order_id=client_order_id,
+        order=order,
+        reconciliation_issue=reconciliation_issue,
+        attempt=attempt,
+        source=source,
+    )
+    if quarantine_issue == "":
+        return reconciliation_issue
+    if reconciliation_issue:
+        return f"{reconciliation_issue}|{quarantine_issue}"
+    return quarantine_issue
 
 
 def _poll_reconciliation_receipt(
@@ -426,6 +662,7 @@ def _poll_reconciliation_receipt(
     timeout_seconds = max(0.0, timeout_seconds)
 
     last_issue = ""
+    lookup_issue_sticky = ""
     for poll_idx in range(budget):
         recovered, lookup_issue = _poll_lookup_with_timeout(
             lookup,
@@ -433,6 +670,8 @@ def _poll_reconciliation_receipt(
             timeout_seconds=timeout_seconds,
         )
         if lookup_issue:
+            if _lookup_issue_requires_quarantine(lookup_issue):
+                lookup_issue_sticky = _prefer_lookup_issue(lookup_issue_sticky, lookup_issue)
             last_issue = lookup_issue
             logging.warning(
                 "Reconciliation lookup issue for client_order_id=%s poll=%d/%d: %s",
@@ -441,6 +680,8 @@ def _poll_reconciliation_receipt(
                 budget,
                 lookup_issue,
             )
+            if _lookup_issue_is_uncooperative_timeout(lookup_issue):
+                return None, (lookup_issue_sticky or lookup_issue)
         if isinstance(recovered, dict):
             receipt = dict(recovered)
             receipt["ok"] = True
@@ -453,12 +694,147 @@ def _poll_reconciliation_receipt(
                 return _normalize_terminal_execution_result(receipt), ""
             if not _ok_true_result_missing_required_broker_fields(order, receipt):
                 return receipt, ""
-            last_issue = "non_authoritative_reconciliation_receipt"
+            if lookup_issue_sticky == "":
+                last_issue = "non_authoritative_reconciliation_receipt"
         elif lookup_issue == "":
-            last_issue = "reconciliation_receipt_unavailable"
+            if lookup_issue_sticky == "":
+                last_issue = "reconciliation_receipt_unavailable"
         if poll_idx + 1 < budget and sleep_seconds > 0:
             time.sleep(sleep_seconds)
-    return None, (last_issue or "reconciliation_receipt_unavailable")
+    return None, (lookup_issue_sticky or last_issue or "reconciliation_receipt_unavailable")
+
+
+def _classify_broker_exception(exc: Exception) -> str:
+    """
+    Phase 32 Step 4: Binary exception taxonomy for broker execution failures.
+
+    Classifies broker exceptions into two canonical categories:
+    - TRANSIENT: Retryable network/infrastructure failures (retry with backoff)
+    - TERMINAL: Hard rejections that will never succeed on retry (fail-closed immediately)
+
+    Returns:
+        "TRANSIENT" or "TERMINAL"
+    """
+    exc_type = type(exc).__name__
+    exc_message = str(exc).lower()
+
+    # TERMINAL: Validation and business logic rejections (infinite retry is catastrophic)
+    terminal_indicators = [
+        # Validation errors
+        "valueerror",
+        "typeerror",
+        "keyerror",
+        # Broker rejections
+        "insufficient buying power",
+        "insufficient funds",
+        "insufficient margin",
+        "invalid symbol",
+        "invalid ticker",
+        "symbol not found",
+        "not tradable",
+        "market closed",
+        "outside market hours",
+        "invalid order type",
+        "invalid side",
+        "invalid quantity",
+        "qty must be positive",
+        "price must be positive",
+        # Authorization/authentication errors
+        "unauthorized",
+        "forbidden",
+        "authentication failed",
+        "invalid api key",
+        "access denied",
+        # HTTP 4xx client errors (except 429 rate limit which is transient)
+        "400 bad request",
+        "401 unauthorized",
+        "403 forbidden",
+        "404 not found",
+    ]
+
+    for indicator in terminal_indicators:
+        if indicator in exc_type.lower() or indicator in exc_message:
+            return "TERMINAL"
+
+    # TRANSIENT: Network/infrastructure failures (retry is safe and expected)
+    transient_indicators = [
+        # Connection errors
+        "connectionerror",
+        "connectionreseterror",
+        "brokenpipeerror",
+        "connectionrefusederror",
+        "connectionabortederror",
+        # Timeout errors
+        "timeouterror",
+        "timeout",
+        "timed out",
+        # HTTP 5xx server errors
+        "500 internal server error",
+        "502 bad gateway",
+        "503 service unavailable",
+        "504 gateway timeout",
+        # Rate limiting (transient, back off and retry)
+        "429 too many requests",
+        "rate limit exceeded",
+        "throttled",
+        # Network issues
+        "network unreachable",
+        "host unreachable",
+        "connection reset by peer",
+        "broken pipe",
+    ]
+
+    for indicator in transient_indicators:
+        if indicator in exc_type.lower() or indicator in exc_message:
+            return "TRANSIENT"
+
+    # Default: treat unknown exceptions as TRANSIENT to preserve existing retry behavior
+    # (fail-safe: retry unknown errors rather than dropping them)
+    return "TRANSIENT"
+
+
+def _build_retry_exhausted_result(
+    *,
+    client_order_id: str,
+    attempt: int,
+    last_error: str,
+    canonical_reason: str,
+) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "ok": False,
+        "error": "retry_exhausted",
+        "canonical_reason": _clean_optional_str(canonical_reason) or "transient_error:retry_exhausted",
+        "exception_class": "TRANSIENT",
+        "client_order_id": str(client_order_id),
+        "attempt": int(attempt),
+    }
+    cleaned_last_error = _clean_optional_str(last_error)
+    if cleaned_last_error:
+        result["last_error"] = cleaned_last_error
+    return result
+
+
+def _build_failed_rejected_result(
+    *,
+    client_order_id: str,
+    attempt: int,
+    rejection_reason: str,
+    canonical_reason: str,
+    last_error: str = "",
+) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "ok": False,
+        "error": "FAILED_REJECTED",
+        "rejection_reason": _clean_optional_str(rejection_reason),
+        "canonical_reason": _clean_optional_str(canonical_reason) or "terminal_exception:unknown",
+        "exception_class": "TERMINAL",
+        "client_order_id": str(client_order_id),
+        "attempt": int(attempt),
+    }
+    cleaned_last_error = _clean_optional_str(last_error)
+    if cleaned_last_error:
+        result["last_error"] = cleaned_last_error
+    return result
 
 
 def execute_orders_with_idempotent_retry(
@@ -511,21 +887,53 @@ def execute_orders_with_idempotent_retry(
         try:
             raw_batch_results = rebalancer.execute_orders(batch_orders, dry_run=False)
         except Exception as exc:
+            # Phase 32 Step 4: Binary exception taxonomy (TRANSIENT vs TERMINAL)
+            exception_class = _classify_broker_exception(exc)
             batch_exception = f"batch_exception:{exc.__class__.__name__}"
+            exception_message = str(exc)
+            canonical_exception_reason = f"{exception_class.lower()}_exception:{exc.__class__.__name__}"
+
+            if exception_class == "TERMINAL":
+                # TERMINAL errors: Instant bypass of retry loop, fail-closed immediately
+                # Examples: "Insufficient Buying Power", "Invalid Symbol", validation errors
+                # Retrying these would freeze capital allocation loop
+                logging.error(
+                    "Execution batch classified TERMINAL (%s): %s",
+                    canonical_exception_reason,
+                    exception_message,
+                )
+                for cid, order in pending_by_cid.items():
+                    final_by_cid[cid] = {
+                        "order": order,
+                        "result": _build_failed_rejected_result(
+                            client_order_id=cid,
+                            attempt=attempt,
+                            rejection_reason=exception_message,
+                            canonical_reason=canonical_exception_reason,
+                            last_error=batch_exception,
+                        ),
+                    }
+                # Release orchestrator lock immediately - other orders can process
+                pending_by_cid = {}
+                break
+
+            # TRANSIENT errors: Bounded retry loop (existing behavior)
+            # Examples: "Connection Reset by Peer", "503 Service Unavailable"
             if attempt < int(max_attempts):
                 if float(retry_sleep_seconds) > 0:
                     time.sleep(float(retry_sleep_seconds))
                 continue
+
+            # Retry exhausted for TRANSIENT error
             for cid, order in pending_by_cid.items():
                 final_by_cid[cid] = {
                     "order": order,
-                    "result": {
-                        "ok": False,
-                        "error": "retry_exhausted",
-                        "client_order_id": cid,
-                        "attempt": attempt,
-                        "last_error": batch_exception,
-                    },
+                    "result": _build_retry_exhausted_result(
+                        client_order_id=cid,
+                        attempt=attempt,
+                        last_error=batch_exception,
+                        canonical_reason=canonical_exception_reason,
+                    ),
                 }
             pending_by_cid = {}
             break
@@ -614,6 +1022,13 @@ def execute_orders_with_idempotent_retry(
                         client_order_id=cid,
                     )
                     if reconciled is None:
+                        reconciliation_issue = _augment_reconciliation_issue_with_quarantine(
+                            client_order_id=cid,
+                            order=order,
+                            reconciliation_issue=reconciliation_issue,
+                            attempt=attempt,
+                            source="ok_true_missing_required_fields",
+                        )
                         raise AmbiguousExecutionError(
                             f"ambiguous execution receipt for client_order_id={cid}: "
                             "ok=True response missing required fields "
@@ -645,7 +1060,9 @@ def execute_orders_with_idempotent_retry(
                 final_by_cid[cid] = {"order": order, "result": final_result}
                 continue
 
-            error_text = str(result.get("error", "")).lower()
+            raw_error_text = _clean_optional_str(result.get("error", ""))
+            error_text = raw_error_text.lower()
+            row_exception_class = _classify_broker_exception(RuntimeError(raw_error_text))
             if "already exists" in error_text:
                 if _recovery_result_matches_intent(
                     order,
@@ -665,6 +1082,13 @@ def execute_orders_with_idempotent_retry(
                             client_order_id=cid,
                         )
                         if reconciled is None:
+                            reconciliation_issue = _augment_reconciliation_issue_with_quarantine(
+                                client_order_id=cid,
+                                order=order,
+                                reconciliation_issue=reconciliation_issue,
+                                attempt=attempt,
+                                source="already_exists_missing_required_fields",
+                            )
                             raise AmbiguousExecutionError(
                                 f"ambiguous execution receipt for client_order_id={cid}: "
                                 "already-exists recovery missing required fields "
@@ -706,19 +1130,32 @@ def execute_orders_with_idempotent_retry(
                     }
                 continue
 
+            if row_exception_class == "TERMINAL":
+                canonical_exception_reason = "terminal_error:non_retryable_broker_result"
+                final_by_cid[cid] = {
+                    "order": order,
+                    "result": _build_failed_rejected_result(
+                        client_order_id=cid,
+                        attempt=attempt,
+                        rejection_reason=raw_error_text or "non_retryable_broker_result",
+                        canonical_reason=canonical_exception_reason,
+                        last_error=raw_error_text,
+                    ),
+                }
+                continue
+
             if _is_retryable_execution_error(error_text):
                 if attempt < int(max_attempts):
                     next_pending[cid] = order
                 else:
                     final_by_cid[cid] = {
                         "order": order,
-                        "result": {
-                            "ok": False,
-                            "error": "retry_exhausted",
-                            "client_order_id": cid,
-                            "attempt": attempt,
-                            "last_error": error_text,
-                        },
+                        "result": _build_retry_exhausted_result(
+                            client_order_id=cid,
+                            attempt=attempt,
+                            last_error=raw_error_text or error_text,
+                            canonical_reason="transient_error:retryable_broker_result",
+                        ),
                     }
                 continue
 
@@ -764,12 +1201,12 @@ def execute_orders_with_idempotent_retry(
     for cid, order in pending_by_cid.items():
         final_by_cid[cid] = {
             "order": order,
-            "result": {
-                "ok": False,
-                "error": "retry_exhausted",
-                "client_order_id": cid,
-                "attempt": int(max_attempts),
-            },
+            "result": _build_retry_exhausted_result(
+                client_order_id=cid,
+                attempt=int(max_attempts),
+                last_error="pending_orders_after_max_attempts",
+                canonical_reason="transient_error:pending_orders_after_max_attempts",
+            ),
         }
 
     return [final_by_cid[cid] for cid in ordered_cids if cid in final_by_cid]

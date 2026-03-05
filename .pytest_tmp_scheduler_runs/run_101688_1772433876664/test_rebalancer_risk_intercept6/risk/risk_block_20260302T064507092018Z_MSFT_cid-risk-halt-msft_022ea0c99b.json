@@ -1,0 +1,25 @@
+{
+  "decision": {
+    "action": "BLOCK",
+    "metrics": {},
+    "reason": "batch halted after prior risk block (vix_kill_switch)",
+    "reason_code": "risk_batch_halt"
+  },
+  "order": {
+    "client_order_id": "cid-risk-halt-msft",
+    "limit_price": null,
+    "order_type": "market",
+    "qty": 1,
+    "side": "sell",
+    "symbol": "MSFT"
+  },
+  "portfolio_state": {
+    "equity": 1000.0,
+    "positions": {
+      "MSFT": 1.0
+    },
+    "symbol_volatility": {},
+    "volatility_by_symbol": {}
+  },
+  "timestamp_utc": "2026-03-02T06:45:07.092Z"
+}

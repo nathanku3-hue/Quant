@@ -172,8 +172,23 @@ def render_auto_backtest_view(
                 # UNPACK TRIPLE RETURN (Weights, Regime, Reason)
                 weights, regime_history, details = strategy.generate_weights(prices_wide, None, macro)
 
-                # Engine Layer
-                results = engine.run_simulation(weights, returns_wide, cost_bps=normalized_config.cost_bps)
+                # Engine Layer with Baseline Export (Phase 33A Step 7)
+                strategy_config = {
+                    "atr_period": normalized_config.atr_period,
+                    "stop_lookback": normalized_config.stop_lookback,
+                    "vol_target": normalized_config.vol_target,
+                    "ma_lookback": normalized_config.ma_lookback,
+                    "max_positions": normalized_config.max_positions,
+                    "min_price": normalized_config.min_price,
+                }
+                results, baseline = engine.run_backtest_with_baseline_export(
+                    target_weights=weights,
+                    returns_df=returns_wide,
+                    strategy_config=strategy_config,
+                    strategy_name="adaptive_trend",
+                    strategy_version="1.0.0",
+                    cost_bps=normalized_config.cost_bps,
+                )
 
             finished_state = control_plane.mark_finished(
                 started_state,

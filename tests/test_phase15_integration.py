@@ -63,6 +63,40 @@ def test_phase15_weights_respect_regime_cap():
     assert (regime <= 0.5 + 1e-12).all()
 
 
+def test_phase15_history_with_partial_missing_precomputed_does_not_crash_and_respects_cap():
+    idx = pd.date_range("2026-01-01", periods=8, freq="B")
+    prices = pd.DataFrame(
+        {
+            101: np.linspace(100.0, 108.0, len(idx)),
+            202: np.linspace(50.0, 55.0, len(idx)),
+        },
+        index=idx,
+    )
+    scores = {(dt, 101): 3.0 for dt in idx}
+    scores.update({(dt, 202): 2.5 for dt in idx})
+    features = _make_feature_history(prices, scores)
+    missing_day = idx[3]
+    missing_mask = (pd.to_datetime(features["date"]) == missing_day) & (features["permno"] == 101)
+    features.loc[missing_mask, "rsi_threshold"] = np.nan
+
+    macro = pd.DataFrame({"regime_scalar": 0.5, "vix_level": 20.0}, index=idx)
+    strat = InvestorCockpitStrategy(
+        use_alpha_engine=True,
+        alpha_top_n=1,
+        hysteresis_exit_rank=2,
+        ratchet_stops=True,
+    )
+    weights, regime, details = strat.generate_weights(
+        prices=prices,
+        fundamentals={"feature_history": features},
+        macro=macro,
+    )
+
+    assert isinstance(details.get("alpha_telemetry"), pd.DataFrame)
+    assert (weights.sum(axis=1) <= 0.5 + 1e-12).all()
+    assert (regime <= 0.5 + 1e-12).all()
+
+
 def test_hysteresis_rank_buffer_hold_then_exit():
     idx = pd.to_datetime(["2026-01-05", "2026-01-06", "2026-01-07"])
     prices = pd.DataFrame(

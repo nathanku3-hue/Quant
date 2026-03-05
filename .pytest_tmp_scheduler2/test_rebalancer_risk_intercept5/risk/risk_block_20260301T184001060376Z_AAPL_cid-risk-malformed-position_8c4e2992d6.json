@@ -1,0 +1,18 @@
+{
+  "decision": {
+    "action": "BLOCK",
+    "metrics": {},
+    "reason": "risk bootstrap failed: invalid position quantity for MSFT: bad-qty",
+    "reason_code": "risk_check_error"
+  },
+  "order": {
+    "client_order_id": "cid-risk-malformed-position",
+    "limit_price": null,
+    "order_type": "market",
+    "qty": 1,
+    "side": "buy",
+    "symbol": "AAPL"
+  },
+  "portfolio_state": {},
+  "timestamp_utc": "2026-03-01T18:40:01.060Z"
+}

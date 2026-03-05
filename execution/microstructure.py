@@ -54,6 +54,10 @@ _DUCKDB_MAINTENANCE_LOCK = threading.Lock()
 _DUCKDB_LAST_CHECKPOINT_TS: dict[str, float] = {}
 
 
+class MicrostructureFlushError(RuntimeError):
+    """Fail-closed telemetry flush durability error."""
+
+
 def _clean_text(value: Any) -> str:
     if value is None:
         return ""
@@ -769,10 +773,17 @@ def _append_duckdb_table_rows(
         insert_column_sql = ", ".join(_quote_identifier(column) for column in insert_columns)
         select_column_sql = ", ".join(f"n.{_quote_identifier(column)}" for column in insert_columns)
         spool_uid_col = _quote_identifier(SPOOL_RECORD_UID_COLUMN)
-        before_count = int(conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
+
+        # Phase 32 Step 3: Create index for O(log N) deduplication lookups instead of O(N) table scans
+        index_name = f"idx_{table.replace(chr(34), '')}_spool_uid"
         conn.execute(
-            f"""
-            INSERT INTO {table} ({insert_column_sql})
+            f"CREATE INDEX IF NOT EXISTS {index_name} ON {table}({spool_uid_col})"
+        )
+
+        # Phase 32 Step 3: Count rows to insert WITHOUT scanning entire table (O(M log N) where M=batch size, N=table size)
+        # Previous: two COUNT(*) FROM table scans (O(N) + O(N)) = O(2N) full table scans
+        # Optimized: count SELECT result before INSERT (O(M log N) with index) = batch-size cost, not table-size cost
+        insert_select_query = f"""
             SELECT {select_column_sql}
             FROM {register_name} n
             WHERE NOT EXISTS (
@@ -780,10 +791,19 @@ def _append_duckdb_table_rows(
                 FROM {table} t
                 WHERE t.{spool_uid_col} = n.{spool_uid_col}
             )
+        """
+        to_insert_count = int(
+            conn.execute(f"SELECT COUNT(*) FROM ({insert_select_query})").fetchone()[0]
+        )
+
+        # Execute the INSERT with the same deduplication logic
+        conn.execute(
+            f"""
+            INSERT INTO {table} ({insert_column_sql})
+            {insert_select_query}
             """
         )
-        after_count = int(conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
-        return max(after_count - before_count, 0)
+        return to_insert_count
     finally:
         conn.unregister(register_name)
 
@@ -839,21 +859,20 @@ def _export_duckdb_table_to_parquet(
 
     cursor_path = _parquet_export_cursor_path(parquet_path)
     with duckdb.connect(str(duckdb_path)) as conn:
+        # Phase 32 Step 3: Remove O(N) COUNT(*) table scan
+        # Previous: SELECT COUNT(*) FROM table to get total_rows (O(N) full table scan)
+        # Optimized: fetch batch and detect end-of-table by result size (O(1) metadata check)
         try:
-            total_rows = int(conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
+            # Validate table exists by attempting to describe it (O(1) metadata operation)
+            conn.execute(f"PRAGMA table_info({table})").fetchall()
         except duckdb.Error:
             return 0
 
         start_row = _read_parquet_export_cursor(cursor_path)
-        if start_row > total_rows:
-            start_row = 0
-            _write_parquet_export_cursor(cursor_path, 0)
 
-        if start_row >= total_rows:
-            return 0
-
-        end_row = min(start_row + max(int(batch_rows), 1), total_rows)
-        write_count = int(end_row - start_row)
+        # Phase 32 Step 3: Fetch batch without knowing total_rows in advance
+        # If result is empty, we've reached end-of-table or cursor is beyond data
+        batch_size = max(int(batch_rows), 1)
         table_columns = _duckdb_table_columns(conn, table)
         export_df: pd.DataFrame | None = None
         candidate_queries: list[str] = [f"SELECT * FROM {table} ORDER BY rowid LIMIT ? OFFSET ?"]
@@ -864,7 +883,7 @@ def _export_duckdb_table_to_parquet(
 
         for sql in candidate_queries:
             try:
-                export_df = conn.execute(sql, [write_count, start_row]).df()
+                export_df = conn.execute(sql, [batch_size, start_row]).df()
                 break
             except duckdb.Error:
                 export_df = None
@@ -872,6 +891,16 @@ def _export_duckdb_table_to_parquet(
 
         if export_df is None:
             return 0
+
+        if export_df.empty:
+            # Keep cursor pinned at EOF so the next append is exported on the next flush.
+            # The telemetry DuckDB tables are append-only in normal operation, so cursor
+            # rewind is more harmful than useful here (it can delay tail export by one cycle).
+            return 0
+
+        # Phase 32 Step 3: Update cursor based on actual rows fetched, not pre-computed total_rows
+        actual_rows_fetched = int(len(export_df))
+        end_row = start_row + actual_rows_fetched
 
     if parquet_path.exists() and parquet_path.is_file():
         wrote = _append_parquet_legacy_file(parquet_path, export_df)
@@ -883,7 +912,7 @@ def _export_duckdb_table_to_parquet(
     if not part_path.exists():
         _atomic_write_parquet(export_df, part_path)
     _write_parquet_export_cursor(cursor_path, end_row)
-    return write_count
+    return actual_rows_fetched
 
 
 def _validate_table_name(table_name: str) -> str:
@@ -1202,12 +1231,48 @@ def _build_spool_records(
     fill_rows: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     def _deterministic_uid(record_type: str, row: dict[str, Any]) -> str:
-        uid_payload = {
+        """
+        Phase 32 Step 6: Immutable hash basis for retry deduplication.
+
+        Computes UID from ONLY immutable origin-state fields to prevent hash drift
+        during retry cycles. Excludes all mutable fields (timestamps, attempt counters,
+        status flags, latency metrics, heartbeat data) that would cause the same
+        logical order to generate different UIDs on retry.
+
+        Immutable fields (included in hash):
+        - record_type: "order" or "fill"
+        - client_order_id: Stable identifier for the order intent
+        - symbol: Ticker symbol
+        - side: "buy" or "sell"
+        - qty: Order quantity
+        - batch_id: Batch identifier (optional but stable within batch)
+
+        Mutable fields (excluded from hash):
+        - captured_at_utc, arrival_ts, submit_sent_ts, broker_ack_ts, filled_at, etc.
+        - latency_ms_*, heartbeat_*, status, ok, error, recovered
+        - All temporal and execution-state fields
+
+        This ensures: UID(order_at_attempt_1) == UID(order_at_attempt_3)
+        """
+        # Extract ONLY immutable origin-state fields for hash
+        immutable_fields = {
             "record_type": str(record_type),
-            # Exclude capture-time wall clock so retries of the same logical event collapse.
-            "row": {k: v for k, v in row.items() if k != "captured_at_utc"},
+            "client_order_id": str(row.get("client_order_id", "")).strip(),
+            "symbol": str(row.get("symbol", "")).strip().upper(),
+            "side": str(row.get("side", "")).strip().lower(),
+            "qty": float(row.get("qty") or 0.0),
         }
-        material = json.dumps(uid_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+
+        # Optional: include batch_id for additional uniqueness within batch
+        batch_id = str(row.get("batch_id", "")).strip()
+        if batch_id:
+            immutable_fields["batch_id"] = batch_id
+
+        # For fill records, include fill-specific immutable fields
+        if record_type == "fill":
+            immutable_fields["fill_index"] = int(row.get("fill_index") or 0)
+
+        material = json.dumps(immutable_fields, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
         return hashlib.sha1(material.encode("utf-8")).hexdigest()
 
     records: list[dict[str, Any]] = []
@@ -1760,13 +1825,16 @@ class _TelemetrySpooler:
         self._thread.join(timeout=remaining_join_timeout)
         final_status = self.status()
         pending_bytes = int(final_status.get("pending_bytes", 0))
-        if pending_bytes > 0:
-            buffered_records = int(final_status.get("buffered_records_pending", 0))
-            raise RuntimeError(
+        buffered_records = int(final_status.get("buffered_records_pending", 0))
+        buffer_drop_count = int(final_status.get("buffer_drop_count", 0))
+        last_flush_error = _clean_text(final_status.get("last_flush_error")) or "none"
+        if pending_bytes > 0 or buffer_drop_count > 0 or last_flush_error != "none":
+            raise MicrostructureFlushError(
                 "telemetry spool shutdown fail-closed: "
                 f"pending_bytes={pending_bytes} "
                 f"buffered_records_pending={buffered_records} "
-                f"last_flush_error={_clean_text(final_status.get('last_flush_error')) or 'none'}"
+                f"buffer_drop_count={buffer_drop_count} "
+                f"last_flush_error={last_flush_error}"
             )
 
     def _run_loop(self) -> None:
@@ -1863,7 +1931,7 @@ def _shutdown_execution_microstructure_spoolers() -> None:
         except RuntimeError as exc:
             shutdown_errors.append(str(exc))
     if shutdown_errors:
-        raise RuntimeError("; ".join(shutdown_errors))
+        raise MicrostructureFlushError("; ".join(shutdown_errors))
 
 
 def wait_for_execution_microstructure_flush(

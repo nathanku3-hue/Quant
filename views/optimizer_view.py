@@ -13,6 +13,54 @@ DEFAULT_PORTFOLIO_VALUE = 10_000.0
 MIN_REQUIRED_OBS = 3
 
 
+def load_strategy_metrics_from_results() -> dict[str, dict]:
+    """
+    Load strategy metrics from canonical source.
+
+    Source: data/backtest_results.json (dashboard.py:32)
+
+    Returns:
+        {
+            "strategy_name": {
+                "cagr": float,
+                "sharpe": float,
+                "max_dd": float,
+                "timestamp": str,
+            }
+        }
+    """
+    from pathlib import Path
+    import json
+
+    results_path = Path("data/backtest_results.json")
+
+    if not results_path.exists():
+        return {}
+
+    try:
+        with open(results_path) as f:
+            data = json.load(f)
+
+        # Coerce to expected types with guards
+        metrics = {}
+        for name, values in data.items():
+            if not isinstance(values, dict):
+                continue  # Skip malformed entries
+
+            metrics[name] = {
+                "cagr": float(values.get("cagr", 0)),
+                "sharpe": float(values.get("sharpe", 0)),
+                "max_dd": float(values.get("max_dd", 0)),
+                "timestamp": str(values.get("timestamp", "unknown")),
+            }
+
+        return metrics
+
+    except (json.JSONDecodeError, ValueError, KeyError) as e:
+        # Fallback to empty on parse errors
+        return {}
+
+
 def _resolve_permnos(
     prices_wide: pd.DataFrame,
     ticker_map: dict,
@@ -146,13 +194,56 @@ def render_optimizer_view(
         method = st.selectbox(
             "Method",
             [
+                "Auto (Best CAGR)",      # NEW
+                "Auto (Best Sharpe)",    # NEW
                 "Inverse Volatility",
                 "Mean-Variance (Max Sharpe)",
                 "Mean-Variance (Min Volatility)",
                 "Mean-Variance (Max Return)",
             ],
-            index=0,
+            index=2,  # Default to Inverse Volatility
         )
+
+    if method == "Auto (Best CAGR)":
+        metrics = load_strategy_metrics_from_results()
+
+        if not metrics:
+            st.warning("No backtest results found. Using Inverse Volatility.")
+            method = "Inverse Volatility"
+        else:
+            best_strat = max(metrics.items(), key=lambda x: x[1]["cagr"])
+            name, data = best_strat
+
+            st.info(
+                f"Using: {name} "
+                f"(CAGR: {data['cagr']*100:.1f}%, "
+                f"Sharpe: {data['sharpe']:.2f}, "
+                f"updated: {data['timestamp'][:10]})"
+            )
+
+            # Use Inverse Volatility as optimization method
+            # (strategy-specific methods not in current optimizer)
+            method = "Inverse Volatility"
+
+    elif method == "Auto (Best Sharpe)":
+        metrics = load_strategy_metrics_from_results()
+
+        if not metrics:
+            st.warning("No backtest results found. Using Mean-Variance (Max Sharpe).")
+            method = "Mean-Variance (Max Sharpe)"
+        else:
+            best_strat = max(metrics.items(), key=lambda x: x[1]["sharpe"])
+            name, data = best_strat
+
+            st.info(
+                f"Using: {name} "
+                f"(Sharpe: {data['sharpe']:.2f}, "
+                f"CAGR: {data['cagr']*100:.1f}%, "
+                f"updated: {data['timestamp'][:10]})"
+            )
+
+            method = "Mean-Variance (Max Sharpe)"
+
     with ctl2:
         max_weight = st.slider("Max weight", min_value=0.05, max_value=1.0, value=0.2, step=0.05)
     with ctl3:
@@ -262,6 +353,26 @@ def render_optimizer_view(
     if allocation_df.empty:
         st.warning("Optimization produced no investable allocation.")
         return
+
+    # Always show cash row for transparency (optimizer is fully-invested)
+    # Append numeric values BEFORE formatting (not pre-formatted strings)
+    # Use internal lowercase schema (permno, ticker, weight, allocation_usd, latest_price, est_shares)
+    total_weight = weights.sum()
+    cash_weight = 1.0 - total_weight
+    cash_allocation = portfolio_value * cash_weight
+
+    # Cash row with numeric values (will be formatted by .style.format later)
+    cash_row = pd.DataFrame([{
+        "permno": "CASH",
+        "ticker": "CASH",
+        "sector": "Cash",
+        "weight": float(cash_weight),
+        "allocation_usd": float(cash_allocation),
+        "latest_price": np.nan,
+        "est_shares": np.nan,
+    }])
+
+    allocation_df = pd.concat([allocation_df, cash_row], ignore_index=True)
 
     sector_exposure = (
         allocation_df.groupby("sector", dropna=False)["weight"]
