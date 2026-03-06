@@ -187,7 +187,7 @@ def test_attribution_report_end_to_end_integration(tmp_path: Path):
 
     # Test 3: Validate phase34_attribution.csv
     attribution_path = output_dir / "phase34_attribution.csv"
-    attribution = pd.read_csv(attribution_path, index_col=0)
+    attribution = pd.read_csv(attribution_path, index_col=0)  # Date index intentional
 
     # Assert non-empty
     assert not attribution.empty, "phase34_attribution.csv is empty"

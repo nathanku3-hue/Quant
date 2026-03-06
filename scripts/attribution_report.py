@@ -624,7 +624,7 @@ def run_attribution_analysis(
     _atomic_csv_write(regime_ic, output_dir / "phase34_regime_ic.csv", index=False)
     print(f"  - {output_dir / 'phase34_regime_ic.csv'}")
 
-    _atomic_csv_write(attribution, output_dir / "phase34_attribution.csv")
+    _atomic_csv_write(attribution, output_dir / "phase34_attribution.csv", index=True)  # Date index intentional
     print(f"  - {output_dir / 'phase34_attribution.csv'}")
 
     _atomic_csv_write(behavior_ledger, output_dir / "phase34_behavior_ledger.csv", index=False)
