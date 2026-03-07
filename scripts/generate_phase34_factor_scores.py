@@ -23,6 +23,7 @@ from strategies.company_scorecard import CompanyScorecard  # noqa: E402
 from strategies.factor_specs import (  # noqa: E402
     build_default_factor_specs,
     build_phase19_5_candidate_factor_sets,
+    build_phase35_wave1_candidate_specs,
 )
 
 
@@ -34,6 +35,7 @@ OUTPUT_PATH = PROCESSED_DIR / "phase34_factor_scores.parquet"
 FACTOR_PRESETS = {
     "DEFAULT_DAY4": build_default_factor_specs(),
     **build_phase19_5_candidate_factor_sets(),
+    "PHASE35_W1_CANDIDATES": build_phase35_wave1_candidate_specs(),
 }
 
 
@@ -123,6 +125,10 @@ def main() -> None:
     print(f"Computed scores for {len(scores_df):,} rows")
     print(f"Summary: n_dates={summary.n_dates}, coverage={summary.coverage:.2%}")
 
+    # Rename 'score' to 'composite_score' for AlphaEngine compatibility
+    if 'score' in scores_df.columns:
+        scores_df = scores_df.rename(columns={'score': 'composite_score'})
+
     # Extract required columns
     required_cols = [
         "date",
@@ -131,6 +137,7 @@ def main() -> None:
         "quality_normalized",
         "volatility_normalized",
         "illiquidity_normalized",
+        "composite_score",
     ]
 
     missing_cols = [col for col in required_cols if col not in scores_df.columns]

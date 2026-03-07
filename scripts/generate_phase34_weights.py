@@ -51,36 +51,104 @@ def _atomic_parquet_write(df: pd.DataFrame, path: Path):
                 pass
 
 
-def load_features_with_lookback(features_path: Path, lookback_days: int = 60) -> pd.DataFrame:
-    """Load features from parquet with lookback for rolling history using DuckDB."""
+def load_features_with_lookback(
+    features_path: Path,
+    lookback_days: int = 60,
+    factor_scores_path: Path | None = None
+) -> pd.DataFrame:
+    """
+    Load features from parquet with lookback for rolling history using DuckDB.
+
+    If factor_scores_path is provided, merges factor scores with technical indicators
+    from features_path. Otherwise, loads directly from features_path.
+    """
     if not features_path.exists():
         raise FileNotFoundError(f"Missing feature store: {features_path}")
 
-    print(f"Loading features from {features_path} using DuckDB...")
+    # If factor scores provided, merge with technical features
+    if factor_scores_path and factor_scores_path.exists():
+        print(f"Loading factor scores from {factor_scores_path}...")
 
-    # Use DuckDB to efficiently load only required columns
-    query = f"""
-    SELECT
-        CAST(date AS DATE) AS date,
-        CAST(permno AS BIGINT) AS permno,
-        CAST(adj_close AS DOUBLE) AS adj_close,
-        CAST(volume AS DOUBLE) AS volume,
-        CAST(sma200 AS DOUBLE) AS sma200,
-        CAST(dist_sma20 AS DOUBLE) AS dist_sma20,
-        CAST(rsi_14d AS DOUBLE) AS rsi_14d,
-        CAST(atr_14d AS DOUBLE) AS atr_14d,
-        CAST(yz_vol_20d AS DOUBLE) AS yz_vol_20d,
-        CAST(composite_score AS DOUBLE) AS composite_score,
-        trend_veto
-    FROM read_parquet('{_sql_escape_path(features_path)}')
-    ORDER BY date, permno
-    """
+        # Load factor scores (includes composite_score and wave-specific factors)
+        factor_query = f"""
+        SELECT
+            CAST(date AS DATE) AS date,
+            CAST(permno AS BIGINT) AS permno,
+            CAST(composite_score AS DOUBLE) AS composite_score
+        FROM read_parquet('{_sql_escape_path(factor_scores_path)}')
+        ORDER BY date, permno
+        """
 
-    con = duckdb.connect()
-    try:
-        df = con.execute(query).df()
-    finally:
-        con.close()
+        con = duckdb.connect()
+        try:
+            factor_scores = con.execute(factor_query).df()
+        finally:
+            con.close()
+
+        print(f"Loaded {len(factor_scores):,} factor score rows")
+
+        # Load technical indicators from baseline features
+        print(f"Loading technical indicators from {features_path}...")
+        technical_query = f"""
+        SELECT
+            CAST(date AS DATE) AS date,
+            CAST(permno AS BIGINT) AS permno,
+            CAST(adj_close AS DOUBLE) AS adj_close,
+            CAST(volume AS DOUBLE) AS volume,
+            CAST(sma200 AS DOUBLE) AS sma200,
+            CAST(dist_sma20 AS DOUBLE) AS dist_sma20,
+            CAST(rsi_14d AS DOUBLE) AS rsi_14d,
+            CAST(atr_14d AS DOUBLE) AS atr_14d,
+            CAST(yz_vol_20d AS DOUBLE) AS yz_vol_20d,
+            trend_veto
+        FROM read_parquet('{_sql_escape_path(features_path)}')
+        ORDER BY date, permno
+        """
+
+        con = duckdb.connect()
+        try:
+            technical_features = con.execute(technical_query).df()
+        finally:
+            con.close()
+
+        print(f"Loaded {len(technical_features):,} technical indicator rows")
+
+        # Merge on (date, permno)
+        print("Merging factor scores with technical indicators...")
+        df = factor_scores.merge(
+            technical_features,
+            on=["date", "permno"],
+            how="inner"
+        )
+
+        print(f"Merged dataset: {len(df):,} rows (inner join on date, permno)")
+
+    else:
+        # Fallback: load directly from features_path
+        print(f"Loading features from {features_path} using DuckDB...")
+
+        query = f"""
+        SELECT
+            CAST(date AS DATE) AS date,
+            CAST(permno AS BIGINT) AS permno,
+            CAST(adj_close AS DOUBLE) AS adj_close,
+            CAST(volume AS DOUBLE) AS volume,
+            CAST(sma200 AS DOUBLE) AS sma200,
+            CAST(dist_sma20 AS DOUBLE) AS dist_sma20,
+            CAST(rsi_14d AS DOUBLE) AS rsi_14d,
+            CAST(atr_14d AS DOUBLE) AS atr_14d,
+            CAST(yz_vol_20d AS DOUBLE) AS yz_vol_20d,
+            CAST(composite_score AS DOUBLE) AS composite_score,
+            trend_veto
+        FROM read_parquet('{_sql_escape_path(features_path)}')
+        ORDER BY date, permno
+        """
+
+        con = duckdb.connect()
+        try:
+            df = con.execute(query).df()
+        finally:
+            con.close()
 
     if df.empty:
         raise RuntimeError("No features loaded from parquet")
@@ -91,7 +159,7 @@ def load_features_with_lookback(features_path: Path, lookback_days: int = 60) ->
     df = df.dropna(subset=["date", "permno"])
     df = df.sort_values(["date", "permno"])
 
-    print(f"Loaded {len(df):,} feature rows, date range: {df['date'].min()} to {df['date'].max()}")
+    print(f"Final dataset: {len(df):,} feature rows, date range: {df['date'].min()} to {df['date'].max()}")
     return df
 
 
@@ -243,8 +311,12 @@ def main():
     print(f"Date range: {start_date.date()} to {end_date.date()}")
     print("=" * 70)
 
-    # Load features with lookback
-    features = load_features_with_lookback(features_path, lookback_days=LOOKBACK_DAYS)
+    # Load features with lookback (merge factor scores if provided)
+    features = load_features_with_lookback(
+        features_path,
+        lookback_days=LOOKBACK_DAYS,
+        factor_scores_path=factor_scores_path
+    )
 
     # Load regime history
     regime_history = load_regime_history(regime_path)
