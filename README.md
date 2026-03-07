@@ -12,11 +12,15 @@ This system implements a multi-phase quantitative trading strategy with:
 
 ## Project Status
 
-**Current Phase**: Phase 34 Complete ✅ (Conditional Approval)
-- Attribution pipeline production-ready
-- All 17 tests passing
-- Accounting identity verified (error < 1e-14)
-- Performance improvement deferred to Phase 35
+**Current Phase**: Phase 35 Closed and Pivoted 🔄
+- **Phase 34**: Attribution pipeline production-ready ✅
+  - All 17 tests passing
+  - Accounting identity verified (error < 1e-14)
+- **Phase 35 (candidate/reweight branch)**: Closed due to blockers 🚫
+  - Invalid experiments (missing data columns)
+  - Model misspecification (R² = -17.85)
+  - Turnover crisis (90-100% daily)
+- **Next**: Data engineering + model fixes, or pivot to Rule of 100 integration
 
 ## Quick Start
 
@@ -133,9 +137,17 @@ sum(contributions) + residual = portfolio_return ✅
 
 ## Documentation
 
+### Phase 34
 - **`docs/PHASE34_CONDITIONAL_APPROVAL.md`** - Final approval status
 - **`docs/PHASE34_FINAL_VERIFICATION.md`** - Engineering verification
 - **`docs/phase_brief/phase34-brief.md`** - Phase 34 specification
+
+### Phase 35
+- **`docs/PHASE35_CLOSURE.md`** - Closure report (candidate/reweight branch blocked)
+- **`docs/saw_reports/saw_phase35_round1.md`** - SAW report with BLOCK verdict
+- **`docs/phase_brief/phase35-brief.md`** - Phase 35 specification
+
+### General
 - **`docs/decision log.md`** - Architecture decision records
 
 ## Performance Metrics
@@ -194,6 +206,6 @@ Configuration files in `config/`:
 
 ---
 
-**Last Updated**: 2026-03-06
-**Phase**: 34 (Conditional Approval)
-**Status**: Engineering Complete ✅, Performance Improvement Planned
+**Last Updated**: 2026-03-07
+**Phase**: 35 (Closed and Pivoted)
+**Status**: Phase 34 Engineering Complete ✅, Phase 35 Candidate/Reweight Branch Blocked 🚫
