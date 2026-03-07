@@ -181,6 +181,45 @@ def build_phase19_5_candidate_factor_sets() -> dict[str, list[FactorSpec]]:
     }
 
 
+def build_phase35_wave1_candidate_specs() -> list[FactorSpec]:
+    """
+    Phase 35 Wave 1: Pure candidate column improvement.
+
+    NO aggregate signals (composite_score removed for clean ablation).
+    NO other changes: equal weights (0.25), zscore norm, no leaky integrators.
+    """
+    return [
+        FactorSpec(
+            name="momentum",
+            candidate_columns=("resid_mom_60d", "rel_strength_60d", "rsi_14d"),
+            direction="positive",
+            weight=0.25,
+            normalization="zscore",
+        ),
+        FactorSpec(
+            name="quality",
+            candidate_columns=("capital_cycle_score", "z_inventory_quality_proxy", "z_moat"),
+            direction="positive",
+            weight=0.25,
+            normalization="zscore",
+        ),
+        FactorSpec(
+            name="volatility",
+            candidate_columns=("yz_vol_20d", "atr_14d"),
+            direction="negative",
+            weight=0.25,
+            normalization="zscore",
+        ),
+        FactorSpec(
+            name="illiquidity",
+            candidate_columns=("amihud_20d", "z_flow_proxy"),
+            direction="negative",
+            weight=0.25,
+            normalization="zscore",
+        ),
+    ]
+
+
 def regime_adaptive_norm(
     values: pd.Series,
     date_index: pd.Series,

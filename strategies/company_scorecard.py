@@ -18,6 +18,7 @@ import pandas as pd
 from strategies.factor_specs import FactorSpec
 from strategies.factor_specs import build_default_factor_specs
 from strategies.factor_specs import build_phase19_5_candidate_factor_sets
+from strategies.factor_specs import build_phase35_wave1_candidate_specs
 from strategies.factor_specs import regime_adaptive_norm
 from strategies.factor_specs import regime_veto
 from strategies.factor_specs import validate_factor_specs
@@ -27,6 +28,12 @@ from strategies.ticker_pool import rank_ticker_pool
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SECTOR_MAP_PATH = PROJECT_ROOT / "data" / "static" / "sector_map.parquet"
 logger = logging.getLogger(__name__)
+
+
+PHASE35_PRESETS = {
+    "PHASE35_W1_CANDIDATES": build_phase35_wave1_candidate_specs(),
+    # Wave 2/3 will be added later
+}
 
 
 @dataclass(frozen=True)
@@ -231,17 +238,20 @@ class CompanyScorecard:
           - P195_SIGNAL_STRENGTH_4F
           - P195_SIGNAL_STRENGTH_5F
           - P195_SIGNAL_STRENGTH_4F_RANK
+          - PHASE35_W1_CANDIDATES
         """
 
         key = str(preset_name).strip().upper()
-        if key == "DEFAULT_DAY4":
+        if key in PHASE35_PRESETS:
+            specs = PHASE35_PRESETS[key]
+        elif key == "DEFAULT_DAY4":
             specs = build_default_factor_specs()
         else:
             phase19_sets = {
                 k.upper(): v for k, v in build_phase19_5_candidate_factor_sets().items()
             }
             if key not in phase19_sets:
-                supported = ["DEFAULT_DAY4"] + sorted(phase19_sets.keys())
+                supported = ["DEFAULT_DAY4"] + sorted(phase19_sets.keys()) + sorted(PHASE35_PRESETS.keys())
                 raise ValueError(
                     f"Unsupported preset_name={preset_name}. Supported={supported}"
                 )
