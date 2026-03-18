@@ -3470,3 +3470,473 @@ Phase 32 Step 4 (2026-03-02): Exception Taxonomy Split - TRANSIENT vs TERMINAL R
     - pytest atexit temp cleanup emits environment-level `PermissionError` noise.
   - Rollback note:
     - revert `main_bot_orchestrator.py`, `tests/test_main_bot_orchestrator.py`, `docs/phase_brief/phase32-brief.md`, and this decision entry if D-214 is rejected.
+
+Phase 55 (2026-03-17): First Bounded Evidence Packet - Gate Miss, No Promotion (D-311) 🟡
+
+  - Decision record:
+    - recompute the canonical allocator gate from `data/processed/phase55_allocator_cpcv_summary.json` and treat any miss as a hard no-promotion outcome; do not reinterpret the first packet into discretionary promotion or implicit retry authority.
+  - The Decision (Hardcoded):
+    - `allocator_gate_pass = 0` on the first bounded Phase 55 evidence packet.
+    - no lattice promotion is authorized.
+    - Rule-of-100 remains inactive under `D-309`.
+    - the Phase 53 research kernel remains immutable under `D-292`.
+    - Phase 55 evidence artifacts remain staged only on `data/processed/phase55_*` via atomic write/replace semantics; no write-back into `research_data` is authorized.
+  - Evidence:
+    - `data/processed/phase55_allocator_cpcv_summary.json` -> `PBO=0.6596408867190602`, `DSR=2.2263075720581107e-45`, `positive_outer_fold_share=0.15`, `SPA_p=1.0`, `WRC_p=1.0`, `allocator_gate_pass=false`.
+    - `data/processed/phase55_allocator_cpcv_evidence.json` published on the same processed surface.
+    - `scripts/phase55_allocator_governance.py::_atomic_write_json` publishes the summary/evidence packet via temp -> `os.replace(...)`.
+  - Contract lock:
+    - `allocator_gate_pass = 1[(PBO < 0.05) and (DSR > 0.95) and (positive_outer_fold_share >= 0.60) and (SPA_p < 0.05)]`.
+    - `if allocator_gate_pass == 0 -> no promotion`.
+  - Open risks:
+    - any follow-up Phase 55 execution requires explicit approval; `D-311` is not a retry grant.
+  - Rollback note:
+    - revert only Phase 55 docs/evidence artifacts if `D-311` wording is amended; do not alter the `D-292` research kernel.
+
+Phase 55 (2026-03-17): Clean Governance Closeout - No-Retry / No-Promotion (D-312) 🟢
+
+  - Decision record:
+    - close Phase 55 Opportunity-Set Controller with `D-311` gate-miss evidence as permanent SSOT; treat any further Phase 55 activity as requiring a new explicit approval packet; block all Phase 56 work until a separate planning-only token is issued.
+  - The Decision (Hardcoded):
+    - Phase 55 governance surface is now closed and immutable.
+    - `allocator_gate_pass = 0` remains authoritative; no reinterpretation or retry authority is granted.
+    - Rule-of-100 remains inactive under `D-309`.
+    - the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - `data/processed/phase55_allocator_cpcv_summary.json` and `data/processed/phase55_allocator_cpcv_evidence.json` are the sole canonical Phase 55 evidence artifacts.
+    - `active_phase = 55` remains the repo SSOT label until a separate explicit Phase 56 planning-only token is recorded.
+    - Phase 56 planning-only kickoff is authorized only after explicit follow-up approval; no implementation or execution is permitted yet.
+  - Evidence:
+    - `data/processed/phase55_allocator_cpcv_summary.json` -> `PBO=0.6596408867190602`, `DSR=2.2263075720581107e-45`, `positive_outer_fold_share=0.15`, `SPA_p=1.0`, `WRC_p=1.0`, `allocator_gate_pass=false`.
+    - `data/processed/phase55_allocator_cpcv_evidence.json` remains the co-published fold-level evidence packet on the same processed surface.
+    - `docs/saw_reports/saw_phase55_d311_gate_miss_20260317.md` and `docs/saw_reports/saw_phase55_d310_kickoff_20260317.md` preserve the governance trail.
+    - `docs/phase_brief/phase55-brief.md` is updated to `CLOSED` and `docs/context/current_context.md` / `docs/context/current_context.json` are refreshed from that SSOT.
+  - Contract lock:
+    - `Phase55 := CLOSED iff (D-312 published) and (context packet refreshed) and (phase55_summary_evidence remains the only SSOT input surface)`.
+    - `if future Phase 55 work is proposed -> require a new explicit approval packet; D-311 does not grant retry authority`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-312` entry plus the synchronized Phase 55 docs/context closeout edits if leadership amends wording; do not alter the `D-311` evidence artifacts or the `D-292` research kernel.
+
+Phase 56 (2026-03-18): Planning-Only Kickoff - Event Sleeve 1 (PEAD) (D-313) 🔵
+
+  - Decision record:
+    - open Phase 56 as a docs-only planning surface for PEAD Event Sleeve 1; execution remains blocked until a separate explicit token is issued.
+  - The Decision (Hardcoded):
+    - Phase 56 is now active for planning only.
+    - `active_phase = 56` becomes the repo SSOT label only after this kickoff packet is published and the context packet is refreshed.
+    - Phase 55 remains closed and immutable under `D-312`; `D-311` evidence remains permanent SSOT.
+    - the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - no Phase 56 implementation, evidence generation, or production promotion is authorized in this round.
+    - Phase 56 execution requires a future explicit approval packet and token.
+  - Evidence:
+    - `docs/phase_brief/phase53-brief.md` roadmap bullet -> `Phase 56 - Event Sleeve 1 (PEAD)`.
+    - `docs/phase_brief/phase53-brief.md` missing-hook table row -> `PEAD sleeve runner + cost-aware report`.
+    - `docs/phase_brief/phase56-brief.md` publishes the planning-only boundary and hook inventory.
+    - `docs/handover/phase56_kickoff_memo_20260318.md` publishes the PM-facing kickoff memo.
+  - Contract lock:
+    - `Phase56 := PLANNING_ONLY iff (D-313 published) and (context packet refreshed) and (NextPhaseApproval == PENDING)`.
+    - `if future Phase 56 work is proposed -> require a separate explicit execution approval packet; D-313 is not an execution grant`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-313` entry plus the synchronized Phase 56 planning docs/context/SAW edits if leadership amends wording; do not alter `D-312`, `D-311` evidence, or the `D-292` research kernel.
+
+Phase 56 (2026-03-18): Bounded Execution Authorization - Event Sleeve 1 (PEAD) (D-314) 🟢
+
+  - Decision record:
+    - consume the exact in-thread token `approve next phase` and authorize the bounded Phase 56 PEAD Event Sleeve 1 first evidence packet on the locked Phase 53 surface only.
+  - The Decision (Hardcoded):
+    - Phase 56 execution is now active for the bounded PEAD surface only.
+    - `NextPhaseApproval = APPROVED` for the first bounded PEAD execution packet.
+    - any Phase 56 work must stay on the same-window / same-cost / same-`core.engine.run_simulation` path and respect `RESEARCH_MAX_DATE = 2022-12-31`.
+    - the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - Rule-of-100 remains inactive under `D-309`.
+    - Phase 55 remains closed and immutable under `D-312`; `D-311` evidence remains historical SSOT and is not reopened here.
+    - no production promotion, loader reopen, post-2022 expansion, or non-PEAD execution is authorized in `D-314`.
+  - Evidence:
+    - exact approval token consumed in-thread on 2026-03-18: `approve next phase`.
+    - `docs/phase_brief/phase56-brief.md` updated to `Executing` with bounded PEAD scope.
+    - `docs/phase_brief/phase53-brief.md` roadmap and missing-hook evidence continue to anchor the PEAD phase scope.
+  - Contract lock:
+    - `phase56_execution_authorized = 1[(reply contains exact 'approve next phase') and (NextPhaseApproval == APPROVED)]`.
+    - `Phase56 := EXECUTING iff (D-314 published) and (context packet refreshed) and (scope remains PEAD-only on the locked surface)`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-314` entry plus the synchronized Phase 56 execution-authorization docs/context/SAW edits if leadership amends wording; do not alter `D-312`, `D-311` evidence, or the `D-292` research kernel.
+
+Phase 56 (2026-03-18): First Bounded PEAD Runner + Evidence Packet (D-315) 🟢
+
+  - Decision record:
+    - implement the smallest bounded PEAD sleeve/report slice on the locked surface using `capital_cycle_score` plus the existing `quality_pass` gate, publish the first cost-aware evidence packet, and keep promotion blocked.
+  - The Decision (Hardcoded):
+    - `scripts/phase56_pead_runner.py` is the bounded Phase 56 runner for this packet.
+    - governed PEAD weights are equal-weight across names that satisfy `quality_pass = 1`, `adv_usd >= 5_000_000`, `0 <= days_since_earnings <= 63`, and `value_rank_pct >= 0.60` on `capital_cycle_score`.
+    - governed return, turnover, and cost series for this packet are produced by `core.engine.run_simulation` at `cost_bps = 5.0` with `end_date <= 2022-12-31`.
+    - no loader reopen, no post-2022 expansion, no Rule-of-100 reopen, and no production promotion is authorized here.
+  - Evidence:
+    - `.venv\Scripts\python scripts/phase56_pead_runner.py --start-date 2000-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0`.
+    - `data/processed/phase56_pead_summary.json` -> `Sharpe = 0.4557`, `CAGR = 0.0795`, `MaxDD = -0.5054`, `Ulcer = 15.1873`, `turnover_annual = 78.7201`, `avg_positions = 32.9191`.
+    - `data/processed/phase56_pead_evidence.csv` publishes the daily governed PEAD return/turnover/equity series for the bounded packet.
+    - `tests/test_phase56_pead_runner.py` passes.
+  - Contract lock:
+    - `phase56_pead_gate_{i,t} = 1[(quality_pass_{i,t} = 1) and (adv_usd_{i,t} >= 5_000_000) and (0 <= days_since_earnings_{i,t} <= 63) and (value_rank_pct_{i,t} >= 0.60)]`.
+    - `Phase56_PEAD_Packet1 := VALID iff (summary artifact exists) and (evidence artifact exists) and (end_date <= 2022-12-31) and (series are produced by core.engine.run_simulation)`.
+  - Open risks:
+    - the broader baseline/delta comparator path is not widened in `D-315`; this packet is bounded evidence only.
+  - Rollback note:
+    - revert only the synchronized Phase 56 runner/test/docs/context/SAW edits from this round; do not alter `D-314`, `D-312`, `D-311` evidence, or the `D-292` research kernel.
+
+Phase 56 (2026-03-18): First Bounded PEAD Evidence Review - Evidence Only / No Widening (D-316) 🔵
+
+  - Decision record:
+    - review the first bounded PEAD evidence packet against the actual on-disk summary schema, publish an evidence-only disposition, and keep comparator widening or promotion blocked absent a separate explicit approval packet.
+  - The Decision (Hardcoded):
+    - `data/processed/phase56_pead_summary.json` is the authoritative summary artifact for this packet.
+    - `strategy_id = PHASE56_PEAD_CAPITAL_CYCLE_V1`, `same_engine = true`, `start_date = 2000-01-01`, `end_date = 2022-12-31`, and `max_date = 2022-12-31` remain the repo-truth identifiers for the first bounded packet.
+    - the bounded summary metrics currently under review are `sharpe = 0.4556995567986322`, `cagr = 0.07950885309583589`, `max_dd = -0.505398622797651`, `ulcer = 15.187284696866094`, `turnover_annual = 78.72013729610197`, and `avg_positions = 32.91907094901107`.
+    - no invented summary fields, inferred gate verdict, comparator delta, or promotion language are authorized in `D-316` because the on-disk summary artifact does not publish them.
+    - `D-314` remains the only execution authorization consumed in this phase so far; `D-316` is a review/hold packet only and does not widen the Phase 56 surface.
+  - Evidence:
+    - `data/processed/phase56_pead_summary.json` -> `strategy_id = PHASE56_PEAD_CAPITAL_CYCLE_V1`, `same_engine = true`, `candidate_rows = 181417`, `candidate_permnos = 219`, `candidate_dates = 5511`, `turnover_total = 1721.5344311064205`, `net_return_total = 4.328752294275915`.
+    - `data/processed/phase56_pead_evidence.csv` remains the co-published daily evidence surface referenced by the summary artifact.
+    - `docs/phase_brief/phase56-brief.md` is updated to the review/hold state and `docs/context/current_context.md` / `docs/context/current_context.json` are refreshed from that SSOT.
+  - Contract lock:
+    - `Phase56_D316_Review := VALID iff (review wording cites only keys present in data/processed/phase56_pead_summary.json) and (same_engine = true) and (end_date = max_date = 2022-12-31) and (no comparator or promotion widening language is introduced)`.
+    - `if future comparator or additional Phase 56 execution is proposed -> require a new explicit approval packet; D-316 is not that approval`.
+  - Open risks:
+    - the broader baseline/delta comparator path remains unpublished in this packet and still requires a separately approved scope if leadership wants it.
+  - Rollback note:
+    - revert only this `D-316` entry plus the synchronized Phase 56 brief/context/lesson/SAW edits if leadership amends the review wording; do not alter the `D-315` evidence artifacts, `D-314`, Phase 55 evidence, or the `D-292` research kernel.
+
+Phase 56 (2026-03-18): Closeout - No Promotion / No Comparator (D-317) 🟢
+
+  - Decision record:
+    - close Phase 56 as evidence-only / no promotion / no comparator widening while preserving the bounded PEAD surface and Phase 55 locks.
+  - The Decision (Hardcoded):
+    - Phase 56 is closed; no promotion or comparator widening is authorized.
+    - `data/processed/phase56_pead_summary.json` and `data/processed/phase56_pead_evidence.csv` remain the SSOT artifacts for Phase 56.
+    - any follow-up Phase 56 work requires a new explicit approval packet.
+  - Evidence:
+    - full regression: `.venv\Scripts\python -m pytest -q` -> PASS (see `docs/context/e2e_evidence/phase56_closeout_full_pytest_20260318.*`).
+    - runtime smoke: `.venv\Scripts\python launch.py --help` -> PASS (see `docs/context/e2e_evidence/phase56_launch_smoke_20260318.*`).
+    - bounded replay: `.venv\Scripts\python scripts/phase56_pead_runner.py --start-date 2000-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase56_pead_replay_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase56_pead_replay_evidence_20260318.csv`.
+  - Contract lock:
+    - `Phase56 := CLOSED iff (D-317 published) and (context packet refreshed) and (SSOT artifacts unchanged)`.
+    - `if future Phase 56 work is proposed -> require a new explicit approval packet; D-317 is not an execution grant`.
+  - Open risks:
+    - comparator hardening remains blocked until an explicit approval packet.
+  - Rollback note:
+    - revert only this `D-317` entry plus the synchronized Phase 56 closeout docs/context/SAW edits; do not alter the `D-315` evidence artifacts, `D-314`, Phase 55 evidence, or the `D-292` research kernel.
+
+Phase 57 (2026-03-18): Planning-Only Kickoff - Event Sleeve 2 (Corporate Actions) (D-318) 🔵
+
+  - Decision record:
+    - open Phase 57 as a docs-only planning surface for Corporate Actions; execution and any optional Phase 56 comparator follow-up remain blocked until separate explicit approval packets are issued.
+  - The Decision (Hardcoded):
+    - Phase 57 is now active for planning only.
+    - `active_phase = 57` becomes the repo SSOT label only after this kickoff packet is published and the context packet is refreshed.
+    - Phase 56 remains closed and immutable under `D-317`; `data/processed/phase56_pead_summary.json` and `data/processed/phase56_pead_evidence.csv` remain permanent SSOT.
+    - Phase 55 remains closed and immutable under `D-312`; `D-311` evidence remains historical SSOT.
+    - the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - no Phase 57 implementation, evidence generation, or production promotion is authorized in this round.
+    - Phase 57 execution requires a future explicit approval packet and the exact token `approve next phase`.
+  - Evidence:
+    - `docs/phase_brief/phase53-brief.md` roadmap bullet -> `Phase 57 - Event Sleeve 2 (Corporate Actions)`.
+    - `docs/phase_brief/phase53-brief.md` missing-hook table row -> `corporate-actions taxonomy`.
+    - `docs/phase_brief/phase57-brief.md` publishes the planning-only boundary and hook inventory.
+    - `docs/handover/phase57_kickoff_memo_20260318.md` publishes the PM-facing kickoff memo.
+  - Contract lock:
+    - `Phase57 := PLANNING_ONLY iff (D-318 published) and (context packet refreshed) and (NextPhaseApproval == PENDING)`.
+    - `if future Phase 57 work is proposed -> require a separate explicit execution approval packet; D-318 is not an execution grant`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-318` entry plus the synchronized Phase 57 planning docs/context/SAW edits if leadership amends wording; do not alter `D-317`, the `D-315` evidence artifacts, `D-312`, or the `D-292` research kernel.
+
+Phase 57 (2026-03-18): Bounded Execution Authorization - Event Sleeve 2 (Corporate Actions) (D-319) 🟢
+
+  - Decision record:
+    - consume the exact in-thread token `approve next phase` and authorize the bounded Phase 57 Corporate Actions first evidence packet on the locked Phase 53 surface only.
+  - The Decision (Hardcoded):
+    - Phase 57 execution is now active for the first bounded Corporate Actions packet only.
+    - `NextPhaseApproval = APPROVED` for the first bounded Phase 57 packet only.
+    - the bounded packet must stay on the same `2015-01-01 -> 2022-12-31`, `5.0` bps, same-`core.engine.run_simulation` path as the latest governed C3 baseline in `data/processed/phase54_core_sleeve_summary.json`.
+    - the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - Rule-of-100 remains inactive under `D-309`.
+    - no production promotion, loader reopen, post-2022 expansion, or non-Phase-57 execution is authorized in `D-319`.
+  - Evidence:
+    - exact approval token consumed in-thread on 2026-03-18: `approve next phase`.
+    - `docs/phase_brief/phase53-brief.md` roadmap bullet -> `Phase 57 - Event Sleeve 2 (Corporate Actions)`.
+    - `data/processed/phase54_core_sleeve_summary.json` -> `baseline_config_id = C3_LEAKY_INTEGRATOR_V1`, `window = 2015-01-01 -> 2022-12-31`, `cost_bps = 5.0`.
+  - Contract lock:
+    - `Phase57_D319_Exec := APPROVED iff (exact token consumed) and (window = 2015-01-01 -> 2022-12-31) and (cost_bps = 5.0) and (same engine path = core.engine.run_simulation)`.
+    - `if future Phase 57 work is proposed -> require a new explicit approval packet; D-319 is not open-ended execution authority`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-319` entry plus the synchronized Phase 57 execution-authorization docs/context/SAW edits if leadership amends wording; do not alter `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 57 (2026-03-18): First Bounded Corporate Actions Runner + Evidence Packet (D-320) 🟢
+
+  - Decision record:
+    - implement the smallest bounded Corporate Actions taxonomy / runner slice on the locked surface, publish the first same-window / same-cost / same-engine summary + evidence + delta-vs-C3 artifacts, and keep promotion blocked pending review.
+  - The Decision (Hardcoded):
+    - `scripts/phase57_corporate_actions_runner.py` is the bounded Phase 57 runner for this packet.
+    - governed Corporate Actions event yield is `corp_action_yield_t = total_ret_t - ((raw_close_t / raw_close_{t-1}) - 1)`.
+    - governed candidates satisfy `quality_pass = 1`, `adv_usd >= 5_000_000`, `0.005 <= corp_action_yield <= 0.25`, and `value_rank_pct >= 0.60` on `capital_cycle_score`.
+    - target weights are equal-weight across confirmed event names on event day and explicitly reindexed to the full trading calendar so `core.engine.run_simulation` executes the packet as a bounded next-day / one-day hold surface under `shift(1)`.
+    - governed return, turnover, and cost series for this packet are produced by `core.engine.run_simulation` at `cost_bps = 5.0` with `start_date = 2015-01-01`, `end_date = 2022-12-31`, and `max_date = 2022-12-31`.
+    - no loader reopen, no post-2022 expansion, no Rule-of-100 reopen, and no production promotion are authorized here.
+  - Evidence:
+    - `.venv\Scripts\python scripts/phase57_corporate_actions_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0`.
+    - `data/processed/phase57_corporate_actions_summary.json` -> `strategy_id = PHASE57_CORP_ACTIONS_CASH_YIELD_V1`, `candidate_rows = 972`, `candidate_permnos = 113`, `candidate_dates = 866`, `active_days = 866`, `sharpe = 0.2392571448595545`, `cagr = 0.029013082955127834`, `max_dd = -0.3943086015317727`, `ulcer = 22.757006739516832`, `turnover_annual = 215.59030183077684`, `net_return_total = 0.2578058722905625`.
+    - `data/processed/phase57_corporate_actions_delta_vs_c3.csv` -> `sharpe_delta = -0.240802877903895`, `cagr_delta = -0.06114407302135216`, `turnover_ratio_phase57_vs_c3 = 0.7061967047220717`, `max_dd_delta = 0.013356997284943994`, `ulcer_delta = 7.955780751115013`.
+  - Contract lock:
+    - `Phase57_D320_Packet := VALID iff (same_window_same_cost_same_engine = 1) and (summary/evidence/delta artifacts are co-published) and (end_date = max_date = 2022-12-31)`.
+    - `if future comparator or additional Phase 57 execution is proposed -> require a new explicit approval packet; D-320 is the first bounded packet only`.
+  - Open risks:
+    - the first bounded packet remains below C3 on Sharpe and CAGR and therefore cannot be treated as promotion-ready evidence.
+  - Rollback note:
+    - revert only the synchronized Phase 57 runner / test / docs / context / SAW edits from this round; do not alter `D-319`, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 57 (2026-03-18): First Bounded Corporate Actions Evidence Review - Evidence Only / No Promotion (D-321) 🔵
+
+  - Decision record:
+    - review the first bounded Corporate Actions packet from the actual on-disk summary / delta artifacts, publish an evidence-only disposition, and keep promotion or widening blocked absent a separate explicit approval packet.
+  - The Decision (Hardcoded):
+    - `data/processed/phase57_corporate_actions_summary.json` and `data/processed/phase57_corporate_actions_delta_vs_c3.csv` are the authoritative artifacts for this review.
+    - `strategy_id = PHASE57_CORP_ACTIONS_CASH_YIELD_V1`, `same_engine = true`, `start_date = 2015-01-01`, `end_date = 2022-12-31`, and `max_date = 2022-12-31` remain the repo-truth identifiers for the first bounded packet.
+    - the reviewed strategic deltas are `sharpe_delta = -0.240802877903895`, `cagr_delta = -0.06114407302135216`, `turnover_ratio_phase57_vs_c3 = 0.7061967047220717`, `max_dd_delta = 0.013356997284943994`, and `ulcer_delta = 7.955780751115013`.
+    - `D-319` remains the only execution authorization consumed in this phase so far; `D-321` is a review / hold packet only and does not widen the Phase 57 surface.
+    - no promotion language, inferred comparator verdict, or additional execution authority is authorized in `D-321`.
+  - Evidence:
+    - `data/processed/phase57_corporate_actions_summary.json` remains the authoritative summary surface for the first bounded packet.
+    - `data/processed/phase57_corporate_actions_evidence.csv` remains the co-published daily evidence surface referenced by the summary artifact.
+    - `data/processed/phase57_corporate_actions_delta_vs_c3.csv` remains the authoritative same-window / same-cost comparator surface versus `C3_LEAKY_INTEGRATOR_V1`.
+    - `docs/phase_brief/phase57-brief.md` is updated to the review / hold state and `docs/context/current_context.md` / `docs/context/current_context.json` are refreshed from that SSOT.
+  - Contract lock:
+    - `Phase57_D321_Review := VALID iff (review wording cites only fields present in phase57_corporate_actions_summary.json or phase57_corporate_actions_delta_vs_c3.csv) and (no promotion or widening language is introduced)`.
+    - `if future comparator or additional Phase 57 execution is proposed -> require a new explicit approval packet; D-321 is not that approval`.
+  - Open risks:
+    - the first bounded Corporate Actions packet remains below C3 on Sharpe and CAGR, so follow-up work is not automatically authorized from this review.
+  - Rollback note:
+    - revert only this `D-321` entry plus the synchronized Phase 57 brief / context / lesson / SAW edits if leadership amends the review wording; do not alter the `D-320` evidence artifacts, `D-319`, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 57 (2026-03-18): Closeout - Evidence Only / No Promotion / No Widening (D-322) 🟢
+
+  - Decision record:
+    - close Phase 57 as evidence-only / no promotion / no widening while preserving the bounded Corporate Actions surface and all prior locks.
+  - The Decision (Hardcoded):
+    - Phase 57 is closed; no promotion, widening, or new Corporate Actions execution is authorized.
+    - `data/processed/phase57_corporate_actions_summary.json`, `data/processed/phase57_corporate_actions_evidence.csv`, and `data/processed/phase57_corporate_actions_delta_vs_c3.csv` remain the SSOT artifacts for Phase 57.
+    - any follow-up Phase 57 work requires a new explicit approval packet.
+  - Evidence:
+    - full regression: `.venv\Scripts\python -m pytest -q` -> PASS (see `docs/context/e2e_evidence/phase57_closeout_full_pytest_20260318.*`).
+    - runtime smoke: `.venv\Scripts\python launch.py --help` -> PASS (see `docs/context/e2e_evidence/phase57_launch_smoke_20260318.*`).
+    - bounded replay: `.venv\Scripts\python scripts/phase57_corporate_actions_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase57_corporate_actions_replay_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase57_corporate_actions_replay_evidence_20260318.csv --delta-path docs\context\e2e_evidence\phase57_corporate_actions_replay_delta_vs_c3_20260318.csv`.
+    - reviewer-B bounded replay: `.venv\Scripts\python scripts/phase57_corporate_actions_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase57_corporate_actions_replay_revb_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase57_corporate_actions_replay_revb_evidence_20260318.csv --delta-path docs\context\e2e_evidence\phase57_corporate_actions_replay_revb_delta_vs_c3_20260318.csv`.
+  - Contract lock:
+    - `Phase57 := CLOSED iff (D-322 published) and (context packet refreshed) and (SSOT artifacts unchanged)`.
+    - `if future Phase 57 work is proposed -> require a new explicit approval packet; D-322 is not an execution grant`.
+  - Open risks:
+    - the bounded packet remains below C3 on Sharpe and CAGR; therefore Phase 57 closes as no-promotion evidence only.
+  - Rollback note:
+    - revert only this `D-322` entry plus the synchronized Phase 57 closeout docs/context/SAW edits; do not alter the `D-320` evidence artifacts, `D-319`, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 58 (2026-03-18): Planning-Only Kickoff - Governance Layer (D-323) 🔵
+
+  - Decision record:
+    - open Phase 58 as a docs-only planning surface for Governance Layer work; execution and any optional prior-phase follow-up remain blocked until separate explicit approval packets are issued.
+  - The Decision (Hardcoded):
+    - Phase 58 is now active for planning only.
+    - `active_phase = 58` becomes the repo SSOT label only after this kickoff packet is published and the context packet is refreshed.
+    - Phase 57 remains closed and immutable under `D-322`; `data/processed/phase57_corporate_actions_summary.json`, `data/processed/phase57_corporate_actions_evidence.csv`, and `data/processed/phase57_corporate_actions_delta_vs_c3.csv` remain permanent SSOT.
+    - Phase 56 remains closed and immutable under `D-317`; Phase 55 remains closed and immutable under `D-312`; the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - no Phase 58 implementation, evidence generation, or production promotion is authorized in this round.
+    - Phase 58 execution requires a future explicit approval packet and the exact token `approve next phase`.
+  - Evidence:
+    - `docs/phase_brief/phase53-brief.md` roadmap bullet -> `Phase 58 - Governance Layer`.
+    - `docs/phase_brief/phase58-brief.md` publishes the planning-only boundary and governance-hook inventory.
+    - `docs/handover/phase58_kickoff_memo_20260318.md` publishes the PM-facing kickoff memo.
+  - Contract lock:
+    - `Phase58 := PLANNING_ONLY iff (D-323 published) and (context packet refreshed) and (NextPhaseApproval == PENDING)`.
+    - `if future Phase 58 work is proposed -> require a separate explicit execution approval packet; D-323 is not an execution grant`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-323` entry plus the synchronized Phase 58 planning docs/context/SAW edits if leadership amends wording; do not alter `D-322`, the bounded Phase 57 artifacts, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Confirmation (2026-03-18): Clean D-322 / D-323 SSOT Revalidation
+
+  - Confirmation record:
+    - confirm the cleaned Phase 57 `D-322` closeout and Phase 58 `D-323` planning-only kickoff packet after removal of the unauthorized helper artifact and scrubbing of unrelated warning references from the current-round closeout surface.
+  - The Confirmation (Hardcoded):
+    - `D-322` remains authoritative and unchanged in substance: Phase 57 is `CLOSED` as evidence-only / no promotion / no widening.
+    - `D-323` remains authoritative and unchanged in substance: Phase 58 is `PLANNING_ONLY`, `active_phase = 58`, and `NextPhaseApproval = PENDING`.
+    - `D-284` through `D-323` plus `RESEARCH_MAX_DATE = 2022-12-31` remain immutable SSOT.
+    - no new execution authority is created by this confirmation entry.
+  - Evidence:
+    - cleaned closeout brief: `docs/phase_brief/phase57-brief.md`.
+    - cleaned kickoff brief: `docs/phase_brief/phase58-brief.md`.
+    - cleaned closeout handover: `docs/handover/phase57_handover.md`.
+    - cleaned kickoff memo: `docs/handover/phase58_kickoff_memo_20260318.md`.
+    - cleaned SAW packet: `docs/saw_reports/saw_phase57_d322_closeout_phase58_d323_kickoff_20260318.md`.
+    - full regression rerun: `docs/context/e2e_evidence/phase57_closeout_full_pytest_20260318.status.txt`.
+    - terminal context validation: `docs/context/e2e_evidence/phase58_context_validate_20260318.status.txt`.
+  - Contract lock:
+    - `Phase57_D322_Confirmed := 1[(phase57_status = CLOSED) and (phase57_artifacts_unchanged = 1)]`.
+    - `Phase58_D323_Confirmed := 1[(active_phase = 58) and (phase58_status = PLANNING_ONLY) and (NextPhaseApproval = PENDING)]`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this clean confirmation entry plus synchronized context refresh if leadership amends wording; do not alter `D-322`, `D-323`, the bounded Phase 57 artifacts, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 58 (2026-03-18): Bounded Execution Authorization - Governance Layer (D-324) 🟢
+
+  - Decision record:
+    - consume the exact in-thread token `approve next phase` and authorize the bounded Phase 58 Governance Layer first evidence packet on the locked Phase 53 surface only.
+  - The Decision (Hardcoded):
+    - Phase 58 execution is now active for the first bounded Governance Layer packet only.
+    - `NextPhaseApproval = APPROVED` for the first bounded Phase 58 packet only.
+    - the bounded packet must stay on the same `2015-01-01 -> 2022-12-31`, `5.0` bps, same-`core.engine.run_simulation` path as the locked Phase 54 C3 baseline where comparator evidence applies.
+    - the bounded packet may normalize the comparable event-sleeve family only and may carry Phase 55 allocator governance as `reference_only`; it may not invent cross-family comparability or a post-2022 audit surface.
+    - the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - no production promotion, loader reopen, post-2022 expansion, or non-Phase-58 execution is authorized in `D-324`.
+  - Evidence:
+    - exact approval token consumed in-thread on 2026-03-18: `approve next phase`.
+    - `docs/phase_brief/phase53-brief.md` roadmap bullet -> `Phase 58 - Governance Layer`.
+    - `data/processed/phase54_core_sleeve_summary.json` -> `baseline_config_id = C3_LEAKY_INTEGRATOR_V1`, `window = 2015-01-01 -> 2022-12-31`, `cost_bps = 5.0`.
+  - Contract lock:
+    - `Phase58_D324_Exec := APPROVED iff (exact token consumed) and (window = 2015-01-01 -> 2022-12-31) and (cost_bps = 5.0) and (same engine path = core.engine.run_simulation)`.
+    - `if future Phase 58 work is proposed -> require a new explicit review packet; D-324 is not open-ended execution authority`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-324` entry plus the synchronized Phase 58 execution-authorization docs/context/SAW edits if leadership amends wording; do not alter `D-322`, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 58 (2026-03-18): First Bounded Governance Evidence Review - Evidence Only / No Promotion / No Widening (D-325) 🔵
+
+  - Decision record:
+    - review the first bounded Governance Layer packet from the on-disk summary / evidence / delta artifacts, publish an evidence-only disposition, and keep promotion or widening blocked absent a separate explicit review packet.
+  - The Decision (Hardcoded):
+    - `data/processed/phase58_governance_summary.json`, `data/processed/phase58_governance_evidence.csv`, and `data/processed/phase58_governance_delta_vs_c3.csv` are the authoritative artifacts for this review.
+    - `packet_id = PHASE58_GOVERNANCE_EVENT_LAYER_V1`, `same_window_same_cost_same_engine = true`, `start_date = 2015-01-01`, `end_date = 2022-12-31`, and `max_date = 2022-12-31` remain the repo-truth identifiers for the first bounded packet.
+    - the bounded packet covers the comparable event-sleeve family only (`phase56_event_pead`, `phase57_event_corporate_actions`) and carries `phase55_allocator_reference` as `reference_only`.
+    - the reviewed family-level governance metrics are `event_family_effective_n_trials = 2.0`, `event_family_spa_p = 0.066`, and `event_family_wrc_p = 0.086`.
+    - the reviewed sleeve-level strategic deltas are:
+      - `phase56_event_pead`: `sharpe_delta = 0.14556879675273404`, `cagr_delta = 0.01916021094987319`, `dsr = 0.9307882752239804`.
+      - `phase57_event_corporate_actions`: `sharpe_delta = -0.240802877903895`, `cagr_delta = -0.06114407302135216`, `dsr = 1.2775341238946346e-41`.
+    - `D-324` remains the only execution authorization consumed in this phase so far; `D-325` is a review / hold packet only and does not widen the Phase 58 surface.
+    - no promotion language, inferred post-2022 audit completion, or additional execution authority is authorized in `D-325`.
+  - Evidence:
+    - `data/processed/phase58_governance_summary.json` remains the authoritative summary surface for the first bounded packet.
+    - `data/processed/phase58_governance_evidence.csv` remains the authoritative normalized evidence surface for the comparable sleeves plus the allocator reference row.
+    - `data/processed/phase58_governance_delta_vs_c3.csv` remains the authoritative same-window / same-cost comparator surface versus `C3_LEAKY_INTEGRATOR_V1`.
+    - `docs/phase_brief/phase58-brief.md` is updated to the review / hold state and `docs/context/current_context.md` / `docs/context/current_context.json` are refreshed from that SSOT.
+  - Contract lock:
+    - `Phase58_D325_Review := VALID iff (review wording cites only fields present in phase58_governance_summary.json, phase58_governance_evidence.csv, or phase58_governance_delta_vs_c3.csv) and (no promotion or widening language is introduced)`.
+    - `if future promotion, widening, or additional Phase 58 execution is proposed -> require a new explicit review packet; D-325 is not that approval`.
+  - Open risks:
+    - the family-level `SPA/WRC` remain above `0.05`, and the Phase 57 sleeve remains below the locked C3 baseline on Sharpe / CAGR, so the first bounded packet remains evidence-only.
+  - Rollback note:
+    - revert only this `D-325` entry plus the synchronized Phase 58 brief / context / lesson / SAW edits if leadership amends the review wording; do not alter the `D-324` evidence artifacts, `D-322`, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 58 (2026-03-18): Closeout - Evidence Only / No Promotion / No Widening (D-326) 🟢
+
+  - Decision record:
+    - close Phase 58 as evidence-only / no promotion / no widening while preserving the bounded Governance Layer surface and all prior locks.
+  - The Decision (Hardcoded):
+    - Phase 58 is closed; no promotion, widening, or new Governance Layer execution is authorized.
+    - `data/processed/phase58_governance_summary.json`, `data/processed/phase58_governance_evidence.csv`, and `data/processed/phase58_governance_delta_vs_c3.csv` remain the SSOT artifacts for Phase 58.
+    - any follow-up Phase 58 work requires a new explicit review packet.
+  - Evidence:
+    - full regression: `.venv\Scripts\python -m pytest -q` -> PASS (see `docs/context/e2e_evidence/phase58_full_pytest_20260318.*`).
+    - runtime smoke: `.venv\Scripts\python launch.py --help` -> PASS (see `docs/context/e2e_evidence/phase58_launch_smoke_20260318.*`).
+    - bounded replay: `.venv\Scripts\python scripts/phase58_governance_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase58_governance_replay_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase58_governance_replay_evidence_20260318.csv --delta-path docs\context\e2e_evidence\phase58_governance_replay_delta_vs_c3_20260318.csv`.
+    - reviewer-B bounded replay: `.venv\Scripts\python scripts/phase58_governance_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase58_governance_replay_revb_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase58_governance_replay_revb_evidence_20260318.csv --delta-path docs\context\e2e_evidence\phase58_governance_replay_revb_delta_vs_c3_20260318.csv`.
+  - Contract lock:
+    - `Phase58 := CLOSED iff (D-326 published) and (context packet refreshed) and (SSOT artifacts unchanged)`.
+    - `if future Phase 58 work is proposed -> require a new explicit review packet; D-326 is not an execution grant`.
+  - Open risks:
+    - the bounded packet remains mixed (`event_family_spa_p = 0.066`, `event_family_wrc_p = 0.086`; Phase 57 remains below C3 on Sharpe / CAGR), so Phase 58 closes as no-promotion evidence only.
+  - Rollback note:
+    - revert only this `D-326` entry plus the synchronized Phase 58 closeout docs/context/SAW edits; do not alter the `D-324` evidence artifacts, `D-322`, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 59 (2026-03-18): Planning-Only Kickoff - Shadow Portfolio (D-327) 🔵
+
+  - Decision record:
+    - open Phase 59 as a docs-only planning surface for Shadow Portfolio work; execution and any optional prior-phase follow-up remain blocked until separate explicit approval packets are issued.
+  - The Decision (Hardcoded):
+    - Phase 59 is now active for planning only.
+    - `active_phase = 59` becomes the repo SSOT label only after this kickoff packet is published and the context packet is refreshed.
+    - Phase 58 remains closed and immutable under `D-326`; `data/processed/phase58_governance_summary.json`, `data/processed/phase58_governance_evidence.csv`, and `data/processed/phase58_governance_delta_vs_c3.csv` remain permanent SSOT.
+    - Phase 57 remains closed and immutable under `D-322`; Phase 56 remains closed and immutable under `D-317`; Phase 55 remains closed and immutable under `D-312`; the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - no Phase 59 implementation, evidence generation, or production promotion is authorized in this round.
+    - Phase 59 execution requires a future explicit approval packet and the exact token `approve next phase`.
+  - Evidence:
+    - `docs/phase_brief/phase53-brief.md` roadmap bullet -> `Phase 59 - Shadow Portfolio`.
+    - `docs/phase_brief/phase59-brief.md` publishes the planning-only boundary and hook inventory.
+    - `docs/handover/phase59_kickoff_memo_20260318.md` publishes the PM-facing kickoff memo.
+  - Contract lock:
+    - `Phase59 := PLANNING_ONLY iff (D-327 published) and (context packet refreshed) and (NextPhaseApproval == PENDING)`.
+    - `if future Phase 59 work is proposed -> require a separate explicit execution approval packet; D-327 is not an execution grant`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-327` entry plus the synchronized Phase 59 planning docs/context/SAW edits if leadership amends wording; do not alter `D-326`, the bounded Phase 58 artifacts, `D-322`, `D-317`, `D-312`, or the `D-292` research kernel.
+
+Phase 59 (2026-03-18): Bounded Execution Authorization - Shadow Portfolio (D-328) 🟢
+
+  - Decision record:
+    - consume the exact in-thread token `approve next phase` and authorize the bounded Phase 59 Shadow Portfolio first evidence packet on the locked read-only research + historical shadow surface only.
+  - The Decision (Hardcoded):
+    - Phase 59 execution is now active for the first bounded Shadow Portfolio packet only.
+    - `NextPhaseApproval = APPROVED` for the first bounded Phase 59 packet only.
+    - the research-side packet must stay on the locked `2015-01-01 -> 2022-12-31`, `5.0` bps, same-window / same-cost / same-engine comparator discipline where comparator evidence applies.
+    - `research_data/catalog.duckdb` and the `allocator_state` cube remain read-only and immutable under `D-292`.
+    - historical `phase50_shadow_ship` artifacts may be cited as explicit reference-only context and must not be rewritten here.
+    - no production promotion, no stable shadow stack execution, no post-2022 expansion, no loader/kernel reopen, and no non-Phase-59 execution are authorized in `D-328`.
+  - Evidence:
+    - exact approval token consumed in-thread on 2026-03-18: `approve next phase`.
+    - `docs/phase_brief/phase59-brief.md` updated to `EXECUTING` with the bounded Shadow Portfolio scope.
+    - `docs/phase_brief/phase53-brief.md` roadmap bullet -> `Phase 59 - Shadow Portfolio`.
+  - Contract lock:
+    - `phase59_execution_authorized = 1[(reply contains exact 'approve next phase') and (NextPhaseApproval == APPROVED)]`.
+    - `Phase59 := EXECUTING iff (D-328 published) and (context packet refreshed) and (scope remains read-only Shadow NAV / alert only)`.
+  - Open risks:
+    - none.
+  - Rollback note:
+    - revert only this `D-328` entry plus the synchronized Phase 59 execution-authorization docs/context/SAW edits if leadership amends wording; do not alter `D-327`, `D-326`, prior-sleeve SSOT artifacts, or the `D-292` research kernel.
+
+Phase 59 (2026-03-18): First Bounded Shadow NAV / Alert Packet - Evidence Only / No Promotion / No Widening (D-329) 🟢
+
+  - Decision record:
+    - implement the smallest bounded Phase 59 read-only Shadow NAV / alert slice, publish the first summary / evidence / delta artifacts, add a dashboard reader, and keep promotion blocked.
+  - The Decision (Hardcoded):
+    - `scripts/phase59_shadow_portfolio_runner.py` is the bounded Phase 59 runner for this packet.
+    - `selected_variant = argmax(selection_count, median_outer_test_sharpe, variant_id_ascending)` over `data/processed/phase55_allocator_cpcv_evidence.json::fold_results`.
+    - the research lane uses `allocator_state(period_return_{selected_variant,t})`, reindexed to the bounded `2015-01-01 -> 2022-12-31` business-day window with `0` on unobserved dates, to produce the first Shadow NAV surface.
+    - the reference-only alert lane uses `data/processed/phase50_shadow_ship/phase50_curve_full_20260410.csv`, `phase50_aggregated_telemetry_20260410.json`, and the day1/day30 positions files to publish `holdings_overlap`, `gross_exposure_delta`, `turnover_delta_abs`, and `turnover_delta_rel`.
+    - `data/phase59_shadow_portfolio.py`, `views/shadow_portfolio_view.py`, and the bounded `dashboard.py` tab hook remain read-only consumers of the research catalog and historical shadow artifacts.
+    - no mutation of `research_data/`, no post-2022 expansion, no stable shadow / multi-sleeve execution, and no production promotion are authorized here.
+  - Evidence:
+    - `.venv\Scripts\python scripts/phase59_shadow_portfolio_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0`.
+    - `docs/handover/phase59_execution_memo_20260318.md` publishes the PM-facing execution memo for the first bounded packet.
+    - `data/processed/phase59_shadow_summary.json` -> `selected_variant = v_3516a4bd6b65`, `research_sharpe = -0.8036313887871052`, `research_cagr = -0.05889864053976657`, `shadow_reference_alert_level = RED`, `holdings_overlap = 0.0`, `gross_exposure_delta = 0.9999999999999998`, `turnover_delta_rel = 0.0019000000000000006`.
+    - `data/processed/phase59_shadow_evidence.csv` publishes the research-lane daily Shadow NAV series plus the reference-only Phase 50 curve lane.
+    - `data/processed/phase59_shadow_delta_vs_c3.csv` publishes the research-vs-C3 structural delta row plus the reference-only alert row.
+    - focused tests: `.venv\Scripts\python -m pytest tests\test_phase59_shadow_portfolio.py tests\test_shadow_portfolio_view.py tests\test_release_controller.py -q` -> PASS (see `docs/context/e2e_evidence/phase59_targeted_tests_20260318.*`).
+    - full regression: `.venv\Scripts\python -m pytest -q` -> PASS (see `docs/context/e2e_evidence/phase59_full_pytest_20260318.*`).
+    - runtime smoke: `.venv\Scripts\python launch.py --help` -> PASS (see `docs/context/e2e_evidence/phase59_launch_smoke_20260318.*`).
+    - bounded replay: `.venv\Scripts\python scripts/phase59_shadow_portfolio_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase59_shadow_replay_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase59_shadow_replay_evidence_20260318.csv --delta-path docs\context\e2e_evidence\phase59_shadow_replay_delta_vs_c3_20260318.csv` -> PASS.
+    - reviewer-B bounded replay: `.venv\Scripts\python scripts/phase59_shadow_portfolio_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase59_shadow_replay_revb_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase59_shadow_replay_revb_evidence_20260318.csv --delta-path docs\context\e2e_evidence\phase59_shadow_replay_revb_delta_vs_c3_20260318.csv` -> PASS.
+  - Contract lock:
+    - `Phase59_D329_Packet := VALID iff (summary/evidence/delta artifacts are co-published) and (max_date <= 2022-12-31) and (research_data remains read-only) and (phase50 artifacts remain reference_only)`.
+    - `if future promotion, widening, stable shadow execution, or post-2022 work is proposed -> require a new explicit review packet; D-329 is the first bounded packet only`.
+  - Open risks:
+    - the research lane remains below the locked C3 baseline on Sharpe / CAGR and the reference lane emits a red alert state (`holdings_overlap = 0.0`, `gross_exposure_delta = 1.0`), so this packet remains evidence-only / no promotion / no widening.
+  - Rollback note:
+    - revert only the synchronized Phase 59 runner/view/test/docs/context/SAW edits from this round and remove `data/processed/phase59_*`; do not alter `D-328`, `D-327`, `D-326`, prior-sleeve SSOT artifacts, or the `D-292` research kernel.
+
