@@ -27,3 +27,4 @@ data/backtest_results.json
 data/fresh_finds.json
 data/last_scan_state.json
 data/watchlist.json
+docs/context/e2e_evidence/archive/
