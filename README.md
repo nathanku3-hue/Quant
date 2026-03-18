@@ -22,6 +22,28 @@ This system implements a multi-phase quantitative trading strategy with:
   - Turnover crisis (90-100% daily)
 - **Next**: Data engineering + model fixes, or pivot to Rule of 100 integration
 
+## Current Truth Surfaces
+
+Use these surfaces together to understand the current system state:
+
+### Static Truth
+- **[top_level_PM.md](top_level_PM.md)** — long-lived product/system intent
+- **[docs/decision log.md](docs/decision%20log.md)** — authoritative decision history
+- **Active phase brief** — current phase scope and boundaries (e.g., `docs/phase_brief/phase59-brief.md`)
+
+### Live Truth
+- **[docs/context/current_context.md](docs/context/current_context.md)** — current active phase and blocked next step
+
+### Bridge Truth
+- **[docs/context/bridge_contract_current.md](docs/context/bridge_contract_current.md)** — translates recent technical closeout state back into PM/planner language and names the next system-level decision
+
+### Evidence Truth
+- **[docs/context/done_checklist_current.md](docs/context/done_checklist_current.md)** — machine-checkable done criteria for current phase
+- **[docs/context/multi_stream_contract_current.md](docs/context/multi_stream_contract_current.md)** — cross-stream coordination map (Backend, Frontend/UI, Data, Docs/Ops)
+- **[docs/context/post_phase_alignment_current.md](docs/context/post_phase_alignment_current.md)** — post-phase stream status update and bottleneck analysis
+
+These surfaces follow the SOP governance kernel (see `E:\code\SOP\ENDGAME.md` for the full truth model).
+
 ## Quick Start
 
 ### Prerequisites
@@ -149,6 +171,7 @@ sum(contributions) + residual = portfolio_return ✅
 
 ### General
 - **`docs/decision log.md`** - Architecture decision records
+- **`docs/context/bridge_contract_current.md`** - Current PM/planner bridge from technical execution back to system-level planning
 
 ## Performance Metrics
 
