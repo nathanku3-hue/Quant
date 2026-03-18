@@ -1,11 +1,14 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-03-02T07:19:03Z",
+  "generated_at_utc": "2026-03-18T11:37:20Z",
   "source_files": [
     "docs/decision log.md",
     "docs/handover/phase0_handover.md",
     "docs/handover/phase20_handover.md",
     "docs/handover/phase31_handover.md",
+    "docs/handover/phase56_handover.md",
+    "docs/handover/phase57_handover.md",
+    "docs/handover/phase58_handover.md",
     "docs/lessonss.md",
     "docs/phase_brief/phase0-brief.md",
     "docs/phase_brief/phase10-brief.md",
@@ -28,26 +31,57 @@
     "docs/phase_brief/phase28-brief.md",
     "docs/phase_brief/phase30-brief.md",
     "docs/phase_brief/phase31-brief.md",
+    "docs/phase_brief/phase32-brief.md",
+    "docs/phase_brief/phase33b-brief.md",
+    "docs/phase_brief/phase33b-slice3-brief.md",
+    "docs/phase_brief/phase34-brief.md",
+    "docs/phase_brief/phase35-brief.md",
+    "docs/phase_brief/phase36-brief.md",
+    "docs/phase_brief/phase37-brief.md",
+    "docs/phase_brief/phase38-brief.md",
+    "docs/phase_brief/phase39-brief.md",
+    "docs/phase_brief/phase40-brief.md",
+    "docs/phase_brief/phase41-brief.md",
+    "docs/phase_brief/phase43-brief.md",
+    "docs/phase_brief/phase45-brief.md",
+    "docs/phase_brief/phase46-brief.md",
+    "docs/phase_brief/phase47-brief.md",
+    "docs/phase_brief/phase48-brief.md",
+    "docs/phase_brief/phase49-brief.md",
+    "docs/phase_brief/phase50-brief.md",
+    "docs/phase_brief/phase51-supercycle-signal-brief.md",
+    "docs/phase_brief/phase52-brief.md",
+    "docs/phase_brief/phase52-week2-brief.md",
+    "docs/phase_brief/phase52-week3-brief.md",
+    "docs/phase_brief/phase53-brief.md",
+    "docs/phase_brief/phase54-brief.md",
+    "docs/phase_brief/phase55-brief.md",
+    "docs/phase_brief/phase56-brief.md",
+    "docs/phase_brief/phase57-brief.md",
+    "docs/phase_brief/phase58-brief.md",
+    "docs/phase_brief/phase59-brief.md",
     "docs/phase_brief/phase9-brief.md"
   ],
-  "active_phase": 31,
+  "active_phase": 59,
   "what_was_done": [
-    "Phase 31 locked Stream 1 PiT truth-layer controls and Stream 5 strict execution telemetry acceptance boundaries with SAW recheck PASS.",
-    "Orchestrator reconciliation was hardened with timeout-bounded fail-loud ambiguity handling and deterministic duplicate-CID fail-closed logic.",
-    "Phase-end smoke validated orchestrator initialization and controlled shutdown sequence without runtime mutation.",
-    "Full matrix promotion gate is now green with immutable artifacts (`status=0`, `597/597` matrix clear)."
+    "Consumed the exact `approve next phase` token into `D-328` and opened the first bounded Phase 59 execution packet only.",
+    "Implemented `data/phase59_shadow_portfolio.py`, `scripts/phase59_shadow_portfolio_runner.py`, `views/shadow_portfolio_view.py`, and the bounded dashboard hook in `dashboard.py`.",
+    "Published `data/processed/phase59_shadow_summary.json`, `data/processed/phase59_shadow_evidence.csv`, and `data/processed/phase59_shadow_delta_vs_c3.csv` from the read-only research catalog plus historical Phase 50 reference artifacts."
   ],
   "what_is_locked": [
-    "Success acceptance invariant: `ok=True` requires authoritative bounded receipt fields and broker identity (`client_order_id`, `filled_qty`, `filled_avg_price`, valid `execution_ts`, fill bound to intended qty`).",
-    "Sparse or malformed `ok=True` payloads never promote success without reconciliation.",
-    "Stream 1 active t-1 selector path remains enforced; retired helper is no longer callable in runtime path."
+    "`D-284`, `D-292`, `D-309`, `D-311`, `D-312`, `D-313`, `D-314`, `D-315`, `D-316`, `D-317`, `D-318`, `D-319`, `D-320`, `D-321`, `D-322`, `D-323`, `D-324`, `D-325`, `D-326`, `D-327`, `D-328`, `D-329`, `RESEARCH_MAX_DATE = 2022-12-31`, `global_active_variants <= 18`, and the same-window / same-cost / same-engine evidence gate.",
+    "`research_data/catalog.duckdb` and `research_data/allocator_state_cube/` remain read-only.",
+    "`data/processed/phase56_*`, `data/processed/phase57_*`, `data/processed/phase58_*`, and the new `data/processed/phase59_*` packet remain evidence-only surfaces; no promotion or widening is authorized."
   ],
   "what_is_next": [
-    "Execute Phase 32 SRE backlog immediately: reconciliation-timeout soaks, UTF-8 decode wedges, DuckDB flush optimization.",
-    "Continue Phase 32 backlog: exception taxonomy split, routing diagnostics tail, UID drift closure."
+    "Review the first bounded Phase 59 packet as evidence-only / no-promotion / no-widening before any follow-up scope is proposed.",
+    "Keep the research lane and reference-only alert lane explicitly separate; do not invent a unified holdings/turnover surface that does not exist on disk.",
+    "Treat any stable shadow stack, post-2022 audit, or multi-sleeve shadow execution as future-scope work only."
   ],
-  "first_command": "start Phase 32 Step 1 soak suite for reconciliation timeout/cancellation resiliency.",
+  "first_command": "Get-Content data\\processed\\phase59_shadow_summary.json",
   "next_todos": [
-    "reconciliation-timeout soaks -> UTF-8 wedge closure -> DuckDB flush optimization -> exception taxonomy split -> routing diagnostics tail -> UID drift closure."
+    "Review the first bounded Phase 59 packet as evidence-only / no-promotion / no-widening before any follow-up scope is proposed.",
+    "Keep the research lane and reference-only alert lane explicitly separate; do not invent a unified holdings/turnover surface that does not exist on disk.",
+    "Treat any stable shadow stack, post-2022 audit, or multi-sleeve shadow execution as future-scope work only."
   ]
 }

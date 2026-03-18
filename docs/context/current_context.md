@@ -1,23 +1,17 @@
 ## What Was Done
-- Phase 31 locked Stream 1 PiT truth-layer controls and Stream 5 strict execution telemetry acceptance boundaries with SAW recheck PASS.
-- Orchestrator reconciliation was hardened with timeout-bounded fail-loud ambiguity handling and deterministic duplicate-CID fail-closed logic.
-- Phase-end smoke validated orchestrator initialization and controlled shutdown sequence without runtime mutation.
-- Full matrix promotion gate is now green with immutable artifacts (`status=0`, `597/597` matrix clear).
-- Phase 32 Step 1 implemented cooperative cancellation, sticky lookup taxonomy, and durable quarantine evidence writes with SAW PASS.
-- Phase 32 Step 2 implemented fail-closed UTF-8 decode error handling in quarantine JSONL replay path with deterministic malformed-byte fixture and SAW PASS.
+- Consumed the exact `approve next phase` token into `D-328` and opened the first bounded Phase 59 execution packet only.
+- Implemented `data/phase59_shadow_portfolio.py`, `scripts/phase59_shadow_portfolio_runner.py`, `views/shadow_portfolio_view.py`, and the bounded dashboard hook in `dashboard.py`.
+- Published `data/processed/phase59_shadow_summary.json`, `data/processed/phase59_shadow_evidence.csv`, and `data/processed/phase59_shadow_delta_vs_c3.csv` from the read-only research catalog plus historical Phase 50 reference artifacts.
 
 ## What Is Locked
-- Success acceptance invariant: `ok=True` requires authoritative bounded receipt fields and broker identity (`client_order_id`, `filled_qty`, `filled_avg_price`, valid `execution_ts`, fill bound to intended qty`).
-- Sparse or malformed `ok=True` payloads never promote success without reconciliation.
-- Stream 1 active t-1 selector path remains enforced; retired helper is no longer callable in runtime path.
-- Reconciliation timeout uses cooperative cancellation with sticky lookup taxonomy precedence.
-- Quarantine JSONL append is durable with lock-serialized fsync writes.
-- Quarantine JSONL replay uses fail-closed UTF-8 decode (`errors='replace'`) and never wedges on corrupted data.
+- `D-284`, `D-292`, `D-309`, `D-311`, `D-312`, `D-313`, `D-314`, `D-315`, `D-316`, `D-317`, `D-318`, `D-319`, `D-320`, `D-321`, `D-322`, `D-323`, `D-324`, `D-325`, `D-326`, `D-327`, `D-328`, `D-329`, `RESEARCH_MAX_DATE = 2022-12-31`, `global_active_variants <= 18`, and the same-window / same-cost / same-engine evidence gate.
+- `research_data/catalog.duckdb` and `research_data/allocator_state_cube/` remain read-only.
+- `data/processed/phase56_*`, `data/processed/phase57_*`, `data/processed/phase58_*`, and the new `data/processed/phase59_*` packet remain evidence-only surfaces; no promotion or widening is authorized.
 
 ## What Is Next
-- Continue Phase 32 backlog: DuckDB flush optimization, exception taxonomy split, routing diagnostics tail, UID drift closure.
-- DuckDB flush optimization -> exception taxonomy split -> routing diagnostics tail -> UID drift closure.
+- Review the first bounded Phase 59 packet as evidence-only / no-promotion / no-widening before any follow-up scope is proposed.
+- Keep the research lane and reference-only alert lane explicitly separate; do not invent a unified holdings/turnover surface that does not exist on disk.
+- Treat any stable shadow stack, post-2022 audit, or multi-sleeve shadow execution as future-scope work only.
 
 ## First Command
-`start Phase 32 Step 3 DuckDB flush optimization for telemetry durability throughput.`
-
+`Get-Content data\processed\phase59_shadow_summary.json`
