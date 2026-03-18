@@ -19,11 +19,49 @@ Keep strict separation of concerns:
 - `views/`: Streamlit rendering and interaction logic.
 - `tests/`: test suites mirroring source structure.
 - `docs/`: phase briefs and specifications.
-- `docs/context/bridge_contract_current.md`: current PM/planner bridge that converts recent execution truth into system-level next-step language.
+- `docs/context/`: current truth surfaces (see Section 2.1)
 - `docs/lessonss.md`: self-learning loop log for mistakes and guardrails.
 - `docs/research/`: domain research PDFs and synthesized findings.
 - `.codex/skills/`: canonical repo-local Codex skills (including `saw` and `research-analysis`).
 - `skills/`: reserved for project deliverables; not the canonical agent-skill source.
+
+### 2.1 Current Truth Surfaces (Mandatory Reading)
+
+Before starting any work, check which truth surfaces exist and are required for this repo/round:
+
+**Root SOP governance:**
+- `E:\code\SOP\KERNEL_ACTIVATION_MATRIX.md` — when each kernel capability becomes mandatory
+- `E:\code\SOP\SPEC_TO_MULTISTREAM_EXECUTION_CHECKLIST.md` — 11-section checklist for multi-stream execution readiness
+- `E:\code\SOP\ENDGAME.md` — target state for SOP governance control plane
+
+**Current truth surfaces (in `docs/context/`):**
+- `bridge_contract_current.md` — translates recent execution truth into PM/planner next-step language (SYSTEM_DELTA, PM_DELTA, OPEN_DECISION, RECOMMENDED_NEXT_STEP, DO_NOT_REDECIDE)
+- `done_checklist_current.md` — machine-checkable done criteria for current phase
+- `planner_packet_current.md` — compact fresh-context packet for planner (current context, active brief, bridge truth, decision tail, blocked next step, active bottleneck)
+- `impact_packet_current.md` — impact view (changed files, owned files, touched interfaces, failing checks)
+- `multi_stream_contract_current.md` — cross-stream coordination map (Backend, Frontend/UI, Data, Docs/Ops)
+- `post_phase_alignment_current.md` — post-phase stream status update and bottleneck analysis
+- `observability_pack_current.md` — drift detection markers (high-risk attempts, stuck sessions, skill under-triggering, budget pressure, compaction/hallucination pressure)
+
+**Activation rules:**
+- Bridge contract: always active (required for any repo with execution truth)
+- Done checklist: always active (required when closure can drift)
+- Planner packet: always active (required when planner rereads too much)
+- Impact packet: active (mature repo with many files)
+- Multi-stream contract: active (multi-stream repo: Backend, Frontend/UI, Data, Docs/Ops)
+- Post-phase alignment: active (multi-stream repo with scope boundaries)
+- Observability pack: active (drift risk is non-trivial, 5+ phases completed)
+
+**Entry sequence:**
+1. Start from `planner_packet_current.md` (compact entry point)
+2. Load `impact_packet_current.md` (changed files, owned files, touched interfaces)
+3. Load `bridge_contract_current.md` (PM/planner bridge)
+4. Load `done_checklist_current.md` (acceptance criteria)
+5. Only escalate to wider reads (phase briefs, decision log, full repo) if one of these conditions applies:
+   - Impact surface is unclear from planner packet + impact packet
+   - Interface ownership is unclear from owned files list
+   - Evidence conflicts between bridge truth and decision tail
+   - Bottleneck cannot be named from current context
 
 ## 3. Operating Principles (Core Commandments)
 1. Docs-as-Code: if behavior changes, update docs (prd and product spec) and decision log in the same milestone. for explicit formulas used, document the explicit formula and where .py used ,in notes.md, 
@@ -44,8 +82,11 @@ Keep strict separation of concerns:
 5. Verify: run `.venv\Scripts\python -m pytest` and runtime smoke checks (`.venv\Scripts\python launch.py` or `.venv\Scripts\streamlit run app.py`).
 6. Review: execute the Section 5 milestone gate.
 7. Bridge: refresh `docs/context/bridge_contract_current.md` with `SYSTEM_DELTA`, `PM / Product Delta`, `OPEN_DECISION`, `RECOMMENDED_NEXT_STEP`, and `DO_NOT_REDECIDE`.
-8. Report: include observability rating, evidence footer (Section 9), and top-down snapshot (Section 11).
-9. SAW round: run Subagents-After-Work protocol from Section 12.
+8. Impact: refresh `docs/context/impact_packet_current.md` with changed files, owned files, touched interfaces, failing checks.
+9. Alignment: refresh `docs/context/post_phase_alignment_current.md` when multi-stream or system-shaping work completes.
+10. Report: include observability rating, evidence footer (Section 9), and top-down snapshot (Section 11).
+11. SAW round: run Subagents-After-Work protocol from Section 12.
+12. Planner return: refresh `docs/context/planner_packet_current.md` for next round entry.
 
 ## 5. Milestone Review Gate (Mandatory)
 Before closing a milestone, spawn reviewer subagents using this prompt:
