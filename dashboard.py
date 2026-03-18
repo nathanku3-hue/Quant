@@ -23,6 +23,7 @@ from views.regime_view import render_regime_banner_from_macro
 from views.auto_backtest_view import render_auto_backtest_view
 from views.optimizer_view import render_optimizer_view
 from views.drift_monitor_view import render_drift_monitor_view
+from views.shadow_portfolio_view import render_shadow_portfolio_view
 from core.drift_alert_manager import DriftAlertManager
 from core.drift_detector import DriftDetector
 from core.dashboard_escalation import initialize_escalation_manager
@@ -1009,7 +1010,7 @@ if drift_alert_manager is not None:
         pass
 
 # --- Layout: TABS (Phase 3: Unified Command Center) ---
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "📊 Ticker Pool & Proxies",
     "🏥 Data Health",           # NEW
     "🔍 Drift Monitor",          # PROMOTED
@@ -1017,6 +1018,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📈 Backtest Lab",           # KEEP (moved to tab5)
     "🧩 Modular Strategies",
     "💼 Portfolio Builder",
+    "🛰️ Shadow Portfolio",
 ])
 
 # ==========================================
@@ -1985,6 +1987,16 @@ with tab7:
     else:
         # Placeholder mode (fundamentals not available)
         _render_portfolio_builder_placeholder()
+
+
+# ==========================================
+# TAB 8: SHADOW PORTFOLIO
+# ==========================================
+with tab8:
+    try:
+        render_shadow_portfolio_view()
+    except Exception as exc:
+        st.warning(f"⚠️ Shadow portfolio monitor unavailable: {type(exc).__name__}: {exc}")
 
 
 def _render_portfolio_builder_placeholder():

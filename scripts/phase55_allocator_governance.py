@@ -29,7 +29,7 @@ DEFAULT_SQL_PATH = PROJECT_ROOT / "allocator_cpcv.sql"
 DEFAULT_SPLITS_ROOT = PROJECT_ROOT / "research_data" / "alloc_cpcv_splits"
 DEFAULT_MAX_DATE = "2022-12-31"
 RESEARCH_MAX_DATE = date(2022, 12, 31)
-DEFAULT_EVIDENCE_PATH = PROJECT_ROOT / "data" / "processed" / "phase55_dsr_pbo_spa_evidence.json"
+DEFAULT_EVIDENCE_PATH = PROJECT_ROOT / "data" / "processed" / "phase55_allocator_cpcv_evidence.json"
 DEFAULT_SUMMARY_PATH = PROJECT_ROOT / "data" / "processed" / "phase55_allocator_cpcv_summary.json"
 ATOMIC_REPLACE_MAX_RETRIES = 8
 ATOMIC_REPLACE_BASE_SLEEP_SECONDS = 0.01
@@ -445,7 +445,9 @@ def _load_cpcv_frame(sql_path: Path, splits_root: Path, max_date: str) -> pd.Dat
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Phase 55 nested CPCV allocator governance runner"
+    )
     parser.add_argument("--sql", default=None)
     parser.add_argument("--splits-root", default="research_data/alloc_cpcv_splits")
     parser.add_argument("--max-date", default="2022-12-31")

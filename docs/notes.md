@@ -1,3 +1,293 @@
+# Feature Engineering Notes
+
+## Phase 53-61 Planning Formula Notes
+
+**Date**: 2026-03-15
+
+### Governance Reuse Anchors (Already Implemented)
+- `N_eff ~= N * (1 - rho_avg) + 1`
+- `lambda_logit_rank = log(r / (1 - r))`
+- `PBO = mean(lambda_logit_rank <= 0)`
+- `DSR = PSR(sr_hat, sr_benchmark, n_obs, skewness, kurtosis)`
+- Existing implementation files:
+  - `utils/statistics.py`
+  - `scripts/parameter_sweep.py`
+  - `tests/test_statistics.py`
+  - `tests/test_parameter_sweep.py`
+
+### Phase 53-61 Contracts (Execution Status Noted)
+- `trial_budget_outer_fold in [9, 18]`
+- `global_active_variants <= 18` is the default governance ceiling; only an explicit execution packet may narrow or override it.
+- `phase53_execution_authorized = 1[(reply contains exact 'approve next phase') and (NextPhaseApproval == APPROVED)]`
+- `research_catalog_path = "research_data/catalog.duckdb"` (read-only research contract)
+- `allocator_state_view = read_parquet("research_data/allocator_state_cube/variant_id=*/*.parquet", hive_partitioning=true)` (registered in read-only catalog)
+- `research_guard = snapshot_date <= 2022-12-31` (required SQL wrapper predicate for research queries; enforced in `scripts/run_allocator_cpcv.py`, which hard-rejects any `max_date > 2022-12-31`)
+- `phase53_memory_gate = peak_process_memory_mb < 2048` (recorded by `scripts/benchmark_phase53_data_kernel.py` for allocator_state and CPCV shard scans)
+- Phase 53 research-v0 data-kernel contracts are runtime-enabled and evidenced in:
+  - `data/processed/phase53_source_manifest.json`
+  - `research_data/allocator_state_cube/allocator_state_manifest.json`
+  - `research_data/alloc_cpcv_splits/cpcv_splits_manifest.json`
+  - `docs/context/e2e_evidence/phase53_allocator_cpcv_run.json`
+  - `docs/context/e2e_evidence/phase53_data_kernel_benchmark.json`
+- `allocator_state_source_{i,t} = melt(phase17_3_parameter_sweep_return_streams)[variant_id=i, snapshot_date=t, period_return_{i,t}]` for `snapshot_date_t <= 2022-12-31` (implemented in `scripts/derive_phase53_sources_from_phase17.py`)
+- `fold_t = build_cscv_block_series(unique(snapshot_date), n_blocks=6)` and `cpcv_source_{i,t} = (fold_t, snapshot_date_t, variant_id_i, period_return_{i,t})` (implemented in `scripts/derive_phase53_sources_from_phase17.py` via `utils/statistics.py`)
+- `research_quarantine_windows = deny_root(WriteData/AddFile, AppendData/AddSubdirectory) + allow_tree(ReadAndExecute)` for `research_data/` so `connect_research()` temp-write probe fails closed while the DuckDB catalog stays readable
+- `f(margin, supply, demand, pricing_power) := score_100` for Phase 54 (authoritative mapping for Rule-of-100 pass flag)
+- `rule100_pass_t = score_100` (authoritative Rule-of-100 pass flag for Phase 54)
+- `score_100` is computed in `strategies/supercycle_signal.py::calculate_supercycle_score`
+- `rule100_pass_lag = shift(rule100_pass_t, 1) by permno` and `rule100_boost = 0.5 * rule100_pass_lag` (Phase 54 core sleeve booster in `strategies/company_scorecard.py::build_phase20_conviction_frame`)
+- `conviction_score = clip(raw_conviction + rule100_boost, 0, 10)` (Phase 54 core sleeve lattice path in `strategies/company_scorecard.py::build_phase20_conviction_frame`)
+- `rule100_pass_rate = mean(rule100_pass_t)` and `rule100_pass_controller = 1[0.15 <= rule100_pass_rate <= 0.20]` (controller uses raw pass rate)
+- `rule100_input_complete = 1[inputs_complete]` and `rule100_pass_rate_eligible = mean(rule100_pass_t | rule100_input_complete = 1)` (diagnostic only)
+- `rule100_input_complete_share = mean(rule100_input_complete)` (diagnostic coverage of Rule-of-100 inputs)
+- Rule-of-100 input sourcing: when `delta_revenue_inventory`, `gm_accel_q`, or `operating_margin_delta_q` are missing from features/SDM, they may be sourced from `data/processed/daily_fundamentals_panel.parquet`; `sales_accel_q` is optional and falls back to `delta_revenue_inventory` inside `strategies/supercycle_signal.py::calculate_supercycle_score`
+- Phase 54 returns coverage filter: features are restricted to permnos with price rows in the evidence window; runner outputs `permnos_total`, `permnos_with_returns`, `permnos_dropped`
+- Phase 54 returns merge: when using `prices_tri.parquet`, missing return rows/values are backfilled from `prices.parquet` with primary precedence
+- Phase 54 returns repair artifact: `data/processed/phase54_core_sleeve_returns_repaired.parquet` persists the TRI+prices union with `pct_change` fallback and keep-last dedupe on `date/permno`
+- Phase 54 raw overlap diagnostics in `scripts/phase20_full_backtest.py`: `overlap_pairs_total = |{(date, permno) in features} ∩ {(date, permno) in repaired_returns}|`, `feature_overlap_rate = overlap_pairs_total / feature_pairs_total`, and `returns_overlap_rate = overlap_pairs_total / returns_pairs_total`
+- Phase 54 executed-exposure diagnostics in `scripts/phase20_full_backtest.py`: `executed_exposure_total_cells = sum(shift(weights_ex_cash, 1) != 0)`, `executed_exposure_missing_cells = sum(1[shift(weights_ex_cash, 1) != 0 and isna(aligned_returns_ex_cash)])`, and `executed_exposure_missing_rate = executed_exposure_missing_cells / executed_exposure_total_cells`
+- Phase 54 overlap sidecar artifact: `data/processed/phase54_core_sleeve_overlap_diagnostics.json` persists both raw pair overlap and executed-exposure overlap ahead of the strict evidence gate
+- Target Rule-of-100 breadth: `15%-20%` pass rate measured on `rule100_pass_t`, pending the final `mu_c / delta_c` lattice check
+- Phase 54 evidence guard: `end_date <= 2022-12-31` enforced by `_validate_end_date_guard` in `scripts/phase20_full_backtest.py` via `RESEARCH_MAX_DATE`
+- Phase 54 C3 loader current-price guard in `scripts/phase20_full_backtest.py::_apply_c3_current_price_guard`: `c3_current_price_ok_t = 1[notna(adj_close_t)]`
+- Phase 54 baseline validity guard: `c3_score_valid_t = score_valid_t * c3_current_price_ok_t` and `c3_score_t = score_t if c3_score_valid_t = 1 else NaN` (applies to C3 baseline rows only; Phase 20 scoring path unchanged)
+- Phase 54 C3 loader diagnostics: `c3_loader_price_guard_rows = sum(1[score_valid_t = 1 and isna(adj_close_t)])`, `c3_loader_price_guard_permnos = nunique(permno | invalidated)`, and `c3_loader_price_guard_applied = 1[c3_loader_price_guard_rows > 0]`
+- Phase 54 evidence-clear predicate (technical gate only): `phase54_evidence_clear = 1[(missing_active_return_cells.c3 = 0) and (missing_active_return_cells.phase20 = 0) and (same_window_same_cost_same_engine = 1) and (SAW Verdict = PASS)]`
+- Phase 54 D-304 strategic follow-up uses the published `phase54_core_sleeve_summary.json` and `phase54_core_sleeve_overlap_diagnostics.json` as SSOT baseline; `ABORT_PIVOT`, `rule100_pass_rate`, and `rule100_pass_controller` affect strategic evaluation only and do not negate `phase54_evidence_clear`
+- Phase 54 D-305 strategic rejection predicate: `phase54_baseline_accept = 1[(decision != "ABORT_PIVOT") and (rule100_pass_controller = 1)]`
+- Phase 54 D-305 targeted-tuning trigger: `phase54_tuning_trigger = 1[(decision = "ABORT_PIVOT") or (rule100_pass_controller = 0)]` with the live packet currently evaluating `1`
+- Phase 54 D-306 movable tuning knobs only: `{demand_floor, margin_floor, r2_threshold, convexity_threshold, ramp_exception_threshold, ramp_margin_floor}` from `strategies/supercycle_signal.py::SupercycleConfig`
+- Phase 54 D-306 bounds: `demand_floor in [-0.02, 0.02]`, `margin_floor in [-0.02, 0.02]`, `r2_threshold in [0.80, 0.95]`, `convexity_threshold in [1.25, 2.00]`, `ramp_exception_threshold in [0.12, 0.24]`, `ramp_margin_floor in [-0.05, 0.00]`
+- Phase 54 D-306 frozen surfaces: `rule100_pass_t = score_100`, `rule100_boost = 0.5 * shift(rule100_pass_t, 1)`, `power_law_exponent`, `gravity_multiplier`, `demand_power_scale`, `margin_power_scale`, `gravity_denominator`, `support_sma_window`, `momentum_lookback`, `softmax_temperature`, `top_n_green`, `top_n_amber`, `max_gross_exposure`, loader/evidence semantics, and all Phase 53/kernel paths
+- Phase 54 D-306 success predicate: `phase54_tuning_success = 1[(phase54_evidence_clear = 1) and (rule100_pass_controller = 1) and (fresh_artifacts = 1) and (SAW Verdict = PASS)]`
+- Phase 54 D-307 tuned artifact fields in `scripts/phase20_full_backtest.py`: `{rule100_demand_floor, rule100_margin_floor, rule100_r2_threshold, rule100_convexity_threshold, rule100_ramp_exception_threshold, rule100_ramp_margin_floor}` emitted by `_rule100_tuning_summary_fields`
+- Phase 54 D-307 ceiling config: `phase54_d307_ceiling_config = 1[(rule100_demand_floor = -0.02) and (rule100_margin_floor = -0.02) and (rule100_r2_threshold = 0.80) and (rule100_convexity_threshold = 1.25) and (rule100_ramp_exception_threshold = 0.12) and (rule100_ramp_margin_floor = -0.05)]`
+- Phase 54 D-307 controller gap: `phase54_controller_gap = max(0, 0.15 - rule100_pass_rate)`; the fresh tuned packet in `data/processed/phase54_d306_tuned_summary.json` evaluates to `0.02357808340727594`
+- Phase 54 D-307 hard-stop predicate: `phase54_d307_hard_stop = 1[(phase54_evidence_clear = 1) and (phase54_d307_ceiling_config = 1) and (rule100_pass_controller = 0)]`
+- Phase 54 D-308 SSOT baseline for strategic disposition: `{data/processed/phase54_core_sleeve_summary.json, data/processed/phase54_core_sleeve_overlap_diagnostics.json}`
+- Phase 54 D-308 option set is closed: `phase54_d308_option in {A_accept_current_baseline, B_final_bounded_widening}`
+- Phase 54 D-308 option A predicate: `phase54_d308_accept_current_baseline = 1[(phase54_evidence_clear = 1) and (rule100_pass_controller = 0)]`
+- Phase 54 D-308 option B predicate: `phase54_d308_final_bounded_widening = 1[(phase54_evidence_clear = 1) and (phase54_d307_hard_stop = 1) and (surface = six SupercycleConfig thresholds inside D-301 only)]`
+- Phase 54 D-308 option B bounds: `demand_floor in [-0.05, 0.05]`, `margin_floor in [-0.05, 0.05]`, `r2_threshold in [0.65, 0.98]`, `convexity_threshold in [1.00, 2.75]`, `ramp_exception_threshold in [0.05, 0.35]`, `ramp_margin_floor in [-0.15, 0.15]`
+- Phase 54 D-308 selected option: `phase54_d308_option = B_final_bounded_widening`
+- Phase 54 D-308 option A rejected: `phase54_d308_option_a_rejected = 1[(phase54_d308_option = B_final_bounded_widening)]`
+- Phase 54 D-308 option B authorized: `phase54_d308_option_b_authorized = 1[(phase54_d308_option = B_final_bounded_widening)]`
+- Phase 54 closeout predicate: `phase54_complete = 1[(phase54_evidence_clear = 1) and (phase54_rule100_rejected = 1) and (SAW Verdict = PASS)]`
+- Phase 54 D-309 rejection: `phase54_rule100_rejected = 1[(phase54_evidence_clear = 1) and (rule100_pass_controller = 0) and (d308b_max_bound_executed = 1)]`
+- Phase 55 baseline: Rule-of-100 sleeve inactive (`rule100_pass_t` forced to 0 or removed from lattice path) unless a new governance packet explicitly reopens it
+- `allocator_gate_pass = 1[(PBO < 0.05) and (DSR > 0.95) and (positive_outer_fold_share >= 0.60) and (SPA_p < 0.05)]`
+- Phase 55 Expert-Locked Definitions (verbatim):
+  - Canonical evidence input surface = read-only Phase 53 research kernel only: (i) allocator_state via research_data/catalog.duckdb / research_data/allocator_state_cube, and (ii) CPCV shard reads via allocator_cpcv.sql + scripts/run_allocator_cpcv.py over research_data/alloc_cpcv_splits, both hard-clamped to snapshot_date <= 2022-12-31. Phase 54 SSOT artifacts may be cited as comparator/governance references only
+  - Nested CPCV = each outer CPCV split is the sole source of final allocator evidence, while allocator ranking/selection is performed only inside an inner CPCV loop built from that outer-train partition. The selected allocator is then executed exactly once on the untouched outer-test fold
+  - WRC = WRC_p is a co-reported diagnostic and governance corroborator, not a new hard unlock clause in Phase 55. Publish WRC_p beside SPA_p in the evidence pack, but keep the hard gate unchanged as allocator_gate_pass = 1[(PBO < 0.05) and (DSR > 0.95) and (positive_outer_fold_share >= 0.60) and (SPA_p < 0.05)]
+  - Same-engine = same_window_same_cost_same_engine = 1[(all compared runs share identical start_date/end_date and end_date <= 2022-12-31) and (all compared runs share one fixed cost_bps) and (all governed return/equity series are produced by core.engine.run_simulation under D-04 shift(1) and D-05 turnover-tax semantics)]. Any result computed outside that path is diagnostic-only and non-gating.
+- Phase 55 Evidence (verbatim):
+  - `rule100_pass_rate = 0.024419920141969833`
+  - `- **Phase 55 - Opportunity-Set Controller**: apply nested CPCV + DSR/PBO/SPA to allocator rules; reuse Phase 17 math; new allocator wrapper and SPA helper required.`
+  - `allocator_gate_pass = 1[(PBO < 0.05) and (DSR > 0.95) and (positive_outer_fold_share >= 0.60) and (SPA_p < 0.05)]`
+  - `guard = f"snapshot_date <= DATE '{max_date}'"`
+- Phase 55 Allocator Gate:
+  - Phase 55 SPA/WRC helpers: `utils/spa.py::spa_p_value`, `utils/spa.py::wrc_p_value`
+  - Nested CPCV wrapper: `scripts/phase55_allocator_governance.py::compute_nested_cpcv`
+  - Gate formula (unchanged): `allocator_gate_pass = 1[(PBO < 0.05) and (DSR > 0.95) and (positive_outer_fold_share >= 0.60) and (SPA_p < 0.05)]`
+  - Scalar reducers: `pbo=mean`, `dsr=median`, `spa_p=median`, `wrc_p=median`
+  - Inner selection reducer: `selected_variant = argmax(selection_count, median_test_sharpe, median_train_sharpe, variant_id_ascending)`
+  - `WRC_p = diagnostic only`
+- `pead_window_return_{i,e} = prod_{d=1..5}(1 + r_{i,e+d}) - 1`
+- Initial PEAD gates:
+  - `value_rank_pct >= 0.60`
+  - `adv_usd >= 5_000_000`
+  - `days_since_earnings <= 63`
+- Phase 56 bounded PEAD runner (`scripts/phase56_pead_runner.py`):
+  - `pead_score_{i,t} = capital_cycle_score_{i,t}`
+  - `adv_usd_{i,t} = mean_{k=0..19}(adj_close_{i,t-k} * volume_{i,t-k})`
+  - `days_since_earnings_{i,t} = date_t - release_date_{i,t}`
+  - `pead_gate_{i,t} = 1[(quality_pass_{i,t} = 1) and (adv_usd_{i,t} >= 5_000_000) and (0 <= days_since_earnings_{i,t} <= 63) and (value_rank_pct_{i,t} >= 0.60)]`
+  - `value_rank_pct_{i,t} = pct_rank(capital_cycle_score_{i,t} within date t, ascending)`
+  - `target_weight_{i,t} = 1 / n_selected_t if pead_gate_{i,t} = 1 else 0`
+  - governed return, turnover, and cost series are produced by `core.engine.run_simulation` under D-04 shift(1) and D-05 turnover-tax semantics
+  - bounded source paths: `data/processed/features.parquet`, `data/processed/daily_fundamentals_panel.parquet`, `data/processed/prices.parquet`, `scripts/phase56_pead_runner.py`, `core/engine.py`
+- `shadow_nav_t = sum_s w_{s,t-1} * (1 + r_{s,t}) - costs_t`
+- `w_{t+1} = Pi_Delta(w_0 + B x_t)` for the planned Phase 61 BPPP meta-layer
+
+### Planned Implementation Anchors / Gaps
+- Reuse candidates:
+  - `utils/statistics.py`
+  - `scripts/parameter_sweep.py`
+  - `strategies/supercycle_signal.py`
+  - `data/calendar_updater.py`
+  - `scripts/build_shadow_monthly.py`
+  - `scripts/phase37_portfolio_construction_runner.py`
+- New implementation still required:
+  - allocator CPCV / SPA wrapper
+  - BPPP meta-layer runner
+  - Shadow-v1 monitoring/alert surface built on allocator_state
+
+### Hook Verification Ledger (Planning Round Evidence)
+| Claim | checked_at | command | result |
+| --- | --- | --- | --- |
+| Governance math exists | 2026-03-15 Asia/Macau | `rg -n "effective_number_of_trials|cscv_analysis|deflated_sharpe_ratio" utils/statistics.py` | Matched the three reusable governance functions in `utils/statistics.py`. |
+| Sweep checkpoint/governance runner exists | 2026-03-15 Asia/Macau | `rg -n "effective_number_of_trials|cscv_analysis|deflated_sharpe_ratio|checkpoint" scripts/parameter_sweep.py` | Matched the imported governance functions plus checkpoint/resume flow in `scripts/parameter_sweep.py`. |
+| Rule-of-100 score anchor exists | 2026-03-15 Asia/Macau | `rg -n "score_100" strategies/supercycle_signal.py scripts/rule_100_backtest_decades.py dashboard.py docs/phase36_rule100_registry.md` | Matched `score_100` in `strategies/supercycle_signal.py`; no competing Phase 53 bridge exists yet. |
+| Earnings calendar reuse surface exists | 2026-03-15 Asia/Macau | `rg -n "earnings_calendar" data/calendar_updater.py data/dashboard_data_loader.py strategies/investor_cockpit.py` | Matched current calendar write/read/consume surfaces for future PEAD work. |
+| Event-study scaffold exists | 2026-03-15 Asia/Macau | `rg -n "event study|event_study|earnings" backtests/event_study_csco.py` | Matched the bounded event-study scaffold in `backtests/event_study_csco.py`. |
+| Shadow/risk primitive reuse exists | 2026-03-15 Asia/Macau | `rg -n "phase37|shadow|atomic|replace" strategies/phase37_portfolio_registry.py scripts/phase37_risk_diagnostics.py scripts/phase37_portfolio_construction_runner.py scripts/build_shadow_monthly.py views/elite_sovereign_view.py` | Matched Phase 37 registry, atomic write helpers, shadow builder, and dashboard reader surfaces. |
+| Allocator kernel hooks now present; meta hooks remain missing | 2026-03-15 Asia/Macau | `rg -n "allocator_cpcv\\.sql|allocator_state|connect_research|BPPP|White Reality Check|Hansen SPA|Reality Check" . -g "!docs/context/**" -g "!docs/handover/phase53_kickoff_memo_20260314.md" -g "!docs/phase_brief/phase53-brief.md" -g "!docs/notes.md" -g "!docs/decision log.md"` | Matches `allocator_cpcv.sql`, `allocator_state`, and `connect_research()` in Phase 53 data-kernel files; SPA/Reality Check/BPPP remain absent. |
+| No direct repo-local Phase 53 source-contract parquet existed; explicit transform required | 2026-03-15 Asia/Macau | `python duckdb schema scan across data/processed/**/*.parquet for {variant_id,snapshot_date} and {fold,snapshot_date}` | No direct local parquet exposed both required source contracts; fixed by adding `scripts/derive_phase53_sources_from_phase17.py` over Phase 17.3 sweep artifacts. |
+| Phase 53 source contracts derived from Phase 17.3 sweep artifacts | 2026-03-15 Asia/Macau | `.venv\Scripts\python scripts\derive_phase53_sources_from_phase17.py` | Produced `data/processed/phase53_allocator_state_source.parquet` and `data/processed/phase53_cpcv_source.parquet` with `105081` rows, `165` variants, `6` folds, and max `snapshot_date = 2022-12-21`. |
+| Phase 53 guarded SQL evidence captured | 2026-03-15 Asia/Macau | `.venv\Scripts\python scripts\run_allocator_cpcv.py` | Wrote `docs/context/e2e_evidence/phase53_allocator_cpcv_run.json` with `row_count = 105081` and `guard_predicate = snapshot_date <= DATE '2022-12-31'`. |
+| Phase 53 8-thread benchmark evidence captured | 2026-03-15 Asia/Macau | `.venv\Scripts\python scripts\benchmark_phase53_data_kernel.py` | Wrote `docs/context/e2e_evidence/phase53_data_kernel_benchmark.json` with `overall_peak_memory_mb = 44.363281`, `memory_source = winapi_working_set`, and `within_memory_limit = true`. |
+
+## Phase 52 Week 3 SMA200 Trend Filter
+
+**Date**: 2026-03-13
+
+### Orthogonal Exposure Formula
+```python
+# Two independent dimensions
+trend_multiplier = 1.0 if SPY_price >= SPY_SMA200 else 0.5
+regime_exposure = 0.4 if realized_vol > 0.25 else 1.0
+
+# Final exposure (multiplicative, not additive)
+final_exposure = trend_multiplier × regime_exposure
+```
+
+### Four Market States
+| State | RV Condition | SPY Condition | Regime Exp | Trend Mult | Final Exp |
+|-------|-------------|---------------|------------|------------|-----------|
+| 1. Normal + Uptrend | RV ≤25% | SPY ≥ SMA200 | 1.0 | 1.0 | 1.0 |
+| 2. Crisis + Uptrend | RV >25% | SPY ≥ SMA200 | 0.4 | 1.0 | 0.4 |
+| 3. Normal + Downtrend | RV ≤25% | SPY < SMA200 | 1.0 | 0.5 | 0.5 |
+| 4. Crisis + Downtrend | RV >25% | SPY < SMA200 | 0.4 | 0.5 | 0.2 |
+
+### Data Sources
+- **SPY**: permno=84398 from prices.parquet
+- **SMA200**: 200-day simple moving average of SPY adj_close
+- **Coverage**: 2000-01-03 to 2024-12-31 (full backtest coverage)
+- **Warmup**: First 200 days for SMA200 initialization
+
+### Trial 14 Baseline (Locked)
+- RV threshold: 25% (annualized)
+- Defensive exposure: 0.4 (40% in high-vol regime)
+- Defensive top_n: 5 stocks
+- Sharpe: 0.644 (target: >0.65)
+- Max DD 2008: -39.32% (+22.68% vs Week 1 baseline)
+
+### Dual Acceptance Criteria
+**Absolute Thresholds** (3/4 required):
+- Max DD 2008 < 45%
+- Max DD 2020 < 25%
+- Sharpe 2007-2024 > 0.65
+- Recovery < 240 days
+
+**Delta Guardrails** (2/3 required):
+- Sharpe ≥ +0.05 vs Trial 14
+- Max DD ≥ -3% vs Trial 14
+- Recovery ≥ -30 days vs Week 1
+
+**Pass**: 3/4 absolute OR 2/3 delta
+
+### Execution Parity and Exact RV Aggregation
+```python
+# Keep Week 3 on the shared engine path so turnover/costs match Weeks 1/2
+results = run_simulation(target_weights=target_weights, returns_df=returns_matrix, cost_bps=10)
+
+# Aggregate chunked market RV exactly per date
+rv_t = sum(chunk_return_sq_t) / sum(chunk_obs_t)
+```
+
+- Shared engine path source: `backtests/phase52_week3_sma200.py` (`run_sma200_trial`)
+- Exact RV aggregation source: `backtests/phase52_week3_sma200.py` (`compute_market_realized_vol_efficient`)
+- Why it matters: preserves apples-to-apples turnover/cost semantics and avoids mean-of-means drift in the market-state series that drives the Week 3 overlay
+
+### Implementation Status
+- ✓ Code complete: `backtests/phase52_week3_sma200.py`
+- ✓ Tests pass: 17/17 in `tests/test_phase52_week3_sma200.py`
+- ✓ Backtest execution complete: exact-RV artifact published in `data/processed/phase52_week3/week3_sma200_results.json`
+- ✓ Shared-engine parity restored: Week 3 now uses `core.engine.run_simulation` for turnover/cost accounting
+- ✓ Closeout lock: Week 3 accepted as the final Phase 52 endpoint under `D-284`
+- ✓ Local Reviewer C verification passed on the final artifact set; the earlier block was reviewer-lane artifact access, not a data-integrity defect
+
+## Phase 51 Supercycle Formula Notes
+
+**Date**: 2026-03-13
+
+### Scorer Contract
+- `sales_accel_eff = sales_accel_q if finite else delta_revenue_inventory`
+- `gm_accel_eff = gm_accel_q if finite else operating_margin_delta_q`
+- `demand_pass = (sales_accel_eff > demand_floor) and (delta_revenue_inventory > demand_floor)`
+- `margin_pass = (gm_accel_eff > margin_floor) and (operating_margin_delta_q > margin_floor)`
+- `demand_strength = max(sales_accel_eff, 0) + max(delta_revenue_inventory, 0)`
+- `margin_strength = max(gm_accel_eff, 0) + max(operating_margin_delta_q, 0)`
+- `alpha_quad_raw = sum((1 + scale_i * max(component_i, 0)) ^ power_law_exponent - 1)`
+- Demand scales: `2.0` for `sales_accel_eff` and `delta_revenue_inventory`
+- Margin scales: `8.0` for `gm_accel_eff` and `operating_margin_delta_q`
+- `gravity_haircut = (delta_us10y_3m / 0.50) * gravity_multiplier`
+- `alpha_quad_adjusted = alpha_quad_raw - gravity_haircut`
+- `r2_proxy = clip(cosine(demand_vector, margin_vector), 0, 1) ^ 2`
+- `convexity_proxy = 1 + 10 * min(demand_strength, margin_strength)`
+- `ramp_exception = demand_pass and demand_strength >= 0.18 and gm_accel_eff >= -0.02 and operating_margin_delta_q >= -0.02`
+- `score_100 = 1` iff:
+  - `demand_pass`
+  - `alpha_quad_adjusted > 0`
+  - and either:
+    - `margin_pass and r2_proxy >= r2_threshold and convexity_proxy >= convexity_threshold`
+    - or `ramp_exception`
+
+### Grid Harness Contract
+- Grid size: `5 x 5 x 3 x 3 = 225`
+- Training rows: `225 x 3 x 8 = 5,400`
+- `strategy_returns_t = signal_{t-1} * asset_return_t`
+- `total_return = prod(1 + strategy_returns) - 1`
+- `sharpe_ratio = mean(strategy_returns) / std(strategy_returns) * sqrt(252)`
+- `max_drawdown = min(equity / cummax(equity) - 1)`
+- `information_coefficient = corr(signal_t, strategy_returns_{t+1})`
+- Strict survivor filter:
+  - `mean_sharpe > 0.8`
+  - `ticker_success_rate > 0.75`
+  - `window_success_rate > 0.66`
+  - `mean_max_dd > -0.25`
+- Fallback survivor rule:
+  - if no row passes the strict filter, emit the top-ranked `top_n` rows with `passes_filters = False` and `selection_basis = "top_ranked_fallback"`
+
+### Implementation Files
+- `strategies/supercycle_signal.py`
+- `backtests/optimize_supercycle_grid.py`
+- `tests/test_supercycle_signal.py`
+- `tests/test_optimize_supercycle_grid.py`
+
+---
+
+## Quality Composite Formula
+
+**Formula**: `quality_composite = 0.4 * ROIC + 0.3 * ROE + 0.3 * Revenue_Growth_YoY`
+
+**Components**:
+
+1. **ROIC (Return on Invested Capital)**: 40% weight
+   - `ROIC = operating_income_ttm / invested_capital_avg`
+   - `operating_income_ttm` = trailing 4-quarter sum of `oibdpq`
+   - `invested_capital` = `ceqq` (equity) + `dlttq` (long-term debt) + `dlcq` (short-term debt)
+   - `invested_capital_avg` = 4-quarter rolling average
+
+2. **ROE (Return on Equity)**: 30% weight
+   - `ROE = niq / ceqq`
+   - `niq` = net income quarterly
+   - `ceqq` = common equity quarterly
+
+3. **Revenue Growth YoY**: 30% weight
+   - `Revenue_Growth_YoY = (revtq - revtq_lag4) / revtq_lag4`
+   - Year-over-year quarterly revenue growth
+
+**Rationale**:
+- Simple, auditable 3-term blend
+- Temporary explicit formula for Phase 35 pilot
+- Future: Replace with research-backed quality basket after pilot validation
+
+**Source**: Phase 1.1 closure report, Phase 2 implementation
+
+---
+
 # Phase 16.13 Formula Notes (Proxy Gate)
 
 Date: 2026-02-17
@@ -26,9 +316,114 @@ Date: 2026-02-17
 - `data/fundamentals.py` (snapshot/daily broadcast propagation)
 - `data/fundamentals_panel.py` (daily panel schema + SQL projection)
 - `data/feature_specs.py` (proxy score + discipline waiver logic)
-- `data/feature_store.py` (feature context + output wiring)
 
 ---
+
+## Phase 36 Survivor/Bundle Formula Notes
+
+**Date**: 2026-03-08
+
+### Frozen Survivor -> Feature Mapping
+- `quality_composite_raw -> quality_composite`
+- `vol_beta_63d -> rolling_beta_63d`
+- `composite_score_baseline -> composite_score`
+
+### Bundle Execution Contract
+- Bundle registry lives in: `strategies/phase36_bundle_registry.py`
+- Bundle execution path lives in: `scripts/signal_sweep_runner.py` (`--mode bundle`)
+- Each bundle input column is first cross-sectionally z-scored by `date`
+- Equal-weight bundle formulas are then evaluated on the normalized feature columns
+
+### Explicit Bundle Formulas
+- `bundle_quality_vol = (zscore(quality_composite) + zscore(rolling_beta_63d)) / 2`
+- `bundle_quality_composite = (zscore(quality_composite) + zscore(composite_score)) / 2`
+- `bundle_vol_composite = (zscore(rolling_beta_63d) + zscore(composite_score)) / 2`
+- `bundle_all_three = (zscore(quality_composite) + zscore(rolling_beta_63d) + zscore(composite_score)) / 3`
+
+### Baseline Delta Gate
+- Validation gate: `delta_ic_val = bundle_ic_validation - baseline_ic_validation`
+- Holdout gate: `delta_ic_hold = bundle_ic_holdout - baseline_ic_holdout`
+- Promotion contract: validation and holdout delta IC must both be populated and `> 0`
+- Calibration delta IC is recorded as a diagnostic, not a gating requirement
+
+### Robustness Round Stress Contract
+- `friction_drag = turnover_monthly * 12 * (cost_bps / 10000)`
+- `ic_net_estimated = ic_gross - friction_drag`
+- `kill_triggered = (window == "holdout") and (cost_bps == 20) and (ic_net_estimated <= 0)`
+- `bundle_decision = Pause if kill_triggered; Continue if delta_ic_val > 0 and delta_ic_hold > 0; otherwise Pivot`
+- `portfolio_decision = Continue if continue_votes >= 3; Pause if pause_votes >= 3; otherwise Pivot`
+- Implementation file: `scripts/phase36_bundle_robustness_round.py`
+
+### Implementation Files
+- `strategies/phase36_bundle_registry.py` (bundle definitions and survivor mapping)
+- `scripts/signal_sweep_runner.py` (cross-sectional normalization, baseline loading, delta computation, fail-closed bundle gate)
+- `scripts/phase36_bundle_robustness_round.py` (robustness stress grid, 20bps holdout floor, majority rubric, artifact emission)
+
+---
+
+## Phase 37 Portfolio Construction Formula Notes
+
+**Date**: 2026-03-09
+
+### Frozen Sleeve Contract
+- Active sleeves: `bundle_quality_vol`, `bundle_vol_composite`, `bundle_all_three`
+- Paused sleeve: `bundle_quality_composite`
+- Registry file: `strategies/phase37_portfolio_registry.py`
+- Comparator path: `data/processed/features_phase35_repaired.parquet`
+- PnL path: `core/engine.py` via `run_simulation(...)`
+
+### Sleeve Return and Risk-Primitive Contract
+- `sleeve_return_t = equity_t / equity_{t-1} - 1`
+- `vol_63d_i(t) = std(sleeve_return_{i,t-62:t}) * sqrt(252)`
+- `cov_126d_{i,j}(t) = cov(sleeve_return_{i,t-125:t}, sleeve_return_{j,t-125:t})`
+- `corr_126d_{i,j}(t) = cov_126d_{i,j}(t) / (vol_63d_i(t) * vol_63d_j(t))`
+- Risk primitives are persisted in `data/processed/phase37_portfolio/portfolio_risk_primitives.parquet`
+- Implementation file: `scripts/phase37_risk_diagnostics.py`
+
+### Portfolio Method Formulas
+- `equal_weight_i = 1 / 3`
+- `inverse_vol_raw_i = 1 / vol_63d_i`
+- `inverse_vol_weight_i = normalize(clamp(inverse_vol_raw_i, 15%, 50%))`
+- `capped_risk_budget = argmin_w Σ_i (risk_share_i - 1/3)^2`
+- Subject to: `Σ_i w_i = 1`, `0.15 <= w_i <= 0.50`, `w_i >= 0`, `gross_exposure = 1.0`
+- Implementation file: `scripts/phase37_portfolio_construction_runner.py`
+
+### Ex-Ante Risk and Guardrail Formulas
+- `portfolio_var = w' Σ w`
+- `marginal_risk_i = (Σ w)_i`
+- `risk_contribution_i = w_i * marginal_risk_i`
+- `risk_share_i = risk_contribution_i / portfolio_var`
+- `gross_turnover_t = 0 if first valid rebalance else 0.5 * Σ_i |w_{i,t} - w_{i,t-1}|`
+- `HHI_t = Σ_i w_{i,t}^2`
+- Hard guards:
+  - optimized methods require `15% <= w_i <= 50%`
+  - optimized methods require `risk_share_i <= 40%`
+  - all methods require `gross_turnover_t <= 25%` after the first valid rebalance
+  - optimized methods require `HHI_t <= 0.375`
+  - infeasible or unstable optimized methods are fail-closed, never silently relaxed
+
+### Performance and Delta Contract
+- `equity_t = Π_{k<=t} (1 + net_ret_k)` from `run_simulation(...)`
+- `CAGR = equity_T^(252 / N_days) - 1`
+- `realized_vol = std(net_ret) * sqrt(252)`
+- `Sharpe = mean(net_ret) / std(net_ret) * sqrt(252)` when `std(net_ret) > 0`, else `0`
+- `max_drawdown = min(equity / cummax(equity) - 1)`
+- `delta_cagr_window = portfolio_cagr_window - baseline_cagr_window`
+- `delta_sharpe_window = portfolio_sharpe_window - baseline_sharpe_window`
+- Baseline files: `data/processed/phase35_reruns/phase35_baseline_corrected_*_target_weights.parquet`
+
+### Recommendation Contract
+- `method_decision = Pause` if any hard block occurs
+- `method_decision = Continue` if `delta_cagr_validation > 0`, `delta_cagr_holdout > 0`, `delta_sharpe_validation > 0`, and `delta_sharpe_holdout > 0`
+- `method_decision = Pivot` otherwise
+- `portfolio_decision = Continue` if `continue_votes >= 2`; `Pause` if `pause_votes >= 2`; otherwise `Pivot`
+- Validator file: `scripts/validate_phase37_portfolio_outputs.py`
+
+### Implementation Files
+- `strategies/phase37_portfolio_registry.py` (sleeve/method registry and locked constraint surface)
+- `scripts/phase37_risk_diagnostics.py` (sleeve inputs, risk primitives, regime diagnostics, manifest)
+- `scripts/phase37_portfolio_construction_runner.py` (monthly weights, engine path evaluation, guardrails, recommendation)
+- `scripts/validate_phase37_portfolio_outputs.py` (fail-closed schema and decision validation)
 
 # Phase 17.1 Formula Notes (Cross-Sectional Backtester)
 
@@ -2757,3 +3152,535 @@ Date: 2026-03-01
   - mixed-poll precedence keeps `lookup_cancelled`,
   - blocked reconciliation lookup does not block telemetry spool append/flush,
   - concurrent quarantine writers remain lossless and parseable.
+
+## Phase 35 Repaired `permno` Overlay Notes (2026-03-08)
+
+### 1) Canonical repaired feature formulas
+- `mom_12m`:
+  - formula: `(adj_close_t / adj_close_t-252) - 1`
+  - implemented in: `data/feature_derivation.py` (`derive_mom_12m`)
+  - materialized by: `scripts/build_phase35_repaired_features.py`
+- `realized_vol_21d`:
+  - formula: `std(pct_change(adj_close), 21d) * sqrt(252)`
+  - implemented in: `data/feature_derivation.py` (`derive_realized_vol_21d`)
+  - materialized by: `scripts/build_phase35_repaired_features.py`
+- `illiq_21d`:
+  - formula: `mean(abs(daily_return) / dollar_volume, 21d) * 1e6`
+  - where `dollar_volume = adj_close * volume`
+  - implemented in: `data/feature_derivation.py` (`derive_illiq_21d`)
+  - materialized by: `scripts/build_phase35_repaired_features.py`
+- `quality_composite`:
+  - explicit formula: `0.4 * roic + 0.3 * roe_q + 0.3 * revenue_growth_yoy`
+  - implemented in: `data/feature_derivation.py` (`derive_quality_composite_from_panel`)
+  - materialized by: `scripts/build_phase35_repaired_features.py`
+
+### 2) Repaired validation contract
+- Provenance nulls are treated as `missing`, not skipped.
+- Price-derived factors are validated only on rows with the required raw inputs:
+  - `mom_12m`: `adj_close`
+  - `realized_vol_21d`: `adj_close`
+  - `illiq_21d`: `adj_close` and non-zero `volume`
+- Implemented in: `data/validation.py` (`summarize_derived_feature_missingness`, `validate_phase35_repaired_window`)
+
+### 3) Attribution numeric-column contract
+- `scripts/attribution_report.py` must exclude `*_source` and `score_valid` from numeric IC and attribution math.
+- Only numeric factor columns should be pivoted into factor IC / attribution calculations.
+
+### 4) Governed evidence windows
+- Calibration: `2022-01-01` → `2023-06-30`
+- Validation: `2023-07-01` → `2024-03-31`
+- Holdout: `2024-04-01` → `2024-12-31`
+- `2020-2021` are warmup only for the repaired Phase 35 rerun path.
+
+
+
+## Phase 36 Robustness Contract Notes (2026-03-08)
+
+### 1) Locked friction-stress formula
+- explicit formula: `ic_net_estimated = ic_gross - ((cost_bps / 10000) * turnover_monthly * 12.0)`
+- implemented in: `scripts/phase36_bundle_robustness_round.py` (`compute_friction_stress`)
+- validated by: `scripts/validate_phase36_bundle_robustness_outputs.py`
+
+### 2) Locked 20bps holdout fail-closed floor
+- explicit rule: `kill_triggered = holdout_net_ic_at_20bps <= 0`
+- implemented in: `scripts/phase36_bundle_robustness_round.py` (`compute_friction_stress`, `apply_majority_rubric`)
+- validated by: `scripts/validate_phase36_bundle_robustness_outputs.py`, `tests/test_phase36_bundle_robustness_round.py`, `tests/test_validate_phase36_bundle_robustness_outputs.py`
+
+### 3) Locked portfolio rubric
+- explicit rule:
+  - `Continue` if `continue_votes >= 3`
+  - `Pause` if `pause_votes >= 3`
+  - otherwise `Pivot`
+- implemented in: `scripts/phase36_bundle_robustness_round.py` (`apply_majority_rubric`)
+- evidence artifact: `data/processed/phase36_rule100/robustness/bundle_robustness_recommendation.json`
+
+## Phase 38 Bounded Gate Contract Notes (2026-03-09)
+
+### 1) Locked dual-gate formulas
+- `active_days = count(governed trading days in the window where the latest in-window frozen method status is 'ready' or 'valid')`
+- `eligible_days = count(governed trading days in the target window recovered from frozen equal_weight diagnostics)`
+- `coverage_ratio = active_days / eligible_days`
+- `method_gate_pass = (validation_active_days >= 252) and (validation_coverage_ratio >= 0.80) and (holdout_active_days >= 252) and (holdout_coverage_ratio >= 0.80)`
+- `portfolio_gate_decision = Continue if continue_votes >= 2; Pause if pause_votes >= 2; otherwise Pivot`
+
+### 2) Frozen execution reconstruction
+- Daily governed calendar source: `data/processed/phase37_portfolio/portfolio_guardrail_diagnostics.csv` rows for `equal_weight`.
+- Optimized-method state expansion: forward-fill each month's frozen `status` within the same governed window to the recovered daily calendar; do not cross window boundaries.
+- Consistency check: `reconstructed_warmup_days == portfolio_method_comparison.warmup_days` for `inverse_vol_63d` and `capped_risk_budget`.
+
+### 3) Evidence surface
+- Bounded execution path: one-off `.venv` inline Python execution from the terminal using frozen artifacts only; no persisted Phase 38 execution script was added by contract.
+- Evidence artifacts: `data/processed/phase38_gate/gate_diagnostics_delta.csv`, `data/processed/phase38_gate/gate_recommendation.json`.
+
+## Phase 39 Reachability Policy Notes (2026-03-09)
+
+### 1) Locked policy formulas
+- `active_days_window = count(governed trading days in the window where the method is in a valid investable state)`
+- `eligible_days_window = count(governed trading days available inside the governed window)`
+- `coverage_ratio_window = active_days_window / eligible_days_window`
+- `threshold_reachable = MIN_ACTIVE_DAYS_THRESHOLD <= min(eligible_days_validation, eligible_days_holdout)`
+- `dual_gate_window_pass = (active_days_window >= MIN_ACTIVE_DAYS_THRESHOLD) and (coverage_ratio_window >= MIN_COVERAGE_RATIO_THRESHOLD)`
+- `future_gate_proposal_allowed = threshold_reachable`
+- `future_execution_authorized = threshold_reachable and explicit_future_governance_instruction`
+
+### 2) Locked governance interpretation
+- If `threshold_reachable = false`, the disposition is governance `Hold` before any threshold approval, worker guide, or execution proposal can advance.
+- Impossible geometry is a policy/window-design issue, not a method-quality failure and not a reason to mutate frozen Phase 37/38 evidence.
+- The dual gate family is preserved; Phase 39 does not rewrite the frozen `252 / 0.80` constants.
+
+### 3) Evidence and implementation boundary
+- Docs-only evidence surface: `docs/phase_brief/phase39-brief.md`, `docs/notes.md`, `docs/context/current_context.json`, `docs/context/current_context.md`, `docs/decision log.md`, `docs/lessonss.md`, `docs/saw_reports/saw_phase39_reachability_policy_20260309.md`.
+- No `.py` implementation file is authorized in Phase 39; the pre-execution reachability screen is a governance policy contract only in this round.
+
+## Phase 40 Geometry Remedy Notes
+
+1. Reachability formula: threshold_reachable = MIN_ACTIVE_DAYS_THRESHOLD <= min(eligible_days_validation, eligible_days_holdout)
+2. Remedy options: Method A (lower threshold - PRIMARY), Method B (redesign windows), Method C (redesign metric)
+3. Planning anchor: Method A, no threshold value activated in Phase 40
+4. Product targets: shadow_ship_target_phase = 48, capital_decision_target_phase >= 50
+5. Boundaries: Docs-only, no execution token, no remedy execution
+
+## Phase 41 Threshold Trade-Off Notes
+
+1. Candidate set: `T = {180, 150, 126}` days under Method A only
+2. Fixed dimension weights:
+   - `w_auditability = 25`
+   - `w_geometry = 30`
+   - `w_dual_gate = 15`
+   - `w_governance = 15`
+   - `w_shadow_path = 15`
+3. Ordinal scoring scale: `s_i(t) ∈ {1,2,3,4,5}` where `5` is strongest governance fit and `1` is unacceptable for current objectives
+4. Weighted score formula:
+   - `score(t) = (25*s_auditability(t) + 30*s_geometry(t) + 15*s_dual_gate(t) + 15*s_governance(t) + 15*s_shadow_path(t)) / 100`
+5. Locked Phase 41 ordinal scores:
+   - `score_components(180) = {auditability:5, geometry:2, dual_gate:5, governance:5, shadow_path:4}`
+   - `score_components(150) = {auditability:4, geometry:4, dual_gate:5, governance:4, shadow_path:4}`
+   - `score_components(126) = {auditability:3, geometry:5, dual_gate:5, governance:3, shadow_path:3}`
+6. Ranked output:
+   - `score(150) = 4.15`
+   - `score(180) = 3.95`
+   - `score(126) = 3.90`
+   - ranked order = `150 > 180 > 126`
+7. Governance interpretation:
+   - ranked order is a CEO decision surface only
+   - no threshold is enacted in Phase 41
+   - threshold selection remains deferred to Phase 42 governance review
+8. Implementation boundary:
+   - no `.py` implementation file is authorized in Phase 41
+   - no rerun or recomputation of frozen Phase 37/38 evidence is authorized in Phase 41
+
+## Phase 42 Threshold Governance Notes
+
+1. Governance-selected implementation target:
+   - `MIN_ACTIVE_DAYS_THRESHOLD_target = 150`
+   - `MIN_COVERAGE_RATIO_THRESHOLD = 0.80` (unchanged)
+2. Selection interpretation:
+   - `150` is selected as the balanced option under the sealed Phase 41 scorecard
+   - `180` remains conservative fallback
+   - `126` remains aggressive reserve option
+3. Governance rationale:
+   - `150` preserves the dual-gate family with materially stronger reachability margin than `180`
+   - `150` avoids the higher governance and shadow-validation burden associated with `126`
+4. Implementation boundary:
+   - selected threshold is governance-locked for future planning only
+   - code/constants remain unchanged until a later explicitly authorized implementation round
+   - no rerun or recomputation of frozen Phase 37/38 evidence is authorized in Phase 42
+   - no gate re-execution or execution token is authorized in Phase 42
+5. Next-phase boundary:
+   - Phase 43 is opened for implementation planning only
+   - research quarantine and inherited hard blocks remain unchanged
+
+## Phase 43 Implementation Planning Notes
+
+1. Future authoritative constant owner:
+   - `strategies/phase37_portfolio_registry.py`
+   - planned registry constants:
+     - `MIN_ACTIVE_DAYS_THRESHOLD = 150`
+     - `MIN_COVERAGE_RATIO_THRESHOLD = 0.80`
+2. Future consumer rule:
+   - `scripts/phase38_gate_execution.py` must import the gate constants from `strategies/phase37_portfolio_registry.py`
+   - runtime code may not hardcode `150` or `0.80` outside the registry
+3. Future gate formulas (implementation target only; not enacted in Phase 43):
+   - `dual_gate_window_pass = (active_days_window >= MIN_ACTIVE_DAYS_THRESHOLD) and (coverage_ratio_window >= MIN_COVERAGE_RATIO_THRESHOLD)`
+   - `method_gate_pass = dual_gate_window_pass_validation and dual_gate_window_pass_holdout`
+4. Future validation path (post-authorization only):
+   - targeted constant propagation:
+     - `.venv\Scripts\python -m pytest tests\test_phase37_portfolio_registry.py tests\test_phase38_gate_execution.py -q`
+   - bounded rerun:
+     - `.venv\Scripts\python scripts\phase38_gate_execution.py`
+   - bounded output validator:
+     - `.venv\Scripts\python scripts\validate_phase38_gate_outputs.py`
+5. Planning boundary:
+   - Phase 43 seals the implementation contract only
+   - Phase 44 reviews the contract before any later implementation authorization
+   - Phase 37 and Phase 38 evidence remain frozen throughout Phase 43
+
+## Phase 45 Implementation Completion Notes
+
+1. Bounded implementation enactment:
+   - Registry constants enacted in `strategies/phase37_portfolio_registry.py`:
+     - `MIN_ACTIVE_DAYS_THRESHOLD = 150`
+     - `MIN_COVERAGE_RATIO_THRESHOLD = 0.80`
+   - Gate execution script implemented: `scripts/phase38_gate_execution.py`
+   - Gate output validator implemented: `scripts/validate_phase38_gate_outputs.py`
+   - Targeted tests added for registry ownership and gate propagation
+2. Gate execution results (150/0.80 thresholds):
+   - Portfolio gate decision: **Pause**
+   - Vote counts: Continue=0, Pause=3, Pivot=0
+   - All three approved methods (equal_weight, inverse_vol_63d, capped_risk_budget) failed dual-gate thresholds
+   - Validation window: 390 active days, 69.5% coverage (passes 150 active days, fails 80% coverage)
+   - Holdout window: 378 active days, 66.0% coverage (passes 150 active days, fails 80% coverage)
+3. Bounded outputs regenerated:
+   - `data/processed/phase38_gate/gate_diagnostics_delta.csv`
+   - `data/processed/phase38_gate/gate_recommendation.json`
+4. Implementation scope discipline:
+   - Write surface limited to authorized files only
+   - No production or shadow deployment
+   - No rerun outside bounded Phase 38 gate path
+   - Frozen Phase 37 evidence preserved
+5. Next-phase boundary:
+   - Phase 45 implementation complete
+   - Phase 46 opens for governance review of gate results
+   - Research quarantine and inherited hard blocks remain unchanged
+
+## Phase 47 Coverage-Ratio Remedy Notes
+
+1. Locked planning path:
+   - coverage ratio is the sole in-scope problem
+   - `Method A` is the only active remedy family in Phase 47
+   - future policy shape remains one common coverage floor across validation and holdout
+   - any later evidence refresh is limited to one narrow bounded rerun against frozen Phase 37 / Phase 45 evidence
+2. Accepted packet constants and evidence:
+   - `MIN_ACTIVE_DAYS_THRESHOLD = 150`
+   - `MIN_COVERAGE_RATIO_THRESHOLD = 0.80`
+   - validation coverage = `0.6952`
+   - holdout coverage = `0.6597`
+   - `min_current_coverage = min(0.6952, 0.6597) = 0.6597`
+3. Candidate coverage-floor set carried forward for later governance:
+   - `C = {0.65, 0.60, 0.55}`
+4. Coverage-margin formula:
+   - `coverage_margin(c) = min_current_coverage - c`
+5. Candidate margins from the accepted packet:
+   - `coverage_margin(0.65) = 0.0097`
+   - `coverage_margin(0.60) = 0.0597`
+   - `coverage_margin(0.55) = 0.1097`
+6. Planning interpretation:
+   - `0.65` = conservative near-pass option
+   - `0.60` = balanced option
+   - `0.55` = aggressive reserve option
+7. Boundary:
+   - no coverage floor is selected in Phase 47
+   - no coverage floor is enacted in Phase 47
+   - no `.py` implementation file is authorized in Phase 47
+
+## Phase 47 Coverage-Floor Selection Notes
+
+1. Selected policy constant:
+   - `MIN_ACTIVE_DAYS_THRESHOLD = 150`
+   - `MIN_COVERAGE_RATIO_THRESHOLD = 0.65`
+2. Selection formula:
+   - `coverage_margin(c) = min_current_coverage - c`
+   - `min_current_coverage = min(0.6952, 0.6597) = 0.6597`
+3. Decision rationale:
+   - `coverage_margin(0.65) = 0.0097` → selected as the narrow conservative pass floor
+   - `coverage_margin(0.60) = 0.0597` → feasible but looser than required
+   - `coverage_margin(0.55) = 0.1097` → widest margin with the highest dilution risk
+4. Governance interpretation:
+   - `0.65` is selected in Phase 47
+   - enactment is deferred to the bounded Phase 48 packet
+   - active-days remedy remains closed
+
+## Phase 48 Bounded Enactment Notes
+
+1. Authoritative Python ownership:
+   - constant owner: `strategies/phase37_portfolio_registry.py`
+   - runtime gate consumer: `scripts/phase38_gate_execution.py`
+   - bounded output validator: `scripts/validate_phase38_gate_outputs.py`
+2. Runtime formulas:
+   - `gate_pass(window) = (active_days(window) >= 150) AND (coverage_ratio(window) >= 0.65)`
+   - `window_regime_days(window, regime) = max(n_days)` across duplicate sleeve rows for the same `(window, regime)`; if duplicate rows disagree on `n_days`, fail closed
+   - `active_days(window) = SUM(window_regime_days(window, regime))` for `regime in {GREEN, AMBER}`
+   - `total_days(window) = SUM(window_regime_days(window, regime))` for all regimes
+   - `coverage_ratio(window) = active_days(window) / total_days(window)`
+   - portfolio disposition remains `Pause` on any governed window miss
+3. Bounded output surface:
+   - `data/processed/phase38_gate/gate_diagnostics_delta.csv`
+   - `data/processed/phase38_gate/gate_recommendation.json`
+4. Corrected Phase 48 rerun result:
+   - validation = `130` active days, `0.6952` coverage
+   - holdout = `126` active days, `0.6597` coverage
+   - coverage clears `0.65`, active days fail `150`
+   - corrected packet = `Pause`
+5. Corrective note:
+   - an earlier interim `Continue` was withdrawn after SAW found duplicated sleeve-row day counts were being summed as distinct governed days
+6. Hard blocks preserved:
+   - no production or shadow deployment
+   - no `permno` migration
+   - no governed `10` bps rewrite
+   - no new sleeves
+   - no Sovereign cartridge integration inside the bounded gate packet
+
+## Phase 49 Shadow-Evidence Integrity Notes
+
+1. Readiness formulas:
+   - `shadow_capture_day_count = count(distinct artifact_trade_date)`
+   - `shadow_capture_window_ok = (min(artifact_trade_date) >= approved_window_start) AND (max(artifact_trade_date) <= approved_window_end)`
+   - `shadow_capture_source_ok = scanner_outputs_from_runtime AND c3_deltas_from_day_specific_telemetry AND no_placeholder_synthesis`
+   - `shadow_capture_ready = (shadow_capture_day_count >= 5) AND shadow_capture_window_ok AND shadow_capture_source_ok`
+2. Current repository state on 2026-03-11:
+   - `scripts/collect_shadow_evidence.py` writes all five day files in a single run
+   - `collect_daily_scanner_output()` emits synthetic ticker rows rather than runtime-captured scanner output
+   - `collect_c3_delta_snapshot()` selects the latest available telemetry event, so day files are relabeled snapshots rather than day-specific captures
+3. Phase boundary:
+   - Phase 49 is docs-only reconciliation
+   - Phase 50 paper-curve remains blocked until `shadow_capture_ready = True` or governance explicitly accepts demo-only evidence
+4. Source paths:
+   - `scripts/collect_shadow_evidence.py`
+   - `data/shadow_evidence/*.json`
+   - `data/telemetry/simulated_routing_intents.log`
+
+## Phase 50 Shadow-Ship Readiness Notes
+
+1. Authoritative Python ownership:
+   - paper-curve generator: `scripts/run_phase50_paper_curve.py`
+   - paper-only dashboard surface: `views/elite_sovereign_view.py`
+2. Demo-mode paper formulas:
+   - `target_weight_i = sovereign_score_i / sum_j(sovereign_score_j)`
+   - `signal_edge_i = demand_i + pricing_i + margin_i - supply_i`
+   - `demo_return_i = clip((0.002 * signal_edge_i) + (0.0001 * hf_scalar_i) + regime_bias_i, -0.02, 0.02)`
+   - `regime_bias_i = 0.0004 if regime contains "Super Cycle", 0.0001 if regime contains "Turnaround", else 0.0`
+   - `day1_slippage_bps = mean(vol_constraint_i) * 50`
+   - `active_days_progress_to_threshold = active_days_observed / 150`
+3. Engine path:
+   - `core.engine.run_simulation` remains the source of truth for `gross_ret`, `net_ret`, `turnover`, and `cost`
+   - `equity_t = cumprod(1 + net_ret_t)`
+4. Bounded output surface:
+   - `data/processed/phase50_shadow_ship/paper_curve_day1.csv`
+   - `data/processed/phase50_shadow_ship/paper_curve_positions_day1.csv`
+   - `data/processed/phase50_shadow_ship/telemetry_day1.json`
+   - `data/processed/phase50_shadow_ship/gate_recommendation.json`
+   - compatibility mirrors:
+     - `data/shadow_evidence/paper_curve_day1.csv`
+     - `data/shadow_evidence/telemetry_day1.json`
+     - `data/processed/phase50_gate/gate_recommendation.json`
+   - `data/telemetry/phase50_paper_curve_events.jsonl`
+   - canonical Phase 50 runtime reads stay on `data/processed/phase50_shadow_ship/`; compatibility mirrors exist only to satisfy CEO memo / handoff path contracts
+5. Governance rule:
+   - workers may not unilaterally open new phases; each phase opening requires explicit CEO sign-off in `docs/decision log.md`
+
+## Phase 50 Final Gate Aggregation Notes
+
+1. Final gate package artifacts:
+   - full curve snapshot: `data/processed/phase50_shadow_ship/phase50_curve_full_20260410.csv`
+   - aggregated telemetry: `data/processed/phase50_shadow_ship/phase50_aggregated_telemetry_20260410.json`
+   - event-log snapshot: `data/processed/phase50_shadow_ship/phase50_event_log_full_20260410.jsonl`
+2. Final gate aggregation formulas used in the accelerated package:
+   - `cumulative_equity_factor = equity_day30`
+   - `cumulative_return_pct = cumulative_equity_factor - 1`
+   - `average_turnover = mean(turnover_days1_30)`
+   - `stability_score = 1 - min(std(net_ret_days1_30) / max(abs(mean(net_ret_days1_30)), 1e-12), 1.0)`
+3. Runtime source of truth:
+   - `scripts/run_phase50_paper_curve.py` remains the only generator for the day-indexed curve and telemetry
+   - the accelerated final package reuses those day-indexed outputs; it does not introduce a new simulation model
+
+## Sovereign Shipping State Notes (2026-04-10)
+
+### 1) Selector and routing state formulas
+- `production_default_selector = "sovereign"`
+- `governed_intent_valid = selector == "sovereign" and intent_payload_complete and audit_fields_present`
+- `live_route_allowed = governed_intent_valid and live_break_glass_enabled and risk_interceptor_pass`
+- `route_mode = "live" if live_route_allowed else "paper_fallback"`
+
+### 2) Governance state changes
+- `docs/handover/sovereign_promotion_package_20260313.md` is now the canonical live artifact rather than a contingent draft.
+- Live-routing surfaces are permitted only through the existing governed execution path (`main_bot_orchestrator.py` -> `execution/rebalancer.py` -> `execution/risk_interceptor.py` -> `execution/broker_api.py`).
+- Paper fallback remains mandatory whenever any live gate fails.
+- Comparator and telemetry lineage remain part of the live audit trail; production unlock does not erase baseline evidence requirements.
+
+### 3) Phase 51 design-state change
+- `docs/phase_brief/phase51-factor-algebra-design.md` is now an implementation-authorized design starting point.
+- The design brief remains a design artifact, not a source-of-truth runtime spec for executed production behavior.
+
+## Live-Market Validation Round Criteria Notes
+
+### 1) Entry and path lock
+- Governed live-routing path remains:
+  - `main_bot_orchestrator.py` -> `execution/rebalancer.py` -> `execution/risk_interceptor.py` -> `execution/broker_api.py`
+- Validation mode token:
+  - `validation_mode = "micro_capital_pilot"`
+- Shadow comparator requirement:
+  - same-window, same-cost, same `engine.run_simulation` path vs latest governed C3 baseline
+
+### 2) Explicit formulas
+- `telemetry_completeness = complete_lineage_orders / total_submitted_orders`
+- `cash_drift = abs(local_cash_eod - broker_cash_eod)`
+- `position_drift = max_symbol(abs(local_qty_eod - broker_qty_eod))`
+- `slippage_deterioration_bps = live_median_adverse_slippage_bps - 7.5`
+- `holdings_overlap = |live_symbols ∩ shadow_symbols| / max(1, |shadow_symbols|)`
+- `gross_exposure_delta = abs(live_gross_exposure - shadow_gross_exposure)`
+- `turnover_delta_abs = abs(live_turnover - shadow_turnover)`
+- `turnover_delta_rel = turnover_delta_abs / max(abs(shadow_turnover), 1e-12)`
+- `validation_round_pass = all(CHK_LMV_01..CHK_LMV_11) and no_rollback_trigger`
+
+### 3) Runtime code loci
+- Intent and authoritative execution result handling:
+  - `main_bot_orchestrator.py`
+- Batch normalization, routing, and risk-block persistence:
+  - `execution/rebalancer.py`
+- Projection, VIX kill switch, sector/single-name/VAR checks:
+  - `execution/risk_interceptor.py`
+- Fill aggregation, slippage, latency, heartbeat, and durable telemetry sinks:
+  - `execution/microstructure.py`
+
+### 4) Truthfulness boundary
+- The current raw runtime path emits order/fill telemetry and slippage only when `arrival_price` context exists.
+- The current raw runtime path does **not** by itself emit:
+  - end-of-day cash/position reconciliation summaries
+  - live-vs-shadow holdings overlap
+  - gross-exposure delta
+  - turnover delta
+  - same-window C3 delta summaries for a live round
+- Those checks therefore require a dedicated validation summarizer/reconciliation layer before a micro-capital live-market validation round can be authorized.
+
+### 5) Artifact contract
+- Raw telemetry remains in:
+  - `data/processed/execution_microstructure.parquet`
+  - `data/processed/execution_microstructure_fills.parquet`
+  - `data/processed/execution_microstructure.duckdb`
+- Future round summaries should live under:
+  - `data/processed/live_market_validation/<round_id>/`
+
+## Phase 57 Corporate Actions Formula Notes
+
+1. Bounded Corporate Actions event proxy:
+   - `corp_action_yield_t = total_ret_t - ((raw_close_t / raw_close_{t-1}) - 1)`
+   - source path:
+     - `scripts/phase57_corporate_actions_runner.py` (`load_corporate_action_frame`)
+2. Eligible denominator family:
+   - `eligible_t = 1[(quality_pass_t = 1) and (adv_usd_t >= 5_000_000) and (0.005 <= corp_action_yield_t <= 0.25)]`
+   - `adv_usd_t = mean(raw_close_t * volume_t over 20 trading days by permno)`
+   - source path:
+     - `scripts/phase57_corporate_actions_runner.py` (`load_corporate_action_frame`, `select_corporate_action_candidates`)
+3. Confirmation family:
+   - `value_rank_pct_t = rank_pct(capital_cycle_score_t by date, ascending)`
+   - `confirmed_t = 1[value_rank_pct_t >= 0.60]`
+   - source path:
+     - `scripts/phase57_corporate_actions_runner.py` (`select_corporate_action_candidates`)
+4. Portfolio construction:
+   - `target_weight_{t,i} = 1 / N_t` for confirmed names on event day `t`
+   - non-event dates are explicitly reindexed to `0` target weight across the full trading calendar
+   - executed exposure remains next-day because `core.engine.run_simulation` applies `shift(1)`
+   - source paths:
+     - `scripts/phase57_corporate_actions_runner.py` (`build_corporate_action_target_weights`)
+     - `core/engine.py` (`run_simulation`)
+5. Same-window / same-cost comparator discipline:
+   - bounded Phase 57 packet window = `2015-01-01 -> 2022-12-31`
+   - `cost_bps = 5.0`
+   - locked comparator baseline = `data/processed/phase54_core_sleeve_summary.json` with `baseline_config_id = C3_LEAKY_INTEGRATOR_V1`
+   - delta metrics:
+     - `sharpe_delta = sharpe_phase57 - sharpe_c3`
+     - `cagr_delta = cagr_phase57 - cagr_c3`
+     - `turnover_ratio_phase57_vs_c3 = turnover_annual_phase57 / turnover_annual_c3`
+     - `max_dd_delta = max_dd_phase57 - max_dd_c3`
+     - `ulcer_delta = ulcer_phase57 - ulcer_c3`
+   - source path:
+     - `scripts/phase57_corporate_actions_runner.py` (`load_baseline_summary`, `build_delta_frame`)
+6. Phase 57 closeout governance predicate:
+   - `phase57_promotion_ready = 1[(same_window_same_cost_same_engine = 1) and (sharpe_delta >= 0) and (cagr_delta >= 0)]`
+   - `phase57_closeout_no_promotion = 1[phase57_promotion_ready = 0]`
+   - source paths:
+     - `docs/decision log.md` (`D-321`, `D-322`)
+     - `docs/phase_brief/phase57-brief.md`
+
+## Phase 58 Governance Layer Formula Notes
+
+1. Comparable event-family scope:
+   - `event_family = {phase56_event_pead, phase57_event_corporate_actions}`
+   - `allocator_reference = phase55 summary only` with `reference_only = true`
+   - source path:
+     - `scripts/phase58_governance_runner.py`
+2. Same-window / same-cost / same-engine packet discipline:
+   - `window = 2015-01-01 -> 2022-12-31`
+   - `cost_bps = 5.0`
+   - `same_window_same_cost_same_engine = 1[(all included event sleeves share the window, cost, and core.engine.run_simulation path)]`
+   - source path:
+     - `scripts/phase58_governance_runner.py`
+3. Family trial-pool normalization:
+   - `event_return_matrix_t = outer_join(net_ret_phase56_t, net_ret_phase57_t).fillna(0)`
+   - `N_eff = effective_number_of_trials(event_return_matrix)`
+   - `sr_estimates = {safe_sharpe(sleeve_i)}`
+   - `dsr_i = deflated_sharpe_ratio(returns_i, sr_estimates, N_eff)`
+   - `family_spa_p, family_wrc_p = spa_wrc_pvalues(event_return_matrix)`
+   - source paths:
+     - `scripts/phase58_governance_runner.py`
+     - `utils/statistics.py`
+     - `utils/spa.py`
+4. Comparator deltas vs the locked C3 baseline:
+   - `sharpe_delta_i = sharpe_i - sharpe_c3`
+   - `cagr_delta_i = cagr_i - cagr_c3`
+   - `turnover_ratio_i = turnover_annual_i / turnover_annual_c3`
+   - `max_dd_delta_i = max_dd_i - max_dd_c3`
+   - `ulcer_delta_i = ulcer_i - ulcer_c3`
+   - source path:
+     - `scripts/phase58_governance_runner.py` (`build_delta_row`)
+5. Explicit bounded-packet non-applicability:
+   - `pbo_applicable_event_family = 0`
+   - reason: `single-packet event sleeves do not expose a CSCV search lattice in this bounded packet`
+   - source path:
+     - `scripts/phase58_governance_runner.py`
+6. Review / hold predicate:
+   - `phase58_review_hold = 1[(event_family_spa_p >= 0.05) or (event_family_wrc_p >= 0.05) or any(sharpe_delta_i < 0) or any(cagr_delta_i < 0)]`
+   - source path:
+     - `scripts/phase58_governance_runner.py` (`build_review_hold_reasons`)
+
+## Phase 59 Shadow Portfolio Formula Notes
+
+1. Phase 55-governed research-variant selector:
+   - `selected_variant = argmax(selection_count, median_outer_test_sharpe, variant_id_ascending)`
+   - input surface: `data/processed/phase55_allocator_cpcv_evidence.json::fold_results`
+   - source path:
+     - `data/phase59_shadow_portfolio.py` (`select_phase55_variant`)
+2. Research-side Shadow NAV surface:
+   - `research_shadow_ret_t = allocator_state(period_return_{selected_variant,t})`
+   - `research_shadow_ret_t = 0` on business dates in `2015-01-01 -> 2022-12-31` where the selected variant has no observed row
+   - `research_shadow_equity_t = cumprod(1 + research_shadow_ret_t)`
+   - source path:
+     - `data/phase59_shadow_portfolio.py` (`_build_research_surface`)
+3. Research-side comparator deltas vs locked C3 baseline:
+   - `sharpe_delta = sharpe_shadow - sharpe_c3`
+   - `cagr_delta = cagr_shadow - cagr_c3`
+   - `max_dd_delta = max_dd_shadow - max_dd_c3`
+   - `ulcer_delta = ulcer_shadow - ulcer_c3`
+   - source path:
+     - `data/phase59_shadow_portfolio.py` (`_build_research_delta_row`)
+4. Reference-only alert contract:
+   - `holdings_overlap = |shadow_latest_tickers ∩ core_sample_selected_tickers| / max(1, |shadow_latest_tickers|)`
+   - `gross_exposure_delta = abs(core_gross_exposure_latest - shadow_gross_exposure_latest)`
+   - `turnover_delta_abs = abs(turnover_delta_vs_c3_phase50)`
+   - `turnover_delta_rel = turnover_delta_abs / max(abs(shadow_average_turnover), 1e-12)`
+   - source path:
+     - `data/phase59_shadow_portfolio.py` (`_build_shadow_reference_surface`)
+5. Review / hold predicate:
+   - `phase59_review_hold = 1[(research_sharpe_delta < 0) or (research_cagr_delta < 0) or (shadow_reference_alert_level != "GREEN")]`
+   - source path:
+     - `data/phase59_shadow_portfolio.py` (`build_phase59_packet`)

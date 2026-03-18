@@ -632,6 +632,10 @@ def _atomic_write_text(path: Path, content: str) -> None:
             os.fsync(handle.fileno())
         _atomic_replace_with_retry(tmp_path, path)
         _fsync_parent_dir_if_possible(path.parent)
+    except Exception:
+        if tmp_path.exists():
+            tmp_path.unlink(missing_ok=True)
+        raise
     finally:
         if tmp_path.exists():
             tmp_path.unlink(missing_ok=True)
@@ -645,6 +649,10 @@ def _atomic_write_parquet(df: pd.DataFrame, path: Path) -> None:
         _fsync_path_if_possible(tmp_path)
         _atomic_replace_with_retry(tmp_path, path)
         _fsync_parent_dir_if_possible(path.parent)
+    except Exception:
+        if tmp_path.exists():
+            tmp_path.unlink(missing_ok=True)
+        raise
     finally:
         if tmp_path.exists():
             tmp_path.unlink(missing_ok=True)
@@ -663,6 +671,10 @@ def _atomic_replace_with_retry(
             os.replace(src, dst)
             return
         except PermissionError:
+            if attempt >= attempts - 1:
+                raise
+            time.sleep(max(float(base_sleep_seconds), 0.001) * float(attempt + 1))
+        except OSError as exc:
             if attempt >= attempts - 1:
                 raise
             time.sleep(max(float(base_sleep_seconds), 0.001) * float(attempt + 1))
@@ -1819,10 +1831,12 @@ class _TelemetrySpooler:
                 self.flush_once()
             except Exception as exc:
                 self._last_flush_error = str(exc)
+                break
             time.sleep(0.01)
 
         remaining_join_timeout = max(deadline - time.monotonic(), 0.1)
-        self._thread.join(timeout=remaining_join_timeout)
+        if self._thread.is_alive():
+            self._thread.join(timeout=remaining_join_timeout)
         final_status = self.status()
         pending_bytes = int(final_status.get("pending_bytes", 0))
         buffered_records = int(final_status.get("buffered_records_pending", 0))
@@ -1927,8 +1941,8 @@ def _shutdown_execution_microstructure_spoolers() -> None:
     shutdown_errors: list[str] = []
     for spooler in spoolers:
         try:
-            spooler.stop()
-        except RuntimeError as exc:
+            spooler.stop(timeout_seconds=3.0)
+        except (RuntimeError, OSError) as exc:
             shutdown_errors.append(str(exc))
     if shutdown_errors:
         raise MicrostructureFlushError("; ".join(shutdown_errors))

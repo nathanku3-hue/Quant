@@ -6,9 +6,7 @@ This validates the real runtime code path used by dashboard.py.
 """
 
 import os
-import sys
 from pathlib import Path
-from unittest.mock import MagicMock
 import pytest
 
 
@@ -18,10 +16,7 @@ def test_dashboard_escalation_initialization_enabled(tmp_path, monkeypatch):
     monkeypatch.setenv("ENABLE_ESCALATION", "true")
     monkeypatch.setenv("ESCALATION_CHECK_INTERVAL", "60")
 
-    # Mock streamlit to avoid UI rendering
-    mock_st = MagicMock()
-    mock_st.session_state = {}
-    sys.modules['streamlit'] = mock_st
+    session_state: dict[str, object] = {}
 
     # Mock data paths
     test_db_path = tmp_path / "drift_alerts.duckdb"
@@ -40,19 +35,18 @@ def test_dashboard_escalation_initialization_enabled(tmp_path, monkeypatch):
     # Call the actual function used by dashboard.py
     initialize_escalation_manager(
         alert_manager=drift_alert_manager,
-        session_state=mock_st.session_state,
+        session_state=session_state,
         telemetry_path=test_telemetry_path,
     )
 
     # Verify manager was created and started
-    assert "escalation_manager" in mock_st.session_state
-    manager = mock_st.session_state["escalation_manager"]
+    assert "escalation_manager" in session_state
+    manager = session_state["escalation_manager"]
     assert manager is not None
     assert manager.health_check().is_running
 
     # Cleanup
     manager.stop(timeout=2.0)
-    del sys.modules['streamlit']
 
 
 def test_dashboard_escalation_initialization_disabled(tmp_path, monkeypatch):
@@ -60,10 +54,7 @@ def test_dashboard_escalation_initialization_disabled(tmp_path, monkeypatch):
     # Set environment
     monkeypatch.setenv("ENABLE_ESCALATION", "false")
 
-    # Mock streamlit
-    mock_st = MagicMock()
-    mock_st.session_state = {}
-    sys.modules['streamlit'] = mock_st
+    session_state: dict[str, object] = {}
 
     # Mock data paths
     test_db_path = tmp_path / "drift_alerts.duckdb"
@@ -80,14 +71,11 @@ def test_dashboard_escalation_initialization_disabled(tmp_path, monkeypatch):
     # Call the actual function used by dashboard.py
     initialize_escalation_manager(
         alert_manager=drift_alert_manager,
-        session_state=mock_st.session_state,
+        session_state=session_state,
     )
 
     # Verify manager was not created
-    assert "escalation_manager" not in mock_st.session_state
-
-    # Cleanup mock
-    del sys.modules['streamlit']
+    assert "escalation_manager" not in session_state
 
 
 def test_dashboard_escalation_singleton_on_rerun(tmp_path, monkeypatch):
@@ -95,10 +83,7 @@ def test_dashboard_escalation_singleton_on_rerun(tmp_path, monkeypatch):
     # Set environment
     monkeypatch.setenv("ENABLE_ESCALATION", "true")
 
-    # Mock streamlit
-    mock_st = MagicMock()
-    mock_st.session_state = {}
-    sys.modules['streamlit'] = mock_st
+    session_state: dict[str, object] = {}
 
     # Mock data paths
     test_db_path = tmp_path / "drift_alerts.duckdb"
@@ -114,22 +99,21 @@ def test_dashboard_escalation_singleton_on_rerun(tmp_path, monkeypatch):
     # First run: create manager
     initialize_escalation_manager(
         alert_manager=drift_alert_manager,
-        session_state=mock_st.session_state,
+        session_state=session_state,
         telemetry_path=test_telemetry_path,
     )
 
-    first_manager = mock_st.session_state["escalation_manager"]
+    first_manager = session_state["escalation_manager"]
 
     # Second run: reuse manager (simulate rerun)
     initialize_escalation_manager(
         alert_manager=drift_alert_manager,
-        session_state=mock_st.session_state,
+        session_state=session_state,
         telemetry_path=test_telemetry_path,
     )
 
-    second_manager = mock_st.session_state["escalation_manager"]
+    second_manager = session_state["escalation_manager"]
     assert second_manager is first_manager  # Same instance (singleton)
 
     # Cleanup
     first_manager.stop(timeout=2.0)
-    del sys.modules['streamlit']

@@ -19,6 +19,7 @@ Keep strict separation of concerns:
 - `views/`: Streamlit rendering and interaction logic.
 - `tests/`: test suites mirroring source structure.
 - `docs/`: phase briefs and specifications.
+- `docs/context/bridge_contract_current.md`: current PM/planner bridge that converts recent execution truth into system-level next-step language.
 - `docs/lessonss.md`: self-learning loop log for mistakes and guardrails.
 - `docs/research/`: domain research PDFs and synthesized findings.
 - `.codex/skills/`: canonical repo-local Codex skills (including `saw` and `research-analysis`).
@@ -42,8 +43,9 @@ Keep strict separation of concerns:
 4. Execute: implement vertical slices (Data -> Strategy -> View -> Ops).
 5. Verify: run `.venv\Scripts\python -m pytest` and runtime smoke checks (`.venv\Scripts\python launch.py` or `.venv\Scripts\streamlit run app.py`).
 6. Review: execute the Section 5 milestone gate.
-7. Report: include observability rating, evidence footer (Section 9), and top-down snapshot (Section 11).
-8. SAW round: run Subagents-After-Work protocol from Section 12.
+7. Bridge: refresh `docs/context/bridge_contract_current.md` with `SYSTEM_DELTA`, `PM / Product Delta`, `OPEN_DECISION`, `RECOMMENDED_NEXT_STEP`, and `DO_NOT_REDECIDE`.
+8. Report: include observability rating, evidence footer (Section 9), and top-down snapshot (Section 11).
+9. SAW round: run Subagents-After-Work protocol from Section 12.
 
 ## 5. Milestone Review Gate (Mandatory)
 Before closing a milestone, spawn reviewer subagents using this prompt:
@@ -61,6 +63,7 @@ Risk tier checks:
 - Restartability: long ETL/update jobs should be resumable/checkpointed.
 - Explainability: scoring outputs must expose human-readable reasoning in UI.
 - Environment hygiene: keep `requirements.txt` in sync with imports.
+- Windows process-liveness checks: never use `os.kill(pid, 0)` on Windows; require an OS-native non-destructive process query for lock ownership or stale-lock recovery.
 
 ## 7. Change Discipline
 - No destructive operations without explicit user confirmation.

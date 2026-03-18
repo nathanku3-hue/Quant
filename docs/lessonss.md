@@ -1,6 +1,6 @@
 # lessonss.md
 
-Last updated: 2026-03-02
+Last updated: 2026-03-18
 
 ## Purpose
 Track mistakes, root causes, and guardrails so repeated errors are prevented.
@@ -264,4 +264,156 @@ Application pattern:
 - Fix applied: Added minimum bounded lookup timeout clamp (`0.01s`), removed synchronous zero-timeout lookup path, centralized canonical transient/terminal builders, routed non-retryable terminal row errors to `FAILED_REJECTED`, enforced terminal classification precedence before retry-token checks, and expanded tests for zero-timeout and mixed-token terminal cases.
 - Guardrail for next time: For taxonomy migrations, enforce one canonical builder per terminal state plus explicit `terminal-precedence-over-retry-token` regressions in the same round before SAW close.
 - Evidence paths: `main_bot_orchestrator.py`, `tests/test_main_bot_orchestrator.py`, `docs/phase_brief/phase32-brief.md`, `docs/decision log.md`, `docs/notes.md`, `.venv\Scripts\python -m pytest tests/test_main_bot_orchestrator.py --disable-warnings`, `.venv\Scripts\python -m py_compile main_bot_orchestrator.py tests/test_main_bot_orchestrator.py`
+
+## 2026-03-17 Round Entry (Phase 55 Allocator Governance Hardening)
+- Date: 2026-03-17
+- Mistake or miss: The first Phase 55 implementation pass fixed the nested CPCV shape but still allowed silent row coercion, same-fold duplicate averaging, and path-based CLI import failure, and the SAW closeout briefly stalled while the original Reviewer B lane failed to return.
+- Root cause: Input-surface hardening and runtime invocation were under-specified up front, and reviewer-lane continuity was treated as incidental instead of being planned as part of the closeout path.
+- Fix applied: Added fail-closed validation for malformed `fold`, `snapshot_date`, `variant_id`, and `period_return` rows, blocked duplicate/fold leakage before matrix construction, normalized numeric `variant_id` values to the string contract, restored direct script-path execution, added focused regressions plus SPA benchmark-alignment coverage, and completed SAW with an independent replacement Reviewer B pass instead of inferring runtime sign-off locally.
+- Guardrail for next time: For bounded governance wrappers, lock the input contract before the first coding pass, add direct script-path smoke coverage in the same round, and predefine a replacement reviewer path so SAW does not stall when one reviewer lane drops.
+- Evidence paths: `scripts/phase55_allocator_governance.py`, `utils/spa.py`, `tests/test_phase55_allocator_governance.py`, `tests/test_spa.py`, `docs/notes.md`, `docs/saw_reports/saw_phase55_allocator_governance_20260317.md`, `.venv\Scripts\python -m pytest tests/test_spa.py tests/test_phase55_allocator_governance.py -q --tb=no`, `.venv\Scripts\python scripts/phase55_allocator_governance.py --help`
+
+## 2026-03-17 Round Entry (Critical Git Recovery / Stash-Untracked Split)
+- Date: 2026-03-17
+- Mistake or miss: The repo cleanup round treated later-phase docs and Phase 53 read-only inputs as safely recoverable from the main stash entry, but those files were untracked and therefore disappeared from the worktree after `git reset --hard` plus `git clean -fd`, leaving `docs/phase_brief` truncated at `phase35-brief.md` and hiding the Phase 53 CPCV input surface.
+- Root cause: Git stash structure was not verified before cleanup. The work assumed `stash@{0}` contained the missing files, but untracked artifacts were actually stored in the stash's untracked-files parent (`stash@{0}^3`), and directory-level restore assumptions were made before proving file-level recovery semantics.
+- Fix applied: Diagnosed the issue with `git ls-files docs/phase_brief` and `git ls-tree -r --name-only 'stash@{0}^3'`, confirmed Phase 36-55 briefs and the read-only research inputs existed only in `stash@{0}^3`, restored the missing docs and research surface from that stash parent, and recorded the recovery path instead of regenerating any locked artifacts.
+- Guardrail for next time: Before any cleanup touching a dirty tree, prove whether critical files are tracked or untracked, inspect stash topology explicitly (`stash@{n}`, `stash@{n}^3`), and never assume `git checkout <stash> -- <dir>` will recover untracked content without validating the result at file level.
+- Evidence paths: `docs/lessonss.md`, `docs/phase_brief/phase36-brief.md`, `docs/phase_brief/phase55-brief.md`, `allocator_cpcv.sql`, `research_data/alloc_cpcv_splits`, `data/research_connector.py`, `git ls-files docs/phase_brief`, `git ls-tree -r --name-only 'stash@{0}'`, `git ls-tree -r --name-only 'stash@{0}^3'`, `git checkout 'stash@{0}^3' -- docs/phase_brief`
+
+## 2026-03-17 Round Entry (Phase 55 Gate-Miss Governance Wording)
+- Date: 2026-03-17
+- Mistake or miss: The Phase 55 SSOT briefly described `D-311` as execution authorization even after the first bounded evidence packet had already failed the allocator gate.
+- Root cause: Execution approval and post-evidence disposition were not recast as separate governance states once the summary artifact landed.
+- Fix applied: Recomputed the locked gate from `data/processed/phase55_allocator_cpcv_summary.json`, recorded `D-311` as gate miss / no promotion, updated the Phase 55 brief wording, and kept artifact staging on `data/processed/phase55_*` only.
+- Guardrail for next time: After every evidence packet, recompute the canonical gate from the published summary JSON in the same round and update SSOT docs before any further planning or promotion language.
+- Evidence paths: `data/processed/phase55_allocator_cpcv_summary.json`, `data/processed/phase55_allocator_cpcv_evidence.json`, `docs/phase_brief/phase55-brief.md`, `docs/decision log.md`
+
+## 2026-03-17 Round Entry (Phase 55 D-312 Repo-Verified Closeout)
+- Date: 2026-03-17
+- Mistake or miss: A thread-level claim treated `D-312` as already published before the repo SSOT actually contained the decision-log, brief, context-packet, and SAW updates.
+- Root cause: Conversation state was treated as authoritative before file-system verification of the governance artifacts.
+- Fix applied: Verified that `docs/decision log.md` still ended at `D-311`, then published `D-312` through synchronized updates to the Phase 55 brief, decision log, lessons log, context packet, and closeout SAW report.
+- Guardrail for next time: Do not accept any governance transition as complete until `docs/decision log.md`, the active phase brief, and the current context packet all reflect the new state in the repo.
+- Evidence paths: `docs/decision log.md`, `docs/phase_brief/phase55-brief.md`, `docs/context/current_context.md`, `docs/context/current_context.json`, `docs/saw_reports/saw_phase55_d312_closeout_20260317.md`
+
+## 2026-03-18 Round Entry (Phase 56 Planning Kickoff Requires Repo Publication)
+- Date: 2026-03-18
+- Mistake or miss: A thread-level claim asserted that Phase 56 planning-only kickoff artifacts had already been published even though the repo still had no `phase56` brief, memo, or decision record.
+- Root cause: Approval intent was conflated with completed repo publication.
+- Fix applied: Verified the absence of `phase56` artifacts in the workspace, then published `D-313`, the Phase 56 kickoff brief, the kickoff memo, the refreshed context packet, and the docs-only SAW report in one synchronized round.
+- Guardrail for next time: Treat an approval token as permission to publish the next-phase packet, not proof that the packet already exists; verify artifact presence in the repo before accepting the transition as complete.
+- Evidence paths: `docs/decision log.md`, `docs/phase_brief/phase56-brief.md`, `docs/handover/phase56_kickoff_memo_20260318.md`, `docs/context/current_context.md`, `docs/context/current_context.json`, `docs/saw_reports/saw_phase56_d313_kickoff_20260318.md`
+
+## 2026-03-18 Round Entry (Phase 56 Execution Token Must Match Published Contract)
+- Date: 2026-03-18
+- Mistake or miss: Thread-level language again tried to treat an execution-open claim as sufficient before checking whether the exact published token contract had actually been satisfied.
+- Root cause: Execution intent and execution authorization were not separated tightly enough from the explicit `approve next phase` gate in the active brief.
+- Fix applied: Verified `docs/phase_brief/phase56-brief.md` still required the exact token, waited for the literal `approve next phase` reply, then published `D-314` and refreshed the context packet in the same round.
+- Guardrail for next time: Do not open execution from paraphrase or delegated summary; require the exact token string in-thread, then update repo SSOT immediately before any implementation work begins.
+- Evidence paths: `docs/phase_brief/phase56-brief.md`, `docs/decision log.md`, `docs/context/current_context.md`, `docs/context/current_context.json`
+
+## 2026-03-18 Round Entry (Phase 56 PEAD Slice Must Start From Repo-Verified Hooks)
+- Date: 2026-03-18
+- Mistake or miss: The thread narrative claimed a bounded PEAD slice and brief updates already existed before the repo had any on-disk implementation packet or evidence artifacts.
+- Root cause: Thread-level execution intent was treated as if it were equivalent to inspected hook inventory and actual artifact publication.
+- Fix applied: Re-read `backtests/event_study_csco.py`, the Phase 56 brief, and the PEAD-related data hooks; then implemented `scripts/phase56_pead_runner.py`, added focused tests, and published the first bounded evidence artifacts from repo-truth only.
+- Guardrail for next time: Before coding a new phase slice, inspect the actual hook files and artifact availability on disk first; never let a thread claim substitute for repo-local proof of the current implementation surface.
+- Evidence paths: `backtests/event_study_csco.py`, `scripts/phase56_pead_runner.py`, `tests/test_phase56_pead_runner.py`, `data/processed/phase56_pead_summary.json`, `data/processed/phase56_pead_evidence.csv`, `.venv\Scripts\python -m pytest tests/test_phase56_pead_runner.py -q --tb=no`, `.venv\Scripts\python scripts/phase56_pead_runner.py --start-date 2000-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0`
+
+## 2026-03-18 Round Entry (Phase 56 Review Packets Must Quote the Real Summary Schema)
+- Date: 2026-03-18
+- Mistake or miss: Thread-level review language drifted into invented Phase 56 summary fields and implied dispositions that were not actually present in `data/processed/phase56_pead_summary.json`.
+- Root cause: The review packet was being narrated from memory instead of reopening the on-disk summary artifact and constraining the wording to its actual schema.
+- Fix applied: Re-read `data/processed/phase56_pead_summary.json`, anchored `D-316` to the exact published keys/metrics (`strategy_id`, `same_engine`, date clamp, Sharpe/CAGR/drawdown/ulcer/turnover/positions), and kept comparator or promotion language blocked.
+- Guardrail for next time: Before publishing any review/closeout packet, open the actual summary artifact and quote only keys that exist on disk; if a field is absent, state that it is absent instead of inferring it.
+- Evidence paths: `data/processed/phase56_pead_summary.json`, `docs/decision log.md`, `docs/phase_brief/phase56-brief.md`, `docs/context/current_context.md`, `docs/context/current_context.json`, `docs/saw_reports/saw_phase56_d316_review_20260318.md`
+
+## 2026-03-18 Round Entry (Streamlit Test Contamination Cleanup)
+- Date: 2026-03-18
+- Mistake or miss: Dashboard integration tests mocked `sys.modules['streamlit']` without restoring full module state, which contaminated later tests and triggered `DeltaGeneratorSingleton instance already exists!`.
+- Root cause: Only the top-level `streamlit` module was deleted/replaced, leaving `streamlit.*` submodules and singleton state alive in the shared pytest process.
+- Fix applied: Removed Streamlit module mocking from `tests/test_dashboard_integration.py` and used a plain `session_state` dict, so tests no longer alter global import state.
+- Guardrail for next time: Do not mock Streamlit via `sys.modules` in shared pytest runs; if isolation is required, snapshot/restore the full `streamlit*` module tree or use subprocess isolation.
+- Evidence paths: `tests/test_dashboard_integration.py`, `tests/test_auto_backtest_view.py`, `tests/test_dashboard_sprint_a.py`, `.venv\Scripts\python -m pytest tests/test_auto_backtest_view.py tests/test_dashboard_integration.py tests/test_dashboard_sprint_a.py::test_metrics_source -q --tb=short`
+
+## 2026-03-18 Round Entry (Phase 56 Closeout Gate Requires Uninterrupted Evidence)
+- Date: 2026-03-18
+- Mistake or miss: An initial closeout regression run was interrupted, leaving a misleading status artifact and an incomplete evidence trail.
+- Root cause: Full-suite regression runs were not treated as atomic evidence captures; interruption yielded partial logs.
+- Fix applied: Re-ran `.venv\Scripts\python -m pytest -q` and `launch.py --help` into `docs/context/e2e_evidence/` with status files, then captured a bounded PEAD replay artifact set.
+- Guardrail for next time: Treat phase-end evidence captures as atomic; if interrupted, delete partial artifacts and rerun to produce clean status + log pairs.
+- Evidence paths: `docs/context/e2e_evidence/phase56_closeout_full_pytest_20260318.*`, `docs/context/e2e_evidence/phase56_launch_smoke_20260318.*`, `docs/context/e2e_evidence/phase56_pead_replay_20260318.*`
+
+## 2026-03-18 Round Entry (Phase 57 Kickoff Must Stay Planning-Only and Repo-Verified)
+- Date: 2026-03-18
+- Mistake or miss: A Phase 57 kickoff claim could have been published as if comparator approval or a Corporate Actions implementation surface already existed on disk.
+- Root cause: Phase-transition intent arrived immediately after a closeout round, which makes it easy to blur a docs-only kickoff with executed hooks or reopened predecessor scope.
+- Fix applied: Re-read the locked Phase 53 roadmap, the Phase 56 closeout packet, and the repo-local Corporate Actions reuse hooks (`data/build_tri.py`, `tests/test_build_tri.py`, `core/instrument_mapper.py`, `scripts/generate_instrument_mapping.py`, `backtests/event_study_csco.py`, `scripts/phase56_pead_runner.py`), then published `D-318` as planning-only with execution still blocked.
+- Guardrail for next time: Before publishing any next-phase kickoff, reopen the roadmap and the real hook files first; never imply that missing hooks exist, that the predecessor phase reopened, or that execution is authorized before the repo SSOT says so.
+- Evidence paths: `docs/phase_brief/phase53-brief.md`, `docs/phase_brief/phase56-brief.md`, `docs/phase_brief/phase57-brief.md`, `docs/handover/phase57_kickoff_memo_20260318.md`, `docs/decision log.md`, `docs/context/current_context.md`, `docs/context/current_context.json`, `docs/saw_reports/saw_phase57_d318_kickoff_20260318.md`
+
+## 2026-03-18 Round Entry (Sparse Event Sleeves Must Reindex the Full Trading Calendar)
+- Date: 2026-03-18
+- Mistake or miss: A first draft of the Phase 57 Corporate Actions runner risked simulating only sparse event dates, which would have let the engine carry positions until the next event date instead of executing a bounded next-day / one-day hold.
+- Root cause: Event-driven candidate selection was treated as if it were the execution calendar, but `core.engine.run_simulation` shifts exposures over the index actually provided to it.
+- Fix applied: Reindexed the Phase 57 target-weight matrix to the full trading calendar from `prices.parquet`, forced zero weights on non-event dates, and added focused tests for the full-calendar contract before publishing the first bounded evidence packet.
+- Guardrail for next time: Any sparse event sleeve must build target weights on the full trading calendar before calling `core.engine.run_simulation`; never pass an event-only index unless the intended holding period is explicitly that sparse schedule.
+- Evidence paths: `scripts/phase57_corporate_actions_runner.py`, `tests/test_phase57_corporate_actions_runner.py`, `data/processed/phase57_corporate_actions_summary.json`, `data/processed/phase57_corporate_actions_evidence.csv`
+
+## 2026-03-18 Round Entry (Long Closeout Evidence Captures Must Escape the Interactive Shell Host)
+- Date: 2026-03-18
+- Mistake or miss: A monolithic interactive-shell capture of the full pytest closeout evidence for Phase 57 repeatedly died near completion and left partial logs.
+- Root cause: The interactive shell host was the unstable layer (`powershell.exe` AppHang / interruption), not a proven pytest or memory failure.
+- Fix applied: Re-ran the full-suite closeout capture through a detached file-backed invocation and accepted only the atomic stdout / stderr / status artifact set once it completed successfully.
+- Guardrail for next time: For long phase-end evidence captures, prefer detached or file-backed invocations over one monolithic interactive shell command; if a partial evidence file appears without a terminal status, delete it and rerun atomically.
+- Evidence paths: `docs/context/e2e_evidence/phase57_closeout_full_pytest_20260318.stdout.log`, `docs/context/e2e_evidence/phase57_closeout_full_pytest_20260318.stderr.log`, `docs/context/e2e_evidence/phase57_closeout_full_pytest_20260318.status.txt`
+
+## 2026-03-18 Round Entry (Governance Packets Must Separate Comparable Sleeves From Reference-Only Families)
+- Date: 2026-03-18
+- Mistake or miss: A first instinct for the Phase 58 Governance Layer packet could have mixed allocator-governance artifacts directly into the same-window / same-cost event-sleeve comparator surface.
+- Root cause: All governance artifacts are related conceptually, but not all of them are comparable on the same execution surface.
+- Fix applied: Kept the first bounded Phase 58 packet on the comparable event-sleeve family only (`Phase 56`, `Phase 57`) and carried the Phase 55 allocator summary as explicit `reference_only` context rather than inventing false comparability.
+- Guardrail for next time: When building a governance packet, separate `comparable same-window/same-cost/same-engine` families from `reference_only` families explicitly; never force a mixed packet to look uniform if the source surfaces are not truly comparable.
+- Evidence paths: `scripts/phase58_governance_runner.py`, `tests/test_phase58_governance_runner.py`, `data/processed/phase58_governance_summary.json`, `data/processed/phase58_governance_evidence.csv`, `data/processed/phase58_governance_delta_vs_c3.csv`
+
+## 2026-03-18 Round Entry (Phase 59 Kickoff Must Inventory Live Shadow Hooks, Not Historical Path Assumptions)
+- Date: 2026-03-18
+- Mistake or miss: The historical Phase 53 roadmap pointed to several Shadow Portfolio hook paths that no longer exist at those exact locations in the current repo.
+- Root cause: Roadmap lineage and current code layout drifted over time, so a planning packet could have overstated live implementation surfaces by trusting the old path list literally.
+- Fix applied: Re-checked the repo-local shadow-related surfaces before publishing `D-327`, kept the kickoff inventory to the current read-only research connector/catalog surfaces plus historical `phase50_shadow_ship` artifacts that still exist on disk, and marked the missing query/alert/dashboard hooks explicitly as missing rather than implied.
+- Guardrail for next time: Before any planning-only kickoff, verify every cited reuse hook exists at the current path; if a historical roadmap path is stale, record it as missing and do not imply the implementation surface is still live.
+- Evidence paths: `docs/phase_brief/phase59-brief.md`, `docs/handover/phase59_kickoff_memo_20260318.md`, `data/research_connector.py`, `research_data/catalog.duckdb`, `data/processed/phase50_shadow_ship/gate_recommendation.json`
+
+## 2026-03-18 Round Entry (Phase 59 Shadow Packet Must Split Research and Reference Lanes Explicitly)
+- Date: 2026-03-18
+- Mistake or miss: The first implementation instinct for Phase 59 could have implied that the read-only research lane and the historical shadow-reference lane shared one uniform holdings/turnover contract.
+- Root cause: The Phase 53 research kernel exposes bounded return/state rows through `allocator_state`, while the Phase 50 shadow artifacts expose positions/turnover/telemetry; those surfaces are related but not identical.
+- Fix applied: Implemented `phase59_shadow_portfolio` as two explicit lanes: a research-side Shadow NAV query and a reference-only Phase 50 alert contract, then carried the distinction into the summary/delta artifacts, brief, and notes.
+- Guardrail for next time: When a packet combines historical monitoring artifacts with research-kernel artifacts, separate `research-comparable` and `reference-only operational` lanes explicitly; do not infer missing holdings/turnover fields from a return-only catalog.
+- Evidence paths: `data/phase59_shadow_portfolio.py`, `scripts/phase59_shadow_portfolio_runner.py`, `views/shadow_portfolio_view.py`, `tests/test_phase59_shadow_portfolio.py`, `data/processed/phase59_shadow_summary.json`, `data/processed/phase59_shadow_delta_vs_c3.csv`
+
+## 2026-03-18 Round Entry (Release Controller Reintroduced Windows os.kill PID Probe)
+- Date: 2026-03-18
+- Mistake or miss: `scripts/release_controller.py` reintroduced `os.kill(pid, 0)` for stale-lock owner liveness on Windows, repeating a previously logged cross-platform lock probe bug and destabilizing the pytest tail.
+- Root cause: The earlier Windows lock-liveness guardrail lived in `docs/lessonss.md` but had not yet been promoted into repo-level engineering policy, so the anti-pattern resurfaced in a different lock implementation.
+- Fix applied: Replaced the Windows path in `release_controller` with a WinAPI-based non-destructive process liveness query, reran the affected release-controller tests, and promoted the guardrail into `AGENTS.md`.
+- Guardrail for next time: For any lock owner / stale-lock liveness check, never use `os.kill(pid, 0)` on Windows; require an OS-native query and treat any recurrence as a repo-policy violation.
+- Evidence paths: `scripts/release_controller.py`, `tests/test_release_controller.py`, `AGENTS.md`, `docs/context/e2e_evidence/phase59_targeted_tests_20260318.status.txt`, `docs/context/e2e_evidence/phase59_full_pytest_20260318.status.txt`
+
+## 2026-03-18 Round Entry (Phase 59 Review and Closeout Must Cite Artifact Truth Only)
+- Date: 2026-03-18
+- Mistake or miss: The first Phase 59 execution summary risked collapsing `implementation`, `review`, and `closeout` into one packet label, which weakened the explicit evidence-review gate expected by the repo governance pattern.
+- Root cause: The bounded packet implementation completed in one round, but the repo governance contract still requires a separate evidence-only review state and a distinct closeout state even when the technical work is already done.
+- Fix applied: Recast `D-329` as the formal evidence-only / no-promotion / no-widening review packet citing only on-disk Phase 59 artifact fields, then published `D-330` as the closeout packet with the same SSOT artifacts unchanged.
+- Guardrail for next time: When a bounded packet finishes in one round, still publish a distinct `execution -> review -> closeout` governance sequence; the review packet must cite only artifact truth, and the closeout packet must reuse the same immutable SSOT artifacts.
+- Evidence paths: `docs/decision log.md`, `docs/phase_brief/phase59-brief.md`, `docs/handover/phase59_handover.md`, `docs/saw_reports/saw_phase59_d329_d330_closeout_20260318.md`
+
+## 2026-03-18 Round Entry (Phase 60 Planning-Only Kickoff Must Freeze Contracts Before Implementation Tokens)
+- Date: 2026-03-18
+- Mistake or miss: Stable-shadow follow-up discussion was close to carrying unresolved contracts (unified comparator surface, cost basis, post-2022 audit shape, allocator eligibility) as implied assumptions instead of explicit planning inputs.
+- Root cause: The roadmap named Phase 60, but the four execution-critical contracts were not yet frozen in one planning-only artifact after the Phase 59 closeout.
+- Fix applied: Published `D-331`, created `docs/phase_brief/phase60-brief.md`, created `docs/handover/phase60_kickoff_memo_20260318.md`, and refreshed `docs/context/bridge_contract_current.md` so the four contracts are explicit while implementation remains blocked.
+- Guardrail for next time: Before any new phase spans multiple prior evidence surfaces, lock comparator surface, cost basis, audit spec, and eligibility rules in docs before any implementation token is allowed.
+- Evidence paths: `docs/decision log.md`, `docs/phase_brief/phase60-brief.md`, `docs/handover/phase60_kickoff_memo_20260318.md`, `docs/context/bridge_contract_current.md`, `docs/context/current_context.md`, `docs/context/current_context.json`
 

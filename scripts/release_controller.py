@@ -91,6 +91,27 @@ def _parse_lock_pid(raw_pid: str | None) -> int | None:
 
 
 def _pid_is_alive(pid: int) -> bool:
+    # Windows cannot safely use os.kill(pid, 0) as a non-destructive liveness probe.
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        STILL_ACTIVE = 259
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        if not handle:
+            last_error = ctypes.get_last_error()
+            return last_error == 5
+        try:
+            exit_code = wintypes.DWORD()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                last_error = ctypes.get_last_error()
+                return last_error == 5
+            return exit_code.value == STILL_ACTIVE
+        finally:
+            kernel32.CloseHandle(handle)
+
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
