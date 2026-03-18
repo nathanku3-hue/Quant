@@ -31,3 +31,9 @@ docs/context/e2e_evidence/archive/
 
 # Research data (intermediate artifacts, not source of truth)
 research_data/
+
+# Bootstrap/stale worker coordination artifacts (Phase 24 legacy)
+docs/context/dispatch_manifest.json
+docs/context/worker_reply_packet.json
+docs/context/worker_status_aggregate.json
+docs/context/phase_end_logs/
