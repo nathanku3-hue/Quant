@@ -1,5 +1,7 @@
 # MEMO: Phase 59 First Bounded Execution - Shadow Portfolio
 
+Historical note: this memo captured the bounded execution packet at publication time. The authoritative closeout state is now [phase59_handover.md](E:/Code/Quant/docs/handover/phase59_handover.md), which records the `D-329` review / hold and `D-330` closeout disposition.
+
 ## Scope
 - `D-328` consumes the exact `approve next phase` token for the first bounded Phase 59 packet only.
 - `D-329` implements a read-only Shadow NAV / alert surface over:

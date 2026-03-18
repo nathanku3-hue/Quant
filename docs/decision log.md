@@ -3910,33 +3910,106 @@ Phase 59 (2026-03-18): Bounded Execution Authorization - Shadow Portfolio (D-328
   - Rollback note:
     - revert only this `D-328` entry plus the synchronized Phase 59 execution-authorization docs/context/SAW edits if leadership amends wording; do not alter `D-327`, `D-326`, prior-sleeve SSOT artifacts, or the `D-292` research kernel.
 
-Phase 59 (2026-03-18): First Bounded Shadow NAV / Alert Packet - Evidence Only / No Promotion / No Widening (D-329) 🟢
+Phase 59 (2026-03-18): First Bounded Shadow NAV / Alert Evidence Review - Evidence Only / No Promotion / No Widening (D-329) 🔵
 
   - Decision record:
-    - implement the smallest bounded Phase 59 read-only Shadow NAV / alert slice, publish the first summary / evidence / delta artifacts, add a dashboard reader, and keep promotion blocked.
+    - review the first bounded Phase 59 Shadow Portfolio packet against the actual on-disk summary / evidence / delta schema, publish an evidence-only disposition, and keep promotion or widening blocked absent a separate explicit review packet.
   - The Decision (Hardcoded):
-    - `scripts/phase59_shadow_portfolio_runner.py` is the bounded Phase 59 runner for this packet.
-    - `selected_variant = argmax(selection_count, median_outer_test_sharpe, variant_id_ascending)` over `data/processed/phase55_allocator_cpcv_evidence.json::fold_results`.
-    - the research lane uses `allocator_state(period_return_{selected_variant,t})`, reindexed to the bounded `2015-01-01 -> 2022-12-31` business-day window with `0` on unobserved dates, to produce the first Shadow NAV surface.
-    - the reference-only alert lane uses `data/processed/phase50_shadow_ship/phase50_curve_full_20260410.csv`, `phase50_aggregated_telemetry_20260410.json`, and the day1/day30 positions files to publish `holdings_overlap`, `gross_exposure_delta`, `turnover_delta_abs`, and `turnover_delta_rel`.
-    - `data/phase59_shadow_portfolio.py`, `views/shadow_portfolio_view.py`, and the bounded `dashboard.py` tab hook remain read-only consumers of the research catalog and historical shadow artifacts.
-    - no mutation of `research_data/`, no post-2022 expansion, no stable shadow / multi-sleeve execution, and no production promotion are authorized here.
+    - `data/processed/phase59_shadow_summary.json` is the authoritative summary artifact for this packet.
+    - the authoritative review fields currently under assessment are `packet_id = PHASE59_SHADOW_MONITOR_V1`, `same_window_same_cost_same_engine = true`, `selected_variant.variant_id = v_3516a4bd6b65`, `selected_variant.sharpe = -0.8036313887871052`, `selected_variant.cagr = -0.05889864053976657`, `selected_variant.max_dd = -0.4151519743100388`, `selected_variant.ulcer = 31.866947767982605`, `shadow_reference.alert_level = RED`, `shadow_reference.holdings_overlap = 0.0`, `shadow_reference.gross_exposure_delta = 0.9999999999999998`, and `shadow_reference.turnover_delta_rel = 0.0019000000000000006`.
+    - `data/processed/phase59_shadow_evidence.csv` remains the authoritative daily evidence surface for the research lane plus the reference-only Phase 50 curve lane.
+    - `data/processed/phase59_shadow_delta_vs_c3.csv` remains the authoritative structural comparator / alert surface for this bounded packet.
+    - no invented unified holdings surface, promotion language, or widening language is authorized in `D-329` because the on-disk artifacts do not publish such a disposition.
+    - `D-328` remains the only execution authorization consumed in this phase so far; `D-329` is a review / hold packet only and does not widen the Phase 59 surface.
   - Evidence:
-    - `.venv\Scripts\python scripts/phase59_shadow_portfolio_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0`.
-    - `docs/handover/phase59_execution_memo_20260318.md` publishes the PM-facing execution memo for the first bounded packet.
-    - `data/processed/phase59_shadow_summary.json` -> `selected_variant = v_3516a4bd6b65`, `research_sharpe = -0.8036313887871052`, `research_cagr = -0.05889864053976657`, `shadow_reference_alert_level = RED`, `holdings_overlap = 0.0`, `gross_exposure_delta = 0.9999999999999998`, `turnover_delta_rel = 0.0019000000000000006`.
-    - `data/processed/phase59_shadow_evidence.csv` publishes the research-lane daily Shadow NAV series plus the reference-only Phase 50 curve lane.
-    - `data/processed/phase59_shadow_delta_vs_c3.csv` publishes the research-vs-C3 structural delta row plus the reference-only alert row.
+    - `data/processed/phase59_shadow_summary.json` -> `review_hold = true`, `review_hold_reasons = [phase59_shadow_research_sharpe_delta < 0, phase59_shadow_research_cagr_delta < 0, phase50_shadow_reference_alert_level = RED]`.
+    - `data/processed/phase59_shadow_evidence.csv` publishes `phase59_shadow_research` and `phase50_shadow_reference` rows as separate lanes.
+    - `data/processed/phase59_shadow_delta_vs_c3.csv` -> `phase59_shadow_research.sharpe_delta = -1.2836914115505547`, `phase59_shadow_research.cagr_delta = -0.14905579651624656`, `phase50_shadow_reference_alerts.alert_level = RED`.
+    - `docs/phase_brief/phase59-brief.md` is updated to the review / hold state and `docs/context/current_context.md` / `docs/context/current_context.json` are refreshed from that SSOT.
+  - Contract lock:
+    - `Phase59_D329_Review := VALID iff (review wording cites only fields present in phase59_shadow_summary.json, phase59_shadow_evidence.csv, or phase59_shadow_delta_vs_c3.csv) and (no promotion or widening language is introduced)`.
+    - `if future promotion, widening, stable shadow execution, or post-2022 work is proposed -> require a new explicit review packet; D-329 is not that approval`.
+  - Open risks:
+    - the research lane remains below the locked C3 baseline on Sharpe / CAGR and the reference-only alert lane is `RED`, so the first bounded packet remains evidence-only.
+  - Rollback note:
+    - revert only this `D-329` entry plus the synchronized Phase 59 brief/context/lesson/SAW edits if leadership amends the review wording; do not alter `D-328`, `D-327`, `D-326`, prior-sleeve SSOT artifacts, or the `D-292` research kernel.
+
+Phase 59 (2026-03-18): Closeout - Evidence Only / No Promotion / No Widening (D-330) 🟢
+
+  - Decision record:
+    - close Phase 59 as evidence-only / no promotion / no widening while preserving the bounded Shadow Portfolio surface and all prior locks.
+  - The Decision (Hardcoded):
+    - Phase 59 is closed; no promotion, widening, stable shadow execution, or new Shadow Portfolio work is authorized.
+    - `data/processed/phase59_shadow_summary.json`, `data/processed/phase59_shadow_evidence.csv`, and `data/processed/phase59_shadow_delta_vs_c3.csv` remain the SSOT artifacts for Phase 59.
+    - any follow-up Phase 59 work or any Phase 60 work requires a new explicit approval packet.
+  - Evidence:
     - focused tests: `.venv\Scripts\python -m pytest tests\test_phase59_shadow_portfolio.py tests\test_shadow_portfolio_view.py tests\test_release_controller.py -q` -> PASS (see `docs/context/e2e_evidence/phase59_targeted_tests_20260318.*`).
     - full regression: `.venv\Scripts\python -m pytest -q` -> PASS (see `docs/context/e2e_evidence/phase59_full_pytest_20260318.*`).
     - runtime smoke: `.venv\Scripts\python launch.py --help` -> PASS (see `docs/context/e2e_evidence/phase59_launch_smoke_20260318.*`).
     - bounded replay: `.venv\Scripts\python scripts/phase59_shadow_portfolio_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase59_shadow_replay_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase59_shadow_replay_evidence_20260318.csv --delta-path docs\context\e2e_evidence\phase59_shadow_replay_delta_vs_c3_20260318.csv` -> PASS.
     - reviewer-B bounded replay: `.venv\Scripts\python scripts/phase59_shadow_portfolio_runner.py --start-date 2015-01-01 --end-date 2022-12-31 --max-date 2022-12-31 --cost-bps 5.0 --summary-path docs\context\e2e_evidence\phase59_shadow_replay_revb_summary_20260318.json --evidence-path docs\context\e2e_evidence\phase59_shadow_replay_revb_evidence_20260318.csv --delta-path docs\context\e2e_evidence\phase59_shadow_replay_revb_delta_vs_c3_20260318.csv` -> PASS.
+    - PM handover: `docs/handover/phase59_handover.md`.
+    - context refresh: `.venv\Scripts\python scripts/build_context_packet.py` and `.venv\Scripts\python scripts/build_context_packet.py --validate` -> PASS.
   - Contract lock:
-    - `Phase59_D329_Packet := VALID iff (summary/evidence/delta artifacts are co-published) and (max_date <= 2022-12-31) and (research_data remains read-only) and (phase50 artifacts remain reference_only)`.
-    - `if future promotion, widening, stable shadow execution, or post-2022 work is proposed -> require a new explicit review packet; D-329 is the first bounded packet only`.
+    - `Phase59 := CLOSED iff (D-330 published) and (context packet refreshed) and (SSOT artifacts unchanged)`.
+    - `if future Phase 59 or Phase 60 work is proposed -> require a new explicit approval packet; D-330 is not an execution grant`.
   - Open risks:
-    - the research lane remains below the locked C3 baseline on Sharpe / CAGR and the reference lane emits a red alert state (`holdings_overlap = 0.0`, `gross_exposure_delta = 1.0`), so this packet remains evidence-only / no promotion / no widening.
+    - the bounded packet remains mixed (`selected_variant.sharpe < sharpe_c3`, `selected_variant.cagr < cagr_c3`; `shadow_reference.alert_level = RED`), so Phase 59 closes as no-promotion evidence only.
   - Rollback note:
-    - revert only the synchronized Phase 59 runner/view/test/docs/context/SAW edits from this round and remove `data/processed/phase59_*`; do not alter `D-328`, `D-327`, `D-326`, prior-sleeve SSOT artifacts, or the `D-292` research kernel.
+    - revert only this `D-330` entry plus the synchronized Phase 59 closeout docs/context/SAW edits; do not alter `D-329`, `D-328`, `D-327`, prior-sleeve SSOT artifacts, or the `D-292` research kernel.
+
+Phase 60 (2026-03-18): Planning-Only Kickoff - Stable Shadow Portfolio (D-331) 🔵
+
+  - Decision record:
+    - open Phase 60 as a docs-only planning surface for the Stable Shadow Portfolio roadmap item, lock the four planning contracts, and keep all implementation, post-2022 audit execution, and production promotion blocked pending a separate explicit approval token.
+  - The Decision (Hardcoded):
+    - Phase 60 is now active for planning only.
+    - `active_phase = 60` becomes the repo SSOT label only after this kickoff packet is published and the context packet is refreshed.
+    - Phase 59 remains closed and immutable under `D-330`; `data/processed/phase59_shadow_summary.json`, `data/processed/phase59_shadow_evidence.csv`, and `data/processed/phase59_shadow_delta_vs_c3.csv` remain permanent SSOT.
+    - Phase 58 remains closed and immutable under `D-326`; Phase 57 remains closed and immutable under `D-322`; Phase 56 remains closed and immutable under `D-317`; Phase 55 remains closed and immutable under `D-312`; the Phase 53 research kernel remains read-only and immutable under `D-292`.
+    - no Phase 60 implementation, no post-2022 audit execution, no code/evidence mutation, no `research_data/` mutation, no kernel reopen, and no production promotion are authorized in this round.
+    - the Phase 60 planning brief must lock these four planning contracts exactly:
+      - unified comparator surface = `Option B`: a governed daily holdings / weights cube built from sleeves plus allocator surfaces, with legacy `phase50_shadow_ship` artifacts remaining `reference_only` and excluded from governed comparator metrics.
+      - governed cost policy = `Option C`: `5.0` bps is the only gating comparator basis for same-window / same-cost evidence continuity; `10.0` bps is mandatory sensitivity-only evidence and is non-gating unless a later decision re-locks the basis.
+      - post-2022 audit spec = `Option A`: one integrated audit only, with mandatory preflight checks and kill switches defined before any holdout run is authorized.
+      - allocator carry-forward = `Option C`: allocator rows may exist in the planning cube, but allocator carry-forward is excluded from the governed book until research eligibility clears on the locked gate family.
+    - Phase 60 implementation requires a future explicit approval packet and the exact token `approve next phase`.
+  - Evidence:
+    - `docs/phase_brief/phase53-brief.md` roadmap bullet -> `Phase 60 - Stable Shadow Portfolio`.
+    - `docs/phase_brief/phase60-brief.md` publishes the planning-only boundary and locks the four planning contracts.
+    - `docs/handover/phase60_kickoff_memo_20260318.md` publishes the PM-facing kickoff memo.
+    - `docs/context/bridge_contract_current.md` is refreshed to the Phase 60 planning-only state.
+  - Contract lock:
+    - `Phase60 := PLANNING_ONLY iff (D-331 published) and (context packet refreshed) and (NextPhaseApproval == PENDING)`.
+    - `if future Phase 60 work is proposed -> require a separate explicit implementation approval packet; D-331 is not an execution grant`.
+  - Open risks:
+    - the family-level `SPA/WRC` remain above `0.05`, the Phase 54 core sleeve remains below promotion readiness (`gates_passed = 4/6`, `rule100_pass_rate = 0.10132320319432121`), the current allocator-selected variant remains negative on Sharpe / CAGR, and the post-2022 holdout seal has not yet been opened.
+  - Rollback note:
+    - revert only this `D-331` entry plus the synchronized Phase 60 planning docs/context/lesson/SAW edits if leadership amends wording; do not alter `D-330`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-18): Complete Institutional Pivot Planning Snapshot (D-332) 🔵
+
+  - Decision record:
+    - incorporate the Complete Institutional Pivot snapshot into Phase 60 planning as the first deliverable, lock validator fix as Priority #1, confirm Method B as the planning default for S&P 500 Pro / Moody's B&D sidecars, and tie this snapshot explicitly to the unified governed surface contract already approved in D-331.
+  - The Decision (Hardcoded):
+    - the next data milestone is "Complete Institutional Pivot" on the already-in-place PIT-clean CRSP/Compustat 2000-2024 bedrock with zero from-scratch replacement required.
+    - operational validator failures (14-day feature freshness gap + 2 zombie snapshot rows) must be cleared immediately per industry standard before any reliable pipeline testing.
+    - S&P 500 Pro / Moody's B&D designation is resolved at 92/100 confidence by preferred Method B: isolated Parquet sidecars joined only at view level (exactly like Osiris) to protect the governed core updater schema and enable parallel deep-credit/factor testing.
+    - no expert delegation is required; Method B is the right planning default with no low-certainty gaps remaining.
+    - the hybrid institutional lake distinguishes CRSP/Compustat (PIT-clean 2000-2024 bedrock, governed core) from Osiris (isolated Parquet sidecar, view-layer join only) and S&P/Moody's (Method B preferred: isolated Parquet sidecars, view-layer join) without opening any false-premise milestone.
+    - Yahoo sidecars remain separate from the institutional lake.
+    - out-of-boundary ingestion keys/schema mappings that violate the governed core updater schema are flagged and blocked from any execution at 100/100 confidence.
+    - Phase 60 planning deliverables are locked: (1) validator fix (14-day freshness gap + 2 zombie snapshot rows) as Priority #1, (2) Method B preference locked for S&P/Moody's sidecars, (3) out-of-boundary ingestion block enforced.
+    - D-284 through D-331 remain immutable; RESEARCH_MAX_DATE = 2022-12-31 remains in force; no code/evidence/execution surface changes during planning; prior SSOT artifacts remain unchanged.
+  - Evidence:
+    - `docs/phase_brief/phase60-brief.md` section 0.5 publishes the Complete Institutional Pivot planning snapshot verbatim.
+    - `docs/context/current_context.md` and `docs/context/current_context.json` are refreshed to reflect planning-only state with validator fix as deliverable #1.
+    - `docs/context/bridge_contract_current.md` is refreshed to the Phase 60 planning-only state with D-332 authority.
+  - Contract lock:
+    - `Phase60_Institutional_Pivot := PLANNING_ONLY iff (D-332 published) and (validator fix Priority #1) and (Method B locked) and (out-of-boundary block enforced) and (context packet refreshed)`.
+    - `if future Phase 60 implementation is proposed -> validator PASS is mandatory before any sidecar testing or data-milestone execution path opens`.
+  - Open risks:
+    - the 14-day feature freshness gap and 2 zombie snapshot rows remain uncleared; validator PASS is the critical blocker for any reliable pipeline testing.
+  - Rollback note:
+    - revert only this `D-332` entry plus the synchronized Phase 60 planning docs/context edits if leadership amends wording; do not alter `D-331`, `D-330`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
 

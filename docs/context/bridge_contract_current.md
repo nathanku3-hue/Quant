@@ -1,14 +1,14 @@
 # Bridge Contract - Current
 
 Status: Current integration bridge  
-Authority: advisory-only PM/planner bridge. This file does not authorize promotion or scope widening beyond the bounded Phase 59 packet.  
+Authority: advisory-only PM/planner bridge. This file does not authorize Phase 60 implementation, post-2022 audit execution, promotion, or scope widening beyond the `D-331` and `D-332` planning-only packets.  
 Purpose: connect Quant's current technical closeout state back to planner truth and product/system truth.
 
 ## Header
-- `BRIDGE_ID`: `20260318-phase59-system-bridge`
+- `BRIDGE_ID`: `20260318-phase60-system-bridge`
 - `DATE_UTC`: `2026-03-18`
-- `SCOPE`: `Phase 58 governance closeout and Phase 59 bounded Shadow Portfolio execution packet`
-- `STATUS`: `executing-bounded-packet`
+- `SCOPE`: `Phase 60 planning-only Stable Shadow kickoff`
+- `STATUS`: `planning-only`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
@@ -18,46 +18,51 @@ Purpose: connect Quant's current technical closeout state back to planner truth 
 - `top_level_PM.md`
 - `README.md`
 - `docs/decision log.md`
-- `docs/phase_brief/phase59-brief.md`
+- `docs/phase_brief/phase60-brief.md`
 
 ## Live Truth Now
-- `SYSTEM_NOW`: `Quant is currently a Multi-Sleeve Research Kernel plus Governance Stack with bounded Phase 56 / 57 / 58 evidence surfaces and one bounded Phase 59 Shadow Portfolio monitoring packet implemented on a read-only research plus reference-only shadow surface.`
-- `ACTIVE_SCOPE`: `Phase 59 bounded Shadow NAV / alert packet review.`
-- `BLOCKED_SCOPE`: `Any Phase 59 promotion, widening, stable shadow stack execution, post-2022 expansion, or kernel mutation remains blocked.`
+- `SYSTEM_NOW`: `Quant is currently a Multi-Sleeve Research Kernel plus Governance Stack with bounded Phase 56 / 57 / 58 / 59 evidence surfaces preserved as immutable SSOT and an active Phase 60 planning-only contract lock.`
+- `ACTIVE_SCOPE`: `Phase 60 planning-only kickoff / contract-lock state.`
+- `BLOCKED_SCOPE`: `Any Phase 60 implementation, any post-2022 audit execution, any production promotion, any research_data mutation, and any kernel mutation remain blocked.`
 
 ## What Changed This Round
-- `SYSTEM_DELTA`: `The system now has a bounded Phase 59 Shadow NAV / alert surface that connects the read-only `allocator_state` catalog to dashboard-visible artifacts while preserving Phase 50 shadow telemetry as reference-only context.`
-- `EXECUTION_DELTA`: `Phase 59 consumed the exact approval token, implemented `phase59_shadow_portfolio_runner.py`, persisted `phase59_*` artifacts, and added a minimal dashboard reader without reopening the research kernel.`
-- `NO_CHANGE`: `Promotion is still blocked, prior sleeves remain immutable SSOT, and the same-window / same-cost / same-engine discipline remains unchanged where comparator evidence applies.`
+- `SYSTEM_DELTA`: `The system now has an explicit Phase 60 planning-only contract set for the Stable Shadow roadmap step: unified governed comparator surface, governed cost policy, integrated post-2022 audit preflight, and allocator carry-forward exclusion. D-332 adds the Complete Institutional Pivot planning snapshot with validator fix as Priority #1, Method B locked for S&P/Moody's sidecars, and out-of-boundary ingestion block enforced.`
+- `EXECUTION_DELTA`: `No execution occurred. The round published D-331, D-332, the Phase 60 planning brief with institutional pivot snapshot, the kickoff memo, and the refreshed planner bridge/context state while keeping implementation blocked.`
+- `NO_CHANGE`: `Promotion is still blocked, prior sleeves remain immutable SSOT, RESEARCH_MAX_DATE = 2022-12-31 remains active, and the same-window / same-cost / same-engine discipline remains unchanged where comparator evidence applies.`
 
 ## PM / Product Delta
-- `STRONGER_NOW`: `The repo now exposes a real read-only Shadow Portfolio monitoring surface with persisted artifacts, a dashboard reader, and a governance-stamped alert contract.`
-- `WEAKER_NOW`: `The Phase 59 packet is still split into a research lane and a reference-only operational lane because the repo does not yet expose one unified governed holdings/turnover surface.`
-- `STILL_UNKNOWN`: `How Phase 60 should fuse the research lane and the operational shadow lane into one stable multi-sleeve shadow book without inventing non-existent source fields.`
+- `STRONGER_NOW`: `The repo now has one explicit planning contract for how a future Stable Shadow scope must be structured without inventing comparability or silently reopening the post-2022 seal. The Complete Institutional Pivot snapshot locks validator fix as Priority #1 and Method B as the planning default for S&P/Moody's sidecars.`
+- `WEAKER_NOW`: `The governed daily holdings / weights cube is still a planning artifact only; no implementation or holdout evidence exists yet. Validator failures (14-day freshness gap + 2 zombie snapshot rows) remain uncleared.`
+- `STILL_UNKNOWN`: `Whether a later explicit implementation packet will be granted after the Phase 60 planning brief is reviewed.`
 
 ## Planner Bridge
-- `OPEN_DECISION`: `Should the next approved work review the bounded Phase 59 packet as evidence-only first, or jump directly into Phase 60 stable shadow stack construction?`
-- `RECOMMENDED_NEXT_STEP`: `Review the first bounded Phase 59 packet as evidence-only / no-promotion / no-widening, then decide whether Phase 60 should add the missing unified holdings/turnover surface.`
-- `WHY_THIS_NEXT`: `The bounded packet now exists, but its red alert state and split-lane data model mean the repo still needs an explicit review before any larger shadow-stack scope is opened.`
-- `NOT_RECOMMENDED_NEXT`: `Do not widen directly into Phase 60 without reviewing the bounded packet. That would skip the evidence checkpoint on the first Shadow Portfolio surface.`
+- `OPEN_DECISION`: `Should the bounded Phase 60 planning brief with Complete Institutional Pivot snapshot be accepted as the only valid contract for any later implementation packet?`
+- `RECOMMENDED_NEXT_STEP`: `Clear validator failures (14-day freshness gap + 2 zombie snapshot rows) as Priority #1, review docs/phase_brief/phase60-brief.md, keep implementation blocked, and require a later explicit approve next phase token before any code or post-2022 audit run starts.`
+- `WHY_THIS_NEXT`: `The planning-only round has now resolved the scope-choice ambiguity and locked the institutional pivot snapshot, so the correct next action is validator fix followed by governance review of the locked contracts rather than silent implementation drift.`
+- `NOT_RECOMMENDED_NEXT`: `Do not implement the unified cube, do not run the post-2022 audit, and do not promote allocator or core-sleeve inputs without a later explicit implementation packet. Do not open any sidecar testing or data-milestone execution path until validator PASS is achieved.`
 
 ## Locked Boundaries
 - `DO_NOT_REDECIDE`:
-  - `Phase 58 is closed under D-326 as evidence-only / no promotion / no widening.`
-  - `Prior sleeve SSOT artifacts for Phases 55 / 56 / 57 / 58 remain immutable.`
+  - `Phase 59 is closed under D-330 as evidence-only / no promotion / no widening.`
+  - `Prior sleeve / governance / shadow SSOT artifacts for Phases 55 / 56 / 57 / 58 / 59 remain immutable.`
   - `RESEARCH_MAX_DATE = 2022-12-31 and the same-window / same-cost / core.engine.run_simulation evidence gate remain active.`
 - `BLOCKED_UNTIL`:
-  - `Any Phase 59 promotion, widening, stable shadow execution, or post-2022 expansion requires a separate explicit review packet.`
-  - `Any scope that mutates `research_data/` or reopens prior sleeves remains blocked.`
+  - `Any Phase 60 implementation, stable shadow execution, or post-2022 audit execution requires a separate explicit approval packet.`
+  - `Any scope that mutates research_data or reopens prior sleeves remains blocked.`
+  - `Allocator carry-forward and core-sleeve promotion remain blocked until later approved eligibility evidence exists.`
 
 ## Evidence Used
 - `docs/context/current_context.md`
-- `docs/phase_brief/phase59-brief.md`
-- `docs/handover/phase59_execution_memo_20260318.md`
+- `docs/phase_brief/phase60-brief.md`
+- `docs/handover/phase60_kickoff_memo_20260318.md`
 - `data/processed/phase59_shadow_summary.json`
-- `data/processed/phase59_shadow_delta_vs_c3.csv`
+- `data/processed/phase58_governance_summary.json`
+- `data/processed/phase54_core_sleeve_summary.json`
+- `data/processed/phase55_allocator_cpcv_evidence.json`
 - `README.md`
 
 ## Open Risks
-- `The bounded packet currently shows red reference alerts and a research lane below the locked C3 baseline, so the surface is evidence-only and not promotion-ready.`
-- `Phase 59 still lacks a unified governed holdings/turnover surface, so Phase 60 planning must avoid implying that the research lane and operational lane are already one stack.`
+- `Validator failures (14-day feature freshness gap + 2 zombie snapshot rows) remain uncleared and block reliable pipeline testing.`
+- `Family-level governance still fails the 5% threshold (event_family_spa_p = 0.066, event_family_wrc_p = 0.086), so the event family is not yet promotion-ready.`
+- `The core sleeve remains below promotion readiness (gates_passed = 4/6, rule100_pass_rate = 0.10132320319432121), so it can only be treated as a planning input.`
+- `The allocator-selected variant remains negative on Sharpe / CAGR and allocator carry-forward is therefore excluded from governed use until eligibility clears.`
