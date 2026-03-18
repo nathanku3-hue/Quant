@@ -43,6 +43,9 @@ Use these surfaces together to understand the current system state:
 - **[docs/context/planner_packet_current.md](docs/context/planner_packet_current.md)** — compact fresh-context packet for planner (current context, active brief, bridge truth, decision tail, blocked next step, active bottleneck)
 - **[docs/context/impact_packet_current.md](docs/context/impact_packet_current.md)** — impact view for planner (changed files, owned files, touched interfaces, failing checks)
 
+### Observability
+- **[docs/context/observability_pack_current.md](docs/context/observability_pack_current.md)** — drift detection markers (high-risk attempts, stuck sessions, skill under-triggering, budget pressure, compaction/hallucination pressure)
+
 These surfaces follow the SOP governance kernel (see `E:\code\SOP\ENDGAME.md` for the full truth model).
 
 ## Quick Start
