@@ -12,15 +12,12 @@ This system implements a multi-phase quantitative trading strategy with:
 
 ## Project Status
 
-**Current Phase**: Phase 35 Closed and Pivoted 🔄
-- **Phase 34**: Attribution pipeline production-ready ✅
-  - All 17 tests passing
-  - Accounting identity verified (error < 1e-14)
-- **Phase 35 (candidate/reweight branch)**: Closed due to blockers 🚫
-  - Invalid experiments (missing data columns)
-  - Model misspecification (R² = -17.85)
-  - Turnover crisis (90-100% daily)
-- **Next**: Data engineering + model fixes, or pivot to Rule of 100 integration
+**Current Phase**: Phase 59 (Shadow Portfolio) — Bounded Packet Execution 🔄
+- **Phase 59 Status**: Bounded read-only Shadow NAV / alert surface implemented (D-329)
+  - Evidence-only / no promotion / no widening
+  - Red reference alerts (research lane below C3 baseline)
+  - Split research/operational lanes (unified surface pending Phase 60)
+- **Next**: PM/CEO bounded packet review before Phase 60 stable shadow stack decision
 
 ## Current Truth Surfaces
 

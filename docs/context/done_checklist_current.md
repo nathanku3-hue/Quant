@@ -85,9 +85,9 @@ pytest tests/test_shadow_portfolio_view.py -v
 # Prior sleeve SSOT immutable
 git diff --exit-code data/processed/phase54_core_sleeve_summary.json
 git diff --exit-code data/processed/phase55_allocator_cpcv_evidence.json
-git diff --exit-code data/processed/phase56_pead_evidence.json
-git diff --exit-code data/processed/phase57_governance_evidence.json
-git diff --exit-code data/processed/phase58_governance_layer_evidence.json
+git diff --exit-code data/processed/phase56_pead_evidence.csv
+git diff --exit-code data/processed/phase57_corporate_actions_evidence.csv
+git diff --exit-code data/processed/phase58_governance_evidence.csv
 ```
 
 ### Fail Conditions
