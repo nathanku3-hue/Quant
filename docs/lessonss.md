@@ -466,6 +466,14 @@ Application pattern:
 - Guardrail for next time: When a phase is being closed as a blocked hold, stamp the closed status explicitly and keep the blocked root cause verbatim; do not imply that closeout itself authorizes remediation or next-phase work.
 - Evidence paths: `docs/phase_brief/phase60-brief.md`, `docs/decision log.md`, `docs/context/bridge_contract_current.md`, `docs/handover/phase60_execution_handover_20260318.md`, `docs/context/current_context.md`, `docs/context/current_context.json`
 
+## 2026-03-20 Round Entry (Readonly Repair Extracts Must Persist the Frozen Missing-Cell Manifest)
+- Date: 2026-03-20
+- Mistake or miss: The frozen `D-341` review packet preserved the exact missing-cell count (`274`) but not the exact `(date, permno)` manifest needed for later readonly repair extracts, while the current live comparator reconstruction had already drifted to `275`.
+- Root cause: The evidence-only blocked review locked count-level truth but did not publish the concrete missing-cell roster, which forced downstream extraction to infer the affected universe from a drifted live reconstruction.
+- Fix applied: Generated additive-only readonly CUSIP output artifacts for the inferred single-name universe (`PERMNO 86544 -> CUSIP 095229100`), anchored the round to the D-341 count as the authority surface, and published an evidence summary that records the live `274` vs `275` drift explicitly.
+- Guardrail for next time: Whenever a blocked evidence packet may feed a later repair or sidecar-prep step, persist the frozen `(date, permno)` manifest in the same round as the count-level review packet so later extracts do not have to infer scope from mutable live data.
+- Evidence paths: `data/processed/d341_missing_executed_exposure_cusips.txt`, `data/processed/d341_missing_executed_exposure_permno_cusip.csv`, `data/processed/d341_missing_executed_exposure_permno_cusip.parquet`, `docs/context/e2e_evidence/phase60_d350_cusip_extract_20260320_summary.json`, `docs/saw_reports/saw_phase60_d350_cusip_extract_20260320.md`
+
 ## 2026-03-19 Round Entry (Phase 60 Kernel Mutation Blocked Reaffirmation)
 - Date: 2026-03-19
 - Mistake or miss: During Phase 60 review, a technical proposal attempted to remediate the exact 274-cell KS-03 gap by altering core engine defaults (`strict_missing_returns`) and snapshot hashing mechanisms.

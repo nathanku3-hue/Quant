@@ -34,123 +34,100 @@ docs/context/bridge_contract_current.md
 docs/phase_brief/phase60-brief.md
 docs/handover/phase60_handover.md
 docs/handover/phase60_execution_handover_20260318.md
-docs/handover/phase59_execution_memo_20260318.md
-docs/handover/phase59_kickoff_memo_20260318.md
-docs/decision log.md (D-327, D-328, D-329, D-330)
+docs/decision log.md (D-337 through D-348)
+README.md
 ```
 
 ## Owned Files
 
-Files owned by Phase 59 Shadow Portfolio stream:
+Files owned by Phase 60 Stable Shadow Portfolio stream:
 
 ```
-data/phase59_shadow_portfolio.py
-scripts/phase59_shadow_portfolio_runner.py
-views/shadow_portfolio_view.py
-tests/test_phase59_shadow_portfolio.py
-tests/test_shadow_portfolio_view.py
-data/processed/phase59_shadow_summary.json
-data/processed/phase59_shadow_evidence.csv
-data/processed/phase59_shadow_delta_vs_c3.csv
-docs/phase_brief/phase59-brief.md
-docs/handover/phase59_*.md
-docs/saw_reports/saw_phase59_*.md
+scripts/phase60_preflight_verify.py
+scripts/phase60_governed_audit_runner.py
+scripts/phase60_governed_cube_runner.py
+scripts/phase60_d341_blocked_audit_review.py
+tests/test_phase60_preflight_verify.py
+tests/test_phase60_governed_audit_runner.py
+tests/test_phase60_governed_cube_runner.py
+tests/test_phase60_d341_blocked_audit_review.py
+tests/test_phase60_d343_hygiene.py
+tests/test_phase60_d345_closeout.py
+data/processed/phase60_governed_cube.parquet
+data/processed/phase60_d340_preflight_*.json
+data/processed/phase60_d341_review_*.json
+docs/phase_brief/phase60-brief.md
+docs/handover/phase60_handover.md
+docs/handover/phase60_execution_handover_20260318.md
+docs/saw_reports/saw_phase60_*.md
+docs/context/e2e_evidence/phase60_*.status.txt
+docs/context/e2e_evidence/phase60_*.json
+docs/context/e2e_evidence/phase60_*.csv
 ```
 
 ## Touched Interfaces
 
-Interfaces modified or newly exposed in Phase 59:
+Interfaces modified or newly exposed in Phase 60:
 
-### Interface 1: `phase59_shadow_summary.json`
-- **Type**: Data schema (JSON artifact)
-- **Owner**: Backend (Phase 59 Shadow Portfolio stream)
-- **Changed**: New artifact created for Phase 59 bounded packet
-- **Consumers**: Frontend/UI (dashboard reader)
+### Interface 1: `phase60_governed_cube.parquet`
+- **Type**: Data schema (Parquet artifact)
+- **Owner**: Backend (Phase 60 Stable Shadow Portfolio stream)
+- **Changed**: New artifact created for Phase 60 governed daily holdings/weight cube
+- **Consumers**: Dashboard (read-only evidence surface)
 
-### Interface 2: `phase59_shadow_evidence.csv`
-- **Type**: Data schema (CSV evidence artifact)
-- **Owner**: Backend (Phase 59 Shadow Portfolio stream)
-- **Changed**: New artifact created for Phase 59 bounded packet
-- **Consumers**: Docs/Ops (evidence review), PM/CEO (bounded packet review)
+### Interface 2: `phase60_d340_audit_*.status.txt`
+- **Type**: Evidence artifact (status file)
+- **Owner**: Backend (Phase 60 Stable Shadow Portfolio stream)
+- **Changed**: Blocked audit evidence with 274-cell gap preserved
+- **Consumers**: Docs/Ops (evidence review), PM/CEO (closeout review)
 
-### Interface 3: `phase59_shadow_delta_vs_c3.csv`
-- **Type**: Data schema (CSV comparator delta)
-- **Owner**: Backend (Phase 59 Shadow Portfolio stream)
-- **Changed**: New artifact created for Phase 59 bounded packet
-- **Consumers**: Docs/Ops (evidence review), PM/CEO (bounded packet review)
+### Interface 3: `phase60_d341_review_*.csv`
+- **Type**: Evidence artifact (CSV findings)
+- **Owner**: Backend (Phase 60 Stable Shadow Portfolio stream)
+- **Changed**: Formal review findings confirming immutable blocked state
+- **Consumers**: Docs/Ops (evidence review), PM/CEO (closeout review)
 
-### Interface 4: Dashboard tab hook (bounded Phase 59 surface)
-- **Type**: UI component hook
-- **Owner**: Frontend/UI
-- **Changed**: New bounded tab hook added to `dashboard.py`
-- **Consumers**: PM/operators (dashboard monitoring)
+### Interface 4: Governance context refresh
+- **Owner**: Docs/Ops (Phase 60 closeout stream)
+- **Changed**: Context packet rebuild with Phase 60 closed state
+- **Consumers**: Planner, PM, future phases
 
 ## Failing Checks
 
-### Test Failures
+NONE (all Phase 60 tests passing)
 
-```
-NONE (all Phase 59 tests passing)
-```
+## Smoke Test Status
 
-### Lint/Type Failures
+PASS (Phase 60 closeout smoke passed)
 
-```
-NONE
-```
+## Stream Impact
 
-### Smoke Test Failures
+### Backend
+- **Phase 60 bounded packet complete**, no further work blocked
+- **Why affected**: Phase 60 implementation complete, closed as evidence-only hold
 
-```
-NONE (Phase 59 launch smoke passed)
-```
+### Frontend/UI
+- **Phase 60 dashboard reader complete**, no further work blocked
+- **Why affected**: Phase 60 bounded tab hook added (read-only)
 
-### CI/CD Failures
+### Data
+- **Phase 60 consumed read-only Phase 56/57 sleeve surfaces**
+- **Why affected**: Phase 60 aggregated governed cube from prior sleeves
+- **No mutation of prior sleeve SSOT**
 
-```
-NONE
-```
+### Docs/Ops
+- **Phase 60 governance artifacts complete**
+- **Why affected**: Phase 60 brief, handover, SAW reports, decision log updated
 
-## Cross-Stream Impact
+## Risks
 
-### Streams Affected
+1. **Changed files list is incomplete**: The planner suspects more files were affected but are not listed
+2. **Evidence artifacts may reference paths not yet staged**: Some Phase 60 evidence files reference untracked code
+3. **Cross-stream impact is unclear**: The planner cannot determine which streams are affected from the current impact packet
+4. **Phase 61 not yet bootstrapped**: D-348 authorizes but Phase 61 is not publicly executing
 
-- **Backend**: Phase 59 bounded packet complete, no further work blocked
-  - **Why affected**: Phase 59 implementation complete
-  - **Action required**: Stand by for next shadow scope approval
+## Evidence
 
-- **Frontend/UI**: Phase 59 dashboard reader complete, no further work blocked
-  - **Why affected**: Phase 59 bounded tab hook added
-  - **Action required**: Stand by for next shadow scope approval
-
-- **Data**: Prior sleeve SSOT immutable, no changes
-  - **Why affected**: Phase 59 consumed read-only allocator_state catalog
-  - **Action required**: None (SSOT remains immutable)
-
-- **Docs/Ops**: Phase 59 governance artifacts complete
-  - **Why affected**: Phase 59 brief, handover, SAW reports, decision log updated
-  - **Action required**: Stand by for PM/CEO bounded packet review
-
-## Escalation Signals
-
-### When This Impact Packet Is Insufficient
-
-The planner should escalate to broader repo reads if:
-
-1. **Changed files list is incomplete**: The planner suspects more files were affected but are not listed (e.g., if Phase 60 work begins and touches additional files)
-2. **Interface ownership is unclear**: The touched interfaces list does not make it clear which subsystem owns a particular interface (e.g., if unified holdings/turnover surface is added)
-3. **Failing checks are ambiguous**: The failure reasons do not provide enough context to diagnose the root cause (currently NONE, but future shadow work may introduce failures)
-4. **Cross-stream impact is unclear**: The planner cannot determine which streams are affected from the current impact packet (e.g., if Phase 60 work spans multiple streams)
-
-## Evidence Used
-- `git diff` output (Phase 59 changes)
-- `pytest` test run logs (Phase 59 tests passing)
-- `docs/context/e2e_evidence/phase59_*` artifacts
-- `docs/context/multi_stream_contract_current.md`
-
-## Writing Rules
-- Keep this file compact and machine-readable.
-- Prefer file paths and interface names over prose descriptions.
-- Make the packet self-contained: the planner should not need to read the whole repo to understand impact.
-- If the planner needs more context, that signals an escalation condition, not a packet deficiency.
-- Keep the artifact thin: one current packet, not a growing archive.
+- `git diff` output (Phase 60 changes)
+- `pytest` test run logs (Phase 60 tests passing)
+- `docs/context/e2e_evidence/phase60_*` artifacts

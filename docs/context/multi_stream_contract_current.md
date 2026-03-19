@@ -5,10 +5,10 @@ Authority: advisory-only integration artifact. This file does not authorize exec
 Purpose: coordinate Docs/Ops, Backend, Frontend/UI, and Data streams so they stay connected instead of drifting into local loops.
 
 ## Header
-- `CONTRACT_ID`: `20260318-quant-phase59-streams`
-- `DATE_UTC`: `2026-03-18`
-- `SCOPE`: `Phase 59 bounded Shadow Portfolio packet + ongoing governance maintenance`
-- `STATUS`: `active`
+- `CONTRACT_ID`: `20260320-quant-phase60-streams`
+- `DATE_UTC`: `2026-03-20`
+- `SCOPE`: `Phase 60 closed-blocked-evidence-only-hold`
+- `STATUS`: `closed`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
@@ -17,112 +17,80 @@ Purpose: coordinate Docs/Ops, Backend, Frontend/UI, and Data streams so they sta
 ## Static Truth Inputs
 - `top_level_PM.md`
 - `docs/decision log.md`
-- `docs/phase_brief/phase59-brief.md`
+- `docs/phase_brief/phase60-brief.md`
 - `README.md`
 
 ## Stream Map
 
 ### Stream 1: Backend
-- **Purpose**: Core research kernel, portfolio construction, shadow monitoring, and bounded execution surfaces
-- **Must Deliver**: Phase 59 bounded Shadow Portfolio packet (read-only NAV/alert surface)
+- **Purpose**: Core research kernel, portfolio construction, shadow monitoring, and governed execution surfaces
+- **Must Deliver**: Phase 60 governed cube and blocked audit evidence (read-only)
 - **Owned Files**:
-  - `data/phase59_shadow_portfolio.py`
-  - `scripts/phase59_shadow_portfolio_runner.py`
-  - `data/research_connector.py`
-  - `research_data/catalog.duckdb`
-  - `data/processed/phase59_*` artifacts
-- **Interfaces**: Exposes `phase59_shadow_summary.json`, `phase59_shadow_evidence.csv`, `phase59_shadow_delta_vs_c3.csv` to Frontend/UI
-- **Dependencies**: Needs immutable prior sleeve SSOT from Data stream (phase54-58 artifacts)
-- **Status**: `executing` (D-329 bounded packet implemented)
+  - `scripts/phase60_preflight_verify.py`
+  - `scripts/phase60_governed_audit_runner.py`
+  - `scripts/phase60_governed_cube_runner.py`
+  - `scripts/phase60_d341_blocked_audit_review.py`
+  - `data/processed/phase60_*` artifacts
+- **Interfaces**: Exposes `phase60_governed_cube.parquet`, `phase60_d340_audit_*.status.txt`, `phase60_d341_review_*.csv` to Frontend/UI
+- **Dependencies**: Needs immutable prior sleeve SSOT from Data stream (phase54-59 artifacts)
+- **Status**: `closed` (Phase 60 closed as blocked evidence-only hold under D-345)
 
 ### Stream 2: Frontend/UI
 - **Purpose**: Dashboard monitoring, visualization, and PM/operator read surfaces
-- **Must Deliver**: Bounded dashboard reader for Phase 59 Shadow Portfolio surface
+- **Must Deliver**: Bounded dashboard reader for Phase 60 evidence surface (read-only)
 - **Owned Files**:
   - `views/shadow_portfolio_view.py`
-  - `dashboard.py` (bounded tab hook)
-  - `tests/test_shadow_portfolio_view.py`
-- **Interfaces**: Consumes `phase59_*` artifacts from Backend, exposes dashboard UI to PM/operators
-- **Dependencies**: Needs Backend to persist `phase59_*` artifacts first
-- **Status**: `executing` (bounded dashboard hook added)
+  - `dashboard.py`
+- **Interfaces**: Consumes `phase60_governed_cube.parquet`, `phase60_*` evidence artifacts from Backend
+- **Dependencies**: Needs Backend stream to publish bounded evidence artifacts
+- **Status**: `complete` (Phase 60 bounded read surface complete)
 
 ### Stream 3: Data
-- **Purpose**: Research data catalog, allocator state, historical shadow artifacts, and prior sleeve SSOT
-- **Must Deliver**: Immutable prior sleeve SSOT (phase54-58), read-only allocator_state catalog
+- **Purpose**: Raw data, feature store, fundamentals panel, sleeve surfaces, and comparator baselines
+- **Must Deliver**: Immutable prior sleeve SSOT (Phase 56/57/58/59 artifacts), C3 comparator baseline
 - **Owned Files**:
-  - `research_data/catalog.duckdb`
-  - `research_data/allocator_state_cube/`
-  - `data/processed/phase50_shadow_ship/` (reference-only)
-  - `data/processed/phase54_core_sleeve_summary.json`
-  - `data/processed/phase55_allocator_cpcv_evidence.json`
-  - `data/processed/phase56_pead_evidence.json`
-  - `data/processed/phase57_governance_evidence.json`
-  - `data/processed/phase58_governance_layer_evidence.json`
-- **Interfaces**: Exposes read-only `allocator_state` catalog and immutable prior sleeve SSOT to Backend
-- **Dependencies**: None (SSOT is locked)
-- **Status**: `complete` (prior sleeve SSOT immutable, catalog read-only)
+  - `data/feature_store.py`
+  - `data/updater.py`
+  - `data/fundamentals_panel.py`
+  - `data/processed/phase54-59_*` artifacts
+- **Interfaces**: Exposes feature/sleeve/comparator surfaces to Backend stream
+- **Dependencies**: Needs no mutation of `research_data/` or prior artifacts
+- **Status**: `frozen` (RESEARCH_MAX_DATE = 2022-12-31)
 
 ### Stream 4: Docs/Ops
-- **Purpose**: Governance artifacts, phase briefs, decision log, handover memos, bridge contracts
-- **Must Deliver**: Phase 59 brief, execution memo, bridge contract, done checklist, multi-stream contract
+- **Purpose**: Governance artifacts, decision log, phase briefs, handovers, SAW reports, context packets
+- **Must Deliver**: Phase 60 brief, handover, SAW reports, done checklist, multi-stream contract
 - **Owned Files**:
-  - `docs/phase_brief/phase59-brief.md`
-  - `docs/handover/phase59_execution_memo_20260318.md`
+  - `docs/phase_brief/phase60-brief.md`
+  - `docs/handover/phase60_handover.md`
+  - `docs/handover/phase60_execution_handover_20260318.md`
+  - `docs/saw_reports/saw_phase60_*.md`
+  - `docs/context/current_context.md`
   - `docs/context/bridge_contract_current.md`
   - `docs/context/done_checklist_current.md`
   - `docs/context/multi_stream_contract_current.md`
-  - `docs/context/current_context.md`
-  - `docs/decision log.md` (D-327, D-328, D-329)
-- **Interfaces**: Exposes governance truth to all streams, consumes execution evidence from Backend/Frontend
-- **Dependencies**: Needs Backend/Frontend execution evidence to update bridge contract and done checklist
-- **Status**: `executing` (Phase 59 governance artifacts in progress)
-
-## Active Stream Now
-- **Backend** (Phase 59 bounded packet execution)
-- **Frontend/UI** (bounded dashboard reader)
-- **Docs/Ops** (governance artifact updates)
-
-## Deferred Streams
-- None (all streams active for Phase 59 bounded packet)
+  - `docs/context/impact_packet_current.md`
+  - `docs/context/observability_pack_current.md`
+  - `docs/context/planner_packet_current.md`
+  - `docs/context/post_phase_alignment_current.md`
+  - `docs/decision log.md`
+- **Interfaces**: Consumes all stream outputs for governance review
+- **Dependencies**: Needs all streams to complete their Phase 60 deliverables
+- **Status**: `complete` (Phase 60 governance artifacts complete)
 
 ## Blocked Streams
-- None currently blocked
+None (all streams complete for Phase 60 bounded packet)
 
-## Shared Success Condition
-- Phase 59 bounded Shadow Portfolio packet is complete when:
-  - Backend persists all `phase59_*` artifacts
-  - Frontend/UI exposes bounded dashboard reader
-  - Data stream maintains immutable prior sleeve SSOT
-  - Docs/Ops publishes complete governance artifacts (brief, memo, bridge, checklist, contract)
-  - All tests pass
-  - PM/CEO can review bounded packet as evidence-only before Phase 60 decision
+## Completion Criteria
+Phase 60 bounded Stable Shadow Portfolio packet is complete when:
+- Backend publishes governed cube and blocked audit evidence artifacts
+- Frontend/UI exposes read-only dashboard surface for evidence
+- Data stream confirms immutable prior sleeve SSOT
+- Docs/Ops publishes Phase 60 brief, handover, SAW reports, context packets
+- All Phase 60 tests passing
+- PM/CEO can review bounded packet as evidence-only before Phase 61 decision
 
-## Integration Checkpoints
-- **Checkpoint 1**: Backend persists `phase59_*` artifacts → Frontend can build dashboard reader
-- **Checkpoint 2**: Backend + Frontend execution complete → Docs/Ops updates bridge contract and done checklist
-- **Checkpoint 3**: All streams complete → PM/CEO bounded packet review (evidence-only / no promotion / no widening)
-
-## Cross-Stream Risks
-- Backend could mutate prior sleeve SSOT (Data stream) → mitigated by immutability lock and git diff checks
-- Frontend could read stale artifacts if Backend changes schema → mitigated by bounded artifact contract
-- Docs/Ops could drift from execution truth if Backend/Frontend don't update handover → mitigated by bridge contract refresh after execution
-
-## Pre-Flight Conditions
-- D-328 execution authorization consumed (approved 2026-03-18)
-- Prior sleeve SSOT immutable (phase54-58 artifacts locked)
-- RESEARCH_MAX_DATE = 2022-12-31 enforced
-- Same-window / same-cost / same-engine discipline active
-
-## Evidence Used
-- `docs/context/current_context.md`
-- `docs/phase_brief/phase59-brief.md`
-- `docs/context/bridge_contract_current.md`
-- `README.md`
-
-## Writing Rules
-- Keep this file top-level and PM-readable.
-- Prefer system language over file-changelog language.
-- Make stream boundaries explicit: what each stream owns, what it exposes, what it needs.
-- If a stream is deferred, say why and when it becomes active.
-- If a stream is blocked, say what unblocks it.
-- Keep the artifact thin: one current contract, not a growing archive.
+## Governance Status
+- Phase 60: CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD (D-345)
+- Phase 61: Bootstrap authorized (D-348) but not yet publicly executed
+- All streams awaiting explicit `approve next phase` token before Phase 61 work begins

@@ -25,126 +25,50 @@ Purpose: provide the planner with a compact, fresh world model without requiring
 - Any Phase 60 widening, any Phase 61+ work, any comparator remediation, any post-2022 audit beyond bounded D-340 slice, or any kernel mutation remains blocked until explicit `approve next phase` token
 
 ## Active Brief
-
 ### Current Phase/Round
 - Phase 60 (closed as blocked evidence-only hold under D-345)
 
-### Goal
-- Preserve Phase 59 bounded Shadow Portfolio packet as immutable evidence SSOT
+- Authority: D-345 (closeout), D-347 (kernel mutation hold), D-348 (Phase 61 bootstrap pending)
 
+- Active brief: `docs/phase_brief/phase60-brief.md`
+
+### Goal
+- Preserve Phase 60 governed cube and blocked audit evidence as immutable SSOT
 ### Non-Goals
-- No promotion of Phase 59 packet to stable shadow execution
-- No widening into Phase 60 stable shadow stack
+- No promotion of Phase 60 to stable shadow execution
+- No widening into Phase 61
 - No post-2022 expansion
 - No mutation of research kernel or prior sleeve SSOT
-
 ### Owned Files
-- `data/phase59_shadow_portfolio.py`
-- `scripts/phase59_shadow_portfolio_runner.py`
-- `views/shadow_portfolio_view.py`
-- `tests/test_phase59_shadow_portfolio.py`
-- `tests/test_shadow_portfolio_view.py`
-- `data/processed/phase59_*` artifacts
-- `docs/phase_brief/phase59-brief.md`
-- `docs/handover/phase59_execution_memo_20260318.md`
-
-### Interfaces
-- Dashboard tab hook for bounded Phase 59 surface (read-only)
-- `phase59_shadow_summary.json` (consumed by dashboard)
-- `phase59_shadow_evidence.csv` (evidence artifact)
-- `phase59_shadow_delta_vs_c3.csv` (comparator delta)
-
-## Bridge Truth
-
-### System Delta
-- The system now has a closed Phase 59 Shadow NAV / alert evidence surface that preserved the read-only research lane plus reference-only shadow alert lane without widening into a stable shadow stack.
-
-### PM Delta
-- **Stronger now**: The repo exposes a reviewed and closed read-only Shadow Portfolio monitoring surface with persisted artifacts, dashboard reader, and governance-stamped alert contract.
-- **Weaker now**: Phase 59 packet is split into research lane and reference-only operational lane (no unified governed holdings/turnover surface).
-- **Still unknown**: Whether next approved shadow scope should widen Phase 59 or move to Phase 60, and how that scope would add a truthful unified holdings/turnover contract.
-
-### Open Decision
-- Should the next approved work widen the closed Phase 59 surface, or open Phase 60 with a new bounded stable-shadow packet?
-
-### Recommended Next Step
-- Stand by in evidence-only mode and wait for an explicit CEO approval packet before any widened Shadow Portfolio or Phase 60 work.
-
-### Why This Next
-- The bounded Phase 59 packet is now closed with mixed evidence, so the correct next action is an explicit governance decision rather than silent scope drift.
-
-### Not Recommended Next
-- Do not widen into Phase 60 or invent a unified holdings surface without a new explicit approval packet.
-
-## Decision Tail
-
-Recent decisions (D-325 through D-330):
-
-- `D-330`: Phase 59 closed as evidence-only / no promotion / no widening
-- `D-329`: Phase 59 first bounded packet implemented and evidenced
-- `D-328`: Phase 59 execution authorization consumed (exact token)
-- `D-327`: Phase 59 opened in planning-only mode
-- `D-326`: Phase 58 closed as evidence-only / no promotion / no widening
-- `D-325`: Phase 58 review complete
-
-## Blocked Next Step
-
-### What Is Blocked
-- Any Phase 59 promotion, widening, stable shadow execution, or post-2022 expansion
-- Any Phase 60 work
-
-### Why Blocked
-- Phase 59 closed as evidence-only with mixed evidence (red reference alerts, split research/operational lanes)
-- No explicit CEO approval packet for next shadow scope
-
-### What Unblocks It
-- Explicit CEO approval packet specifying:
-  - Whether to widen Phase 59 or open Phase 60
-  - What unified holdings/turnover contract is required
-  - What evidence threshold must be met before promotion
-
-## Active Bottleneck
-
-### Current Bottleneck
-- PM/CEO bounded packet review and next-scope approval
-
-### Why It Is The Bottleneck
-- Phase 59 execution is complete, but next shadow scope cannot proceed without explicit governance decision
-
-### What Unblocks It
-- CEO approval packet for next shadow scope (Phase 59 widening or Phase 60 bounded packet)
-
-## Escalation Rules
-
-### When To Read Wider Surfaces
-
-The planner should escalate to broader repo reads only when:
-
-1. **Impact surface is unclear**: The planner packet + impact packet do not contain enough information to identify which files/interfaces are affected
-2. **Interface ownership is unclear**: The owned files list does not make it clear which subsystem owns a particular interface
-3. **Evidence conflicts**: The bridge truth and decision tail contain conflicting information that cannot be resolved from current artifacts
-4. **Bottleneck cannot be named**: The active bottleneck is not clear from current context and requires broader system inspection
-
-### Default Read Strategy
-
-By default, the planner should:
-
-1. Load this planner packet first
-2. Load the impact packet (changed files, owned files, touched interfaces, failing checks)
-3. Propose next step from these small packets
-4. Only escalate to wider reads if one of the four escalation conditions applies
-
-## Evidence Used
+- `scripts/phase60_preflight_verify.py`
+- `scripts/phase60_governed_audit_runner.py`
+- `scripts/phase60_governed_cube_runner.py`
+- `scripts/phase60_d341_blocked_audit_review.py`
+- `tests/test_phase60_preflight_verify.py`
+- `tests/test_phase60_governed_audit_runner.py`
+- `tests/test_phase60_governed_cube_runner.py`
+- `tests/test_phase60_d341_blocked_audit_review.py`
+- `tests/test_phase60_d343_hygiene.py`
+- `tests/test_phase60_d345_closeout.py`
+- `docs/phase_brief/phase60-brief.md`
+- `docs/handover/phase60_handover.md`
+- `docs/handover/phase60_execution_handover_20260318.md`
+- `data/processed/phase60_*` artifacts
 - `docs/context/current_context.md`
-- `docs/phase_brief/phase59-brief.md`
 - `docs/context/bridge_contract_current.md`
-- `docs/decision log.md` (D-325 through D-330)
-- `docs/context/multi_stream_contract_current.md`
-- `docs/context/post_phase_alignment_current.md`
-
-## Writing Rules
-- Keep this file compact and PM-readable.
-- Prefer system language over file-changelog language.
-- Make the packet self-contained: the planner should not need to read the whole repo to propose a next step.
-- If the planner needs more context, that signals an escalation condition, not a packet deficiency.
-- Keep the artifact thin: one current packet, not a growing archive.
+### Interfaces
+- Governance artifact consumers (read-only)
+- Dashboard tab hook for bounded Phase 60 evidence surface (read-only)
+- `phase60_governed_cube.parquet` (governed daily holdings/weight cube)
+- `phase60_d340_audit_*.status.txt` (blocked audit evidence)
+- `phase60_d341_review_*.csv` (formal review findings)
+### Bridge Truth
+### System Delta
+- Phase 60 is closed as blocked evidence-only hold under D-345
+- 274-cell C3 comparator gap preserved verbatim
+- D-347 locks kernel against Option A structural changes
+- D-348 authorizes Phase 61 bootstrap pending explicit approval
+### Planner Delta
+- **Stronger now**: Formal closeout packet (D-345) with explicit blocked-audit root cause preserved
+- **Weaker now**: Audit remains blocked; cannot proceed to Phase 61 without explicit approval
+- **Still unknown**: Whether Phase 61 data patch will succeed; when it will be approved

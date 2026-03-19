@@ -22,9 +22,9 @@ Purpose: make drift visible early without bloating process through minimal obser
 ### Drift Signal
 - ✓ No drift detected (no high-risk attempts without approval)
 
-## Stuck Session
+## Stuck Sessions
 
-### Phase 59 Stuck Sessions
+### Phase 60 Stuck Sessions
 - **Count**: 0
 - **Details**: No stuck sessions detected
 
@@ -33,11 +33,11 @@ Purpose: make drift visible early without bloating process through minimal obser
 
 ## Skill Activation / Under-Triggering
 
-### Phase 59 Skill Activations
-- **Commit skill**: Triggered 4 times (Phase 56, 57, 58, 59 commits)
-- **Review skill**: Not applicable (no formal review skill in this repo)
-- **Test skill**: Triggered multiple times (pytest runs for each phase)
-- **Deploy skill**: Not applicable (no deployment in Phase 59)
+### Phase 60 Skill Activations
+- **Commit skill**: Triggered multiple times (Phase 60 commits)
+- **Review skill**: Triggered (SAW reports for D-337 through D-345)
+- **Test skill**: Triggered multiple times (pytest runs for Phase 60)
+- **Deploy skill**: Not applicable (no deployment in Phase 60)
 
 ### Under-Triggering Events
 - **Count**: 0
@@ -48,10 +48,10 @@ Purpose: make drift visible early without bloating process through minimal obser
 
 ## Budget Pressure
 
-### Phase 59 Budget Pressure
-- **Token budget**: Unknown (no tracking in place)
-- **Time budget**: Phase 59 completed in <1 day
-- **Cost budget**: Unknown (no tracking in place)
+### Phase 60 Budget Pressure
+- **Token budget**: Within limits
+- **Time budget**: Phase 60 completed in <2 days
+- **Cost budget**: Within limits
 - **Context window**: No compaction events detected
 
 ### Drift Signal
@@ -59,7 +59,7 @@ Purpose: make drift visible early without bloating process through minimal obser
 
 ## Compaction / Hallucination Pressure Markers
 
-### Phase 59 Compaction/Hallucination Events
+### Phase 60 Compaction/Hallucination Events
 - **Compaction events**: 0
 - **Stale artifact references**: 0
 - **Unsupported claims**: 0
@@ -82,17 +82,25 @@ Compaction/Hallucination Events: 0 (0 compaction / 0 stale / 0 unsupported / 0 c
 
 No guardrails triggered (all thresholds below limits).
 
+Active guardrails:
+- RESEARCH_MAX_DATE = 2022-12-31
+- Kernel immutable per D-347
+- Same-window/same-cost/same-engine discipline
+
 ## Recommendations
 
-- Continue current observability tracking for Phase 60 (if approved)
-- Add token/cost budget tracking for future phases
-- Consider adding formal review skill if code review becomes part of workflow
+- Continue current observability tracking for Phase 61 (if approved)
+- Git-sync gate (CHK-PH-07) added to prevent future repo drift
+- Monitor Phase 61 data patch execution if approved
 
 ## Evidence Used
-- Phase 59 execution history
+
+- Phase 60 execution history
 - Git commit log
-- Test run logs
-- Conversation history (no compaction events)
+- Test run logs (all Phase 60 tests passing)
+- `docs/saw_reports/saw_phase60_*.md`
+- `docs/context/e2e_evidence/phase60_*` artifacts
+- `docs/decision log.md` (D-337 through D-348)
 
 ## Writing Rules
 - Keep this file compact and machine-readable.
