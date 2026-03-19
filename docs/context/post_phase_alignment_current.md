@@ -18,107 +18,111 @@ Purpose: update the multi-stream map after Phase 60 closeout so Phase 61 plannin
 ## Static Truth Inputs
 - `top_level_PM.md`
 - `docs/decision log.md` (D-337 through D-348)
-- `docs/phase_brief/phase59-brief.md`
+- `docs/phase_brief/phase60-brief.md`
 - `docs/context/multi_stream_contract_current.md`
 
 ## What Changed This Round
 
 ### System Shape Delta
-- The system now has a bounded Phase 59 Shadow NAV / alert surface that connects the read-only `allocator_state` catalog to dashboard-visible artifacts
-- Historical Phase 50 shadow telemetry is now carried as explicit reference-only operational context
-- The repo exposes a real read-only Shadow Portfolio monitoring surface with persisted artifacts, dashboard reader, and governance-stamped alert contract
-- Prior sleeve SSOT (phase54-58) remains immutable
+- The system now has a governed daily holdings/weight cube built from Phase 56/57 sleeve surfaces
+- Post-2022 bounded audit executed with blocked evidence result (274-cell C3 comparator gap)
+- D-347 locked kernel against Option A structural changes
+- D-348 authorizes Phase 61 bootstrap pending explicit approval
+- Prior sleeve SSOT (phase54-59) remains immutable
 
 ### Execution Delta
-- Added `data/phase59_shadow_portfolio.py`
-- Added `scripts/phase59_shadow_portfolio_runner.py`
-- Added `views/shadow_portfolio_view.py`
-- Added bounded dashboard tab hook in `dashboard.py`
-- Persisted `data/processed/phase59_shadow_summary.json`
-- Persisted `data/processed/phase59_shadow_evidence.csv`
-- Persisted `data/processed/phase59_shadow_delta_vs_c3.csv`
-- Added tests: `test_phase59_shadow_portfolio.py`, `test_shadow_portfolio_view.py`
+- Added `scripts/phase60_preflight_verify.py`
+- Added `scripts/phase60_governed_audit_runner.py`
+- Added `scripts/phase60_governed_cube_runner.py`
+- Added `scripts/phase60_d341_blocked_audit_review.py`
+- Persisted `data/processed/phase60_governed_cube.parquet`
+- Persisted `docs/context/e2e_evidence/phase60_d340_preflight_*.status.txt`
+- Persisted `docs/context/e2e_evidence/phase60_d340_audit_*.status.txt`
+- Persisted `docs/context/e2e_evidence/phase60_d341_review_*.csv`
+- Added tests: `test_phase60_preflight_verify.py`, `test_phase60_governed_audit_runner.py`, `test_phase60_governed_cube_runner.py`, `test_phase60_d341_blocked_audit_review.py`, `test_phase60_d343_hygiene.py`, `test_phase60_d345_closeout.py`
 
 ### No Change
 - Promotion remains blocked (evidence-only packet)
-- Prior sleeve SSOT remains immutable (phase54-58 artifacts unchanged)
+- Prior sleeve SSOT remains immutable (phase54-59 artifacts unchanged)
 - RESEARCH_MAX_DATE = 2022-12-31 discipline unchanged
 - Same-window / same-cost / same-engine discipline unchanged where comparator evidence applies
 - Research kernel (`research_data/`) unchanged
+- Core engine (`core/engine.py`) unchanged per D-347
 
 ## Stream Status Update
 
 ### Stream 1: Backend
-- **Previous Status**: `executing`
-- **Current Status**: `complete` (for Phase 59 bounded packet)
-- **What Changed**: Implemented Phase 59 bounded Shadow Portfolio packet, persisted all `phase59_*` artifacts
-- **What Remains**: Phase 60 stable shadow stack (pending PM/CEO review)
+- **Previous Status**: `executing` (Phase 59 bounded packet)
+- **Current Status**: `closed` (Phase 60 closed as blocked evidence-only hold)
+- **What Changed**: Implemented governed cube, executed bounded audit, confirmed 274-cell gap preserved verbatim
+- **What Remains**: Phase 61 data patch (pending explicit `approve next phase` token)
 
 ### Stream 2: Frontend/UI
-- **Previous Status**: `executing`
-- **Current Status**: `complete` (for Phase 59 bounded packet)
-- **What Changed**: Added bounded dashboard reader for Phase 59 Shadow Portfolio surface
-- **What Remains**: Phase 60 stable shadow stack UI (pending PM/CEO review)
+- **Previous Status**: `complete` (Phase 59 bounded packet)
+- **Current Status**: `complete` (Phase 60 evidence surface read-only)
+- **What Changed**: Dashboard reader for Phase 60 evidence surface
+- **What Remains**: Phase 61 UI (pending explicit approval)
 
 ### Stream 3: Data
 - **Previous Status**: `complete`
-- **Current Status**: `complete`
-- **What Changed**: Nothing (prior sleeve SSOT remains immutable, catalog remains read-only)
-- **What Remains**: Phase 60 may need unified governed holdings/turnover surface
+- **Current Status**: `frozen`
+- **What Changed**: Nothing (prior sleeve SSOT remains immutable, C3 comparator baseline unchanged)
+- **What Remains**: Phase 61 data patch for 274-cell gap (pending explicit approval)
 
 ### Stream 4: Docs/Ops
-- **Previous Status**: `executing`
-- **Current Status**: `complete` (for Phase 59 bounded packet)
-- **What Changed**: Published Phase 59 brief, execution memo, bridge contract, done checklist, multi-stream contract, post-phase alignment
-- **What Remains**: Phase 60 governance artifacts (pending PM/CEO review)
+- **Previous Status**: `executing` (Phase 59 bounded packet)
+- **Current Status**: `complete` (Phase 60 closeout)
+- **What Changed**: Published Phase 60 brief, handover, SAW reports, context packets, done checklist
+- **What Remains**: Phase 61 governance artifacts (pending explicit approval)
 
 ## Current Bottleneck
-- **PM/CEO bounded packet review** is now the bottleneck
-- **Why**: Phase 59 bounded packet shows red reference alerts and research lane below locked C3 baseline, so the surface is evidence-only and not promotion-ready
-- **What unblocks it**: PM/CEO explicit review decision on whether to:
-  1. Review bounded packet as evidence-only and defer Phase 60, or
-  2. Approve Phase 60 stable shadow stack construction after bounded packet review
+- **Explicit approval packet** is now the bottleneck
+- **Why**: Phase 60 is closed as blocked evidence-only hold. D-348 authorizes Phase 61 bootstrap but Phase 61 is not yet publicly executing.
+- **What unblocks it**: Explicit `approve next phase` token from PM/CEO
 
 ## Interface Drift
-- **Split research/operational lanes**: Phase 59 packet is split into a research lane (read-only `allocator_state` catalog) and a reference-only operational lane (Phase 50 shadow artifacts) because the repo does not yet expose one unified governed holdings/turnover surface
-- **Cross-stream contract impact**: Phase 60 planning must avoid implying that the research lane and operational lane are already one stack
-- **What needs updating**: If Phase 60 proceeds, multi-stream contract must define how Backend/Data streams will fuse research and operational lanes into one stable shadow book
+- **274-cell C3 comparator gap**: Preserved verbatim, no remediation
+- **Kernel mutation hold**: D-347 locks `core/engine.py` against Option A structural changes
+- **Phase 61 pending**: Data-level completeness patch and Method B sidecar integration await explicit approval
 
 ## Next Stream Active
-- **Docs/Ops** (PM/CEO bounded packet review)
-- **Why**: Phase 59 execution is complete, but promotion and Phase 60 planning are blocked until PM/CEO reviews the bounded packet as evidence-only
+- **Docs/Ops** (await explicit `approve next phase` token)
+- **Why**: Phase 60 is closed. Phase 61 requires explicit approval before execution begins.
 
 ## PM Decision Required
-- **Decision**: Should Phase 60 stable shadow stack proceed, or should Phase 59 remain evidence-only?
+- **Decision**: Should Phase 61 data patch and Method B integration proceed?
 - **Evidence supporting decision**:
-  - Phase 59 bounded packet exists with persisted artifacts and dashboard reader
-  - Red reference alerts indicate research lane is below locked C3 baseline
-  - Split research/operational lanes indicate unified holdings/turnover surface is missing
-  - Prior sleeve SSOT remains immutable and governance-compliant
+  - Phase 60 closed as blocked evidence-only hold under D-345
+  - 274-cell C3 comparator gap preserved verbatim
+  - D-347 locks kernel against structural changes
+  - D-348 authorizes Phase 61 bootstrap pending explicit approval
 - **Options**:
-  1. Review bounded packet as evidence-only, defer Phase 60 until unified surface design is approved
-  2. Approve Phase 60 stable shadow stack construction with explicit scope to fuse research/operational lanes
+  1. Approve Phase 61 execution: reply `approve next phase`
+  2. Defer Phase 61: keep system in blocked evidence-only hold state
 
 ## What Should Not Be Done Next
-- Do not widen directly into Phase 60 without reviewing the bounded packet (would skip evidence checkpoint)
-- Do not promote Phase 59 packet to stable shadow execution (red alerts indicate not promotion-ready)
-- Do not mutate prior sleeve SSOT (phase54-58 artifacts remain immutable)
-- Do not reopen research kernel or generate post-2022 evidence (RESEARCH_MAX_DATE = 2022-12-31 remains active)
+- Do not begin Phase 61 execution without explicit `approve next phase` token
+- Do not mutate `core/engine.py` (D-347 hold)
+- Do not remediate 274-cell gap without approval
+- Do not mutate prior sleeve SSOT (phase54-59 artifacts remain immutable)
+- Do not reopen research kernel or generate post-2022 evidence beyond bounded D-340 slice (RESEARCH_MAX_DATE = 2022-12-31 remains active)
 
 ## Open Risks
-- Phase 59 bounded packet shows red reference alerts and research lane below locked C3 baseline (evidence-only, not promotion-ready)
-- Phase 59 lacks unified governed holdings/turnover surface (split research/operational lanes)
-- Phase 60 planning must avoid implying research lane and operational lane are already one stack
+- 274-cell C3 comparator gap preserved verbatim (blocked evidence-only)
+- Allocator carry-forward blocked (negative Sharpe/CAGR, PBO 0.66)
+- Core sleeve blocked (4/6 gates passed, Rule 100 pass rate 10.1%)
+- Event family SPA_p/WRC_p > 0.05 (not promotion-ready)
 
 ## Evidence Used
 - `docs/context/current_context.md`
-- `docs/phase_brief/phase59-brief.md`
-- `docs/handover/phase59_execution_memo_20260318.md`
+- `docs/phase_brief/phase60-brief.md`
+- `docs/handover/phase60_handover.md`
+- `docs/handover/phase60_execution_handover_20260318.md`
 - `docs/context/bridge_contract_current.md`
 - `docs/context/done_checklist_current.md`
 - `docs/context/multi_stream_contract_current.md`
-- `data/processed/phase59_shadow_summary.json`
-- `data/processed/phase59_shadow_delta_vs_c3.csv`
+- `data/processed/phase60_governed_cube.parquet`
+- `docs/context/e2e_evidence/phase60_d341_review_*.csv`
 
 ## Writing Rules
 - Keep this file top-level and PM-readable.
