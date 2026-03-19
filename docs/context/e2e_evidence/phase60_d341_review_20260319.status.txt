@@ -1,0 +1,1 @@
+PASS: D-341 blocked audit review confirmed evidence-only hold; D-340 SSOT remains blocked with KS-03 and 274 missing executed-exposure return cells.

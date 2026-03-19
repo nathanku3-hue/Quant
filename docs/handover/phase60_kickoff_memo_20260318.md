@@ -1,20 +1,20 @@
 # MEMO: Phase 60 Kickoff - Stable Shadow Portfolio
 
 Date: 2026-03-18
-Updated: 2026-03-18 (D-332 institutional pivot snapshot added)
+Updated: 2026-03-18 (D-335 planning-only kickoff published)
 To: Project Lead
 From: Codex (repo SSOT draft)
-Status: Planning-only kickoff recorded with institutional pivot snapshot. Implementation remains blocked pending a separate explicit token.
+Status: Planning-only kickoff published under `D-335`. Execution remains blocked pending a separate explicit token.
 
 ## Scope Lock
-- Phase 59 remains closed under `D-330`; the bounded Shadow Portfolio artifacts stay immutable SSOT.
+- Phase 59 remains closed again under `D-334`; the bounded Shadow Portfolio artifacts stay immutable SSOT.
 - Phase 58 remains closed under `D-326`; the bounded Governance Layer artifacts stay immutable SSOT.
 - Phase 57 remains closed under `D-322`; the bounded Corporate Actions artifacts stay immutable SSOT.
 - Phase 56 remains closed under `D-317`; the bounded PEAD artifacts stay immutable SSOT.
 - Phase 55 remains closed under `D-312`; allocator governance evidence stays immutable SSOT.
 - Phase 53 research-v0 kernel remains complete and read-only under `D-292`.
 - Rule-of-100 remains inactive under `D-309`.
-- Phase 60 is opened for planning only; `NextPhaseApproval = PENDING` for implementation.
+- Phase 60 is active in planning-only mode under `D-335`; `NextPhaseApproval = PENDING` for implementation.
 - Holdout quarantine and same-window / same-cost / same-`core.engine.run_simulation` evidence discipline remain in force; `RESEARCH_MAX_DATE = 2022-12-31`.
 
 ## Complete Institutional Pivot (D-332 Planning Snapshot)
@@ -44,33 +44,33 @@ Status: Planning-only kickoff recorded with institutional pivot snapshot. Implem
 - **Allocator carry-forward**: allocator overlay fields may exist in planning artifacts, but governed carry-forward remains excluded until research eligibility clears.
 
 ## Governance Clarification
-- Phase 60 is planning-only in this round.
+- Phase 60 is planning-only in this round under `D-335`.
 - No Phase 60 code, tests, evidence generation, or post-2022 run are authorized.
 - No comparator widening beyond the locked planning contracts is authorized here.
 - No prior sleeve or shadow artifact may be reinterpreted or rewritten in this round.
 
 ## Execution Gate Checklist (Planning-Only)
-- `D-330` remains the authority for the closed Phase 59 endpoint.
+- `D-334` remains the authority for the closed Phase 59 endpoint.
 - `D-326`, `D-322`, `D-317`, and `D-312` remain the authorities for the closed prior sleeve/governance endpoints.
 - `D-292` confirms the Phase 53 kernel remains read-only.
 - `D-309` keeps Rule-of-100 inactive.
-- Phase 60 implementation is not authorized; a future exact `approve next phase` token is required.
+- Phase 60 implementation and evidence generation are not authorized; a future exact `approve next phase` token is required.
 - `NextPhaseApproval = PENDING`.
 - All Stable Shadow implementation, post-2022 audit execution, and production promotion remain blocked.
 
-## Acceptance Checks (Phase 60 Kickoff + D-332 Institutional Pivot)
+## Acceptance Checks (Phase 60 Kickoff Refresh + D-332 Institutional Pivot)
 - `CHK-P60-01`: Boundary documented with inherited locks.
 - `CHK-P60-02`: Phase 53 roadmap scope recorded verbatim.
-- `CHK-P60-03`: `D-331` logged as planning-only.
+- `CHK-P60-03`: `D-335` logged as planning-only.
 - `CHK-P60-04`: Unified governed comparator surface contract recorded.
 - `CHK-P60-05`: Governed cost policy recorded.
 - `CHK-P60-06`: One-shot post-2022 audit preflight + kill-switch contract recorded.
 - `CHK-P60-07`: Allocator carry-forward exclusion recorded.
 - `CHK-P60-08`: Bridge and context refreshed.
 - `CHK-P60-09`: Implementation remains blocked pending a future exact `approve next phase` token.
-- `CHK-P60-10`: `D-332` institutional pivot snapshot incorporated with validator fix as Priority #1.
-- `CHK-P60-11`: Method B locked as planning default for S&P/Moody's sidecars.
-- `CHK-P60-12`: Out-of-boundary ingestion block enforced.
+- `CHK-P60-10`: `D-332` institutional pivot snapshot remains incorporated inside the active planning boundary.
+- `CHK-P60-11`: Method B remains locked as planning default for S&P/Moody's sidecars.
+- `CHK-P60-12`: Out-of-boundary ingestion block remains enforced.
 
 ## Out of Scope (Phase 60 Planning-Only Kickoff)
 - Any code/data changes

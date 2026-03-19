@@ -1,0 +1,35 @@
+........................................................................ [  7%]
+........................................................................ [ 15%]
+..............................................s......................... [ 23%]
+........................................................................ [ 31%]
+........................................................................ [ 39%]
+........................................................................ [ 47%]
+........................................................................ [ 55%]
+..............................................................s......... [ 63%]
+......s................................................................. [ 71%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 94%]
+................................................                         [100%]
+============================== warnings summary ===============================
+tests/test_alpha_engine.py::test_trend_veto_string_false_is_parsed_as_false
+  E:\Code\Quant\tests\test_alpha_engine.py:296: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value 'False' has dtype incompatible with bool, please explicitly cast to a compatible dtype first.
+    features.loc[today, "trend_veto"] = "False"
+
+tests/test_alpha_engine.py::test_trend_veto_unknown_tokens_default_to_veto_true
+  E:\Code\Quant\tests\test_alpha_engine.py:313: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value 'MAYBE' has dtype incompatible with bool, please explicitly cast to a compatible dtype first.
+    features.loc[today, "trend_veto"] = "MAYBE"
+
+tests/test_ticker_pool.py::test_rank_ticker_pool_rejects_non_coercible_dates_with_count
+  E:\Code\Quant\tests\test_ticker_pool.py:290: FutureWarning:
+  
+  Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value 'not-a-date' has dtype incompatible with datetime64[s], please explicitly cast to a compatible dtype first.
+
+tests/test_ticker_pool.py::test_rank_ticker_pool_rejects_non_coercible_dates_with_count
+  E:\Code\Quant\strategies\ticker_pool.py:806: UserWarning:
+  
+  Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+EscalationManager not running
+EscalationManager not running

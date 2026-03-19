@@ -417,3 +417,66 @@ Application pattern:
 - Guardrail for next time: Before any new phase spans multiple prior evidence surfaces, lock comparator surface, cost basis, audit spec, and eligibility rules in docs before any implementation token is allowed.
 - Evidence paths: `docs/decision log.md`, `docs/phase_brief/phase60-brief.md`, `docs/handover/phase60_kickoff_memo_20260318.md`, `docs/context/bridge_contract_current.md`, `docs/context/current_context.md`, `docs/context/current_context.json`
 
+## 2026-03-19 Round Entry (Execution Packets Must Refresh Bridge + SAW in the Same Round)
+- Date: 2026-03-19
+- Mistake or miss: The D-337 execution packet left the bridge on stale D-335 planning-only language and the D-337 SAW report outside the required validator-clean schema.
+- Root cause: Governance artifacts were refreshed unevenly after the execution transition, so the decision log/brief/context moved to D-337 while bridge/SAW lagged behind.
+- Fix applied: Published `D-338`, refreshed `docs/context/bridge_contract_current.md` to D-337 truth, rewrote `docs/saw_reports/saw_phase60_d337_first_packet_20260318.md` into the required schema, refreshed context artifacts, and held any code/cube start pending the next explicit packet.
+- Guardrail for next time: When a phase transitions from planning to execution, refresh decision log, brief, bridge, context, and SAW in the same round; do not treat bridge/SAW as optional follow-up cleanup.
+- Evidence paths: `docs/decision log.md`, `docs/context/bridge_contract_current.md`, `docs/saw_reports/saw_phase60_d337_first_packet_20260318.md`, `docs/context/current_context.md`, `docs/context/current_context.json`, `docs/context/e2e_evidence/phase60_d338_d337_saw_validate_20260319.txt`
+
+## 2026-03-19 Round Entry (Validator Freshness Must Follow the Feature Builder's Governed Price Surface)
+- Date: 2026-03-19
+- Mistake or miss: The data-layer validator originally compared `features.parquet` against `prices.parquet + yahoo_patch.parquet`, even when the feature builder was operating in TRI mode on `prices_tri.parquet`.
+- Root cause: Freshness validation was keyed to a generic latest-price surface instead of the actual governed input surface selected by `_price_source_config()`.
+- Fix applied: Locked the validator to the feature builder's governed price surface, added regression tests for both lag and lead cases, verified live validator PASS, and published the bounded governed cube off the same same-window / same-cost sleeve surfaces.
+- Guardrail for next time: Any freshness or integrity validator must reference the exact runtime-configured input surface of the builder it is validating; never compare to a broader surface the builder does not consume.
+- Evidence paths: `scripts/validate_data_layer.py`, `tests/test_validate_data_layer.py`, `docs/context/e2e_evidence/phase60_validator_fix_20260319_validate_data_layer.txt`, `docs/context/e2e_evidence/phase60_validator_fix_20260319_full_pytest.status.txt`, `scripts/phase60_governed_cube_runner.py`, `tests/test_phase60_governed_cube_runner.py`
+
+## 2026-03-19 Round Entry (Blocked Audit Reviews Must Stay Read-Only and SSOT-Bounded)
+- Date: 2026-03-19
+- Mistake or miss: A blocked audit packet can tempt follow-on work to rerun, widen, or “repair” the failed comparator path while claiming it is just a review.
+- Root cause: Governance review scope can blur when the blocked packet and the remediation idea sit next to each other in the same phase.
+- Fix applied: Published D-341 as a read-only review over the four immutable D-340 SSOT artifacts only, confirmed the exact `274` missing executed-exposure return cells, and emitted an evidence-only hold packet with every authorization flag still false.
+- Guardrail for next time: Formal review packets must read the frozen SSOT artifacts only and fail if those artifacts drift; never reopen the comparator path, mutate research data, or widen scope under the label of review.
+- Evidence paths: `scripts/phase60_d341_blocked_audit_review.py`, `tests/test_phase60_d341_blocked_audit_review.py`, `docs/context/e2e_evidence/phase60_d341_review_20260319_summary.json`, `docs/context/e2e_evidence/phase60_d341_review_20260319_findings.csv`, `docs/context/e2e_evidence/phase60_d341_review_20260319.status.txt`
+
+## 2026-03-19 Round Entry (Active Briefs Must Not Carry Resolved Blockers Forward)
+- Date: 2026-03-19
+- Mistake or miss: The active Phase 60 brief still carried a resolved validator-failure block, and the bridge still cited the kickoff memo instead of the current execution handover.
+- Root cause: Historical planning language and evidence references were not cleaned up after the validator gate was cleared and the execution-era handover became the active SSOT.
+- Fix applied: Published `D-343`, removed the stale resolved-validator block from the active brief, refreshed the bridge evidence attribution to the execution handover, rebuilt the context packet, and added a focused regression to prevent recurrence.
+- Guardrail for next time: When a blocker is resolved, remove it from active-state sections and keep it only in historical outcome sections; when a new handover supersedes a kickoff memo, update bridge evidence references in the same round.
+- Evidence paths: `docs/phase_brief/phase60-brief.md`, `docs/context/bridge_contract_current.md`, `docs/handover/phase60_execution_handover_20260318.md`, `tests/test_phase60_d343_hygiene.py`, `docs/context/e2e_evidence/phase60_d343_hygiene_20260319_targeted_pytest.status.txt`
+
+## 2026-03-19 Round Entry (Hold States Must Be Stamped Explicitly in the Active Brief Status)
+- Date: 2026-03-19
+- Mistake or miss: Even after the D-341 blocked-audit hold became the active Phase 60 reality, the brief status still read `EXECUTING_BOUNDED`, which understated the actual blocked-hold state.
+- Root cause: Governance-close wording was updated in narrative sections, but the top-level status field lagged behind the true hold disposition.
+- Fix applied: Published `D-344`, updated the active Phase 60 brief status to `BLOCKED_EVIDENCE_ONLY_HOLD`, refreshed the bridge/current-context surfaces, and kept all execution/remediation boundaries unchanged.
+- Guardrail for next time: When a phase enters an evidence-only hold, update the active brief status line in the same round; do not leave the top-level status implying freer execution than the decision packet allows.
+- Evidence paths: `docs/phase_brief/phase60-brief.md`, `docs/decision log.md`, `docs/context/bridge_contract_current.md`, `docs/context/current_context.md`, `docs/context/current_context.json`
+
+## 2026-03-19 Round Entry (Formal Closeouts Must Stamp Closed State Without Inventing Exit Authority)
+- Date: 2026-03-19
+- Mistake or miss: After the blocked-hold state was already clear, the repo still lacked one final closeout packet explicitly marking Phase 60 as closed while preserving the blocked root cause and the lack of remediation authority.
+- Root cause: The team had the correct hold state, but the formal closeout marker had not yet been added to the brief/bridge/handover stack.
+- Fix applied: Published `D-345`, updated the active brief status to `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD`, refreshed the bridge/current-context/handover surfaces, and preserved the exact `274`-cell comparator gap as the formal closeout basis.
+- Guardrail for next time: When a phase is being closed as a blocked hold, stamp the closed status explicitly and keep the blocked root cause verbatim; do not imply that closeout itself authorizes remediation or next-phase work.
+- Evidence paths: `docs/phase_brief/phase60-brief.md`, `docs/decision log.md`, `docs/context/bridge_contract_current.md`, `docs/handover/phase60_execution_handover_20260318.md`, `docs/context/current_context.md`, `docs/context/current_context.json`
+
+## 2026-03-19 Round Entry (Phase 60 Kernel Mutation Blocked Reaffirmation)
+- Date: 2026-03-19
+- Mistake or miss: During Phase 60 review, a technical proposal attempted to remediate the exact 274-cell KS-03 gap by altering core engine defaults (`strict_missing_returns`) and snapshot hashing mechanisms.
+- Root cause: Structural architecture fixes were being proposed to bypass a blocked comparator check, which violated the D-346/D-345 closeout boundary that prohibited direct remediation.
+- Fix applied: Published `D-347`, explicitly blocked both Option A architecture changes, locked `core/engine.py` as immutable, preserved the 274-cell gap verbatim, and required a formal `approve next phase` token for any future kernel widening or Phase 61 work.
+- Guardrail for next time: When a phase is formally blocked by governance on a gap, never remediate the underlying engine component without a brand new authorized execution phase; structural changes to bypass explicit hold states are kernel mutations.
+- Evidence paths: `docs/decision log.md`, `docs/phase_brief/phase60-brief.md`, `docs/context/bridge_contract_current.md`, `docs/handover/phase60_execution_handover_20260318.md`
+
+## 2026-03-19 Round Entry (Phase 61 Transition and Data-Level Completeness Rule)
+- Date: 2026-03-19
+- Mistake or miss: During Phase 60, a blocked C3 comparator gap (274 missing cells) led to proposed architecture mutations, which were rightly rejected by D-347. The resolution (Phase 61 D-348) must use data-level sidecar completeness instead of kernel changes.
+- Root cause: Missing data on executed exposures was originally framed as a code-level engine/comparator defect instead of a data-completeness requirement matching the strict execution assumptions.
+- Fix applied: Published `D-348`, consumed the CEO `approve next phase` token, closed Phase 60, and opened Phase 61 for a data-only patch preserving `strict_missing_returns=True` and `core/engine.py` immutability.
+- Guardrail for next time: Resolve missing-return gaps on strict comparators via data-sidecar completeness patches or outer logic rather than mutating the core engine validation logic.
+- Evidence paths: `docs/decision log.md`, `docs/phase_brief/phase60-brief.md`, `docs/handover/phase60_execution_handover_20260318.md`

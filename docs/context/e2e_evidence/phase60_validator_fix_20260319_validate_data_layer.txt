@@ -1,0 +1,41 @@
+Starting Data Layer Integrity Check...
+
+[Check 0] Feature Store Integrity
+Rows: 2,555,730
+Null key rows: 0
+Duplicate (date, permno) keys: 0
+Date range: 2000-01-03 -> 2026-02-13
+Feature store extends 409 day(s) beyond latest governed price source (acceptable for current build mode)
+Composite-score NaN ratio: 31.98%
+PASS: feature store integrity checks passed.
+
+[Check 1] Zombie Audit
+Snapshot zombies (release_date <= 2025-09-18): 0 / 1545
+Historical zombies in fundamentals (<2024-01-01, advisory only): 601 / 2819
+
+[Check 2] Alignment Audit
+Universe Coverage: 2819 / 3000 (94.0%)
+Tickers with fundamentals but no price map (Top3000): 0 (0.00%)
+Tickers with price map but no fundamentals (Top3000): 181
+
+[Check 3] PIT Audit
+PIT violations (release_date <= fiscal_period_end): 0 / 215876
+
+PIT Sample (NVDA/AAPL latest rows):
+ticker fiscal_period_end release_date  revenue        source
+  NVDA        2024-10-31   2024-11-21  35082.0 compustat_csv
+  AAPL        2024-12-31   2025-01-31 124300.0 compustat_csv
+  NVDA        2025-01-31   2025-02-27  39331.0 compustat_csv
+  AAPL        2025-03-31   2025-05-02  95359.0 compustat_csv
+  NVDA        2025-04-30   2025-05-29  44062.0 compustat_csv
+  AAPL        2025-06-30   2025-08-01  94036.0 compustat_csv
+  NVDA        2025-07-31   2025-08-28  46743.0 compustat_csv
+  AAPL        2025-09-30   2025-10-31 102466.0 compustat_csv
+  NVDA        2025-10-31   2025-11-20  57006.0 compustat_csv
+  AAPL        2025-12-31   2026-01-30 143756.0 compustat_csv
+
+Snapshot Data Quality: 100.0% rows have non-null revenue_growth_yoy
+Snapshot Data Quality: 100.0% rows have non-null roic
+Historical fundamentals quality (informational): 75.0% non-null growth
+
+DATA LAYER: PASSED. Ready for Catalyst Radar.

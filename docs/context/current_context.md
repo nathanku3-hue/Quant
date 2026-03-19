@@ -1,22 +1,30 @@
 ## What Was Done
-- Published `D-331` to open Phase 60 in planning-only mode for the Stable Shadow Portfolio roadmap step.
-- Locked the four Phase 60 planning contracts in `docs/phase_brief/phase60-brief.md`: unified governed comparator surface, governed cost policy, one-shot post-2022 audit spec, and allocator carry-forward eligibility.
-- Published `D-332` to incorporate the Complete Institutional Pivot planning snapshot as the first Phase 60 deliverable with validator fix as Priority #1, Method B locked for S&P/Moody's sidecars, and out-of-boundary ingestion block enforced.
-- Published the PM-facing kickoff memo and refreshed the planner bridge to the Phase 60 planning-only state.
+- Consumed the exact `approve next phase` token per `D-337` to authorize the first bounded Phase 60 implementation packet.
+- Executed the `D-339` validator-fix slice: the validator now passes on the governed feature/snapshot surface and the zombie-row gate is clean.
+- Built the bounded governed daily holdings / weight cube from the existing read-only Phase 56 / Phase 57 sleeve surfaces with allocator overlay forced to zero.
+- Executed the `D-340` mandatory preflight checks and the bounded integrated post-2022 audit slice; the audit published a blocked evidence result because the same-period C3 comparator failed under strict missing-return rules.
+- Executed the `D-341` formal blocked-audit review packet and confirmed the immutable D-340 hold state, including the exact `274` missing executed-exposure return cells and the preserved no-remediation / no-widening boundaries.
+- Executed the `D-343` documentation-hygiene packet to remove stale active-state validator language and refresh the bridge evidence citation to the current execution-era handover.
+- Executed the `D-344` stale-language cleanup formalization packet to preserve the active `BLOCKED_EVIDENCE_ONLY_HOLD` state with a fresh verification bundle.
+- Executed the `D-345` formal closeout packet to close Phase 60 as `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD` with the same immutable blocked-audit root cause preserved.
+- Executed the `D-347` rule enforcement packet to explicitly reject Option A kernel-mutation changes (`strict_missing_returns: bool = True` and snapshot-hash overrides), asserting the 274-cell gap must remain verbatim without remediation.
+- Logged `D-348` authorizing Phase 61 bootstrap pending explicit execution token.
 
 ## What Is Locked
-- `D-284`, `D-292`, `D-309`, `D-311`, `D-312`, `D-313`, `D-314`, `D-315`, `D-316`, `D-317`, `D-318`, `D-319`, `D-320`, `D-321`, `D-322`, `D-323`, `D-324`, `D-325`, `D-326`, `D-327`, `D-328`, `D-329`, `D-330`, `D-331`, `D-332`, `RESEARCH_MAX_DATE = 2022-12-31`, `global_active_variants <= 18`, and the same-window / same-cost / same-`core.engine.run_simulation` evidence gate.
-- Prior sleeve and shadow SSOT artifacts remain immutable; `phase50_shadow_ship` remains `reference_only`.
-- Phase 60 is planning-only; no implementation, no post-2022 execution, and no promotion without a later explicit approval packet.
-- Validator fix (14-day freshness gap + 2 zombie snapshot rows) is Priority #1 deliverable before any sidecar testing or data-milestone execution.
-- Method B (isolated Parquet sidecars, view-layer join only) is locked as the planning default for S&P 500 Pro / Moody's B&D.
-- Out-of-boundary ingestion keys/schema mappings are blocked from execution.
+- The four planning contracts from `D-331`/`D-332` (unified cube Option B, governed cost 5.0 bps gate, audit Option A, allocator exclude) remain unchanged.
+- All prior locks (D-284…D-347, RESEARCH_MAX_DATE=2022-12-31).
+- The 274 cell gap remains unchanged at the core validation level, `core/engine.py` remains strictly immutable.
+- Public state:
+- **Phase 60**: CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD
+- **Phase 61**: Bootstrap authorized (D-348) but not yet publicly executed; pending explicit `approve next phase` token
 
 ## What Is Next
-- Clear validator failures (14-day freshness gap + 2 zombie snapshot rows) before any sidecar testing or data-milestone execution.
-- Review the bounded Phase 60 planning brief with Complete Institutional Pivot snapshot and keep implementation blocked.
-- Stand by for a separate explicit `approve next phase` token before any code change or post-2022 audit execution.
-- Preserve the four locked contracts plus the institutional pivot snapshot as the only valid inputs for any later Phase 60 implementation packet.
+- Execute the data-level completeness patch (sidecar or targeted append to C3 comparator surface) for the 274 executed-exposure return cells to unblock the audit without kernel changes.
+- Integrate S&P 500 Pro / Moody's B&D via locked Method B (isolated Parquet sidecars joined only at the view layer).
+- Re-run the exact D-340 bounded integrated audit on the patched comparator.
+- Phase 61 data patch and Method B integration pending explicit approval.
 
 ## First Command
-`Clear validator failures (14-day freshness gap + 2 zombie snapshot rows) as Priority #1, then await explicit approve next phase token before any Phase 60 implementation or post-2022 audit execution.`
+```text
+Reply `approve next phase` to bootstrap Phase 61 execution.
+```

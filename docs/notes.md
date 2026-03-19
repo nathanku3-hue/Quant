@@ -3684,3 +3684,110 @@ Date: 2026-03-01
    - `phase59_review_hold = 1[(research_sharpe_delta < 0) or (research_cagr_delta < 0) or (shadow_reference_alert_level != "GREEN")]`
    - source path:
      - `data/phase59_shadow_portfolio.py` (`build_phase59_packet`)
+
+## Phase 60 Validator + Governed Cube Formula Notes
+
+1. Validator freshness reference:
+   - `governed_price_surface = _price_source_config()`
+   - if `mode = tri`, use `prices_tri.parquet` only
+   - else use `prices.parquet` plus `yahoo_patch.parquet` when patch exists
+   - freshness delta:
+     - `freshness_delta_days = latest_governed_price_date - latest_feature_date`
+     - positive = lag
+     - zero = current
+     - negative = features extend beyond governed price source and are acceptable for the current build mode
+   - source path:
+     - `scripts/validate_data_layer.py` (`_freshness_status_text`, `_validate_feature_store_layer`)
+2. Bounded governed sleeve surfaces:
+   - `phase56_event_pead_weight_{i,t}` reconstructed from locked Phase 56 PEAD selection/weight logic on `2015-01-01 -> 2022-12-31`
+   - `phase57_event_corporate_actions_weight_{i,t}` reconstructed from locked Phase 57 Corporate Actions selection/weight logic on `2015-01-01 -> 2022-12-31`
+   - source paths:
+     - `scripts/phase56_pead_runner.py`
+     - `scripts/phase57_corporate_actions_runner.py`
+     - `scripts/phase60_governed_cube_runner.py`
+3. Governed cube construction:
+   - `book_weight_pre_allocator_{i,t} = phase56_event_pead_weight_{i,t} + phase57_event_corporate_actions_weight_{i,t}`
+   - `allocator_overlay_weight_{i,t} = 0` while allocator carry-forward remains blocked
+   - `book_weight_final_{i,t} = book_weight_pre_allocator_{i,t} + allocator_overlay_weight_{i,t}`
+   - `gross_exposure_t = sum_i(abs(book_weight_final_{i,t}))`
+   - `turnover_component_{i,t} = abs(book_weight_final_{i,t} - book_weight_final_{i,t-1})`
+   - source path:
+     - `scripts/phase60_governed_cube_runner.py` (`_build_cube_rows`)
+4. Eligibility contract in the cube:
+   - active row:
+     - `eligibility_state = governed_active__allocator_blocked`
+   - zero-weight exit row retained for turnover proof:
+     - `eligibility_state = turnover_exit__allocator_blocked`
+   - source path:
+     - `scripts/phase60_governed_cube_runner.py`
+5. D-340 preflight contract over the published cube:
+   - `PF-01`: cube summary matches locked packet id, window, max_date, and `5.0` bps gate
+   - `PF-02`: cube publishes non-empty holdings/exposure/turnover fields and excludes `phase50_shadow_ship`
+   - `PF-03`: governed gate remains `5.0` bps with `10.0` bps reserved for sensitivity
+   - `PF-04`: audit gate list and kill-switch list are frozen before execution
+   - `PF-05`: output paths remain outside `research_data/`
+   - `PF-06`: summary paths point to the exact published cube artifacts
+   - source path:
+     - `scripts/phase60_preflight_verify.py`
+6. D-340 bounded audit contract:
+   - audit window:
+     - `2023-01-01 -> 2024-12-31`
+   - `book_weights_{i,t} = phase56_event_pead_weight_{i,t} + phase57_event_corporate_actions_weight_{i,t}`
+   - `allocator_overlay_weight_{i,t} = 0`
+   - `GATE-01`: `spa_p < 0.05 and wrc_p < 0.05`
+   - `GATE-02`: `sharpe_pead >= sharpe_c3 and cagr_pead >= cagr_c3`
+   - `GATE-03`: `core_sleeve_block_enforced = True`
+   - `GATE-04`: `allocator_block_enforced = 1[(allocator_gate_pass = 0) and (allocator_overlay_applied = 0)]`
+   - `GATE-05`: unified cube overlap/exposure/turnover metrics are non-empty on the governed surface
+   - `KS-03_same_period_c3_unavailable`:
+     - triggers when the same-period C3 comparator cannot be produced under strict missing-return rules
+   - source path:
+     - `scripts/phase60_governed_audit_runner.py`
+7. D-341 blocked-audit review contract:
+   - review inputs are locked to exactly four immutable SSOT artifacts:
+     - `docs/context/e2e_evidence/phase60_d340_preflight_20260319_summary.json`
+     - `data/processed/phase60_governed_audit_summary.json`
+     - `data/processed/phase60_governed_audit_evidence.csv`
+     - `data/processed/phase60_governed_audit_delta.csv`
+   - `review_status = blocked_confirmed`
+   - `disposition = evidence_only_hold`
+   - `missing_executed_exposure_return_cells = 274`
+   - `comparator_available = False`
+   - reviewed delta lanes:
+     - `5bps_gate`
+     - `10bps_sensitivity`
+   - authorization flags must all remain false:
+     - `promotion_authorized`
+     - `remediation_authorized`
+     - `widening_authorized`
+     - `allocator_carry_forward_authorized`
+     - `core_sleeve_inclusion_authorized`
+     - `research_data_mutation_authorized`
+     - `kernel_mutation_authorized`
+   - source path:
+     - `scripts/phase60_d341_blocked_audit_review.py`
+8. D-343 documentation hygiene contract:
+   - active brief must not present resolved validator failures as current blockers after `D-339`
+   - bridge `Evidence Used` must point to the current execution-era handover, not the historical kickoff memo, once Phase 60 is in execution-era hold state
+   - source of truth paths:
+     - `docs/phase_brief/phase60-brief.md`
+     - `docs/context/bridge_contract_current.md`
+9. D-344 hold-formalization contract:
+   - active brief status must be `BLOCKED_EVIDENCE_ONLY_HOLD`
+   - `D-341` remains the current authoritative evidence-only hold packet
+   - no new remediation, widening, promotion, allocator carry-forward, core inclusion, or kernel mutation authority may appear in the D-344 packet
+   - source of truth paths:
+     - `docs/phase_brief/phase60-brief.md`
+     - `docs/decision log.md`
+     - `docs/context/bridge_contract_current.md`
+10. D-345 formal closeout contract:
+   - active brief status must be `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD`
+   - the exact blocked root cause must remain:
+     - `KS-03_same_period_c3_unavailable`
+     - `274` missing executed-exposure return cells
+   - no remediation, widening, promotion, allocator carry-forward, core inclusion, kernel mutation, or Phase 61+ authority may appear in the D-345 packet
+   - source of truth paths:
+     - `docs/phase_brief/phase60-brief.md`
+     - `docs/decision log.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/handover/phase60_execution_handover_20260318.md`

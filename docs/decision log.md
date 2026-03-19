@@ -4013,3 +4013,326 @@ Phase 60 (2026-03-18): Complete Institutional Pivot Planning Snapshot (D-332) �
   - Rollback note:
     - revert only this `D-332` entry plus the synchronized Phase 60 planning docs/context edits if leadership amends wording; do not alter `D-331`, `D-330`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
 
+Phase 59 (2026-03-18): Reopened Monitoring Refresh - Evidence Only / No Promotion / No Widening (D-333) 🟢
+
+  - Decision record:
+    - reopen Phase 59 narrowly for a monitoring-only refresh over the existing bounded Shadow Portfolio surface, using the existing read-only `phase59_*` packet plus Catalyst Radar-style runtime filtering on `holdings_overlap`, `gross_exposure_delta`, and `turnover_delta_rel` through the already-present D-328 sidecar joins, while preserving all prior locks and keeping the disposition evidence-only / no-promotion / no-widening.
+  - The Decision (Hardcoded):
+    - `D-330` remains authoritative for the first bounded packet closeout, but this `D-333` packet reopens Phase 59 for a narrow monitoring-only refresh scope only.
+    - no new loaders, no kernel reopen, no `research_data/` mutation, no post-2022 expansion, no production promotion, no stable shadow / multi-sleeve execution, and no widening beyond the existing `phase59_*` packet are authorized.
+    - the active bounded monitoring surface remains the existing read-only `data/processed/phase59_shadow_summary.json`, `data/processed/phase59_shadow_evidence.csv`, and `data/processed/phase59_shadow_delta_vs_c3.csv` artifacts plus replay evidence emitted under `docs/context/e2e_evidence/`.
+    - Catalyst Radar overlay in this packet means runtime filtering / presentation only on the already-published `holdings_overlap`, `gross_exposure_delta`, and `turnover_delta_rel` metrics; it does not create a new governed holdings surface and does not mutate the Phase 59 SSOT artifacts.
+    - `dashboard.py` and `views/shadow_portfolio_view.py` remain minimal read-only enrichment surfaces only.
+    - `data/processed/phase55_allocator_cpcv_evidence.json` may be cited only as a reference-only prior comparator lane; no new governed delta-vs-prior SSOT is authorized.
+    - all prior locks `D-284`..`D-332`, `RESEARCH_MAX_DATE = 2022-12-31`, and same-window / same-cost / same-`core.engine.run_simulation` discipline remain preserved verbatim.
+  - Evidence:
+    - `docs/phase_brief/phase59-brief.md` is updated to show the reopened monitoring-only scope under `D-333` with active_phase remaining `59`.
+    - `docs/handover/phase59_handover.md` and the SAW report are refreshed to document the reopened bounded monitoring refresh packet.
+    - targeted pytest, launch smoke, dual replays, and context build/validate are rerun only for the bounded Phase 59 monitoring scope.
+  - Contract lock:
+    - `Phase59 := REOPENED_MONITORING_ONLY iff (D-333 published) and (scope remains read-only Catalyst Radar style runtime filtering on existing Phase 59 metrics) and (no new Phase 59 SSOT artifact family is introduced)`.
+    - `if future Phase 59 widening, Phase 60 execution, or governed surface expansion is proposed -> require a separate explicit approval packet; D-333 is not that authority`.
+  - Open risks:
+    - none in the bounded reopened scope; the packet remains evidence-only / no-promotion / no-widening by construction.
+  - Rollback note:
+    - revert only this `D-333` entry plus the synchronized reopened Phase 59 docs/context/SAW edits if leadership amends wording; do not alter `D-332`, `D-331`, `D-330`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 59 (2026-03-18): Closeout After Reopened Monitoring Refresh - Evidence Only / No Promotion / No Widening (D-334) 🟢
+
+  - Decision record:
+    - close the narrow `D-333` reopened monitoring-only packet as complete, preserve the bounded Catalyst Radar sidecar overlay as runtime filtering / presentation only, and return Phase 59 to a closed evidence-only / no-promotion / no-widening state.
+  - The Decision (Hardcoded):
+    - Phase 59 is closed again under `D-334`; the reopened `D-333` monitoring packet is complete and no further Phase 59 work is authorized absent a separate explicit approval packet.
+    - the bounded Catalyst Radar sidecar overlay is complete via read-only runtime filtering on the already-published `holdings_overlap`, `gross_exposure_delta`, and `turnover_delta_rel` metrics only.
+    - no new loaders, no kernel reopen, no `research_data/` mutation, no post-2022 expansion, no production promotion, no stable shadow / multi-sleeve execution, and no new governed artifact family were introduced in the reopened packet.
+    - the canonical Phase 59 SSOT remains `data/processed/phase59_shadow_summary.json`, `data/processed/phase59_shadow_evidence.csv`, and `data/processed/phase59_shadow_delta_vs_c3.csv`; the D-333 replay outputs under `docs/context/e2e_evidence/` are evidence-only replay artifacts and do not replace SSOT.
+    - all prior locks `D-284`..`D-333`, `RESEARCH_MAX_DATE = 2022-12-31`, and same-window / same-cost / same-`core.engine.run_simulation` discipline remain preserved verbatim.
+  - Evidence:
+    - `docs/phase_brief/phase59-brief.md` is returned to `CLOSED` with `D-334` authority and active_phase remaining `59`.
+    - `docs/handover/phase59_handover.md` and the D-334 SAW report record the reopened monitoring refresh as complete and closed.
+    - the D-333 targeted pytest, launch smoke, dual replays, and context build/validate all passed before closeout.
+  - Contract lock:
+    - `Phase59 := CLOSED_AGAIN iff (D-334 published) and (D-333 bounded monitoring verification passed) and (no new Phase 59 governed artifact family introduced)`.
+    - `if future Phase 59 widening or any Phase 60 execution is proposed -> require a separate explicit approval packet; D-334 is not that authority`.
+  - Open risks:
+    - none in the bounded closeout scope; the packet remains evidence-only / no-promotion / no-widening by construction.
+  - Rollback note:
+    - revert only this `D-334` entry plus the synchronized closeout docs/context/SAW edits if leadership amends wording; do not alter `D-333`, `D-332`, `D-331`, `D-330`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-18): Planning-Only Kickoff Refresh - Execution Blocked (D-335) 🟢
+
+  - Decision record:
+    - formally approve the `D-334` Phase 59 closeout, reactivate the active repo context at Phase 60 in planning-only mode, and preserve the previously locked Stable Shadow planning contracts without granting any implementation or evidence-generation authority.
+  - The Decision (Hardcoded):
+    - `D-335` makes Phase 60 the active planning context only; it does not authorize code changes, tests, replay runners, sidecar writes, holdout execution, or production promotion.
+    - the Phase 60 planning boundary remains the D-331/D-332 contract set: unified governed comparator surface, governed `5.0` bps gating cost basis with `10.0` bps sensitivity lane, one-shot post-2022 audit preflight/kill-switch design, allocator carry-forward exclusion, and the Complete Institutional Pivot planning snapshot.
+    - `NextPhaseApproval = PENDING` remains mandatory, and any Phase 60 implementation or evidence generation requires a later explicit approval packet containing the exact token `approve next phase`.
+    - Phase 59 stays closed under `D-334`; no widening, no reopen, no new loader files, and no mutation of prior SSOT artifacts are authorized by this packet.
+    - all prior locks `D-284`..`D-334`, `RESEARCH_MAX_DATE = 2022-12-31`, and same-window / same-cost / same-`core.engine.run_simulation` discipline remain preserved verbatim.
+  - Evidence:
+    - `docs/phase_brief/phase60-brief.md` is refreshed to `D-335` authority with execution explicitly blocked and `active_phase = 60` as the planning SSOT label.
+    - `docs/handover/phase60_kickoff_memo_20260318.md`, `docs/context/bridge_contract_current.md`, and the D-335 SAW report are refreshed in the same docs-only round.
+    - `docs/context/current_context.md` and `docs/context/current_context.json` are rebuilt from the Phase 60 planning source and validated without running any Phase 60 implementation or evidence command.
+  - Contract lock:
+    - `Phase60 := PLANNING_ONLY iff (D-335 published) and (NextPhaseApproval == PENDING) and (no execution/evidence generation authority granted)`.
+    - `if future Phase 60 implementation, evidence generation, or post-2022 execution is proposed -> require a separate explicit approval packet containing exact 'approve next phase'; D-335 is not that authority`.
+  - Open risks:
+    - the governed daily holdings / weights cube remains a planning contract only; no implementation or holdout evidence exists yet.
+  - Rollback note:
+    - revert only this `D-335` entry plus the synchronized Phase 60 planning docs/context/SAW edits if leadership amends wording; do not alter `D-334`, `D-333`, `D-332`, `D-331`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-18): First Bounded Execution Authorization (D-337) 🟢
+
+  - Decision record:
+    - Consume the exact approval token to authorize only the first bounded Phase 60 implementation packet. Transition active_phase := 60 after this packet publishes and the context packet is refreshed.
+  - The Decision (Hardcoded):
+    - approve next phase exactly consumed.
+    - Keep the four D-331 contracts locked verbatim (unified daily holdings/weight cube = Option B, governed cost = 5.0 bps gate + 10.0 bps sensitivity-only, one-shot integrated post-2022 audit = Option A with all preflight checks + kill switches, allocator carry-forward excluded until eligibility clears).
+    - Validator fix (14-day freshness gap + 2 zombie snapshot rows) remains absolute Priority #1 before any deeper testing or post-2022 run.
+    - Method B sidecars (isolated Parquet, view-layer join only) locked for S&P/Moody’s.
+    - All prior locks (D-284…D-336, RESEARCH_MAX_DATE=2022-12-31, same-engine discipline, out-of-boundary ingestion block) preserved verbatim.
+    - No promotion of Phase 54 core sleeve, no carry-forward of negative-Sharpe allocator variant, no kernel mutation, no research_data/ mutation, no post-2022 data exposure until full gates + preflights pass.
+  - Evidence:
+    - Run only bounded verification: `pytest -q`, launch smoke, context rebuild/validate.
+    - Capture outputs under `docs/context/e2e_evidence/phase60_d337_first_packet_20260318.*`.
+    - Publish updated `docs/handover/phase60_execution_handover_20260318.md`, refreshed `current_context.json` (must show active_phase=60), and new SAW report.
+  - Contract lock:
+    - `Phase60 := EXECUTING_BOUNDED iff (D-337 published) and (exact token consumed) and (context packet refreshed) and (validator fix flagged Priority #1) and (scope remains first bounded cube + preflight checks only)`.
+    - `Any attempt to widen, run post-2022 data, or promote blocked sleeves before kill-switch preflights -> immediate rollback + governance violation`.
+  - Open risks:
+    - Validator fix first condition means no testing or sidecar use until the gap and zombie rows are fixed.
+  - Rollback note:
+    - Immediate rollback + governance violation if any attempt to widen, run post-2022 data, or promote blocked sleeves before kill-switch preflights occurs.
+
+Phase 60 (2026-03-19): D-337 Governance Hygiene & Internal Consistency (D-338) 🟢
+
+  - Decision record:
+    - repair the internal governance artifacts for the bounded D-337 packet only: refresh the stale bridge, rewrite the D-337 SAW report into validator-clean schema, refresh the context packet, and hold any validator/code/cube start until the next explicit packet.
+  - The Decision (Hardcoded):
+    - `D-337` remains the sole bounded execution authorization consumed so far for Phase 60.
+    - `D-338` is docs-only hygiene. It does not widen scope, it does not mutate code or evidence surfaces, and it does not start the validator fix or the unified cube build.
+    - `docs/context/bridge_contract_current.md` must align to the D-337 bounded execution truth, not the stale D-335 planning-only posture.
+    - `docs/saw_reports/saw_phase60_d337_first_packet_20260318.md` must be re-authored into the repo-standard SAW schema and pass `validate_saw_report_blocks.py`.
+    - `docs/context/current_context.md` and `docs/context/current_context.json` must be refreshed so they preserve D-337 history while showing the D-338 hold: await the next explicit packet before any validator/code/cube work begins.
+    - all prior locks `D-284`..`D-337`, `RESEARCH_MAX_DATE = 2022-12-31`, the four D-331 planning contracts, the D-332 institutional-pivot snapshot, the D-335 planning refresh, and all prior SSOT artifacts remain preserved verbatim.
+  - Evidence:
+    - `docs/context/bridge_contract_current.md` refreshed from stale D-335 planning-only language to D-337 bounded execution truth with D-338 hold language.
+    - `docs/saw_reports/saw_phase60_d337_first_packet_20260318.md` re-authored into validator-clean schema.
+    - `docs/context/e2e_evidence/phase60_d338_d337_saw_validate_20260319.txt` -> PASS.
+    - `docs/context/e2e_evidence/phase60_d338_context_build_20260319.*` and `phase60_d338_context_validate_20260319.*` -> PASS.
+  - Contract lock:
+    - `Phase60_D338_Hygiene := VALID iff (bridge reflects D-337 truth) and (D-337 SAW validator passes) and (context packet refreshed) and (no validator/code/cube work started in this round)`.
+    - `if future validator fix or bounded cube work is proposed -> require the next explicit packet after D-338; D-338 is not the release command`.
+  - Open risks:
+    - the validator fix (14-day freshness gap + 2 zombie snapshot rows) remains unresolved, and all code/cube work is intentionally held pending the next explicit packet.
+  - Rollback note:
+    - revert only this `D-338` entry plus the synchronized bridge/context/SAW/brief/lesson edits if leadership amends wording; do not alter `D-337`, `D-335`, `D-332`, `D-331`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-19): Validator Fix Priority Enforcement + Bounded Governed Cube Build (D-339) 🟢
+
+  - Decision record:
+    - execute only the bounded D-339 slice inside the already-authorized D-337 packet: inspect the exact validator failure paths, verify the validator gate to green, and publish the first governed daily holdings / weight cube on the existing read-only sleeve surfaces with allocator overlay explicitly forced to zero.
+  - The Decision (Hardcoded):
+    - the validator gate is now measured against the same governed price surface the feature builder actually consumes.
+    - the live validator status is green: no feature-store freshness failure on the governed surface, zero zombie snapshot rows, and zero PIT violations.
+    - the bounded governed cube is built only from:
+      - `phase56_event_pead` reconstructed on the locked `2015-01-01 -> 2022-12-31`, `5.0` bps, read-only governed sleeve logic,
+      - `phase57_event_corporate_actions` reconstructed on the locked `2015-01-01 -> 2022-12-31`, `5.0` bps, read-only governed sleeve logic.
+    - allocator overlay remains `0.0` on every cube row because allocator carry-forward remains excluded until eligibility clears.
+    - the blocked Phase 54 core sleeve remains excluded from the cube.
+    - no post-2022 data, no kernel mutation, no `research_data/` mutation, no promotion path, and no widening beyond the bounded D-339 slice are authorized here.
+    - all prior locks `D-284`..`D-338`, `RESEARCH_MAX_DATE = 2022-12-31`, same-window / same-cost / same-`core.engine.run_simulation` discipline, Contract A/B/C/D from `D-331`, and the institutional-pivot framing from `D-332` remain preserved verbatim.
+  - Evidence:
+    - targeted pytest for validator + cube slice: `docs/context/e2e_evidence/phase60_validator_fix_20260319_targeted_pytest.*` -> PASS.
+    - full regression: `docs/context/e2e_evidence/phase60_validator_fix_20260319_full_pytest.*` -> PASS.
+    - validator: `docs/context/e2e_evidence/phase60_validator_fix_20260319_validate_data_layer.txt` -> PASS.
+    - bounded cube runner: `docs/context/e2e_evidence/phase60_governed_cube_20260319.*` -> PASS.
+    - launch smoke: `docs/context/e2e_evidence/phase60_governed_cube_20260319_smoke.*` -> PASS.
+    - governed cube artifacts:
+      - `data/processed/phase60_governed_cube_summary.json`
+      - `data/processed/phase60_governed_cube.csv`
+      - `data/processed/phase60_governed_cube_daily.csv`
+    - updated PM handover: `docs/handover/phase60_execution_handover_20260318.md`
+    - refreshed context packet and D-339 SAW report published in the same round.
+  - Contract lock:
+    - `Phase60_D339 := VALID iff (validator = PASS) and (zombie_rows = 0) and (cube uses only phase56_event_pead + phase57_event_corporate_actions with allocator_overlay_weight = 0) and (max_date <= 2022-12-31) and (cost_bps_gate = 5.0)`.
+    - `if future post-2022 work, promotion path, sidecar expansion, or widened cube execution is proposed -> require a separate explicit approval packet; D-339 is not that authority`.
+  - Open risks:
+    - the governed cube is still pre-audit and pre-promotion: no post-2022 evidence exists, allocator carry-forward remains blocked, and the core sleeve remains excluded.
+  - Rollback note:
+    - revert only this `D-339` entry plus the synchronized Phase 60 validator/cube docs/context/SAW edits if leadership amends wording; do not alter `D-338`, `D-337`, `D-335`, `D-332`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-19): Mandatory Preflight Checks + Bounded One-Shot Post-2022 Audit (D-340) 🟢
+
+  - Decision record:
+    - execute PF-01..PF-06 on the published governed cube, then run the bounded integrated post-2022 audit slice only if the preflights pass, while preserving all promotion, carry-forward, core-inclusion, and widening blocks.
+  - The Decision (Hardcoded):
+    - PF-01..PF-06 passed on the published `phase60_governed_cube*` artifacts.
+    - the bounded audit window is `2023-01-01 -> 2024-12-31`.
+    - the governed audit gate remains `5.0` bps and the separate sensitivity lane remains `10.0` bps.
+    - allocator overlay remains `0.0`, allocator carry-forward remains blocked, and the core sleeve remains excluded.
+    - no `phase50_shadow_ship` reference fill, no post-2022 promotion claim, no `research_data/` mutation, no kernel mutation, and no widening beyond the bounded D-340 audit slice are authorized here.
+    - the audit result is `blocked` by kill switch `KS-03_same_period_c3_unavailable` because the same-period C3 comparator hit `274` missing executed-exposure return cells under strict rules.
+  - Evidence:
+    - preflight evidence: `docs/context/e2e_evidence/phase60_d340_preflight_20260319.*` -> PASS.
+    - bounded audit evidence:
+      - `data/processed/phase60_governed_audit_summary.json`
+      - `data/processed/phase60_governed_audit_evidence.csv`
+      - `data/processed/phase60_governed_audit_delta.csv`
+      - `docs/context/e2e_evidence/phase60_d340_audit_20260319.*`
+    - full regression: `docs/context/e2e_evidence/phase60_d340_full_pytest_20260319.*` -> PASS.
+    - launch smoke: `docs/context/e2e_evidence/phase60_d340_audit_20260319_smoke.*` -> PASS.
+  - Contract lock:
+    - `Phase60_D340 := VALID iff (PF-01..PF-06 = PASS) and (audit artifacts published) and (allocator_overlay_weight = 0) and (core_sleeve_included = 0) and (audit verdict carries no promotion claim)`.
+    - `if future comparator remediation, post-2022 widening, promotion path, or any further Phase 60 expansion is proposed -> require a separate explicit approval packet; D-340 is not that authority`.
+  - Open risks:
+    - the same-period C3 comparator is unavailable under strict missing-return rules (`274` missing executed-exposure return cells), so GATE-02 cannot clear and the audit remains blocked evidence only.
+  - Rollback note:
+    - revert only this `D-340` entry plus the synchronized preflight/audit docs/context/SAW edits if leadership amends wording; do not alter `D-339`, `D-338`, `D-337`, `D-335`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-19): Blocked Audit Formal Review + Evidence-Only Hold Packet (D-341) 🟢
+
+  - Decision record:
+    - formally review the immutable D-340 blocked audit packet against the four SSOT artifacts only, extract the exact `274` executed-exposure missing-return-cell root cause, and publish an evidence-only hold packet with no remediation, no widening, and no promotion authority.
+  - The Decision (Hardcoded):
+    - D-341 validates only:
+      - `docs/context/e2e_evidence/phase60_d340_preflight_20260319_summary.json`
+      - `data/processed/phase60_governed_audit_summary.json`
+      - `data/processed/phase60_governed_audit_evidence.csv`
+      - `data/processed/phase60_governed_audit_delta.csv`
+    - the D-340 packet remains `blocked` with `kill_switches_triggered = [KS-03_same_period_c3_unavailable]`.
+    - the same-period comparator remains unavailable under strict missing-return rules because it hit exactly `274` missing executed-exposure return cells.
+    - the D-341 review packet publishes only evidence-only hold artifacts:
+      - `docs/context/e2e_evidence/phase60_d341_review_20260319_summary.json`
+      - `docs/context/e2e_evidence/phase60_d341_review_20260319_findings.csv`
+      - `docs/context/e2e_evidence/phase60_d341_review_20260319.status.txt`
+    - `active_phase = 60` remains unchanged, and remediation, promotion, widening, allocator carry-forward, core inclusion, `research_data/` mutation, and kernel mutation remain unauthorized.
+  - Evidence:
+    - D-341 review evidence:
+      - `docs/context/e2e_evidence/phase60_d341_review_20260319_summary.json`
+      - `docs/context/e2e_evidence/phase60_d341_review_20260319_findings.csv`
+      - `docs/context/e2e_evidence/phase60_d341_review_20260319.status.txt`
+    - focused regression: `docs/context/e2e_evidence/phase60_d341_review_20260319_targeted_pytest.status.txt` -> PASS.
+    - full regression: `docs/context/e2e_evidence/phase60_d341_review_20260319_full_pytest.status.txt` -> PASS.
+    - context refresh: `docs/context/e2e_evidence/phase60_d341_review_20260319_context_build.status.txt` -> PASS.
+    - context validate: `docs/context/e2e_evidence/phase60_d341_review_20260319_context_validate.status.txt` -> PASS.
+    - SAW validate: `docs/context/e2e_evidence/phase60_d341_review_20260319_saw_validate.txt` -> PASS.
+    - closure validate: `docs/context/e2e_evidence/phase60_d341_review_20260319_closure_validate.txt` -> PASS.
+  - Contract lock:
+    - `Phase60_D341 := VALID iff (D340_preflight_passed = 1) and (D340_audit_status = blocked) and (KS-03_same_period_c3_unavailable in kill_switches_triggered) and (missing_executed_exposure_return_cells = 274) and (D341 outputs publish evidence_only_hold with all authorization flags = 0)`.
+    - `if future comparator remediation, promotion path, post-2022 widening, allocator carry-forward, core inclusion, or any further Phase 60 expansion is proposed -> require a separate explicit approval packet; D-341 is not that authority`.
+  - Open risks:
+    - the same-period C3 comparator remains unavailable under strict missing-return rules (`274` missing executed-exposure return cells), so the audit remains evidence-only and blocked from promotion.
+  - Rollback note:
+    - revert only this `D-341` entry plus the synchronized review/docs/context/SAW edits if leadership amends wording; do not alter `D-340`, `D-339`, `D-338`, `D-337`, `D-335`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-19): Documentation Hygiene & Stale Language Cleanup (D-343) 🟢
+
+  - Decision record:
+    - remove the stale active-state validator-failure language from the active Phase 60 brief, refresh the bridge evidence attribution to the current execution-era handover, and preserve the bounded D-341 evidence-only hold state without changing any execution authority.
+  - The Decision (Hardcoded):
+    - `D-343` is docs-only hygiene. It does not authorize remediation, promotion, widening, allocator carry-forward, core inclusion, `research_data/` mutation, kernel mutation, or any further Phase 60 execution.
+    - the stale Phase 60 brief block `Operational Validator Failures (Must Clear Immediately)` is removed from the active brief because the validator gate was already cleared under `D-339`.
+    - the bridge `Evidence Used` reference is refreshed from the historical kickoff memo to the current execution-era handover `docs/handover/phase60_execution_handover_20260318.md`.
+    - `D-341` remains the authoritative evidence-only hold packet for the blocked D-340 audit result.
+  - Evidence:
+    - `docs/phase_brief/phase60-brief.md` no longer presents the resolved validator issue as an active blocker.
+    - `docs/context/bridge_contract_current.md` cites the current execution handover under `Evidence Used`.
+    - targeted pytest, context build/validate, and SAW validation are captured under `docs/context/e2e_evidence/phase60_d343_hygiene_20260319.*`.
+  - Contract lock:
+    - `Phase60_D343 := VALID iff (active brief no longer contains stale resolved-validator blocker language) and (bridge evidence attribution points to current execution handover) and (D-341 hold state is otherwise unchanged)`.
+    - `if future remediation, widening, promotion path, allocator carry-forward, core inclusion, or any further Phase 60 expansion is proposed -> require a separate explicit approval packet; D-343 is not that authority`.
+  - Open risks:
+    - none new in-scope; `D-341` remains the authoritative blocked-audit hold packet.
+  - Rollback note:
+    - revert only this `D-343` entry plus the synchronized brief/bridge/context/SAW/lesson edits if leadership amends wording; do not alter `D-341`, `D-340`, `D-339`, `D-338`, `D-337`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-19): Closure Path Decision + Blocked Hold Formalization (D-344) 🟢
+
+  - Decision record:
+    - formally confirm that Phase 60 is not yet on a closeout path because the D-340 same-period comparator block remains unresolved, preserve the D-341 evidence-only hold as the current active state, and publish a documentation-hygiene formalization packet with no new execution authority.
+  - The Decision (Hardcoded):
+    - Phase 60 is now explicitly stamped as `BLOCKED_EVIDENCE_ONLY_HOLD` in the active brief.
+    - `D-344` is docs-only formalization. It does not authorize remediation, widening, promotion, allocator carry-forward, core inclusion, `research_data/` mutation, kernel mutation, or any further Phase 60 execution.
+    - `D-341` remains the authoritative evidence-only hold packet over the immutable `D-340` blocked audit result.
+    - the exact root cause remains unchanged: the same-period C3 comparator failed under strict missing-return rules with `274` missing executed-exposure return cells.
+    - the stale resolved-validator language remains absent from the active brief, and the bridge evidence attribution remains locked to the execution-era handover.
+  - Evidence:
+    - `docs/phase_brief/phase60-brief.md` status is now `BLOCKED_EVIDENCE_ONLY_HOLD`.
+    - `docs/context/bridge_contract_current.md` still cites `docs/handover/phase60_execution_handover_20260318.md` under `Evidence Used`.
+    - targeted pytest, context build/validate, and SAW validation are captured under `docs/context/e2e_evidence/phase60_d344_hygiene_20260319.*`.
+  - Contract lock:
+    - `Phase60_D344 := VALID iff (phase60_brief_status = BLOCKED_EVIDENCE_ONLY_HOLD) and (stale resolved-validator language absent) and (bridge evidence attribution points to execution handover) and (D341 hold state unchanged)`.
+    - `if future remediation, widening, promotion path, allocator carry-forward, core inclusion, or any further Phase 60 expansion is proposed -> require a separate explicit approval packet; D-344 is not that authority`.
+  - Open risks:
+    - none new in-scope; the D-341 blocked-audit hold remains the authoritative Phase 60 state.
+  - Rollback note:
+    - revert only this `D-344` entry plus the synchronized brief/bridge/context/SAW/lesson edits if leadership amends wording; do not alter `D-343`, `D-341`, `D-340`, `D-339`, `D-338`, `D-337`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-19): Formal Evidence-Only Closeout as Blocked Hold Packet (D-345) 🟢
+
+  - Decision record:
+    - formally close Phase 60 as a blocked evidence-only hold, preserving the immutable D-340 blocked audit result and the D-341 review root cause, while granting no remediation, no widening, no promotion, and no Phase 61+ authority.
+  - The Decision (Hardcoded):
+    - Phase 60 is formally closed as `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD`.
+    - the exact blocked root cause remains unchanged and must be preserved verbatim:
+      - same-period C3 comparator unavailable under strict missing-return rules,
+      - `274` missing executed-exposure return cells,
+      - `kill_switches_triggered = [KS-03_same_period_c3_unavailable]`.
+    - `D-345` is docs-only closeout. It does not authorize remediation, widening, promotion, allocator carry-forward, core inclusion, `research_data/` mutation, kernel mutation, or any Phase 61+ scope.
+    - all prior locks `D-284`..`D-344`, `RESEARCH_MAX_DATE = 2022-12-31`, same-window / same-cost / same-`core.engine.run_simulation` discipline, and the four D-331 planning contracts remain preserved verbatim.
+  - Evidence:
+    - `docs/phase_brief/phase60-brief.md` status is `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD`.
+    - `docs/context/bridge_contract_current.md` reflects D-345 closeout state.
+    - `docs/handover/phase60_execution_handover_20260318.md` reflects D-345 blocked-hold closeout.
+    - targeted pytest, context build/validate, and SAW/closure validation are captured under `docs/context/e2e_evidence/phase60_d345_closeout_20260319.*`.
+  - Contract lock:
+    - `Phase60_D345 := CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD iff (phase60_brief_status = CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD) and (D341_root_cause_preserved = 274_missing_cells + KS03) and (no new execution authority granted)`.
+    - `if future remediation, widening, promotion path, allocator carry-forward, core inclusion, kernel mutation, or any Phase 61+ scope is proposed -> require a separate explicit approval packet containing exact 'approve next phase'; D-345 is not that authority`.
+  - Open risks:
+    - none new in-scope; the blocked same-period comparator root cause is now the preserved formal closeout basis for Phase 60.
+  - Rollback note:
+    - revert only this `D-345` entry plus the synchronized closeout docs/context/SAW/lesson edits if leadership amends wording; do not alter `D-344`, `D-343`, `D-341`, `D-340`, `D-339`, `D-338`, `D-337`, prior-sleeve SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 60 (2026-03-19): Post-Phase-60 Kernel Mutation Hold Packet (D-347) 🟢
+
+  - Decision record:
+    - explicitly reject Option A for core/engine.py:34 (strict_missing_returns) and the data snapshot hash function; declare both changes blocked under the D-346/D-345 closeout, preserve the 274 missing executed-exposure return cells verbatim without remediation, and require a formal `approve next phase` token for any Phase 61+ work.
+  - The Decision (Hardcoded):
+    - `core/engine.py` remains immutable.
+    - changing `strict_missing_returns` to True or changing the hash function constitutes a kernel mutation and direct remediation of the 274-cell gap, which is explicitly blocked at 100/100 confidence.
+    - the 274-cell gap is preserved verbatim; no fix or comparator repair is authorized in this round.
+    - any future kernel hardening or Phase 61 work requires a completely new explicit packet containing the literal token `approve next phase` before any code change.
+  - Evidence:
+    - Phase 60 `docs/context/e2e_evidence/phase60_d347_hold_20260319.*` outputs.
+    - refreshed context packets affirming `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD`.
+    - new SAW report `docs/saw_reports/saw_phase60_d347_kernel_hold_20260319.md`.
+  - Contract lock:
+    - `Phase60_D347 := MUTATION_BLOCKED iff (core/engine.py unchanged) and (gap preserved verbatim) and (Phase 61/kernel widening strictly requires approve next phase)`.
+    - `if future kernel hardening or Phase 61 work is proposed -> require a separate explicit approval packet containing exact 'approve next phase'`.
+  - Open risks:
+    - none new; the blocked 274-cell C3 comparator gap remains unresolved and unremediated per governance rules.
+  - Rollback note:
+    - revert only this `D-347` entry plus the synchronized brief/context/SAW/lesson edits; do not alter prior SSOT artifacts, `RESEARCH_MAX_DATE = 2022-12-31`, or the `D-292` research kernel.
+
+Phase 61 (2026-03-19): CEO “approve next phase” Token Consumed + Bounded Phase 61 Comparator Remediation Packet (Data-Only) (D-348) 🟢
+
+  - Decision record:
+    - Publish and execute only the D-348 bounded packet exactly as defined in the CEO Handover.
+    - Data-level completeness patch for the 2023-2024 executed-exposure returns (sidecar refresh or targeted append to C3 comparator surface).
+    - Preserve `strict_missing_returns=True` and snapshot hash function verbatim — no kernel mutation.
+    - Re-run the exact D-340 bounded integrated audit (governed cube from PEAD + Corporate Actions sleeves, `allocator_overlay=0.0`, core sleeve excluded, `5.0` bps gate + separate `10.0` bps sensitivity lane, window `2023-01-01 -> 2024-12-31`).
+    - Integrate S&P 500 Pro / Moody’s B&D via locked Method B (isolated Parquet sidecars joined only at view layer).
+    - Immediately after successful re-audit, publish new evidence bundle and transition docs.
+    - No other work authorized (no promotion, no allocator carry-forward, no core inclusion, no `RESEARCH_MAX_DATE` lift, no widening beyond this slice).
+  - The Decision (Hardcoded):
+    - Phase 60 is officially closed. Phase 61 is executing under EXECUTING_BOUNDED.
+    - `core/engine.py` remains untouched (D-347 lock enforced).
+    - The 274-cell history stays in lessons as accepted evidence-only root cause.
+    - All prior locks (D-284–D-347, `RESEARCH_MAX_DATE=2022-12-31`, same-window/same-cost/same-engine, `5.0` bps gate, allocator/core exclusions) preserved verbatim.
+  - Evidence:
+    - Docs updated across `decision log.md`, `phase60-brief.md`, `current_context.md`, `current_context.json`, `bridge_contract_current.md`, `phase60_execution_handover_20260318.md`, `lessonss.md`.
+  - Contract lock:
+    - Bounded execution slice logic applies solely to data patch for 274 return cells (C3 only), followed by Method B sidecar integration. Null core/engine.py mutations permitted.
+  - Rollback note:
+    - Kernel mutation, widening, promotion, or any change beyond the bounded data patch → revert all D-348 edits and return to D-347 hold state.

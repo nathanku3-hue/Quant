@@ -12,12 +12,13 @@ This system implements a multi-phase quantitative trading strategy with:
 
 ## Project Status
 
-**Current Phase**: Phase 59 (Shadow Portfolio) — Bounded Packet Execution 🔄
-- **Phase 59 Status**: Bounded read-only Shadow NAV / alert surface implemented (D-329)
-  - Evidence-only / no promotion / no widening
-  - Red reference alerts (research lane below C3 baseline)
-  - Split research/operational lanes (unified surface pending Phase 60)
-- **Next**: PM/CEO bounded packet review before Phase 60 stable shadow stack decision
+**Current Phase**: Phase 60 (Stable Shadow Portfolio) — CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD 🚫
+- **Phase 60 Status**: Closed under D-345/D-347/D-348
+  - 274-cell C3 return gap preserved verbatim
+  - Kernel immutable (core/engine.py locked)
+  - Audit blocked on same-period comparator unavailable
+- **Phase 61**: Bootstrap authorized (D-348) but not yet publicly executed; pending explicit `approve next phase` token
+- **Next**: Data-level completeness patch for 274 C3 return cells + Method B sidecar integration
 
 ## Current Truth Surfaces
 
