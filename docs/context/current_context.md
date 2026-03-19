@@ -7,24 +7,17 @@
 - Executed the `D-343` documentation-hygiene packet to remove stale active-state validator language and refresh the bridge evidence citation to the current execution-era handover.
 - Executed the `D-344` stale-language cleanup formalization packet to preserve the active `BLOCKED_EVIDENCE_ONLY_HOLD` state with a fresh verification bundle.
 - Executed the `D-345` formal closeout packet to close Phase 60 as `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD` with the same immutable blocked-audit root cause preserved.
-- Executed the `D-347` rule enforcement packet to explicitly reject Option A kernel-mutation changes (`strict_missing_returns: bool = True` and snapshot-hash overrides), asserting the 274-cell gap must remain verbatim without remediation.
-- Logged `D-348` authorizing Phase 61 bootstrap pending explicit execution token.
 
 ## What Is Locked
 - The four planning contracts from `D-331`/`D-332` (unified cube Option B, governed cost 5.0 bps gate, audit Option A, allocator exclude) remain unchanged.
-- All prior locks (D-284…D-347, RESEARCH_MAX_DATE=2022-12-31).
-- The 274 cell gap remains unchanged at the core validation level, `core/engine.py` remains strictly immutable.
-- Public state:
-- **Phase 60**: CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD
-- **Phase 61**: Bootstrap authorized (D-348) but not yet publicly executed; pending explicit `approve next phase` token
+- All prior locks (D-284…D-345, RESEARCH_MAX_DATE=2022-12-31).
+- No post-2022 exposure beyond the bounded D-340 slice, no remediation of the blocked comparator path, no carry-forward of negative Sharpe, and no core promotion.
 
 ## What Is Next
-- Execute the data-level completeness patch (sidecar or targeted append to C3 comparator surface) for the 274 executed-exposure return cells to unblock the audit without kernel changes.
-- Integrate S&P 500 Pro / Moody's B&D via locked Method B (isolated Parquet sidecars joined only at the view layer).
-- Re-run the exact D-340 bounded integrated audit on the patched comparator.
-- Phase 61 data patch and Method B integration pending explicit approval.
+- Await the next explicit packet containing the literal token `approve next phase` before any remediation of the blocked post-2022 comparator path, any promotion path, any Phase 61+ scope, or any wider execution begins.
+- Next packet -> decide whether to authorize comparator remediation or any new phase/slice; D-345 itself is a formal blocked-hold closeout and grants no such authority.
 
 ## First Command
 ```text
-Reply `approve next phase` to bootstrap Phase 61 execution.
+Await the next explicit packet containing exact `approve next phase` before any remediation, promotion, Phase 61+, comparator remediation, or widened execution starts.
 ```

@@ -27,7 +27,7 @@ Use these surfaces together to understand the current system state:
 ### Static Truth
 - **[top_level_PM.md](top_level_PM.md)** — long-lived product/system intent
 - **[docs/decision log.md](docs/decision%20log.md)** — authoritative decision history
-- **Active phase brief** — current phase scope and boundaries (e.g., `docs/phase_brief/phase59-brief.md`)
+- **Active phase brief** — current phase scope and boundaries (e.g., `docs/phase_brief/phase60-brief.md`)
 
 ### Live Truth
 - **[docs/context/current_context.md](docs/context/current_context.md)** — current active phase and blocked next step
