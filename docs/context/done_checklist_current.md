@@ -24,61 +24,65 @@ Purpose: define machine-checkable done criteria for Phase 60 closeout as blocked
 
 ### Governance Closeout
 - [x] D-345 formal closeout published
-- [x] D-347 kernel mutation hold enforced
-- [x] D-348 Phase 61 bootstrap authorized but not executed
+- [x] D-347 kernel mutation hold enforced (Option A structural changes rejected)
+- [x] D-348 Phase 61 bootstrap authorized but not yet publicly executing
 - [x] 274-cell gap preserved verbatim without remediation
 - [x] No mutation of `research_data/` or prior sleeve SSOT
 - [x] No post-2022 evidence generation beyond bounded D-340 slice (RESEARCH_MAX_DATE = 2022-12-31)
 
 ### Evidence Completeness
-- [x] `data/processed/phase59_shadow_summary.json` persisted
-- [x] `data/processed/phase59_shadow_evidence.csv` persisted
-- [x] `data/processed/phase59_shadow_delta_vs_c3.csv` persisted
-- [x] Comparator delta vs C3 baseline documented
-- [x] Alert metrics captured (red reference alerts documented)
+- [x] `data/processed/phase60_governed_cube.parquet` persisted
+- [x] `docs/context/e2e_evidence/phase60_d340_preflight_*.status.txt` persisted
+- [x] `docs/context/e2e_evidence/phase60_d340_audit_*.status.txt` persisted (blocked result)
+- [x] `docs/context/e2e_evidence/phase60_d341_review_*.csv` persisted
+- [x] 274-cell gap count documented verbatim
 
 ### Integration Completeness
-- [x] Dashboard tab hook added for bounded Phase 59 surface
-- [x] `phase59_shadow_portfolio_runner.py` executable
-- [x] `views/shadow_portfolio_view.py` integrated
-- [x] Tests pass: `test_phase59_shadow_portfolio.py`, `test_shadow_portfolio_view.py`
+- [x] `scripts/phase60_preflight_verify.py` executable
+- [x] `scripts/phase60_governed_audit_runner.py` executable
+- [x] `scripts/phase60_governed_cube_runner.py` executable
+- [x] Tests pass: `test_phase60_preflight_verify.py`, `test_phase60_governed_audit_runner.py`, `test_phase60_governed_cube_runner.py`
 
 ### Documentation Completeness
-- [x] Phase 59 brief published (`docs/phase_brief/phase59-brief.md`)
-- [x] Execution memo published (`docs/handover/phase59_execution_memo_20260318.md`)
+- [x] Phase 60 brief published (`docs/phase_brief/phase60-brief.md`)
+- [x] Phase 60 handover published (`docs/handover/phase60_handover.md`)
+- [x] Execution handover published (`docs/handover/phase60_execution_handover_20260318.md`)
 - [x] Bridge contract updated (`docs/context/bridge_contract_current.md`)
 - [x] Current context updated (`docs/context/current_context.md`)
 
 ### Handoff Completeness
-- [x] Bridge contract names open decision: review bounded packet before Phase 60
-- [x] Recommended next step explicit: evidence-only review, no promotion
-- [x] Open risks documented: red alerts, split research/operational lanes
-- [x] Blocked scope explicit: promotion, widening, stable shadow execution
+- [x] Bridge contract names open decision: await explicit `approve next phase` token
+- [x] Recommended next step explicit: data-level patch, no kernel mutation
+- [x] Open risks documented: 274-cell gap, allocator negative Sharpe, core sleeve 4/6 gates
+- [x] Blocked scope explicit: kernel mutation, comparator remediation without approval, Phase 61+ execution
 
 ## Explicit Non-Goals
-- No promotion of Phase 59 packet to stable shadow execution
-- No widening into Phase 60 stable shadow stack
-- No post-2022 expansion
+- No promotion of Phase 60 to stable shadow execution
+- No widening into Phase 61 without explicit approval
+- No post-2022 expansion beyond bounded D-340 slice
 - No mutation of research kernel or prior sleeve SSOT
 - No live-routing or production promotion
+- No Option A structural engine changes (D-347 hold)
 
 ## Blocked Until
-- Phase 59 promotion requires separate explicit review packet
-- Phase 60 stable shadow stack requires PM/CEO approval after bounded packet review
-- Any scope that mutates `research_data/` or reopens prior sleeves remains blocked
+- Phase 61 execution requires explicit `approve next phase` token
+- Data patch for 274-cell gap requires explicit approval packet
+- Method B sidecar integration requires explicit approval packet
+- Any scope that mutates `research_data/` or `core/engine.py` remains blocked
 
 ## Machine-Checkable Rules
 
 ### Pass Conditions
 ```
 # Evidence artifacts exist
-test -f data/processed/phase59_shadow_summary.json
-test -f data/processed/phase59_shadow_evidence.csv
-test -f data/processed/phase59_shadow_delta_vs_c3.csv
+test -f data/processed/phase60_governed_cube.parquet
+test -f docs/context/e2e_evidence/phase60_d340_preflight_20260319.status.txt
+test -f docs/context/e2e_evidence/phase60_d340_audit_20260319.status.txt
 
 # Tests pass
-pytest tests/test_phase59_shadow_portfolio.py -v
-pytest tests/test_shadow_portfolio_view.py -v
+pytest tests/test_phase60_preflight_verify.py -v
+pytest tests/test_phase60_governed_audit_runner.py -v
+pytest tests/test_phase60_governed_cube_runner.py -v
 
 # No post-2022 data in research evidence
 # (manual check: RESEARCH_MAX_DATE = 2022-12-31 enforced)
@@ -89,6 +93,7 @@ git diff --exit-code data/processed/phase55_allocator_cpcv_evidence.json
 git diff --exit-code data/processed/phase56_pead_evidence.csv
 git diff --exit-code data/processed/phase57_corporate_actions_evidence.csv
 git diff --exit-code data/processed/phase58_governance_evidence.csv
+git diff --exit-code data/processed/phase59_shadow_summary.json
 ```
 
 ### Fail Conditions
@@ -96,28 +101,34 @@ git diff --exit-code data/processed/phase58_governance_evidence.csv
 # Research kernel mutated
 git diff --exit-code research_data/
 
+# Core engine mutated (D-347 hold)
+git diff --exit-code core/engine.py
+
 # Post-2022 evidence generated
 # (manual check: any evidence timestamp > 2022-12-31)
 
 # Prior sleeve SSOT changed
-git diff data/processed/phase5[4-8]_*
+git diff data/processed/phase5[4-9]_*
 
 # Promotion artifacts exist (should not exist yet)
-! test -f data/processed/phase59_promoted_shadow_stack.json
+! test -f data/processed/phase60_promoted_shadow_stack.json
 ```
 
 ## Evidence Used
 - `docs/context/current_context.md`
-- `docs/phase_brief/phase59-brief.md`
-- `docs/handover/phase59_execution_memo_20260318.md`
-- `data/processed/phase59_shadow_summary.json`
-- `data/processed/phase59_shadow_delta_vs_c3.csv`
+- `docs/phase_brief/phase60-brief.md`
+- `docs/handover/phase60_handover.md`
+- `docs/handover/phase60_execution_handover_20260318.md`
+- `data/processed/phase60_governed_cube.parquet`
+- `docs/context/e2e_evidence/phase60_d341_review_*.csv`
 - `docs/context/bridge_contract_current.md`
 
 ## Open Risks
-- Bounded packet shows red reference alerts and research lane below locked C3 baseline (evidence-only, not promotion-ready)
-- Phase 59 lacks unified governed holdings/turnover surface (split research/operational lanes)
-- Phase 60 planning must avoid implying research lane and operational lane are already one stack
+- 274-cell C3 comparator gap preserved verbatim (blocked evidence-only)
+- Allocator carry-forward blocked (negative Sharpe/CAGR, PBO 0.66)
+- Core sleeve blocked (4/6 gates passed, Rule 100 pass rate 10.1%)
+- Event family SPA_p/WRC_p > 0.05 (not promotion-ready)
+- Phase 61 requires explicit `approve next phase` token
 
 ## Writing Rules
 - Keep this file top-level and PM-readable.

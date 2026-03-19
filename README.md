@@ -104,9 +104,10 @@ python scripts/attribution_report.py \
 
 ### Scripts
 
-- **`scripts/attribution_report.py`** - Generate Phase 34 attribution artifacts
-- **`scripts/generate_phase34_factor_scores.py`** - Materialize factor scores
-- **`scripts/generate_phase34_weights.py`** - Generate target weights
+- **`scripts/phase60_preflight_verify.py`** - Preflight verification for governed cube
+- **`scripts/phase60_governed_audit_runner.py`** - Bounded post-2022 audit runner
+- **`scripts/phase60_governed_cube_runner.py`** - Governed daily holdings/weight cube generator
+- **`scripts/phase60_d341_blocked_audit_review.py`** - Formal blocked-audit review
 
 ## Testing
 
@@ -114,78 +115,55 @@ python scripts/attribution_report.py \
 # Run all tests
 pytest tests/ -v
 
-# Run specific test suites
-pytest tests/test_factor_attribution.py -v
-pytest tests/test_attribution_integration.py -v
+# Run Phase 60 specific tests
+pytest tests/test_phase60_*.py -v
 
 # Run with coverage
 pytest tests/ --cov=. --cov-report=html
 ```
 
-**Test Coverage**: 17/17 tests passing
-- Factor attribution: 5 tests
-- Behavior ledger: 5 tests
-- Attribution validation: 6 tests
-- Integration: 1 test
+**Test Coverage**: All Phase 60 tests passing
+- Preflight verification tests
+- Governed audit runner tests
+- Governed cube tests
+- Blocked-audit review tests
+- Documentation hygiene tests
+- Closeout tests
 
-## Phase 34 Deliverables
+## Phase 60 Deliverables
 
 ### Artifacts Generated
 
 All artifacts in `data/processed/`:
 
-1. **phase34_factor_ic.csv** (228 KB, 3,012 rows)
-   - Long-format IC values for 4 factors across 753 dates
-   - Schema: `['date', 'factor', 'ic', 'p_value', 'n_assets']`
-
-2. **phase34_regime_ic.csv** (776 bytes)
-   - Regime-conditional IC statistics
-   - Schema: `['regime', 'factor', 'mean_ic', 'std_ic', 'n_obs']`
-
-3. **phase34_attribution.csv** (89 KB, 684 rows)
-   - Performance attribution with accounting identity
-   - Schema: `['portfolio_return', 'residual', '*_contribution']`
-
-4. **phase34_behavior_ledger.csv** (32 KB)
-   - Weight changes and regime transitions
-   - Schema: `['date', 'regime', 'regime_changed', 'total_weight_change', 'n_positions']`
-
-5. **phase34_summary.json** (529 bytes)
-   - Summary statistics: IC stability, regime hit-rates, R²
+1. **phase60_governed_cube.parquet** - Governed daily holdings/weight cube
+2. **phase60_d340_preflight_*.json** - Preflight check results (PF-01..PF-06)
+3. **phase60_d340_audit_*.status.txt** - Blocked audit evidence (274-cell gap preserved)
+4. **phase60_d341_review_*.csv/json** - Formal blocked-audit review findings
 
 ### Validation
 
-**Accounting Identity**: Perfect floating-point precision
-```
-Mean error: 3.05e-16
-Max error: 1.42e-14
-sum(contributions) + residual = portfolio_return ✅
-```
+**Governance State**: Phase 60 closed as CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD
+- 274-cell C3 comparator gap preserved verbatim
+- Kernel immutable per D-347
+- Phase 61 bootstrap authorized (D-348) but not yet executing publicly
 
 ## Documentation
 
-### Phase 34
-- **`docs/PHASE34_CONDITIONAL_APPROVAL.md`** - Final approval status
-- **`docs/PHASE34_FINAL_VERIFICATION.md`** - Engineering verification
-- **`docs/phase_brief/phase34-brief.md`** - Phase 34 specification
-
-### Phase 35
-- **`docs/PHASE35_CLOSURE.md`** - Closure report (candidate/reweight branch blocked)
-- **`docs/saw_reports/saw_phase35_round1.md`** - SAW report with BLOCK verdict
-- **`docs/phase_brief/phase35-brief.md`** - Phase 35 specification
+### Phase 60
+- **`docs/phase_brief/phase60-brief.md`** - Phase 60 specification
+- **`docs/handover/phase60_handover.md`** - CEO handover memo
+- **`docs/handover/phase60_execution_handover_20260318.md`** - Execution handover
 
 ### General
-- **`docs/decision log.md`** - Architecture decision records
-- **`docs/context/bridge_contract_current.md`** - Current PM/planner bridge from technical execution back to system-level planning
+- **`docs/decision log.md`** - Architecture decision records (D-01 through D-348)
+- **`docs/context/bridge_contract_current.md`** - Current PM/planner bridge
 
-## Performance Metrics
+## Current System Status
 
-Current factor performance (Phase 34):
-- Mean IC: -0.002 (target: > 0.02)
-- Contribution R²: -0.268 (target: > 0.5)
-- Regime hit-rates: GREEN 25%, AMBER 0%, RED 50% (target: > 70%)
-
-**Note**: Engineering pipeline is production-ready. Performance improvement planned for Phase 35 (Targeted Feature Engineering).
+- **Multi-Sleeve Research Kernel**: Phase 56/57/58/59/60 evidence surfaces preserved as immutable SSOT
+- **Governance Stack**: 348 architecture decisions
+- **Blockers**: 274-cell C3 comparator gap; Phase 61 pending explicit approval
 
 ## Development Workflow
 
@@ -234,6 +212,6 @@ Configuration files in `config/`:
 
 ---
 
-**Last Updated**: 2026-03-07
-**Phase**: 35 (Closed and Pivoted)
-**Status**: Phase 34 Engineering Complete ✅, Phase 35 Candidate/Reweight Branch Blocked 🚫
+**Last Updated**: 2026-03-20
+**Phase**: 60 (Closed as Blocked Evidence-Only Hold)
+**Status**: Phase 60 CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD ✅ | Phase 61 Bootstrap Pending (D-348) 🔄
