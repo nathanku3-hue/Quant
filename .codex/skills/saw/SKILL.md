@@ -151,6 +151,7 @@ Remark: 2) <secondary item> [00/100]: <one-line reason> (optional; show only if 
    - `CHK-PH-04` Data integrity and atomic-write verification: Reviewer C confirms temp->replace path, key row-count sanity checks, and artifact freshness for this phase.
    - `CHK-PH-05` Docs-as-code gate: update active phase brief (`docs/phase_brief/phase<NN>-brief.md` or canonical equivalent) with live loop state + acceptance criteria, plus `docs/notes.md` formula registry, `docs/decision log.md`, and `docs/lessonss.md`.
    - `CHK-PH-06` Context artifact refresh gate: run `.venv\Scripts\python scripts/build_context_packet.py`, require fresh artifacts `docs/context/current_context.json` and `docs/context/current_context.md`, then run `.venv\Scripts\python scripts/build_context_packet.py --validate`; non-zero exit or missing artifacts => fail.
+   - `CHK-PH-07` Git sync gate: `git status --porcelain` must be empty AND `git log origin/main..HEAD --oneline` must be empty before phase-close SAW verdict PASS. All evidence artifacts must be committed and pushed to origin/main.
 3. PM handover artifact (single source of truth):
    - write `docs/handover/phase<NN>_handoover.md`.
    - use `references/phase_end_handover_template.md`.

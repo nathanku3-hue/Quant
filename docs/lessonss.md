@@ -1,6 +1,6 @@
 # lessonss.md
 
-Last updated: 2026-03-18
+Last updated: 2026-03-20
 
 ## Purpose
 Track mistakes, root causes, and guardrails so repeated errors are prevented.
@@ -13,6 +13,7 @@ Track mistakes, root causes, and guardrails so repeated errors are prevented.
 ## Entries
 | Date | Scope | Mistake/Miss | Root Cause | Fix Applied | Guardrail | Evidence |
 |---|---|---|---|---|---|---|
+| 2026-03-20 | Post-phase GitHub alignment | Repo fell 30+ phases behind public GitHub; CEO handover links would 404 | No git-sync checkpoint in phase closeout SAW template | Added `CHK-PH-07` Git sync gate to SAW protocol and milestone review checklist | `git status --porcelain` empty AND `git log origin/main..HEAD --oneline` empty before phase-close SAW verdict PASS | `docs/checklist_milestone_review.md`, `.codex/skills/saw/SKILL.md` |
 | 2026-02-18 | Governance bootstrap | No persistent self-learning log existed | Process control gap | Added mandatory feedback-loop policy | Append one lesson after each execution/review round | `AGENTS.md`, `docs/lessonss.md` |
 | 2026-02-18 | SAW round reconciliation | Reviewer-independence proof was implied but not explicit | Missing ownership-check line item | Added explicit implementer/reviewer agent-separation check in SAW protocol | Always include ownership check in SAW report before verdict | `AGENTS.md` |
 | 2026-02-19 | Interactive review governance | Review guidance from external prompt was being reapplied ad hoc | Missing standardized review-mode contract in project policy | Added Section 14 interactive review protocol to `AGENTS.md` and decision-log record | For review tasks, force mode gate + per-issue option analysis + confirmation checkpoint before implementation | `AGENTS.md`, `docs/decision log.md`, `N/A (docs-only round; no test run)` |

@@ -20,6 +20,7 @@
 - [ ] **Lessons Loop**: Is `docs/lessonss.md` updated with date, mistake, root cause, fix, and guardrail?
 
 ## 4. Phase-End Closure (Mandatory at phase completion)
+- [ ] **Git Sync**: Are all evidence artifacts committed and pushed to origin/main? (`git status --porcelain` empty AND `git log origin/main..HEAD --oneline` empty)
 - [ ] **Subagent E2E Replay**: Did implementer and Reviewer B independently run an end-to-end phase path?
 - [ ] **Full Regression**: Did `.venv\Scripts\python -m pytest -q` pass for the phase-close candidate?
 - [ ] **Runtime Smoke**: Did one app boot smoke path pass (`launch.py` or headless `streamlit run app.py`)?
