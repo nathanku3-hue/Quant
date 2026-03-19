@@ -1,33 +1,34 @@
-# Done Checklist - Phase 59 Bounded Packet
+# Done Checklist - Phase 60 Closeout
 
-Status: Active
+Status: Closed
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, or scope widening by itself.
-Purpose: define machine-checkable done criteria for the Phase 59 bounded Shadow Portfolio packet.
+Purpose: define machine-checkable done criteria for Phase 60 closeout as blocked evidence-only hold.
 
 ## Header
-- `CHECKLIST_ID`: `20260318-phase59-bounded-packet`
-- `DATE_UTC`: `2026-03-18`
-- `SCOPE`: `Phase 59 bounded Shadow Portfolio packet (evidence-only / no promotion / no widening)`
-- `STATUS`: `active`
+- `CHECKLIST_ID`: `20260320-phase60-closeout`
+- `DATE_UTC`: `2026-03-20`
+- `SCOPE`: `Phase 60 closed as blocked evidence-only hold (D-345/D-347/D-348)`
+- `STATUS`: `closed`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
-- Phase 59 needs explicit done criteria so the bounded packet can be reviewed as evidence-only before any Phase 60 stable shadow stack work begins.
+- Phase 60 is closed under D-345 with the 274-cell C3 comparator gap preserved verbatim. No remediation, no kernel mutation, no widening.
 
 ## Static Truth Inputs
 - `top_level_PM.md`
-- `docs/decision log.md` (D-327, D-328, D-329)
-- `docs/phase_brief/phase59-brief.md`
+- `docs/decision log.md` (D-337 through D-348)
+- `docs/phase_brief/phase60-brief.md`
 - `docs/context/bridge_contract_current.md`
 
 ## Done Criteria
 
-### Functional Completeness
-- [x] Read-only Shadow NAV surface implemented using `allocator_state` catalog
-- [x] Historical Phase 50 shadow artifacts carried as reference-only context
-- [x] Bounded dashboard reader consumes only `phase59_*` artifacts
+### Governance Closeout
+- [x] D-345 formal closeout published
+- [x] D-347 kernel mutation hold enforced
+- [x] D-348 Phase 61 bootstrap authorized but not executed
+- [x] 274-cell gap preserved verbatim without remediation
 - [x] No mutation of `research_data/` or prior sleeve SSOT
-- [x] No post-2022 evidence generation (RESEARCH_MAX_DATE = 2022-12-31)
+- [x] No post-2022 evidence generation beyond bounded D-340 slice (RESEARCH_MAX_DATE = 2022-12-31)
 
 ### Evidence Completeness
 - [x] `data/processed/phase59_shadow_summary.json` persisted

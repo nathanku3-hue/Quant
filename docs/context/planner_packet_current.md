@@ -5,29 +5,29 @@ Authority: advisory-only integration artifact. This file does not authorize exec
 Purpose: provide the planner with a compact, fresh world model without requiring full-repo rereads.
 
 ## Header
-- `PACKET_ID`: `20260318-phase59-closeout-planner`
-- `DATE_UTC`: `2026-03-18`
-- `SCOPE`: `Phase 59 evidence-only closeout / handover state`
+- `PACKET_ID`: `20260320-phase60-closeout-planner`
+- `DATE_UTC`: `2026-03-20`
+- `SCOPE`: `Phase 60 closed-blocked-evidence-only-hold`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
-- The planner needs a compact fresh-context packet to propose next steps without rereading the whole repo after Phase 59 closeout.
+- The planner needs a compact fresh-context packet to propose next steps without rereading the whole repo after Phase 60 closeout.
 
 ## Current Context
 
 ### What System Exists Now
-- Quant is a Multi-Sleeve Research Kernel plus Governance Stack with bounded Phase 56/57/58 evidence surfaces and a closed Phase 59 Shadow Portfolio evidence surface preserved as immutable SSOT.
+- Quant is a Multi-Sleeve Research Kernel plus Governance Stack with bounded Phase 56/57/58/59/60 evidence surfaces preserved as immutable SSOT. Phase 60 is CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD with 274-cell comparator gap preserved verbatim.
 
 ### Active Scope
-- Phase 59 evidence-only closeout / handover state
+- Phase 60 formally closed as blocked evidence-only hold under D-345
 
 ### Blocked Scope
-- Any Phase 59 widening, any Phase 60 work, any post-2022 expansion, or any kernel mutation remains blocked
+- Any Phase 60 widening, any Phase 61+ work, any comparator remediation, any post-2022 audit beyond bounded D-340 slice, or any kernel mutation remains blocked until explicit `approve next phase` token
 
 ## Active Brief
 
 ### Current Phase/Round
-- Phase 59 (closed as evidence-only / no promotion / no widening)
+- Phase 60 (closed as blocked evidence-only hold under D-345)
 
 ### Goal
 - Preserve Phase 59 bounded Shadow Portfolio packet as immutable evidence SSOT
