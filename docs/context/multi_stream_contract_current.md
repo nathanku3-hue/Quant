@@ -94,4 +94,4 @@ Phase 61 bounded comparator-remediation packet is complete when:
 ## Governance Status
 - Phase 60: Closed as `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD` under `D-345`
 - Phase 61: Complete; `KS-03` cleared under `D-351`
-- Next packet required: choose the next platform-hardening phase (frontend shell consolidation or execution-boundary hardening)
+- Next action: start Phase 62 (Frontend Shell Consolidation) per D-352 locked roadmap. See `PHASE_QUEUE.md`.

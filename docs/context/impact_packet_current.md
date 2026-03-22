@@ -130,7 +130,7 @@ PASS (context builder refresh + validation pass; Phase 61 targeted test suite pa
 
 1. **Fresh vendor-side provenance is still unresolved**: WRDS PAM auth rejection means future extractions may still need account recovery or a raw-tape export.
 2. **Current packet drift can recur**: future phase transitions can leave `current_context`, planner, and README stale unless the context packet is rebuilt in the same round.
-3. **Execution/runtime direction is still undecided**: the cleared comparator does not by itself choose between frontend shell consolidation and execution-boundary hardening.
+3. **Execution/runtime direction is now locked**: D-352 locked the Terminal Zero v2.6 roadmap. Phase 62 (frontend shell consolidation) is READY, Phase 63 (execution-boundary hardening) is QUEUED after it.
 
 ## Evidence
 

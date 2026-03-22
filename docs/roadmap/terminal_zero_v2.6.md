@@ -1,7 +1,7 @@
 # Terminal Zero v2.6 — Official Adopted & Locked Roadmap
 
 Date: 2026-03-23
-Authority: D-352 (pending commit)
+Authority: D-352
 Status: LOCKED
 Origin: Alpha Rating Discussion reconciliation (Expert 1 / Expert 2 / Local Worker)
 Agreement Score: 99/100

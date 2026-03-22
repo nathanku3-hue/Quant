@@ -9,7 +9,7 @@ Purpose: update the multi-stream map after Phase 61 closeout so the next platfor
 - `DATE_UTC`: `2026-03-22`
 - `SCOPE`: `Phase 61 complete - comparator remediation closed`
 - `PREVIOUS_PHASE`: `Phase 60 (closeout, blocked evidence-only hold)`
-- `NEXT_PHASE`: `TBD (frontend shell consolidation or execution-boundary hardening)`
+- `NEXT_PHASE`: `Phase 62 (Frontend Shell Consolidation) — READY per D-352`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
@@ -86,15 +86,13 @@ Purpose: update the multi-stream map after Phase 61 closeout so the next platfor
 - **Why**: The backend comparator blocker is cleared; the highest remaining product risk is operator-shell cohesion and state visibility.
 
 ## PM Decision Required
-- **Decision**: Should the next explicit packet prioritize frontend shell consolidation or execution-boundary hardening?
-- **Evidence supporting decision**:
-  - Phase 61 complete, `KS-03` cleared under `D-351`
-  - `core/engine.py` and prior sleeve SSOT remain stable
-  - Current operator shell still carries concentrated complexity in `dashboard.py`
-  - Execution/runtime boundary remains broker-specific
-- **Options**:
-  1. Approve frontend shell consolidation first
-  2. Approve execution-boundary hardening first
+- **Decision**: RESOLVED by D-352. The Terminal Zero v2.6 roadmap is locked.
+- **Locked Sequencing**:
+  1. Phase 62: Frontend shell consolidation (READY)
+  2. Phase 63: Execution-boundary hardening (QUEUED)
+  3. Phase 64: Data provenance hardening (QUEUED)
+  4. Phase 65: MLOps skeleton (QUEUED)
+- **Reference**: `PHASE_QUEUE.md`, `docs/roadmap/terminal_zero_v2.6.md`
 
 ## What Should Not Be Done Next
 - Do not reopen comparator remediation as if it were still the primary blocker

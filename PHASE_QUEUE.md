@@ -3,7 +3,7 @@
 Status: ACTIVE
 Authority: Terminal Zero v2.6 Roadmap (`docs/roadmap/terminal_zero_v2.6.md`)
 Last Updated: 2026-03-23
-Baseline: Phase 61 COMPLETE / KS-03 CLEARED (uncommitted worktree)
+Baseline: Phase 61 COMPLETE / KS-03 CLEARED (committed as b266870, pushed to origin/main)
 
 ---
 
@@ -18,20 +18,11 @@ Baseline: Phase 61 COMPLETE / KS-03 CLEARED (uncommitted worktree)
 
 ---
 
-## Pre-Requisite: Commit Phase 61
-
-| Item | Action |
-|------|--------|
-| Commit the Phase 61 dirty worktree | `git add` the reconciled files, commit, push. This is the baseline for Phase 62. |
-| Status | **MUST DO BEFORE PHASE 62** |
-
----
-
 ## Tier 1: Platform Hardening + ML Skeleton
 
 ### Phase 62 — Frontend Shell Consolidation
-- **Status**: READY (after Phase 61 commit)
-- **Blocked by**: Phase 61 commit
+- **Status**: READY
+- **Blocked by**: —
 - **Emphasis**: Frontend 70 / Backend 20 / Docs 10
 - **Scope**:
   - Break `dashboard.py` (2084 lines) into `shell_frame.py`, `route_registry.py`, `shared_loaders.py`
@@ -268,8 +259,7 @@ Baseline: Phase 61 COMPLETE / KS-03 CLEARED (uncommitted worktree)
 
 | Phase | Name | Status | Blocked By |
 |-------|------|--------|------------|
-| pre   | Commit Phase 61 worktree | **MUST DO** | — |
-| 62    | Frontend Shell Consolidation | READY | Phase 61 commit |
+| 62    | Frontend Shell Consolidation | READY | — |
 | 63    | Execution Boundary Hardening | QUEUED | 62 |
 | 64    | Data Provenance Hardening | QUEUED | 63 |
 | 65    | MLOps Skeleton | QUEUED | 64 |

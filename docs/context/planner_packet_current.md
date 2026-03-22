@@ -70,4 +70,4 @@ Purpose: provide the planner with a compact, fresh world model without requiring
 ### Planner Delta
 - **Stronger now**: the same-period C3 comparator is no longer the active blocker; the governed audit returns `status = "ok"` with a bounded sidecar/view-layer repair.
 - **Weaker now**: live WRDS authentication still fails with PAM auth rejection, so the provenance chain still depends on the bounded bedrock fallback instead of a fresh vendor pull.
-- **Still unknown**: whether the next explicit packet should prioritize frontend shell consolidation or execution-boundary hardening first.
+- **Resolved by D-352**: the Terminal Zero v2.6 roadmap is locked. Phase 62 (frontend shell consolidation) is READY. Phase 63 (execution-boundary hardening) is QUEUED after Phase 62. See `PHASE_QUEUE.md` and `docs/roadmap/terminal_zero_v2.6.md`.

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-03-22T14:41:37Z",
+  "generated_at_utc": "2026-03-22T18:30:24Z",
   "source_files": [
     "docs/decision log.md",
     "docs/handover/phase0_handover.md",
@@ -79,12 +79,13 @@
     "Allocator carry-forward, core inclusion, promotion, and widening beyond the bounded Phase 61 slice remain blocked until a later explicit packet."
   ],
   "what_is_next": [
-    "Refresh the stale current truth surfaces so planner, bridge, impact, alignment, observability, and README all reflect the Phase 61 complete / `KS-03` cleared state.",
-    "Start the next approved platform-hardening phase from the cleared comparator baseline, with frontend shell consolidation and execution-boundary hardening as the leading candidates."
+    "Phase 62 (Frontend Shell Consolidation) is READY per D-352 and the locked Terminal Zero v2.6 roadmap. See `PHASE_QUEUE.md` for scope and exit criteria.",
+    "Phase 63 (Execution Boundary Hardening) is QUEUED after Phase 62.",
+    "The V1/V2 architecture boundary is defined in `docs/architecture/v1_v2_boundary.md`."
   ],
   "first_command": ".venv\\Scripts\\python scripts/build_context_packet.py",
   "next_todos": [
-    "Update `docs/context/*_current.md` and `README.md` to the `D-351` truth.",
-    "Add regression coverage so future phase-status changes cannot leave `current_context`, planner, bridge, and README on older phase state."
+    "Start Phase 62: break `dashboard.py` into shell_frame, route_registry, and shared_loaders.",
+    "Phase 63 follows after Phase 62 exit criteria are met."
   ]
 }

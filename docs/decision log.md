@@ -4434,7 +4434,7 @@ Phase 61 (2026-03-23): Terminal Zero v2.6 Roadmap Lock + Nautilus Deferral + V1/
     - `Nautilus_DEFERRED := VALID iff (BrokerPort_defined_in_phase63 = 1) and (v2_pipeline_baseline_proven = 1) before any Nautilus adapter work`.
     - `ML_PROMOTION_GATE := VALID iff (ml_augmented_pct >= 0.40) and (total_promotions_attempted >= 5) evaluated by automated script at Phase 74`.
   - Open risks:
-    - Phase 61 worktree is still uncommitted; Phase 62 cannot start until the commit is pushed.
+    - Phase 61 committed as b266870 and pushed to origin/main. Phase 62 is READY.
     - WRDS PAM auth remains unresolved; provenance hardening (Phase 64) will address this.
     - Streamlit long-term viability is an open question deferred past Phase 62 (modularize first, migrate later if needed).
   - Rollback note:

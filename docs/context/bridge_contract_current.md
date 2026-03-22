@@ -33,12 +33,12 @@ Purpose: connect Quant's current technical state back to planner truth and produ
 ## PM / Product Delta
 - `STRONGER_NOW`: `The same-period comparator failure is no longer the active system blocker: Phase 61 proved the bounded repair path and the governed audit now reports status = ok with empty kill_switches_triggered.`
 - `WEAKER_NOW`: `Live WRDS authentication still fails with PAM rejection, so the repo currently relies on a bounded bedrock fallback for the sidecar provenance chain.`
-- `STILL_UNKNOWN`: `Which next explicit packet should be prioritized after the comparator repair: frontend shell consolidation, execution-boundary hardening, or another bounded product-hardening slice.`
+- `STILL_UNKNOWN`: `Whether Streamlit remains the long-term UI shell (deferred past Phase 62; modularize first).`
 
 ## Planner Bridge
-- `OPEN_DECISION`: `Should the next explicit packet prioritize frontend shell consolidation or execution-boundary hardening now that KS-03 is cleared?`
-- `RECOMMENDED_NEXT_STEP`: `Treat Phase 61 as the new cleared comparator baseline, keep the V1 research kernel unchanged, and start the next platform-hardening phase with frontend shell consolidation before broader runtime expansion.`
-- `WHY_THIS_NEXT`: `The highest remaining risk is no longer comparator correctness; it is state drift and operator-shell debt. Frontend shell consolidation reduces future truth-surface drift while keeping the repaired backend path stable.`
+- `OPEN_DECISION`: `RESOLVED by D-352. The Terminal Zero v2.6 roadmap is locked. Phase 62 (frontend shell consolidation) is READY. Phase 63 (execution-boundary hardening) is QUEUED after Phase 62.`
+- `RECOMMENDED_NEXT_STEP`: `Start Phase 62: break dashboard.py into shell_frame, route_registry, and shared_loaders. See PHASE_QUEUE.md for full scope and exit criteria.`
+- `WHY_THIS_NEXT`: `D-352 locked the sequencing: frontend shell consolidation first, execution-boundary hardening second, data provenance third, MLOps skeleton fourth. The highest remaining risk is operator-shell debt, not comparator correctness.`
 - `NOT_RECOMMENDED_NEXT`: `Do not reopen core-engine mutation proposals, do not treat Phase 61 completion as promotion authority, and do not widen into live trading or allocator/core-sleeve promotion without a new explicit packet.`
 
 ## Locked Boundaries
