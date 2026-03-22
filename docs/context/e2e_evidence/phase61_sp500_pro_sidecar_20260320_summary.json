@@ -1,0 +1,44 @@
+{
+  "date_mask_start": "2023-01-01",
+  "input_map": "E:\\Code\\Quant\\data\\processed\\d341_missing_executed_exposure_permno_cusip.csv",
+  "input_tape_csv": "E:\\Code\\Quant\\data\\raw\\sp500_pro_avantax_tape.csv",
+  "input_workbook": "E:\\Code\\Quant\\SPGlobal_Avantax,Inc._SecurityDetail_19-Mar-2026.xlsx",
+  "matched_cusips": [
+    "095229100"
+  ],
+  "matched_permnos": [
+    86544
+  ],
+  "metadata_mode": "security_detail_as_of_fallback",
+  "notes": [
+    "The builder prefers the raw daily tape CSV when present and otherwise falls back to the metadata-only Security Detail workbook.",
+    "The strict D-350 bound remains date >= 2023-01-01 in all modes.",
+    "sp_rating and sp_score remain null unless a machine-readable vendor field is supplied."
+  ],
+  "output_columns": [
+    "date",
+    "permno",
+    "sp_rating",
+    "sp_score",
+    "price",
+    "total_return",
+    "cusip",
+    "isin",
+    "ticker",
+    "company_name",
+    "issue_date",
+    "source_as_of_date",
+    "source_file",
+    "source_sheet"
+  ],
+  "output_parquet": "E:\\Code\\Quant\\data\\processed\\sidecar_sp500_pro_2023_2024.parquet",
+  "price_present": false,
+  "rows_after_mask": 1,
+  "rows_before_mask": 1,
+  "run_date_tag": "20260320",
+  "source_date_max": "2023-11-06",
+  "source_date_min": "2023-11-06",
+  "sp_rating_present": false,
+  "sp_score_present": false,
+  "total_return_present": false
+}

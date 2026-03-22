@@ -5,102 +5,102 @@ Authority: advisory-only integration artifact. This file does not authorize exec
 Purpose: make drift visible early without bloating process through minimal observability markers.
 
 ## Header
-- `PACK_ID`: `20260320-quant-phase60-closeout-obs`
-- `DATE_UTC`: `2026-03-20`
-- `SCOPE`: `Phase 60 closed as blocked evidence-only hold`
+- `PACK_ID`: `20260322-quant-phase61-reconciled-obs`
+- `DATE_UTC`: `2026-03-22`
+- `SCOPE`: `Phase 61 complete with current-state packet reconciliation`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
-- Track observability markers for Phase 60 closeout to detect drift early and create guardrails for future phases.
+- Track observability markers after the Phase 61 closeout so packet drift and stale phase-state narration are visible early instead of lingering across future phases.
 
 ## High-Risk Attempts
 
-### Phase 60 High-Risk Attempts
+### Phase 61 High-Risk Attempts
 - **Count**: 0
-- **Details**: No high-risk attempts (no kernel mutations per D-347, no post-2022 audit widening, no comparator remediation, no production promotion)
+- **Details**: No unauthorized kernel mutations, no `research_data/` writes, no production promotion, no widening beyond the bounded sidecar/view-layer packet
 
 ### Drift Signal
-- ✓ No drift detected (no high-risk attempts without approval)
+- ✓ No execution-boundary drift detected
 
 ## Stuck Sessions
 
-### Phase 60 Stuck Sessions
-- **Count**: 0
-- **Details**: No stuck sessions detected
+### Phase 61 Stuck Sessions
+- **Count**: 1
+- **Details**: One stale-current-packet condition persisted after `D-351`: planner / bridge / impact / alignment continued to advertise the older Phase 60 hold state even though the Phase 61 brief and SAW evidence showed `KS-03` cleared
 
 ### Drift Signal
-- ✓ No drift detected (no stuck sessions)
+- Resolved in current round through context rebuild plus packet refresh
 
 ## Skill Activation / Under-Triggering
 
-### Phase 60 Skill Activations
-- **Commit skill**: Triggered multiple times (Phase 60 commits)
-- **Review skill**: Triggered (SAW reports for D-337 through D-345)
-- **Test skill**: Triggered multiple times (pytest runs for Phase 60)
-- **Deploy skill**: Not applicable (no deployment in Phase 60)
+### Phase 61 Skill Activations
+- **Review skill**: Triggered (`saw_phase61_*` reports published)
+- **Test skill**: Triggered (targeted pytest for sidecar/audit scripts)
+- **Docs reconciliation**: Triggered in current round to refresh stale current-state packets
+- **Deploy skill**: Not applicable (no deployment in Phase 61)
 
 ### Under-Triggering Events
-- **Count**: 0
-- **Details**: No under-triggering detected
+- **Count**: 1
+- **Details**: Context rebuild and current-packet refresh were not completed in the same round as the Phase 61 brief/evidence publication
 
 ### Drift Signal
-- ✓ No drift detected (skills triggered appropriately)
+- Active guardrail needed: any active-phase/status change must rerun context build + packet hygiene tests in the same round
 
 ## Budget Pressure
 
-### Phase 60 Budget Pressure
+### Phase 61 Budget Pressure
 - **Token budget**: Within limits
-- **Time budget**: Phase 60 completed in <2 days
+- **Time budget**: Within limits
 - **Cost budget**: Within limits
-- **Context window**: No compaction events detected
+- **Context window**: One stale-current-packet event created avoidable reread overhead
 
 ### Drift Signal
-- ✓ No drift detected (no budget pressure markers)
+- Mild docs/process pressure only; no runtime budget issue detected
 
 ## Compaction / Hallucination Pressure Markers
 
-### Phase 60 Compaction/Hallucination Events
+### Phase 61 Compaction/Hallucination Events
 - **Compaction events**: 0
-- **Stale artifact references**: 0
+- **Stale artifact references**: 5 (`planner`, `bridge`, `impact`, `alignment`, `README` phase status)
 - **Unsupported claims**: 0
-- **Contradictory claims**: 0
+- **Contradictory claims**: 1 (Phase 60 blocked-hold packet set vs Phase 61 complete brief/evidence)
 
 ### Drift Signal
-- ✓ No drift detected (no compaction/hallucination pressure)
+- Resolved in current round; add regression coverage to prevent recurrence
 
 ## Observability Pack Summary
 
-```
+```text
 High-Risk Attempts: 0 (0 approved / 0 denied / 0 skipped)
-Stuck Sessions: 0 (0 same error / 0 no changes / 0 circular / 0 escalation loop)
-Skill Under-Triggering: 0 (0 commit / 0 review / 0 test / 0 deploy)
-Budget Pressure Events: 0 (0 token / 0 time / 0 cost / 0 context)
-Compaction/Hallucination Events: 0 (0 compaction / 0 stale / 0 unsupported / 0 contradiction)
+Stuck Sessions: 1 (0 same error / 0 no changes / 0 circular / 1 stale-current-packet loop)
+Skill Under-Triggering: 1 (0 commit / 0 review / 1 packet-refresh / 0 deploy)
+Budget Pressure Events: 1 (0 token / 0 time / 0 cost / 1 avoidable reread)
+Compaction/Hallucination Events: 6 (0 compaction / 5 stale / 0 unsupported / 1 contradiction)
 ```
 
 ## Drift Guardrails
 
-No guardrails triggered (all thresholds below limits).
-
-Active guardrails:
-- RESEARCH_MAX_DATE = 2022-12-31
-- Kernel immutable per D-347
-- Same-window/same-cost/same-engine discipline
+Triggered / reinforced guardrails:
+- After any active-phase status change, rerun `.venv\Scripts\python scripts/build_context_packet.py` and `--validate` in the same round
+- Add packet hygiene tests covering Phase brief -> current context -> planner / bridge / README alignment
+- Keep `RESEARCH_MAX_DATE = 2022-12-31`, kernel immutability, and same-window / same-cost / same-engine discipline unchanged
 
 ## Recommendations
 
-- Continue current observability tracking for Phase 61 (if approved)
-- Git-sync gate (CHK-PH-07) added to prevent future repo drift
-- Monitor Phase 61 data patch execution if approved
+- Make context rebuild + current-packet refresh part of every future phase-status transition
+- Prioritize frontend shell consolidation next; stale operator/read surfaces are now a larger risk than comparator correctness
+- Keep tracking vendor-provenance drift separately from comparator-correctness drift
 
 ## Evidence Used
 
-- Phase 60 execution history
-- Git commit log
-- Test run logs (all Phase 60 tests passing)
-- `docs/saw_reports/saw_phase60_*.md`
-- `docs/context/e2e_evidence/phase60_*` artifacts
-- `docs/decision log.md` (D-337 through D-348)
+- `docs/phase_brief/phase61-brief.md`
+- `docs/context/current_context.md`
+- `docs/context/planner_packet_current.md`
+- `docs/context/bridge_contract_current.md`
+- `docs/context/impact_packet_current.md`
+- `docs/context/post_phase_alignment_current.md`
+- `docs/saw_reports/saw_phase61_*.md`
+- `docs/context/e2e_evidence/phase61_*.json`
 
 ## Writing Rules
 - Keep this file compact and machine-readable.

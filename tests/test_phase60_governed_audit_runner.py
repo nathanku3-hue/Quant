@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -58,3 +60,77 @@ def test_build_daily_evidence_includes_turnover_and_exposure():
     ]
     assert float(out.loc[0, "gross_exposure"]) == pytest.approx(1.0)
     assert float(out.loc[1, "turnover_total"]) == pytest.approx(1.0)
+
+
+def test_merge_returns_long_prefers_sidecar_rows():
+    base = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2023-11-27", "2023-11-28"]),
+            "permno": [86544, 86544],
+            "ret": [0.01, 0.0],
+        }
+    )
+    sidecar = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2023-11-28", "2023-11-29"]),
+            "permno": [86544, 86544],
+            "ret": [0.02, -0.03],
+        }
+    )
+
+    merged, info = mod._merge_returns_long(base, sidecar)
+
+    assert merged["date"].dt.strftime("%Y-%m-%d").tolist() == ["2023-11-27", "2023-11-28", "2023-11-29"]
+    assert merged["ret"].tolist() == [0.01, 0.02, -0.03]
+    assert info["sidecar_present"] is True
+    assert info["sidecar_rows_total"] == 2
+    assert info["sidecar_override_rows"] == 1
+    assert info["sidecar_permnos"] == [86544]
+
+
+def test_apply_sidecar_feature_mask_drops_dates_on_and_after_last_return_date():
+    features = pd.DataFrame(
+        {
+            "date": pd.to_datetime(
+                [
+                    "2023-11-27",
+                    "2023-11-28",
+                    "2023-11-29",
+                    "2023-11-30",
+                    "2023-11-29",
+                ]
+            ),
+            "permno": [86544, 86544, 86544, 86544, 12345],
+            "score": [1, 1, 1, 1, 1],
+        }
+    )
+    sidecar = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2023-11-28", "2023-11-29"]),
+            "permno": [86544, 86544],
+            "ret": [0.0, -0.03],
+        }
+    )
+
+    masked, info = mod._apply_sidecar_feature_mask(features, sidecar)
+
+    assert masked["date"].dt.strftime("%Y-%m-%d").tolist() == ["2023-11-27", "2023-11-28", "2023-11-29"]
+    assert masked["permno"].tolist() == [86544, 86544, 12345]
+    assert info["feature_rows_dropped"] == 2
+    assert info["feature_mask_permnos"] == [86544]
+    assert info["feature_mask_date_min"] == "2023-11-29"
+    assert info["feature_mask_date_max"] == "2023-11-30"
+
+
+def test_load_sidecar_returns_rejects_duplicate_date_permno_rows(tmp_path: Path):
+    sidecar_path = tmp_path / "sidecar.parquet"
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2023-11-29", "2023-11-29"]),
+            "permno": [86544, 86544],
+            "total_return": [0.01, 0.02],
+        }
+    ).to_parquet(sidecar_path, index=False)
+
+    with pytest.raises(RuntimeError, match="duplicate date/permno rows"):
+        mod._load_sidecar_returns(sidecar_path, pd.Timestamp("2023-01-01"), pd.Timestamp("2024-12-31"))

@@ -1,23 +1,19 @@
 ## What Was Done
-- Consumed the exact `approve next phase` token per `D-337` to authorize the first bounded Phase 60 implementation packet.
-- Executed the `D-339` validator-fix slice: the validator now passes on the governed feature/snapshot surface and the zombie-row gate is clean.
-- Built the bounded governed daily holdings / weight cube from the existing read-only Phase 56 / Phase 57 sleeve surfaces with allocator overlay forced to zero.
-- Executed the `D-340` mandatory preflight checks and the bounded integrated post-2022 audit slice; the audit published a blocked evidence result because the same-period C3 comparator failed under strict missing-return rules.
-- Executed the `D-341` formal blocked-audit review packet and confirmed the immutable D-340 hold state, including the exact `274` missing executed-exposure return cells and the preserved no-remediation / no-widening boundaries.
-- Executed the `D-343` documentation-hygiene packet to remove stale active-state validator language and refresh the bridge evidence citation to the current execution-era handover.
-- Executed the `D-344` stale-language cleanup formalization packet to preserve the active `BLOCKED_EVIDENCE_ONLY_HOLD` state with a fresh verification bundle.
-- Executed the `D-345` formal closeout packet to close Phase 60 as `CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD` with the same immutable blocked-audit root cause preserved.
+- Consumed `D-348` and completed the bounded Phase 61 comparator-remediation slice without mutating `core/engine.py`, `research_data/`, or bedrock price artifacts.
+- Prepared the literal raw-tape ingest path under `D-350`, keeping the builder fail-closed until the exact daily tape exists on disk.
+- Closed the two audit-path execution gaps under `D-351`: sidecar returns now overlay the comparator return surface and post-coverage feature rows are masked before strict `t -> t+1` execution.
+- Cleared `KS-03` with a bounded bedrock fallback sidecar (`227` AVTA rows) and validated the repaired path with focused pytest coverage plus a passing governed audit (`status = "ok"`).
 
 ## What Is Locked
-- The four planning contracts from `D-331`/`D-332` (unified cube Option B, governed cost 5.0 bps gate, audit Option A, allocator exclude) remain unchanged.
-- All prior locks (D-284…D-345, RESEARCH_MAX_DATE=2022-12-31).
-- No post-2022 exposure beyond the bounded D-340 slice, no remediation of the blocked comparator path, no carry-forward of negative Sharpe, and no core promotion.
+- `core/engine.py`, `research_data/`, and bedrock price artifacts remain immutable.
+- Prior sleeve SSOT artifacts (Phases 54-60), `RESEARCH_MAX_DATE = 2022-12-31`, and the same-window / same-cost / same-engine evidence gate remain active.
+- Allocator carry-forward, core inclusion, promotion, and widening beyond the bounded Phase 61 slice remain blocked until a later explicit packet.
 
 ## What Is Next
-- Await the next explicit packet containing the literal token `approve next phase` before any remediation of the blocked post-2022 comparator path, any promotion path, any Phase 61+ scope, or any wider execution begins.
-- Next packet -> decide whether to authorize comparator remediation or any new phase/slice; D-345 itself is a formal blocked-hold closeout and grants no such authority.
+- Refresh the stale current truth surfaces so planner, bridge, impact, alignment, observability, and README all reflect the Phase 61 complete / `KS-03` cleared state.
+- Start the next approved platform-hardening phase from the cleared comparator baseline, with frontend shell consolidation and execution-boundary hardening as the leading candidates.
+- Update `docs/context/*_current.md` and `README.md` to the `D-351` truth.
+- Add regression coverage so future phase-status changes cannot leave `current_context`, planner, bridge, and README on older phase state.
 
 ## First Command
-```text
-Await the next explicit packet containing exact `approve next phase` before any remediation, promotion, Phase 61+, comparator remediation, or widened execution starts.
-```
+`.venv\Scripts\python scripts/build_context_packet.py`

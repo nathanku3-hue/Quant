@@ -489,3 +489,39 @@ Application pattern:
 - Fix applied: Published `D-348`, consumed the CEO `approve next phase` token, closed Phase 60, and opened Phase 61 for a data-only patch preserving `strict_missing_returns=True` and `core/engine.py` immutability.
 - Guardrail for next time: Resolve missing-return gaps on strict comparators via data-sidecar completeness patches or outer logic rather than mutating the core engine validation logic.
 - Evidence paths: `docs/decision log.md`, `docs/phase_brief/phase60-brief.md`, `docs/handover/phase60_execution_handover_20260318.md`
+
+## 2026-03-20 Round Entry (Prepare Downstream Ingest Before External Vendor Tape Arrives)
+- Date: 2026-03-20
+- Mistake or miss: The D-350 directive depended on a literal Capital IQ daily tape that is not currently producible on this workstation because the add-in is absent and the raw CSV does not exist yet.
+- Root cause: The extraction step depended on an external vendor tool surface, while the local code path had not yet been hardened to ingest the tape immediately once it arrives.
+- Fix applied: Upgraded `scripts/build_sp500_pro_sidecar.py` to prefer `data/raw/sp500_pro_avantax_tape.csv`, reject duplicate dates and floatless tapes, parse accounting-style negatives, and fail closed by default when the raw tape is missing.
+- Guardrail for next time: When a repair round depends on an external vendor export, build and verify the downstream ingest path first, then report the local environment blocker explicitly instead of treating missing vendor data as if the remediation were complete.
+- Evidence paths: `scripts/build_sp500_pro_sidecar.py`, `tests/test_build_sp500_pro_sidecar.py`, `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json`
+
+## 2026-03-20 Round Entry (Strict Missing-Return Repairs Need Both Return Overlay and Pre-Execution Coverage Masking)
+- Date: 2026-03-20
+- Mistake or miss: The initial D-350 remediation framing assumed that publishing a sidecar file would patch KS-03 by itself.
+- Root cause: The audit path was still loading returns from the base parquet only, and the comparator continued selecting AVTA after its last available return date, so strict `t -> t+1` execution would still fail even with a populated sidecar.
+- Fix applied: Added sidecar return overlay logic to `scripts/phase60_governed_audit_runner.py`, added a sidecar-driven feature-date mask that drops sidecar permnos on and after their last available return date, and validated the repaired path with the real `2023-11-28` boundary return row from `data/processed/prices.parquet`.
+- Guardrail for next time: For any strict missing-return repair, patch both interfaces explicitly:
+  - the return surface the simulator consumes;
+  - the feature/selection surface that can create next-day executed exposure after coverage ends.
+- Evidence paths: `scripts/phase60_governed_audit_runner.py`, `scripts/ingest_d350_wrds_sidecar.py`, `tests/test_phase60_governed_audit_runner.py`, `tests/test_ingest_d350_wrds_sidecar.py`, `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json`, `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
+
+## 2026-03-20 Round Entry (Credential Presence Is Not Credential Validity)
+- Date: 2026-03-20
+- Mistake or miss: The Phase 61 blocker was initially tracked as missing WRDS environment variables, but a later live run showed that even with env vars supplied the login could still fail upstream.
+- Root cause: Local environment readiness and remote authentication validity were treated as one gate instead of two separate checks.
+- Fix applied: Executed the live extractor with supplied credentials, captured the WRDS PAM authentication failure explicitly, and updated the Phase 61 brief/evidence/SAW surfaces to reflect an auth blocker rather than a missing-env blocker.
+- Guardrail for next time: For external authenticated data repairs, verify both gates separately:
+  - local env variables present;
+  - remote login succeeds.
+- Evidence paths: `scripts/ingest_d350_wrds_sidecar.py`, `docs/phase_brief/phase61-brief.md`, `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json`, `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
+
+## 2026-03-22 Round Entry (Current Truth Surfaces Must Refresh in the Same Round as Phase-State Changes)
+- Date: 2026-03-22
+- Mistake or miss: The active Phase 61 brief and `D-351` evidence said `KS-03` was cleared, but `current_context`, planner, bridge, impact, alignment, observability, and README still advertised the older Phase 60 blocked-hold state.
+- Root cause: `scripts/build_context_packet.py` still selected the latest phase doc with a `New Context Packet`, and the Phase 61 brief had not published one; the broader current packet set also was not refreshed in the same round as the newer phase-state evidence.
+- Fix applied: Added a `New Context Packet` block to `docs/phase_brief/phase61-brief.md`, rebuilt `docs/context/current_context.*`, refreshed the stale `*_current.md` packet set plus `README.md`, and added regression tests for current-phase promotion and packet alignment.
+- Guardrail for next time: Whenever a phase brief changes the active phase/status, publish or refresh the `New Context Packet` in that same phase doc, rerun `scripts/build_context_packet.py` and `--validate`, and run packet hygiene tests before closing the round.
+- Evidence paths: `docs/phase_brief/phase61-brief.md`, `docs/context/current_context.md`, `docs/context/current_context.json`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `README.md`, `tests/test_build_context_packet.py`, `tests/test_phase61_context_hygiene.py`

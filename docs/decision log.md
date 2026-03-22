@@ -4336,3 +4336,106 @@ Phase 61 (2026-03-19): CEO “approve next phase” Token Consumed + Bounded Pha
     - Bounded execution slice logic applies solely to data patch for 274 return cells (C3 only), followed by Method B sidecar integration. Null core/engine.py mutations permitted.
   - Rollback note:
     - Kernel mutation, widening, promotion, or any change beyond the bounded data patch → revert all D-348 edits and return to D-347 hold state.
+
+Phase 61 (2026-03-20): Raw Tape Ingest Path Prepared, Local Tape Extraction Still Blocked (D-350) 🟡
+
+  - Decision record:
+    - prepare the exact raw-tape ingest path for `data/raw/sp500_pro_avantax_tape.csv`, harden the builder to fail closed on malformed tape input, and report the current local blocker truthfully because the Capital IQ plug-in extraction path is not available on this workstation.
+  - The Decision (Hardcoded):
+    - `scripts/build_sp500_pro_sidecar.py` now prefers the literal daily tape CSV and only allows metadata fallback when explicitly requested.
+    - raw tape contract:
+      - required normalized columns: `date`, `price`, `total_return`,
+      - reject duplicate trading dates,
+      - reject all-NaN `price`,
+      - reject all-NaN `total_return`,
+      - parse accounting-style negatives like `(3.25%)` and `(1.23)`.
+    - the normal builder invocation is now intentionally blocked until `data/raw/sp500_pro_avantax_tape.csv` exists.
+    - current local extraction remains blocked because:
+      - Excel `16.0` is available,
+      - the Capital IQ COM add-in is not present / connected,
+      - the raw tape CSV is absent.
+    - therefore the literal D-350 daily-tape remediation is not yet complete on this machine, even though the downstream ingest path is ready.
+  - Evidence:
+    - `scripts/build_sp500_pro_sidecar.py`
+    - `tests/test_build_sp500_pro_sidecar.py`
+    - `.venv\Scripts\python -m pytest tests/test_build_sp500_pro_sidecar.py -q` -> PASS (`8 passed`)
+    - `.venv\Scripts\python scripts/build_sp500_pro_sidecar.py` -> BLOCK (`Raw tape CSV is missing ...`)
+    - `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json`
+  - Contract lock:
+    - `Phase61_D350 := BLOCKED iff (raw_tape_csv_present = 0) or (capital_iq_addin_present = 0)`.
+    - `if literal daily tape appears -> rerun build_sp500_pro_sidecar.py without --allow-metadata-fallback and overwrite sidecar_sp500_pro_2023_2024.parquet from the real tape`.
+  - Open risks:
+    - the current sidecar remains metadata fallback only and does not satisfy the literal-daily-tape repair objective.
+    - C3 view-layer patching for the 274 missing cells remains blocked until the raw tape CSV is actually produced.
+  - Rollback note:
+    - revert only the D-350 builder/test/docs changes if leadership rejects the prepared ingest path; do not alter D-348 authority, the D-350 PERMNO/CUSIP map, or bedrock price artifacts.
+
+Phase 61 (2026-03-20): Audit Gap Closure + Sidecar Coverage Mask Validation (D-351) 🟡
+
+  - Decision record:
+    - close the two execution gaps left open by the original D-350 tape plan:
+      - the governed audit must actually consume the sidecar return rows;
+      - the C3 comparator must stop selecting AVTA on and after its last available return date under strict `t -> t+1` execution.
+    - add a standalone WRDS CRSP extractor for the bounded sidecar path, attempt the live run, and report the live auth blocker truthfully if WRDS rejects the supplied login.
+    - validate the repaired audit path with the real on-disk CRSP boundary return row already present in `data/processed/prices.parquet` (`PERMNO 86544`, `2023-11-28`, `total_ret = 0.0`) without mutating bedrock artifacts.
+  - The Decision (Hardcoded):
+    - `scripts/phase60_governed_audit_runner.py` now overlays sidecar `total_return` rows onto the comparator return surface before strict-missing-return validation.
+    - the same comparator path now masks sidecar permnos from C3 feature rows on and after the last available sidecar return date, so stale post-delist feature rows cannot create impossible next-day executions.
+    - `scripts/ingest_d350_wrds_sidecar.py` is the canonical env-only WRDS extractor for publishing the bounded D-350 sidecar into `data/processed/sidecar_sp500_pro_2023_2024.parquet`.
+    - focused validation proves the repaired path clears KS-03 when supplied the missing boundary return row, but the live repo sidecar remains metadata-only because the 2026-03-20 WRDS login attempt failed with PAM authentication.
+    - no mutation of `core/engine.py`, `research_data/`, or bedrock price artifacts is authorized or required by this packet.
+  - Evidence:
+    - `scripts/phase60_governed_audit_runner.py`
+    - `scripts/ingest_d350_wrds_sidecar.py`
+    - `tests/test_phase60_governed_audit_runner.py`
+    - `tests/test_ingest_d350_wrds_sidecar.py`
+    - `.venv\Scripts\python -m pytest tests/test_phase60_governed_audit_runner.py tests/test_ingest_d350_wrds_sidecar.py -q` -> PASS (`9 passed`)
+    - temporary bounded validation using a one-row sidecar built from `data/processed/prices.parquet` (`date=2023-11-28`, `total_ret=0.0`) -> comparator PASS, governed audit `status = ok`
+    - `docs/phase_brief/phase61-brief.md`
+    - `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json`
+    - `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
+  - Contract lock:
+    - `Phase61_D351 := VALID iff (audit_runner_consumes_sidecar = 1) and (feature_mask_blocks_post_coverage_selection = 1) and (focused_tests = PASS) and (temp_boundary_sidecar_validation = PASS)`.
+    - `if live WRDS extraction is required -> run scripts/ingest_d350_wrds_sidecar.py only with env-supplied credentials and keep all writes isolated to the bounded sidecar/evidence paths; if WRDS rejects auth, leave the sidecar unchanged and keep the audit blocked`.
+  - Open risks:
+    - live WRDS execution is blocked because WRDS rejected the supplied login with PAM authentication failure;
+    - the repo sidecar remains metadata-only until the live bounded sidecar is written;
+    - the local bedrock boundary row has `adj_close = NaN`, so direct CRSP price republishing still depends on the live WRDS extractor.
+  - Rollback note:
+    - revert only the D-351 code/docs/report changes if leadership rejects the view-layer remediation path; do not alter D-350 raw-tape prep, D-348 authority, bedrock price artifacts, or `core/engine.py`.
+
+Phase 61 (2026-03-23): Terminal Zero v2.6 Roadmap Lock + Nautilus Deferral + V1/V2 Boundary (D-352) 🟢
+
+  - Decision record:
+    - lock the Terminal Zero v2.6 roadmap as the official forward plan for Phases 62–80+.
+    - establish the V1 Core / V2 Discovery architecture boundary with strict directory isolation, promotion contract schema, and candidate lifecycle governance.
+    - defer the Nautilus Trader adapter spike to Phases 69–70; the BrokerPort interface is defined in Phase 63 (execution boundary hardening) as the prerequisite adapter seam.
+    - ML integration follows an 80/20 split in Phases 62–65 (80% platform hardening, 20% MLOps skeleton), with no distributed compute until Phase 72.
+    - the non-ML V2 discovery pipeline (registry, proxy sim, promotion contract) must process at least one candidate family end-to-end before ML augmentation targets apply.
+  - The Decision (Hardcoded):
+    - `docs/roadmap/terminal_zero_v2.6.md` is the locked roadmap document.
+    - `docs/architecture/v1_v2_boundary.md` is the V1/V2 split contract with directory boundaries, promotion packet schema, and candidate lifecycle.
+    - `PHASE_QUEUE.md` (repo root) is the worker pickup list for Phases 62–80+.
+    - BrokerPort interface: defined in Phase 63. No direct Alpaca imports outside `execution/broker_api.py` after Phase 63.
+    - Nautilus: deferred to Phases 69–70. No Nautilus work before V2 pipeline baseline proves structural integrity.
+    - ML promotion metric: ≥40% ML-augmented promotions with N ≥ 5 floor, evaluated at Phase 74.
+    - ML allocator failure path: BLOCKED status + 30-day cooldown + D-log retirement if 6-month shadow test fails (Phases 78–79).
+    - DRL: bounded research spike at Phase 73, prove-or-kill, not approved for standard promotion pipeline.
+    - Data isolation: ML experiment artifacts in `v2_discovery/mlops/`; V1 canonical paths (`data/processed/`, `research_data/`) strictly excluded from V2/ML writes.
+    - Online models: subject to same drift escalation and KS-03 kill-switch governance as static models.
+  - Evidence:
+    - `docs/roadmap/terminal_zero_v2.6.md`
+    - `docs/architecture/v1_v2_boundary.md`
+    - `PHASE_QUEUE.md`
+    - `Alpha Rating Discussion_2026-03-20 23_44_29.md` (reconciliation debate trail)
+    - `docs/saw_reports/saw_phase61_context_reconciliation_20260322.md` (baseline SAW)
+  - Contract lock:
+    - `Phase62_READY := VALID iff (phase61_committed = 1) and (roadmap_v2.6_locked = 1) and (v1_v2_boundary_published = 1) and (phase_queue_published = 1)`.
+    - `Nautilus_DEFERRED := VALID iff (BrokerPort_defined_in_phase63 = 1) and (v2_pipeline_baseline_proven = 1) before any Nautilus adapter work`.
+    - `ML_PROMOTION_GATE := VALID iff (ml_augmented_pct >= 0.40) and (total_promotions_attempted >= 5) evaluated by automated script at Phase 74`.
+  - Open risks:
+    - Phase 61 worktree is still uncommitted; Phase 62 cannot start until the commit is pushed.
+    - WRDS PAM auth remains unresolved; provenance hardening (Phase 64) will address this.
+    - Streamlit long-term viability is an open question deferred past Phase 62 (modularize first, migrate later if needed).
+  - Rollback note:
+    - revert only the D-352 roadmap/architecture/queue files if leadership rejects the v2.6 plan; do not alter D-348 through D-351 authority, Phase 61 reconciliation artifacts, or any V1 canonical data.

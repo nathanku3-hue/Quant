@@ -44,6 +44,7 @@ PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 DEFAULT_SUMMARY_PATH = PROCESSED_DIR / "phase60_governed_audit_summary.json"
 DEFAULT_EVIDENCE_PATH = PROCESSED_DIR / "phase60_governed_audit_evidence.csv"
 DEFAULT_DELTA_PATH = PROCESSED_DIR / "phase60_governed_audit_delta.csv"
+DEFAULT_SIDECAR_PATH = PROCESSED_DIR / "sidecar_sp500_pro_2023_2024.parquet"
 DEFAULT_PREFLIGHT_PATH = (
     PROJECT_ROOT / "docs" / "context" / "e2e_evidence" / "phase60_d340_preflight_20260319_summary.json"
 )
@@ -69,6 +70,7 @@ class AuditConfig:
     phase55_summary_path: Path = DEFAULT_PHASE55_SUMMARY_PATH
     cube_summary_path: Path = DEFAULT_PHASE60_CUBE_SUMMARY_PATH
     prices_path: Path = DEFAULT_PRICES_PATH
+    sidecar_path: Path = DEFAULT_SIDECAR_PATH
 
 
 def validate_config(cfg: AuditConfig) -> None:
@@ -89,7 +91,119 @@ def _load_json(path: Path) -> dict[str, Any]:
         return json.load(handle)
 
 
-def _run_phase20_comparator(start_date: pd.Timestamp, end_date: pd.Timestamp, cost_bps: float) -> dict[str, Any]:
+def _load_sidecar_returns(
+    sidecar_path: Path,
+    start_date: pd.Timestamp,
+    end_date: pd.Timestamp,
+) -> pd.DataFrame:
+    if not sidecar_path.exists():
+        return pd.DataFrame(columns=["date", "permno", "ret"])
+
+    sidecar = pd.read_parquet(sidecar_path)
+    required = {"date", "permno", "total_return"}
+    missing = required - set(sidecar.columns)
+    if missing:
+        raise ValueError(f"Sidecar parquet missing required columns: {sorted(missing)}")
+
+    out = sidecar.loc[:, ["date", "permno", "total_return"]].copy()
+    out["date"] = pd.to_datetime(out["date"], errors="coerce")
+    out["permno"] = pd.to_numeric(out["permno"], errors="coerce")
+    out["ret"] = pd.to_numeric(out["total_return"], errors="coerce")
+    out = out.drop(columns=["total_return"])
+    out = out.dropna(subset=["date", "permno"])
+    out["permno"] = out["permno"].astype(int)
+    out = out[(out["date"] >= start_date) & (out["date"] <= end_date)].copy()
+    if out.empty:
+        return out.reset_index(drop=True)
+    if out.duplicated(subset=["date", "permno"]).any():
+        duplicates = out.loc[out.duplicated(subset=["date", "permno"], keep=False), ["date", "permno"]]
+        raise RuntimeError(
+            "Sidecar parquet contains duplicate date/permno rows: "
+            f"{duplicates.sort_values(['date', 'permno']).head(10).to_dict(orient='records')}"
+        )
+    return out.sort_values(["date", "permno"]).reset_index(drop=True)
+
+
+def _merge_returns_long(base_returns: pd.DataFrame, sidecar_returns: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
+    base = base_returns.copy()
+    base["date"] = pd.to_datetime(base["date"], errors="coerce")
+    base["permno"] = pd.to_numeric(base["permno"], errors="coerce")
+    base["ret"] = pd.to_numeric(base["ret"], errors="coerce")
+    base = base.dropna(subset=["date", "permno"]).copy()
+    base["permno"] = base["permno"].astype(int)
+    base["source"] = "base"
+
+    sidecar = sidecar_returns.copy()
+    if sidecar.empty:
+        merged = base.drop(columns=["source"]).sort_values(["date", "permno"]).reset_index(drop=True)
+        return merged, {
+            "sidecar_present": False,
+            "sidecar_rows_total": 0,
+            "sidecar_rows_used": 0,
+            "sidecar_override_rows": 0,
+            "sidecar_permnos": [],
+        }
+
+    sidecar["date"] = pd.to_datetime(sidecar["date"], errors="coerce")
+    sidecar["permno"] = pd.to_numeric(sidecar["permno"], errors="coerce")
+    sidecar["ret"] = pd.to_numeric(sidecar["ret"], errors="coerce")
+    sidecar = sidecar.dropna(subset=["date", "permno"]).copy()
+    sidecar["permno"] = sidecar["permno"].astype(int)
+    sidecar["source"] = "sidecar"
+
+    overlap = base.merge(sidecar[["date", "permno"]], on=["date", "permno"], how="inner")
+    merged = (
+        pd.concat([base, sidecar], ignore_index=True)
+        .sort_values(["date", "permno", "source"])
+        .drop_duplicates(subset=["date", "permno"], keep="last")
+        .drop(columns=["source"])
+        .sort_values(["date", "permno"])
+        .reset_index(drop=True)
+    )
+    return merged, {
+        "sidecar_present": True,
+        "sidecar_rows_total": int(len(sidecar)),
+        "sidecar_rows_used": int(len(sidecar)),
+        "sidecar_override_rows": int(len(overlap)),
+        "sidecar_permnos": sorted(sidecar["permno"].unique().tolist()),
+    }
+
+
+def _apply_sidecar_feature_mask(features: pd.DataFrame, sidecar_returns: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
+    if features.empty or sidecar_returns.empty:
+        return features, {"feature_rows_dropped": 0, "feature_mask_permnos": []}
+
+    coverage = (
+        sidecar_returns.dropna(subset=["ret"])
+        .groupby("permno", sort=True)["date"]
+        .max()
+        .rename("last_return_date")
+        .reset_index()
+    )
+    if coverage.empty:
+        return features, {"feature_rows_dropped": 0, "feature_mask_permnos": []}
+
+    masked = features.copy()
+    masked["date"] = pd.to_datetime(masked["date"], errors="coerce")
+    masked["permno"] = pd.to_numeric(masked["permno"], errors="coerce")
+    masked = masked.merge(coverage, on="permno", how="left")
+    keep_mask = masked["last_return_date"].isna() | (masked["date"] < masked["last_return_date"])
+    dropped = masked.loc[~keep_mask, ["date", "permno"]].copy()
+    masked = masked.loc[keep_mask].drop(columns=["last_return_date"]).reset_index(drop=True)
+    return masked, {
+        "feature_rows_dropped": int(len(dropped)),
+        "feature_mask_permnos": sorted(coverage["permno"].astype(int).unique().tolist()),
+        "feature_mask_date_min": str(dropped["date"].min().date()) if not dropped.empty else None,
+        "feature_mask_date_max": str(dropped["date"].max().date()) if not dropped.empty else None,
+    }
+
+
+def _run_phase20_comparator(
+    start_date: pd.Timestamp,
+    end_date: pd.Timestamp,
+    cost_bps: float,
+    sidecar_path: Path,
+) -> dict[str, Any]:
     extra_cols = [
         "ticker",
         "adj_close",
@@ -107,6 +221,8 @@ def _run_phase20_comparator(start_date: pd.Timestamp, end_date: pd.Timestamp, co
         extra_columns=extra_cols,
         sdm_features_path=C3_SDM_FEATURES_PATH,
     )
+    sidecar_returns = _load_sidecar_returns(sidecar_path, start_date, end_date)
+    features, feature_mask_info = _apply_sidecar_feature_mask(features, sidecar_returns)
     if features.empty:
         raise RuntimeError("KS-03: same-period C3 comparator has no feature rows in the audit window")
 
@@ -125,11 +241,13 @@ def _run_phase20_comparator(start_date: pd.Timestamp, end_date: pd.Timestamp, co
     prices_path = DEFAULT_PRICES_PATH
     if (PROJECT_ROOT / "data" / "processed" / "prices_tri.parquet").exists():
         prices_path = PROJECT_ROOT / "data" / "processed" / "prices_tri.parquet"
-    returns = _load_returns(prices_path, permnos, start_date, end_date)
+    returns, sidecar_info = _load_returns(prices_path, permnos, start_date, end_date, sidecar_path=sidecar_path)
     sim = _simulate(baseline_weights, returns, cost_bps)
     return {
         "baseline_config_id": PRODUCTION_CONFIG_V1.config_id,
         "metrics": {"c3": _metrics(sim)},
+        "sidecar_info": sidecar_info,
+        "feature_mask_info": feature_mask_info,
     }
 
 
@@ -183,13 +301,25 @@ def _normalize(weights: pd.DataFrame, calendar: pd.DatetimeIndex, permnos: list[
     return out
 
 
-def _load_returns(prices_path: Path, permnos: list[int], start_date: pd.Timestamp, end_date: pd.Timestamp) -> pd.DataFrame:
-    returns_long = _load_returns_subset(
+def _load_returns(
+    prices_path: Path,
+    permnos: list[int],
+    start_date: pd.Timestamp,
+    end_date: pd.Timestamp,
+    sidecar_path: Path | None = None,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    base_returns = _load_returns_subset(
         prices_path=prices_path,
         permnos=permnos,
         start_date=start_date,
         end_date=end_date,
     )
+    sidecar_returns = (
+        _load_sidecar_returns(sidecar_path, start_date, end_date)
+        if sidecar_path is not None
+        else pd.DataFrame(columns=["date", "permno", "ret"])
+    )
+    returns_long, sidecar_info = _merge_returns_long(base_returns, sidecar_returns)
     returns = (
         returns_long.assign(
             date=pd.to_datetime(returns_long["date"], errors="coerce"),
@@ -202,7 +332,7 @@ def _load_returns(prices_path: Path, permnos: list[int], start_date: pd.Timestam
     )
     returns.columns = pd.Index(pd.to_numeric(returns.columns, errors="coerce").astype(int), name="permno")
     returns.index.name = "date"
-    return returns
+    return returns, sidecar_info
 
 
 def _simulate(weights: pd.DataFrame, returns: pd.DataFrame, cost_bps: float) -> pd.DataFrame:
@@ -281,7 +411,13 @@ def run_governed_audit(cfg: AuditConfig) -> dict[str, Any]:
         core_included=False,
     )
 
-    returns = _load_returns(cfg.prices_path, permnos, cfg.start_date, cfg.end_date)
+    returns, governed_sidecar_info = _load_returns(
+        cfg.prices_path,
+        permnos,
+        cfg.start_date,
+        cfg.end_date,
+        sidecar_path=cfg.sidecar_path,
+    )
     sim_book_5 = _simulate(weights, returns, cfg.cost_bps)
     sim_book_10 = _simulate(weights, returns, cfg.sensitivity_bps)
     sim_pead_5 = _simulate(pead, returns, cfg.cost_bps)
@@ -292,8 +428,8 @@ def run_governed_audit(cfg: AuditConfig) -> dict[str, Any]:
     c3_5: dict[str, Any] | None = None
     c3_10: dict[str, Any] | None = None
     try:
-        c3_5 = _run_phase20_comparator(cfg.start_date, cfg.end_date, cfg.cost_bps)
-        c3_10 = _run_phase20_comparator(cfg.start_date, cfg.end_date, cfg.sensitivity_bps)
+        c3_5 = _run_phase20_comparator(cfg.start_date, cfg.end_date, cfg.cost_bps, cfg.sidecar_path)
+        c3_10 = _run_phase20_comparator(cfg.start_date, cfg.end_date, cfg.sensitivity_bps, cfg.sidecar_path)
     except RuntimeError as exc:
         comparator_error = str(exc)
         kill_switches_triggered.append("KS-03_same_period_c3_unavailable")
@@ -400,10 +536,18 @@ def run_governed_audit(cfg: AuditConfig) -> dict[str, Any]:
         "same_period_c3_5bps": {
             "baseline_config_id": str(c3_5["baseline_config_id"]) if c3_5 is not None else "",
             "metrics_c3": c3_5["metrics"]["c3"] if c3_5 is not None else {},
+            "sidecar_info": c3_5["sidecar_info"] if c3_5 is not None else {},
+            "feature_mask_info": c3_5["feature_mask_info"] if c3_5 is not None else {},
         },
         "same_period_c3_10bps": {
             "baseline_config_id": str(c3_10["baseline_config_id"]) if c3_10 is not None else "",
             "metrics_c3": c3_10["metrics"]["c3"] if c3_10 is not None else {},
+            "sidecar_info": c3_10["sidecar_info"] if c3_10 is not None else {},
+            "feature_mask_info": c3_10["feature_mask_info"] if c3_10 is not None else {},
+        },
+        "governed_returns_sidecar": {
+            "path": str(cfg.sidecar_path),
+            **governed_sidecar_info,
         },
         "overlap_ratio_mean": float(overlap_ratio.mean()),
         "gross_exposure_mean": float(daily_evidence["gross_exposure"].mean()),
@@ -430,6 +574,7 @@ def parse_args() -> AuditConfig:
     parser.add_argument("--evidence-path", default=str(DEFAULT_EVIDENCE_PATH))
     parser.add_argument("--delta-path", default=str(DEFAULT_DELTA_PATH))
     parser.add_argument("--preflight-path", default=str(DEFAULT_PREFLIGHT_PATH))
+    parser.add_argument("--sidecar-path", default=str(DEFAULT_SIDECAR_PATH))
     args = parser.parse_args()
     return AuditConfig(
         start_date=pd.Timestamp(args.start_date),
@@ -440,6 +585,7 @@ def parse_args() -> AuditConfig:
         evidence_path=Path(args.evidence_path),
         delta_path=Path(args.delta_path),
         preflight_path=Path(args.preflight_path),
+        sidecar_path=Path(args.sidecar_path),
     )
 
 

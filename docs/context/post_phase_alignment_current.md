@@ -1,128 +1,122 @@
-# Post-Phase Alignment - Phase 60 Closeout
+# Post-Phase Alignment - Phase 61 Closeout
 
 Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, or scope widening by itself.
-Purpose: update the multi-stream map after Phase 60 closeout so Phase 61 planning starts from current truth instead of stale assumptions.
+Purpose: update the multi-stream map after Phase 61 closeout so the next platform-hardening phase starts from current truth instead of the older Phase 60 hold narrative.
 
 ## Header
-- `ALIGNMENT_ID`: `20260320-phase60-to-phase61-pending`
-- `DATE_UTC`: `2026-03-20`
-- `SCOPE`: `Phase 60 closed as blocked evidence-only hold`
-- `PREVIOUS_PHASE`: `Phase 59 (Shadow Portfolio closeout, evidence-only / no promotion)`
-- `NEXT_PHASE`: `Phase 61 (Data patch pending explicit approval - not yet bootstrapped publicly)`
+- `ALIGNMENT_ID`: `20260322-phase61-to-next-planning`
+- `DATE_UTC`: `2026-03-22`
+- `SCOPE`: `Phase 61 complete - comparator remediation closed`
+- `PREVIOUS_PHASE`: `Phase 60 (closeout, blocked evidence-only hold)`
+- `NEXT_PHASE`: `TBD (frontend shell consolidation or execution-boundary hardening)`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
-- Phase 60 is closed under D-345 with the 274-cell C3 comparator gap preserved verbatim. Phase 61 bootstrap is authorized by D-348 but not yet publicly executed.
+- Phase 61 completed the bounded comparator repair path. The repo now needs a post-phase alignment artifact that starts from `KS-03` cleared truth instead of the older blocked-hold state.
 
 ## Static Truth Inputs
 - `top_level_PM.md`
-- `docs/decision log.md` (D-337 through D-348)
-- `docs/phase_brief/phase60-brief.md`
+- `docs/decision log.md` (`D-348` through `D-351`)
+- `docs/phase_brief/phase61-brief.md`
 - `docs/context/multi_stream_contract_current.md`
 
 ## What Changed This Round
 
 ### System Shape Delta
-- The system now has a governed daily holdings/weight cube built from Phase 56/57 sleeve surfaces
-- Post-2022 bounded audit executed with blocked evidence result (274-cell C3 comparator gap)
-- D-347 locked kernel against Option A structural changes
-- D-348 authorizes Phase 61 bootstrap pending explicit approval
-- Prior sleeve SSOT (phase54-59) remains immutable
+- The same-period C3 comparator failure is no longer active; the governed audit now reports `status = "ok"`.
+- The bounded sidecar lane is now part of the runtime truth for the repaired comparator path.
+- `D-350` hardened the literal raw-tape ingest path without widening the execution boundary.
+- Prior sleeve SSOT remains immutable and `core/engine.py` remains unchanged.
 
 ### Execution Delta
-- Added `scripts/phase60_preflight_verify.py`
-- Added `scripts/phase60_governed_audit_runner.py`
-- Added `scripts/phase60_governed_cube_runner.py`
-- Added `scripts/phase60_d341_blocked_audit_review.py`
-- Persisted `data/processed/phase60_governed_cube.parquet`
-- Persisted `docs/context/e2e_evidence/phase60_d340_preflight_*.status.txt`
-- Persisted `docs/context/e2e_evidence/phase60_d340_audit_*.status.txt`
-- Persisted `docs/context/e2e_evidence/phase60_d341_review_*.csv`
-- Added tests: `test_phase60_preflight_verify.py`, `test_phase60_governed_audit_runner.py`, `test_phase60_governed_cube_runner.py`, `test_phase60_d341_blocked_audit_review.py`, `test_phase60_d343_hygiene.py`, `test_phase60_d345_closeout.py`
+- Updated `scripts/phase60_governed_audit_runner.py` to consume sidecar returns before strict-missing-return validation.
+- Added `scripts/ingest_d350_wrds_sidecar.py` for bounded env-only WRDS extraction.
+- Added `scripts/build_sp500_pro_sidecar.py` raw-tape hardening and fail-closed behavior.
+- Persisted `data/processed/sidecar_sp500_pro_2023_2024.parquet`.
+- Persisted `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json`.
+- Persisted `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json`.
+- Refreshed current context / bridge / planner / impact / alignment / observability / README to the Phase 61 complete state.
 
 ### No Change
-- Promotion remains blocked (evidence-only packet)
-- Prior sleeve SSOT remains immutable (phase54-59 artifacts unchanged)
-- RESEARCH_MAX_DATE = 2022-12-31 discipline unchanged
-- Same-window / same-cost / same-engine discipline unchanged where comparator evidence applies
-- Research kernel (`research_data/`) unchanged
-- Core engine (`core/engine.py`) unchanged per D-347
+- Promotion remains blocked.
+- Prior sleeve SSOT remains immutable (phase54-60 artifacts unchanged).
+- `RESEARCH_MAX_DATE = 2022-12-31` discipline unchanged.
+- Same-window / same-cost / same-engine discipline unchanged where comparator evidence applies.
+- `research_data/` unchanged.
+- `core/engine.py` unchanged per `D-347`.
 
 ## Stream Status Update
 
 ### Stream 1: Backend
-- **Previous Status**: `executing` (Phase 59 bounded packet)
-- **Current Status**: `closed` (Phase 60 closed as blocked evidence-only hold)
-- **What Changed**: Implemented governed cube, executed bounded audit, confirmed 274-cell gap preserved verbatim
-- **What Remains**: Phase 61 data patch (pending explicit `approve next phase` token)
+- **Previous Status**: `blocked-hold` at the Phase 60 packet boundary
+- **Current Status**: `complete`
+- **What Changed**: Sidecar overlay and post-coverage masking cleared `KS-03` under the bounded Phase 61 slice.
+- **What Remains**: Next runtime/platform-hardening phase, if approved.
 
 ### Stream 2: Frontend/UI
-- **Previous Status**: `complete` (Phase 59 bounded packet)
-- **Current Status**: `complete` (Phase 60 evidence surface read-only)
-- **What Changed**: Dashboard reader for Phase 60 evidence surface
-- **What Remains**: Phase 61 UI (pending explicit approval)
+- **Previous Status**: `complete` for the old read-only Phase 60 evidence surface
+- **Current Status**: `ready-next`
+- **What Changed**: Comparator truth no longer blocks the operator shell; current status surfaces now advertise the cleared state.
+- **What Remains**: Shell consolidation and clearer operator-state routing.
 
 ### Stream 3: Data
-- **Previous Status**: `complete`
-- **Current Status**: `frozen`
-- **What Changed**: Nothing (prior sleeve SSOT remains immutable, C3 comparator baseline unchanged)
-- **What Remains**: Phase 61 data patch for 274-cell gap (pending explicit approval)
+- **Previous Status**: `frozen`
+- **Current Status**: `frozen-plus-sidecar`
+- **What Changed**: Additive-only sidecar lane now coexists with immutable bedrock surfaces.
+- **What Remains**: Fresh vendor-side provenance remains optional but unresolved.
 
 ### Stream 4: Docs/Ops
-- **Previous Status**: `executing` (Phase 59 bounded packet)
-- **Current Status**: `complete` (Phase 60 closeout)
-- **What Changed**: Published Phase 60 brief, handover, SAW reports, context packets, done checklist
-- **What Remains**: Phase 61 governance artifacts (pending explicit approval)
+- **Previous Status**: `stale-current-packets`
+- **Current Status**: `complete`
+- **What Changed**: Current packet set now matches the Phase 61 brief and `D-351` evidence.
+- **What Remains**: Publish the next explicit planning packet once the next phase is selected.
 
 ## Current Bottleneck
-- **Explicit approval packet** is now the bottleneck
-- **Why**: Phase 60 is closed as blocked evidence-only hold. D-348 authorizes Phase 61 bootstrap but Phase 61 is not yet publicly executing.
-- **What unblocks it**: Explicit `approve next phase` token from PM/CEO
+- **Next-phase prioritization** is now the bottleneck.
+- **Why**: Comparator correctness is repaired. The repo now needs an explicit choice between frontend shell consolidation and execution-boundary hardening.
+- **What unblocks it**: A new explicit planning/approval packet for the next platform-hardening phase.
 
 ## Interface Drift
-- **274-cell C3 comparator gap**: Preserved verbatim, no remediation
-- **Kernel mutation hold**: D-347 locks `core/engine.py` against Option A structural changes
-- **Phase 61 pending**: Data-level completeness patch and Method B sidecar integration await explicit approval
+- **Phase drift in current packets**: Resolved in this round by rebuilding `current_context` and refreshing the `*_current.md` set.
+- **Bounded sidecar provenance**: Still indirect because the live WRDS run remains blocked by PAM auth rejection.
 
 ## Next Stream Active
-- **Docs/Ops** (await explicit `approve next phase` token)
-- **Why**: Phase 60 is closed. Phase 61 requires explicit approval before execution begins.
+- **Frontend/UI**
+- **Why**: The backend comparator blocker is cleared; the highest remaining product risk is operator-shell cohesion and state visibility.
 
 ## PM Decision Required
-- **Decision**: Should Phase 61 data patch and Method B integration proceed?
+- **Decision**: Should the next explicit packet prioritize frontend shell consolidation or execution-boundary hardening?
 - **Evidence supporting decision**:
-  - Phase 60 closed as blocked evidence-only hold under D-345
-  - 274-cell C3 comparator gap preserved verbatim
-  - D-347 locks kernel against structural changes
-  - D-348 authorizes Phase 61 bootstrap pending explicit approval
+  - Phase 61 complete, `KS-03` cleared under `D-351`
+  - `core/engine.py` and prior sleeve SSOT remain stable
+  - Current operator shell still carries concentrated complexity in `dashboard.py`
+  - Execution/runtime boundary remains broker-specific
 - **Options**:
-  1. Approve Phase 61 execution: reply `approve next phase`
-  2. Defer Phase 61: keep system in blocked evidence-only hold state
+  1. Approve frontend shell consolidation first
+  2. Approve execution-boundary hardening first
 
 ## What Should Not Be Done Next
-- Do not begin Phase 61 execution without explicit `approve next phase` token
-- Do not mutate `core/engine.py` (D-347 hold)
-- Do not remediate 274-cell gap without approval
-- Do not mutate prior sleeve SSOT (phase54-59 artifacts remain immutable)
-- Do not reopen research kernel or generate post-2022 evidence beyond bounded D-340 slice (RESEARCH_MAX_DATE = 2022-12-31 remains active)
+- Do not reopen comparator remediation as if it were still the primary blocker
+- Do not mutate `core/engine.py`
+- Do not treat Phase 61 completion as promotion authority
+- Do not mutate prior sleeve SSOT or `research_data/`
 
 ## Open Risks
-- 274-cell C3 comparator gap preserved verbatim (blocked evidence-only)
-- Allocator carry-forward blocked (negative Sharpe/CAGR, PBO 0.66)
-- Core sleeve blocked (4/6 gates passed, Rule 100 pass rate 10.1%)
+- WRDS live authentication still fails with PAM rejection
+- Allocator carry-forward remains blocked (negative Sharpe/CAGR, PBO 0.66)
+- Core sleeve remains blocked (4/6 gates passed, Rule 100 pass rate 10.1%)
 - Event family SPA_p/WRC_p > 0.05 (not promotion-ready)
 
 ## Evidence Used
 - `docs/context/current_context.md`
-- `docs/phase_brief/phase60-brief.md`
-- `docs/handover/phase60_handover.md`
-- `docs/handover/phase60_execution_handover_20260318.md`
+- `docs/phase_brief/phase61-brief.md`
 - `docs/context/bridge_contract_current.md`
 - `docs/context/done_checklist_current.md`
 - `docs/context/multi_stream_contract_current.md`
-- `data/processed/phase60_governed_cube.parquet`
-- `docs/context/e2e_evidence/phase60_d341_review_*.csv`
+- `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json`
+- `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json`
+- `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
 
 ## Writing Rules
 - Keep this file top-level and PM-readable.

@@ -5,70 +5,69 @@ Authority: advisory-only integration artifact. This file does not authorize exec
 Purpose: provide the planner with a compact, fresh world model without requiring full-repo rereads.
 
 ## Header
-- `PACKET_ID`: `20260320-phase60-closeout-planner`
-- `DATE_UTC`: `2026-03-20`
-- `SCOPE`: `Phase 60 closed-blocked-evidence-only-hold`
+- `PACKET_ID`: `20260322-phase61-reconciled-planner`
+- `DATE_UTC`: `2026-03-22`
+- `SCOPE`: `Phase 61 complete - KS-03 cleared, truth surfaces reconciled`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
-- The planner needs a compact fresh-context packet to propose next steps without rereading the whole repo after Phase 60 closeout.
+- The planner needs a compact fresh-context packet that reflects the latest bounded execution truth after the `D-351` Phase 61 closure rather than the earlier Phase 60 hold state.
 
 ## Current Context
 
 ### What System Exists Now
-- Quant is a Multi-Sleeve Research Kernel plus Governance Stack with bounded Phase 56/57/58/59/60 evidence surfaces preserved as immutable SSOT. Phase 60 is CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD with 274-cell comparator gap preserved verbatim.
+- Quant is a Multi-Sleeve Research Kernel plus Governance Stack with immutable Phase 56/57/58/59/60 evidence surfaces preserved as SSOT and a bounded Phase 61 comparator-remediation slice completed under `D-348` / `D-350` / `D-351`. `KS-03` is cleared at the view layer, and the governed audit now returns `status = "ok"` without kernel mutation.
 
 ### Active Scope
-- Phase 60 formally closed as blocked evidence-only hold under D-345
+- Phase 61 is complete, and the current round reconciles planner / bridge / context / README truth surfaces to the `D-351` state.
 
 ### Blocked Scope
-- Any Phase 60 widening, any Phase 61+ work, any comparator remediation, any post-2022 audit beyond bounded D-340 slice, or any kernel mutation remains blocked until explicit `approve next phase` token
+- Any `core/engine.py` mutation, `research_data/` mutation, allocator carry-forward, core inclusion, live promotion, or widening beyond the bounded sidecar/view-layer slice remains blocked until a later explicit packet.
 
 ## Active Brief
 ### Current Phase/Round
-- Phase 60 (closed as blocked evidence-only hold under D-345)
+- Phase 61 (`COMPLETE - KS-03 CLEARED`)
 
-- Authority: D-345 (closeout), D-347 (kernel mutation hold), D-348 (Phase 61 bootstrap pending)
+- Authority: `D-348` (bounded execution), `D-350` (raw-tape ingest preparation), `D-351` (audit-gap closure and sidecar coverage masking)
 
-- Active brief: `docs/phase_brief/phase60-brief.md`
+- Active brief: `docs/phase_brief/phase61-brief.md`
 
 ### Goal
-- Preserve Phase 60 governed cube and blocked audit evidence as immutable SSOT
+- Preserve the cleared comparator truth and give the planner a current packet set for the next platform-hardening phase.
+
 ### Non-Goals
-- No promotion of Phase 60 to stable shadow execution
-- No widening into Phase 61
-- No post-2022 expansion
-- No mutation of research kernel or prior sleeve SSOT
+- No mutation of `core/engine.py`
+- No mutation of `research_data/`
+- No mutation of bedrock price artifacts
+- No allocator carry-forward, core-sleeve inclusion, or production promotion
+
 ### Owned Files
-- `scripts/phase60_preflight_verify.py`
 - `scripts/phase60_governed_audit_runner.py`
-- `scripts/phase60_governed_cube_runner.py`
-- `scripts/phase60_d341_blocked_audit_review.py`
-- `tests/test_phase60_preflight_verify.py`
+- `scripts/ingest_d350_wrds_sidecar.py`
+- `scripts/build_sp500_pro_sidecar.py`
 - `tests/test_phase60_governed_audit_runner.py`
-- `tests/test_phase60_governed_cube_runner.py`
-- `tests/test_phase60_d341_blocked_audit_review.py`
-- `tests/test_phase60_d343_hygiene.py`
-- `tests/test_phase60_d345_closeout.py`
-- `docs/phase_brief/phase60-brief.md`
-- `docs/handover/phase60_handover.md`
-- `docs/handover/phase60_execution_handover_20260318.md`
-- `data/processed/phase60_*` artifacts
+- `tests/test_ingest_d350_wrds_sidecar.py`
+- `tests/test_build_sp500_pro_sidecar.py`
+- `docs/phase_brief/phase61-brief.md`
+- `docs/saw_reports/saw_phase61_d349_sp500_pro_sidecar_20260320.md`
+- `docs/saw_reports/saw_phase61_d350_tape_ingest_block_20260320.md`
+- `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
 - `docs/context/current_context.md`
 - `docs/context/bridge_contract_current.md`
+
 ### Interfaces
-- Governance artifact consumers (read-only)
-- Dashboard tab hook for bounded Phase 60 evidence surface (read-only)
-- `phase60_governed_cube.parquet` (governed daily holdings/weight cube)
-- `phase60_d340_audit_*.status.txt` (blocked audit evidence)
-- `phase60_d341_review_*.csv` (formal review findings)
+- `data/processed/sidecar_sp500_pro_2023_2024.parquet` (bounded sidecar return surface)
+- `data/processed/phase60_governed_audit_summary.json` (governed audit status now `ok`)
+- `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json` (bounded remediation evidence)
+- `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json` (raw-tape blocker evidence)
+
 ### Bridge Truth
 ### System Delta
-- Phase 60 is closed as blocked evidence-only hold under D-345
-- 274-cell C3 comparator gap preserved verbatim
-- D-347 locks kernel against Option A structural changes
-- D-348 authorizes Phase 61 bootstrap pending explicit approval
+- Phase 61 consumed the explicit approval token in `D-348` and completed the bounded comparator remediation path.
+- `KS-03` is cleared without mutating `core/engine.py`.
+- `D-350` hardened the raw-tape ingest path, and `D-351` closed the sidecar-overlay and post-coverage masking gaps.
+
 ### Planner Delta
-- **Stronger now**: Formal closeout packet (D-345) with explicit blocked-audit root cause preserved
-- **Weaker now**: Audit remains blocked; cannot proceed to Phase 61 without explicit approval
-- **Still unknown**: Whether Phase 61 data patch will succeed; when it will be approved
+- **Stronger now**: the same-period C3 comparator is no longer the active blocker; the governed audit returns `status = "ok"` with a bounded sidecar/view-layer repair.
+- **Weaker now**: live WRDS authentication still fails with PAM auth rejection, so the provenance chain still depends on the bounded bedrock fallback instead of a fresh vendor pull.
+- **Still unknown**: whether the next explicit packet should prioritize frontend shell consolidation or execution-boundary hardening first.

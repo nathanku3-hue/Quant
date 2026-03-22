@@ -12,13 +12,13 @@ This system implements a multi-phase quantitative trading strategy with:
 
 ## Project Status
 
-**Current Phase**: Phase 60 (Stable Shadow Portfolio) — CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD 🚫
-- **Phase 60 Status**: Closed under D-345/D-347/D-348
-  - 274-cell C3 return gap preserved verbatim
-  - Kernel immutable (core/engine.py locked)
-  - Audit blocked on same-period comparator unavailable
-- **Phase 61**: Bootstrap authorized (D-348) but not yet publicly executed; pending explicit `approve next phase` token
-- **Next**: Data-level completeness patch for 274 C3 return cells + Method B sidecar integration
+**Current Phase**: Phase 61 (Comparator Remediation) — COMPLETE / KS-03 CLEARED
+- **Phase 61 Status**: Complete under D-348/D-350/D-351
+  - same-period C3 comparator repaired through bounded sidecar/view-layer logic
+  - kernel immutable (`core/engine.py` unchanged)
+  - governed audit now returns `status = "ok"`
+- **Open Operational Risk**: Live WRDS authentication still fails with PAM rejection; current provenance uses bounded bedrock fallback
+- **Next**: truth surfaces reconciled; next explicit platform phase should choose between frontend shell consolidation and execution-boundary hardening
 
 ## Current Truth Surfaces
 
@@ -27,10 +27,10 @@ Use these surfaces together to understand the current system state:
 ### Static Truth
 - **[top_level_PM.md](top_level_PM.md)** — long-lived product/system intent
 - **[docs/decision log.md](docs/decision%20log.md)** — authoritative decision history
-- **Active phase brief** — current phase scope and boundaries (e.g., `docs/phase_brief/phase60-brief.md`)
+- **Active phase brief** — current phase scope and boundaries (e.g., `docs/phase_brief/phase61-brief.md`)
 
 ### Live Truth
-- **[docs/context/current_context.md](docs/context/current_context.md)** — current active phase and blocked next step
+- **[docs/context/current_context.md](docs/context/current_context.md)** — current active phase and next immediate command
 
 ### Bridge Truth
 - **[docs/context/bridge_contract_current.md](docs/context/bridge_contract_current.md)** — translates recent technical closeout state back into PM/planner language and names the next system-level decision
@@ -115,55 +115,54 @@ python scripts/attribution_report.py \
 # Run all tests
 pytest tests/ -v
 
-# Run Phase 60 specific tests
-pytest tests/test_phase60_*.py -v
+# Run Phase 61 specific tests
+pytest tests/test_phase60_governed_audit_runner.py tests/test_ingest_d350_wrds_sidecar.py tests/test_build_sp500_pro_sidecar.py -v
 
 # Run with coverage
 pytest tests/ --cov=. --cov-report=html
 ```
 
-**Test Coverage**: All Phase 60 tests passing
-- Preflight verification tests
-- Governed audit runner tests
-- Governed cube tests
-- Blocked-audit review tests
-- Documentation hygiene tests
-- Closeout tests
+**Test Coverage**: Phase 61 targeted tests and packet hygiene checks passing
+- Governed audit runner regression tests
+- WRDS sidecar extractor tests
+- Raw-tape sidecar builder tests
+- Context-builder and Phase 61 packet hygiene tests
 
-## Phase 60 Deliverables
+## Phase 61 Deliverables
 
 ### Artifacts Generated
 
-All artifacts in `data/processed/`:
+Key artifacts in `data/processed/`:
 
-1. **phase60_governed_cube.parquet** - Governed daily holdings/weight cube
-2. **phase60_d340_preflight_*.json** - Preflight check results (PF-01..PF-06)
-3. **phase60_d340_audit_*.status.txt** - Blocked audit evidence (274-cell gap preserved)
-4. **phase60_d341_review_*.csv/json** - Formal blocked-audit review findings
+1. **sidecar_sp500_pro_2023_2024.parquet** - Bounded sidecar return surface for the repaired comparator path
+2. **phase60_governed_audit_summary.json** - Governed audit summary now reporting `status = "ok"`
+3. **phase61_d350_wrds_pivot_20260319_summary.json** - Evidence summary for sidecar overlay and coverage masking
+4. **phase61_sp500_pro_tape_block_20260320.json** - Truthful raw-tape blocker evidence for the literal vendor export path
 
 ### Validation
 
-**Governance State**: Phase 60 closed as CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD
-- 274-cell C3 comparator gap preserved verbatim
-- Kernel immutable per D-347
-- Phase 61 bootstrap authorized (D-348) but not yet executing publicly
+**Governance State**: Phase 61 complete with `KS-03` cleared
+- comparator repair bounded to sidecar/view-layer logic
+- kernel immutable per D-347
+- promotion, allocator carry-forward, and core inclusion still blocked
 
 ## Documentation
 
-### Phase 60
-- **`docs/phase_brief/phase60-brief.md`** - Phase 60 specification
-- **`docs/handover/phase60_handover.md`** - CEO handover memo
-- **`docs/handover/phase60_execution_handover_20260318.md`** - Execution handover
+### Phase 61
+- **`docs/phase_brief/phase61-brief.md`** - Phase 61 bounded remediation brief
+- **`docs/saw_reports/saw_phase61_d349_sp500_pro_sidecar_20260320.md`** - Sidecar fallback review
+- **`docs/saw_reports/saw_phase61_d350_tape_ingest_block_20260320.md`** - Raw-tape blocker review
+- **`docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`** - WRDS/bedrock fallback remediation review
 
 ### General
-- **`docs/decision log.md`** - Architecture decision records (D-01 through D-348)
+- **`docs/decision log.md`** - Architecture decision records (D-01 through D-351)
 - **`docs/context/bridge_contract_current.md`** - Current PM/planner bridge
 
 ## Current System Status
 
-- **Multi-Sleeve Research Kernel**: Phase 56/57/58/59/60 evidence surfaces preserved as immutable SSOT
-- **Governance Stack**: 348 architecture decisions
-- **Blockers**: 274-cell C3 comparator gap; Phase 61 pending explicit approval
+- **Multi-Sleeve Research Kernel**: Phase 56/57/58/59/60 evidence surfaces preserved as immutable SSOT, with a bounded Phase 61 repair lane completed on top
+- **Governance Stack**: 351 architecture decisions
+- **Remaining Risks**: vendor-side provenance still indirect; promotion and widened execution remain blocked
 
 ## Development Workflow
 
@@ -212,6 +211,6 @@ Configuration files in `config/`:
 
 ---
 
-**Last Updated**: 2026-03-20
-**Phase**: 60 (Closed as Blocked Evidence-Only Hold)
-**Status**: Phase 60 CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD ✅ | Phase 61 Bootstrap Pending (D-348) 🔄
+**Last Updated**: 2026-03-22
+**Phase**: 61 (Comparator Remediation Complete)
+**Status**: Phase 61 COMPLETE / KS-03 CLEARED ✅ | Next Platform Phase Pending 🔄

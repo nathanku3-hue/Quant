@@ -1,0 +1,22 @@
+{
+  "packet_id": "PHASE61_D350_BEDROCK_FALLBACK_V1",
+  "status": "ok",
+  "source": "prices_tri.parquet (bedrock fallback)",
+  "permno": 86544,
+  "query_start_date": "2023-01-01",
+  "query_end_date": "2023-11-29",
+  "rows_extracted": 227,
+  "date_min": "2023-01-03",
+  "date_max": "2023-11-27",
+  "null_price_count": 0,
+  "null_total_return_count": 0,
+  "output_parquet": "data\\processed\\sidecar_sp500_pro_2023_2024.parquet",
+  "audit_result": {
+    "governed_audit_status": "ok",
+    "kill_switches_triggered": [],
+    "sidecar_rows_used": 227,
+    "feature_rows_masked": 276,
+    "wrds_auth_status": "blocked_pam_failure",
+    "fallback_method": "bedrock_prices_tri_parquet"
+  }
+}

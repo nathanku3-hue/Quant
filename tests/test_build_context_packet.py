@@ -139,6 +139,36 @@ def test_active_phase_prefers_selected_context_source(tmp_path: Path) -> None:
     assert int(packet["active_phase"]) == 7
 
 
+def test_active_phase_promotes_newer_brief_when_context_packet_exists(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    _write(
+        repo / "docs/phase_brief/phase99-brief.md",
+        "\n".join(
+            [
+                "# Phase 99 Brief",
+                "",
+                "## New Context Packet",
+                "## What Was Done",
+                "- Landed newer brief context.",
+                "## What Is Locked",
+                "- Older handover is superseded.",
+                "## What Is Next",
+                "- Refresh current context.",
+                "## First Command",
+                "```text",
+                ".venv\\Scripts\\python scripts/build_context_packet.py",
+                "```",
+            ]
+        ),
+    )
+    packet = build_context_packet(
+        repo_root=repo,
+        generated_at_utc=datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    )
+    assert int(packet["active_phase"]) == 99
+    assert packet["what_was_done"] == ["Landed newer brief context."]
+
+
 def test_markdown_first_command_uses_fenced_block_when_backticks_present() -> None:
     packet = {
         "schema_version": "1.0.0",

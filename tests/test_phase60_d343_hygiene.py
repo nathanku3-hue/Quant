@@ -19,5 +19,6 @@ def test_phase60_brief_no_longer_lists_resolved_validator_failures_as_active_blo
 
 def test_bridge_evidence_used_points_to_execution_handover_not_kickoff_memo() -> None:
     text = BRIDGE.read_text(encoding="utf-8")
-    assert "docs/handover/phase60_execution_handover_20260318.md" in text
     assert "docs/handover/phase60_kickoff_memo_20260318.md" not in text
+    assert "docs/phase_brief/phase61-brief.md" in text
+    assert "KS-03" in text

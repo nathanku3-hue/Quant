@@ -1,0 +1,16 @@
+{
+  "packet_id": "PHASE61_SP500_PRO_TAPE_BLOCK_V1",
+  "workbook": "E:\\Code\\Quant\\SPGlobal_Avantax,Inc._SecurityDetail_19-Mar-2026.xlsx",
+  "raw_tape_csv": "E:\\Code\\Quant\\data\\raw\\sp500_pro_avantax_tape.csv",
+  "excel_available": true,
+  "excel_version": "16.0",
+  "capital_iq_addin_present": false,
+  "raw_tape_present": false,
+  "status": "blocked",
+  "block_reason": "literal_daily_tape_unavailable_locally",
+  "notes": [
+    "Excel is installed locally but the Capital IQ COM add-in is not present or connected in the current add-in inventory.",
+    "The supplied workbook is metadata-only and cannot provide the literal daily tape by itself.",
+    "The sidecar builder now supports the real raw tape CSV path and fails closed until that CSV exists."
+  ]
+}
