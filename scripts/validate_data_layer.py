@@ -31,6 +31,7 @@ PRICES_PATH = "data/processed/prices.parquet"
 PATCH_PATH = "data/processed/yahoo_patch.parquet"
 TICKERS_PATH = "data/processed/tickers.parquet"
 FEATURES_PATH = "data/processed/features.parquet"
+PRICES_TRI_PATH = "data/processed/prices_tri.parquet"
 
 
 def _safe_load():
@@ -49,13 +50,38 @@ def _normalize_ticker(series: pd.Series) -> pd.Series:
     return series.astype(str).str.upper().str.strip()
 
 
+def _price_source_config() -> dict[str, str | None]:
+    if os.path.exists(PRICES_TRI_PATH):
+        return {"base": PRICES_TRI_PATH, "patch": None}
+    return {"base": PRICES_PATH, "patch": PATCH_PATH if os.path.exists(PATCH_PATH) else None}
+
+
+def _freshness_status_text(
+    *,
+    features_max_date: pd.Timestamp,
+    price_max_date: pd.Timestamp,
+) -> tuple[int | None, str]:
+    features_ts = pd.to_datetime(features_max_date, errors="coerce")
+    price_ts = pd.to_datetime(price_max_date, errors="coerce")
+    if pd.isna(features_ts) or pd.isna(price_ts):
+        return None, "Freshness gap unavailable"
+    freshness_gap_days = int((price_ts - features_ts).days)
+    if freshness_gap_days >= 0:
+        return freshness_gap_days, f"Freshness gap vs latest prices: {freshness_gap_days} day(s)"
+    lead_days = abs(freshness_gap_days)
+    return freshness_gap_days, f"Features extends {lead_days} day(s) beyond governed price surface"
+
+
 def _validate_feature_store_layer() -> bool:
     print("\n[Check 0] Feature Store Integrity")
     if not os.path.exists(FEATURES_PATH):
         print(f"CRITICAL: missing file -> {FEATURES_PATH}")
         return False
-    if not os.path.exists(PRICES_PATH):
-        print(f"CRITICAL: missing file -> {PRICES_PATH}")
+    price_config = _price_source_config()
+    price_base = str(price_config["base"] or "")
+    price_patch = price_config.get("patch")
+    if not price_base or not os.path.exists(price_base):
+        print(f"CRITICAL: missing governed price surface -> {price_base}")
         return False
 
     con = duckdb.connect()
@@ -84,19 +110,19 @@ def _validate_feature_store_layer() -> bool:
             """
         ).fetchone()[0]
 
-        if os.path.exists(PATCH_PATH):
+        if price_patch and os.path.exists(str(price_patch)):
             max_price_date = con.execute(
                 f"""
                 SELECT MAX(d) FROM (
-                    SELECT MAX(CAST(date AS DATE)) AS d FROM '{PRICES_PATH}'
+                    SELECT MAX(CAST(date AS DATE)) AS d FROM '{price_base}'
                     UNION ALL
-                    SELECT MAX(CAST(date AS DATE)) AS d FROM '{PATCH_PATH}'
+                    SELECT MAX(CAST(date AS DATE)) AS d FROM '{price_patch}'
                 )
                 """
             ).fetchone()[0]
         else:
             max_price_date = con.execute(
-                f"SELECT MAX(CAST(date AS DATE)) AS d FROM '{PRICES_PATH}'"
+                f"SELECT MAX(CAST(date AS DATE)) AS d FROM '{price_base}'"
             ).fetchone()[0]
 
         score_nan_ratio = con.execute(
@@ -118,10 +144,9 @@ def _validate_feature_store_layer() -> bool:
     min_date = pd.to_datetime(summary[2], errors="coerce") if summary and summary[2] is not None else pd.NaT
     max_date = pd.to_datetime(summary[3], errors="coerce") if summary and summary[3] is not None else pd.NaT
     max_price_ts = pd.to_datetime(max_price_date, errors="coerce") if max_price_date is not None else pd.NaT
-    freshness_gap_days = (
-        int((max_price_ts - max_date).days)
-        if pd.notna(max_price_ts) and pd.notna(max_date)
-        else None
+    freshness_gap_days, freshness_message = _freshness_status_text(
+        features_max_date=max_date,
+        price_max_date=max_price_ts,
     )
 
     print(f"Rows: {total_rows:,}")
@@ -129,7 +154,7 @@ def _validate_feature_store_layer() -> bool:
     print(f"Duplicate (date, permno) keys: {int(duplicate_keys)}")
     print(f"Date range: {str(min_date.date()) if pd.notna(min_date) else 'NA'} -> {str(max_date.date()) if pd.notna(max_date) else 'NA'}")
     if freshness_gap_days is not None:
-        print(f"Freshness gap vs latest prices: {freshness_gap_days} day(s)")
+        print(freshness_message)
     if score_nan_ratio is not None:
         print(f"Composite-score NaN ratio: {float(score_nan_ratio):.2%}")
 
