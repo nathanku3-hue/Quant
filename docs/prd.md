@@ -20,10 +20,12 @@ Terminal Zero is a local-first quantitative research platform that has evolved t
 
 Core Philosophy: "The Pilot's Checklist." Do not guess. Check the instruments. Then let the math optimize the instruments.
 
-Current governance overlay (R64.1, 2026-05-09):
+Current governance overlay (Phase 65, 2026-05-09):
   - Provenance and validation gates are executable before paper-alert expansion.
   - Alpaca operational/paper infrastructure uses `alpaca-py==0.43.4`; live orders remain blocked.
-  - Phase F Candidate Registry is approved as registry-only work before strategy search or promotion packets.
+  - Phase F Candidate Registry is complete as registry-only work before strategy search or promotion packets.
+  - Candidate intent must be recorded before results with `trial_count`, `parameters_searched`, `manifest_uri`, `source_quality`, and `code_ref`.
+  - Candidate Registry snapshots are not promotion authority; strategy search, simulation, alerts, and broker behavior remain blocked until separately approved.
 
 2. System Architecture
 Layer 1: Data Lake (ETL → Parquet files)

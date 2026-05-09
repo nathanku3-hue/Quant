@@ -3870,3 +3870,57 @@ Date: 2026-03-01
      - `requirements.lock`
      - `pyproject.toml`
      - `tests/test_dependency_hygiene.py`
+
+## Phase 65 Candidate Registry Notes
+
+1. Candidate intent predicate:
+   - `candidate_valid = 1` iff all required intent fields are present before results:
+     - `candidate_id`
+     - `family_id`
+     - `hypothesis`
+     - `universe`
+     - `features`
+     - `parameters_searched`
+     - `trial_count`
+     - `train_window`
+     - `test_window`
+     - `cost_model`
+     - `data_snapshot`
+     - `manifest_uri`
+     - `source_quality`
+     - `created_at`
+     - `created_by`
+     - `code_ref`
+     - `status`
+   - source path:
+     - `v2_discovery/schemas.py` (`CandidateSpec`)
+2. Event hash formula:
+   - `event_hash_i = SHA256(canonical_json(event_i without event_hash))`
+   - `previous_event_hash_1 = "GENESIS"`
+   - `hash_chain_valid = 1` iff `previous_event_hash_i == event_hash_{i-1}` for all `i > 1` and every stored `event_hash_i` recomputes exactly.
+   - source path:
+     - `v2_discovery/schemas.py` (`compute_event_hash`)
+     - `v2_discovery/registry.py` (`verify_hash_chain`)
+3. Snapshot projection:
+   - `candidate_snapshot = replay(candidate_events_jsonl)`
+   - event log is source of truth; snapshot is disposable projection.
+   - source path:
+     - `v2_discovery/registry.py` (`rebuild_snapshot`, `write_snapshot`)
+4. Phase F status machine:
+   - allowed:
+     - `generated -> incubating`
+     - `incubating -> rejected`
+     - `generated -> rejected`
+     - `generated -> retired`
+     - `generated -> quarantined`
+   - forbidden:
+     - `incubating -> promoted`
+     - `any -> alerted`
+     - `any -> executed`
+   - source path:
+     - `v2_discovery/schemas.py` (`ALLOWED_STATUS_TRANSITIONS`, `FORBIDDEN_PHASE_F_STATUSES`)
+5. Promotion readiness:
+   - `promotion_ready = false` for every Phase F snapshot.
+   - if `source_quality != "canonical"`, then `promotion_block_reason = "non_canonical_source_quality"`.
+   - source path:
+     - `v2_discovery/schemas.py` (`CandidateSnapshot`)

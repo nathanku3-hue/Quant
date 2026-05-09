@@ -2,12 +2,12 @@
 
 Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, or scope widening by itself.
-Purpose: coordinate Backend, Frontend/UI, Data, and Docs/Ops streams after D-353 and R64.1.
+Purpose: coordinate Backend, Frontend/UI, Data, and Docs/Ops streams after D-353, R64.1, and Phase 65.
 
 ## Header
-- `CONTRACT_ID`: `20260509-d354-r64-1-closeout-streams`
+- `CONTRACT_ID`: `20260509-d355-phase65-closeout-streams`
 - `DATE_UTC`: `2026-05-09`
-- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F Candidate Registry closed`
 - `STATUS`: `current`
 - `OWNER`: `PM / Architecture Office`
 
@@ -61,8 +61,9 @@ Purpose: coordinate Backend, Frontend/UI, Data, and Docs/Ops streams after D-353
 
 ## Blocked Streams
 - Live trading / broker automation remains blocked.
-- Candidate registry implementation is not started yet; it is approved as the next narrow phase.
+- Candidate registry implementation is complete but remains registry-only, not a search or promotion entry point.
 - Paper alert packet and paper portfolio loop are not started in D-353.
+- Strategy search and V2 fast simulation are not started in Phase 65.
 
 ## Completion Criteria
 - Backend manifest and validation tests pass.
@@ -75,4 +76,11 @@ Purpose: coordinate Backend, Frontend/UI, Data, and Docs/Ops streams after D-353
 - Phase 61: Complete; KS-03 cleared.
 - D-353 / Phase 64 accelerated slice: Complete for provenance + validation A-E.
 - R64.1 dependency hygiene: Complete; `pip check` passes.
-- Next action: Phase F Candidate Registry only.
+- Phase 65 Candidate Registry: Complete; registry-only.
+- Next action: choose Phase G V2 Proxy Boundary or advanced registry accounting.
+
+## Phase 65 Stream Addendum
+
+Backend/Data now owns `v2_discovery/*`, `scripts/run_candidate_registry_demo.py`, `tests/test_candidate_registry.py`, and `data/registry/*`.
+
+Docs/Ops now owns `docs/architecture/candidate_registry_policy.md`, `docs/handover/phase65_handover.md`, and `docs/saw_reports/saw_phase65_candidate_registry_20260509.md`.

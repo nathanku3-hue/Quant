@@ -16,6 +16,7 @@ tmp/
 tmp_*/
 *.log
 *.jsonl
+!data/registry/candidate_events.jsonl
 
 # Generated data artifacts
 data/raw/

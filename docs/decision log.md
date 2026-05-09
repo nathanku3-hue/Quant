@@ -4515,3 +4515,44 @@ Phase 64.1 (2026-05-09): Dependency Hygiene + Phase F Candidate Registry Approva
     - unrelated pre-existing dirty files remain excluded from the R64/R65 surgical commits.
   - Rollback note:
     - revert only the R64.1 dependency files, broker SDK shim, dependency tests, and docs if the `alpaca-py` boundary is rejected; do not revert D-353 provenance/validation gates or Phase 61 SSOT artifacts.
+
+Phase 65 (2026-05-09): Candidate Registry - Registry-Only Closeout (D-355) 🟢
+
+  - Decision record:
+    - implement Phase F as a registry-only candidate intent ledger before strategy search, simulation, alerts, promotion packets, or broker behavior.
+    - record candidate metadata, trial family intent, code reference, data snapshot, source quality, and manifest pointer before any result payload exists.
+    - use a simple JSONL append-only event log first; do not add MLflow, DVC, vectorbt, Qlib, a strategy factory, or V2 fast simulator in this phase.
+    - keep the next decision explicit: Phase G V2 Proxy Boundary versus advanced registry accounting for trial families and multiple-testing metadata.
+  - The Decision (Hardcoded):
+    - `v2_discovery/schemas.py` defines frozen `CandidateSpec`, `CandidateEvent`, and `CandidateSnapshot` dataclasses.
+    - `v2_discovery/registry.py` writes `data/registry/candidate_events.jsonl` as the source of truth and derives `data/registry/candidate_snapshot.json`.
+    - every candidate requires `manifest_uri`, `source_quality`, `trial_count`, and `parameters_searched`; the manifest must exist and source quality must match.
+    - event hashes chain with `previous_event_hash` and `event_hash`, with the first event anchored to `GENESIS`.
+    - allowed Phase F transitions are `generated -> incubating`, `incubating -> rejected`, `generated -> rejected`, `generated -> retired`, and `generated -> quarantined`.
+    - `promoted`, `alerted`, and `executed` statuses are forbidden in Phase F; registry snapshots are never promotion-ready.
+  - Evidence:
+    - `docs/architecture/candidate_registry_policy.md`
+    - `v2_discovery/schemas.py`
+    - `v2_discovery/registry.py`
+    - `scripts/run_candidate_registry_demo.py`
+    - `tests/test_candidate_registry.py`
+    - `data/registry/candidate_events.jsonl`
+    - `data/registry/candidate_snapshot.json`
+    - `data/registry/candidate_registry_rebuild_report.json`
+    - `.venv\Scripts\python -m pytest tests/test_candidate_registry.py -q` -> PASS (`12 passed`)
+    - `.venv\Scripts\python scripts\run_candidate_registry_demo.py` -> PASS (`event_count = 3`, `demo_status = rejected`, `hash_chain_valid = true`)
+    - `.venv\Scripts\python -m pytest tests/test_dependency_hygiene.py tests/test_provider_ports.py tests/test_provenance_policy.py tests/test_data_readiness_audit.py tests/test_minimal_validation_lab.py tests/test_candidate_registry.py -q` -> PASS
+    - `.venv\Scripts\python -m pytest -q` -> PASS with existing skips/warnings
+    - `.venv\Scripts\python -m pip check` -> PASS (`No broken requirements found.`)
+    - `.venv\Scripts\python scripts\audit_data_readiness.py` -> PASS (`ready_for_paper_alerts = true`, warning `stale_sidecars_max_date_2023-11-27`)
+    - `.venv\Scripts\python scripts\run_minimal_validation_lab.py --create-input-manifest --promotion-intent` -> PASS
+    - `.venv\Scripts\python launch.py --server.headless true --server.port 8599` -> PASS (headless smoke reached local URL; smoke process stopped)
+  - Contract lock:
+    - `PH65_REGISTRY_ONLY := VALID iff (append_only_event_log = 1) and (snapshot_rebuilds_from_events = 1) and (candidate_manifest_uri_required = 1) and (candidate_source_quality_required = 1) and (trial_count_required = 1) and (strategy_search = 0) and (promotion_packets = 0) and (alerts = 0) and (execution = 0)`.
+    - `PH65_HASH_CHAIN := VALID iff event_hash_i == SHA256(canonical_json(event_i without event_hash)) and previous_event_hash_i == event_hash_{i-1}`.
+  - Open risks:
+    - yfinance legacy migration remains future debt but is not a Candidate Registry blocker while quarantine tests pass.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+    - unrelated pre-existing dirty files remain excluded from the Phase 65 surgical commit.
+  - Rollback note:
+    - revert only Phase 65 registry code, tests, policy/brief/handover/context docs, and `data/registry/*` artifacts if the registry kernel is rejected; do not revert D-353/R64.1 provenance, validation, provider, dependency, or broker-boundary work.

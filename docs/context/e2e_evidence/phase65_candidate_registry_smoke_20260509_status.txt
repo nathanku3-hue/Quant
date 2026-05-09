@@ -1,0 +1,1 @@
+PASS headless dashboard smoke reached http://localhost:8599

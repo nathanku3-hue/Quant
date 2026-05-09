@@ -1,13 +1,13 @@
-# Done Checklist - R64.1 Dependency + Git Hygiene Closeout
+# Done Checklist - Phase 65 Candidate Registry Closeout
 
 Status: Closed
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, or scope widening by itself.
-Purpose: define machine-checkable done criteria for closing D-353/R64.1 before Phase F Candidate Registry starts.
+Purpose: define machine-checkable done criteria for closing Phase F Candidate Registry before any strategy search or next-phase boundary work starts.
 
 ## Header
-- `CHECKLIST_ID`: `20260509-d354-r64-1-closeout`
+- `CHECKLIST_ID`: `20260509-d355-phase65-closeout`
 - `DATE_UTC`: `2026-05-09`
-- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F Candidate Registry closed`
 - `STATUS`: `closed`
 - `OWNER`: `PM / Architecture Office`
 
@@ -53,6 +53,17 @@ Purpose: define machine-checkable done criteria for closing D-353/R64.1 before P
 - [x] Milestone commits are surgical and unrelated dirty files are excluded.
 - [x] A-E evidence artifacts under `data/processed/` are intentionally ignored by repo policy and reproducible with the audit/validation commands.
 
+### Phase 65 Registry Completeness
+- [x] `docs/architecture/candidate_registry_policy.md` is published.
+- [x] `v2_discovery/schemas.py` defines frozen candidate/event/snapshot schemas.
+- [x] `v2_discovery/registry.py` defines append-only event persistence and snapshot rebuild.
+- [x] `tests/test_candidate_registry.py` covers required manifest URI, source quality, trial count, searched parameters, append-only log behavior, snapshot rebuild, invalid transitions, Tier 2 promotion block, duplicate IDs, hash-chain tamper detection, and forbidden operation methods.
+- [x] `scripts/run_candidate_registry_demo.py` emits the dummy lifecycle proof.
+- [x] `data/registry/candidate_events.jsonl` exists and contains the dummy lifecycle event chain.
+- [x] `data/registry/candidate_snapshot.json` exists and rebuilds from JSONL.
+- [x] `data/registry/candidate_registry_rebuild_report.json` exists and reports `hash_chain_valid = true`.
+- [x] No strategy factory, V2 fast simulator, alert, promotion, broker, or live path is introduced.
+
 ## Explicit Non-Goals
 - No live Alpaca orders.
 - No broker automation.
@@ -81,6 +92,7 @@ test -f data/processed/phase56_pead_evidence.csv.manifest.json
 ```text
 run a secret scanner over data docs scripts tests execution validation and fail on credential material
 rg "submit_order\\(" data/providers validation scripts/run_minimal_validation_lab.py scripts/audit_data_readiness.py
+rg "run_strategy_search|generate_strategy|run_backtest|promote_candidate|emit_alert|execute_candidate" v2_discovery scripts/run_candidate_registry_demo.py tests/test_candidate_registry.py
 ```
 
 ## Evidence Used
@@ -93,6 +105,10 @@ rg "submit_order\\(" data/providers validation scripts/run_minimal_validation_la
 - `tests/test_provider_ports.py`
 - `docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md`
 - `docs/saw_reports/saw_phase64_1_dependency_git_hygiene_20260509.md`
+- `docs/architecture/candidate_registry_policy.md`
+- `docs/handover/phase65_handover.md`
+- `docs/saw_reports/saw_phase65_candidate_registry_20260509.md`
+- `data/registry/candidate_registry_rebuild_report.json`
 
 ## Open Risks
 - yfinance quarantine surface is broad and should be migrated gradually.

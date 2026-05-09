@@ -12,14 +12,15 @@ This system implements a multi-phase quantitative trading strategy with:
 
 ## Project Status
 
-**Current Phase**: Phase 64.1 closeout hygiene — COMPLETE; Phase F Candidate Registry approved, not started
+**Current Phase**: Phase 65 Candidate Registry — COMPLETE, registry-only
 - **D-353 Status**: Complete for source policy, manifest enforcement, provider ports, data readiness audit, and minimal validation lab
   - validation reports now require manifests
   - yfinance is quarantined as Tier 2 discovery/convenience data
   - Alpaca is operational/paper market data only; live orders remain blocked
 - **R64.1 Status**: Dependency hygiene closed with `alpaca-py==0.43.4`; `pip check` passes
+- **Phase F Status**: Candidate Registry closed as append-only metadata/lifecycle work; no strategy search, simulation, promotion packet, alert, broker, or live path added
 - **Open Operational Risk**: primary S&P sidecar is stale through 2023-11-27; yfinance remains quarantined legacy debt
-- **Next**: Phase F Candidate Registry only. See `docs/phase_brief/phase65-brief.md`.
+- **Next Decision**: Choose Phase G V2 Proxy Boundary or advanced registry accounting; strategy search is not automatically approved.
 
 ## Current Truth Surfaces
 
@@ -28,7 +29,7 @@ Use these surfaces together to understand the current system state:
 ### Static Truth
 - **[top_level_PM.md](top_level_PM.md)** — long-lived product/system intent
 - **[docs/decision log.md](docs/decision%20log.md)** — authoritative decision history
-- **Active phase brief** — current phase scope and boundaries (e.g., `docs/phase_brief/phase64-brief.md`)
+- **Active phase brief** — current phase scope and boundaries (e.g., `docs/phase_brief/phase65-brief.md`)
 
 ### Live Truth
 - **[docs/context/current_context.md](docs/context/current_context.md)** — current active phase and next immediate command
@@ -123,6 +124,10 @@ pytest tests/test_provenance_policy.py tests/test_provider_ports.py tests/test_d
 pytest tests/test_dependency_hygiene.py tests/test_execution_controls.py tests/test_provider_ports.py -v
 python -m pip check
 
+# Run Phase 65 Candidate Registry tests
+pytest tests/test_candidate_registry.py -v
+python scripts/run_candidate_registry_demo.py
+
 # Run with coverage
 pytest tests/ --cov=. --cov-report=html
 ```
@@ -134,6 +139,7 @@ pytest tests/ --cov=. --cov-report=html
 - Minimal validation lab tests
 - Alpaca paper/live boundary tests
 - Alpaca SDK dependency hygiene tests
+- Candidate Registry append-only lifecycle and hash-chain tests
 
 ## Phase 64 / D-353 Deliverables
 
@@ -159,17 +165,24 @@ Key artifacts in `data/processed/`:
 ### Phase 64 / D-353
 - **`docs/architecture/data_source_policy.md`** - Data source tiers and executable invariants
 - **`docs/phase_brief/phase64-brief.md`** - D-353 accelerated provenance + validation brief
-- **`docs/phase_brief/phase65-brief.md`** - Phase F Candidate Registry approval brief
+- **`docs/phase_brief/phase65-brief.md`** - Phase F Candidate Registry closeout brief
 - **`docs/handover/phase64_handover.md`** - PM handover for provenance + validation gates
 
+### Phase 65 / Candidate Registry
+- **`docs/architecture/candidate_registry_policy.md`** - Registry-only policy and invariants
+- **`docs/handover/phase65_handover.md`** - PM handover for Candidate Registry
+- **`data/registry/candidate_events.jsonl`** - Append-only candidate event log
+- **`data/registry/candidate_snapshot.json`** - Disposable snapshot projection
+- **`data/registry/candidate_registry_rebuild_report.json`** - Rebuild and hash-chain proof
+
 ### General
-- **`docs/decision log.md`** - Architecture decision records (D-01 through D-353)
+- **`docs/decision log.md`** - Architecture decision records (D-01 through D-355)
 - **`docs/context/bridge_contract_current.md`** - Current PM/planner bridge
 
 ## Current System Status
 
 - **Multi-Sleeve Research Kernel**: Prior evidence surfaces preserved as immutable SSOT, with D-353 provenance gates layered on top
-- **Governance Stack**: 353 architecture decisions
+- **Governance Stack**: 355 architecture decisions
 - **Remaining Risks**: yfinance quarantine migration, stale S&P sidecar provenance, and blocked live execution
 
 ## Development Workflow
@@ -220,5 +233,5 @@ Configuration files in `config/`:
 ---
 
 **Last Updated**: 2026-05-09
-**Phase**: 64 accelerated provenance + validation gates
-**Status**: D-353 Complete | Paper-alert readiness gates active
+**Phase**: 65 Candidate Registry
+**Status**: D-355 Complete | Registry-only lineage gates active

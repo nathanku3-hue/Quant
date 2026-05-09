@@ -2,12 +2,12 @@
 
 Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, or scope widening by itself.
-Purpose: provide a compact view of what changed and what might be affected after D-353/R64.1.
+Purpose: provide a compact view of what changed and what might be affected after D-353/R64.1/Phase65.
 
 ## Header
-- `PACKET_ID`: `20260509-d354-r64-1-closeout-impact`
+- `PACKET_ID`: `20260509-d355-phase65-closeout-impact`
 - `DATE_UTC`: `2026-05-09`
-- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F Candidate Registry closed`
 - `OWNER`: `PM / Architecture Office`
 
 ## Changed Files
@@ -162,3 +162,43 @@ pyproject.toml
 - `.venv\Scripts\python -m pip check`
 - `.venv\Scripts\python -m pytest tests/test_dependency_hygiene.py tests/test_execution_controls.py tests/test_provider_ports.py tests/test_provenance_policy.py -q`
 - `.venv\Scripts\python .codex/skills/_shared/scripts/validate_saw_report_blocks.py --report-file docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md`
+
+## Phase 65 Closeout Addendum
+
+Changed files:
+
+```text
+v2_discovery/__init__.py
+v2_discovery/schemas.py
+v2_discovery/registry.py
+scripts/run_candidate_registry_demo.py
+tests/test_candidate_registry.py
+docs/architecture/candidate_registry_policy.md
+docs/phase_brief/phase65-brief.md
+docs/handover/phase65_handover.md
+docs/saw_reports/saw_phase65_candidate_registry_20260509.md
+data/registry/candidate_events.jsonl
+data/registry/candidate_snapshot.json
+data/registry/candidate_registry_rebuild_report.json
+```
+
+Touched interface:
+
+```text
+Candidate Registry = frozen candidate intent + append-only event log + rebuildable snapshot projection.
+```
+
+Passing checks:
+
+```text
+.venv\Scripts\python -m pytest tests/test_candidate_registry.py -q -> PASS, 12 passed
+.venv\Scripts\python scripts\run_candidate_registry_demo.py -> PASS, event_count=3, demo_status=rejected, hash_chain_valid=true
+.venv\Scripts\python -m pytest -q -> PASS with existing skips/warnings
+.venv\Scripts\python launch.py --server.headless true --server.port 8599 -> PASS
+```
+
+Additional risks:
+
+```text
+Future Phase G must not blur registry accounting into strategy search without explicit approval.
+```

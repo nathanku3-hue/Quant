@@ -541,3 +541,11 @@ Application pattern:
 - Fix applied: Migrated the main Alpaca SDK boundary to `alpaca-py==0.43.4`, removed the legacy Alpaca SDK from the main dependency files and venv, regenerated `requirements.lock`, added dependency hygiene tests, and reran `pip check`.
 - Guardrail for next time: Before starting any candidate-generation or experiment-multiplication phase, require `pip check` to pass or explicitly isolate the conflicting package outside the main research environment.
 - Evidence paths: `execution/broker_api.py`, `requirements.txt`, `requirements.lock`, `pyproject.toml`, `tests/test_dependency_hygiene.py`, `docs/phase_brief/phase65-brief.md`, `docs/saw_reports/saw_phase64_1_dependency_git_hygiene_20260509.md`
+
+## 2026-05-09 Round Entry (Candidate Memory Must Precede Candidate Results)
+- Date: 2026-05-09
+- Mistake or miss: The project had many historical "candidate" references but no append-only identity ledger that records trial intent before results.
+- Root cause: Prior phases optimized and validated bounded ideas without a dedicated pre-result registry, which would make future multiple-testing accounting too easy to reconstruct after seeing outcomes.
+- Fix applied: Added the Phase 65 Candidate Registry kernel with frozen candidate specs, append-only JSONL events, hash-chain verification, rebuildable snapshots, dummy lifecycle evidence, and tests for required manifests/source quality/trial counts/parameters.
+- Guardrail for next time: Do not start strategy search, parameter sweeps, alerts, or promotion packets until every candidate family and trial count is recorded in the registry before result generation.
+- Evidence paths: `v2_discovery/schemas.py`, `v2_discovery/registry.py`, `tests/test_candidate_registry.py`, `scripts/run_candidate_registry_demo.py`, `data/registry/candidate_events.jsonl`, `data/registry/candidate_snapshot.json`, `docs/architecture/candidate_registry_policy.md`, `docs/saw_reports/saw_phase65_candidate_registry_20260509.md`

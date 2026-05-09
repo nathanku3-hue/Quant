@@ -1,15 +1,15 @@
-# Post-Phase Alignment - R64.1 Closeout
+# Post-Phase Alignment - Phase 65 Closeout
 
 Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, or scope widening by itself.
-Purpose: update the multi-stream map after the accelerated provenance + validation milestone and dependency hygiene wedge.
+Purpose: update the multi-stream map after the accelerated provenance + validation milestone, dependency hygiene wedge, and Candidate Registry closeout.
 
 ## Header
-- `ALIGNMENT_ID`: `20260509-d354-r64-1-closeout-alignment`
+- `ALIGNMENT_ID`: `20260509-d355-phase65-closeout-alignment`
 - `DATE_UTC`: `2026-05-09`
-- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F Candidate Registry closed`
 - `PREVIOUS_PHASE`: `Phase 61 complete / D-352 roadmap locked`
-- `NEXT_PHASE`: `Phase F Candidate Registry`
+- `NEXT_PHASE`: `Phase G decision: V2 Proxy Boundary or advanced registry accounting`
 - `OWNER`: `PM / Architecture Office`
 
 ## What Changed This Round
@@ -93,3 +93,14 @@ Purpose: update the multi-stream map after the accelerated provenance + validati
 - `docs/architecture/data_source_policy.md`
 - `data/processed/data_readiness_report.json`
 - `data/processed/minimal_validation_report.json`
+- `docs/architecture/candidate_registry_policy.md`
+- `docs/handover/phase65_handover.md`
+- `data/registry/candidate_registry_rebuild_report.json`
+
+## Phase 65 Closeout Addendum
+
+- Candidate intent and lifecycle are now append-only and manifest-backed before results.
+- Added Candidate Registry schemas, JSONL event log, snapshot projection, rebuild report, dummy lifecycle script, and tests.
+- No strategy search, V2 simulator, alert packet, promotion packet, broker call, or provider integration was added.
+- Current bottleneck moved from candidate lineage implementation to the Phase G boundary decision.
+- PM decision required: choose V2 Proxy Boundary or advanced registry accounting; do not start strategy search automatically.

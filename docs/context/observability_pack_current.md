@@ -2,12 +2,12 @@
 
 Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, or scope widening by itself.
-Purpose: make drift visible early after D-353/R64.1.
+Purpose: make drift visible early after D-353/R64.1/Phase65.
 
 ## Header
-- `PACK_ID`: `20260509-d354-r64-1-closeout-obs`
+- `PACK_ID`: `20260509-d355-phase65-closeout-obs`
 - `DATE_UTC`: `2026-05-09`
-- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F Candidate Registry closed`
 - `OWNER`: `PM / Architecture Office`
 
 ## High-Risk Attempts
@@ -70,15 +70,24 @@ Compaction/Hallucination Events: 1 (0 compaction / 1 stale / 0 unsupported / 0 c
 - Keep yfinance direct-use allowlist current and fail tests on new spread.
 - Run manifest validation before promotion-intent validation.
 - Run `.venv\Scripts\python -m pip check` before candidate expansion or broker/quote runtime changes.
+- Do not let Candidate Registry become a strategy factory, simulator, alert emitter, or broker path.
 
 ## Recommendations
 
 - Keep `alpaca-py==0.43.4` as the main SDK path and keep legacy Alpaca SDK out of the main environment.
 - Migrate legacy yfinance scripts behind provider ports gradually.
-- Continue to Phase F Candidate Registry only; do not start strategy search.
+- Choose Phase G boundary deliberately; do not start strategy search automatically.
 
 ## Evidence Used
 
 - `docs/phase_brief/phase64-brief.md`
 - `tests/test_provider_ports.py`
 - `.venv\Scripts\python -m pip check`
+- `tests/test_candidate_registry.py`
+- `data/registry/candidate_registry_rebuild_report.json`
+
+## Phase 65 Observability Addendum
+
+- Phase 65 added no live/broker/alert/provider behavior.
+- Phase 65 full regression and headless smoke passed.
+- Drift guardrail: registry snapshots are not promotion authority and `promotion_ready` remains false.

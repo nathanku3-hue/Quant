@@ -61,6 +61,13 @@ Guiding Principle: "Signals from Price, PnL from Returns."
     - The legacy `alpaca-trade-api` package is excluded from the main research environment.
     - This SDK migration does not authorize live orders, broker automation, or any scope beyond paper operational quote metadata.
 
+  Phase 65 Candidate Registry note:
+    - Phase F Candidate Registry is complete as registry-only work.
+    - Candidate intent must be registered before results with `candidate_id`, `family_id`, `hypothesis`, `universe`, `features`, `parameters_searched`, `trial_count`, `train_window`, `test_window`, `cost_model`, `data_snapshot`, `manifest_uri`, `source_quality`, `created_at`, `created_by`, `code_ref`, and `status`.
+    - Registry events are append-only JSONL records chained by `previous_event_hash` and `event_hash`.
+    - Snapshot files are disposable projections from the event log, not source of truth.
+    - This registry does not authorize strategy generation, simulation, alerts, promotion packets, broker calls, or live execution.
+
 1. System Architecture Diagram
 The system is composed of six strictly isolated layers:
   Data Layer (The Lake): Hybrid Parquet lake (WRDS base + Yahoo patch).
