@@ -1,68 +1,78 @@
 # Bridge Contract - Current
 
 Status: Current integration bridge
-Authority: advisory-only PM/planner bridge. This file reflects the bounded `D-348` / `D-350` / `D-351` Phase 61 remediation packet and the reconciled current truth surfaces. It does not authorize promotion, allocator carry-forward, core inclusion, or widening beyond the bounded sidecar/view-layer slice.
-Purpose: connect Quant's current technical state back to planner truth and product/system truth.
+Authority: advisory-only PM/planner bridge. This file reflects D-353, the accelerated provenance + validation + paper-alert gate milestone A-E. It does not authorize live trading, broker automation, promotion, allocator carry-forward, core inclusion, or widening beyond daily US-equity paper-alert validation gates.
+Purpose: connect Quant's current technical state back to planner truth and product/system truth after R64.1 hygiene.
 
 ## Header
-- `BRIDGE_ID`: `20260322-phase61-d351-system-bridge`
-- `DATE_UTC`: `2026-03-22`
-- `SCOPE`: `Phase 61 complete - comparator remediation bounded and KS-03 cleared`
-- `STATUS`: `complete-bounded-ks03-cleared`
+- `BRIDGE_ID`: `20260509-d354-r64-1-closeout-bridge`
+- `DATE_UTC`: `2026-05-09`
+- `SCOPE`: `D-353 A-E COMPLETE + R64.1 dependency hygiene CLOSED + Phase F approved/not started`
+- `STATUS`: `phase65-approved-registry-only`
 - `OWNER`: `PM / Architecture Office`
 
 ## Why This File Exists
-- Quant has strong phase briefs, review packets, and evidence artifacts, but it still needs one thin artifact that says what the system now means and what the planner should do next after the `D-351` repair path.
+- The repo now has executable source-quality and validation gates. The planner needs to treat provenance as a runtime gate, not a paragraph in a plan.
 
 ## Static Truth Inputs
 - `top_level_PM.md`
-- `README.md`
 - `docs/decision log.md`
-- `docs/phase_brief/phase61-brief.md`
+- `docs/phase_brief/phase64-brief.md`
+- `docs/architecture/data_source_policy.md`
+- `docs/handover/phase64_handover.md`
 
 ## Live Truth Now
-- `SYSTEM_NOW`: `Quant is currently a Multi-Sleeve Research Kernel plus Governance Stack with immutable Phase 56 / 57 / 58 / 59 / 60 evidence surfaces preserved as SSOT and a completed bounded Phase 61 comparator-remediation packet whose governed audit now returns status = ok after sidecar overlay plus post-coverage feature masking.`
-- `ACTIVE_SCOPE`: `Phase 61 is complete; the current packet set now reflects the cleared KS-03 state and bounded provenance risks.`
-- `BLOCKED_SCOPE`: `Any production promotion, allocator carry-forward, core inclusion, research_data mutation, core/engine.py mutation, or widening beyond the bounded sidecar/view-layer slice remains blocked until the next explicit packet.`
+- `SYSTEM_NOW`: `Quant has manifest-backed provenance gates, provider ports, yfinance quarantine, data readiness audit, minimal validation lab, and a clean main Alpaca dependency path via alpaca-py.`
+- `ACTIVE_SCOPE`: `D-353 A-E and R64.1 hygiene are complete; Phase F Candidate Registry is approved but not started.`
+- `BLOCKED_SCOPE`: `Live Alpaca orders, broker automation, strategy search, V2 fast simulation, paper alerts, options/futures, Tier 2 promotion packets, yfinance canonical truth, and credential material in source/docs/logs/artifacts remain blocked.`
 
 ## What Changed This Round
-- `SYSTEM_DELTA`: `The system moved from a Phase 60 blocked hold to a Phase 61 completed bounded remediation path. KS-03 is cleared and the governed audit now returns ok without kernel mutation.`
-- `EXECUTION_DELTA`: `The repo hardened the raw-tape ingest path, overlaid bounded sidecar returns into the governed audit, masked post-coverage feature rows, and refreshed stale current truth surfaces to match that result.`
-- `NO_CHANGE`: `Promotion is still blocked, prior sleeves remain immutable SSOT, RESEARCH_MAX_DATE = 2022-12-31 remains active, and the same-window / same-cost / same-engine discipline remains unchanged where comparator evidence applies.`
+- `SYSTEM_DELTA`: `Provenance became the first executable gate: validation reports require manifests, promotion intent requires canonical source quality, and alerts/quotes require source-quality metadata.`
+- `EXECUTION_DELTA`: `Added data/provenance.py, data/providers/*, scripts/audit_data_readiness.py, validation/*, scripts/run_minimal_validation_lab.py, focused tests, and R64.1 Alpaca SDK hygiene. Alpaca quote snapshots now carry feed-quality tags and non-paper endpoint initialization requires a signed decision env gate.`
+- `NO_CHANGE`: `No live trading authority, no broker automation, no core/engine.py mutation, no research_data mutation, no yfinance canonical upgrade, and no promotion path were introduced.`
 
 ## PM / Product Delta
-- `STRONGER_NOW`: `The same-period comparator failure is no longer the active system blocker: Phase 61 proved the bounded repair path and the governed audit now reports status = ok with empty kill_switches_triggered.`
-- `WEAKER_NOW`: `Live WRDS authentication still fails with PAM rejection, so the repo currently relies on a bounded bedrock fallback for the sidecar provenance chain.`
-- `STILL_UNKNOWN`: `Whether Streamlit remains the long-term UI shell (deferred past Phase 62; modularize first).`
+- `STRONGER_NOW`: `The system can now refuse missing-manifest validation, Tier 2 promotion attempts, source-quality-free alerts, and untagged Alpaca IEX quotes in tests/runtime helpers.`
+- `WEAKER_NOW`: `The actual yfinance legacy surface is larger than the plan list and remains quarantined rather than removed.`
+- `STILL_UNKNOWN`: `Whether Alpaca account entitlements support SIP/delayed SIP for higher-quality operational marking.`
 
 ## Planner Bridge
-- `OPEN_DECISION`: `RESOLVED by D-352. The Terminal Zero v2.6 roadmap is locked. Phase 62 (frontend shell consolidation) is READY. Phase 63 (execution-boundary hardening) is QUEUED after Phase 62.`
-- `RECOMMENDED_NEXT_STEP`: `Start Phase 62: break dashboard.py into shell_frame, route_registry, and shared_loaders. See PHASE_QUEUE.md for full scope and exit criteria.`
-- `WHY_THIS_NEXT`: `D-352 locked the sequencing: frontend shell consolidation first, execution-boundary hardening second, data provenance third, MLOps skeleton fourth. The highest remaining risk is operator-shell debt, not comparator correctness.`
-- `NOT_RECOMMENDED_NEXT`: `Do not reopen core-engine mutation proposals, do not treat Phase 61 completion as promotion authority, and do not widen into live trading or allocator/core-sleeve promotion without a new explicit packet.`
+- `OPEN_DECISION`: `None for R64.1. Phase F Candidate Registry is approved as registry-only work.`
+- `RECOMMENDED_NEXT_STEP`: `Implement Phase F candidate registry with append-only lifecycle, required trial_count, and required manifest pointer.`
+- `WHY_THIS_NEXT`: `Candidate metadata must exist before multiple-testing correction, strategy search, and paper-alert packets can claim controlled discovery lineage.`
+- `NOT_RECOMMENDED_NEXT`: `Do not use live Alpaca credentials, do not place live orders, do not delete yfinance blindly, and do not treat readiness or validation reports as promotion authority.`
 
 ## Locked Boundaries
 - `DO_NOT_REDECIDE`:
-  - `Phase 59 remains closed as evidence-only / no promotion / no widening.`
-  - `Prior sleeve / governance / shadow SSOT artifacts for Phases 55 / 56 / 57 / 58 / 59 / 60 remain immutable.`
-  - `RESEARCH_MAX_DATE = 2022-12-31 and the same-window / same-cost / core.engine.run_simulation evidence gate remain active.`
+  - `yfinance is Tier 2 discovery/convenience data only.`
+  - `Alpaca is operational/paper market data only for this milestone.`
+  - `Promotion-intent validation requires canonical source quality and a manifest.`
+  - `No live trading without a later signed decision-log packet.`
 - `BLOCKED_UNTIL`:
-  - `Any promotion, live-routing widening, allocator carry-forward, core inclusion, or post-Phase-61 scope requires a separate explicit packet.`
-  - `Any scope that mutates research_data or core/engine.py remains blocked.`
-  - `Fresh vendor-side provenance for the sidecar remains pending successful WRDS auth or a delivered raw-tape export.`
+  - `Live Alpaca orders remain blocked until explicit signed decision-log approval.`
+  - `Broker automation remains blocked until BrokerPort and risk/alert packet contracts are complete.`
+  - `Tier 2 promotion packets remain blocked permanently unless source quality is corrected by canonical evidence.`
 
 ## Evidence Used
-- `docs/context/current_context.md`
-- `docs/phase_brief/phase61-brief.md`
-- `docs/saw_reports/saw_phase61_d349_sp500_pro_sidecar_20260320.md`
-- `docs/saw_reports/saw_phase61_d350_tape_ingest_block_20260320.md`
-- `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
-- `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json`
-- `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json`
-- `README.md`
+- `docs/architecture/data_source_policy.md`
+- `docs/phase_brief/phase64-brief.md`
+- `docs/handover/phase64_handover.md`
+- `data/processed/data_readiness_report.json`
+- `data/processed/data_readiness_report.json.manifest.json`
+- `data/processed/minimal_validation_report.json`
+- `data/processed/minimal_validation_report.json.manifest.json`
+- `data/processed/phase56_pead_evidence.csv.manifest.json`
+- `requirements.txt`
+- `requirements.lock`
+- `pyproject.toml`
+- `.venv\Scripts\python -m pip check` -> PASS
+- `tests/test_dependency_hygiene.py`
+- `tests/test_provenance_policy.py`
+- `tests/test_provider_ports.py`
+- `tests/test_data_readiness_audit.py`
+- `tests/test_minimal_validation_lab.py`
 
 ## Open Risks
-- `Live WRDS authentication still fails with PAM rejection, so future extractions may require account recovery or a later vendor rerun.`
-- `The current sidecar provenance chain is bounded but indirect because the cleared KS-03 path used bedrock fallback data rather than a fresh WRDS pull.`
-- `Allocator carry-forward remains blocked because its eligibility metrics are still negative.`
-- `The core sleeve remains below promotion readiness and cannot be promoted from the cleared comparator alone.`
+- `yfinance quarantine surface is broad and should be migrated gradually behind provider ports.`
+- `Primary S&P sidecar is stale through 2023-11-27.`
+- `Unrelated pre-existing dirty files must remain excluded from R64/R65 commits.`

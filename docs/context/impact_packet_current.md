@@ -1,141 +1,164 @@
 # Impact Packet - Current
 
 Status: Current
-Authority: advisory-only integration artifact. This file does not authorize execution, promotion, or scope widening by itself.
-Purpose: provide the planner with a compact view of what changed and what might be affected, without requiring full-repo rereads.
+Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, or scope widening by itself.
+Purpose: provide a compact view of what changed and what might be affected after D-353/R64.1.
 
 ## Header
-- `PACKET_ID`: `20260322-phase61-reconciled-impact`
-- `DATE_UTC`: `2026-03-22`
-- `SCOPE`: `Phase 61 complete, KS-03 cleared, current truth surfaces reconciled`
+- `PACKET_ID`: `20260509-d354-r64-1-closeout-impact`
+- `DATE_UTC`: `2026-05-09`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
 - `OWNER`: `PM / Architecture Office`
-
-## Why This File Exists
-- The planner needs an impact packet that reflects the bounded Phase 61 remediation files and the current docs reconciliation, not the older Phase 60 hold packet.
 
 ## Changed Files
 
-Files modified in the Phase 61 remediation + reconciliation window:
-
 ```text
-scripts/phase60_governed_audit_runner.py
-scripts/ingest_d350_wrds_sidecar.py
-scripts/build_sp500_pro_sidecar.py
-tests/test_phase60_governed_audit_runner.py
-tests/test_ingest_d350_wrds_sidecar.py
-tests/test_build_sp500_pro_sidecar.py
-tests/test_build_context_packet.py
-tests/test_phase61_context_hygiene.py
-docs/phase_brief/phase61-brief.md
-docs/context/current_context.md
-docs/context/current_context.json
-docs/context/planner_packet_current.md
-docs/context/bridge_contract_current.md
-docs/context/done_checklist_current.md
-docs/context/impact_packet_current.md
-docs/context/multi_stream_contract_current.md
-docs/context/post_phase_alignment_current.md
-docs/context/observability_pack_current.md
-docs/saw_reports/saw_phase61_d349_sp500_pro_sidecar_20260320.md
-docs/saw_reports/saw_phase61_d350_tape_ingest_block_20260320.md
-docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md
-docs/decision log.md (D-348 through D-351)
-README.md
+data/provenance.py
+data/providers/__init__.py
+data/providers/base.py
+data/providers/legacy_allowlist.py
+data/providers/registry.py
+data/providers/yahoo_provider.py
+data/providers/alpaca_provider.py
+execution/broker_api.py
+validation/__init__.py
+validation/metrics.py
+validation/oos.py
+validation/walk_forward.py
+validation/regime_tests.py
+validation/permutation.py
+validation/bootstrap.py
+validation/schemas.py
+scripts/audit_data_readiness.py
+scripts/run_minimal_validation_lab.py
+tests/test_provenance_policy.py
+tests/test_provider_ports.py
+tests/test_data_readiness_audit.py
+tests/test_minimal_validation_lab.py
+tests/test_execution_controls.py
+tests/test_dependency_hygiene.py
+docs/architecture/data_source_policy.md
+docs/phase_brief/phase64-brief.md
+docs/phase_brief/phase65-brief.md
+docs/handover/phase64_handover.md
+docs/decision log.md
+docs/notes.md
+docs/lessonss.md
+docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md
+docs/saw_reports/saw_phase64_1_dependency_git_hygiene_20260509.md
+docs/context/*.md
+requirements.txt
+requirements.lock
+pyproject.toml
+data/processed/data_readiness_report.json
+data/processed/data_readiness_report.json.manifest.json
+data/processed/minimal_validation_report.json
+data/processed/minimal_validation_report.json.manifest.json
+data/processed/phase56_pead_evidence.csv.manifest.json
 ```
 
 ## Owned Files
 
-Files owned by the bounded Phase 61 comparator-remediation + docs-reconciliation slice:
+Owned by this D-353 slice:
 
 ```text
-scripts/phase60_governed_audit_runner.py
-scripts/ingest_d350_wrds_sidecar.py
-scripts/build_sp500_pro_sidecar.py
-tests/test_phase60_governed_audit_runner.py
-tests/test_ingest_d350_wrds_sidecar.py
-tests/test_build_sp500_pro_sidecar.py
-tests/test_build_context_packet.py
-tests/test_phase61_context_hygiene.py
-docs/phase_brief/phase61-brief.md
-docs/context/current_context.md
-docs/context/current_context.json
-docs/context/planner_packet_current.md
-docs/context/bridge_contract_current.md
-docs/context/done_checklist_current.md
-docs/context/impact_packet_current.md
-docs/context/multi_stream_contract_current.md
-docs/context/post_phase_alignment_current.md
-docs/context/observability_pack_current.md
-docs/context/e2e_evidence/phase61_*.json
-docs/saw_reports/saw_phase61_*.md
-data/processed/sidecar_sp500_pro_2023_2024.parquet
-data/processed/phase60_governed_audit_summary.json
+data/provenance.py
+data/providers/*
+validation/*
+scripts/audit_data_readiness.py
+scripts/run_minimal_validation_lab.py
+tests/test_provenance_policy.py
+tests/test_provider_ports.py
+tests/test_data_readiness_audit.py
+tests/test_minimal_validation_lab.py
+docs/architecture/data_source_policy.md
+docs/phase_brief/phase64-brief.md
+docs/phase_brief/phase65-brief.md
+docs/handover/phase64_handover.md
+data/processed/data_readiness_report.json*
+data/processed/minimal_validation_report.json*
+data/processed/phase56_pead_evidence.csv.manifest.json
+```
+
+Touched shared file:
+
+```text
+execution/broker_api.py
+tests/test_execution_controls.py
+docs/decision log.md
+docs/notes.md
+docs/lessonss.md
+docs/context/*.md
+requirements.txt
+requirements.lock
+pyproject.toml
 ```
 
 ## Touched Interfaces
 
-Interfaces modified or newly exposed in Phase 61:
+### Interface 1: Provenance Manifest
+- **Type**: Data/source-quality contract
+- **Owner**: Data / Docs-Ops
+- **Changed**: New required fields and fail-closed validation helpers
+- **Consumers**: validation lab, readiness audit, promotion gate, alert/quote builders
 
-### Interface 1: `sidecar_sp500_pro_2023_2024.parquet`
-- **Type**: Data schema (bounded sidecar parquet)
-- **Owner**: Backend (Phase 61 comparator-remediation stream)
-- **Changed**: View-layer sidecar for the bounded AVTA comparator repair path
-- **Consumers**: Governed audit runner, Docs/Ops evidence review
+### Interface 2: Provider Ports
+- **Type**: Market-data adapter contract
+- **Owner**: Data / Backend
+- **Changed**: `MarketDataPort.latest_quote()` plus Yahoo and Alpaca adapters
+- **Consumers**: future paper-alert packet and legacy migration work
 
-### Interface 2: `phase60_governed_audit_summary.json`
-- **Type**: Evidence artifact (JSON status summary)
-- **Owner**: Backend
-- **Changed**: Governed audit now reports `status = "ok"` after sidecar overlay + post-coverage masking
-- **Consumers**: Planner, PM, Docs/Ops
+### Interface 3: Alpaca Quote Snapshot
+- **Type**: Operational quote metadata
+- **Owner**: Execution
+- **Changed**: quote snapshots now include provider, feed, source quality, quote quality, and license scope
+- **Consumers**: future paper-alert marks and risk packet display
 
-### Interface 3: `phase61_*summary.json`
-- **Type**: Evidence artifacts
-- **Owner**: Docs/Ops
-- **Changed**: Captures the raw-tape blocker truth and the bounded WRDS/bedrock fallback evidence for Phase 61
-- **Consumers**: Planner, PM, future packet authors
-
-### Interface 4: Current-state packet set
-- **Type**: Governance context surface
-- **Owner**: Docs/Ops
-- **Changed**: Planner / bridge / alignment / observability / README now align to the Phase 61 complete state
-- **Consumers**: Planner, PM, Frontend/UI roadmap work
+### Interface 4: Validation Report
+- **Type**: Validation lab schema
+- **Owner**: Backend / Data
+- **Changed**: OOS, walk-forward, regime, permutation, and bootstrap sections require source manifest
+- **Consumers**: candidate registry and promotion-intent checks
 
 ## Failing Checks
 
-NONE in current round scope (targeted tests and context validation pass)
+- None in current R64.1 acceptance scope.
 
-## Smoke Test Status
+## Passing Checks
 
-PASS (context builder refresh + validation pass; Phase 61 targeted test suite passes)
+- Targeted pytest: PASS, `75 passed`.
+- Dependency hygiene pytest: PASS.
+- `pip check`: PASS, no broken requirements.
+- Data readiness audit: PASS, `ready_for_paper_alerts = true`.
+- Minimal validation lab: PASS on `phase56_pead_evidence.csv`.
+- Compile check over new modules/tests: PASS.
+- SAW report block validation and closure-packet validation: PASS.
 
 ## Stream Impact
 
 ### Backend
-- **Phase 61 comparator-remediation packet complete**
-- **Why affected**: sidecar overlay, feature masking, and raw-tape ingest-path hardening landed in backend scripts
+- Provenance and validation gates now exist and are test-covered.
 
 ### Frontend/UI
-- **Read surfaces unblocked by comparator truth**
-- **Why affected**: current packets and README now advertise the cleared `KS-03` state instead of the older Phase 60 hold
+- No UI wiring in this slice; future shell can read source-quality and readiness artifacts.
 
 ### Data
-- **Bedrock data remained immutable; additive sidecar lane active**
-- **Why affected**: bounded sidecar now sits beside the existing price surface without mutating the underlying SSOT
+- Readiness audit and manifests create canonical evidence for daily paper-alert readiness.
 
 ### Docs/Ops
-- **Current packet set reconciled**
-- **Why affected**: planner / bridge / impact / alignment / observability were stale relative to `D-351`
+- Data source policy, phase brief, handover, decision log, notes, and current packet set updated.
 
 ## Risks
 
-1. **Fresh vendor-side provenance is still unresolved**: WRDS PAM auth rejection means future extractions may still need account recovery or a raw-tape export.
-2. **Current packet drift can recur**: future phase transitions can leave `current_context`, planner, and README stale unless the context packet is rebuilt in the same round.
-3. **Execution/runtime direction is now locked**: D-352 locked the Terminal Zero v2.6 roadmap. Phase 62 (frontend shell consolidation) is READY, Phase 63 (execution-boundary hardening) is QUEUED after it.
+1. yfinance quarantine surface is broad and migration remains future work.
+2. S&P sidecar max date is stale through `2023-11-27`.
+3. Unrelated dirty files must stay excluded from surgical R64/R65 commits.
 
 ## Evidence
 
-- `git diff` output for the current round
-- `.venv\Scripts\python scripts/build_context_packet.py`
-- `.venv\Scripts\python scripts/build_context_packet.py --validate`
-- `docs/context/e2e_evidence/phase61_*.json`
-- `docs/saw_reports/saw_phase61_*.md`
+- `.venv\Scripts\python -m pytest tests/test_provenance_policy.py tests/test_provider_ports.py tests/test_data_readiness_audit.py tests/test_minimal_validation_lab.py tests/test_execution_controls.py -q`
+- `.venv\Scripts\python scripts\audit_data_readiness.py`
+- `.venv\Scripts\python scripts\run_minimal_validation_lab.py --create-input-manifest --promotion-intent`
+- `.venv\Scripts\python -m pip check`
+- `.venv\Scripts\python -m pytest tests/test_dependency_hygiene.py tests/test_execution_controls.py tests/test_provider_ports.py tests/test_provenance_policy.py -q`
+- `.venv\Scripts\python .codex/skills/_shared/scripts/validate_saw_report_blocks.py --report-file docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md`

@@ -4439,3 +4439,79 @@ Phase 61 (2026-03-23): Terminal Zero v2.6 Roadmap Lock + Nautilus Deferral + V1/
     - Streamlit long-term viability is an open question deferred past Phase 62 (modularize first, migrate later if needed).
   - Rollback note:
     - revert only the D-352 roadmap/architecture/queue files if leadership rejects the v2.6 plan; do not alter D-348 through D-351 authority, Phase 61 reconciliation artifacts, or any V1 canonical data.
+
+Phase 64 (2026-05-09): Accelerated Provenance + Validation + Paper-Alert Gate Milestone A-E (D-353) 🟢
+
+  - Decision record:
+    - consume the user-approved "full go" for provenance + validation + paper-alert gate work only, not live trading.
+    - execute Phases A-E from `docs/research/laptop_quant_implementation_plan_20260509.md`: source policy, provenance manifest enforcement, provider ports, data health audit, and minimal validation lab.
+    - keep yfinance quarantined as Tier 2 discovery/convenience data rather than deleting it.
+    - use Alpaca only as operational/paper market data in this milestone; no live Alpaca order path or broker automation is authorized.
+  - The Decision (Hardcoded):
+    - `docs/architecture/data_source_policy.md` is active.
+    - validation reports require manifests.
+    - V1 promotion-intent validation requires `source_quality = "canonical"`.
+    - `source_quality = "non_canonical"` blocks yfinance/Tier 2 promotion packets.
+    - Alpaca IEX quotes must carry `quote_quality = "iex_only"` and cannot be represented as SIP-quality market truth.
+    - non-paper Alpaca endpoint initialization requires both break-glass and `TZ_SIGNED_LIVE_TRADING_DECISION=YES`; no such live decision is granted by D-353.
+    - credentials must never be committed, logged, embedded in docs, or emitted in artifacts.
+  - Evidence:
+    - `data/provenance.py`
+    - `data/providers/`
+    - `execution/broker_api.py`
+    - `scripts/audit_data_readiness.py`
+    - `validation/`
+    - `scripts/run_minimal_validation_lab.py`
+    - `tests/test_provenance_policy.py`
+    - `tests/test_provider_ports.py`
+    - `tests/test_data_readiness_audit.py`
+    - `tests/test_minimal_validation_lab.py`
+    - `.venv\Scripts\python -m pytest tests/test_provenance_policy.py tests/test_provider_ports.py tests/test_data_readiness_audit.py tests/test_minimal_validation_lab.py tests/test_execution_controls.py -q` -> PASS (`75 passed`)
+    - `.venv\Scripts\python scripts\audit_data_readiness.py` -> PASS (`ready_for_paper_alerts = true`, warning `stale_sidecars_max_date_2023-11-27`)
+    - `.venv\Scripts\python scripts\run_minimal_validation_lab.py --create-input-manifest --promotion-intent` -> PASS
+    - `data/processed/data_readiness_report.json`
+    - `data/processed/data_readiness_report.json.manifest.json`
+    - `data/processed/minimal_validation_report.json`
+    - `data/processed/minimal_validation_report.json.manifest.json`
+    - `data/processed/phase56_pead_evidence.csv.manifest.json`
+  - Contract lock:
+    - `D353_VALIDATION_GATE := VALID iff (validation_report_manifest_present = 1) and (promotion_intent_source_quality = canonical) and (tier2_promotion_block = 1)`.
+    - `D353_PROVIDER_GATE := VALID iff (new provider use routes through data/providers/*) and (direct_yfinance_uses subset of data.providers.legacy_allowlist.YFINANCE_DIRECT_USE_ALLOWLIST)`.
+    - `D353_ALPACA_BOUNDARY := PAPER_ONLY iff (non_paper_endpoint_requires_break_glass = 1) and (non_paper_endpoint_requires_signed_decision = 1) and (no D-log live-trading approval exists)`.
+  - Open risks:
+    - yfinance quarantine surface is larger than the original plan list and includes many legacy scripts; the allowlist now records current reality and fails closed on new spread.
+    - `pip check` reports inherited dependency conflicts: `alpaca-trade-api 3.2.0` requires `urllib3<2` and `websockets<11`, while the environment has newer versions.
+    - primary S&P sidecar is stale through `2023-11-27`; readiness still passes for daily paper-alert gating but provenance refresh remains recommended.
+  - Rollback note:
+    - revert only D-353 code/docs/report artifacts if leadership rejects the accelerated provenance milestone; do not alter Phase 61 SSOT artifacts, `core/engine.py`, `research_data/`, or bedrock price artifacts.
+
+Phase 64.1 (2026-05-09): Dependency Hygiene + Phase F Candidate Registry Approval (D-354) 🟢
+
+  - Decision record:
+    - close the dependency hygiene wedge before Candidate Registry so experiment multiplication does not start on a red `pip check`.
+    - migrate the main Alpaca SDK boundary from `alpaca-trade-api` to `alpaca-py==0.43.4`.
+    - keep Alpaca functionality bounded to operational/paper quote and existing paper/live safety gates; no live orders or broker automation are authorized.
+    - approve Phase F Candidate Registry only after R64.1 checks pass, with registry-only scope and no strategy factory, V2 fast simulator, promotion packet, alert packet, or live execution path.
+  - The Decision (Hardcoded):
+    - `requirements.txt`, `requirements.lock`, and `pyproject.toml` use `alpaca-py==0.43.4` in the main environment.
+    - `alpaca-trade-api` is excluded from the main dependency set and `execution/broker_api.py` no longer imports `alpaca_trade_api`.
+    - the existing broker boundary keeps the same credential, paper-default, non-paper break-glass, and signed-decision gates.
+    - Phase F Candidate Registry is approved as append-only metadata/lifecycle work: candidate metadata before results, required `trial_count`, required manifest pointer, and immutable audit trail.
+  - Evidence:
+    - `execution/broker_api.py`
+    - `requirements.txt`
+    - `requirements.lock`
+    - `pyproject.toml`
+    - `tests/test_dependency_hygiene.py`
+    - `docs/phase_brief/phase65-brief.md`
+    - `.venv\Scripts\python -m pip check` -> PASS (`No broken requirements found.`)
+    - `.venv\Scripts\python -m pytest tests/test_dependency_hygiene.py tests/test_execution_controls.py tests/test_provider_ports.py tests/test_provenance_policy.py -q` -> PASS
+  - Contract lock:
+    - `R64_1_DEPENDENCY_GATE := VALID iff (pip_check = PASS) and (main_dependency = alpaca-py==0.43.4) and (legacy_alpaca_trade_api_not_in_main_deps = 1)`.
+    - `PHASE_F_APPROVED := VALID iff (R64_1_DEPENDENCY_GATE = VALID) and (scope = registry_only) and (strategy_factory = blocked) and (promotion_packets = blocked) and (live_execution = blocked)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt but is not a Candidate Registry blocker while quarantine tests pass.
+    - primary S&P sidecar freshness remains a warning for paper-alert readiness and should be refreshed when canonical vendor access is available.
+    - unrelated pre-existing dirty files remain excluded from the R64/R65 surgical commits.
+  - Rollback note:
+    - revert only the R64.1 dependency files, broker SDK shim, dependency tests, and docs if the `alpaca-py` boundary is rejected; do not revert D-353 provenance/validation gates or Phase 61 SSOT artifacts.

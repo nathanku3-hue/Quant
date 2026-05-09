@@ -21,11 +21,11 @@ def test_phase61_brief_exposes_new_context_packet() -> None:
     assert "## First Command" in text
 
 
-def test_current_context_promotes_phase61_as_active_phase() -> None:
+def test_current_context_promotes_latest_active_phase() -> None:
     payload = json.loads(CURRENT_CONTEXT_JSON.read_text(encoding="utf-8"))
-    assert int(payload["active_phase"]) == 61
+    assert int(payload["active_phase"]) == 65
     joined_done = " ".join(str(x) for x in payload["what_was_done"])
-    assert "KS-03" in joined_done
+    assert "R64.1" in joined_done
 
 
 def test_planner_bridge_and_readme_no_longer_advertise_phase60_hold_as_current() -> None:
@@ -34,7 +34,7 @@ def test_planner_bridge_and_readme_no_longer_advertise_phase60_hold_as_current()
     readme_text = README.read_text(encoding="utf-8")
 
     for text in (planner_text, bridge_text, readme_text):
-        assert "Phase 61" in text
-        assert "KS-03" in text
+        assert "D-353" in text or "Phase 64" in text
+        assert "provenance" in text.lower()
         assert "Phase 61 bootstrap authorized" not in text
         assert "not yet publicly executed" not in text

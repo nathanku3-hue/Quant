@@ -1,73 +1,91 @@
 # Planner Packet - Current
 
 Status: Current
-Authority: advisory-only integration artifact. This file does not authorize execution, promotion, or scope widening by itself.
-Purpose: provide the planner with a compact, fresh world model without requiring full-repo rereads.
+Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, or scope widening by itself.
+Purpose: provide the planner with a compact fresh world model after R64.1.
 
 ## Header
-- `PACKET_ID`: `20260322-phase61-reconciled-planner`
-- `DATE_UTC`: `2026-03-22`
-- `SCOPE`: `Phase 61 complete - KS-03 cleared, truth surfaces reconciled`
+- `PACKET_ID`: `20260509-d354-r64-1-closeout-planner`
+- `DATE_UTC`: `2026-05-09`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
 - `OWNER`: `PM / Architecture Office`
-
-## Why This File Exists
-- The planner needs a compact fresh-context packet that reflects the latest bounded execution truth after the `D-351` Phase 61 closure rather than the earlier Phase 60 hold state.
 
 ## Current Context
 
 ### What System Exists Now
-- Quant is a Multi-Sleeve Research Kernel plus Governance Stack with immutable Phase 56/57/58/59/60 evidence surfaces preserved as SSOT and a bounded Phase 61 comparator-remediation slice completed under `D-348` / `D-350` / `D-351`. `KS-03` is cleared at the view layer, and the governed audit now returns `status = "ok"` without kernel mutation.
+- Quant now has executable provenance gates, provider ports, yfinance quarantine, data readiness audit, minimal validation lab, and a clean `alpaca-py` dependency boundary for paper/operational Alpaca use.
 
 ### Active Scope
-- Phase 61 is complete, and the current round reconciles planner / bridge / context / README truth surfaces to the `D-351` state.
+- D-353 A-E and R64.1 dependency hygiene are complete. Phase F Candidate Registry is approved but not started.
 
 ### Blocked Scope
-- Any `core/engine.py` mutation, `research_data/` mutation, allocator carry-forward, core inclusion, live promotion, or widening beyond the bounded sidecar/view-layer slice remains blocked until a later explicit packet.
+- Live Alpaca orders, broker automation, strategy search, V2 fast simulator, paper alerts, intraday/HFT, options/futures, Tier 2 promotion packets, yfinance canonical truth, and credential material in artifacts remain blocked.
 
 ## Active Brief
 ### Current Phase/Round
-- Phase 61 (`COMPLETE - KS-03 CLEARED`)
+- Phase 65 Candidate Registry (`APPROVED_NOT_STARTED`)
 
-- Authority: `D-348` (bounded execution), `D-350` (raw-tape ingest preparation), `D-351` (audit-gap closure and sidecar coverage masking)
-
-- Active brief: `docs/phase_brief/phase61-brief.md`
+- Authority: `D-354`
+- Active brief: `docs/phase_brief/phase65-brief.md`
 
 ### Goal
-- Preserve the cleared comparator truth and give the planner a current packet set for the next platform-hardening phase.
+- Implement registry-only candidate identity and append-only lifecycle before any experiment multiplication.
 
 ### Non-Goals
-- No mutation of `core/engine.py`
-- No mutation of `research_data/`
-- No mutation of bedrock price artifacts
-- No allocator carry-forward, core-sleeve inclusion, or production promotion
+- No live trading.
+- No broker automation.
+- No Tier 2 promotion.
+- No yfinance canonical truth.
+- No strategy factory, V2 fast simulator, paper alert packet, or promotion packet.
 
 ### Owned Files
-- `scripts/phase60_governed_audit_runner.py`
-- `scripts/ingest_d350_wrds_sidecar.py`
-- `scripts/build_sp500_pro_sidecar.py`
-- `tests/test_phase60_governed_audit_runner.py`
-- `tests/test_ingest_d350_wrds_sidecar.py`
-- `tests/test_build_sp500_pro_sidecar.py`
-- `docs/phase_brief/phase61-brief.md`
-- `docs/saw_reports/saw_phase61_d349_sp500_pro_sidecar_20260320.md`
-- `docs/saw_reports/saw_phase61_d350_tape_ingest_block_20260320.md`
-- `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
-- `docs/context/current_context.md`
-- `docs/context/bridge_contract_current.md`
+- `data/provenance.py`
+- `data/providers/*`
+- `validation/*`
+- `scripts/audit_data_readiness.py`
+- `scripts/run_minimal_validation_lab.py`
+- `requirements.txt`
+- `requirements.lock`
+- `pyproject.toml`
+- `tests/test_dependency_hygiene.py`
+- `docs/architecture/data_source_policy.md`
+- `docs/phase_brief/phase64-brief.md`
+- `docs/phase_brief/phase65-brief.md`
+- `docs/handover/phase64_handover.md`
+- `data/processed/data_readiness_report.json*`
+- `data/processed/minimal_validation_report.json*`
 
 ### Interfaces
-- `data/processed/sidecar_sp500_pro_2023_2024.parquet` (bounded sidecar return surface)
-- `data/processed/phase60_governed_audit_summary.json` (governed audit status now `ok`)
-- `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json` (bounded remediation evidence)
-- `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json` (raw-tape blocker evidence)
+- Manifest schema
+- Provider ports
+- Alpaca quote metadata
+- Validation report schema
+- Data readiness report
+- Candidate registry lifecycle contract (next implementation)
 
 ### Bridge Truth
-### System Delta
-- Phase 61 consumed the explicit approval token in `D-348` and completed the bounded comparator remediation path.
-- `KS-03` is cleared without mutating `core/engine.py`.
-- `D-350` hardened the raw-tape ingest path, and `D-351` closed the sidecar-overlay and post-coverage masking gaps.
+- `SYSTEM_DELTA`: Provenance, source quality, and validation manifests are executable gates.
+- `PM_DELTA`: Daily paper-alert readiness is supported by manifest-backed evidence, and dependency hygiene no longer blocks Candidate Registry.
+- `OPEN_DECISION`: None for R64.1; Phase F registry-only work is approved.
+- `RECOMMENDED_NEXT_STEP`: Phase F Candidate Registry.
+- `DO_NOT_REDECIDE`: yfinance Tier 2 only; Alpaca paper/operational only; no live trading.
 
-### Planner Delta
-- **Stronger now**: the same-period C3 comparator is no longer the active blocker; the governed audit returns `status = "ok"` with a bounded sidecar/view-layer repair.
-- **Weaker now**: live WRDS authentication still fails with PAM auth rejection, so the provenance chain still depends on the bounded bedrock fallback instead of a fresh vendor pull.
-- **Resolved by D-352**: the Terminal Zero v2.6 roadmap is locked. Phase 62 (frontend shell consolidation) is READY. Phase 63 (execution-boundary hardening) is QUEUED after Phase 62. See `PHASE_QUEUE.md` and `docs/roadmap/terminal_zero_v2.6.md`.
+## Blocked Next Step
+- Paper alert packet, paper portfolio loop, strategy search, and promotion packets should not start before candidate lineage is append-only and auditable.
+
+## Active Bottleneck
+- Candidate registry implementation before multiple-testing and alert generation.
+
+## Evidence
+- `data/processed/data_readiness_report.json`
+- `data/processed/minimal_validation_report.json`
+- `docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md`
+- `docs/saw_reports/saw_phase64_1_dependency_git_hygiene_20260509.md`
+- `requirements.lock`
+- Targeted pytest: `75 passed`
+- `pip check`: PASS
+
+## Escalation Rules
+- Escalate to `docs/architecture/data_source_policy.md` for source-tier disputes.
+- Escalate to `docs/handover/phase64_handover.md` for PM-level handoff.
+- Escalate to `docs/decision log.md` for locked boundaries.

@@ -525,3 +525,19 @@ Application pattern:
 - Fix applied: Added a `New Context Packet` block to `docs/phase_brief/phase61-brief.md`, rebuilt `docs/context/current_context.*`, refreshed the stale `*_current.md` packet set plus `README.md`, and added regression tests for current-phase promotion and packet alignment.
 - Guardrail for next time: Whenever a phase brief changes the active phase/status, publish or refresh the `New Context Packet` in that same phase doc, rerun `scripts/build_context_packet.py` and `--validate`, and run packet hygiene tests before closing the round.
 - Evidence paths: `docs/phase_brief/phase61-brief.md`, `docs/context/current_context.md`, `docs/context/current_context.json`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `README.md`, `tests/test_build_context_packet.py`, `tests/test_phase61_context_hygiene.py`
+
+## 2026-05-09 Round Entry (Secret Hygiene Must Avoid Even Fragmentary Echoes)
+- Date: 2026-05-09
+- Mistake or miss: During the D-353 provenance closeout, a checklist draft briefly used literal credential fragments as examples for a secret scan, which could have persisted sensitive material even though the final implementation was env-only.
+- Root cause: The scan proof was framed around specific pasted material instead of a generic scanner command and a no-match result.
+- Fix applied: Replaced the checklist wording with a generic secret-scanner requirement, reran the milestone secret scan, and kept the broker integration env-only with no credential material in source, docs, tests, logs, or artifacts.
+- Guardrail for next time: Never write pasted secrets or fragments of pasted secrets into docs, tests, comments, or evidence commands; prove hygiene with generic scanners and no-match status only.
+- Evidence paths: `docs/context/done_checklist_current.md`, `execution/broker_api.py`, `data/provenance.py`, `docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md`, `tests/test_execution_controls.py`, `tests/test_provenance_policy.py`
+
+## 2026-05-09 Round Entry (Dependency Closure Must Precede Experiment Multiplication)
+- Date: 2026-05-09
+- Mistake or miss: D-353 closed with `pip check` red, which would have let Candidate Registry start on an unstable dependency surface.
+- Root cause: Functional tests passed, but dependency compatibility was treated as a carried risk instead of an entry gate for experiment multiplication.
+- Fix applied: Migrated the main Alpaca SDK boundary to `alpaca-py==0.43.4`, removed the legacy Alpaca SDK from the main dependency files and venv, regenerated `requirements.lock`, added dependency hygiene tests, and reran `pip check`.
+- Guardrail for next time: Before starting any candidate-generation or experiment-multiplication phase, require `pip check` to pass or explicitly isolate the conflicting package outside the main research environment.
+- Evidence paths: `execution/broker_api.py`, `requirements.txt`, `requirements.lock`, `pyproject.toml`, `tests/test_dependency_hygiene.py`, `docs/phase_brief/phase65-brief.md`, `docs/saw_reports/saw_phase64_1_dependency_git_hygiene_20260509.md`

@@ -3791,3 +3791,82 @@ Date: 2026-03-01
      - `docs/decision log.md`
      - `docs/context/bridge_contract_current.md`
      - `docs/handover/phase60_execution_handover_20260318.md`
+
+## Phase 64 Provenance + Validation Formula Notes
+
+1. Source-quality gate:
+   - `source_quality in {"canonical", "operational", "non_canonical", "rejected"}`
+   - promotion-intent validation requires:
+     - `source_quality = "canonical"`
+   - source path:
+     - `data/provenance.py` (`require_source_quality`, `assert_can_promote`, `assert_can_validate_artifact`)
+2. Data readiness predicate:
+   - `ready_for_paper_alerts = 1[blockers == []]`
+   - blocker examples:
+     - missing required artifact group;
+     - empty artifact;
+     - null `(date, permno)` keys;
+     - duplicate `(date, permno)` keys;
+     - price/return null ratio over threshold on `prices_tri`.
+   - source path:
+     - `scripts/audit_data_readiness.py` (`run_audit`)
+3. Return summary formulas:
+   - `equity_t = prod_{i<=t}(1 + net_ret_i)`
+   - `cumulative_return = equity_T - 1`
+   - `drawdown_t = equity_t / max_{i<=t}(equity_i) - 1`
+   - `max_drawdown = min_t(drawdown_t)`
+   - `sharpe_annualized = mean(net_ret) / stdev(net_ret) * sqrt(252)`
+   - source path:
+     - `validation/metrics.py` (`summarize_returns`)
+4. OOS validation:
+   - default split:
+     - `train = first 70% of ordered returns`
+     - `test = final 30% of ordered returns`
+   - pass predicate:
+     - `mean(test_net_ret) > 0`
+   - source path:
+     - `validation/oos.py` (`run_oos_test`)
+5. Walk-forward validation:
+   - default windows:
+     - `train_size = 60`
+     - `test_size = 20`
+     - `step_size = 20`
+   - pass predicate:
+     - `positive_test_windows >= max(1, floor(window_count / 2))`
+   - source path:
+     - `validation/walk_forward.py` (`run_walk_forward`)
+6. Regime validation:
+   - if no regime column exists:
+     - `regime_t = high_vol if rolling_std_20(net_ret)_t > median(rolling_std_20(net_ret)) else low_vol`
+   - pass predicate:
+     - each reported regime has enough observations and `worst_mean_daily_return > -0.01`
+   - source path:
+     - `validation/regime_tests.py` (`run_regime_tests`)
+7. Permutation validation:
+   - sign-flip null:
+     - `null_mean_j = mean(net_ret_i * random_choice([-1, 1]))`
+   - `permutation_p = (count(null_mean_j >= observed_mean) + 1) / (n_permutations + 1)`
+   - pass predicate:
+     - `observed_mean > 0 and permutation_p <= 0.10`
+   - source path:
+     - `validation/permutation.py` (`run_permutation_test`)
+8. Bootstrap validation:
+   - sample returns with replacement `n_bootstrap` times;
+   - compute percentile confidence interval for mean daily return;
+   - pass predicate:
+     - `mean_ci_low > 0`
+   - source path:
+     - `validation/bootstrap.py` (`run_bootstrap_ci`)
+
+## Phase 64.1 Dependency Hygiene Notes
+
+1. Alpaca SDK boundary:
+   - no formula changes in R64.1;
+   - main dependency set uses `alpaca-py==0.43.4`;
+   - legacy `alpaca-trade-api` is excluded from `requirements.txt`, `requirements.lock`, and `pyproject.toml`;
+   - source paths:
+     - `execution/broker_api.py`
+     - `requirements.txt`
+     - `requirements.lock`
+     - `pyproject.toml`
+     - `tests/test_dependency_hygiene.py`

@@ -1,125 +1,99 @@
-# Done Checklist - Phase 61 Closeout
+# Done Checklist - R64.1 Dependency + Git Hygiene Closeout
 
 Status: Closed
-Authority: advisory-only integration artifact. This file does not authorize execution, promotion, or scope widening by itself.
-Purpose: define machine-checkable done criteria for the bounded Phase 61 comparator-remediation packet and the refreshed current-state truth surfaces.
+Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, or scope widening by itself.
+Purpose: define machine-checkable done criteria for closing D-353/R64.1 before Phase F Candidate Registry starts.
 
 ## Header
-- `CHECKLIST_ID`: `20260322-phase61-closeout`
-- `DATE_UTC`: `2026-03-22`
-- `SCOPE`: `Phase 61 complete - KS-03 cleared with bounded sidecar/view-layer remediation`
+- `CHECKLIST_ID`: `20260509-d354-r64-1-closeout`
+- `DATE_UTC`: `2026-05-09`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
 - `STATUS`: `closed`
 - `OWNER`: `PM / Architecture Office`
-
-## Why This File Exists
-- Phase 61 completed the bounded comparator repair path. The same-period C3 comparator is no longer blocked, but the repo still needs a current checklist that preserves the no-kernel-mutation and no-promotion boundaries.
-
-## Static Truth Inputs
-- `top_level_PM.md`
-- `docs/decision log.md` (`D-348`, `D-350`, `D-351`)
-- `docs/phase_brief/phase61-brief.md`
-- `docs/context/bridge_contract_current.md`
 
 ## Done Criteria
 
 ### Governance Closeout
-- [x] `D-348` bounded Phase 61 packet executed with no kernel mutation
-- [x] `D-350` raw-tape ingest path prepared and left fail-closed when the literal tape is absent
-- [x] `D-351` sidecar overlay + post-coverage feature masking validated
-- [x] `KS-03` cleared (`status = "ok"`, empty `kill_switches_triggered`)
-- [x] No mutation of `research_data/` or bedrock price artifacts
+- [x] `D-353` decision log entry records yfinance quarantine, Alpaca operational/paper scope, no live orders, and manifest-first validation.
+- [x] `D-354` decision log entry records Alpaca SDK migration, `pip check` closure, and Phase F registry-only approval.
+- [x] `docs/architecture/data_source_policy.md` is published.
+- [x] `docs/phase_brief/phase64-brief.md`, `docs/phase_brief/phase65-brief.md`, and `docs/handover/phase64_handover.md` are published.
+- [x] `docs/lessonss.md` and `docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md` are published.
 
-### Evidence Completeness
-- [x] `data/processed/sidecar_sp500_pro_2023_2024.parquet` persisted
-- [x] `data/processed/phase60_governed_audit_summary.json` persisted with cleared status
-- [x] `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json` persisted
-- [x] `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json` persisted
-- [x] `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md` persisted
+### Executable Gate Completeness
+- [x] Manifest schema exists in `data/provenance.py`.
+- [x] Missing-manifest validation fails closed.
+- [x] Tier 2/non-canonical promotion-intent validation fails closed.
+- [x] Alert/quote records require `source_quality`, provider, and feed tags.
+- [x] Alpaca IEX quote snapshots are tagged `iex_only`.
+- [x] Non-paper Alpaca endpoint initialization requires both break-glass and signed-decision env gates.
 
-### Integration Completeness
-- [x] `scripts/phase60_governed_audit_runner.py` overlays bounded sidecar returns into the comparator path
-- [x] `scripts/ingest_d350_wrds_sidecar.py` exists and writes atomically through the bounded sidecar/evidence path
-- [x] `scripts/build_sp500_pro_sidecar.py` fails closed when the literal raw tape is absent
-- [x] Tests pass: `test_phase60_governed_audit_runner.py`, `test_ingest_d350_wrds_sidecar.py`, `test_build_sp500_pro_sidecar.py`
+### Provider-Port Completeness
+- [x] `MarketDataPort` exists in `data/providers/base.py`.
+- [x] Yahoo adapter exists and emits `source_quality = non_canonical`.
+- [x] Alpaca adapter exists and routes through the broker wrapper.
+- [x] `TZ_MARKET_DATA_PROVIDER` selector exists.
+- [x] Current direct yfinance usage is captured by the migration allowlist.
 
-### Documentation Completeness
-- [x] Phase 61 brief published (`docs/phase_brief/phase61-brief.md`)
-- [x] Current context rebuilt from the Phase 61 context source (`docs/context/current_context.md`)
-- [x] Bridge, planner, impact, alignment, and README surfaces refreshed to the Phase 61 complete state
-- [x] Context-builder validation passes after the refresh
+### Audit + Validation Completeness
+- [x] Data readiness audit emits `data/processed/data_readiness_report.json`.
+- [x] Data readiness audit emits `data/processed/data_readiness_report.json.manifest.json`.
+- [x] Minimal validation lab emits `data/processed/minimal_validation_report.json`.
+- [x] Minimal validation lab emits `data/processed/minimal_validation_report.json.manifest.json`.
+- [x] PEAD evidence input manifest exists at `data/processed/phase56_pead_evidence.csv.manifest.json`.
 
-### Handoff Completeness
-- [x] Bridge contract names the new open decision after the comparator repair
-- [x] Recommended next step points to product-hardening work, not comparator remediation
-- [x] Open risks document the bounded provenance / WRDS-auth gap truthfully
-- [x] Blocked scope remains explicit for kernel mutation, promotion, and scope widening
+### Verification Completeness
+- [x] Targeted tests pass: `75 passed`.
+- [x] Data readiness audit passes: `ready_for_paper_alerts = true`.
+- [x] Minimal validation lab passes on existing PEAD evidence.
+- [x] Secret scan over touched milestone files contains no pasted Alpaca key material.
+- [x] SAW block validation and closure-packet validation pass.
+- [x] `pip check` passes.
+- [x] Dependency files use `alpaca-py==0.43.4` and exclude the legacy Alpaca SDK.
+- [x] Milestone commits are surgical and unrelated dirty files are excluded.
+- [x] A-E evidence artifacts under `data/processed/` are intentionally ignored by repo policy and reproducible with the audit/validation commands.
 
 ## Explicit Non-Goals
-- No mutation of `core/engine.py`
-- No mutation of `research_data/`
-- No promotion of the cleared comparator result into live trading authority
-- No allocator carry-forward or core-sleeve inclusion
-- No widening beyond the bounded Phase 61 slice
-
-## Blocked Until
-- Any live promotion or widened execution scope requires a later explicit packet
-- Any scope that mutates `research_data/` or `core/engine.py` remains blocked
-- Fresh vendor-side provenance for the sidecar remains pending a successful WRDS auth run or delivered raw-tape export
+- No live Alpaca orders.
+- No broker automation.
+- No intraday/HFT.
+- No options/futures.
+- No Tier 2 promotion packets.
+- No yfinance canonical truth.
+- No credentials in source/docs/tests/logs/artifacts.
 
 ## Machine-Checkable Rules
 
 ### Pass Conditions
 ```text
-# Evidence artifacts exist
-test -f data/processed/sidecar_sp500_pro_2023_2024.parquet
-test -f data/processed/phase60_governed_audit_summary.json
-test -f docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json
-
-# Targeted tests pass
-.venv\Scripts\python -m pytest tests/test_phase60_governed_audit_runner.py tests/test_ingest_d350_wrds_sidecar.py tests/test_build_sp500_pro_sidecar.py -q
-
-# Context packet refresh is current
-.venv\Scripts\python scripts/build_context_packet.py
-.venv\Scripts\python scripts/build_context_packet.py --validate
-
-# Prior sleeve SSOT remains immutable
-git diff --exit-code data/processed/phase54_core_sleeve_summary.json
-git diff --exit-code data/processed/phase55_allocator_cpcv_evidence.json
-git diff --exit-code data/processed/phase56_pead_evidence.csv
-git diff --exit-code data/processed/phase57_corporate_actions_evidence.csv
-git diff --exit-code data/processed/phase58_governance_evidence.csv
-git diff --exit-code data/processed/phase59_shadow_summary.json
+.venv\Scripts\python -m pytest tests/test_provenance_policy.py tests/test_provider_ports.py tests/test_data_readiness_audit.py tests/test_minimal_validation_lab.py tests/test_execution_controls.py -q
+.venv\Scripts\python scripts\audit_data_readiness.py
+.venv\Scripts\python scripts\run_minimal_validation_lab.py --create-input-manifest --promotion-intent
+.venv\Scripts\python -m pip check
+.venv\Scripts\python -m pytest tests/test_dependency_hygiene.py tests/test_execution_controls.py tests/test_provider_ports.py tests/test_provenance_policy.py -q
+.venv\Scripts\python .codex/skills/_shared/scripts/validate_saw_report_blocks.py --report-file docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md
+test -f data/processed/data_readiness_report.json.manifest.json
+test -f data/processed/minimal_validation_report.json.manifest.json
+test -f data/processed/phase56_pead_evidence.csv.manifest.json
 ```
 
 ### Fail Conditions
 ```text
-# Research kernel mutated
-git diff --exit-code research_data/
-
-# Core engine mutated
-git diff --exit-code core/engine.py
-
-# Promotion artifacts exist (should not exist yet)
-! test -f data/processed/phase61_promoted_shadow_stack.json
+run a secret scanner over data docs scripts tests execution validation and fail on credential material
+rg "submit_order\\(" data/providers validation scripts/run_minimal_validation_lab.py scripts/audit_data_readiness.py
 ```
 
 ## Evidence Used
-- `docs/context/current_context.md`
-- `docs/phase_brief/phase61-brief.md`
-- `docs/saw_reports/saw_phase61_d349_sp500_pro_sidecar_20260320.md`
-- `docs/saw_reports/saw_phase61_d350_tape_ingest_block_20260320.md`
-- `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
-- `data/processed/sidecar_sp500_pro_2023_2024.parquet`
-- `docs/context/bridge_contract_current.md`
+- `docs/phase_brief/phase64-brief.md`
+- `docs/handover/phase64_handover.md`
+- `docs/architecture/data_source_policy.md`
+- `data/processed/data_readiness_report.json`
+- `data/processed/minimal_validation_report.json`
+- `tests/test_provenance_policy.py`
+- `tests/test_provider_ports.py`
+- `docs/saw_reports/saw_phase64_d353_provenance_validation_20260509.md`
+- `docs/saw_reports/saw_phase64_1_dependency_git_hygiene_20260509.md`
 
 ## Open Risks
-- WRDS credentials remain unvalidated because the live login still fails with PAM rejection
-- The sidecar provenance chain is bounded but indirect because the cleared path used a bedrock fallback
-- Allocator carry-forward and core promotion remain blocked for independent governance reasons
-
-## Writing Rules
-- Keep this file top-level and PM-readable.
-- Prefer system language over file-changelog language.
-- Make criteria checkable: prefer "X must pass" over "X should be good."
-- If a criterion cannot be checked mechanically, say how a human checks it.
-- Keep the artifact thin: one current checklist, not a growing archive.
+- yfinance quarantine surface is broad and should be migrated gradually.
+- S&P sidecar provenance is stale through `2023-11-27`.

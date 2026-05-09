@@ -56,6 +56,11 @@ Guiding Principle: "Signals from Price, PnL from Returns."
     - FR-041 matrix entries are historical freeze documentation.
     - Current runtime budget contract is FR-050/FR-070 (`GREEN=1.0`, `AMBER=0.5`, `RED=0.0`).
 
+  R64.1 dependency hygiene note:
+    - Alpaca operational/paper quote infrastructure uses `alpaca-py==0.43.4` as the main SDK boundary.
+    - The legacy `alpaca-trade-api` package is excluded from the main research environment.
+    - This SDK migration does not authorize live orders, broker automation, or any scope beyond paper operational quote metadata.
+
 1. System Architecture Diagram
 The system is composed of six strictly isolated layers:
   Data Layer (The Lake): Hybrid Parquet lake (WRDS base + Yahoo patch).

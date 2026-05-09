@@ -1,125 +1,95 @@
-# Post-Phase Alignment - Phase 61 Closeout
+# Post-Phase Alignment - R64.1 Closeout
 
 Status: Current
-Authority: advisory-only integration artifact. This file does not authorize execution, promotion, or scope widening by itself.
-Purpose: update the multi-stream map after Phase 61 closeout so the next platform-hardening phase starts from current truth instead of the older Phase 60 hold narrative.
+Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, or scope widening by itself.
+Purpose: update the multi-stream map after the accelerated provenance + validation milestone and dependency hygiene wedge.
 
 ## Header
-- `ALIGNMENT_ID`: `20260322-phase61-to-next-planning`
-- `DATE_UTC`: `2026-03-22`
-- `SCOPE`: `Phase 61 complete - comparator remediation closed`
-- `PREVIOUS_PHASE`: `Phase 60 (closeout, blocked evidence-only hold)`
-- `NEXT_PHASE`: `Phase 62 (Frontend Shell Consolidation) — READY per D-352`
+- `ALIGNMENT_ID`: `20260509-d354-r64-1-closeout-alignment`
+- `DATE_UTC`: `2026-05-09`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
+- `PREVIOUS_PHASE`: `Phase 61 complete / D-352 roadmap locked`
+- `NEXT_PHASE`: `Phase F Candidate Registry`
 - `OWNER`: `PM / Architecture Office`
-
-## Why This File Exists
-- Phase 61 completed the bounded comparator repair path. The repo now needs a post-phase alignment artifact that starts from `KS-03` cleared truth instead of the older blocked-hold state.
-
-## Static Truth Inputs
-- `top_level_PM.md`
-- `docs/decision log.md` (`D-348` through `D-351`)
-- `docs/phase_brief/phase61-brief.md`
-- `docs/context/multi_stream_contract_current.md`
 
 ## What Changed This Round
 
 ### System Shape Delta
-- The same-period C3 comparator failure is no longer active; the governed audit now reports `status = "ok"`.
-- The bounded sidecar lane is now part of the runtime truth for the repaired comparator path.
-- `D-350` hardened the literal raw-tape ingest path without widening the execution boundary.
-- Prior sleeve SSOT remains immutable and `core/engine.py` remains unchanged.
+- Source quality is now an executable contract.
+- Validation reports require manifests.
+- Promotion-intent validation is canonical-only.
+- yfinance is quarantined as Tier 2 discovery/convenience.
+- Alpaca quote snapshots now carry feed and quality metadata.
+- Live Alpaca endpoint initialization now needs a signed decision in addition to break-glass.
+- Main Alpaca SDK boundary now uses `alpaca-py==0.43.4`; `pip check` passes.
 
 ### Execution Delta
-- Updated `scripts/phase60_governed_audit_runner.py` to consume sidecar returns before strict-missing-return validation.
-- Added `scripts/ingest_d350_wrds_sidecar.py` for bounded env-only WRDS extraction.
-- Added `scripts/build_sp500_pro_sidecar.py` raw-tape hardening and fail-closed behavior.
-- Persisted `data/processed/sidecar_sp500_pro_2023_2024.parquet`.
-- Persisted `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json`.
-- Persisted `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json`.
-- Refreshed current context / bridge / planner / impact / alignment / observability / README to the Phase 61 complete state.
+- Added provenance module, provider ports, readiness audit, validation lab, tests, and docs.
+- Generated readiness and validation reports with manifests.
+- Restored `.venv` onto Python 3.12.13 from the bundled Codex runtime because the previous Python 3.12.10 home path no longer existed.
 
 ### No Change
-- Promotion remains blocked.
-- Prior sleeve SSOT remains immutable (phase54-60 artifacts unchanged).
-- `RESEARCH_MAX_DATE = 2022-12-31` discipline unchanged.
-- Same-window / same-cost / same-engine discipline unchanged where comparator evidence applies.
-- `research_data/` unchanged.
-- `core/engine.py` unchanged per `D-347`.
+- No live orders.
+- No broker automation.
+- No `core/engine.py` mutation.
+- No `research_data/` mutation.
+- No yfinance canonical status.
+- No promotion authority.
 
 ## Stream Status Update
 
-### Stream 1: Backend
-- **Previous Status**: `blocked-hold` at the Phase 60 packet boundary
-- **Current Status**: `complete`
-- **What Changed**: Sidecar overlay and post-coverage masking cleared `KS-03` under the bounded Phase 61 slice.
-- **What Remains**: Next runtime/platform-hardening phase, if approved.
+### Backend
+- **Previous Status**: ready for future platform hardening
+- **Current Status**: provenance/validation gate complete
+- **What Changed**: validation and promotion-source gates are now executable.
+- **What Remains**: alert packet and paper portfolio loop.
 
-### Stream 2: Frontend/UI
-- **Previous Status**: `complete` for the old read-only Phase 60 evidence surface
-- **Current Status**: `ready-next`
-- **What Changed**: Comparator truth no longer blocks the operator shell; current status surfaces now advertise the cleared state.
-- **What Remains**: Shell consolidation and clearer operator-state routing.
+### Frontend/UI
+- **Previous Status**: Phase 62 ready
+- **Current Status**: deferred in D-353
+- **What Changed**: no UI code in this slice.
+- **What Remains**: source-quality/readiness display can be added later.
 
-### Stream 3: Data
-- **Previous Status**: `frozen`
-- **Current Status**: `frozen-plus-sidecar`
-- **What Changed**: Additive-only sidecar lane now coexists with immutable bedrock surfaces.
-- **What Remains**: Fresh vendor-side provenance remains optional but unresolved.
+### Data
+- **Previous Status**: frozen-plus-sidecar
+- **Current Status**: manifest-backed readiness audit complete
+- **What Changed**: local daily US-equity readiness is now reported with a manifest.
+- **What Remains**: refresh stale S&P sidecar provenance.
 
-### Stream 4: Docs/Ops
-- **Previous Status**: `stale-current-packets`
-- **Current Status**: `complete`
-- **What Changed**: Current packet set now matches the Phase 61 brief and `D-351` evidence.
-- **What Remains**: Publish the next explicit planning packet once the next phase is selected.
+### Docs/Ops
+- **Previous Status**: D-352 roadmap ready
+- **Current Status**: D-353 current surfaces updated
+- **What Changed**: policy, brief, handover, decision log, notes, and current packets now reflect provenance gates.
+- **What Remains**: Candidate Registry implementation and future yfinance/sidecar cleanup.
 
 ## Current Bottleneck
-- **Next-phase prioritization** is now the bottleneck.
-- **Why**: Comparator correctness is repaired. The repo now needs an explicit choice between frontend shell consolidation and execution-boundary hardening.
-- **What unblocks it**: A new explicit planning/approval packet for the next platform-hardening phase.
+- **Candidate lineage / registry** is the next product bottleneck.
+- **Why**: Provenance gates exist; discovery ideas now need append-only candidate identity before advanced multiple-testing or alerts.
 
 ## Interface Drift
-- **Phase drift in current packets**: Resolved in this round by rebuilding `current_context` and refreshing the `*_current.md` set.
-- **Bounded sidecar provenance**: Still indirect because the live WRDS run remains blocked by PAM auth rejection.
+- yfinance legacy usage was broader than the original plan. The allowlist now reflects actual direct-use files and fails on new spread.
+- Alpaca dependency drift is closed for the main environment; keep `pip check` green before future experiment multiplication.
 
 ## Next Stream Active
-- **Frontend/UI**
-- **Why**: The backend comparator blocker is cleared; the highest remaining product risk is operator-shell cohesion and state visibility.
+- **Backend/Data**
+- **Why**: Candidate registry and alert packet will consume the new provenance/validation gates.
 
 ## PM Decision Required
-- **Decision**: RESOLVED by D-352. The Terminal Zero v2.6 roadmap is locked.
-- **Locked Sequencing**:
-  1. Phase 62: Frontend shell consolidation (READY)
-  2. Phase 63: Execution-boundary hardening (QUEUED)
-  3. Phase 64: Data provenance hardening (QUEUED)
-  4. Phase 65: MLOps skeleton (QUEUED)
-- **Reference**: `PHASE_QUEUE.md`, `docs/roadmap/terminal_zero_v2.6.md`
+- None for R64.1. Phase F Candidate Registry is approved as registry-only work.
 
 ## What Should Not Be Done Next
-- Do not reopen comparator remediation as if it were still the primary blocker
-- Do not mutate `core/engine.py`
-- Do not treat Phase 61 completion as promotion authority
-- Do not mutate prior sleeve SSOT or `research_data/`
+- Do not place live orders.
+- Do not use pasted credentials.
+- Do not promote Tier 2 data.
+- Do not delete yfinance before legacy paths are behind adapters.
 
 ## Open Risks
-- WRDS live authentication still fails with PAM rejection
-- Allocator carry-forward remains blocked (negative Sharpe/CAGR, PBO 0.66)
-- Core sleeve remains blocked (4/6 gates passed, Rule 100 pass rate 10.1%)
-- Event family SPA_p/WRC_p > 0.05 (not promotion-ready)
+- Broad yfinance quarantine surface.
+- Stale S&P sidecar max date.
 
 ## Evidence Used
-- `docs/context/current_context.md`
-- `docs/phase_brief/phase61-brief.md`
-- `docs/context/bridge_contract_current.md`
-- `docs/context/done_checklist_current.md`
-- `docs/context/multi_stream_contract_current.md`
-- `docs/context/e2e_evidence/phase61_d350_wrds_pivot_20260319_summary.json`
-- `docs/context/e2e_evidence/phase61_sp500_pro_tape_block_20260320.json`
-- `docs/saw_reports/saw_phase61_d350_wrds_tape_20260319.md`
-
-## Writing Rules
-- Keep this file top-level and PM-readable.
-- Prefer system language over file-changelog language.
-- Make stream status updates explicit: what changed, what remains, what is blocked.
-- If the bottleneck changed, say why.
-- If an interface drifted, say what contract needs updating.
-- Keep the artifact thin: one current alignment, not a growing archive.
+- `docs/phase_brief/phase64-brief.md`
+- `docs/handover/phase64_handover.md`
+- `docs/architecture/data_source_policy.md`
+- `data/processed/data_readiness_report.json`
+- `data/processed/minimal_validation_report.json`

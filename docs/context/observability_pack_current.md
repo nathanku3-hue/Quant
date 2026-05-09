@@ -1,109 +1,84 @@
 # Observability Pack - Current
 
 Status: Current
-Authority: advisory-only integration artifact. This file does not authorize execution, promotion, or scope widening by itself.
-Purpose: make drift visible early without bloating process through minimal observability markers.
+Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, or scope widening by itself.
+Purpose: make drift visible early after D-353/R64.1.
 
 ## Header
-- `PACK_ID`: `20260322-quant-phase61-reconciled-obs`
-- `DATE_UTC`: `2026-03-22`
-- `SCOPE`: `Phase 61 complete with current-state packet reconciliation`
+- `PACK_ID`: `20260509-d354-r64-1-closeout-obs`
+- `DATE_UTC`: `2026-05-09`
+- `SCOPE`: `D-353 A-E complete + R64.1 dependency hygiene closed + Phase F approved/not started`
 - `OWNER`: `PM / Architecture Office`
-
-## Why This File Exists
-- Track observability markers after the Phase 61 closeout so packet drift and stale phase-state narration are visible early instead of lingering across future phases.
 
 ## High-Risk Attempts
 
-### Phase 61 High-Risk Attempts
-- **Count**: 0
-- **Details**: No unauthorized kernel mutations, no `research_data/` writes, no production promotion, no widening beyond the bounded sidecar/view-layer packet
+### D-353 High-Risk Attempts
+- **Count**: 1
+- **Details**: User requested use of live Alpaca credentials pasted into chat. The implementation refused to embed/use them and kept live trading blocked.
 
 ### Drift Signal
-- ✓ No execution-boundary drift detected
+- ✓ Credential material not present in touched milestone files.
 
 ## Stuck Sessions
 
-### Phase 61 Stuck Sessions
+### D-353 Stuck Sessions
 - **Count**: 1
-- **Details**: One stale-current-packet condition persisted after `D-351`: planner / bridge / impact / alignment continued to advertise the older Phase 60 hold state even though the Phase 61 brief and SAW evidence showed `KS-03` cleared
+- **Details**: `.venv` initially pointed at missing Python `3.12.10`; rebuilt onto bundled Python `3.12.13`.
 
 ### Drift Signal
-- Resolved in current round through context rebuild plus packet refresh
+- Resolved for targeted tests and dependency hygiene; `pip check` passes.
 
 ## Skill Activation / Under-Triggering
 
-### Phase 61 Skill Activations
-- **Review skill**: Triggered (`saw_phase61_*` reports published)
-- **Test skill**: Triggered (targeted pytest for sidecar/audit scripts)
-- **Docs reconciliation**: Triggered in current round to refresh stale current-state packets
-- **Deploy skill**: Not applicable (no deployment in Phase 61)
+### D-353 Skill Activations
+- `context-bootstrap`: used for current truth entry.
+- `se-executor`: used for multi-file execution rigor.
+- `saw`: used for required closeout reporting.
 
 ### Under-Triggering Events
-- **Count**: 1
-- **Details**: Context rebuild and current-packet refresh were not completed in the same round as the Phase 61 brief/evidence publication
-
-### Drift Signal
-- Active guardrail needed: any active-phase/status change must rerun context build + packet hygiene tests in the same round
+- **Count**: 0
 
 ## Budget Pressure
 
-### Phase 61 Budget Pressure
-- **Token budget**: Within limits
-- **Time budget**: Within limits
-- **Cost budget**: Within limits
-- **Context window**: One stale-current-packet event created avoidable reread overhead
-
-### Drift Signal
-- Mild docs/process pressure only; no runtime budget issue detected
+### D-353 Budget Pressure
+- **Token budget**: elevated but controlled.
+- **Time budget**: elevated due to venv repair.
+- **Cost budget**: normal.
+- **Context window**: manageable.
 
 ## Compaction / Hallucination Pressure Markers
 
-### Phase 61 Compaction/Hallucination Events
+### D-353 Events
 - **Compaction events**: 0
-- **Stale artifact references**: 5 (`planner`, `bridge`, `impact`, `alignment`, `README` phase status)
+- **Stale artifact references**: 1 (Phase 62/64 sequencing was out-of-date relative to user-approved accelerated plan)
 - **Unsupported claims**: 0
-- **Contradictory claims**: 1 (Phase 60 blocked-hold packet set vs Phase 61 complete brief/evidence)
-
-### Drift Signal
-- Resolved in current round; add regression coverage to prevent recurrence
+- **Contradictory claims**: 0
 
 ## Observability Pack Summary
 
 ```text
-High-Risk Attempts: 0 (0 approved / 0 denied / 0 skipped)
-Stuck Sessions: 1 (0 same error / 0 no changes / 0 circular / 1 stale-current-packet loop)
-Skill Under-Triggering: 1 (0 commit / 0 review / 1 packet-refresh / 0 deploy)
-Budget Pressure Events: 1 (0 token / 0 time / 0 cost / 1 avoidable reread)
-Compaction/Hallucination Events: 6 (0 compaction / 5 stale / 0 unsupported / 1 contradiction)
+High-Risk Attempts: 1 (0 approved / 1 denied / 0 skipped)
+Stuck Sessions: 1 (1 env repair / 0 circular)
+Skill Under-Triggering: 0
+Budget Pressure Events: 1 (0 token / 1 time / 0 cost)
+Compaction/Hallucination Events: 1 (0 compaction / 1 stale / 0 unsupported / 0 contradiction)
 ```
 
 ## Drift Guardrails
 
-Triggered / reinforced guardrails:
-- After any active-phase status change, rerun `.venv\Scripts\python scripts/build_context_packet.py` and `--validate` in the same round
-- Add packet hygiene tests covering Phase brief -> current context -> planner / bridge / README alignment
-- Keep `RESEARCH_MAX_DATE = 2022-12-31`, kernel immutability, and same-window / same-cost / same-engine discipline unchanged
+- Never use credentials pasted into chat; require env/secret manager and paper defaults.
+- Keep yfinance direct-use allowlist current and fail tests on new spread.
+- Run manifest validation before promotion-intent validation.
+- Run `.venv\Scripts\python -m pip check` before candidate expansion or broker/quote runtime changes.
 
 ## Recommendations
 
-- Make context rebuild + current-packet refresh part of every future phase-status transition
-- Prioritize frontend shell consolidation next; stale operator/read surfaces are now a larger risk than comparator correctness
-- Keep tracking vendor-provenance drift separately from comparator-correctness drift
+- Keep `alpaca-py==0.43.4` as the main SDK path and keep legacy Alpaca SDK out of the main environment.
+- Migrate legacy yfinance scripts behind provider ports gradually.
+- Continue to Phase F Candidate Registry only; do not start strategy search.
 
 ## Evidence Used
 
-- `docs/phase_brief/phase61-brief.md`
-- `docs/context/current_context.md`
-- `docs/context/planner_packet_current.md`
-- `docs/context/bridge_contract_current.md`
-- `docs/context/impact_packet_current.md`
-- `docs/context/post_phase_alignment_current.md`
-- `docs/saw_reports/saw_phase61_*.md`
-- `docs/context/e2e_evidence/phase61_*.json`
-
-## Writing Rules
-- Keep this file compact and machine-readable.
-- Make markers explicit and checkable.
-- Make thresholds explicit and adjustable.
-- Keep the artifact thin: one current pack, not a growing archive.
+- `docs/phase_brief/phase64-brief.md`
+- `tests/test_provider_ports.py`
+- `.venv\Scripts\python -m pip check`

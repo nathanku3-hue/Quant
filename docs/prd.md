@@ -20,6 +20,11 @@ Terminal Zero is a local-first quantitative research platform that has evolved t
 
 Core Philosophy: "The Pilot's Checklist." Do not guess. Check the instruments. Then let the math optimize the instruments.
 
+Current governance overlay (R64.1, 2026-05-09):
+  - Provenance and validation gates are executable before paper-alert expansion.
+  - Alpaca operational/paper infrastructure uses `alpaca-py==0.43.4`; live orders remain blocked.
+  - Phase F Candidate Registry is approved as registry-only work before strategy search or promotion packets.
+
 2. System Architecture
 Layer 1: Data Lake (ETL → Parquet files)
 Layer 2: Compute Engine (Vectorized PnL with Shift(1), Turnover Tax)
