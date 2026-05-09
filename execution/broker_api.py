@@ -4,16 +4,35 @@ import math
 import os
 from datetime import datetime, timezone
 from decimal import Decimal
+from types import SimpleNamespace
 from typing import Any
 
-import alpaca_trade_api as tradeapi
-from alpaca_trade_api.rest import APIError
+from alpaca.common.exceptions import APIError
+from alpaca.data.enums import DataFeed
+from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.requests import StockLatestBarRequest
+from alpaca.data.requests import StockLatestQuoteRequest
+from alpaca.data.requests import StockLatestTradeRequest
+from alpaca.trading.client import TradingClient
+from alpaca.trading.enums import OrderSide
+from alpaca.trading.enums import OrderType
+from alpaca.trading.enums import TimeInForce
+from alpaca.trading.requests import LimitOrderRequest
+from alpaca.trading.requests import MarketOrderRequest
 from core.security_policy import assert_egress_url_allowed
 
 
 PAPER_BASE_URL = "https://paper-api.alpaca.markets"
 LIVE_TRADING_BREAK_GLASS_ENV = "TZ_ALPACA_ALLOW_LIVE"
 LIVE_TRADING_BREAK_GLASS_VALUE = "YES"
+ALPACA_DATA_FEED_ENV = "TZ_ALPACA_DATA_FEED"
+DEFAULT_ALPACA_DATA_FEED = "iex"
+ALPACA_ALLOWED_DATA_FEEDS = frozenset({"iex", "delayed_sip", "sip"})
+_ALPACA_PY_DATA_FEEDS = {
+    "iex": DataFeed.IEX,
+    "delayed_sip": DataFeed.DELAYED_SIP,
+    "sip": DataFeed.SIP,
+}
 
 
 def _normalize_base_url(url: str) -> str:
@@ -24,6 +43,143 @@ def _is_paper_base_url(url: str) -> bool:
     normalized = _normalize_base_url(url).lower()
     paper = PAPER_BASE_URL.lower()
     return normalized == paper or normalized.startswith(f"{paper}/")
+
+
+def resolve_alpaca_data_feed(feed: Any | None = None) -> str:
+    value = _clean_optional_text(feed or os.environ.get(ALPACA_DATA_FEED_ENV) or DEFAULT_ALPACA_DATA_FEED).lower()
+    if value not in ALPACA_ALLOWED_DATA_FEEDS:
+        allowed = ", ".join(sorted(ALPACA_ALLOWED_DATA_FEEDS))
+        raise ValueError(f"Unsupported Alpaca data feed {value!r}; allowed feeds: {allowed}")
+    return value
+
+
+def _quote_quality_for_feed(feed: str) -> str:
+    feed_l = str(feed).lower().strip()
+    if feed_l == "iex":
+        return "iex_only"
+    if feed_l == "delayed_sip":
+        return "delayed_sip_quality"
+    if feed_l == "sip":
+        return "sip_quality"
+    return "unknown"
+
+
+def _alpaca_py_feed(feed: str | None) -> DataFeed:
+    return _ALPACA_PY_DATA_FEEDS[resolve_alpaca_data_feed(feed)]
+
+
+def _alpaca_py_side(side: str) -> OrderSide:
+    return OrderSide(str(side).lower().strip())
+
+
+def _alpaca_py_order_type(order_type: str) -> OrderType:
+    return OrderType(str(order_type).lower().strip())
+
+
+def _alpaca_py_time_in_force(time_in_force: str) -> TimeInForce:
+    return TimeInForce(str(time_in_force).lower().strip())
+
+
+def _lookup_symbol_payload(payload: Any, symbol: str) -> Any:
+    if not isinstance(payload, dict):
+        return payload
+    symbol_u = str(symbol).upper()
+    return payload.get(symbol_u) or payload.get(str(symbol)) or payload.get(symbol_u.lower())
+
+
+class _AlpacaPyREST:
+    """Compatibility wrapper for the legacy REST surface used inside this module."""
+
+    def __init__(
+        self,
+        api_key: str,
+        api_secret: str,
+        *,
+        base_url: str,
+        api_version: str | None = None,
+    ) -> None:
+        _ = api_version
+        base_url_s = _normalize_base_url(base_url)
+        paper = _is_paper_base_url(base_url_s)
+        self._trading = TradingClient(
+            api_key=api_key,
+            secret_key=api_secret,
+            paper=paper,
+            raw_data=False,
+            url_override=base_url_s,
+        )
+        self._data = StockHistoricalDataClient(
+            api_key=api_key,
+            secret_key=api_secret,
+            raw_data=False,
+        )
+
+    def get_account(self) -> Any:
+        return self._trading.get_account()
+
+    def list_positions(self) -> list[Any]:
+        return list(self._trading.get_all_positions())
+
+    def submit_order(self, **kwargs: Any) -> Any:
+        order_type = _alpaca_py_order_type(str(kwargs.get("type", "")))
+        base_payload = {
+            "symbol": kwargs.get("symbol"),
+            "qty": kwargs.get("qty"),
+            "side": _alpaca_py_side(str(kwargs.get("side", ""))),
+            "type": order_type,
+            "time_in_force": _alpaca_py_time_in_force(str(kwargs.get("time_in_force", ""))),
+            "client_order_id": kwargs.get("client_order_id"),
+        }
+        if order_type == OrderType.LIMIT:
+            order_request = LimitOrderRequest(
+                **base_payload,
+                limit_price=kwargs.get("limit_price"),
+            )
+        else:
+            order_request = MarketOrderRequest(**base_payload)
+        return self._trading.submit_order(order_request)
+
+    def get_order_by_client_order_id(self, client_order_id: str) -> Any:
+        return self._trading.get_order_by_client_id(client_order_id)
+
+    def close_all_positions(self) -> Any:
+        return self._trading.close_all_positions(cancel_orders=True)
+
+    def get_clock(self) -> Any:
+        return self._trading.get_clock()
+
+    def get_latest_quote(self, symbol: str, feed: str | None = None) -> Any:
+        symbol_u = str(symbol).upper()
+        request = StockLatestQuoteRequest(
+            symbol_or_symbols=symbol_u,
+            feed=_alpaca_py_feed(feed),
+        )
+        return _lookup_symbol_payload(self._data.get_stock_latest_quote(request), symbol_u)
+
+    def get_latest_trade(self, symbol: str, feed: str | None = None) -> Any:
+        symbol_u = str(symbol).upper()
+        request = StockLatestTradeRequest(
+            symbol_or_symbols=symbol_u,
+            feed=_alpaca_py_feed(feed),
+        )
+        return _lookup_symbol_payload(self._data.get_stock_latest_trade(request), symbol_u)
+
+    def get_latest_bar(self, symbol: str, feed: str | None = None) -> Any:
+        symbol_u = str(symbol).upper()
+        request = StockLatestBarRequest(
+            symbol_or_symbols=symbol_u,
+            feed=_alpaca_py_feed(feed),
+        )
+        bar = _lookup_symbol_payload(self._data.get_stock_latest_bar(request), symbol_u)
+        if hasattr(bar, "c"):
+            return bar
+        return SimpleNamespace(
+            c=getattr(bar, "close", None),
+            timestamp=getattr(bar, "timestamp", None),
+        )
+
+
+tradeapi = SimpleNamespace(REST=_AlpacaPyREST)
 
 
 def _to_number(value: Any) -> int | float:
@@ -203,12 +359,21 @@ class AlpacaBroker:
             )
 
         break_glass = str(os.environ.get(LIVE_TRADING_BREAK_GLASS_ENV, "")).strip().upper()
-        if not _is_paper_base_url(base_url) and break_glass != LIVE_TRADING_BREAK_GLASS_VALUE:
-            raise EnvironmentError(
-                "Refusing non-paper Alpaca base URL. "
-                f"Set {LIVE_TRADING_BREAK_GLASS_ENV}={LIVE_TRADING_BREAK_GLASS_VALUE} "
-                "to explicitly allow live trading."
-            )
+        if not _is_paper_base_url(base_url):
+            if break_glass != LIVE_TRADING_BREAK_GLASS_VALUE:
+                raise EnvironmentError(
+                    "Refusing non-paper Alpaca base URL. "
+                    f"Set {LIVE_TRADING_BREAK_GLASS_ENV}={LIVE_TRADING_BREAK_GLASS_VALUE} "
+                    "to explicitly allow live trading."
+                )
+            signed_live_decision = str(
+                os.environ.get("TZ_SIGNED_LIVE_TRADING_DECISION", "")
+            ).strip().upper()
+            if signed_live_decision != "YES":
+                raise EnvironmentError(
+                    "Live Alpaca trading is outside the current milestone. "
+                    "Set TZ_SIGNED_LIVE_TRADING_DECISION=YES only after a signed decision-log packet."
+                )
 
         self.api = tradeapi.REST(api_key, api_secret, base_url=base_url, api_version="v2")
 
@@ -580,11 +745,15 @@ class AlpacaBroker:
         clock = self.api.get_clock()
         return bool(clock.is_open)
 
-    def get_latest_quote_snapshot(self, symbol: str) -> dict[str, Any]:
+    def get_latest_quote_snapshot(self, symbol: str, feed: str | None = None) -> dict[str, Any]:
         symbol_u = _clean_optional_text(symbol).upper()
         if not symbol_u:
             raise RuntimeError("symbol is required for quote snapshot")
-        quote = self.api.get_latest_quote(symbol_u)
+        feed_s = resolve_alpaca_data_feed(feed)
+        try:
+            quote = self.api.get_latest_quote(symbol_u, feed=feed_s)
+        except TypeError:
+            quote = self.api.get_latest_quote(symbol_u)
         bid_price = _to_positive_float_or_none(
             getattr(quote, "bid_price", None) or getattr(quote, "bidprice", None)
         )
@@ -602,6 +771,11 @@ class AlpacaBroker:
             "quote_ts": _to_iso_utc_ms(getattr(quote, "timestamp", None) or getattr(quote, "t", None)),
             "snapshot_ts": _utc_now_iso_ms(),
             "source": "alpaca_latest_quote",
+            "provider": "alpaca",
+            "provider_feed": feed_s,
+            "source_quality": "operational",
+            "quote_quality": _quote_quality_for_feed(feed_s),
+            "license_scope": "paper_operational_market_data",
         }
 
     def get_latest_price(self, symbol: str) -> float:

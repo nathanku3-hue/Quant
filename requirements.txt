@@ -1,6 +1,6 @@
 # Lock mirror of pyproject.toml ([project.dependencies] + dev pytest).
 # Update pyproject.toml first, then mirror here in the same change.
-alpaca-trade-api==3.2.0
+alpaca-py==0.43.4
 duckdb==1.4.4
 joblib==1.5.2
 numpy==2.4.2

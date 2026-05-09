@@ -97,6 +97,7 @@ def test_alpaca_broker_allows_non_paper_with_break_glass(monkeypatch: pytest.Mon
     monkeypatch.setenv("APCA_API_SECRET_KEY", "secret")
     monkeypatch.setenv("APCA_API_BASE_URL", "https://api.alpaca.markets/")
     monkeypatch.setenv(broker_mod.LIVE_TRADING_BREAK_GLASS_ENV, broker_mod.LIVE_TRADING_BREAK_GLASS_VALUE)
+    monkeypatch.setenv("TZ_SIGNED_LIVE_TRADING_DECISION", "YES")
 
     broker_mod.AlpacaBroker()
 
