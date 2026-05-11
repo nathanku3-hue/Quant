@@ -15,20 +15,28 @@ logs/
 tmp/
 tmp_*/
 *.log
+/_optimizer_diff_tmp.txt
+/_untracked_tmp.txt
+/tests/pytest_out.txt
 *.jsonl
 !data/registry/candidate_events.jsonl
 
 # Generated data artifacts
+/backtest_results.json
 data/raw/
 data/processed/
 data/*.csv
 data/*.zip
 data/*.lock
+data/runtime_cache/
 data/backtest_results.json
 data/fresh_finds.json
 data/last_scan_state.json
 data/watchlist.json
 docs/context/e2e_evidence/archive/
+
+# Local vendor/reference drops
+/SPGlobal_Avantax,Inc._SecurityDetail_19-Mar-2026.xlsx
 
 # Research data (intermediate artifacts, not source of truth)
 research_data/
