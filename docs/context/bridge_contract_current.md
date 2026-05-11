@@ -4,6 +4,16 @@ Status: Current integration bridge
 Authority: advisory-only PM/planner bridge. This file does not authorize live trading, broker automation, promotion, provider ingestion, strategy search, candidate ranking, candidate scoring, candidate validation, alerts, dashboard content redesign, macro scoring, factor scoring, or scope widening.
 Purpose: connect Quant's technical state back to product/system truth after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Dashboard Unified Data Cache Performance Fix
+
+- `SYSTEM_DELTA`: `Dashboard unified parquet data load is now wrapped in st.cache_resource and keyed by processed/static parquet file signatures.`
+- `PM_DELTA`: `Normal Streamlit widget reruns should no longer pay the verified ~8s DuckDB/parquet wide-frame load when source data has not changed.`
+- `DATA_DELTA`: `Cache invalidation tracks source parquet resolved path, mtime_ns, and size for price, patch, macro/liquidity, ticker, fundamentals, calendar, and sector-map inputs.`
+- `CLOSURE_DELTA`: `Focused compile/tests, portfolio regressions, full pytest, Streamlit HTTP smoke, context validation, and independent SAW Implementer/Reviewer A/B/C passes completed.`
+- `OPEN_DECISION`: `Hold or separately measure the alpha-engine daily loop and scanner financial-statement cache follow-ups.`
+- `RECOMMENDED_NEXT_STEP`: `hold_or_measure_alpha_backtest_runtime_or_scanner_financial_cache.`
+- `DO_NOT_REDECIDE`: `No provider ingestion, canonical market-data write, strategy search, ranking, scoring, alert, broker call, optimizer objective change, or scanner rule change is authorized.`
+
 ## Latest Addendum - Dashboard Scanner Testability Hardening
 
 - `SYSTEM_DELTA`: `Dashboard scanner deterministic math now lives in strategies/scanner.py with focused boundary-value tests; dashboard.py preserves provider/cache/persistence ownership and delegates enrichment.`

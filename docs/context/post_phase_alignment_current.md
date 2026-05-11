@@ -4,6 +4,23 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, candidate validation, provider ingestion, strategy search, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: update the multi-stream map after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Dashboard Unified Data Cache Performance Fix
+
+## What Changed This Round
+
+- Added `dashboard._load_unified_data_cached(...)` with `st.cache_resource` around the expensive unified historical parquet package load.
+- Added `core.data_orchestrator.build_unified_data_cache_signature(...)` to key the cache by processed/static source parquet resolved path, `mtime_ns`, and size.
+- Added focused tests for cache-signature mutation and dashboard cache wiring.
+- Updated truth surfaces, decision log, notes, lessons, and SAW report after full pytest and independent SAW reconciliation.
+
+## Current Bottleneck
+
+- The cache fix is closed with full pytest, runtime smoke, context validation, and SAW PASS. Remaining follow-ups are optional: behavior-level rerun-counter coverage and future copy discipline if a mutating dashboard consumer appears.
+
+## What Should Not Be Done Next
+
+- Do not expand this closure into provider ingestion, canonical market-data writes, alpha-engine loop rewrite, scanner financial-statement cache, scanner semantic changes, ranking, scoring, alerts, brokers, optimizer objective changes, or candidate-card dashboard integration.
+
 ## Latest Addendum - Dashboard Scanner Testability Hardening
 
 ## What Changed This Round

@@ -4,6 +4,15 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, strategy search, candidate ranking, candidate scoring, thesis validation, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: provide the planner with a compact fresh world model after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Dashboard Unified Data Cache Performance Fix
+
+- `CURRENT_DELTA`: `DASHBOARD_UNIFIED_DATA_CACHE_PERFORMANCE_FIX caches the expensive dashboard unified parquet package across Streamlit reruns.`
+- `IMPLEMENTATION_ARTIFACTS`: `dashboard.py`, `core/data_orchestrator.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_dashboard_sprint_a.py`.
+- `PERFORMANCE_DELTA`: `Pre-fix direct load measured 8.802s and 8.393s; reruns now reuse st.cache_resource unless source parquet path/mtime/size signatures change.`
+- `CLOSURE_DELTA`: `Focused compile/tests, portfolio regressions, full pytest, Streamlit HTTP smoke, context validation, and independent SAW Implementer/Reviewer A/B/C passes completed.`
+- `BOUNDARY`: `No provider ingestion, canonical market-data write, scanner semantic change, alpha-engine loop rewrite, ranking, scoring, alert, broker, optimizer objective change, or candidate-card dashboard merge.`
+- `NEXT_STEP`: `hold_or_measure_alpha_backtest_runtime_or_scanner_financial_cache.`
+
 ## Latest Addendum - Dashboard Scanner Testability Hardening
 
 - `CURRENT_DELTA`: `DASHBOARD_SCANNER_TESTABILITY_HARDENING extracts deterministic scanner math into strategies/scanner.py and adds focused boundary tests.`

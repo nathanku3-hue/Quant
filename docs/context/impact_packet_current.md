@@ -4,6 +4,62 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, broker calls, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: provide a compact view of the Portfolio Optimizer View Test and Performance Hardening implementation and affected interfaces.
 
+## Latest Addendum - Dashboard Unified Data Cache Performance Fix
+
+### Changed Runtime Files
+
+```text
+dashboard.py
+core/data_orchestrator.py
+```
+
+### Changed Test Files
+
+```text
+tests/test_data_orchestrator_portfolio_runtime.py
+tests/test_dashboard_sprint_a.py
+```
+
+### Changed Governance / Evidence Files
+
+```text
+docs/notes.md
+docs/decision log.md
+docs/lessonss.md
+docs/context/bridge_contract_current.md
+docs/context/impact_packet_current.md
+docs/context/done_checklist_current.md
+docs/context/planner_packet_current.md
+docs/context/e2e_evidence/dashboard_unified_data_cache_8507_status.txt
+docs/context/e2e_evidence/dashboard_unified_data_cache_8507_stdout.txt
+docs/context/e2e_evidence/dashboard_unified_data_cache_8507_stderr.txt
+```
+
+### Touched Interfaces
+
+- `Dashboard unified data load`: `dashboard.py` calls `_load_unified_data_cached(...)` instead of loading the institutional parquet package directly on every Streamlit rerun.
+- `Unified data cache invalidation`: `core.data_orchestrator.build_unified_data_cache_signature(...)` fingerprints relevant processed/static parquet source files by resolved path, mtime_ns, and size.
+
+### Passing Checks
+
+- `.venv\Scripts\python -m py_compile dashboard.py core\data_orchestrator.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_dashboard_sprint_a.py` -> PASS.
+- `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dashboard_sprint_a.py -q` -> PASS, 16 passed.
+- `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py -q` -> PASS, 22 passed.
+- `.venv\Scripts\python -m pytest -q` -> PASS.
+- Streamlit HTTP smoke at `http://127.0.0.1:8507` -> PASS, HTTP 200.
+- `.venv\Scripts\python scripts\build_context_packet.py --validate` -> PASS.
+- Independent SAW Implementer and Reviewer A/B/C passes -> PASS after reconciling stale full-pytest evidence.
+- SAW closure packet validation and report block validation -> PASS.
+
+### Failing / Incomplete Checks
+
+- None in current focused/full verification.
+
+### Open Risks
+
+- Cached package is returned as a mutable resource; current dashboard consumers treat the package as read-mostly, but future in-place mutation should switch this path to `st.cache_data` or copy before mutation.
+- Alpha-engine daily-loop optimization and scanner raw-financials cache remain separate follow-ups.
+
 ## Latest Addendum - Dashboard Scanner Testability Hardening
 
 ### Changed Runtime Files
@@ -43,13 +99,14 @@ docs/context/observability_pack_current.md
 
 - `Dashboard scanner`: `dashboard.py` still owns yfinance fetch/cache/payload persistence; deterministic enrichment delegates to `strategies.scanner.enrich_scan_frame`.
 - `Scanner formulas`: macro score, breadth status, technicals, entry/support math, tactics, proxy signal, rating, and leverage are importable pure helpers.
+- `Scanner data quality`: non-finite macro and breadth inputs fail closed to `None` / `UNKNOWN` instead of optimistic labels.
 - `Test fixtures`: `tests/conftest.py` now exposes common synthetic price, return, macro, and ticker-map fixtures.
 
 ### Passing Checks
 
 - `.venv\Scripts\python -m pytest tests\test_scanner.py tests\test_strategy.py tests\test_phase15_integration.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\test_process_utils.py -q` -> PASS, 46 passed.
 - `.venv\Scripts\python -m py_compile strategies\scanner.py dashboard.py tests\test_scanner.py tests\test_strategy.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\conftest.py` -> PASS.
-- `.venv\Scripts\python -m pytest -q` -> PASS.
+- `.venv\Scripts\python -m pytest -q` -> PASS after non-finite scanner reconciliation.
 - `.venv\Scripts\python -m pytest --collect-only -q` -> PASS; collection includes scanner, adaptive-trend, production-config, core-ETL, and process-guardrail tests.
 
 ### Failing / Incomplete Checks

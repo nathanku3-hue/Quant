@@ -5611,6 +5611,7 @@ Phase 65 Dashboard Scanner Testability Hardening (2026-05-11)
     - add small direct tests for `InvestorCockpitStrategy`, `AdaptiveTrendStrategy`, `ProductionConfig`, and `core.etl`.
   - The Decision (Hardcoded):
     - `strategies/scanner.py` owns pure scanner math and dataframe enrichment.
+    - non-finite macro and breadth inputs fail closed to `None` / `UNKNOWN` instead of optimistic labels or scores.
     - `dashboard.py` still owns yfinance calls through `fetch_macro_score`, `get_breadth_status`, and `get_prices_and_technicals`, then delegates deterministic enrichment to `enrich_scan_frame(...)`.
     - `tests/test_scanner.py` is the scanner formula guardrail; `tests/test_process_utils.py` remains the process-liveness guardrail.
     - no scanner semantics, provider authority, candidate-card state, ranking/scoring policy, alert, broker behavior, or dashboard redesign is approved by this round.
@@ -5716,5 +5717,12 @@ Phase 65 Dashboard Unified Data Cache Performance Fix (2026-05-11)
     - `tests/test_dashboard_sprint_a.py` locks that the dashboard load path uses the signature cache.
   - Evidence:
     - pre-fix timing: direct `.venv` load of `load_unified_data(...)` took `8.802s` and `8.393s` for `(2518, 2000)` price/return matrices.
+    - `.venv\Scripts\python -m py_compile dashboard.py core\data_orchestrator.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_dashboard_sprint_a.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dashboard_sprint_a.py -q` PASS, 16 passed.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py -q` PASS, 22 passed.
+    - Streamlit HTTP smoke `http://127.0.0.1:8507` PASS, HTTP 200.
+    - `.venv\Scripts\python scripts\build_context_packet.py --validate` PASS.
+    - `.venv\Scripts\python .codex\skills\_shared\scripts\validate_closure_packet.py --packet "<cache ClosurePacket>" --require-open-risks-when-block --require-next-action-when-block` PASS.
+    - `.venv\Scripts\python .codex\skills\_shared\scripts\validate_saw_report_blocks.py --report-file docs\saw_reports\saw_dashboard_unified_data_cache_performance_20260511.md` PASS.
   - Contract lock:
     - `DASHBOARD_UNIFIED_DATA_CACHE := VALID iff (streamlit_cache_resource = 1) and (cache_key_includes_loader_args = 1) and (cache_key_includes_source_parquet_signature = 1) and (source_parquet_rewrite_invalidates = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0)`.

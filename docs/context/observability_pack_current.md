@@ -4,6 +4,28 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, candidate validation, provider ingestion, strategy search, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: make drift visible early after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Dashboard Unified Data Cache Performance Fix
+
+## High-Risk Attempts
+
+- Treating `st.cache_resource` as safe for future mutating consumers without defensive copies or switching to `st.cache_data`.
+- Letting source-text cache tests replace full regression and runtime smoke evidence.
+- Treating the cache signature as provider freshness or canonical ingestion.
+- Expanding this performance slice into alpha-engine loop rewrites or scanner financial-statement caching.
+
+## Drift Signal
+
+- This round is dashboard runtime performance hardening only. The product behavior, data authority, scanner semantics, optimizer policy, ranking/scoring, alerts, and broker scope are unchanged.
+- Full pytest and SAW now pass after stale quick-slice evidence was reconciled.
+
+## Evidence Used
+
+- `dashboard.py`
+- `core/data_orchestrator.py`
+- `tests/test_data_orchestrator_portfolio_runtime.py`
+- `tests/test_dashboard_sprint_a.py`
+- `docs/saw_reports/saw_dashboard_unified_data_cache_performance_20260511.md`
+
 ## Latest Addendum - Dashboard Scanner Testability Hardening
 
 ## High-Risk Attempts
@@ -12,10 +34,12 @@ Purpose: make drift visible early after the Portfolio Optimizer View Test and Pe
 - Moving yfinance/provider calls into strategy code.
 - Letting scanner formula tests replace full dashboard/runtime smoke for phase closure.
 - Re-coupling entry, tactic, proxy, rating, and leverage rules into inline dashboard closures.
+- Letting non-finite macro or breadth inputs coerce to optimistic scores or labels.
 
 ## Drift Signal
 
 - This round is testability and regression hardening only. Dashboard scanner labels should remain behavior-preserving, provider authority is unchanged, and no action/ranking/scoring policy is approved.
+- Reviewer-driven non-finite macro/breadth regressions now fail closed through `tests/test_scanner.py`.
 
 ## Evidence Used
 

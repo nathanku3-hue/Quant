@@ -4,11 +4,33 @@ Status: Current with Portfolio Universe Construction PASS and optimizer-core qua
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, thesis validation, or scope widening by itself.
 Purpose: define machine-checkable done criteria for current Phase 65 portfolio universe and candidate-card work.
 
+## Latest Addendum - Dashboard Unified Data Cache Performance Fix
+
+- [x] `dashboard.py::_load_unified_data_cached` exists.
+- [x] `_load_unified_data_cached` is decorated with `st.cache_resource`.
+- [x] Dashboard unified package load includes `data_signature=build_unified_data_cache_signature(...)`.
+- [x] `core.data_orchestrator.build_unified_data_cache_signature` exists.
+- [x] Cache signature tracks source parquet path, mtime_ns, and size.
+- [x] File add/remove/rewrite changes signature in focused tests.
+- [x] Dashboard source guard confirms cached unified load path.
+- [x] Focused compile passes.
+- [x] Focused data-orchestrator/dashboard tests pass.
+- [x] Portfolio YTD and optimizer view regressions pass.
+- [x] Streamlit HTTP smoke reaches dashboard with status 200.
+- [x] Context validation passes.
+- [x] Full pytest completed in this round.
+- [x] SAW independent Implementer and Reviewer A/B/C passes completed in this round.
+- [x] Stale quick-slice closure evidence reconciled after full pytest.
+- [x] `docs/saw_reports/saw_dashboard_unified_data_cache_performance_20260511.md` exists and records SAW PASS.
+- [x] SAW closure packet validation passes.
+- [x] SAW report block validation passes.
+
 ## Latest Addendum - Dashboard Scanner Testability Hardening
 
 - [x] `strategies/scanner.py` exists and owns deterministic scanner math.
 - [x] `dashboard.py` preserves yfinance/provider calls and delegates scanner enrichment to `strategies.scanner.enrich_scan_frame`.
 - [x] Macro score, breadth, price technicals, cluster, entry/support, tactics, proxy signal, rating, leverage, and scan-frame enrichment have focused tests.
+- [x] Non-finite macro and breadth inputs fail closed to unknown/neutral behavior with regression coverage.
 - [x] `tests/conftest.py` includes shared price/return/macro/ticker-map fixtures.
 - [x] `InvestorCockpitStrategy` quality-cap coverage exists.
 - [x] `AdaptiveTrendStrategy` regime transition coverage exists.

@@ -4949,6 +4949,7 @@ Date: 2026-03-01
    - `rate_score = 50` when 63-day `^TNX` velocity is `<= 0`; `rate_score = 0` when velocity is `>= 0.50`; otherwise linearly interpolate over `[0.00, 0.50]`.
    - `credit_score = 50` when `VWEHX/VFISX` distance from its 200-day SMA is `>= 4.65%`; `credit_score = 0` when distance is `<= -2.0%`; otherwise linearly interpolate over `[-2.0%, 4.65%]`.
    - `macro_score = round(rate_score + credit_score)`.
+   - `macro_score = None` when required close series contain non-finite values, invalid rate endpoints, non-positive credit denominator rows in an otherwise eligible credit window, or non-finite 200-day credit ratio math.
    - source paths:
      - `strategies/scanner.py`
      - `dashboard.py`
@@ -4970,6 +4971,7 @@ Date: 2026-03-01
    - `Proxy_Signal = COILED SPRING` when proxy is strong and price is not stretched; `CORRELATED` when both proxy and price are strong; `DIVERGING`, `CORRECTING`, and `MISPRICED` follow the same proxy/price truth table.
    - `Rating` precedence: `KILL` action -> exit; parabolic warning -> tight-trail exit; terminal stretch -> wait; score-100 rows require proxy and distance gates before `ENTER`.
    - `Leverage = LEAPs` only when rating includes `STRONG BUY`, `macro_score >= 80`, and `Convexity <= 1.5`.
+   - Breadth status returns `UNKNOWN (No Data)` when latest or 50-day SMA inputs are non-finite.
    - source paths:
      - `strategies/scanner.py`
      - `dashboard.py`

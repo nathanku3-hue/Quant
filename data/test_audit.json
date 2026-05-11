@@ -1,0 +1,32 @@
+Traceback (most recent call last):
+  File "E:\Code\Quant\scripts\phase60_governed_audit_runner.py", line 454, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "E:\Code\Quant\scripts\phase60_governed_audit_runner.py", line 448, in main
+    summary = run_governed_audit(cfg)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Code\Quant\scripts\phase60_governed_audit_runner.py", line 295, in run_governed_audit
+    c3_5 = _run_phase20_comparator(cfg.start_date, cfg.end_date, cfg.cost_bps)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Code\Quant\scripts\phase60_governed_audit_runner.py", line 103, in _run_phase20_comparator
+    features = _load_c3_features_window(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Code\Quant\scripts\phase20_full_backtest.py", line 294, in _load_features_window
+    sdm = _read_feature_window(
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Code\Quant\scripts\phase20_full_backtest.py", line 256, in _read_feature_window
+    df = df.loc[in_window].copy()
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Code\Quant\.venv\Lib\site-packages\pandas\core\generic.py", line 6811, in copy
+    data = self._mgr.copy(deep=deep)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Code\Quant\.venv\Lib\site-packages\pandas\core\internals\managers.py", line 593, in copy
+    res = self.apply("copy", deep=deep)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Code\Quant\.venv\Lib\site-packages\pandas\core\internals\managers.py", line 363, in apply
+    applied = getattr(b, f)(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Code\Quant\.venv\Lib\site-packages\pandas\core\internals\blocks.py", line 796, in copy
+    values = values.copy()
+             ^^^^^^^^^^^^^
+numpy._core._exceptions._ArrayMemoryError: Unable to allocate 140. MiB for an array with shape (3, 6112429) and data type object

@@ -4,6 +4,33 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: coordinate streams after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Dashboard Unified Data Cache Performance Fix
+
+### Frontend/UI
+
+- **Status**: dashboard unified parquet package load is cached across Streamlit reruns; full pytest and SAW PASS.
+- **Must Deliver**: keep top-level dashboard load responsive without changing page behavior or data authority.
+- **Owned Files**:
+  - `dashboard.py`
+  - `tests/test_dashboard_sprint_a.py`
+
+### Data/Ops
+
+- **Status**: source parquet cache signature implemented and tested.
+- **Must Deliver**: invalidate cached package when relevant processed/static parquet source files are added, removed, or rewritten.
+- **Owned Files**:
+  - `core/data_orchestrator.py`
+  - `tests/test_data_orchestrator_portfolio_runtime.py`
+
+### Docs/Ops
+
+- **Status**: bridge, impact, done checklist, planner packet, notes, decision log, lessons, SAW report, post-phase alignment, and observability pack updated.
+- **Must Deliver**: carry mutable `st.cache_resource` residual risk as a future dashboard-owner guardrail.
+
+### Blocked
+
+- Provider ingestion, canonical market-data writes, alpha-engine loop rewrite, scanner financial-statement cache, scanner semantic changes, ranking, scoring, alerts, brokers, optimizer objective changes, and candidate-card dashboard merge.
+
 ## Latest Addendum - Dashboard Scanner Testability Hardening
 
 ### Backend/Strategy
