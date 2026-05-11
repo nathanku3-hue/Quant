@@ -38,6 +38,7 @@ REQUIRED_MD_HEADERS = (
 MAX_CONTEXT_AGE_HOURS = 24.0
 
 _PHASE_RE = re.compile(r"phase(\d+)", re.IGNORECASE)
+_SUBPHASE_RE = re.compile(r"phase\d+[_-]g(?P<subphase>[A-Za-z0-9]+)", re.IGNORECASE)
 _LABEL_LINE_RE = re.compile(
     r"^\s*(?:[-*+]\s*)?(?:\d+[.)]\s*)?(?P<label>[A-Za-z][A-Za-z0-9 \-_/()]+?)\s*:\s*(?P<value>.*)\s*$"
 )
@@ -101,10 +102,46 @@ def _dedupe_keep_order(values: list[str]) -> list[str]:
 
 
 def _phase_number(path: Path) -> int:
+    name = path.name.lower()
+    if "dashboard_ia_handover" in name:
+        return 65
+    if "dash_1_page_registry_shell_handover" in name:
+        return 65
     match = _PHASE_RE.search(path.name)
     if not match:
         return -1
     return int(match.group(1))
+
+
+def _subphase_number(path: Path) -> int:
+    name = path.name.lower()
+    if "dashboard_ia_handover" in name:
+        return 80150
+    if "dash_1_page_registry_shell_handover" in name:
+        return 80175
+    if "optimizer_core_structured_diagnostics_handover" in name:
+        return 80500
+    match = _SUBPHASE_RE.search(path.name)
+    if not match:
+        return 0
+    raw = match.group("subphase").lower()
+    digit_match = re.match(r"(?P<digits>\d+)(?P<suffix>[a-z]*)", raw)
+    if not digit_match:
+        return 0
+
+    digits = digit_match.group("digits")
+    suffix = digit_match.group("suffix")
+    # Historical files encode G7.1-G7.4 as g71-g74, and G8.1 as g81.
+    # Score packed single-digit major/minor labels semantically so G8.1
+    # sorts after G8 but before G9, while G10 still sorts as major phase 10.
+    if len(digits) == 2 and digits[0] != "1" and int(digits[1:]) > 0:
+        major = int(digits[0])
+        minor = int(digits[1:])
+    else:
+        major = int(digits)
+        minor = 0
+    suffix_score = sum(ord(char) - ord("a") + 1 for char in suffix[:2])
+    return (major * 10000) + (minor * 100) + suffix_score
 
 
 def _discover_sources(repo_root: Path) -> SourceDocs:
@@ -114,7 +151,11 @@ def _discover_sources(repo_root: Path) -> SourceDocs:
         key=lambda p: (_phase_number(p), p.as_posix()),
     )
     phase_handovers = sorted(
-        (docs_root / "handover").glob("phase*_handover.md"),
+        [
+            *(docs_root / "handover").glob("phase*_handover.md"),
+            *(docs_root / "handover").glob("dashboard_ia_handover_*.md"),
+            *(docs_root / "handover").glob("dash_1_page_registry_shell_handover_*.md"),
+        ],
         key=lambda p: (_phase_number(p), p.as_posix()),
     )
     decision_log = docs_root / "decision log.md"
@@ -226,7 +267,14 @@ def _select_context_source(
         candidates.append((_phase_number(path), 0, path))
     for path in phase_briefs:
         candidates.append((_phase_number(path), 1, path))
-    candidates.sort(key=lambda item: (-item[0], item[1], item[2].as_posix()))
+    candidates.sort(
+        key=lambda item: (
+            -item[0],
+            item[1],
+            -_subphase_number(item[2]),
+            item[2].as_posix(),
+        )
+    )
 
     errors: list[str] = []
     for _, _, path in candidates:

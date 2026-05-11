@@ -2,13 +2,54 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
+
 import numpy as np
 import pandas as pd
+
+from strategies.optimizer_diagnostics import (
+    OptimizerFeasibilityReport,
+    OptimizerRunResult,
+    OptimizerSolverDiagnostics,
+    build_solver_diagnostics,
+    check_optimizer_feasibility,
+)
 
 try:
     from scipy.optimize import minimize
 except Exception:  # pragma: no cover - optional dependency guard
     minimize = None
+
+
+class OptimizationMethod(StrEnum):
+    """Supported portfolio optimizer methods exposed to UI callers."""
+
+    HISTORICAL_BEST_CAGR = "Historical Best CAGR Strategy"
+    HISTORICAL_MAX_SHARPE = "Historical Max Sharpe Strategy"
+    INVERSE_VOLATILITY = "Inverse Volatility"
+    THESIS_NEUTRAL_MAX_SHARPE = "Thesis-Neutral Max Sharpe"
+    MEAN_VARIANCE_MIN_VOLATILITY = "Mean-Variance (Min Volatility)"
+    MEAN_VARIANCE_MAX_RETURN = "Mean-Variance (Max Return)"
+
+    @property
+    def is_mean_variance(self) -> bool:
+        return self in MEAN_VARIANCE_METHODS
+
+
+OPTIMIZATION_METHOD_OPTIONS = (
+    OptimizationMethod.HISTORICAL_BEST_CAGR,
+    OptimizationMethod.HISTORICAL_MAX_SHARPE,
+    OptimizationMethod.INVERSE_VOLATILITY,
+    OptimizationMethod.THESIS_NEUTRAL_MAX_SHARPE,
+    OptimizationMethod.MEAN_VARIANCE_MIN_VOLATILITY,
+    OptimizationMethod.MEAN_VARIANCE_MAX_RETURN,
+)
+DEFAULT_OPTIMIZATION_METHOD = OptimizationMethod.INVERSE_VOLATILITY
+MEAN_VARIANCE_METHODS = (
+    OptimizationMethod.THESIS_NEUTRAL_MAX_SHARPE,
+    OptimizationMethod.MEAN_VARIANCE_MIN_VOLATILITY,
+    OptimizationMethod.MEAN_VARIANCE_MAX_RETURN,
+)
 
 
 class PortfolioOptimizer:
@@ -103,6 +144,81 @@ class PortfolioOptimizer:
             return self._equal_weight(all_assets)
         eq = self._equal_weight(investable_assets)
         return self._expand_to_all_assets(all_assets, eq)
+
+    @staticmethod
+    def _attach_diagnostics(
+        weights: pd.Series,
+        diagnostics: OptimizerSolverDiagnostics,
+    ) -> pd.Series:
+        """Attach structured diagnostics without changing the public Series API."""
+        result = weights.copy()
+        result.attrs["optimizer_diagnostics"] = diagnostics.to_dict()
+        result.attrs["optimizer_diagnostics_object"] = diagnostics
+        return result
+
+    def _diagnostic_result(
+        self,
+        weights: pd.Series,
+        diagnostics: OptimizerSolverDiagnostics,
+    ) -> OptimizerRunResult:
+        return OptimizerRunResult(
+            weights=self._attach_diagnostics(weights, diagnostics),
+            diagnostics=diagnostics,
+        )
+
+    def _build_empty_diagnostic_result(
+        self,
+        *,
+        objective_name: str,
+        n_assets: int,
+        max_weight: float,
+        feasibility_report: OptimizerFeasibilityReport,
+        solver_status: int | str | None,
+        solver_message: str,
+    ) -> OptimizerRunResult:
+        weights = pd.Series(dtype=float)
+        diagnostics = build_solver_diagnostics(
+            solver_success=False,
+            solver_status=solver_status,
+            solver_message=solver_message,
+            objective_name=objective_name,
+            n_assets=n_assets,
+            max_weight=max_weight,
+            weights=weights,
+            feasibility_report=feasibility_report,
+            fallback_used=False,
+            result_is_optimized=False,
+        )
+        return self._diagnostic_result(weights, diagnostics)
+
+    def _build_fallback_diagnostic_result(
+        self,
+        *,
+        all_assets: pd.Index,
+        investable_assets: pd.Index,
+        objective_name: str,
+        n_assets: int,
+        max_weight: float,
+        feasibility_report: OptimizerFeasibilityReport,
+        solver_status: int | str | None,
+        solver_message: str,
+        fallback_reason: str,
+    ) -> OptimizerRunResult:
+        weights = self._safe_equal_fallback(all_assets, investable_assets)
+        diagnostics = build_solver_diagnostics(
+            solver_success=False,
+            solver_status=solver_status,
+            solver_message=solver_message,
+            objective_name=objective_name,
+            n_assets=n_assets,
+            max_weight=max_weight,
+            weights=weights.reindex(investable_assets).fillna(0.0),
+            feasibility_report=feasibility_report,
+            fallback_used=True,
+            fallback_reason=fallback_reason,
+            result_is_optimized=False,
+        )
+        return self._diagnostic_result(weights, diagnostics)
 
     @staticmethod
     def _lookup_sector(asset, sector_map: dict | None, default: str = "Unknown") -> str:
@@ -248,6 +364,53 @@ class PortfolioOptimizer:
             return None
         return clipped
 
+    def _run_slsqp_with_status(
+        self,
+        objective_fn,
+        n_assets: int,
+        max_weight: float,
+        x0: np.ndarray | None = None,
+    ) -> tuple[np.ndarray | None, bool, int | str | None, str]:
+        """Solve with SLSQP and preserve status details for diagnostics."""
+        if minimize is None:
+            return None, False, "scipy_unavailable", "SciPy unavailable; SLSQP could not run."
+        if x0 is None:
+            x0 = np.full(n_assets, 1.0 / max(1, n_assets), dtype=float)
+
+        constraints = ({"type": "eq", "fun": lambda w: float(np.sum(w) - 1.0)},)
+        bounds = tuple((0.0, max_weight) for _ in range(n_assets))
+
+        try:
+            result = minimize(
+                objective_fn,
+                x0=x0,
+                method="SLSQP",
+                bounds=bounds,
+                constraints=constraints,
+                options={"maxiter": 500, "ftol": 1e-9},
+            )
+        except Exception as exc:
+            return None, False, "exception", f"SLSQP failed: {exc}"
+
+        status = getattr(result, "status", None)
+        message = str(getattr(result, "message", "") or "")
+
+        if not bool(getattr(result, "success", False)) or getattr(result, "x", None) is None:
+            return None, False, status, message or "SLSQP did not produce a successful solution."
+
+        weights = np.asarray(result.x, dtype=float)
+        if not self._validate_solution(weights, max_weight=max_weight):
+            return None, False, status, message or "SLSQP returned an invalid bounded solution."
+
+        clipped = np.clip(weights, 0.0, max_weight)
+        total = float(clipped.sum())
+        if total <= 0:
+            return None, False, status, message or "SLSQP returned zero total allocation."
+        clipped = clipped / total
+        if np.any(clipped > (max_weight + 1e-4)):
+            return None, False, status, message or "SLSQP clipped solution exceeded max-weight cap."
+        return clipped, True, status, message or "SLSQP optimization succeeded."
+
     def calculate_covariance(self, prices_df: pd.DataFrame) -> pd.DataFrame:
         """Return annualized covariance matrix from price history with NaN-safe handling."""
         prices, returns = self._prepare_returns(prices_df)
@@ -264,30 +427,79 @@ class PortfolioOptimizer:
         np.fill_diagonal(cov.values, diag)
         return cov
 
-    def optimize_inverse_volatility(self, prices_df: pd.DataFrame, max_weight: float = 0.2) -> pd.Series:
-        """Optimize weights from inverse annualized volatility with bounded constraints."""
+    def optimize_inverse_volatility_with_diagnostics(
+        self,
+        prices_df: pd.DataFrame,
+        max_weight: float = 0.2,
+    ) -> OptimizerRunResult:
+        """Optimize inverse-volatility weights and return structured diagnostics."""
         all_assets = pd.Index(prices_df.columns) if isinstance(prices_df, pd.DataFrame) else pd.Index([])
-        if len(all_assets) == 0:
-            return pd.Series(dtype=float)
 
         try:
             max_weight = float(max_weight)
         except Exception:
             max_weight = 0.2
-        if max_weight <= 0:
-            return self._safe_equal_fallback(all_assets)
+
+        feasibility = check_optimizer_feasibility(
+            n_assets=len(all_assets),
+            max_weight=max_weight,
+        )
+        if len(all_assets) == 0 or not feasibility.is_feasible:
+            return self._build_empty_diagnostic_result(
+                objective_name="inverse_volatility",
+                n_assets=len(all_assets),
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status="not_started",
+                solver_message="Pre-solver feasibility failed.",
+            )
 
         prices, returns = self._prepare_returns(prices_df)
         if returns.empty:
-            return self._safe_equal_fallback(all_assets)
+            return self._build_fallback_diagnostic_result(
+                all_assets=all_assets,
+                investable_assets=all_assets,
+                objective_name="inverse_volatility",
+                n_assets=len(all_assets),
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status="not_started",
+                solver_message="Insufficient return history for inverse-volatility optimization.",
+                fallback_reason="insufficient return history",
+            )
 
         investable_assets = returns.columns
         n_assets = len(investable_assets)
+        feasibility = check_optimizer_feasibility(
+            n_assets=n_assets,
+            max_weight=max_weight,
+        )
+        if not feasibility.is_feasible:
+            return self._build_empty_diagnostic_result(
+                objective_name="inverse_volatility",
+                n_assets=n_assets,
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status="not_started",
+                solver_message="Pre-solver feasibility failed.",
+            )
+
         if n_assets == 1:
             single = pd.Series([1.0], index=investable_assets, dtype=float)
-            return self._expand_to_all_assets(all_assets, single)
-        if not self._is_feasible(n_assets, max_weight):
-            return self._safe_equal_fallback(all_assets, investable_assets)
+            weights = self._expand_to_all_assets(all_assets, single)
+            diagnostics = build_solver_diagnostics(
+                solver_success=True,
+                solver_status="deterministic_single_asset",
+                solver_message="Single investable asset receives full allocation without SLSQP.",
+                objective_name="inverse_volatility",
+                n_assets=n_assets,
+                max_weight=max_weight,
+                weights=single,
+                feasibility_report=feasibility,
+                fallback_used=False,
+                result_is_optimized=True,
+            )
+            return self._diagnostic_result(weights, diagnostics)
 
         volatility = returns.std(skipna=True) * np.sqrt(float(self.annualization_factor))
         volatility = volatility.replace([np.inf, -np.inf], np.nan)
@@ -295,37 +507,93 @@ class PortfolioOptimizer:
         inv_vol = inv_vol.replace([np.inf, -np.inf], np.nan).fillna(0.0)
 
         if float(inv_vol.sum()) <= 0:
-            return self._safe_equal_fallback(all_assets, investable_assets)
+            return self._build_fallback_diagnostic_result(
+                all_assets=all_assets,
+                investable_assets=investable_assets,
+                objective_name="inverse_volatility",
+                n_assets=n_assets,
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status="not_started",
+                solver_message="Inverse-volatility target could not be formed from positive volatility.",
+                fallback_reason="invalid inverse-volatility target",
+            )
 
         target = (inv_vol / inv_vol.sum()).to_numpy(dtype=float)
         objective = lambda w: float(np.dot(w - target, w - target))
         x0 = np.full(n_assets, 1.0 / n_assets, dtype=float)
 
-        solved = self._run_slsqp(objective, n_assets=n_assets, max_weight=max_weight, x0=x0)
+        solved, solver_success, solver_status, solver_message = self._run_slsqp_with_status(
+            objective,
+            n_assets=n_assets,
+            max_weight=max_weight,
+            x0=x0,
+        )
         if solved is None:
-            return self._safe_equal_fallback(all_assets, investable_assets)
+            return self._build_fallback_diagnostic_result(
+                all_assets=all_assets,
+                investable_assets=investable_assets,
+                objective_name="inverse_volatility",
+                n_assets=n_assets,
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status=solver_status,
+                solver_message=solver_message,
+                fallback_reason=solver_message or "SLSQP failed",
+            )
 
-        weights = pd.Series(solved, index=investable_assets, dtype=float)
-        return self._expand_to_all_assets(all_assets, weights)
+        optimized = pd.Series(solved, index=investable_assets, dtype=float)
+        weights = self._expand_to_all_assets(all_assets, optimized)
+        diagnostics = build_solver_diagnostics(
+            solver_success=solver_success,
+            solver_status=solver_status,
+            solver_message=solver_message,
+            objective_name="inverse_volatility",
+            n_assets=n_assets,
+            max_weight=max_weight,
+            weights=optimized,
+            feasibility_report=feasibility,
+            fallback_used=False,
+            result_is_optimized=True,
+        )
+        return self._diagnostic_result(weights, diagnostics)
 
-    def optimize_mean_variance(
+    def optimize_inverse_volatility(self, prices_df: pd.DataFrame, max_weight: float = 0.2) -> pd.Series:
+        """Optimize weights from inverse annualized volatility with bounded constraints."""
+        return self.optimize_inverse_volatility_with_diagnostics(
+            prices_df=prices_df,
+            max_weight=max_weight,
+        ).weights
+
+    def optimize_mean_variance_with_diagnostics(
         self,
         prices_df: pd.DataFrame,
         objective: str = "max_sharpe",
         max_weight: float = 0.2,
         risk_free_rate: float = 0.0,
-    ) -> pd.Series:
-        """Optimize mean-variance weights with scipy and constrained long-only bounds."""
+    ) -> OptimizerRunResult:
+        """Optimize mean-variance weights and return structured diagnostics."""
         all_assets = pd.Index(prices_df.columns) if isinstance(prices_df, pd.DataFrame) else pd.Index([])
-        if len(all_assets) == 0:
-            return pd.Series(dtype=float)
 
         try:
             max_weight = float(max_weight)
         except Exception:
             max_weight = 0.2
-        if max_weight <= 0:
-            return self._safe_equal_fallback(all_assets)
+        objective = (objective or "max_sharpe").strip().lower()
+
+        feasibility = check_optimizer_feasibility(
+            n_assets=len(all_assets),
+            max_weight=max_weight,
+        )
+        if len(all_assets) == 0 or not feasibility.is_feasible:
+            return self._build_empty_diagnostic_result(
+                objective_name=objective,
+                n_assets=len(all_assets),
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status="not_started",
+                solver_message="Pre-solver feasibility failed.",
+            )
 
         try:
             risk_free_rate = float(risk_free_rate)
@@ -334,22 +602,67 @@ class PortfolioOptimizer:
 
         prices, returns = self._prepare_returns(prices_df)
         if returns.empty:
-            return self._safe_equal_fallback(all_assets)
+            return self._build_fallback_diagnostic_result(
+                all_assets=all_assets,
+                investable_assets=all_assets,
+                objective_name=objective,
+                n_assets=len(all_assets),
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status="not_started",
+                solver_message="Insufficient return history for mean-variance optimization.",
+                fallback_reason="insufficient return history",
+            )
 
         investable_assets = returns.columns
         n_assets = len(investable_assets)
+        feasibility = check_optimizer_feasibility(
+            n_assets=n_assets,
+            max_weight=max_weight,
+        )
+        if not feasibility.is_feasible:
+            return self._build_empty_diagnostic_result(
+                objective_name=objective,
+                n_assets=n_assets,
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status="not_started",
+                solver_message="Pre-solver feasibility failed.",
+            )
+
         if n_assets == 1:
             single = pd.Series([1.0], index=investable_assets, dtype=float)
-            return self._expand_to_all_assets(all_assets, single)
-        if not self._is_feasible(n_assets, max_weight):
-            return self._safe_equal_fallback(all_assets, investable_assets)
+            weights = self._expand_to_all_assets(all_assets, single)
+            diagnostics = build_solver_diagnostics(
+                solver_success=True,
+                solver_status="deterministic_single_asset",
+                solver_message="Single investable asset receives full allocation without SLSQP.",
+                objective_name=objective,
+                n_assets=n_assets,
+                max_weight=max_weight,
+                weights=single,
+                feasibility_report=feasibility,
+                fallback_used=False,
+                result_is_optimized=True,
+            )
+            return self._diagnostic_result(weights, diagnostics)
 
         exp_returns = (returns.mean(skipna=True) * float(self.annualization_factor)).reindex(investable_assets)
         exp_returns = exp_returns.fillna(0.0)
 
         cov = self.calculate_covariance(prices.loc[:, investable_assets])
         if cov.empty:
-            return self._safe_equal_fallback(all_assets, investable_assets)
+            return self._build_fallback_diagnostic_result(
+                all_assets=all_assets,
+                investable_assets=investable_assets,
+                objective_name=objective,
+                n_assets=n_assets,
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status="not_started",
+                solver_message="Covariance matrix could not be formed.",
+                fallback_reason="missing covariance matrix",
+            )
         cov = cov.reindex(index=investable_assets, columns=investable_assets).fillna(0.0)
 
         cov_matrix = cov.to_numpy(dtype=float)
@@ -357,7 +670,6 @@ class PortfolioOptimizer:
         cov_matrix = cov_matrix + np.eye(n_assets) * 1e-8
 
         mu = exp_returns.to_numpy(dtype=float)
-        objective = (objective or "max_sharpe").strip().lower()
 
         def port_return(w: np.ndarray) -> float:
             return float(np.dot(w, mu))
@@ -374,9 +686,52 @@ class PortfolioOptimizer:
             objective_fn = lambda w: -((port_return(w) - risk_free_rate) / (port_vol(w) + 1e-12))
 
         x0 = np.full(n_assets, 1.0 / n_assets, dtype=float)
-        solved = self._run_slsqp(objective_fn, n_assets=n_assets, max_weight=max_weight, x0=x0)
+        solved, solver_success, solver_status, solver_message = self._run_slsqp_with_status(
+            objective_fn,
+            n_assets=n_assets,
+            max_weight=max_weight,
+            x0=x0,
+        )
         if solved is None:
-            return self._safe_equal_fallback(all_assets, investable_assets)
+            return self._build_fallback_diagnostic_result(
+                all_assets=all_assets,
+                investable_assets=investable_assets,
+                objective_name=objective,
+                n_assets=n_assets,
+                max_weight=max_weight,
+                feasibility_report=feasibility,
+                solver_status=solver_status,
+                solver_message=solver_message,
+                fallback_reason=solver_message or "SLSQP failed",
+            )
 
-        weights = pd.Series(solved, index=investable_assets, dtype=float)
-        return self._expand_to_all_assets(all_assets, weights)
+        optimized = pd.Series(solved, index=investable_assets, dtype=float)
+        weights = self._expand_to_all_assets(all_assets, optimized)
+        diagnostics = build_solver_diagnostics(
+            solver_success=solver_success,
+            solver_status=solver_status,
+            solver_message=solver_message,
+            objective_name=objective,
+            n_assets=n_assets,
+            max_weight=max_weight,
+            weights=optimized,
+            feasibility_report=feasibility,
+            fallback_used=False,
+            result_is_optimized=True,
+        )
+        return self._diagnostic_result(weights, diagnostics)
+
+    def optimize_mean_variance(
+        self,
+        prices_df: pd.DataFrame,
+        objective: str = "max_sharpe",
+        max_weight: float = 0.2,
+        risk_free_rate: float = 0.0,
+    ) -> pd.Series:
+        """Optimize mean-variance weights with scipy and constrained long-only bounds."""
+        return self.optimize_mean_variance_with_diagnostics(
+            prices_df=prices_df,
+            objective=objective,
+            max_weight=max_weight,
+            risk_free_rate=risk_free_rate,
+        ).weights

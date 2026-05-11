@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import ctypes
 import hashlib
 import itertools
 import json
@@ -24,6 +23,7 @@ from utils.statistics import (  # noqa: E402
     deflated_sharpe_ratio,
     effective_number_of_trials,
 )
+from utils.process import pid_is_running  # noqa: E402
 
 
 PROCESSED_DIR = os.path.join(PROJECT_ROOT, "data", "processed")
@@ -206,59 +206,7 @@ def _read_json_file(path: str) -> dict[str, Any]:
 
 
 def _pid_is_running(pid: int) -> bool:
-    if int(pid) <= 0:
-        return False
-    if os.name == "nt":
-        # Windows: avoid os.kill(pid, 0), which can terminate the target process.
-        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-        STILL_ACTIVE = 259
-        ERROR_ACCESS_DENIED = 5
-        ERROR_INVALID_PARAMETER = 87
-        try:
-            kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-            open_process = kernel32.OpenProcess
-            open_process.argtypes = [ctypes.c_uint32, ctypes.c_int, ctypes.c_uint32]
-            open_process.restype = ctypes.c_void_p
-            get_exit_code = kernel32.GetExitCodeProcess
-            get_exit_code.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint32)]
-            get_exit_code.restype = ctypes.c_int
-            close_handle = kernel32.CloseHandle
-            close_handle.argtypes = [ctypes.c_void_p]
-            close_handle.restype = ctypes.c_int
-
-            handle = open_process(PROCESS_QUERY_LIMITED_INFORMATION, 0, int(pid))
-            if not handle:
-                err = ctypes.get_last_error()
-                if err == ERROR_ACCESS_DENIED:
-                    return True
-                if err == ERROR_INVALID_PARAMETER:
-                    return False
-                return False
-
-            try:
-                exit_code = ctypes.c_uint32(0)
-                ok = get_exit_code(handle, ctypes.byref(exit_code))
-                if not ok:
-                    err = ctypes.get_last_error()
-                    if err == ERROR_ACCESS_DENIED:
-                        return True
-                    # Conservative: failed query should not break a potentially live lock owner.
-                    return True
-                return int(exit_code.value) == STILL_ACTIVE
-            finally:
-                close_handle(handle)
-        except Exception:
-            # Conservative fallback to avoid wrongly treating a live lock as stale.
-            return True
-    try:
-        os.kill(int(pid), 0)
-        return True
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    except OSError:
-        return False
+    return pid_is_running(pid)
 
 
 def _lock_age_seconds(payload: dict[str, Any]) -> float | None:

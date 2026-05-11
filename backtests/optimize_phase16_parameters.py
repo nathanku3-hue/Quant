@@ -31,6 +31,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from core import engine
 from strategies.alpha_engine import AlphaEngine, AlphaEngineConfig
 from strategies.investor_cockpit import InvestorCockpitStrategy
+from utils.process import pid_is_running
 
 
 PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
@@ -717,17 +718,7 @@ def _atomic_csv_write(mod15, df: pd.DataFrame, path: Path):
 
 
 def _is_pid_alive(pid: int) -> bool:
-    if int(pid) <= 0:
-        return False
-    try:
-        os.kill(int(pid), 0)
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    except OSError:
-        return False
-    return True
+    return pid_is_running(pid)
 
 
 def _read_lock_meta(lock_path: Path) -> dict | None:

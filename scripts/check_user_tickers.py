@@ -7,7 +7,7 @@ import numpy as np
 
 warnings.filterwarnings('ignore')
 
-tickers = ['CEG', 'NBIS', 'CLS', 'MRVL', 'RBRK']
+tickers = ['CEG', 'NBIS', 'CLS', 'MRVL', 'RBRK', 'ANET']
 
 def process_financials(t):
     try:

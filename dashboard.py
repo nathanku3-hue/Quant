@@ -7,7 +7,6 @@ import numpy as np
 import os
 import sys
 import json
-import signal
 import subprocess
 import datetime
 import atexit
@@ -15,18 +14,30 @@ from pathlib import Path
 from functools import reduce
 from filelock import FileLock
 from core.release_metadata import build_release_cache_fingerprint
-from core.dashboard_control_plane import coerce_proxy_numeric
 from core.dashboard_control_plane import derive_hf_proxy_data_health
 from core.dashboard_control_plane import ensure_payload_data_health
+from core.data_orchestrator import build_unified_data_cache_signature
+from core.data_orchestrator import clean_price_frame
 from core.data_orchestrator import get_macro_features
+from core.data_orchestrator import load_unified_data
 from views.regime_view import render_regime_banner_from_macro
 from views.auto_backtest_view import render_auto_backtest_view
 from views.optimizer_view import render_optimizer_view
 from views.drift_monitor_view import render_drift_monitor_view
 from views.shadow_portfolio_view import render_shadow_portfolio_view
+from views.page_registry import build_dashboard_navigation
+from strategies.portfolio_universe import (
+    DEFAULT_OPTIMIZER_UNIVERSE_POLICY,
+    build_optimizer_universe,
+)
+from strategies.scanner import build_price_technicals
+from strategies.scanner import calculate_macro_score
+from strategies.scanner import classify_breadth_status
+from strategies.scanner import enrich_scan_frame
 from core.drift_alert_manager import DriftAlertManager
 from core.drift_detector import DriftDetector
 from core.dashboard_escalation import initialize_escalation_manager
+from utils.process import pid_is_running
 # st_autorefresh removed in V3.10 — replaced by @st.fragment(run_every=)
 
 # --- Phase 2: Backtest Cache + PID Infrastructure ---
@@ -82,7 +93,9 @@ def is_backtest_running() -> tuple:
             except (ValueError, TypeError):
                 pass
 
-        os.kill(pid, 0)  # probe only, no signal
+        if not pid_is_running(pid):
+            BT_PID_FILE.unlink(missing_ok=True)
+            return False, "", 0.0
         return True, name, start_ts
     except (ProcessLookupError, ValueError, OSError):
         BT_PID_FILE.unlink(missing_ok=True)
@@ -93,13 +106,13 @@ def spawn_backtest(script_path: str, strategy_name: str) -> int:
     Uses CREATE_NEW_PROCESS_GROUP to prevent child KeyboardInterrupt
     from propagating to the parent Streamlit process on Windows.
     """
-    # Kill existing zombie first
+    # Fail closed on a live PID file. A stale file can point at a reused PID, so
+    # the dashboard must never terminate a process it cannot prove it owns.
     if BT_PID_FILE.exists():
-        try:
-            old_pid = int(BT_PID_FILE.read_text().strip().split("|")[0])
-            os.kill(old_pid, signal.SIGTERM)
-        except (ProcessLookupError, ValueError, OSError):
-            pass
+        running, running_name, _start_ts = is_backtest_running()
+        if running:
+            label = f" for {running_name}" if running_name else ""
+            raise RuntimeError(f"Backtest already running{label}; refusing to spawn another.")
     # Detach from parent console to prevent KeyboardInterrupt propagation
     flags = 0
     if sys.platform == "win32":
@@ -123,7 +136,7 @@ except ImportError:
     st.error("Engine modules not found. Please run from the root directory.")
     st.stop()
 
-st.set_page_config(page_title="Sovereign Cockpit", layout="wide", page_icon="🎯")
+st.set_page_config(page_title="Terminal Zero GodView", layout="wide", page_icon="🎯")
 
 # --- Persistence Layer ---
 CACHE_DIR = "data"
@@ -323,49 +336,8 @@ def fetch_auto_data():
 @st.cache_data(ttl=3600*4) # cache for 4 hours
 def fetch_macro_score():
     try:
-        # Fetch data robustly
-        df = yf.download(["^TNX", "VWEHX", "VFISX"], period="2y", progress=False)['Close']
-        if df.empty or len(df) < 200:
-            return None
-            
-        tnx = df['^TNX'].dropna()
-        vwehx = df['VWEHX'].dropna()
-        vfisx = df['VFISX'].dropna()
-        
-        # 1. Rate Velocity (Max pain at +0.50)
-        rate_val = 50.0 # Default max
-        if len(tnx) >= 63:
-            vel = tnx.iloc[-1] - tnx.iloc[-63]
-            if vel <= 0.0:
-                rate_val = 50.0
-            elif vel >= 0.50:
-                rate_val = 0.0
-            else:
-                rate_val = 50.0 * ((0.50 - vel) / 0.50)
-                
-        # 2. Credit Solvency (Calibrated Phase 57-F: Max +4.65%, Panic -2.0%)
-        credit_val = 50.0 # Default max
-        common_idx = vwehx.index.intersection(vfisx.index)
-        if len(common_idx) >= 200:
-            ratio = vwehx.loc[common_idx] / vfisx.loc[common_idx]
-            sma200 = ratio.rolling(200).mean().iloc[-1]
-            curr_ratio = ratio.iloc[-1]
-            
-            cdist = ((curr_ratio - sma200) / sma200) * 100
-            
-            if cdist >= 4.65:
-                credit_val = 50.0
-            elif cdist <= -2.0:
-                credit_val = 0.0
-            else:
-                credit_val = 50.0 * ((cdist - (-2.0)) / (4.65 - (-2.0)))
-                
-        total_score = round(rate_val + credit_val)
-        return {
-            "score": total_score,
-            "rate_score": round(rate_val),
-            "credit_score": round(credit_val)
-        }
+        df = yf.download(["^TNX", "VWEHX", "VFISX"], period="2y", progress=False)["Close"]
+        return calculate_macro_score(df)
     except Exception:
         return None
 
@@ -377,83 +349,47 @@ def get_breadth_status():
     Returns: status_label, status_color
     """
     try:
-        data = yf.download(['RSP', 'SPY'], period='6mo', progress=False)['Close']
-        if data.empty or len(data) < 50:
-            return "UNKNOWN (No Data)", "#888"
-            
-        spy = data['SPY']
-        rsp = data['RSP']
-        
-        spy_now = spy.iloc[-1].item() if not isinstance(spy.iloc[-1], float) else spy.iloc[-1]
-        spy_sma50 = spy.rolling(window=50).mean().iloc[-1].item() if not isinstance(spy.rolling(window=50).mean().iloc[-1], float) else spy.rolling(window=50).mean().iloc[-1]
-        
-        rsp_now = rsp.iloc[-1].item() if not isinstance(rsp.iloc[-1], float) else rsp.iloc[-1]
-        rsp_sma50 = rsp.rolling(window=50).mean().iloc[-1].item() if not isinstance(rsp.rolling(window=50).mean().iloc[-1], float) else rsp.rolling(window=50).mean().iloc[-1]
-        
-        if rsp_now > rsp_sma50:
-            return "HEALTHY (Broad)", "#00FFAA"
-        elif (spy_now > spy_sma50) and (rsp_now < rsp_sma50):
-            return "DIVERGENCE (Thinning)", "#FFD700"
-        else:
-            return "WEAK (Correction)", "#ff4444"
+        data = yf.download(["RSP", "SPY"], period="6mo", progress=False)["Close"]
+        return classify_breadth_status(data)
     except Exception:
         return "UNKNOWN (Error)", "#888"
 
 
+@st.cache_resource(show_spinner=False)
+def _load_unified_data_cached(
+    *,
+    mode: str,
+    top_n: int,
+    start_year: int,
+    universe_mode: str,
+    asof_date,
+    processed_dir: str,
+    static_dir: str,
+    data_signature: tuple[tuple[str, int | None, int | None], ...],
+):
+    # data_signature is part of the Streamlit cache key and invalidates on parquet updates.
+    return load_unified_data(
+        mode=mode,
+        top_n=top_n,
+        start_year=start_year,
+        universe_mode=universe_mode,
+        asof_date=asof_date,
+        processed_dir=processed_dir,
+        static_dir=static_dir,
+    )
+
+
 def get_prices_and_technicals(tickers):
-    data = {}
     if not tickers:
-        return data
+        return {}
     try:
-        # Batch fetch all tickers at once to save massive API latency
         hist_all = yf.download(tickers, period="1y", progress=False)
-        for t in tickers:
-            try:
-                if isinstance(hist_all.columns, pd.MultiIndex):
-                    # Multi-tickers
-                    hist = hist_all.xs(t, level=1, axis=1).dropna()
-                else:
-                    # Single ticker
-                    hist = hist_all.dropna()
-                    
-                if len(hist) >= 14:
-                    close = hist['Close']
-                    volatility_3m = close.pct_change().std() * (252 ** 0.5)
-                    current = close.iloc[-1].item()
-                    
-                    ema21 = close.ewm(span=21, adjust=False).mean().iloc[-1].item()
-                    sma50 = close.rolling(window=50, min_periods=10).mean().iloc[-1].item()
-                    sma200 = close.rolling(window=200, min_periods=10).mean().iloc[-1].item()
-                    # Calculate 14-Day ATR
-                    high_low = hist['High'] - hist['Low']
-                    high_close = (hist['High'] - close.shift(1)).abs()
-                    low_close = (hist['Low'] - close.shift(1)).abs()
-                    ranges = pd.concat([high_low, high_close, low_close], axis=1)
-                    true_range = ranges.max(axis=1)
-                    atr = true_range.ewm(alpha=1/14, adjust=False).mean().iloc[-1].item()
-                    
-                    # Calculate Convexity (Acceleration)
-                    ema10 = close.ewm(span=10, adjust=False).mean()
-                    slope = ema10.diff()
-                    avg_slope = slope.rolling(window=20).mean().iloc[-1].item() if not pd.isna(slope.rolling(window=20).mean().iloc[-1].item()) else 1.0
-                    curr_slope = slope.iloc[-1].item() if not pd.isna(slope.iloc[-1].item()) else 1.0
-                    
-                    if avg_slope <= 0:
-                        convexity = 1.0
-                    else:
-                        convexity = curr_slope / avg_slope
-                        
-                    data[t] = {"price": current, "ema21": ema21, "sma50": sma50, "sma200": sma200, "atr": atr, "convexity": convexity}
-                else:
-                    current = hist['Close'].iloc[-1].item() if ('Close' in hist and not hist.empty) else 0.0
-                    data[t] = {"price": current, "ema21": current, "sma50": current, "sma200": current, "atr": 0.0, "convexity": 1.0}
-            except Exception:
-                data[t] = {"price": 0.0, "ema21": 0.0, "sma50": 0.0, "sma200": 0.0, "atr": 0.0, "convexity": 1.0}
+        return build_price_technicals(hist_all, tickers)
     except Exception:
-        # Fallback if bulk fetch completely fails
-        for t in tickers:
-            data[t] = {"price": 0.0, "ema21": 0.0, "sma50": 0.0, "sma200": 0.0, "atr": 0.0, "convexity": 1.0}
-    return data
+        return {
+            t: {"price": 0.0, "ema21": 0.0, "sma50": 0.0, "sma200": 0.0, "atr": 0.0, "convexity": 1.0}
+            for t in tickers
+        }
 
 def run_and_save_scan():
     with st.spinner("Booting Sensors & Firing Physics Engine..."):
@@ -463,261 +399,16 @@ def run_and_save_scan():
         
         if df_scan is not None and not df_scan.empty:
             technicals = get_prices_and_technicals(df_scan['Ticker'].tolist())
-            
-            df_scan['Current_Price'] = df_scan['Ticker'].apply(lambda x: technicals.get(x, {}).get('price', 0.0))
-            df_scan['EMA21'] = df_scan['Ticker'].apply(lambda x: technicals.get(x, {}).get('ema21', 0.0))
-            df_scan['SMA50'] = df_scan['Ticker'].apply(lambda x: technicals.get(x, {}).get('sma50', 0.0))
-            df_scan['SMA200'] = df_scan['Ticker'].apply(lambda x: technicals.get(x, {}).get('sma200', 0.0))
-            df_scan['ATR'] = df_scan['Ticker'].apply(lambda x: technicals.get(x, {}).get('atr', 0.0))
-            df_scan['Convexity'] = df_scan['Ticker'].apply(lambda x: technicals.get(x, {}).get('convexity', 1.0))
-            
-            df_scan['Sector'] = df_scan['Ticker'].map(SECTOR_MAP).fillna('Unknown')
-            
             macro = fetch_macro_score()
-            macro_score = macro['score'] if macro else 50
-            macro_risk = (macro_score < 50)
-            
-            def calc_cluster(row):
-                if row['Current_Price'] <= 0: return "Unknown"
-                atr_ratio = row['ATR'] / row['Current_Price']
-                if atr_ratio < 0.025: return "I. Heavy"
-                elif atr_ratio <= 0.045: return "II. Sprinter"
-                else: return "III. Scout"
-            
-            df_scan['Cluster_Type'] = df_scan.apply(calc_cluster, axis=1)
-            
-            def get_sovereign_entry_price(row):
-                curr = row['Current_Price']
-                ema21 = row['EMA21']
-                sma50 = row['SMA50']
-                sma200 = row['SMA200']
-                ms = macro_score
-                ase = row['Score']
-                conv = row['Convexity']
-                ctype = str(row['Cluster_Type']).upper()
-                
-                if curr <= 0: return 0.0, "N/A"
-                
-                base_support = sma50
-                rationale = "50-SMA (Standard)"
-                
-                if ms >= 80 and ase >= 95 and conv <= 1.5:
-                    base_support = ema21
-                    rationale = "21-EMA (God Mode)"
-                
-                if conv > 1.5:
-                    base_support = sma50
-                    rationale = "50-SMA (Mania Protection)"
-                    
-                if ms < 50:
-                    base_support = sma50
-                    rationale = "50-SMA (Macro Defense)"
-                    
-                if curr < base_support:
-                    if base_support == ema21:
-                        base_support = sma50
-                        rationale = "50-SMA (21 Broken)"
-                    elif base_support == sma50:
-                        base_support = sma200
-                        rationale = "200-Day (Deep Value)"
-                    else:
-                        return 0.0, "NO SUPPORT"
-                        
-                # Phase 52-F: Max Flush Logic
-                if "SCOUT" in ctype:
-                    max_flush = 0.16
-                elif "SPRINTER" in ctype:
-                    max_flush = 0.11
-                else:
-                    max_flush = 0.05
-                    
-                # Phase 52-F: Quality Premium Logic
-                if ase >= 95:
-                    premium = 0.05
-                elif ase >= 90:
-                    premium = 0.03
-                else:
-                    premium = 0.00
-                    
-                net_buffer = max(0, max_flush - premium)
-                final_entry_price = base_support * (1 - net_buffer)
-                
-                return pd.Series([final_entry_price, rationale, max_flush, premium, base_support])
+            df_scan = enrich_scan_frame(
+                df_scan,
+                technicals=technicals,
+                sector_map=SECTOR_MAP,
+                proxy_db=PROXY_DB,
+                proxy_data=proxy_data,
+                macro=macro,
+            )
 
-            entries = df_scan.apply(get_sovereign_entry_price, axis=1)
-            df_scan[['Entry_Price', 'Support_Label', 'Max_Flush', 'Premium', 'Base_Support']] = entries
-            df_scan['Support_Price'] = df_scan['Entry_Price']
-            
-            def calc_dist(row):
-                if row['Entry_Price'] <= 0: return 0.0
-                return ((row['Current_Price'] / row['Entry_Price']) - 1) * 100
-            df_scan['Tech_Support_Dist'] = df_scan.apply(calc_dist, axis=1)
-            
-            def calc_tactics(row):
-                atr = row['ATR']
-                price = row['Current_Price']
-                dist_pct = row['Tech_Support_Dist']
-                entry = row['Entry_Price']
-                score = row['Score']
-                convexity = row['Convexity']
-                cluster = row['Cluster_Type']
-                
-                if atr <= 0 or price <= 0:
-                    return entry * 0.95, "N/A", cluster, 3.0
-                    
-                if "I. HEAVY" in str(cluster).upper():
-                    limit = 8.2
-                elif "II. SPRINTER" in str(cluster).upper():
-                    limit = 8.8
-                else:
-                    limit = 12.3
-                
-                active_limit = 6.0 if macro_risk else limit
-                
-                if score >= 90:
-                    # Phase 62-F Adaptive Governor
-                    accel_factor = max(0, convexity - 1.0)
-                    stretch_factor = max(0, dist_pct) / limit if limit > 0 else 0
-                    penalty_weight = 0.5 * accel_factor * stretch_factor
-                    multiplier = 3.0 / (1.0 + penalty_weight)
-                    
-                    # Hard Clamps
-                    multiplier = max(1.5, min(3.0, multiplier))
-                    
-                    if dist_pct > active_limit and multiplier < 2.5: # Consider it tight if < 2.5
-                        return price - (multiplier * atr), f"🚀 SUPER CYCLE | ⚠️ PARABOLIC MANIA -> TRAIL ({multiplier:.1f}x)", cluster, multiplier
-                    else:
-                        return entry - (multiplier * atr), f"🚀 SUPER CYCLE | LINEAR TREND -> KINETIC TRAIL ({multiplier:.1f}x)", cluster, multiplier
-                else:
-                    return entry - (3.0 * atr), "🛡️ STANDARD TREND | WIDE STOP ONLY (3.0x)", cluster, 3.0
-            
-            tactics = df_scan.apply(calc_tactics, axis=1)
-            df_scan['Stop_Loss'] = tactics.apply(lambda x: x[0])
-            df_scan['Tactical_Warning'] = tactics.apply(lambda x: x[1])
-            df_scan['Cluster'] = tactics.apply(lambda x: x[2])
-            df_scan['Multiplier'] = tactics.apply(lambda x: x[3])
-            
-            # Risk Distance calculation (use abs to prevent negative targets on trailing stops)
-            df_scan['Risk_Dist'] = abs(df_scan['Entry_Price'] - df_scan['Stop_Loss'])
-            
-            # 3:1 Asymmetric Return Target (3R Milestone)
-            df_scan['Target_Price'] = df_scan['Entry_Price'] + (3.0 * df_scan['Risk_Dist'])
-            
-            # --- Generate Tri-Column Proxy Data ---
-            def generate_tri_column(row):
-                sector = row['Sector']
-                score = row['Score']
-                price_dist = row['Tech_Support_Dist']
-                
-                proxy_info = PROXY_DB.get(sector, PROXY_DB['Software'])
-                
-                # 1. Type (Confidence)
-                p_type = proxy_info['type'] if proxy_info['type'] != 'None' else "[NO PROXY]"
-                p_conf = proxy_info['conf'] if proxy_info['type'] != 'None' else ""
-                
-                # 2. Content (Live Data)
-                p_content = "[NO DATA]"
-                actual_val = 0.0
-                if proxy_info['key'] and proxy_info['key'] in proxy_data:
-                    proxy_val_data = proxy_data[proxy_info['key']]
-                    raw_proxy_val = proxy_val_data.get('val') if isinstance(proxy_val_data, dict) else proxy_val_data
-                    actual_val = coerce_proxy_numeric(raw_proxy_val, default=0.0)
-                    span = proxy_val_data.get('span', proxy_info.get('span', '')) if isinstance(proxy_val_data, dict) else proxy_info.get('span', '')
-                    
-                    p_content = f"{proxy_info['name']} ({span}): {actual_val*100:+.1f}%"
-                    
-                    if proxy_info['type'] == 'Individual + Sector' and 'sec_name' in proxy_info:
-                        sec_key = proxy_info['sec_key']
-                        if sec_key in proxy_data:
-                            sec_val_data = proxy_data[sec_key]
-                            raw_sec_val = sec_val_data.get('val') if isinstance(sec_val_data, dict) else sec_val_data
-                            sec_val = coerce_proxy_numeric(raw_sec_val, default=0.0)
-                            sec_span = sec_val_data.get('span', proxy_info.get('sec_span', '')) if isinstance(sec_val_data, dict) else proxy_info.get('sec_span', '')
-                            p_content += f" | {proxy_info['sec_name']} ({sec_span}): {sec_val*100:+.1f}%"
-                        else:
-                            p_content += f" | {proxy_info['sec_name']} ({proxy_info.get('sec_span', '')}): Syncing"
-                elif proxy_info['name'] != '[NO PROXY]':
-                    p_content = f"{proxy_info['name']}: Awaiting Sync"
-                    
-                # 3. Signal (The Truth Table)
-                p_signal = "N/A"
-                if proxy_info['type'] != 'None':
-                    proxy_is_strong = actual_val > 0.02 # Generally up
-                    proxy_is_weak = actual_val <= 0.02  # Flat or down
-                    price_is_strong = price_dist > 5.0  # Ripping above MA50
-                    price_is_weak = price_dist <= 5.0   # Flat or below
-                    
-                    if proxy_is_strong and price_is_weak:
-                        p_signal = "COILED SPRING"
-                    elif proxy_is_strong and price_is_strong:
-                        p_signal = "CORRELATED"
-                    elif proxy_is_weak and price_is_strong:
-                        p_signal = "DIVERGING"
-                    elif proxy_is_weak and price_is_weak and score > 0:
-                        p_signal = "CORRECTING"
-                    elif proxy_is_weak and price_is_strong and score == 0:
-                        p_signal = "MISPRICED"
-                        
-                return pd.Series([p_type, p_conf, p_content, p_signal])
-
-            df_scan[['Proxy_Type', 'P_Value', 'Proxy_Content', 'Proxy_Signal']] = df_scan.apply(generate_tri_column, axis=1)
-
-            def generate_rating(row):
-                action = str(row['Action'])
-                score = row['Score']
-                dist = row['Tech_Support_Dist']
-                support = row['Support_Price']
-                label = row['Support_Label']
-                proxy_type = str(row['Proxy_Type'])
-                has_proxy = "[NO PROXY]" not in proxy_type
-                warning = str(row.get('Tactical_Warning', ''))
-                signal = str(row.get('Proxy_Signal', ''))
-                
-                if "KILL" in action:
-                    return "EXIT (Macro/Sector Rot)"
-                
-                if "PARABOLIC" in warning:
-                    return "EXIT / TRAIL TIGHT (Mania Top)"
-                
-                if "STRETCH" in warning:
-                    return "WAIT (Terminal Stretch)"
-                
-                elif score == 100:
-                    if not has_proxy:
-                        return "WATCH (Miss Proxy Cap)"
-                    elif dist > 5.0:
-                        label_short = label.split(" (")[0]
-                        return f"WATCH (Wait for {label_short}: ${support:.2f})"
-                    elif signal == "COILED SPRING":
-                        return "ENTER: STRONG BUY (Coiled)"
-                    elif dist >= -2.0:
-                        return "ENTER: BUY (Baseline)"
-                    else:
-                        return "ENTER: BUY"
-                        
-                elif score >= 90:
-                    return "WATCH / HOLD"
-                        
-                else:
-                    return "IGNORE"
-
-            df_scan['Rating'] = df_scan.apply(generate_rating, axis=1)
-            
-            # --- Leverage logic ---
-            def calc_leverage(row):
-                rating = str(row.get('Rating', ''))
-                convexity = row.get('Convexity', 1.0)
-                current_macro = macro['score'] if macro else 50
-                
-                if "STRONG BUY" in rating:
-                    if current_macro >= 80 and convexity <= 1.5:
-                        return "LEAPs"
-                    else:
-                        return "Avoid"
-                else:
-                    return ""
-            df_scan['Leverage'] = df_scan.apply(calc_leverage, axis=1)
-            
             # Save state
             payload = {
                 "timestamp": datetime.datetime.now().isoformat(),
@@ -749,14 +440,19 @@ sector_map_parquet = None
 fundamentals_wide = None
 
 try:
-    from core.data_orchestrator import load_unified_data
-
     # Attempt to load historical parquet data
-    unified_package = load_unified_data(
+    unified_package = _load_unified_data_cached(
         mode="historical",
         top_n=2000,
         start_year=2000,
         universe_mode="top_liquid",
+        asof_date=None,
+        processed_dir="./data/processed",
+        static_dir="./data/static",
+        data_signature=build_unified_data_cache_signature(
+            processed_dir="./data/processed",
+            static_dir="./data/static",
+        ),
     )
 
     prices_wide = unified_package.prices
@@ -841,8 +537,8 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-    st.divider()
-    st.header("🛡️ Hedge Harvester")
+def _render_hedge_harvester_section() -> None:
+    st.subheader("Hedge Harvester")
     hedge_ticker = st.text_input("Enter Ticker for Collar:", value="MU").upper()
     if st.button("Generate Option Yield"):
         with st.spinner(f"Pricing vol for {hedge_ticker}..."):
@@ -874,8 +570,8 @@ if os.path.exists(FRESH_FINDS_FILE):
         pass
 
 # --- Header ---
-st.title("🎯 The Sovereign Cockpit")
-st.markdown(f"Full Auto Execution Mode | Proxy Integrity Lock <span style='color:#888;font-size:0.9em;'>(Updated: {time_str})</span>", unsafe_allow_html=True)
+st.title("Terminal Zero GodView")
+st.markdown(f"Page Registry Shell | Proxy Integrity Lock <span style='color:#888;font-size:0.9em;'>(Updated: {time_str})</span>", unsafe_allow_html=True)
 health_ratio = float(data_health.get("degraded_ratio", 1.0))
 health_ratio = max(0.0, min(1.0, health_ratio))
 
@@ -1009,22 +705,12 @@ if drift_alert_manager is not None:
         # Keep optional sidebar indicator fail-safe.
         pass
 
-# --- Layout: TABS (Phase 3: Unified Command Center) ---
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-    "📊 Ticker Pool & Proxies",
-    "🏥 Data Health",           # NEW
-    "🔍 Drift Monitor",          # PROMOTED
-    "🔬 Daily Scan",
-    "📈 Backtest Lab",           # KEEP (moved to tab5)
-    "🧩 Modular Strategies",
-    "💼 Portfolio Builder",
-    "🛰️ Shadow Portfolio",
-])
+# --- DASH-1 page registry shell: new top-level pages, legacy content preserved below. ---
 
 # ==========================================
 # TAB 1: TICKER POOL & PROXY MONITOR
 # ==========================================
-with tab1:
+def _render_opportunities_page() -> None:
     col1, col2 = st.columns([3, 1])
     with col1:
         st.subheader("The Sovereign Pool (Proxy Gated)")
@@ -1168,7 +854,7 @@ with tab1:
 # ==========================================
 # TAB 2: DATA HEALTH MONITOR
 # ==========================================
-with tab2:
+def _render_data_health_section() -> None:
     st.header("🏥 Data Health Monitor")
 
     # Move Data Health content here (was lines 870-901)
@@ -1208,14 +894,24 @@ with tab2:
 # ==========================================
 # TAB 3: DRIFT MONITOR (PROMOTED)
 # ==========================================
-with tab3:
+def _render_drift_monitor_section() -> None:
     from views.drift_monitor_view import render_drift_monitor_view
-    render_drift_monitor_view()
+    if drift_alert_manager is None or drift_detector is None:
+        st.info("Drift monitor unavailable.")
+    else:
+        render_drift_monitor_view(
+            alert_manager=drift_alert_manager,
+            drift_detector=drift_detector,
+            baseline_weights=baseline_weights,
+            baseline_metadata=baseline_metadata,
+            live_weights=live_weights,
+            macro=macro_features if "macro_features" in globals() else pd.DataFrame(),
+        )
 
 # ==========================================
 # TAB 4: DAILY SCAN (CONFLUENCE)
 # ==========================================
-with tab4:
+def _render_daily_scan_section() -> None:
     st.subheader("Confluence Grid (Fundamental Resonance vs. Technical Extension)")
     
     lens_view = st.radio("Toggle Lens:", ["🌍 Macro View (Decluttered)", "🎯 Sniper View (High-Alpha Dispersion)"], horizontal=True)
@@ -1596,7 +1292,7 @@ def _render_legacy_backtest_table():
 # ==========================================
 # TAB 5: BACKTEST LAB (Interactive Runner)
 # ==========================================
-with tab5:
+def _render_backtest_lab_section() -> None:
     st.subheader("📈 Backtest Lab: Interactive Strategy Validation")
     st.markdown("Run backtests with PID tracking and live result display. "
                 "Uses institutional-grade TRI data for accurate performance measurement.")
@@ -1694,7 +1390,96 @@ STRATEGY_REGISTRY = {
     },
 }
 
-with tab6:
+_POOL_TO_UNIVERSE = {
+    "Score \u2265 90 (Super Cycle)": "Sovereign Pool",
+    "Score 100 (Flawless only)": "Sovereign Pool",
+    "Sovereign Pool (flush-adj)": "Sovereign Pool",
+    "Global (all sectors)": "Global (All Sectors)",
+    "Score \u2265 90 (2nd tier)": "Sovereign Pool",
+}
+
+
+def _format_backtest_percent(value: object, *, signed: bool) -> str:
+    if isinstance(value, (int, float)) and value != 0:
+        if signed:
+            return f"+{value*100:.1f}%" if value > 0 else f"{value*100:.1f}%"
+        return f"{value*100:.1f}%"
+    if isinstance(value, str):
+        return value
+    return ""
+
+
+def _build_strategy_matrix(
+    bt_cache: dict,
+    *,
+    running: bool,
+    running_name: str,
+) -> pd.DataFrame:
+    rows = []
+    first_pending_assigned = False
+    for name, strategy in STRATEGY_REGISTRY.items():
+        bt_reg = strategy.get("backtest", {})
+        cached = bt_cache.get(name, {})
+        cagr_raw = cached.get("cagr") or bt_reg.get("cagr")
+        dd_raw = cached.get("max_dd") or bt_reg.get("max_dd")
+        has_results = bool(cagr_raw)
+        if running and running_name == name:
+            bt_status = "Running..."
+        elif has_results:
+            bt_status = "Done"
+        elif bt_reg.get("sufficient"):
+            if not first_pending_assigned:
+                bt_status = "Next"
+                first_pending_assigned = True
+            else:
+                bt_status = "Pending"
+        else:
+            bt_status = "Insufficient"
+
+        rows.append({
+            "Strategy": name,
+            "Universe": _POOL_TO_UNIVERSE.get(
+                strategy.get("ticker_pool", ""),
+                "Global (All Sectors)",
+            ),
+            "Entry": strategy["entry"],
+            "Exit": strategy["exit"],
+            "Rules": strategy.get("rules", ""),
+            "CAGR": _format_backtest_percent(cagr_raw, signed=True),
+            "Max DD": _format_backtest_percent(dd_raw, signed=False),
+            "BT": bt_status,
+            "Core Math": strategy["core_math"],
+        })
+    return pd.DataFrame(rows)
+
+
+def _ensure_strategy_formula_cache() -> None:
+    if "formulas_loaded" not in st.session_state:
+        st.session_state.formula_cache = {
+            name: strat["core_math"] for name, strat in STRATEGY_REGISTRY.items()
+        }
+        st.session_state.formulas_loaded = True
+
+
+def _ensure_modular_strategy_state(
+    bt_cache: dict | None = None,
+    running: bool | None = None,
+    running_name: str | None = None,
+) -> pd.DataFrame:
+    _ensure_strategy_formula_cache()
+    cache = bt_cache if bt_cache is not None else read_bt_cache()
+    if running is None or running_name is None:
+        running, running_name, _bt_start_ts = is_backtest_running()
+    if "strat_matrix_v3" not in st.session_state:
+        st.session_state.strat_matrix_v3 = _build_strategy_matrix(
+            cache,
+            running=bool(running),
+            running_name=str(running_name or ""),
+        )
+    return st.session_state.strat_matrix_v3
+
+
+def _render_modular_strategies_section() -> None:
     st.header("🧩 Modular Strategies Matrix")
     st.markdown("Click a strategy row to view its physics. Edit below. All rows filter with implicit AND.")
 
@@ -1714,14 +1499,6 @@ with tab6:
     _V3_CACHE_VERSION = _release_bound_cache_version(_V3_VERSION)
     ALL_RULES = list({s.get("rules", "") for s in STRATEGY_REGISTRY.values() if s.get("rules")})
     UNIVERSES = ["Global (All Sectors)", "S&P 500", "US Tech Sector", "Sovereign Pool", "LEAP Eligible"]
-    # Map ticker_pool descriptions to Universe options
-    _POOL_TO_UNIVERSE = {
-        "Score \u2265 90 (Super Cycle)": "Sovereign Pool",
-        "Score 100 (Flawless only)": "Sovereign Pool",
-        "Sovereign Pool (flush-adj)": "Sovereign Pool",
-        "Global (all sectors)": "Global (All Sectors)",
-        "Score \u2265 90 (2nd tier)": "Sovereign Pool",
-    }
     if st.session_state.get("_v3_ver") != _V3_CACHE_VERSION:
         st.session_state.pop("strat_matrix_v3", None)
         st.session_state["_v3_ver"] = _V3_CACHE_VERSION
@@ -1731,50 +1508,11 @@ with tab6:
     running, running_name, bt_start_ts = is_backtest_running()
 
     # --- 1. Build DataFrame from registry ---
-    if 'strat_matrix_v3' not in st.session_state:
-        rows = []
-        first_pending_assigned = False
-        for name, s in STRATEGY_REGISTRY.items():
-            bt_reg = s.get("backtest", {})
-            cached = bt_cache.get(name, {})
-            cagr_raw = cached.get("cagr") or bt_reg.get("cagr")
-            dd_raw = cached.get("max_dd") or bt_reg.get("max_dd")
-            if isinstance(cagr_raw, (int, float)) and cagr_raw != 0:
-                cagr_val = f"+{cagr_raw*100:.1f}%" if cagr_raw > 0 else f"{cagr_raw*100:.1f}%"
-            elif isinstance(cagr_raw, str):
-                cagr_val = cagr_raw
-            else:
-                cagr_val = ""
-            if isinstance(dd_raw, (int, float)) and dd_raw != 0:
-                dd_val = f"{dd_raw*100:.1f}%"
-            elif isinstance(dd_raw, str):
-                dd_val = dd_raw
-            else:
-                dd_val = ""
-            has_results = bool(cagr_raw)
-            if running and running_name == name:
-                bt_status = "Running..."
-            elif has_results:
-                bt_status = "Done"
-            elif bt_reg.get("sufficient"):
-                if not first_pending_assigned:
-                    bt_status = "Next"
-                    first_pending_assigned = True
-                else:
-                    bt_status = "Pending"
-            else:
-                bt_status = "Insufficient"
-            rows.append({
-                "Strategy": name,
-                "Universe": _POOL_TO_UNIVERSE.get(s.get("ticker_pool", ""), "Global (All Sectors)"),
-                "Entry": s["entry"], "Exit": s["exit"],
-                "Rules": s.get("rules", ""),
-                "CAGR": cagr_val, "Max DD": dd_val, "BT": bt_status,
-                "Core Math": s["core_math"],
-            })
-        st.session_state.strat_matrix_v3 = pd.DataFrame(rows)
-
-    base_df = st.session_state.strat_matrix_v3
+    base_df = _ensure_modular_strategy_state(
+        bt_cache,
+        running=running,
+        running_name=running_name,
+    )
     display_cols = ["Strategy", "Universe", "Entry", "Exit", "Rules", "CAGR", "Max DD", "BT"]
 
     # --- Run Next Backtest: fragment-based polling (no fog) ---
@@ -1809,10 +1547,13 @@ with tab6:
                         next_script = f"scripts/{bt_info['script']}"
                         break
                 if next_name and next_script:
-                    pid = spawn_backtest(next_script, next_name)
-                    st.session_state["_bt_was_running"] = True
-                    st.session_state.pop("strat_matrix_v3", None)
-                    st.rerun()
+                    try:
+                        pid = spawn_backtest(next_script, next_name)
+                        st.session_state["_bt_was_running"] = True
+                        st.session_state.pop("strat_matrix_v3", None)
+                        st.rerun()
+                    except RuntimeError as exc:
+                        st.warning(str(exc))
                 else:
                     st.warning("No pending backtests to run.")
 
@@ -1959,40 +1700,266 @@ with tab6:
 # ==========================================
 # TAB 7: PORTFOLIO BUILDER (Optional PM Tools)
 # ==========================================
-with tab7:
-    st.subheader("💼 Portfolio Builder: Mean-Variance Optimization")
-    st.markdown("Construct optimal portfolios with sector constraints and regime-aware allocation.")
+def _clean_portfolio_price_frame(prices: pd.DataFrame) -> pd.DataFrame:
+    return clean_price_frame(prices)
 
-    # Check if parquet data + fundamentals available
+
+def _extract_yfinance_close(raw: pd.DataFrame, tickers: tuple[str, ...]) -> pd.DataFrame:
+    if not isinstance(raw, pd.DataFrame) or raw.empty:
+        return pd.DataFrame()
+    close = pd.DataFrame()
+    if isinstance(raw.columns, pd.MultiIndex):
+        levels_0 = set(raw.columns.get_level_values(0))
+        levels_1 = set(raw.columns.get_level_values(1))
+        if "Close" in levels_0:
+            close = raw["Close"]
+        elif "Adj Close" in levels_0:
+            close = raw["Adj Close"]
+        elif "Close" in levels_1:
+            close = raw.xs("Close", axis=1, level=1)
+        elif "Adj Close" in levels_1:
+            close = raw.xs("Adj Close", axis=1, level=1)
+    elif "Close" in raw.columns:
+        close = raw["Close"]
+    elif "Adj Close" in raw.columns:
+        close = raw["Adj Close"]
+
+    if isinstance(close, pd.Series):
+        close = close.to_frame(name=tickers[0] if tickers else "Close")
+    if not isinstance(close, pd.DataFrame) or close.empty:
+        return pd.DataFrame()
+    close.columns = [str(col).upper() for col in close.columns]
+    return _clean_portfolio_price_frame(close)
+
+
+@st.cache_data(ttl=900, show_spinner=False)
+def _download_ytd_close_prices(tickers: tuple[str, ...], start_iso: str) -> pd.DataFrame:
+    if not tickers:
+        return pd.DataFrame()
+    raw = yf.download(
+        list(tickers),
+        start=start_iso,
+        progress=False,
+        auto_adjust=True,
+        threads=True,
+    )
+    return _extract_yfinance_close(raw, tickers)
+
+
+def _current_optimizer_weights() -> pd.Series:
+    raw = st.session_state.get("optimizer_weights")
+    if isinstance(raw, pd.Series):
+        weights = raw.copy()
+    elif isinstance(raw, dict):
+        weights = pd.Series(raw, dtype="float64")
+    else:
+        return pd.Series(dtype="float64")
+    weights = pd.to_numeric(weights, errors="coerce").replace([np.inf, -np.inf], np.nan)
+    weights = weights.dropna()
+    weights = weights[weights > 0]
+    if weights.empty or float(weights.sum()) <= 0:
+        return pd.Series(dtype="float64")
+    return weights / float(weights.sum())
+
+
+def _weights_by_ticker(weights: pd.Series) -> pd.Series:
+    ticker_lookup = ticker_map_parquet if isinstance(ticker_map_parquet, dict) else {}
+    rows: dict[str, float] = {}
+    for permno, weight in weights.items():
+        ticker = ticker_lookup.get(permno)
+        if ticker is None:
+            try:
+                ticker = ticker_lookup.get(int(permno))
+            except Exception:
+                ticker = None
+        if ticker:
+            rows[str(ticker).upper()] = rows.get(str(ticker).upper(), 0.0) + float(weight)
+    out = pd.Series(rows, dtype="float64")
+    if out.empty or float(out.sum()) <= 0:
+        return pd.Series(dtype="float64")
+    return out / float(out.sum())
+
+
+def _weighted_equity_curve(
+    prices: pd.DataFrame,
+    weights: pd.Series,
+    name: str,
+) -> pd.Series | None:
+    prices = _clean_portfolio_price_frame(prices)
+    if prices.empty or weights.empty:
+        return None
+    cols = [col for col in weights.index if col in prices.columns]
+    if not cols:
+        return None
+    aligned_prices = prices.reindex(columns=cols).ffill().dropna(how="all")
+    if aligned_prices.shape[0] < 2:
+        return None
+    aligned_weights = weights.reindex(cols).fillna(0.0)
+    if float(aligned_weights.sum()) <= 0:
+        return None
+    aligned_weights = aligned_weights / float(aligned_weights.sum())
+    daily_returns = aligned_prices.pct_change(fill_method=None).iloc[1:]
+    weighted_returns = daily_returns.mul(aligned_weights, axis=1).sum(axis=1, min_count=1)
+    weighted_returns = weighted_returns.dropna()
+    if weighted_returns.empty:
+        return None
+    equity = (1 + weighted_returns).cumprod()
+    equity.name = name
+    return equity
+
+
+def _build_portfolio_ytd_equity(
+    weights: pd.Series,
+    ytd_start: pd.Timestamp,
+) -> tuple[pd.Series | None, pd.Timestamp | None, str]:
+    start_iso = ytd_start.strftime("%Y-%m-%d")
+    ticker_weights = _weights_by_ticker(weights)
+    if not ticker_weights.empty:
+        live_prices = _download_ytd_close_prices(tuple(ticker_weights.index), start_iso)
+        live_equity = _weighted_equity_curve(
+            prices=live_prices,
+            weights=ticker_weights,
+            name="Portfolio",
+        )
+        if live_equity is not None:
+            return live_equity, live_prices.index.max(), "optimized live"
+
+    if not weights.empty and parquet_data_available and not prices_wide.empty:
+        ytd_prices = prices_wide.loc[prices_wide.index >= ytd_start]
+        ytd_prices = ytd_prices.reindex(columns=weights.index)
+        local_equity = _weighted_equity_curve(
+            prices=ytd_prices,
+            weights=weights,
+            name="Portfolio",
+        )
+        if local_equity is not None:
+            return local_equity, _clean_portfolio_price_frame(ytd_prices).index.max(), "optimized local"
+
+    if parquet_data_available and not prices_wide.empty:
+        ytd_prices = prices_wide.loc[prices_wide.index >= ytd_start].copy()
+        if not ytd_prices.empty and ytd_prices.shape[1] > 0:
+            ew = pd.Series(1.0 / ytd_prices.shape[1], index=ytd_prices.columns)
+            ew_equity = _weighted_equity_curve(ytd_prices, ew, "Portfolio (EW)")
+            if ew_equity is not None:
+                return ew_equity, _clean_portfolio_price_frame(ytd_prices).index.max(), "equal-weight local"
+
+    return None, None, "unavailable"
+
+
+def _render_portfolio_ytd_chart() -> None:
+    """Render Portfolio YTD performance vs SPY and QQQ benchmarks."""
+    st.subheader("📈 YTD Performance")
+
+    ytd_start = pd.Timestamp(datetime.datetime.now().year, 1, 1)
+    weights = _current_optimizer_weights()
+    portfolio_equity, portfolio_latest, portfolio_source = _build_portfolio_ytd_equity(
+        weights=weights,
+        ytd_start=ytd_start,
+    )
+
+    benchmark_equity = {}
+    benchmark_latest = None
+    try:
+        bench_data = _download_ytd_close_prices(("SPY", "QQQ"), ytd_start.strftime("%Y-%m-%d"))
+        if not bench_data.empty:
+            benchmark_latest = bench_data.index.max()
+            bench_returns = bench_data.pct_change(fill_method=None).iloc[1:]
+            for col in ["SPY", "QQQ"]:
+                if col in bench_returns.columns:
+                    eq = (1 + bench_returns[col]).cumprod()
+                    benchmark_equity[col] = eq
+    except Exception:
+        pass
+
+    if not benchmark_equity and portfolio_equity is None:
+        st.info("No YTD data available yet. Benchmarks and portfolio data will appear once market data is loaded.")
+        return
+
+    # --- Build Plotly chart ---
+    fig = go.Figure()
+
+    if portfolio_equity is not None:
+        fig.add_trace(go.Scatter(
+            x=portfolio_equity.index,
+            y=(portfolio_equity - 1) * 100,
+            mode="lines",
+            name=portfolio_equity.name,
+            line=dict(color="#00FFAA", width=2.5),
+        ))
+
+    color_map = {"SPY": "#6366F1", "QQQ": "#F59E0B"}
+    for ticker, eq in benchmark_equity.items():
+        fig.add_trace(go.Scatter(
+            x=eq.index,
+            y=(eq - 1) * 100,
+            mode="lines",
+            name=ticker,
+            line=dict(color=color_map.get(ticker, "#888888"), width=1.8, dash="dot"),
+        ))
+
+    fig.add_hline(y=0, line_dash="dash", line_color="#555555", line_width=0.8)
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=420,
+        yaxis_title="YTD Return (%)",
+        xaxis_title="",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(l=40, r=20, t=30, b=30),
+        hovermode="x unified",
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    metric_cols = st.columns(3 if portfolio_equity is not None else 2)
+    col_idx = 0
+    if portfolio_equity is not None:
+        pf_ret = float(portfolio_equity.iloc[-1] - 1) * 100 if len(portfolio_equity) > 0 else 0.0
+        with metric_cols[col_idx]:
+            st.metric(portfolio_equity.name, f"{pf_ret:+.2f}%")
+        col_idx += 1
+    for ticker in ["SPY", "QQQ"]:
+        if ticker in benchmark_equity and col_idx < len(metric_cols):
+            eq = benchmark_equity[ticker]
+            ret = float(eq.iloc[-1] - 1) * 100 if len(eq) > 0 else 0.0
+            with metric_cols[col_idx]:
+                st.metric(ticker, f"{ret:+.2f}%")
+            col_idx += 1
+
+    latest_dates = [d for d in [portfolio_latest, benchmark_latest] if d is not None]
+    if latest_dates:
+        latest_date = max(latest_dates)
+        st.caption(f"Stock prices refreshed through {latest_date.date()} ({portfolio_source}).")
+
+
+def _render_portfolio_builder_section() -> None:
     if parquet_data_available and fundamentals_wide is not None:
         try:
-            # Extract selected tickers from current scan results
-            selected_tickers = list(df_scan["Ticker"].values) if 'Ticker' in df_scan.columns else []
-
-            st.success("✅ **Fundamentals Data Active** - Portfolio Builder enabled")
-
-            # Activate Portfolio Builder
+            universe = build_optimizer_universe(
+                df_scan=df_scan,
+                ticker_map=ticker_map_parquet,
+                prices_wide=prices_wide,
+                policy=DEFAULT_OPTIMIZER_UNIVERSE_POLICY,
+            )
             render_optimizer_view(
                 prices_wide=prices_wide,
                 ticker_map=ticker_map_parquet,
                 sector_map=sector_map_parquet,
-                selected_tickers=selected_tickers[:20],  # Limit to top 20 for performance
+                selected_permnos=universe.included_permnos,
+                universe_audit=universe,
             )
-
         except Exception as e:
-            st.error(f"⚠️ Portfolio Builder activation failed: {type(e).__name__}: {e}")
-            st.caption("Falling back to placeholder mode...")
-            _render_portfolio_builder_placeholder()
-
+            st.error(f"Optimizer unavailable: {type(e).__name__}: {e}")
     else:
-        # Placeholder mode (fundamentals not available)
         _render_portfolio_builder_placeholder()
+
+    st.divider()
+    _render_portfolio_ytd_chart()
 
 
 # ==========================================
 # TAB 8: SHADOW PORTFOLIO
 # ==========================================
-with tab8:
+def _render_shadow_portfolio_section() -> None:
     try:
         render_shadow_portfolio_view()
     except Exception as exc:
@@ -2000,33 +1967,12 @@ with tab8:
 
 
 def _render_portfolio_builder_placeholder():
-    """Render Portfolio Builder placeholder when fundamentals unavailable."""
-    st.info("🔧 **Portfolio Builder: Data Dependency Not Met**\n\n"
-            "Portfolio optimization requires fundamentals data (sector classifications, "
-            "market cap, financial ratios). \n\n"
-            "**Current Status:** "
-            + ("Parquet data loaded but fundamentals missing. " if parquet_data_available else "Parquet data unavailable. ")
-            + "Run fundamentals updater to enable.\n\n"
-            "**Alternative:** Use Tab 4 (Modular Strategies) for signal-based allocation.")
-
-    # Placeholder preview
-    st.divider()
-    st.caption("**Preview: Portfolio Builder Features (Available When Fundamentals Loaded)**")
-
-    preview_cols = st.columns(3)
-    with preview_cols[0]:
-        st.markdown("**📊 Mean-Variance Optimization**")
-        st.caption("- Efficient frontier calculation\n- Max Sharpe / Min Vol portfolios\n- Custom risk tolerance slider")
-
-    with preview_cols[1]:
-        st.markdown("**🎯 Constraint Management**")
-        st.caption("- Sector exposure limits\n- Position size caps\n- Long-only / long-short toggle")
-
-    with preview_cols[2]:
-        st.markdown("**🧬 Regime Integration**")
-        st.caption("- Auto-scale exposure by FR-041 state\n- Defensive tilt in RED regime\n- Leverage boost in GREEN regime")
-
-
+    """Render optimizer fallback when fundamentals unavailable."""
+    base_df = _ensure_modular_strategy_state()
+    st.info(
+        "Portfolio optimization requires fundamentals data. "
+        "Run fundamentals updater to enable, or use Research Lab / Modular Strategies."
+    )
 
     # --- 5. Combined Execution Logic ---
     st.divider()
@@ -2081,4 +2027,65 @@ def _render_portfolio_builder_placeholder():
             qual_view = qualifying[qual_cols].copy()
             qual_view["Current_Price"] = qual_view["Current_Price"].map("${:.2f}".format)
             st.dataframe(qual_view, use_container_width=True, hide_index=True)
+
+
+def _render_command_center_page() -> None:
+    _render_placeholder_page("Command Center")
+
+
+def _render_placeholder_page(title: str) -> None:
+    st.header(title)
+    st.info("DASH-1 shell placeholder. Content design is held for a later approved dashboard phase.")
+
+
+def _render_portfolio_allocation_page() -> None:
+    st.header("Portfolio & Allocation")
+    _render_portfolio_builder_section()
+    st.divider()
+    _render_shadow_portfolio_section()
+
+
+def _render_research_lab_page() -> None:
+    st.header("Research Lab")
+    selected_section = st.radio(
+        "Research workflow",
+        ["Daily Scan", "Backtest Lab", "Modular Strategies"],
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    if selected_section == "Daily Scan":
+        _render_daily_scan_section()
+    elif selected_section == "Backtest Lab":
+        _render_backtest_lab_section()
+    else:
+        _render_modular_strategies_section()
+
+
+def _render_settings_ops_page() -> None:
+    st.header("Settings & Ops")
+    selected_section = st.radio(
+        "Ops workflow",
+        ["Data Health", "Drift Monitor"],
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    if selected_section == "Data Health":
+        _render_data_health_section()
+    else:
+        _render_drift_monitor_section()
+
+
+page = build_dashboard_navigation(
+    {
+        "Command Center": _render_command_center_page,
+        "Opportunities": _render_opportunities_page,
+        "Thesis Card": lambda: _render_placeholder_page("Thesis Card"),
+        "Market Behavior": lambda: _render_placeholder_page("Market Behavior"),
+        "Entry & Hold Discipline": lambda: _render_placeholder_page("Entry & Hold Discipline"),
+        "Portfolio & Allocation": _render_portfolio_allocation_page,
+        "Research Lab": _render_research_lab_page,
+        "Settings & Ops": _render_settings_ops_page,
+    }
+)
+page.run()
 

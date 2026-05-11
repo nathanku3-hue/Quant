@@ -14,7 +14,6 @@ Features:
 """
 
 import datetime
-import ctypes
 import glob
 import logging
 import os
@@ -32,6 +31,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 from utils.parallel import parallel_execute  # noqa: E402
+from utils.process import pid_is_running  # noqa: E402
 
 PROCESSED_DIR = os.path.join(PROJECT_ROOT, "data", "processed")
 PATCH_PATH = os.path.join(PROCESSED_DIR, "yahoo_patch.parquet")
@@ -107,59 +107,7 @@ def _parse_lock_payload(payload: str) -> tuple[int, int, str]:
 
 
 def _pid_is_running(pid: int) -> bool:
-    if int(pid) <= 0:
-        return False
-    if os.name == "nt":
-        # Windows-safe probe: never use os.kill(pid, 0) here.
-        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-        STILL_ACTIVE = 259
-        ERROR_ACCESS_DENIED = 5
-        ERROR_INVALID_PARAMETER = 87
-        try:
-            kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-            open_process = kernel32.OpenProcess
-            open_process.argtypes = [ctypes.c_uint32, ctypes.c_int, ctypes.c_uint32]
-            open_process.restype = ctypes.c_void_p
-            get_exit_code = kernel32.GetExitCodeProcess
-            get_exit_code.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint32)]
-            get_exit_code.restype = ctypes.c_int
-            close_handle = kernel32.CloseHandle
-            close_handle.argtypes = [ctypes.c_void_p]
-            close_handle.restype = ctypes.c_int
-
-            handle = open_process(PROCESS_QUERY_LIMITED_INFORMATION, 0, int(pid))
-            if not handle:
-                err = ctypes.get_last_error()
-                if err == ERROR_ACCESS_DENIED:
-                    return True
-                if err == ERROR_INVALID_PARAMETER:
-                    return False
-                return False
-
-            try:
-                exit_code = ctypes.c_uint32(0)
-                ok = get_exit_code(handle, ctypes.byref(exit_code))
-                if not ok:
-                    err = ctypes.get_last_error()
-                    if err == ERROR_ACCESS_DENIED:
-                        return True
-                    return True
-                return int(exit_code.value) == STILL_ACTIVE
-            finally:
-                close_handle(handle)
-        except Exception:
-            # Conservative fallback to avoid deleting a potentially live owner lock.
-            return True
-
-    try:
-        os.kill(int(pid), 0)
-        return True
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    except OSError:
-        return False
+    return pid_is_running(pid)
 
 
 def _update_lock_owner_live(*, allow_self_owner: bool = False) -> bool:
