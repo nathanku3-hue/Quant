@@ -1,0 +1,62 @@
+{
+  "allowed_use": [
+    "macro context",
+    "future regime panel source validation",
+    "liquidity / rates / credit context",
+    "GodView macro-factor context"
+  ],
+  "api_key_required": "true_for_live_api",
+  "asof_ts": "2024-03-01",
+  "dataset_type": "macro_series",
+  "date_range": {
+    "end": "2024-03-01",
+    "start": "2024-01-01"
+  },
+  "forbidden_use": [
+    "live API call",
+    "API key handling",
+    "macro regime score",
+    "factor regime score",
+    "signal ranking",
+    "alert emission",
+    "broker call",
+    "state machine input"
+  ],
+  "manifest_schema_version": "1.0.0",
+  "observed_estimated_or_inferred": "observed",
+  "official_source_url": "https://fred.stlouisfed.org/",
+  "primary_key_fields": [
+    "series_id",
+    "date",
+    "realtime_start",
+    "realtime_end"
+  ],
+  "provider": "fred",
+  "provider_feed": "fred_or_alfred",
+  "retrieved_at_or_static_fixture_created_at": "2026-05-09",
+  "row_count": 9,
+  "schema_columns": [
+    "series_id",
+    "date",
+    "value",
+    "realtime_start",
+    "realtime_end",
+    "asof_ts",
+    "official_source_row_locator"
+  ],
+  "schema_version": "1.0.0",
+  "series_category": {
+    "BAA10Y": "credit spread",
+    "DGS10": "rates / yields",
+    "M2SL": "liquidity / money supply"
+  },
+  "series_id": [
+    "DGS10",
+    "M2SL",
+    "BAA10Y"
+  ],
+  "sha256": "f1a1b8b378d92a8fcb38f008967f6e97afb6b3b1a08ee6e930e8ac64070c9b08",
+  "source_name": "FRED / ALFRED",
+  "source_quality": "public_official_observed",
+  "terms_note": "FRED and ALFRED are official Federal Reserve Bank of St. Louis economic data services. This is a tiny static fixture only; live API use requires a registered API key and separate provider approval."
+}

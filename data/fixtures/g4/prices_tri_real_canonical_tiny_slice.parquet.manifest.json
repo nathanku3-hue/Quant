@@ -1,0 +1,51 @@
+{
+  "artifact_path": "E:\\Code\\Quant\\data\\fixtures\\g4\\prices_tri_real_canonical_tiny_slice.parquet",
+  "asof_ts": "2026-05-09T08:43:53Z",
+  "date_range": {
+    "end": "2024-02-29",
+    "start": "2024-01-02"
+  },
+  "extra": {
+    "dataset_name": "prices_tri_real_canonical_tiny_slice",
+    "primary_key": [
+      "date",
+      "permno"
+    ],
+    "source_artifact": "data/processed/prices_tri.parquet",
+    "source_artifact_sha256": "c7150b9c0a1ce6aaaaf45d9abaec2e0ebea01098f6b26425c674031cb761712e",
+    "source_slice": {
+      "daily_bars_only": true,
+      "date_end": "2024-02-29",
+      "date_start": "2024-01-02",
+      "sidecar_required": false,
+      "tickers": [
+        "MSFT",
+        "ORCL",
+        "NVDA"
+      ]
+    },
+    "source_tier": "tier0",
+    "symbol_count": 3
+  },
+  "license_scope": "internal_research_validation",
+  "manifest_created_at_utc": "2026-05-09T08:43:53Z",
+  "manifest_schema_version": "1.0.0",
+  "provider": "terminal_zero",
+  "provider_feed": "tri_repaired_prices",
+  "row_count": 123,
+  "schema": {
+    "columns": [
+      "date",
+      "permno",
+      "ticker",
+      "tri",
+      "total_ret",
+      "legacy_adj_close",
+      "raw_close",
+      "volume"
+    ]
+  },
+  "schema_version": "1.0.0",
+  "sha256": "23e5ab23030c5f56018580968afc0dbcbde18f3bdc7ce1914e73c933e9d5e9a7",
+  "source_quality": "canonical"
+}

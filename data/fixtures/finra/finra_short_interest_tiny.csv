@@ -1,0 +1,4 @@
+settlement_date,ticker,issue_name,short_interest,average_daily_volume,days_to_cover,official_source_row_locator
+2026-04-15,AAPL,Apple Inc. Common Stock,134422787,39674165,3.39,shrt20260415.csv:symbolCode=AAPL
+2026-04-15,TSLA,"Tesla, Inc. Common Stock",71106902,70796421,1.00,shrt20260415.csv:symbolCode=TSLA
+2026-04-15,GME,GameStop Corp. Class A,61907606,6610420,9.37,shrt20260415.csv:symbolCode=GME

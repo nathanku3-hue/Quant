@@ -1,0 +1,67 @@
+{
+  "entity": {
+    "cik": "0000320193",
+    "entity_name": "Apple Inc.",
+    "ticker_if_known": "AAPL"
+  },
+  "filings": [
+    {
+      "accession_number": "0001140361-26-020298",
+      "cik": "0000320193",
+      "filing_date": "2026-05-08",
+      "form": "4",
+      "primary_document": "xslF345X06/form4.xml",
+      "primary_key": "0000320193|0001140361-26-020298|4|2026-05-08",
+      "raw_locator": "https://data.sec.gov/submissions/CIK0000320193.json",
+      "report_date": "2026-05-06"
+    },
+    {
+      "accession_number": "0001921094-26-000446",
+      "cik": "0000320193",
+      "filing_date": "2026-05-06",
+      "form": "144",
+      "primary_document": "xsl144X01/primary_doc.xml",
+      "primary_key": "0000320193|0001921094-26-000446|144|2026-05-06",
+      "raw_locator": "https://data.sec.gov/submissions/CIK0000320193.json",
+      "report_date": ""
+    },
+    {
+      "accession_number": "0001950047-26-004044",
+      "cik": "0000320193",
+      "filing_date": "2026-05-05",
+      "form": "144",
+      "primary_document": "xsl144X01/primary_doc.xml",
+      "primary_key": "0000320193|0001950047-26-004044|144|2026-05-05",
+      "raw_locator": "https://data.sec.gov/submissions/CIK0000320193.json",
+      "report_date": ""
+    },
+    {
+      "accession_number": "0000320193-26-000013",
+      "cik": "0000320193",
+      "filing_date": "2026-05-01",
+      "form": "10-Q",
+      "primary_document": "aapl-20260328.htm",
+      "primary_key": "0000320193|0000320193-26-000013|10-Q|2026-05-01",
+      "raw_locator": "https://data.sec.gov/submissions/CIK0000320193.json",
+      "report_date": "2026-03-28"
+    },
+    {
+      "accession_number": "0000320193-26-000011",
+      "cik": "0000320193",
+      "filing_date": "2026-04-30",
+      "form": "8-K",
+      "primary_document": "aapl-20260430.htm",
+      "primary_key": "0000320193|0000320193-26-000011|8-K|2026-04-30",
+      "raw_locator": "https://data.sec.gov/submissions/CIK0000320193.json",
+      "report_date": "2026-04-30"
+    }
+  ],
+  "fixture_id": "sec_submissions_aapl_tiny_v1",
+  "fixture_type": "sec_submissions_tiny",
+  "retrieval": {
+    "api_endpoint": "https://data.sec.gov/submissions/CIK0000320193.json",
+    "retrieved_at": "2026-05-09T15:25:40Z",
+    "user_agent_used": "TerminalZeroResearch/0.1"
+  },
+  "schema_version": "1.0.0"
+}

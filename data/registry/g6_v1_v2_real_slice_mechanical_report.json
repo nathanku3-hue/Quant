@@ -1,0 +1,3231 @@
+{
+  "alerts_emitted": false,
+  "artifact_uri": "data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet",
+  "blockers": [],
+  "broker_calls": false,
+  "canonical_engine_required": true,
+  "cash": {
+    "v1": [
+      {
+        "date": "2024-01-02",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-04",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-05",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-08",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-09",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-10",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-11",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-12",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-16",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-17",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-18",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-19",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-22",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-23",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-24",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-25",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-26",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-29",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-30",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-31",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-01",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-02",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-05",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-06",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-07",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-08",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-09",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-12",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-13",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-14",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-15",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-16",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-20",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-21",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-22",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-23",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-26",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-27",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-28",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-29",
+        "value": 0.0
+      }
+    ],
+    "v2": [
+      {
+        "date": "2024-01-02",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-04",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-05",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-08",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-09",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-10",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-11",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-12",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-16",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-17",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-18",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-19",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-22",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-23",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-24",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-25",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-26",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-29",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-30",
+        "value": 0.0
+      },
+      {
+        "date": "2024-01-31",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-01",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-02",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-05",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-06",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-07",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-08",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-09",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-12",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-13",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-14",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-15",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-16",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-20",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-21",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-22",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-23",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-26",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-27",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-28",
+        "value": 0.0
+      },
+      {
+        "date": "2024-02-29",
+        "value": 0.0
+      }
+    ]
+  },
+  "code_ref": "v2_discovery/replay/real_slice_v1_v2_comparison.py@phase65-g6",
+  "comparison_fields": [
+    "positions",
+    "cash",
+    "turnover",
+    "transaction_cost",
+    "gross_exposure",
+    "net_exposure",
+    "row_count",
+    "date_range",
+    "source_quality",
+    "manifest_uri",
+    "engine_name",
+    "engine_version"
+  ],
+  "comparison_result": "match",
+  "comparison_run_id": "PH65_G6_V1_V2_REAL_SLICE_MECHANICAL_001",
+  "dataset_name": "prices_tri_real_canonical_tiny_slice",
+  "date_range": {
+    "end": "2024-02-29",
+    "start": "2024-01-02"
+  },
+  "engine_name": {
+    "v1": "core.engine.run_simulation",
+    "v2": "v2_proxy"
+  },
+  "engine_version": {
+    "v1": "phase65-g5-core-engine-current",
+    "v2": "0.1.0"
+  },
+  "equality_fields": [
+    "positions",
+    "cash",
+    "turnover",
+    "transaction_cost",
+    "gross_exposure",
+    "net_exposure",
+    "row_count",
+    "date_range",
+    "source_quality",
+    "manifest_uri"
+  ],
+  "field_results": {
+    "cash": "match",
+    "date_range": "match",
+    "engine_name": "recorded",
+    "engine_version": "recorded",
+    "gross_exposure": "match",
+    "manifest_uri": "match",
+    "net_exposure": "match",
+    "positions": "match",
+    "row_count": "match",
+    "source_quality": "match",
+    "transaction_cost": "match",
+    "turnover": "match"
+  },
+  "gross_exposure": {
+    "v1": [
+      {
+        "date": "2024-01-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-04",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-05",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-08",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-09",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-10",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-11",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-12",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-16",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-17",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-18",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-19",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-22",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-23",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-24",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-25",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-26",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-29",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-30",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-31",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-01",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-05",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-06",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-07",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-08",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-09",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-12",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-13",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-14",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-15",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-16",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-20",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-21",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-22",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-23",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-26",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-27",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-28",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-29",
+        "value": 1.0
+      }
+    ],
+    "v2": [
+      {
+        "date": "2024-01-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-04",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-05",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-08",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-09",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-10",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-11",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-12",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-16",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-17",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-18",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-19",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-22",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-23",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-24",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-25",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-26",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-29",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-30",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-31",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-01",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-05",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-06",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-07",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-08",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-09",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-12",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-13",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-14",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-15",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-16",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-20",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-21",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-22",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-23",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-26",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-27",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-28",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-29",
+        "value": 1.0
+      }
+    ]
+  },
+  "identity_fields": [
+    "engine_name",
+    "engine_version"
+  ],
+  "manifest_sha256": "702b487cced3a0cacd26605ae9d42b5dc06b955855b5bbc56d6e56e81747e3ec",
+  "manifest_uri": "data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet.manifest.json",
+  "mechanical_comparison_result": "match",
+  "mismatch_count": 0,
+  "mismatch_fields": [],
+  "net_exposure": {
+    "v1": [
+      {
+        "date": "2024-01-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-04",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-05",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-08",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-09",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-10",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-11",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-12",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-16",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-17",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-18",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-19",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-22",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-23",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-24",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-25",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-26",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-29",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-30",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-31",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-01",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-05",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-06",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-07",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-08",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-09",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-12",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-13",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-14",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-15",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-16",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-20",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-21",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-22",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-23",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-26",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-27",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-28",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-29",
+        "value": 1.0
+      }
+    ],
+    "v2": [
+      {
+        "date": "2024-01-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-04",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-05",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-08",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-09",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-10",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-11",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-12",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-16",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-17",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-18",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-19",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-22",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-23",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-24",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-25",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-26",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-29",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-30",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-31",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-01",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-05",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-06",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-07",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-08",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-09",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-12",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-13",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-14",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-15",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-16",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-20",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-21",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-22",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-23",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-26",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-27",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-28",
+        "value": 1.0
+      },
+      {
+        "date": "2024-02-29",
+        "value": 1.0
+      }
+    ]
+  },
+  "positions": {
+    "v1": [
+      {
+        "date": "2024-01-02",
+        "market_value": 33300.0,
+        "permno": 10104,
+        "quantity": 124.790475
+      },
+      {
+        "date": "2024-01-02",
+        "market_value": 33300.0,
+        "permno": 10107,
+        "quantity": 36.079507
+      },
+      {
+        "date": "2024-01-02",
+        "market_value": 33300.0,
+        "permno": 86580,
+        "quantity": 3.328444
+      },
+      {
+        "date": "2024-01-03",
+        "market_value": 32983.011064,
+        "permno": 10104,
+        "quantity": 125.532769
+      },
+      {
+        "date": "2024-01-03",
+        "market_value": 32983.011064,
+        "permno": 10107,
+        "quantity": 35.762093
+      },
+      {
+        "date": "2024-01-03",
+        "market_value": 32983.011064,
+        "permno": 86580,
+        "quantity": 3.338275
+      },
+      {
+        "date": "2024-01-04",
+        "market_value": 33017.011236,
+        "permno": 10104,
+        "quantity": 125.502904
+      },
+      {
+        "date": "2024-01-04",
+        "market_value": 33017.011236,
+        "permno": 10107,
+        "quantity": 36.057782
+      },
+      {
+        "date": "2024-01-04",
+        "market_value": 33017.011236,
+        "permno": 86580,
+        "quantity": 3.31185
+      },
+      {
+        "date": "2024-01-05",
+        "market_value": 33278.02246,
+        "permno": 10104,
+        "quantity": 126.322619
+      },
+      {
+        "date": "2024-01-05",
+        "market_value": 33278.02246,
+        "permno": 10107,
+        "quantity": 36.361594
+      },
+      {
+        "date": "2024-01-05",
+        "market_value": 33278.02246,
+        "permno": 86580,
+        "quantity": 3.263311
+      },
+      {
+        "date": "2024-01-08",
+        "market_value": 34408.137747,
+        "permno": 10104,
+        "quantity": 128.203943
+      },
+      {
+        "date": "2024-01-08",
+        "market_value": 34408.137747,
+        "permno": 10107,
+        "quantity": 36.900049
+      },
+      {
+        "date": "2024-01-08",
+        "market_value": 34408.137747,
+        "permno": 86580,
+        "quantity": 3.17034
+      },
+      {
+        "date": "2024-01-09",
+        "market_value": 34523.320645,
+        "permno": 10104,
+        "quantity": 129.911581
+      },
+      {
+        "date": "2024-01-09",
+        "market_value": 34523.320645,
+        "permno": 10107,
+        "quantity": 36.91519
+      },
+      {
+        "date": "2024-01-09",
+        "market_value": 34523.320645,
+        "permno": 86580,
+        "quantity": 3.127857
+      },
+      {
+        "date": "2024-01-10",
+        "market_value": 35075.503265,
+        "permno": 10104,
+        "quantity": 131.116466
+      },
+      {
+        "date": "2024-01-10",
+        "market_value": 35075.503265,
+        "permno": 10107,
+        "quantity": 36.821702
+      },
+      {
+        "date": "2024-01-10",
+        "market_value": 35075.503265,
+        "permno": 86580,
+        "quantity": 3.107136
+      },
+      {
+        "date": "2024-01-11",
+        "market_value": 35329.417064,
+        "permno": 10104,
+        "quantity": 130.994229
+      },
+      {
+        "date": "2024-01-11",
+        "market_value": 35329.417064,
+        "permno": 10107,
+        "quantity": 36.908918
+      },
+      {
+        "date": "2024-01-11",
+        "market_value": 35329.417064,
+        "permno": 86580,
+        "quantity": 3.102685
+      },
+      {
+        "date": "2024-01-12",
+        "market_value": 35628.385316,
+        "permno": 10104,
+        "quantity": 129.83492
+      },
+      {
+        "date": "2024-01-12",
+        "market_value": 35628.385316,
+        "permno": 10107,
+        "quantity": 36.853308
+      },
+      {
+        "date": "2024-01-12",
+        "market_value": 35628.385316,
+        "permno": 86580,
+        "quantity": 3.135347
+      },
+      {
+        "date": "2024-01-16",
+        "market_value": 36042.580689,
+        "permno": 10104,
+        "quantity": 131.381215
+      },
+      {
+        "date": "2024-01-16",
+        "market_value": 36042.580689,
+        "permno": 10107,
+        "quantity": 37.109777
+      },
+      {
+        "date": "2024-01-16",
+        "market_value": 36042.580689,
+        "permno": 86580,
+        "quantity": 3.077738
+      },
+      {
+        "date": "2024-01-17",
+        "market_value": 35931.994029,
+        "permno": 10104,
+        "quantity": 131.150452
+      },
+      {
+        "date": "2024-01-17",
+        "market_value": 35931.994029,
+        "permno": 10107,
+        "quantity": 37.071915
+      },
+      {
+        "date": "2024-01-17",
+        "market_value": 35931.994029,
+        "permno": 86580,
+        "quantity": 3.086303
+      },
+      {
+        "date": "2024-01-18",
+        "market_value": 36547.848672,
+        "permno": 10104,
+        "quantity": 130.612462
+      },
+      {
+        "date": "2024-01-18",
+        "market_value": 36547.848672,
+        "permno": 10107,
+        "quantity": 37.286085
+      },
+      {
+        "date": "2024-01-18",
+        "market_value": 36547.848672,
+        "permno": 86580,
+        "quantity": 3.081261
+      },
+      {
+        "date": "2024-01-19",
+        "market_value": 37313.10498,
+        "permno": 10104,
+        "quantity": 132.167825
+      },
+      {
+        "date": "2024-01-19",
+        "market_value": 37313.10498,
+        "permno": 10107,
+        "quantity": 37.608464
+      },
+      {
+        "date": "2024-01-19",
+        "market_value": 37313.10498,
+        "permno": 86580,
+        "quantity": 3.019716
+      },
+      {
+        "date": "2024-01-22",
+        "market_value": 37328.419247,
+        "permno": 10104,
+        "quantity": 131.705651
+      },
+      {
+        "date": "2024-01-22",
+        "market_value": 37328.419247,
+        "permno": 10107,
+        "quantity": 37.828857
+      },
+      {
+        "date": "2024-01-22",
+        "market_value": 37328.419247,
+        "permno": 86580,
+        "quantity": 3.012701
+      },
+      {
+        "date": "2024-01-23",
+        "market_value": 37644.435981,
+        "permno": 10104,
+        "quantity": 130.765924
+      },
+      {
+        "date": "2024-01-23",
+        "market_value": 37644.435981,
+        "permno": 10107,
+        "quantity": 37.920526
+      },
+      {
+        "date": "2024-01-23",
+        "market_value": 37644.435981,
+        "permno": 86580,
+        "quantity": 3.027094
+      },
+      {
+        "date": "2024-01-24",
+        "market_value": 38349.652365,
+        "permno": 10104,
+        "quantity": 130.325547
+      },
+      {
+        "date": "2024-01-24",
+        "market_value": 38349.652365,
+        "permno": 10107,
+        "quantity": 38.279698
+      },
+      {
+        "date": "2024-01-24",
+        "market_value": 38349.652365,
+        "permno": 86580,
+        "quantity": 3.008972
+      },
+      {
+        "date": "2024-01-25",
+        "market_value": 38553.259367,
+        "permno": 10104,
+        "quantity": 130.231399
+      },
+      {
+        "date": "2024-01-25",
+        "market_value": 38553.259367,
+        "permno": 10107,
+        "quantity": 38.263379
+      },
+      {
+        "date": "2024-01-25",
+        "market_value": 38553.259367,
+        "permno": 86580,
+        "quantity": 3.012428
+      },
+      {
+        "date": "2024-01-26",
+        "market_value": 38360.865609,
+        "permno": 10104,
+        "quantity": 129.988355
+      },
+      {
+        "date": "2024-01-26",
+        "market_value": 38360.865609,
+        "permno": 10107,
+        "quantity": 38.161042
+      },
+      {
+        "date": "2024-01-26",
+        "market_value": 38360.865609,
+        "permno": 86580,
+        "quantity": 3.026173
+      },
+      {
+        "date": "2024-01-29",
+        "market_value": 38744.875465,
+        "permno": 10104,
+        "quantity": 132.316781
+      },
+      {
+        "date": "2024-01-29",
+        "market_value": 38744.875465,
+        "permno": 10107,
+        "quantity": 37.998383
+      },
+      {
+        "date": "2024-01-29",
+        "market_value": 38744.875465,
+        "permno": 86580,
+        "quantity": 2.986301
+      },
+      {
+        "date": "2024-01-30",
+        "market_value": 38819.571893,
+        "permno": 10104,
+        "quantity": 132.095798
+      },
+      {
+        "date": "2024-01-30",
+        "market_value": 38819.571893,
+        "permno": 10107,
+        "quantity": 38.17693
+      },
+      {
+        "date": "2024-01-30",
+        "market_value": 38819.571893,
+        "permno": 86580,
+        "quantity": 2.977329
+      },
+      {
+        "date": "2024-01-31",
+        "market_value": 37934.89511,
+        "permno": 10104,
+        "quantity": 131.928332
+      },
+      {
+        "date": "2024-01-31",
+        "market_value": 37934.89511,
+        "permno": 10107,
+        "quantity": 38.340009
+      },
+      {
+        "date": "2024-01-31",
+        "market_value": 37934.89511,
+        "permno": 86580,
+        "quantity": 2.968446
+      },
+      {
+        "date": "2024-02-01",
+        "market_value": 38873.69395,
+        "permno": 10104,
+        "quantity": 130.711416
+      },
+      {
+        "date": "2024-02-01",
+        "market_value": 38873.69395,
+        "permno": 10107,
+        "quantity": 38.685572
+      },
+      {
+        "date": "2024-02-01",
+        "market_value": 38873.69395,
+        "permno": 86580,
+        "quantity": 2.969511
+      },
+      {
+        "date": "2024-02-02",
+        "market_value": 39785.068971,
+        "permno": 10104,
+        "quantity": 133.475422
+      },
+      {
+        "date": "2024-02-02",
+        "market_value": 39785.068971,
+        "permno": 10107,
+        "quantity": 38.876202
+      },
+      {
+        "date": "2024-02-02",
+        "market_value": 39785.068971,
+        "permno": 86580,
+        "quantity": 2.895212
+      },
+      {
+        "date": "2024-02-05",
+        "market_value": 40309.057152,
+        "permno": 10104,
+        "quantity": 134.536197
+      },
+      {
+        "date": "2024-02-05",
+        "market_value": 40309.057152,
+        "permno": 10107,
+        "quantity": 39.929061
+      },
+      {
+        "date": "2024-02-05",
+        "market_value": 40309.057152,
+        "permno": 86580,
+        "quantity": 2.799141
+      },
+      {
+        "date": "2024-02-06",
+        "market_value": 39962.785081,
+        "permno": 10104,
+        "quantity": 134.641382
+      },
+      {
+        "date": "2024-02-06",
+        "market_value": 39962.785081,
+        "permno": 10107,
+        "quantity": 39.601654
+      },
+      {
+        "date": "2024-02-06",
+        "market_value": 39962.785081,
+        "permno": 86580,
+        "quantity": 2.820207
+      },
+      {
+        "date": "2024-02-07",
+        "market_value": 40837.740687,
+        "permno": 10104,
+        "quantity": 135.277893
+      },
+      {
+        "date": "2024-02-07",
+        "market_value": 40837.740687,
+        "permno": 10107,
+        "quantity": 39.632073
+      },
+      {
+        "date": "2024-02-07",
+        "market_value": 40837.740687,
+        "permno": 86580,
+        "quantity": 2.804826
+      },
+      {
+        "date": "2024-02-08",
+        "market_value": 40682.177119,
+        "permno": 10104,
+        "quantity": 135.444001
+      },
+      {
+        "date": "2024-02-08",
+        "market_value": 40682.177119,
+        "permno": 10107,
+        "quantity": 39.475378
+      },
+      {
+        "date": "2024-02-08",
+        "market_value": 40682.177119,
+        "permno": 86580,
+        "quantity": 2.812519
+      },
+      {
+        "date": "2024-02-09",
+        "market_value": 41373.15659,
+        "permno": 10104,
+        "quantity": 137.791757
+      },
+      {
+        "date": "2024-02-09",
+        "market_value": 41373.15659,
+        "permno": 10107,
+        "quantity": 39.531109
+      },
+      {
+        "date": "2024-02-09",
+        "market_value": 41373.15659,
+        "permno": 86580,
+        "quantity": 2.761473
+      },
+      {
+        "date": "2024-02-12",
+        "market_value": 41126.860705,
+        "permno": 10104,
+        "quantity": 137.917456
+      },
+      {
+        "date": "2024-02-12",
+        "market_value": 41126.860705,
+        "permno": 10107,
+        "quantity": 39.796378
+      },
+      {
+        "date": "2024-02-12",
+        "market_value": 41126.860705,
+        "permno": 86580,
+        "quantity": 2.740665
+      },
+      {
+        "date": "2024-02-13",
+        "market_value": 40552.99671,
+        "permno": 10104,
+        "quantity": 138.576924
+      },
+      {
+        "date": "2024-02-13",
+        "market_value": 40552.99671,
+        "permno": 10107,
+        "quantity": 40.104489
+      },
+      {
+        "date": "2024-02-13",
+        "market_value": 40552.99671,
+        "permno": 86580,
+        "quantity": 2.706919
+      },
+      {
+        "date": "2024-02-14",
+        "market_value": 41084.16103,
+        "permno": 10104,
+        "quantity": 139.679366
+      },
+      {
+        "date": "2024-02-14",
+        "market_value": 41084.16103,
+        "permno": 10107,
+        "quantity": 40.241528
+      },
+      {
+        "date": "2024-02-14",
+        "market_value": 41084.16103,
+        "permno": 86580,
+        "quantity": 2.676618
+      },
+      {
+        "date": "2024-02-15",
+        "market_value": 40578.492582,
+        "permno": 10104,
+        "quantity": 139.770633
+      },
+      {
+        "date": "2024-02-15",
+        "market_value": 40578.492582,
+        "permno": 10107,
+        "quantity": 40.032664
+      },
+      {
+        "date": "2024-02-15",
+        "market_value": 40578.492582,
+        "permno": 86580,
+        "quantity": 2.688863
+      },
+      {
+        "date": "2024-02-16",
+        "market_value": 40310.473049,
+        "permno": 10104,
+        "quantity": 140.68109
+      },
+      {
+        "date": "2024-02-16",
+        "market_value": 40310.473049,
+        "permno": 10107,
+        "quantity": 40.014298
+      },
+      {
+        "date": "2024-02-16",
+        "market_value": 40310.473049,
+        "permno": 86580,
+        "quantity": 2.672757
+      },
+      {
+        "date": "2024-02-20",
+        "market_value": 39337.499746,
+        "permno": 10104,
+        "quantity": 140.905908
+      },
+      {
+        "date": "2024-02-20",
+        "market_value": 39337.499746,
+        "permno": 10107,
+        "quantity": 39.17159
+      },
+      {
+        "date": "2024-02-20",
+        "market_value": 39337.499746,
+        "permno": 86580,
+        "quantity": 2.726955
+      },
+      {
+        "date": "2024-02-21",
+        "market_value": 38908.297564,
+        "permno": 10104,
+        "quantity": 139.74219
+      },
+      {
+        "date": "2024-02-21",
+        "market_value": 38908.297564,
+        "permno": 10107,
+        "quantity": 38.802947
+      },
+      {
+        "date": "2024-02-21",
+        "market_value": 38908.297564,
+        "permno": 86580,
+        "quantity": 2.776353
+      },
+      {
+        "date": "2024-02-22",
+        "market_value": 41680.132147,
+        "permno": 10104,
+        "quantity": 145.854192
+      },
+      {
+        "date": "2024-02-22",
+        "market_value": 41680.132147,
+        "permno": 10107,
+        "quantity": 40.61101
+      },
+      {
+        "date": "2024-02-22",
+        "market_value": 41680.132147,
+        "permno": 86580,
+        "quantity": 2.555084
+      },
+      {
+        "date": "2024-02-23",
+        "market_value": 41802.753092,
+        "permno": 10104,
+        "quantity": 145.054949
+      },
+      {
+        "date": "2024-02-23",
+        "market_value": 41802.753092,
+        "permno": 10107,
+        "quantity": 40.860503
+      },
+      {
+        "date": "2024-02-23",
+        "market_value": 41802.753092,
+        "permno": 86580,
+        "quantity": 2.553531
+      },
+      {
+        "date": "2024-02-26",
+        "market_value": 41634.093049,
+        "permno": 10104,
+        "quantity": 145.745568
+      },
+      {
+        "date": "2024-02-26",
+        "market_value": 41634.093049,
+        "permno": 10107,
+        "quantity": 40.975258
+      },
+      {
+        "date": "2024-02-26",
+        "market_value": 41634.093049,
+        "permno": 86580,
+        "quantity": 2.534386
+      },
+      {
+        "date": "2024-02-27",
+        "market_value": 41614.594967,
+        "permno": 10104,
+        "quantity": 145.141007
+      },
+      {
+        "date": "2024-02-27",
+        "market_value": 41614.594967,
+        "permno": 10107,
+        "quantity": 40.962089
+      },
+      {
+        "date": "2024-02-27",
+        "market_value": 41614.594967,
+        "permno": 86580,
+        "quantity": 2.545785
+      },
+      {
+        "date": "2024-02-28",
+        "market_value": 41476.907433,
+        "permno": 10104,
+        "quantity": 144.272129
+      },
+      {
+        "date": "2024-02-28",
+        "market_value": 41476.907433,
+        "permno": 10107,
+        "quantity": 40.80253
+      },
+      {
+        "date": "2024-02-28",
+        "market_value": 41476.907433,
+        "permno": 86580,
+        "quantity": 2.571275
+      },
+      {
+        "date": "2024-02-29",
+        "market_value": 41935.308818,
+        "permno": 10104,
+        "quantity": 145.86662
+      },
+      {
+        "date": "2024-02-29",
+        "market_value": 41935.308818,
+        "permno": 10107,
+        "quantity": 40.66305
+      },
+      {
+        "date": "2024-02-29",
+        "market_value": 41935.308818,
+        "permno": 86580,
+        "quantity": 2.552076
+      }
+    ],
+    "v2": [
+      {
+        "date": "2024-01-02",
+        "market_value": 33300.0,
+        "permno": 10104,
+        "quantity": 124.790475
+      },
+      {
+        "date": "2024-01-02",
+        "market_value": 33300.0,
+        "permno": 10107,
+        "quantity": 36.079507
+      },
+      {
+        "date": "2024-01-02",
+        "market_value": 33300.0,
+        "permno": 86580,
+        "quantity": 3.328444
+      },
+      {
+        "date": "2024-01-03",
+        "market_value": 32983.011064,
+        "permno": 10104,
+        "quantity": 125.532769
+      },
+      {
+        "date": "2024-01-03",
+        "market_value": 32983.011064,
+        "permno": 10107,
+        "quantity": 35.762093
+      },
+      {
+        "date": "2024-01-03",
+        "market_value": 32983.011064,
+        "permno": 86580,
+        "quantity": 3.338275
+      },
+      {
+        "date": "2024-01-04",
+        "market_value": 33017.011236,
+        "permno": 10104,
+        "quantity": 125.502904
+      },
+      {
+        "date": "2024-01-04",
+        "market_value": 33017.011236,
+        "permno": 10107,
+        "quantity": 36.057782
+      },
+      {
+        "date": "2024-01-04",
+        "market_value": 33017.011236,
+        "permno": 86580,
+        "quantity": 3.31185
+      },
+      {
+        "date": "2024-01-05",
+        "market_value": 33278.02246,
+        "permno": 10104,
+        "quantity": 126.322619
+      },
+      {
+        "date": "2024-01-05",
+        "market_value": 33278.02246,
+        "permno": 10107,
+        "quantity": 36.361594
+      },
+      {
+        "date": "2024-01-05",
+        "market_value": 33278.02246,
+        "permno": 86580,
+        "quantity": 3.263311
+      },
+      {
+        "date": "2024-01-08",
+        "market_value": 34408.137747,
+        "permno": 10104,
+        "quantity": 128.203943
+      },
+      {
+        "date": "2024-01-08",
+        "market_value": 34408.137747,
+        "permno": 10107,
+        "quantity": 36.900049
+      },
+      {
+        "date": "2024-01-08",
+        "market_value": 34408.137747,
+        "permno": 86580,
+        "quantity": 3.17034
+      },
+      {
+        "date": "2024-01-09",
+        "market_value": 34523.320645,
+        "permno": 10104,
+        "quantity": 129.911581
+      },
+      {
+        "date": "2024-01-09",
+        "market_value": 34523.320645,
+        "permno": 10107,
+        "quantity": 36.91519
+      },
+      {
+        "date": "2024-01-09",
+        "market_value": 34523.320645,
+        "permno": 86580,
+        "quantity": 3.127857
+      },
+      {
+        "date": "2024-01-10",
+        "market_value": 35075.503265,
+        "permno": 10104,
+        "quantity": 131.116466
+      },
+      {
+        "date": "2024-01-10",
+        "market_value": 35075.503265,
+        "permno": 10107,
+        "quantity": 36.821702
+      },
+      {
+        "date": "2024-01-10",
+        "market_value": 35075.503265,
+        "permno": 86580,
+        "quantity": 3.107136
+      },
+      {
+        "date": "2024-01-11",
+        "market_value": 35329.417064,
+        "permno": 10104,
+        "quantity": 130.994229
+      },
+      {
+        "date": "2024-01-11",
+        "market_value": 35329.417064,
+        "permno": 10107,
+        "quantity": 36.908918
+      },
+      {
+        "date": "2024-01-11",
+        "market_value": 35329.417064,
+        "permno": 86580,
+        "quantity": 3.102685
+      },
+      {
+        "date": "2024-01-12",
+        "market_value": 35628.385316,
+        "permno": 10104,
+        "quantity": 129.83492
+      },
+      {
+        "date": "2024-01-12",
+        "market_value": 35628.385316,
+        "permno": 10107,
+        "quantity": 36.853308
+      },
+      {
+        "date": "2024-01-12",
+        "market_value": 35628.385316,
+        "permno": 86580,
+        "quantity": 3.135347
+      },
+      {
+        "date": "2024-01-16",
+        "market_value": 36042.580689,
+        "permno": 10104,
+        "quantity": 131.381215
+      },
+      {
+        "date": "2024-01-16",
+        "market_value": 36042.580689,
+        "permno": 10107,
+        "quantity": 37.109777
+      },
+      {
+        "date": "2024-01-16",
+        "market_value": 36042.580689,
+        "permno": 86580,
+        "quantity": 3.077738
+      },
+      {
+        "date": "2024-01-17",
+        "market_value": 35931.994029,
+        "permno": 10104,
+        "quantity": 131.150452
+      },
+      {
+        "date": "2024-01-17",
+        "market_value": 35931.994029,
+        "permno": 10107,
+        "quantity": 37.071915
+      },
+      {
+        "date": "2024-01-17",
+        "market_value": 35931.994029,
+        "permno": 86580,
+        "quantity": 3.086303
+      },
+      {
+        "date": "2024-01-18",
+        "market_value": 36547.848672,
+        "permno": 10104,
+        "quantity": 130.612462
+      },
+      {
+        "date": "2024-01-18",
+        "market_value": 36547.848672,
+        "permno": 10107,
+        "quantity": 37.286085
+      },
+      {
+        "date": "2024-01-18",
+        "market_value": 36547.848672,
+        "permno": 86580,
+        "quantity": 3.081261
+      },
+      {
+        "date": "2024-01-19",
+        "market_value": 37313.10498,
+        "permno": 10104,
+        "quantity": 132.167825
+      },
+      {
+        "date": "2024-01-19",
+        "market_value": 37313.10498,
+        "permno": 10107,
+        "quantity": 37.608464
+      },
+      {
+        "date": "2024-01-19",
+        "market_value": 37313.10498,
+        "permno": 86580,
+        "quantity": 3.019716
+      },
+      {
+        "date": "2024-01-22",
+        "market_value": 37328.419247,
+        "permno": 10104,
+        "quantity": 131.705651
+      },
+      {
+        "date": "2024-01-22",
+        "market_value": 37328.419247,
+        "permno": 10107,
+        "quantity": 37.828857
+      },
+      {
+        "date": "2024-01-22",
+        "market_value": 37328.419247,
+        "permno": 86580,
+        "quantity": 3.012701
+      },
+      {
+        "date": "2024-01-23",
+        "market_value": 37644.435981,
+        "permno": 10104,
+        "quantity": 130.765924
+      },
+      {
+        "date": "2024-01-23",
+        "market_value": 37644.435981,
+        "permno": 10107,
+        "quantity": 37.920526
+      },
+      {
+        "date": "2024-01-23",
+        "market_value": 37644.435981,
+        "permno": 86580,
+        "quantity": 3.027094
+      },
+      {
+        "date": "2024-01-24",
+        "market_value": 38349.652365,
+        "permno": 10104,
+        "quantity": 130.325547
+      },
+      {
+        "date": "2024-01-24",
+        "market_value": 38349.652365,
+        "permno": 10107,
+        "quantity": 38.279698
+      },
+      {
+        "date": "2024-01-24",
+        "market_value": 38349.652365,
+        "permno": 86580,
+        "quantity": 3.008972
+      },
+      {
+        "date": "2024-01-25",
+        "market_value": 38553.259367,
+        "permno": 10104,
+        "quantity": 130.231399
+      },
+      {
+        "date": "2024-01-25",
+        "market_value": 38553.259367,
+        "permno": 10107,
+        "quantity": 38.263379
+      },
+      {
+        "date": "2024-01-25",
+        "market_value": 38553.259367,
+        "permno": 86580,
+        "quantity": 3.012428
+      },
+      {
+        "date": "2024-01-26",
+        "market_value": 38360.865609,
+        "permno": 10104,
+        "quantity": 129.988355
+      },
+      {
+        "date": "2024-01-26",
+        "market_value": 38360.865609,
+        "permno": 10107,
+        "quantity": 38.161042
+      },
+      {
+        "date": "2024-01-26",
+        "market_value": 38360.865609,
+        "permno": 86580,
+        "quantity": 3.026173
+      },
+      {
+        "date": "2024-01-29",
+        "market_value": 38744.875465,
+        "permno": 10104,
+        "quantity": 132.316781
+      },
+      {
+        "date": "2024-01-29",
+        "market_value": 38744.875465,
+        "permno": 10107,
+        "quantity": 37.998383
+      },
+      {
+        "date": "2024-01-29",
+        "market_value": 38744.875465,
+        "permno": 86580,
+        "quantity": 2.986301
+      },
+      {
+        "date": "2024-01-30",
+        "market_value": 38819.571893,
+        "permno": 10104,
+        "quantity": 132.095798
+      },
+      {
+        "date": "2024-01-30",
+        "market_value": 38819.571893,
+        "permno": 10107,
+        "quantity": 38.17693
+      },
+      {
+        "date": "2024-01-30",
+        "market_value": 38819.571893,
+        "permno": 86580,
+        "quantity": 2.977329
+      },
+      {
+        "date": "2024-01-31",
+        "market_value": 37934.89511,
+        "permno": 10104,
+        "quantity": 131.928332
+      },
+      {
+        "date": "2024-01-31",
+        "market_value": 37934.89511,
+        "permno": 10107,
+        "quantity": 38.340009
+      },
+      {
+        "date": "2024-01-31",
+        "market_value": 37934.89511,
+        "permno": 86580,
+        "quantity": 2.968446
+      },
+      {
+        "date": "2024-02-01",
+        "market_value": 38873.69395,
+        "permno": 10104,
+        "quantity": 130.711416
+      },
+      {
+        "date": "2024-02-01",
+        "market_value": 38873.69395,
+        "permno": 10107,
+        "quantity": 38.685572
+      },
+      {
+        "date": "2024-02-01",
+        "market_value": 38873.69395,
+        "permno": 86580,
+        "quantity": 2.969511
+      },
+      {
+        "date": "2024-02-02",
+        "market_value": 39785.068971,
+        "permno": 10104,
+        "quantity": 133.475422
+      },
+      {
+        "date": "2024-02-02",
+        "market_value": 39785.068971,
+        "permno": 10107,
+        "quantity": 38.876202
+      },
+      {
+        "date": "2024-02-02",
+        "market_value": 39785.068971,
+        "permno": 86580,
+        "quantity": 2.895212
+      },
+      {
+        "date": "2024-02-05",
+        "market_value": 40309.057152,
+        "permno": 10104,
+        "quantity": 134.536197
+      },
+      {
+        "date": "2024-02-05",
+        "market_value": 40309.057152,
+        "permno": 10107,
+        "quantity": 39.929061
+      },
+      {
+        "date": "2024-02-05",
+        "market_value": 40309.057152,
+        "permno": 86580,
+        "quantity": 2.799141
+      },
+      {
+        "date": "2024-02-06",
+        "market_value": 39962.785081,
+        "permno": 10104,
+        "quantity": 134.641382
+      },
+      {
+        "date": "2024-02-06",
+        "market_value": 39962.785081,
+        "permno": 10107,
+        "quantity": 39.601654
+      },
+      {
+        "date": "2024-02-06",
+        "market_value": 39962.785081,
+        "permno": 86580,
+        "quantity": 2.820207
+      },
+      {
+        "date": "2024-02-07",
+        "market_value": 40837.740687,
+        "permno": 10104,
+        "quantity": 135.277893
+      },
+      {
+        "date": "2024-02-07",
+        "market_value": 40837.740687,
+        "permno": 10107,
+        "quantity": 39.632073
+      },
+      {
+        "date": "2024-02-07",
+        "market_value": 40837.740687,
+        "permno": 86580,
+        "quantity": 2.804826
+      },
+      {
+        "date": "2024-02-08",
+        "market_value": 40682.177119,
+        "permno": 10104,
+        "quantity": 135.444001
+      },
+      {
+        "date": "2024-02-08",
+        "market_value": 40682.177119,
+        "permno": 10107,
+        "quantity": 39.475378
+      },
+      {
+        "date": "2024-02-08",
+        "market_value": 40682.177119,
+        "permno": 86580,
+        "quantity": 2.812519
+      },
+      {
+        "date": "2024-02-09",
+        "market_value": 41373.15659,
+        "permno": 10104,
+        "quantity": 137.791757
+      },
+      {
+        "date": "2024-02-09",
+        "market_value": 41373.15659,
+        "permno": 10107,
+        "quantity": 39.531109
+      },
+      {
+        "date": "2024-02-09",
+        "market_value": 41373.15659,
+        "permno": 86580,
+        "quantity": 2.761473
+      },
+      {
+        "date": "2024-02-12",
+        "market_value": 41126.860705,
+        "permno": 10104,
+        "quantity": 137.917456
+      },
+      {
+        "date": "2024-02-12",
+        "market_value": 41126.860705,
+        "permno": 10107,
+        "quantity": 39.796378
+      },
+      {
+        "date": "2024-02-12",
+        "market_value": 41126.860705,
+        "permno": 86580,
+        "quantity": 2.740665
+      },
+      {
+        "date": "2024-02-13",
+        "market_value": 40552.99671,
+        "permno": 10104,
+        "quantity": 138.576924
+      },
+      {
+        "date": "2024-02-13",
+        "market_value": 40552.99671,
+        "permno": 10107,
+        "quantity": 40.104489
+      },
+      {
+        "date": "2024-02-13",
+        "market_value": 40552.99671,
+        "permno": 86580,
+        "quantity": 2.706919
+      },
+      {
+        "date": "2024-02-14",
+        "market_value": 41084.16103,
+        "permno": 10104,
+        "quantity": 139.679366
+      },
+      {
+        "date": "2024-02-14",
+        "market_value": 41084.16103,
+        "permno": 10107,
+        "quantity": 40.241528
+      },
+      {
+        "date": "2024-02-14",
+        "market_value": 41084.16103,
+        "permno": 86580,
+        "quantity": 2.676618
+      },
+      {
+        "date": "2024-02-15",
+        "market_value": 40578.492582,
+        "permno": 10104,
+        "quantity": 139.770633
+      },
+      {
+        "date": "2024-02-15",
+        "market_value": 40578.492582,
+        "permno": 10107,
+        "quantity": 40.032664
+      },
+      {
+        "date": "2024-02-15",
+        "market_value": 40578.492582,
+        "permno": 86580,
+        "quantity": 2.688863
+      },
+      {
+        "date": "2024-02-16",
+        "market_value": 40310.473049,
+        "permno": 10104,
+        "quantity": 140.68109
+      },
+      {
+        "date": "2024-02-16",
+        "market_value": 40310.473049,
+        "permno": 10107,
+        "quantity": 40.014298
+      },
+      {
+        "date": "2024-02-16",
+        "market_value": 40310.473049,
+        "permno": 86580,
+        "quantity": 2.672757
+      },
+      {
+        "date": "2024-02-20",
+        "market_value": 39337.499746,
+        "permno": 10104,
+        "quantity": 140.905908
+      },
+      {
+        "date": "2024-02-20",
+        "market_value": 39337.499746,
+        "permno": 10107,
+        "quantity": 39.17159
+      },
+      {
+        "date": "2024-02-20",
+        "market_value": 39337.499746,
+        "permno": 86580,
+        "quantity": 2.726955
+      },
+      {
+        "date": "2024-02-21",
+        "market_value": 38908.297564,
+        "permno": 10104,
+        "quantity": 139.74219
+      },
+      {
+        "date": "2024-02-21",
+        "market_value": 38908.297564,
+        "permno": 10107,
+        "quantity": 38.802947
+      },
+      {
+        "date": "2024-02-21",
+        "market_value": 38908.297564,
+        "permno": 86580,
+        "quantity": 2.776353
+      },
+      {
+        "date": "2024-02-22",
+        "market_value": 41680.132147,
+        "permno": 10104,
+        "quantity": 145.854192
+      },
+      {
+        "date": "2024-02-22",
+        "market_value": 41680.132147,
+        "permno": 10107,
+        "quantity": 40.61101
+      },
+      {
+        "date": "2024-02-22",
+        "market_value": 41680.132147,
+        "permno": 86580,
+        "quantity": 2.555084
+      },
+      {
+        "date": "2024-02-23",
+        "market_value": 41802.753092,
+        "permno": 10104,
+        "quantity": 145.054949
+      },
+      {
+        "date": "2024-02-23",
+        "market_value": 41802.753092,
+        "permno": 10107,
+        "quantity": 40.860503
+      },
+      {
+        "date": "2024-02-23",
+        "market_value": 41802.753092,
+        "permno": 86580,
+        "quantity": 2.553531
+      },
+      {
+        "date": "2024-02-26",
+        "market_value": 41634.093049,
+        "permno": 10104,
+        "quantity": 145.745568
+      },
+      {
+        "date": "2024-02-26",
+        "market_value": 41634.093049,
+        "permno": 10107,
+        "quantity": 40.975258
+      },
+      {
+        "date": "2024-02-26",
+        "market_value": 41634.093049,
+        "permno": 86580,
+        "quantity": 2.534386
+      },
+      {
+        "date": "2024-02-27",
+        "market_value": 41614.594967,
+        "permno": 10104,
+        "quantity": 145.141007
+      },
+      {
+        "date": "2024-02-27",
+        "market_value": 41614.594967,
+        "permno": 10107,
+        "quantity": 40.962089
+      },
+      {
+        "date": "2024-02-27",
+        "market_value": 41614.594967,
+        "permno": 86580,
+        "quantity": 2.545785
+      },
+      {
+        "date": "2024-02-28",
+        "market_value": 41476.907433,
+        "permno": 10104,
+        "quantity": 144.272129
+      },
+      {
+        "date": "2024-02-28",
+        "market_value": 41476.907433,
+        "permno": 10107,
+        "quantity": 40.80253
+      },
+      {
+        "date": "2024-02-28",
+        "market_value": 41476.907433,
+        "permno": 86580,
+        "quantity": 2.571275
+      },
+      {
+        "date": "2024-02-29",
+        "market_value": 41935.308818,
+        "permno": 10104,
+        "quantity": 145.86662
+      },
+      {
+        "date": "2024-02-29",
+        "market_value": 41935.308818,
+        "permno": 10107,
+        "quantity": 40.66305
+      },
+      {
+        "date": "2024-02-29",
+        "market_value": 41935.308818,
+        "permno": 86580,
+        "quantity": 2.552076
+      }
+    ]
+  },
+  "promotion_ready": false,
+  "report_schema_version": "1.0.0",
+  "row_count": 123,
+  "source_quality": "canonical",
+  "symbol_count": 3,
+  "transaction_cost": {
+    "v1": [
+      {
+        "date": "2024-01-02",
+        "value": 100.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 0.585106
+      },
+      {
+        "date": "2024-01-04",
+        "value": 0.541869
+      },
+      {
+        "date": "2024-01-05",
+        "value": 0.9893
+      },
+      {
+        "date": "2024-01-08",
+        "value": 2.016715
+      },
+      {
+        "date": "2024-01-09",
+        "value": 0.937162
+      },
+      {
+        "date": "2024-01-10",
+        "value": 0.645078
+      },
+      {
+        "date": "2024-01-11",
+        "value": 0.167078
+      },
+      {
+        "date": "2024-01-12",
+        "value": 0.742791
+      },
+      {
+        "date": "2024-01-16",
+        "value": 1.348392
+      },
+      {
+        "date": "2024-01-17",
+        "value": 0.199576
+      },
+      {
+        "date": "2024-01-18",
+        "value": 0.420141
+      },
+      {
+        "date": "2024-01-19",
+        "value": 1.519927
+      },
+      {
+        "date": "2024-01-22",
+        "value": 0.435246
+      },
+      {
+        "date": "2024-01-23",
+        "value": 0.54069
+      },
+      {
+        "date": "2024-01-24",
+        "value": 0.720136
+      },
+      {
+        "date": "2024-01-25",
+        "value": 0.08851
+      },
+      {
+        "date": "2024-01-26",
+        "value": 0.34873
+      },
+      {
+        "date": "2024-01-29",
+        "value": 1.364524
+      },
+      {
+        "date": "2024-01-30",
+        "value": 0.363348
+      },
+      {
+        "date": "2024-01-31",
+        "value": 0.322927
+      },
+      {
+        "date": "2024-02-01",
+        "value": 0.723342
+      },
+      {
+        "date": "2024-02-02",
+        "value": 2.040633
+      },
+      {
+        "date": "2024-02-05",
+        "value": 2.765091
+      },
+      {
+        "date": "2024-02-06",
+        "value": 0.660344
+      },
+      {
+        "date": "2024-02-07",
+        "value": 0.447586
+      },
+      {
+        "date": "2024-02-08",
+        "value": 0.322755
+      },
+      {
+        "date": "2024-02-09",
+        "value": 1.528561
+      },
+      {
+        "date": "2024-02-12",
+        "value": 0.624074
+      },
+      {
+        "date": "2024-02-13",
+        "value": 1.010433
+      },
+      {
+        "date": "2024-02-14",
+        "value": 0.929582
+      },
+      {
+        "date": "2024-02-15",
+        "value": 0.423141
+      },
+      {
+        "date": "2024-02-16",
+        "value": 0.522109
+      },
+      {
+        "date": "2024-02-20",
+        "value": 1.691428
+      },
+      {
+        "date": "2024-02-21",
+        "value": 1.385466
+      },
+      {
+        "date": "2024-02-22",
+        "value": 7.214145
+      },
+      {
+        "date": "2024-02-23",
+        "value": 0.510833
+      },
+      {
+        "date": "2024-02-26",
+        "value": 0.628607
+      },
+      {
+        "date": "2024-02-27",
+        "value": 0.372937
+      },
+      {
+        "date": "2024-02-28",
+        "value": 0.822884
+      },
+      {
+        "date": "2024-02-29",
+        "value": 0.917414
+      }
+    ],
+    "v2": [
+      {
+        "date": "2024-01-02",
+        "value": 100.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 0.585106
+      },
+      {
+        "date": "2024-01-04",
+        "value": 0.541869
+      },
+      {
+        "date": "2024-01-05",
+        "value": 0.9893
+      },
+      {
+        "date": "2024-01-08",
+        "value": 2.016715
+      },
+      {
+        "date": "2024-01-09",
+        "value": 0.937162
+      },
+      {
+        "date": "2024-01-10",
+        "value": 0.645078
+      },
+      {
+        "date": "2024-01-11",
+        "value": 0.167078
+      },
+      {
+        "date": "2024-01-12",
+        "value": 0.742791
+      },
+      {
+        "date": "2024-01-16",
+        "value": 1.348392
+      },
+      {
+        "date": "2024-01-17",
+        "value": 0.199576
+      },
+      {
+        "date": "2024-01-18",
+        "value": 0.420141
+      },
+      {
+        "date": "2024-01-19",
+        "value": 1.519927
+      },
+      {
+        "date": "2024-01-22",
+        "value": 0.435246
+      },
+      {
+        "date": "2024-01-23",
+        "value": 0.54069
+      },
+      {
+        "date": "2024-01-24",
+        "value": 0.720136
+      },
+      {
+        "date": "2024-01-25",
+        "value": 0.08851
+      },
+      {
+        "date": "2024-01-26",
+        "value": 0.34873
+      },
+      {
+        "date": "2024-01-29",
+        "value": 1.364524
+      },
+      {
+        "date": "2024-01-30",
+        "value": 0.363348
+      },
+      {
+        "date": "2024-01-31",
+        "value": 0.322927
+      },
+      {
+        "date": "2024-02-01",
+        "value": 0.723342
+      },
+      {
+        "date": "2024-02-02",
+        "value": 2.040633
+      },
+      {
+        "date": "2024-02-05",
+        "value": 2.765091
+      },
+      {
+        "date": "2024-02-06",
+        "value": 0.660344
+      },
+      {
+        "date": "2024-02-07",
+        "value": 0.447586
+      },
+      {
+        "date": "2024-02-08",
+        "value": 0.322755
+      },
+      {
+        "date": "2024-02-09",
+        "value": 1.528561
+      },
+      {
+        "date": "2024-02-12",
+        "value": 0.624074
+      },
+      {
+        "date": "2024-02-13",
+        "value": 1.010433
+      },
+      {
+        "date": "2024-02-14",
+        "value": 0.929582
+      },
+      {
+        "date": "2024-02-15",
+        "value": 0.423141
+      },
+      {
+        "date": "2024-02-16",
+        "value": 0.522109
+      },
+      {
+        "date": "2024-02-20",
+        "value": 1.691428
+      },
+      {
+        "date": "2024-02-21",
+        "value": 1.385466
+      },
+      {
+        "date": "2024-02-22",
+        "value": 7.214145
+      },
+      {
+        "date": "2024-02-23",
+        "value": 0.510833
+      },
+      {
+        "date": "2024-02-26",
+        "value": 0.628607
+      },
+      {
+        "date": "2024-02-27",
+        "value": 0.372937
+      },
+      {
+        "date": "2024-02-28",
+        "value": 0.822884
+      },
+      {
+        "date": "2024-02-29",
+        "value": 0.917414
+      }
+    ]
+  },
+  "turnover": {
+    "v1": [
+      {
+        "date": "2024-01-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 0.005913
+      },
+      {
+        "date": "2024-01-04",
+        "value": 0.005471
+      },
+      {
+        "date": "2024-01-05",
+        "value": 0.009909
+      },
+      {
+        "date": "2024-01-08",
+        "value": 0.019537
+      },
+      {
+        "date": "2024-01-09",
+        "value": 0.009049
+      },
+      {
+        "date": "2024-01-10",
+        "value": 0.00613
+      },
+      {
+        "date": "2024-01-11",
+        "value": 0.001576
+      },
+      {
+        "date": "2024-01-12",
+        "value": 0.006949
+      },
+      {
+        "date": "2024-01-16",
+        "value": 0.01247
+      },
+      {
+        "date": "2024-01-17",
+        "value": 0.001851
+      },
+      {
+        "date": "2024-01-18",
+        "value": 0.003832
+      },
+      {
+        "date": "2024-01-19",
+        "value": 0.013578
+      },
+      {
+        "date": "2024-01-22",
+        "value": 0.003887
+      },
+      {
+        "date": "2024-01-23",
+        "value": 0.004788
+      },
+      {
+        "date": "2024-01-24",
+        "value": 0.006259
+      },
+      {
+        "date": "2024-01-25",
+        "value": 0.000765
+      },
+      {
+        "date": "2024-01-26",
+        "value": 0.00303
+      },
+      {
+        "date": "2024-01-29",
+        "value": 0.011739
+      },
+      {
+        "date": "2024-01-30",
+        "value": 0.00312
+      },
+      {
+        "date": "2024-01-31",
+        "value": 0.002838
+      },
+      {
+        "date": "2024-02-01",
+        "value": 0.006202
+      },
+      {
+        "date": "2024-02-02",
+        "value": 0.017097
+      },
+      {
+        "date": "2024-02-05",
+        "value": 0.022865
+      },
+      {
+        "date": "2024-02-06",
+        "value": 0.005508
+      },
+      {
+        "date": "2024-02-07",
+        "value": 0.003653
+      },
+      {
+        "date": "2024-02-08",
+        "value": 0.002645
+      },
+      {
+        "date": "2024-02-09",
+        "value": 0.012315
+      },
+      {
+        "date": "2024-02-12",
+        "value": 0.005058
+      },
+      {
+        "date": "2024-02-13",
+        "value": 0.008305
+      },
+      {
+        "date": "2024-02-14",
+        "value": 0.007542
+      },
+      {
+        "date": "2024-02-15",
+        "value": 0.003476
+      },
+      {
+        "date": "2024-02-16",
+        "value": 0.004317
+      },
+      {
+        "date": "2024-02-20",
+        "value": 0.014332
+      },
+      {
+        "date": "2024-02-21",
+        "value": 0.011869
+      },
+      {
+        "date": "2024-02-22",
+        "value": 0.057691
+      },
+      {
+        "date": "2024-02-23",
+        "value": 0.004073
+      },
+      {
+        "date": "2024-02-26",
+        "value": 0.005033
+      },
+      {
+        "date": "2024-02-27",
+        "value": 0.002987
+      },
+      {
+        "date": "2024-02-28",
+        "value": 0.006613
+      },
+      {
+        "date": "2024-02-29",
+        "value": 0.007292
+      }
+    ],
+    "v2": [
+      {
+        "date": "2024-01-02",
+        "value": 1.0
+      },
+      {
+        "date": "2024-01-03",
+        "value": 0.005913
+      },
+      {
+        "date": "2024-01-04",
+        "value": 0.005471
+      },
+      {
+        "date": "2024-01-05",
+        "value": 0.009909
+      },
+      {
+        "date": "2024-01-08",
+        "value": 0.019537
+      },
+      {
+        "date": "2024-01-09",
+        "value": 0.009049
+      },
+      {
+        "date": "2024-01-10",
+        "value": 0.00613
+      },
+      {
+        "date": "2024-01-11",
+        "value": 0.001576
+      },
+      {
+        "date": "2024-01-12",
+        "value": 0.006949
+      },
+      {
+        "date": "2024-01-16",
+        "value": 0.01247
+      },
+      {
+        "date": "2024-01-17",
+        "value": 0.001851
+      },
+      {
+        "date": "2024-01-18",
+        "value": 0.003832
+      },
+      {
+        "date": "2024-01-19",
+        "value": 0.013578
+      },
+      {
+        "date": "2024-01-22",
+        "value": 0.003887
+      },
+      {
+        "date": "2024-01-23",
+        "value": 0.004788
+      },
+      {
+        "date": "2024-01-24",
+        "value": 0.006259
+      },
+      {
+        "date": "2024-01-25",
+        "value": 0.000765
+      },
+      {
+        "date": "2024-01-26",
+        "value": 0.00303
+      },
+      {
+        "date": "2024-01-29",
+        "value": 0.011739
+      },
+      {
+        "date": "2024-01-30",
+        "value": 0.00312
+      },
+      {
+        "date": "2024-01-31",
+        "value": 0.002838
+      },
+      {
+        "date": "2024-02-01",
+        "value": 0.006202
+      },
+      {
+        "date": "2024-02-02",
+        "value": 0.017097
+      },
+      {
+        "date": "2024-02-05",
+        "value": 0.022865
+      },
+      {
+        "date": "2024-02-06",
+        "value": 0.005508
+      },
+      {
+        "date": "2024-02-07",
+        "value": 0.003653
+      },
+      {
+        "date": "2024-02-08",
+        "value": 0.002645
+      },
+      {
+        "date": "2024-02-09",
+        "value": 0.012315
+      },
+      {
+        "date": "2024-02-12",
+        "value": 0.005058
+      },
+      {
+        "date": "2024-02-13",
+        "value": 0.008305
+      },
+      {
+        "date": "2024-02-14",
+        "value": 0.007542
+      },
+      {
+        "date": "2024-02-15",
+        "value": 0.003476
+      },
+      {
+        "date": "2024-02-16",
+        "value": 0.004317
+      },
+      {
+        "date": "2024-02-20",
+        "value": 0.014332
+      },
+      {
+        "date": "2024-02-21",
+        "value": 0.011869
+      },
+      {
+        "date": "2024-02-22",
+        "value": 0.057691
+      },
+      {
+        "date": "2024-02-23",
+        "value": 0.004073
+      },
+      {
+        "date": "2024-02-26",
+        "value": 0.005033
+      },
+      {
+        "date": "2024-02-27",
+        "value": 0.002987
+      },
+      {
+        "date": "2024-02-28",
+        "value": 0.006613
+      },
+      {
+        "date": "2024-02-29",
+        "value": 0.007292
+      }
+    ]
+  },
+  "v2_promotion_ready": false,
+  "warnings": []
+}

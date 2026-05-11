@@ -1,0 +1,61 @@
+{
+  "boundary_verdict": "tier2_blocked",
+  "canonical_engine_required": true,
+  "cash": [
+    {
+      "date": "2020-01-02",
+      "value": 0.0
+    },
+    {
+      "date": "2020-01-03",
+      "value": 0.0
+    }
+  ],
+  "date_range": {
+    "end": "2020-01-03",
+    "start": "2020-01-02"
+  },
+  "gross_exposure": [
+    {
+      "date": "2020-01-02",
+      "value": 1.0
+    },
+    {
+      "date": "2020-01-03",
+      "value": 1.0
+    }
+  ],
+  "manifest_uri": "data/fixtures/v2_proxy/synthetic_manifest.json",
+  "net_exposure": [
+    {
+      "date": "2020-01-02",
+      "value": 1.0
+    },
+    {
+      "date": "2020-01-03",
+      "value": 1.0
+    }
+  ],
+  "promotion_ready": false,
+  "row_count": 2,
+  "transaction_cost": [
+    {
+      "date": "2020-01-02",
+      "value": 100.0
+    },
+    {
+      "date": "2020-01-03",
+      "value": 21.978
+    }
+  ],
+  "turnover": [
+    {
+      "date": "2020-01-02",
+      "value": 1.0
+    },
+    {
+      "date": "2020-01-03",
+      "value": 0.2
+    }
+  ]
+}

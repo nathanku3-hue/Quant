@@ -1,0 +1,71 @@
+{
+  "allowed_use": [
+    "squeeze base context",
+    "positioning context",
+    "GodView market behavior input",
+    "delayed short-crowding evidence"
+  ],
+  "asof_ts": "2026-04-24",
+  "average_daily_volume": {
+    "max": 70796421,
+    "min": 6610420
+  },
+  "dataset_type": "short_interest",
+  "date_range": {
+    "end": "2026-04-15",
+    "start": "2026-04-15"
+  },
+  "days_to_cover": {
+    "max": 9.37,
+    "min": 1.0
+  },
+  "forbidden_use": [
+    "real-time squeeze trigger",
+    "buy/sell signal",
+    "standalone ranking factor",
+    "alert emission",
+    "canonical alpha evidence without additional validation"
+  ],
+  "freshness_policy": "twice_monthly / delayed",
+  "issue_name": [
+    "Apple Inc. Common Stock",
+    "Tesla, Inc. Common Stock",
+    "GameStop Corp. Class A"
+  ],
+  "license_or_terms_note": "FINRA official public short-interest file; use as tiny static fixture only. Website/catalog terms and any future API terms must be reviewed before automated or bulk use.",
+  "manifest_schema_version": "1.0.0",
+  "observed_estimated_or_inferred": "observed",
+  "official_source_url": "https://cdn.finra.org/equity/otcmarket/biweekly/shrt20260415.csv",
+  "primary_key_fields": [
+    "settlement_date",
+    "ticker"
+  ],
+  "provider": "finra",
+  "provider_feed": "equity_short_interest",
+  "publication_or_retrieved_at": "2026-04-24",
+  "reg_sho_fields_present": false,
+  "row_count": 3,
+  "schema_columns": [
+    "settlement_date",
+    "ticker",
+    "issue_name",
+    "short_interest",
+    "average_daily_volume",
+    "days_to_cover",
+    "official_source_row_locator"
+  ],
+  "schema_version": "1.0.0",
+  "settlement_date": "2026-04-15",
+  "sha256": "6db7f5302e138fb95c77ff0357dcbdd86b481694a72e76aca397d2885299b5ca",
+  "short_interest": {
+    "max": 134422787,
+    "min": 61907606
+  },
+  "source_name": "FINRA Equity Short Interest",
+  "source_quality": "public_official_observed",
+  "ticker": [
+    "AAPL",
+    "TSLA",
+    "GME"
+  ]
+}

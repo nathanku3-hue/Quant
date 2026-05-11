@@ -1,0 +1,481 @@
+{
+  "queue_id": "SUPERCYCLE_CANDIDATE_INTAKE_QUEUE_V0",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "scope": "PH65_G8_1_INTAKE_ONLY",
+  "authority": "candidate_discovery_intake_only",
+  "candidate_intake_items": [
+    {
+      "ticker": "MU",
+      "company_name": "Micron Technology, Inc.",
+      "theme_candidates": [
+        "MEMORY_STORAGE_SUPERCYCLE",
+        "AI_COMPUTE_INFRA"
+      ],
+      "why_it_might_belong": "Human-spotted memory and AI infrastructure supercycle candidate already represented by the one approved G8 candidate card.",
+      "evidence_needed": [
+        "maintain official filing and segment evidence requirements from the existing card",
+        "keep market-behavior evidence missing until a later approved signal-card phase",
+        "verify cycle-breaker evidence before any thesis validation"
+      ],
+      "known_source_candidates": [
+        {
+          "source_id": "MU_SUPERCYCLE_CANDIDATE_CARD_V0",
+          "source_type": "existing_static_candidate_card",
+          "canonical": false,
+          "note": "Existing card proves object shape only; it is not alpha evidence."
+        }
+      ],
+      "official_sources_needed": [
+        "SEC filings",
+        "company investor-relations releases and transcripts",
+        "manifested official-source evidence in a later approved card or signal phase"
+      ],
+      "market_behavior_modules_relevant": [
+        "PRICE_VOLUME_BEHAVIOR",
+        "FINRA_SHORT_INTEREST",
+        "IV_VOL_INTELLIGENCE",
+        "OPTIONS_WHALE_RADAR",
+        "GAMMA_DEALER_MAP",
+        "FRED_MACRO_LIQUIDITY",
+        "KEN_FRENCH_FACTOR_CONTEXT"
+      ],
+      "thesis_breakers_to_check": [
+        "memory oversupply or pricing reversal",
+        "AI demand failing to translate into durable revenue or margin evidence",
+        "capex or balance-sheet pressure outweighing cycle improvement"
+      ],
+      "provider_gaps": [
+        "licensed options, IV, gamma, and whale evidence",
+        "canonical price-volume behavior evidence",
+        "future official filing evidence mapped to the thesis"
+      ],
+      "current_status": "candidate_card_exists",
+      "discovery_origin": [
+        "USER_SEEDED"
+      ],
+      "origin_evidence": [
+        {
+          "origin": "USER_SEEDED",
+          "source_id": "user_seeded_mu_candidate_card_context",
+          "canonical": false,
+          "note": "MU is user-seeded and already has the one approved G8 candidate card; this is not validation or action evidence."
+        }
+      ],
+      "scout_path": [
+        "manual_user_seed"
+      ],
+      "is_user_seeded": true,
+      "is_system_scouted": false,
+      "is_validated": false,
+      "is_actionable": false,
+      "not_alpha_evidence": true,
+      "no_score": true,
+      "no_rank": true,
+      "no_buy_sell_signal": true
+    },
+    {
+      "ticker": "DELL",
+      "company_name": "Dell Technologies Inc.",
+      "theme_candidates": [
+        "AI_SERVER_SUPPLY_CHAIN",
+        "AI_COMPUTE_INFRA"
+      ],
+      "why_it_might_belong": "AI server and infrastructure exposure makes the name plausible for a discovery intake queue, pending official order, backlog, margin, and customer evidence.",
+      "evidence_needed": [
+        "official AI-server order and backlog evidence",
+        "segment margin and working-capital evidence",
+        "customer concentration and execution-risk evidence"
+      ],
+      "known_source_candidates": [
+        {
+          "source_id": "dell_investor_relations_candidate",
+          "source_type": "official_ir_candidate",
+          "canonical": false,
+          "locator": "investors.delltechnologies.com",
+          "note": "Candidate source lead only; no filing or transcript validation is performed in G8.1."
+        }
+      ],
+      "official_sources_needed": [
+        "Dell investor-relations releases",
+        "Dell SEC filings",
+        "official earnings-call transcript or filing excerpts in a later approved card"
+      ],
+      "market_behavior_modules_relevant": [
+        "PRICE_VOLUME_BEHAVIOR",
+        "FINRA_SHORT_INTEREST",
+        "SEC_FILINGS_OWNERSHIP",
+        "FRED_MACRO_LIQUIDITY",
+        "KEN_FRENCH_FACTOR_CONTEXT"
+      ],
+      "thesis_breakers_to_check": [
+        "AI-server backlog converts at weak margins",
+        "supply constraints or customer concentration weaken durability",
+        "working-capital or inventory pressure offsets revenue growth"
+      ],
+      "provider_gaps": [
+        "canonical segment/backlog evidence",
+        "canonical price-volume behavior evidence",
+        "licensed options and dealer-positioning evidence"
+      ],
+      "current_status": "intake_only",
+      "discovery_origin": [
+        "USER_SEEDED",
+        "THEME_ADJACENT"
+      ],
+      "origin_evidence": [
+        {
+          "origin": "USER_SEEDED",
+          "source_id": "user_seeded_dell_name",
+          "canonical": false,
+          "note": "DELL was provided by the user as a seed intake name."
+        },
+        {
+          "origin": "THEME_ADJACENT",
+          "source_id": "ai_server_supply_chain_theme_mapping",
+          "canonical": false,
+          "note": "Theme adjacency only; no official backlog or margin evidence is validated."
+        }
+      ],
+      "scout_path": [
+        "manual_user_seed",
+        "theme_adjacency:AI_SERVER_SUPPLY_CHAIN"
+      ],
+      "is_user_seeded": true,
+      "is_system_scouted": false,
+      "is_validated": false,
+      "is_actionable": false,
+      "not_alpha_evidence": true,
+      "no_score": true,
+      "no_rank": true,
+      "no_buy_sell_signal": true
+    },
+    {
+      "ticker": "INTC",
+      "company_name": "Intel Corporation",
+      "theme_candidates": [
+        "RESHORING_FOUNDRY",
+        "AI_COMPUTE_INFRA"
+      ],
+      "why_it_might_belong": "Foundry, reshoring, AI PC, and turnaround exposure make the name plausible for intake, but it requires unusually careful thesis-breaker handling.",
+      "evidence_needed": [
+        "official foundry customer, utilization, and yield evidence",
+        "turnaround milestone and margin evidence",
+        "balance-sheet, capex, and competitive-position evidence"
+      ],
+      "known_source_candidates": [
+        {
+          "source_id": "intel_investor_relations_candidate",
+          "source_type": "official_ir_candidate",
+          "canonical": false,
+          "locator": "intel.com/content/www/us/en/investor-relations.html",
+          "note": "Candidate source lead only; no turnaround claim is validated in G8.1."
+        }
+      ],
+      "official_sources_needed": [
+        "Intel investor-relations releases",
+        "Intel SEC filings",
+        "official foundry and segment disclosures in a later approved card"
+      ],
+      "market_behavior_modules_relevant": [
+        "PRICE_VOLUME_BEHAVIOR",
+        "FINRA_SHORT_INTEREST",
+        "SEC_FILINGS_OWNERSHIP",
+        "FRED_MACRO_LIQUIDITY",
+        "KEN_FRENCH_FACTOR_CONTEXT"
+      ],
+      "thesis_breakers_to_check": [
+        "foundry execution milestones slip or fail to show utilization evidence",
+        "turnaround cash burn or margin pressure overwhelms reshoring thesis",
+        "competitive position weakens despite AI PC or foundry narrative"
+      ],
+      "provider_gaps": [
+        "canonical foundry customer evidence",
+        "canonical turnaround milestone evidence",
+        "canonical price-volume behavior evidence"
+      ],
+      "current_status": "intake_only",
+      "discovery_origin": [
+        "USER_SEEDED",
+        "THEME_ADJACENT"
+      ],
+      "origin_evidence": [
+        {
+          "origin": "USER_SEEDED",
+          "source_id": "user_seeded_intc_name",
+          "canonical": false,
+          "note": "INTC was provided by the user as a seed intake name."
+        },
+        {
+          "origin": "THEME_ADJACENT",
+          "source_id": "reshoring_foundry_theme_mapping",
+          "canonical": false,
+          "note": "Theme adjacency only; no official foundry milestone is validated."
+        }
+      ],
+      "scout_path": [
+        "manual_user_seed",
+        "theme_adjacency:RESHORING_FOUNDRY"
+      ],
+      "is_user_seeded": true,
+      "is_system_scouted": false,
+      "is_validated": false,
+      "is_actionable": false,
+      "not_alpha_evidence": true,
+      "no_score": true,
+      "no_rank": true,
+      "no_buy_sell_signal": true
+    },
+    {
+      "ticker": "AMD",
+      "company_name": "Advanced Micro Devices, Inc.",
+      "theme_candidates": [
+        "AI_COMPUTE_INFRA"
+      ],
+      "why_it_might_belong": "AI and data-center compute exposure makes the name plausible for intake, pending official segment, product-ramp, margin, and competitive evidence.",
+      "evidence_needed": [
+        "official data-center revenue and product-ramp evidence",
+        "gross margin and supply evidence",
+        "competitive positioning evidence versus incumbent and custom silicon alternatives"
+      ],
+      "known_source_candidates": [
+        {
+          "source_id": "amd_investor_relations_candidate",
+          "source_type": "official_ir_candidate",
+          "canonical": false,
+          "locator": "ir.amd.com",
+          "note": "Candidate source lead only; no segment-growth claim is validated in G8.1."
+        }
+      ],
+      "official_sources_needed": [
+        "AMD investor-relations releases",
+        "AMD SEC filings",
+        "official segment disclosures in a later approved card"
+      ],
+      "market_behavior_modules_relevant": [
+        "PRICE_VOLUME_BEHAVIOR",
+        "FINRA_SHORT_INTEREST",
+        "SEC_FILINGS_OWNERSHIP",
+        "FRED_MACRO_LIQUIDITY",
+        "KEN_FRENCH_FACTOR_CONTEXT"
+      ],
+      "thesis_breakers_to_check": [
+        "AI accelerator ramp fails to meet official demand evidence",
+        "data-center growth does not translate into durable margin improvement",
+        "competitive pressure or customer concentration breaks the thesis"
+      ],
+      "provider_gaps": [
+        "canonical segment and product-ramp evidence",
+        "canonical price-volume behavior evidence",
+        "licensed options and dealer-positioning evidence"
+      ],
+      "current_status": "intake_only",
+      "discovery_origin": [
+        "USER_SEEDED",
+        "THEME_ADJACENT"
+      ],
+      "origin_evidence": [
+        {
+          "origin": "USER_SEEDED",
+          "source_id": "user_seeded_amd_name",
+          "canonical": false,
+          "note": "AMD was provided by the user as a seed intake name."
+        },
+        {
+          "origin": "THEME_ADJACENT",
+          "source_id": "ai_compute_infra_theme_mapping",
+          "canonical": false,
+          "note": "Theme adjacency only; no official data-center product-ramp evidence is validated."
+        }
+      ],
+      "scout_path": [
+        "manual_user_seed",
+        "theme_adjacency:AI_COMPUTE_INFRA"
+      ],
+      "is_user_seeded": true,
+      "is_system_scouted": false,
+      "is_validated": false,
+      "is_actionable": false,
+      "not_alpha_evidence": true,
+      "no_score": true,
+      "no_rank": true,
+      "no_buy_sell_signal": true
+    },
+    {
+      "ticker": "LRCX",
+      "company_name": "Lam Research Corporation",
+      "theme_candidates": [
+        "SEMICAP_EQUIPMENT",
+        "MEMORY_STORAGE_SUPERCYCLE"
+      ],
+      "why_it_might_belong": "Semicap and memory-capex exposure make the name plausible for intake, pending official demand, backlog, WFE, and cycle evidence.",
+      "evidence_needed": [
+        "official WFE demand or order evidence",
+        "memory and foundry-logic capex exposure evidence",
+        "export-control, customer-concentration, and cancellation-risk evidence"
+      ],
+      "known_source_candidates": [
+        {
+          "source_id": "lam_research_investor_relations_candidate",
+          "source_type": "official_ir_candidate",
+          "canonical": false,
+          "locator": "investor.lamresearch.com",
+          "note": "Candidate source lead only; third-party summaries must be replaced by official filing or transcript evidence later."
+        }
+      ],
+      "official_sources_needed": [
+        "Lam Research investor-relations releases",
+        "Lam Research SEC filings",
+        "official earnings-call transcript or filing excerpts in a later approved card"
+      ],
+      "market_behavior_modules_relevant": [
+        "PRICE_VOLUME_BEHAVIOR",
+        "FINRA_SHORT_INTEREST",
+        "SEC_FILINGS_OWNERSHIP",
+        "FRED_MACRO_LIQUIDITY",
+        "KEN_FRENCH_FACTOR_CONTEXT"
+      ],
+      "thesis_breakers_to_check": [
+        "memory or WFE capex cycle weakens before official confirmation",
+        "export controls or customer concentration reduce durable demand",
+        "orders fail to translate into revenue or margin resilience"
+      ],
+      "provider_gaps": [
+        "canonical WFE and order evidence",
+        "canonical price-volume behavior evidence",
+        "licensed options and dealer-positioning evidence"
+      ],
+      "current_status": "intake_only",
+      "discovery_origin": [
+        "USER_SEEDED",
+        "SUPPLY_CHAIN_ADJACENT"
+      ],
+      "origin_evidence": [
+        {
+          "origin": "USER_SEEDED",
+          "source_id": "user_seeded_lrcx_name",
+          "canonical": false,
+          "note": "LRCX was provided by the user as a seed intake name."
+        },
+        {
+          "origin": "SUPPLY_CHAIN_ADJACENT",
+          "source_id": "memory_semicap_supply_chain_mapping",
+          "canonical": false,
+          "note": "Supply-chain adjacency only; no official WFE or order evidence is validated."
+        }
+      ],
+      "scout_path": [
+        "manual_user_seed",
+        "supply_chain_adjacency:MEMORY_STORAGE_SUPERCYCLE"
+      ],
+      "is_user_seeded": true,
+      "is_system_scouted": false,
+      "is_validated": false,
+      "is_actionable": false,
+      "not_alpha_evidence": true,
+      "no_score": true,
+      "no_rank": true,
+      "no_buy_sell_signal": true
+    },
+    {
+      "ticker": "ALB",
+      "company_name": "Albemarle Corporation",
+      "theme_candidates": [
+        "CRITICAL_MINERALS_LITHIUM"
+      ],
+      "why_it_might_belong": "Lithium, battery, and energy-storage exposure make the name plausible for intake, pending official price, volume, cost, and balance-sheet evidence.",
+      "evidence_needed": [
+        "official lithium price, volume, and segment evidence",
+        "cost-curve and balance-sheet evidence",
+        "demand, oversupply, and substitution-risk evidence"
+      ],
+      "known_source_candidates": [
+        {
+          "source_id": "albemarle_investor_relations_candidate",
+          "source_type": "official_ir_candidate",
+          "canonical": false,
+          "locator": "investors.albemarle.com",
+          "note": "Candidate source lead only; no energy-storage cycle claim is validated in G8.1."
+        }
+      ],
+      "official_sources_needed": [
+        "Albemarle investor-relations releases",
+        "Albemarle SEC filings",
+        "official segment disclosures in a later approved card"
+      ],
+      "market_behavior_modules_relevant": [
+        "PRICE_VOLUME_BEHAVIOR",
+        "FINRA_SHORT_INTEREST",
+        "SEC_FILINGS_OWNERSHIP",
+        "FRED_MACRO_LIQUIDITY",
+        "KEN_FRENCH_FACTOR_CONTEXT"
+      ],
+      "thesis_breakers_to_check": [
+        "lithium oversupply or price weakness overwhelms volume improvement",
+        "battery or energy-storage demand weakens against supply growth",
+        "balance-sheet or project-execution risk breaks the cycle thesis"
+      ],
+      "provider_gaps": [
+        "canonical price and volume evidence",
+        "canonical cost-curve evidence",
+        "canonical price-volume behavior evidence"
+      ],
+      "current_status": "intake_only",
+      "discovery_origin": [
+        "USER_SEEDED",
+        "THEME_ADJACENT"
+      ],
+      "origin_evidence": [
+        {
+          "origin": "USER_SEEDED",
+          "source_id": "user_seeded_alb_name",
+          "canonical": false,
+          "note": "ALB was provided by the user as a seed intake name."
+        },
+        {
+          "origin": "THEME_ADJACENT",
+          "source_id": "critical_minerals_lithium_theme_mapping",
+          "canonical": false,
+          "note": "Theme adjacency only; no official lithium price, volume, or cost evidence is validated."
+        }
+      ],
+      "scout_path": [
+        "manual_user_seed",
+        "theme_adjacency:CRITICAL_MINERALS_LITHIUM"
+      ],
+      "is_user_seeded": true,
+      "is_system_scouted": false,
+      "is_validated": false,
+      "is_actionable": false,
+      "not_alpha_evidence": true,
+      "no_score": true,
+      "no_rank": true,
+      "no_buy_sell_signal": true
+    }
+  ],
+  "object_distinctions": {
+    "candidate_intake_item": "This name may belong in the discovery universe.",
+    "candidate_card": "This name has one structured thesis object.",
+    "later_evidence_state": "This name passed later evidence gates.",
+    "later_action_state": "This later state requires thesis, market-behavior, and risk checks outside G8.1."
+  },
+  "forbidden_outputs": {
+    "no_score": true,
+    "no_rank": true,
+    "no_buy_sell_signal": true,
+    "no_candidate_ranking": true,
+    "no_validated_thesis": true,
+    "no_buying_range": true
+  },
+  "forbidden_use": [
+    "alpha search",
+    "candidate ranking",
+    "candidate scoring",
+    "validated-thesis claims",
+    "action-state promotion",
+    "backtest",
+    "provider ingestion",
+    "dashboard runtime behavior",
+    "alerts",
+    "broker behavior"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "scout_output_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "scope": "PH65_G8_1B_SCOUT_OUTPUT_TINY",
+  "authority": "local_factor_scout_intake_only",
+  "scout_model_id": "LOCAL_FACTOR_EQUAL_WEIGHT_V0",
+  "scout_model_version": "0.1.0",
+  "scout_model_manifest": "data/discovery/local_factor_scout_baseline_v0.manifest.json",
+  "output_manifest": "data/discovery/local_factor_scout_output_tiny_v0.manifest.json",
+  "asof_date": "2026-02-13",
+  "items": [
+    {
+      "ticker": "MSFT",
+      "company_name": "MICROSOFT CORP",
+      "discovery_origin": "LOCAL_FACTOR_SCOUT",
+      "scout_model_id": "LOCAL_FACTOR_EQUAL_WEIGHT_V0",
+      "asof_date": "2026-02-13",
+      "reason_bucket": "local_factor_exposures_available_for_research_intake",
+      "factor_exposures_available": true,
+      "evidence_needed": [
+        "official segment and filing evidence before any thesis validation",
+        "market-behavior evidence from separately approved signal cards",
+        "source-quality review to replace local artifact context with canonical evidence if promoted later"
+      ],
+      "thesis_breakers_to_check": [
+        "AI infrastructure demand does not translate into durable revenue or margin evidence",
+        "cloud capex or competitive pressure weakens the research thesis",
+        "regulatory or platform concentration risk outweighs supercycle exposure"
+      ],
+      "provider_gaps": [
+        "canonical price-volume behavior evidence",
+        "licensed options, IV, gamma, and dealer-positioning evidence",
+        "official filing and transcript evidence mapped to a later thesis object"
+      ],
+      "status": "intake_only",
+      "not_alpha_evidence": true,
+      "is_user_seeded": false,
+      "is_system_scouted": true,
+      "is_validated": false,
+      "is_actionable": false
+    }
+  ],
+  "forbidden_outputs": {
+    "no_score_display": true,
+    "no_rank": true,
+    "no_buy_sell_signal": true,
+    "no_candidate_card": true,
+    "no_dashboard_change": true
+  },
+  "allowed_use": [
+    "prove one governed LOCAL_FACTOR_SCOUT intake item",
+    "schema validation for G8.1B",
+    "planner handoff for later approval choices"
+  ],
+  "forbidden_use": [
+    "candidate ranking",
+    "candidate scoring",
+    "recommendation language",
+    "validated thesis claims",
+    "action-state promotion",
+    "dashboard runtime behavior",
+    "alerts",
+    "broker behavior"
+  ]
+}

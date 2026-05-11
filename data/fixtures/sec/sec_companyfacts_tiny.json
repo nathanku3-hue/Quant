@@ -1,0 +1,47 @@
+{
+  "entity": {
+    "cik": "0000320193",
+    "entity_name": "Apple Inc.",
+    "ticker_if_known": "AAPL"
+  },
+  "facts": [
+    {
+      "accession_number": "0000320193-26-000013",
+      "cik": "0000320193",
+      "end": "2026-03-28",
+      "filed": "2026-05-01",
+      "form": "10-Q",
+      "fp": "Q2",
+      "fy": 2026,
+      "primary_key": "0000320193|0000320193-26-000013|10-Q|Assets|2026-03-28|USD",
+      "raw_locator": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "tag": "Assets",
+      "taxonomy": "us-gaap",
+      "unit": "USD",
+      "value": 371082000000
+    },
+    {
+      "accession_number": "0000320193-26-000013",
+      "cik": "0000320193",
+      "end": "2026-03-28",
+      "filed": "2026-05-01",
+      "form": "10-Q",
+      "fp": "Q2",
+      "fy": 2026,
+      "primary_key": "0000320193|0000320193-26-000013|10-Q|NetIncomeLoss|2026-03-28|USD",
+      "raw_locator": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "tag": "NetIncomeLoss",
+      "taxonomy": "us-gaap",
+      "unit": "USD",
+      "value": 29578000000
+    }
+  ],
+  "fixture_id": "sec_companyfacts_aapl_tiny_v1",
+  "fixture_type": "sec_companyfacts_tiny",
+  "retrieval": {
+    "api_endpoint": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+    "retrieved_at": "2026-05-09T15:25:40Z",
+    "user_agent_used": "TerminalZeroResearch/0.1"
+  },
+  "schema_version": "1.0.0"
+}

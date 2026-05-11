@@ -1,0 +1,48 @@
+{
+  "allowed_use": "Static fixture validation, provenance, schema, row-count, date, and source-rights proof only.",
+  "api_endpoint": "https://data.sec.gov/submissions/CIK0000320193.json",
+  "asof_ts": "2026-05-08",
+  "cik": "0000320193",
+  "date_range": {
+    "end": "2026-05-08",
+    "start": "2026-04-30"
+  },
+  "entity_key_type": "CIK",
+  "fixture_id": "sec_submissions_aapl_tiny_v1",
+  "forbidden_use": "No live provider, bulk download, ingestion, canonical lake writes, signal scoring, candidate generation, alerts, broker calls, or state-machine consumption.",
+  "form_types": [
+    "4",
+    "144",
+    "10-Q",
+    "8-K"
+  ],
+  "license_or_terms_note": "SEC EDGAR data via data.sec.gov official public JSON API; automated access must follow SEC fair-access guidance.",
+  "manifest_schema_version": "1.0.0",
+  "observed_estimated_or_inferred": "observed",
+  "primary_key_fields": [
+    "cik",
+    "accession_number",
+    "form",
+    "filing_date"
+  ],
+  "provider": "sec",
+  "provider_feed": "data.sec.gov",
+  "rate_limit_policy": "No more than 10 requests per second per SEC fair-access guidance; this fixture used one submissions request and stores a static tiny sample only.",
+  "retrieved_at": "2026-05-09T15:25:40Z",
+  "row_count": 5,
+  "schema_columns": [
+    "accession_number",
+    "cik",
+    "filing_date",
+    "form",
+    "primary_document",
+    "primary_key",
+    "raw_locator",
+    "report_date"
+  ],
+  "schema_version": "1.0.0",
+  "sha256": "29579c46216dd15c0426f0c731f57533e290de592c0e2021739f729e2adf0c1b",
+  "source_name": "SEC EDGAR / data.sec.gov",
+  "source_quality": "public_official_observed",
+  "ticker_if_known": "AAPL"
+}

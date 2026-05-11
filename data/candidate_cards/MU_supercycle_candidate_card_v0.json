@@ -1,0 +1,187 @@
+{
+  "candidate_id": "MU_SUPERCYCLE_CANDIDATE_CARD_V0",
+  "ticker": "MU",
+  "company_name": "Micron Technology, Inc.",
+  "theme": "memory-and-ai-infrastructure-supercycle",
+  "supercycle_family_id": "SUPERCYCLE_GEM_MEMORY_AI_INFRA_V0",
+  "candidate_status": "candidate_card_only",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "created_by": "human_nominated_codex_structured",
+  "source_quality_summary": {
+    "observed": [
+      {
+        "claim": "Ticker, company-name, and public-company identity are recorded as fixture-style identity context only.",
+        "source_id": "manual_human_nomination_20260510",
+        "quality_label": "observed",
+        "canonical": true
+      }
+    ],
+    "estimated": [
+      "No estimated market-behavior signal is treated as observed in this card."
+    ],
+    "inferred": [
+      "The supercycle framing is a human-nominated research thesis, not alpha evidence."
+    ],
+    "research_only": [
+      "This card captures the pre-analysis research object before screening, ranking, scoring, backtest, replay, or provider ingestion."
+    ],
+    "not_canonical": [
+      "Any later web/source review is research capture only until separately manifested and approved."
+    ],
+    "missing": [
+      "canonical price-volume behavior evidence",
+      "SEC filing evidence specific to the thesis",
+      "FINRA short-interest context for this ticker",
+      "CFTC broad regime context mapped to the theme",
+      "FRED/Ken French macro/factor context mapped to the theme",
+      "options/IV/gamma/whale provider evidence"
+    ],
+    "stale": [
+      "No stale source is promoted to canonical evidence in G8."
+    ],
+    "forbidden": [
+      "yfinance as canonical source",
+      "ranked screen results",
+      "live provider calls",
+      "paid options/IV/gamma data",
+      "unmanifested sources",
+      "buy/sell/alert/broker outputs"
+    ],
+    "canonical_sources": [
+      {
+        "source_id": "manual_human_nomination_20260510",
+        "source_type": "manual_research_note",
+        "quality_label": "research_only",
+        "canonical": true,
+        "canonical_for": "candidate-card identity and thesis placeholder only"
+      }
+    ]
+  },
+  "manifest_uri": "data/candidate_cards/MU_supercycle_candidate_card_v0.manifest.json",
+  "state_machine_version": "G7.2_definition_only_v1",
+  "primary_alpha": {
+    "thesis_summary": "Human-nominated memory and AI infrastructure supercycle candidate. This is a thesis placeholder for structured evidence gathering, not a finding that the thesis is true.",
+    "supercycle_driver": "Potential cyclical and structural demand pressure in memory tied to AI infrastructure buildout; unverified for G8.",
+    "evidence_present": [
+      {
+        "evidence_id": "G8_MU_PRESENT_001",
+        "description": "Human nomination selected MU as the first clean established public-company fixture.",
+        "quality_label": "research_only",
+        "observed_estimated_or_inferred": "inferred"
+      }
+    ],
+    "evidence_missing": [
+      "official filing evidence tied to the thesis",
+      "canonical price-volume behavior evidence",
+      "manifested market-behavior context",
+      "licensed options/IV/gamma/whale evidence",
+      "thesis-specific invalidation evidence"
+    ],
+    "thesis_breakers": [
+      "memory cycle fundamentals contradict the supercycle thesis",
+      "AI infrastructure demand fails to translate into durable margin or revenue evidence",
+      "balance-sheet or capex pressure overwhelms cycle recovery",
+      "state-machine evidence moves to THESIS_BROKEN"
+    ],
+    "data_dependencies": [
+      "future SEC fixture or provider approval for official filing evidence",
+      "future canonical price-volume manifest",
+      "future FINRA short-interest context if approved",
+      "future macro/factor context if approved",
+      "future licensed options/IV/gamma provider decision"
+    ]
+  },
+  "secondary_alpha": {
+    "market_behavior_modules_relevant": [
+      "PRICE_VOLUME_BEHAVIOR",
+      "FINRA_SHORT_INTEREST",
+      "IV_VOL_INTELLIGENCE",
+      "OPTIONS_WHALE_RADAR",
+      "GAMMA_DEALER_MAP",
+      "FRED_MACRO_LIQUIDITY",
+      "KEN_FRENCH_FACTOR_CONTEXT"
+    ],
+    "observed_signals_available": [],
+    "estimated_signals_needed_later": [
+      {
+        "signal_family": "ROTATION_SCORE",
+        "quality_label": "estimated",
+        "allowed_later_only": true
+      }
+    ],
+    "inferred_signals_allowed_later": [
+      {
+        "signal_family": "RISK_INVALIDATION",
+        "quality_label": "inferred",
+        "allowed_later_only": true
+      }
+    ],
+    "blocked_signals_due_to_provider_gap": [
+      {
+        "signal_family": "IV_VOL_INTELLIGENCE",
+        "quality_label": "provider_gap",
+        "reason": "licensed provider decision required"
+      },
+      {
+        "signal_family": "OPTIONS_WHALE_RADAR",
+        "quality_label": "provider_gap",
+        "reason": "licensed provider decision required"
+      },
+      {
+        "signal_family": "GAMMA_DEALER_MAP",
+        "quality_label": "provider_gap",
+        "reason": "licensed provider decision required"
+      }
+    ]
+  },
+  "state_mapping": {
+    "initial_state": "THESIS_CANDIDATE",
+    "allowed_next_states": [
+      "EVIDENCE_BUILDING",
+      "LEFT_SIDE_RISK",
+      "THESIS_BROKEN"
+    ],
+    "forbidden_jumps": [
+      "THESIS_CANDIDATE -> BUYING_RANGE",
+      "THESIS_CANDIDATE -> ADD_ON_SETUP",
+      "THESIS_CANDIDATE -> LET_WINNER_RUN",
+      "THESIS_CANDIDATE -> TRIM_OPTIONAL"
+    ],
+    "reason_codes_present": [
+      "THESIS_EVIDENCE"
+    ],
+    "reason_codes_missing": [
+      "PRICE_VOLUME_BEHAVIOR",
+      "IV_VOL_BEHAVIOR",
+      "OPTIONS_WHALE_BEHAVIOR",
+      "SHORT_SQUEEZE_BASE",
+      "CTA_SYSTEMATIC_CONTEXT",
+      "ROTATION_CONTEXT",
+      "MACRO_LIQUIDITY_CONTEXT",
+      "FACTOR_REGIME_CONTEXT",
+      "OWNERSHIP_WHALE_CONTEXT",
+      "RISK_INVALIDATION"
+    ]
+  },
+  "risk_discipline": {
+    "left_side_risk_questions": [
+      "What observed evidence would indicate the thesis is early, fragile, or structurally wrong?",
+      "What official or canonical evidence is required before leaving THESIS_CANDIDATE?"
+    ],
+    "hold_discipline_questions": [
+      "What later evidence would justify monitoring as EVIDENCE_BUILDING without producing an action state?",
+      "What provider gaps must remain visible before any market-behavior interpretation?"
+    ],
+    "invalidation_questions": [
+      "Which filing, cycle, margin, or demand evidence would break the thesis?",
+      "Which missing source would make the card stale rather than actionable?"
+    ]
+  },
+  "forbidden_outputs": {
+    "no_score": true,
+    "no_rank": true,
+    "no_buy_sell_signal": true,
+    "no_alert": true,
+    "no_broker_action": true
+  }
+}

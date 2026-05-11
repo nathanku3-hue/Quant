@@ -1,0 +1,294 @@
+{
+  "candidate_id": "MSFT_SUPERCYCLE_CANDIDATE_CARD_V0",
+  "ticker": "MSFT",
+  "company_name": "MICROSOFT CORP",
+  "theme": "ai-cloud-infrastructure-supercycle",
+  "supercycle_family_id": "SUPERCYCLE_GEM_AI_CLOUD_INFRA_V0",
+  "candidate_status": "candidate_card_only",
+  "discovery_origin": "LOCAL_FACTOR_SCOUT",
+  "scout_model_id": "LOCAL_FACTOR_EQUAL_WEIGHT_V0",
+  "source_intake_item_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0:MSFT:2026-02-13",
+  "source_intake_manifest_uri": "data/discovery/local_factor_scout_output_tiny_v0.manifest.json",
+  "candidate_card_manifest_uri": "data/candidate_cards/MSFT_supercycle_candidate_card_v0.manifest.json",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "created_by": "local_factor_scout_codex_structured",
+  "source_quality_summary": {
+    "observed": [
+      {
+        "claim": "The governed LOCAL_FACTOR_SCOUT output contains exactly one intake-only MSFT item.",
+        "source_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "candidate-card provenance only"
+      },
+      {
+        "claim": "Microsoft reports FY2025 Azure and cloud growth while also noting margin impact from scaling AI infrastructure.",
+        "source_id": "MSFT_2025_ANNUAL_REPORT",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "public evidence pointer only, not thesis validation"
+      },
+      {
+        "claim": "Microsoft publicly described large AI-enabled datacenter investment plans for FY2025.",
+        "source_id": "MSFT_GOLDEN_OPPORTUNITY_AI_20250103",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "public evidence pointer only, not thesis validation"
+      },
+      {
+        "claim": "SEC Form 13F timing is delayed and can support slow ownership context later, not live whale behavior.",
+        "source_id": "SEC_13F_FAQ",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "filing-timing policy only"
+      }
+    ],
+    "estimated": [
+      "No estimated market-behavior signal is treated as observed in this card.",
+      "Any future AI demand, ownership, options, IV, gamma, or dealer-positioning interpretation requires separate evidence."
+    ],
+    "inferred": [
+      "The AI/cloud infrastructure framing is a research hypothesis created from a governed scout item and public-source pointers.",
+      "The local factor scout selection is provenance, not proof that MSFT has superior alpha."
+    ],
+    "research_only": [
+      "This card converts one system-scouted intake object into a structured research object.",
+      "The card records evidence to gather and thesis breakers, but does not validate the thesis."
+    ],
+    "not_canonical": [
+      "Third-party articles, social posts, analyst commentary, and yfinance are not canonical evidence for this card.",
+      "Any future provider or web research must be manifested before it can become canonical evidence."
+    ],
+    "missing": [
+      "canonical price-volume behavior evidence",
+      "manifested SEC filing excerpts mapped to the thesis",
+      "official segment evidence translated into a thesis validation packet",
+      "current ownership and insider behavior evidence",
+      "licensed options, IV, gamma, whale, and dealer-positioning evidence",
+      "market-behavior signal card evidence from a later approved G9 lane"
+    ],
+    "stale": [
+      "The local factor scout as-of date is 2026-02-13 and is not a live market signal.",
+      "Future 13F evidence would be delayed by filing rules and must be labeled slow ownership context."
+    ],
+    "forbidden": [
+      "factor score display",
+      "candidate ranking",
+      "validated thesis claims",
+      "buy/sell/hold output",
+      "buying range",
+      "alert metadata",
+      "broker action",
+      "dashboard runtime behavior",
+      "provider ingestion"
+    ],
+    "canonical_sources": [
+      {
+        "source_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0",
+        "source_type": "governed_local_artifact",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "source intake provenance",
+        "artifact_uri": "data/discovery/local_factor_scout_output_tiny_v0.json",
+        "manifest_uri": "data/discovery/local_factor_scout_output_tiny_v0.manifest.json"
+      },
+      {
+        "source_id": "MSFT_2025_ANNUAL_REPORT",
+        "source_type": "official_annual_report",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "light public evidence pointer only",
+        "locator": "https://www.microsoft.com/investor/reports/ar25/index.html"
+      },
+      {
+        "source_id": "MSFT_GOLDEN_OPPORTUNITY_AI_20250103",
+        "source_type": "official_company_blog",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "light public evidence pointer only",
+        "locator": "https://blogs.microsoft.com/on-the-issues/2025/01/03/the-golden-opportunity-for-american-ai/"
+      },
+      {
+        "source_id": "SEC_13F_FAQ",
+        "source_type": "official_sec_policy",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "13F timing and slow ownership context only",
+        "locator": "https://www.sec.gov/rules-regulations/staff-guidance/division-investment-management-frequently-asked-questions/frequently-asked-questions-about-form-13f"
+      }
+    ]
+  },
+  "manifest_uri": "data/candidate_cards/MSFT_supercycle_candidate_card_v0.manifest.json",
+  "state_machine_version": "G7.2_definition_only_v1",
+  "primary_alpha": {
+    "thesis_summary": "System-scouted AI/cloud infrastructure supercycle candidate. This is a structured research object for evidence gathering, not proof that the thesis is true.",
+    "supercycle_driver": "Potential long-duration AI and cloud infrastructure demand, enterprise software distribution, and datacenter buildout exposure; unvalidated in G8.2.",
+    "evidence_present": [
+      {
+        "evidence_id": "G82_MSFT_PRESENT_001",
+        "description": "G8.1B emitted MSFT as the only governed LOCAL_FACTOR_SCOUT intake item.",
+        "quality_label": "observed",
+        "observed_estimated_or_inferred": "observed",
+        "source_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0"
+      },
+      {
+        "evidence_id": "G82_MSFT_PRESENT_002",
+        "description": "Official/public Microsoft sources provide light pointers to AI infrastructure, Azure, and enterprise-cloud context.",
+        "quality_label": "observed",
+        "observed_estimated_or_inferred": "observed",
+        "source_id": "MSFT_2025_ANNUAL_REPORT"
+      }
+    ],
+    "evidence_missing": [
+      "thesis-specific filing excerpts with manifested locators",
+      "canonical price-volume behavior evidence",
+      "market-behavior signal card evidence",
+      "current ownership, insider, and whale-behavior context",
+      "options, IV, gamma, and dealer-positioning evidence",
+      "explicit thesis-breaker review against capex, margins, competition, and regulation"
+    ],
+    "thesis_breakers": [
+      "AI infrastructure demand does not translate into durable revenue or margin evidence",
+      "cloud capex pressure or datacenter constraints weaken the thesis",
+      "enterprise AI adoption slows or distribution advantage erodes",
+      "regulatory, platform, security, or customer-concentration risks outweigh the supercycle framing",
+      "state-machine evidence later moves the object to THESIS_BROKEN"
+    ],
+    "data_dependencies": [
+      "future SEC filing evidence packet",
+      "future canonical price-volume manifest",
+      "future market-behavior signal card if G9 is approved",
+      "future ownership/insider policy and provider decision",
+      "future licensed options/IV/gamma provider decision"
+    ]
+  },
+  "secondary_alpha": {
+    "relevant_market_behavior_modules": [
+      "PRICE_VOLUME_BEHAVIOR",
+      "SEC_FILINGS_OWNERSHIP",
+      "IV_VOL_INTELLIGENCE",
+      "OPTIONS_WHALE_RADAR",
+      "GAMMA_DEALER_MAP",
+      "FRED_MACRO_LIQUIDITY",
+      "KEN_FRENCH_FACTOR_CONTEXT"
+    ],
+    "market_behavior_modules_relevant": [
+      "PRICE_VOLUME_BEHAVIOR",
+      "SEC_FILINGS_OWNERSHIP",
+      "IV_VOL_INTELLIGENCE",
+      "OPTIONS_WHALE_RADAR",
+      "GAMMA_DEALER_MAP",
+      "FRED_MACRO_LIQUIDITY",
+      "KEN_FRENCH_FACTOR_CONTEXT"
+    ],
+    "observed_signals_available": [],
+    "estimated_signals_needed_later": [
+      {
+        "signal_family": "ROTATION_SCORE",
+        "quality_label": "estimated",
+        "allowed_later_only": true
+      },
+      {
+        "signal_family": "SEC_FILINGS_OWNERSHIP",
+        "quality_label": "delayed_context",
+        "allowed_later_only": true,
+        "reason": "13F can support slow ownership context only after filing delay; it is not live whale behavior."
+      }
+    ],
+    "inferred_signals_allowed_later": [
+      {
+        "signal_family": "RISK_INVALIDATION",
+        "quality_label": "inferred",
+        "allowed_later_only": true
+      }
+    ],
+    "provider_gaps": [
+      "canonical price-volume behavior evidence",
+      "current ownership and insider behavior evidence",
+      "licensed options, IV, gamma, and dealer-positioning evidence",
+      "market-behavior signal evidence from a later approved G9 lane"
+    ],
+    "blocked_signals_due_to_provider_gap": [
+      {
+        "signal_family": "IV_VOL_INTELLIGENCE",
+        "quality_label": "provider_gap",
+        "reason": "licensed provider decision required"
+      },
+      {
+        "signal_family": "OPTIONS_WHALE_RADAR",
+        "quality_label": "provider_gap",
+        "reason": "licensed provider decision required"
+      },
+      {
+        "signal_family": "GAMMA_DEALER_MAP",
+        "quality_label": "provider_gap",
+        "reason": "licensed provider decision required"
+      }
+    ]
+  },
+  "state_mapping": {
+    "initial_state": "THESIS_CANDIDATE",
+    "allowed_next_states": [
+      "EVIDENCE_BUILDING",
+      "LEFT_SIDE_RISK",
+      "THESIS_BROKEN"
+    ],
+    "forbidden_states": [
+      "BUYING_RANGE",
+      "ADD_ON_SETUP",
+      "LET_WINNER_RUN"
+    ],
+    "forbidden_jumps": [
+      "THESIS_CANDIDATE -> BUYING_RANGE",
+      "THESIS_CANDIDATE -> ADD_ON_SETUP",
+      "THESIS_CANDIDATE -> LET_WINNER_RUN",
+      "THESIS_CANDIDATE -> TRIM_OPTIONAL"
+    ],
+    "reason_codes_present": [
+      "THESIS_EVIDENCE"
+    ],
+    "reason_codes_missing": [
+      "PRICE_VOLUME_BEHAVIOR",
+      "IV_VOL_BEHAVIOR",
+      "OPTIONS_WHALE_BEHAVIOR",
+      "SHORT_SQUEEZE_BASE",
+      "CTA_SYSTEMATIC_CONTEXT",
+      "ROTATION_CONTEXT",
+      "MACRO_LIQUIDITY_CONTEXT",
+      "FACTOR_REGIME_CONTEXT",
+      "OWNERSHIP_WHALE_CONTEXT",
+      "RISK_INVALIDATION"
+    ]
+  },
+  "risk_discipline": {
+    "left_side_risk_questions": [
+      "What observed evidence would show AI/cloud demand is priced in, fragile, or margin-destructive?",
+      "Which public filing or official-source evidence is required before leaving THESIS_CANDIDATE?"
+    ],
+    "hold_discipline_questions": [
+      "What later evidence would justify EVIDENCE_BUILDING without producing an action state?",
+      "Which provider gaps must remain visible before any market-behavior interpretation?"
+    ],
+    "invalidation_questions": [
+      "Which capex, margin, Azure, enterprise adoption, regulation, or security evidence would break the thesis?",
+      "Which missing source would make the card stale rather than actionable?"
+    ]
+  },
+  "governance": {
+    "not_validated": true,
+    "not_actionable": true,
+    "no_score": true,
+    "no_rank": true,
+    "no_buy_sell_signal": true,
+    "no_buying_range": true,
+    "no_alert": true,
+    "no_broker_action": true
+  },
+  "forbidden_outputs": {
+    "no_score": true,
+    "no_rank": true,
+    "no_buy_sell_signal": true,
+    "no_alert": true,
+    "no_broker_action": true
+  }
+}

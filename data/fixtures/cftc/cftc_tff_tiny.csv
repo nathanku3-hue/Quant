@@ -1,0 +1,9 @@
+report_date,asof_position_date,market_name,contract_market_code,trader_category,long_positions,short_positions,spreading_positions,open_interest,official_source_row_locator
+2026-05-08,2026-05-05,E-Mini S&P 500,13874A,Dealer/Intermediary,126440,836027,44547,1987685,financial_lf.htm:line426:Dealer/Intermediary
+2026-05-08,2026-05-05,E-Mini S&P 500,13874A,Asset Manager/Institutional,1205350,195462,104106,1987685,financial_lf.htm:line426:Asset Manager/Institutional
+2026-05-08,2026-05-05,E-Mini S&P 500,13874A,Leveraged Funds,140585,546460,45139,1987685,financial_lf.htm:line426:Leveraged Funds
+2026-05-08,2026-05-05,E-Mini S&P 500,13874A,Other Reportables,68168,50117,170,1987685,financial_lf.htm:line426:Other Reportables
+2026-05-08,2026-05-05,UST 10Y Note,043602,Dealer/Intermediary,219295,616607,45201,5369025,financial_lf.htm:line926:Dealer/Intermediary
+2026-05-08,2026-05-05,UST 10Y Note,043602,Asset Manager/Institutional,3150873,1013088,674782,5369025,financial_lf.htm:line926:Asset Manager/Institutional
+2026-05-08,2026-05-05,UST 10Y Note,043602,Leveraged Funds,325504,2329352,186414,5369025,financial_lf.htm:line926:Leveraged Funds
+2026-05-08,2026-05-05,UST 10Y Note,043602,Other Reportables,348096,152647,188,5369025,financial_lf.htm:line926:Other Reportables

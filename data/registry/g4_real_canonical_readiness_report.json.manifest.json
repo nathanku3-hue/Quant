@@ -1,0 +1,22 @@
+{
+  "artifact_path": "data\\registry\\g4_real_canonical_readiness_report.json",
+  "asof_ts": "2026-05-09T08:46:25Z",
+  "date_range": {
+    "end": "2026-05-09T08:46:25Z",
+    "start": "2026-05-09T08:46:25Z"
+  },
+  "extra": {
+    "dataset_name": "prices_tri_real_canonical_tiny_slice",
+    "readiness_run_id": "PH65_G4_REAL_CANONICAL_READINESS_001",
+    "ready_for_g5": true
+  },
+  "license_scope": "internal_governance_report",
+  "manifest_created_at_utc": "2026-05-09T08:46:25Z",
+  "manifest_schema_version": "1.0.0",
+  "provider": "terminal_zero",
+  "provider_feed": "g4_real_canonical_readiness_report",
+  "row_count": 1,
+  "schema_version": "1.0.0",
+  "sha256": "5f40570613230e5c289bfb112f2acf813d52690022ddd88d49891b2aa11e5b28",
+  "source_quality": "canonical"
+}

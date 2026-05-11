@@ -1,0 +1,23 @@
+{
+  "artifact_path": "data\\registry\\g6_v1_v2_real_slice_mechanical_report.json",
+  "asof_ts": "2026-05-09T09:55:37Z",
+  "date_range": {
+    "end": "2024-02-29",
+    "start": "2024-01-02"
+  },
+  "extra": {
+    "comparison_result": "match",
+    "comparison_run_id": "PH65_G6_V1_V2_REAL_SLICE_MECHANICAL_001",
+    "dataset_name": "prices_tri_real_canonical_tiny_slice",
+    "v2_promotion_ready": false
+  },
+  "license_scope": "internal_governance_report",
+  "manifest_created_at_utc": "2026-05-09T09:55:37Z",
+  "manifest_schema_version": "1.0.0",
+  "provider": "terminal_zero",
+  "provider_feed": "g6_v1_v2_real_slice_mechanical_report",
+  "row_count": 1,
+  "schema_version": "1.0.0",
+  "sha256": "d6bb4e8525e4a5ab8cd86a603011f0afa71aad7786ea776c0a1d50452ff279c7",
+  "source_quality": "canonical"
+}

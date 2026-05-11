@@ -1,0 +1,84 @@
+{
+  "allowed_use": [
+    "broad futures-positioning context",
+    "macro/regime support",
+    "CTA/systematic-pressure proxy",
+    "GodView market-behavior context"
+  ],
+  "asof_position_date": "2026-05-05",
+  "contract_market_code": [
+    "13874A",
+    "043602"
+  ],
+  "dataset_type": "futures_positioning",
+  "date_range": {
+    "end": "2026-05-08",
+    "start": "2026-05-08"
+  },
+  "forbidden_use": [
+    "direct single-name CTA buying evidence",
+    "buy/sell signal",
+    "standalone ranking factor",
+    "alert emission",
+    "alpha evidence without validation",
+    "single_name_inference"
+  ],
+  "freshness_policy": "weekly / Friday release / Tuesday positions",
+  "license_or_terms_note": "CFTC official public Commitments of Traders / Traders in Financial Futures report; use as a tiny static fixture only. Future automated or bulk use requires separate provider approval and terms review.",
+  "long_positions": {
+    "max": 3150873,
+    "min": 68168
+  },
+  "manifest_schema_version": "1.0.0",
+  "market_name": [
+    "E-Mini S&P 500",
+    "UST 10Y Note"
+  ],
+  "observed_estimated_or_inferred": "observed",
+  "official_source_url": "https://www.cftc.gov/dea/futures/financial_lf.htm",
+  "open_interest": {
+    "max": 5369025,
+    "min": 1987685
+  },
+  "primary_key_fields": [
+    "report_date",
+    "market_name",
+    "contract_market_code",
+    "trader_category"
+  ],
+  "provider": "cftc",
+  "provider_feed": "cot_tff",
+  "publication_or_retrieved_at": "2026-05-08",
+  "report_date": "2026-05-08",
+  "row_count": 8,
+  "schema_columns": [
+    "report_date",
+    "asof_position_date",
+    "market_name",
+    "contract_market_code",
+    "trader_category",
+    "long_positions",
+    "short_positions",
+    "spreading_positions",
+    "open_interest",
+    "official_source_row_locator"
+  ],
+  "schema_version": "1.0.0",
+  "sha256": "60a2a737b11a13dfed4230d7715cb9cfce8a26eec4fb8fe9ebd3fb23c8754d82",
+  "short_positions": {
+    "max": 2329352,
+    "min": 50117
+  },
+  "source_name": "CFTC Commitments of Traders / TFF",
+  "source_quality": "public_official_observed",
+  "spreading_positions": {
+    "max": 674782,
+    "min": 170
+  },
+  "trader_category": [
+    "Dealer/Intermediary",
+    "Asset Manager/Institutional",
+    "Leveraged Funds",
+    "Other Reportables"
+  ]
+}

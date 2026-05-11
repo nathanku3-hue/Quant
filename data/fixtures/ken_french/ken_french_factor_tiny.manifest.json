@@ -1,0 +1,61 @@
+{
+  "allowed_use": [
+    "factor context",
+    "future benchmark comparison source validation",
+    "factor/regime context",
+    "GodView macro-factor context"
+  ],
+  "asof_ts": "1926-10-31",
+  "dataset_id": "fama_french_3_factors_monthly",
+  "dataset_type": "factor_returns",
+  "date_range": {
+    "end": "1926-10-31",
+    "start": "1926-07-31"
+  },
+  "factor_name": [
+    "Mkt-RF",
+    "SMB",
+    "HML"
+  ],
+  "factor_return": {
+    "max": 3.81,
+    "min": -3.27
+  },
+  "forbidden_use": [
+    "claim alpha",
+    "rank candidates",
+    "factor regime score",
+    "macro regime score",
+    "signal ranking",
+    "alert emission",
+    "broker call",
+    "state machine input"
+  ],
+  "frequency": "monthly",
+  "manifest_schema_version": "1.0.0",
+  "observed_estimated_or_inferred": "observed",
+  "official_source_url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html",
+  "primary_key_fields": [
+    "dataset_id",
+    "date",
+    "factor_name"
+  ],
+  "provider": "ken_french",
+  "provider_feed": "data_library",
+  "retrieved_at_or_static_fixture_created_at": "2026-05-09",
+  "row_count": 12,
+  "schema_columns": [
+    "dataset_id",
+    "date",
+    "factor_name",
+    "factor_return",
+    "frequency",
+    "asof_ts",
+    "official_source_row_locator"
+  ],
+  "schema_version": "1.0.0",
+  "sha256": "559c82ac34fc9a647f38b26b61da76359f9718b9f1cd3c3801ae3da9f7447db4",
+  "source_name": "Kenneth French Data Library",
+  "source_quality": "public_research_observed",
+  "terms_note": "Kenneth French Data Library public research factor file. This is a tiny static fixture only; future automated retrieval, redistribution, or production use requires separate source and terms review."
+}

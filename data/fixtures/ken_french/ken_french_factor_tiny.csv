@@ -1,0 +1,13 @@
+dataset_id,date,factor_name,factor_return,frequency,asof_ts,official_source_row_locator
+fama_french_3_factors_monthly,1926-07-31,Mkt-RF,2.89,monthly,1926-07-31,F-F Research Data Factors CSV 192607 Mkt-RF
+fama_french_3_factors_monthly,1926-07-31,SMB,-2.55,monthly,1926-07-31,F-F Research Data Factors CSV 192607 SMB
+fama_french_3_factors_monthly,1926-07-31,HML,-2.39,monthly,1926-07-31,F-F Research Data Factors CSV 192607 HML
+fama_french_3_factors_monthly,1926-08-31,Mkt-RF,2.64,monthly,1926-08-31,F-F Research Data Factors CSV 192608 Mkt-RF
+fama_french_3_factors_monthly,1926-08-31,SMB,-1.14,monthly,1926-08-31,F-F Research Data Factors CSV 192608 SMB
+fama_french_3_factors_monthly,1926-08-31,HML,3.81,monthly,1926-08-31,F-F Research Data Factors CSV 192608 HML
+fama_french_3_factors_monthly,1926-09-30,Mkt-RF,0.38,monthly,1926-09-30,F-F Research Data Factors CSV 192609 Mkt-RF
+fama_french_3_factors_monthly,1926-09-30,SMB,-1.36,monthly,1926-09-30,F-F Research Data Factors CSV 192609 SMB
+fama_french_3_factors_monthly,1926-09-30,HML,0.05,monthly,1926-09-30,F-F Research Data Factors CSV 192609 HML
+fama_french_3_factors_monthly,1926-10-31,Mkt-RF,-3.27,monthly,1926-10-31,F-F Research Data Factors CSV 192610 Mkt-RF
+fama_french_3_factors_monthly,1926-10-31,SMB,-0.14,monthly,1926-10-31,F-F Research Data Factors CSV 192610 SMB
+fama_french_3_factors_monthly,1926-10-31,HML,0.82,monthly,1926-10-31,F-F Research Data Factors CSV 192610 HML

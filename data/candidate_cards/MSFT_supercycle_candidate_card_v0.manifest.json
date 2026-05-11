@@ -1,0 +1,102 @@
+{
+  "manifest_id": "MSFT_SUPERCYCLE_CANDIDATE_CARD_V0_MANIFEST",
+  "artifact_uri": "data/candidate_cards/MSFT_supercycle_candidate_card_v0.json",
+  "artifact_sha256": "c94ddf4120f363a1e8aace303ee32680c36f0a313e484bbf066dba318bff3f7c",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "scope": "PH65_G8_2_SYSTEM_SCOUTED_CANDIDATE_CARD",
+  "candidate_id": "MSFT_SUPERCYCLE_CANDIDATE_CARD_V0",
+  "ticker": "MSFT",
+  "row_count": 1,
+  "source_intake_item_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0:MSFT:2026-02-13",
+  "source_intake_artifact_uri": "data/discovery/local_factor_scout_output_tiny_v0.json",
+  "source_intake_manifest_uri": "data/discovery/local_factor_scout_output_tiny_v0.manifest.json",
+  "discovery_origin": "LOCAL_FACTOR_SCOUT",
+  "scout_model_id": "LOCAL_FACTOR_EQUAL_WEIGHT_V0",
+  "source_policy": {
+    "allowed_sources": [
+      "existing governed LOCAL_FACTOR_SCOUT output",
+      "official/public source notes",
+      "SEC filing-timing policy notes",
+      "manual research notes"
+    ],
+    "forbidden_sources": [
+      "live provider calls",
+      "new ingestion",
+      "yfinance as canonical evidence",
+      "ranked screen results",
+      "factor score display",
+      "paid options/IV/gamma data",
+      "unmanifested sources"
+    ],
+    "canonical_sources": [
+      {
+        "source_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0",
+        "source_type": "governed_local_artifact",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "source intake provenance",
+        "artifact_uri": "data/discovery/local_factor_scout_output_tiny_v0.json",
+        "manifest_uri": "data/discovery/local_factor_scout_output_tiny_v0.manifest.json"
+      },
+      {
+        "source_id": "MSFT_2025_ANNUAL_REPORT",
+        "source_type": "official_annual_report",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "light public evidence pointer only",
+        "locator": "https://www.microsoft.com/investor/reports/ar25/index.html"
+      },
+      {
+        "source_id": "MSFT_GOLDEN_OPPORTUNITY_AI_20250103",
+        "source_type": "official_company_blog",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "light public evidence pointer only",
+        "locator": "https://blogs.microsoft.com/on-the-issues/2025/01/03/the-golden-opportunity-for-american-ai/"
+      },
+      {
+        "source_id": "SEC_13F_FAQ",
+        "source_type": "official_sec_policy",
+        "quality_label": "observed",
+        "canonical": true,
+        "canonical_for": "13F timing and slow ownership context only",
+        "locator": "https://www.sec.gov/rules-regulations/staff-guidance/division-investment-management-frequently-asked-questions/frequently-asked-questions-about-form-13f"
+      }
+    ],
+    "source_notes": [
+      {
+        "source_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0",
+        "quality_label": "observed",
+        "canonical": true,
+        "note": "The scout output creates provenance for the MSFT card only; it is not alpha evidence."
+      },
+      {
+        "source_id": "official_public_evidence_pointers",
+        "quality_label": "research_only",
+        "canonical": false,
+        "note": "Official/public sources are used lightly to identify evidence categories, not to validate the thesis."
+      }
+    ]
+  },
+  "allowed_use": [
+    "system-scouted candidate-card-only validation",
+    "state-framework mapping",
+    "source-quality gap labeling",
+    "future planner handoff"
+  ],
+  "forbidden_use": [
+    "alpha search",
+    "candidate screening",
+    "ranking",
+    "scoring",
+    "backtest",
+    "replay",
+    "provider ingestion",
+    "dashboard runtime",
+    "buy/sell/hold output",
+    "buying range",
+    "alert",
+    "broker calls",
+    "investment recommendation"
+  ]
+}

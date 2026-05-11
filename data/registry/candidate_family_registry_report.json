@@ -1,0 +1,33 @@
+{
+  "alerts_emitted": false,
+  "blockers": [],
+  "broker_calls": false,
+  "candidate_generation_enabled": false,
+  "code_ref": "v2_discovery/families/registry.py@phase65-g7",
+  "created_at": "2026-05-09T11:11:45Z",
+  "defined_only": true,
+  "families": [
+    {
+      "data_tier_required": "tier0",
+      "family_id": "PEAD_DAILY_V0",
+      "finite_trial_count": 24,
+      "manifest_uri": "data/registry/candidate_families/pead_daily_v0.json.manifest.json",
+      "sidecar_required": false,
+      "source_quality_required": "canonical",
+      "status": "defined",
+      "trial_budget_max": 24,
+      "version": 1
+    }
+  ],
+  "family_count": 1,
+  "family_ids": [
+    "PEAD_DAILY_V0"
+  ],
+  "manifest_backed": true,
+  "promotion_packet_created": false,
+  "promotion_ready": false,
+  "registry_report_id": "PH65_G7_CANDIDATE_FAMILY_REGISTRY_001",
+  "report_schema_version": "1.0.0",
+  "result_generation_enabled": false,
+  "warnings": []
+}

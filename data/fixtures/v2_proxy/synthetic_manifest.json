@@ -1,0 +1,97 @@
+{
+  "artifact_path": "data/fixtures/v2_proxy/synthetic_weights.csv",
+  "asof_ts": "2026-05-09T00:00:00Z",
+  "date_range": {
+    "end": "2020-01-03",
+    "start": "2020-01-02"
+  },
+  "extra": {
+    "expected_ledger": {
+      "date_range": {
+        "end": "2020-01-03",
+        "start": "2020-01-02"
+      },
+      "path": "data/fixtures/v2_proxy/expected_ledger.csv",
+      "row_count": 2,
+      "schema": {
+        "columns": [
+          "date",
+          "cash",
+          "turnover",
+          "transaction_cost",
+          "gross_exposure",
+          "net_exposure"
+        ]
+      },
+      "sha256": "3d69bdf1fb6a8ce98400d0a5eff3255662fe42b3e573f08f4b6b0b1c9b2707fc"
+    },
+    "expected_positions": {
+      "date_range": {
+        "end": "2020-01-03",
+        "start": "2020-01-02"
+      },
+      "path": "data/fixtures/v2_proxy/expected_positions.csv",
+      "row_count": 4,
+      "schema": {
+        "columns": [
+          "date",
+          "symbol",
+          "quantity",
+          "market_value"
+        ]
+      },
+      "sha256": "32dd6dfba16826051be6adbfe38530f58429a6b7969ca9a6ce6e756dae969d8a"
+    },
+    "expected_result": {
+      "date_range": {
+        "end": "2020-01-03",
+        "start": "2020-01-02"
+      },
+      "path": "data/fixtures/v2_proxy/expected_result.json",
+      "row_count": 2,
+      "sha256": "4029a68df991b5a73eb7a6401e4562fa32f6dcd91f346fcb3151aa98804281eb"
+    },
+    "fixture_scope": "v2_proxy_synthetic_g1",
+    "prices": {
+      "date_range": {
+        "end": "2020-01-03",
+        "start": "2020-01-02"
+      },
+      "path": "data/fixtures/v2_proxy/synthetic_prices.csv",
+      "row_count": 4,
+      "schema": {
+        "columns": [
+          "date",
+          "symbol",
+          "close"
+        ]
+      },
+      "sha256": "732e1898866f2dd777b64650d70c154dc6b6f72cbd23785dee8a865e9bd360a7"
+    },
+    "weights": {
+      "date_range": {
+        "end": "2020-01-03",
+        "start": "2020-01-02"
+      },
+      "path": "data/fixtures/v2_proxy/synthetic_weights.csv",
+      "row_count": 4,
+      "schema": {
+        "columns": [
+          "date",
+          "symbol",
+          "target_weight"
+        ]
+      },
+      "sha256": "3804eeff6664ada5c03bace1beaeb136a96e5d85f11ba5faeeafb84da9db3760"
+    }
+  },
+  "license_scope": "synthetic_fixture_only",
+  "manifest_created_at_utc": "2026-05-09T00:00:00Z",
+  "manifest_schema_version": "1.0.0",
+  "provider": "synthetic_fixture",
+  "provider_feed": "prebaked_target_weights",
+  "row_count": 4,
+  "schema_version": "1.0.0",
+  "sha256": "3804eeff6664ada5c03bace1beaeb136a96e5d85f11ba5faeeafb84da9db3760",
+  "source_quality": "non_canonical"
+}
