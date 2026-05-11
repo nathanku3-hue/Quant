@@ -13,6 +13,7 @@ Track mistakes, root causes, and guardrails so repeated errors are prevented.
 ## Entries
 | Date | Scope | Mistake/Miss | Root Cause | Fix Applied | Guardrail | Evidence |
 |---|---|---|---|---|---|---|
+| 2026-05-11 | Dashboard scanner testability hardening | Core scanner formulas lived as dashboard runtime closures and had no focused boundary tests | Streamlit orchestration, provider calls, row math, and label rules were coupled in one large `run_and_save_scan` path | Extracted deterministic scanner math to `strategies/scanner.py`, kept provider calls in `dashboard.py`, and added boundary tests plus strategy/config/ETL coverage | Scanner formula changes must land in `strategies/scanner.py` with `tests/test_scanner.py` boundary coverage before dashboard wiring is accepted | `strategies/scanner.py`, `dashboard.py`, `tests/test_scanner.py`, `tests/test_adaptive_trend.py`, `tests/test_production_config.py`, `tests/test_core_etl.py`, `.venv\Scripts\python -m pytest tests\test_scanner.py tests\test_strategy.py tests\test_phase15_integration.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\test_process_utils.py -q` |
 | 2026-03-20 | Post-phase GitHub alignment | Repo fell 30+ phases behind public GitHub; CEO handover links would 404 | No git-sync checkpoint in phase closeout SAW template | Added `CHK-PH-07` Git sync gate to SAW protocol and milestone review checklist | `git status --porcelain` empty AND `git log origin/main..HEAD --oneline` empty before phase-close SAW verdict PASS | `docs/checklist_milestone_review.md`, `.codex/skills/saw/SKILL.md` |
 | 2026-02-18 | Governance bootstrap | No persistent self-learning log existed | Process control gap | Added mandatory feedback-loop policy | Append one lesson after each execution/review round | `AGENTS.md`, `docs/lessonss.md` |
 | 2026-02-18 | SAW round reconciliation | Reviewer-independence proof was implied but not explicit | Missing ownership-check line item | Added explicit implementer/reviewer agent-separation check in SAW protocol | Always include ownership check in SAW report before verdict | `AGENTS.md` |
@@ -549,3 +550,346 @@ Application pattern:
 - Fix applied: Added the Phase 65 Candidate Registry kernel with frozen candidate specs, append-only JSONL events, hash-chain verification, rebuildable snapshots, dummy lifecycle evidence, and tests for required manifests/source quality/trial counts/parameters.
 - Guardrail for next time: Do not start strategy search, parameter sweeps, alerts, or promotion packets until every candidate family and trial count is recorded in the registry before result generation.
 - Evidence paths: `v2_discovery/schemas.py`, `v2_discovery/registry.py`, `tests/test_candidate_registry.py`, `scripts/run_candidate_registry_demo.py`, `data/registry/candidate_events.jsonl`, `data/registry/candidate_snapshot.json`, `docs/architecture/candidate_registry_policy.md`, `docs/saw_reports/saw_phase65_candidate_registry_20260509.md`
+
+## 2026-05-09 Round Entry (Fast Proxy Outputs Must Stay Outside Canonical Truth)
+- Date: 2026-05-09
+- Mistake or miss: After Candidate Registry, the next likely drift risk was letting future fast proxy outputs look like official validation evidence.
+- Root cause: A proxy simulator can become seductive infrastructure unless the boundary makes non-promotion and V1 rerun requirements executable before useful simulations exist.
+- Fix applied: Added the Phase G0 V2 Proxy Boundary Harness with frozen proxy schemas, manifest/candidate/event validation, real registry note proof, no-op proxy round trip, forced `promotion_ready = false`, forced `canonical_engine_required = true`, and tests proving no alert/broker/search path is exposed.
+- Guardrail for next time: Do not add a real fast simulator or strategy family until proxy outputs are already blocked from promotion, every promotion path requires `core.engine.run_simulation`, and proxy audit IDs resolve to append-only registry events.
+- Evidence paths: `v2_discovery/fast_sim/schemas.py`, `v2_discovery/fast_sim/boundary.py`, `v2_discovery/fast_sim/noop_proxy.py`, `tests/test_v2_proxy_boundary.py`, `docs/architecture/v2_proxy_boundary_policy.md`, `docs/saw_reports/saw_phase65_v2_proxy_boundary_20260509.md`
+
+## 2026-05-09 Round Entry (Same-Phase Handover Suffixes Must Not Regress Current Context)
+- Date: 2026-05-09
+- Mistake or miss: Phase G1 initially added a fresh handover, but the context packet builder still preferred the older same-phase `phase65_g0_handover.md` over `phase65_g1_handover.md`.
+- Root cause: context source selection ranked only phase number, broad source type, and path order; it did not understand same-phase G-suffix progression.
+- Fix applied: Added suffix-aware source ranking in `scripts/build_context_packet.py`, added a regression in `tests/test_build_context_packet.py`, rebuilt `docs/context/current_context.*`, and validated the context packet.
+- Guardrail for next time: When closing subphases under the same numeric phase, add or validate a context-selection test that proves the newest suffix is the active source before refreshing planner packets.
+- Evidence paths: `scripts/build_context_packet.py`, `tests/test_build_context_packet.py`, `docs/context/current_context.json`, `docs/context/current_context.md`
+
+## 2026-05-09 Round Entry (Synthetic Proxy Mechanics Must Prove Hashes Before Accounting)
+- Date: 2026-05-09
+- Mistake or miss: The first G1 test harness copied fixture files through text writes, which changed bytes on Windows and made hash validation fail earlier than the intended invariant.
+- Root cause: Fixture hashes are byte-level contracts, but the temporary-fixture test setup treated CSV copies as text-normalized content.
+- Fix applied: Switched fixture-copy tests to byte-preserving writes, kept component hash validation in `v2_discovery/fast_sim/fixtures.py`, and added deterministic golden-file and accounting-property tests.
+- Guardrail for next time: For manifest-backed fixtures, copy and mutate files at the byte/hash-contract level first, then test semantic invariants only after manifest hashes are intentionally aligned.
+- Evidence paths: `v2_discovery/fast_sim/fixtures.py`, `tests/test_v2_fast_proxy_synthetic.py`, `tests/test_v2_fast_proxy_invariants.py`, `data/fixtures/v2_proxy/synthetic_manifest.json`
+
+## 2026-05-09 Round Entry (Synthetic Proxy Evidence Must Fail Closed On Non-Finite And Sparse Inputs)
+- Date: 2026-05-09
+- Mistake or miss: G1 initially accepted some deterministic-looking bad evidence paths: non-finite numbers were not uniformly rejected, fixture manifests did not reconcile row count/date range/schema metadata, nullable symbols could become literal `<NA>`, and sparse target weights could be silently imputed to zero.
+- Root cause: Hash validation proved file bytes, but semantic validation was spread across local checks and did not treat fixture metadata, symbol nulls, target-weight sparsity, and strict JSON numeric validity as one fail-closed boundary.
+- Fix applied: Added reusable fast-proxy validators, finite guards across fixture/pre-ledger/post-ledger/result/proxy metadata boundaries, per-file manifest reconciliation, missing-symbol and sparse-weight regressions, and final Reviewer B/C rechecks.
+- Guardrail for next time: For any simulator fixture, require a single validation layer that rejects `nan`, `+inf`, `-inf`, sparse required matrices, missing identifiers, and manifest metadata drift before simulation or golden comparison; never repair evidence with `nan_to_num`, `fillna(0)`, interpolation, or stringified nulls.
+- Evidence paths: `v2_discovery/fast_sim/validation.py`, `v2_discovery/fast_sim/fixtures.py`, `v2_discovery/fast_sim/ledger.py`, `v2_discovery/fast_sim/schemas.py`, `tests/test_v2_fast_proxy_synthetic.py`, `tests/test_v2_fast_proxy_invariants.py`, `data/fixtures/v2_proxy/synthetic_manifest.json`, `docs/saw_reports/saw_phase65_g1_synthetic_proxy_20260509.md`
+
+## 2026-05-09 Round Entry (Replay Closeout Needs Fresh Handover Source And Owned Errors)
+- Date: 2026-05-09
+- Mistake or miss: The first G3 focused test pass exposed two closure risks: duplicate fixture candidates could be hidden when a candidate ID was supplied, and lower-level proxy errors bubbled out without the G3 boundary type. Later, the context packet builder still selected the older G1 handover after the phase brief was updated.
+- Root cause: The G3 selector narrowed by requested candidate before enforcing the global one-fixture invariant; the replay wrapper delegated to G2 without normalizing errors; context source ranking prefers latest phase handover over phase brief.
+- Fix applied: Enforced global fixture-count validation before candidate-ID selection, wrapped lower-level proxy boundary errors as `G3ReplayError`, added `docs/handover/phase65_g3_handover.md`, and rebuilt/validated context packets.
+- Guardrail for next time: For every same-phase G-suffix closeout, publish the newest suffix handover before running `scripts/build_context_packet.py`, and enforce cardinality invariants before optional selector filters.
+- Evidence paths: `v2_discovery/replay/canonical_replay.py`, `tests/test_v2_canonical_replay_fixture.py`, `docs/handover/phase65_g3_handover.md`, `docs/context/current_context.md`, `scripts/build_context_packet.py --validate`
+
+## 2026-05-09 Round Entry (Real Canonical Readiness Needs Its Own Tiny Manifest)
+- Date: 2026-05-09
+- Mistake or miss: The full `prices_tri.parquet` artifact was real and canonical, but it did not have a dedicated sidecar manifest suitable for a tiny first-contact readiness proof.
+- Root cause: Prior readiness audits summarized large canonical artifacts, while G4 needed a small immutable fixture with exact hash, row-count, schema, date-range, key, and domain evidence.
+- Fix applied: Created a tiny Tier 0 `prices_tri` fixture under `data/fixtures/g4/`, sealed it with a dedicated manifest, defaulted readiness execution to `report_path=None`, and removed contiguous forbidden metric/provider tokens from readiness implementation source scans.
+- Guardrail for next time: For first-contact real data phases, derive the smallest clean canonical fixture, publish its own manifest, and run source-level forbidden-path scans so reject-list strings cannot masquerade as broker or performance behavior.
+- Evidence paths: `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet`, `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet.manifest.json`, `v2_discovery/readiness/canonical_slice.py`, `v2_discovery/readiness/canonical_readiness.py`, `tests/test_g4_real_canonical_readiness_fixture.py`
+
+## 2026-05-09 Round Entry (Real Canonical Replay Must Stay Mechanical)
+- Date: 2026-05-09
+- Mistake or miss: A real canonical replay can easily be misread as strategy evidence if the report exposes return-series or performance-style fields.
+- Root cause: The official engine naturally computes return columns, but G5's purpose is proving replay plumbing and accounting controls, not evaluating edge.
+- Fix applied: G5 calls `core.engine.run_simulation` for official-path proof, but the published report exposes only positions, cash, turnover, transaction cost, gross exposure, net exposure, manifest identity, and blocked promotion/alert/broker booleans.
+- Guardrail for next time: For real-data replay phases before alpha authorization, keep engine return outputs internal, publish only mechanical accounting fields, default `report_path=None`, and run forbidden-field scans on implementation and artifact JSON.
+- Evidence paths: `v2_discovery/replay/canonical_real_replay.py`, `v2_discovery/replay/canonical_replay_report.py`, `tests/test_g5_single_canonical_replay_no_alpha.py`, `data/registry/g5_single_canonical_replay_report.json`
+
+## 2026-05-09 Round Entry (V1/V2 Real-Slice Match Still Is Not Promotion)
+- Date: 2026-05-09
+- Mistake or miss: A V1/V2 mechanical match on real canonical data could be misread as V2 promotion authority or strategy evidence if report fields or context surfaces are loose.
+- Root cause: Mechanical equivalence and predictive edge are adjacent-looking artifacts unless the report explicitly separates equality fields, engine identity metadata, and promotion blockers.
+- Fix applied: G6 compares only approved mechanical fields, records V1/V2 engine identity separately, keeps `promotion_ready = false` and `v2_promotion_ready = false`, defaults `report_path=None`, and publishes a dedicated mechanical-comparison policy.
+- Guardrail for next time: When V2 matches V1 on real data, still require an explicit later decision before candidate-family definition, search, alerts, broker paths, paper trading, or promotion packets.
+- Evidence paths: `v2_discovery/replay/real_slice_v1_v2_comparison.py`, `v2_discovery/replay/mechanical_comparison_report.py`, `tests/test_g6_v1_v2_real_slice_mechanical_comparison.py`, `data/registry/g6_v1_v2_real_slice_mechanical_report.json`
+
+## 2026-05-09 Round Entry (Research Family Boundaries Must Exist Before Results)
+- Date: 2026-05-09
+- Mistake or miss: A future candidate could inherit a family label without a pre-result contract for allowed features, parameters, trial budget, and promotion data policy.
+- Root cause: Candidate Registry records individual intent, but multiple-testing control needs the hypothesis family and trial budget fixed before outcomes exist.
+- Fix applied: Added G7 candidate-family definition package, manifest-backed `PEAD_DAILY_V0` artifact, append-only/versioned behavior, finite parameter-space validation, trial-budget checks, and definition-only report hygiene.
+- Guardrail for next time: Before generating even one candidate from a family, require the family JSON and manifest to reconcile, require `trial_budget_max`, and block all result, ranking, alert, broker, and promotion paths in the family-definition layer.
+- Evidence paths: `v2_discovery/families/schemas.py`, `v2_discovery/families/registry.py`, `v2_discovery/families/validation.py`, `v2_discovery/families/trial_budget.py`, `tests/test_g7_candidate_family_definition.py`, `data/registry/candidate_families/pead_daily_v0.json`, `data/registry/candidate_families/pead_daily_v0.json.manifest.json`
+
+## 2026-05-09 Round Entry (Roadmap Labels Must Match The Real Product Problem)
+- Date: 2026-05-09
+- Mistake or miss: After G7, the next default step still pointed toward PEAD candidate generation, which could make a tactical signal family look like the center of the product.
+- Root cause: The technical governance roadmap was coherent, but the product framing had not been updated after the user clarified the real job: discretionary augmentation for de-risked asymmetric upside.
+- Fix applied: Added G7.1 roadmap realignment docs, reclassified `PEAD_DAILY_V0` as tactical, named `SUPERCYCLE_GEM_DAILY_V0` as the primary product-family target, and refreshed current truth surfaces to hold G8 until a G7.2-or-hold decision.
+- Guardrail for next time: Before candidate generation starts, verify that the roadmap label, family role, and dashboard mission match the current user problem; if not, run a docs/context realignment phase before implementation.
+- Evidence paths: `docs/architecture/product_roadmap_discretionary_augmentation.md`, `docs/architecture/dashboard_signal_taxonomy.md`, `docs/architecture/supercycle_gem_family_policy.md`, `docs/handover/phase65_g71_handover.md`
+
+## 2026-05-09 Round Entry (Streamlit Smoke Must Inspect Page Exceptions)
+- Date: 2026-05-09
+- Mistake or miss: A liveness-only `launch.py` smoke was treated as runtime evidence even though the legacy dashboard page had an uncaught `TypeError` in the promoted drift monitor tab.
+- Root cause: The smoke checked whether the Streamlit process stayed alive but did not inspect stderr for `Uncaught app execution`, so a page-level failure looked like a pass.
+- Fix applied: Passed the existing drift monitor dependencies into `render_drift_monitor_view`, added a focused dashboard integration regression, stopped stale smoke processes, and reran runtime smoke with stderr inspection.
+- Guardrail for next time: Streamlit smoke evidence must check both process liveness and stderr/page-exception markers before being recorded as PASS.
+- Evidence paths: `dashboard.py`, `tests/test_dashboard_drift_monitor_integration.py`, `tests/test_drift_monitor_view.py`, `docs/context/e2e_evidence/phase65_g7_1_launch_smoke_20260509_status.txt`, `docs/context/e2e_evidence/phase65_g7_1_launch_smoke_20260509_stderr.txt`
+
+## 2026-05-09 Round Entry (Alpha-Suffix Handoffs Need Context-Builder Visibility)
+- Date: 2026-05-09
+- Mistake or miss: G7.1A first used `phase65_g71a_handover.md`, but the context packet builder ranks numeric G suffixes and could still select the older G7.1 packet if the alpha suffix is not made visible.
+- Root cause: Same-phase source ranking parses `g<digits>` and ignores alphabetic suffix meaning; G7.1A is a product/planning label rather than a numeric suffix the builder understands.
+- Fix applied: Added a docs-only selector alias `docs/handover/phase65_g71-1a_handover.md`, rebuilt `docs/context/current_context.*`, and validated context selection.
+- Guardrail for next time: For same-phase alpha substeps, either update the context builder with explicit alpha-suffix ordering in a dedicated code phase or publish a clearly labeled selector alias that states it is not a new phase and does not authorize implementation.
+- Evidence paths: `docs/handover/phase65_g71a_handover.md`, `docs/handover/phase65_g71-1a_handover.md`, `docs/context/current_context.md`, `scripts/build_context_packet.py --validate`
+
+## 2026-05-09 Round Entry (Broad Compileall Can Surface Inherited Workspace Hygiene)
+- Date: 2026-05-09
+- Mistake or miss: The requested broad `.venv\Scripts\python -m compileall .` failed in a docs-only phase, even though the round did not edit code.
+- Root cause: The broad workspace contains inherited hygiene issues: `scripts/wrds_schema_hunter.py` has null bytes, and some temp/cache directories have ACL-protected traversal.
+- Fix applied: Isolated the null-byte source with a read-only scan, reran scoped compile checks over active packages/tests and current entry scripts, and recorded the broad compileall failure as inherited/out of scope in the impact and done surfaces.
+- Guardrail for next time: For docs-only phases, run broad compileall when requested but distinguish inherited workspace traversal/source hygiene from the owned diff; keep a scoped compile check over active code paths as the actionable evidence.
+- Evidence paths: `scripts/wrds_schema_hunter.py`, `docs/context/impact_packet_current.md`, `docs/context/done_checklist_current.md`, scoped `compileall`/`py_compile` outputs
+
+## 2026-05-09 Round Entry (State Machines Must Wait For Data Reality)
+- Date: 2026-05-09
+- Mistake or miss: The next action after product canon could have jumped into G7.2 state-machine design before proving which GodView signals are actually available, delayed, licensed, estimated, or missing.
+- Root cause: Product architecture vocabulary can make future capabilities sound present unless source readiness and provider gaps are mapped first.
+- Fix applied: Ran G7.1B as docs/architecture/source mapping only, published signal-source matrix, provider roadmap, freshness policy, observed-vs-estimated policy, and Codex/Chrome SOP, and kept G7.2/G8 held.
+- Guardrail for next time: Before designing any state machine that consumes a new data layer, require a source matrix with readiness, provider need, freshness, trust level, build priority, and observed/estimated/inferred labels for every signal family.
+- Evidence paths: `docs/architecture/godview_data_infra_gap_assessment.md`, `docs/architecture/godview_signal_source_matrix.md`, `docs/architecture/godview_provider_roadmap.md`, `docs/architecture/godview_signal_freshness_policy.md`, `docs/architecture/godview_observed_vs_estimated_policy.md`, `docs/context/planner_packet_current.md`
+
+## 2026-05-09 Round Entry (Research Capture Must Not Become Source Approval)
+- Date: 2026-05-09
+- Mistake or miss: A supplied API availability survey could be misread as audited source approval or as permission to start SEC/FINRA/CFTC provider work.
+- Root cause: Source names and no-cost/public availability labels look implementation-ready unless the docs explicitly separate research capture, source audit, source policy, and provider implementation.
+- Fix applied: Captured G7.1C as audit-pending research, added provider selection gates, marked no-cost paths as post-audit only, and refreshed truth surfaces to hold G7.2 and provider implementation.
+- Guardrail for next time: Any external source survey must carry an audit queue, audit-pending status, and a no-provider/no-ingestion invariant before downstream planning can use it.
+- Evidence paths: `docs/research/g7_1c_open_source_repo_data_api_availability_survey_20260509.md`, `docs/architecture/godview_provider_selection_policy.md`, `docs/architecture/godview_build_vs_borrow_decision.md`, `docs/context/planner_packet_current.md`
+
+## 2026-05-09 Round Entry (Source Audit Must Not Become Ingestion Approval)
+- Date: 2026-05-09
+- Mistake or miss: Official public sources can look implementation-ready once terms and URLs are audited.
+- Root cause: Source availability, fixture design, provider code, and dashboard/state-machine consumption are adjacent planning steps unless each is separated by explicit approval.
+- Fix applied: Published G7.1C source audit, required-column terms matrix, tiny fixture schema plan only, provider priority note, refreshed context, and SAW report with no data downloads or provider files.
+- Guardrail for next time: After source audit, require a one-source source policy and explicit tiny-fixture approval before any provider proof; keep observed, estimated, and inferred labels separate in every artifact.
+- Evidence paths: `docs/architecture/godview_public_source_audit.md`, `docs/architecture/godview_source_terms_matrix.md`, `docs/architecture/godview_tiny_fixture_schema_plan.md`, `docs/saw_reports/saw_phase65_g7_1c_public_source_audit_20260509.md`
+
+## 2026-05-09 Round Entry (Tiny Fixture Must Not Become Provider Code)
+- Date: 2026-05-09
+- Mistake or miss: Once a static SEC fixture exists, it can be mistaken for permission to build a live provider, expand tickers, or feed a state machine.
+- Root cause: Static public-source samples and provider ingestion share endpoint vocabulary unless the fixture docs, manifests, and tests repeat the fixture-only boundary.
+- Fix applied: Added G7.1D SEC policy, fixture plan, two static Apple Inc. fixtures, sidecar manifests, and fixture-only tests that validate provenance mechanics without adding a provider module.
+- Guardrail for next time: Every tiny public-source fixture proof must state `fixture_only`, include allowed/forbidden use in manifests, validate static artifacts through tests, and keep provider/state-machine/scoring work behind a separate approval.
+- Evidence paths: `docs/architecture/sec_tiny_fixture_policy.md`, `docs/architecture/sec_public_provider_fixture_plan.md`, `data/fixtures/sec/sec_companyfacts_tiny.json`, `data/fixtures/sec/sec_submissions_tiny.json`, `tests/test_g7_1d_sec_tiny_fixture.py`
+
+## 2026-05-10 Round Entry (Short Interest Must Not Become A Squeeze Signal)
+- Date: 2026-05-10
+- Mistake or miss: FINRA short-interest fixtures can be mistaken for real-time squeeze evidence or mixed with Reg SHO short-sale-volume fields.
+- Root cause: Short interest, short-sale volume, and squeeze pressure share similar vocabulary unless the fixture schema and policy make timing and measurement differences executable.
+- Fix applied: Added the G7.1E FINRA short-interest policy, short-interest-vs-short-volume policy, a three-row static short-interest fixture, manifest allowed/forbidden use labels, and tests rejecting Reg SHO fields, duplicate primary keys, bad hashes, row-count drift, and non-finite/negative numeric values.
+- Guardrail for next time: Treat FINRA short interest as delayed squeeze-base context only; require separate approval, separate fixture, and separate labels for Reg SHO or OTC/ATS data before any state-machine or scoring work.
+- Evidence paths: `docs/architecture/finra_short_interest_tiny_fixture_policy.md`, `docs/architecture/finra_short_interest_vs_short_volume_policy.md`, `data/fixtures/finra/finra_short_interest_tiny.csv`, `data/fixtures/finra/finra_short_interest_tiny.manifest.json`, `tests/test_g7_1e_finra_short_interest_tiny_fixture.py`
+
+## 2026-05-10 Round Entry (CFTC TFF Must Not Become Single-Name CTA Evidence)
+- Date: 2026-05-10
+- Mistake or miss: CFTC TFF broad futures-positioning rows can be mistaken for direct CTA buying evidence for a single stock.
+- Root cause: `Leveraged Funds`, `systematic`, and `CTA pressure` vocabulary can sound stock-specific unless the fixture schema and policy force market-level, weekly, delayed interpretation.
+- Fix applied: Added the G7.1F CFTC TFF fixture policy, usage policy, an eight-row static TFF fixture, manifest allowed/forbidden use labels, and tests rejecting single-name fields, duplicate primary keys, bad hashes, row-count drift, unknown trader categories, and non-finite/negative numeric values.
+- Guardrail for next time: Treat CFTC TFF as broad regime/systematic-positioning context only; require separate approval, separate evidence, and explicit validation before any CTA score, state-machine input, ranking factor, alert, or single-name inference.
+- Evidence paths: `docs/architecture/cftc_tff_tiny_fixture_policy.md`, `docs/architecture/cftc_cot_tff_usage_policy.md`, `data/fixtures/cftc/cftc_tff_tiny.csv`, `data/fixtures/cftc/cftc_tff_tiny.manifest.json`, `tests/test_g7_1f_cftc_tff_tiny_fixture.py`
+
+## 2026-05-09 Round Entry (Macro / Factor Fixtures Must Not Become Scores)
+- Date: 2026-05-09
+- Mistake or miss: FRED macro rows and Ken French factor returns can be mistaken for permission to emit macro/factor regime scores or rank candidates.
+- Root cause: Macro/factor language is naturally regime-oriented, so a tiny source fixture can sound like a model input unless manifests, policies, and tests forbid scoring/runtime fields.
+- Fix applied: Added the G7.1G FRED / Ken French fixture policy, macro/factor usage policy, two static fixtures, manifest allowed/forbidden use labels, and tests rejecting score/runtime columns, duplicate primary keys, bad hashes, row-count/date-range drift, missing identifiers, and non-finite numeric values.
+- Guardrail for next time: Treat public macro/factor rows as context-only until a separately approved state-machine or scoring phase; require real-time/vintage handling before any backtest or state-machine consumption.
+- Evidence paths: `docs/architecture/fred_ken_french_tiny_fixture_policy.md`, `docs/architecture/macro_factor_context_usage_policy.md`, `data/fixtures/fred/fred_macro_tiny.csv`, `data/fixtures/ken_french/ken_french_factor_tiny.csv`, `tests/test_g7_1g_fred_ken_french_tiny_fixture.py`
+## 2026-05-10 Round Entry (G7.2 Opportunity State Machine)
+- Date: 2026-05-10
+- Mistake or miss: State labels can be overread as trade instructions, and source classes can be overread as provider approval.
+- Root cause: Opportunity-state vocabulary, source-policy vocabulary, and dashboard vocabulary are adjacent to execution language unless no-order/no-alert/no-score boundaries are explicit.
+- Fix applied: Added finite opportunity states, transition evidence schemas, forbidden-jump register, and transition tests that fail closed on action metadata, estimated-only buying-range creation, and inferred-only winner-run creation.
+- Guardrail for next time: Whenever introducing a state machine, define the no-order/no-alert boundary in the same round and test the forbidden jumps explicitly.
+- Evidence paths: `opportunity_engine/states.py`, `opportunity_engine/schemas.py`, `opportunity_engine/transitions.py`, `tests/test_g7_2_opportunity_state_machine.py`
+
+## 2026-05-10 Round Entry (G7.3 Signal-to-State Source Eligibility Map)
+- Date: 2026-05-10
+- Mistake or miss: Public fixture pillars and provider-gap families could be treated as available sources or action evidence.
+- Root cause: Official, estimated, inferred, and provider-gap labels are easy to flatten unless source classes and confidence labels are explicit.
+- Fix applied: Added source classes, signal-family policy maps, freshness requirements, and confidence labels that block estimated-only and provider-gap signals from action-state influence.
+- Guardrail for next time: Whenever mapping signals to states, enforce source-class, freshness, and forbidden-influence checks before any dashboard or provider conversation.
+- Evidence paths: `opportunity_engine/source_classes.py`, `opportunity_engine/signal_policy.py`, `tests/test_g7_3_signal_to_state_source_map.py`
+
+## 2026-05-10 Round Entry (G7.4 Dashboard Wireframe / Product-State Spec)
+- Date: 2026-05-10
+- Mistake or miss: Dashboard section names can sound like runtime UI, and card fields can sound like candidate-card authority.
+- Root cause: Product-spec language sits close to implementation language unless the no-runtime/no-alert/no-order boundary is repeated.
+- Fix applied: Added state-first dashboard sections, watchlist card fields, daily brief sections, and focused tests that forbid orders, alerts, scores, rankings, provider calls, broker calls, and runtime dashboard code.
+- Guardrail for next time: Whenever drafting dashboard specs, state explicitly that the artifact is product-spec only and test for forbidden runtime wording.
+- Evidence paths: `docs/architecture/godview_dashboard_wireframe.md`, `docs/architecture/godview_watchlist_card_spec.md`, `docs/architecture/godview_daily_brief_spec.md`, `tests/test_g7_4_dashboard_state_spec.py`
+
+## 2026-05-10 Round Entry (G8 Supercycle Candidate Card)
+- Date: 2026-05-10
+- Mistake or miss: A first real ticker card can be mistaken for candidate screening, alpha evidence, or a buying-range recommendation.
+- Root cause: Once a human-nominated company appears in a structured object, product vocabulary can sound promotional unless source labels, missing evidence, and forbidden outputs are executable.
+- Fix applied: Added one MU candidate-card schema, static card, manifest, and tests that require source-quality labels, restrict initial states, reject score/rank/signal/alert/broker fields, reject yfinance as canonical evidence, and require provider-gap labels for options/IV/gamma/whales.
+- Guardrail for next time: Every candidate-card object must declare `candidate_card_only`, keep action states forbidden, and validate observed/estimated/inferred labels before any future signal-card or dashboard work can consume it.
+- Evidence paths: `opportunity_engine/candidate_card_schema.py`, `opportunity_engine/candidate_card.py`, `data/candidate_cards/MU_supercycle_candidate_card_v0.json`, `data/candidate_cards/MU_supercycle_candidate_card_v0.manifest.json`, `tests/test_g8_supercycle_candidate_card.py`
+
+## 2026-05-10 Round Entry (G8.1 Discovery Intake Must Not Become Ranking)
+- Date: 2026-05-10
+- Mistake or miss: A theme-to-candidate queue can be mistaken for alpha search, candidate ranking, or recommendations if the artifact only lists tickers.
+- Root cause: Discovery vocabulary naturally sits close to screening vocabulary unless evidence requirements, provider gaps, and negated output flags are executable.
+- Fix applied: Added a manifest-backed discovery intake schema, six-name static queue, theme taxonomy, and tests that reject score/rank fields, buy/sell/hold calls, validated status, action-state promotion, yfinance canonical evidence, and missing manifest evidence.
+- Guardrail for next time: Every discovery queue must preserve intake-only status, require evidence-needed/thesis-breaker/provider-gap fields, and keep candidate-card promotion behind a separate approval.
+- Evidence paths: `opportunity_engine/discovery_intake_schema.py`, `opportunity_engine/discovery_intake.py`, `data/discovery/supercycle_candidate_intake_queue_v0.json`, `tests/test_g8_1_supercycle_discovery_intake.py`
+
+## 2026-05-10 Round Entry (Discovery Origin Must Not Drift Into System Scout)
+- Date: 2026-05-10
+- Mistake or miss: The G8.1 six-name queue could be read as system-discovered even though the names were user-seeded.
+- Root cause: Intake artifacts had ticker/status fields but did not carry explicit discovery-origin provenance, so planner language could collapse user-seeded, theme-adjacent, factor-scouted, and system-scouted paths.
+- Fix applied: Added `DiscoveryOrigin`, required origin fields, relabeled the six-name queue, blocked current seeds from `SYSTEM_SCOUTED`, held `LOCAL_FACTOR_SCOUT` until G8.1B, and added focused G8.1A tests.
+- Guardrail for next time: Every discovery intake item must carry origin labels, origin evidence, scout path, and validation/action booleans before any planner treats it as discovered.
+- Evidence paths: `opportunity_engine/discovery_intake_schema.py`, `data/discovery/supercycle_candidate_intake_queue_v0.json`, `tests/test_g8_1a_discovery_drift_policy.py`, `docs/architecture/discovery_drift_policy.md`
+
+## 2026-05-10 Round Entry (Dashboard Redesign Must Start With IA)
+- Date: 2026-05-10
+- Mistake or miss: A dashboard redo can jump straight into Streamlit tabs and visual changes before the product page order is agreed.
+- Root cause: The existing Sovereign Cockpit mixes operator cockpit, data health, drift ops, research lab, portfolio tools, and experiments as peer tabs.
+- Fix applied: Approved DASH-0 as planning-only IA, mapped legacy tabs into state-first pages, moved Data Health/Drift Monitor to future Settings & Ops, and kept runtime shell work behind DASH-1 approval.
+- Guardrail for next time: Dashboard runtime changes must start from an approved page map and migration plan; ops diagnostics and research tools should not crowd the main Command Center.
+- Evidence paths: `docs/architecture/dashboard_information_architecture.md`, `docs/architecture/dashboard_page_registry_plan.md`, `docs/architecture/dashboard_redesign_migration_plan.md`, `docs/architecture/dashboard_ops_relocation_policy.md`
+
+## 2026-05-10 Round Entry (Factor Scout Must Not Become Ranking)
+- Date: 2026-05-10
+- Mistake or miss: A local factor artifact can be overread as a discovery model with ranking or alpha meaning once it emits a system-scouted ticker.
+- Root cause: Factor artifacts naturally contain internal numeric columns, and the word scout can collapse deterministic surfacing into recommendation language if manifests and validators do not block leakage.
+- Fix applied: Wrapped the Phase 34 artifact as `LOCAL_FACTOR_SCOUT`, emitted exactly one intake-only item, selected by deterministic latest-date/local-metadata/ascending-permno rule, and validated no score, rank, action language, candidate-card creation, or yfinance canonical source.
+- Guardrail for next time: Any future factor-scout output must keep numeric factor values quarantined, require a manifest-backed origin, and state that system-scouted means intake surfacing only until a separate validation phase approves model use.
+- Evidence paths: `opportunity_engine/factor_scout_schema.py`, `opportunity_engine/factor_scout.py`, `data/discovery/local_factor_scout_output_tiny_v0.json`, `tests/test_g8_1b_pipeline_first_discovery_scout.py`, `docs/architecture/factor_scout_output_contract.md`
+
+## 2026-05-10 Round Entry (Dashboard Shell Must Not Become Redesign)
+- Date: 2026-05-10
+- Mistake or miss: Moving from flat tabs to a page registry can accidentally become a page redesign or semantic expansion.
+- Root cause: Streamlit navigation work sits next to visual layout, status badges, research tools, alerts, and scoring vocabulary unless the shell owns only routing and relocation.
+- Fix applied: Added a DASH-1 page registry shell with approved IA pages, moved legacy content behind the mapped pages, kept new GodView pages as placeholders/status-only, and tested for no flat `st.tabs` navigation and no factor-scout/broker/action leakage.
+- Guardrail for next time: Treat dashboard navigation changes as shell-only unless a later DASH phase explicitly approves page content redesign; keep old research and ops workflows grouped away from Command Center.
+- Evidence paths: `dashboard.py`, `views/page_registry.py`, `tests/test_dash_1_page_registry_shell.py`, `docs/handover/dash_1_page_registry_shell_handover_20260510.md`
+
+## 2026-05-10 Round Entry (System-Scouted Card Must Not Become Dashboard Action)
+- Date: 2026-05-10
+- Mistake or miss: MSFT can appear both as a legacy dashboard ticker-list row and as the new G8.2 candidate-card artifact, which can make the card look merged into dashboard action logic.
+- Root cause: The legacy dashboard already contains MSFT runtime labels, tactical prices, trend labels, `COILED SPRING`, and `IGNORE`, while G8.2 introduces a file-backed MSFT research object with the same ticker.
+- Fix applied: Documented the dashboard boundary in the G8.2 policy, bridge, planner packet, handover, PRD/spec notices, and tests; kept the card static and did not wire it into dashboard runtime.
+- Guardrail for next time: Any future DASH card-reader lane must render candidate cards as status-only research objects and must explicitly avoid legacy action-shaped labels unless a later product state has separate approval.
+- Evidence paths: `docs/architecture/g8_2_system_scouted_candidate_card_policy.md`, `data/candidate_cards/MSFT_supercycle_candidate_card_v0.json`, `tests/test_g8_2_system_scouted_candidate_card.py`, `dashboard.py`
+
+## 2026-05-10 Round Entry (Portfolio Optimizer Should Stay Primary)
+- Date: 2026-05-10
+- Mistake or miss: The first DASH-2 pass hid Portfolio Optimizer behind an expander and placed it below the YTD comparison, making the primary allocation workflow feel secondary.
+- Root cause: Cleanup pressure from removing Portfolio Builder marketing copy drifted into interaction hierarchy and treated the optimizer as optional instead of primary.
+- Fix applied: Removed the optimizer expander/toggle, rendered optimizer above YTD Performance, calculated YTD portfolio return from current optimizer weights, and added live adjusted-close freshness overlays for selected stocks and SPY/QQQ.
+- Guardrail for next time: When simplifying a page, preserve the primary operator workflow as top-level unless the user explicitly asks to demote it.
+- Evidence paths: `dashboard.py`, `views/optimizer_view.py`, `tests/test_dash_2_portfolio_ytd.py`, browser check at `http://127.0.0.1:8502/portfolio-and-allocation`
+
+## 2026-05-10 Round Entry (Display Order Must Not Become Portfolio Universe)
+- Date: 2026-05-10
+- Mistake or miss: The optimizer inherited `df_scan` display order and `selected_tickers[:20]`, which let EXIT/KILL rows enter the default portfolio universe and made a missing local price series look like a user-selected 19-name basket.
+- Root cause: Discovery universe, dashboard display ranking, and allocation universe were collapsed into one handoff.
+- Fix applied: Added `strategies/portfolio_universe.py`, wired `dashboard.py` to pass an audited universe to `views/optimizer_view.py`, default-excluded EXIT/KILL/AVOID/IGNORE, treated WATCH as research-only, reported ticker/price readiness, and added max-weight feasibility diagnostics.
+- Guardrail for next time: Any capital-allocation handoff must use an explicit optimizer-universe contract and must show excluded names, missing mappings, price-history failures, and cap-bound warnings before optimization.
+- Evidence paths: `strategies/portfolio_universe.py`, `dashboard.py`, `views/optimizer_view.py`, `tests/test_portfolio_universe.py`, `docs/architecture/portfolio_construction_contract.md`
+
+## 2026-05-11 Round Entry (Dirty Optimizer Math Must Not Hide Inside Universe Closure)
+- Date: 2026-05-11
+- Mistake or miss: A dirty `strategies/optimizer.py` lower-bound/math diff was present while the Portfolio Universe Construction Fix was supposed to close only the mechanical universe handoff and diagnostics.
+- Root cause: Broad dirty worktree state made it possible for out-of-scope optimizer-core edits to sit beside a narrow governance closure.
+- Fix applied: Ran independent SAW reviewers; kept the round read-only for implementation; updated the SAW report to block on the unaccepted optimizer-core diff instead of silently passing governance.
+- Guardrail for next time: Before portfolio closure, run a forbidden-scope diff scan across all dirty optimizer/scanner/runtime files and explicitly classify each dirty file as in-scope, inherited, or separately approved before claiming PASS.
+- Evidence paths: `docs/saw_reports/saw_portfolio_universe_construction_fix_20260510.md`, `strategies/optimizer.py`, Reviewer B SAW finding, forbidden-scope scan output.
+
+## 2026-05-11 Round Entry (Quarantine Before Pass)
+- Date: 2026-05-11
+- Mistake or miss: The universe-construction closure almost treated an optimizer-core lower-bound/SLSQP diff as a closure side issue instead of a separate model-policy change.
+- Root cause: The closure gate checked focused portfolio behavior before isolating every dirty optimizer-core file in the worktree.
+- Fix applied: Saved the dirty optimizer diff to `docs/quarantine/optimizer_core_lower_bounds_slsqp_diff_20260510.patch`, added a quarantine note, reverted `strategies/optimizer.py`, reran focused validation, and updated SAW to PASS only after the optimizer diff was gone.
+- Guardrail for next time: A portfolio-universe PASS must require `git diff -- strategies/optimizer.py` to be empty unless an optimizer-core policy round explicitly owns that file.
+- Evidence paths: `docs/quarantine/optimizer_core_lower_bounds_slsqp_diff_20260510.patch`, `docs/quarantine/optimizer_core_lower_bounds_slsqp_diff_note_20260510.md`, `docs/saw_reports/saw_portfolio_universe_construction_fix_20260510.md`, focused pytest/compile/context/browser evidence.
+
+## 2026-05-11 Round Entry (Audit Tests Must Not Masquerade As Implementation)
+- Date: 2026-05-11
+- Mistake or miss: A docs/tests-first optimizer policy audit could be misread as approval to merge lower-bound/SLSQP implementation.
+- Root cause: Test names for future required behavior can sound like current implementation proof unless strict xfails and audit wording clearly separate policy debt from accepted code.
+- Fix applied: Added optimizer-core policy docs, preserved no `strategies/optimizer.py` diff, and marked current infeasibility/fallback/active-bound behavior as strict xfail audit debt.
+- Guardrail for next time: Future optimizer-core acceptance must replace strict xfails with passing implementation tests in the same branch and SAW; audit xfails alone are not implementation approval.
+- Evidence paths: `docs/architecture/optimizer_core_policy_audit.md`, `docs/architecture/optimizer_constraints_policy.md`, `docs/architecture/optimizer_lower_bound_slsqp_policy.md`, `tests/test_optimizer_core_policy.py`, `docs/saw_reports/saw_optimizer_core_policy_audit_20260510.md`.
+
+## 2026-05-11 Round Entry (Diagnostics Must Fail Closed On Non-Finite Weights)
+- Date: 2026-05-11
+- Mistake or miss: The first optimizer diagnostics implementation could sanitize NaN/inf weights to zero for residual math and still classify a diagnostic envelope as fully invested or optimized if the remaining finite weights summed to one.
+- Root cause: Constraint diagnostics reused cleanup logic suitable for display math instead of preserving the original non-finite state as a hard diagnostic failure.
+- Fix applied: Detect non-finite values before fill, mark bound/constraint diagnostics as error, force `constraints_satisfied = false`, prevent `result_is_optimized`, and add NaN/inf regression tests.
+- Guardrail for next time: Any diagnostic layer that cleans numeric inputs for reporting must separately preserve pre-clean invalidity and fail closed before emitting success status.
+- Evidence paths: `strategies/optimizer_diagnostics.py`, `tests/test_optimizer_core_policy.py`, `docs/saw_reports/saw_optimizer_core_structured_diagnostics_20260511.md`, `.venv\Scripts\python -m pytest tests\test_optimizer_core_policy.py -q`.
+
+## 2026-05-11 Round Entry (View Refactors Need Real Streamlit Coverage)
+- Date: 2026-05-11
+- Mistake or miss: The optimizer view had helper-level refactor work while the render body could still drift back to stale control code and runtime-only errors.
+- Root cause: Existing checks were mostly source-text assertions and did not instantiate the Streamlit widget tree for `/portfolio-and-allocation`.
+- Fix applied: Added dedicated `streamlit.testing.v1.AppTest` coverage, reconciled the optimizer render body to the helper path, cached optimizer runs, and moved recent display overlays behind a display-only Parquet cache with atomic writes.
+- Guardrail for next time: Any optimizer view refactor must include at least one AppTest render, one widget-control rerun, and one focused UI-to-solver handoff test before claiming the route is stable.
+- Evidence paths: `views/optimizer_view.py`, `core/data_orchestrator.py`, `tests/test_optimizer_view.py`, `tests/test_optimizer_core_policy.py`, `.venv\Scripts\python -m pytest tests\test_optimizer_view.py tests\test_optimizer_core_policy.py tests\test_dash_2_portfolio_ytd.py -q`.
+
+## 2026-05-11 Round Entry (Display Freshness Must Not Live In The View)
+- Date: 2026-05-11
+- Mistake or miss: The approved DASH-2 display freshness overlay left yfinance fetching, local TRI scaling/stitching, and backtest-result JSON parsing inside `views/optimizer_view.py`.
+- Root cause: The first runtime slice prioritized preserving Portfolio & Allocation behavior and did not immediately complete the data/UI boundary cleanup.
+- Fix applied: Moved selected-stock display overlay fetching, adjusted-close extraction, local TRI scaling/stitching, and strategy metrics parsing into `core/data_orchestrator.py`; updated the view and focused tests.
+- Guardrail for next time: Any runtime display-refresh path may be triggered by UI, but provider calls, price stitching, and repository file reads must live behind data orchestration/provider boundaries.
+- Evidence paths: `core/data_orchestrator.py`, `views/optimizer_view.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest -q`.
+
+## 2026-05-11 Round Entry (Optimizer View Refactors Must Fail Closed)
+- Date: 2026-05-11
+- Mistake or miss: Optimizer UI code carried method-label strings, audit-object coercion, cash-row manipulation, and render layout in one large procedural function; first refactor also left stale session weights on failure exits.
+- Root cause: Dashboard velocity left view orchestration, typed source contracts, display-table assembly, and downstream session-state handoff coupled in `render_optimizer_view`.
+- Fix applied: Moved optimizer method labels into a strategy-layer enum/registry, typed the universe audit boundary to `OptimizerUniverseResult`, moved cash-row injection into `_build_allocation_table`, split renderer responsibilities into focused helpers, cleared optimizer session state on all invalid exits, and treated future-dated overlay cache mtimes as stale.
+- Guardrail for next time: Optimizer view changes should keep method labels source-owned, accept the universe dataclass contract directly, keep render functions declarative, and clear downstream session outputs before every fail-closed return.
+- Evidence paths: `strategies/optimizer.py`, `views/optimizer_view.py`, `core/data_orchestrator.py`, `tests/test_portfolio_universe.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `docs/saw_reports/saw_optimizer_view_code_quality_20260511.md`, `.venv\Scripts\python -m pytest -q`, Streamlit smoke at `http://127.0.0.1:8506/portfolio-and-allocation`.
+
+## 2026-05-11 Round Entry (SAW Resource Blocks Need Explicit Rerun Closure)
+- Date: 2026-05-11
+- Mistake or miss: The optimizer view hardening implementation had passing tests and runtime smoke, but the first SAW report stayed BLOCK because independent subagents were unavailable.
+- Root cause: Closure depended on subagent availability and the report correctly refused to infer independent review from local verification alone.
+- Fix applied: Reran SAW with distinct Implementer and Reviewer A/B/C agents, reconciled PASS outputs, carried only Low runtime hygiene follow-ups, and updated the SAW report plus current truth surfaces.
+- Guardrail for next time: When SAW is blocked by resource availability rather than defects, keep the report BLOCK, then rerun independent agents and update closure packets only after concrete PASS outputs exist.
+- Evidence paths: `docs/saw_reports/saw_portfolio_optimizer_view_perf_hardening_20260511.md`, `docs/context/done_checklist_current.md`, `docs/context/bridge_contract_current.md`, SAW rerun agent outputs.
+
+## 2026-05-11 Round Entry (Display Overlays Must Merge Cell-Wise)
+- Date: 2026-05-11
+- Mistake or miss: The first data-boundary refactor could let a partial live overlay overwrite an overlapping local price row with `NaN` for tickers missing from the live response.
+- Root cause: The stitch step used row concatenation plus duplicate-date `keep=last`, which was fine for full live rows but unsafe for sparse live frames.
+- Fix applied: Changed selected-price stitching to `scaled_live_overlay.combine_first(local_TRI_prices)`, deduped duplicate anchor dates before scaling, fail-softened background refresh submission, and locked stale-while-revalidate behavior with focused tests.
+- Guardrail for next time: Any display overlay that is allowed to be sparse must merge cell-wise and must prove missing live cells preserve canonical local values.
+- Evidence paths: `core/data_orchestrator.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `docs/saw_reports/saw_portfolio_data_boundary_refactor_20260511.md`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py -q`.
+
+## 2026-05-11 Round Entry (PID Probes Must Be Shared And Windows-Safe)
+- Date: 2026-05-11
+- Mistake or miss: Dashboard and phase16 optimizer lock code still had direct `os.kill(pid, 0)` liveness probes while updater/parameter-sweep had copied Windows-safe implementations.
+- Root cause: Process-liveness safety lived in local helpers instead of one shared utility, so later runtime paths drifted back to unsafe platform behavior.
+- Fix applied: Added `utils/process.py::pid_is_running`, routed dashboard/updater/parameter-sweep/release-controller/phase16 optimizer wrappers through it, and added `tests/test_process_utils.py`.
+- Guardrail for next time: New PID or lock-owner liveness checks must call `utils.process.pid_is_running`; direct `os.kill(pid, 0)` is allowed only inside that utility's non-Windows branch.
+- Evidence paths: `utils/process.py`, `dashboard.py`, `data/updater.py`, `scripts/parameter_sweep.py`, `scripts/release_controller.py`, `backtests/optimize_phase16_parameters.py`, `tests/test_process_utils.py`, `.venv\Scripts\python -m pytest tests\test_process_utils.py tests\test_parameter_sweep.py tests\test_updater_parallel.py tests\test_release_controller.py tests\test_optimize_phase16_parameters.py tests\test_dash_1_page_registry_shell.py tests\test_dash_2_portfolio_ytd.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_optimizer_view.py -q`.
+
+## 2026-05-11 Round Entry (Dashboard Rerun Caches Need Source Signatures)
+- Date: 2026-05-11
+- Mistake or miss: The dashboard loaded the full unified parquet package on every Streamlit rerun even though the source parquet files usually had not changed.
+- Root cause: The expensive DuckDB/pivot/concat load lived in top-level dashboard code without a Streamlit cache boundary or source-file invalidation key.
+- Fix applied: Added `core.data_orchestrator.build_unified_data_cache_signature`, wrapped the dashboard unified-data load with `st.cache_resource`, and keyed the cache by source parquet path/mtime/size signatures.
+- Guardrail for next time: Heavy top-level Streamlit data loads must either be behind a cache with explicit source invalidation or be moved out of rerun scope before dashboard UX is considered acceptable.
+- Evidence paths: `dashboard.py`, `core/data_orchestrator.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_dashboard_sprint_a.py`, pre-fix `.venv` timing of `load_unified_data(...)` at `8.802s` and `8.393s`.

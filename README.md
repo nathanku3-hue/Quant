@@ -1,237 +1,205 @@
-# Quant Trading System
+# Terminal Zero: Unified Opportunity Engine
 
-A production-grade quantitative trading system with factor-based portfolio construction, regime-aware risk management, and real-time performance attribution.
+Status: Phase 65 G7.1A starter docs / product-spec rewrite
+Date: 2026-05-09
+Authority: G7.1A docs-only product canon
 
-## Overview
+Terminal Zero is a local-first discretionary augmentation cockpit. It is not a trading bot.
 
-This system implements a multi-phase quantitative trading strategy with:
-- **Factor Attribution Analysis** - IC-based factor evaluation with regime conditioning
-- **Risk Management** - Maintenance blackout windows, drain strategies, and transient backoff
-- **Dashboard** - Real-time monitoring with attribution views and performance metrics
-- **Orchestration** - Event-driven architecture with retry/backoff mechanisms
+The product is the **Unified Opportunity Engine**:
 
-## Project Status
+```text
+Primary alpha:   supercycle gem discovery / de-risked asymmetric upside
+Secondary alpha: GodView market-behavior intelligence
+Output layer:    buying-range, hold-discipline, trim-risk, and thesis-break prompts
+```
 
-**Current Phase**: Phase 65 Candidate Registry — COMPLETE, registry-only
-- **D-353 Status**: Complete for source policy, manifest enforcement, provider ports, data readiness audit, and minimal validation lab
-  - validation reports now require manifests
-  - yfinance is quarantined as Tier 2 discovery/convenience data
-  - Alpaca is operational/paper market data only; live orders remain blocked
-- **R64.1 Status**: Dependency hygiene closed with `alpaca-py==0.43.4`; `pip check` passes
-- **Phase F Status**: Candidate Registry closed as append-only metadata/lifecycle work; no strategy search, simulation, promotion packet, alert, broker, or live path added
-- **Open Operational Risk**: primary S&P sidecar is stale through 2023-11-27; yfinance remains quarantined legacy debt
-- **Next Decision**: Choose Phase G V2 Proxy Boundary or advanced registry accounting; strategy search is not automatically approved.
+The engine helps a discretionary supercycle investor/operator find MU/SNDK-style structural winners and read market behavior well enough to avoid two expensive mistakes:
+
+- buying too early on the left side;
+- selling too early while momentum, flows, positioning, and thesis evidence remain supportive.
+
+All outputs are decision-support states or paper-only prompts. They are not orders, broker instructions, alert authorization, or signal approval.
+
+## Current Canon
+
+Use these starter docs first:
+
+- [PRD.md](PRD.md) - product requirements for the Unified Opportunity Engine
+- [PRODUCT_SPEC.md](PRODUCT_SPEC.md) - product and architecture specification
+- [docs/architecture/top_level_roadmap.md](docs/architecture/top_level_roadmap.md) - G7.1A through G12 roadmap
+- [docs/architecture/unified_opportunity_engine.md](docs/architecture/unified_opportunity_engine.md) - top-level product architecture
+- [docs/architecture/godview_signal_taxonomy.md](docs/architecture/godview_signal_taxonomy.md) - GodView signal families and use boundaries
+- [docs/architecture/data_infra_gap_assessment.md](docs/architecture/data_infra_gap_assessment.md) - current readiness and future provider gaps
+- [docs/architecture/codex_agent_research_workflow.md](docs/architecture/codex_agent_research_workflow.md) - Codex/Chrome research-agent SOP
+- [docs/architecture/dashboard_product_spec.md](docs/architecture/dashboard_product_spec.md) - dashboard state model and product surface
+
+Historical lowercase docs remain for continuity:
+
+- [docs/prd.md](docs/prd.md)
+- [docs/spec.md](docs/spec.md)
+
+Those files now point back to the root canon above. If a conflict appears, the G7.1A root docs win for product framing.
+
+## Product Model
+
+### 1. Primary Alpha: Supercycle Gem Discovery
+
+Find de-risked asymmetric upside: companies or assets where structural demand, supply constraints, ownership behavior, fundamentals, and market action converge into a possible supercycle winner.
+
+This layer is thesis-first. It does not start from generic alpha search, parameter sweeps, or backtest-driven ranking.
+
+### 2. Secondary Alpha: GodView Market-Behavior Intelligence
+
+Read the market around the thesis:
+
+- implied volatility and volatility surface behavior;
+- options whales and unusual options activity;
+- gamma and dealer-positioning estimates;
+- short interest and short-squeeze context;
+- CTA/systematic pressure and CFTC positioning proxies;
+- sector rotation and factor/risk appetite;
+- ETF/passive holdings and flow pressure;
+- dark-pool, ATS, and block activity;
+- ownership whales through 13F/13D/Form 4 style evidence;
+- microstructure and order-book context;
+- catalysts, news, and narrative velocity;
+- broad regime.
+
+Some of these are observed facts. Others are vendor fields or model estimates. The product must label that difference before downstream use.
+
+### 3. Output Layer: Decision Augmentation
+
+The dashboard should resolve evidence into states such as:
+
+```text
+wait
+watch
+accumulation
+confirmation
+buying range
+let winner run
+trim optional
+exit risk
+thesis broken
+```
+
+These are operator prompts, not automatic trades.
+
+## Current Phase
+
+**Phase G8.2: System-Scouted Candidate Card**
+
+Scope:
+
+- one MSFT candidate-card-only research object from the governed `LOCAL_FACTOR_SCOUT` output;
+- no new scout output;
+- no cards for DELL/AMD/LRCX/ALB;
+- no search, ranking, scoring, thesis validation, buying range, alert, broker call, provider ingestion, or dashboard runtime merge.
+
+G8.2 proves the system-scouted intake-to-card path. Existing dashboard MSFT rows remain legacy runtime output, not the G8.2 card.
+
+Baseline history remains active underneath this product rewrite: D-353 / Phase 64 provenance and validation gates are complete, and R64.1 dependency hygiene is closed with `pip check` passing.
+
+## Roadmap
+
+```text
+G7.1A - Starter Docs / PRD / Product Spec Rewrite
+G7.1B - Data + Infra Gap Assessment for GodView signals
+G7.1C - Codex/Chrome Research Agent SOP
+G7.2  - Unified Opportunity Engine State Machine
+G7.3  - GodView Signal Source Policy
+G7.4  - Supercycle Gem Family Definition, no search
+G7.5  - Market Behavior Signal Family Definitions, no search
+G8    - One Supercycle Gem Candidate Card, no search
+G8.1  - Discovery intake and origin governance
+G8.2  - One system-scouted MSFT candidate card, no validation
+G9    - One Market Behavior Signal Card, no search
+G10   - Dashboard Prototype: watchlist state view
+G11   - Bounded discovery under sealed families
+G12   - Paper-only buying-range / hold-discipline alerts
+```
+
+Immediate next action:
+
+```text
+approve_g9_one_market_behavior_signal_card_or_g8_3_one_user_seeded_candidate_card_or_dash_card_reader_or_hold
+```
+
+## Current Infrastructure Readiness
+
+Ready for governance foundations:
+
+- canonical daily price governance;
+- manifests and provenance checks;
+- Candidate Registry;
+- V1/V2 mechanical replay discipline;
+- dashboard smoke discipline;
+- minimal validation lab;
+- paper-alert readiness foundations.
+
+Not ready for full GodView without future provider layers:
+
+- options, IV, and OPRA-style data;
+- options open interest and volume;
+- whale options flow;
+- gamma/dealer estimates;
+- short interest and borrow/stock-loan context;
+- CFTC COT/TFF positioning;
+- SEC 13F/13D/Form 4 ownership intelligence;
+- ETF holdings and flows;
+- dark-pool, ATS, and block activity;
+- microstructure and order-book feeds;
+- news and narrative velocity capture.
+
+These gaps are expected. G7.1A documents them; it does not build them.
+
+## Development Environment
+
+Hard constraints:
+
+- Python 3.12+ through `.venv`;
+- Streamlit UI;
+- DuckDB SQL engine;
+- Pandas/Polars dataframes;
+- Parquet storage;
+- Plotly and Streamlit native components;
+- pytest and `streamlit.testing` where applicable.
+
+Common commands:
+
+```powershell
+.\.venv\Scripts\python -m pytest -q
+.\.venv\Scripts\python -m pip check
+.\.venv\Scripts\python scripts\build_context_packet.py
+.\.venv\Scripts\python scripts\build_context_packet.py --validate
+.\.venv\Scripts\streamlit run app.py
+```
 
 ## Current Truth Surfaces
 
-Use these surfaces together to understand the current system state:
+Start from:
 
-### Static Truth
-- **[top_level_PM.md](top_level_PM.md)** — long-lived product/system intent
-- **[docs/decision log.md](docs/decision%20log.md)** — authoritative decision history
-- **Active phase brief** — current phase scope and boundaries (e.g., `docs/phase_brief/phase65-brief.md`)
+- [docs/context/planner_packet_current.md](docs/context/planner_packet_current.md)
+- [docs/context/impact_packet_current.md](docs/context/impact_packet_current.md)
+- [docs/context/bridge_contract_current.md](docs/context/bridge_contract_current.md)
+- [docs/context/done_checklist_current.md](docs/context/done_checklist_current.md)
+- [docs/context/multi_stream_contract_current.md](docs/context/multi_stream_contract_current.md)
+- [docs/context/post_phase_alignment_current.md](docs/context/post_phase_alignment_current.md)
+- [docs/context/observability_pack_current.md](docs/context/observability_pack_current.md)
 
-### Live Truth
-- **[docs/context/current_context.md](docs/context/current_context.md)** — current active phase and next immediate command
+These surfaces are advisory. They do not authorize trading, alerts, broker automation, candidate generation, search, replay, proxy runs, promotion packets, or scope widening by themselves.
 
-### Bridge Truth
-- **[docs/context/bridge_contract_current.md](docs/context/bridge_contract_current.md)** — translates recent technical closeout state back into PM/planner language and names the next system-level decision
+## Non-Negotiable Boundaries
 
-### Evidence Truth
-- **[docs/context/done_checklist_current.md](docs/context/done_checklist_current.md)** — machine-checkable done criteria for current phase
-- **[docs/context/multi_stream_contract_current.md](docs/context/multi_stream_contract_current.md)** — cross-stream coordination map (Backend, Frontend/UI, Data, Docs/Ops)
-- **[docs/context/post_phase_alignment_current.md](docs/context/post_phase_alignment_current.md)** — post-phase stream status update and bottleneck analysis
+- Terminal Zero is not a trading bot.
+- G8.2 candidate cards are not scores, ranks, alerts, recommendations, buying ranges, or broker actions.
+- G8 PEAD candidate generation remains held.
+- `PEAD_DAILY_V0` remains a valid tactical family, not the product center.
+- GodView signals must carry source quality, freshness, latency, confidence, observed-vs-estimated status, allowed use, forbidden use, and manifest identity before downstream use.
+- No signal becomes alpha evidence because a research agent captured a source page.
+- No credentials, live broker paths, or canonical market-data writes may be handled by Codex/Chrome research workflows.
 
-### Planner Truth
-- **[docs/context/planner_packet_current.md](docs/context/planner_packet_current.md)** — compact fresh-context packet for planner (current context, active brief, bridge truth, decision tail, blocked next step, active bottleneck)
-- **[docs/context/impact_packet_current.md](docs/context/impact_packet_current.md)** — impact view for planner (changed files, owned files, touched interfaces, failing checks)
+## Last Updated
 
-### Observability
-- **[docs/context/observability_pack_current.md](docs/context/observability_pack_current.md)** — drift detection markers (high-risk attempts, stuck sessions, skill under-triggering, budget pressure, compaction/hallucination pressure)
-
-These surfaces follow the SOP governance kernel (see `E:\code\SOP\ENDGAME.md` for the full truth model).
-
-## Quick Start
-
-### Prerequisites
-- Python 3.12+
-- Virtual environment recommended
-
-### Installation
-
-```bash
-# Clone repository
-git clone <repository-url>
-cd Quant
-
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run tests
-pytest tests/ -v
-```
-
-### Running Attribution Analysis
-
-```bash
-python scripts/attribution_report.py \
-  --start-date 2022-01-01 \
-  --end-date 2024-12-31 \
-  --output-dir data/processed
-```
-
-## Architecture
-
-### Core Modules
-
-- **`core/`** - Core business logic
-  - `data_orchestrator.py` - Data loading and orchestration
-  - `dashboard_control_plane.py` - Dashboard state management
-  - `maintenance_blackout.py` - Maintenance window enforcement
-  - `retry_backoff.py` - Transient error handling
-
-- **`strategies/`** - Trading strategies
-  - `factor_attribution.py` - IC computation and attribution
-  - `behavior_ledger.py` - Behavior tracking with bootstrap CI
-
-- **`execution/`** - Order execution
-  - `microstructure.py` - Market microstructure handling
-
-- **`views/`** - Dashboard views
-  - `attribution_view.py` - Attribution visualization
-
-### Scripts
-
-- **`scripts/phase60_preflight_verify.py`** - Preflight verification for governed cube
-- **`scripts/phase60_governed_audit_runner.py`** - Bounded post-2022 audit runner
-- **`scripts/phase60_governed_cube_runner.py`** - Governed daily holdings/weight cube generator
-- **`scripts/phase60_d341_blocked_audit_review.py`** - Formal blocked-audit review
-
-## Testing
-
-```bash
-# Run all tests
-pytest tests/ -v
-
-# Run D-353 provenance + validation gate tests
-pytest tests/test_provenance_policy.py tests/test_provider_ports.py tests/test_data_readiness_audit.py tests/test_minimal_validation_lab.py tests/test_execution_controls.py -v
-
-# Run R64.1 dependency hygiene tests
-pytest tests/test_dependency_hygiene.py tests/test_execution_controls.py tests/test_provider_ports.py -v
-python -m pip check
-
-# Run Phase 65 Candidate Registry tests
-pytest tests/test_candidate_registry.py -v
-python scripts/run_candidate_registry_demo.py
-
-# Run with coverage
-pytest tests/ --cov=. --cov-report=html
-```
-
-**Test Coverage**: D-353 targeted tests and packet hygiene checks passing
-- Provenance manifest and promotion-source gates
-- Provider-port and yfinance quarantine tests
-- Data readiness audit tests
-- Minimal validation lab tests
-- Alpaca paper/live boundary tests
-- Alpaca SDK dependency hygiene tests
-- Candidate Registry append-only lifecycle and hash-chain tests
-
-## Phase 64 / D-353 Deliverables
-
-### Artifacts Generated
-
-Key artifacts in `data/processed/`:
-
-1. **data_readiness_report.json** - Daily US-equity paper-alert readiness audit
-2. **data_readiness_report.json.manifest.json** - Manifest for the readiness audit
-3. **minimal_validation_report.json** - OOS, walk-forward, regime, permutation, and bootstrap validation report
-4. **minimal_validation_report.json.manifest.json** - Manifest for the validation report
-5. **phase56_pead_evidence.csv.manifest.json** - Canonical input manifest for PEAD evidence
-
-### Validation
-
-**Governance State**: D-353 complete for provenance + validation gates
-- data readiness audit returns `ready_for_paper_alerts = true`
-- minimal validation lab passes on existing PEAD evidence
-- live trading, broker automation, and Tier 2 promotion remain blocked
-
-## Documentation
-
-### Phase 64 / D-353
-- **`docs/architecture/data_source_policy.md`** - Data source tiers and executable invariants
-- **`docs/phase_brief/phase64-brief.md`** - D-353 accelerated provenance + validation brief
-- **`docs/phase_brief/phase65-brief.md`** - Phase F Candidate Registry closeout brief
-- **`docs/handover/phase64_handover.md`** - PM handover for provenance + validation gates
-
-### Phase 65 / Candidate Registry
-- **`docs/architecture/candidate_registry_policy.md`** - Registry-only policy and invariants
-- **`docs/handover/phase65_handover.md`** - PM handover for Candidate Registry
-- **`data/registry/candidate_events.jsonl`** - Append-only candidate event log
-- **`data/registry/candidate_snapshot.json`** - Disposable snapshot projection
-- **`data/registry/candidate_registry_rebuild_report.json`** - Rebuild and hash-chain proof
-
-### General
-- **`docs/decision log.md`** - Architecture decision records (D-01 through D-355)
-- **`docs/context/bridge_contract_current.md`** - Current PM/planner bridge
-
-## Current System Status
-
-- **Multi-Sleeve Research Kernel**: Prior evidence surfaces preserved as immutable SSOT, with D-353 provenance gates layered on top
-- **Governance Stack**: 355 architecture decisions
-- **Remaining Risks**: yfinance quarantine migration, stale S&P sidecar provenance, and blocked live execution
-
-## Development Workflow
-
-### Branching Strategy
-- `main` - Production-ready code
-- Feature branches for new phases
-
-### Commit Convention
-```
-feat: add new feature
-fix: bug fix
-chore: maintenance tasks
-docs: documentation updates
-test: test additions/modifications
-```
-
-### Phase Progression
-1. Phase brief created in `docs/phase_brief/`
-2. Implementation with tests
-3. SAW report (Strengths, Areas for improvement, Warnings)
-4. Closure report with acceptance criteria validation
-5. Merge to main
-
-## Configuration
-
-Configuration files in `config/`:
-- Factor definitions
-- Regime thresholds
-- Risk parameters
-
-## Contributing
-
-1. Create feature branch from `main`
-2. Implement changes with tests
-3. Ensure all tests pass: `pytest tests/ -v`
-4. Update documentation
-5. Submit for review
-
-## License
-
-[Specify license]
-
-## Contact
-
-[Specify contact information]
-
----
-
-**Last Updated**: 2026-05-09
-**Phase**: 65 Candidate Registry
-**Status**: D-355 Complete | Registry-only lineage gates active
+2026-05-10 - Phase 65 G8.2 system-scouted candidate-card proof.

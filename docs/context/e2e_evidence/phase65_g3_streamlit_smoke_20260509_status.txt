@@ -1,0 +1,4 @@
+process_alive_after_20s=True
+listener_after_20s=True
+exit_code=
+port=8610

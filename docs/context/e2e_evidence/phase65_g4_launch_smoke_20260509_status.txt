@@ -1,0 +1,4 @@
+launch_smoke_alive_after_20s=True
+launch_smoke_exit_code=0
+launch_smoke_port=8620
+launch_smoke_status=PASS

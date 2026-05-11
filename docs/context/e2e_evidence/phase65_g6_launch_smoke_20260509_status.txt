@@ -1,0 +1,6 @@
+runtime_smoke_status=PASS
+process_alive_after_20s=True
+exit_code=
+port=8622
+stdout=docs\context\e2e_evidence\phase65_g6_launch_smoke_20260509_stdout.txt
+stderr=docs\context\e2e_evidence\phase65_g6_launch_smoke_20260509_stderr.txt

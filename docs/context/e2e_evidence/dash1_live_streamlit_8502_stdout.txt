@@ -1,0 +1,44 @@
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8502
+  Network URL: http://198.18.0.1:8502
+  External URL: http://91.243.81.209:8502
+
+[EgressBlocked] high_freq_fetch_tsmc: Deny-by-default egress policy blocked host 'query1.finance.yahoo.com' for high_freq_fetch_tsmc. Allowed suffixes: ('alpaca.markets', 'wrds-pgdata.wharton.upenn.edu', 'financialmodelingprep.com')
+[EgressBlocked] high_freq_fetch_energy: Deny-by-default egress policy blocked host 'query1.finance.yahoo.com' for high_freq_fetch_energy. Allowed suffixes: ('alpaca.markets', 'wrds-pgdata.wharton.upenn.edu', 'financialmodelingprep.com')
+[EgressBlocked] high_freq_fetch_cloud: Deny-by-default egress policy blocked host 'query1.finance.yahoo.com' for high_freq_fetch_cloud. Allowed suffixes: ('alpaca.markets', 'wrds-pgdata.wharton.upenn.edu', 'financialmodelingprep.com')
+Initiating Phase 39: The 'Opportunity Gate' Final Matrix with Crisis Gates & Cyborg Sensing...
+Fetching Macro Crisis data (VIX & US10Y)...
+Fetching Financial Matrix for the 25 targeted assets...
+[EgressBlocked] high_freq_fetch_fred: Deny-by-default egress policy blocked host 'fred.stlouisfed.org' for high_freq_fetch_fred. Allowed suffixes: ('alpaca.markets', 'wrds-pgdata.wharton.upenn.edu', 'financialmodelingprep.com')
+[EgressBlocked] high_freq_fetch_fred: Deny-by-default egress policy blocked host 'fred.stlouisfed.org' for high_freq_fetch_fred. Allowed suffixes: ('alpaca.markets', 'wrds-pgdata.wharton.upenn.edu', 'financialmodelingprep.com')
+
+--- The Final 'Opportunity Gate' Matrix ---
+Ticker   | Regime                         | Score  | Action                     | Demand     | Supply     | Pricing    | Margin    
+---------------------------------------------------------------------------------------------------------------------------------------
+AMD      | Super Cycle (Q1)               | 100    | BUY AGGRESSIVE             | +11.08%    | -0.018x    | +2.61%     | +3.32%    
+WDC      | Super Cycle (Q1)               | 100    | BUY AGGRESSIVE             | +10.61%    | +0.011x    | +4.48%     | +5.09%    
+AMAT     | Super Cycle (Q1)               | 100    | BUY AGGRESSIVE             | +3.12%     | -0.001x    | +0.97%     | +2.05%    
+LRCX     | Super Cycle (Q1)               | 100    | BUY AGGRESSIVE             | +9.29%     | +0.066x    | +0.22%     | +1.17%    
+CIEN     | Super Cycle (Q1)               | 100    | BUY AGGRESSIVE             | +5.55%     | +0.010x    | +1.14%     | +4.64%    
+GOOGL    | Turnaround (Q2)                | 90     | BUY AGGRESSIVE             | -3.46%     | +0.000x    | +2.65%     | +4.55%    
+INTC     | Turnaround (Q2)                | 90     | BUY AGGRESSIVE             | -0.71%     | -0.089x    | +3.23%     | +2.86%    
+COHR     | Transition                     | 50     | IGNORE (Opportunity Cost)  | +6.59%     | -0.039x    | +0.32%     | +0.89%    
+TSLA     | Transition                     | 50     | IGNORE (Opportunity Cost)  | -10.10%    | -0.381x    | +0.97%     | -2.11%    
+META     | Transition                     | 50     | IGNORE (Opportunity Cost)  | -5.98%     | +0.000x    | +0.06%     | -0.70%    
+RBRK     | Transition                     | 40     | IGNORE (Opportunity Cost)  | +7.86%     | -0.564x    | +1.00%     | -0.26%    
+MSFT     | Empty Calorie (Q3)             | 20     | IGNORE (Opportunity Cost)  | +1.98%     | -2.522x    | -0.40%     | -0.77%    
+CLS      | Empty Calorie (Q3)             | 20     | IGNORE (Opportunity Cost)  | +10.73%    | -0.122x    | -1.05%     | -2.16%    
+MU       | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | +74.89%    | +0.008x    | +18.37%    | +22.65%   
+VRT      | Value Trap (Q4)                | 0      | IGNORE (Opportunity Cost)  | -8.00%     | -0.308x    | -1.21%     | -4.71%    
+ETN      | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | +5.61%     | -0.012x    | -1.23%     | -3.92%    
+TSM      | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | +5.67%     | -0.022x    | +2.87%     | +3.42%    
+AMZN     | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | -14.93%    | -0.475x    | +3.35%     | +1.44%    
+AVGO     | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | +7.19%     | -0.462x    | +0.14%     | +2.39%    
+NVDA     | [DEATH: VALUATION GRAVITY]     | 0      | KILL                       | +19.51%    | +0.030x    | +1.59%     | +1.86%    
+CEG      | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | -7.55%     | -0.123x    | -6.41%     | -8.94%    
+SNDK     | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | +96.69%    | -0.178x    | +27.41%    | +34.45%   
+SMCI     | [DEATH: PROFITLESS GROWTH]     | 0      | KILL                       | +152.75%   | +0.327x    | -3.02%     | +0.11%    
+TER      | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | +18.38%    | +0.161x    | +3.69%     | +8.69%    
+NBIS     | [DEATH: CHANNEL STUFFING]      | 0      | KILL                       | +55.85%    | +0.000x    | -0.72%     | -20.68%   

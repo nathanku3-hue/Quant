@@ -94,9 +94,9 @@ with tab2:
 ---
 
 #### Change A3: Fix Metrics Source (Correct Path)
-**File**: `views/optimizer_view.py:146`
+**File**: `core/data_orchestrator.py`
 
-**Add helper function** (top of file):
+**Helper function** (moved out of the view in the Portfolio Data Boundary Refactor):
 ```python
 def load_strategy_metrics_from_results() -> dict[str, dict]:
     """
@@ -365,7 +365,7 @@ def test_tab_order():
 
 def test_metrics_source():
     """Verify metrics loaded from backtest_results.json."""
-    from views.optimizer_view import load_strategy_metrics_from_results
+    from core.data_orchestrator import load_strategy_metrics_from_results
     metrics = load_strategy_metrics_from_results()
     # Verify structure (may be empty if file doesn't exist)
     assert isinstance(metrics, dict)

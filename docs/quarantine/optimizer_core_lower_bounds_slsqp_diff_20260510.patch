@@ -1,0 +1,324 @@
+diff --git a/strategies/optimizer.py b/strategies/optimizer.py
+index 8c37372..6d78ae3 100644
+--- a/strategies/optimizer.py
++++ b/strategies/optimizer.py
+@@ -65,7 +65,130 @@ class PortfolioOptimizer:
+         return n_assets > 0 and max_weight > 0 and (max_weight * n_assets) >= (1.0 - tol)
+ 
+     @staticmethod
+-    def _validate_solution(weights: np.ndarray, max_weight: float, tol: float = 1e-4) -> bool:
++    def _coerce_lower_bounds(
++        index: pd.Index,
++        lower_bounds: dict | pd.Series | None,
++    ) -> pd.Series:
++        """Return non-negative lower bounds aligned to index."""
++        bounds = pd.Series(0.0, index=index, dtype=float)
++        if lower_bounds is None:
++            return bounds
++
++        if isinstance(lower_bounds, pd.Series):
++            raw = lower_bounds
++        elif isinstance(lower_bounds, dict):
++            raw = pd.Series(lower_bounds, dtype=float)
++        else:
++            return bounds
++
++        for asset in index:
++            value = None
++            if asset in raw.index:
++                value = raw.loc[asset]
++            elif str(asset) in raw.index:
++                value = raw.loc[str(asset)]
++            else:
++                try:
++                    asset_int = int(asset)
++                    if asset_int in raw.index:
++                        value = raw.loc[asset_int]
++                    elif str(asset_int) in raw.index:
++                        value = raw.loc[str(asset_int)]
++                except Exception:
++                    value = None
++            if value is not None:
++                bounds.loc[asset] = value
++
++        bounds = pd.to_numeric(bounds, errors="coerce").fillna(0.0)
++        return bounds.clip(lower=0.0)
++
++    @staticmethod
++    def _bounds_are_feasible(
++        lower_bounds: pd.Series,
++        max_weight: float,
++        tol: float = 1e-9,
++    ) -> bool:
++        if lower_bounds.empty:
++            return False
++        if np.any(lower_bounds.to_numpy(dtype=float) > (max_weight + tol)):
++            return False
++        lower_sum = float(lower_bounds.sum())
++        if lower_sum > (1.0 + tol):
++            return False
++        capacity = float((max_weight - lower_bounds).clip(lower=0.0).sum())
++        return capacity >= ((1.0 - lower_sum) - tol)
++
++    @staticmethod
++    def _bounded_equal_weight(
++        index: pd.Index,
++        max_weight: float,
++        lower_bounds: pd.Series,
++        tol: float = 1e-9,
++    ) -> pd.Series:
++        """Build a fallback that respects lower bounds when feasible."""
++        if len(index) == 0:
++            return pd.Series(dtype=float)
++        if lower_bounds.empty:
++            return pd.Series(1.0 / len(index), index=index, dtype=float)
++        if not PortfolioOptimizer._bounds_are_feasible(lower_bounds, max_weight, tol=tol):
++            return pd.Series(1.0 / len(index), index=index, dtype=float)
++
++        weights = lower_bounds.reindex(index).fillna(0.0).astype(float).clip(lower=0.0)
++        remaining = 1.0 - float(weights.sum())
++        while remaining > tol:
++            room = (float(max_weight) - weights).clip(lower=0.0)
++            eligible = room[room > tol]
++            if eligible.empty:
++                break
++            add_each = remaining / len(eligible)
++            additions = np.minimum(eligible.to_numpy(dtype=float), add_each)
++            weights.loc[eligible.index] = weights.loc[eligible.index] + additions
++            new_remaining = 1.0 - float(weights.sum())
++            if new_remaining >= remaining - tol:
++                break
++            remaining = new_remaining
++
++        total = float(weights.sum())
++        if total > 0:
++            weights = weights / total
++        return weights
++
++    @staticmethod
++    def _make_initial_weights(
++        n_assets: int,
++        max_weight: float,
++        lower_bounds: np.ndarray | None = None,
++    ) -> np.ndarray | None:
++        if n_assets <= 0:
++            return None
++        if lower_bounds is None:
++            lower_bounds = np.zeros(n_assets, dtype=float)
++        lower_bounds = np.asarray(lower_bounds, dtype=float)
++        if lower_bounds.shape != (n_assets,):
++            return None
++        if not np.all(np.isfinite(lower_bounds)):
++            return None
++        if np.any(lower_bounds < -1e-9) or np.any(lower_bounds > max_weight + 1e-9):
++            return None
++
++        capacity = np.clip(float(max_weight) - lower_bounds, 0.0, None)
++        remaining = 1.0 - float(lower_bounds.sum())
++        if remaining < -1e-9 or float(capacity.sum()) < remaining - 1e-9:
++            return None
++        if remaining <= 1e-9:
++            total = float(lower_bounds.sum())
++            return lower_bounds / total if total > 0 else None
++        if float(capacity.sum()) <= 0:
++            return None
++        return lower_bounds + (capacity / float(capacity.sum())) * remaining
++
++    @staticmethod
++    def _validate_solution(
++        weights: np.ndarray,
++        max_weight: float,
++        lower_bounds: np.ndarray | None = None,
++        tol: float = 1e-4,
++    ) -> bool:
+         """Validate solver output against long-only, fully-invested, bounded rules."""
+         if weights.ndim != 1 or len(weights) == 0:
+             return False
+@@ -73,6 +196,12 @@ class PortfolioOptimizer:
+             return False
+         if np.any(weights < -tol):
+             return False
++        if lower_bounds is not None:
++            lower_bounds = np.asarray(lower_bounds, dtype=float)
++            if lower_bounds.shape != weights.shape:
++                return False
++            if np.any(weights < (lower_bounds - tol)):
++                return False
+         if np.any(weights > (max_weight + tol)):
+             return False
+         return abs(float(weights.sum()) - 1.0) <= tol
+@@ -97,11 +226,17 @@ class PortfolioOptimizer:
+         self,
+         all_assets: pd.Index,
+         investable_assets: pd.Index | None = None,
++        max_weight: float | None = None,
++        lower_bounds: dict | pd.Series | None = None,
+     ) -> pd.Series:
+         """Fallback to equal weights, preferring only investable assets when available."""
+         if investable_assets is None or len(investable_assets) == 0:
+             return self._equal_weight(all_assets)
+-        eq = self._equal_weight(investable_assets)
++        if max_weight is None:
++            eq = self._equal_weight(investable_assets)
++        else:
++            aligned_lower = self._coerce_lower_bounds(investable_assets, lower_bounds)
++            eq = self._bounded_equal_weight(investable_assets, float(max_weight), aligned_lower)
+         return self._expand_to_all_assets(all_assets, eq)
+ 
+     @staticmethod
+@@ -209,16 +344,25 @@ class PortfolioOptimizer:
+         objective_fn,
+         n_assets: int,
+         max_weight: float,
++        lower_bounds: np.ndarray | None = None,
+         x0: np.ndarray | None = None,
+     ) -> np.ndarray | None:
+         """Solve bounded long-only allocation with full-investment constraint."""
+         if minimize is None:
+             return None
+         if x0 is None:
+-            x0 = np.full(n_assets, 1.0 / max(1, n_assets), dtype=float)
++            x0 = self._make_initial_weights(
++                n_assets=n_assets,
++                max_weight=max_weight,
++                lower_bounds=lower_bounds,
++            )
++        if x0 is None:
++            return None
++        if lower_bounds is None:
++            lower_bounds = np.zeros(n_assets, dtype=float)
+ 
+         constraints = ({"type": "eq", "fun": lambda w: float(np.sum(w) - 1.0)},)
+-        bounds = tuple((0.0, max_weight) for _ in range(n_assets))
++        bounds = tuple((float(lower_bounds[i]), max_weight) for i in range(n_assets))
+ 
+         try:
+             result = minimize(
+@@ -236,15 +380,15 @@ class PortfolioOptimizer:
+             return None
+ 
+         weights = np.asarray(result.x, dtype=float)
+-        if not self._validate_solution(weights, max_weight=max_weight):
++        if not self._validate_solution(weights, max_weight=max_weight, lower_bounds=lower_bounds):
+             return None
+ 
+-        clipped = np.clip(weights, 0.0, max_weight)
++        clipped = np.clip(weights, lower_bounds, max_weight)
+         total = float(clipped.sum())
+         if total <= 0:
+             return None
+         clipped = clipped / total
+-        if np.any(clipped > (max_weight + 1e-4)):
++        if not self._validate_solution(clipped, max_weight=max_weight, lower_bounds=lower_bounds):
+             return None
+         return clipped
+ 
+@@ -264,7 +408,12 @@ class PortfolioOptimizer:
+         np.fill_diagonal(cov.values, diag)
+         return cov
+ 
+-    def optimize_inverse_volatility(self, prices_df: pd.DataFrame, max_weight: float = 0.2) -> pd.Series:
++    def optimize_inverse_volatility(
++        self,
++        prices_df: pd.DataFrame,
++        max_weight: float = 0.2,
++        lower_bounds: dict | pd.Series | None = None,
++    ) -> pd.Series:
+         """Optimize weights from inverse annualized volatility with bounded constraints."""
+         all_assets = pd.Index(prices_df.columns) if isinstance(prices_df, pd.DataFrame) else pd.Index([])
+         if len(all_assets) == 0:
+@@ -286,8 +435,17 @@ class PortfolioOptimizer:
+         if n_assets == 1:
+             single = pd.Series([1.0], index=investable_assets, dtype=float)
+             return self._expand_to_all_assets(all_assets, single)
+-        if not self._is_feasible(n_assets, max_weight):
+-            return self._safe_equal_fallback(all_assets, investable_assets)
++        aligned_lower = self._coerce_lower_bounds(investable_assets, lower_bounds)
++        if (
++            not self._is_feasible(n_assets, max_weight)
++            or not self._bounds_are_feasible(aligned_lower, max_weight)
++        ):
++            return self._safe_equal_fallback(
++                all_assets,
++                investable_assets,
++                max_weight=max_weight,
++                lower_bounds=aligned_lower,
++            )
+ 
+         volatility = returns.std(skipna=True) * np.sqrt(float(self.annualization_factor))
+         volatility = volatility.replace([np.inf, -np.inf], np.nan)
+@@ -299,11 +457,19 @@ class PortfolioOptimizer:
+ 
+         target = (inv_vol / inv_vol.sum()).to_numpy(dtype=float)
+         objective = lambda w: float(np.dot(w - target, w - target))
+-        x0 = np.full(n_assets, 1.0 / n_assets, dtype=float)
+-
+-        solved = self._run_slsqp(objective, n_assets=n_assets, max_weight=max_weight, x0=x0)
++        solved = self._run_slsqp(
++            objective,
++            n_assets=n_assets,
++            max_weight=max_weight,
++            lower_bounds=aligned_lower.to_numpy(dtype=float),
++        )
+         if solved is None:
+-            return self._safe_equal_fallback(all_assets, investable_assets)
++            return self._safe_equal_fallback(
++                all_assets,
++                investable_assets,
++                max_weight=max_weight,
++                lower_bounds=aligned_lower,
++            )
+ 
+         weights = pd.Series(solved, index=investable_assets, dtype=float)
+         return self._expand_to_all_assets(all_assets, weights)
+@@ -314,6 +480,7 @@ class PortfolioOptimizer:
+         objective: str = "max_sharpe",
+         max_weight: float = 0.2,
+         risk_free_rate: float = 0.0,
++        lower_bounds: dict | pd.Series | None = None,
+     ) -> pd.Series:
+         """Optimize mean-variance weights with scipy and constrained long-only bounds."""
+         all_assets = pd.Index(prices_df.columns) if isinstance(prices_df, pd.DataFrame) else pd.Index([])
+@@ -341,8 +508,17 @@ class PortfolioOptimizer:
+         if n_assets == 1:
+             single = pd.Series([1.0], index=investable_assets, dtype=float)
+             return self._expand_to_all_assets(all_assets, single)
+-        if not self._is_feasible(n_assets, max_weight):
+-            return self._safe_equal_fallback(all_assets, investable_assets)
++        aligned_lower = self._coerce_lower_bounds(investable_assets, lower_bounds)
++        if (
++            not self._is_feasible(n_assets, max_weight)
++            or not self._bounds_are_feasible(aligned_lower, max_weight)
++        ):
++            return self._safe_equal_fallback(
++                all_assets,
++                investable_assets,
++                max_weight=max_weight,
++                lower_bounds=aligned_lower,
++            )
+ 
+         exp_returns = (returns.mean(skipna=True) * float(self.annualization_factor)).reindex(investable_assets)
+         exp_returns = exp_returns.fillna(0.0)
+@@ -373,10 +549,19 @@ class PortfolioOptimizer:
+         else:
+             objective_fn = lambda w: -((port_return(w) - risk_free_rate) / (port_vol(w) + 1e-12))
+ 
+-        x0 = np.full(n_assets, 1.0 / n_assets, dtype=float)
+-        solved = self._run_slsqp(objective_fn, n_assets=n_assets, max_weight=max_weight, x0=x0)
++        solved = self._run_slsqp(
++            objective_fn,
++            n_assets=n_assets,
++            max_weight=max_weight,
++            lower_bounds=aligned_lower.to_numpy(dtype=float),
++        )
+         if solved is None:
+-            return self._safe_equal_fallback(all_assets, investable_assets)
++            return self._safe_equal_fallback(
++                all_assets,
++                investable_assets,
++                max_weight=max_weight,
++                lower_bounds=aligned_lower,
++            )
+ 
+         weights = pd.Series(solved, index=investable_assets, dtype=float)
+         return self._expand_to_all_assets(all_assets, weights)

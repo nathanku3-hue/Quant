@@ -4556,3 +4556,1165 @@ Phase 65 (2026-05-09): Candidate Registry - Registry-Only Closeout (D-355) 🟢
     - unrelated pre-existing dirty files remain excluded from the Phase 65 surgical commit.
   - Rollback note:
     - revert only Phase 65 registry code, tests, policy/brief/handover/context docs, and `data/registry/*` artifacts if the registry kernel is rejected; do not revert D-353/R64.1 provenance, validation, provider, dependency, or broker-boundary work.
+
+Phase 65 G0 (2026-05-09): V2 Proxy Boundary Harness (D-356) 🟢
+
+  - Decision record:
+    - create a boundary-only V2 proxy airlock after Candidate Registry and before any useful fast simulation.
+    - keep `core.engine.run_simulation` as the only official V1 truth path.
+    - keep V2 proxy outputs advisory only with `promotion_ready = false` and `canonical_engine_required = true`.
+    - do not add strategy search, parameter sweeps, candidate ranking, alerts, broker calls, promotion packets, external engines, MLflow, DVC, vectorbt, Qlib, LEAN, or Nautilus.
+  - The Decision (Hardcoded):
+    - `v2_discovery/fast_sim/schemas.py` defines frozen `ProxyRunSpec`, `ProxyRunResult`, `PromotionPacketDraft`, `ProxyBoundaryVerdict`, and `ProxyRunStatus`.
+    - `v2_discovery/fast_sim/boundary.py` validates registered candidates, registry event IDs, manifests, source quality, proxy verdicts, and registry note proofs.
+    - `v2_discovery/fast_sim/noop_proxy.py` computes no alpha and only appends a registry note.
+    - proxy results cannot be promotion-ready, cannot use forged registry note IDs, and cannot bypass the future V1 canonical rerun requirement.
+  - Evidence:
+    - `docs/architecture/v2_proxy_boundary_policy.md`
+    - `v2_discovery/fast_sim/schemas.py`
+    - `v2_discovery/fast_sim/boundary.py`
+    - `v2_discovery/fast_sim/noop_proxy.py`
+    - `tests/test_v2_proxy_boundary.py`
+    - `.venv\Scripts\python -m pytest tests/test_v2_proxy_boundary.py -q` -> PASS (`11 passed`)
+    - `.venv\Scripts\python -m compileall v2_discovery\fast_sim tests\test_v2_proxy_boundary.py` -> PASS
+  - Contract lock:
+    - `PH65_G0_BOUNDARY_ONLY := VALID iff (proxy_result_promotion_ready = 0) and (canonical_engine_required = 1) and (registered_candidate_required = 1) and (manifest_required = 1) and (source_quality_required = 1) and (registry_note_event_valid = 1) and (strategy_search = 0) and (broker_calls = 0) and (alerts = 0)`.
+    - `PH65_G0_CANONICAL_TRUTH := VALID iff official_truth_path = core.engine.run_simulation`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+  - Rollback note:
+    - revert only Phase G0 fast-sim boundary files, tests, policy/brief/context docs, and SAW report if the boundary harness is rejected; do not revert Phase F Candidate Registry, D-353 provenance gates, or R64.1 dependency hygiene.
+
+Phase 65 G1 (2026-05-09): Deterministic Synthetic Fast-Proxy Simulator (D-357) 🟢
+
+  - Decision record:
+    - approve G1 as synthetic mechanics only after G0 proved proxy output containment.
+    - prove deterministic replay, manifest-backed fixture loading, hash validation, cost accounting, ledger output, and registry/boundary references.
+    - keep proxy outputs separate from official truth; V1 `core.engine.run_simulation` evidence remains required for any future promotion.
+    - do not add strategy search, real market data, PEAD variants, alpha/Sharpe/CAGR/max-drawdown/ranking metrics, alerts, broker calls, promotion packets, MLflow, or DVC.
+  - The Decision (Hardcoded):
+    - `v2_discovery/fast_sim/fixtures.py` accepts only `data/fixtures/v2_proxy/*` with provider `synthetic_fixture`, feed `prebaked_target_weights`, license `synthetic_fixture_only`, and fixture hash checks.
+    - `v2_discovery/fast_sim/cost_model.py` computes deterministic transaction costs from configured bps, initial cash, and turnover.
+    - `v2_discovery/fast_sim/ledger.py` computes positions, cash, turnover, transaction costs, gross exposure, and net exposure from prebaked target weights.
+    - `v2_discovery/fast_sim/simulator.py` routes every run through `V2ProxyBoundary`, appends only a registry note, and returns `promotion_ready = false` plus `canonical_engine_required = true`.
+    - golden fixtures live under `data/fixtures/v2_proxy/` and are validated with strict table comparisons in tests.
+  - Evidence:
+    - `data/fixtures/v2_proxy/synthetic_manifest.json`
+    - `data/fixtures/v2_proxy/expected_ledger.csv`
+    - `data/fixtures/v2_proxy/expected_positions.csv`
+    - `data/fixtures/v2_proxy/expected_result.json`
+    - `v2_discovery/fast_sim/cost_model.py`
+    - `v2_discovery/fast_sim/fixtures.py`
+    - `v2_discovery/fast_sim/ledger.py`
+    - `v2_discovery/fast_sim/simulator.py`
+    - `tests/test_v2_fast_proxy_synthetic.py`
+    - `tests/test_v2_fast_proxy_invariants.py`
+    - `.venv\Scripts\python -m pytest tests\test_v2_fast_proxy_synthetic.py tests\test_v2_fast_proxy_invariants.py -q` -> PASS (`16 passed`)
+    - `.venv\Scripts\python -m pytest tests\test_v2_fast_proxy_synthetic.py tests\test_v2_fast_proxy_invariants.py tests\test_v2_proxy_boundary.py tests\test_candidate_registry.py -q` -> PASS (`39 passed`)
+    - `.venv\Scripts\python -m compileall v2_discovery\fast_sim tests\test_v2_fast_proxy_synthetic.py tests\test_v2_fast_proxy_invariants.py` -> PASS
+    - `.venv\Scripts\python -m pip check` -> PASS (`No broken requirements found.`)
+  - Contract lock:
+    - `PH65_G1_SYNTHETIC_ONLY := VALID iff (fixture_manifest_required = 1) and (fixture_hashes_match = 1) and (real_market_data_paths = 0) and (prebaked_weights_only = 1) and (strategy_search = 0) and (alerts = 0) and (broker_calls = 0)`.
+    - `PH65_G1_QUARANTINE := VALID iff (promotion_ready = 0) and (canonical_engine_required = 1) and (boundary_verdict in {tier2_blocked, blocked_from_promotion}) and (official_truth_path_required = core.engine.run_simulation)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+    - G2 must not convert synthetic mechanics into strategy discovery without explicit approval.
+  - Rollback note:
+    - revert only Phase G1 simulator files, G1 tests, `data/fixtures/v2_proxy/*`, policy/brief/context docs, and SAW report if the synthetic simulator is rejected; do not revert Phase G0 boundary, Phase F Candidate Registry, D-353 provenance gates, or R64.1 dependency hygiene.
+
+Phase 65 G1.1 (2026-05-09): Synthetic Fast Proxy Data-Integrity Reconciliation (D-358) 🟢
+
+  - Decision record:
+    - close the Reviewer C data-integrity block before any G2 decision.
+    - treat `nan`, `+inf`, and `-inf` as invalid evidence at fixture load, pre-ledger, post-ledger, result-summary, and proxy metadata boundaries.
+    - reconcile fixture/golden manifest row counts, date ranges, schema columns, and SHA-256 hashes against loaded artifacts.
+    - fail closed on missing symbols and sparse target weights; do not use `nan_to_num`, `fillna(0)`, or imputation to repair bad evidence.
+    - keep G1 synthetic mechanics only; no G2, real market data, strategy search, alert, broker, or promotion authority is introduced.
+  - The Decision (Hardcoded):
+    - `v2_discovery/fast_sim/validation.py` centralizes required-column, null, finite-numeric, positive-numeric, and manifest reconciliation checks.
+    - `v2_discovery/fast_sim/fixtures.py` validates symbols before string cleanup, rejects non-finite prices/weights, and reconciles prices, weights, and top-level manifest metadata.
+    - `v2_discovery/fast_sim/ledger.py` validates pre-ledger inputs/cost assumptions, rejects sparse target weights after pivot, and validates positions/ledger outputs.
+    - `v2_discovery/fast_sim/schemas.py` requires strict JSON-serializable finite proxy mappings.
+    - `data/fixtures/v2_proxy/synthetic_manifest.json` now declares row count, date range, schema, and hash metadata for prices, weights, expected ledger, expected positions, and expected result.
+  - Evidence:
+    - `v2_discovery/fast_sim/validation.py`
+    - `v2_discovery/fast_sim/fixtures.py`
+    - `v2_discovery/fast_sim/ledger.py`
+    - `v2_discovery/fast_sim/schemas.py`
+    - `tests/test_v2_fast_proxy_synthetic.py`
+    - `tests/test_v2_fast_proxy_invariants.py`
+    - `data/fixtures/v2_proxy/synthetic_manifest.json`
+    - `.venv\Scripts\python -m pytest tests/test_v2_fast_proxy_synthetic.py -q` -> PASS (`25 passed`)
+    - `.venv\Scripts\python -m pytest tests/test_v2_fast_proxy_invariants.py -q` -> PASS (`9 passed`)
+    - `.venv\Scripts\python -m pytest tests/test_v2_proxy_boundary.py -q` -> PASS (`11 passed`)
+    - `.venv\Scripts\python -m pytest tests/test_v2_fast_proxy_synthetic.py tests/test_v2_fast_proxy_invariants.py tests/test_v2_proxy_boundary.py tests/test_candidate_registry.py -q` -> PASS (`57 passed`)
+    - `.venv\Scripts\python -m pytest -q` -> PASS with existing skips/warnings
+    - `.venv\Scripts\python -m pip check` -> PASS
+    - `.venv\Scripts\python scripts\audit_data_readiness.py` -> PASS (`ready_for_paper_alerts = true`, warning `stale_sidecars_max_date_2023-11-27`)
+    - `.venv\Scripts\python scripts\run_minimal_validation_lab.py --create-input-manifest --promotion-intent` -> PASS
+    - `.venv\Scripts\python launch.py --server.headless true --server.port 8604` -> PASS (stayed alive for 20s)
+    - Reviewer B recheck -> PASS
+    - Reviewer C final recheck -> PASS
+  - Contract lock:
+    - `PH65_G1_FINITE_GATE := VALID iff all numeric fixture inputs, cost assumptions, ledger outputs, positions, result series, and proxy metadata are finite and strict-JSON serializable`.
+    - `PH65_G1_MANIFEST_RECONCILIATION := VALID iff manifest row_count/date_range/schema/sha256 metadata equals loaded fixture or golden artifact truth`.
+    - `PH65_G1_NO_REPAIR := VALID iff missing symbols, sparse weights, non-finite values, and manifest drift fail closed before simulation output is accepted`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+    - G2 must remain a separate explicit decision and must stay synthetic/no-search unless approved.
+  - Rollback note:
+    - revert only Phase G1.1 validation/schema/fixture/test/doc/report changes if the reconciliation is rejected; do not revert Phase G0 boundary, Phase F Candidate Registry, D-353 provenance gates, or R64.1 dependency hygiene.
+
+Phase 65 G2 (2026-05-09): Single Registered Fixture Candidate (D-359) 🟢
+
+  - Decision record:
+    - approve exactly one registered synthetic fixture candidate through the quarantined V2 proxy.
+    - prove registry -> G1 fixture -> deterministic proxy -> real hash-linked registry note -> lineage report once.
+    - keep the proxy result blocked from promotion with `promotion_ready = false` and `canonical_engine_required = true`.
+    - do not add strategy search, real market data, candidate ranking, alerts, broker calls, promotion packets, MLflow, or DVC.
+  - The Decision (Hardcoded):
+    - `v2_discovery/fast_sim/run_candidate_proxy.py` registers or loads one G2 fixture candidate and reuses the fixed proxy note if repeated.
+    - `v2_discovery/fast_sim/lineage.py` rebuilds lineage from the append-only registry event log and validates hash-linked note proof.
+    - `data/registry/g2_single_fixture_candidate_report.json*` records the optional lineage report and manifest.
+  - Evidence:
+    - `tests/test_v2_proxy_registered_candidate_flow.py`
+    - `docs/architecture/g2_registered_fixture_candidate_policy.md`
+    - `docs/saw_reports/saw_phase65_g2_registered_fixture_candidate_20260509.md`
+    - `.venv\Scripts\python -m pytest tests\test_v2_proxy_registered_candidate_flow.py -q` -> PASS (`19 passed`)
+    - `.venv\Scripts\python -m pytest tests\test_v2_proxy_registered_candidate_flow.py tests\test_v2_fast_proxy_synthetic.py tests\test_v2_fast_proxy_invariants.py tests\test_v2_proxy_boundary.py tests\test_candidate_registry.py -q` -> PASS (`76 passed`)
+  - Contract lock:
+    - `PH65_G2_LINEAGE_ONLY := VALID iff (registered_fixture_candidates = 1) and (registry_note_hash_linked = 1) and (promotion_ready = 0) and (canonical_engine_required = 1) and (strategy_search = 0) and (broker_calls = 0) and (alerts = 0)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+  - Rollback note:
+    - revert only the G2 runner, lineage helper, test, policy, SAW report, and G2 registry report artifacts if rejected; do not revert G0, G1, Candidate Registry, D-353, or R64.1.
+
+Phase 65 G3 (2026-05-09): First Canonical Replay Fixture (D-360) 🟢
+
+  - Decision record:
+    - approve the first canonical replay fixture as truth-alignment work, not strategy search.
+    - replay exactly one registered fixture candidate through `core.engine.run_simulation`.
+    - compare V1 and V2 only on mechanical accounting fields.
+    - keep V2 subordinate even when the mechanical comparison matches.
+    - treat SR 26-2 model-risk guidance as governance framing for inventory, documentation, and validation discipline, not as a new dependency.
+  - The Decision (Hardcoded):
+    - `v2_discovery/replay/canonical_replay.py` requires one registered G2 fixture candidate, validates manifest/source-quality/hash evidence, calls `core.engine.run_simulation`, and writes the optional replay report.
+    - `v2_discovery/replay/comparison.py` compares only positions, cash, turnover, transaction cost, gross exposure, net exposure, row count, date range, manifest URI, source quality, and candidate ID.
+    - `v2_discovery/replay/schemas.py` locks `promotion_ready = false`, `canonical_engine_required = true`, and `boundary_verdict = "v2_blocked_from_promotion"`.
+  - Evidence:
+    - `tests/test_v2_canonical_replay_fixture.py`
+    - `docs/architecture/g3_canonical_replay_fixture_policy.md`
+    - `data/registry/g3_canonical_replay_report.json*`
+    - `.venv\Scripts\python -m pytest tests\test_v2_canonical_replay_fixture.py -q` -> PASS (`15 passed`)
+  - Contract lock:
+    - `PH65_G3_CANONICAL_REPLAY_ONLY := VALID iff (registered_fixture_candidates = 1) and (v1_engine = core.engine.run_simulation) and (comparison_fields = mechanical_allowed_set) and (promotion_ready = 0) and (promotion_packet_created = 0) and (strategy_search = 0) and (broker_calls = 0) and (alerts = 0)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+  - Rollback note:
+    - revert only the G3 replay package, focused test, policy, SAW report, G3 registry report artifacts, and G3 documentation/context updates if rejected; do not revert G2, G1, G0, Candidate Registry, D-353, or R64.1.
+
+Phase 65 G4 (2026-05-09): First Real Canonical Dataset Readiness Fixture (D-361) 🟢
+
+  - Decision record:
+    - approve the first real canonical dataset readiness fixture.
+    - use one tiny Tier 0 `prices_tri` daily-bar slice only.
+    - require a manifest and reconcile manifest SHA-256, row count, schema, and date range.
+    - validate finite numeric values, duplicate primary keys, monotonic dates per `permno`, price domain, return domain, and freshness.
+    - keep sidecars optional for the passing price slice; stale sidecars block only when explicitly required.
+    - do not run strategy search, V2 real-data discovery, alpha logic, candidate ranking, alerts, broker calls, or promotion packets.
+  - The Decision (Hardcoded):
+    - `v2_discovery/readiness/canonical_slice.py` loads only the G4 canonical slice and rejects Tier 2, public-web, operational-market-data, stale, ambiguous, non-finite, duplicate-key, non-monotonic, or impossible-domain artifacts.
+    - `v2_discovery/readiness/canonical_readiness.py` emits readiness-only reports with `ready_for_g5 = true` after all gates pass and defaults `report_path = None` so test/dry runs do not refresh artifacts.
+    - `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet*` is the first tiny real canonical dataset fixture.
+  - Evidence:
+    - `tests/test_g4_real_canonical_readiness_fixture.py`
+    - `docs/architecture/g4_real_canonical_readiness_policy.md`
+    - `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet*`
+    - `data/registry/g4_real_canonical_readiness_report.json*`
+    - `.venv\Scripts\python -m pytest tests\test_g4_real_canonical_readiness_fixture.py -q` -> PASS (`18 passed`)
+  - Contract lock:
+    - `PH65_G4_READINESS_ONLY := VALID iff (source_quality = canonical) and (source_tier = tier0) and (manifest_reconciles = 1) and (finite_numeric_check = pass) and (duplicate_key_check = pass) and (date_monotonicity_check = pass) and (price_domain_check = pass) and (return_domain_check = pass) and (strategy_search = 0) and (performance_metrics = 0) and (broker_calls = 0) and (alerts = 0)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+  - Rollback note:
+    - revert only G4 readiness package, focused test, fixture/report artifacts, policy, handover, SAW report, and G4 documentation/context updates if rejected; do not revert G3, G2, G1, G0, Candidate Registry, D-353, or R64.1.
+
+Phase 65 G5 (2026-05-09): Single Canonical Replay, No Alpha (D-362) 🟢
+
+  - Decision record:
+    - approve one official V1 canonical replay on the G4 tiny real Tier 0 canonical slice.
+    - use predeclared neutral equal weights only.
+    - call `core.engine.run_simulation` once and publish mechanical accounting only.
+    - do not call V2 proxy on real data.
+    - do not run strategy search, alpha logic, ranking, alerts, broker calls, or promotion packets.
+  - The Decision (Hardcoded):
+    - `v2_discovery/replay/canonical_real_replay.py` loads the G4 canonical slice through readiness gates, builds neutral weights, calls `core.engine.run_simulation`, and builds deterministic positions/ledger evidence.
+    - `v2_discovery/replay/canonical_replay_report.py` emits a manifest-backed report with positions, cash, turnover, transaction cost, gross exposure, net exposure, and blocked promotion/alert/broker booleans only.
+    - `data/registry/g5_single_canonical_replay_report.json*` records the optional mechanical replay report and manifest.
+  - Evidence:
+    - `tests/test_g5_single_canonical_replay_no_alpha.py`
+    - `docs/architecture/g5_single_canonical_replay_no_alpha_policy.md`
+    - `data/registry/g5_single_canonical_replay_report.json*`
+    - `.venv\Scripts\python -m pytest tests\test_g5_single_canonical_replay_no_alpha.py -q` -> PASS (`18 passed`)
+    - `.venv\Scripts\python -m pytest tests\test_g5_single_canonical_replay_no_alpha.py tests\test_g4_real_canonical_readiness_fixture.py -q` -> PASS (`36 passed`)
+    - G5 artifact hash audit -> PASS
+  - Contract lock:
+    - `PH65_G5_CANONICAL_REPLAY_ONLY := VALID iff (source_quality = canonical) and (source_tier = tier0) and (manifest_reconciles = 1) and (weights = predeclared_equal_weight) and (v1_engine = core.engine.run_simulation) and (v2_proxy_real_data_run = 0) and (performance_metrics = 0) and (promotion_ready = 0) and (broker_calls = 0) and (alerts = 0)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+  - Rollback note:
+    - revert only G5 replay modules, focused test, report artifacts, policy, handover, SAW report, and G5 documentation/context updates if rejected; do not revert G4, G3, G2, G1, G0, Candidate Registry, D-353, or R64.1.
+
+Phase 65 G6 (2026-05-09): V1/V2 Real-Slice Mechanical Comparison (D-363) 🟢
+
+  - Decision record:
+    - approve one V1/V2 mechanical comparison on the G4 tiny real Tier 0 canonical slice.
+    - use predeclared neutral equal weights only.
+    - call V1 official replay and V2 proxy mechanics separately.
+    - compare only mechanical accounting and source identity fields.
+    - keep V2 subordinate and non-promotable even when V1/V2 match.
+    - do not run strategy search, alpha logic, ranking, alerts, broker calls, or promotion packets.
+  - The Decision (Hardcoded):
+    - `v2_discovery/replay/real_slice_v1_v2_comparison.py` loads the G4 canonical slice through readiness gates, reuses the G5 V1 replay path, runs V2 proxy ledger mechanics on the same predeclared weights, and compares approved fields only.
+    - `v2_discovery/replay/mechanical_comparison_report.py` emits a manifest-backed report with V1/V2 positions, cash, turnover, transaction cost, gross exposure, net exposure, source identity, engine identity, mismatch fields, and blocked promotion/alert/broker booleans only.
+    - `data/registry/g6_v1_v2_real_slice_mechanical_report.json*` records the optional mechanical comparison report and manifest.
+  - Evidence:
+    - `tests/test_g6_v1_v2_real_slice_mechanical_comparison.py`
+    - `docs/architecture/g6_v1_v2_real_slice_mechanical_policy.md`
+    - `data/registry/g6_v1_v2_real_slice_mechanical_report.json*`
+    - `.venv\Scripts\python -m pytest tests\test_g6_v1_v2_real_slice_mechanical_comparison.py -q` -> PASS (`20 passed`)
+    - G6 artifact hash audit -> PASS
+  - Contract lock:
+    - `PH65_G6_MECHANICAL_COMPARISON_ONLY := VALID iff (source_quality = canonical) and (source_tier = tier0) and (manifest_reconciles = 1) and (weights = predeclared_equal_weight) and (v1_engine = core.engine.run_simulation) and (v2_engine = proxy_mechanics) and (comparison_fields = approved_mechanical_set) and (mismatch_count = 0) and (v2_promotion_ready = 0) and (performance_metrics = 0) and (promotion_packet = 0) and (broker_calls = 0) and (alerts = 0)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+  - Rollback note:
+    - revert only G6 comparison modules, focused test, report artifacts, policy, handover, SAW report, and G6 documentation/context updates if rejected; do not revert G5, G4, G3, G2, G1, G0, Candidate Registry, D-353, or R64.1.
+
+Phase 65 G7 (2026-05-09): Controlled Candidate-Family Definition (D-364) 🟢
+
+  - Decision record:
+    - approve the first controlled candidate-family definition before search.
+    - define `PEAD_DAILY_V0` with hypothesis, universe, feature allowlist, finite parameter space, fixed trial budget, Tier 0 canonical data policy, validation gates, and multiple-testing policy.
+    - keep G7 definition-only: no candidate generation, backtest, replay, proxy run, alpha/performance metric, ranking, alert, broker call, or promotion packet.
+  - The Decision (Hardcoded):
+    - `v2_discovery/families/schemas.py` defines a frozen family schema with finite allowed features, finite parameter space, required `trial_budget_max`, Tier 0/canonical policy, and promotion-source rejection.
+    - `v2_discovery/families/trial_budget.py` computes and validates the finite trial count.
+    - `v2_discovery/families/registry.py` writes append-only/versioned family artifacts, requires manifest-backed family definitions before future candidate creation, and emits a definition-only registry report.
+    - `v2_discovery/families/validation.py` reconciles family manifests and blocks outcome/performance/ranking fields in the report.
+    - `data/registry/candidate_families/pead_daily_v0.json*` records the first family definition and manifest.
+  - Evidence:
+    - `tests/test_g7_candidate_family_definition.py`
+    - `docs/architecture/g7_candidate_family_definition_policy.md`
+    - `data/registry/candidate_families/pead_daily_v0.json*`
+    - `data/registry/candidate_family_registry_report.json`
+    - `.venv\Scripts\python -m pytest tests\test_g7_candidate_family_definition.py -q` -> PASS (`19 passed`)
+    - `.venv\Scripts\python -m pytest tests\test_g7_candidate_family_definition.py tests\test_g6_v1_v2_real_slice_mechanical_comparison.py tests\test_g5_single_canonical_replay_no_alpha.py tests\test_g4_real_canonical_readiness_fixture.py tests\test_v2_canonical_replay_fixture.py tests\test_v2_proxy_registered_candidate_flow.py tests\test_v2_fast_proxy_synthetic.py tests\test_v2_fast_proxy_invariants.py tests\test_v2_proxy_boundary.py tests\test_candidate_registry.py -q` -> PASS (`166 passed`)
+  - Contract lock:
+    - `PH65_G7_DEFINITION_ONLY := VALID iff (family_id = PEAD_DAILY_V0) and (status = defined) and (manifest_reconciles = 1) and (finite_trial_count = 24) and (trial_budget_max = 24) and (data_tier_required = tier0) and (source_quality_required = canonical) and (candidate_generation = 0) and (result_generation = 0) and (performance_metrics = 0) and (promotion_packet = 0) and (broker_calls = 0) and (alerts = 0)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+  - Rollback note:
+    - revert only G7 family modules, focused test, family/report artifacts, policy, handover, SAW report, and G7 documentation/context updates if rejected; do not revert G6, G5, G4, G3, G2, G1, G0, Candidate Registry, D-353, or R64.1.
+
+Phase 65 G7.1 (2026-05-09): Roadmap Realignment / Product Charter (D-365) 🟢
+
+  - Decision record:
+    - approve roadmap realignment before G8 candidate generation.
+    - hold G8 PEAD candidate generation until a separate approval.
+    - frame Terminal Zero as discretionary augmentation for de-risked asymmetric upside, not generic alpha search and not a trading bot.
+    - document the planning allocation model: 90% supercycle gem discovery and 10% buying-range / hold-discipline prompting.
+    - keep `PEAD_DAILY_V0` valid but classify it as a tactical signal family.
+    - name `SUPERCYCLE_GEM_DAILY_V0` as the primary product family target for the next definition-only phase.
+    - define dashboard taxonomy around thesis health, entry discipline, hold discipline, flow/positioning, and regime.
+    - treat short-squeeze and CTA-type inputs as dashboard context, not automatic triggers.
+    - do not generate candidates, run backtests, replay/proxy runs, search, rankings, alerts, broker calls, live orders, paper trades, or promotion packets.
+  - The Decision (Hardcoded):
+    - `docs/architecture/product_roadmap_discretionary_augmentation.md` is the product charter for the discretionary augmentation roadmap.
+    - `docs/architecture/dashboard_signal_taxonomy.md` is the dashboard state taxonomy and source-quality boundary.
+    - `docs/architecture/supercycle_gem_family_policy.md` names the primary product family target for G7.2.
+    - `docs/handover/phase65_g71_handover.md` is the PM handover and current-context source for the roadmap realignment.
+    - `dashboard.py` now passes the already-created drift monitor dependencies into the promoted drift tab after runtime smoke exposed a missing-argument Streamlit page error.
+  - Evidence:
+    - `docs/architecture/product_roadmap_discretionary_augmentation.md`
+    - `docs/architecture/dashboard_signal_taxonomy.md`
+    - `docs/architecture/supercycle_gem_family_policy.md`
+    - `docs/handover/phase65_g71_handover.md`
+    - `.venv\Scripts\python -m pytest tests\test_g7_candidate_family_definition.py -q` -> PASS
+    - `.venv\Scripts\python -m pytest tests\test_dashboard_drift_monitor_integration.py tests\test_drift_monitor_view.py -q` -> PASS
+    - `.venv\Scripts\python launch.py --server.headless true --server.port 8631` -> PASS (alive after 30s; no uncaught app execution in stderr)
+    - `.venv\Scripts\python scripts\build_context_packet.py --validate` -> PASS
+  - Contract lock:
+    - `PH65_G7_1_PRODUCT_CHARTER_ONLY := VALID iff (roadmap = discretionary_augmentation) and (supercycle_focus = 0.90) and (buying_range_hold_prompt_focus = 0.10) and (pead_role = tactical_signal_family) and (primary_family_target = SUPERCYCLE_GEM_DAILY_V0) and (g8_pead_generation = held) and (candidate_generation = 0) and (backtest = 0) and (replay = 0) and (proxy_run = 0) and (strategy_search = 0) and (ranking = 0) and (broker_calls = 0) and (alerts = 0) and (promotion_packet = 0)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains a paper-alert warning through `2023-11-27`.
+  - Rollback note:
+    - revert only G7.1 docs/context/SAW/handover updates if rejected; do not revert G7 family code, G7 artifacts, G6, G5, G4, G3, G2, G1, G0, Candidate Registry, D-353, or R64.1.
+
+Phase 65 G7.1A (2026-05-09): Starter Docs / PRD / Product Spec Rewrite (D-366) 🟡
+
+  - Decision record:
+    - approve a docs-only starter-docs and product-spec rewrite before G7.2, G7.4, G7.5, G8, or any search/candidate work.
+    - name the product `Unified Opportunity Engine`.
+    - define the product as:
+      - Primary Alpha: Supercycle Gem Discovery / de-risked asymmetric upside.
+      - Secondary Alpha: GodView Market Behavior Intelligence.
+      - Output Layer: Decision Augmentation through dashboard states and paper-only prompts.
+    - state plainly that Terminal Zero is not a trading bot.
+    - make root `PRD.md` and `PRODUCT_SPEC.md` the product canon.
+    - keep lowercase `docs/prd.md` and `docs/spec.md` aligned with canon notices to prevent stale-entry drift.
+    - move Supercycle Gem Family Definition downstream to G7.4; G7.2 is now Unified Opportunity Engine State Machine.
+    - set immediate next action to `approve_g7_1b_data_infra_gap_or_g7_2_state_machine`.
+    - keep G7.2, G7.4, G7.5, G8, search, candidate generation, backtest, replay, proxy run, provider ingestion, ranking, alerts, broker calls, Alpaca live behavior, OpenClaw notification, and dashboard-runtime implementation held.
+  - The Decision (Hardcoded):
+    - `README.md`, `PRD.md`, and `PRODUCT_SPEC.md` are the starter product canon for the Unified Opportunity Engine.
+    - `docs/architecture/top_level_roadmap.md` records the G7.1A-G12 roadmap.
+    - `docs/architecture/unified_opportunity_engine.md` defines the three product layers and future state-engine concept.
+    - `docs/architecture/godview_signal_taxonomy.md` defines GodView signal families and use boundaries.
+    - `docs/architecture/data_infra_gap_assessment.md` documents current governance readiness and future GodView provider gaps.
+    - `docs/architecture/codex_agent_research_workflow.md` defines allowed and forbidden Codex/Chrome research-agent uses.
+    - `docs/architecture/dashboard_product_spec.md` defines future dashboard states without runtime behavior.
+  - Evidence:
+    - `README.md`
+    - `PRD.md`
+    - `PRODUCT_SPEC.md`
+    - `docs/architecture/top_level_roadmap.md`
+    - `docs/architecture/unified_opportunity_engine.md`
+    - `docs/architecture/godview_signal_taxonomy.md`
+    - `docs/architecture/data_infra_gap_assessment.md`
+    - `docs/architecture/codex_agent_research_workflow.md`
+    - `docs/architecture/dashboard_product_spec.md`
+    - validation evidence pending final G7.1A SAW closeout.
+  - Contract lock:
+    - `PH65_G7_1A_DOCS_ONLY := VALID iff (product = Unified Opportunity Engine) and (primary_alpha = Supercycle Gem Discovery) and (secondary_alpha = GodView Market Behavior Intelligence) and (output_layer = Decision Augmentation) and (root_prd_spec_canon = 1) and (immediate_next_action = approve_g7_1b_data_infra_gap_or_g7_2_state_machine) and (g7_2_approved = 0) and (g7_4_family_definition = 0) and (g8_generation = held) and (candidate_generation = 0) and (search = 0) and (backtest = 0) and (replay = 0) and (proxy_run = 0) and (provider_ingestion = 0) and (ranking = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+  - Open risks:
+    - yfinance legacy migration remains future debt.
+    - primary S&P sidecar freshness remains stale through `2023-11-27`.
+    - full GodView requires future source policy and provider design.
+  - Rollback note:
+    - revert only G7.1A starter-docs/product-spec/context/SAW/handover updates if rejected; do not revert G7.1, G7 family artifacts, dashboard drift-monitor fix, or prior G phases.
+
+Phase 65 G7.1B (2026-05-09): Data + Infra Gap Assessment (D-367) 🟡
+
+  - Decision record:
+    - approve G7.1B before G7.2 state-machine work.
+    - keep scope to docs, architecture, and source mapping only.
+    - answer whether the current repo/data layer can support the GodView Opportunity Engine.
+    - classify each GodView signal family by readiness, provider need, freshness, trust level, and build priority.
+    - document future provider ports only; do not implement them.
+    - require future GodView signals to carry signal id, family, ticker/theme, source quality, provider/feed, observed-vs-estimated label, freshness, latency, as-of timestamp, confidence, allowed use, forbidden use, and manifest URI.
+    - define observed, estimated, and inferred labels.
+    - allow Codex/Chrome research agents only for research capture and docs; forbid alpha evidence, source approval, canonical market-data writes, scraping without policy, alerts, and trading actions.
+    - hold G7.2 and G8 until a separate downstream decision.
+  - The Decision (Hardcoded):
+    - `docs/architecture/godview_data_infra_gap_assessment.md` records the answer: current infra is governance-ready and daily-price-ready, not full-GodView-ready.
+    - `docs/architecture/godview_signal_source_matrix.md` records source/readiness/freshness/trust/build-priority mapping.
+    - `docs/architecture/godview_provider_roadmap.md` names future provider ports without creating provider files.
+    - `docs/architecture/godview_signal_freshness_policy.md` defines future freshness buckets and required time fields.
+    - `docs/architecture/godview_observed_vs_estimated_policy.md` defines observed, estimated, and inferred labels.
+    - `docs/architecture/codex_chrome_research_sop.md` defines research-agent allowed/forbidden uses.
+  - Evidence:
+    - `docs/architecture/godview_data_infra_gap_assessment.md`
+    - `docs/architecture/godview_signal_source_matrix.md`
+    - `docs/architecture/godview_provider_roadmap.md`
+    - `docs/architecture/godview_signal_freshness_policy.md`
+    - `docs/architecture/godview_observed_vs_estimated_policy.md`
+    - `docs/architecture/codex_chrome_research_sop.md`
+    - `docs/handover/phase65_g71b_handover.md`
+    - validation evidence pending final G7.1B SAW closeout.
+  - Contract lock:
+    - `PH65_G7_1B_DATA_INFRA_GAP_ONLY := VALID iff (source_matrix = published) and (provider_roadmap = documented_only) and (current_infra = governance_ready_not_full_godview_ready) and (observed_estimated_inferred_policy = published) and (freshness_policy = published) and (codex_chrome_research_only = 1) and (g7_2_approved = 0) and (g8_generation = held) and (provider_code = 0) and (ingestion = 0) and (candidate_generation = 0) and (search = 0) and (backtest = 0) and (replay = 0) and (proxy_run = 0) and (ranking = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+  - Open risks:
+    - yfinance migration remains future debt.
+    - primary S&P sidecar freshness remains stale through `2023-11-27`.
+    - full GodView requires future source policy, licensing decisions, and provider implementation.
+    - broad compileall workspace hygiene remains inherited debt.
+  - Rollback note:
+    - revert only G7.1B architecture docs/context/SAW/handover/governance-log updates if rejected; do not revert G7.1A product canon, G7.1 roadmap realignment, G7 family artifacts, dashboard drift-monitor fix, or prior G phases.
+
+Phase 65 G7.1C (2026-05-09): Open-Source Repo + Data/API Availability Survey (D-368) 🟡
+
+  - Decision record:
+    - approve G7.1C as docs/research and architecture planning only.
+    - capture the supplied open-source repo and data/API availability survey as a `docs/research` artifact with source audit pending.
+    - treat OpenBB, LEAN, Qlib, vectorbt, FinRL, pandas-datareader, Freqtrade, Hummingbot, and CCXT as architecture references, not canonical GodView source approval.
+    - plan the immediate no-cost public-source path as SEC + FINRA + CFTC + public macro after audit only.
+    - keep yfinance quarantined as Tier 2 discovery only.
+    - keep OPRA/options, IV, options whales, gamma/dealer maps, dark-pool/block, microstructure, ETF/passive flows, and governed news/narrative behind future provider/source decisions.
+    - hold G7.2 and provider implementation until source audit is completed or explicitly waived.
+    - do not add provider code, ingestion, state machine, candidate generation, search, backtests, replays, proxy runs, ranking, alerts, broker calls, paper trades, promotion packets, or dashboard runtime behavior.
+  - The Decision (Hardcoded):
+    - `docs/research/g7_1c_open_source_repo_data_api_availability_survey_20260509.md` is the audit-pending research capture.
+    - `docs/architecture/open_source_data_source_survey.md` records open-source architecture lessons.
+    - `docs/architecture/godview_api_availability_matrix.md` separates ready, no-cost/public, paid/licensed, operational, and delayed/context sources.
+    - `docs/architecture/godview_provider_selection_policy.md` defines source audit gates before provider implementation.
+    - `docs/architecture/godview_build_vs_borrow_decision.md` records build-vs-borrow and the held no-cost implementation plan.
+  - Evidence:
+    - `docs/research/g7_1c_open_source_repo_data_api_availability_survey_20260509.md`
+    - `docs/architecture/open_source_data_source_survey.md`
+    - `docs/architecture/godview_api_availability_matrix.md`
+    - `docs/architecture/godview_provider_selection_policy.md`
+    - `docs/architecture/godview_build_vs_borrow_decision.md`
+    - validation evidence pending final G7.1C SAW closeout.
+  - Contract lock:
+    - `PH65_G7_1C_OPEN_SOURCE_API_SURVEY_ONLY := VALID iff (research_capture = audit_pending) and (open_source_repos = architecture_reference_only) and (no_cost_path = sec_finra_cftc_public_macro_after_audit) and (options_iv_gamma_microstructure = provider_decision_gap) and (g7_2_approved = 0) and (provider_code = 0) and (ingestion = 0) and (candidate_generation = 0) and (search = 0) and (backtest = 0) and (replay = 0) and (proxy_run = 0) and (ranking = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+  - Open risks:
+    - source claims are audit-pending and must not be treated as independently verified.
+    - yfinance migration remains future debt.
+    - primary S&P sidecar freshness remains stale through `2023-11-27`.
+    - full GodView requires future source policy, licensing decisions, and provider implementation.
+    - broad compileall workspace hygiene remains inherited debt.
+  - Rollback note:
+    - revert only G7.1C research/architecture/context/SAW/handover/governance-log updates if rejected; do not revert G7.1B source matrix, G7.1A product canon, G7.1 roadmap realignment, G7 family artifacts, dashboard drift-monitor fix, or prior G phases.
+
+Phase 65 G7.1C (2026-05-09): Official Public Source Audit (D-369) 🟡
+
+  - Decision record:
+    - approve G7.1C official public source audit as audit-only documentation.
+    - verify SEC EDGAR / data.sec.gov, FINRA short interest, FINRA Reg SHO daily short-sale volume, FINRA OTC/ATS transparency, CFTC COT/TFF, FRED/ALFRED, and Ken French Data Library against official/public docs.
+    - record source rights, auth, API key, cost, freshness, history depth, usage constraints, entity keys, raw locators, as-of timestamp availability, observed/estimated/inferred label, allowed use, forbidden use, fixture feasibility, implementation priority, and open questions.
+    - define tiny fixture schemas for later only; do not download data or create fixture files.
+    - hold provider implementation until explicit approval.
+    - state clearly that SEC / FINRA / CFTC / FRED / Ken French can support future GodView public-source modules, but audit approval does not authorize ingestion.
+    - keep CFTC COT/TFF as broad regime/futures positioning only, not direct single-name CTA buying evidence.
+    - keep Reg SHO daily short-sale volume separate from short interest.
+    - do not add provider code, ingestion, state machine, candidate generation, search, backtests, replays, proxy runs, ranking, alerts, broker calls, paper trades, promotion packets, physical fixtures, or dashboard runtime behavior.
+  - The Decision (Hardcoded):
+    - `docs/architecture/godview_public_source_audit.md` records the official/public source audit.
+    - `docs/architecture/godview_source_terms_matrix.md` records the required-column terms matrix.
+    - `docs/architecture/godview_tiny_fixture_schema_plan.md` records future fixture schemas only.
+    - `docs/architecture/godview_public_provider_priority.md` records the one-tiny-fixture-or-hold priority.
+    - `docs/handover/phase65_g71c_source_audit_handover.md` is the canonical PM handover.
+    - `docs/handover/phase65_g71-0c_handover.md` is the current context selector alias.
+  - Evidence:
+    - `docs/architecture/godview_public_source_audit.md`
+    - `docs/architecture/godview_source_terms_matrix.md`
+    - `docs/architecture/godview_tiny_fixture_schema_plan.md`
+    - `docs/architecture/godview_public_provider_priority.md`
+    - `docs/handover/phase65_g71c_source_audit_handover.md`
+    - `docs/saw_reports/saw_phase65_g7_1c_public_source_audit_20260509.md`
+  - Contract lock:
+    - `PH65_G7_1C_PUBLIC_SOURCE_AUDIT_ONLY := VALID iff (official_source_audit = complete) and (source_terms_matrix = published) and (tiny_fixture_schema_plan = plan_only) and (provider_priority = published) and (physical_fixture = 0) and (provider_code = 0) and (ingestion = 0) and (state_machine = 0) and (candidate_generation = 0) and (search = 0) and (backtest = 0) and (replay = 0) and (proxy_run = 0) and (ranking = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+  - Open risks:
+    - yfinance migration remains future debt.
+    - primary S&P sidecar freshness remains stale through `2023-11-27`.
+    - GodView provider gap remains open until a future provider/fixture proof is explicitly approved.
+    - options/OPRA/IV/gamma/whale-flow license gap remains out of scope.
+    - broad compileall workspace hygiene remains inherited debt.
+  - Rollback note:
+    - revert only G7.1C audit docs, matrices, context, handover, and SAW report; do not revert G7.1A, G7.1, G7 family artifacts, dashboard drift-monitor fix, or prior G phases.
+
+Phase 65 G7.1D (2026-05-09): SEC Tiny Public Fixture Proof (D-370) 🟡
+
+  - Decision record:
+    - approve G7.1D as one tiny SEC data.sec.gov public-provider fixture proof.
+    - choose SEC first, not FINRA, because SEC is official, public, no-key, lower interpretation risk, and maps well to Supercycle thesis/ownership/fundamentals evidence.
+    - use exactly one stable large-cap entity: Apple Inc. / AAPL / CIK `0000320193`.
+    - create one static companyfacts fixture and one static submissions fixture with sidecar manifests.
+    - validate manifest presence, SHA-256, row counts, date parsing, CIK format, duplicate primary-key rejection, non-finite numeric rejection, source quality, allowed/forbidden use, and observed label.
+    - do not build a live SEC provider, broad downloader, scheduled ingestion, canonical lake write, ticker universe expansion, Form 4/13F strategy logic, GodView score, candidate generator, state machine, dashboard runtime behavior, alert, or broker path.
+    - keep FINRA, CFTC, FRED, Ken French, and G7.2 held until separate approval.
+  - The Decision (Hardcoded):
+    - `docs/architecture/sec_tiny_fixture_policy.md` records G7.1D SEC source policy and forbidden scope.
+    - `docs/architecture/sec_public_provider_fixture_plan.md` records the static fixture shape and validation plan.
+    - `data/fixtures/sec/sec_companyfacts_tiny.json` stores two observed Apple Inc. companyfacts rows.
+    - `data/fixtures/sec/sec_companyfacts_tiny.json.manifest.json` stores the companyfacts manifest.
+    - `data/fixtures/sec/sec_submissions_tiny.json` stores five observed Apple Inc. submission metadata rows.
+    - `data/fixtures/sec/sec_submissions_tiny.json.manifest.json` stores the submissions manifest.
+    - `tests/test_g7_1d_sec_tiny_fixture.py` validates the static fixture proof and negative paths.
+    - `docs/handover/phase65_g71d_sec_tiny_fixture_handover.md` is the canonical PM handover.
+  - Evidence:
+    - `docs/architecture/sec_tiny_fixture_policy.md`
+    - `docs/architecture/sec_public_provider_fixture_plan.md`
+    - `data/fixtures/sec/sec_companyfacts_tiny.json`
+    - `data/fixtures/sec/sec_companyfacts_tiny.json.manifest.json`
+    - `data/fixtures/sec/sec_submissions_tiny.json`
+    - `data/fixtures/sec/sec_submissions_tiny.json.manifest.json`
+    - `tests/test_g7_1d_sec_tiny_fixture.py`
+    - validation evidence PASS: focused fixture tests, focused fixture + context-builder tests, full pytest, pip check, scoped compile, dashboard drift regression, launch smoke, data readiness, minimal validation lab, forbidden implementation scan, secret scan, artifact hash audit, context rebuild/validation, SAW report validation, and closure packet validation.
+  - Contract lock:
+    - `PH65_G7_1D_SEC_TINY_FIXTURE_ONLY := VALID iff (sec_static_fixture = 1) and (sec_companyfacts_rows = 2) and (sec_submissions_rows = 5) and (manifest_hash_match = 1) and (row_count_match = 1) and (cik_format_valid = 1) and (date_fields_parse = 1) and (duplicate_primary_key_rejected = 1) and (non_finite_numeric_rejected = 1) and (source_quality = public_official_observed) and (observed_label = observed) and (provider_code = 0) and (broad_downloader = 0) and (ingestion = 0) and (canonical_lake_write = 0) and (state_machine = 0) and (candidate_generation = 0) and (ranking = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+  - Open risks:
+    - yfinance migration remains future debt.
+    - primary S&P sidecar freshness remains stale through `2023-11-27`.
+    - FINRA short-interest policy details remain future work.
+    - GodView provider gap remains open after this static proof.
+    - broad compileall workspace hygiene remains inherited debt.
+  - Rollback note:
+    - revert only G7.1D SEC fixture docs, fixture files, test file, context, handover, and SAW report; do not revert G7.1C audit docs or prior Phase 65 artifacts.
+
+Phase 65 G7.1E (2026-05-10): FINRA Short Interest Tiny Fixture Proof (D-371)
+
+  - Decision record:
+    - approve G7.1E as one tiny FINRA Equity Short Interest public fixture proof.
+    - use short interest first, not Reg SHO short-sale volume, because short interest maps to delayed squeeze-base / positioning context while Reg SHO daily volume is a separate daily trading-activity dataset.
+    - use exactly one settlement date, `2026-04-15`, and exactly three tickers: `AAPL`, `TSLA`, and `GME`.
+    - create one static CSV fixture with one sidecar manifest; do not build a live FINRA provider or broad downloader.
+    - validate manifest presence, SHA-256, row count, settlement-date parsing, ticker presence, finite/non-negative numeric fields, duplicate primary-key rejection, source quality, allowed/forbidden use, observed label, and Reg SHO field exclusion.
+    - lock the interpretation rule: short interest may say "short base exists"; it may not say "forced covering is happening now."
+    - do not add FINRA provider code, live FINRA API calls, bulk downloads, Reg SHO ingestion, OTC/ATS ingestion, squeeze scoring, short-squeeze ranking, candidate generation, G7.2 state machine, dashboard runtime behavior, alerts, broker calls, paper trades, or promotion packets.
+    - keep CFTC, FRED, Ken French, options/IV/OPRA, and G7.2 held until separate approval.
+  - The Decision (Hardcoded):
+    - `docs/architecture/finra_short_interest_tiny_fixture_policy.md` records G7.1E FINRA source policy and forbidden scope.
+    - `docs/architecture/finra_short_interest_vs_short_volume_policy.md` records the short-interest-vs-Reg-SHO interpretation boundary.
+    - `docs/architecture/finra_public_provider_fixture_plan.md` records the static fixture shape and validation plan.
+    - `data/fixtures/finra/finra_short_interest_tiny.csv` stores three observed FINRA short-interest rows for settlement date `2026-04-15`.
+    - `data/fixtures/finra/finra_short_interest_tiny.manifest.json` stores the source-rights/provenance/hash manifest.
+    - `tests/test_g7_1e_finra_short_interest_tiny_fixture.py` validates the static fixture proof and negative paths.
+    - `docs/handover/phase65_g71e_finra_tiny_fixture_handover.md` is the canonical PM handover.
+    - `docs/handover/phase65_g71-00e_handover.md` is the current context selector alias.
+    - `docs/handover/phase65_g71-0e_handover.md` is the compatibility selector alias.
+    - `docs/saw_reports/saw_phase65_g7_1e_finra_tiny_fixture_20260509.md` records the SAW closeout.
+  - Evidence:
+    - `docs/architecture/finra_short_interest_tiny_fixture_policy.md`
+    - `docs/architecture/finra_short_interest_vs_short_volume_policy.md`
+    - `docs/architecture/finra_public_provider_fixture_plan.md`
+    - `data/fixtures/finra/finra_short_interest_tiny.csv`
+    - `data/fixtures/finra/finra_short_interest_tiny.manifest.json`
+    - `tests/test_g7_1e_finra_short_interest_tiny_fixture.py`
+    - validation evidence PASS: focused fixture tests, focused fixture + context-builder tests, full pytest, pip check, scoped compile, dashboard drift regression, launch smoke, data readiness, minimal validation lab, forbidden implementation scan, secret scan, artifact hash audit, context rebuild/validation, SAW report validation, evidence-map validation, and closure packet validation.
+  - Contract lock:
+    - `PH65_G7_1E_FINRA_TINY_FIXTURE_ONLY := VALID iff (finra_static_fixture = 1) and (dataset_type = short_interest) and (settlement_dates = 1) and (tickers = 3) and (row_count = 3) and (manifest_hash_match = 1) and (row_count_match = 1) and (settlement_date_parses = 1) and (ticker_present = 1) and (duplicate_primary_key_rejected = 1) and (non_finite_numeric_rejected = 1) and (non_negative_numeric_fields = 1) and (source_quality = public_official_observed) and (observed_label = observed) and (reg_sho_fields_present = 0) and (provider_code = 0) and (live_api_call = 0) and (bulk_downloader = 0) and (reg_sho_ingestion = 0) and (otc_ats_ingestion = 0) and (state_machine = 0) and (candidate_generation = 0) and (squeeze_score = 0) and (ranking = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+  - Open risks:
+    - yfinance migration remains future debt.
+    - primary S&P sidecar freshness remains stale through `2023-11-27`.
+    - Reg SHO policy and fixture remain future work and must not be conflated with short interest.
+    - GodView provider gap remains open after this static proof.
+    - broad compileall workspace hygiene remains inherited debt.
+  - Rollback note:
+    - revert only G7.1E FINRA fixture docs, fixture files, test file, context, handover, provider-priority update, governance-log updates, and SAW report; do not revert G7.1D SEC fixture docs or prior Phase 65 artifacts.
+
+Phase 65 G7.1F (2026-05-10): CFTC COT/TFF Tiny Fixture Proof (D-372)
+
+  - Decision record:
+    - approve G7.1F as one tiny CFTC Commitments of Traders / Traders in Financial Futures public fixture proof.
+    - use CFTC TFF next because it supports broad futures-positioning / systematic-regime context for GodView, while remaining explicitly unable to prove single-name CTA buying.
+    - use exactly one report date, `2026-05-08`, and exactly one as-of position date, `2026-05-05`.
+    - use exactly two broad financial futures markets: `E-Mini S&P 500` and `UST 10Y Note`.
+    - use exactly four TFF trader categories: `Dealer/Intermediary`, `Asset Manager/Institutional`, `Leveraged Funds`, and `Other Reportables`.
+    - create one static CSV fixture with one sidecar manifest; do not build a live CFTC provider or broad downloader.
+    - validate manifest presence, SHA-256, row count, report-date parsing, as-of-position-date parsing, market/code/category presence, finite/non-negative numeric fields, duplicate primary-key rejection, source quality, allowed/forbidden use, observed label, and single-name field exclusion.
+    - lock the interpretation rule: CFTC TFF may say "systematic/regime positioning context is supportive or hostile"; it may not say "CTAs are buying this stock today."
+    - do not add CFTC provider code, live CFTC API calls, bulk downloads, CTA scoring, single-name CTA inference, buy/sell/hold state-machine input, standalone ranking factor, dashboard runtime behavior, alerts, broker calls, paper trades, or promotion packets.
+    - keep FRED/Ken French, Reg SHO, ATS/dark-pool, options/IV/gamma/whale data, and G7.2 held until separate approval.
+  - The Decision (Hardcoded):
+    - `docs/architecture/cftc_tff_tiny_fixture_policy.md` records G7.1F CFTC source policy and forbidden scope.
+    - `docs/architecture/cftc_cot_tff_usage_policy.md` records the broad-regime-vs-single-name-CTA interpretation boundary.
+    - `docs/architecture/cftc_public_provider_fixture_plan.md` records the static fixture shape and validation plan.
+    - `data/fixtures/cftc/cftc_tff_tiny.csv` stores eight observed CFTC TFF rows for report date `2026-05-08`.
+    - `data/fixtures/cftc/cftc_tff_tiny.manifest.json` stores the source-rights/provenance/hash manifest.
+    - `tests/test_g7_1f_cftc_tff_tiny_fixture.py` validates the static fixture proof and negative paths.
+    - `docs/handover/phase65_g71f_cftc_tiny_fixture_handover.md` is the canonical PM handover.
+    - `docs/handover/phase65_g71-000f_handover.md` is the current context selector alias.
+    - `docs/handover/phase65_g71-0f_handover.md` is the compatibility selector alias.
+    - `docs/saw_reports/saw_phase65_g7_1f_cftc_tiny_fixture_20260509.md` records the SAW closeout.
+  - Evidence:
+    - `docs/architecture/cftc_tff_tiny_fixture_policy.md`
+    - `docs/architecture/cftc_cot_tff_usage_policy.md`
+    - `docs/architecture/cftc_public_provider_fixture_plan.md`
+    - `data/fixtures/cftc/cftc_tff_tiny.csv`
+    - `data/fixtures/cftc/cftc_tff_tiny.manifest.json`
+    - `tests/test_g7_1f_cftc_tff_tiny_fixture.py`
+    - validation evidence PASS: focused fixture tests, focused fixture + context-builder tests, full pytest, pip check, scoped compile, dashboard drift regression, launch smoke, data readiness, minimal validation lab, forbidden implementation scan, secret scan, artifact hash audit, context rebuild/validation, SAW report validation, evidence-map validation, and closure packet validation.
+  - Contract lock:
+    - `PH65_G7_1F_CFTC_TFF_TINY_FIXTURE_ONLY := VALID iff (cftc_static_fixture = 1) and (dataset_type = futures_positioning) and (report_dates = 1) and (asof_position_dates = 1) and (markets = 2) and (trader_categories = 4) and (row_count = 8) and (manifest_hash_match = 1) and (row_count_match = 1) and (report_date_parses = 1) and (asof_position_date_parses = 1) and (market_name_present = 1) and (contract_market_code_present = 1) and (trader_category_allowed = 1) and (duplicate_primary_key_rejected = 1) and (non_finite_numeric_rejected = 1) and (non_negative_numeric_fields = 1) and (source_quality = public_official_observed) and (observed_label = observed) and (single_name_inference_forbidden = 1) and (provider_code = 0) and (live_api_call = 0) and (bulk_downloader = 0) and (cta_score = 0) and (single_name_inference = 0) and (state_machine = 0) and (candidate_generation = 0) and (ranking = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+  - Open risks:
+    - yfinance migration remains future debt.
+    - primary S&P sidecar freshness remains stale through `2023-11-27`.
+    - Reg SHO policy and fixture remain future work and must not be conflated with short interest.
+    - GodView provider gap remains open after this static proof.
+    - broad compileall workspace hygiene remains inherited debt.
+  - Rollback note:
+    - revert only G7.1F CFTC fixture docs, fixture files, test file, context, handover, provider-priority update, governance-log updates, and SAW report; do not revert G7.1E FINRA fixture docs or prior Phase 65 artifacts.
+
+Phase 65 G7.1G (2026-05-09): FRED / Ken French Tiny Fixture Proof (D-373)
+
+  - Decision record:
+    - approve G7.1G as one tiny FRED macro fixture and one tiny Ken French factor fixture proof.
+    - use FRED / ALFRED next because official macro series and real-time-period semantics matter for future macro/regime context without hindsight leakage.
+    - use the Kenneth French Data Library because public research factor returns are a standard benchmark/factor context source.
+    - use exactly three FRED macro series: `DGS10`, `M2SL`, and `BAA10Y`, with three dates per series.
+    - use exactly one Ken French dataset: `fama_french_3_factors_monthly`, with four monthly dates and long-form `Mkt-RF`, `SMB`, and `HML` factor rows.
+    - create static CSV fixtures with sidecar manifests; do not build a live FRED provider, Ken French provider, downloader, or API client.
+    - validate manifest presence, SHA-256, row count, date range, date parsing, finite numeric values, duplicate primary-key rejection, source quality, allowed/forbidden use, observed label, FRED API-key-required label, and score/runtime field exclusion.
+    - lock the interpretation rule: FRED may support macro context and future regime panels, but not a macro regime score in this phase; Ken French may support factor context and later benchmark comparison, but not alpha claims or candidate ranking in this phase.
+    - do not add live API calls, API key handling, bulk downloads, macro regime score, factor regime score, signal ranking, candidate generation, G7.2 state machine, dashboard runtime behavior, alerts, broker calls, paper trades, or promotion packets.
+    - hold G7.2 until separate approval.
+  - The Decision (Hardcoded):
+    - `docs/architecture/fred_ken_french_tiny_fixture_policy.md` records G7.1G source policy and forbidden scope.
+    - `docs/architecture/macro_factor_context_usage_policy.md` records macro/factor context-only interpretation policy.
+    - `docs/architecture/fred_ken_french_public_provider_fixture_plan.md` records the static fixture shapes and validation plan.
+    - `data/fixtures/fred/fred_macro_tiny.csv` stores nine observed FRED macro rows.
+    - `data/fixtures/fred/fred_macro_tiny.manifest.json` stores the FRED source-rights/provenance/hash manifest.
+    - `data/fixtures/ken_french/ken_french_factor_tiny.csv` stores twelve observed Ken French factor-return rows.
+    - `data/fixtures/ken_french/ken_french_factor_tiny.manifest.json` stores the Ken French source-rights/provenance/hash manifest.
+    - `tests/test_g7_1g_fred_ken_french_tiny_fixture.py` validates the static fixture proof and negative paths.
+    - `docs/handover/phase65_g71g_fred_ken_french_tiny_fixture_handover.md` is the canonical PM handover.
+    - `docs/handover/phase65_g71-0000g_handover.md` is the current context selector alias.
+    - `docs/handover/phase65_g71-0g_handover.md` is the compatibility selector alias.
+    - `docs/saw_reports/saw_phase65_g7_1g_fred_ken_french_tiny_fixture_20260509.md` records the SAW closeout.
+  - Evidence:
+    - `docs/architecture/fred_ken_french_tiny_fixture_policy.md`
+    - `docs/architecture/macro_factor_context_usage_policy.md`
+    - `docs/architecture/fred_ken_french_public_provider_fixture_plan.md`
+    - `data/fixtures/fred/fred_macro_tiny.csv`
+    - `data/fixtures/fred/fred_macro_tiny.manifest.json`
+    - `data/fixtures/ken_french/ken_french_factor_tiny.csv`
+    - `data/fixtures/ken_french/ken_french_factor_tiny.manifest.json`
+    - `tests/test_g7_1g_fred_ken_french_tiny_fixture.py`
+    - validation evidence PASS: focused fixture tests, focused fixture + context-builder tests, full pytest, pip check, scoped compile, dashboard drift regression, launch smoke, data readiness, minimal validation lab, forbidden implementation scan, secret scan, artifact hash audit, context rebuild/validation, SAW report validation, evidence-map validation, and closure packet validation.
+  - Contract lock:
+    - `PH65_G7_1G_FRED_KEN_FRENCH_TINY_FIXTURE_ONLY := VALID iff (fred_static_fixture = 1) and (ken_french_static_fixture = 1) and (fred_series = 3) and (fred_rows = 9) and (ken_french_datasets = 1) and (ken_french_rows = 12) and (manifest_hash_match = 1) and (row_count_match = 1) and (date_range_match = 1) and (date_fields_parse = 1) and (series_id_present = 1) and (dataset_id_present = 1) and (numeric_values_finite = 1) and (duplicate_primary_key_rejected = 1) and (source_quality_present = 1) and (observed_label = observed) and (allowed_forbidden_use_present = 1) and (fred_api_key_required_label = true_for_live_api) and (provider_code = 0) and (live_api_call = 0) and (api_key_handling = 0) and (bulk_downloader = 0) and (macro_regime_score = 0) and (factor_regime_score = 0) and (state_machine = 0) and (candidate_generation = 0) and (ranking = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+  - Open risks:
+    - yfinance migration remains future debt.
+    - primary S&P sidecar freshness remains stale through `2023-11-27`.
+    - Reg SHO policy and fixture remain future work and must not be conflated with short interest.
+    - GodView provider gap remains open after this static proof.
+    - FRED live API key handling and series rights remain future provider-policy work.
+    - broad compileall workspace hygiene remains inherited debt.
+  - Rollback note:
+    - revert only G7.1G FRED / Ken French fixture docs, fixture files, test file, context, handover, provider-priority update, governance-log updates, and SAW report; do not revert G7.1F CFTC fixture docs or prior Phase 65 artifacts.
+
+Phase 65 G7.2 (2026-05-10): Unified Opportunity State Machine (D-374)
+
+  - Decision record:
+    - approve G7.2 as definition-only Unified Opportunity State Machine work.
+    - define finite opportunity states, reason codes, transition evidence schemas, forbidden jumps, and validator tests.
+    - keep all score, rank, alert, broker, provider, ingestion, search, backtest, replay, proxy, and dashboard-runtime behavior blocked.
+    - require `THESIS_BROKEN` to override bullish market behavior.
+    - block direct `THESIS_CANDIDATE -> BUYING_RANGE` jumps.
+    - require `LEFT_SIDE_RISK` to pass through `ACCUMULATION_WATCH` or `CONFIRMATION_WATCH` before `BUYING_RANGE`.
+    - block estimated-only evidence from creating `BUYING_RANGE`.
+    - block inferred-only evidence from creating `LET_WINNER_RUN`.
+  - The Decision (Hardcoded):
+    - `docs/architecture/unified_opportunity_state_machine.md` records the state-machine definition.
+    - `docs/architecture/opportunity_state_transition_policy.md` records the transition policy.
+    - `docs/architecture/opportunity_state_forbidden_jumps.md` records the hard forbidden-jump register.
+    - `opportunity_engine/states.py` stores the finite state and reason-code enums.
+    - `opportunity_engine/schemas.py` stores the transition evidence schemas.
+    - `opportunity_engine/transitions.py` stores the transition validator.
+    - `tests/test_g7_2_opportunity_state_machine.py` validates the state-machine invariants.
+    - `docs/handover/phase65_g72_state_machine_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g7_2_state_machine_20260509.md` records the SAW closeout.
+  - Evidence:
+    - focused G7.2 tests PASS.
+    - scoped compile PASS.
+    - closure packet validation PASS.
+    - SAW report validation PASS.
+    - evidence validation PASS.
+  - Contract lock:
+    - `PH65_G7_2_STATE_DEFINITION_ONLY := VALID iff (state_enum_complete = 1) and (reason_codes_present = 1) and (source_classes_present = 1) and (forbidden_jump_not_requested = 1) and (thesis_broken_override_applied = 1) and (estimated_only_buying_range = 0) and (inferred_only_let_winner_run = 0) and (score_rank_alert_broker_fields_absent = 1) and (candidate_generation = 0) and (search = 0) and (backtest = 0) and (replay = 0) and (proxy_run = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+
+Phase 65 G7.3 (2026-05-10): Signal-to-State Source Eligibility Map (D-375)
+
+  - Decision record:
+    - approve G7.3 as policy-only Signal-to-State Source Eligibility Map work.
+    - map every GodView signal family to source class, observed/estimated/inferred label, allowed state influence, forbidden state influence, freshness requirement, and confidence label.
+    - keep provider classes, live API calls, source registry implementation, scoring, ranking, alerts, broker, and dashboard runtime behavior blocked.
+    - preserve SEC/FINRA/CFTC/FRED/Ken French fixture pillars as context/reason-code sources only.
+    - keep Tier 2/yfinance from moving any state toward `BUYING_RANGE` or `LET_WINNER_RUN`.
+    - keep options/IV/gamma/whales as provider-gap signals.
+  - The Decision (Hardcoded):
+    - `docs/architecture/godview_signal_to_state_map.md` records the full source-to-state map.
+    - `docs/architecture/godview_source_eligibility_policy.md` records source-class eligibility.
+    - `docs/architecture/godview_signal_confidence_policy.md` records confidence labels and freshness degradation.
+    - `opportunity_engine/source_classes.py` stores source class, signal family, and confidence enums.
+    - `opportunity_engine/signal_policy.py` stores the signal-family policy map.
+    - `tests/test_g7_3_signal_to_state_source_map.py` validates the policy boundaries.
+    - `docs/handover/phase65_g73_signal_to_state_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g7_3_signal_to_state_map_20260509.md` records the SAW closeout.
+  - Evidence:
+    - focused G7.3 tests PASS.
+    - scoped compile PASS.
+    - closure packet validation PASS.
+    - SAW report validation PASS.
+    - evidence validation PASS.
+  - Contract lock:
+    - `PH65_G7_3_POLICY_ONLY := VALID iff (source_class_enum_complete = 1) and (signal_family_map_complete = 1) and (public_fixtures_context_only = 1) and (estimated_only_buying_range = 0) and (tier2_yfinance_action_state = 0) and (provider_gap_signals = 1) and (short_interest_context_only = 1) and (cftc_broad_regime_only = 1) and (fred_ken_french_context_only = 1) and (provider_code = 0) and (live_api_call = 0) and (source_registry = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+
+Phase 65 G7.4 (2026-05-10): Dashboard Wireframe / Product-State Spec (D-376)
+
+  - Decision record:
+    - approve G7.4 as product-spec-only dashboard wireframe work.
+    - define state-first dashboard sections, watchlist card fields, and daily brief structure.
+    - keep dashboard runtime code, Streamlit edits, candidate cards, alerts, provider calls, broker calls, score, ranking, and candidate generation blocked.
+    - ensure the dashboard answers what state an opportunity is in, why, what changed, and what is blocked.
+    - keep buy/sell/order language out of the runtime boundary.
+  - The Decision (Hardcoded):
+    - `docs/architecture/godview_dashboard_wireframe.md` records the dashboard wireframe.
+    - `docs/architecture/godview_watchlist_card_spec.md` records the watchlist card fields.
+    - `docs/architecture/godview_daily_brief_spec.md` records the daily brief structure.
+    - `tests/test_g7_4_dashboard_state_spec.py` validates the spec boundaries.
+    - `docs/handover/phase65_g74_dashboard_wireframe_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g7_4_dashboard_wireframe_20260509.md` records the SAW closeout.
+  - Evidence:
+    - focused G7.4 tests PASS.
+    - scoped compile PASS.
+    - closure packet validation PASS.
+    - SAW report validation PASS.
+    - evidence validation PASS.
+  - Contract lock:
+    - `PH65_G7_4_PRODUCT_SPEC_ONLY := VALID iff (dashboard_sections_complete = 1) and (watchlist_card_fields_complete = 1) and (daily_brief_spec_complete = 1) and (no_buy_sell_alert_score_rank = 1) and (no_runtime_streamlit = 1) and (no_dashboard_runtime_change = 1) and (candidate_card = 0) and (provider_code = 0) and (live_api_call = 0) and (broker_calls = 0)`.
+
+Phase 65 G8.1 (2026-05-10): Supercycle Discovery Intake (D-378)
+
+  - Decision record:
+    - approve G8.1 as discovery-intake-only work.
+    - create a small supercycle theme taxonomy.
+    - create one static candidate intake queue seeded exactly with `MU`, `DELL`, `INTC`, `AMD`, `LRCX`, and `ALB`.
+    - preserve `MU` as the only existing full candidate card.
+    - mark `DELL`, `INTC`, `AMD`, `LRCX`, and `ALB` as intake-only.
+    - require evidence-needed fields, thesis breakers, provider gaps, and source-lead caveats before any future card work.
+    - keep alpha search, ranking, scoring, thesis validation, buying range, backtest, replay, provider ingestion, dashboard runtime, alerts, broker behavior, and recommendations blocked.
+  - The Decision (Hardcoded):
+    - `opportunity_engine/discovery_intake_schema.py` stores the G8.1 schema constants and validator.
+    - `opportunity_engine/discovery_intake.py` loads taxonomy/queue/manifest JSON and validates bundles.
+    - `data/discovery/supercycle_discovery_themes_v0.json` stores the approved theme taxonomy.
+    - `data/discovery/supercycle_candidate_intake_queue_v0.json` stores the six-name intake queue.
+    - `data/discovery/supercycle_candidate_intake_queue_v0.manifest.json` stores the queue manifest and source-policy boundary.
+    - `tests/test_g8_1_supercycle_discovery_intake.py` validates the G8.1 invariants.
+    - `docs/architecture/g8_1_supercycle_discovery_intake_policy.md` records the intake-only policy.
+    - `docs/architecture/supercycle_discovery_theme_taxonomy.md` records the theme contract.
+    - `docs/architecture/supercycle_candidate_intake_schema.md` records the queue schema.
+    - `docs/handover/phase65_g81_supercycle_discovery_intake_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g8_1_supercycle_discovery_intake_20260510.md` records the SAW closeout.
+  - Evidence:
+    - focused G8.1 tests PASS.
+    - final validation matrix recorded in the G8.1 SAW report.
+  - Contract lock:
+    - `PH65_G8_1_INTAKE_ONLY := VALID iff (seed_tickers = [MU,DELL,INTC,AMD,LRCX,ALB]) and (candidate_card_exists = {MU}) and (intake_only = {DELL,INTC,AMD,LRCX,ALB}) and (ticker_required = 1) and (theme_candidates_required = 1) and (evidence_needed_required = 1) and (thesis_breakers_required = 1) and (provider_gaps_required = 1) and (score_fields = 0) and (rank_fields = 0) and (buy_sell_hold_calls = 0) and (validated_status = 0) and (action_state_promotion = 0) and (yfinance_canonical = 0) and (manifest_hash_match = 1) and (alpha_search = 0) and (backtest = 0) and (replay = 0) and (provider_ingestion = 0) and (dashboard_runtime = 0) and (broker_behavior = 0)`.
+
+Phase 65 G8.1A (2026-05-10): Discovery Drift Correction (D-379)
+
+  - Decision record:
+    - approve G8.1A as product-governance and schema-only drift correction.
+    - mark the current six-name queue as user-seeded, with theme or supply-chain adjacency where applicable.
+    - prevent `MU`, `DELL`, `INTC`, `AMD`, `LRCX`, and `ALB` from being described as pure system-scouted output.
+    - require `discovery_origin`, `origin_evidence`, `scout_path`, `is_user_seeded`, `is_system_scouted`, `is_validated`, and `is_actionable`.
+    - define `LOCAL_FACTOR_SCOUT` for a later G8.1B scout baseline but keep it unused in G8.1A.
+    - keep factor scout, alpha search, ranking, scoring, thesis validation, buying range, dashboard runtime, alerts, broker behavior, and recommendations blocked.
+  - The Decision (Hardcoded):
+    - `opportunity_engine/discovery_intake_schema.py` stores the origin enum and validator rules.
+    - `data/discovery/supercycle_candidate_intake_queue_v0.json` stores the relabeled six-name queue.
+    - `data/discovery/supercycle_candidate_intake_queue_v0.manifest.json` records the origin policy and refreshed queue hash.
+    - `tests/test_g8_1a_discovery_drift_policy.py` validates the G8.1A invariants.
+    - `docs/architecture/discovery_drift_policy.md` records the drift correction.
+    - `docs/architecture/discovery_origin_taxonomy.md` records the origin taxonomy.
+    - `docs/architecture/supercycle_scout_protocol.md` records the G8.1A scout boundary and G8.1B preview.
+    - `docs/architecture/discovery_intake_vs_candidate_card.md` records the object boundary.
+    - `docs/handover/phase65_g81a_discovery_drift_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g8_1a_discovery_drift_20260510.md` records the SAW closeout.
+  - Evidence:
+    - focused G8.1/G8.1A tests PASS.
+    - scoped compile PASS.
+  - Contract lock:
+    - `PH65_G8_1A_DISCOVERY_DRIFT := VALID iff (origin_required = 1) and (origin_evidence_required = 1) and (scout_path_required = 1) and (seed_tickers = [MU,DELL,INTC,AMD,LRCX,ALB]) and (MU_origin = USER_SEEDED) and (DELL_INTC_AMD_ALB_origin = USER_SEEDED+THEME_ADJACENT) and (LRCX_origin = USER_SEEDED+SUPPLY_CHAIN_ADJACENT) and (system_scouted_current_six = 0) and (validated_current_six = 0) and (actionable_current_six = 0) and (local_factor_scout_used = 0) and (rank = 0) and (score = 0) and (buy_sell_hold = 0)`.
+
+Phase 65 DASH-0 (2026-05-10): GodView Dashboard IA Redesign Plan (D-380)
+
+  - Decision record:
+    - approve DASH-0 as planning-only dashboard information architecture.
+    - approve target page map: Command Center, Opportunities, Thesis Card, Market Behavior, Entry & Hold Discipline, Portfolio & Allocation, Research Lab, Settings & Ops.
+    - plan future Streamlit page registry/sidebar shell using `st.Page` and `st.navigation` after DASH-1 approval.
+    - move Data Health and Drift Monitor to future Settings & Ops.
+    - move Backtest Lab, Modular Strategies, Daily Scan, and experiments to future Research Lab.
+    - move Portfolio Builder and Shadow Portfolio to future Portfolio & Allocation.
+    - record future optimizer UX task to align `Max weight` and `Max sector weight` in one Risk limits group.
+    - keep runtime dashboard code, Streamlit navigation shell, providers, factor scout, discovery intake output, candidate cards, backtests, alerts, broker behavior, rankings, and scores blocked.
+  - The Decision (Hardcoded):
+    - `docs/architecture/dashboard_information_architecture.md` records the approved page map.
+    - `docs/architecture/dashboard_page_registry_plan.md` records the future registry/sidebar plan.
+    - `docs/architecture/dashboard_redesign_migration_plan.md` records the legacy-to-new mapping.
+    - `docs/architecture/dashboard_ops_relocation_policy.md` records Data Health / Drift Monitor relocation.
+    - `docs/handover/dashboard_ia_handover_20260510.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_dashboard_ia_redesign_plan_20260510.md` records the SAW closeout.
+  - Evidence:
+    - official Streamlit docs confirm `st.Page` / `st.navigation` are the flexible multipage mechanism and the entrypoint acts as router/frame.
+    - context validation PASS.
+  - Contract lock:
+    - `PH65_DASH_0_IA_SPEC_ONLY := VALID iff (page_map = [Command Center,Opportunities,Thesis Card,Market Behavior,Entry & Hold Discipline,Portfolio & Allocation,Research Lab,Settings & Ops]) and (legacy_movement_mapped = 1) and (ops_relocation_policy = 1) and (streamlit_registry_basis = 1) and (dashboard_py_touched = 0) and (views_touched = 0) and (optimizer_view_touched = 0) and (factor_scout_touched = 0) and (discovery_intake_output_touched = 0) and (candidate_cards_touched = 0) and (provider_code = 0) and (backtest_code = 0) and (alerts = 0) and (broker_calls = 0)`.
+
+Phase 65 G8 (2026-05-10): One Supercycle Gem Candidate Card (D-377)
+
+  - Decision record:
+    - approve G8 as candidate-card-only work for one human-nominated ticker.
+    - use `MU` as the default ticker.
+    - create a structured research object with source-quality labels, evidence-present/missing lists, thesis breakers, data dependencies, state mapping, provider-gap labels, and forbidden outputs.
+    - keep alpha search, candidate screening, ranking, scoring, upside calculation, buy range, backtest, replay, provider ingestion, dashboard runtime, buy/sell alerts, and broker calls blocked.
+    - require initial state to be only `THESIS_CANDIDATE` or `EVIDENCE_BUILDING`.
+    - require `BUYING_RANGE`, `ADD_ON_SETUP`, `LET_WINNER_RUN`, and `TRIM_OPTIONAL` to remain forbidden for G8.
+  - The Decision (Hardcoded):
+    - `opportunity_engine/candidate_card_schema.py` stores the G8 schema constants and validator.
+    - `opportunity_engine/candidate_card.py` loads card/manifest JSON and validates card bundles.
+    - `data/candidate_cards/MU_supercycle_candidate_card_v0.json` stores the one MU card.
+    - `data/candidate_cards/MU_supercycle_candidate_card_v0.manifest.json` stores the card manifest and source-policy boundary.
+    - `tests/test_g8_supercycle_candidate_card.py` validates the G8 invariants.
+    - `docs/architecture/g8_supercycle_candidate_card_policy.md` records the candidate-card-only policy.
+    - `docs/architecture/supercycle_candidate_card_schema.md` records the schema contract.
+    - `docs/handover/phase65_g8_supercycle_candidate_card_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g8_supercycle_candidate_card_20260510.md` records the SAW closeout.
+  - Evidence:
+    - focused G8 tests PASS.
+    - G7.2/G7.3/G7.4 regression tests PASS.
+    - full validation matrix recorded in the G8 SAW report.
+  - Contract lock:
+    - `PH65_G8_CANDIDATE_CARD_ONLY := VALID iff (one_card = MU) and (candidate_status = candidate_card_only) and (ticker_required = 1) and (theme_required = 1) and (manifest_required = 1) and (source_quality_summary_required = 1) and (initial_state in {THESIS_CANDIDATE,EVIDENCE_BUILDING}) and (action_states_absent = 1) and (score_rank_signal_alert_broker_fields_absent = 1) and (yfinance_canonical = 0) and (estimated_as_observed = 0) and (options_iv_gamma_whales_provider_gap = 1) and (alpha_search = 0) and (screening = 0) and (ranking = 0) and (backtest = 0) and (replay = 0) and (provider_ingestion = 0) and (dashboard_runtime = 0) and (broker_calls = 0)`.
+Phase 65 G7.2 (2026-05-10): Unified Opportunity State Machine (D-374)
+
+  - Decision record:
+    - approve G7.2 as definition-only Unified Opportunity State Machine work.
+    - define finite opportunity states, reason codes, transition evidence schemas, forbidden jumps, and validator tests.
+    - keep all score, rank, alert, broker, provider, ingestion, search, backtest, replay, proxy, and dashboard-runtime behavior blocked.
+    - require `THESIS_BROKEN` to override bullish market behavior.
+    - block direct `THESIS_CANDIDATE -> BUYING_RANGE` jumps.
+    - require `LEFT_SIDE_RISK` to pass through `ACCUMULATION_WATCH` or `CONFIRMATION_WATCH` before `BUYING_RANGE`.
+    - block estimated-only evidence from creating `BUYING_RANGE`.
+    - block inferred-only evidence from creating `LET_WINNER_RUN`.
+  - The Decision (Hardcoded):
+    - `docs/architecture/unified_opportunity_state_machine.md` records the state-machine definition.
+    - `docs/architecture/opportunity_state_transition_policy.md` records the transition policy.
+    - `docs/architecture/opportunity_state_forbidden_jumps.md` records the hard forbidden-jump register.
+    - `opportunity_engine/states.py` stores the finite state and reason-code enums.
+    - `opportunity_engine/schemas.py` stores the transition evidence schemas.
+    - `opportunity_engine/transitions.py` stores the transition validator.
+    - `tests/test_g7_2_opportunity_state_machine.py` validates the state-machine invariants.
+    - `docs/handover/phase65_g72_state_machine_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g7_2_state_machine_20260509.md` records the SAW closeout.
+  - Evidence:
+    - focused G7.2 tests PASS.
+    - scoped compile PASS.
+    - closure packet validation PASS.
+    - SAW report validation PASS.
+    - evidence validation PASS.
+  - Contract lock:
+    - `PH65_G7_2_STATE_DEFINITION_ONLY := VALID iff (state_enum_complete = 1) and (reason_codes_present = 1) and (source_classes_present = 1) and (forbidden_jump_not_requested = 1) and (thesis_broken_override_applied = 1) and (estimated_only_buying_range = 0) and (inferred_only_let_winner_run = 0) and (score_rank_alert_broker_fields_absent = 1) and (candidate_generation = 0) and (search = 0) and (backtest = 0) and (replay = 0) and (proxy_run = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+
+Phase 65 G7.3 (2026-05-10): Signal-to-State Source Eligibility Map (D-375)
+
+  - Decision record:
+    - approve G7.3 as policy-only Signal-to-State Source Eligibility Map work.
+    - map every GodView signal family to source class, observed/estimated/inferred label, allowed state influence, forbidden state influence, freshness requirement, and confidence label.
+    - keep provider classes, live API calls, source registry implementation, scoring, ranking, alerts, broker, and dashboard runtime behavior blocked.
+    - preserve SEC/FINRA/CFTC/FRED/Ken French fixture pillars as context/reason-code sources only.
+    - keep Tier 2/yfinance from moving any state toward `BUYING_RANGE` or `LET_WINNER_RUN`.
+    - keep options/IV/gamma/whales as provider-gap signals.
+  - The Decision (Hardcoded):
+    - `docs/architecture/godview_signal_to_state_map.md` records the full source-to-state map.
+    - `docs/architecture/godview_source_eligibility_policy.md` records source-class eligibility.
+    - `docs/architecture/godview_signal_confidence_policy.md` records confidence labels and freshness degradation.
+    - `opportunity_engine/source_classes.py` stores source class, signal family, and confidence enums.
+    - `opportunity_engine/signal_policy.py` stores the signal-family policy map.
+    - `tests/test_g7_3_signal_to_state_source_map.py` validates the policy boundaries.
+    - `docs/handover/phase65_g73_signal_to_state_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g7_3_signal_to_state_map_20260509.md` records the SAW closeout.
+  - Evidence:
+    - focused G7.3 tests PASS.
+    - scoped compile PASS.
+    - closure packet validation PASS.
+    - SAW report validation PASS.
+    - evidence validation PASS.
+  - Contract lock:
+    - `PH65_G7_3_POLICY_ONLY := VALID iff (source_class_enum_complete = 1) and (signal_family_map_complete = 1) and (public_fixtures_context_only = 1) and (estimated_only_buying_range = 0) and (tier2_yfinance_action_state = 0) and (provider_gap_signals = 1) and (short_interest_context_only = 1) and (cftc_broad_regime_only = 1) and (fred_ken_french_context_only = 1) and (provider_code = 0) and (live_api_call = 0) and (source_registry = 0) and (alerts = 0) and (broker_calls = 0) and (dashboard_runtime_change = 0)`.
+
+Phase 65 G7.4 (2026-05-10): Dashboard Wireframe / Product-State Spec (D-376)
+
+  - Decision record:
+    - approve G7.4 as product-spec-only dashboard wireframe work.
+    - define state-first dashboard sections, watchlist card fields, and daily brief structure.
+    - keep dashboard runtime code, Streamlit edits, candidate cards, alerts, provider calls, broker calls, score, ranking, and candidate generation blocked.
+    - ensure the dashboard answers what state an opportunity is in, why, what changed, and what is blocked.
+    - keep buy/sell/order language out of the runtime boundary.
+  - The Decision (Hardcoded):
+    - `docs/architecture/godview_dashboard_wireframe.md` records the dashboard wireframe.
+    - `docs/architecture/godview_watchlist_card_spec.md` records the watchlist card fields.
+    - `docs/architecture/godview_daily_brief_spec.md` records the daily brief structure.
+    - `tests/test_g7_4_dashboard_state_spec.py` validates the spec boundaries.
+    - `docs/handover/phase65_g74_dashboard_wireframe_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g7_4_dashboard_wireframe_20260509.md` records the SAW closeout.
+  - Evidence:
+    - focused G7.4 tests PASS.
+    - scoped compile PASS.
+    - closure packet validation PASS.
+    - SAW report validation PASS.
+    - evidence validation PASS.
+  - Contract lock:
+    - `PH65_G7_4_PRODUCT_SPEC_ONLY := VALID iff (dashboard_sections_complete = 1) and (watchlist_card_fields_complete = 1) and (daily_brief_spec_complete = 1) and (no_buy_sell_alert_score_rank = 1) and (no_runtime_streamlit = 1) and (no_dashboard_runtime_change = 1) and (candidate_card = 0) and (provider_code = 0) and (live_api_call = 0) and (broker_calls = 0)`.
+Phase 65 G8.1B (2026-05-10): Pipeline-First Discovery Scout Baseline (D-381)
+
+  - Decision record:
+    - approve G8.1B as backend/governance-only work.
+    - wrap the existing local Phase 34 factor artifact as `LOCAL_FACTOR_SCOUT`.
+    - name the wrapper `4-Factor Equal-Weight Scout Baseline`.
+    - use `scout_model_id = LOCAL_FACTOR_EQUAL_WEIGHT_V0`.
+    - emit exactly one tiny intake-only scout output item.
+    - keep rank, score display, recommendation language, validation claims, candidate-card creation, dashboard runtime behavior, provider calls, alerts, and broker behavior blocked.
+  - The Decision (Hardcoded):
+    - `opportunity_engine/factor_scout_schema.py` stores the G8.1B schema constants and validator.
+    - `opportunity_engine/factor_scout.py` loads/validates scout artifacts and reads local source metadata deterministically.
+    - `data/discovery/local_factor_scout_baseline_v0.json` stores the governed baseline metadata.
+    - `data/discovery/local_factor_scout_baseline_v0.manifest.json` stores the baseline manifest and source-policy boundary.
+    - `data/discovery/local_factor_scout_output_tiny_v0.json` stores one `LOCAL_FACTOR_SCOUT` intake-only item.
+    - `data/discovery/local_factor_scout_output_tiny_v0.manifest.json` stores the output manifest.
+    - `tests/test_g8_1b_pipeline_first_discovery_scout.py` validates G8.1B invariants.
+    - `docs/architecture/pipeline_first_discovery_scout_policy.md`, `docs/architecture/local_factor_scout_baseline_policy.md`, and `docs/architecture/factor_scout_output_contract.md` record the policy and output contracts.
+    - `docs/handover/phase65_g81b_pipeline_first_scout_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g8_1b_pipeline_first_scout_20260510.md` records the SAW closeout.
+  - Evidence:
+    - focused G8.1B tests PASS.
+    - source artifact metadata reconciles to 2555730 rows, 2000-01-03 to 2026-02-13, and 389 permnos.
+    - deterministic fixture selection returns `MSFT` by latest-date/local-metadata/ascending-permno rule, not by factor ordering.
+  - Contract lock:
+    - `PH65_G8_1B_SCOUT_BASELINE_ONLY := VALID iff (model_id = LOCAL_FACTOR_EQUAL_WEIGHT_V0) and (model_name = 4-Factor Equal-Weight Scout Baseline) and (source_artifact = data/processed/phase34_factor_scores.parquet) and (factor_names = [momentum_normalized,quality_normalized,volatility_normalized,illiquidity_normalized]) and (sum(factor_weights) = 1.0) and (output_items = 1) and (discovery_origin = LOCAL_FACTOR_SCOUT) and (status = intake_only) and (system_scouted = 1) and (validated = 0) and (actionable = 0) and (score_display = 0) and (rank = 0) and (buy_sell_signal = 0) and (candidate_card = 0) and (dashboard_runtime = 0) and (provider_call = 0)`.
+
+Phase 65 DASH-1 (2026-05-10): Page Registry Shell (D-382)
+
+  - Decision record:
+    - approve DASH-1 as runtime shell-only work.
+    - replace the old flat-tab mental model with a Streamlit page registry/sidebar shell.
+    - keep legacy page behavior while relocating old pages behind approved IA buckets.
+    - keep new GodView pages placeholder/status-only until a later approved phase.
+    - keep all new data, metrics, product claims, provider calls, alerts, broker behavior, factor-scout integration, candidate generation, ranking, scoring, and buy/sell/hold output blocked.
+  - The Decision (Hardcoded):
+    - `dashboard.py` owns the shared Streamlit entrypoint/frame and calls `page.run()`.
+    - `views/page_registry.py` owns approved page titles, page groups, and legacy movement map.
+    - `tests/test_dash_1_page_registry_shell.py` validates the approved page map, legacy relocation, absence of `st.tabs`, and forbidden-scope boundaries.
+    - `docs/handover/dash_1_page_registry_shell_handover_20260510.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_dash_1_page_registry_shell_20260510.md` records the SAW closeout.
+  - Parallel lane:
+    - `docs/saw_reports/saw_phase65_g8_1b_r_reviewer_rerun_20260510.md` closes G8.1B-R reviewer evidence with PASS and no dashboard edits.
+  - Contract lock:
+    - `PH65_DASH_1_RUNTIME_SHELL_ONLY := VALID iff (approved_page_order = 1) and (st_page_registry = 1) and (selected_page_run = 1) and (legacy_relocation = 1) and (old_flat_tabs = 0) and (new_metrics = 0) and (new_data = 0) and (ranking = 0) and (scoring = 0) and (alerts = 0) and (broker_calls = 0) and (provider_ingestion = 0) and (factor_scout_integration = 0)`.
+
+Phase 65 G8.2 (2026-05-10): System-Scouted Candidate Card (D-383)
+
+  - Decision record:
+    - approve G8.2 as Data + Docs/Ops candidate-card-only work.
+    - convert exactly one governed `LOCAL_FACTOR_SCOUT` output item into a structured research object.
+    - use `MSFT` only because it is the sole G8.1B `LOCAL_FACTOR_SCOUT` output.
+    - require `candidate_status = candidate_card_only`, `discovery_origin = LOCAL_FACTOR_SCOUT`, `scout_model_id = LOCAL_FACTOR_EQUAL_WEIGHT_V0`, `source_intake_item_id`, `source_intake_manifest_uri`, and `candidate_card_manifest_uri`.
+    - keep DELL/AMD/LRCX/ALB cards, new scout outputs, factor-score display, rank, score, thesis validation, actionability, buy/sell/hold, buying range, alert, broker behavior, provider ingestion, and dashboard runtime merge blocked.
+    - treat official/public evidence pointers as research orientation only, not thesis validation.
+  - The Decision (Hardcoded):
+    - `data/candidate_cards/MSFT_supercycle_candidate_card_v0.json` stores the MSFT system-scouted candidate card.
+    - `data/candidate_cards/MSFT_supercycle_candidate_card_v0.manifest.json` stores the card manifest, provenance, source policy, and hash.
+    - `opportunity_engine/candidate_card_schema.py` rejects factor-score leakage and validates optional governance flags when present.
+    - `tests/test_g8_2_system_scouted_candidate_card.py` validates G8.2 invariants.
+    - `docs/architecture/g8_2_system_scouted_candidate_card_policy.md` records the policy and dashboard boundary.
+    - `docs/handover/phase65_g82_system_scouted_candidate_card_handover.md` is the canonical PM handover.
+    - `docs/saw_reports/saw_phase65_g8_2_system_scouted_candidate_card_20260510.md` records the SAW closeout.
+  - Evidence:
+    - focused G8.2 tests PASS.
+    - G8/G8.1B/G8.2 regression PASS.
+    - context-builder tests PASS.
+    - scoped compile PASS.
+    - context rebuild and closure validators PASS after SAW publication.
+  - Dashboard boundary:
+    - The dashboard can already show `MSFT` through legacy runtime ticker-list logic.
+    - That runtime row is not the G8.2 candidate card and must not be interpreted as card-reader integration.
+  - Contract lock:
+    - `PH65_G8_2_ONE_CARD_ONLY := VALID iff (source_scout_output = data/discovery/local_factor_scout_output_tiny_v0.json) and (source_scout_tickers = [MSFT]) and (candidate_card_ticker = MSFT) and (candidate_status = candidate_card_only) and (discovery_origin = LOCAL_FACTOR_SCOUT) and (scout_model_id = LOCAL_FACTOR_EQUAL_WEIGHT_V0) and (source_intake_manifest_uri_present = 1) and (candidate_manifest_uri_present = 1) and (candidate_cards = [MU,MSFT]) and (new_scout_output = 0) and (user_seeded_cards_created = 0) and (factor_score = 0) and (rank = 0) and (score = 0) and (validated = 0) and (actionable = 0) and (buy_sell_hold = 0) and (buying_range = 0) and (alert = 0) and (broker_call = 0) and (provider_ingestion = 0) and (dashboard_runtime_merge = 0)`.
+
+Phase 65 DASH-2 (2026-05-10): Portfolio Allocation Runtime Slice
+
+  - Decision record:
+    - keep Portfolio Optimizer visible at the top of `Portfolio & Allocation`.
+    - remove the optimizer expander/toggle introduced in the first DASH-2 pass.
+    - render YTD Performance below the optimizer, comparing optimized portfolio return against SPY and QQQ.
+    - refresh selected stock and benchmark prices with an in-memory yfinance adjusted-close overlay for display freshness only.
+    - keep broker behavior, alerts, candidate ranking/scoring, factor-scout integration, provider ingestion, and canonical evidence changes blocked.
+  - The Decision (Hardcoded):
+    - `views/optimizer_view.py` refreshes selected optimizer price series and stores current optimizer weights in `st.session_state["optimizer_weights"]`.
+    - `dashboard.py` calculates weighted YTD portfolio return from current optimizer weights and displays SPY/QQQ YTD metrics below the optimizer.
+    - `tests/test_dash_2_portfolio_ytd.py` validates ordering, return-weight plumbing, freshness helpers, and no forbidden runtime scope.
+  - Evidence:
+    - focused DASH-2 tests PASS.
+    - DASH-1 navigation regression PASS.
+    - scoped compile PASS.
+    - Browser check shows `Portfolio Optimizer` before `YTD Performance`, SPY/QQQ metrics present, and freshness through 2026-05-08.
+  - Contract lock:
+    - `PH65_DASH_2_PORTFOLIO_RUNTIME_SLICE := VALID iff (optimizer_top_level = 1) and (optimizer_expander = 0) and (ytd_below_optimizer = 1) and (portfolio_return = weighted_optimizer_return) and (benchmarks = [SPY,QQQ]) and (fresh_price_overlay = in_memory_display_only) and (provider_ingestion = 0) and (broker_call = 0) and (alert = 0) and (candidate_rank_score = 0)`.
+
+Phase 65 Portfolio Universe Construction Fix (2026-05-10)
+
+  - Decision record:
+    - approve P0-P3 mechanical correction only: explicit optimizer universe builder, default exclusion of `EXIT`/`KILL`/`AVOID`/`IGNORE`, ticker/price readiness reporting, and max-weight feasibility diagnostics.
+    - approve lightweight P4-P6 support: rename misleading Sharpe labels, add regression tests, and document the portfolio construction contract.
+    - hold Black-Litterman, MU 20% policy, conviction mode, WATCH investability policy, manual override, thesis-anchor sizing, scanner rewrites, and new portfolio objectives.
+  - The Decision (Hardcoded):
+    - `strategies/portfolio_universe.py` owns scanner-row eligibility classification, ticker-map readiness, local price-history readiness, and max-weight feasibility diagnostics.
+    - `dashboard.py` calls `build_optimizer_universe(...)` and passes `universe.included_permnos` plus `universe_audit` to the optimizer view instead of slicing `df_scan["Ticker"]`.
+    - `views/optimizer_view.py` renders the universe audit, uses only audited candidate assets when provided, explains allocation constraints, and labels the max-Sharpe path as thesis-neutral.
+    - `docs/architecture/portfolio_construction_contract.md` records the scanner/display/allocation boundary and explicitly blocks conviction work.
+  - Evidence:
+    - focused portfolio universe and DASH-2 tests PASS.
+    - scoped compile PASS for `strategies/portfolio_universe.py`, `views/optimizer_view.py`, and `dashboard.py`.
+    - current cached scan audits to zero eligible assets under the conservative policy because current rows are EXIT/KILL/IGNORE/WATCH or local price-history failures.
+    - browser smoke at `http://127.0.0.1:8503/portfolio-and-allocation` shows Portfolio Optimizer, Universe Audit, fail-closed no-eligible message, and YTD Performance.
+  - Contract lock:
+    - `PORTFOLIO_UNIVERSE_CONSTRUCTION_FIX := VALID iff (explicit_universe_builder = 1) and (display_sort_slice = 0) and (exit_kill_avoid_ignore_default_excluded = 1) and (watch_research_only_default = 1) and (ticker_map_readiness_reported = 1) and (price_history_readiness_reported = 1) and (max_weight_feasibility_diagnostic = 1) and (auto_best_sharpe_label = 0) and (mu_hard_floor = 0) and (conviction_mode = 0) and (black_litterman_runtime = 0) and (manual_override = 0)`.
+
+Phase 65 Portfolio Universe Optimizer-Core Quarantine (2026-05-10)
+
+  - Decision record:
+    - reject accepting the dirty `strategies/optimizer.py` lower-bound/SLSQP diff into the Portfolio Universe Construction Fix closure.
+    - preserve the optimizer-core diff as a quarantine patch, revert `strategies/optimizer.py` to baseline, and close the universe-construction fix only after focused validation passes.
+    - open optimizer lower-bound/SLSQP behavior as a separate policy/audit round before any acceptance, revision, or rejection of optimizer-core math changes.
+  - The Decision (Hardcoded):
+    - `docs/quarantine/optimizer_core_lower_bounds_slsqp_diff_20260510.patch` stores the quarantined dirty diff.
+    - `docs/quarantine/optimizer_core_lower_bounds_slsqp_diff_note_20260510.md` records that the diff is out of scope for universe construction.
+    - `docs/saw_reports/saw_portfolio_universe_construction_fix_20260510.md` closes `PORTFOLIO_UNIVERSE_CONSTRUCTION_FIX_20260510` as PASS after quarantine.
+  - Evidence:
+    - `git diff -- strategies/optimizer.py` is empty.
+    - focused portfolio universe/DASH tests PASS.
+    - full pytest PASS after context/provenance hygiene and yfinance allowlist repair.
+    - scoped compile PASS.
+    - context validation PASS.
+    - browser smoke PASS at `/portfolio-and-allocation`.
+  - Contract lock:
+    - `PORTFOLIO_UNIVERSE_QUARANTINE_CLOSE := VALID iff (optimizer_diff_saved = 1) and (strategies_optimizer_diff = 0) and (focused_tests_pass = 1) and (scoped_compile_pass = 1) and (context_validate_pass = 1) and (browser_smoke_pass = 1) and (optimizer_core_lower_bounds_accepted = 0)`.
+
+Phase 65 Optimizer Core Policy Audit (2026-05-10)
+
+  - Decision record:
+    - open `OPTIMIZER_CORE_POLICY_AUDIT` as docs/tests-first work only.
+    - reject the quarantined lower-bound/SLSQP diff as-is.
+    - hold implementation until a future round explicitly approves optimizer-core policy changes and replaces audit xfails with passing implementation tests.
+  - The Decision (Hardcoded):
+    - `docs/architecture/optimizer_core_policy_audit.md` records audit questions, answer set, source rationale, and reject-as-is disposition.
+    - `docs/architecture/optimizer_constraints_policy.md` records current and future feasibility formulas.
+    - `docs/architecture/optimizer_lower_bound_slsqp_policy.md` records lower-bound/SLSQP policy and active-bound reporting requirements.
+    - `tests/test_optimizer_core_policy.py` locks non-approval and records strict xfail debt for infeasibility/fallback/active-bound behavior.
+    - `docs/saw_reports/saw_optimizer_core_policy_audit_20260510.md` records the independent implementer/reviewer SAW closeout.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_optimizer_core_policy.py -q` PASS with expected strict xfails.
+    - `git diff -- strategies/optimizer.py` remains empty.
+  - Contract lock:
+    - `OPTIMIZER_CORE_POLICY_AUDIT := VALID iff (policy_docs_present = 1) and (policy_tests_present = 1) and (strategies_optimizer_diff = 0) and (lower_bound_slsqp_diff_accepted = 0) and (mu_conviction = 0) and (watch_investability = 0) and (black_litterman = 0) and (universe_eligibility_change = 0)`.
+
+Phase 65 Dashboard Scanner Testability Hardening (2026-05-11)
+
+  - Decision record:
+    - approve `DASHBOARD_SCANNER_TESTABILITY_HARDENING` as behavior-preserving scanner extraction and coverage work.
+    - move deterministic dashboard scanner formulas out of inline `dashboard.py` closures into `strategies/scanner.py`.
+    - keep dashboard-owned provider calls, Streamlit cache boundaries, and payload persistence in `dashboard.py`.
+    - add focused boundary-value tests for macro scoring, breadth status, price technicals, cluster classification, entry price, tactics, proxy signal, rating, leverage, and full scan-frame enrichment.
+    - add small direct tests for `InvestorCockpitStrategy`, `AdaptiveTrendStrategy`, `ProductionConfig`, and `core.etl`.
+  - The Decision (Hardcoded):
+    - `strategies/scanner.py` owns pure scanner math and dataframe enrichment.
+    - `dashboard.py` still owns yfinance calls through `fetch_macro_score`, `get_breadth_status`, and `get_prices_and_technicals`, then delegates deterministic enrichment to `enrich_scan_frame(...)`.
+    - `tests/test_scanner.py` is the scanner formula guardrail; `tests/test_process_utils.py` remains the process-liveness guardrail.
+    - no scanner semantics, provider authority, candidate-card state, ranking/scoring policy, alert, broker behavior, or dashboard redesign is approved by this round.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_scanner.py tests\test_strategy.py tests\test_phase15_integration.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\test_process_utils.py -q` PASS, 46 passed.
+    - `.venv\Scripts\python -m py_compile strategies\scanner.py dashboard.py tests\test_scanner.py tests\test_strategy.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\conftest.py` PASS.
+    - `.venv\Scripts\python -m pytest -q` PASS.
+    - `tests/pytest_out.txt` refreshed with the current full-suite PASS summary.
+  - Contract lock:
+    - `DASHBOARD_SCANNER_TESTABILITY_HARDENING := VALID iff (scanner_math_owner = strategies/scanner.py) and (dashboard_provider_boundary_preserved = 1) and (scanner_boundary_tests = 1) and (process_guardrail_still_passing = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0) and (ranking_policy_change = 0) and (alert_or_broker = 0)`.
+
+Phase 65 Optimizer Core Structured Diagnostics (2026-05-11)
+
+  - Decision record:
+    - approve `OPTIMIZER_CORE_STRUCTURED_DIAGNOSTICS_IMPLEMENTATION` as diagnostics-only optimizer-core work.
+    - implement explicit pre-solver feasibility checks, equal-weight boundary warnings, SLSQP status reporting, post-solver active-bound diagnostics, full-investment residual diagnostics, and UI-safe explanation rows.
+    - keep the quarantined lower-bound/SLSQP diff rejected as-is; this round does not approve lower-bound allocation policy.
+    - keep MU conviction policy, WATCH investability expansion, Black-Litterman, simple tilt / conviction optimizer, new objectives, scanner rules, manual overrides, provider ingestion, alerts, broker behavior, and replay behavior blocked.
+  - The Decision (Hardcoded):
+    - `strategies/optimizer_diagnostics.py` owns structured diagnostic objects and formulas.
+    - `strategies/optimizer.py` exposes diagnostic-returning optimizer methods while preserving legacy weight-returning methods.
+    - `views/optimizer_view.py` renders optimization status, feasibility status, active constraints, max-cap assets, lower-bound assets, equal-weight-forced status, solver status, residuals, and fallback labeling.
+    - `tests/test_optimizer_core_policy.py` converts prior strict xfail audit debt into passing diagnostics tests.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_optimizer_core_policy.py -q` PASS.
+    - scoped compile PASS for `strategies/optimizer.py`, `strategies/optimizer_diagnostics.py`, `views/optimizer_view.py`, and `dashboard.py`.
+  - Contract lock:
+    - `OPTIMIZER_CORE_STRUCTURED_DIAGNOSTICS := VALID iff (diagnostics_module = 1) and (pre_solver_feasibility = 1) and (slsqp_status_report = 1) and (active_bound_report = 1) and (constraint_residual_report = 1) and (fallback_labeled = 1) and (silent_fallback = 0) and (mu_conviction = 0) and (watch_investability = 0) and (black_litterman = 0) and (new_objective = 0) and (scanner_rule_change = 0)`.
+
+Phase 65 Portfolio Data Boundary Refactor (2026-05-11)
+
+  - Decision record:
+    - approve `1A/2A/3A` architecture cleanup for `/portfolio-and-allocation`.
+    - move selected-stock live display overlay fetching, close extraction, local TRI scaling, and stitching out of `views/optimizer_view.py`.
+    - move `data/backtest_results.json` strategy-metrics parsing out of `views/optimizer_view.py`.
+    - keep the DASH-2 display freshness behavior and optimizer diagnostics unchanged.
+  - The Decision (Hardcoded):
+    - `core/data_orchestrator.py` owns `download_recent_close_prices`, `scale_live_overlay_to_local`, `refresh_selected_prices_with_live_overlay`, and `load_strategy_metrics_from_results`.
+    - `views/optimizer_view.py` imports these helpers and does not import yfinance or parse `data/backtest_results.json` directly.
+    - `data/providers/legacy_allowlist.py` no longer needs `views/optimizer_view.py` because direct yfinance usage is removed from the view.
+    - `tests/test_data_orchestrator_portfolio_runtime.py` locks overlay scaling/stitching, duplicate-date anchor handling, partial-live cell preservation, stale-while-revalidate behavior, scheduler submit fail-soft behavior, future-mtime cache invalidation, and metrics parsing behavior.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile core\data_orchestrator.py views\optimizer_view.py data\providers\legacy_allowlist.py tests\test_dash_2_portfolio_ytd.py tests\test_dashboard_sprint_a.py tests\test_data_orchestrator_portfolio_runtime.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py -q` PASS, 8 passed.
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dashboard_sprint_a.py tests\test_dash_2_portfolio_ytd.py tests\test_provider_ports.py tests\test_portfolio_universe.py -q` PASS, 47 passed.
+    - `.venv\Scripts\python -m pytest tests\test_optimizer_core_policy.py -q` PASS, 17 passed.
+    - `.venv\Scripts\python -m pytest -q` PASS.
+    - runtime smoke `http://localhost:8505/portfolio-and-allocation` PASS, HTTP 200.
+  - Contract lock:
+    - `PORTFOLIO_DATA_BOUNDARY_REFACTOR := VALID iff (view_yfinance_import = 0) and (view_backtest_json_parse = 0) and (overlay_fetch_owner = core_data_orchestrator) and (overlay_scale_stitch_owner = core_data_orchestrator) and (partial_live_overlay_preserves_local_cells = 1) and (duplicate_anchor_dates_deduped_before_scaling = 1) and (stale_overlay_cache_is_display_only = 1) and (scheduler_submit_failure_fails_soft = 1) and (strategy_metrics_owner = core_data_orchestrator) and (provider_ingestion = 0) and (canonical_write = 0) and (optimizer_objective_change = 0)`.
+
+Phase 65 Portfolio Optimizer View Test and Performance Hardening (2026-05-11)
+
+  - Decision record:
+    - implement the approved tests/performance options for `/portfolio-and-allocation`.
+    - add dedicated Streamlit `AppTest` coverage for the optimizer view render path, mean-variance dropdown, and sector-cap controls.
+    - add a UI-to-solver handoff test that pipes synthetic max-weight and risk-free-rate controls into the real SLSQP optimizer.
+    - cache recent display close overlays through non-canonical Parquet files and schedule background refresh on cold/stale cache misses.
+    - cache optimizer runs by selected price frame and user parameters.
+  - The Decision (Hardcoded):
+    - `tests/test_optimizer_view.py` owns Streamlit view integration coverage and display-cache behavior tests.
+    - `tests/test_optimizer_core_policy.py` owns UI-derived bounds through real optimizer coverage.
+    - `core/data_orchestrator.py` owns display-only Parquet overlay cache, background refresh scheduling, atomic cache writes, and copy-safe scale cache.
+    - `views/optimizer_view.py` uses `_run_optimizer_cached(...)` for equivalent rerenders and keeps sector caps post-solver.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_optimizer_view.py tests\test_optimizer_core_policy.py tests\test_dash_2_portfolio_ytd.py -q` PASS, 39 passed.
+  - Contract lock:
+    - `PORTFOLIO_OPTIMIZER_VIEW_PERF_HARDENING := VALID iff (streamlit_view_test = 1) and (ui_solver_bounds_test = 1) and (overlay_parquet_cache = display_only) and (cache_write_atomic = 1) and (cold_cache_nonblocking = 1) and (optimizer_run_cache = 1) and (sector_cap_post_solver = 1) and (provider_ingestion = 0) and (canonical_write = 0) and (new_optimizer_objective = 0) and (mu_conviction = 0) and (watch_investability = 0)`.
+
+Phase 65 Dashboard Architecture Safety Slice (2026-05-11)
+
+  - Decision record:
+    - approve the Architecture Section 1 recommended fixes for process liveness safety and local dashboard duplication cleanup.
+    - centralize PID liveness probing in `utils/process.py` and route dashboard, updater, release-controller, parameter-sweep, and phase16 optimizer lock callers through the shared helper.
+    - keep compatibility wrappers (`_pid_is_running`, `_pid_is_alive`, `_is_pid_alive`) so existing tests and monkeypatch seams stay stable.
+    - collapse duplicated dashboard strategy-matrix initialization behind `_build_strategy_matrix(...)` and `_ensure_modular_strategy_state(...)`.
+    - delegate `dashboard.py::_clean_portfolio_price_frame(...)` to `core.data_orchestrator.clean_price_frame(...)`.
+  - The Decision (Hardcoded):
+    - `utils/process.py::pid_is_running` owns the Windows-safe process probe and is the only allowed place for a process-liveness `os.kill(pid, 0)` style fallback.
+    - dashboard backtest PID status no longer calls `os.kill(pid, 0)` directly.
+    - strategy-matrix status semantics remain unchanged: `Running...`, `Done`, `Next`, `Pending`, and `Insufficient`.
+    - dashboard portfolio YTD cleanup now inherits canonical duplicate-date handling from `core.data_orchestrator.clean_price_frame`.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile utils\process.py dashboard.py data\updater.py scripts\parameter_sweep.py scripts\release_controller.py backtests\optimize_phase16_parameters.py tests\test_process_utils.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_process_utils.py tests\test_parameter_sweep.py tests\test_updater_parallel.py tests\test_release_controller.py tests\test_optimize_phase16_parameters.py tests\test_dash_1_page_registry_shell.py tests\test_dash_2_portfolio_ytd.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_optimizer_view.py -q` PASS, 102 passed.
+    - `rg -n "os\.kill\(pid,\s*0\)|os\.kill\(int\(pid\),\s*0\)" -g "*.py"` finds no unsafe runtime caller outside the shared utility comment.
+    - `.venv\Scripts\python -m pytest -q` was attempted but timed out after 304 seconds; affected focused suite passed.
+    - `.venv\Scripts\python launch.py` was attempted as an app boot smoke; the long-running server timed out, then `Invoke-WebRequest http://127.0.0.1:8501` returned HTTP 200 and the smoke process tree was stopped.
+  - Contract lock:
+    - `DASHBOARD_ARCHITECTURE_SAFETY := VALID iff (shared_pid_probe = utils.process.pid_is_running) and (unsafe_windows_pid_probe_runtime_callers = 0) and (legacy_pid_wrapper_names_preserved = 1) and (strategy_matrix_builder_single = 1) and (dashboard_price_cleaner_delegates_to_core = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0)`.
+
+Phase 65 Dashboard Unified Data Cache Performance Fix (2026-05-11)
+
+  - Decision record:
+    - approve the Performance Part 4 Issue 1 fix for uncached dashboard unified parquet loads.
+    - cache `load_unified_data(mode="historical", top_n=2000, start_year=2000, universe_mode="top_liquid")` across Streamlit reruns.
+    - invalidate the cache through source-file signatures rather than a blind TTL, so local parquet rewrites are visible on the next rerun.
+    - keep provider ingestion, canonical data writes, alpha-engine loop optimization, scanner financial-statement caching, and row-wise scanner enrichment refactors out of this slice.
+  - The Decision (Hardcoded):
+    - `dashboard.py::_load_unified_data_cached` owns the Streamlit `st.cache_resource` wrapper.
+    - `core.data_orchestrator.build_unified_data_cache_signature` owns the cache invalidation fingerprint for relevant processed/static parquet files.
+    - `tests/test_data_orchestrator_portfolio_runtime.py` locks file-signature change behavior.
+    - `tests/test_dashboard_sprint_a.py` locks that the dashboard load path uses the signature cache.
+  - Evidence:
+    - pre-fix timing: direct `.venv` load of `load_unified_data(...)` took `8.802s` and `8.393s` for `(2518, 2000)` price/return matrices.
+  - Contract lock:
+    - `DASHBOARD_UNIFIED_DATA_CACHE := VALID iff (streamlit_cache_resource = 1) and (cache_key_includes_loader_args = 1) and (cache_key_includes_source_parquet_signature = 1) and (source_parquet_rewrite_invalidates = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0)`.

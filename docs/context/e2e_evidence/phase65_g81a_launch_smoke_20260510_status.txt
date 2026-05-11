@@ -1,0 +1,6 @@
+runtime_smoke_status=PASS
+runtime_smoke_alive_after_20s=True
+runtime_smoke_exception_marker=
+runtime_smoke_port=8627
+stdout=docs\context\e2e_evidence\phase65_g81a_launch_smoke_20260510_stdout.txt
+stderr=docs\context\e2e_evidence\phase65_g81a_launch_smoke_20260510_stderr.txt

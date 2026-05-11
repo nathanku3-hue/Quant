@@ -3924,3 +3924,1094 @@ Date: 2026-03-01
    - if `source_quality != "canonical"`, then `promotion_block_reason = "non_canonical_source_quality"`.
    - source path:
      - `v2_discovery/schemas.py` (`CandidateSnapshot`)
+
+## Phase G0 V2 Proxy Boundary Notes
+
+1. Proxy truth boundary:
+   - `proxy_truth_official = false` for every V2 proxy result.
+   - `promotion_ready = false` for every V2 proxy run/result.
+   - `canonical_engine_required = true` for every V2 proxy run/result.
+   - source path:
+     - `v2_discovery/fast_sim/schemas.py` (`ProxyRunSpec`, `ProxyRunResult`)
+2. Canonical engine rule:
+   - `promotion_packet_draft_valid = 1` only if:
+     - `source_quality = "canonical"`
+     - `canonical_engine_name = "core.engine.run_simulation"`
+     - `canonical_result_ref != ""`
+     - `promotion_ready = false`
+     - `canonical_engine_required = true`
+   - source path:
+     - `v2_discovery/fast_sim/schemas.py` (`PromotionPacketDraft`)
+3. Proxy boundary predicate:
+   - `proxy_boundary_valid = 1` iff:
+     - candidate exists in `CandidateRegistry.rebuild_snapshot()`;
+     - `registry_event_id` exists and points to `candidate_id`;
+     - `manifest_uri` exists;
+     - candidate, proxy, and manifest `source_quality` values match;
+     - `registry_note_event_id` exists, points to the same `candidate_id`, has `event_type = "candidate.note_added"`, and references the `proxy_run_id` plus `boundary_verdict`;
+     - proxy result verdict matches boundary policy.
+   - source path:
+     - `v2_discovery/fast_sim/boundary.py` (`V2ProxyBoundary`)
+4. No-op proxy rule:
+   - no alpha, Sharpe, return curve, ranking, search, alert, or broker behavior is computed.
+   - no-op proxy run may append a registry note only.
+   - `registry_note_event_valid = 1` iff the note event resolves from the append-only event log and names the same proxy run and boundary verdict.
+   - source path:
+     - `v2_discovery/fast_sim/noop_proxy.py` (`NoopProxy`)
+
+## Phase G1 Synthetic Fast-Proxy Mechanics Notes
+
+1. Synthetic fixture gate:
+   - `synthetic_fixture_valid = 1` iff:
+     - manifest path is under `data/fixtures/v2_proxy/`;
+     - manifest `provider = "synthetic_fixture"`;
+     - manifest `provider_feed = "prebaked_target_weights"`;
+     - manifest `license_scope = "synthetic_fixture_only"`;
+     - manifest `source_quality in {"non_canonical", "rejected"}`;
+     - component hashes for prices and target weights match `compute_sha256(file)`;
+     - target weights have strict columns `date,symbol,target_weight`.
+   - source path:
+     - `v2_discovery/fast_sim/fixtures.py` (`load_synthetic_proxy_fixture`)
+2. Transaction-cost formula:
+   - `cost_rate = total_cost_bps / 10000`
+   - `transaction_cost_t = equity_before_cost_t * turnover_t * cost_rate`
+   - source path:
+     - `v2_discovery/fast_sim/cost_model.py` (`FastProxyCostModel`)
+3. Synthetic ledger formulas:
+   - `current_value_{t,s} = quantity_{t-1,s} * price_{t,s}`
+   - `equity_before_cost_t = cash_{t-1} + sum_s(current_value_{t,s})`
+   - `current_weight_{t,s} = current_value_{t,s} / equity_before_cost_t`
+   - `turnover_t = sum_s(abs(target_weight_{t,s} - current_weight_{t,s}))`
+   - `equity_after_cost_t = equity_before_cost_t - transaction_cost_t`
+   - `target_value_{t,s} = target_weight_{t,s} * equity_after_cost_t`
+   - `quantity_{t,s} = target_value_{t,s} / price_{t,s}`
+   - `cash_t = equity_after_cost_t - sum_s(target_value_{t,s})`
+   - source path:
+     - `v2_discovery/fast_sim/ledger.py` (`build_synthetic_ledger`)
+4. Exposure formulas:
+   - `gross_exposure_t = sum_s(abs(target_value_{t,s})) / equity_after_cost_t`
+   - `net_exposure_t = sum_s(target_value_{t,s}) / equity_after_cost_t`
+   - invariant:
+     - `gross_exposure_t >= abs(net_exposure_t)`
+   - source path:
+     - `v2_discovery/fast_sim/ledger.py` (`build_synthetic_ledger`)
+5. Proxy result quarantine:
+   - `promotion_ready = false`
+   - `canonical_engine_required = true`
+   - `boundary_verdict = tier2_blocked` for the non-canonical synthetic fixture
+   - source path:
+     - `v2_discovery/fast_sim/simulator.py` (`SyntheticFastProxySimulator`)
+6. Finite-value gate:
+   - `finite_numeric_valid = 1` iff every checked numeric value satisfies `np.isfinite(value)`.
+   - rejected classes:
+     - `nan`
+     - `+inf`
+     - `-inf`
+   - checked boundaries:
+     - fixture load: prices, weights, cost-model inputs;
+     - pre-ledger: prices, target weights, cost assumptions;
+     - post-ledger: positions, cash, turnover, transaction cost, gross exposure, net exposure;
+     - result summary and proxy metadata: strict JSON finite values only.
+   - source paths:
+     - `v2_discovery/fast_sim/validation.py` (`validate_finite_numeric`, `validate_positive_numeric`)
+     - `v2_discovery/fast_sim/cost_model.py` (`FastProxyCostModel`)
+     - `v2_discovery/fast_sim/ledger.py` (`_validate_pre_ledger_inputs`, `validate_synthetic_ledger_output`)
+     - `v2_discovery/fast_sim/simulator.py` (`_validate_result_summary`)
+     - `v2_discovery/fast_sim/schemas.py` (`_require_json_finite`)
+7. Manifest reconciliation gate:
+   - `manifest_reconciles = 1` iff:
+     - `manifest.row_count == len(df)`;
+     - `manifest.date_range.start == min(df[date])`;
+     - `manifest.date_range.end == max(df[date])`;
+     - `manifest.sha256 == compute_sha256(file_path)`;
+     - if schema columns are present, `manifest.schema.columns == list(df.columns)`.
+   - source paths:
+     - `v2_discovery/fast_sim/validation.py` (`validate_manifest_reconciles`)
+     - `v2_discovery/fast_sim/fixtures.py` (`load_synthetic_proxy_fixture`)
+     - `data/fixtures/v2_proxy/synthetic_manifest.json`
+8. No-repair invariant:
+   - `repair_used = 0` for invalid evidence.
+   - missing symbols, sparse target weights, non-finite values, and manifest drift must raise `ProxyBoundaryError`.
+   - forbidden repair patterns in G1 validation path:
+     - `nan_to_num`
+     - sparse-weight `fillna(0)`
+     - forward/backward fill or interpolation.
+   - source paths:
+     - `v2_discovery/fast_sim/fixtures.py`
+     - `v2_discovery/fast_sim/ledger.py`
+     - `tests/test_v2_fast_proxy_synthetic.py`
+     - `tests/test_v2_fast_proxy_invariants.py`
+
+## Phase G3 Canonical Replay Fixture Notes
+
+1. Canonical replay call gate:
+   - `g3_v1_called = 1` iff the replay adapter calls `core.engine.run_simulation` with the fixture target-weight matrix, fixture return matrix, configured cost rate, and `strict_missing_returns = true`.
+   - source path:
+     - `v2_discovery/replay/canonical_replay.py` (`run_v1_canonical_replay`)
+2. Allowed comparison field set:
+   - `comparison_fields = {positions, cash, turnover, transaction_cost, gross_exposure, net_exposure, row_count, date_range, manifest_uri, source_quality, candidate_id}`.
+   - `comparison_result = "match"` iff every allowed field matches under the G3 tolerance.
+   - `mismatch_count = count(field where v1_field != v2_field)`.
+   - source path:
+     - `v2_discovery/replay/comparison.py` (`compare_allowed_mechanical_fields`)
+3. G3 accounting formulas:
+   - `returns_{t,s} = price_{t,s} / price_{t-1,s} - 1`, first row filled with `0.0` only for the V1 engine call surface.
+   - `cost_rate = total_cost_bps / 10000`.
+   - `transaction_cost_t = equity_before_cost_t * turnover_t * cost_rate`.
+   - `gross_exposure_t = sum_s(abs(target_value_{t,s})) / equity_after_cost_t`.
+   - `net_exposure_t = sum_s(target_value_{t,s}) / equity_after_cost_t`.
+   - source path:
+     - `v2_discovery/replay/canonical_replay.py` (`_returns_matrix`, `_build_v1_accounting`)
+4. Non-promotion invariant:
+   - `g3_promotion_ready = false`.
+   - `canonical_engine_required = true`.
+   - `boundary_verdict = "v2_blocked_from_promotion"`.
+   - A V1/V2 mechanical match does not create a promotion packet and does not grant trading permission.
+   - source path:
+     - `v2_discovery/replay/canonical_replay.py` (`build_g3_replay_report`)
+
+## Phase G4 Real Canonical Dataset Readiness Notes
+
+1. Canonical slice gate:
+   - `g4_canonical_slice_valid = 1` iff:
+     - `source_quality = "canonical"`;
+     - manifest `extra.source_tier = "tier0"`;
+     - provider/feed are not public-web, Tier 2, or operational-market-data sources;
+     - artifact and manifest exist.
+   - source path:
+     - `v2_discovery/readiness/canonical_slice.py` (`load_g4_canonical_slice`)
+2. Manifest reconciliation formula:
+   - `manifest_reconciles = 1` iff:
+     - `manifest.sha256 == compute_sha256(artifact)`;
+     - `manifest.row_count == len(df)`;
+     - `manifest.date_range.start == min(df.date)`;
+     - `manifest.date_range.end == max(df.date)`;
+     - `manifest.schema.columns == list(df.columns)`.
+   - source path:
+     - `v2_discovery/readiness/canonical_slice.py` (`_validate_manifest_contract`, `_validate_slice_data`)
+3. Primary-key and monotonicity rules:
+   - `duplicate_key_check = pass` iff `count_duplicates(df[date, permno]) = 0`.
+   - `date_monotonicity_check = pass` iff dates are monotonic increasing within each `permno`.
+   - source path:
+     - `v2_discovery/readiness/canonical_slice.py` (`_validate_duplicate_primary_keys`, `_validate_date_monotonicity`)
+4. Price and return domain rules:
+   - `price_domain_check = pass` iff `tri > 0`, `legacy_adj_close > 0`, `raw_close > 0`, and `volume >= 0`.
+   - `return_domain_check = pass` iff `-1.0 < total_ret <= 10.0`.
+   - source path:
+     - `v2_discovery/readiness/canonical_slice.py` (`_validate_price_domain`, `_validate_return_domain`)
+5. G4 report invariant:
+   - `ready_for_g5 = true` means dataset readiness only.
+   - `sidecar_required = false` for the passing price slice.
+   - report contains no alpha, performance, ranking, alert, broker, or promotion fields.
+  - source path:
+     - `v2_discovery/readiness/canonical_readiness.py` (`build_g4_readiness_report`)
+
+## Phase G5 Single Canonical Replay Notes
+
+1. Canonical replay call gate:
+   - `g5_v1_called = 1` iff `run_g5_single_canonical_replay` calls `core.engine.run_simulation` with the G4 canonical returns matrix, predeclared neutral target weights, configured cost rate, and `strict_missing_returns = true`.
+   - source path:
+     - `v2_discovery/replay/canonical_real_replay.py` (`run_g5_single_canonical_replay`)
+2. Neutral fixture weights:
+   - `target_weight_{t,s} = 1 / count_symbols_t` for each `permno` on date `t`.
+   - only `weight_mode = "equal_weight"` is accepted.
+   - signal functions, rankers, selectors, and dynamic callbacks are rejected.
+   - source path:
+     - `v2_discovery/replay/canonical_real_replay.py` (`build_predeclared_neutral_weights`)
+3. G5 accounting formulas:
+   - `engine_returns_{t,s} = total_ret_{t,s}`.
+   - `cost_rate = total_cost_bps / 10000`.
+   - `turnover_t = sum_s(abs(target_weight_{t,s} - current_weight_{t,s}))`.
+   - `transaction_cost_t = equity_before_cost_t * turnover_t * cost_rate`.
+   - `target_value_{t,s} = target_weight_{t,s} * equity_after_cost_t`.
+   - `cash_t = equity_after_cost_t - sum_s(target_value_{t,s})`.
+   - `gross_exposure_t = sum_s(abs(target_value_{t,s})) / equity_after_cost_t`.
+   - `net_exposure_t = sum_s(target_value_{t,s}) / equity_after_cost_t`.
+   - source path:
+     - `v2_discovery/replay/canonical_real_replay.py` (`build_g5_mechanical_replay`)
+4. Non-promotion invariant:
+   - `g5_promotion_ready = false`.
+   - `alerts_emitted = false`.
+   - `broker_calls = false`.
+   - `mechanical_replay_result = "completed"` means official-path replay plumbing only, not alpha evidence.
+   - source path:
+     - `v2_discovery/replay/canonical_replay_report.py` (`build_g5_replay_report`)
+
+## Phase G6 V1/V2 Real-Slice Mechanical Comparison Notes
+
+1. Real-slice comparison gate:
+   - `g6_v1_v2_comparison_valid = 1` iff the G4 canonical slice passes manifest/source gates, G5 V1 replay runs through `core.engine.run_simulation`, V2 proxy ledger mechanics run on the same predeclared weights, and all approved equality fields match.
+   - source path:
+     - `v2_discovery/replay/real_slice_v1_v2_comparison.py` (`run_g6_v1_v2_real_slice_mechanical_comparison`)
+2. Approved comparison field set:
+   - `comparison_fields = {positions, cash, turnover, transaction_cost, gross_exposure, net_exposure, row_count, date_range, source_quality, manifest_uri, engine_name, engine_version}`.
+   - Equality is required for positions, cash, turnover, transaction cost, gross exposure, net exposure, row count, date range, source quality, and manifest URI.
+   - Engine name and engine version are recorded as identity metadata because V1 and V2 are intentionally distinct engines.
+   - source path:
+     - `v2_discovery/replay/real_slice_v1_v2_comparison.py` (`compare_g6_mechanical_fields`)
+3. G6 accounting formulas:
+   - `target_weight_{t,s} = 1 / count_symbols_t`.
+   - `cost_rate = total_cost_bps / 10000`.
+   - `turnover_t = sum_s(abs(target_weight_{t,s} - current_weight_{t,s}))`.
+   - `transaction_cost_t = equity_before_cost_t * turnover_t * cost_rate`.
+   - `cash_t = equity_after_cost_t - sum_s(target_value_{t,s})`.
+   - `gross_exposure_t = sum_s(abs(target_value_{t,s})) / equity_after_cost_t`.
+   - `net_exposure_t = sum_s(target_value_{t,s}) / equity_after_cost_t`.
+   - `mismatch_count = count(field where V1_field != V2_field)`.
+   - source path:
+     - `v2_discovery/replay/real_slice_v1_v2_comparison.py`
+4. Non-promotion invariant:
+   - `g6_promotion_ready = false`.
+   - `v2_promotion_ready = false`.
+   - `canonical_engine_required = true`.
+   - `alerts_emitted = false`.
+   - `broker_calls = false`.
+   - A V1/V2 mechanical match does not create a promotion packet and does not grant trading permission.
+   - source path:
+     - `v2_discovery/replay/mechanical_comparison_report.py` (`build_g6_mechanical_comparison_report`)
+
+## Phase G7 Candidate Family Definition Notes
+
+1. Family manifest gate:
+   - `family_manifest_valid = 1` iff:
+     - family definition JSON exists;
+     - manifest JSON exists;
+     - `manifest.sha256 == compute_sha256(family_json)`;
+     - `manifest.row_count == 1`;
+     - `manifest.extra.family_id == family.family_id`;
+     - `manifest.extra.version == family.version`;
+     - `manifest.extra.trial_budget_max == family.trial_budget_max`.
+   - source path:
+     - `v2_discovery/families/validation.py` (`validate_manifest_backing`)
+2. Trial-budget formula:
+   - `finite_trial_count = product(count(options_p) for p in parameter_space)`.
+   - For `PEAD_DAILY_V0`:
+     - `holding_days = {1, 3, 5, 10}` -> 4 options;
+     - `liquidity_floor = {adv_usd_5m, adv_usd_20m, adv_usd_50m}` -> 3 options;
+     - `event_window_lag = {1, 2}` -> 2 options;
+     - `finite_trial_count = 4 * 3 * 2 = 24`.
+   - `trial_budget_valid = finite_trial_count <= trial_budget_max`.
+   - source paths:
+     - `v2_discovery/families/schemas.py` (`CandidateFamilyDefinition.finite_trial_count`)
+     - `v2_discovery/families/trial_budget.py` (`calculate_trial_budget`, `validate_trial_budget`)
+3. Definition-only report invariant:
+   - `g7_definition_only = true` iff:
+     - `defined_only = true`;
+     - `candidate_generation_enabled = false`;
+     - `result_generation_enabled = false`;
+     - `promotion_ready = false`;
+     - `alerts_emitted = false`;
+     - `broker_calls = false`;
+     - no outcome/performance/ranking field is present.
+   - source path:
+     - `v2_discovery/families/validation.py` (`validate_registry_report`)
+
+## Phase G7.1 Roadmap Realignment / Product Charter Notes
+
+1. Product focus planning model:
+   - `product_focus = 0.90 * supercycle_gem_discovery + 0.10 * buying_range_hold_discipline_prompting`.
+   - This is a planning allocation model only; it is not a portfolio allocation, ranking score, signal weight, or execution rule.
+   - source paths:
+     - `docs/architecture/product_roadmap_discretionary_augmentation.md`
+     - `docs/handover/phase65_g71_handover.md`
+2. Family classification:
+   - `SUPERCYCLE_GEM_DAILY_V0 = primary_product_family_target`.
+   - `PEAD_DAILY_V0 = tactical_signal_family`.
+   - G7 `PEAD_DAILY_V0` artifacts remain valid and are not modified by G7.1.
+   - source path:
+     - `docs/architecture/supercycle_gem_family_policy.md`
+3. Dashboard taxonomy:
+   - `dashboard_panels = {thesis_health, entry_discipline, hold_discipline, flow_positioning, regime}`.
+   - future short-squeeze and CTA-type inputs are dashboard context, not automatic triggers.
+   - source path:
+     - `docs/architecture/dashboard_signal_taxonomy.md`
+4. G7.1 non-execution invariant:
+   - `g7_1_valid = 1` iff docs/context are updated, `PEAD_DAILY_V0` remains tactical, `SUPERCYCLE_GEM_DAILY_V0` is primary target, G8 PEAD generation is held, and no candidate generation/backtest/replay/proxy/search/ranking/alert/broker/promotion code or artifact is added.
+   - source paths:
+     - `docs/architecture/product_roadmap_discretionary_augmentation.md`
+     - `docs/phase_brief/phase65-brief.md`
+
+## Phase G7.1A Starter Docs / Product Spec Rewrite Notes
+
+1. Unified Opportunity Engine product formula:
+   - `Unified Opportunity Engine = Supercycle Gem Discovery + GodView Market Behavior Intelligence + Decision Augmentation`.
+   - This is a product architecture formula only; it is not a score, trading rule, allocation rule, or implemented state machine.
+   - source paths:
+     - `README.md`
+     - `PRD.md`
+     - `PRODUCT_SPEC.md`
+     - `docs/architecture/unified_opportunity_engine.md`
+2. Future state-engine concept:
+   - `dashboard_state = f(thesis_state, market_behavior_state, entry_discipline_state, hold_discipline_state, source_quality_state)`.
+   - This is future G7.2 design vocabulary only; G7.1A does not implement state-machine code.
+   - source paths:
+     - `PRODUCT_SPEC.md`
+     - `docs/architecture/unified_opportunity_engine.md`
+     - `docs/architecture/dashboard_product_spec.md`
+3. GodView signal metadata contract:
+   - every future signal must carry `source_quality`, `provider`, `provider_feed`, `freshness`, `latency`, `confidence`, `observed_vs_estimated`, `allowed_use`, `forbidden_use`, and `manifest_uri`.
+   - source paths:
+     - `PRD.md`
+     - `PRODUCT_SPEC.md`
+     - `docs/architecture/godview_signal_taxonomy.md`
+     - `docs/architecture/data_infra_gap_assessment.md`
+4. G7.1A non-execution invariant:
+   - `g7_1a_valid = 1` iff root product canon exists, current truth surfaces point to `approve_g7_1b_data_infra_gap_or_g7_2_state_machine`, G7.2/G7.4/G7.5/G8 remain held, and no candidate generation/search/backtest/replay/proxy/provider/ranking/alert/broker/dashboard-runtime implementation is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+
+## Phase G7.1B Data + Infra Gap Assessment Notes
+
+1. GodView infrastructure fit formula:
+   - `godview_current_infra = governance_ready + price_volume_ready + provider_port_pattern_ready`.
+   - `godview_current_infra != full_market_behavior_ready`.
+   - This is an architecture assessment formula only; it is not an implemented capability check or signal score.
+   - source paths:
+     - `docs/architecture/godview_data_infra_gap_assessment.md`
+     - `docs/architecture/godview_provider_roadmap.md`
+2. GodView source label formula:
+   - `godview_signal_label = observed | estimated | inferred`.
+   - Observed examples: price, volume, official filings, official short interest, official COT, licensed options prints.
+   - Estimated examples: CTA buying, gamma exposure, dealer positioning, whale intent, dark-pool accumulation, squeeze pressure.
+   - Inferred examples: narrative velocity, thesis health, rotation state, entry discipline, hold discipline.
+   - source path:
+     - `docs/architecture/godview_observed_vs_estimated_policy.md`
+3. GodView freshness formula:
+   - `freshness_state = fresh | delayed | stale | unknown`.
+   - Required time fields are `asof_ts`, `captured_at_utc`, `freshness`, `latency`, `provider`, `provider_feed`, and `manifest_uri`.
+   - source path:
+     - `docs/architecture/godview_signal_freshness_policy.md`
+4. GodView future signal metadata contract:
+   - every future signal must carry `signal_id`, `signal_family`, `ticker_or_theme`, `source_quality`, `provider`, `provider_feed`, `observed_vs_estimated`, `freshness`, `latency`, `asof_ts`, `confidence`, `allowed_use`, `forbidden_use`, and `manifest_uri`.
+   - source path:
+     - `docs/architecture/godview_signal_source_matrix.md`
+5. G7.1B non-execution invariant:
+   - `g7_1b_valid = 1` iff GodView source matrix/provider roadmap/freshness policy/observed-vs-estimated policy/Codex-Chrome SOP are documented, current infra is classified as governance-ready but not full-GodView-ready, G7.2/G7.4/G7.5/G8 remain held, and no provider code/ingestion/search/candidate/backtest/replay/proxy/ranking/alert/broker/dashboard-runtime behavior is added.
+  - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+
+## Phase G7.1C Open-Source Repo + API Availability Survey Notes
+
+1. No-cost public-source planning formula:
+   - `godview_no_cost_path_after_audit = existing_tier0_price_volume + SEC + FINRA + CFTC + public_macro`.
+   - This is a planning formula only; it is not provider approval, ingestion, signal scoring, ranking, alerting, or trading authority.
+   - source paths:
+     - `docs/research/g7_1c_open_source_repo_data_api_availability_survey_20260509.md`
+     - `docs/architecture/godview_api_availability_matrix.md`
+     - `docs/architecture/godview_build_vs_borrow_decision.md`
+2. Advanced-flow gap formula:
+   - `godview_advanced_flow_gap = options_iv_whales_gamma + dark_pool_block + microstructure`.
+   - These remain paid/licensed or provider-decision gaps; they are not no-cost implementation candidates in G7.1C.
+   - source paths:
+     - `docs/architecture/godview_api_availability_matrix.md`
+     - `docs/architecture/godview_provider_selection_policy.md`
+3. Provider audit gate:
+   - `provider_candidate_eligible = true` iff rights/terms, cost, authentication, as-of semantics, capture time, freshness, raw locator, manifest fit, source label, allowed use, forbidden use, and rollback path are documented.
+   - G7.1C documents the gate but does not execute the audit.
+   - source path:
+     - `docs/architecture/godview_provider_selection_policy.md`
+4. G7.1C non-execution invariant:
+   - `g7_1c_valid = 1` iff research/architecture docs are updated, source claims are marked audit-pending, G7.2/G7.3/G7.4/G7.5/G8 remain held, and no provider code/ingestion/search/candidate/backtest/replay/proxy/ranking/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+
+## Phase G7.1C Official Public Source Audit Notes
+
+1. Public source eligibility formula:
+   - `public_source_candidate_eligible = official_source + terms_reviewed + cost_auth_key_known + freshness_known + raw_locator_known + asof_semantics_known + allowed_forbidden_use_known`.
+   - This is an audit/planning formula only; it is not provider code, signal scoring, ranking, alerting, or trading authority.
+   - source paths:
+     - `docs/architecture/godview_public_source_audit.md`
+     - `docs/architecture/godview_source_terms_matrix.md`
+2. Tiny fixture gate formula:
+   - `tiny_fixture_allowed = explicit_future_approval and source_policy_published and manifest_contract_defined`.
+   - In G7.1C source audit, `tiny_fixture_allowed = false`; schemas are plans only and no data is downloaded.
+   - source path:
+     - `docs/architecture/godview_tiny_fixture_schema_plan.md`
+3. Observed / estimated / inferred classification:
+   - Observed: official filings, official short interest, Reg SHO volume, CFTC reported positioning, FRED macro series, Ken French factor returns.
+   - Estimated: CTA pressure, squeeze pressure, whale intent, dark-pool accumulation, dealer/gamma pressure.
+   - Inferred: thesis health, market regime state, entry discipline, hold discipline.
+   - source path:
+     - `docs/architecture/godview_public_source_audit.md`
+4. CFTC source-use constraint:
+   - `cftc_allowed_use = broad_regime_or_futures_positioning`.
+   - `cftc_forbidden_use = direct_single_name_cta_buying_evidence`.
+   - source path:
+     - `docs/architecture/godview_public_source_audit.md`
+5. G7.1C audit-only invariant:
+   - `g7_1c_source_audit_valid = 1` iff official source audit/docs/context/handover/SAW are updated, the terms matrix and schema plan are published, G7.2/G7.3/G7.4/G7.5/G8 remain held, and no physical fixture/provider code/ingestion/search/candidate/backtest/replay/proxy/ranking/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_1c_public_source_audit_20260509.md`
+
+## Phase G7.1D SEC Tiny Fixture Notes
+
+1. SEC fixture validity formula:
+   - `g7_1d_sec_fixture_valid = static_fixture and manifest_hash_matches and row_count_reconciles and cik_is_10_digit_string and date_fields_parse and duplicate_primary_keys == 0 and numeric_fact_values_are_finite and observed_estimated_or_inferred == observed and provider_code_added == false and ingestion_added == false`.
+   - This is a fixture/provenance formula only; it is not a signal score, ranking rule, state-machine rule, or provider approval.
+   - source paths:
+     - `docs/architecture/sec_tiny_fixture_policy.md`
+     - `tests/test_g7_1d_sec_tiny_fixture.py`
+2. SEC manifest identity formula:
+   - `sec_manifest_identity = source_name + source_quality + provider + provider_feed + api_endpoint + retrieved_at + asof_ts + CIK + form_types + row_count + date_range + sha256 + allowed_use + forbidden_use`.
+   - source paths:
+     - `data/fixtures/sec/sec_companyfacts_tiny.json.manifest.json`
+     - `data/fixtures/sec/sec_submissions_tiny.json.manifest.json`
+3. G7.1D non-provider invariant:
+   - `g7_1d_provider_scope_valid = 1` iff SEC fixture docs/fixtures/tests/context/handover/SAW are updated, G7.2 remains held, and no live provider/broad downloader/ingestion/canonical lake write/signal score/candidate generation/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_1d_sec_tiny_fixture_20260509.md`
+
+## Phase G7.1E FINRA Short Interest Tiny Fixture Notes
+
+1. FINRA fixture validity formula:
+   - `g7_1e_finra_fixture_valid = static_fixture and dataset_type == short_interest and manifest_hash_matches and row_count_reconciles and settlement_date_parses and ticker_present and short_interest_is_finite_non_negative and average_daily_volume_is_finite_non_negative and days_to_cover_is_finite_non_negative_when_present and duplicate_primary_keys == 0 and observed_estimated_or_inferred == observed and reg_sho_fields_present == false and provider_code_added == false`.
+   - This is a fixture/provenance formula only; it is not a squeeze score, ranking rule, state-machine rule, alert rule, or provider approval.
+   - source paths:
+     - `docs/architecture/finra_short_interest_tiny_fixture_policy.md`
+     - `tests/test_g7_1e_finra_short_interest_tiny_fixture.py`
+2. FINRA short-interest interpretation formula:
+   - `short_interest_context = delayed_short_crowding_evidence`.
+   - `squeeze_signal_allowed = short_interest_context + additional_validated_evidence + explicit_future_scoring_approval`.
+   - Therefore, `short_interest_context_only != real_time_squeeze_trigger`.
+   - source path:
+     - `docs/architecture/finra_short_interest_vs_short_volume_policy.md`
+3. FINRA non-provider invariant:
+   - `g7_1e_provider_scope_valid = 1` iff FINRA fixture docs/fixture/test/context/handover/SAW are updated, G7.2 remains held, and no FINRA provider/live API/bulk download/Reg SHO ingestion/OTC-ATS ingestion/squeeze score/candidate generation/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_1e_finra_tiny_fixture_20260509.md`
+
+## Phase G7.1F CFTC TFF Tiny Fixture Notes
+
+1. CFTC fixture validity formula:
+   - `g7_1f_cftc_fixture_valid = static_fixture and dataset_type == futures_positioning and manifest_hash_matches and row_count_reconciles and report_date_parses and asof_position_date_parses and market_name_present and contract_market_code_present and trader_category_in_allowed_categories and long_positions_is_finite_non_negative and short_positions_is_finite_non_negative and spreading_positions_is_finite_non_negative_when_present and open_interest_is_finite_non_negative and duplicate_primary_keys == 0 and observed_estimated_or_inferred == observed and single_name_inference_forbidden == true and provider_code_added == false`.
+   - This is a fixture/provenance formula only; it is not a CTA score, ranking rule, state-machine rule, alert rule, or provider approval.
+   - source paths:
+     - `docs/architecture/cftc_tff_tiny_fixture_policy.md`
+     - `tests/test_g7_1f_cftc_tff_tiny_fixture.py`
+2. CFTC COT/TFF interpretation formula:
+   - `cftc_tff_allowed_context = observed_futures_positioning and broad_market_contract and weekly_delayed and source_quality == public_official_observed and single_name_inference == false`.
+   - `cftc_tff_forbidden_signal = single_name_cta_claim or standalone_buy_sell_signal or ranking_factor or alert_emission or alpha_evidence_without_validation`.
+   - Therefore, `cftc_tff_context_only != single_name_cta_buying_evidence`.
+   - source path:
+     - `docs/architecture/cftc_cot_tff_usage_policy.md`
+3. CFTC non-provider invariant:
+   - `g7_1f_provider_scope_valid = 1` iff CFTC fixture docs/fixture/test/context/handover/SAW are updated, G7.2 remains held, and no CFTC provider/live API/bulk download/CTA score/single-name inference/candidate generation/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_1f_cftc_tiny_fixture_20260509.md`
+
+## Phase G7.1G FRED / Ken French Tiny Fixture Notes
+
+1. FRED fixture validity formula:
+   - `g7_1g_fred_fixture_valid = static_fixture and dataset_type == macro_series and manifest_hash_matches and row_count_reconciles and date_range_reconciles and date_fields_parse and series_id_present and value_is_finite and duplicate_primary_keys == 0 and observed_estimated_or_inferred == observed and api_key_required == true_for_live_api and provider_code_added == false`.
+   - This is a fixture/provenance formula only; it is not a macro regime score, ranking rule, state-machine rule, alert rule, or provider approval.
+   - source paths:
+     - `docs/architecture/fred_ken_french_tiny_fixture_policy.md`
+     - `tests/test_g7_1g_fred_ken_french_tiny_fixture.py`
+2. Ken French fixture validity formula:
+   - `g7_1g_ken_french_fixture_valid = static_fixture and dataset_type == factor_returns and manifest_hash_matches and row_count_reconciles and date_range_reconciles and date_fields_parse and dataset_id_present and factor_name_present and factor_return_is_finite and duplicate_primary_keys == 0 and observed_estimated_or_inferred == observed and provider_code_added == false`.
+   - This is a fixture/provenance formula only; it is not factor alpha proof, a factor regime score, ranking rule, state-machine rule, alert rule, or provider approval.
+   - source paths:
+     - `docs/architecture/fred_ken_french_tiny_fixture_policy.md`
+     - `tests/test_g7_1g_fred_ken_french_tiny_fixture.py`
+3. Macro/factor interpretation formula:
+   - `macro_factor_context_allowed = observed_macro_series_or_factor_returns and manifest_hash_matches and allowed_use_present and forbidden_use_present`.
+   - `macro_factor_forbidden_signal = macro_regime_score or factor_regime_score or candidate_rank or alert_emission or broker_call or state_machine_input_without_future_approval`.
+   - Therefore, `macro_factor_fixture_context_only != alpha_proof_or_ranking_signal`.
+   - source path:
+     - `docs/architecture/macro_factor_context_usage_policy.md`
+4. FRED / Ken French non-provider invariant:
+   - `g7_1g_provider_scope_valid = 1` iff FRED/Ken French fixture docs/fixtures/tests/context/handover/SAW are updated, G7.2 remains held, and no FRED provider/Ken French provider/live API/API key handling/bulk download/macro score/factor score/candidate generation/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_1g_fred_ken_french_tiny_fixture_20260509.md`
+
+## Phase G7.2 Opportunity State Machine Notes
+
+1. State validation formula:
+   - `g7_2_transition_valid = state_enum_complete and reason_codes_present and source_classes_present and forbidden_jump_not_requested and thesis_broken_override_applied and estimated_only_buying_range == false and inferred_only_let_winner_run == false and score_rank_alert_broker_fields_absent`.
+   - This is a definition/validator formula only; it is not a score, rank, alert, order, or provider rule.
+   - source paths:
+     - `docs/architecture/unified_opportunity_state_machine.md`
+     - `docs/architecture/opportunity_state_transition_policy.md`
+     - `docs/architecture/opportunity_state_forbidden_jumps.md`
+     - `opportunity_engine/states.py`
+     - `opportunity_engine/schemas.py`
+     - `opportunity_engine/transitions.py`
+     - `tests/test_g7_2_opportunity_state_machine.py`
+2. State semantics formula:
+   - `thesis_broken_override = thesis_broken ? THESIS_BROKEN : requested_state`.
+   - `left_side_confirmation_gate = LEFT_SIDE_RISK -> ACCUMULATION_WATCH|CONFIRMATION_WATCH -> BUYING_RANGE`.
+   - `estimated_only_action_state = false`.
+   - `inferred_only_hold_state = false`.
+   - source paths:
+     - `docs/architecture/opportunity_state_forbidden_jumps.md`
+     - `opportunity_engine/transitions.py`
+3. G7.2 non-action invariant:
+   - `g7_2_provider_scope_valid = 1` iff G7.2 docs/code/tests/context/handover/SAW are updated and no candidate generation/search/backtest/replay/proxy/ranking/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_2_state_machine_20260509.md`
+
+## Phase G7.3 Signal-to-State Source Eligibility Notes
+
+1. Source eligibility formula:
+   - `state_eligible = source_class_allowed and freshness_known and forbidden_state_influence_excludes(target_state)`.
+   - This is a source-policy formula only; it is not provider implementation or ranking authority.
+   - source paths:
+     - `docs/architecture/godview_signal_to_state_map.md`
+     - `docs/architecture/godview_source_eligibility_policy.md`
+     - `docs/architecture/godview_signal_confidence_policy.md`
+     - `opportunity_engine/source_classes.py`
+     - `opportunity_engine/signal_policy.py`
+     - `tests/test_g7_3_signal_to_state_source_map.py`
+2. Source labels formula:
+   - `observed_official_context = SEC|FINRA|CFTC|FRED|KenFrench`.
+   - `estimated_only_action_state = false`.
+   - `tier2_yfinance_action_state = false`.
+   - source paths:
+     - `docs/architecture/godview_source_eligibility_policy.md`
+     - `docs/architecture/godview_signal_confidence_policy.md`
+3. G7.3 non-provider invariant:
+   - `g7_3_provider_scope_valid = 1` iff G7.3 docs/code/tests/context/handover/SAW are updated and no provider/source-registry/live API/ranking/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_3_signal_to_state_map_20260509.md`
+
+## Phase G7.4 Dashboard Wireframe / Product-State Spec Notes
+
+1. Dashboard state spec formula:
+   - `dashboard_card = state + prior_state + reason_codes + source_breakdown + blockers + monitoring_questions`.
+   - `brief_state_only = state_changes + freshness_gaps + blockers + questions`.
+   - This is a product-spec formula only; it is not runtime UI behavior.
+   - source paths:
+     - `docs/architecture/godview_dashboard_wireframe.md`
+     - `docs/architecture/godview_watchlist_card_spec.md`
+     - `docs/architecture/godview_daily_brief_spec.md`
+     - `tests/test_g7_4_dashboard_state_spec.py`
+2. Dashboard wording formula:
+   - `state_label_only = true`.
+   - `no_buy_sell_alert_score_rank = true`.
+   - `no_runtime_streamlit = true`.
+   - source paths:
+     - `docs/architecture/godview_dashboard_wireframe.md`
+     - `docs/architecture/godview_watchlist_card_spec.md`
+     - `docs/architecture/godview_daily_brief_spec.md`
+3. G7.4 non-runtime invariant:
+   - `g7_4_provider_scope_valid = 1` iff G7.4 docs/tests/context/handover/SAW are updated and no dashboard runtime code, Streamlit edits, candidate card, alert, broker, or provider behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_4_dashboard_wireframe_20260509.md`
+
+## Phase G8 Supercycle Candidate Card Notes
+
+1. Candidate-card validation formula:
+   - `g8_card_valid = required_fields_present and manifest_present and initial_state in {THESIS_CANDIDATE,EVIDENCE_BUILDING} and forbidden_action_states_absent and no_score_rank_signal_alert_broker and provider_gap_signals_explicit`.
+   - This is a definition/evidence-card formula only; it is not alpha evidence, ranking, scoring, buy/sell logic, alerting, provider ingestion, replay, backtest, or broker behavior.
+   - source paths:
+     - `opportunity_engine/candidate_card_schema.py`
+     - `opportunity_engine/candidate_card.py`
+     - `tests/test_g8_supercycle_candidate_card.py`
+2. Source-quality formula:
+   - `source_quality_complete = observed + estimated + inferred + research_only + not_canonical + missing + stale + forbidden + canonical_sources`.
+   - `yfinance_canonical_source = false`.
+   - `estimated_signal_presented_as_observed = false`.
+   - source paths:
+     - `data/candidate_cards/MU_supercycle_candidate_card_v0.json`
+     - `data/candidate_cards/MU_supercycle_candidate_card_v0.manifest.json`
+     - `docs/architecture/supercycle_candidate_card_schema.md`
+3. G8 non-action invariant:
+   - `g8_scope_valid = 1` iff the MU card and docs/tests/context/handover/SAW are updated and no alpha search, candidate screening, ranking, scoring, backtest, replay, provider ingestion, dashboard runtime, buy/sell alert, or broker action is added.
+   - source paths:
+     - `docs/architecture/g8_supercycle_candidate_card_policy.md`
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/saw_reports/saw_phase65_g8_supercycle_candidate_card_20260510.md`
+
+## Phase G8.1 Supercycle Discovery Intake Notes
+
+1. Discovery-intake validity formula:
+   - `g8_1_intake_valid = required_seed_tickers_exact and theme_candidates_present and evidence_needed_present and thesis_breakers_present and provider_gaps_present and no_score_fields and no_rank_fields and no_buy_sell_hold_calls and validated_status_absent and action_states_absent and yfinance_canonical_absent and manifest_hash_matches`.
+   - This is an intake/planning formula only; it is not alpha evidence, ranking, scoring, thesis validation, buying-range logic, alerting, provider ingestion, replay, backtest, or broker behavior.
+   - source paths:
+     - `opportunity_engine/discovery_intake_schema.py`
+     - `opportunity_engine/discovery_intake.py`
+     - `tests/test_g8_1_supercycle_discovery_intake.py`
+2. Seed queue formula:
+   - `g8_1_seed_queue = [MU, DELL, INTC, AMD, LRCX, ALB]`.
+   - `candidate_card_exists = {MU}`.
+   - `intake_only = {DELL, INTC, AMD, LRCX, ALB}`.
+   - source paths:
+     - `data/discovery/supercycle_candidate_intake_queue_v0.json`
+     - `data/discovery/supercycle_candidate_intake_queue_v0.manifest.json`
+3. Theme taxonomy formula:
+   - `g8_1_theme_taxonomy = {AI_COMPUTE_INFRA, AI_SERVER_SUPPLY_CHAIN, MEMORY_STORAGE_SUPERCYCLE, SEMICAP_EQUIPMENT, POWER_COOLING_GRID, CRITICAL_MINERALS_LITHIUM, RESHORING_FOUNDRY, DEFENSE_INDUSTRIAL, BIOTECH_PLATFORM}`.
+   - source path:
+     - `data/discovery/supercycle_discovery_themes_v0.json`
+4. G8.1 non-action invariant:
+   - `g8_1_scope_valid = 1` iff the taxonomy, queue, manifest, docs, tests, context, handover, and SAW are updated and no alpha search, candidate ranking, candidate scoring, thesis validation, buying range, provider ingestion, dashboard runtime, alert, or broker behavior is added.
+   - source paths:
+     - `docs/architecture/g8_1_supercycle_discovery_intake_policy.md`
+     - `docs/architecture/supercycle_candidate_intake_schema.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/saw_reports/saw_phase65_g8_1_supercycle_discovery_intake_20260510.md`
+
+## Phase G8.1A Discovery Drift Correction Notes
+
+1. Discovery-origin formula:
+   - `g8_1a_origin_valid = origin_present and origin_evidence_present and scout_path_present and user_seeded_flag_matches_origin and system_scouted_flag_matches_origin and current_six_system_scouted == false and is_validated == false and is_actionable == false`.
+   - This is provenance governance only; it is not alpha evidence, ranking, scoring, validation, actionability, or recommendation logic.
+   - source paths:
+     - `opportunity_engine/discovery_intake_schema.py`
+     - `data/discovery/supercycle_candidate_intake_queue_v0.json`
+     - `tests/test_g8_1a_discovery_drift_policy.py`
+2. Current seed-origin map:
+   - `MU = USER_SEEDED`.
+   - `DELL = USER_SEEDED + THEME_ADJACENT`.
+   - `INTC = USER_SEEDED + THEME_ADJACENT`.
+   - `AMD = USER_SEEDED + THEME_ADJACENT`.
+   - `LRCX = USER_SEEDED + SUPPLY_CHAIN_ADJACENT`.
+   - `ALB = USER_SEEDED + THEME_ADJACENT`.
+3. G8.1B guardrail:
+   - `LOCAL_FACTOR_SCOUT` is defined in `opportunity_engine/discovery_intake_schema.py` but is rejected in G8.1A intake output.
+   - `data/processed/phase34_factor_scores.parquet` remains held until a manifest-backed G8.1B scout contract is approved.
+
+## Phase DASH-0 Dashboard IA Notes
+
+1. Dashboard IA formula:
+   - `dash_0_ia_valid = page_map_approved and legacy_movement_mapped and ops_relocation_defined and streamlit_registry_basis_documented and runtime_files_touched == false`.
+   - This is a planning formula only; it is not a Streamlit runtime shell, dashboard implementation, alert path, provider path, broker path, score, or rank.
+   - source paths:
+     - `docs/architecture/dashboard_information_architecture.md`
+     - `docs/architecture/dashboard_page_registry_plan.md`
+     - `docs/architecture/dashboard_redesign_migration_plan.md`
+     - `docs/architecture/dashboard_ops_relocation_policy.md`
+2. Target page map:
+   - `Command Center -> state distribution, freshness, risks, next monitoring focus`.
+   - `Opportunities -> intake/candidate cards with origin/status labels`.
+   - `Thesis Card -> MU/current candidate thesis, evidence, contradictions, blockers`.
+   - `Market Behavior -> GodView signal families with observed/estimated/inferred labels`.
+   - `Entry & Hold Discipline -> why not buy yet / why not sell yet`.
+   - `Portfolio & Allocation -> risk limits, allocation, shadow portfolio`.
+   - `Research Lab -> backtests, modular strategies, daily scan, experiments`.
+   - `Settings & Ops -> data health, drift monitor, diagnostics, refresh`.
+3. Runtime hold:
+   - Future `Max weight` + `Max sector weight` alignment in `views/optimizer_view.py` is recorded as a future Risk limits UX task only.
+   - No `dashboard.py`, `views/`, or `optimizer_view.py` edits are authorized by DASH-0.
+## Phase G7.2 Opportunity State Machine Notes
+
+1. State validation formula:
+   - `g7_2_transition_valid = state_enum_complete and reason_codes_present and source_classes_present and forbidden_jump_not_requested and thesis_broken_override_applied and estimated_only_buying_range == false and inferred_only_let_winner_run == false and score_rank_alert_broker_fields_absent`.
+   - This is a definition/validator formula only; it is not a score, rank, alert, order, or provider rule.
+   - source paths:
+     - `docs/architecture/unified_opportunity_state_machine.md`
+     - `docs/architecture/opportunity_state_transition_policy.md`
+     - `docs/architecture/opportunity_state_forbidden_jumps.md`
+     - `opportunity_engine/states.py`
+     - `opportunity_engine/schemas.py`
+     - `opportunity_engine/transitions.py`
+     - `tests/test_g7_2_opportunity_state_machine.py`
+2. State semantics formula:
+   - `thesis_broken_override = thesis_broken ? THESIS_BROKEN : requested_state`.
+   - `left_side_confirmation_gate = LEFT_SIDE_RISK -> ACCUMULATION_WATCH|CONFIRMATION_WATCH -> BUYING_RANGE`.
+   - `estimated_only_action_state = false`.
+   - `inferred_only_hold_state = false`.
+   - source paths:
+     - `docs/architecture/opportunity_state_forbidden_jumps.md`
+     - `opportunity_engine/transitions.py`
+3. G7.2 non-action invariant:
+   - `g7_2_provider_scope_valid = 1` iff G7.2 docs/code/tests/context/handover/SAW are updated and no candidate generation/search/backtest/replay/proxy/ranking/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_2_state_machine_20260509.md`
+
+## Phase G7.3 Signal-to-State Source Eligibility Notes
+
+1. Source eligibility formula:
+   - `state_eligible = source_class_allowed and freshness_known and forbidden_state_influence_excludes(target_state)`.
+   - This is a source-policy formula only; it is not provider implementation or ranking authority.
+   - source paths:
+     - `docs/architecture/godview_signal_to_state_map.md`
+     - `docs/architecture/godview_source_eligibility_policy.md`
+     - `docs/architecture/godview_signal_confidence_policy.md`
+     - `opportunity_engine/source_classes.py`
+     - `opportunity_engine/signal_policy.py`
+     - `tests/test_g7_3_signal_to_state_source_map.py`
+2. Source labels formula:
+   - `observed_official_context = SEC|FINRA|CFTC|FRED|KenFrench`.
+   - `estimated_only_action_state = false`.
+   - `tier2_yfinance_action_state = false`.
+   - source paths:
+     - `docs/architecture/godview_source_eligibility_policy.md`
+     - `docs/architecture/godview_signal_confidence_policy.md`
+3. G7.3 non-provider invariant:
+   - `g7_3_provider_scope_valid = 1` iff G7.3 docs/code/tests/context/handover/SAW are updated and no provider/source-registry/live API/ranking/alert/broker/dashboard-runtime behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_3_signal_to_state_map_20260509.md`
+
+## Phase G7.4 Dashboard Wireframe / Product-State Spec Notes
+
+1. Dashboard state spec formula:
+   - `dashboard_card = state + prior_state + reason_codes + source_breakdown + blockers + monitoring_questions`.
+   - `brief_state_only = state_changes + freshness_gaps + blockers + questions`.
+   - This is a product-spec formula only; it is not runtime UI behavior.
+   - source paths:
+     - `docs/architecture/godview_dashboard_wireframe.md`
+     - `docs/architecture/godview_watchlist_card_spec.md`
+     - `docs/architecture/godview_daily_brief_spec.md`
+     - `tests/test_g7_4_dashboard_state_spec.py`
+2. Dashboard wording formula:
+   - `state_label_only = true`.
+   - `no_buy_sell_alert_score_rank = true`.
+   - `no_runtime_streamlit = true`.
+   - source paths:
+     - `docs/architecture/godview_dashboard_wireframe.md`
+     - `docs/architecture/godview_watchlist_card_spec.md`
+     - `docs/architecture/godview_daily_brief_spec.md`
+3. G7.4 non-runtime invariant:
+   - `g7_4_provider_scope_valid = 1` iff G7.4 docs/tests/context/handover/SAW are updated and no dashboard runtime code, Streamlit edits, candidate card, alert, broker, or provider behavior is added.
+   - source paths:
+     - `docs/phase_brief/phase65-brief.md`
+     - `docs/context/done_checklist_current.md`
+     - `docs/context/bridge_contract_current.md`
+     - `docs/saw_reports/saw_phase65_g7_4_dashboard_wireframe_20260509.md`
+## Phase G8.1B Pipeline-First Discovery Scout Notes
+
+1. Equal-weight scout wrapper formula:
+   - `factor_weights = {momentum_normalized: 0.25, quality_normalized: 0.25, volatility_normalized: 0.25, illiquidity_normalized: 0.25}`.
+   - `sum(factor_weights) = 1.0`.
+   - This is wrapper metadata for the existing local artifact, not optimization or model validation.
+   - source paths:
+     - `opportunity_engine/factor_scout_schema.py`
+     - `data/discovery/local_factor_scout_baseline_v0.json`
+2. Deterministic fixture-selection formula:
+   - `eligible = (date == max(date)) and score_valid and non_null(momentum_normalized, quality_normalized, volatility_normalized, illiquidity_normalized) and local_ticker_company_metadata_present`.
+   - `selected_row = first eligible row ordered by asof_date descending and permno ascending`.
+   - observed selection: `asof_date = 2026-02-13`, `permno = 10107`, `ticker = MSFT`.
+   - source paths:
+     - `opportunity_engine/factor_scout.py`
+     - `data/discovery/local_factor_scout_output_tiny_v0.json`
+3. G8.1B non-leakage invariant:
+   - `g8_1b_valid = baseline_valid and output_count == 1 and discovery_origin == LOCAL_FACTOR_SCOUT and status == intake_only and is_system_scouted == true and is_user_seeded == false and is_validated == false and is_actionable == false and score_display == false and rank == false and buy_sell_signal == false and candidate_card == false`.
+   - source paths:
+     - `tests/test_g8_1b_pipeline_first_discovery_scout.py`
+     - `docs/architecture/factor_scout_output_contract.md`
+
+## DASH-1 Page Registry Shell Notes
+
+1. Navigation shell formula:
+   - `dash_1_shell_valid = approved_page_order_present and streamlit_page_registry_present and selected_page_run_called and old_flat_tabs_absent`.
+   - source paths:
+     - `views/page_registry.py`
+     - `dashboard.py`
+     - `tests/test_dash_1_page_registry_shell.py`
+2. Legacy relocation formula:
+   - `Ticker Pool & Proxies -> Opportunities`.
+   - `Data Health + Drift Monitor -> Settings & Ops`.
+   - `Daily Scan + Backtest Lab + Modular Strategies + Hedge Harvester -> Research Lab`.
+   - `Portfolio Builder + Shadow Portfolio -> Portfolio & Allocation`.
+   - source paths:
+     - `views/page_registry.py`
+     - `dashboard.py`
+3. DASH-1 non-expansion invariant:
+   - `dash_1_scope_valid = shell_only and legacy_relocation_only and no_new_metrics and no_new_data and no_ranking and no_scoring and no_alerts and no_broker_calls and no_provider_ingestion and no_factor_scout_integration`.
+   - source paths:
+     - `tests/test_dash_1_page_registry_shell.py`
+     - `docs/saw_reports/saw_dash_1_page_registry_shell_20260510.md`
+
+## Phase G8.2 System-Scouted Candidate Card Notes
+
+1. Scout-to-card eligibility formula:
+   - `eligible_card_ticker = scout_output.items[0].ticker = MSFT`.
+   - `eligible_card_count = 1`.
+   - This uses the existing governed `LOCAL_FACTOR_SCOUT` output only; it does not create a new scout output.
+   - source paths:
+     - `data/discovery/local_factor_scout_output_tiny_v0.json`
+     - `data/discovery/local_factor_scout_output_tiny_v0.manifest.json`
+     - `tests/test_g8_2_system_scouted_candidate_card.py`
+2. Candidate-card validity formula:
+   - `g8_2_card_valid = card_valid and ticker_matches_scout and source_intake_manifest_present and candidate_manifest_present and no_score_rank_action`.
+   - `no_score_rank_action = no_factor_score and no_rank and no_buy_sell_hold and not_validated and not_actionable and no_buying_range and no_alert and no_broker_action`.
+   - source paths:
+     - `opportunity_engine/candidate_card_schema.py`
+     - `data/candidate_cards/MSFT_supercycle_candidate_card_v0.json`
+     - `data/candidate_cards/MSFT_supercycle_candidate_card_v0.manifest.json`
+     - `tests/test_g8_2_system_scouted_candidate_card.py`
+3. Candidate-card universe formula:
+   - `candidate_cards = {MU, MSFT}`.
+   - `new_user_seeded_cards = 0` for G8.2.
+   - source paths:
+     - `data/candidate_cards/`
+     - `tests/test_g8_2_system_scouted_candidate_card.py`
+4. Dashboard boundary formula:
+   - `dashboard_msft_legacy_row != g8_2_msft_candidate_card`.
+   - `dashboard_card_reader_authorized = false` until a later approved DASH lane.
+   - source paths:
+     - `dashboard.py`
+     - `docs/architecture/g8_2_system_scouted_candidate_card_policy.md`
+     - `docs/context/bridge_contract_current.md`
+
+## DASH-2 Portfolio Allocation Runtime Notes
+
+1. Optimized portfolio YTD return formula:
+   - `portfolio_daily_return_t = sum(weight_i * price_return_i_t)` where `weight_i` is the current optimizer allocation normalized to sum to 1.
+   - `portfolio_ytd_equity_t = cumulative_product(1 + portfolio_daily_return_t)`.
+   - `portfolio_ytd_return = portfolio_ytd_equity_last - 1`.
+   - source paths:
+     - `core/data_orchestrator.py`
+     - `views/optimizer_view.py`
+     - `dashboard.py`
+     - `tests/test_dash_2_portfolio_ytd.py`
+2. Fresh price overlay formula:
+   - `live_scaled_ticker_price = live_adjusted_close * (local_TRI_anchor / live_adjusted_close_anchor)`.
+   - `refreshed_prices = local_TRI_history + live_scaled_overlay` with duplicate dates kept from the freshest overlay.
+   - This is a runtime display freshness overlay only; it is not canonical provider ingestion or evidence-card validation.
+   - source paths:
+     - `core/data_orchestrator.py`
+     - `views/optimizer_view.py`
+     - `dashboard.py`
+3. Portfolio page ordering formula:
+   - `Portfolio & Allocation = Portfolio Optimizer -> YTD Performance vs SPY/QQQ -> Shadow Portfolio`.
+   - source paths:
+     - `dashboard.py`
+
+## Portfolio Universe Construction Fix Notes
+
+1. Optimizer universe formula:
+   - `optimizer_universe = scanner_rows where policy_status = eligible and ticker_map_resolved = true and local_history_obs >= min_history_obs`.
+   - `eligible = rating contains ENTER STRONG BUY or ENTER BUY`.
+   - `research_only = rating contains WATCH`.
+   - `excluded = rating_or_action contains EXIT or KILL or AVOID or IGNORE`.
+   - source paths:
+     - `strategies/portfolio_universe.py`
+     - `dashboard.py`
+     - `views/optimizer_view.py`
+     - `tests/test_portfolio_universe.py`
+2. Display-order non-leakage formula:
+   - `portfolio_input_valid = explicit_optimizer_universe and not df_scan_display_order[:20]`.
+   - source paths:
+     - `dashboard.py`
+     - `tests/test_dash_2_portfolio_ytd.py`
+3. Max-weight feasibility formula:
+   - `min_feasible_max_weight = 1 / n_assets`.
+   - `is_feasible = max_weight * n_assets >= 1`.
+   - `is_boundary_forced = is_feasible and max_weight <= min_feasible_max_weight + tolerance`.
+   - source paths:
+     - `strategies/portfolio_universe.py`
+     - `views/optimizer_view.py`
+     - `tests/test_portfolio_universe.py`
+4. Thesis-neutral boundary:
+   - `current_optimizer_conviction = 0`.
+   - `mu_hard_floor = false`.
+   - `black_litterman_runtime = false`.
+   - Future conviction work requires a separate thesis-anchor policy before any expected-return tilt, confidence parameter, or anchor sizing can be implemented.
+   - source paths:
+     - `docs/architecture/portfolio_construction_contract.md`
+
+## Portfolio Universe Optimizer-Core Quarantine Notes
+
+1. Quarantine formula:
+   - `portfolio_universe_closure_valid = universe_patch_scope_valid and strategies_optimizer_diff == empty and optimizer_core_diff_preserved_for_audit`.
+   - `optimizer_core_diff_preserved_for_audit = exists(docs/quarantine/optimizer_core_lower_bounds_slsqp_diff_20260510.patch)`.
+   - source paths:
+     - `docs/quarantine/optimizer_core_lower_bounds_slsqp_diff_20260510.patch`
+     - `docs/quarantine/optimizer_core_lower_bounds_slsqp_diff_note_20260510.md`
+     - `docs/saw_reports/saw_portfolio_universe_construction_fix_20260510.md`
+2. Optimizer-core policy boundary:
+   - `lower_bound_slsqp_changes_accepted = false`.
+   - `optimizer_core_policy_audit_required = true`.
+   - Future acceptance requires policy docs, infeasibility tests, active-bound reporting rules, and a separate SAW report.
+   - source paths:
+     - `docs/architecture/optimizer_core_policy_audit.md`
+     - `docs/architecture/optimizer_constraints_policy.md`
+     - `docs/architecture/optimizer_lower_bound_slsqp_policy.md`
+3. Provider-hygiene repair:
+   - `views/optimizer_view.py` no longer imports yfinance or reads `data/backtest_results.json` directly.
+   - Portfolio display-refresh price stitching and strategy metrics parsing are owned by `core/data_orchestrator.py`.
+   - Direct yfinance usage remains behind provider ports or legacy allowlisted files; `views/optimizer_view.py` is no longer in `data/providers/legacy_allowlist.py`.
+   - source paths:
+      - `core/data_orchestrator.py`
+      - `views/optimizer_view.py`
+      - `data/providers/legacy_allowlist.py`
+      - `tests/test_data_orchestrator_portfolio_runtime.py`
+
+## Optimizer Core Structured Diagnostics Notes
+
+1. Pre-solver feasibility formulas:
+   - `upper_bound_feasible = n_assets > 0 and max_weight * n_assets >= 1`.
+   - `lower_sum_feasible = min_weight * n_assets <= 1` for uniform diagnostic floors.
+   - `required_min_sum_feasible = sum(required_min_weights) <= 1`.
+   - `per_asset_bound_feasible = all(0 <= lower_i <= max_weight <= 1)`.
+   - source paths:
+     - `strategies/optimizer_diagnostics.py`
+     - `strategies/optimizer.py`
+     - `tests/test_optimizer_core_policy.py`
+2. Equal-weight boundary formula:
+   - `min_feasible_max_weight = 1 / n_assets`.
+   - `equal_weight_forced = upper_bound_feasible and max_weight <= min_feasible_max_weight + tolerance`.
+   - source paths:
+     - `strategies/optimizer_diagnostics.py`
+     - `views/optimizer_view.py`
+     - `tests/test_optimizer_core_policy.py`
+3. Bound and constraint diagnostics formulas:
+   - `active_lower_i = weight_i <= lower_bound + tolerance`.
+   - `active_upper_i = weight_i >= max_weight - tolerance`.
+   - `cash_residual = 1 - sum(weights)`.
+   - `full_investment_constraint_residual = sum(weights) - 1`.
+   - source paths:
+     - `strategies/optimizer_diagnostics.py`
+     - `views/optimizer_view.py`
+4. Fallback labeling formula:
+   - `fallback_valid = fallback_used and result_is_optimized == false and fallback_reason is visible`.
+   - `silent_fallback_valid = false`.
+   - `non_finite_weight_valid = false`.
+   - `non_finite_weight_result = ERROR and constraints_satisfied == false and result_is_optimized == false`.
+   - source paths:
+     - `strategies/optimizer.py`
+     - `strategies/optimizer_diagnostics.py`
+     - `views/optimizer_view.py`
+     - `tests/test_optimizer_core_policy.py`
+5. Scope boundary:
+   - `optimizer_diagnostics_only = true`.
+   - `mu_conviction = false`, `watch_investability_expansion = false`, `black_litterman = false`, `new_objective = false`, `scanner_rule_change = false`.
+   - source paths:
+     - `docs/architecture/optimizer_core_policy_audit.md`
+     - `docs/architecture/optimizer_constraints_policy.md`
+     - `docs/architecture/optimizer_lower_bound_slsqp_policy.md`
+
+## Portfolio Optimizer View Test and Performance Notes
+
+1. Display-only overlay cache formula:
+   - `overlay_cache_key = sha256(version, sorted_tickers, start_iso)[:24]`.
+   - `overlay_cache_hit = cache_path_exists and cache_age_seconds <= cache_ttl_seconds`.
+   - `cold_cache_behavior = schedule_background_refresh and return local_TRI_prices`.
+   - `stale_cache_behavior = return_cached_display_prices and schedule_background_refresh`; stale overlay data is display-only and never canonical provider evidence.
+   - `future_mtime_cache_state = not_fresh`.
+   - `cache_write = temp_parquet_same_dir -> os.replace(cache_path)`.
+   - This cache is display freshness only; it is not canonical provider ingestion or candidate-card evidence.
+   - source paths:
+      - `core/data_orchestrator.py`
+      - `.gitignore`
+     - `tests/test_optimizer_view.py`
+2. Live overlay scale cache formula:
+   - `scale_cache_key = sha256(local_price_frame) + ":" + sha256(live_price_frame)`.
+   - `clean_price_frame = numeric_coerce -> drop_all_nan_rows -> datetime_index -> sort -> duplicate_index_keep_last`.
+   - `live_scaled_ticker_price = live_adjusted_close * (local_TRI_anchor / live_adjusted_close_anchor)`.
+   - `refreshed_selected_prices = scaled_live_overlay.combine_first(local_TRI_prices)`, so partial live rows update only non-null live cells and cannot erase local prices for missing tickers.
+   - Cached dataframes are returned as copies to prevent caller mutation from poisoning cache state.
+   - source paths:
+      - `core/data_orchestrator.py`
+      - `tests/test_data_orchestrator_portfolio_runtime.py`
+      - `tests/test_optimizer_view.py`
+3. Optimizer run cache formula:
+   - `optimizer_cache_inputs = method + selected_price_frame + max_weight + risk_free_rate`.
+   - `sector_cap_path = post_solver_apply_sector_cap(weights, sector_map, max_sector_weight)`.
+   - Sector cap remains a post-solver soft constraint and is not represented as an SLSQP bound or equality/inequality constraint.
+   - source paths:
+     - `views/optimizer_view.py`
+     - `tests/test_optimizer_core_policy.py`
+     - `tests/test_optimizer_view.py`
+
+## Dashboard Scanner Testability Notes
+
+1. Scanner macro score formula:
+   - `rate_score = 50` when 63-day `^TNX` velocity is `<= 0`; `rate_score = 0` when velocity is `>= 0.50`; otherwise linearly interpolate over `[0.00, 0.50]`.
+   - `credit_score = 50` when `VWEHX/VFISX` distance from its 200-day SMA is `>= 4.65%`; `credit_score = 0` when distance is `<= -2.0%`; otherwise linearly interpolate over `[-2.0%, 4.65%]`.
+   - `macro_score = round(rate_score + credit_score)`.
+   - source paths:
+     - `strategies/scanner.py`
+     - `dashboard.py`
+     - `tests/test_scanner.py`
+2. Scanner entry/tactics formula:
+   - `cluster = Heavy if ATR/current_price < 0.025; Sprinter if <= 0.045; else Scout`.
+   - `base_support = EMA21` only when `macro_score >= 80`, `Score >= 95`, and `Convexity <= 1.5`; mania or macro defense uses `SMA50`.
+   - `max_flush = 0.16` for Scout, `0.11` for Sprinter, `0.05` otherwise.
+   - `premium = 0.05` when `Score >= 95`, `0.03` when `Score >= 90`, otherwise `0`.
+   - `entry_price = base_support * (1 - max(0, max_flush - premium))`.
+   - `support_distance_pct = ((current_price / entry_price) - 1) * 100`.
+   - `tactics_multiplier = clamp(3.0 / (1.0 + 0.5 * max(0, convexity - 1.0) * max(0, support_distance_pct) / cluster_limit), 1.5, 3.0)`.
+   - `target_price = entry_price + 3.0 * abs(entry_price - stop_loss)`.
+   - source paths:
+     - `strategies/scanner.py`
+     - `dashboard.py`
+     - `tests/test_scanner.py`
+3. Scanner action label formula:
+   - `Proxy_Signal = COILED SPRING` when proxy is strong and price is not stretched; `CORRELATED` when both proxy and price are strong; `DIVERGING`, `CORRECTING`, and `MISPRICED` follow the same proxy/price truth table.
+   - `Rating` precedence: `KILL` action -> exit; parabolic warning -> tight-trail exit; terminal stretch -> wait; score-100 rows require proxy and distance gates before `ENTER`.
+   - `Leverage = LEAPs` only when rating includes `STRONG BUY`, `macro_score >= 80`, and `Convexity <= 1.5`.
+   - source paths:
+     - `strategies/scanner.py`
+     - `dashboard.py`
+     - `tests/test_scanner.py`
+
+## Dashboard Architecture Safety Notes
+
+1. Process liveness probe:
+   - `pid_is_running(pid) = false` when PID is invalid or confirmed not live.
+   - Windows path: `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION) -> GetExitCodeProcess -> STILL_ACTIVE`.
+   - Access denied is treated as live; probe failure is conservative and does not reclaim a potentially live lock owner.
+   - Non-Windows path may use `os.kill(pid, 0)` only inside `utils/process.py`.
+   - source paths:
+     - `utils/process.py`
+     - `dashboard.py`
+     - `data/updater.py`
+     - `scripts/parameter_sweep.py`
+     - `scripts/release_controller.py`
+     - `backtests/optimize_phase16_parameters.py`
+     - `tests/test_process_utils.py`
+2. Strategy-matrix builder:
+   - `cagr_display = signed_percent(cagr_raw)` for numeric non-zero CAGR, raw string when preformatted, otherwise blank.
+   - `max_dd_display = percent(max_dd_raw)` for numeric non-zero max drawdown, raw string when preformatted, otherwise blank.
+   - `bt_status = Running... if running_name matches; else Done if cagr exists; else first sufficient strategy is Next; later sufficient strategies are Pending; insufficient strategies are Insufficient`.
+   - source paths:
+     - `dashboard.py`
+3. Dashboard portfolio price cleanup:
+   - `dashboard._clean_portfolio_price_frame(prices) = core.data_orchestrator.clean_price_frame(prices)`.
+   - This inherits numeric coercion, all-NaN row dropping, datetime index normalization, timezone removal, sorting, and duplicate timestamp `keep=last`.
+   - source paths:
+     - `dashboard.py`
+     - `core/data_orchestrator.py`
+
+## Dashboard Unified Data Cache Notes
+
+1. Unified parquet package cache:
+   - `dashboard._load_unified_data_cached(...)` wraps `core.data_orchestrator.load_unified_data(...)` with `st.cache_resource`.
+   - Cache key includes loader args plus `data_signature = build_unified_data_cache_signature(processed_dir, static_dir)`.
+   - `build_unified_data_cache_signature(...)` records `(resolved_path, st_mtime_ns, st_size)` for the dashboard source parquet files, including price, patch, macro/liquidity, ticker, fundamentals, calendar, and sector-map inputs.
+   - This removes repeated DuckDB/pivot/concat work on normal Streamlit widget reruns while invalidating when relevant parquet inputs are added, removed, or rewritten.
+   - source paths:
+     - `dashboard.py`
+     - `core/data_orchestrator.py`
+     - `tests/test_data_orchestrator_portfolio_runtime.py`
+     - `tests/test_dashboard_sprint_a.py`

@@ -1,3 +1,107 @@
+G7.1A Canonical Notice (2026-05-09)
+
+The current product/spec canon is the root-level `PRD.md` and `PRODUCT_SPEC.md`.
+
+This historical technical specification remains for continuity, but G7.1A supersedes the old product framing:
+
+- Product: Unified Opportunity Engine.
+- Architecture: Supercycle Gem Discovery + GodView Market Behavior Intelligence + Decision Augmentation.
+- Future state engine target: `thesis_state + market_behavior_state + entry_discipline_state + hold_discipline_state + source_quality_state -> dashboard_state`.
+- GodView families: IV, options whales, gamma, short squeeze, CTA/systematic pressure, sector rotation, ETF/passive flows, dark-pool/block activity, ownership whales, microstructure, catalysts/news/narrative, and regime.
+- Required future signal metadata: `source_quality`, `provider`, `provider_feed`, `freshness`, `latency`, `confidence`, `observed_vs_estimated`, `allowed_use`, `forbidden_use`, `manifest_uri`.
+- Boundary: G7.1A is docs/architecture only and adds no search, candidate generation, backtest, replay, proxy run, provider ingestion, ranking, alerts, broker calls, or new runtime dashboard behavior.
+- Immediate next action: `approve_g7_1b_data_infra_gap_or_g7_2_state_machine`.
+
+G8 Candidate-Card Notice (2026-05-10)
+
+- G8 creates exactly one human-nominated Supercycle Gem Candidate Card for `MU`.
+- The card is a structured research object, not an investment recommendation.
+- Initial state is limited to `THESIS_CANDIDATE` or `EVIDENCE_BUILDING`.
+- `BUYING_RANGE`, `ADD_ON_SETUP`, `LET_WINNER_RUN`, and `TRIM_OPTIONAL` remain forbidden for G8.
+- The validator rejects score, rank, buy/sell signal, alert, broker action, yfinance canonical evidence, estimated-as-observed signals, and missing options/IV/gamma provider-gap labels.
+- Immediate next action: `approve_g9_one_market_behavior_signal_card_or_hold`.
+
+G8.1 Discovery-Intake Notice (2026-05-10)
+
+- G8.1 creates the first Supercycle Discovery Intake layer.
+- The seed taxonomy is `AI_COMPUTE_INFRA`, `AI_SERVER_SUPPLY_CHAIN`, `MEMORY_STORAGE_SUPERCYCLE`, `SEMICAP_EQUIPMENT`, `POWER_COOLING_GRID`, `CRITICAL_MINERALS_LITHIUM`, `RESHORING_FOUNDRY`, `DEFENSE_INDUSTRIAL`, and `BIOTECH_PLATFORM`.
+- The seed queue is exactly `MU`, `DELL`, `INTC`, `AMD`, `LRCX`, and `ALB`.
+- `MU` is the only `candidate_card_exists` item; all other names are `intake_only`.
+- The validator requires `ticker`, `theme_candidates`, `evidence_needed`, `thesis_breakers_to_check`, `provider_gaps`, and the negated output flags.
+- The validator rejects score/rank fields, buy/sell/hold calls, validated-thesis status, action-state promotion, yfinance canonical evidence, and missing manifests.
+- Immediate next action: `approve_g8_2_one_additional_candidate_card_or_g9_one_market_behavior_signal_card_or_hold`.
+
+G8.1A Discovery-Drift Correction Notice (2026-05-10)
+
+- G8.1A adds discovery-origin schema discipline to the G8.1 queue.
+- Allowed origin values are `USER_SEEDED`, `THEME_ADJACENT`, `SUPPLY_CHAIN_ADJACENT`, `PEER_CLUSTER`, `CUSTOMER_SUPPLIER_LINK`, `ETF_HOLDING_LINK`, `SEC_INDUSTRY_LINK`, `NEWS_RESEARCH_CAPTURE`, `LOCAL_FACTOR_SCOUT`, and `SYSTEM_SCOUTED`.
+- Current seed labels are: `MU = USER_SEEDED`; `DELL/INTC/AMD/ALB = USER_SEEDED + THEME_ADJACENT`; `LRCX = USER_SEEDED + SUPPLY_CHAIN_ADJACENT`.
+- All six current names must keep `is_system_scouted = false`, `is_validated = false`, and `is_actionable = false`.
+- `LOCAL_FACTOR_SCOUT` is reserved for G8.1B and cannot appear in G8.1A intake output.
+- Immediate next action: `approve_g8_1b_pipeline_first_discovery_scout_or_hold`.
+
+DASH-0 Dashboard IA Notice (2026-05-10)
+
+- DASH-0 approves the dashboard IA only.
+- Target page order: Command Center, Opportunities, Thesis Card, Market Behavior, Entry & Hold Discipline, Portfolio & Allocation, Research Lab, Settings & Ops.
+- Future navigation should use an explicit page registry/sidebar shell, likely via Streamlit `st.Page` and `st.navigation`, after DASH-1 approval.
+- Data Health and Drift Monitor move to future Settings & Ops; Backtests, Modular Strategies, and Daily Scan move to future Research Lab.
+- The optimizer risk-limit alignment is recorded as a future runtime task, not implemented in DASH-0.
+- Immediate next action: `approve_dash_1_page_registry_shell_or_hold`.
+
+DASH-1 Page Registry Shell Notice (2026-05-10)
+
+- DASH-1 uses Streamlit `st.Page` and `st.navigation` for the runtime page registry/sidebar shell.
+- The entrypoint remains the shared frame/router and executes the selected page with `page.run()`.
+- The implementation preserves legacy page internals while relocating them behind the approved IA buckets.
+- `views/page_registry.py` owns the approved page order, page groups, and legacy movement map.
+- Command Center, Thesis Card, Market Behavior, and Entry & Hold Discipline are shell placeholders only; Command Center status badges are deferred to DASH-2.
+- No optimizer risk-limit control redesign, new metric, score, rank, signal, alert, broker, provider, ingestion, candidate generation, factor-scout integration, or buy/sell/hold output is authorized.
+- Immediate next action: `approve_dash_2_command_center_placeholder_or_hold`.
+
+G8.2 System-Scouted Candidate-Card Notice (2026-05-10)
+
+- G8.2 converts the sole G8.1B `LOCAL_FACTOR_SCOUT` output, `MSFT`, into one candidate-card-only research object.
+- Required provenance fields include `discovery_origin = LOCAL_FACTOR_SCOUT`, `scout_model_id = LOCAL_FACTOR_EQUAL_WEIGHT_V0`, `source_intake_item_id`, `source_intake_manifest_uri`, and `candidate_card_manifest_uri`.
+- The optional `governance` block must preserve `not_validated`, `not_actionable`, `no_score`, `no_rank`, `no_buy_sell_signal`, `no_alert`, and `no_broker_action` as true.
+- Candidate-card validation rejects factor-score leakage and all direct score, rank, buy/sell, buying-range, alert, broker, order, target-price, or action fields.
+- The MSFT card is not merged into dashboard runtime. Existing dashboard MSFT ticker-list rows remain legacy runtime output and are not candidate-card status.
+- Immediate next action: `approve_g9_one_market_behavior_signal_card_or_g8_3_one_user_seeded_candidate_card_or_dash_card_reader_or_hold`.
+
+Portfolio Universe Construction Notice (2026-05-10)
+
+- `strategies/portfolio_universe.py` owns optimizer-universe eligibility, ticker-map readiness, local price-history readiness, and max-weight feasibility diagnostics.
+- `dashboard.py` must pass `universe.included_permnos` from `build_optimizer_universe(...)`; it must not pass display-sorted `df_scan["Ticker"][:20]`.
+- Default optimizer eligibility is limited to `ENTER STRONG BUY` and `ENTER BUY`; generic `WATCH` remains research-only and `EXIT`/`KILL`/`AVOID`/`IGNORE` remain excluded.
+- Runtime conviction modes, Black-Litterman, MU floors, thesis anchors, manual overrides, scanner rewrites, and new objectives remain blocked until separately approved.
+- Immediate next action: `approve_thesis_anchor_policy_or_hold`.
+
+Optimizer Core Structured Diagnostics Notice (2026-05-11)
+
+Dashboard Architecture Safety Notice (2026-05-11)
+
+- Runtime PID liveness checks now use `utils.process.pid_is_running`.
+- Direct `os.kill(pid, 0)` style liveness probing is prohibited in runtime callers because Windows can treat it as a real signal.
+- Existing local wrapper names remain as compatibility seams for tests and lock-owner recovery code.
+- `dashboard.py` strategy-matrix initialization now uses one helper path.
+- Dashboard portfolio price cleanup delegates to `core.data_orchestrator.clean_price_frame`.
+- This is architecture safety/hygiene only: no provider ingestion, canonical market-data write, strategy search, ranking, scoring, alert, broker, or dashboard content redesign is authorized.
+- Immediate next action: `hold_or_continue_code_quality_review_section`.
+
+- `strategies/optimizer_diagnostics.py` owns structured optimizer diagnostic objects and formulas.
+- `strategies/optimizer.py` exposes diagnostic-returning optimizer methods while preserving existing weight-returning methods.
+- `views/optimizer_view.py` renders optimization status, feasibility status, active constraints, assets at max cap, assets at lower bound, equal-weight-forced status, solver status, residuals, and fallback labels.
+- The approved formulas are `upper_bound_feasible = n_assets > 0 and max_weight * n_assets >= 1`, `equal_weight_forced = max_weight <= (1 / n_assets) + tolerance`, `active_upper_i = weight_i >= max_weight - tolerance`, and `full_investment_constraint_residual = sum(weights) - 1`.
+- This is diagnostics-only; no lower-bound allocation policy, MU conviction, WATCH investability expansion, Black-Litterman, new objective, scanner rule, manual override, provider ingestion, alert, broker, or replay behavior is approved.
+
+Portfolio Optimizer View Test and Performance Notice (2026-05-11)
+
+- `tests/test_optimizer_view.py` uses Streamlit `AppTest` for optimizer view rendering, mean-variance control selection, and sector-cap UI coverage.
+- `core/data_orchestrator.py` owns a display-only Parquet cache for recent close-price overlays; cache misses schedule background refresh and return local TRI data immediately when no cached overlay exists.
+- `views/optimizer_view.py` caches optimizer runs by `method`, selected price frame, `max_weight`, and `risk_free_rate`.
+- Sector caps remain post-solver soft constraints; they are not SLSQP constraints and do not approve new optimizer policy.
+- No canonical provider ingestion, lower-bound allocation policy, MU conviction, WATCH investability expansion, Black-Litterman, new objective, alert, broker, score, rank, or card-reader integration is approved.
+
 Technical Specification: Terminal Zero (Ironclad Architecture)
 Author: Atomic Mesh | Date: 2026-02-19 | Status: Active Blueprint | Version: 14.1 (PM Hierarchy + Stage Loop Governance Sync)
 Guiding Principle: "Signals from Price, PnL from Returns."
@@ -67,6 +171,60 @@ Guiding Principle: "Signals from Price, PnL from Returns."
     - Registry events are append-only JSONL records chained by `previous_event_hash` and `event_hash`.
     - Snapshot files are disposable projections from the event log, not source of truth.
     - This registry does not authorize strategy generation, simulation, alerts, promotion packets, broker calls, or live execution.
+
+  Phase G0 V2 Proxy Boundary note:
+    - V2 proxy boundary harness is complete as boundary-only work under `v2_discovery/fast_sim/`.
+    - Proxy outputs must carry `promotion_ready = false`, `canonical_engine_required = true`, `source_quality`, `manifest_uri`, `registry_event_id`, `registry_note_event_id`, `code_ref`, and `data_snapshot`.
+    - `core.engine.run_simulation` remains the only official truth path.
+    - The no-op proxy computes no alpha, Sharpe, return curve, ranking, or best candidate; it may append only a registry note, and result validation must resolve that note back to the same candidate, proxy run, and boundary verdict.
+    - This boundary does not authorize a real fast simulator, strategy search, parameter sweeps, alerts, promotion packets, broker calls, or external engine adapters.
+
+  Phase G1 Deterministic Synthetic Fast-Proxy note:
+    - Phase G1 is complete as synthetic mechanics only under `v2_discovery/fast_sim/`.
+    - The simulator accepts only manifest-backed fixture files under `data/fixtures/v2_proxy/`.
+    - Fixture/golden artifacts must reconcile row count, date range, schema columns, and SHA-256 hash metadata before accepted output.
+    - `nan`, `+inf`, `-inf`, missing symbols, sparse target weights, and non-finite proxy metadata fail closed.
+    - Invalid fixture evidence must not be repaired with `nan_to_num`, sparse-weight `fillna(0)`, interpolation, or stringified nulls.
+    - The only simulator weight input is prebaked `date,symbol,target_weight`; no signal function, strategy factory, PEAD variant, parameter search, or ranking surface is authorized.
+    - Allowed outputs are positions, cash, turnover, transaction cost, gross exposure, net exposure, row count, date range, boundary verdict, `promotion_ready = false`, and `canonical_engine_required = true`.
+    - Real market data paths, alerts, broker calls, promotion packets, and performance metrics such as alpha, Sharpe, CAGR, and max drawdown remain blocked.
+    - V2 proxy output remains separate from official truth; future promotion still requires V1 `core.engine.run_simulation`.
+
+  Phase G2 Single Registered Fixture Candidate note:
+    - Phase G2 is complete as lineage-only work under `v2_discovery/fast_sim/run_candidate_proxy.py` and `lineage.py`.
+    - Exactly one synthetic fixture candidate is registered or loaded from the Candidate Registry before proxy output exists.
+    - The proxy run appends or reuses one hash-linked `candidate.note_added` registry event and emits `data/registry/g2_single_fixture_candidate_report.json`.
+    - G2 remains blocked from strategy search, ranking, alerts, broker calls, promotion packets, real market data, and external engines.
+
+  Phase G3 First Canonical Replay Fixture note:
+    - Phase G3 is complete as truth-alignment work under `v2_discovery/replay/`.
+    - G3 requires exactly one registered G2 fixture candidate, its manifest, source quality, data snapshot, and manifest hash.
+    - G3 calls the official V1 path, `core.engine.run_simulation`, and compares V1/V2 only on positions, cash, turnover, transaction cost, gross exposure, net exposure, row count, date range, manifest URI, source quality, and candidate ID.
+    - `data/registry/g3_canonical_replay_report.json` records `comparison_result = "match"`, `mismatch_count = 0`, `promotion_ready = false`, `canonical_engine_required = true`, and `boundary_verdict = "v2_blocked_from_promotion"`.
+    - A V1/V2 match is accounting evidence only; it does not create a promotion packet or trading permission.
+
+  Phase G4 Real Canonical Dataset Readiness note:
+    - Phase G4 is complete as readiness-only work under `v2_discovery/readiness/`.
+    - The first real canonical contact is a tiny `prices_tri` slice with 123 rows, 3 symbols, daily bars, and its own Tier 0 manifest.
+    - G4 reconciles manifest hash, row count, schema, date range, finite numeric values, duplicate keys, monotonic dates, price domain, return domain, freshness, and no-sidecar-required status.
+    - `ready_for_g5 = true` is dataset readiness only, not alpha evidence, ranking evidence, alert evidence, or promotion authority.
+
+  Phase G5 Single Canonical Replay No Alpha note:
+    - Phase G5 is complete as V1-only mechanical replay work under `v2_discovery/replay/canonical_real_replay.py`.
+    - G5 uses the G4 tiny real canonical slice, predeclared neutral equal weights only, and the official V1 path `core.engine.run_simulation`.
+    - G5 does not call V2 proxy on real data.
+    - Allowed outputs are positions, cash, turnover, transaction cost, gross exposure, net exposure, row count, date range, source quality, manifest identity, `promotion_ready = false`, `alerts_emitted = false`, and `broker_calls = false`.
+    - No alpha, Sharpe, CAGR, drawdown, score, rank, buy/sell decision, alert, broker call, promotion packet, or trading permission is authorized.
+
+  Phase G7.1 Roadmap Realignment note:
+    - Phase G7.1 is complete as product-charter and docs/context work only.
+    - Terminal Zero is framed as discretionary augmentation for de-risked asymmetric upside, not generic alpha search and not a trading bot.
+    - The planning allocation model is 90% supercycle gem discovery and 10% buying-range / hold-discipline prompting.
+    - `PEAD_DAILY_V0` remains valid as a tactical signal family only.
+    - `SUPERCYCLE_GEM_DAILY_V0` is the primary product family target for a later definition-only phase.
+    - The dashboard taxonomy has five panels: thesis health, entry discipline, hold discipline, flow/positioning, and regime.
+    - Short-squeeze and CTA-type inputs are future dashboard context only, not automatic triggers.
+    - G7.1 authorizes no candidate generation, backtest, replay, proxy run, search, ranking, alert emission, broker call, live order, or promotion packet.
 
 1. System Architecture Diagram
 The system is composed of six strictly isolated layers:
@@ -1350,3 +1508,234 @@ Scope: execution submit/recovery semantics hardening for terminal unfilled outco
 - Legacy single-file parquet dedupe must preserve historical rows with missing dedupe keys.
 - Null-safe key rule:
   - for each key in `{record_id, uid, _spool_record_uid}` dedupe only records with non-empty key values and preserve null/empty-key rows.
+
+## Phase G4 Addendum: Real Canonical Dataset Readiness Fixture
+
+Date: 2026-05-09
+Scope: first tiny Tier 0 canonical price-slice readiness gate; no strategy search or alpha evidence.
+
+### Canonical slice contract
+- Artifact:
+  - `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet`
+- Manifest:
+  - `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet.manifest.json`
+- Source:
+  - `data/processed/prices_tri.parquet`
+- Required source fields:
+  - `source_quality = "canonical"`
+  - `extra.source_tier = "tier0"`
+  - `provider = "terminal_zero"`
+  - `provider_feed = "tri_repaired_prices"`
+- Slice:
+  - `row_count = 123`
+  - `symbol_count = 3`
+  - `date_range = 2024-01-02 -> 2024-02-29`
+  - `primary_key = {date, permno}`
+
+### Readiness formula
+- `g4_ready_for_g5 = true` iff:
+  - `manifest.sha256 == compute_sha256(artifact)`;
+  - `manifest.row_count == len(df)`;
+  - `manifest.schema.columns == list(df.columns)`;
+  - `manifest.date_range == {min(df.date), max(df.date)}`;
+  - all required numeric fields are finite;
+  - `count_duplicates(df[date, permno]) = 0`;
+  - dates are monotonic increasing per `permno`;
+  - `tri > 0`, `legacy_adj_close > 0`, `raw_close > 0`, `volume >= 0`;
+  - `-1.0 < total_ret <= 10.0`;
+  - `sidecar_required = false` for the passing slice.
+
+### Boundary lock
+- G4 report is readiness-only:
+  - no alpha metrics;
+  - no strategy ranking;
+  - no alerts;
+  - no broker action;
+  - no promotion packet;
+  - no registry candidate status mutation.
+- Implementation paths:
+  - `v2_discovery/readiness/canonical_slice.py`
+  - `v2_discovery/readiness/canonical_readiness.py`
+  - `tests/test_g4_real_canonical_readiness_fixture.py`
+
+## Phase G6 Addendum: V1/V2 Real-Slice Mechanical Comparison
+
+Date: 2026-05-09
+Scope: compare official V1 replay and V2 proxy mechanics on one tiny Tier 0 canonical price slice; no strategy search or alpha evidence.
+
+### Comparison contract
+- Artifact:
+  - `data/registry/g6_v1_v2_real_slice_mechanical_report.json`
+- Manifest:
+  - `data/registry/g6_v1_v2_real_slice_mechanical_report.json.manifest.json`
+- Input slice:
+  - `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet`
+- Required source fields:
+  - `source_quality = "canonical"`
+  - `extra.source_tier = "tier0"`
+  - `provider = "terminal_zero"`
+  - `provider_feed = "tri_repaired_prices"`
+- Slice:
+  - `row_count = 123`
+  - `symbol_count = 3`
+  - `date_range = 2024-01-02 -> 2024-02-29`
+
+### Mechanical comparison formula
+- `g6_match = true` iff:
+  - V1 positions equal V2 positions exactly after normalized date/permno ordering;
+  - V1 cash equals V2 cash exactly;
+  - V1 turnover equals V2 turnover exactly;
+  - V1 transaction cost equals V2 transaction cost exactly;
+  - V1 gross exposure equals V2 gross exposure exactly;
+  - V1 net exposure equals V2 net exposure exactly;
+  - V1/V2 row count, date range, source quality, and manifest URI match.
+- Engine names and versions are recorded, not equality-forced, because V1 and V2 are intentionally distinct engines.
+
+### Boundary lock
+- G6 report is mechanical-comparison-only:
+  - no alpha metrics;
+  - no strategy ranking;
+  - no alerts;
+  - no broker action;
+  - no promotion packet;
+  - `promotion_ready = false`;
+  - `v2_promotion_ready = false`.
+- Implementation paths:
+  - `v2_discovery/replay/real_slice_v1_v2_comparison.py`
+  - `v2_discovery/replay/mechanical_comparison_report.py`
+  - `tests/test_g6_v1_v2_real_slice_mechanical_comparison.py`
+
+## Phase G7 Addendum: Candidate Family Definition
+
+Date: 2026-05-09
+Scope: define the first controlled candidate family before search; no candidate generation, backtest, replay, proxy run, alpha evidence, ranking, alert, broker call, or promotion packet.
+
+### Family contract
+- Artifact:
+  - `data/registry/candidate_families/pead_daily_v0.json`
+- Manifest:
+  - `data/registry/candidate_families/pead_daily_v0.json.manifest.json`
+- Registry report:
+  - `data/registry/candidate_family_registry_report.json`
+- Family:
+  - `family_id = "PEAD_DAILY_V0"`
+  - `status = "defined"`
+  - `data_tier_required = "tier0"`
+  - `source_quality_required = "canonical"`
+  - `sidecar_required = false`
+
+### Trial-budget formula
+- `finite_trial_count = product(count(options_p) for p in parameter_space)`.
+- For `PEAD_DAILY_V0`:
+  - `holding_days = {1, 3, 5, 10}` -> 4 options;
+  - `liquidity_floor = {adv_usd_5m, adv_usd_20m, adv_usd_50m}` -> 3 options;
+  - `event_window_lag = {1, 2}` -> 2 options;
+  - `finite_trial_count = 4 * 3 * 2 = 24`.
+- `trial_budget_valid = true` iff `finite_trial_count <= trial_budget_max`.
+
+### Boundary lock
+- G7 report is definition-only:
+  - `defined_only = true`;
+  - `candidate_generation_enabled = false`;
+  - `result_generation_enabled = false`;
+  - `promotion_ready = false`;
+  - `alerts_emitted = false`;
+  - `broker_calls = false`.
+- Family definitions are append-only/versioned; silent mutation is rejected.
+- Tier 2, yfinance, OpenBB, and operational Alpaca cannot be allowed as promotion evidence.
+- Implementation paths:
+  - `v2_discovery/families/schemas.py`
+  - `v2_discovery/families/trial_budget.py`
+  - `v2_discovery/families/registry.py`
+  - `v2_discovery/families/validation.py`
+  - `tests/test_g7_candidate_family_definition.py`
+
+## Phase G7.1 Addendum: Roadmap Realignment / Product Charter
+
+Date: 2026-05-09
+Scope: product roadmap and dashboard taxonomy realignment only; no candidate generation, backtest, replay, proxy run, alpha evidence, ranking, alert, broker call, or promotion packet.
+
+### Product charter
+- Terminal Zero is discretionary augmentation for de-risked asymmetric upside.
+- Product focus:
+  - `product_focus = 0.90 * supercycle_gem_discovery + 0.10 * buying_range_hold_discipline_prompting`.
+- This is a planning allocation model only. It is not a portfolio allocation, signal weight, score, threshold, or execution rule.
+
+### Family classification
+- Primary product family target:
+  - `SUPERCYCLE_GEM_DAILY_V0`
+  - status: planned for definition, not implemented
+- Tactical signal family:
+  - `PEAD_DAILY_V0`
+  - status: defined by G7 and still valid
+  - role: tactical signal family / future evidence module, not the roadmap center
+
+### Dashboard taxonomy
+- Five panels:
+  - thesis health;
+  - entry discipline;
+  - hold discipline;
+  - flow and positioning;
+  - regime.
+- Flow and positioning inputs are contextual and source-quality labeled.
+- Short-squeeze and CTA-type signals are not automatic triggers.
+
+### Roadmap sequence
+- G7.1: roadmap realignment, discretionary augmentation + supercycle gem framing.
+- G7.2: define `SUPERCYCLE_GEM_DAILY_V0`, no search.
+- G8: create one thesis candidate card, no search.
+- G9: build dashboard signal map, no alpha search.
+- G10: begin bounded discovery inside one approved family.
+- G11: entry/hold discipline monitor.
+- G12: paper-only buying-range prompts.
+
+### Boundary lock
+- G8 PEAD candidate generation is held until a separate approval.
+- No implementation code is added by G7.1.
+- No G7 family artifacts are mutated by G7.1.
+- No buy/sell signal, ranking, alert emission, broker path, live order, paper trade, promotion packet, or human-reviewed approval is authorized.
+
+### Documentation paths
+- `docs/architecture/product_roadmap_discretionary_augmentation.md`
+- `docs/architecture/dashboard_signal_taxonomy.md`
+- `docs/architecture/supercycle_gem_family_policy.md`
+- `docs/handover/phase65_g71_handover.md`
+
+## DASH-2 Portfolio Allocation Runtime Slice
+
+### Runtime ordering
+- `Portfolio & Allocation` renders:
+  - `Portfolio Optimizer`
+  - `YTD Performance`
+  - `Shadow Portfolio`
+- Portfolio Optimizer remains top-level and is not hidden behind an expander.
+
+### Return formula
+- `portfolio_daily_return_t = sum(weight_i * price_return_i_t)`.
+- `portfolio_ytd_equity_t = cumulative_product(1 + portfolio_daily_return_t)`.
+- `portfolio_ytd_return = portfolio_ytd_equity_last - 1`.
+- `weight_i` comes from current optimizer output when available.
+
+### Freshness boundary
+- Selected stocks plus SPY/QQQ may use an in-memory yfinance adjusted-close overlay for display freshness.
+- The overlay does not write canonical data and does not authorize provider ingestion, alerting, broker calls, candidate scoring, or candidate ranking.
+- Portfolio Optimizer selected-stock overlay fetching, scaling, stitching, and strategy-metrics JSON parsing are owned by `core/data_orchestrator.py`, not the Streamlit view.
+- Recent close overlays are cached under `data/runtime_cache/optimizer_live_overlay` as display-only Parquet files.
+- `overlay_cache_key = sha256(version, sorted_tickers, start_iso)[:24]`.
+- `overlay_cache_hit = cache_file_exists and cache_age_seconds <= cache_ttl_seconds`.
+- `cold_cache_behavior = schedule_background_refresh and return local_TRI_prices`.
+- The overlay scaling cache key is `sha256(local_price_frame) + ":" + sha256(live_price_frame)` and returns copy-safe cached dataframes.
+
+### Optimizer runtime cache
+- Optimizer reruns are cached with Streamlit `st.cache_data`.
+- `optimizer_cache_inputs = method + selected_price_frame + max_weight + risk_free_rate`.
+- Sector caps are applied after optimizer weights and are tested as post-solver constraints; they are not encoded as SLSQP constraints.
+
+### Evidence paths
+- `core/data_orchestrator.py`
+- `dashboard.py`
+- `views/optimizer_view.py`
+- `tests/test_dash_2_portfolio_ytd.py`
+- `tests/test_data_orchestrator_portfolio_runtime.py`
+- `tests/test_optimizer_view.py`
+- `tests/test_optimizer_core_policy.py`
