@@ -4,6 +4,126 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, broker calls, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: provide a compact view of the Portfolio Optimizer View Test and Performance Hardening implementation and affected interfaces.
 
+## Latest Addendum - Pinned Strategy Universe Hardening
+
+### Changed Runtime Files
+
+```text
+data/universe/pinned_thesis_universe.yml   (manifest: 10 thesis tickers)
+data/universe/loader.py                    (fail-closed loader with strict validation)
+data/universe/__init__.py
+data/feature_store.py                      (unions pinned permnos, aborts on failure unless override)
+scripts/pit_lifecycle_replay.py            (defaults to scanner∪pinned, shared eligibility gate)
+```
+
+### Changed Test Files
+
+```text
+tests/test_pinned_universe.py              (27 tests: loader, gates, union, fail-closed, diagnostics, edge cases)
+```
+
+### Changed Data Files
+
+```text
+data/processed/yahoo_patch.parquet         (backfilled MU/AMD/AVGO/TSM/INTC/LRCX/SNDK/WDC/AMAT)
+data/processed/prices_tri.parquet          (rebuilt through 2026-05-11)
+data/processed/macro_features.parquet      (rebuilt through 2026-05-11)
+data/processed/macro_features_tri.parquet  (rebuilt through 2026-05-11)
+data/processed/features.parquet            (203 permnos = 200 yearly_union + pinned)
+data/portfolio_lifecycle_log.jsonl          (103 events, 12 tickers)
+```
+
+### Touched Interfaces
+
+- `run_build()` signature: added `allow_missing_pinned_universe: bool = False`
+- `load_pinned_manifest()`: raises FileNotFoundError/ValueError (was silent return [])
+- `_default_replay_tickers()`: raises on loader failure (was silent fallback to [])
+- `is_pit_eligible()` / `is_pit_exit()`: new shared gate functions
+
+### Pinned Universe Formula
+
+```
+feature_universe = yearly_top_n(200) ∪ pinned_thesis_universe.yml
+replay_tickers   = SCANNER_TICKERS ∪ pinned_thesis_universe.yml
+eligibility      = z_demand > 0 AND capital_cycle_score > 0 AND dist_sma20 ≤ 0.05 AND NOT trend_veto
+exit_trigger     = dist_sma20 > 0.12 OR trend_veto (on held position)
+```
+
+### Failing Checks
+
+None. 102 tests pass (27 pinned + 34 feature_store + 14 lifecycle + 7 dash-1 + 20 dash-2).
+
+## Latest Addendum - Portfolio Lifecycle Current Holds Fix
+
+### Changed Runtime Files
+
+```text
+data/portfolio_lifecycle_log.py
+strategies/portfolio_universe.py
+views/optimizer_view.py
+dashboard.py
+```
+
+### Changed Test Files
+
+```text
+tests/test_position_lifecycle.py
+tests/test_portfolio_universe.py
+tests/test_optimizer_view.py
+tests/test_dash_2_portfolio_ytd.py
+```
+
+### Changed Governance Files
+
+```text
+docs/notes.md
+docs/decision log.md
+docs/prd.md
+docs/spec.md
+PRD.md
+PRODUCT_SPEC.md
+docs/phase_brief/phase65-brief.md
+docs/lessonss.md
+docs/context/bridge_contract_current.md
+docs/context/impact_packet_current.md
+docs/context/done_checklist_current.md
+docs/context/planner_packet_current.md
+docs/context/multi_stream_contract_current.md
+docs/context/post_phase_alignment_current.md
+docs/context/observability_pack_current.md
+```
+
+### Touched Interfaces
+
+- `Lifecycle replay state`: `data.portfolio_lifecycle_log.get_open_lifecycle_positions(...)` reconstructs latest ENTER/EXIT open holdings as of a PIT-safe cutoff.
+- `Current position memory`: `strategies.portfolio_universe.load_current_position_memory(...)` prefers lifecycle replay state over stale JSON memory when replay evidence exists.
+- `Optimizer universe`: open lifecycle holdings are included as `included_current_hold`, even when today's scanner row is EXIT/KILL.
+- `Portfolio allocation UI`: no-fresh-PIT-ENTER with open lifecycle holds renders current holds plus residual cash, not 100% cash.
+- `Portfolio performance`: session, ticker-mapped, and aligned weights preserve residual cash unless total weights exceed 100%.
+- `Lifecycle data integrity`: JSONL appends use lock + temp + replace, and malformed rows fail closed instead of being skipped.
+
+### Passing Checks
+
+- `.venv\Scripts\python -m py_compile data\portfolio_lifecycle_log.py strategies\portfolio_universe.py views\optimizer_view.py dashboard.py tests\test_position_lifecycle.py tests\test_portfolio_universe.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py` -> PASS.
+- `.venv\Scripts\python -m pytest tests\test_position_lifecycle.py tests\test_portfolio_universe.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py -q` -> PASS, 58 passed.
+- `.venv\Scripts\python -m pytest -q` -> PASS.
+- Browser smoke at `http://127.0.0.1:8509/portfolio-and-allocation` -> PASS; Universe Audit shows included lifecycle holds and the residual-cash message renders.
+- Local lifecycle state check -> open holdings are `AMAT`, `AVGO`, and `TSLA`, not sell-all.
+- `.venv\Scripts\python scripts\build_context_packet.py --validate` -> PASS.
+- `.venv\Scripts\python .codex\skills\_shared\scripts\validate_closure_packet.py --packet "<lifecycle ClosurePacket>" --require-open-risks-when-block --require-next-action-when-block` -> PASS.
+- `.venv\Scripts\python .codex\skills\_shared\scripts\validate_saw_report_blocks.py --report-file docs\saw_reports\saw_portfolio_lifecycle_current_holds_20260512.md` -> PASS.
+- `.venv\Scripts\python .codex\skills\_shared\scripts\validate_se_evidence.py ...` -> PASS.
+
+### Failing / Incomplete Checks
+
+- None in current focused verification.
+
+### Open Risks
+
+- Existing lifecycle replay weights are simple replay weights and not a full execution ledger with fills, quantities, realized P&L, or slippage.
+- Hard-crash stale lifecycle `.lock` recovery is a future Ops hardening follow-up; current behavior fails closed by timeout.
+- Broader dirty worktree contains inherited dashboard/navigation and governance edits outside this focused fix.
+
 ## Latest Addendum - Dashboard Unified Data Cache Performance Fix
 
 ### Changed Runtime Files
@@ -104,10 +224,11 @@ docs/context/observability_pack_current.md
 
 ### Passing Checks
 
-- `.venv\Scripts\python -m pytest tests\test_scanner.py tests\test_strategy.py tests\test_phase15_integration.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\test_process_utils.py -q` -> PASS, 46 passed.
+- `.venv\Scripts\python -m pytest tests\test_scanner.py tests\test_strategy.py tests\test_phase15_integration.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\test_process_utils.py -q` -> PASS, 49 passed.
 - `.venv\Scripts\python -m py_compile strategies\scanner.py dashboard.py tests\test_scanner.py tests\test_strategy.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\conftest.py` -> PASS.
 - `.venv\Scripts\python -m pytest -q` -> PASS after non-finite scanner reconciliation.
 - `.venv\Scripts\python -m pytest --collect-only -q` -> PASS; collection includes scanner, adaptive-trend, production-config, core-ETL, and process-guardrail tests.
+- SAW Reviewer C final recheck -> PASS; latest raw `VWEHX`/`VFISX` fail-closed behavior verified.
 
 ### Failing / Incomplete Checks
 

@@ -4,6 +4,40 @@ Status: Current with Portfolio Universe Construction PASS and optimizer-core qua
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, thesis validation, or scope widening by itself.
 Purpose: define machine-checkable done criteria for current Phase 65 portfolio universe and candidate-card work.
 
+## Latest Addendum - Pinned Strategy Universe Hardening
+
+- [x] `data/universe/pinned_thesis_universe.yml` exists with ≥10 thesis tickers.
+- [x] `data/universe/loader.py` raises FileNotFoundError on missing manifest.
+- [x] `data/universe/loader.py` raises ValueError on empty/malformed/duplicate entries.
+- [x] `data/feature_store.py run_build()` aborts when pinned loader fails (unless `allow_missing_pinned_universe=True`).
+- [x] `data/feature_store.py run_build()` unions pinned permnos into feature universe.
+- [x] `scripts/pit_lifecycle_replay._default_replay_tickers()` raises on loader failure (no silent fallback).
+- [x] `scripts/pit_lifecycle_replay.is_pit_eligible()` is the single shared gate for replay and diagnostics.
+- [x] `scripts/pit_lifecycle_replay.diagnose_pinned_exclusions()` reports every pinned ticker with status OK/DATA_BLOCKED/FAILED_GATE.
+- [x] All 10 pinned tickers have yahoo_patch coverage from 2025-01-02.
+- [x] All 10 pinned tickers have features.parquet rows with non-null price-derived columns.
+- [x] 27 regression tests in `tests/test_pinned_universe.py` pass.
+
+## Latest Addendum - Portfolio Lifecycle Current Holds Fix
+
+- [x] `data.portfolio_lifecycle_log.get_open_lifecycle_positions` exists.
+- [x] Open lifecycle positions use latest ENTER/EXIT event at or before `as_of`.
+- [x] Future-dated lifecycle rows are ignored for current holdings.
+- [x] Malformed lifecycle JSONL rows fail closed with a visible error.
+- [x] Lifecycle JSONL appends use temp-file replacement instead of direct append.
+- [x] Lifecycle sell-all overrides stale JSON position memory.
+- [x] `strategies.portfolio_universe.load_current_position_memory` prefers lifecycle replay state when replay evidence exists.
+- [x] `build_optimizer_universe` includes open lifecycle holdings as `included_current_hold`.
+- [x] Open lifecycle holdings can remain included even when today's scanner row is EXIT/KILL.
+- [x] Portfolio Optimizer renders lifecycle holds plus residual cash when there are open holds and no fresh PIT ENTER candidates.
+- [x] Portfolio performance session weights preserve residual cash unless weights exceed 100%.
+- [x] Live ticker-mapped YTD weights preserve residual cash unless mapped weights exceed 100%.
+- [x] Focused compile passes.
+- [x] Focused lifecycle/universe/optimizer/YTD tests pass.
+- [x] Browser smoke completed for `/portfolio-and-allocation` after this fix.
+- [x] Full pytest completed for this focused bug round.
+- [x] SAW report exists and validates for this focused bug round.
+
 ## Latest Addendum - Dashboard Unified Data Cache Performance Fix
 
 - [x] `dashboard.py::_load_unified_data_cached` exists.
@@ -40,6 +74,8 @@ Purpose: define machine-checkable done criteria for current Phase 65 portfolio u
 - [x] Focused affected pytest passes.
 - [x] Scoped compile passes.
 - [x] Full pytest completed for this scanner hardening addendum.
+- [x] SAW Reviewer C final recheck passes after latest invalid credit denominator reconciliation.
+- [x] `docs/saw_reports/saw_dashboard_scanner_testability_hardening_20260511.md` records SAW PASS.
 
 ## Latest Addendum - Dashboard Architecture Safety Slice
 

@@ -2244,6 +2244,7 @@ def run_build(
     cs_scale_mode: str = CS_SCALE_ROBUST,
     cs_scale_epsilon_floor: float = CS_SCALE_DEFAULT_EPSILON_FLOOR,
     cs_scale_min_window_size: int = CS_SCALE_DEFAULT_MIN_WINDOW,
+    allow_missing_pinned_universe: bool = False,
 ) -> dict:
     status = _new_status()
     try:
@@ -2332,11 +2333,39 @@ def run_build(
 
         now_utc = pd.Timestamp.utcnow()
         today_ts = (now_utc.tz_localize(None) if now_utc.tzinfo is not None else now_utc).normalize()
-        if incremental_active and append_start_ts > today_ts:
-            status["success"] = True
-            status["rows_written"] = 0
-            _log(status, "✅ Feature store already up to date (no incremental rows pending).")
+
+        # Validate pinned universe BEFORE incremental no-op (new tickers must not be silently skipped)
+        try:
+            from data.universe.loader import get_pinned_permnos as _get_pinned
+            strategy_pinned = _get_pinned()
+        except Exception as exc:
+            if not allow_missing_pinned_universe:
+                _warn(status, f"Pinned universe loader failed: {type(exc).__name__}: {exc}. Aborting (pass allow_missing_pinned_universe=True to override).")
+                return status
+            _warn(status, f"⚠ Pinned universe loader failed: {type(exc).__name__}: {exc}. Proceeding with override.")
+            strategy_pinned = []
+
+        if not strategy_pinned and not allow_missing_pinned_universe:
+            _warn(status, "Pinned strategy universe resolved to 0 permnos. Aborting (pass allow_missing_pinned_universe=True to override).")
             return status
+
+        if incremental_active and append_start_ts > today_ts:
+            # Even on no-op, verify pinned tickers are already in the feature store
+            if strategy_pinned:
+                existing_permnos = set(_load_existing_feature_permnos(FEATURES_PATH))
+                missing_pinned = [p for p in strategy_pinned if p not in existing_permnos]
+                if missing_pinned:
+                    _warn(status, f"Incremental no-op blocked: {len(missing_pinned)} pinned permnos missing from feature store. Forcing rebuild.")
+                else:
+                    status["success"] = True
+                    status["rows_written"] = 0
+                    _log(status, "✅ Feature store already up to date (no incremental rows pending). Pinned universe verified.")
+                    return status
+            else:
+                status["success"] = True
+                status["rows_written"] = 0
+                _log(status, "✅ Feature store already up to date (no incremental rows pending).")
+                return status
 
         pinned_permnos: list[int] = []
         if incremental_active:
@@ -2354,6 +2383,10 @@ def run_build(
                 f"{universe_anchor_ts.strftime('%Y-%m-%d')} (strict t-1 daily liquidity; full-year blocks disabled)",
             )
         fresh_permnos = _select_universe_permnos(cfg=cfg, start_date=universe_anchor_ts, end_date=end_ts)
+        # Union pinned strategy universe (already validated above; just apply the union here)
+        if strategy_pinned:
+            fresh_permnos = sorted(set(int(p) for p in fresh_permnos) | set(int(p) for p in strategy_pinned))
+            _log(status, f"📌 Strategy universe pinned: {len(strategy_pinned)} thesis permnos unioned")
         if pinned_permnos:
             permnos = sorted(set(int(p) for p in pinned_permnos) | set(int(p) for p in fresh_permnos))
             _log(status, f"🧩 Incremental universe unioned with fresh selector: {len(permnos):,} permnos")
@@ -2645,6 +2678,11 @@ def main():
         default=CS_SCALE_DEFAULT_MIN_WINDOW,
         help="Minimum non-null cross-sectional window before percentile fallback is used.",
     )
+    parser.add_argument(
+        "--allow-missing-pinned-universe",
+        action="store_true",
+        help="Allow build to proceed if pinned strategy universe manifest is missing or broken.",
+    )
     args = parser.parse_args()
 
     result = run_build(
@@ -2659,6 +2697,7 @@ def main():
         cs_scale_mode=args.cs_scale_mode,
         cs_scale_epsilon_floor=args.cs_scale_epsilon_floor,
         cs_scale_min_window_size=args.cs_scale_min_window_size,
+        allow_missing_pinned_universe=bool(args.allow_missing_pinned_universe),
     )
     if not result.get("success"):
         sys.exit(1)

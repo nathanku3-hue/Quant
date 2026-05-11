@@ -1,0 +1,53 @@
+# Pinned Strategy Universe — Supercycle Thesis Tickers
+#
+# These tickers are explicitly included in the feature universe regardless of
+# liquidity ranking. They represent named thesis positions that must never be
+# silently excluded by top-N selectors.
+#
+# Rules:
+#   - Every pinned ticker gets yahoo_patch price coverage from its start date.
+#   - Every pinned ticker gets features rows after its valid start date.
+#   - If price history is unavailable, it is flagged as DATA_BLOCKED, not silently excluded.
+#   - PIT replay shows exclusion reason for pinned tickers that fail gates.
+
+supercycle_thesis:
+  - ticker: MU
+    start: "2025-01-02"
+    source: yahoo
+
+  - ticker: AMD
+    start: "2025-01-02"
+    source: yahoo
+
+  - ticker: AVGO
+    start: "2025-01-02"
+    source: yahoo
+
+  - ticker: TSM
+    start: "2025-01-02"
+    source: yahoo
+
+  - ticker: INTC
+    start: "2025-01-02"
+    source: yahoo
+
+  - ticker: LRCX
+    start: "2025-01-02"
+    source: yahoo
+
+  - ticker: SNDK
+    start: first_available_trade_date
+    source: yahoo
+    notes: "post-delisting/new-history edge case; ticker re-tracked 2025+"
+
+  - ticker: WDC
+    start: "2025-01-02"
+    source: yahoo
+
+  - ticker: NVDA
+    start: "2025-01-02"
+    source: yahoo
+
+  - ticker: AMAT
+    start: "2025-01-02"
+    source: yahoo

@@ -1175,12 +1175,15 @@ def test_run_build_incremental_noop_when_features_ahead_of_today(tmp_path, monke
             "permno": [10001],
             "ticker": ["AAA"],
             "adj_close": [100.0],
+            "tri": [100.0],
             "volume": [1_000_000.0],
             "rolling_beta_63d": [np.nan],
             "resid_mom_60d": [np.nan],
             "rel_strength_60d": [np.nan],
             "amihud_20d": [np.nan],
+            "illiq_21d": [np.nan],
             "yz_vol_20d": [np.nan],
+            "realized_vol_21d": [np.nan],
             "atr_14d": [np.nan],
             "rsi_14d": [np.nan],
             "dist_sma20": [np.nan],
@@ -1190,8 +1193,16 @@ def test_run_build_incremental_noop_when_features_ahead_of_today(tmp_path, monke
             "z_flow_proxy": [np.nan],
             "z_vol_penalty": [np.nan],
             "composite_score": [np.nan],
+            "z_moat": [np.nan],
+            "z_inventory_quality_proxy": [np.nan],
+            "z_discipline_cond": [np.nan],
+            "z_demand": [np.nan],
+            "capital_cycle_score": [np.nan],
+            "quality_composite": [np.nan],
             "yz_mode": ["proxy_close_only"],
             "atr_mode": ["proxy_close_only"],
+            "year": [today.year],
+            "month": [today.month],
         }
     )
     existing.to_parquet(feature_path, index=False)
@@ -1201,7 +1212,7 @@ def test_run_build_incremental_noop_when_features_ahead_of_today(tmp_path, monke
     monkeypatch.setattr(fs_mod, "FEATURES_PATH", str(feature_path))
     monkeypatch.setattr(fs_mod.updater, "UPDATE_LOCK_PATH", str(tmp_path / ".update.lock"))
 
-    result = run_build(start_year=int(today.year - 1), incremental=True)
+    result = run_build(start_year=int(today.year - 1), incremental=True, allow_missing_pinned_universe=True)
     assert result["success"] is True
     assert result["rows_written"] == 0
 

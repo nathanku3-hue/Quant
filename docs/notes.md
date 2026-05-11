@@ -5017,3 +5017,71 @@ Date: 2026-03-01
      - `core/data_orchestrator.py`
      - `tests/test_data_orchestrator_portfolio_runtime.py`
      - `tests/test_dashboard_sprint_a.py`
+
+## Portfolio Lifecycle Current-Hold Notes
+
+1. PIT-safe open-position reconstruction:
+   - `open_position_ticker = true` iff the latest lifecycle event for that ticker with `event_date <= as_of` has `action = ENTER`.
+   - A later `EXIT` event removes the ticker from the open-position set.
+   - Future-dated replay rows are ignored for the current portfolio view.
+   - `current_position_memory = open_lifecycle_positions` when lifecycle replay evidence exists; JSON position memory is only a fallback when the lifecycle log is empty.
+   - Lifecycle JSONL appends use a lock plus temp-file write and `os.replace`.
+   - Malformed JSONL rows raise a visible error instead of being silently skipped.
+   - source paths:
+     - `data/portfolio_lifecycle_log.py`
+     - `strategies/portfolio_universe.py`
+     - `tests/test_position_lifecycle.py`
+2. Current-hold allocation formula:
+   - Open lifecycle holdings enter the optimizer universe as `included_current_hold`, even when today's scanner row is `EXIT` / `KILL`; only lifecycle `EXIT` closes the current holding.
+   - When the included universe has current holds and no fresh `eligible_rating` entry candidates, the Portfolio Optimizer renders current lifecycle holdings rather than a 100% cash pie.
+   - `hold_weight_i = last_weight_i` from lifecycle position memory.
+   - If `sum(hold_weight_i) <= 1`, `cash_weight = 1 - sum(hold_weight_i)`.
+   - If `sum(hold_weight_i) > 1`, hold weights are normalized by their total and `cash_weight = 0`.
+   - Portfolio performance preserves residual cash by normalizing session, ticker-mapped, and aligned weights only when their sum exceeds 100%.
+   - source paths:
+     - `views/optimizer_view.py`
+     - `dashboard.py`
+     - `tests/test_optimizer_view.py`
+     - `tests/test_dash_2_portfolio_ytd.py`
+
+
+## Pinned Strategy Universe Formula (2026-05-12)
+
+### Manifest
+- Source: `data/universe/pinned_thesis_universe.yml`
+- Tickers: MU, AMD, AVGO, TSM, INTC, LRCX, SNDK, WDC, NVDA, AMAT
+
+### Feature Universe Construction
+```
+feature_universe = yearly_top_n(200) ∪ get_pinned_permnos()
+```
+- `data/feature_store.py run_build()` unions pinned permnos after yearly selector
+- Build aborts if pinned loader fails (unless `allow_missing_pinned_universe=True`)
+
+### PIT Replay Eligibility (shared gate: `is_pit_eligible()`)
+```
+ENTER when:
+  z_demand > 0
+  AND capital_cycle_score > 0
+  AND dist_sma20 ≤ 0.05
+  AND NOT trend_veto
+
+EXIT when:
+  dist_sma20 > 0.12
+  OR trend_veto (on held position)
+```
+- Used by: `scripts/pit_lifecycle_replay.py` (both `run_pit_replay` and `diagnose_pinned_exclusions`)
+- PIT-equivalent of live scanner logic (not identical — live uses Delta_Demand/Supply/Pricing/Margin + crisis gates)
+
+### Replay Ticker Universe
+```
+replay_tickers = SCANNER_TICKERS ∪ get_pinned_tickers()
+```
+- Raises on loader failure (no silent fallback to scanner-only)
+
+### Fail-Closed Invariants
+- Missing manifest → FileNotFoundError (not empty list)
+- Empty/malformed manifest → ValueError
+- Duplicate tickers → ValueError
+- Feature build without pinned → aborts (not warns)
+- Replay without pinned → raises (not falls back)

@@ -4,6 +4,25 @@ Status: Current integration bridge
 Authority: advisory-only PM/planner bridge. This file does not authorize live trading, broker automation, promotion, provider ingestion, strategy search, candidate ranking, candidate scoring, candidate validation, alerts, dashboard content redesign, macro scoring, factor scoring, or scope widening.
 Purpose: connect Quant's technical state back to product/system truth after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Pinned Strategy Universe Hardening
+
+- `SYSTEM_DELTA`: `Thesis tickers are explicitly pinned into feature generation via manifest. Feature store unions pinned permnos after yearly_top_n. PIT replay defaults to scanner ∪ pinned. Shared eligibility gate used by both replay and diagnostics. Loader raises on missing/broken manifest.`
+- `PM_DELTA`: `Strategy-universe inclusion is now explicit, auditable, and impossible to silently drop. 103 lifecycle events across 12 tickers. NVDA explicitly FAILED_GATE.`
+- `OPEN_DECISION`: `Evaluate NVDA fundamental gate or proceed to Stream 2 strategy review.`
+- `RECOMMENDED_NEXT_STEP`: `evaluate_nvda_fundamental_gate_or_stream2_strategy_review_or_hold.`
+- `DO_NOT_REDECIDE`: `No provider ingestion, canonical market-data write, strategy search, ranking, scoring, alert, broker call, optimizer objective change, or scanner rule change is authorized.`
+
+## Latest Addendum - Portfolio Lifecycle Current Holds Fix
+
+- `SYSTEM_DELTA`: `Portfolio & Allocation now reconstructs current open holdings from PIT-safe Position Lifecycle Replay state before declaring sell-all cash.`
+- `PM_DELTA`: `If replay has open ENTER positions without later EXIT events, the current allocation shows held names plus residual cash rather than 100% cash.`
+- `DATA_DELTA`: `Lifecycle JSONL is read locally; future-dated replay rows are ignored; JSON position memory is fallback only when lifecycle evidence is empty.`
+- `UI_DELTA`: `Open lifecycle holdings enter the universe as included_current_hold and render as Allocation (Lifecycle Holds) when no fresh PIT ENTER candidate exists.`
+- `CLOSURE_DELTA`: `Focused compile, 58-test portfolio/lifecycle suite, full pytest, browser smoke, context validation, SAW report validation, closure packet validation, and SE evidence validation passed; latest local replay check is not sell-all and has open AMAT, AVGO, and TSLA positions.`
+- `OPEN_DECISION`: `Hold or separately approve a broader lifecycle transaction model / current-position accounting policy.`
+- `RECOMMENDED_NEXT_STEP`: `hold_or_review_lifecycle_position_accounting_policy.`
+- `DO_NOT_REDECIDE`: `No provider ingestion, canonical market-data write, broker call, alert, ranking, scoring, new optimizer objective, conviction mode, or Black-Litterman is authorized.`
+
 ## Latest Addendum - Dashboard Unified Data Cache Performance Fix
 
 - `SYSTEM_DELTA`: `Dashboard unified parquet data load is now wrapped in st.cache_resource and keyed by processed/static parquet file signatures.`
@@ -19,7 +38,7 @@ Purpose: connect Quant's technical state back to product/system truth after the 
 - `SYSTEM_DELTA`: `Dashboard scanner deterministic math now lives in strategies/scanner.py with focused boundary-value tests; dashboard.py preserves provider/cache/persistence ownership and delegates enrichment.`
 - `PM_DELTA`: `Scanner labels and tactical fields are more regression-resistant without changing product semantics or authorizing new recommendations.`
 - `TEST_DELTA`: `Scanner formula tests, strategy/config/ETL coverage, and the process guardrail passed in the focused suite.`
-- `CLOSURE_DELTA`: `Focused compile, 46-test affected suite, and full pytest passed.`
+- `CLOSURE_DELTA`: `Focused compile, 49-test affected suite, full pytest, and SAW Reviewer C final recheck passed.`
 - `OPEN_DECISION`: `Hold, run longer full regression, or continue the next review section.`
 - `RECOMMENDED_NEXT_STEP`: `continue_review_or_hold.`
 - `DO_NOT_REDECIDE`: `No provider ingestion, canonical market-data write, scanner semantic change, strategy search, ranking, scoring policy change, alert, broker call, dashboard redesign, or candidate-card dashboard merge is authorized.`

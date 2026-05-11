@@ -893,3 +893,33 @@ Application pattern:
 - Fix applied: Added `core.data_orchestrator.build_unified_data_cache_signature`, wrapped the dashboard unified-data load with `st.cache_resource`, and keyed the cache by source parquet path/mtime/size signatures.
 - Guardrail for next time: Heavy top-level Streamlit data loads must either be behind a cache with explicit source invalidation or be moved out of rerun scope before dashboard UX is considered acceptable.
 - Evidence paths: `dashboard.py`, `core/data_orchestrator.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_dashboard_sprint_a.py`, pre-fix `.venv` timing of `load_unified_data(...)` at `8.802s` and `8.393s`.
+
+## 2026-05-11 Round Entry (Lifecycle Replay Must Drive Current Holds)
+- Date: 2026-05-11
+- Mistake or miss: Portfolio & Allocation could show 100% cash while Position Lifecycle Replay still had open ENTER positions.
+- Root cause: Universe construction used today's scanner labels and optional JSON memory, but did not treat PIT lifecycle replay as the authoritative current-holding state.
+- Fix applied: Added PIT-safe open-position reconstruction, preferred lifecycle replay over stale JSON memory, included open positions as `included_current_hold`, preserved residual cash across allocation/live-YTD weight mapping, and made lifecycle JSONL append/fail-closed behavior stricter.
+- Guardrail for next time: Any current-portfolio display must first reconcile latest lifecycle ENTER/EXIT state before declaring sell-all cash, and every performance path must preserve residual cash unless weights exceed 100%.
+- Evidence paths: `data/portfolio_lifecycle_log.py`, `strategies/portfolio_universe.py`, `views/optimizer_view.py`, `dashboard.py`, `tests/test_position_lifecycle.py`, `tests/test_portfolio_universe.py`, `tests/test_optimizer_view.py`, `.venv\Scripts\python -m pytest tests\test_position_lifecycle.py tests\test_portfolio_universe.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py -q`.
+
+
+## 2026-05-12: Pinned Strategy Universe — Silent Exclusion Class
+
+**Mistake**: Thesis tickers (MU, SNDK, WDC) were silently excluded from features and PIT replay because they fell outside the top-N liquidity selector. No error, no warning, no diagnostic — just missing data.
+
+**Root cause**: The feature_store universe selector is liquidity-ranked. Tickers with low recent dollar volume (delisted periods, consolidation phases) drop out. The PIT replay used a hardcoded ticker list that didn't auto-include manifest additions. Error handlers used `except: pass` patterns that swallowed failures.
+
+**Fix applied**:
+1. Pinned universe manifest (`data/universe/pinned_thesis_universe.yml`) — explicit named tickers.
+2. Feature store unions pinned permnos after liquidity selection; aborts on loader failure unless `allow_missing_pinned_universe=True`.
+3. PIT replay defaults to `SCANNER_TICKERS ∪ pinned manifest`; raises on loader failure.
+4. Loader validates strictly: rejects empty groups, blank tickers, duplicates, unresolved permnos.
+5. Incremental no-op checks pinned coverage before returning "up to date".
+
+**Guardrail for next time**:
+- Any universe selector that can silently exclude named strategy tickers must have a pinned override lane.
+- `except: pass` on universe/manifest loaders is forbidden — use fail-closed with explicit override.
+- Test the default fail-closed path, not just the override path.
+- When adding a new ticker to the strategy, verify it appears in both features AND replay output before closing.
+
+**Evidence**: `tests/test_pinned_universe.py` (27 tests), `tests/test_feature_store.py` (34 tests), PIT replay diagnostics showing all 10 pinned tickers accounted for.

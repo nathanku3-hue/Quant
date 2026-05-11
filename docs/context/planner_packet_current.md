@@ -4,6 +4,34 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, strategy search, candidate ranking, candidate scoring, thesis validation, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: provide the planner with a compact fresh world model after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Portfolio Lifecycle Current Holds Fix
+
+- `CURRENT_DELTA`: `Portfolio & Allocation now treats Position Lifecycle Replay as the authority for current open holdings before rendering sell-all cash.`
+- `IMPLEMENTATION_ARTIFACTS`: `data/portfolio_lifecycle_log.py`, `strategies/portfolio_universe.py`, `views/optimizer_view.py`, `dashboard.py`, `tests/test_position_lifecycle.py`, `tests/test_portfolio_universe.py`, `tests/test_optimizer_view.py`, `tests/test_dash_2_portfolio_ytd.py`.
+- `BEHAVIOR_DELTA`: `Open lifecycle ENTER positions without later PIT-safe EXIT events render as lifecycle holds plus residual cash when there are no fresh PIT ENTER candidates today.`
+- `PIT_DELTA`: `Future-dated lifecycle rows are ignored; lifecycle replay overrides stale JSON position memory when replay evidence exists.`
+- `CLOSURE_DELTA`: `Focused compile, 58-test portfolio/lifecycle suite, full pytest, browser smoke, context validation, SAW report validation, closure packet validation, and SE evidence validation passed.`
+- `BOUNDARY`: `No provider ingestion, canonical market-data write, broker call, alert, ranking, scoring, new optimizer objective, conviction mode, or Black-Litterman.`
+- `NEXT_STEP`: `hold_or_review_lifecycle_position_accounting_policy.`
+
+## Latest Addendum - Pinned Strategy Universe Hardening
+
+- `CURRENT_DELTA`: `PINNED_STRATEGY_UNIVERSE_HARDENING enforces explicit thesis-ticker inclusion in feature generation and PIT replay with fail-closed loader, shared eligibility gate, and regression tests.`
+- `IMPLEMENTATION_ARTIFACTS`: `data/universe/pinned_thesis_universe.yml`, `data/universe/loader.py`, `data/feature_store.py`, `scripts/pit_lifecycle_replay.py`, `tests/test_pinned_universe.py`.
+- `DATA_DELTA`: `10 thesis tickers (MU, AMD, AVGO, TSM, INTC, LRCX, SNDK, WDC, NVDA, AMAT) are pinned into feature universe regardless of liquidity ranking. yahoo_patch backfilled for all. PIT replay produces 103 events across 12 tickers. NVDA explicitly FAILED_GATE (not silently dropped).`
+- `INVARIANT_DELTA`: `Manifest missing/broken → build aborts (not warning). Replay raises on loader failure (not fallback). Unresolved permno → ValueError. Incremental no-op checks pinned coverage before returning. Shared is_pit_eligible()/is_pit_exit() used by both replay and diagnostics. 27 regression tests enforce no-silent-exclusion.`
+- `BOUNDARY`: `No provider ingestion, canonical market-data write, scanner semantic change, strategy search, ranking, scoring, alert, broker, optimizer objective change, or candidate-card dashboard merge.`
+- `NEXT_STEP`: `evaluate_nvda_fundamental_gate_or_stream2_strategy_review_or_hold.`
+
+## Latest Addendum - Frontend 3-Page Navigation Refactor
+
+- `CURRENT_DELTA`: `FRONTEND_3_PAGE_NAV_REFACTOR replaces 8-page shell with 3 views: Portfolio & Allocation, Discovery & Analysis, Entry/Exit Strategy.`
+- `IMPLEMENTATION_ARTIFACTS`: `dashboard.py`, `views/page_registry.py`, `views/discovery_view.py`, `views/strategy_view.py`, `tests/test_dash_1_page_registry_shell.py`, `tests/test_dash_2_portfolio_ytd.py`.
+- `NAVIGATION_DELTA`: `Sidebar now shows 3 pages. Portfolio includes optimizer+shadow+YTD+data-health+drift. Discovery composes opportunities+confluence. Strategy composes modular-strategies+backtest-lab.`
+- `CLOSURE_DELTA`: `24 DASH tests and 70 broader tests pass; no regressions.`
+- `BOUNDARY`: `No provider ingestion, canonical market-data write, scanner semantic change, strategy search, ranking, scoring, alert, broker, optimizer objective change, or candidate-card dashboard merge.`
+- `NEXT_STEP`: `hold_or_approve_dead_code_cleanup_or_next_phase.`
+
 ## Latest Addendum - Dashboard Unified Data Cache Performance Fix
 
 - `CURRENT_DELTA`: `DASHBOARD_UNIFIED_DATA_CACHE_PERFORMANCE_FIX caches the expensive dashboard unified parquet package across Streamlit reruns.`
@@ -18,7 +46,7 @@ Purpose: provide the planner with a compact fresh world model after the Portfoli
 - `CURRENT_DELTA`: `DASHBOARD_SCANNER_TESTABILITY_HARDENING extracts deterministic scanner math into strategies/scanner.py and adds focused boundary tests.`
 - `IMPLEMENTATION_ARTIFACTS`: `strategies/scanner.py`, `dashboard.py`, `tests/test_scanner.py`, `tests/test_adaptive_trend.py`, `tests/test_production_config.py`, `tests/test_core_etl.py`, `tests/test_strategy.py`, `tests/conftest.py`.
 - `BOUNDARY_DELTA`: `dashboard.py keeps provider/cache/persistence ownership; scanner enrichment is importable and testable without Streamlit.`
-- `CLOSURE_DELTA`: `Focused compile, affected 46-test suite, full pytest, and test-evidence refresh passed.`
+- `CLOSURE_DELTA`: `Focused compile, affected 49-test suite, full pytest, SAW Reviewer C final recheck, and test-evidence refresh passed.`
 - `BOUNDARY`: `No provider ingestion, canonical market-data write, scanner semantic change, strategy search, ranking, scoring policy change, alert, broker, dashboard redesign, or candidate-card dashboard merge.`
 - `NEXT_STEP`: `continue_review_or_hold`.
 
