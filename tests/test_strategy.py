@@ -50,3 +50,21 @@ def test_generate_weights_known_trend_conviction_score():
     assert details["cv_value"][101] == 0
     assert details["cv_macro"] == 2
     assert details["cv_mom"][101] == 2
+
+
+def test_generate_weights_caps_conviction_when_quality_fails():
+    idx = pd.date_range("2025-01-01", periods=260, freq="B")
+    prices = pd.DataFrame({101: np.linspace(100.0, 220.0, len(idx))}, index=idx)
+    macro = pd.DataFrame({"vix_proxy": np.linspace(30.0, 10.0, len(idx))}, index=idx)
+    quality_pass = pd.DataFrame({101: [False] * len(idx)}, index=idx)
+    strat = InvestorCockpitStrategy(green_candle=True, use_dynamic_params=False)
+
+    _, _, details = strat.generate_weights(
+        prices,
+        fundamentals={"quality_pass": quality_pass},
+        macro=macro,
+    )
+
+    assert details["conviction"][101] == 5
+    assert details["quality_pass"][101] == 0
+    assert details["quality_cap_applied"][101] is True

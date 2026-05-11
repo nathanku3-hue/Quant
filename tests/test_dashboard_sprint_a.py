@@ -1,5 +1,7 @@
 # Pseudocode - requires implementation
 
+from pathlib import Path
+
 def test_tab_count():
     """Verify 7 tabs after promotion."""
     # TODO: Mock st.tabs, import dashboard, verify tab_names length
@@ -15,10 +17,31 @@ def test_tab_order():
 
 def test_metrics_source():
     """Verify metrics loaded from backtest_results.json."""
-    from views.optimizer_view import load_strategy_metrics_from_results
+    from core.data_orchestrator import load_strategy_metrics_from_results
+
     metrics = load_strategy_metrics_from_results()
     # Verify structure (may be empty if file doesn't exist)
     assert isinstance(metrics, dict)
+
+
+def test_optimizer_view_uses_metrics_repository():
+    """Optimizer view delegates backtest-result parsing to the data orchestrator."""
+    source = Path("views/optimizer_view.py").read_text(encoding="utf-8")
+
+    assert "from core.data_orchestrator import load_strategy_metrics_from_results" in source
+    assert "data/backtest_results.json" not in source
+    assert "json.load(" not in source
+
+
+def test_dashboard_unified_parquet_load_uses_signature_cache():
+    """Dashboard caches the expensive unified parquet load across Streamlit reruns."""
+    source = Path("dashboard.py").read_text(encoding="utf-8")
+
+    assert "@st.cache_resource" in source
+    assert "def _load_unified_data_cached(" in source
+    assert "build_unified_data_cache_signature(" in source
+    assert "data_signature=" in source
+    assert "load_unified_data(" in source
 
 def test_cash_row_numeric_types():
     """Verify cash row uses numeric values, not pre-formatted strings."""
