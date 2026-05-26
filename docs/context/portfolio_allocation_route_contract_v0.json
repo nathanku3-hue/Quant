@@ -1,0 +1,155 @@
+{
+  "schema_version": "route_contract.v0",
+  "route_id": "portfolio_allocation.strict.v0",
+  "generated_at_utc": "2026-05-26T00:00:00Z",
+  "strict_invariants": {
+    "read_only": true,
+    "provider_calls_allowed": false,
+    "canonical_writes_allowed": false,
+    "broker_calls_allowed": false,
+    "live_overlay_allowed": false,
+    "scan_refresh_allowed": false,
+    "replay_rebuild_allowed": false,
+    "allowed_boot_writes": [
+      "runtime/boot_status_current.json"
+    ]
+  },
+  "subroutes": [
+    {
+      "id": "portfolio_allocation.optimizer_current",
+      "description": "Current optimizer universe and allocation controls using local historical data.",
+      "trusted_outputs": ["optimizer_universe", "allocation_table", "portfolio_replay_selection"],
+      "required_inputs": [
+        "historical_dashboard_package",
+        "local_price_source",
+        "local_returns",
+        "ticker_map",
+        "selected_or_default_assets",
+        "price_endpoint_freshness"
+      ],
+      "conditional_inputs": [
+        {
+          "id": "scan_payload",
+          "required_when": "optimizer universe is derived from current scan cache",
+          "path": "data/last_scan_state.json",
+          "missing_strict_status": "FAIL",
+          "missing_planning_status": "WARN"
+        },
+        {
+          "id": "sector_map",
+          "required_when": "sector cap or trusted sector display is enabled",
+          "path": "data/static/sector_map.parquet",
+          "missing_strict_status": "FAIL",
+          "missing_planning_status": "WARN"
+        },
+        {
+          "id": "fundamentals_wide",
+          "required_when": "current dashboard page-render branch requires fundamentals_wide is not None",
+          "path": "loader_return:f fundamentals_wide",
+          "missing_strict_status": "FAIL",
+          "missing_planning_status": "WARN"
+        }
+      ],
+      "fail_closed_conditions": [
+        "price source missing",
+        "returns missing when optimizer/replay output depends on returns",
+        "ticker map missing for selected or nonzero-weight asset",
+        "price/return slot corruption",
+        "duplicate dates or duplicate asset columns in selected matrix",
+        "nonfinite required selected values",
+        "selected asset endpoint stale beyond policy",
+        "live overlay/provider refresh needed to make selected asset current",
+        "scan cache missing or malformed when scan-derived optimizer universe is required"
+      ]
+    },
+    {
+      "id": "portfolio_allocation.daily_replay",
+      "description": "Daily replay, YTD chart, allocation snapshot, and strategy replay context.",
+      "trusted_outputs": ["daily_replay_context", "allocation_snapshot", "YTD_chart", "strategy_replay_section"],
+      "required_inputs": [
+        "pit_universe",
+        "local_price_source",
+        "local_returns",
+        "ticker_map",
+        "durable_replay_request_or_selection",
+        "replay_controls",
+        "replay_dates"
+      ],
+      "conditional_inputs": [
+        {
+          "id": "saved_selected_method_artifact",
+          "required_when": "strict boot is asked to certify saved artifact reuse",
+          "path_glob": "data/runtime_cache/strategy_replay/*.selected_method_replay.parquet",
+          "missing_strict_status": "WARN",
+          "mismatch_strict_status": "FAIL"
+        },
+        {
+          "id": "lifecycle_annotations",
+          "required_when": "displayed as trusted replay evidence",
+          "path": "data/portfolio_lifecycle_log.jsonl",
+          "missing_strict_status": "WARN",
+          "malformed_strict_status": "FAIL"
+        },
+        {
+          "id": "buy_sell_decisions",
+          "required_when": "displayed as trusted decision context",
+          "path": "data/portfolio_lifecycle_buy_sell_log.jsonl",
+          "missing_strict_status": "WARN",
+          "malformed_strict_status": "FAIL"
+        },
+        {
+          "id": "rule100_history",
+          "required_when": "selected method is Rule of 100",
+          "path": "data/processed/rule100_softmax_v1_history.csv",
+          "missing_strict_status": "FAIL",
+          "missing_planning_status": "WARN"
+        }
+      ],
+      "fail_closed_conditions": [
+        "PIT universe missing or malformed",
+        "PIT window does not cover requested replay dates",
+        "duplicate (date, permno) in PIT checked window",
+        "selected replay asset not in PIT membership for as-of window",
+        "ticker mapping missing for selected replay asset",
+        "route selection only exists in Streamlit session state and no durable request was supplied to the gate",
+        "saved artifact would be reused but dashboard_cache_signature, controls, method, date_window, source signatures, row counts, schema, or identity mismatch",
+        "replay build would be required to certify output"
+      ]
+    },
+    {
+      "id": "portfolio_allocation.benchmarks",
+      "description": "Benchmark-relative display for YTD/portfolio performance.",
+      "trusted_outputs": ["benchmark_return_metrics", "benchmark_overlay_chart"],
+      "required_inputs": ["local_benchmark_prices_when_displayed_as_trusted"],
+      "conditional_inputs": [
+        {
+          "id": "spy_qqq_benchmark_columns",
+          "required_when": "benchmark metrics are displayed as trusted",
+          "path": "loader_return:prices_wide[SPY,QQQ] or approved local benchmark source",
+          "missing_strict_status": "FAIL",
+          "missing_planning_status": "WARN"
+        }
+      ],
+      "fail_closed_conditions": [
+        "benchmark data missing when trusted benchmark metrics are displayed",
+        "benchmark live overlay lacks same-column overlap anchor",
+        "provider call required to refresh benchmark"
+      ]
+    }
+  ],
+  "planning_behavior": {
+    "missing_route_input": "WARN",
+    "stale_selected_asset": "WARN",
+    "missing_replay_artifact": "WARN",
+    "provider_call_attempt": "FAIL",
+    "canonical_write_attempt": "FAIL"
+  },
+  "strict_behavior": {
+    "missing_route_input": "FAIL",
+    "stale_selected_asset": "FAIL",
+    "missing_replay_artifact": "WARN unless saved-artifact-only certification is requested",
+    "reused_replay_artifact_mismatch": "FAIL",
+    "provider_call_attempt": "FAIL",
+    "canonical_write_attempt": "FAIL"
+  }
+}

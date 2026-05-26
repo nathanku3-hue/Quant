@@ -1,0 +1,180 @@
+{
+  "schema_version": "data_artifact_taxonomy.v0",
+  "generated_at_utc": "2026-05-26T00:00:00Z",
+  "authority": "Data Readiness Gate v0 accepted direction",
+  "classes": {
+    "canonical": {
+      "description": "Governed research inputs. Never silently regenerated or rewritten during boot.",
+      "writable_during_boot": false,
+      "default_repair_policy": "manual_approval"
+    },
+    "derived": {
+      "description": "Deterministic outputs from canonical or governed local inputs.",
+      "writable_during_boot": false,
+      "default_repair_policy": "manual_approval"
+    },
+    "cache_only": {
+      "description": "Runtime accelerators or display caches. Not evidence of research truth.",
+      "writable_during_boot": false,
+      "default_repair_policy": "never_during_boot"
+    },
+    "evidence_only": {
+      "description": "Artifacts that prove a check, report, context, or review happened.",
+      "writable_during_boot": false,
+      "default_repair_policy": "manual_approval"
+    },
+    "disposable": {
+      "description": "Temp/log/scratch outputs. Boot must not depend on them or silently delete them.",
+      "writable_during_boot": false,
+      "default_repair_policy": "never_during_boot"
+    }
+  },
+  "allowed_boot_writes": [
+    "runtime/boot_status_current.json"
+  ],
+  "artifacts": [
+    {
+      "path_glob": "data/processed/prices_tri.parquet",
+      "taxonomy": "canonical",
+      "source_quality": "canonical",
+      "required_for": ["portfolio_allocation.optimizer_current", "portfolio_allocation.daily_replay"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "FAIL",
+      "notes": "Preferred local TRI price/return source."
+    },
+    {
+      "path_glob": "data/processed/prices.parquet",
+      "taxonomy": "canonical",
+      "source_quality": "canonical",
+      "required_for": ["portfolio_allocation.optimizer_current", "portfolio_allocation.daily_replay"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "FAIL",
+      "notes": "Fallback only when prices_tri.parquet is unavailable and policy allows base price source."
+    },
+    {
+      "path_glob": "data/processed/yahoo_patch.parquet",
+      "taxonomy": "canonical",
+      "source_quality": "non_canonical_patch_governed_local",
+      "required_for": ["portfolio_allocation.optimizer_current", "portfolio_allocation.daily_replay"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "WARN",
+      "notes": "Local governed patch only; no provider refresh during boot."
+    },
+    {
+      "path_glob": "data/processed/tickers.parquet",
+      "taxonomy": "canonical",
+      "source_quality": "canonical",
+      "required_for": ["portfolio_allocation.optimizer_current", "portfolio_allocation.daily_replay", "pinned_universe"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "FAIL",
+      "notes": "Ticker/permno map. Selected assets fail closed when mapping is unavailable."
+    },
+    {
+      "path_glob": "data/processed/universe_r3000_daily.parquet",
+      "taxonomy": "canonical",
+      "source_quality": "canonical",
+      "required_for": ["portfolio_allocation.daily_replay", "pit_replay"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "FAIL",
+      "notes": "PIT R3000 membership proof for trusted replay."
+    },
+    {
+      "path_glob": "data/universe/pinned_thesis_universe.yml",
+      "taxonomy": "canonical",
+      "source_quality": "canonical",
+      "required_for": ["pinned_universe", "rule100", "portfolio_allocation.daily_replay"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "FAIL",
+      "notes": "Pinned thesis manifest; missing maps fail closed when route uses pinned names."
+    },
+    {
+      "path_glob": "data/static/sector_map.parquet",
+      "taxonomy": "canonical",
+      "source_quality": "canonical",
+      "required_for": ["portfolio_allocation.sector_cap", "portfolio_allocation.display"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "WARN",
+      "notes": "Strict FAIL only when sector cap or trusted sector display depends on it."
+    },
+    {
+      "path_glob": "data/last_scan_state.json",
+      "taxonomy": "cache_only",
+      "source_quality": "non_canonical",
+      "required_for": ["portfolio_allocation.optimizer_current"],
+      "writable_during_boot": false,
+      "repair_policy": "never_during_boot",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "FAIL",
+      "notes": "Required only when current optimizer universe is derived from scanner cache. Boot must not refresh scan."
+    },
+    {
+      "path_glob": "data/portfolio_lifecycle_log.jsonl",
+      "taxonomy": "evidence_only",
+      "source_quality": "operational",
+      "required_for": ["portfolio_allocation.open_positions", "portfolio_allocation.daily_replay"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "WARN",
+      "notes": "Strict FAIL only if malformed and displayed as trusted route evidence."
+    },
+    {
+      "path_glob": "data/portfolio_lifecycle_buy_sell_log.jsonl",
+      "taxonomy": "evidence_only",
+      "source_quality": "operational",
+      "required_for": ["portfolio_allocation.daily_replay"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "WARN",
+      "notes": "Decision context evidence."
+    },
+    {
+      "path_glob": "data/processed/rule100_softmax_v1_history.csv",
+      "taxonomy": "derived",
+      "source_quality": "canonical",
+      "required_for": ["portfolio_allocation.rule100"],
+      "writable_during_boot": false,
+      "repair_policy": "manual_approval",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "FAIL",
+      "notes": "Required only when selected method is Rule of 100."
+    },
+    {
+      "path_glob": "data/runtime_cache/strategy_replay/*.selected_method_replay.parquet",
+      "taxonomy": "cache_only",
+      "source_quality": "not_applicable",
+      "required_for": ["portfolio_allocation.daily_replay.saved_artifact"],
+      "writable_during_boot": false,
+      "repair_policy": "never_during_boot",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "WARN",
+      "notes": "Probe only selected artifact; fail if reused and identity/signature/window/schema mismatches."
+    },
+    {
+      "path_glob": "runtime/boot_status_current.json",
+      "taxonomy": "derived",
+      "source_quality": "not_applicable",
+      "required_for": ["boot"],
+      "writable_during_boot": true,
+      "repair_policy": "automatic_requested_output",
+      "planning_missing_status": "WARN",
+      "strict_missing_status": "WARN",
+      "notes": "Canonical runtime boot-status JSON and the only durable boot write allowed during boot. docs/context/boot_status_current.json is legacy fallback only. No markdown companion is part of v0."
+    }
+  ]
+}
