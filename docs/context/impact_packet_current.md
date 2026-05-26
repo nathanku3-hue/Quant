@@ -4,6 +4,42 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, broker calls, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: provide a compact view of the Portfolio Optimizer View Test and Performance Hardening implementation and affected interfaces.
 
+## Latest Addendum - Research Validity Runner v0 GitHub Anchor
+
+### Pushed Commit
+
+```text
+8716c51781d8524de4147cf42f17e52466913de4 Add research-validity runner v0 evidence gate
+```
+
+### GitHub Alignment
+
+```text
+origin/codex/optimizer-core-structured-diagnostics = 8716c51781d8524de4147cf42f17e52466913de4
+```
+
+### Committed Files
+
+```text
+research/
+tests/test_research_*.py
+docs/architecture/research_validity_contract.md
+docs/saw_reports/saw_research_validity_runner_v0_20260526.md
+PRD.md / PRODUCT_SPEC.md / docs/prd.md / docs/spec.md
+docs/notes.md / docs/decision log.md / docs/lessonss.md / docs/phase_brief/phase65-brief.md
+```
+
+### Passing Checks
+
+- `.venv\Scripts\python -m pytest tests\test_research_status.py tests\test_research_evidence_schema.py tests\test_research_benchmarks.py tests\test_research_backtest_runner.py tests\test_research_rule100_adapter.py tests\test_engine.py -q` -> PASS, 45 passed.
+- `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py tests\test_position_lifecycle.py tests\test_pinned_universe.py tests\test_portfolio_universe.py tests\test_optimizer_core_policy.py -q` -> PASS, 186 passed.
+- `.venv\Scripts\python -m pytest tests\test_build_context_packet.py -q` -> PASS, 21 passed.
+- `.venv\Scripts\python scripts\build_context_packet.py` and `--validate` -> PASS.
+
+### Open Risks
+
+- Remaining dirty/untracked worktree is inherited/local context outside this pushed commit.
+
 ## Latest Addendum - Pinned Strategy Universe Hardening
 
 ### Changed Runtime Files

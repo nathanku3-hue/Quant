@@ -4,6 +4,18 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, strategy search, candidate ranking, candidate scoring, thesis validation, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: provide the planner with a compact fresh world model after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Research Validity Runner v0 GitHub Anchor
+
+- `CURRENT_DELTA`: `Research Validity Runner v0 is isolated and pushed in commit 8716c51781d8524de4147cf42f17e52466913de4.`
+- `COMMIT_MESSAGE`: `Add research-validity runner v0 evidence gate.`
+- `IMPLEMENTATION_ARTIFACTS`: `research/`, `tests/test_research_*.py`, `docs/architecture/research_validity_contract.md`, `docs/saw_reports/saw_research_validity_runner_v0_20260526.md`.
+- `TEST_DELTA`: `Research/engine suite PASS with 45 tests; affected replay/lifecycle/optimizer suite PASS with 186 tests; context-builder test PASS with 21 tests; context rebuild/validate PASS.`
+- `SAW_DELTA`: `Reviewer A/B/C PASS and staged-diff reviewer PASS; SAWBlockValidation PASS.`
+- `GITHUB_DELTA`: `GitHub is aligned through 8716c51781d8524de4147cf42f17e52466913de4 on origin/codex/optimizer-core-structured-diagnostics.`
+- `BOUNDARY`: `Inherited dirty/untracked worktree remains outside this pushed commit; boot-preflight staging can resume only after remaining local context is classified.`
+- `NEXT_STEP`: `classify_remaining_dirty_context_then_continue_boot_preflight_staging.`
+- `DO_NOT_REDECIDE`: `Do not treat remaining dirty local files as GitHub state or safe-boot truth.`
+
 ## Latest Addendum - Portfolio Lifecycle Current Holds Fix
 
 - `CURRENT_DELTA`: `Portfolio & Allocation now treats Position Lifecycle Replay as the authority for current open holdings before rendering sell-all cash.`

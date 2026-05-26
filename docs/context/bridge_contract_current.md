@@ -4,6 +4,16 @@ Status: Current integration bridge
 Authority: advisory-only PM/planner bridge. This file does not authorize live trading, broker automation, promotion, provider ingestion, strategy search, candidate ranking, candidate scoring, candidate validation, alerts, dashboard content redesign, macro scoring, factor scoring, or scope widening.
 Purpose: connect Quant's technical state back to product/system truth after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Research Validity Runner v0 GitHub Anchor
+
+- `SYSTEM_DELTA`: `Research-validity evidence gating exists in pushed commit 8716c51781d8524de4147cf42f17e52466913de4.`
+- `PM_DELTA`: `The project has a remote-safe boundary before any strategy, signal, candidate, replay, optimizer output, or dashboard surface can claim research-valid status.`
+- `GIT_DELTA`: `GitHub is aligned through 8716c51781d8524de4147cf42f17e52466913de4 on origin/codex/optimizer-core-structured-diagnostics.`
+- `DIRTY_WORKTREE_DELTA`: `Remaining dirty/untracked files are inherited or later local context and are not part of the pushed research-validity commit.`
+- `OPEN_DECISION`: `Handle remaining inherited/local dirty context as separate buckets before claiming safe boot.`
+- `RECOMMENDED_NEXT_STEP`: `classify_remaining_dirty_context_then_continue_boot_preflight_staging.`
+- `DO_NOT_REDECIDE`: `Do not mix boot-preflight, dashboard, optimizer/lifecycle, packet zips, or unrelated dirty files into the research-validity GitHub anchor.`
+
 ## Latest Addendum - Pinned Strategy Universe Hardening
 
 - `SYSTEM_DELTA`: `Thesis tickers are explicitly pinned into feature generation via manifest. Feature store unions pinned permnos after yearly_top_n. PIT replay defaults to scanner ∪ pinned. Shared eligibility gate used by both replay and diagnostics. Loader raises on missing/broken manifest.`

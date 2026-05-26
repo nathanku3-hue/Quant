@@ -4,6 +4,20 @@ Status: Current with Portfolio Universe Construction PASS and optimizer-core qua
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, thesis validation, or scope widening by itself.
 Purpose: define machine-checkable done criteria for current Phase 65 portfolio universe and candidate-card work.
 
+## Latest Addendum - Research Validity Runner v0 GitHub Anchor
+
+- [x] Research-validity runner v0 exists in an isolated commit.
+- [x] Commit SHA recorded: `8716c51781d8524de4147cf42f17e52466913de4`.
+- [x] Commit message: `Add research-validity runner v0 evidence gate`.
+- [x] Commit is pushed to GitHub and remote branch resolves to `8716c51781d8524de4147cf42f17e52466913de4`.
+- [x] No boot-preflight, dashboard, optimizer/lifecycle, packet zip, or unrelated dirty files were staged into that commit.
+- [x] Research/engine suite passed with 45 tests.
+- [x] Affected replay/lifecycle/optimizer suite passed with 186 tests.
+- [x] Context-builder test passed with 21 tests.
+- [x] Context rebuild and validation passed.
+- [x] SAW report block validation passed.
+- [ ] Remaining inherited/local dirty worktree is not classified as safe boot.
+
 ## Latest Addendum - Pinned Strategy Universe Hardening
 
 - [x] `data/universe/pinned_thesis_universe.yml` exists with ≥10 thesis tickers.

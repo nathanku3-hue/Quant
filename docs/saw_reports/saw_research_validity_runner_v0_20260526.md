@@ -4,6 +4,10 @@ RoundID: `ROUND-20260526-RESEARCH-VALIDITY-RUNNER-V0`
 ScopeID: `SCOPE-RESEARCH-VALIDITY-RUNNER-V0`
 Hierarchy Confirmation: Approved | Session: current-thread | Trigger: inherited-user-approved-domain | Domains: Quant Research, Backend, Data, Docs/Ops
 SAW Verdict: PASS
+Commit Anchor: `8716c51781d8524de4147cf42f17e52466913de4`
+Commit Scope: pushed isolated commit `Add research-validity runner v0 evidence gate`
+GitHub Status: pushed and verified on `origin/codex/optimizer-core-structured-diagnostics` at `8716c51781d8524de4147cf42f17e52466913de4`.
+Dirty Worktree Status: inherited/local dirty context remains outside the pushed commit.
 
 ## Scope
 
