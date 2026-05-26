@@ -5726,3 +5726,24 @@ Phase 65 Dashboard Unified Data Cache Performance Fix (2026-05-11)
     - `.venv\Scripts\python .codex\skills\_shared\scripts\validate_saw_report_blocks.py --report-file docs\saw_reports\saw_dashboard_unified_data_cache_performance_20260511.md` PASS.
   - Contract lock:
     - `DASHBOARD_UNIFIED_DATA_CACHE := VALID iff (streamlit_cache_resource = 1) and (cache_key_includes_loader_args = 1) and (cache_key_includes_source_parquet_signature = 1) and (source_parquet_rewrite_invalidates = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0)`.
+
+Phase 65 Research Validity Runner v0 (2026-05-26)
+
+  - Decision record:
+    - make research validity mechanical before any strategy, signal, candidate, replay, optimizer output, or dashboard surface can claim research-valid status.
+    - approve a top-level `research/` package as the evidence-runner layer while keeping `core.engine.run_simulation(...)` as the official PnL/cost/turnover primitive.
+    - route Rule100 replay rows through a diagnostic-only adapter first; this does not promote Rule100 as validated alpha.
+  - The Decision (Hardcoded):
+    - `ResearchStatus` is a closed vocabulary: `diagnostic_only`, `exploratory`, `research_valid`, `candidate_ready`, `blocked`.
+    - `research.backtest_runner.run_research_backtest(...)` forces `strict_missing_returns=True` and blocks missing cartridge, cost policy, benchmark policy, PIT proof, input signatures, leakage checks, CASH columns, non-finite executed returns, malformed target-weight dates, and sparse-calendar target weights in v0.
+    - caller-supplied `run_id` values must be a single safe path segment; absolute paths, traversal, nested paths, empty ids, and unsupported characters fail before artifact path creation.
+    - `research.evidence_schema.write_evidence_packet(...)` writes JSON/CSV artifacts through temp files in the run directory plus `os.replace`, removes stale final manifests before same-run rewrites, and emits `evidence_packet.json` last.
+    - v0 cash handling is implicit residual cash only; the engine target-weight matrix must not include a `CASH` column.
+    - `research.benchmarks.build_pit_equal_weight_benchmark(...)` constructs same-date PIT equal-weight target weights and the benchmark is run through the same engine/cost/strict policy.
+    - `research.adapters.rule100_replay_adapter` filters daily portfolio rows, excludes CASH, pivots date x asset target weights, rejects conflicting duplicate date/asset rows, and ignores replay equity/performance columns.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile research\__init__.py research\status.py research\strategy_cartridge.py research\metrics.py research\evidence_schema.py research\benchmarks.py research\backtest_runner.py research\adapters\__init__.py research\adapters\rule100_replay_adapter.py tests\test_research_status.py tests\test_research_evidence_schema.py tests\test_research_benchmarks.py tests\test_research_backtest_runner.py tests\test_research_rule100_adapter.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_research_status.py tests\test_research_evidence_schema.py tests\test_research_benchmarks.py tests\test_research_backtest_runner.py tests\test_research_rule100_adapter.py tests\test_engine.py -q` PASS, 45 passed.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py tests\test_position_lifecycle.py tests\test_pinned_universe.py tests\test_portfolio_universe.py tests\test_optimizer_core_policy.py -q` PASS, 186 passed.
+  - Contract lock:
+    - `RESEARCH_VALIDITY_RUNNER_V0 := VALID iff (closed_status_vocab = 1) and (canonical_engine_wrapper = 1) and (strict_missing_returns_forced = 1) and (cash_column_forbidden = 1) and (implicit_cash_residual = 1) and (full_calendar_target_weights = 1) and (run_id_path_confined = 1) and (evidence_writes_atomic = 1) and (final_manifest_last = 1) and (pit_equal_weight_benchmark_same_engine = 1) and (rule100_adapter_diagnostic_only = 1) and (replay_equity_authority = 0) and (provider_ingestion = 0) and (canonical_market_data_write = 0) and (ranking = 0) and (scoring = 0) and (broker_call = 0)`.

@@ -5085,3 +5085,42 @@ replay_tickers = SCANNER_TICKERS ∪ get_pinned_tickers()
 - Duplicate tickers → ValueError
 - Feature build without pinned → aborts (not warns)
 - Replay without pinned → raises (not falls back)
+
+## Research Validity Runner v0 Notes (2026-05-26)
+
+1. Promotion formula:
+   - `No cartridge + no canonical engine run + no PIT proof + no benchmark + no costs + no evidence packet = not research-valid`.
+   - Code path: `docs/architecture/research_validity_contract.md`, `research/backtest_runner.py`.
+2. Canonical engine wrapper:
+   - `research.backtest_runner.run_research_backtest(...)` is the v0 evidence wrapper over `core.engine.run_simulation(...)`.
+   - It forces `strict_missing_returns=True` and records `canonical_engine = core.engine.run_simulation`.
+   - Caller-supplied `run_id` values are restricted to a single safe path segment before the evidence run directory is resolved.
+3. Cash and target-weight policy:
+   - Cash is implicit residual weight, not an engine column.
+   - `cash_residual = 1.0 - sum(executed_risky_weights)`.
+   - V0 target weights must have sorted unique dates, match the returns calendar, be numeric/finite/long-only, exclude `CASH`, and have row sums `<= 1.0`.
+4. Cost formula:
+   - `turnover_cost_rate = 0.0010 = 10 bps per unit one-way risky-asset turnover`.
+   - Current engine bridge: `core.engine.run_simulation(..., cost_bps=turnover_cost_rate)`.
+   - Engine cost formula remains `cost = turnover * cost_bps`; evidence reports both decimal rate and bps equivalent.
+5. Benchmark and Rule100 adapter:
+   - `research.benchmarks.build_pit_equal_weight_benchmark(...)` constructs same-date PIT equal-weight risky-asset weights and the benchmark runs through the same engine/cost/strict policy.
+   - `research.adapters.rule100_replay_adapter` filters `daily_portfolio` rows, excludes CASH, pivots date x asset `target_weight`, rejects conflicting duplicate date/asset rows, ignores replay equity/performance columns, and leaves Rule100 `diagnostic_only`.
+6. Evidence-write policy:
+   - `research.evidence_schema.write_evidence_packet(...)` writes JSON/CSV artifacts through temp files in the destination run directory and promotes them with `os.replace`.
+   - Existing `evidence_packet.json` is removed before same-run overwrite attempts, and the new final packet manifest is emitted only after component artifacts succeed.
+7. Boundary:
+   - No provider ingestion, canonical market-data write, strategy promotion, ranking, scoring, recommendation, alert, broker automation, autonomous allocation, or live trading is authorized.
+8. Evidence paths:
+   - `research/status.py`
+   - `research/strategy_cartridge.py`
+   - `research/backtest_runner.py`
+   - `research/benchmarks.py`
+   - `research/metrics.py`
+   - `research/evidence_schema.py`
+   - `research/adapters/rule100_replay_adapter.py`
+   - `tests/test_research_status.py`
+   - `tests/test_research_evidence_schema.py`
+   - `tests/test_research_benchmarks.py`
+   - `tests/test_research_backtest_runner.py`
+   - `tests/test_research_rule100_adapter.py`

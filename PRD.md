@@ -7,6 +7,14 @@ Scope: docs and architecture only
 
 ## Current Phase 65 Notices
 
+Research Validity Runner v0 (2026-05-26):
+
+- Terminal Zero now has a mechanical research-validity contract: `No cartridge + no canonical engine run + no PIT proof + no benchmark + no costs + no evidence packet = not research-valid`.
+- The first implementation adds a top-level `research/` package and keeps `core.engine.run_simulation(...)` as the official PnL/cost/turnover primitive.
+- Research evidence output is path-confined and atomic: unsafe `run_id` values are rejected, artifact files are promoted by temp-to-replace, and the final packet manifest is written last.
+- Rule100 replay can be adapted into runner target weights, but it remains `diagnostic_only` by default and is not promoted as validated alpha.
+- This does not authorize provider ingestion, canonical market-data writes, live trading, broker behavior, alerts, ranking, scoring, recommendations, autonomous allocation, or strategy promotion.
+
 G8.1A Discovery Drift Correction (2026-05-10):
 
 - The current six-name discovery queue is user-seeded and theme/supply-chain-adjacent, not pure system-scouted output.

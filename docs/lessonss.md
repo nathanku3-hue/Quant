@@ -923,3 +923,11 @@ Application pattern:
 - When adding a new ticker to the strategy, verify it appears in both features AND replay output before closing.
 
 **Evidence**: `tests/test_pinned_universe.py` (27 tests), `tests/test_feature_store.py` (34 tests), PIT replay diagnostics showing all 10 pinned tickers accounted for.
+
+## 2026-05-26 Round Entry (Evidence Runners Need Output-Path and Completion Gates)
+- Date: 2026-05-26
+- Mistake or miss: Research-validity runner v0 initially focused on PIT/cost/benchmark math but did not fully prove evidence-output containment, atomic writes, or stale final-manifest cleanup.
+- Root cause: The first implementation treated the evidence directory as a passive artifact sink, while reviewer runtime analysis correctly treated it as part of the research-validity boundary.
+- Fix applied: Rejected unsafe `run_id` values, resolved evidence run directories under the cartridge output root, wrote JSON/CSV artifacts through same-directory temp files plus `os.replace`, removed stale `evidence_packet.json` before same-run rewrites, emitted final manifest last, and added focused regressions.
+- Guardrail for next time: Any runner that emits evidence must test path confinement, temp-to-replace writes, final-manifest ordering, stale-manifest failure behavior, and malformed-input blocked paths before SAW closure.
+- Evidence paths: `research/backtest_runner.py`, `research/evidence_schema.py`, `tests/test_research_backtest_runner.py`, `tests/test_research_evidence_schema.py`, `.venv\Scripts\python -m pytest tests\test_research_status.py tests\test_research_evidence_schema.py tests\test_research_benchmarks.py tests\test_research_backtest_runner.py tests\test_research_rule100_adapter.py tests\test_engine.py -q`.

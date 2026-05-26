@@ -1205,3 +1205,19 @@ Do not revert G7.1G FRED/Ken French fixtures, G7.1F CFTC fixture docs, G7.1E FIN
   - HTTP smoke at `http://127.0.0.1:8501` -> PASS, HTTP 200.
   - SAW PASS in `docs/saw_reports/saw_dashboard_architecture_safety_20260511.md`.
   - Full pytest timed out after 304 seconds; longer full-regression window is required before phase-close proof.
+
+## Research Validity Runner v0 Addendum
+
+- Current user-approved implementation slice: create a mechanical research-validity gate before any strategy, signal, candidate, replay, optimizer output, or dashboard surface can claim research-valid status.
+- Implemented behavior:
+  - Added `docs/architecture/research_validity_contract.md`.
+  - Added top-level `research/` package with closed statuses, cartridge validation, canonical engine wrapper, metrics, evidence packet writer, benchmark constructors, and Rule100 replay adapter.
+  - `run_research_backtest(...)` forces `strict_missing_returns=True`, blocks missing cost/benchmark/PIT/input/leakage gates, forbids `CASH` columns, requires full-calendar target weights, and records implicit residual cash.
+  - Runner output now rejects unsafe `run_id` path segments, blocks malformed target-weight dates without raising, writes evidence JSON/CSV through temp files plus `os.replace`, removes stale final manifests before same-run rewrites, and emits final `evidence_packet.json` last.
+  - Rule100 replay adapter filters `daily_portfolio` rows, excludes CASH, pivots date x asset target weights, rejects conflicting duplicate date/asset rows, and marks output `diagnostic_only`.
+- Boundary:
+  - no live trading, broker automation, alerting, ranking, scoring, recommendation, autonomous allocation, provider ingestion, canonical market-data write, dashboard change, or Rule100 strategy promotion is authorized.
+- Evidence:
+  - `.venv\Scripts\python -m py_compile research\__init__.py research\status.py research\strategy_cartridge.py research\metrics.py research\evidence_schema.py research\benchmarks.py research\backtest_runner.py research\adapters\__init__.py research\adapters\rule100_replay_adapter.py tests\test_research_status.py tests\test_research_evidence_schema.py tests\test_research_benchmarks.py tests\test_research_backtest_runner.py tests\test_research_rule100_adapter.py` -> PASS.
+  - `.venv\Scripts\python -m pytest tests\test_research_status.py tests\test_research_evidence_schema.py tests\test_research_benchmarks.py tests\test_research_backtest_runner.py tests\test_research_rule100_adapter.py tests\test_engine.py -q` -> PASS, 45 passed.
+  - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py tests\test_position_lifecycle.py tests\test_pinned_universe.py tests\test_portfolio_universe.py tests\test_optimizer_core_policy.py -q` -> PASS, 186 passed.

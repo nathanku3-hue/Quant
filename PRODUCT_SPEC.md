@@ -7,6 +7,15 @@ Scope: docs and architecture only
 
 ## Current Phase 65 Notices
 
+Research Validity Runner v0 (2026-05-26):
+
+- `research.backtest_runner.run_research_backtest(...)` is the v0 canonical evidence wrapper over `core.engine.run_simulation(...)`.
+- `research.status.ResearchStatus` locks the status vocabulary: `diagnostic_only`, `exploratory`, `research_valid`, `candidate_ready`, `blocked`.
+- `research.adapters.rule100_replay_adapter` filters Rule100 daily replay rows, excludes CASH, ignores replay equity/performance columns, and emits runner-ready target weights while preserving diagnostic-only status.
+- V0 evidence requires strict missing-return behavior, declared costs, required benchmarks, PIT proof, input signatures, leakage checks, metrics, and a verdict packet.
+- V0 evidence output rejects unsafe `run_id` values, confines the run directory under cartridge `output_dir`, writes JSON/CSV artifacts with temp-to-`os.replace`, and emits `evidence_packet.json` last.
+- No provider ingestion, canonical market-data write, live trading, broker behavior, alerts, ranking, scoring, recommendations, autonomous allocation, or strategy promotion is authorized.
+
 G8.1A Discovery Drift Correction (2026-05-10):
 
 - Discovery intake items now require origin provenance fields before any later scout work can consume them.

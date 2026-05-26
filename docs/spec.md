@@ -1739,3 +1739,12 @@ Scope: product roadmap and dashboard taxonomy realignment only; no candidate gen
 - `tests/test_data_orchestrator_portfolio_runtime.py`
 - `tests/test_optimizer_view.py`
 - `tests/test_optimizer_core_policy.py`
+
+Research Validity Runner v0 Notice (2026-05-26)
+
+- `docs/architecture/research_validity_contract.md` defines the mechanical promotion rule: `No cartridge + no canonical engine run + no PIT proof + no benchmark + no costs + no evidence packet = not research-valid`.
+- `research.backtest_runner.run_research_backtest(...)` is the v0 wrapper around `core.engine.run_simulation(...)`; research-valid paths force `strict_missing_returns=True`.
+- V0 target weights are risky-asset-only and full-calendar: no `CASH` column, sorted unique dates matching the returns calendar, finite numeric long-only weights, and row sums `<= 1.0`.
+- Evidence output is path-confined by safe `run_id`, written with temp files plus `os.replace`, and final `evidence_packet.json` is emitted only after component artifacts succeed.
+- Cash is implicit residual weight; Rule100 replay remains `diagnostic_only` through `research.adapters.rule100_replay_adapter`.
+- No provider ingestion, canonical market-data write, strategy promotion, ranking, scoring, recommendation, alert, broker automation, autonomous allocation, or live trading is authorized.
