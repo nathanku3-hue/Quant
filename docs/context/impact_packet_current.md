@@ -4,6 +4,57 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, broker calls, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: provide a compact view of the Portfolio Optimizer View Test and Performance Hardening implementation and affected interfaces.
 
+## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
+
+### Pushed Commit
+
+```text
+7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e Wire data-readiness gate into boot preflight
+```
+
+### Audit Verdict
+
+```text
+PASS_WITH_NOTES
+```
+
+### Audited Diff Range
+
+```text
+22f2788a18e9ea38896b688a818f58b5f7576dfb..7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e
+```
+
+### Committed Files In Range
+
+```text
+docs/architecture/boot_preflight_contract.md
+scripts/boot_preflight.py
+tests/test_boot_preflight.py
+```
+
+### Audit Confirmed
+
+- `scripts/boot_preflight.py` calls `core.data_readiness_gate.run_data_readiness_gate(...)`.
+- Data-readiness `PASS`, `WARN`, and `FAIL` map to ready, degraded, and blocked behavior.
+- Failed preflight cannot refresh `runtime/boot_status_current.json`; it reports `blocked-until-pass`.
+- Boot-facing data-readiness details sanitize research-trust `next_actions`.
+- No governance, context-packet, dashboard, replay, optimizer, Rule100, or research-validity integration was added.
+- Default behavior remains read-only unless `--write-status` is explicitly supplied.
+
+### Audit Checks
+
+- `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight.py tests/test_boot_status_contract.py -q` -> PASS, 24 passed.
+- `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_data_readiness_gate.py tests/test_data_readiness_gate_write_guard.py -q` -> PASS, 15 passed.
+- `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_engine.py -q` -> PASS, 4 passed.
+- `E:\Code\Quant\.venv\Scripts\python.exe scripts/boot_preflight.py --help` -> PASS.
+- `E:\Code\Quant\.venv\Scripts\python.exe scripts/run_data_readiness_gate.py --help` -> PASS.
+
+### Notes And Open Risks
+
+- Optional `scripts/boot_preflight.py --json` byte-for-byte audit was skipped because `generated_at_utc` is intentionally time-varying; deterministic JSON output is future hardening, not a blocker.
+- Full repo phase-close regression has not been run from this anchor.
+- Main worktree remains dirty/local and must not be treated as GitHub truth.
+
 ## Latest Addendum - Research Validity Runner v0 GitHub Anchor
 
 ### Pushed Commit

@@ -4,6 +4,17 @@ Status: Current integration bridge
 Authority: advisory-only PM/planner bridge. This file does not authorize live trading, broker automation, promotion, provider ingestion, strategy search, candidate ranking, candidate scoring, candidate validation, alerts, dashboard content redesign, macro scoring, factor scoring, or scope widening.
 Purpose: connect Quant's technical state back to product/system truth after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
+
+- `SYSTEM_DELTA`: `Boot preflight now has a pushed, audited data-readiness integration anchor at 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e.`
+- `PM_DELTA`: `The system can report data-readiness state during boot without treating that state as research validity, strategy validity, alpha, a recommendation, or a dashboard promotion claim.`
+- `AUDIT_DELTA`: `Clean remote audit returned PASS_WITH_NOTES for 22f2788..7cbe3c0 and confirmed only the approved three files changed.`
+- `GIT_DELTA`: `GitHub is aligned through 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e on origin/codex/optimizer-core-structured-diagnostics.`
+- `DIRTY_WORKTREE_DELTA`: `Remaining local dirty/untracked files are quarantined local context and are not GitHub truth.`
+- `OPEN_DECISION`: `Run clean remote phase-close regression from this audit anchor before any further implementation.`
+- `RECOMMENDED_NEXT_STEP`: `run_clean_remote_phase_close_regression_from_7cbe3c0.`
+- `DO_NOT_REDECIDE`: `Do not broaden into governance/context-packet, dashboard, replay, optimizer, Rule100, research-validity, or generated_at_utc determinism work before phase-close status is known.`
+
 ## Latest Addendum - Research Validity Runner v0 GitHub Anchor
 
 - `SYSTEM_DELTA`: `Research-validity evidence gating exists in pushed commit 8716c51781d8524de4147cf42f17e52466913de4.`

@@ -4,6 +4,22 @@ Status: Current with Portfolio Universe Construction PASS and optimizer-core qua
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, thesis validation, or scope widening by itself.
 Purpose: define machine-checkable done criteria for current Phase 65 portfolio universe and candidate-card work.
 
+## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
+
+- [x] Boot preflight data-readiness integration commit is pushed: `7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e`.
+- [x] Clean remote audit verdict recorded: `PASS_WITH_NOTES`.
+- [x] Audit range recorded: `22f2788a18e9ea38896b688a818f58b5f7576dfb..7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e`.
+- [x] Audit confirmed only the three approved files changed in the range.
+- [x] Audit confirmed boot preflight calls the pushed data-readiness gate.
+- [x] Audit confirmed `PASS/WARN/FAIL` maps to ready/degraded/blocked.
+- [x] Audit confirmed failed preflight cannot refresh `runtime/boot_status_current.json`.
+- [x] Audit confirmed boot-facing data-readiness details sanitize research-trust `next_actions`.
+- [x] Audit confirmed no governance/context-packet/dashboard/replay/optimizer/Rule100/research-validity integration was added.
+- [x] Audit confirmed default behavior remains read-only unless `--write-status` is explicitly supplied.
+- [x] Audit note accepted: `generated_at_utc` makes byte-for-byte `--json` output non-deterministic; deterministic JSON output is future hardening.
+- [ ] Clean remote phase-close regression from `7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e` has not yet been run.
+- [ ] Main dirty worktree remains local context and is not GitHub truth.
+
 ## Latest Addendum - Research Validity Runner v0 GitHub Anchor
 
 - [x] Research-validity runner v0 exists in an isolated commit.

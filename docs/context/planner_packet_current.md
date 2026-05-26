@@ -4,6 +4,18 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, strategy search, candidate ranking, candidate scoring, thesis validation, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: provide the planner with a compact fresh world model after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
+
+- `CURRENT_DELTA`: `Boot preflight data-readiness integration is pushed and audited at 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e.`
+- `AUDIT_VERDICT`: `PASS_WITH_NOTES; accepted as the remote-safe audit anchor.`
+- `AUDIT_RANGE`: `22f2788a18e9ea38896b688a818f58b5f7576dfb..7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e contained only docs/architecture/boot_preflight_contract.md, scripts/boot_preflight.py, and tests/test_boot_preflight.py.`
+- `CONFIRMED_BEHAVIOR`: `boot_preflight calls the pushed data-readiness gate; PASS/WARN/FAIL maps to ready/degraded/blocked; failed preflight cannot refresh runtime/boot_status_current.json; boot-facing details sanitize research-trust next_actions.`
+- `BOUNDARY`: `No governance, context-packet, dashboard, replay, optimizer, Rule100, or research-validity integration was added. This audit does not authorize strategy validity, alpha, recommendations, or dashboard promotion.`
+- `NOTE`: `Optional --json byte-for-byte audit was skipped because generated_at_utc is intentionally time-varying; deterministic JSON output is future schema/test hardening, not a blocker.`
+- `GITHUB_DELTA`: `GitHub is aligned through 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e; remaining dirty local files are not GitHub truth.`
+- `NEXT_STEP`: `run_clean_remote_phase_close_regression_from_the_audit_anchor.`
+- `DO_NOT_REDECIDE`: `Do not patch generated_at_utc determinism, stage dirty context, or start governance/context-packet implementation before the clean phase-close regression verdict.`
+
 ## Latest Addendum - Research Validity Runner v0 GitHub Anchor
 
 - `CURRENT_DELTA`: `Research Validity Runner v0 is isolated and pushed in commit 8716c51781d8524de4147cf42f17e52466913de4.`

@@ -6,6 +6,34 @@ Workspace: `E:\Code\Quant`
 Branch: `codex/optimizer-core-structured-diagnostics`
 Authority: advisory-only worktree classification. This file does not authorize staging, deletion, revert, provider ingestion, dashboard redesign, scoring, ranking, alerting, broker behavior, live trading, or scope widening by itself.
 
+## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
+
+Remote truth is anchored at:
+
+```text
+7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e
+```
+
+Accepted audit verdict:
+
+```text
+PASS_WITH_NOTES
+```
+
+The accepted audit confirmed the `22f2788..7cbe3c0` range changed only:
+
+```text
+docs/architecture/boot_preflight_contract.md
+scripts/boot_preflight.py
+tests/test_boot_preflight.py
+```
+
+Remaining dirty local files are inherited/local context and are not GitHub truth. They must not be used as phase-close evidence, boot readiness evidence, research-validity evidence, strategy-validity evidence, alpha evidence, recommendation authority, or dashboard-promotion authority.
+
+Generated bundles, zips, packet folders, patches, runtime stdout/stderr/pid/status files, and evidence captures remain excluded from the audit-anchor commit unless a later explicit artifact policy approves them.
+
+The `generated_at_utc` byte-for-byte JSON determinism note from the audit is a future schema/test-hardening item, not a cleanup or implementation instruction for this anchor.
+
 ## Purpose
 
 Classify the broader dirty worktree into reviewable buckets before any staging or cleanup action. This manifest is the handoff artifact for the next staging plan.
