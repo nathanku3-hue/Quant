@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terminal-zero.local/schemas/boot_status_current.schema.json",
+  "title": "Terminal Zero Boot Status v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "source",
+    "primary_verdict",
+    "flags",
+    "checks",
+    "next_safe_action",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "const": "boot-status/v1" },
+    "generated_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "source": { "type": "string", "minLength": 1 },
+    "primary_verdict": { "enum": ["ready", "degraded", "blocked"] },
+    "flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["safe_boot", "boot_candidate", "local_planning"],
+      "properties": {
+        "safe_boot": { "type": "boolean" },
+        "boot_candidate": { "type": "boolean" },
+        "local_planning": { "type": "boolean" }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "status", "severity", "summary"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["pass", "warn", "fail", "not_applicable", "deferred"] },
+          "severity": { "enum": ["ready", "degraded", "blocked"] },
+          "summary": { "type": "string", "minLength": 1 },
+          "evidence_ref": { "type": "string" },
+          "destination": { "type": "string" },
+          "details": { "type": "object" }
+        }
+      }
+    },
+    "next_safe_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "destination", "reason", "allowed_use", "forbidden_use"],
+      "properties": {
+        "label": { "type": "string", "pattern": "^(Inspect|Review|Open)\\b" },
+        "destination": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "allowed_use": { "type": "string", "minLength": 1 },
+        "forbidden_use": { "type": "string", "minLength": 1 }
+      }
+    },
+    "artifact_id": { "type": "string" },
+    "git_commit": { "type": "string" },
+    "local_context_id": { "type": "string" },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "metadata": { "type": "object" }
+  }
+}

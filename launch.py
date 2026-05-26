@@ -4,6 +4,7 @@ Terminal Zero launcher with runtime guardrails.
 Usage:
     python launch.py
     python launch.py --server.headless true --server.port 8501
+    python launch.py --preflight --strict
 """
 
 from __future__ import annotations
@@ -26,6 +27,15 @@ REQUIRED_MODULES = (
     "streamlit",
     "yfinance",
 )
+
+USAGE = """Terminal Zero launcher
+
+Usage:
+    python launch.py
+    python launch.py --server.headless true --server.port 8501
+    python launch.py --preflight --strict
+    python launch.py --preflight --mode planning
+"""
 
 
 def _project_root() -> str:
@@ -80,7 +90,50 @@ def _print_errors(errors: list[str]) -> None:
     print("- Or activate .venv before running.")
 
 
+def _print_usage() -> None:
+    print(USAGE.rstrip())
+
+
+def _is_preflight_request(argv: list[str]) -> bool:
+    return "--preflight" in argv or "--preflight-strict" in argv
+
+
+def _run_preflight(argv: list[str]) -> int:
+    from scripts.boot_preflight import main as boot_preflight_main
+
+    preflight_args: list[str] = []
+    has_repo_root = False
+    strict_alias = False
+    for arg in argv:
+        if arg == "--preflight":
+            continue
+        if arg == "--preflight-strict":
+            strict_alias = True
+            continue
+        if arg == "--repo-root" or arg.startswith("--repo-root="):
+            has_repo_root = True
+        preflight_args.append(arg)
+    if not has_repo_root:
+        preflight_args = ["--repo-root", _project_root(), *preflight_args]
+    if strict_alias:
+        preflight_args.extend(["--mode", "strict"])
+    return boot_preflight_main(preflight_args)
+
+
 def main() -> int:
+    argv = sys.argv[1:]
+    if argv in (["--help"], ["-h"]):
+        _print_usage()
+        return 0
+    if _is_preflight_request(argv):
+        checks = []
+        checks.extend(_check_python_version())
+        checks.extend(_check_venv())
+        if checks:
+            _print_errors(checks)
+            return 1
+        return _run_preflight(argv)
+
     checks = []
     checks.extend(_check_python_version())
     checks.extend(_check_venv())
@@ -89,7 +142,7 @@ def main() -> int:
         _print_errors(checks)
         return 1
 
-    cmd = [sys.executable, "-m", "streamlit", "run", "dashboard.py", *sys.argv[1:]]
+    cmd = [sys.executable, "-m", "streamlit", "run", "dashboard.py", *argv]
     return subprocess.call(cmd, cwd=_project_root())
 
 
