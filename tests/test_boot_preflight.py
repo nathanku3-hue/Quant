@@ -26,6 +26,24 @@ def _clean_git_state() -> dict[str, object]:
     }
 
 
+def _data_gate_status(overall_status: str = "PASS") -> dict[str, object]:
+    return {
+        "schema_version": "data_readiness_gate.v0",
+        "generated_at_utc": "2026-05-26T00:00:00Z",
+        "mode": "strict",
+        "overall_status": overall_status,
+        "planning_status": overall_status,
+        "strict_status": overall_status,
+        "route_id": "portfolio_allocation.strict.v0",
+        "route_readiness": {"portfolio_allocation_route_status": overall_status},
+        "summary": {
+            "blockers": ["missing strict-required artifacts"] if overall_status == "FAIL" else [],
+            "warnings": ["missing optional artifacts"] if overall_status == "WARN" else [],
+            "next_actions": [],
+        },
+    }
+
+
 def test_generated_expert_packets_are_advisory_evidence() -> None:
     bucket, severity, reason = boot_preflight.classify_path(
         "docs/context/e2e_evidence/reboot_expert_packet_20260526/PACKET_INDEX.md"
@@ -105,6 +123,7 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
 
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
     monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
 
     def fake_pytest_gate(
         _repo: Path,
@@ -124,7 +143,7 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
     assert exit_code == 0
     assert status["verdict"] == "PASS"
     assert pytest_commands == [boot_preflight.BOOT_CONTROL_TEST_COMMAND]
-    assert status["checks"]["data_readiness_gate"]["status"] == "DEFERRED"
+    assert status["checks"]["data_readiness_gate"]["overall_status"] == "PASS"
     assert status["checks"]["governance_preflight"]["status"] == "DEFERRED"
     assert status["checks"]["portfolio_apptest_smoke"]["status"] == "DEFERRED"
     assert status["checks"]["focused_replay_dashboard_contract"]["status"] == "DEFERRED"
@@ -136,6 +155,7 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
 def test_planning_mode_does_not_run_tests(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
     monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
     monkeypatch.setattr(
         boot_preflight,
         "_run_pytest_gate",
@@ -151,6 +171,7 @@ def test_planning_mode_does_not_run_tests(tmp_path: Path, monkeypatch) -> None:
 
 def test_require_github_blocks_dirty_or_unaligned_state(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
     monkeypatch.setattr(
         boot_preflight,
         "collect_git_state",
@@ -182,6 +203,7 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
             "boot_core": {"status": "PASS", "command": "file-contract"},
             "git": _clean_git_state(),
             "dirty": {"status": "PASS", "dirty_state": "clean"},
+            "data_readiness_gate": _data_gate_status("PASS"),
             "boot_control_tests": {"status": "PASS", "command": "pytest"},
         },
     }
@@ -190,7 +212,85 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
     round_trip = BootStatus.from_json_dict(json.loads(boot_status.to_json_text()))
 
     assert round_trip.primary_verdict == "degraded"
-    assert any(check.id == "data_readiness_gate" and check.status == "deferred" for check in round_trip.checks)
+    assert any(check.id == "data_readiness_gate" and check.status == "pass" for check in round_trip.checks)
+
+
+def test_data_readiness_gate_failure_blocks_preflight(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("FAIL"))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
+    status, exit_code = boot_preflight.build_status(args)
+    boot_status = boot_preflight.make_boot_status_from_preflight(status)
+
+    assert exit_code == 1
+    assert "data-readiness gate failed" in status["failures"]
+    assert boot_status.primary_verdict == "blocked"
+    assert any(check.id == "data_readiness_gate" and check.status == "fail" for check in boot_status.checks)
+
+
+def test_data_readiness_gate_warning_degrades_without_failing(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("WARN"))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
+    status, exit_code = boot_preflight.build_status(args)
+    boot_status = boot_preflight.make_boot_status_from_preflight(status)
+
+    assert exit_code == 0
+    assert status["verdict"] == "PASS"
+    assert "Data readiness gate is degraded or uncertified." in status["warnings"]
+    assert boot_status.primary_verdict == "degraded"
+    assert any(check.id == "data_readiness_gate" and check.status == "warn" for check in boot_status.checks)
+
+
+def test_write_status_is_blocked_until_preflight_passes(tmp_path: Path, monkeypatch) -> None:
+    writes: list[Path] = []
+
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("FAIL"))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+    monkeypatch.setattr(
+        boot_preflight,
+        "write_boot_status_file",
+        lambda _status, path, *, repo_root: writes.append(Path(path)) or "written",
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--write-status"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    assert status["status_write"]["result"] == "blocked-until-pass"
+    assert writes == []
+
+
+def test_data_readiness_gate_next_actions_are_not_boot_status_copy() -> None:
+    raw_status = _data_gate_status("FAIL")
+    raw_status["summary"]["next_actions"] = ["Fix checks before trusting research output."]
+
+    sanitized = boot_preflight._boot_safe_data_readiness_status(raw_status)
+    check = boot_preflight._check_from_data_readiness_gate(sanitized)
+
+    assert "next_actions" not in sanitized["summary"]
+    assert "next_actions" not in check.details["summary"]
+    assert "research output" not in json.dumps(check.to_json_dict())
 
 
 def test_launch_preflight_dispatch_adds_repo_root(monkeypatch) -> None:
@@ -238,7 +338,7 @@ def test_no_boot_core_imports_for_deferred_dependency_modules() -> None:
 
     assert "from scripts.governance_preflight" not in source
     assert "import scripts.governance_preflight" not in source
-    assert "core.data_readiness_gate" not in source
+    assert "from core.data_readiness_gate import run_data_readiness_gate" in source
 
 
 def test_pytest_gate_uses_argv_not_shell(tmp_path: Path, monkeypatch) -> None:
