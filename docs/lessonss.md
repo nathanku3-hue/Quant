@@ -939,3 +939,11 @@ Application pattern:
 - Fix applied: Made G4 manifest path validation resolve declared paths relative to repo root, stored the G4 artifact path as repo-relative, refreshed synthetic fixture hashes from committed bytes, and made G2 lineage report manifests hash the absolute report target before storing a repo-relative artifact path.
 - Guardrail for next time: Replay fixture manifests must compare resolved paths but store repo-relative paths, and fixture hashes must be refreshed from stable file bytes only, never from workspace roots, timestamps, generated runtime paths, or process cwd.
 - Evidence paths: `v2_discovery/readiness/canonical_slice.py`, `v2_discovery/fast_sim/run_candidate_proxy.py`, `tests/test_v2_proxy_registered_candidate_flow.py`, `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet.manifest.json`, `data/fixtures/v2_proxy/synthetic_manifest.json`, `.venv\Scripts\python -m pytest tests\test_g5_single_canonical_replay_no_alpha.py tests\test_signed_envelope_replay.py tests\test_v2_canonical_replay_fixture.py -q`.
+
+## 2026-05-27 Round Entry (Scanner Display Must Quarantine Raw Action Labels)
+- Date: 2026-05-27
+- Mistake or miss: The dashboard opportunities and screened-ticker tables still rendered raw scanner fields such as Rating, Entry_Price, Stop_Loss, Target_Price, Score, and Leverage directly into the UI path.
+- Root cause: The scanner display logic was embedded inline in `dashboard.py`, so the render path reused raw action-shaped columns instead of a separate research-only view model.
+- Fix applied: Added `views/scanner_display.py`, mapped raw ratings to research-only labels, renamed/removed action-shaped columns before `st.dataframe`, routed both scanner tables through the quarantine helper, and added focused regression tests.
+- Guardrail for next time: Any scanner-derived dataframe sent to Streamlit must pass through a research-only display helper first, and the dashboard source should never expose raw action-shaped columns in the render section.
+- Evidence paths: `dashboard.py`, `views/scanner_display.py`, `tests/test_dashboard_scanner_display.py`, `tests/test_scanner.py`, `.venv\Scripts\python -m pytest tests\test_dashboard_scanner_display.py tests\test_g8_2_system_scouted_candidate_card.py -q`.

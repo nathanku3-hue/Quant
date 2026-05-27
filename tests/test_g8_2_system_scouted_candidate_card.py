@@ -10,6 +10,7 @@ from opportunity_engine.candidate_card import (
 )
 from opportunity_engine.candidate_card_schema import validate_candidate_card
 from opportunity_engine.factor_scout import (
+    artifact_sha256 as scout_artifact_sha256,
     load_factor_scout_manifest,
     load_factor_scout_output,
 )
@@ -20,6 +21,8 @@ CARD_PATH = Path("data/candidate_cards/MSFT_supercycle_candidate_card_v0.json")
 MANIFEST_PATH = Path("data/candidate_cards/MSFT_supercycle_candidate_card_v0.manifest.json")
 SCOUT_OUTPUT_PATH = Path("data/discovery/local_factor_scout_output_tiny_v0.json")
 SCOUT_MANIFEST_PATH = Path("data/discovery/local_factor_scout_output_tiny_v0.manifest.json")
+SCOUT_BASELINE_PATH = Path("data/discovery/local_factor_scout_baseline_v0.json")
+SCOUT_BASELINE_MANIFEST_PATH = Path("data/discovery/local_factor_scout_baseline_v0.manifest.json")
 CANDIDATE_CARD_DIR = Path("data/candidate_cards")
 
 
@@ -188,3 +191,32 @@ def test_g8_2_mu_and_msft_are_only_candidate_cards():
     ]
     assert _manifest()["source_intake_manifest_uri"] == str(SCOUT_MANIFEST_PATH).replace("\\", "/")
     assert _scout_manifest()["tickers"] == ["MSFT"]
+
+
+def test_g8_2_candidate_card_transitive_scout_manifest_hash_chain():
+    card = _card()
+    card_manifest = _manifest()
+    scout_manifest_path = Path(card["source_intake_manifest_uri"])
+
+    assert scout_manifest_path == SCOUT_MANIFEST_PATH
+    assert card_manifest["source_intake_manifest_uri"] == str(SCOUT_MANIFEST_PATH).replace("\\", "/")
+
+    scout_manifest = load_factor_scout_manifest(scout_manifest_path)
+    scout_output_path = Path(scout_manifest["artifact_uri"])
+
+    assert scout_output_path == SCOUT_OUTPUT_PATH
+    assert scout_output_path.exists()
+    assert scout_manifest["artifact_sha256"] == scout_artifact_sha256(scout_output_path)
+
+    scout_output = load_factor_scout_output(scout_output_path)
+    assert scout_output["scout_model_manifest"] == str(SCOUT_BASELINE_MANIFEST_PATH).replace("\\", "/")
+
+    baseline_manifest_path = Path(scout_manifest["baseline_manifest_uri"])
+    baseline_manifest = load_factor_scout_manifest(baseline_manifest_path)
+    baseline_path = Path(baseline_manifest["artifact_uri"])
+
+    assert baseline_manifest_path == SCOUT_BASELINE_MANIFEST_PATH
+    assert baseline_path == SCOUT_BASELINE_PATH
+    assert baseline_path.exists()
+    assert scout_manifest["baseline_artifact_uri"] == str(SCOUT_BASELINE_PATH).replace("\\", "/")
+    assert baseline_manifest["artifact_sha256"] == scout_artifact_sha256(baseline_path)

@@ -1,16 +1,17 @@
 # Boot Preflight Contract v0
 
 Status: implementation contract
-Scope: boot-core control plane plus standalone data-readiness gate integration
-Non-scope: governance preflight, context rebuilding, replay behavior, optimizer behavior, dashboard semantics, research-validity claims, data repair, provider ingestion, broker actions, strategy logic
+Scope: boot-core control plane plus governance preflight integration
+Non-scope: data-readiness execution, context rebuilding, replay behavior, optimizer behavior, dashboard semantics, research-validity claims, data repair, provider ingestion, broker actions, strategy logic
 
 ## Mission
 
 Terminal Zero must expose one deterministic boot-status contract before broad
 feature buckets are staged. The current slice keeps the boot path narrow: it
 proves the status vocabulary, schema, launch dispatch, basic Git/dirty
-inspection, preflight pass/fail shell, and the already-pushed standalone
-data-readiness gate.
+inspection, preflight pass/fail shell, and the governance preflight boundary.
+Data-readiness is reported as deferred in this proof and must not run from
+`scripts/boot_preflight.py` until a separate slice approves it.
 
 ## Commands
 
@@ -46,43 +47,39 @@ Boot-core v0 may check:
 - `docs/context/boot_status_current.schema.json` matches the boot-status vocabulary,
 - Git state is readable,
 - dirty files are classified at a basic safety level,
-- the data-readiness gate runs in read-only mode and reports structured readiness,
+- governance preflight runs and reports structured PASS/WARN/FAIL state,
 - boot-control tests pass in strict mode unless `--no-tests` is supplied,
 - `--require-github` has a clean worktree and upstream-aligned HEAD.
 
 Boot-core v0 may import:
 
-- `core.data_readiness_gate.run_data_readiness_gate`.
+- `scripts.governance_preflight.run_governance_preflight`.
 
 Boot-core v0 must not import or execute:
 
-- `scripts.governance_preflight`,
+- `core.data_readiness_gate.run_data_readiness_gate`,
+- `scripts/run_data_readiness_gate.py`,
 - `scripts/build_context_packet.py --validate`,
 - dashboard AppTest smoke paths,
 - replay/dashboard focused-contract commands,
 - optimizer, Rule100, replay, or data repair modules.
 
-Governance, context-packet, smoke, replay/dashboard, optimizer, Rule100, and
-data-repair checks remain deferred until their own slices are approved.
+Data-readiness, context-packet, smoke, replay/dashboard, optimizer, Rule100,
+and data-repair checks remain deferred until their own slices are approved.
 
-## Data-Readiness Gate Policy
+## Data-Readiness Deferral Policy
 
-`scripts/boot_preflight.py` calls `run_data_readiness_gate(repo_root, mode=...)`
-directly. It does not call the CLI wrapper and does not write status files unless
-the operator explicitly supplies `--write-status`. Even with `--write-status`,
-failed preflight does not refresh the runtime status artifact; it reports
+`scripts/boot_preflight.py` must not call the data-readiness gate in this
+current governance slice. It emits `checks.data_readiness_gate.status =
+DEFERRED`, and `make_boot_status_from_preflight(...)` maps that state to a
+degraded non-safe boot candidate. A later data-readiness slice must update this
+contract, the tests, and the runtime status mapping before the gate can execute
+from boot preflight.
+
+The boot preflight writer does not write status files unless the operator
+explicitly supplies `--write-status`. Even with `--write-status`, failed
+preflight does not refresh the runtime status artifact; it reports
 `blocked-until-pass` in the transient result instead.
-
-Gate status maps into boot status as:
-
-- `PASS`: readiness check `pass`, severity `ready`,
-- `WARN`: readiness check `warn`, severity `degraded`, boot preflight exit code remains `0`,
-- `FAIL`: readiness check `fail`, severity `blocked`, boot preflight exit code is `1`,
-- `DEFER` or `DEFERRED`: readiness check `deferred`, severity `degraded`.
-
-Required data-readiness contract failures must not be silently downgraded to
-warnings. Optional missing artifacts may degrade the boot status when the gate
-reports `WARN`.
 
 ## Status Artifact Policy
 
@@ -134,6 +131,6 @@ Advisory only:
 
 ## Deferred Scope
 
-The next slice may add the governance/context-packet dependency set. It must be
-staged separately and must not be retroactively mixed into the boot-core or
-data-readiness integration commits.
+The next slice may add the data-readiness/context-packet dependency set. It must
+be staged separately and must not be retroactively mixed into the boot-core or
+governance integration commits.
