@@ -1,7 +1,7 @@
 {
   "manifest_id": "LOCAL_FACTOR_SCOUT_BASELINE_V0_MANIFEST",
   "artifact_uri": "data/discovery/local_factor_scout_baseline_v0.json",
-  "artifact_sha256": "c256b2c9a2230773d894228dd6fd0f67122036f51d22d09696cfd219a7142000",
+  "artifact_sha256": "29b4148412941114c326a74b0a127715f42c2ba00a1b648252ea06dd9a89aeb7",
   "created_at": "2026-05-10T00:00:00+08:00",
   "scope": "PH65_G8_1B_SCOUT_BASELINE_ONLY",
   "scout_model_id": "LOCAL_FACTOR_EQUAL_WEIGHT_V0",

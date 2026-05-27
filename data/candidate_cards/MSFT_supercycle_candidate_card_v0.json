@@ -288,6 +288,7 @@
     "no_score": true,
     "no_rank": true,
     "no_buy_sell_signal": true,
+    "no_buying_range": true,
     "no_alert": true,
     "no_broker_action": true
   }

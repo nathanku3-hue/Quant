@@ -26,7 +26,7 @@ SCHEMA_VERSION = "data_readiness_gate.v0"
 DEFAULT_TAXONOMY_PATH = Path("docs/context/data_artifact_taxonomy_current.json")
 DEFAULT_ROUTE_CONTRACT_PATH = Path("docs/context/portfolio_allocation_route_contract_v0.json")
 DEFAULT_STATUS_PATH = BOOT_STATUS_CURRENT_PATH
-ALLOWED_BOOT_WRITES = {BOOT_STATUS_CURRENT_PATH.as_posix()}
+ALLOWED_BOOT_WRITES = {DEFAULT_STATUS_PATH.as_posix()}
 BOOT_WRITE_GUARD_ROOTS = (
     "app.py",
     "launch.py",

@@ -26,6 +26,8 @@ from views.optimizer_view import render_optimizer_view
 from views.drift_monitor_view import render_drift_monitor_view
 from views.shadow_portfolio_view import render_shadow_portfolio_view
 from views.page_registry import build_dashboard_navigation
+from views.scanner_display import build_scanner_research_display_frame
+from views.scanner_display import style_scanner_research_display_frame
 from strategies.portfolio_universe import (
     DEFAULT_OPTIMIZER_UNIVERSE_POLICY,
     build_optimizer_universe,
@@ -540,7 +542,7 @@ with st.sidebar:
 def _render_hedge_harvester_section() -> None:
     st.subheader("Hedge Harvester")
     hedge_ticker = st.text_input("Enter Ticker for Collar:", value="MU").upper()
-    if st.button("Generate Option Yield"):
+    if st.button("Run Research Premium Scenario"):
         with st.spinner(f"Pricing vol for {hedge_ticker}..."):
             res = calculate_optimal_hedge(hedge_ticker)
             if "Action" not in res:
@@ -643,21 +645,6 @@ except Exception as e:
 if drone_count > 0:
     st.info(f"🛸 **DRONE INTEL:** {drone_count} New Targets Detected dynamically by Scout Drone (Last Sweep: {drone_timestamp})")
 
-# Custom Sort: Prioritize Actionable Ratings
-def rate_weight(val):
-    v = str(val).upper()
-    if "ENTER: STRONG BUY" in v: return 1
-    if "ENTER: BUY" in v: return 2
-    if "EXIT" in v: return 3
-    if "WATCH (" in v and "Miss" not in v and "No" not in v: return 4
-    if "WATCH" in v or "HOLD" in v: return 5
-    if "IGNORE" in v: return 6
-    if "AVOID" in v: return 7
-    return 8
-
-df_scan['SortWeight'] = df_scan['Rating'].apply(rate_weight)
-df_scan = df_scan.sort_values(by=['SortWeight', 'Score'], ascending=[True, False]).drop(columns=['SortWeight'])
-
 # --- Drift Monitor setup (shared across sidebar + Tab 6) ---
 drift_alert_manager = None
 drift_detector = None
@@ -716,137 +703,10 @@ def _render_opportunities_page() -> None:
         st.subheader("The Sovereign Pool (Proxy Gated)")
     with col2:
         st.markdown("<div style='text-align: right; margin-top: 15px;'><span style='background-color: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 5px; font-size: 0.85em; color: #88ccff;'>⚙️ Active Engine: <b>🌊 Sovereign Alpha (Phase 65)</b></span></div>", unsafe_allow_html=True)
-    
-    display_cols = ['Ticker', 'Leverage', 'Cluster', 'Current_Price', 'Entry_Price', 'Stop_Loss', 'Target_Price', 'Tactical_Warning', 'Proxy_Type', 'P_Value', 'Proxy_Content', 'Proxy_Signal', 'Rating', 'Score']
-    view_df = df_scan[display_cols].copy()
-    
-    # Currency formatting
-    view_df['Current_Price'] = view_df['Current_Price'].map("${:.2f}".format)
-    
-    def format_entry(row):
-        ep = row.get('Entry_Price', 0.0)
-        flush = row.get('Max_Flush', 0.0)
-        prem = row.get('Premium', 0.0)
-        if ep > 0:
-            return f"${ep:.2f}\n(Flush -{flush*100:.0f}% | Prem +{prem*100:.0f}%)"
-        return "N/A"
-        
-    view_df['Entry_Price'] = df_scan.apply(format_entry, axis=1)
-    
-    def format_stop(row):
-        sl = row['Stop_Loss']
-        entry = row['Entry_Price']
-        price = row['Current_Price']
-        warning = str(row.get('Tactical_Warning', ''))
-        rating = str(row.get('Rating', '')).upper()
-        
-        if not ("HOLD" in rating or "ENTER:" in rating):
-            return ""
-            
-        if "TRAIL" in warning and "PARABOLIC" in warning:
-            if price > 0:
-                pct = ((price - sl) / price) * 100
-                return f"${sl:.2f} (Trail -{pct:.1f}%)"
-            return f"${sl:.2f}"
-            
-        if entry > 0:
-            pct = ((entry - sl) / entry) * 100
-            if pct < 0: pct = 0 # safety
-            return f"${sl:.2f} (-{pct:.1f}%)"
-        return f"${sl:.2f}"
-        
-    def format_target(row):
-        tp = row['Target_Price']
-        rating = str(row.get('Rating', '')).upper()
-        if "HOLD" in rating or "ENTER:" in rating:
-            return f"${tp:.2f}"
-        return ""
-        
-    view_df['Stop_Loss'] = df_scan.apply(format_stop, axis=1)
-    view_df['Target_Price'] = df_scan.apply(format_target, axis=1)
-        
-    view_df = view_df.rename(columns={'Proxy_Content': f'Proxy_Content (Updated: {time_str})'})
-    
-    def highlight_dataframe(row):
-        cols = [''] * len(row)
-        
-        # Color coding Rating
-        rating_col = view_df.columns.get_loc('Rating')
-        v = str(row['Rating']).upper()
-        if "ENTER:" in v:
-            cols[rating_col] = 'color: #00ff88; font-weight: bold;'
-        elif "WATCH" in v or "HOLD" in v:
-            if "NO PROXY" in v or "MISS PROXY" in v:
-                cols[rating_col] = 'color: #ffb020; font-weight: bold;' # Amber
-            else:
-                cols[rating_col] = 'color: #FFD700; font-weight: bold;' # Gold
-        elif "EXIT" in v or "AVOID" in v or "KILL" in v:
-            cols[rating_col] = 'color: #ff4444; font-weight: bold;'
-            
-        # Color coding Wide Stop (Position Size Warning)
-        stop_col = view_df.columns.get_loc('Stop_Loss')
-        sl_str = str(row['Stop_Loss'])
-        if "Trail" in sl_str:
-            cols[stop_col] = 'color: #ffb020; font-weight: bold;' # Amber warning for tightening stop
-        elif "(-" in sl_str:
-            try:
-                pct_val = float(sl_str.split("(-")[1].split("%")[0])
-                if pct_val > 12.0:
-                    cols[stop_col] = 'color: #ffb020; font-weight: bold;' # Amber
-            except Exception:
-                pass
-            
-        warn_col = view_df.columns.get_loc('Tactical_Warning')
-        score_val = row.get('Score', 0)
-        warning_str = str(row['Tactical_Warning'])
-        
-        if score_val < 90:
-            cols[warn_col] = 'color: #555555; font-style: italic;' # Grey out
-        elif "PARABOLIC" in warning_str:
-            cols[warn_col] = 'color: #ff4444; font-weight: bold;' # Red tight
-        elif "LINEAR TREND" in warning_str:
-            cols[warn_col] = 'color: #00ff88; font-weight: bold;' # Green Linear
-        elif "SUPER CYCLE" in warning_str:
-            cols[warn_col] = 'color: #00ff88; font-weight: bold;'
-            
-        # Color coding Leverage
-        if 'Leverage' in view_df.columns:
-            veh_col = view_df.columns.get_loc('Leverage')
-            veh_val = str(row.get('Leverage', ''))
-            if "LEAP" in veh_val:
-                cols[veh_col] = 'color: #DDAAFF; font-weight: bold; background-color: rgba(221,170,255,0.1);' # Purple 
-            elif "Avoid" in veh_val:
-                cols[veh_col] = 'color: #ffb020; font-weight: bold;' # Amber
-                
-        # Color coding Proxy Type and P_Value
-        type_col = view_df.columns.get_loc('Proxy_Type')
-        if "NO PROXY" in str(row['Proxy_Type']):
-            cols[type_col] = 'color: #ff4444;'
-        else:
-            cols[type_col] = 'color: #88ccff;'
-            
-        if 'P_Value' in view_df.columns:
-            pval_col = view_df.columns.get_loc('P_Value')
-            cols[pval_col] = 'color: #aaa; font-style: italic;'
-            
-        # Color coding Proxy Signal (The Truth Table)
-        sig_col = view_df.columns.get_loc('Proxy_Signal')
-        sig = str(row['Proxy_Signal'])
-        if sig == "COILED SPRING":
-            cols[sig_col] = 'color: #00ff88; font-weight: bold; background-color: rgba(0,255,136,0.1);'
-        elif sig == "CORRELATED":
-            cols[sig_col] = 'color: #aaddaa;'
-        elif sig == "DIVERGING":
-            cols[sig_col] = 'color: #ffb020; font-weight: bold; background-color: rgba(255,176,32,0.1);' # Flashing Orange
-        elif sig == "MISPRICED" or sig == "UNDERVALUED":
-            cols[sig_col] = 'color: #ff4444; font-weight: bold;'
-        elif sig == "CORRECTING":
-            cols[sig_col] = 'color: #888888;'
-            
-        return cols
+    view_df = build_scanner_research_display_frame(df_scan, time_label=time_str)
     
     st.dataframe(
-        view_df.style.apply(highlight_dataframe, axis=1), 
+        style_scanner_research_display_frame(view_df),
         use_container_width=True,
         hide_index=True
     )
@@ -918,10 +778,10 @@ def _render_daily_scan_section() -> None:
 
     def get_plot_category(score, dist):
         if score == 100:
-            if dist > 5.0: return "Wait (Extended)"
-            elif dist >= -2.0: return "Strong Buy (Max Alpha)"
-            else: return "Buy"
-        elif score >= 90: return "Watch / Hold"
+            if dist > 5.0: return "Review (Extended)"
+            elif dist >= -2.0: return "High Research Score"
+            else: return "Research Band"
+        elif score >= 90: return "Monitor / Stable"
         return "Ignore"
 
     plot_records = []
@@ -1099,10 +959,10 @@ def _render_daily_scan_section() -> None:
             y_range = [15, 108]
         
         color_discrete_map = {
-            "Strong Buy (Max Alpha)": "#00FFAA",
-            "Buy": "#00cc66",
-            "Wait (Extended)": "#FFB020",
-            "Watch / Hold": "#FFD700",
+            "High Research Score": "#00FFAA",
+            "Research Band": "#00cc66",
+            "Review (Extended)": "#FFB020",
+            "Monitor / Stable": "#FFD700",
             "Ignore": "#888888"
         }
         
@@ -1120,7 +980,7 @@ def _render_daily_scan_section() -> None:
             labels={
                 "Tech_Support_Dist": "Distance from Dynamic Support (%)",
                 "Display_Score": "Fundamental Physics Score",
-                "Plot_Category": "Action Status",
+                "Plot_Category": "Research Status",
                 "Support_Label": "Active Rail",
                 "Source": "Intel Source"
             }
@@ -1133,7 +993,7 @@ def _render_daily_scan_section() -> None:
                 marker=dict(size=14, symbol="circle", line=dict(width=1, color='DarkSlateGrey'))
             )
         
-        # Draw Max Alpha Zone
+        # Draw upper research band
         fig.add_shape(
             type="rect",
             x0=-2, y0=90, x1=5, y1=102,
@@ -1142,7 +1002,7 @@ def _render_daily_scan_section() -> None:
             opacity=0.15,
             layer="below"
         )
-        fig.add_annotation(x=1.5, y=96, text="MAX ALPHA ZONE", showarrow=False, font=dict(color="#00FFAA", size=14))
+        fig.add_annotation(x=1.5, y=96, text="UPPER RESEARCH BAND", showarrow=False, font=dict(color="#00FFAA", size=14))
         
         # Draw Extended Zone (Wait for Support)
         fig.add_shape(
@@ -1974,9 +1834,9 @@ def _render_portfolio_builder_placeholder():
         "Run fundamentals updater to enable, or use Research Lab / Modular Strategies."
     )
 
-    # --- 5. Combined Execution Logic ---
+    # --- 5. Combined scenario logic ---
     st.divider()
-    st.subheader("⚙️ Combined Execution Logic")
+    st.subheader("⚙️ Combined Scenario Logic")
 
     if len(base_df) == 0:
         st.warning("No logic blocks in matrix. Engine is currently in observation mode.")
@@ -1986,7 +1846,7 @@ def _render_portfolio_builder_placeholder():
 
         # Build AND-chained logic string
         logic_str = " **AND** ".join(f"({n})" for n in names)
-        st.markdown(f"**EXECUTE IF:** {logic_str}")
+        st.markdown(f"**SCENARIO CONDITION:** {logic_str}")
 
         # AND compounding warning
         if len(names) >= 3:
@@ -2011,22 +1871,21 @@ def _render_portfolio_builder_placeholder():
             st.error(f"Signal compiler error: {e}")
             df_scan["Sovereign_Command"] = False
 
-        # --- 7. Qualifying Tickers Readout ---
+        # --- 7. Screened tickers readout ---
         st.divider()
-        st.subheader("🎯 Qualifying Tickers")
+        st.subheader("🎯 Screened Tickers")
         qualifying = df_scan[df_scan.get("Sovereign_Command", pd.Series(False, index=df_scan.index)) == True]
 
         if qualifying.empty:
-            st.info("No tickers qualify under the current filter combination. Matrix is empty.")
+            st.info("No tickers meet the current research filter combination. Matrix is empty.")
         else:
-            st.success(f"**{len(qualifying)}** ticker(s) pass the combined gate.")
-            qual_cols = ["Ticker", "Score", "Rating", "Current_Price"]
-            for opt_col in ["Convexity", "Tech_Support_Dist", "Multiplier"]:
-                if opt_col in qualifying.columns:
-                    qual_cols.append(opt_col)
-            qual_view = qualifying[qual_cols].copy()
-            qual_view["Current_Price"] = qual_view["Current_Price"].map("${:.2f}".format)
-            st.dataframe(qual_view, use_container_width=True, hide_index=True)
+            st.success(f"**{len(qualifying)}** ticker(s) meet the combined research gate.")
+            qual_view = build_scanner_research_display_frame(qualifying, time_label=time_str)
+            st.dataframe(
+                style_scanner_research_display_frame(qual_view),
+                use_container_width=True,
+                hide_index=True,
+            )
 
 
 def _render_command_center_page() -> None:

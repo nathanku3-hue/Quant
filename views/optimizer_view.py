@@ -83,7 +83,7 @@ def _build_allocation_table(
     sector_map: dict | None,
     portfolio_value: float,
 ) -> pd.DataFrame:
-    """Build a complete allocation table with weights, dollars, shares, and cash."""
+    """Build a complete allocation table with weights, dollars, units, and cash."""
     latest_prices = prices_selected.ffill().iloc[-1].replace([np.inf, -np.inf], np.nan)
     weights = weights.reindex(prices_selected.columns).fillna(0.0)
 
@@ -606,14 +606,14 @@ def _render_allocation_table(allocation_df: pd.DataFrame) -> None:
                 "weight": "Weight",
                 "allocation_usd": "Allocation ($)",
                 "latest_price": "Latest Price ($)",
-                "est_shares": "Estimated Shares",
+                "est_shares": "Estimated Units",
             }
         ).style.format(
             {
                 "Weight": "{:.2%}",
                 "Allocation ($)": "${:,.2f}",
                 "Latest Price ($)": "${:,.2f}",
-                "Estimated Shares": "{:,.2f}",
+                "Estimated Units": "{:,.2f}",
             }
         ),
         width="stretch",

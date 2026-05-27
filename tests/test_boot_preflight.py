@@ -2,12 +2,23 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
-
 import launch
+import pytest
+
 from core.boot_status import BootStatus
 from scripts import boot_preflight
 from scripts.boot_preflight import CommandResult, DirtyEntry
+
+CANONICAL_BOOT_STATUS_PATH = Path("runtime/boot_status_current.json")
+CONTEXT_BOOT_STATUS_SNAPSHOT_PATH = Path("docs/context/boot_status_current.json")
+
+
+class _GovernanceResult:
+    def __init__(self, status: str = "PASS") -> None:
+        self.status = status
+
+    def to_dict(self) -> dict[str, object]:
+        return {"status": self.status, "findings": []}
 
 
 def _clean_git_state() -> dict[str, object]:
@@ -31,24 +42,6 @@ def _clean_git_state() -> dict[str, object]:
         },
         "worktree_clean": True,
         "entries": [],
-    }
-
-
-def _data_gate_status(overall_status: str = "PASS") -> dict[str, object]:
-    return {
-        "schema_version": "data_readiness_gate.v0",
-        "generated_at_utc": "2026-05-26T00:00:00Z",
-        "mode": "strict",
-        "overall_status": overall_status,
-        "planning_status": overall_status,
-        "strict_status": overall_status,
-        "route_id": "portfolio_allocation.strict.v0",
-        "route_readiness": {"portfolio_allocation_route_status": overall_status},
-        "summary": {
-            "blockers": ["missing strict-required artifacts"] if overall_status == "FAIL" else [],
-            "warnings": ["missing optional artifacts"] if overall_status == "WARN" else [],
-            "next_actions": [],
-        },
     }
 
 
@@ -130,8 +123,8 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
     pytest_commands: list[tuple[str, ...]] = []
 
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
     monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
 
     def fake_pytest_gate(
         _repo: Path,
@@ -151,8 +144,8 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
     assert exit_code == 0
     assert status["verdict"] == "PASS"
     assert pytest_commands == [boot_preflight.BOOT_CONTROL_TEST_COMMAND]
-    assert status["checks"]["data_readiness_gate"]["overall_status"] == "PASS"
-    assert status["checks"]["governance_preflight"]["status"] == "DEFERRED"
+    assert status["checks"]["data_readiness_gate"]["status"] == "DEFERRED"
+    assert status["checks"]["governance"]["status"] == "PASS"
     assert status["checks"]["portfolio_apptest_smoke"]["status"] == "DEFERRED"
     assert status["checks"]["focused_replay_dashboard_contract"]["status"] == "DEFERRED"
     assert boot_status.primary_verdict == "degraded"
@@ -160,10 +153,190 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
     assert boot_status.flags.safe_boot is False
 
 
+def test_boot_preflight_uses_runtime_boot_status_contract(capsys) -> None:
+    assert boot_preflight.BOOT_STATUS_CURRENT_PATH == CANONICAL_BOOT_STATUS_PATH
+    assert boot_preflight.DEFAULT_STATUS_JSON == CANONICAL_BOOT_STATUS_PATH
+
+    with pytest.raises(SystemExit):
+        boot_preflight.parse_args(["--help"])
+
+    help_text = capsys.readouterr().out
+    assert "runtime/boot_status_current.json" in help_text
+
+
+def test_strict_preflight_without_write_flag_creates_no_status_artifact(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 0
+    assert status["verdict"] == "PASS"
+    assert "status_write" not in status
+    assert not (tmp_path / CANONICAL_BOOT_STATUS_PATH).exists()
+    assert not (tmp_path / CONTEXT_BOOT_STATUS_SNAPSHOT_PATH).exists()
+
+
+def test_strict_write_status_writes_only_runtime_canonical_after_pass(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--write-status"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 0
+    assert status["verdict"] == "PASS"
+    assert status["status_write"]["path"] == CANONICAL_BOOT_STATUS_PATH.as_posix()
+    assert (tmp_path / CANONICAL_BOOT_STATUS_PATH).exists()
+    assert not (tmp_path / CONTEXT_BOOT_STATUS_SNAPSHOT_PATH).exists()
+    boot_status = BootStatus.from_json_dict(
+        json.loads((tmp_path / CANONICAL_BOOT_STATUS_PATH).read_text(encoding="utf-8"))
+    )
+    assert boot_status.metadata["mode"] == "strict"
+
+
+def test_require_github_write_status_detects_post_write_dirty_state(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    git_states = [
+        _clean_git_state(),
+        {
+            **_clean_git_state(),
+            "worktree_clean": False,
+            "entries": [{"status": "M", "path": CANONICAL_BOOT_STATUS_PATH.as_posix()}],
+        },
+    ]
+    observed_paths: list[Path] = []
+
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: git_states.pop(0))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    def fake_write_boot_status_file(
+        status: BootStatus,
+        path: str | Path,
+        *,
+        repo_root: Path,
+    ) -> str:
+        observed_paths.append(Path(path))
+        target = repo_root / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(status.to_json_text(), encoding="utf-8")
+        assert git_states, "final GitHub proof must run after status write"
+        return "written"
+
+    monkeypatch.setattr(boot_preflight, "_write_boot_status_file", fake_write_boot_status_file)
+
+    args = boot_preflight.parse_args(
+        ["--repo-root", str(tmp_path), "--strict", "--require-github", "--write-status"]
+    )
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    assert status["verdict"] == "FAIL"
+    assert status["status_write"] == {
+        "path": CANONICAL_BOOT_STATUS_PATH.as_posix(),
+        "result": "written",
+    }
+    assert observed_paths == [CANONICAL_BOOT_STATUS_PATH]
+    assert status["post_git"]["worktree_clean"] is False
+    assert status["post_git"]["entries"] == [
+        {"status": "M", "path": CANONICAL_BOOT_STATUS_PATH.as_posix()}
+    ]
+    assert "--require-github post-check requires a clean worktree" in status["failures"]
+    assert git_states == []
+
+
+def test_strict_write_status_does_not_create_status_after_failed_preflight(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        boot_preflight,
+        "validate_boot_core",
+        lambda _repo: {"status": "FAIL", "blockers": ["missing:BOOT.md"]},
+    )
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--write-status"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    assert status["verdict"] == "FAIL"
+    assert status["status_write"] == {
+        "path": CANONICAL_BOOT_STATUS_PATH.as_posix(),
+        "result": "blocked-until-pass",
+    }
+    assert not (tmp_path / CANONICAL_BOOT_STATUS_PATH).exists()
+    assert not (tmp_path / CONTEXT_BOOT_STATUS_SNAPSHOT_PATH).exists()
+
+
+def test_strict_write_status_rejects_docs_context_snapshot_status_out(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--strict",
+            "--write-status",
+            "--status-out",
+            CONTEXT_BOOT_STATUS_SNAPSHOT_PATH.as_posix(),
+        ]
+    )
+
+    with pytest.raises(boot_preflight.PreflightConfigError):
+        boot_preflight.build_status(args)
+
+    assert not (tmp_path / CANONICAL_BOOT_STATUS_PATH).exists()
+    assert not (tmp_path / CONTEXT_BOOT_STATUS_SNAPSHOT_PATH).exists()
+
+
 def test_planning_mode_does_not_run_tests(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
     monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
     monkeypatch.setattr(
         boot_preflight,
         "_run_pytest_gate",
@@ -179,7 +352,7 @@ def test_planning_mode_does_not_run_tests(tmp_path: Path, monkeypatch) -> None:
 
 def test_require_github_blocks_dirty_or_unaligned_state(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
     monkeypatch.setattr(
         boot_preflight,
         "collect_git_state",
@@ -233,7 +406,7 @@ def test_detached_expected_ref_and_sha_satisfy_require_github(tmp_path: Path, mo
 
     monkeypatch.setattr(boot_preflight, "_git", fake_git)
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
     monkeypatch.setattr(
         boot_preflight,
         "_run_pytest_gate",
@@ -283,7 +456,7 @@ def test_detached_require_github_without_expected_proof_fails_as_unavailable(tmp
 
     monkeypatch.setattr(boot_preflight, "_git", fake_git)
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
     monkeypatch.setattr(
         boot_preflight,
         "_run_pytest_gate",
@@ -355,7 +528,7 @@ def test_require_github_post_check_reports_expected_proof_mismatch(tmp_path: Pat
     states = [first_state, post_state]
 
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
     monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: states.pop(0))
     monkeypatch.setattr(
         boot_preflight,
@@ -394,7 +567,7 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
             "boot_core": {"status": "PASS", "command": "file-contract"},
             "git": _clean_git_state(),
             "dirty": {"status": "PASS", "dirty_state": "clean"},
-            "data_readiness_gate": _data_gate_status("PASS"),
+            "governance": {"status": "PASS", "command": "governance"},
             "boot_control_tests": {"status": "PASS", "command": "pytest"},
         },
     }
@@ -403,203 +576,7 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
     round_trip = BootStatus.from_json_dict(json.loads(boot_status.to_json_text()))
 
     assert round_trip.primary_verdict == "degraded"
-    assert any(check.id == "data_readiness_gate" and check.status == "pass" for check in round_trip.checks)
-
-
-def test_data_readiness_gate_failure_blocks_preflight(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("FAIL"))
-    monkeypatch.setattr(
-        boot_preflight,
-        "_run_pytest_gate",
-        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
-    )
-
-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
-    status, exit_code = boot_preflight.build_status(args)
-    boot_status = boot_preflight.make_boot_status_from_preflight(status)
-
-    assert exit_code == 1
-    assert "data-readiness gate failed" in status["failures"]
-    classification = status["checks"]["data_readiness_gate"]["boot_phase_close_classification"]
-    assert classification["CodeReady"] == "PASS_WITH_DATA_QUARANTINE"
-    assert classification["DataReadyStrict"] == "BLOCKED_MISSING_LOCAL_ARTIFACTS"
-    assert classification["BootReady"] == "BLOCKED_DATA_READY_STRICT"
-    assert boot_status.primary_verdict == "blocked"
-    data_check = next(check for check in boot_status.checks if check.id == "data_readiness_gate")
-    assert data_check.status == "fail"
-    assert data_check.details["boot_phase_close_classification"]["CodeReady"] == "PASS_WITH_DATA_QUARANTINE"
-
-
-def test_failed_preflight_does_not_write_runtime_status_without_write_status(
-    tmp_path: Path,
-    monkeypatch,
-) -> None:
-    runtime_status = tmp_path / "runtime" / "boot_status_current.json"
-    writes: list[Any] = []
-
-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("FAIL"))
-    monkeypatch.setattr(
-        boot_preflight,
-        "_run_pytest_gate",
-        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
-    )
-    monkeypatch.setattr(
-        boot_preflight,
-        "write_boot_status_file",
-        lambda *args, **kwargs: writes.append((args, kwargs)) or "written",
-    )
-
-    args = boot_preflight.parse_args(
-        ["--repo-root", str(tmp_path), "--strict", "--status-out", str(runtime_status)]
-    )
-    status, exit_code = boot_preflight.build_status(args)
-
-    assert exit_code == 1
-    assert status["verdict"] == "FAIL"
-    assert "status_write" not in status
-    assert writes == []
-    assert not runtime_status.exists()
-
-
-def test_mixed_data_contract_failure_is_not_data_quarantine(tmp_path: Path, monkeypatch) -> None:
-    mixed_status = {
-        **_data_gate_status("FAIL"),
-        "checks": [
-            {
-                "id": "canonical_presence.portfolio_allocation",
-                "status": "FAIL",
-                "mode_effect": {"planning": "WARN", "strict": "FAIL"},
-                "reason": "missing strict-required artifacts",
-                "metrics": {
-                    "required_missing": ["data/processed/prices_tri.parquet"],
-                    "optional_missing": ["data/processed/yahoo_patch.parquet"],
-                },
-            },
-            {
-                "id": "price_return_integrity.selected_sample",
-                "status": "FAIL",
-                "mode_effect": {"planning": "WARN", "strict": "FAIL"},
-                "reason": "return_values_outside_unit_bound",
-            },
-        ],
-        "summary": {"blockers": ["missing strict-required artifacts", "return_values_outside_unit_bound"], "warnings": []},
-    }
-
-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: mixed_status)
-    monkeypatch.setattr(
-        boot_preflight,
-        "_run_pytest_gate",
-        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
-    )
-
-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
-    status, exit_code = boot_preflight.build_status(args)
-
-    assert exit_code == 1
-    classification = status["checks"]["data_readiness_gate"]["boot_phase_close_classification"]
-    assert classification["CodeReady"] == "BLOCKED_DATA_CONTRACT"
-    assert classification["DataReadyStrict"] == "BLOCKED_DATA_CONTRACT"
-    assert classification["BootReady"] == "BLOCKED_DATA_READY_STRICT"
-    assert classification["missing_local_artifacts"] == ["data/processed/prices_tri.parquet"]
-    assert classification["data_contract_blockers"] == ["return_values_outside_unit_bound"]
-
-
-def test_missing_schema_failure_is_not_data_quarantine(tmp_path: Path, monkeypatch) -> None:
-    schema_status = {
-        **_data_gate_status("FAIL"),
-        "checks": [
-            {
-                "id": "price_return_integrity.selected_sample",
-                "status": "FAIL",
-                "mode_effect": {"planning": "WARN", "strict": "FAIL"},
-                "reason": "missing_required_columns",
-            },
-        ],
-        "summary": {"blockers": ["missing_required_columns"], "warnings": []},
-    }
-
-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: schema_status)
-    monkeypatch.setattr(
-        boot_preflight,
-        "_run_pytest_gate",
-        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
-    )
-
-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
-    status, exit_code = boot_preflight.build_status(args)
-
-    assert exit_code == 1
-    classification = status["checks"]["data_readiness_gate"]["boot_phase_close_classification"]
-    assert classification["CodeReady"] == "BLOCKED_DATA_CONTRACT"
-    assert classification["DataReadyStrict"] == "BLOCKED_DATA_CONTRACT"
-    assert classification["missing_local_artifacts"] == []
-    assert classification["data_contract_blockers"] == ["missing_required_columns"]
-
-
-def test_data_readiness_gate_warning_degrades_without_failing(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("WARN"))
-    monkeypatch.setattr(
-        boot_preflight,
-        "_run_pytest_gate",
-        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
-    )
-
-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
-    status, exit_code = boot_preflight.build_status(args)
-    boot_status = boot_preflight.make_boot_status_from_preflight(status)
-
-    assert exit_code == 0
-    assert status["verdict"] == "PASS"
-    assert "Data readiness gate is degraded or uncertified." in status["warnings"]
-    assert boot_status.primary_verdict == "degraded"
-    assert any(check.id == "data_readiness_gate" and check.status == "warn" for check in boot_status.checks)
-
-
-def test_write_status_is_blocked_until_preflight_passes(tmp_path: Path, monkeypatch) -> None:
-    writes: list[Path] = []
-
-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
-    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("FAIL"))
-    monkeypatch.setattr(
-        boot_preflight,
-        "_run_pytest_gate",
-        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
-    )
-    monkeypatch.setattr(
-        boot_preflight,
-        "write_boot_status_file",
-        lambda _status, path, *, repo_root: writes.append(Path(path)) or "written",
-    )
-
-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--write-status"])
-    status, exit_code = boot_preflight.build_status(args)
-
-    assert exit_code == 1
-    assert status["status_write"]["result"] == "blocked-until-pass"
-    assert writes == []
-
-
-def test_data_readiness_gate_next_actions_are_not_boot_status_copy() -> None:
-    raw_status = _data_gate_status("FAIL")
-    raw_status["summary"]["next_actions"] = ["Fix checks before trusting research output."]
-
-    sanitized = boot_preflight._boot_safe_data_readiness_status(raw_status)
-    check = boot_preflight._check_from_data_readiness_gate(sanitized)
-
-    assert "next_actions" not in sanitized["summary"]
-    assert "next_actions" not in check.details["summary"]
-    assert "research output" not in json.dumps(check.to_json_dict())
+    assert any(check.id == "data_readiness_gate" and check.status == "deferred" for check in round_trip.checks)
 
 
 def test_launch_preflight_dispatch_adds_repo_root(monkeypatch) -> None:
@@ -642,12 +619,11 @@ def test_launch_preflight_enforces_project_venv(monkeypatch) -> None:
     assert launch.main() == 1
 
 
-def test_no_boot_core_imports_for_deferred_dependency_modules() -> None:
+def test_boot_core_imports_governance_but_not_data_readiness() -> None:
     source = Path(boot_preflight.__file__).read_text(encoding="utf-8")
 
-    assert "from scripts.governance_preflight" not in source
-    assert "import scripts.governance_preflight" not in source
-    assert "from core.data_readiness_gate import run_data_readiness_gate" in source
+    assert "from scripts.governance_preflight import run_governance_preflight" in source
+    assert "core.data_readiness_gate" not in source
 
 
 def test_pytest_gate_uses_argv_not_shell(tmp_path: Path, monkeypatch) -> None:

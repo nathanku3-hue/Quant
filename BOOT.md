@@ -2,7 +2,8 @@
 
 Boot-core v0 is the first executable control-plane slice. It proves the boot
 status contract, basic Git/dirty inspection, CLI wiring, and status artifact
-shape without importing the broader data-readiness/governance graph.
+shape. The current governance slice also runs `scripts.governance_preflight`;
+data-readiness remains deferred from this boot proof.
 
 Normal boot-core check:
 
@@ -31,7 +32,7 @@ Final GitHub-aligned proof after an intentional status commit:
 Generated boot status:
 
 ```text
-docs/context/boot_status_current.json
+runtime/boot_status_current.json
 ```
 
 Schema:
@@ -43,11 +44,12 @@ docs/context/boot_status_current.schema.json
 Deferred from boot-core v0:
 
 - data-readiness gates
-- governance preflight
 - context packet rebuild/validation
 - Portfolio AppTest smoke
 - focused replay/dashboard contract
 - optimizer, Rule100, replay, and data-repair work
 
 `BOOT.md` is intentionally static. The living verdict is the generated JSON
-status, and safe boot still requires a later full safe-boot slice.
+status. Governance preflight is in the current boot slice; safe boot still
+requires later data-readiness, context, smoke, replay/dashboard, optimizer,
+Rule100, and data-repair slices.

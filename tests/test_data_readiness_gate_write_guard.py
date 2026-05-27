@@ -8,14 +8,26 @@ import pytest
 from core.boot_status import BootStatus
 from core import data_readiness_gate as gate
 
+CANONICAL_BOOT_STATUS_PATH = Path("runtime/boot_status_current.json")
+CONTEXT_BOOT_STATUS_SNAPSHOT_PATH = Path("docs/context/boot_status_current.json")
+
+
+def test_data_readiness_gate_uses_runtime_boot_status_contract() -> None:
+    assert gate.DEFAULT_STATUS_PATH == CANONICAL_BOOT_STATUS_PATH
+    assert gate.ALLOWED_BOOT_WRITES == {CANONICAL_BOOT_STATUS_PATH.as_posix()}
+    assert CONTEXT_BOOT_STATUS_SNAPSHOT_PATH.as_posix() not in gate.ALLOWED_BOOT_WRITES
+
 
 def test_write_boot_status_allows_only_boot_status_path(tmp_path: Path) -> None:
     status = {"schema_version": gate.SCHEMA_VERSION, "overall_status": "PASS"}
 
     with pytest.raises(ValueError):
         gate.write_boot_status("docs/context/not_boot_status.json", status, repo_root=tmp_path)
+    with pytest.raises(ValueError):
+        gate.write_boot_status(CONTEXT_BOOT_STATUS_SNAPSHOT_PATH, status, repo_root=tmp_path)
 
     assert not (tmp_path / "docs/context/not_boot_status.json").exists()
+    assert not (tmp_path / CONTEXT_BOOT_STATUS_SNAPSHOT_PATH).exists()
 
 
 def test_write_boot_status_uses_atomic_target_and_leaves_no_temp_file(tmp_path: Path) -> None:
@@ -65,6 +77,20 @@ def test_boot_write_snapshot_rejects_disallowed_context_delta(tmp_path: Path) ->
     assert diff["disallowed_changed"] == ["docs/context/current_context.json"]
 
 
+def test_boot_write_snapshot_rejects_docs_context_boot_status_delta(tmp_path: Path) -> None:
+    before = gate.capture_boot_write_snapshot(tmp_path)
+    context_status = tmp_path / CONTEXT_BOOT_STATUS_SNAPSHOT_PATH
+    context_status.parent.mkdir(parents=True)
+    context_status.write_text('{"schema_version": "boot-status/v1"}\n', encoding="utf-8")
+    after = gate.capture_boot_write_snapshot(tmp_path)
+
+    diff = gate.diff_boot_write_snapshot(before, after)
+
+    assert diff["status"] == "FAIL"
+    assert diff["allowed_changed"] == []
+    assert diff["disallowed_changed"] == [CONTEXT_BOOT_STATUS_SNAPSHOT_PATH.as_posix()]
+
+
 def test_boot_write_snapshot_rejects_temp_residue_in_guarded_data_roots(tmp_path: Path) -> None:
     before = gate.capture_boot_write_snapshot(tmp_path)
     residue_paths = [
@@ -87,20 +113,7 @@ def test_boot_write_snapshot_rejects_temp_residue_in_guarded_data_roots(tmp_path
     ]
 
 
-def test_noncanonical_runtime_boot_status_path_is_not_an_allowed_write() -> None:
-    before = gate.capture_boot_write_snapshot(Path("."))
-    after = dict(before)
-    forbidden_path = "docs/context/" + gate.DEFAULT_STATUS_PATH.name
-    after[forbidden_path] = (17, 123, False)
-
-    diff = gate.diff_boot_write_snapshot(before, after)
-
-    assert diff["status"] == "FAIL"
-    assert diff["allowed_changed"] == []
-    assert diff["disallowed_changed"] == [forbidden_path]
-
-
-def test_runtime_boot_status_path_is_allowed_only_when_schema_valid() -> None:
+def test_canonical_runtime_boot_status_path_is_allowed_only_when_schema_valid() -> None:
     before = gate.capture_boot_write_snapshot(Path("."))
     after = dict(before)
     canonical_path = gate.DEFAULT_STATUS_PATH.as_posix()
@@ -112,3 +125,16 @@ def test_runtime_boot_status_path_is_allowed_only_when_schema_valid() -> None:
     assert diff["allowed_changed"] == []
     assert diff["invalid_allowed_writes"] == [canonical_path]
     assert diff["disallowed_changed"] == [canonical_path]
+
+
+def test_docs_context_boot_status_path_is_not_an_allowed_write() -> None:
+    before = gate.capture_boot_write_snapshot(Path("."))
+    after = dict(before)
+    after[CONTEXT_BOOT_STATUS_SNAPSHOT_PATH.as_posix()] = (17, 123, False)
+
+    diff = gate.diff_boot_write_snapshot(before, after)
+
+    assert diff["status"] == "FAIL"
+    assert diff["allowed_changed"] == []
+    assert diff["invalid_allowed_writes"] == []
+    assert diff["disallowed_changed"] == [CONTEXT_BOOT_STATUS_SNAPSHOT_PATH.as_posix()]

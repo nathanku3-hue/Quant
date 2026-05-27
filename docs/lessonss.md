@@ -947,3 +947,11 @@ Application pattern:
 - Fix applied: Added explicit expected-ref/SHA proof for detached worktrees, classified strict missing local artifacts as `PASS_WITH_DATA_QUARANTINE` plus `BLOCKED_MISSING_LOCAL_ARTIFACTS`, documented BOOT-0A governance-preflight deferral, and added focused tests.
 - Guardrail for next time: Phase-close reports must distinguish source/GitHub proof from strict local data readiness; missing local governed artifacts block BootReady without implying source-code regression.
 - Evidence paths: `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `docs/architecture/boot_preflight_contract.md`, `docs/architecture/data_readiness_gate_v0.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight.py tests/test_boot_status_contract.py -q`.
+
+## 2026-05-27 Round Entry (Scanner Display Must Quarantine Raw Action Labels)
+- Date: 2026-05-27
+- Mistake or miss: The dashboard opportunities and screened-ticker tables still rendered raw scanner fields such as Rating, Entry_Price, Stop_Loss, Target_Price, Score, and Leverage directly into the UI path.
+- Root cause: The scanner display logic was embedded inline in `dashboard.py`, so the render path reused raw action-shaped columns instead of a separate research-only view model.
+- Fix applied: Added `views/scanner_display.py`, mapped raw ratings to research-only labels, renamed/removed action-shaped columns before `st.dataframe`, routed both scanner tables through the quarantine helper, and added focused regression tests.
+- Guardrail for next time: Any scanner-derived dataframe sent to Streamlit must pass through a research-only display helper first, and the dashboard source should never expose raw action-shaped columns in the render section.
+- Evidence paths: `dashboard.py`, `views/scanner_display.py`, `tests/test_dashboard_scanner_display.py`, `tests/test_scanner.py`, `.venv\Scripts\python -m pytest tests\test_dashboard_scanner_display.py tests\test_g8_2_system_scouted_candidate_card.py -q`.

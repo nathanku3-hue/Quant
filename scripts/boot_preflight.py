@@ -20,14 +20,14 @@ if __package__ in (None, ""):
 
 from core.boot_status import (
     BOOT_STATUS_CURRENT_PATH,
+    BOOT_STATUS_SCHEMA_PATH,
     BootContextFlags,
     BootStatus,
     ReadinessCheck,
     deferred_check,
     make_boot_status,
-    write_boot_status_file,
 )
-from core.data_readiness_gate import run_data_readiness_gate
+from scripts.governance_preflight import run_governance_preflight
 
 
 SCHEMA_VERSION = "boot-preflight.v1"
@@ -38,23 +38,28 @@ BOOT_CONTROL_TEST_COMMAND = (
     "pytest",
     "tests/test_boot_preflight.py",
     "tests/test_boot_status_contract.py",
+    "tests/test_boot_preflight_governance.py",
     "-q",
 )
 BOOT_CORE_REQUIRED_FILES = (
     "BOOT.md",
     "launch.py",
     "core/boot_status.py",
+    "opportunity_engine/candidate_card_schema.py",
     "scripts/boot_preflight.py",
+    "scripts/governance_preflight.py",
     "tests/test_boot_preflight.py",
     "tests/test_boot_status_contract.py",
+    "tests/test_boot_preflight_governance.py",
     "docs/architecture/boot_preflight_contract.md",
-    "docs/context/boot_status_current.schema.json",
+    "docs/architecture/governance_boundary_policy.md",
+    BOOT_STATUS_SCHEMA_PATH.as_posix(),
 )
 DEFERRED_DEPENDENCY_CHECKS = (
     (
-        "governance_preflight",
-        "Governance boundary preflight",
-        "Deferred from boot-core v0; no governance module is imported or executed by default.",
+        "data_readiness_gate",
+        "Data readiness gate",
+        "Deferred from boot-core v0; stage data-readiness in its own slice.",
     ),
     (
         "context_packet_validation",
@@ -266,8 +271,8 @@ def _validate_status_schema_file(repo_root: Path, schema_path: Path) -> tuple[bo
         relative = schema_path.resolve().relative_to(repo_root.resolve()).as_posix()
     except ValueError:
         return False, "schema path must stay inside repository"
-    if relative != "docs/context/boot_status_current.schema.json":
-        return False, "schema path must be docs/context/boot_status_current.schema.json"
+    if relative != BOOT_STATUS_SCHEMA_PATH.as_posix():
+        return False, f"schema path must be {BOOT_STATUS_SCHEMA_PATH.as_posix()}"
     return True, "schema JSON matches boot-core v0 status vocabulary"
 
 
@@ -285,7 +290,7 @@ def validate_boot_core(repo_root: Path) -> dict[str, Any]:
             files.append({"path": relative, "status": "not_file"})
             continue
         entry: dict[str, Any] = {"path": relative, "status": "present", "signature": _file_signature(path)}
-        if relative == "docs/context/boot_status_current.schema.json":
+        if relative == BOOT_STATUS_SCHEMA_PATH.as_posix():
             ok, summary = _validate_status_schema_file(repo_root, path)
             entry["schema_validation"] = "PASS" if ok else "FAIL"
             entry["schema_summary"] = summary
@@ -493,6 +498,17 @@ def _check_from_gate(
             destination=destination,
             details=dict(gate),
         )
+    if gate.get("status") == "WARN":
+        return ReadinessCheck(
+            id=check_id,
+            label=label,
+            status="warn",
+            severity="degraded",
+            summary=f"{label} reported warnings.",
+            evidence_ref=str(gate.get("command", "")) or None,
+            destination=destination,
+            details=dict(gate),
+        )
     if gate.get("status") in {"SKIPPED", "DEFERRED"}:
         return ReadinessCheck(
             id=check_id,
@@ -514,174 +530,6 @@ def _check_from_gate(
         destination=destination,
         details=dict(gate),
     )
-
-
-def _run_data_readiness_check(repo_root: Path, mode: str) -> dict[str, Any]:
-    try:
-        status = run_data_readiness_gate(repo_root, mode=mode)
-    except Exception as exc:
-        return {
-            "schema_version": "data_readiness_gate.v0",
-            "generated_at_utc": _utc_now(),
-            "mode": mode,
-            "overall_status": "FAIL",
-            "planning_status": "FAIL",
-            "strict_status": "FAIL",
-            "route_id": "portfolio_allocation.strict.v0",
-            "summary": {
-                "blockers": [f"data_readiness_gate_exception:{exc}"],
-                "warnings": [],
-            },
-        }
-    return dict(status)
-
-
-def _boot_safe_data_readiness_status(status: Mapping[str, Any]) -> dict[str, Any]:
-    payload = dict(status)
-    summary = payload.get("summary")
-    if isinstance(summary, Mapping):
-        payload["summary"] = {
-            "blockers": list(summary.get("blockers") or []),
-            "warnings": list(summary.get("warnings") or []),
-        }
-    return payload
-
-
-def _check_from_data_readiness_gate(status: Mapping[str, Any]) -> ReadinessCheck:
-    status = _boot_safe_data_readiness_status(status)
-    raw_status = str(status.get("overall_status", "FAIL")).strip().upper()
-    if raw_status == "PASS":
-        check_status = "pass"
-        severity = "ready"
-        summary = "Data readiness gate passed."
-    elif raw_status in {"WARN", "DEFER", "DEFERRED"}:
-        check_status = "warn" if raw_status == "WARN" else "deferred"
-        severity = "degraded"
-        summary = "Data readiness gate is degraded or uncertified."
-    else:
-        check_status = "fail"
-        severity = "blocked"
-        summary = "Data readiness gate failed."
-
-    summary_payload = status.get("summary")
-    details: dict[str, Any] = {
-        "overall_status": raw_status,
-        "planning_status": status.get("planning_status"),
-        "strict_status": status.get("strict_status"),
-        "mode": status.get("mode"),
-        "route_id": status.get("route_id"),
-        "route_readiness": status.get("route_readiness"),
-        "boot_phase_close_classification": status.get("boot_phase_close_classification"),
-    }
-    if isinstance(summary_payload, Mapping):
-        details["summary"] = dict(summary_payload)
-        blockers = summary_payload.get("blockers")
-        warnings = summary_payload.get("warnings")
-        if raw_status == "FAIL" and blockers:
-            summary = f"Data readiness gate failed: {len(blockers)} blocker(s)."
-        elif raw_status == "WARN" and warnings:
-            summary = f"Data readiness gate warned: {len(warnings)} warning(s)."
-
-    return ReadinessCheck(
-        id="data_readiness_gate",
-        label="Data readiness gate",
-        status=check_status,
-        severity=severity,
-        summary=summary,
-        destination="Boot Status",
-        details=details,
-    )
-
-
-def _strict_effect(check: Mapping[str, Any]) -> str:
-    mode_effect = check.get("mode_effect")
-    if isinstance(mode_effect, Mapping):
-        value = mode_effect.get("strict")
-    else:
-        value = check.get("strict", check.get("status"))
-    return str(value or "").strip().upper()
-
-
-def _is_missing_local_artifact_reason(reason: str) -> bool:
-    tokens = [item.strip().lower() for item in reason.split(";") if item.strip()]
-    if not tokens:
-        return False
-    for token in tokens:
-        if token == "missing strict-required artifacts":
-            continue
-        if token == "missing_pit_universe":
-            continue
-        if token.startswith("price source missing:"):
-            continue
-        return False
-    return True
-
-
-def _classify_data_readiness_for_boot(status: Mapping[str, Any]) -> dict[str, Any]:
-    raw_status = str(status.get("overall_status", "FAIL")).strip().upper()
-    strict_status = str(status.get("strict_status", raw_status)).strip().upper()
-    checks = status.get("checks")
-    missing_local_artifacts: list[str] = []
-    data_contract_blockers: list[str] = []
-    strict_blocker_count = 0
-    if isinstance(checks, Sequence) and not isinstance(checks, (str, bytes)):
-        for check in checks:
-            if not isinstance(check, Mapping):
-                continue
-            if _strict_effect(check) != "FAIL":
-                continue
-            strict_blocker_count += 1
-            metrics = check.get("metrics")
-            reason = str(check.get("reason", ""))
-            required_missing: list[str] = []
-            if isinstance(metrics, Mapping):
-                value = metrics.get("required_missing")
-                if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
-                    required_missing = [str(item) for item in value if str(item)]
-                    missing_local_artifacts.extend(required_missing)
-            if required_missing:
-                continue
-            if _is_missing_local_artifact_reason(reason):
-                missing_local_artifacts.append(reason)
-            else:
-                data_contract_blockers.append(reason or str(check.get("id", "unknown_strict_failure")))
-    summary = status.get("summary")
-    summary_blockers: list[str] = []
-    if isinstance(summary, Mapping):
-        for blocker in summary.get("blockers") or []:
-            text = str(blocker)
-            if text:
-                summary_blockers.append(text)
-    if strict_blocker_count == 0 and summary_blockers:
-        for blocker in summary_blockers:
-            if _is_missing_local_artifact_reason(blocker):
-                missing_local_artifacts.append(blocker)
-            else:
-                data_contract_blockers.append(blocker)
-    missing_local_artifacts = sorted(set(item for item in missing_local_artifacts if item))
-    data_contract_blockers = sorted(set(item for item in data_contract_blockers if item))
-    data_ready_strict = strict_status
-    boot_ready = raw_status
-    code_ready = "PASS"
-    if raw_status == "FAIL" and missing_local_artifacts and not data_contract_blockers:
-        data_ready_strict = "BLOCKED_MISSING_LOCAL_ARTIFACTS"
-        boot_ready = "BLOCKED_DATA_READY_STRICT"
-        code_ready = "PASS_WITH_DATA_QUARANTINE"
-    elif raw_status == "FAIL":
-        data_ready_strict = "BLOCKED_DATA_CONTRACT"
-        boot_ready = "BLOCKED_DATA_READY_STRICT"
-        code_ready = "BLOCKED_DATA_CONTRACT"
-    elif raw_status in {"WARN", "DEFER", "DEFERRED"}:
-        data_ready_strict = "DEGRADED_OR_UNCERTIFIED"
-        boot_ready = "DEGRADED_DATA_READY_STRICT"
-    return {
-        "CodeReady": code_ready,
-        "DataReadyStrict": data_ready_strict,
-        "BootReady": boot_ready,
-        "missing_local_artifacts": missing_local_artifacts,
-        "data_contract_blockers": data_contract_blockers,
-        "classification_basis": "local data-readiness gate output; not a code regression classifier",
-    }
 
 
 def _github_alignment_failure(git: Mapping[str, Any], *, post_check: bool = False) -> str:
@@ -752,6 +600,7 @@ def make_boot_status_from_preflight(preflight_status: Mapping[str, Any]) -> Boot
     boot_core = checks_map.get("boot_core", {})
     dirty = checks_map.get("dirty", {})
     boot_tests = checks_map.get("boot_control_tests", {})
+    governance = checks_map.get("governance", {})
     checks: list[ReadinessCheck] = [
         _check_from_gate("boot_core", "Boot-core file contract", boot_core if isinstance(boot_core, Mapping) else {}),
         _status_from_git(
@@ -759,10 +608,10 @@ def make_boot_status_from_preflight(preflight_status: Mapping[str, Any]) -> Boot
             bool(preflight_status.get("require_github")),
         ),
         _check_from_gate("dirty_worktree", "Dirty worktree classification", dirty if isinstance(dirty, Mapping) else {}),
-        _check_from_data_readiness_gate(
-            checks_map.get("data_readiness_gate", {})
-            if isinstance(checks_map.get("data_readiness_gate", {}), Mapping)
-            else {}
+        _check_from_gate(
+            "governance_preflight",
+            "Governance preflight",
+            governance if isinstance(governance, Mapping) else {},
         ),
         _check_from_gate(
             "boot_control_tests",
@@ -790,13 +639,44 @@ def make_boot_status_from_preflight(preflight_status: Mapping[str, Any]) -> Boot
             "preflight_schema_version": preflight_status.get("schema_version"),
             "mode": preflight_status.get("mode"),
             "require_github": preflight_status.get("require_github"),
-            "deferred_scope": "governance/dashboard/replay/optimizer/context-packet/research-validity",
+            "deferred_scope": "data-readiness/dashboard/replay/optimizer",
         },
     )
 
 
 def _boot_status_json_text(preflight_status: Mapping[str, Any]) -> str:
     return make_boot_status_from_preflight(preflight_status).to_json_text()
+
+
+def _resolve_boot_status_target(path: str | Path, repo_root: Path) -> Path:
+    target = Path(path)
+    resolved = target if target.is_absolute() else repo_root / target
+    try:
+        relative = resolved.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError as exc:
+        raise PreflightConfigError("boot status output must stay inside repository") from exc
+    if relative != BOOT_STATUS_CURRENT_PATH.as_posix():
+        raise PreflightConfigError(
+            f"boot status output must be {BOOT_STATUS_CURRENT_PATH.as_posix()}; got {relative}"
+        )
+    return resolved
+
+
+def _write_boot_status_file(status: BootStatus, path: str | Path, *, repo_root: Path) -> str:
+    target = _resolve_boot_status_target(path, repo_root)
+    text = status.to_json_text()
+    existing = target.read_text(encoding="utf-8") if target.exists() else None
+    if existing == text:
+        return "unchanged"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = target.with_name(f".{target.name}.{os.getpid()}.tmp")
+    try:
+        tmp_path.write_text(text, encoding="utf-8", newline="\n")
+        os.replace(tmp_path, target)
+    finally:
+        if tmp_path.exists():
+            tmp_path.unlink()
+    return "written"
 
 
 def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
@@ -815,21 +695,19 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         expected_ref=args.expected_ref,
         expected_sha=args.expected_sha,
     )
+    governance_result = run_governance_preflight(repo_root).to_dict()
+    checks["governance"] = governance_result
+    if governance_result["status"] == "FAIL":
+        failures.append("governance preflight did not pass: FAIL")
+    elif governance_result["status"] == "WARN":
+        warnings.append("governance preflight warning")
+
     checks["git"] = git_state
     dirty_entries = [DirtyEntry(**entry) for entry in git_state.get("entries", [])]
     dirty = classify_dirty_entries(dirty_entries)
     checks["dirty"] = dirty
     if dirty["status"] != "PASS":
         failures.append("unclassified source/test/runtime dirty files are present")
-
-    data_readiness = _boot_safe_data_readiness_status(_run_data_readiness_check(repo_root, args.mode))
-    data_readiness["boot_phase_close_classification"] = _classify_data_readiness_for_boot(data_readiness)
-    checks["data_readiness_gate"] = data_readiness
-    data_readiness_status = str(data_readiness.get("overall_status", "FAIL")).strip().upper()
-    if data_readiness_status == "FAIL":
-        failures.append("data-readiness gate failed")
-    elif data_readiness_status in {"WARN", "DEFER", "DEFERRED"}:
-        warnings.append("Data readiness gate is degraded or uncertified.")
 
     if args.require_github:
         if not git_state.get("available"):
@@ -873,6 +751,20 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         "checks": checks,
     }
 
+    write_allowed = (
+        status["verdict"] == "PASS"
+        and args.mode == "strict"
+        and not args.no_tests
+        and not args.smoke
+        and not args.run_focused_contract
+    )
+    if args.write_status and write_allowed:
+        boot_status = make_boot_status_from_preflight(status)
+        write_result = _write_boot_status_file(boot_status, args.status_out, repo_root=repo_root)
+        status["status_write"] = {"path": _normalize_path(args.status_out), "result": write_result}
+    elif args.write_status:
+        status["status_write"] = {"path": _normalize_path(args.status_out), "result": "blocked-until-pass"}
+
     if args.require_github:
         post_git = collect_git_state(
             repo_root,
@@ -889,34 +781,16 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
             status["exit_code"] = 1
             status["failures"].append(_github_alignment_failure(post_git, post_check=True))
 
-    if args.write_status:
-        if status["verdict"] != "PASS":
-            status["status_write"] = {
-                "path": _normalize_path(args.status_out),
-                "result": "blocked-until-pass",
-                "reason": "boot preflight status is not PASS",
-            }
-        else:
-            boot_status = make_boot_status_from_preflight(status)
-            write_result = write_boot_status_file(boot_status, args.status_out, repo_root=repo_root)
-            status["status_write"] = {"path": _normalize_path(args.status_out), "result": write_result}
-
     return status, int(status["exit_code"])
 
 
 def render_human(status: Mapping[str, Any]) -> str:
     boot_status = make_boot_status_from_preflight(status)
-    checks = status.get("checks")
-    checks_map = checks if isinstance(checks, Mapping) else {}
-    data_gate = checks_map.get("data_readiness_gate", {})
-    data_gate_status = data_gate.get("overall_status") if isinstance(data_gate, Mapping) else None
     lines = [
         f"BOOT VERDICT: {status.get('verdict')}",
         f"Mode: {status.get('mode')}",
         f"Boot status: {boot_status.primary_verdict}",
     ]
-    if data_gate_status:
-        lines.append(f"Data readiness: {data_gate_status}")
     failures = status.get("failures") or []
     warnings = status.get("warnings") or []
     if failures:
@@ -945,7 +819,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--expected-sha",
         help="Expected commit SHA used as explicit GitHub proof in detached worktrees.",
     )
-    parser.add_argument("--write-status", action="store_true", help="Write runtime/boot_status_current.json.")
+    parser.add_argument(
+        "--write-status",
+        action="store_true",
+        help=f"Write {BOOT_STATUS_CURRENT_PATH.as_posix()}.",
+    )
     parser.add_argument("--status-out", default=DEFAULT_STATUS_JSON.as_posix())
     parser.add_argument("--json", action="store_true", help="Print machine-readable preflight JSON.")
     parser.add_argument("--no-tests", action="store_true", help="Skip strict boot-control pytest gate.")

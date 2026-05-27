@@ -46,6 +46,7 @@ REQUIRED_TOP_LEVEL_FIELDS = frozenset(
         "state_mapping",
         "risk_discipline",
         "forbidden_outputs",
+        "governance",
     }
 )
 
@@ -67,6 +68,7 @@ REQUIRED_FORBIDDEN_OUTPUT_FLAGS = {
     "no_score": True,
     "no_rank": True,
     "no_buy_sell_signal": True,
+    "no_buying_range": True,
     "no_alert": True,
     "no_broker_action": True,
 }
@@ -100,6 +102,8 @@ FORBIDDEN_ACTION_KEYS = frozenset(
         "buy_range",
         "buying_range",
         "entry_price",
+        "stop_loss",
+        "hold_signal",
         "alert",
         "alert_emitted",
         "broker_action",
@@ -135,6 +139,7 @@ REQUIRED_GOVERNANCE_FLAGS = {
     "no_score": True,
     "no_rank": True,
     "no_buy_sell_signal": True,
+    "no_buying_range": True,
     "no_alert": True,
     "no_broker_action": True,
 }
@@ -299,9 +304,10 @@ def _validate_provider_gap_signals(card: Mapping[str, Any], errors: list[str]) -
 def _validate_governance_flags(card: Mapping[str, Any], errors: list[str]) -> None:
     governance = card.get("governance")
     if governance is None:
+        errors.append("governance is required")
         return
     if not isinstance(governance, Mapping):
-        errors.append("governance must be an object when present")
+        errors.append("governance must be an object")
         return
 
     for field_name, expected_value in REQUIRED_GOVERNANCE_FLAGS.items():
