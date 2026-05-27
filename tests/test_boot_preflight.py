@@ -626,6 +626,47 @@ def test_boot_core_imports_governance_but_not_data_readiness() -> None:
     assert "core.data_readiness_gate" not in source
 
 
+def test_boot_preflight_integration_blocks_on_governance_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        boot_preflight,
+        "collect_git_state",
+        lambda _repo, **_kwargs: {
+            "available": True,
+            "status": "PASS",
+            "branch": "main",
+            "head": "abc",
+            "upstream": "origin/main",
+            "upstream_head": "abc",
+            "ahead": 0,
+            "behind": 0,
+            "has_upstream": True,
+            "aligned": True,
+            "upstream_aligned": True,
+            "expected_remote_proof": {
+                "requested": False,
+                "aligned": False,
+                "proof_available": False,
+                "reason": "not_requested",
+            },
+            "worktree_clean": True,
+            "entries": [],
+        },
+    )
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    (tmp_path / "dashboard.py").write_text('TITLE = "Strong Buy"\n', encoding="utf-8")
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--mode", "planning", "--no-tests"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    assert status["verdict"] == "FAIL"
+    assert "governance preflight did not pass: FAIL" in status["failures"]
+    assert status["checks"]["governance"]["status"] == "FAIL"
+
+
 def test_pytest_gate_uses_argv_not_shell(tmp_path: Path, monkeypatch) -> None:
     seen: list[tuple[object, bool, float | None]] = []
 

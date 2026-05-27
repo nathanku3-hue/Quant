@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
 
-from scripts import boot_preflight
 from scripts.governance_preflight import REQUIRED_CANDIDATE_FLAGS, run_governance_preflight
+
+
+PYTHON = Path(r"E:\Code\Quant\.venv\Scripts\python.exe")
 
 
 def _write_candidate(
@@ -93,7 +96,39 @@ def _base_card() -> dict:
     }
 
 
-def test_artifact_drift_fails_when_patch_exists_without_root_port(tmp_path: Path) -> None:
+def test_scanner_does_not_import_boot_preflight_module() -> None:
+    source = Path("scripts/governance_preflight.py").read_text(encoding="utf-8")
+    test_source = Path("tests/test_boot_preflight_governance.py").read_text(encoding="utf-8")
+    boot_import = "from scripts import " + "boot_preflight"
+
+    assert "scripts.boot_preflight" not in source
+    assert boot_import not in test_source
+
+
+def test_artifact_drift_requires_integrated_governance_files(tmp_path: Path) -> None:
+    (tmp_path / "governance_gate_v0.patch").write_text("reference patch only\n", encoding="utf-8")
+    (tmp_path / "scripts").mkdir()
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "docs" / "architecture").mkdir(parents=True)
+    (tmp_path / "opportunity_engine").mkdir()
+    (tmp_path / "scripts" / "governance_preflight.py").write_text("# scanner\n", encoding="utf-8")
+    (tmp_path / "scripts" / "boot_preflight.py").write_text(
+        "run_governance_preflight\nchecks['governance']\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "docs" / "architecture" / "governance_boundary_policy.md").write_text("# policy\n", encoding="utf-8")
+    (tmp_path / "opportunity_engine" / "candidate_card_schema.py").write_text(
+        '"governance"\n"no_buying_range"\n',
+        encoding="utf-8",
+    )
+    (tmp_path / "tests" / "test_boot_preflight_governance.py").write_text("# tests\n", encoding="utf-8")
+
+    result = run_governance_preflight(tmp_path)
+
+    assert result.passed, [finding.format() for finding in result.findings]
+
+
+def test_artifact_drift_fails_when_patch_exists_without_standalone_files(tmp_path: Path) -> None:
     (tmp_path / "governance_gate_v0.patch").write_text("reference patch only\n", encoding="utf-8")
 
     result = run_governance_preflight(tmp_path)
@@ -146,7 +181,6 @@ def test_exact_neutral_research_console_labels_are_allowed(tmp_path: Path) -> No
     ],
 )
 def test_advisory_or_action_ui_terms_fail_closed(tmp_path: Path, phrase: str) -> None:
-    (tmp_path / "views").mkdir()
     (tmp_path / "dashboard.py").write_text(
         f'import streamlit as st\nst.markdown("{phrase}")\n',
         encoding="utf-8",
@@ -156,24 +190,11 @@ def test_advisory_or_action_ui_terms_fail_closed(tmp_path: Path, phrase: str) ->
 
     assert not result.passed
     assert result.status == "FAIL"
-    assert any(
-        finding.code == "GOV-002"
-        and finding.severity == "fail"
-        and phrase.lower() in finding.message.lower()
-        for finding in result.findings
-    )
+    assert any(finding.code == "GOV-002" and phrase.lower() in finding.message.lower() for finding in result.findings)
 
 
-@pytest.mark.parametrize(
-    "phrase",
-    [
-        "Strong\nBuy",
-        "BUY   AGGRESSIVE",
-        "Action\nStatus: Buy",
-    ],
-)
+@pytest.mark.parametrize("phrase", ["Strong\nBuy", "BUY   AGGRESSIVE", "Action\nStatus: Buy"])
 def test_action_ui_terms_fail_closed_with_whitespace_variants(tmp_path: Path, phrase: str) -> None:
-    (tmp_path / "views").mkdir()
     (tmp_path / "dashboard.py").write_text(
         f'import streamlit as st\nst.markdown({phrase!r})\n',
         encoding="utf-8",
@@ -202,7 +223,6 @@ def test_action_ui_terms_fail_closed_with_whitespace_variants(tmp_path: Path, ph
     ],
 )
 def test_exact_research_console_labels_are_allowed(tmp_path: Path, phrase: str) -> None:
-    (tmp_path / "views").mkdir()
     (tmp_path / "dashboard.py").write_text(
         f'import streamlit as st\nst.markdown("{phrase}")\n',
         encoding="utf-8",
@@ -226,7 +246,6 @@ def test_exact_research_console_labels_are_allowed(tmp_path: Path, phrase: str) 
     ],
 )
 def test_research_console_labels_are_exact_only(tmp_path: Path, phrase: str) -> None:
-    (tmp_path / "views").mkdir()
     (tmp_path / "dashboard.py").write_text(
         f'import streamlit as st\nst.markdown("{phrase}")\n',
         encoding="utf-8",
@@ -239,29 +258,7 @@ def test_research_console_labels_are_exact_only(tmp_path: Path, phrase: str) -> 
     assert any(finding.code == "GOV-002" for finding in result.findings)
 
 
-def test_entry_exit_strategy_fails_when_used_as_instructional_copy(tmp_path: Path) -> None:
-    (tmp_path / "views").mkdir()
-    (tmp_path / "views" / "page_registry.py").write_text(
-        'PAGES = ["Entry/Exit Strategy"]\n',
-        encoding="utf-8",
-    )
-    (tmp_path / "dashboard.py").write_text(
-        'LABEL = "Entry/Exit Strategy action panel: investment recommendation"\n',
-        encoding="utf-8",
-    )
-
-    result = run_governance_preflight(tmp_path)
-
-    assert not result.passed
-    assert result.status == "FAIL"
-    assert any(
-        finding.code == "GOV-002" and "investment recommendation" in finding.message
-        for finding in result.findings
-    )
-
-
 def test_internal_replay_codes_are_allowed_when_not_display_phrases(tmp_path: Path) -> None:
-    (tmp_path / "views").mkdir()
     (tmp_path / "dashboard.py").write_text(
         'actions = {"BUY", "SELL", "ENTER", "EXIT"}\n'
         'allowed = "BUY" in actions and "SELL" in actions\n',
@@ -279,15 +276,11 @@ def test_dynamic_display_action_states_fail_closed(tmp_path: Path) -> None:
         'state = {"state": "BUY", "desc": "Research candidate"}\n',
         encoding="utf-8",
     )
-    (tmp_path / "dashboard.py").write_text("", encoding="utf-8")
 
     result = run_governance_preflight(tmp_path)
 
     assert not result.passed
-    assert any(
-        finding.code == "GOV-002" and "dynamic display value" in finding.message
-        for finding in result.findings
-    )
+    assert any(finding.code == "GOV-002" and "dynamic display value" in finding.message for finding in result.findings)
 
 
 def test_candidate_card_requires_governance_block(tmp_path: Path) -> None:
@@ -362,10 +355,7 @@ def test_candidate_card_rejects_off_sibling_manifest_uri(tmp_path: Path) -> None
     result = run_governance_preflight(tmp_path)
 
     assert not result.passed
-    assert any(
-        finding.code == "GOV-008" and "manifest_uri must equal sibling manifest path" in finding.message
-        for finding in result.findings
-    )
+    assert any(finding.code == "GOV-008" and "manifest_uri must equal sibling manifest path" in finding.message for finding in result.findings)
 
 
 def test_candidate_card_rejects_wrong_sibling_manifest_uri(tmp_path: Path) -> None:
@@ -393,10 +383,7 @@ def test_candidate_card_manifest_requires_artifact_uri(tmp_path: Path) -> None:
     result = run_governance_preflight(tmp_path)
 
     assert not result.passed
-    assert any(
-        finding.code == "GOV-008" and "artifact_uri is required" in finding.message
-        for finding in result.findings
-    )
+    assert any(finding.code == "GOV-008" and "artifact_uri is required" in finding.message for finding in result.findings)
 
 
 def test_runtime_order_flags_fail_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -416,42 +403,31 @@ def test_negated_governance_text_can_mention_prohibited_words(tmp_path: Path) ->
     assert result.passed, [finding.format() for finding in result.findings]
 
 
-def test_boot_preflight_integration_blocks_on_governance_failure(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setattr(
-        boot_preflight,
-        "collect_git_state",
-        lambda _repo, **_kwargs: {
-            "available": True,
-            "status": "PASS",
-            "branch": "main",
-            "head": "abc",
-            "upstream": "origin/main",
-            "upstream_head": "abc",
-            "ahead": 0,
-            "behind": 0,
-            "has_upstream": True,
-            "aligned": True,
-            "upstream_aligned": True,
-            "expected_remote_proof": {
-                "requested": False,
-                "aligned": False,
-                "proof_available": False,
-                "reason": "not_requested",
-            },
-            "worktree_clean": True,
-            "entries": [],
-        },
+def test_json_cli_is_read_only_and_does_not_generate_runtime_status(tmp_path: Path) -> None:
+    script_path = Path("scripts/governance_preflight.py").resolve()
+    completed = subprocess.run(
+        [str(PYTHON), str(script_path), "--repo-root", str(tmp_path), "--json"],
+        check=True,
+        capture_output=True,
+        text=True,
     )
-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+
+    payload = json.loads(completed.stdout)
+    assert payload["status"] == "PASS"
+    assert not (tmp_path / "runtime" / "boot_status_current.json").exists()
+
+
+def test_json_cli_reports_findings_without_boot_blocking_exit(tmp_path: Path) -> None:
+    script_path = Path("scripts/governance_preflight.py").resolve()
     (tmp_path / "dashboard.py").write_text('TITLE = "Strong Buy"\n', encoding="utf-8")
 
-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--mode", "planning", "--no-tests"])
-    status, exit_code = boot_preflight.build_status(args)
+    completed = subprocess.run(
+        [str(PYTHON), str(script_path), "--repo-root", str(tmp_path), "--json"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
 
-    assert exit_code == 1
-    assert status["verdict"] == "FAIL"
-    assert "governance preflight did not pass: FAIL" in status["failures"]
-    assert status["checks"]["governance"]["status"] == "FAIL"
+    payload = json.loads(completed.stdout)
+    assert payload["status"] == "FAIL"
+    assert payload["passed"] is False

@@ -249,9 +249,9 @@ class GovernancePreflightResult:
 
 
 def run_governance_preflight(repo_root: str | Path) -> GovernancePreflightResult:
-    root = Path(repo_root).resolve()
+    root = _resolve_repo_root(repo_root)
     findings: list[GovernanceFinding] = []
-    checks: dict[str, Any] = {}
+    checks: dict[str, Any] = {"repo_root": root.as_posix()}
 
     _check_artifact_drift(root, findings, checks)
     _check_runtime_defaults(findings, checks)
@@ -266,12 +266,19 @@ def run_governance_preflight(repo_root: str | Path) -> GovernancePreflightResult
     )
 
 
+def _resolve_repo_root(repo_root: str | Path) -> Path:
+    root = Path(repo_root).resolve()
+    if not root.exists() or not root.is_dir():
+        raise ValueError(f"repo root does not exist or is not a directory: {repo_root}")
+    return root
+
+
 def _check_artifact_drift(
     root: Path,
     findings: list[GovernanceFinding],
     checks: dict[str, Any],
 ) -> None:
-    present_artifacts = [name for name in ARTIFACT_DRIFT_SENTINELS if (root / name).exists()]
+    present_artifacts = [name for name in ARTIFACT_DRIFT_SENTINELS if _inside_existing_path(root, root / name)]
     missing: list[str] = []
     if present_artifacts:
         missing.extend(path for path in EXPECTED_ROOT_FILES if not (root / path).exists())
@@ -292,6 +299,7 @@ def _check_artifact_drift(
     checks["GOV-000"] = {
         "artifacts_present": present_artifacts,
         "missing_expected_root_items": sorted(missing),
+        "expected_root_items": list(EXPECTED_ROOT_FILES),
     }
 
 
@@ -530,7 +538,8 @@ def _check_candidate_cards(
     findings: list[GovernanceFinding],
     checks: dict[str, Any],
 ) -> None:
-    card_paths = sorted((root / "data" / "candidate_cards").glob("*_candidate_card_v0.json"))
+    candidate_dir = root / "data" / "candidate_cards"
+    card_paths = sorted(_confined_glob(root, candidate_dir, "*_candidate_card_v0.json"))
     for card_path in card_paths:
         card = _load_json(root, card_path, "GOV-003", findings)
         if not isinstance(card, Mapping):
@@ -761,23 +770,20 @@ def _check_runtime_forbidden_tokens(
 
 def _ui_files(root: Path) -> Iterable[Path]:
     dashboard = root / "dashboard.py"
-    if dashboard.exists():
-        yield dashboard
+    if _inside_existing_path(root, dashboard):
+        yield dashboard.resolve()
     views = root / "views"
-    if views.exists():
-        yield from sorted(views.glob("*.py"))
+    yield from _confined_glob(root, views, "*.py")
 
 
 def _runtime_files(root: Path) -> Iterable[Path]:
-    dashboard = root / "dashboard.py"
-    if dashboard.exists():
-        yield dashboard
-    views = root / "views"
-    if not views.exists():
-        return
-    for path in sorted(views.glob("*.py")):
-        if path.exists():
-            yield path
+    yield from _ui_files(root)
+
+
+def _confined_glob(root: Path, directory: Path, pattern: str) -> Iterable[Path]:
+    if not _inside_existing_path(root, directory) or not directory.is_dir():
+        return ()
+    return tuple(path.resolve() for path in sorted(directory.glob(pattern)) if _inside_existing_path(root, path))
 
 
 def _load_json(
@@ -832,6 +838,22 @@ def _env_is_truthy(value: str | None) -> bool:
     return bool(normalized)
 
 
+def _inside_existing_path(root: Path, path: Path) -> bool:
+    try:
+        resolved = path.resolve()
+    except OSError:
+        return False
+    return resolved.exists() and _is_relative_to(resolved, root)
+
+
+def _is_relative_to(path: Path, root: Path) -> bool:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError:
+        return False
+    return True
+
+
 def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
@@ -872,13 +894,17 @@ def render_human(result: GovernancePreflightResult) -> str:
 
 
 def main(argv: Iterable[str] | None = None) -> int:
-    args = parse_args(argv)
-    result = run_governance_preflight(args.repo_root)
+    try:
+        args = parse_args(argv)
+        result = run_governance_preflight(args.repo_root)
+    except Exception as exc:
+        print(f"Governance preflight v0: ERROR\n{exc}", file=sys.stderr)
+        return 2
     if args.json:
         print(json.dumps(result.to_dict(), indent=2, sort_keys=True, ensure_ascii=True))
     else:
         print(render_human(result), end="")
-    return 0 if result.passed else 1
+    return 0
 
 
 if __name__ == "__main__":
