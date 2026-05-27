@@ -1,6 +1,6 @@
 """
 Terminal Zero — Detail View [FR-026 + D-28 JIT Patch]
-Renders: Chart + Action Report card for a single ticker drill-down.
+Renders: chart + research summary card for a single ticker drill-down.
 Auto-patches stale data from Yahoo before rendering.
 """
 import streamlit as st
@@ -10,6 +10,17 @@ import pandas as pd
 from data import fundamentals_updater
 from strategies.investor_cockpit import InvestorCockpitStrategy
 from views.jit_patch import is_ticker_stale, jit_patch_ticker
+
+
+def _research_state_label(raw_state: str) -> str:
+    labels = {
+        "BUY": "Research Band",
+        "HOLD": "Research Stable",
+        "WATCH": "Review Pending",
+        "AVOID": "Risk Flag",
+        "WAIT": "Support Review",
+    }
+    return labels.get(str(raw_state).upper(), "Research Review")
 
 
 def _go_scanner():
@@ -138,20 +149,22 @@ def _render_card(t, tkr_name, prices_wide, details, k_stop, z_entry, use_adaptiv
 
     # State
     sd = details.get("states", {}).get(t, {
-        "state": "HOLD", "desc": "🛡️ Trend Healthy",
+        "raw_state": "HOLD", "desc": "🛡️ Trend Healthy",
         "color": "#00ff88", "support": stop_price,
     })
-    action, reason, color, support = sd["state"], sd["desc"], sd["color"], sd["support"]
+    action = sd.get("state", sd.get("raw_state", "RESEARCH"))
+    reason, color, support = sd["desc"], sd["color"], sd["support"]
+    state_label = _research_state_label(action)
 
     if action in ("HOLD", "BUY", "WATCH"):
         buf = (price / stop_price - 1) if stop_price > 0 else 0
         line1 = f"🛡️ Floor: ${stop_price:.2f} ({buf:+.1%} buffer)"
         if action == "BUY":
-            line2 = "✅ <span style='color:#00ff88'>Buy Zone confirmed.</span>"
+            line2 = "✅ <span style='color:#00ff88'>Research band confirmed.</span>"
         elif action == "WATCH":
-            line2 = f"👀 <span style='color:#FFD700'>Dip near ${buy_val:.2f}. Wait for green candle.</span>"
+            line2 = f"👀 <span style='color:#FFD700'>Nearby research band: ${buy_val:.2f}. Await confirming session.</span>"
         else:
-            line2 = f"💎 Buy Zone: ${buy_val:.2f} <span style='color:#888'>(z={z_val:.2f})</span>"
+            line2 = f"💎 Research band: ${buy_val:.2f} <span style='color:#888'>(z={z_val:.2f})</span>"
     elif action == "AVOID":
         line1 = f"⛔ Broken Stop: ${stop_price:.2f} <span style='color:#888'>(k={k_val:.2f})</span>"
         line2 = f"📍 <span style='color:#FFD700'>Wait for ${support:.2f} support</span>"
@@ -194,13 +207,13 @@ def _render_card(t, tkr_name, prices_wide, details, k_stop, z_entry, use_adaptiv
         q_line = "<span style='color:#ff6b6b'>⚠️ Quality: FAIL (Unprofitable or Shrinking)</span>"
         q_cap_line = ""
 
-    st.markdown("#### 📋 Action Report")
+    st.markdown("#### 📋 Research Summary")
     st.markdown(f"""
     <div style='border:1px solid #333;padding:10px;margin-bottom:5px;
                 border-radius:5px;border-left:3px solid {color}'>
         <div style='display:flex;justify-content:space-between'>
             <b>{tkr_name}</b>
-            <span style='color:{color};font-weight:bold'>{action}</span>
+            <span style='color:{color};font-weight:bold'>{state_label}</span>
         </div>
         <div style='font-size:0.9em;color:#aaa'>Price: ${price:.2f} {vol_badge}</div>
         <div style='font-size:0.8em;margin-top:5px'>
@@ -250,7 +263,7 @@ def _render_chart(permno, tkr_name, prices_wide, strat, details,
         line=dict(color="#ff4444", width=1, dash="dash"),
     ))
     fig.add_trace(go.Scatter(
-        x=sb.index, y=sb.values, name=f"Buy Zone (z={z_t:.1f})",
+        x=sb.index, y=sb.values, name=f"Research band (z={z_t:.1f})",
         line=dict(color="#00ff88", width=1, dash="dot"),
     ))
     fig.update_layout(
