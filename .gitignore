@@ -21,6 +21,10 @@ tmp_*/
 *.jsonl
 !data/registry/candidate_events.jsonl
 
+# Runtime-local generated status
+/runtime/boot_status_current.json
+/runtime/.boot_status_current.json.*.tmp
+
 # Generated data artifacts
 /backtest_results.json
 data/raw/
