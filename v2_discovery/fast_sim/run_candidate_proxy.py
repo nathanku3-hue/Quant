@@ -263,15 +263,14 @@ def write_g2_lineage_artifact(
     root = Path(repo_root) if repo_root is not None else Path.cwd()
     target = _resolve_path(root, report_path)
     write_json_atomic(dict(lineage_report), target)
-    artifact_path: str | Path = target
+    reported_artifact_path: str | Path = target
     try:
-        if root.resolve() == Path.cwd().resolve():
-            artifact_path = target.relative_to(root)
+        reported_artifact_path = target.resolve().relative_to(root.resolve())
     except ValueError:
-        artifact_path = target
+        reported_artifact_path = target
     manifest = build_manifest(
         ManifestInput(
-            artifact_path=artifact_path,
+            artifact_path=target,
             source_quality=str(lineage_report["source_quality"]),
             provider="synthetic_fixture",
             provider_feed="v2_proxy_lineage_report",
@@ -286,6 +285,7 @@ def write_g2_lineage_artifact(
             },
         )
     )
+    manifest["artifact_path"] = str(reported_artifact_path)
     manifest_path = Path(f"{target}.manifest.json")
     write_manifest(manifest, manifest_path)
     return target, manifest_path

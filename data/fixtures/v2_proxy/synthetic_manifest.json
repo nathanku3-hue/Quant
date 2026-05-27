@@ -23,7 +23,7 @@
           "net_exposure"
         ]
       },
-      "sha256": "3d69bdf1fb6a8ce98400d0a5eff3255662fe42b3e573f08f4b6b0b1c9b2707fc"
+      "sha256": "c901dbc4c88c77affc8af202c2cbec8d75bb8e7d18d61f15cb8dbf2a18106e86"
     },
     "expected_positions": {
       "date_range": {
@@ -40,7 +40,7 @@
           "market_value"
         ]
       },
-      "sha256": "32dd6dfba16826051be6adbfe38530f58429a6b7969ca9a6ce6e756dae969d8a"
+      "sha256": "41530158167cd467ea92ada7267b3c9350a482eed55d9193aede785b3de236b1"
     },
     "expected_result": {
       "date_range": {
@@ -49,7 +49,7 @@
       },
       "path": "data/fixtures/v2_proxy/expected_result.json",
       "row_count": 2,
-      "sha256": "4029a68df991b5a73eb7a6401e4562fa32f6dcd91f346fcb3151aa98804281eb"
+      "sha256": "9154ff2c6a80c7e1549062dcd66d50b3ef054213dee8c1137da25ee594d81a8f"
     },
     "fixture_scope": "v2_proxy_synthetic_g1",
     "prices": {
@@ -66,7 +66,7 @@
           "close"
         ]
       },
-      "sha256": "732e1898866f2dd777b64650d70c154dc6b6f72cbd23785dee8a865e9bd360a7"
+      "sha256": "838cdea0cc7b2768f29189df1eddeaa076848da4b748502af1092ab30cd414b6"
     },
     "weights": {
       "date_range": {
@@ -82,7 +82,7 @@
           "target_weight"
         ]
       },
-      "sha256": "3804eeff6664ada5c03bace1beaeb136a96e5d85f11ba5faeeafb84da9db3760"
+      "sha256": "e46663270701c6c3b50fddba53114daf3cbaa3821339ceb90f2ca85abf92de8c"
     }
   },
   "license_scope": "synthetic_fixture_only",
@@ -92,6 +92,6 @@
   "provider_feed": "prebaked_target_weights",
   "row_count": 4,
   "schema_version": "1.0.0",
-  "sha256": "3804eeff6664ada5c03bace1beaeb136a96e5d85f11ba5faeeafb84da9db3760",
+  "sha256": "e46663270701c6c3b50fddba53114daf3cbaa3821339ceb90f2ca85abf92de8c",
   "source_quality": "non_canonical"
 }

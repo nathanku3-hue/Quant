@@ -9,6 +9,7 @@ import pytest
 from data.provenance import ManifestInput
 from data.provenance import build_manifest
 from data.provenance import compute_sha256
+from data.provenance import load_manifest
 from data.provenance import SOURCE_QUALITY_CANONICAL
 from data.provenance import SOURCE_QUALITY_NON_CANONICAL
 from data.provenance import assert_can_promote
@@ -420,6 +421,29 @@ def test_g2_end_to_end_optional_artifact_uses_registered_candidate(tmp_path):
     assert output.report_manifest_path is not None and output.report_manifest_path.exists()
     assert registry.verify_hash_chain()["valid"] is True
     assert registry.rebuild_snapshot()[G2_SYNTHETIC_CANDIDATE_ID].event_count == 2
+
+
+def test_g2_report_manifest_hashes_repo_root_target_when_cwd_differs(tmp_path, monkeypatch):
+    repo_root = tmp_path / "repo"
+    repo_fixture = repo_root / "data" / "fixtures" / "v2_proxy"
+    repo_fixture.mkdir(parents=True)
+    for path in FIXTURE_DIR.iterdir():
+        if path.is_file():
+            (repo_fixture / path.name).write_bytes(path.read_bytes())
+    outside_cwd = tmp_path / "outside"
+    outside_cwd.mkdir()
+    monkeypatch.chdir(outside_cwd)
+
+    registry = _registry(tmp_path / "state", repo_root=repo_root)
+    output = run_g2_single_fixture_candidate(
+        registry=registry,
+        actor="pytest",
+        report_path="data/registry/report.json",
+    )
+    manifest = load_manifest(output.report_manifest_path)
+
+    assert Path(manifest["artifact_path"]) == Path("data/registry/report.json")
+    assert manifest["sha256"] == compute_sha256(output.report_path)
 
 
 def test_g2_fixture_loader_still_reconciles_g1_manifest():

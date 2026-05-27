@@ -5747,3 +5747,19 @@ Phase 65 Research Validity Runner v0 (2026-05-26)
     - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py tests\test_position_lifecycle.py tests\test_pinned_universe.py tests\test_portfolio_universe.py tests\test_optimizer_core_policy.py -q` PASS, 186 passed.
   - Contract lock:
     - `RESEARCH_VALIDITY_RUNNER_V0 := VALID iff (closed_status_vocab = 1) and (canonical_engine_wrapper = 1) and (strict_missing_returns_forced = 1) and (cash_column_forbidden = 1) and (implicit_cash_residual = 1) and (full_calendar_target_weights = 1) and (run_id_path_confined = 1) and (evidence_writes_atomic = 1) and (final_manifest_last = 1) and (pit_equal_weight_benchmark_same_engine = 1) and (rule100_adapter_diagnostic_only = 1) and (replay_equity_authority = 0) and (provider_ingestion = 0) and (canonical_market_data_write = 0) and (ranking = 0) and (scoring = 0) and (broker_call = 0)`.
+
+Phase-Close Replay Fixture Determinism v0 (2026-05-27)
+
+  - Decision record:
+    - stabilize replay-adjacent phase-close fixtures before continuing governance/context-packet preflight work.
+    - treat the 19 replay-adjacent failures as fixture portability/staleness, not a boot/data-readiness or strategy replay behavior regression.
+    - keep the fix limited to repo-relative fixture path handling and refreshed synthetic fixture hashes.
+  - The Decision (Hardcoded):
+    - `data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet.manifest.json` stores a repo-relative artifact path.
+    - `v2_discovery.readiness.canonical_slice` validates declared manifest artifact paths after resolving them against repo root.
+    - `data/fixtures/v2_proxy/synthetic_manifest.json` hashes reflect committed fixture file bytes.
+    - `v2_discovery.fast_sim.run_candidate_proxy.write_g2_lineage_artifact(...)` hashes the absolute report target, then writes repo-relative artifact paths when the report target is under repo root.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_g4_real_canonical_readiness_fixture.py tests\test_g5_single_canonical_replay_no_alpha.py tests\test_g6_v1_v2_real_slice_mechanical_comparison.py tests\test_v2_canonical_replay_fixture.py tests\test_v2_proxy_registered_candidate_flow.py tests\test_signed_envelope_replay.py -q` PASS.
+  - Contract lock:
+    - `REPLAY_FIXTURE_DETERMINISM_V0 := VALID iff (g4_manifest_path_repo_relative = 1) and (g4_manifest_path_compare_resolved = 1) and (synthetic_fixture_hashes_current = 1) and (g2_report_manifest_hashes_absolute_target = 1) and (g2_report_manifest_path_repo_relative_when_under_root = 1) and (strategy_behavior_change = 0) and (boot_data_readiness_change = 0) and (governance_preflight_change = 0)`.
