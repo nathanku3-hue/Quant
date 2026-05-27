@@ -45,6 +45,28 @@ def _clean_git_state() -> dict[str, object]:
     }
 
 
+@pytest.fixture(autouse=True)
+def _default_dependency_gates(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_data_readiness_gate_check",
+        lambda _repo, _mode: {
+            "status": "PASS",
+            "command": "data-readiness",
+            "summary": "Data readiness gate passed.",
+        },
+    )
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_script_gate",
+        lambda _repo, command_parts, **_kwargs: {
+            "status": "PASS",
+            "command": " ".join(boot_preflight._python_command(command_parts)),
+            "returncode": 0,
+        },
+    )
+
+
 def test_generated_expert_packets_are_advisory_evidence() -> None:
     bucket, severity, reason = boot_preflight.classify_path(
         "docs/context/e2e_evidence/reboot_expert_packet_20260526/PACKET_INDEX.md"
@@ -116,11 +138,12 @@ def test_validate_boot_core_requires_exact_schema_path(tmp_path: Path) -> None:
     assert result["required_files"] == list(boot_preflight.BOOT_CORE_REQUIRED_FILES)
 
 
-def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
+def test_strict_gates_run_real_checks_when_requested(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
     pytest_commands: list[tuple[str, ...]] = []
+    script_commands: list[tuple[str, ...]] = []
 
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
     monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
@@ -136,6 +159,12 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
         return {"status": "PASS", "command": "pytest", "returncode": 0}
 
     monkeypatch.setattr(boot_preflight, "_run_pytest_gate", fake_pytest_gate)
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_script_gate",
+        lambda _repo, command_parts, **_kwargs: script_commands.append(command_parts)
+        or {"status": "PASS", "command": "context", "returncode": 0},
+    )
 
     args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--smoke", "--run-focused-contract"])
     status, exit_code = boot_preflight.build_status(args)
@@ -143,13 +172,42 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
 
     assert exit_code == 0
     assert status["verdict"] == "PASS"
-    assert pytest_commands == [boot_preflight.BOOT_CONTROL_TEST_COMMAND]
-    assert status["checks"]["data_readiness_gate"]["status"] == "DEFERRED"
+    assert pytest_commands == [
+        boot_preflight.BOOT_CONTROL_TEST_COMMAND,
+        boot_preflight.PORTFOLIO_APPTEST_SMOKE_COMMAND,
+        boot_preflight.FOCUSED_REPLAY_DASHBOARD_CONTRACT_COMMAND,
+    ]
+    assert script_commands == [boot_preflight.CONTEXT_PACKET_VALIDATION_COMMAND]
+    assert status["checks"]["data_readiness_gate"]["status"] == "PASS"
     assert status["checks"]["governance"]["status"] == "PASS"
-    assert status["checks"]["portfolio_apptest_smoke"]["status"] == "DEFERRED"
-    assert status["checks"]["focused_replay_dashboard_contract"]["status"] == "DEFERRED"
+    assert status["checks"]["portfolio_apptest_smoke"]["status"] == "PASS"
+    assert status["checks"]["focused_replay_dashboard_contract"]["status"] == "PASS"
     assert boot_status.primary_verdict == "degraded"
     assert boot_status.flags.boot_candidate is True
+    assert boot_status.flags.safe_boot is False
+
+
+def test_strict_default_marks_unrequested_dashboard_gates_as_safe_boot_blockers(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
+    status, exit_code = boot_preflight.build_status(args)
+    boot_status = boot_preflight.make_boot_status_from_preflight(status)
+
+    assert exit_code == 0
+    assert status["checks"]["portfolio_apptest_smoke"]["status"] == "SKIPPED"
+    assert status["checks"]["focused_replay_dashboard_contract"]["status"] == "SKIPPED"
+    assert boot_status.primary_verdict == "degraded"
     assert boot_status.flags.safe_boot is False
 
 
@@ -200,7 +258,9 @@ def test_strict_write_status_writes_only_runtime_canonical_after_pass(
         lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
     )
 
-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--write-status"])
+    args = boot_preflight.parse_args(
+        ["--repo-root", str(tmp_path), "--strict", "--require-github", "--smoke", "--run-focused-contract", "--write-status"]
+    )
     status, exit_code = boot_preflight.build_status(args)
 
     assert exit_code == 0
@@ -212,6 +272,7 @@ def test_strict_write_status_writes_only_runtime_canonical_after_pass(
         json.loads((tmp_path / CANONICAL_BOOT_STATUS_PATH).read_text(encoding="utf-8"))
     )
     assert boot_status.metadata["mode"] == "strict"
+    assert boot_status.flags.safe_boot is True
 
 
 def test_require_github_write_status_detects_post_write_dirty_state(
@@ -219,6 +280,7 @@ def test_require_github_write_status_detects_post_write_dirty_state(
     monkeypatch,
 ) -> None:
     git_states = [
+        _clean_git_state(),
         _clean_git_state(),
         {
             **_clean_git_state(),
@@ -253,7 +315,7 @@ def test_require_github_write_status_detects_post_write_dirty_state(
     monkeypatch.setattr(boot_preflight, "_write_boot_status_file", fake_write_boot_status_file)
 
     args = boot_preflight.parse_args(
-        ["--repo-root", str(tmp_path), "--strict", "--require-github", "--write-status"]
+        ["--repo-root", str(tmp_path), "--strict", "--require-github", "--smoke", "--run-focused-contract", "--write-status"]
     )
     status, exit_code = boot_preflight.build_status(args)
 
@@ -264,11 +326,12 @@ def test_require_github_write_status_detects_post_write_dirty_state(
         "result": "written",
     }
     assert observed_paths == [CANONICAL_BOOT_STATUS_PATH]
-    assert status["post_git"]["worktree_clean"] is False
-    assert status["post_git"]["entries"] == [
+    assert status["post_git"]["worktree_clean"] is True
+    assert status["final_git"]["worktree_clean"] is False
+    assert status["final_git"]["entries"] == [
         {"status": "M", "path": CANONICAL_BOOT_STATUS_PATH.as_posix()}
     ]
-    assert "--require-github post-check requires a clean worktree" in status["failures"]
+    assert "--require-github final post-write check requires a clean worktree" in status["failures"]
     assert git_states == []
 
 
@@ -320,6 +383,9 @@ def test_strict_write_status_rejects_docs_context_snapshot_status_out(
             "--repo-root",
             str(tmp_path),
             "--strict",
+            "--require-github",
+            "--smoke",
+            "--run-focused-contract",
             "--write-status",
             "--status-out",
             CONTEXT_BOOT_STATUS_SNAPSHOT_PATH.as_posix(),
@@ -440,6 +506,41 @@ def test_detached_expected_ref_and_sha_satisfy_require_github(tmp_path: Path, mo
     assert ("ls-remote", "origin", "refs/heads/codex/phase-close") in calls
 
 
+def test_data_readiness_warn_degrades_safe_boot_even_when_preflight_passes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_data_readiness_gate_check",
+        lambda _repo, _mode: {
+            "status": "WARN",
+            "summary": "Data readiness gate warned: 1 warning(s).",
+            "details": {"strict_status": "WARN", "summary": {"warnings": ["uncertified"]}},
+        },
+    )
+
+    args = boot_preflight.parse_args(
+        ["--repo-root", str(tmp_path), "--strict", "--require-github", "--smoke", "--run-focused-contract"]
+    )
+    status, exit_code = boot_preflight.build_status(args)
+    boot_status = boot_preflight.make_boot_status_from_preflight(status)
+
+    assert exit_code == 0
+    assert status["verdict"] == "PASS"
+    assert status["checks"]["data_readiness_gate"]["status"] == "WARN"
+    assert boot_status.primary_verdict == "degraded"
+    assert boot_status.flags.safe_boot is False
+
+
 def test_detached_require_github_without_expected_proof_fails_as_unavailable(tmp_path: Path, monkeypatch) -> None:
     def fake_git(_repo: Path, *args: str) -> CommandResult:
         if args == ("rev-parse", "--is-inside-work-tree"):
@@ -525,7 +626,7 @@ def test_require_github_post_check_reports_expected_proof_mismatch(tmp_path: Pat
             "reason": "remote_sha_mismatch",
         },
     }
-    states = [first_state, post_state]
+    states = [first_state, post_state, post_state]
 
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
     monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
@@ -569,6 +670,10 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
             "dirty": {"status": "PASS", "dirty_state": "clean"},
             "governance": {"status": "PASS", "command": "governance"},
             "boot_control_tests": {"status": "PASS", "command": "pytest"},
+            "data_readiness_gate": {"status": "PASS", "command": "data-readiness"},
+            "context_packet_validation": {"status": "PASS", "command": "context"},
+            "portfolio_apptest_smoke": {"status": "SKIPPED", "reason": "not requested"},
+            "focused_replay_dashboard_contract": {"status": "SKIPPED", "reason": "not requested"},
         },
     }
 
@@ -576,7 +681,41 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
     round_trip = BootStatus.from_json_dict(json.loads(boot_status.to_json_text()))
 
     assert round_trip.primary_verdict == "degraded"
-    assert any(check.id == "data_readiness_gate" and check.status == "deferred" for check in round_trip.checks)
+    assert any(check.id == "portfolio_apptest_smoke" and check.status == "not_applicable" for check in round_trip.checks)
+    assert round_trip.flags.safe_boot is False
+
+
+def test_make_boot_status_from_preflight_sets_safe_boot_only_after_required_gate_truth() -> None:
+    preflight_status = {
+        "schema_version": boot_preflight.SCHEMA_VERSION,
+        "generated_at_utc": "2026-05-26T00:00:00Z",
+        "mode": "strict",
+        "require_github": True,
+        "verdict": "PASS",
+        "exit_code": 0,
+        "warnings": [],
+        "checks": {
+            "boot_core": {"status": "PASS", "command": "file-contract"},
+            "git": _clean_git_state(),
+            "post_git": _clean_git_state(),
+            "dirty": {"status": "PASS", "dirty_state": "clean"},
+            "governance": {"status": "PASS", "command": "governance"},
+            "boot_control_tests": {"status": "PASS", "command": "pytest"},
+            "data_readiness_gate": {"status": "PASS", "command": "data-readiness"},
+            "context_packet_validation": {"status": "PASS", "command": "context"},
+            "portfolio_apptest_smoke": {"status": "PASS", "command": "apptest"},
+            "focused_replay_dashboard_contract": {"status": "PASS", "command": "focused"},
+        },
+    }
+
+    boot_status = boot_preflight.make_boot_status_from_preflight(preflight_status)
+
+    assert boot_status.primary_verdict == "ready"
+    assert boot_status.flags.safe_boot is True
+    assert boot_status.metadata["safe_boot_required_gates"] == [
+        *boot_preflight.SAFE_BOOT_REQUIRED_GATES,
+        "post_git_state",
+    ]
 
 
 def test_launch_preflight_dispatch_adds_repo_root(monkeypatch) -> None:
@@ -619,11 +758,11 @@ def test_launch_preflight_enforces_project_venv(monkeypatch) -> None:
     assert launch.main() == 1
 
 
-def test_boot_core_imports_governance_but_not_data_readiness() -> None:
+def test_boot_core_imports_governance_and_data_readiness_gate() -> None:
     source = Path(boot_preflight.__file__).read_text(encoding="utf-8")
 
     assert "from scripts.governance_preflight import run_governance_preflight" in source
-    assert "core.data_readiness_gate" not in source
+    assert "from core.data_readiness_gate import run_data_readiness_gate" in source
 
 
 def test_boot_preflight_integration_blocks_on_governance_failure(

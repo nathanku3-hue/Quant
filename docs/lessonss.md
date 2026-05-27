@@ -955,3 +955,11 @@ Application pattern:
 - Fix applied: Added `views/scanner_display.py`, mapped raw ratings to research-only labels, renamed/removed action-shaped columns before `st.dataframe`, routed both scanner tables through the quarantine helper, and added focused regression tests.
 - Guardrail for next time: Any scanner-derived dataframe sent to Streamlit must pass through a research-only display helper first, and the dashboard source should never expose raw action-shaped columns in the render section.
 - Evidence paths: `dashboard.py`, `views/scanner_display.py`, `tests/test_dashboard_scanner_display.py`, `tests/test_scanner.py`, `.venv\Scripts\python -m pytest tests\test_dashboard_scanner_display.py tests\test_g8_2_system_scouted_candidate_card.py -q`.
+
+## 2026-05-27 Round Entry (Safe Boot Must Be Earned From Gate Truth)
+- Date: 2026-05-27
+- Mistake or miss: Boot status could report a strict preflight PASS while safe-boot dependencies were deferred or skipped, leaving `safe_boot` disconnected from actual gate truth.
+- Root cause: `make_boot_status_from_preflight` hard-coded `safe_boot=false` and appended deferred dependency checks instead of modeling each dependency as a real gate or explicit blocker.
+- Fix applied: Wired read-only data-readiness, context validation, Portfolio AppTest smoke, and focused replay/dashboard contract into boot preflight; changed status mapping so warning/skipped/deferred/failed required gates keep `safe_boot=false`; documented the new contract.
+- Guardrail for next time: A boot-status artifact may set `safe_boot=true` only when every named required gate is present, strict, GitHub-required, passing, and post-write Git proof remains clean/aligned.
+- Evidence paths: `core/boot_status.py`, `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `tests/test_boot_status_contract.py`, `docs/architecture/boot_preflight_contract.md`.

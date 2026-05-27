@@ -14,6 +14,7 @@ from core.boot_status import (
     DEFAULT_BOOT_STATUS_PATH,
     NextSafeAction,
     ReadinessCheck,
+    checks_allow_safe_boot,
     deferred_check,
     load_boot_status_fail_closed,
     make_boot_status,
@@ -76,7 +77,31 @@ def test_deferred_check_degrades_boot_status() -> None:
     )
 
     assert status.primary_verdict == "degraded"
-    assert status.flags.safe_boot is True
+    assert status.flags.safe_boot is False
+
+
+def test_safe_boot_flag_is_earned_only_when_all_checks_pass() -> None:
+    warn_status = make_boot_status(
+        source="test",
+        flags=BootContextFlags(safe_boot=True, boot_candidate=True),
+        checks=(
+            _ready_check(),
+            ReadinessCheck(
+                id="context_packet_validation",
+                label="Context packet validation",
+                status="warn",
+                severity="degraded",
+                summary="Context packet is stale.",
+            ),
+        ),
+        generated_at="2026-05-26T00:00:00Z",
+    )
+    ready_status = _boot_status(safe_boot=True)
+
+    assert checks_allow_safe_boot(ready_status.checks) is True
+    assert checks_allow_safe_boot(warn_status.checks) is False
+    assert warn_status.primary_verdict == "degraded"
+    assert warn_status.flags.safe_boot is False
 
 
 def test_boot_status_round_trips_json() -> None:

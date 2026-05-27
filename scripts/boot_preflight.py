@@ -24,15 +24,17 @@ from core.boot_status import (
     BootContextFlags,
     BootStatus,
     ReadinessCheck,
-    deferred_check,
+    checks_allow_safe_boot,
     make_boot_status,
 )
+from core.data_readiness_gate import run_data_readiness_gate
 from scripts.governance_preflight import run_governance_preflight
 
 
 SCHEMA_VERSION = "boot-preflight.v1"
 DEFAULT_STATUS_JSON = BOOT_STATUS_CURRENT_PATH
 DEFAULT_PYTEST_GATE_TIMEOUT_SECONDS = 180.0
+DEFAULT_CONTEXT_GATE_TIMEOUT_SECONDS = 60.0
 BOOT_CONTROL_TEST_COMMAND = (
     "-m",
     "pytest",
@@ -40,6 +42,25 @@ BOOT_CONTROL_TEST_COMMAND = (
     "tests/test_boot_status_contract.py",
     "tests/test_boot_preflight_governance.py",
     "-q",
+)
+PORTFOLIO_APPTEST_SMOKE_COMMAND = (
+    "-m",
+    "pytest",
+    "tests/test_optimizer_view.py::test_optimizer_view_renders_with_streamlit_testing",
+    "tests/test_optimizer_view.py::test_optimizer_view_exercises_mean_variance_and_sector_cap_controls",
+    "-q",
+)
+FOCUSED_REPLAY_DASHBOARD_CONTRACT_COMMAND = (
+    "-m",
+    "pytest",
+    "tests/test_dashboard_scanner_display.py",
+    "tests/test_portfolio_universe.py::test_watch_is_research_only_by_default",
+    "tests/test_dash_2_portfolio_ytd.py::test_dash_2_no_forbidden_runtime_scope",
+    "-q",
+)
+CONTEXT_PACKET_VALIDATION_COMMAND = (
+    "scripts/build_context_packet.py",
+    "--validate",
 )
 BOOT_CORE_REQUIRED_FILES = (
     "BOOT.md",
@@ -55,28 +76,61 @@ BOOT_CORE_REQUIRED_FILES = (
     "docs/architecture/governance_boundary_policy.md",
     BOOT_STATUS_SCHEMA_PATH.as_posix(),
 )
-DEFERRED_DEPENDENCY_CHECKS = (
-    (
-        "data_readiness_gate",
-        "Data readiness gate",
-        "Deferred from boot-core v0; stage data-readiness in its own slice.",
-    ),
-    (
-        "context_packet_validation",
-        "Context packet rebuild/validation",
-        "Deferred from boot-core v0; context generation remains a separate governance step.",
-    ),
-    (
-        "portfolio_apptest_smoke",
-        "Portfolio AppTest smoke",
-        "Deferred from boot-core v0; dashboard smoke must be approved as a later slice.",
-    ),
-    (
-        "focused_replay_dashboard_contract",
-        "Focused replay/dashboard contract",
-        "Deferred from boot-core v0; replay/dashboard tests are not default boot-core gates.",
-    ),
+SAFE_BOOT_REQUIRED_GATES = (
+    "git_state",
+    "governance_preflight",
+    "boot_control_tests",
+    "data_readiness_gate",
+    "context_packet_validation",
+    "portfolio_apptest_smoke",
+    "focused_replay_dashboard_contract",
 )
+BOOT_STATUS_CHECK_ORDER = (
+    "boot_core",
+    "git_state",
+    "dirty_worktree",
+    "governance_preflight",
+    "boot_control_tests",
+    "data_readiness_gate",
+    "context_packet_validation",
+    "portfolio_apptest_smoke",
+    "focused_replay_dashboard_contract",
+)
+GATE_LABELS = {
+    "boot_core": "Boot-core file contract",
+    "git_state": "Git state",
+    "dirty_worktree": "Dirty worktree classification",
+    "governance_preflight": "Governance preflight",
+    "boot_control_tests": "Boot-control tests",
+    "data_readiness_gate": "Data readiness gate",
+    "context_packet_validation": "Context packet validation",
+    "portfolio_apptest_smoke": "Portfolio AppTest smoke",
+    "focused_replay_dashboard_contract": "Focused replay/dashboard contract",
+}
+GATE_STATUS_TO_CHECK_STATUS = {
+    "PASS": "pass",
+    "WARN": "warn",
+    "SKIPPED": "not_applicable",
+    "DEFERRED": "deferred",
+    "FAIL": "fail",
+}
+GATE_STATUS_TO_SEVERITY = {
+    "PASS": "ready",
+    "WARN": "degraded",
+    "SKIPPED": "degraded",
+    "DEFERRED": "degraded",
+    "FAIL": "blocked",
+}
+COMMAND_GATE_SKIP_REASONS = {
+    "context_packet_validation": "Context packet validation runs only in strict mode.",
+    "portfolio_apptest_smoke": "Portfolio AppTest smoke runs only when --smoke is supplied.",
+    "focused_replay_dashboard_contract": "Focused replay/dashboard contract runs only when --run-focused-contract is supplied.",
+}
+COMMAND_GATE_PASS_SUMMARIES = {
+    "context_packet_validation": "Existing context packet artifacts are fresh and schema-valid.",
+    "portfolio_apptest_smoke": "Deterministic Portfolio AppTest smoke passed without status mutation.",
+    "focused_replay_dashboard_contract": "Focused replay/dashboard governance contract passed.",
+}
 
 BOOT_CORE_SOURCE = set(BOOT_CORE_REQUIRED_FILES)
 GENERATED_EVIDENCE_PATTERNS = (
@@ -480,6 +534,77 @@ def _run_pytest_gate(
     }
 
 
+def _run_script_gate(
+    repo_root: Path,
+    command_parts: tuple[str, ...],
+    *,
+    timeout: float | None = None,
+) -> dict[str, Any]:
+    result = _run_command(_python_command(command_parts), cwd=repo_root, timeout=timeout)
+    return {
+        "status": "PASS" if result.returncode == 0 else "FAIL",
+        "command": " ".join(_python_command(command_parts)),
+        "returncode": result.returncode,
+        "stdout_tail": _tail(result.stdout),
+        "stderr_tail": _tail(result.stderr),
+    }
+
+
+def _run_data_readiness_gate_check(repo_root: Path, mode: str) -> dict[str, Any]:
+    command = "core.data_readiness_gate.run_data_readiness_gate(read_only=True)"
+    try:
+        status = run_data_readiness_gate(repo_root, mode=mode)
+    except Exception as exc:
+        return {
+            "status": "FAIL",
+            "command": command,
+            "summary": f"Data readiness gate failed to run: {exc}",
+            "details": {"exception": repr(exc), "read_only": True},
+        }
+    raw_status = str(status.get("overall_status", "FAIL")).strip().upper()
+    if raw_status == "PASS":
+        gate_status = "PASS"
+        summary = "Data readiness gate passed."
+    elif raw_status in {"WARN", "DEFER", "DEFERRED"}:
+        gate_status = "WARN"
+        summary = "Data readiness gate is degraded or uncertified."
+    else:
+        gate_status = "FAIL"
+        summary = "Data readiness gate failed."
+    summary_payload = status.get("summary") if isinstance(status.get("summary"), Mapping) else {}
+    blockers = summary_payload.get("blockers", []) if isinstance(summary_payload, Mapping) else []
+    warnings = summary_payload.get("warnings", []) if isinstance(summary_payload, Mapping) else []
+    if gate_status == "FAIL" and blockers:
+        summary = f"Data readiness gate failed: {len(blockers)} blocker(s)."
+    elif gate_status == "WARN" and warnings:
+        summary = f"Data readiness gate warned: {len(warnings)} warning(s)."
+    return {
+        "status": gate_status,
+        "command": command,
+        "summary": summary,
+        "details": {
+            "overall_status": raw_status,
+            "planning_status": status.get("planning_status"),
+            "strict_status": status.get("strict_status"),
+            "mode": status.get("mode"),
+            "route_id": status.get("route_id"),
+            "route_readiness": status.get("route_readiness"),
+            "summary": {
+                "blockers": list(blockers) if isinstance(blockers, list) else [],
+                "warnings": list(warnings) if isinstance(warnings, list) else [],
+            },
+            "read_only": True,
+        },
+    }
+
+
+def _skipped_gate(check_id: str) -> dict[str, Any]:
+    return {
+        "status": "SKIPPED",
+        "reason": COMMAND_GATE_SKIP_REASONS[check_id],
+    }
+
+
 def _check_from_gate(
     check_id: str,
     label: str,
@@ -487,34 +612,36 @@ def _check_from_gate(
     *,
     destination: str = "Boot Status",
 ) -> ReadinessCheck:
-    if gate.get("status") == "PASS":
+    gate_status = str(gate.get("status", "FAIL")).upper()
+    summary = str(gate.get("summary") or gate.get("reason") or "")
+    if gate_status == "PASS":
         return ReadinessCheck(
             id=check_id,
             label=label,
             status="pass",
             severity="ready",
-            summary=f"{label} passed.",
+            summary=summary or f"{label} passed.",
             evidence_ref=str(gate.get("command", "")) or None,
             destination=destination,
             details=dict(gate),
         )
-    if gate.get("status") == "WARN":
+    if gate_status == "WARN":
         return ReadinessCheck(
             id=check_id,
             label=label,
             status="warn",
             severity="degraded",
-            summary=f"{label} reported warnings.",
+            summary=summary or f"{label} reported warnings.",
             evidence_ref=str(gate.get("command", "")) or None,
             destination=destination,
             details=dict(gate),
         )
-    if gate.get("status") in {"SKIPPED", "DEFERRED"}:
+    if gate_status in {"SKIPPED", "DEFERRED"}:
         return ReadinessCheck(
             id=check_id,
             label=label,
-            status="not_applicable" if gate.get("status") == "SKIPPED" else "deferred",
-            severity="ready" if gate.get("status") == "SKIPPED" else "degraded",
+            status="not_applicable" if gate_status == "SKIPPED" else "deferred",
+            severity="degraded",
             summary=str(gate.get("reason", f"{label} was not run.")),
             evidence_ref=str(gate.get("command", "")) or None,
             destination=destination,
@@ -525,7 +652,7 @@ def _check_from_gate(
         label=label,
         status="fail",
         severity="blocked",
-        summary=f"{label} failed.",
+        summary=summary or f"{label} failed.",
         evidence_ref=str(gate.get("command", "")) or None,
         destination=destination,
         details=dict(gate),
@@ -594,37 +721,64 @@ def _status_from_git(git: Mapping[str, Any], require_github: bool) -> ReadinessC
     )
 
 
+def _post_status_from_git(git: Mapping[str, Any], require_github: bool) -> ReadinessCheck:
+    check = _status_from_git(git, require_github)
+    summary = check.summary
+    if check.status == "pass":
+        summary = "Post-write Git check remains clean and aligned."
+    elif check.status == "fail":
+        summary = _github_alignment_failure(git, post_check=True)
+    return ReadinessCheck(
+        id="post_git_state",
+        label="Post-write Git state",
+        status=check.status,
+        severity=check.severity,
+        summary=summary,
+        evidence_ref=check.evidence_ref,
+        destination=check.destination,
+        details=check.details,
+    )
+
+
+def _required_gate_ids(preflight_status: Mapping[str, Any]) -> tuple[str, ...]:
+    return (
+        (*SAFE_BOOT_REQUIRED_GATES, "post_git_state")
+        if isinstance(preflight_status.get("checks"), Mapping)
+        and "post_git" in preflight_status.get("checks", {})
+        else SAFE_BOOT_REQUIRED_GATES
+    )
+
+
 def make_boot_status_from_preflight(preflight_status: Mapping[str, Any]) -> BootStatus:
     checks_payload = preflight_status.get("checks")
     checks_map = checks_payload if isinstance(checks_payload, Mapping) else {}
-    boot_core = checks_map.get("boot_core", {})
-    dirty = checks_map.get("dirty", {})
-    boot_tests = checks_map.get("boot_control_tests", {})
-    governance = checks_map.get("governance", {})
-    checks: list[ReadinessCheck] = [
-        _check_from_gate("boot_core", "Boot-core file contract", boot_core if isinstance(boot_core, Mapping) else {}),
-        _status_from_git(
-            checks_map.get("git", {}) if isinstance(checks_map.get("git", {}), Mapping) else {},
-            bool(preflight_status.get("require_github")),
-        ),
-        _check_from_gate("dirty_worktree", "Dirty worktree classification", dirty if isinstance(dirty, Mapping) else {}),
-        _check_from_gate(
-            "governance_preflight",
-            "Governance preflight",
-            governance if isinstance(governance, Mapping) else {},
-        ),
-        _check_from_gate(
-            "boot_control_tests",
-            "Boot-control tests",
-            boot_tests if isinstance(boot_tests, Mapping) else {},
-        ),
-    ]
-    checks.extend(
-        deferred_check(check_id, label, summary)
-        for check_id, label, summary in DEFERRED_DEPENDENCY_CHECKS
+    checks: list[ReadinessCheck] = []
+    for check_id in BOOT_STATUS_CHECK_ORDER:
+        if check_id == "git_state":
+            checks.append(
+                _status_from_git(
+                    checks_map.get("git", {}) if isinstance(checks_map.get("git", {}), Mapping) else {},
+                    bool(preflight_status.get("require_github")),
+                )
+            )
+            continue
+        key = "dirty" if check_id == "dirty_worktree" else "governance" if check_id == "governance_preflight" else check_id
+        gate = checks_map.get(key, {})
+        checks.append(_check_from_gate(check_id, GATE_LABELS[check_id], gate if isinstance(gate, Mapping) else {}))
+    if isinstance(checks_map.get("post_git"), Mapping):
+        checks.append(_post_status_from_git(checks_map["post_git"], bool(preflight_status.get("require_github"))))
+    required_gate_ids = _required_gate_ids(preflight_status)
+    check_by_id = {check.id: check for check in checks}
+    required_checks = [check_by_id[check_id] for check_id in required_gate_ids if check_id in check_by_id]
+    safe_boot = (
+        preflight_status.get("mode") == "strict"
+        and bool(preflight_status.get("require_github"))
+        and preflight_status.get("verdict") == "PASS"
+        and len(required_checks) == len(required_gate_ids)
+        and checks_allow_safe_boot(required_checks)
     )
     flags = BootContextFlags(
-        safe_boot=False,
+        safe_boot=safe_boot,
         boot_candidate=preflight_status.get("mode") == "strict" and preflight_status.get("verdict") == "PASS",
         local_planning=preflight_status.get("mode") == "planning",
     )
@@ -639,7 +793,8 @@ def make_boot_status_from_preflight(preflight_status: Mapping[str, Any]) -> Boot
             "preflight_schema_version": preflight_status.get("schema_version"),
             "mode": preflight_status.get("mode"),
             "require_github": preflight_status.get("require_github"),
-            "deferred_scope": "data-readiness/dashboard/replay/optimizer",
+            "safe_boot_required_gates": list(required_gate_ids),
+            "deferred_scope": [],
         },
     )
 
@@ -732,12 +887,57 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
             "command": " ".join(_python_command(BOOT_CONTROL_TEST_COMMAND)),
         }
 
-    for key, _label, summary in DEFERRED_DEPENDENCY_CHECKS:
-        checks[key] = {"status": "DEFERRED", "reason": summary}
+    checks["data_readiness_gate"] = _run_data_readiness_gate_check(repo_root, args.mode)
+    if checks["data_readiness_gate"]["status"] == "FAIL":
+        failures.append("data-readiness gate did not pass: FAIL")
+    elif checks["data_readiness_gate"]["status"] != "PASS":
+        warnings.append("data-readiness gate is degraded")
+
+    if args.mode == "strict" and not args.no_tests:
+        checks["context_packet_validation"] = _run_script_gate(
+            repo_root,
+            CONTEXT_PACKET_VALIDATION_COMMAND,
+            timeout=DEFAULT_CONTEXT_GATE_TIMEOUT_SECONDS,
+        )
+        if checks["context_packet_validation"]["status"] == "PASS":
+            checks["context_packet_validation"]["summary"] = COMMAND_GATE_PASS_SUMMARIES["context_packet_validation"]
+        else:
+            failures.append("context packet validation failed")
+    else:
+        checks["context_packet_validation"] = _skipped_gate("context_packet_validation")
+
     if args.smoke:
-        warnings.append("Portfolio AppTest smoke is deferred from boot-core v0 and was not run.")
+        checks["portfolio_apptest_smoke"] = _run_pytest_gate(
+            repo_root,
+            PORTFOLIO_APPTEST_SMOKE_COMMAND,
+            timeout=DEFAULT_PYTEST_GATE_TIMEOUT_SECONDS,
+        )
+        if checks["portfolio_apptest_smoke"]["status"] == "PASS":
+            checks["portfolio_apptest_smoke"]["summary"] = COMMAND_GATE_PASS_SUMMARIES["portfolio_apptest_smoke"]
+        else:
+            failures.append("Portfolio AppTest smoke failed")
+    else:
+        checks["portfolio_apptest_smoke"] = _skipped_gate("portfolio_apptest_smoke")
+
     if args.run_focused_contract:
-        warnings.append("Focused replay/dashboard contract is deferred from boot-core v0 and was not run.")
+        checks["focused_replay_dashboard_contract"] = _run_pytest_gate(
+            repo_root,
+            FOCUSED_REPLAY_DASHBOARD_CONTRACT_COMMAND,
+            timeout=DEFAULT_PYTEST_GATE_TIMEOUT_SECONDS,
+        )
+        if checks["focused_replay_dashboard_contract"]["status"] == "PASS":
+            checks["focused_replay_dashboard_contract"]["summary"] = COMMAND_GATE_PASS_SUMMARIES[
+                "focused_replay_dashboard_contract"
+            ]
+        else:
+            failures.append("focused replay/dashboard contract failed")
+    else:
+        checks["focused_replay_dashboard_contract"] = _skipped_gate("focused_replay_dashboard_contract")
+
+    if checks["portfolio_apptest_smoke"]["status"] == "SKIPPED":
+        warnings.append(COMMAND_GATE_SKIP_REASONS["portfolio_apptest_smoke"])
+    if checks["focused_replay_dashboard_contract"]["status"] == "SKIPPED":
+        warnings.append(COMMAND_GATE_SKIP_REASONS["focused_replay_dashboard_contract"])
 
     status: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
@@ -751,20 +951,6 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         "checks": checks,
     }
 
-    write_allowed = (
-        status["verdict"] == "PASS"
-        and args.mode == "strict"
-        and not args.no_tests
-        and not args.smoke
-        and not args.run_focused_contract
-    )
-    if args.write_status and write_allowed:
-        boot_status = make_boot_status_from_preflight(status)
-        write_result = _write_boot_status_file(boot_status, args.status_out, repo_root=repo_root)
-        status["status_write"] = {"path": _normalize_path(args.status_out), "result": write_result}
-    elif args.write_status:
-        status["status_write"] = {"path": _normalize_path(args.status_out), "result": "blocked-until-pass"}
-
     if args.require_github:
         post_git = collect_git_state(
             repo_root,
@@ -772,6 +958,7 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
             expected_sha=args.expected_sha,
         )
         status["post_git"] = post_git
+        status["checks"]["post_git"] = post_git
         if not post_git.get("worktree_clean"):
             status["verdict"] = "FAIL"
             status["exit_code"] = 1
@@ -781,15 +968,49 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
             status["exit_code"] = 1
             status["failures"].append(_github_alignment_failure(post_git, post_check=True))
 
+    write_allowed = (
+        status["verdict"] == "PASS"
+        and args.mode == "strict"
+        and args.require_github
+        and not args.no_tests
+        and args.smoke
+        and args.run_focused_contract
+        and make_boot_status_from_preflight(status).flags.safe_boot
+    )
+    if args.write_status and write_allowed:
+        boot_status = make_boot_status_from_preflight(status)
+        write_result = _write_boot_status_file(boot_status, args.status_out, repo_root=repo_root)
+        status["status_write"] = {"path": _normalize_path(args.status_out), "result": write_result}
+    elif args.write_status:
+        status["status_write"] = {"path": _normalize_path(args.status_out), "result": "blocked-until-pass"}
+
+    if args.require_github:
+        final_git = collect_git_state(
+            repo_root,
+            expected_ref=args.expected_ref,
+            expected_sha=args.expected_sha,
+        )
+        status["final_git"] = final_git
+        if not final_git.get("worktree_clean"):
+            status["verdict"] = "FAIL"
+            status["exit_code"] = 1
+            status["failures"].append("--require-github final post-write check requires a clean worktree")
+        if not final_git.get("aligned"):
+            status["verdict"] = "FAIL"
+            status["exit_code"] = 1
+            status["failures"].append(_github_alignment_failure(final_git, post_check=True))
+
     return status, int(status["exit_code"])
 
 
 def render_human(status: Mapping[str, Any]) -> str:
     boot_status = make_boot_status_from_preflight(status)
+    boot_checks = {check.id: check for check in boot_status.checks}
     lines = [
         f"BOOT VERDICT: {status.get('verdict')}",
         f"Mode: {status.get('mode')}",
         f"Boot status: {boot_status.primary_verdict}",
+        f"Safe boot: {str(boot_status.flags.safe_boot).lower()}",
     ]
     failures = status.get("failures") or []
     warnings = status.get("warnings") or []
@@ -799,9 +1020,11 @@ def render_human(status: Mapping[str, Any]) -> str:
     if warnings:
         lines.append("Warnings:")
         lines.extend(f"- {item}" for item in warnings)
-    lines.append("Deferred:")
-    for _check_id, label, _summary in DEFERRED_DEPENDENCY_CHECKS:
-        lines.append(f"- {label}")
+    lines.append("Safe-boot gates:")
+    for check_id in SAFE_BOOT_REQUIRED_GATES:
+        check = boot_checks.get(check_id)
+        effective_status = check.status.upper() if check else "MISSING"
+        lines.append(f"- {GATE_LABELS[check_id]}: {effective_status}")
     return "\n".join(lines) + "\n"
 
 
@@ -827,11 +1050,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--status-out", default=DEFAULT_STATUS_JSON.as_posix())
     parser.add_argument("--json", action="store_true", help="Print machine-readable preflight JSON.")
     parser.add_argument("--no-tests", action="store_true", help="Skip strict boot-control pytest gate.")
-    parser.add_argument("--smoke", action="store_true", help="Accepted for compatibility; deferred in boot-core v0.")
+    parser.add_argument("--smoke", action="store_true", help="Run deterministic Portfolio AppTest smoke gate.")
     parser.add_argument(
         "--run-focused-contract",
         action="store_true",
-        help="Accepted for compatibility; deferred in boot-core v0.",
+        help="Run focused replay/dashboard governance contract gate.",
     )
     args = parser.parse_args(argv)
     if args.strict:

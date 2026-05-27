@@ -1,17 +1,16 @@
 # Boot Preflight Contract v0
 
 Status: implementation contract
-Scope: boot-core control plane plus governance preflight integration
-Non-scope: data-readiness execution, context rebuilding, replay behavior, optimizer behavior, dashboard semantics, research-validity claims, data repair, provider ingestion, broker actions, strategy logic
+Scope: boot-core control plane plus safe-boot gate truth
+Non-scope: context rebuilding, replay rebuilding, optimizer behavior changes, dashboard semantic redesign, research-validity claims, data repair, provider ingestion, broker actions, strategy logic
 
 ## Mission
 
 Terminal Zero must expose one deterministic boot-status contract before broad
-feature buckets are staged. The current slice keeps the boot path narrow: it
-proves the status vocabulary, schema, launch dispatch, basic Git/dirty
-inspection, preflight pass/fail shell, and the governance preflight boundary.
-Data-readiness is reported as deferred in this proof and must not run from
-`scripts/boot_preflight.py` until a separate slice approves it.
+feature buckets are staged. The current slice converts previously deferred
+boot-status dependencies into real gates or explicit safe-boot blockers. Safe
+boot is earned only from current gate truth; missing, warning, skipped,
+deferred, or failed required gates keep `safe_boot=false`.
 
 ## Commands
 
@@ -30,7 +29,7 @@ Planning-mode check for local dirty work:
 Intentional status write:
 
 ```powershell
-.\.venv\Scripts\python launch.py --preflight --strict --write-status
+.\.venv\Scripts\python launch.py --preflight --strict --require-github --smoke --run-focused-contract --write-status
 ```
 
 Final read-only GitHub proof after intentional status evidence is committed:
@@ -55,23 +54,26 @@ Boot-core v0 may check:
 - dirty files are classified at a basic safety level,
 - governance preflight runs and reports structured PASS/WARN/FAIL state,
 - boot-control tests pass in strict mode unless `--no-tests` is supplied,
+- data-readiness runs through `core.data_readiness_gate.run_data_readiness_gate` in read-only mode,
+- context packet validation runs through `scripts/build_context_packet.py --validate` without implicit rebuild,
+- Portfolio AppTest smoke runs only when `--smoke` is supplied,
+- focused replay/dashboard governance contract runs only when `--run-focused-contract` is supplied,
 - `--require-github` has a clean worktree and either upstream-aligned HEAD or an explicit expected-ref/SHA proof.
 
 Boot-core v0 may import:
 
 - `scripts.governance_preflight.run_governance_preflight`.
+- `core.data_readiness_gate.run_data_readiness_gate`.
 
 Boot-core v0 must not import or execute:
 
-- `core.data_readiness_gate.run_data_readiness_gate`,
 - `scripts/run_data_readiness_gate.py`,
-- `scripts/build_context_packet.py --validate`,
-- dashboard AppTest smoke paths,
-- replay/dashboard focused-contract commands,
 - optimizer, Rule100, replay, or data repair modules.
 
-Data-readiness, context-packet, smoke, replay/dashboard, optimizer, Rule100,
-and data-repair checks remain deferred until their own slices are approved.
+Context-packet validation, dashboard AppTest smoke, and focused
+replay/dashboard checks run as subprocess gates and must not rebuild or repair
+artifacts implicitly. Optimizer, Rule100, replay rebuilds, and data repair remain
+outside boot preflight.
 
 ## GitHub Proof Policy
 
@@ -87,14 +89,18 @@ fail as proof unavailable. If expected proof is supplied but the remote ref,
 remote SHA, expected SHA, or local `HEAD` disagree, the gate fails as expected
 proof mismatch.
 
-## Data-Readiness Deferral Policy
+## Safe-Boot Gate Policy
 
-`scripts/boot_preflight.py` must not call the data-readiness gate in this
-current governance slice. It emits `checks.data_readiness_gate.status =
-DEFERRED`, and `make_boot_status_from_preflight(...)` maps that state to a
-degraded non-safe boot candidate. A later data-readiness slice must update this
-contract, the tests, and the runtime status mapping before the gate can execute
-from boot preflight.
+`safe_boot=true` only when all required gates pass in strict mode with
+`--require-github`: Git state, governance preflight, boot-control tests,
+data-readiness gate, context packet validation, Portfolio AppTest smoke,
+focused replay/dashboard contract, and the post-write Git check when status
+writing is attempted.
+
+If any required gate is missing, warning, skipped, deferred, or failed,
+`make_boot_status_from_preflight(...)` maps the boot status to degraded or
+blocked with `safe_boot=false`. A data-readiness `WARN` remains a safe-boot
+blocker even when the transient preflight verdict is `PASS`.
 
 The boot preflight writer does not write status files unless the operator
 explicitly supplies `--write-status`. Even with `--write-status`, failed
@@ -145,12 +151,11 @@ Advisory only:
 
 ## Exit Codes
 
-- `0`: boot-core PASS, possibly degraded by deferred checks.
+- `0`: preflight PASS, possibly degraded by explicit safe-boot blockers.
 - `1`: boot-core FAIL caused by failed checks.
 - `2`: internal/configuration error.
 
 ## Deferred Scope
 
-The next slice may add the data-readiness/context-packet dependency set. It must
-be staged separately and must not be retroactively mixed into the boot-core or
-governance integration commits.
+Optimizer, Rule100, replay rebuilds, data repair, provider ingestion, broker
+behavior, and research-validity promotion remain outside this boot gate.

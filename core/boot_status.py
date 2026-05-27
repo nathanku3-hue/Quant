@@ -285,6 +285,10 @@ def primary_verdict_from_checks(checks: Sequence[ReadinessCheck], flags: BootCon
     return "ready" if flags.safe_boot else "degraded"
 
 
+def checks_allow_safe_boot(checks: Sequence[ReadinessCheck]) -> bool:
+    return bool(checks) and all(check.status == "pass" and check.severity == "ready" for check in checks)
+
+
 def validate_next_safe_action(action: NextSafeAction) -> None:
     if not action.label.strip():
         raise BootStatusValidationError("NextSafeAction.label is required")
@@ -354,13 +358,20 @@ def make_boot_status(
             destination="Boot Status",
         ),
     )
-    primary = primary_verdict_from_checks(check_tuple, flags)
+    effective_flags = flags
+    if flags.safe_boot and not checks_allow_safe_boot(check_tuple):
+        effective_flags = BootContextFlags(
+            safe_boot=False,
+            boot_candidate=flags.boot_candidate,
+            local_planning=flags.local_planning,
+        )
+    primary = primary_verdict_from_checks(check_tuple, effective_flags)
     return BootStatus(
         schema_version=SCHEMA_VERSION,
         generated_at=generated_at or _utc_now(),
         source=source,
         primary_verdict=primary,
-        flags=flags,
+        flags=effective_flags,
         checks=check_tuple,
         next_safe_action=next_safe_action or next_safe_action_for_verdict(primary),
         artifact_id=artifact_id,
