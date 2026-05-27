@@ -10,9 +10,10 @@ from typing import Any, Mapping, Sequence
 
 
 SCHEMA_VERSION = "boot-status/v1"
-DEFAULT_BOOT_STATUS_PATH = Path("runtime/boot_status_current.json")
-BOOT_STATUS_CURRENT_PATH = DEFAULT_BOOT_STATUS_PATH
-LEGACY_BOOT_STATUS_PATH = Path("docs/context/boot_status_current.json")
+BOOT_STATUS_CURRENT_PATH = Path("runtime/boot_status_current.json")
+DEFAULT_BOOT_STATUS_PATH = BOOT_STATUS_CURRENT_PATH
+BOOT_STATUS_CONTEXT_SNAPSHOT_PATH = Path("docs/context/boot_status_current.json")
+BOOT_STATUS_SCHEMA_PATH = Path("docs/context/boot_status_current.schema.json")
 
 PRIMARY_VERDICTS = ("ready", "degraded", "blocked")
 CHECK_STATUSES = ("pass", "warn", "fail", "not_applicable", "deferred")
@@ -388,7 +389,7 @@ def status_json_text(status: BootStatus | Mapping[str, Any]) -> str:
 
 def _resolve_boot_status_target(path: str | Path, repo_root: str | Path | None) -> Path:
     target = Path(path)
-    allowed_paths = {DEFAULT_BOOT_STATUS_PATH.as_posix(), LEGACY_BOOT_STATUS_PATH.as_posix()}
+    allowed_paths = {DEFAULT_BOOT_STATUS_PATH.as_posix()}
     if repo_root is None:
         if target.is_absolute() or target.as_posix() not in allowed_paths:
             raise BootStatusValidationError(
@@ -486,6 +487,4 @@ def load_boot_status_fail_closed(path: str | Path | None = None) -> BootStatus:
         return _load_boot_status_path(Path(path), source_role="explicit")
     if DEFAULT_BOOT_STATUS_PATH.exists():
         return _load_boot_status_path(DEFAULT_BOOT_STATUS_PATH, source_role="canonical")
-    if LEGACY_BOOT_STATUS_PATH.exists():
-        return _load_boot_status_path(LEGACY_BOOT_STATUS_PATH, source_role="legacy")
     return blocked_boot_status("Boot status artifact is missing.", path=DEFAULT_BOOT_STATUS_PATH)
