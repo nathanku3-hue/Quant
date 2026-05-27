@@ -38,6 +38,12 @@ Final read-only GitHub proof after intentional status evidence is committed:
 .\.venv\Scripts\python launch.py --preflight --strict --require-github
 ```
 
+Detached clean-worktree GitHub proof when the worktree has no upstream:
+
+```powershell
+.\.venv\Scripts\python launch.py --preflight --strict --require-github --expected-ref <branch> --expected-sha <sha>
+```
+
 ## v0 Behavior
 
 Boot-core v0 may check:
@@ -48,7 +54,7 @@ Boot-core v0 may check:
 - dirty files are classified at a basic safety level,
 - the data-readiness gate runs in read-only mode and reports structured readiness,
 - boot-control tests pass in strict mode unless `--no-tests` is supplied,
-- `--require-github` has a clean worktree and upstream-aligned HEAD.
+- `--require-github` has a clean worktree and either upstream-aligned HEAD or an explicit expected-ref/SHA proof.
 
 Boot-core v0 may import:
 
@@ -64,6 +70,22 @@ Boot-core v0 must not import or execute:
 
 Governance, context-packet, smoke, replay/dashboard, optimizer, Rule100, and
 data-repair checks remain deferred until their own slices are approved.
+`scripts/governance_preflight.py` is not a phase-close required command in
+BOOT-0A; it remains deferred until BOOT-0B.
+
+## GitHub Proof Policy
+
+`--require-github` is a proof gate, not a branch-shape gate. It passes when the
+worktree is clean and one of these is true:
+
+- `HEAD` matches the configured upstream and the ahead/behind count is zero,
+- or `--expected-ref` / `--expected-sha` prove that detached local `HEAD`
+  matches `git ls-remote origin refs/heads/<expected-ref>`.
+
+If a detached worktree has no upstream and no expected ref/SHA, the gate must
+fail as proof unavailable. If expected proof is supplied but the remote ref,
+remote SHA, expected SHA, or local `HEAD` disagree, the gate fails as expected
+proof mismatch.
 
 ## Data-Readiness Gate Policy
 
@@ -83,6 +105,21 @@ Gate status maps into boot status as:
 Required data-readiness contract failures must not be silently downgraded to
 warnings. Optional missing artifacts may degrade the boot status when the gate
 reports `WARN`.
+
+Strict missing local governed artifacts are classified as data readiness
+blockers, not code regressions. The transient JSON exposes:
+
+- `CodeReady = PASS_WITH_DATA_QUARANTINE`,
+- `DataReadyStrict = BLOCKED_MISSING_LOCAL_ARTIFACTS`,
+- `BootReady = BLOCKED_DATA_READY_STRICT`.
+
+This means source/control-plane proof can be clean while strict trusted boot is
+still blocked because local governed artifacts are absent. Failed preflight does
+not write `runtime/boot_status_current.json` unless `--write-status` is supplied;
+even with `--write-status`, a failed verdict reports `blocked-until-pass`.
+Mixed strict failures or non-missing data-contract defects remain
+`CodeReady = BLOCKED_DATA_CONTRACT`; only all-missing governed local artifacts
+qualify for `PASS_WITH_DATA_QUARANTINE`.
 
 ## Status Artifact Policy
 

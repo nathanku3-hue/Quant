@@ -31,7 +31,7 @@ live_overlay_allowed = false
 scan_refresh_allowed = false
 replay_rebuild_allowed = false
 automatic_repair_allowed = false
-allowed_boot_write = docs/context/boot_status_current.json
+allowed_boot_write = runtime/boot_status_current.json
 ```
 
 ### Subroute A — current optimizer/allocation readiness
@@ -58,6 +58,26 @@ Strict rule: no stale selected asset may be repaired with live overlay during bo
 ```text
 selected asset stale; provider/live overlay refresh not authorized during boot
 ```
+
+### Phase-close classification
+
+Strict missing local governed artifacts are a data-readiness block, not a code
+regression. When the strict data gate fails because required local artifacts are
+missing, `scripts/boot_preflight.py` must report the failure as:
+
+```text
+CodeReady = PASS_WITH_DATA_QUARANTINE
+DataReadyStrict = BLOCKED_MISSING_LOCAL_ARTIFACTS
+BootReady = BLOCKED_DATA_READY_STRICT
+```
+
+`CodeReady` only means the boot-control code and GitHub proof may be clean. It
+does not authorize safe boot, research trust, replay trust, dashboard promotion,
+or provider repair. `BootReady` remains blocked until the governed local
+artifacts are present and the strict data-readiness gate passes.
+This quarantine applies only when all strict blockers are governed local artifact
+absence; schema, corruption, unreadable, duplicate, slot-swap, or return-bound
+defects remain `CodeReady = BLOCKED_DATA_CONTRACT`.
 
 ### Subroute B — daily replay / YTD / replay allocation snapshot readiness
 
@@ -198,6 +218,15 @@ tests that define data contracts
 ```
 
 Safe GitHub boot should additionally require clean worktree and upstream alignment.
+
+Detached clean worktrees may satisfy phase-close GitHub proof through
+`--expected-ref` and `--expected-sha`, where boot preflight compares local
+`HEAD` with `git ls-remote origin refs/heads/<expected-ref>`. A detached
+worktree without upstream and without expected proof fails as proof unavailable.
+
+`scripts/governance_preflight.py` is not required for BOOT-0A phase-close. It is
+deferred to BOOT-0B with the context-packet dependency set and must not be
+retroactively treated as a BOOT-0A failure.
 
 ### Stage 4 — provider boundary
 
@@ -391,7 +420,7 @@ v0 is done when:
 1. The accepted direction is documented.
 2. The artifact taxonomy JSON exists and validates.
 3. The Portfolio & Allocation route contract JSON exists and validates.
-4. The gate writes runtime/boot_status_current.json by default and nothing else.
+4. The gate writes runtime/boot_status_current.json only when explicitly requested and nothing else.
 5. Strict boot blocks trusted output on missing/stale/malformed route-required data.
 6. Planning boot can open with warnings.
 7. Provider calls are impossible during gate execution.

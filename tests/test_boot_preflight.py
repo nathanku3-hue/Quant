@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import launch
 from core.boot_status import BootStatus
@@ -21,6 +22,13 @@ def _clean_git_state() -> dict[str, object]:
         "behind": 0,
         "has_upstream": True,
         "aligned": True,
+        "upstream_aligned": True,
+        "expected_remote_proof": {
+            "requested": False,
+            "aligned": False,
+            "proof_available": False,
+            "reason": "not_requested",
+        },
         "worktree_clean": True,
         "entries": [],
     }
@@ -122,7 +130,7 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
     pytest_commands: list[tuple[str, ...]] = []
 
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
     monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
 
     def fake_pytest_gate(
@@ -154,7 +162,7 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
 
 def test_planning_mode_does_not_run_tests(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
     monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
     monkeypatch.setattr(
         boot_preflight,
@@ -175,7 +183,12 @@ def test_require_github_blocks_dirty_or_unaligned_state(tmp_path: Path, monkeypa
     monkeypatch.setattr(
         boot_preflight,
         "collect_git_state",
-        lambda _repo: {**_clean_git_state(), "aligned": False, "ahead": 1},
+        lambda _repo, **_kwargs: {
+            **_clean_git_state(),
+            "aligned": False,
+            "upstream_aligned": False,
+            "ahead": 1,
+        },
     )
     monkeypatch.setattr(
         boot_preflight,
@@ -187,7 +200,185 @@ def test_require_github_blocks_dirty_or_unaligned_state(tmp_path: Path, monkeypa
     status, exit_code = boot_preflight.build_status(args)
 
     assert exit_code == 1
-    assert "--require-github requires HEAD to match upstream" in status["failures"]
+    assert "--require-github upstream mismatch:ahead=1,behind=0" in status["failures"]
+
+
+def test_detached_expected_ref_and_sha_satisfy_require_github(tmp_path: Path, monkeypatch) -> None:
+    head = "fb31170abc123"
+    calls: list[tuple[str, ...]] = []
+
+    def fake_git(_repo: Path, *args: str) -> CommandResult:
+        calls.append(args)
+        if args == ("rev-parse", "--is-inside-work-tree"):
+            return CommandResult(args=args, returncode=0, stdout="true\n")
+        if args == ("rev-parse", "--abbrev-ref", "HEAD"):
+            return CommandResult(args=args, returncode=0, stdout="HEAD\n")
+        if args == ("rev-parse", "HEAD"):
+            return CommandResult(args=args, returncode=0, stdout=f"{head}\n")
+        if args == ("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"):
+            return CommandResult(args=args, returncode=128, stderr="no upstream\n")
+        if args == ("rev-parse", "@{u}"):
+            return CommandResult(args=args, returncode=128, stderr="no upstream\n")
+        if args == ("rev-list", "--left-right", "--count", "HEAD...@{u}"):
+            return CommandResult(args=args, returncode=128, stderr="no upstream\n")
+        if args == ("status", "--porcelain=v1", "-z"):
+            return CommandResult(args=args, returncode=0, stdout="")
+        if args == ("ls-remote", "origin", "refs/heads/codex/phase-close"):
+            return CommandResult(
+                args=args,
+                returncode=0,
+                stdout=f"{head}\trefs/heads/codex/phase-close\n",
+            )
+        return CommandResult(args=args, returncode=1, stderr=f"unexpected:{args!r}")
+
+    monkeypatch.setattr(boot_preflight, "_git", fake_git)
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--strict",
+            "--require-github",
+            "--expected-ref",
+            "codex/phase-close",
+            "--expected-sha",
+            head,
+        ]
+    )
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 0
+    assert status["verdict"] == "PASS"
+    proof = status["checks"]["git"]["expected_remote_proof"]
+    assert proof["aligned"] is True
+    assert proof["proof_available"] is True
+    assert proof["remote_sha"] == head
+    assert proof["local_head_matches_remote"] is True
+    assert proof["local_head_matches_expected_sha"] is True
+    assert proof["remote_matches_expected_sha"] is True
+    assert proof["reason"] == "expected_ref_sha_aligned"
+    assert ("ls-remote", "origin", "refs/heads/codex/phase-close") in calls
+
+
+def test_detached_require_github_without_expected_proof_fails_as_unavailable(tmp_path: Path, monkeypatch) -> None:
+    def fake_git(_repo: Path, *args: str) -> CommandResult:
+        if args == ("rev-parse", "--is-inside-work-tree"):
+            return CommandResult(args=args, returncode=0, stdout="true\n")
+        if args == ("rev-parse", "--abbrev-ref", "HEAD"):
+            return CommandResult(args=args, returncode=0, stdout="HEAD\n")
+        if args == ("rev-parse", "HEAD"):
+            return CommandResult(args=args, returncode=0, stdout="fb31170abc123\n")
+        if args == ("status", "--porcelain=v1", "-z"):
+            return CommandResult(args=args, returncode=0, stdout="")
+        if "@{u}" in args:
+            return CommandResult(args=args, returncode=128, stderr="no upstream\n")
+        return CommandResult(args=args, returncode=1, stderr=f"unexpected:{args!r}")
+
+    monkeypatch.setattr(boot_preflight, "_git", fake_git)
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--require-github"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    assert "--require-github proof_unavailable:no upstream or explicit expected ref/SHA" in status["failures"]
+    proof = status["checks"]["git"]["expected_remote_proof"]
+    assert proof["requested"] is False
+    assert proof["proof_available"] is False
+    assert proof["reason"] == "not_requested"
+    assert status["checks"]["git"]["has_upstream"] is False
+    assert status["checks"]["git"]["aligned"] is False
+
+
+def test_expected_sha_without_expected_ref_does_not_satisfy_github_proof(tmp_path: Path, monkeypatch) -> None:
+    def fake_git(_repo: Path, *args: str) -> CommandResult:
+        if args == ("rev-parse", "--is-inside-work-tree"):
+            return CommandResult(args=args, returncode=0, stdout="true\n")
+        if args == ("rev-parse", "--abbrev-ref", "HEAD"):
+            return CommandResult(args=args, returncode=0, stdout="HEAD\n")
+        if args == ("rev-parse", "HEAD"):
+            return CommandResult(args=args, returncode=0, stdout="fb31170abc123\n")
+        if args == ("status", "--porcelain=v1", "-z"):
+            return CommandResult(args=args, returncode=0, stdout="")
+        if "@{u}" in args:
+            return CommandResult(args=args, returncode=128, stderr="no upstream\n")
+        return CommandResult(args=args, returncode=1, stderr=f"unexpected:{args!r}")
+
+    monkeypatch.setattr(boot_preflight, "_git", fake_git)
+
+    git_state = boot_preflight.collect_git_state(tmp_path, expected_sha="fb31170abc123")
+
+    proof = git_state["expected_remote_proof"]
+    assert proof["requested"] is True
+    assert proof["proof_available"] is False
+    assert proof["aligned"] is False
+    assert proof["local_head_matches_expected_sha"] is True
+    assert proof["reason"] == "expected_ref_and_sha_required"
+
+
+def test_require_github_post_check_reports_expected_proof_mismatch(tmp_path: Path, monkeypatch) -> None:
+    first_state = {
+        **_clean_git_state(),
+        "has_upstream": False,
+        "upstream_aligned": False,
+        "aligned": True,
+        "expected_remote_proof": {
+            "requested": True,
+            "aligned": True,
+            "proof_available": True,
+            "reason": "expected_ref_sha_aligned",
+        },
+    }
+    post_state = {
+        **first_state,
+        "aligned": False,
+        "expected_remote_proof": {
+            "requested": True,
+            "aligned": False,
+            "proof_available": True,
+            "reason": "remote_sha_mismatch",
+        },
+    }
+    states = [first_state, post_state]
+
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("PASS"))
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: states.pop(0))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--strict",
+            "--require-github",
+            "--expected-ref",
+            "codex/phase-close",
+            "--expected-sha",
+            "abc123",
+        ]
+    )
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    assert "--require-github post-check expected ref/SHA proof failed:remote_sha_mismatch" in status["failures"]
 
 
 def test_make_boot_status_from_preflight_is_schema_valid() -> None:
@@ -217,7 +408,7 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
 
 def test_data_readiness_gate_failure_blocks_preflight(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
     monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("FAIL"))
     monkeypatch.setattr(
         boot_preflight,
@@ -231,13 +422,131 @@ def test_data_readiness_gate_failure_blocks_preflight(tmp_path: Path, monkeypatc
 
     assert exit_code == 1
     assert "data-readiness gate failed" in status["failures"]
+    classification = status["checks"]["data_readiness_gate"]["boot_phase_close_classification"]
+    assert classification["CodeReady"] == "PASS_WITH_DATA_QUARANTINE"
+    assert classification["DataReadyStrict"] == "BLOCKED_MISSING_LOCAL_ARTIFACTS"
+    assert classification["BootReady"] == "BLOCKED_DATA_READY_STRICT"
     assert boot_status.primary_verdict == "blocked"
-    assert any(check.id == "data_readiness_gate" and check.status == "fail" for check in boot_status.checks)
+    data_check = next(check for check in boot_status.checks if check.id == "data_readiness_gate")
+    assert data_check.status == "fail"
+    assert data_check.details["boot_phase_close_classification"]["CodeReady"] == "PASS_WITH_DATA_QUARANTINE"
+
+
+def test_failed_preflight_does_not_write_runtime_status_without_write_status(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    runtime_status = tmp_path / "runtime" / "boot_status_current.json"
+    writes: list[Any] = []
+
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("FAIL"))
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+    monkeypatch.setattr(
+        boot_preflight,
+        "write_boot_status_file",
+        lambda *args, **kwargs: writes.append((args, kwargs)) or "written",
+    )
+
+    args = boot_preflight.parse_args(
+        ["--repo-root", str(tmp_path), "--strict", "--status-out", str(runtime_status)]
+    )
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    assert status["verdict"] == "FAIL"
+    assert "status_write" not in status
+    assert writes == []
+    assert not runtime_status.exists()
+
+
+def test_mixed_data_contract_failure_is_not_data_quarantine(tmp_path: Path, monkeypatch) -> None:
+    mixed_status = {
+        **_data_gate_status("FAIL"),
+        "checks": [
+            {
+                "id": "canonical_presence.portfolio_allocation",
+                "status": "FAIL",
+                "mode_effect": {"planning": "WARN", "strict": "FAIL"},
+                "reason": "missing strict-required artifacts",
+                "metrics": {
+                    "required_missing": ["data/processed/prices_tri.parquet"],
+                    "optional_missing": ["data/processed/yahoo_patch.parquet"],
+                },
+            },
+            {
+                "id": "price_return_integrity.selected_sample",
+                "status": "FAIL",
+                "mode_effect": {"planning": "WARN", "strict": "FAIL"},
+                "reason": "return_values_outside_unit_bound",
+            },
+        ],
+        "summary": {"blockers": ["missing strict-required artifacts", "return_values_outside_unit_bound"], "warnings": []},
+    }
+
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: mixed_status)
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    classification = status["checks"]["data_readiness_gate"]["boot_phase_close_classification"]
+    assert classification["CodeReady"] == "BLOCKED_DATA_CONTRACT"
+    assert classification["DataReadyStrict"] == "BLOCKED_DATA_CONTRACT"
+    assert classification["BootReady"] == "BLOCKED_DATA_READY_STRICT"
+    assert classification["missing_local_artifacts"] == ["data/processed/prices_tri.parquet"]
+    assert classification["data_contract_blockers"] == ["return_values_outside_unit_bound"]
+
+
+def test_missing_schema_failure_is_not_data_quarantine(tmp_path: Path, monkeypatch) -> None:
+    schema_status = {
+        **_data_gate_status("FAIL"),
+        "checks": [
+            {
+                "id": "price_return_integrity.selected_sample",
+                "status": "FAIL",
+                "mode_effect": {"planning": "WARN", "strict": "FAIL"},
+                "reason": "missing_required_columns",
+            },
+        ],
+        "summary": {"blockers": ["missing_required_columns"], "warnings": []},
+    }
+
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: schema_status)
+    monkeypatch.setattr(
+        boot_preflight,
+        "_run_pytest_gate",
+        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    classification = status["checks"]["data_readiness_gate"]["boot_phase_close_classification"]
+    assert classification["CodeReady"] == "BLOCKED_DATA_CONTRACT"
+    assert classification["DataReadyStrict"] == "BLOCKED_DATA_CONTRACT"
+    assert classification["missing_local_artifacts"] == []
+    assert classification["data_contract_blockers"] == ["missing_required_columns"]
 
 
 def test_data_readiness_gate_warning_degrades_without_failing(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
     monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("WARN"))
     monkeypatch.setattr(
         boot_preflight,
@@ -260,7 +569,7 @@ def test_write_status_is_blocked_until_preflight_passes(tmp_path: Path, monkeypa
     writes: list[Path] = []
 
     monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
     monkeypatch.setattr(boot_preflight, "_run_data_readiness_check", lambda _repo, _mode: _data_gate_status("FAIL"))
     monkeypatch.setattr(
         boot_preflight,

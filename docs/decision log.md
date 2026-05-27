@@ -5763,3 +5763,20 @@ Phase-Close Replay Fixture Determinism v0 (2026-05-27)
     - `.venv\Scripts\python -m pytest tests\test_g4_real_canonical_readiness_fixture.py tests\test_g5_single_canonical_replay_no_alpha.py tests\test_g6_v1_v2_real_slice_mechanical_comparison.py tests\test_v2_canonical_replay_fixture.py tests\test_v2_proxy_registered_candidate_flow.py tests\test_signed_envelope_replay.py -q` PASS.
   - Contract lock:
     - `REPLAY_FIXTURE_DETERMINISM_V0 := VALID iff (g4_manifest_path_repo_relative = 1) and (g4_manifest_path_compare_resolved = 1) and (synthetic_fixture_hashes_current = 1) and (g2_report_manifest_hashes_absolute_target = 1) and (g2_report_manifest_path_repo_relative_when_under_root = 1) and (strategy_behavior_change = 0) and (boot_data_readiness_change = 0) and (governance_preflight_change = 0)`.
+
+Strict Clean-Tree Phase-Close Contract v0 (2026-05-27)
+
+  - Decision record:
+    - make clean detached worktree phase-close truthful without treating missing governed local data artifacts as source-code regressions.
+    - allow `--require-github` to use explicit `--expected-ref` and `--expected-sha` proof when no upstream exists.
+    - keep stale `scripts/governance_preflight.py` requirements out of BOOT-0A phase-close; governance preflight remains BOOT-0B scope.
+  - The Decision (Hardcoded):
+    - detached GitHub proof resolves `refs/heads/<expected-ref>` with `git ls-remote origin` and requires remote SHA, expected SHA, and local `HEAD` to match.
+    - detached `--require-github` with no upstream and no expected proof fails as proof unavailable.
+    - strict missing governed local artifacts classify as `CodeReady=PASS_WITH_DATA_QUARANTINE`, `DataReadyStrict=BLOCKED_MISSING_LOCAL_ARTIFACTS`, and `BootReady=BLOCKED_DATA_READY_STRICT`.
+    - failed preflight does not write `runtime/boot_status_current.json` unless `--write-status` is supplied, and failed `--write-status` remains `blocked-until-pass`.
+  - Evidence:
+    - Focused tests added in `tests/test_boot_preflight.py` for detached expected proof, missing expected proof, data-quarantine classification, and no default runtime status write.
+    - `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight.py tests/test_boot_status_contract.py -q` PASS in `E:\Code\Quant_strict_phase_close_work`.
+  - Contract lock:
+    - `STRICT_CLEAN_TREE_PHASE_CLOSE_V0 := VALID iff (detached_expected_ref_sha_proof = 1) and (no_expected_proof_blocks = 1) and (missing_governed_data_is_data_quarantine = 1) and (boot_ready_blocks_on_missing_data = 1) and (failed_preflight_default_write = 0) and (governance_preflight_required_in_boot0a = 0)`.

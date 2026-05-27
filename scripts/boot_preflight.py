@@ -322,7 +322,91 @@ def _git(repo_root: Path, *args: str) -> CommandResult:
     return _run_command(["git", *args], cwd=repo_root)
 
 
-def collect_git_state(repo_root: Path) -> dict[str, Any]:
+def _expected_refspec(expected_ref: str | None) -> str:
+    ref = (expected_ref or "").strip()
+    if not ref:
+        return ""
+    if ref.startswith("refs/heads/"):
+        return ref
+    return f"refs/heads/{ref}"
+
+
+def _collect_expected_remote_proof(
+    repo_root: Path,
+    *,
+    head_sha: str,
+    expected_ref: str | None,
+    expected_sha: str | None,
+) -> dict[str, Any]:
+    refspec = _expected_refspec(expected_ref)
+    expected_sha = (expected_sha or "").strip()
+    proof: dict[str, Any] = {
+        "requested": bool(refspec or expected_sha),
+        "expected_ref": (expected_ref or "").strip(),
+        "expected_refspec": refspec,
+        "expected_sha": expected_sha,
+        "remote": "origin",
+        "remote_sha": "",
+        "remote_ref_found": None,
+        "local_head_matches_remote": None,
+        "local_head_matches_expected_sha": None,
+        "remote_matches_expected_sha": None,
+        "aligned": False,
+        "proof_available": False,
+        "reason": "not_requested",
+    }
+    if not proof["requested"]:
+        return proof
+    if not refspec or not expected_sha:
+        proof["reason"] = "expected_ref_and_sha_required"
+        if expected_sha:
+            proof["local_head_matches_expected_sha"] = bool(head_sha and head_sha == expected_sha)
+        return proof
+    if expected_sha:
+        proof["local_head_matches_expected_sha"] = bool(head_sha and head_sha == expected_sha)
+    if refspec:
+        remote = _git(repo_root, "ls-remote", "origin", refspec)
+        proof["ls_remote_returncode"] = remote.returncode
+        proof["ls_remote_stdout"] = _tail(remote.stdout, 1000)
+        proof["ls_remote_stderr"] = _tail(remote.stderr, 1000)
+        if remote.returncode == 0:
+            parts = remote.stdout.strip().split()
+            remote_sha = parts[0] if len(parts) >= 2 else ""
+            proof["remote_sha"] = remote_sha
+            proof["remote_ref_found"] = bool(remote_sha)
+            proof["local_head_matches_remote"] = bool(head_sha and remote_sha and head_sha == remote_sha)
+            if expected_sha:
+                proof["remote_matches_expected_sha"] = bool(remote_sha and remote_sha == expected_sha)
+        else:
+            proof["remote_ref_found"] = False
+            proof["reason"] = "ls_remote_failed"
+            return proof
+    proof["proof_available"] = bool(refspec and proof.get("remote_ref_found"))
+    if not proof["proof_available"]:
+        proof["reason"] = "remote_ref_missing"
+        return proof
+    proof["aligned"] = bool(
+        proof.get("local_head_matches_remote")
+        and proof.get("local_head_matches_expected_sha")
+        and proof.get("remote_matches_expected_sha")
+    )
+    if proof["aligned"]:
+        proof["reason"] = "expected_ref_sha_aligned"
+    elif not proof.get("local_head_matches_expected_sha"):
+        proof["reason"] = "local_head_mismatch"
+    elif not proof.get("remote_matches_expected_sha"):
+        proof["reason"] = "remote_sha_mismatch"
+    else:
+        proof["reason"] = "local_remote_mismatch"
+    return proof
+
+
+def collect_git_state(
+    repo_root: Path,
+    *,
+    expected_ref: str | None = None,
+    expected_sha: str | None = None,
+) -> dict[str, Any]:
     inside = _git(repo_root, "rev-parse", "--is-inside-work-tree")
     if inside.returncode != 0 or inside.stdout.strip() != "true":
         return {
@@ -349,7 +433,14 @@ def collect_git_state(repo_root: Path) -> dict[str, Any]:
         if len(parts) == 2:
             ahead, behind = int(parts[0]), int(parts[1])
     has_upstream = bool(upstream_name and upstream_sha)
-    aligned = bool(has_upstream and head_sha and upstream_sha and head_sha == upstream_sha and ahead == 0 and behind == 0)
+    upstream_aligned = bool(has_upstream and head_sha and upstream_sha and head_sha == upstream_sha and ahead == 0 and behind == 0)
+    expected_remote_proof = _collect_expected_remote_proof(
+        repo_root,
+        head_sha=head_sha,
+        expected_ref=expected_ref,
+        expected_sha=expected_sha,
+    )
+    aligned = bool(upstream_aligned or expected_remote_proof.get("aligned"))
     return {
         "available": True,
         "status": "PASS",
@@ -361,6 +452,8 @@ def collect_git_state(repo_root: Path) -> dict[str, Any]:
         "behind": behind,
         "has_upstream": has_upstream,
         "aligned": aligned,
+        "upstream_aligned": upstream_aligned,
+        "expected_remote_proof": expected_remote_proof,
         "worktree_clean": not entries,
         "entries": [entry.__dict__ for entry in entries],
     }
@@ -478,6 +571,7 @@ def _check_from_data_readiness_gate(status: Mapping[str, Any]) -> ReadinessCheck
         "mode": status.get("mode"),
         "route_id": status.get("route_id"),
         "route_readiness": status.get("route_readiness"),
+        "boot_phase_close_classification": status.get("boot_phase_close_classification"),
     }
     if isinstance(summary_payload, Mapping):
         details["summary"] = dict(summary_payload)
@@ -499,6 +593,113 @@ def _check_from_data_readiness_gate(status: Mapping[str, Any]) -> ReadinessCheck
     )
 
 
+def _strict_effect(check: Mapping[str, Any]) -> str:
+    mode_effect = check.get("mode_effect")
+    if isinstance(mode_effect, Mapping):
+        value = mode_effect.get("strict")
+    else:
+        value = check.get("strict", check.get("status"))
+    return str(value or "").strip().upper()
+
+
+def _is_missing_local_artifact_reason(reason: str) -> bool:
+    tokens = [item.strip().lower() for item in reason.split(";") if item.strip()]
+    if not tokens:
+        return False
+    for token in tokens:
+        if token == "missing strict-required artifacts":
+            continue
+        if token == "missing_pit_universe":
+            continue
+        if token.startswith("price source missing:"):
+            continue
+        return False
+    return True
+
+
+def _classify_data_readiness_for_boot(status: Mapping[str, Any]) -> dict[str, Any]:
+    raw_status = str(status.get("overall_status", "FAIL")).strip().upper()
+    strict_status = str(status.get("strict_status", raw_status)).strip().upper()
+    checks = status.get("checks")
+    missing_local_artifacts: list[str] = []
+    data_contract_blockers: list[str] = []
+    strict_blocker_count = 0
+    if isinstance(checks, Sequence) and not isinstance(checks, (str, bytes)):
+        for check in checks:
+            if not isinstance(check, Mapping):
+                continue
+            if _strict_effect(check) != "FAIL":
+                continue
+            strict_blocker_count += 1
+            metrics = check.get("metrics")
+            reason = str(check.get("reason", ""))
+            required_missing: list[str] = []
+            if isinstance(metrics, Mapping):
+                value = metrics.get("required_missing")
+                if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+                    required_missing = [str(item) for item in value if str(item)]
+                    missing_local_artifacts.extend(required_missing)
+            if required_missing:
+                continue
+            if _is_missing_local_artifact_reason(reason):
+                missing_local_artifacts.append(reason)
+            else:
+                data_contract_blockers.append(reason or str(check.get("id", "unknown_strict_failure")))
+    summary = status.get("summary")
+    summary_blockers: list[str] = []
+    if isinstance(summary, Mapping):
+        for blocker in summary.get("blockers") or []:
+            text = str(blocker)
+            if text:
+                summary_blockers.append(text)
+    if strict_blocker_count == 0 and summary_blockers:
+        for blocker in summary_blockers:
+            if _is_missing_local_artifact_reason(blocker):
+                missing_local_artifacts.append(blocker)
+            else:
+                data_contract_blockers.append(blocker)
+    missing_local_artifacts = sorted(set(item for item in missing_local_artifacts if item))
+    data_contract_blockers = sorted(set(item for item in data_contract_blockers if item))
+    data_ready_strict = strict_status
+    boot_ready = raw_status
+    code_ready = "PASS"
+    if raw_status == "FAIL" and missing_local_artifacts and not data_contract_blockers:
+        data_ready_strict = "BLOCKED_MISSING_LOCAL_ARTIFACTS"
+        boot_ready = "BLOCKED_DATA_READY_STRICT"
+        code_ready = "PASS_WITH_DATA_QUARANTINE"
+    elif raw_status == "FAIL":
+        data_ready_strict = "BLOCKED_DATA_CONTRACT"
+        boot_ready = "BLOCKED_DATA_READY_STRICT"
+        code_ready = "BLOCKED_DATA_CONTRACT"
+    elif raw_status in {"WARN", "DEFER", "DEFERRED"}:
+        data_ready_strict = "DEGRADED_OR_UNCERTIFIED"
+        boot_ready = "DEGRADED_DATA_READY_STRICT"
+    return {
+        "CodeReady": code_ready,
+        "DataReadyStrict": data_ready_strict,
+        "BootReady": boot_ready,
+        "missing_local_artifacts": missing_local_artifacts,
+        "data_contract_blockers": data_contract_blockers,
+        "classification_basis": "local data-readiness gate output; not a code regression classifier",
+    }
+
+
+def _github_alignment_failure(git: Mapping[str, Any], *, post_check: bool = False) -> str:
+    prefix = "--require-github post-check" if post_check else "--require-github"
+    proof = git.get("expected_remote_proof", {})
+    proof_requested = bool(isinstance(proof, Mapping) and proof.get("requested"))
+    if git.get("has_upstream") and not proof_requested:
+        ahead = git.get("ahead")
+        behind = git.get("behind")
+        return f"{prefix} upstream mismatch:ahead={ahead},behind={behind}"
+    if proof_requested:
+        reason = str(proof.get("reason") or "unknown") if isinstance(proof, Mapping) else "unknown"
+        if isinstance(proof, Mapping) and not proof.get("proof_available"):
+            return f"{prefix} proof_unavailable:{reason}"
+        return f"{prefix} expected ref/SHA proof failed:{reason}"
+    return f"{prefix} proof_unavailable:no upstream or explicit expected ref/SHA"
+
+
 def _status_from_git(git: Mapping[str, Any], require_github: bool) -> ReadinessCheck:
     if not git.get("available"):
         severity = "blocked" if require_github else "degraded"
@@ -517,7 +718,7 @@ def _status_from_git(git: Mapping[str, Any], require_github: bool) -> ReadinessC
             label="Git state",
             status="fail",
             severity="blocked",
-            summary="--require-github requires clean worktree and upstream-aligned HEAD.",
+            summary=_github_alignment_failure(git),
             evidence_ref=str(git.get("head", "")) or None,
             destination="Boot Status",
             details=dict(git),
@@ -538,7 +739,7 @@ def _status_from_git(git: Mapping[str, Any], require_github: bool) -> ReadinessC
         label="Git state",
         status="pass",
         severity="ready",
-        summary="Git worktree is clean and HEAD matches upstream.",
+        summary="Git worktree is clean and HEAD matches GitHub proof.",
         evidence_ref=str(git.get("head", "")) or None,
         destination="Boot Status",
         details=dict(git),
@@ -609,7 +810,11 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     if boot_core["status"] != "PASS":
         failures.append("boot-core file contract failed")
 
-    git_state = collect_git_state(repo_root)
+    git_state = collect_git_state(
+        repo_root,
+        expected_ref=args.expected_ref,
+        expected_sha=args.expected_sha,
+    )
     checks["git"] = git_state
     dirty_entries = [DirtyEntry(**entry) for entry in git_state.get("entries", [])]
     dirty = classify_dirty_entries(dirty_entries)
@@ -618,6 +823,7 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         failures.append("unclassified source/test/runtime dirty files are present")
 
     data_readiness = _boot_safe_data_readiness_status(_run_data_readiness_check(repo_root, args.mode))
+    data_readiness["boot_phase_close_classification"] = _classify_data_readiness_for_boot(data_readiness)
     checks["data_readiness_gate"] = data_readiness
     data_readiness_status = str(data_readiness.get("overall_status", "FAIL")).strip().upper()
     if data_readiness_status == "FAIL":
@@ -631,7 +837,7 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         if not git_state.get("worktree_clean"):
             failures.append("--require-github requires a clean worktree")
         if not git_state.get("aligned"):
-            failures.append("--require-github requires HEAD to match upstream")
+            failures.append(_github_alignment_failure(git_state))
 
     if args.mode == "strict" and not args.no_tests:
         checks["boot_control_tests"] = _run_pytest_gate(
@@ -668,12 +874,20 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     }
 
     if args.require_github:
-        post_git = collect_git_state(repo_root)
+        post_git = collect_git_state(
+            repo_root,
+            expected_ref=args.expected_ref,
+            expected_sha=args.expected_sha,
+        )
         status["post_git"] = post_git
-        if not post_git.get("worktree_clean") or not post_git.get("aligned"):
+        if not post_git.get("worktree_clean"):
             status["verdict"] = "FAIL"
             status["exit_code"] = 1
-            status["failures"].append("--require-github post-check is not clean/aligned")
+            status["failures"].append("--require-github post-check requires a clean worktree")
+        if not post_git.get("aligned"):
+            status["verdict"] = "FAIL"
+            status["exit_code"] = 1
+            status["failures"].append(_github_alignment_failure(post_git, post_check=True))
 
     if args.write_status:
         if status["verdict"] != "PASS":
@@ -723,6 +937,14 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--mode", choices=("planning", "strict"), default="planning")
     parser.add_argument("--strict", action="store_true", help="Alias for --mode strict.")
     parser.add_argument("--require-github", action="store_true", help="Require clean upstream-aligned Git state.")
+    parser.add_argument(
+        "--expected-ref",
+        help="Remote branch name or refs/heads/* ref used as explicit GitHub proof in detached worktrees.",
+    )
+    parser.add_argument(
+        "--expected-sha",
+        help="Expected commit SHA used as explicit GitHub proof in detached worktrees.",
+    )
     parser.add_argument("--write-status", action="store_true", help="Write runtime/boot_status_current.json.")
     parser.add_argument("--status-out", default=DEFAULT_STATUS_JSON.as_posix())
     parser.add_argument("--json", action="store_true", help="Print machine-readable preflight JSON.")
