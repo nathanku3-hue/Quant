@@ -4,6 +4,8 @@ import pandas as pd
 from streamlit.testing.v1 import AppTest
 
 from core import data_orchestrator
+from rendered_governance import assert_rendered_governance_safe
+from rendered_governance import scan_rendered_governance
 from strategies.optimizer import OptimizationMethod
 
 
@@ -38,6 +40,26 @@ def test_optimizer_view_renders_with_streamlit_testing() -> None:
     assert app.selectbox[0].label == "Method"
     assert any(subheader.value == "Optimizer Diagnostics" for subheader in app.subheader)
     assert any(subheader.value == "Allocation Table" for subheader in app.subheader)
+
+
+def test_optimizer_view_rendered_labels_are_governance_safe() -> None:
+    app = AppTest.from_string(OPTIMIZER_VIEW_APP).run(timeout=15)
+
+    assert not app.exception
+    assert_rendered_governance_safe(app)
+    assert not any(
+        finding.pattern
+        in {
+            "Estimated Shares",
+            "Action Status",
+            "Score",
+            "Rank",
+            "Ranking",
+            "Rating",
+            "recommendation",
+        }
+        for finding in scan_rendered_governance(app)
+    )
 
 
 def test_optimizer_view_exercises_mean_variance_and_sector_cap_controls() -> None:

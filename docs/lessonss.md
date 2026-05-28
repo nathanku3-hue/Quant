@@ -1003,3 +1003,11 @@ Application pattern:
 - Fix applied: Added a feature-development reopen anchor that separates green/yellow/red feature lanes, keeps manual execution scripts outside default boot, and requires governance gates to reopen for broker/order/alert/recommendation/scoring/ranking changes.
 - Guardrail for next time: Treat `safe_boot=true` as permission for research-only feature branches only; live execution, recommendations, ranking, scoring, action alerts, and replay-output certification require explicit gates and SAW evidence.
 - Evidence paths: `docs/context/feature_development_reopen_anchor_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/planner_packet_current.md`, `docs/saw_reports/saw_feature_development_reopen_anchor_20260528.md`.
+
+## 2026-05-28 Round Entry (Rendered UI Governance Needs AppTest Evidence)
+- Date: 2026-05-28
+- Mistake or miss: Source-level UI governance and dataframe display quarantine did not prove forbidden labels stayed absent after Streamlit rendered markdown, captions, metrics, download labels, and dataframe/table cells.
+- Root cause: Existing checks scanned source literals and dataframe model helpers, while AppTest rendered output can humanize labels, expose widget proto labels, and surface cell values after the view layer runs.
+- Fix applied: Added a reusable rendered AppTest text collector/scanner, synthetic allow/fail AppTest cases, optimizer rendered-output governance coverage, and scanner-display rendered dataframe quarantine coverage.
+- Guardrail for next time: Any UI surface that can render governance-sensitive labels must have rendered-output coverage before broadening product claims; source/static scans remain necessary but are not sufficient for dataframe/widget display safety.
+- Evidence paths: `tests/rendered_governance.py`, `tests/test_rendered_apptest_governance.py`, `tests/test_optimizer_view.py`, `docs/saw_reports/saw_rendered_apptest_governance_expansion_20260528.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_rendered_apptest_governance.py tests/test_optimizer_view.py -q`.
