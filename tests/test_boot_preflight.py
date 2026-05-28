@@ -177,6 +177,11 @@ def test_strict_gates_run_real_checks_when_requested(
         boot_preflight.PORTFOLIO_APPTEST_SMOKE_COMMAND,
         boot_preflight.FOCUSED_REPLAY_DASHBOARD_CONTRACT_COMMAND,
     ]
+    assert "tests/test_rendered_apptest_governance.py" in boot_preflight.PORTFOLIO_APPTEST_SMOKE_COMMAND
+    assert (
+        "tests/test_optimizer_view.py::test_optimizer_view_rendered_labels_are_governance_safe"
+        in boot_preflight.PORTFOLIO_APPTEST_SMOKE_COMMAND
+    )
     assert script_commands == [boot_preflight.CONTEXT_PACKET_VALIDATION_COMMAND]
     assert status["checks"]["data_readiness_gate"]["status"] == "PASS"
     assert status["checks"]["governance"]["status"] == "PASS"
@@ -185,6 +190,60 @@ def test_strict_gates_run_real_checks_when_requested(
     assert boot_status.primary_verdict == "degraded"
     assert boot_status.flags.boot_candidate is True
     assert boot_status.flags.safe_boot is False
+
+
+def test_strict_smoke_blocks_status_write_when_rendered_governance_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest_commands: list[tuple[str, ...]] = []
+
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    monkeypatch.setattr(boot_preflight, "run_governance_preflight", lambda _repo: _GovernanceResult("PASS"))
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+
+    def fake_pytest_gate(
+        _repo: Path,
+        command_parts: tuple[str, ...],
+        *,
+        timeout: float | None = None,
+    ) -> dict[str, object]:
+        pytest_commands.append(command_parts)
+        if "tests/test_rendered_apptest_governance.py" in command_parts:
+            return {
+                "status": "FAIL",
+                "command": "pytest rendered-governance",
+                "returncode": 1,
+            }
+        return {"status": "PASS", "command": "pytest", "returncode": 0}
+
+    monkeypatch.setattr(boot_preflight, "_run_pytest_gate", fake_pytest_gate)
+
+    args = boot_preflight.parse_args(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--strict",
+            "--require-github",
+            "--smoke",
+            "--run-focused-contract",
+            "--write-status",
+        ]
+    )
+    status, exit_code = boot_preflight.build_status(args)
+    boot_status = boot_preflight.make_boot_status_from_preflight(status)
+
+    assert exit_code == 1
+    assert status["verdict"] == "FAIL"
+    assert status["checks"]["portfolio_apptest_smoke"]["status"] == "FAIL"
+    assert "Portfolio AppTest smoke failed" in status["failures"]
+    assert boot_preflight.PORTFOLIO_APPTEST_SMOKE_COMMAND in pytest_commands
+    assert status["status_write"] == {
+        "path": CANONICAL_BOOT_STATUS_PATH.as_posix(),
+        "result": "blocked-until-pass",
+    }
+    assert boot_status.flags.safe_boot is False
+    assert not (tmp_path / CANONICAL_BOOT_STATUS_PATH).exists()
 
 
 def test_strict_default_marks_unrequested_dashboard_gates_as_safe_boot_blockers(

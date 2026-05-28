@@ -45,6 +45,7 @@ import streamlit as st
 
 st.header("Strong Buy")
 st.caption("Latest Buys/Sells")
+st.markdown("BUY")
 st.metric("Action Status", "research-only fixture")
 st.download_button("Generate Option Yield", data="not-used", file_name="fixture.txt")
 st.dataframe(
@@ -53,11 +54,14 @@ st.dataframe(
             "Score": [99],
             "Research Bucket": ["Rows Passing Research Filter"],
             "safe_cell": ["broker_call"],
+            "safe_cell_2": ["SELL"],
         }
     ),
     hide_index=True,
 )
 st.table(pd.DataFrame({"safe_column": ["investment recommendation"]}))
+st.caption("Entry/Exit Strategy")
+st.caption("Portfolio Optimizer")
 """
 
 
@@ -85,16 +89,16 @@ ALLOWED_VARIANT_RENDERED_APP = r"""
 import streamlit as st
 
 st.header("Portfolio & Allocation")
-st.caption("Entry/Exit Strategy")
+st.caption("Historical Replay Lifecycle Events")
 st.metric("Research Optimizer - Simulation Only", "ready")
 """
 
 DANGEROUS_ALLOWED_VARIANT_RENDERED_APP = r"""
 import streamlit as st
 
-st.header("Entry/Exit Strategy action panel")
 st.caption("Portfolio & Allocation action panel")
 st.metric("Research Optimizer - Simulation Only action panel", "blocked")
+st.markdown("Simulation Weight Table score panel")
 """
 
 
@@ -106,11 +110,15 @@ st.metric("Research Optimizer - Simulation Only action panel", "blocked")
             {
                 "Strong Buy",
                 "Latest Buys/Sells",
+                "BUY",
                 "Action Status",
                 "Generate Option Yield",
                 "Score",
                 "broker_call",
+                "SELL",
                 "investment recommendation",
+                "Entry/Exit Strategy",
+                "Portfolio Optimizer",
             },
         )
     ],
@@ -148,9 +156,9 @@ def test_rendered_governance_allows_exact_labels_but_blocks_action_variants() ->
 
     findings = scan_rendered_governance(variant_app)
     assert {
-        "Entry/Exit Strategy variant with action panel",
         "Portfolio & Allocation variant with action panel",
         "Research Optimizer - Simulation Only variant with action panel",
+        "Simulation Weight Table variant with score",
     }.issubset({finding.pattern for finding in findings})
     with pytest.raises(AssertionError, match="Rendered governance scan found forbidden labels"):
         assert_rendered_governance_safe(variant_app)

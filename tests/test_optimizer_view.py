@@ -35,7 +35,8 @@ def test_optimizer_view_renders_with_streamlit_testing() -> None:
     app = AppTest.from_string(OPTIMIZER_VIEW_APP).run(timeout=15)
 
     assert not app.exception
-    assert any("Portfolio Optimizer" in header.value for header in app.header)
+    assert any("Research Optimizer - Simulation Only" in header.value for header in app.header)
+    assert not any("Portfolio Optimizer" in header.value for header in app.header)
     assert app.multiselect[0].label == "Select assets"
     assert app.selectbox[0].label == "Method"
     assert any(subheader.value == "Optimizer Diagnostics" for subheader in app.subheader)

@@ -46,7 +46,9 @@ BOOT_CONTROL_TEST_COMMAND = (
 PORTFOLIO_APPTEST_SMOKE_COMMAND = (
     "-m",
     "pytest",
+    "tests/test_rendered_apptest_governance.py",
     "tests/test_optimizer_view.py::test_optimizer_view_renders_with_streamlit_testing",
+    "tests/test_optimizer_view.py::test_optimizer_view_rendered_labels_are_governance_safe",
     "tests/test_optimizer_view.py::test_optimizer_view_exercises_mean_variance_and_sector_cap_controls",
     "-q",
 )

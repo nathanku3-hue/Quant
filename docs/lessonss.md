@@ -1019,3 +1019,11 @@ Application pattern:
 - Fix applied: Added a narrow allowed-label variant guard for action/recommendation/broker/order/alert/submit/buy/sell/rank/score terms and regression coverage proving exact labels pass while action-shaped variants fail.
 - Guardrail for next time: Any exact allow-list entry must be treated as exact only; rendered variants that add action, recommendation, broker/order, alert, ranking, or scoring semantics should fail unless explicitly approved with tests.
 - Evidence paths: `tests/rendered_governance.py`, `tests/test_rendered_apptest_governance.py`, `docs/saw_reports/saw_rendered_apptest_governance_expansion_20260528.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_rendered_apptest_governance.py tests/test_optimizer_view.py -q`.
+
+## 2026-05-28 Round Entry (Rendered Governance Boot Wiring Must Resolve Policy Before Enforcement)
+- Date: 2026-05-28
+- Mistake or miss: The rendered AppTest scanner was proven as a companion test, but strict boot smoke did not yet run it and the latest rendered-label policy conflicted with older accepted labels such as `Entry/Exit Strategy` and `Portfolio Optimizer`.
+- Root cause: Rendered governance began as test-owned coverage after source/static gates, while the optimizer header and exact label allow-list still reflected older copy policy.
+- Fix applied: Wired the rendered governance suite into the existing Portfolio AppTest smoke command, renamed the optimizer header to `Research Optimizer - Simulation Only`, made `Entry/Exit Strategy`, `Portfolio Optimizer`, standalone `BUY`, and standalone `SELL` fail rendered governance, and added a boot-preflight regression proving rendered smoke failure blocks status writes.
+- Guardrail for next time: Before promoting companion governance tests into boot evidence, resolve label-policy conflicts explicitly and add a failure-path test that proves a rendered governance failure cannot produce or refresh `runtime/boot_status_current.json`.
+- Evidence paths: `scripts/boot_preflight.py`, `tests/rendered_governance.py`, `tests/test_rendered_apptest_governance.py`, `tests/test_boot_preflight.py`, `views/optimizer_view.py`, `tests/test_optimizer_view.py`, `docs/saw_reports/saw_rendered_governance_boot_preflight_wiring_20260528.md`.

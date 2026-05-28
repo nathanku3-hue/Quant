@@ -647,7 +647,7 @@ def render_optimizer_view(
     universe_audit: OptimizerUniverseResult | None = None,
 ):
     """Render portfolio optimization controls and allocations."""
-    st.header("📦 Portfolio Optimizer")
+    st.header("Research Optimizer - Simulation Only")
 
     if not isinstance(prices_wide, pd.DataFrame) or prices_wide.empty:
         _clear_optimizer_session_weights()
