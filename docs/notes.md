@@ -5136,6 +5136,7 @@ replay_tickers = SCANNER_TICKERS ∪ get_pinned_tickers()
 3. Replay selection certification:
    - Certificate path: `data/registry/portfolio_replay_selection_certification_v0.json`.
    - Bound evidence: existing G5/G4 registry reports and the G4 canonical tiny-slice fixture. This certifies durable replay-selection identity/evidence only; it does not fabricate or promote strategy results.
+   - Output scoping: a valid certificate may set `portfolio_replay_selection_status=CERTIFIED`; `portfolio_replay_output_status` remains `UNCERTIFIED_OUTPUT_NOT_CLAIMED` until a replay output artifact is separately certified.
 4. Yahoo patch policy:
    - `yahoo_patch_required = exists(data/processed/yahoo_patch.parquet) OR selected_endpoint_cert.yahoo_patch_policy.no_patch_certified`.
    - Missing `yahoo_patch` remains `WARN` unless the selected endpoint certificate explicitly states `patch_required=false` and `no_patch_certified=true`.

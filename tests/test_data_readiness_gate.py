@@ -344,7 +344,8 @@ def test_replay_output_stays_uncertified_without_durable_selection(tmp_path: Pat
 
     status = gate.run_data_readiness_gate(tmp_path, mode="strict")
 
-    assert status["route_readiness"]["portfolio_replay_output_status"] == "UNCERTIFIED"
+    assert status["route_readiness"]["portfolio_replay_selection_status"] == "UNCERTIFIED"
+    assert status["route_readiness"]["portfolio_replay_output_status"] == "UNCERTIFIED_OUTPUT_NOT_CLAIMED"
     replay = next(
         check for check in status["checks"] if check["id"] == "replay_artifact.durable_selection_v0"
     )
@@ -422,8 +423,10 @@ def test_valid_replay_cert_passes_replay_certification(tmp_path: Path) -> None:
 
     replay = _check_by_id(status, "replay_artifact.durable_selection_v0")
     assert replay["status"] == "PASS"
-    assert replay["metrics"]["portfolio_replay_output_status"] == "CERTIFIED"
-    assert status["route_readiness"]["portfolio_replay_output_status"] == "CERTIFIED"
+    assert replay["metrics"]["portfolio_replay_selection_status"] == "CERTIFIED"
+    assert replay["metrics"]["portfolio_replay_output_status"] == "UNCERTIFIED_OUTPUT_NOT_CLAIMED"
+    assert status["route_readiness"]["portfolio_replay_selection_status"] == "CERTIFIED"
+    assert status["route_readiness"]["portfolio_replay_output_status"] == "UNCERTIFIED_OUTPUT_NOT_CLAIMED"
 
 
 def test_replay_cert_sourced_from_streamlit_session_state_fails(tmp_path: Path) -> None:

@@ -648,12 +648,13 @@ def _check_replay_certification(repo_root: Path, mode: str) -> GateCheck:
     )
     metrics = {
         **dict(metrics),
-        "portfolio_replay_output_status": "CERTIFIED" if status == "PASS" else "UNCERTIFIED",
+        "portfolio_replay_selection_status": "CERTIFIED" if status == "PASS" else "UNCERTIFIED",
+        "portfolio_replay_output_status": "UNCERTIFIED_OUTPUT_NOT_CLAIMED",
     }
     if status == "WARN" and reason.startswith("missing:"):
         reason = (
             f"{reason}; No durable PortfolioReplaySelection is certified outside Streamlit session state; "
-            "replay output remains UNCERTIFIED."
+            "replay selection remains UNCERTIFIED and replay output remains UNCERTIFIED_OUTPUT_NOT_CLAIMED."
         )
     return GateCheck(
         id="replay_artifact.durable_selection_v0",
@@ -840,16 +841,18 @@ def _route_readiness(checks: Sequence[GateCheck], mode: str) -> dict[str, Any]:
         "provider_boundary.boot_gate_no_live_imports",
     )
     replay_cert = by_id.get("replay_artifact.durable_selection_v0")
-    replay_status = "CERTIFIED" if replay_cert and replay_cert.status == "PASS" else "UNCERTIFIED"
+    replay_selection_status = "CERTIFIED" if replay_cert and replay_cert.status == "PASS" else "UNCERTIFIED"
     return {
         "portfolio_allocation.local_data_prerequisites": combine(local_ids),
         "portfolio_allocation.optimizer_current": combine(optimizer_ids),
         "portfolio_allocation.daily_replay": combine(replay_ids),
         "portfolio_allocation.benchmarks": "WARN",
-        "portfolio_replay_output_status": replay_status,
+        "portfolio_replay_selection_status": replay_selection_status,
+        "portfolio_replay_output_status": "UNCERTIFIED_OUTPUT_NOT_CLAIMED",
         "notes": [
-            "Optimizer/replay output certification is route-conditional.",
-            "Replay certification requires a durable non-session-state PortfolioReplaySelection certificate.",
+            "Replay selection readiness certification is route-conditional and does not certify replay output artifacts.",
+            "Replay output remains UNCERTIFIED_OUTPUT_NOT_CLAIMED unless an actual replay output artifact is certified.",
+            "Replay selection certification requires a durable non-session-state PortfolioReplaySelection certificate.",
         ],
     }
 

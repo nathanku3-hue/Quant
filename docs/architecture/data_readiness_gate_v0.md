@@ -91,7 +91,7 @@ Required for strict trusted output:
 | Price source | `data/processed/prices_tri.parquet` preferred; fallback `prices.parquet` + `yahoo_patch.parquet` only if policy allows | canonical | FAIL if missing or unable to cover requested replay dates/assets. |
 | Return source | `total_ret` from price source/loader | canonical/derived | FAIL on malformed, nonfinite required values, slot corruption, or absurd returns. |
 | Ticker map | `data/processed/tickers.parquet` | canonical | FAIL if any selected allocation/replay asset cannot map. |
-| Replay selection | `PortfolioReplaySelection` equivalent: method, max_weight, risk_free_rate, replay_assets, latest_price_date, signature | route state | v0 should require a durable request/selection input for strict replay certification. If only Streamlit session state knows it, boot cannot certify replay output globally. |
+| Replay selection | `PortfolioReplaySelection` equivalent: method, max_weight, risk_free_rate, replay_assets, latest_price_date, signature | route state | v0 should require a durable request/selection input for strict replay-selection readiness. If only Streamlit session state knows it, boot cannot certify replay selection globally. This does not certify a replay output artifact. |
 | Replay controls | method, max_weight, risk_free_rate, Rule100 candidate frame if Rule100 | route state/evidence | FAIL if nonfinite, missing, or signature-mismatched. |
 | Replay dates | YTD/horizon dates derived from local price index | derived | FAIL if no replay dates or requested window outside local data/PIT coverage. |
 | Saved replay artifact | `data/runtime_cache/strategy_replay/*.selected_method_replay.parquet` + `.manifest.json` | cache/evidence-only | Strict FAIL only if the dashboard would reuse it and identity/signature/window/row-count/schema checks fail. Missing is WARN unless strict replay output requires saved-artifact-only mode. |
@@ -99,7 +99,7 @@ Required for strict trusted output:
 | Buy/sell decisions | `data/portfolio_lifecycle_buy_sell_log.jsonl` | evidence/derived | WARN if absent; FAIL if present but malformed and displayed as trusted replay evidence. |
 | Rule100 history | `data/processed/rule100_softmax_v1_history.csv` | derived/evidence | Required only when method is Rule of 100. FAIL if selected method is Rule of 100 and required columns are missing. |
 
-Strict replay rule: v0 should not rebuild a replay. It may probe the selected saved artifact or declare replay output not certified. Transitional in-memory replay build belongs to dashboard runtime, not boot certification.
+Strict replay rule: v0 should not rebuild a replay. It may probe the selected saved artifact or declare replay output not certified. Durable replay-selection proof should surface as `portfolio_replay_selection_status`; legacy `portfolio_replay_output_status` remains `UNCERTIFIED_OUTPUT_NOT_CLAIMED` until an actual output artifact is certified. Transitional in-memory replay build belongs to dashboard runtime, not boot certification.
 
 ### Durable certification addendum — 2026-05-28
 
@@ -125,8 +125,9 @@ contains an explicit `yahoo_patch_policy` with
 missing patch is harmless and must not repair or rebuild the patch.
 
 These certificates are proof of local data/replay-selection readiness only. They
-do not promote strategy results, validate alpha, authorize recommendations,
-write runtime status, call providers, or regenerate replay artifacts.
+do not certify replay output artifacts, promote strategy results, validate alpha,
+authorize recommendations, write runtime status, call providers, or regenerate
+replay artifacts.
 
 ### Subroute C — benchmark/YTD display readiness
 

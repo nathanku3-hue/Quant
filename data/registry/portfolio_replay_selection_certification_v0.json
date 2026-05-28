@@ -53,6 +53,7 @@
   "provider_calls_allowed": false,
   "rebuild_during_boot_allowed": false,
   "repair_during_boot_allowed": false,
+  "replay_output_artifact_status": "UNCERTIFIED_OUTPUT_NOT_CLAIMED",
   "replay_selection_id": "PH65_G5_SINGLE_CANONICAL_REPLAY_001",
   "review_scope_id": "ROUND-20260527-DATA-READINESS-CERTIFICATION",
   "route_id": "portfolio_allocation.strict.v0",

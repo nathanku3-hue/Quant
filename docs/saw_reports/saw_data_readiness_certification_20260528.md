@@ -1,4 +1,4 @@
-# SAW Report - Data Readiness Durable Certification
+# SAW Report - Data Readiness Durable Certification and Replay Scope Repair
 
 RoundID: `ROUND-20260527-DATA-READINESS-CERTIFICATION`
 ScopeID: `SCOPE-DURABLE-SELECTED-ENDPOINT-AND-REPLAY-SELECTION-CERTS`
@@ -10,7 +10,7 @@ Dirty Worktree Status: current-round files dirty before commit; pre-commit `--re
 
 ## Scope
 
-Add durable, hash-bound, read-only certification artifacts and checks so `data_readiness_gate` can move selected endpoint and replay readiness from WARN to PASS truthfully, including explicit no-patch certification for missing `yahoo_patch`.
+Add durable, hash-bound, read-only certification artifacts and checks so `data_readiness_gate` can move selected endpoint and replay-selection readiness from WARN to PASS truthfully, including explicit no-patch certification for missing `yahoo_patch`. The replay-selection certificate must not imply replay output artifact certification.
 
 ## Owned Files
 
@@ -31,18 +31,19 @@ Add durable, hash-bound, read-only certification artifacts and checks so `data_r
 - CHK-03: Stale selected endpoint cert is strict WARN.
 - CHK-04: Selected endpoint cert bad hash is strict FAIL.
 - CHK-05: Missing replay cert is strict WARN.
-- CHK-06: Valid replay cert makes replay certification PASS and replay output CERTIFIED.
+- CHK-06: Valid replay cert makes replay-selection readiness PASS and `portfolio_replay_selection_status=CERTIFIED`.
 - CHK-07: Replay cert sourced from Streamlit/session state is strict FAIL.
 - CHK-08: Missing `yahoo_patch` without no-patch cert is strict WARN.
 - CHK-09: Missing `yahoo_patch` with valid no-patch cert produces no yahoo_patch WARN.
 - CHK-10: Certification validation is read-only and leaves no boot/data/cert tmp residue.
 - CHK-11: Direct strict data-readiness gate returns PASS against the local safe-boot worktree.
 - CHK-12: Governance, boot-control, context, AppTest smoke, and focused replay/dashboard preflight gates pass before commit; GitHub gate blocks only because worktree is dirty.
+- CHK-13: Replay output remains `UNCERTIFIED_OUTPUT_NOT_CLAIMED` unless an actual replay output artifact is separately certified.
 
 ## Subagent Pass Summary
 
 - Implementer pass: PASS. Implemented certificate validators, tests, registry certs, and docs-as-code updates without provider calls, repairs, replay rebuilds, runtime status writes, or large data staging.
-- Reviewer A: PASS. Strategy correctness boundary preserved: replay cert binds durable selection/evidence only and does not claim alpha, recommendation, or strategy promotion.
+- Reviewer A: PASS. Strategy correctness boundary preserved: replay cert binds durable selection/evidence only and does not claim replay output artifact certification, alpha, recommendation, or strategy promotion.
 - Reviewer B: PASS. Runtime/ops resilience preserved: validation is read-only, provider/live imports remain forbidden, write-status was not invoked, and pre-commit GitHub gate blocked dirty worktree as expected.
 - Reviewer C: PASS. Data integrity path validates repo-relative paths, SHA-256, optional size, expiry, non-session-state origin, no-patch policy, and tmp-residue absence.
 - Ownership check: PASS. Implementer and Reviewer A/B/C roles are recorded as distinct SAW roles.
@@ -52,6 +53,7 @@ Add durable, hash-bound, read-only certification artifacts and checks so `data_r
 | Severity | Impact | Fix | Owner | Status |
 |---|---|---|---|---|
 | High | Replay and selected endpoint checks could not truthfully PASS because no durable non-session-state proof existed. | Added hash-bound registry certificates and strict validator checks. | Implementer | Closed |
+| High | Replay selection certification was surfaced as `portfolio_replay_output_status=CERTIFIED`, overclaiming replay output certification. | Added `portfolio_replay_selection_status` for the durable proof and kept legacy `portfolio_replay_output_status=UNCERTIFIED_OUTPUT_NOT_CLAIMED`. | Repair Worker + Reviewer A | Closed |
 | High | Missing `yahoo_patch` could be overread as harmless if the WARN were simply suppressed. | Required explicit selected-endpoint `no_patch_certified` policy before removing WARN. | Implementer + Reviewer C | Closed |
 | Medium | Historical `.tmp` evidence files under `docs/context/e2e_evidence` could falsely block data-readiness tmp-residue checks. | Scoped certification tmp-residue check to `runtime`, `data/processed`, `data/runtime_cache`, and `data/registry`. | Implementer + Reviewer B | Closed |
 | Medium | Pre-commit safe boot cannot pass while current-round files are dirty. | Confirmed boot preflight blocks `--require-github` until commit/push; no status file was generated. | Reviewer B | Closed |
@@ -61,6 +63,7 @@ Add durable, hash-bound, read-only certification artifacts and checks so `data_r
 In-scope findings/actions:
 
 - Data-readiness selected endpoint, replay selection, and `yahoo_patch` no-patch certification are implemented and tested.
+- Replay-selection readiness is separated from replay output artifact certification.
 - Registry certification JSONs are tracked/unignored proof files; large `data/processed` parquet artifacts remain ignored local data.
 - Docs-as-code records the formula, policy, decision, and lesson.
 
@@ -73,10 +76,10 @@ Inherited out-of-scope findings/actions:
 ## Verification Evidence
 
 - `EVD-01`: `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py -q` -> PASS, 27 passed.
-- `EVD-02`: `E:\Code\Quant\.venv\Scripts\python.exe -c "from core.data_readiness_gate import run_data_readiness_gate; import json; payload=run_data_readiness_gate('.', mode='strict'); print(json.dumps(payload, indent=2, sort_keys=True))"` -> PASS; `overall_status=PASS`, `strict_status=PASS`, selected endpoint `CERTIFIED`, replay output `CERTIFIED`, no warnings/blockers.
+- `EVD-02`: `E:\Code\Quant\.venv\Scripts\python.exe -c "from core.data_readiness_gate import run_data_readiness_gate; import json; payload=run_data_readiness_gate('.', mode='strict'); print(json.dumps(payload, indent=2, sort_keys=True))"` -> PASS; `overall_status=PASS`, `strict_status=PASS`, selected endpoint `CERTIFIED`, replay selection `CERTIFIED`, replay output `UNCERTIFIED_OUTPUT_NOT_CLAIMED`, no warnings/blockers.
 - `EVD-03`: `E:\Code\Quant\.venv\Scripts\python.exe scripts\governance_preflight.py --repo-root . --json` -> PASS.
 - `EVD-04`: `E:\Code\Quant\.venv\Scripts\python.exe scripts\boot_preflight.py --repo-root . --mode strict --require-github --smoke --run-focused-contract --json` -> expected pre-commit FAIL only because worktree was dirty; boot-control tests, data-readiness, governance, context validation, Portfolio AppTest smoke, and focused replay/dashboard contract all PASS.
-- `EVD-05`: `Test-Path runtime\boot_status_current.json` -> False.
+- `EVD-05`: No repair command used `--write-status` before commit; any pre-existing ignored `runtime\boot_status_current.json` was not treated as current safe-boot proof.
 
 ## SE Executor Closure
 
@@ -111,13 +114,13 @@ GitHub-optimized ordering is maintained: architecture contract under `docs/archi
 ## Open Risks:
 
 - Post-commit/post-push safe-boot must be rerun before any runtime boot-status generation.
-- `runtime/boot_status_current.json` is absent by design until the full safe-boot gate passes clean/aligned after push.
+- Any pre-existing ignored `runtime/boot_status_current.json` is not current proof and must not be refreshed until the full safe-boot gate passes clean/aligned after push.
 - Certificate expiry is `2026-06-11T00:00:00Z`; refresh is required after that date before strict PASS can continue.
 
 ## Next action:
 
 Commit and push the narrow certification files, rerun full strict safe-boot gate, and only run `--write-status` if safe_boot=true and Git is clean/aligned.
 
-ClosurePacket: RoundID=ROUND-20260527-DATA-READINESS-CERTIFICATION; ScopeID=SCOPE-DURABLE-SELECTED-ENDPOINT-AND-REPLAY-SELECTION-CERTS; ChecksTotal=12; ChecksPassed=12; ChecksFailed=0; Verdict=PASS; OpenRisks=post-push-safe-boot-write-status-still-required; NextAction=commit-push-rerun-safe-boot-then-write-status-only-if-clean-aligned
+ClosurePacket: RoundID=ROUND-20260527-DATA-READINESS-CERTIFICATION; ScopeID=SCOPE-DURABLE-SELECTED-ENDPOINT-AND-REPLAY-SELECTION-CERTS; ChecksTotal=13; ChecksPassed=13; ChecksFailed=0; Verdict=PASS; OpenRisks=post-push-safe-boot-write-status-still-required; NextAction=commit-push-rerun-safe-boot-then-write-status-only-if-clean-aligned
 ClosureValidation: PASS
 SAWBlockValidation: PASS

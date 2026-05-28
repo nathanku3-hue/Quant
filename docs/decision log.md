@@ -5791,11 +5791,12 @@ Data Readiness Durable Certification v0 (2026-05-28)
     - `core.data_readiness_gate` validates cert schema, `route_id`, `review_scope_id`, expiry, non-session-state origin, no provider/repair/rebuild flags, non-empty selected assets, referenced file presence, SHA-256, and optional size.
     - selected endpoint cert path is `data/registry/portfolio_selected_endpoint_certification_v0.json`.
     - replay selection cert path is `data/registry/portfolio_replay_selection_certification_v0.json`.
+    - replay selection proof surfaces as `portfolio_replay_selection_status=CERTIFIED`; legacy `portfolio_replay_output_status` remains `UNCERTIFIED_OUTPUT_NOT_CLAIMED` unless an actual replay output artifact is separately certified.
     - bad hash or session-state-sourced replay cert is strict FAIL; missing cert is strict WARN; expired cert is strict WARN.
     - `yahoo_patch` missing is strict WARN unless selected endpoint cert declares `patch_required=false` and `no_patch_certified=true`.
   - Evidence:
     - `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py -q` PASS, 27 passed.
-    - Direct strict data-readiness gate PASS with selected endpoint certified, replay output `CERTIFIED`, no `yahoo_patch` warnings, no blockers, and no boot/data/cert temp residue.
+    - Direct strict data-readiness gate PASS with selected endpoint certified, replay selection `CERTIFIED`, replay output `UNCERTIFIED_OUTPUT_NOT_CLAIMED`, no `yahoo_patch` warnings, no blockers, and no boot/data/cert temp residue.
     - Pre-commit strict boot preflight reached PASS for data readiness, governance, context validation, AppTest smoke, focused replay/dashboard contract, and boot-control tests; final pre-commit verdict failed only because the worktree was intentionally dirty before commit.
   - Contract lock:
     - `DATA_READINESS_DURABLE_CERTIFICATION_V0 := VALID iff (selected_endpoint_cert_hash_bound = 1) and (replay_selection_cert_hash_bound = 1) and (cert_origin_session_state = 0) and (provider_calls_allowed = 0) and (repair_during_boot = 0) and (rebuild_during_boot = 0) and (bad_hash_fails = 1) and (missing_cert_warns = 1) and (expired_cert_warns = 1) and (yahoo_patch_no_patch_cert_required = 1) and (runtime_status_write = 0)`.
