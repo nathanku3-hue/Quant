@@ -84,7 +84,7 @@ Reviewer A pass: PASS. Classification language does not overclaim replay output,
 
 Reviewer B pass: PASS. Strict boot remains read-only; runtime status was not regenerated; branch requires clean GitHub alignment.
 
-Reviewer C pass: PASS. Manifest is deterministic JSON, no large ignored data artifacts or runtime status files were staged.
+Reviewer C pass: PASS after repair. Core drift/escalation alert surfaces and manual escalation smoke/soak scripts are now scanned and classified; missing-manifest behavior has explicit coverage. No large ignored data artifacts or runtime status files were staged.
 
 Ownership check: PASS. Implementer and reviewer roles are distinct in the SAW reconciliation model for this round.
 
@@ -92,6 +92,7 @@ Ownership check: PASS. Implementer and reviewer roles are distinct in the SAW re
 
 ClosureValidation: PASS
 SAWBlockValidation: PASS
+EvidenceValidation: PASS
 
 ClosurePacket: RoundID=ROUND-20260528-EXECUTION-MODULE-INVENTORY; ScopeID=SCOPE-EXECUTION-MODULE-BROKER-ORDER-PATHS; ChecksTotal=8; ChecksPassed=8; ChecksFailed=0; Verdict=PASS; OpenRisks=replay-output-remains-intentionally-uncertified-until-real-output-artifact-cert-exists_manual-execution-scripts-remain-classified-outside-default-boot-not-removed; NextAction=review-merge-execution-inventory-branch-then-rerun-target-strict-safe-boot
 
