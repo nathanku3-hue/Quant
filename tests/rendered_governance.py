@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import json
 import re
 import unicodedata
 from dataclasses import dataclass
@@ -20,6 +21,7 @@ RENDERED_ALLOWED_EXACT_LABELS = frozenset(
         "Entry/Exit Events",
         "EXIT event",
         "Historical Replay Lifecycle Events",
+        "Open replay lifecycle rows",
         "Portfolio & Allocation",
         "Replay Allocation",
         "Replay Decision-Code Audit Log",
@@ -30,6 +32,7 @@ RENDERED_ALLOWED_EXACT_LABELS = frozenset(
         "Research Optimizer - Simulation Only",
         "Research Portfolio / Replay Allocation",
         "Rows Passing Research Filter",
+        "Simulation notional",
         "Simulation Weight Table",
         "Strategy Research Replay",
         "Target Weight",
@@ -67,6 +70,8 @@ RENDERED_FORBIDDEN_PHRASES = (
     "order_action",
     "buy_alert",
     "sell_alert",
+    "rebalance now",
+    "allocation alert",
     "entry_alert",
     "exit_alert",
     "rebalance_alert",
@@ -264,11 +269,58 @@ def _as_dataframe(value: Any) -> pd.DataFrame | None:
     return None
 
 
-def _collect_table_text(items: list[RenderedText], source: str, value: Any) -> None:
+def _index_is_hidden(element: Any) -> bool:
+    proto = getattr(element, "proto", None)
+    if proto is None:
+        return False
+
+    try:
+        columns_config = getattr(proto, "columns")
+    except Exception:
+        return False
+    if not columns_config:
+        return False
+
+    try:
+        parsed = json.loads(columns_config)
+    except (TypeError, ValueError):
+        return False
+
+    index_config = parsed.get("_index")
+    return isinstance(index_config, dict) and index_config.get("hidden") is True
+
+
+def _collect_index_text(
+    items: list[RenderedText],
+    source: str,
+    index: pd.Index,
+) -> None:
+    for name in index.names:
+        if name is not None:
+            _add_text(items, f"{source}.index_name", name)
+
+    if isinstance(index, pd.MultiIndex):
+        index_values = index.to_frame(index=False).to_numpy().ravel()
+    else:
+        index_values = index.to_numpy()
+
+    for value in index_values:
+        _add_text(items, f"{source}.index", value)
+
+
+def _collect_table_text(
+    items: list[RenderedText],
+    source: str,
+    value: Any,
+    *,
+    include_index: bool = True,
+) -> None:
     frame = _as_dataframe(value)
     if frame is None:
         return
 
+    if include_index:
+        _collect_index_text(items, source, frame.index)
     for column in frame.columns:
         _add_text(items, f"{source}.column", column)
     for cell in frame.astype(str).to_numpy().ravel():
@@ -287,7 +339,12 @@ def collect_rendered_text(app: Any) -> list[RenderedText]:
         for index, element in enumerate(_iter_collection(app, collection_name)):
             _collect_element_text(items, f"{collection_name}[{index}]", element)
             if hasattr(element, "value"):
-                _collect_table_text(items, f"{collection_name}[{index}]", element.value)
+                _collect_table_text(
+                    items,
+                    f"{collection_name}[{index}]",
+                    element.value,
+                    include_index=not _index_is_hidden(element),
+                )
 
     for block_name in ("main", "sidebar"):
         block = getattr(app, block_name, None)
