@@ -11,6 +11,91 @@
   ],
   "surfaces": [
     {
+      "path": "core/drift_alert_manager.py",
+      "classification": "ops_health_only",
+      "terms": [
+        "DriftAlertManager",
+        "acknowledge_alert",
+        "escalation_history",
+        "process_drift_result",
+        "resolve_alert"
+      ],
+      "evidence_tokens": [
+        "GREEN is baseline telemetry only",
+        "Alert suppressed",
+        "acknowledge_alert",
+        "resolve_alert",
+        "escalation_history"
+      ],
+      "rationale": "DriftAlertManager owns local DuckDB alert lifecycle state for drift health; it does not submit broker orders, call webhooks, or authorize trading alerts during research boot."
+    },
+    {
+      "path": "core/async_drift_worker.py",
+      "classification": "ops_health_only",
+      "terms": [
+        "DriftAlertManager",
+        "EscalationManager",
+        "escalation_manager.start",
+        "process_drift_result"
+      ],
+      "evidence_tokens": [
+        "daemon=True",
+        "self.alert_manager.process_drift_result",
+        "self.escalation_manager.start",
+        "telemetry_spool"
+      ],
+      "rationale": "Async drift worker can create local drift-health alerts and optionally start the local escalation manager; it is ops-health lifecycle code, not an order, broker, webhook, or recommendation path."
+    },
+    {
+      "path": "core/escalation_config.py",
+      "classification": "ops_health_only",
+      "terms": [
+        "ENABLE_ESCALATION",
+        "ESCALATION_ENABLE_WEBHOOK",
+        "ESCALATION_WEBHOOK_URL",
+        "EscalationManager",
+        "webhook"
+      ],
+      "evidence_tokens": [
+        "enabled=os.getenv(\"ENABLE_ESCALATION\", \"false\")",
+        "enable_webhook=os.getenv(\"ESCALATION_ENABLE_WEBHOOK\", \"false\")",
+        "webhook_url=os.getenv(\"ESCALATION_WEBHOOK_URL\", \"\")"
+      ],
+      "rationale": "Escalation configuration is default-disabled environment parsing only; webhook fields are future-channel configuration and do not send notifications by themselves."
+    },
+    {
+      "path": "core/escalation_manager.py",
+      "classification": "ops_health_only",
+      "terms": [
+        "DriftAlertManager",
+        "EscalationManager",
+        "escalation_history"
+      ],
+      "evidence_tokens": [
+        "channel=\"log\"",
+        "EscalationManager",
+        "telemetry_spool.write_event",
+        "escalation_history"
+      ],
+      "rationale": "EscalationManager increments local alert escalation state and emits local telemetry; its current channel is log-only and it contains no broker/order/webhook delivery path."
+    },
+    {
+      "path": "core/dashboard_escalation.py",
+      "classification": "ops_health_only",
+      "terms": [
+        "DriftAlertManager",
+        "EscalationManager",
+        "escalation_manager.start"
+      ],
+      "evidence_tokens": [
+        "if escalation_config.enabled:",
+        "escalation_manager.start()",
+        "atexit.register",
+        "TelemetrySpool"
+      ],
+      "rationale": "Dashboard escalation initialization starts only when the default-disabled ops-health escalation config is enabled; it starts local health telemetry and does not authorize broker/order/webhook behavior."
+    },
+    {
       "path": "execution/broker_api.py",
       "classification": "research_only_blocked",
       "terms": [
@@ -130,6 +215,42 @@
         "requests.post"
       ],
       "rationale": "Execution bridge can generate order-shaped payloads and send Discord webhook notifications only when explicitly invoked/configured; default research boot cannot treat this as an alert or broker authorization."
+    },
+    {
+      "path": "scripts/escalation_smoke_test.py",
+      "classification": "test_fixture",
+      "terms": [
+        "DriftAlertManager",
+        "ENABLE_ESCALATION",
+        "EscalationManager",
+        "escalation_history",
+        "escalation_manager.start"
+      ],
+      "evidence_tokens": [
+        "Phase 33B Slice 4: Escalation Runtime Smoke Test",
+        "ENABLE_ESCALATION=false",
+        "data/test_escalation_smoke.duckdb",
+        "if __name__ == \"__main__\""
+      ],
+      "rationale": "Manual escalation smoke script is a test fixture that creates local test alert state only when run directly; it is not imported by default research boot."
+    },
+    {
+      "path": "scripts/escalation_soak_test.py",
+      "classification": "test_fixture",
+      "terms": [
+        "DriftAlertManager",
+        "EscalationManager",
+        "escalation_history",
+        "escalation_manager.start",
+        "process_drift_result"
+      ],
+      "evidence_tokens": [
+        "Run escalation manager soak test",
+        "data/test_escalation_soak.duckdb",
+        "output_path = Path(\"data/processed/phase33b_soak_evidence.json\")",
+        "if __name__ == \"__main__\""
+      ],
+      "rationale": "Manual escalation soak script is a test fixture that writes local test evidence only when run directly; it is not imported by default research boot."
     },
     {
       "path": "data/providers/alpaca_provider.py",

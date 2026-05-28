@@ -197,6 +197,11 @@ EXECUTION_INVENTORY_SCHEMA_VERSION = "execution-module-inventory/v0"
 EXECUTION_INVENTORY_REVIEW_SCOPE_ID = "ROUND-20260528-EXECUTION-MODULE-INVENTORY"
 
 EXECUTION_INVENTORY_EXACT_PATHS = (
+    "core/drift_alert_manager.py",
+    "core/async_drift_worker.py",
+    "core/escalation_config.py",
+    "core/escalation_manager.py",
+    "core/dashboard_escalation.py",
     "execution/broker_api.py",
     "execution/rebalancer.py",
     "main_console.py",
@@ -204,6 +209,8 @@ EXECUTION_INVENTORY_EXACT_PATHS = (
     "scripts/test_rebalance.py",
     "scripts/test_alpaca_connection.py",
     "scripts/execution_bridge.py",
+    "scripts/escalation_smoke_test.py",
+    "scripts/escalation_soak_test.py",
     "data/providers/alpaca_provider.py",
     "views/drift_monitor_view.py",
 )
@@ -247,6 +254,16 @@ EXECUTION_SENSITIVE_PATTERNS: Mapping[str, re.Pattern[str]] = {
     "BUY_ACTION": re.compile(r'"action"\s*:\s*"BUY"'),
     "MARKET_ORDER_TYPE": re.compile(r'"order_type"\s*:\s*"MARKET"'),
     "DriftAlertManager": re.compile(r"(?<![A-Za-z0-9_])DriftAlertManager(?![A-Za-z0-9_])"),
+    "EscalationManager": re.compile(r"(?<![A-Za-z0-9_])EscalationManager(?![A-Za-z0-9_])"),
+    "ENABLE_ESCALATION": re.compile(r"(?<![A-Za-z0-9_])ENABLE_ESCALATION(?![A-Za-z0-9_])"),
+    "ESCALATION_ENABLE_WEBHOOK": re.compile(
+        r"(?<![A-Za-z0-9_])ESCALATION_ENABLE_WEBHOOK(?![A-Za-z0-9_])"
+    ),
+    "ESCALATION_WEBHOOK_URL": re.compile(
+        r"(?<![A-Za-z0-9_])ESCALATION_WEBHOOK_URL(?![A-Za-z0-9_])"
+    ),
+    "escalation_history": re.compile(r"(?<![A-Za-z0-9_])escalation_history(?![A-Za-z0-9_])"),
+    "escalation_manager.start": re.compile(r"(?<![A-Za-z0-9_])escalation_manager\.start(?![A-Za-z0-9_])"),
     "process_drift_result": re.compile(r"(?<![A-Za-z0-9_])process_drift_result(?![A-Za-z0-9_])"),
     "acknowledge_alert": re.compile(r"(?<![A-Za-z0-9_])acknowledge_alert(?![A-Za-z0-9_])"),
     "resolve_alert": re.compile(r"(?<![A-Za-z0-9_])resolve_alert(?![A-Za-z0-9_])"),

@@ -5808,9 +5808,11 @@ Execution Module Inventory Gate v0 (2026-05-28)
     - keep existing real broker/order paths only as explicitly classified research-only blocked, test fixture, ops-health-only, or historical surfaces.
     - make unclassified broker/order/webhook paths fail `governance_preflight`, which already blocks strict boot through existing integration.
   - The Decision (Hardcoded):
-    - GOV-009 scans the fixed execution-sensitive path set plus `execution/execution_payload_*.json`.
+    - GOV-009 scans the fixed execution-sensitive path set, including core drift/escalation alert lifecycle modules, manual escalation smoke/soak scripts, and `execution/execution_payload_*.json`.
     - `docs/context/execution_module_inventory_current.json` must use schema `execution-module-inventory/v0` and review scope `ROUND-20260528-EXECUTION-MODULE-INVENTORY`.
     - every detected sensitive term must be covered by a manifest entry with one of `dead_code_historical`, `test_fixture`, `ops_health_only`, `research_only_blocked`, or `unknown_blocker`.
+    - missing inventory manifest is an explicit GOV-009 failure whenever any execution-sensitive broker/order/notifier/alert surface is detected.
+    - core drift/escalation surfaces may be `ops_health_only` only when they are local alert persistence/telemetry or default-disabled configuration with no broker/order/webhook delivery path.
     - `unknown_blocker`, uncovered terms, stale terms, missing manifest evidence tokens, invalid classifications, missing paths, or default dashboard/view imports from `execution` fail GOV-009.
     - replay output remains `UNCERTIFIED_OUTPUT_NOT_CLAIMED`; this gate does not certify replay outputs.
   - Evidence:

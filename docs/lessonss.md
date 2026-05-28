@@ -987,3 +987,11 @@ Application pattern:
 - Fix applied: Added GOV-009 execution-module inventory with a manifest-backed classification gate, evidence-token validation, default dashboard/view execution-import blocking, and tests for unclassified broker/webhook paths.
 - Guardrail for next time: Any new broker/order/notifier/alert path must be added to `docs/context/execution_module_inventory_current.json` with a non-overclaiming classification and guard evidence, or strict governance/boot must fail.
 - Evidence paths: `scripts/governance_preflight.py`, `docs/context/execution_module_inventory_current.json`, `tests/test_boot_preflight_governance.py`, `tests/test_boot_preflight.py`, `docs/architecture/governance_boundary_policy.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight_governance.py tests/test_boot_preflight.py tests/test_boot_status_contract.py -q`.
+
+## 2026-05-28 Round Entry (Alert/Escalation Surfaces Must Be In GOV-009)
+- Date: 2026-05-28
+- Mistake or miss: The first GOV-009 implementation inventoried broker/order/webhook paths but omitted core drift/escalation alert lifecycle modules and manual escalation scripts, even though alert/notifier behavior was part of the round scope.
+- Root cause: The initial execution-sensitive path set was built from broker/rebalance searches and did not include the ops-health alert manager, async drift worker, escalation manager/config, dashboard escalation initializer, or escalation smoke/soak scripts.
+- Fix applied: Extended GOV-009 exact-path scanning and sensitive-term patterns to the core alert/escalation surfaces, classified them as `ops_health_only` or `test_fixture` in the manifest with evidence tokens, and added an explicit missing-manifest regression.
+- Guardrail for next time: An execution inventory gate must include alert/escalation lifecycle code, not just broker/order code; `ops_health_only` requires local-only/default-disabled evidence and no broker/order/webhook delivery path.
+- Evidence paths: `scripts/governance_preflight.py`, `docs/context/execution_module_inventory_current.json`, `tests/test_boot_preflight_governance.py`, `docs/architecture/governance_boundary_policy.md`, `E:\Code\Quant\.venv\Scripts\python.exe scripts/governance_preflight.py --repo-root . --json`.

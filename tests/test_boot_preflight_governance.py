@@ -417,8 +417,40 @@ def test_execution_inventory_gate_is_reported() -> None:
     result = run_governance_preflight(Path.cwd())
 
     assert "GOV-009" in result.checks
-    assert result.checks["GOV-009"]["manifest_path"] == "docs/context/execution_module_inventory_current.json"
-    assert result.checks["GOV-009"]["status"] == "PASS"
+    gate = result.checks["GOV-009"]
+    assert gate["manifest_path"] == "docs/context/execution_module_inventory_current.json"
+    assert gate["status"] == "PASS"
+    assert gate["surface_count"] == gate["covered_surface_count"]
+    assert set(gate["files_scanned"]) >= {
+        "core/drift_alert_manager.py",
+        "core/async_drift_worker.py",
+        "core/escalation_config.py",
+        "core/escalation_manager.py",
+        "core/dashboard_escalation.py",
+        "scripts/escalation_smoke_test.py",
+        "scripts/escalation_soak_test.py",
+    }
+
+
+def test_execution_inventory_requires_manifest_when_sensitive_surface_exists(tmp_path: Path) -> None:
+    alert_path = tmp_path / "core" / "drift_alert_manager.py"
+    alert_path.parent.mkdir(parents=True)
+    alert_path.write_text(
+        "class DriftAlertManager:\n"
+        "    def process_drift_result(self):\n"
+        "        return None\n",
+        encoding="utf-8",
+    )
+
+    result = run_governance_preflight(tmp_path)
+
+    assert not result.passed
+    assert any(
+        finding.code == "GOV-009"
+        and finding.path == "docs/context/execution_module_inventory_current.json"
+        and "execution inventory manifest is required" in finding.message
+        for finding in result.findings
+    )
 
 
 def test_unclassified_broker_order_path_fails_execution_inventory(tmp_path: Path) -> None:

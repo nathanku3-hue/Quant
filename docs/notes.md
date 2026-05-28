@@ -5155,6 +5155,7 @@ replay_tickers = SCANNER_TICKERS ∪ get_pinned_tickers()
    - `dead_code_historical`, `test_fixture`, `ops_health_only`, `research_only_blocked`, `unknown_blocker`.
    - `unknown_blocker` is a governance failure.
 4. Scanned surfaces:
-   - `execution/broker_api.py`, `execution/rebalancer.py`, `main_console.py`, `main_bot_orchestrator.py`, `scripts/test_rebalance.py`, `scripts/test_alpaca_connection.py`, `scripts/execution_bridge.py`, `data/providers/alpaca_provider.py`, `execution/execution_payload_*.json`, and `views/drift_monitor_view.py`.
+   - `core/drift_alert_manager.py`, `core/async_drift_worker.py`, `core/escalation_config.py`, `core/escalation_manager.py`, `core/dashboard_escalation.py`, `execution/broker_api.py`, `execution/rebalancer.py`, `main_console.py`, `main_bot_orchestrator.py`, `scripts/test_rebalance.py`, `scripts/test_alpaca_connection.py`, `scripts/execution_bridge.py`, `scripts/escalation_smoke_test.py`, `scripts/escalation_soak_test.py`, `data/providers/alpaca_provider.py`, `execution/execution_payload_*.json`, and `views/drift_monitor_view.py`.
+   - Core drift/escalation surfaces may classify as `ops_health_only` only when evidence proves local alert persistence/telemetry or default-disabled configuration and no broker/order/webhook delivery path.
 5. Boundary:
    - GOV-009 is an inventory and boot-safety gate. It does not authorize broker calls, order submission, Discord/webhook alerts, provider refresh, recommendations, replay-output certification, or trading. It only proves current execution-sensitive surfaces are classified and not reachable from default research boot.

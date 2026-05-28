@@ -52,6 +52,11 @@ GOV-009 execution-module inventory:
 GOV-009 scans these execution-sensitive surfaces by default:
 
 ```text
+core/drift_alert_manager.py
+core/async_drift_worker.py
+core/escalation_config.py
+core/escalation_manager.py
+core/dashboard_escalation.py
 execution/broker_api.py
 execution/rebalancer.py
 main_console.py
@@ -59,12 +64,16 @@ main_bot_orchestrator.py
 scripts/test_rebalance.py
 scripts/test_alpaca_connection.py
 scripts/execution_bridge.py
+scripts/escalation_smoke_test.py
+scripts/escalation_soak_test.py
 data/providers/alpaca_provider.py
 execution/execution_payload_*.json
 views/drift_monitor_view.py
 ```
 
 The inventory is a research-only boot proof, not an authorization layer. Real broker/order paths remain blocked from default research boot unless separately approved; historical execution payloads remain inert; drift alerts are ops-health only when no broker/order/webhook path is reachable; replay output remains outside this gate and is still uncertified unless a separate replay-output artifact certificate exists.
+
+Core drift and escalation modules are included in GOV-009 because alert/notifier behavior is in scope for boot governance. Current drift alert and escalation paths are classified as `ops_health_only` when they persist local DuckDB/telemetry state, are default-disabled where applicable, and contain no broker, order, webhook delivery, or recommendation authority. Manual escalation smoke/soak scripts are classified as `test_fixture`; they are not default boot surfaces.
 
 ## Candidate-Card Required Flags
 
