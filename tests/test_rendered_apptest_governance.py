@@ -81,6 +81,22 @@ st.dataframe(
 st.table(pd.DataFrame({"Replay Decision-Code Audit Log": ["Research Bucket"]}))
 """
 
+ALLOWED_VARIANT_RENDERED_APP = r"""
+import streamlit as st
+
+st.header("Portfolio & Allocation")
+st.caption("Entry/Exit Strategy")
+st.metric("Research Optimizer - Simulation Only", "ready")
+"""
+
+DANGEROUS_ALLOWED_VARIANT_RENDERED_APP = r"""
+import streamlit as st
+
+st.header("Entry/Exit Strategy action panel")
+st.caption("Portfolio & Allocation action panel")
+st.metric("Research Optimizer - Simulation Only action panel", "blocked")
+"""
+
 
 @pytest.mark.parametrize(
     ("app_source", "expected_patterns"),
@@ -118,6 +134,26 @@ def test_rendered_governance_scan_allows_research_only_labels() -> None:
 
     assert not app.exception
     assert_rendered_governance_safe(app)
+
+
+def test_rendered_governance_allows_exact_labels_but_blocks_action_variants() -> None:
+    allowed_app = AppTest.from_string(ALLOWED_VARIANT_RENDERED_APP).run(timeout=15)
+    variant_app = AppTest.from_string(DANGEROUS_ALLOWED_VARIANT_RENDERED_APP).run(
+        timeout=15
+    )
+
+    assert not allowed_app.exception
+    assert not variant_app.exception
+    assert_rendered_governance_safe(allowed_app)
+
+    findings = scan_rendered_governance(variant_app)
+    assert {
+        "Entry/Exit Strategy variant with action panel",
+        "Portfolio & Allocation variant with action panel",
+        "Research Optimizer - Simulation Only variant with action panel",
+    }.issubset({finding.pattern for finding in findings})
+    with pytest.raises(AssertionError, match="Rendered governance scan found forbidden labels"):
+        assert_rendered_governance_safe(variant_app)
 
 
 def test_rendered_governance_collects_download_and_dataframe_text() -> None:

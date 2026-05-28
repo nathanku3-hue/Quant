@@ -93,6 +93,22 @@ RENDERED_FORBIDDEN_EXACT_LABELS = frozenset(
     }
 )
 
+RENDERED_ALLOWED_VARIANT_DANGEROUS_TERMS = (
+    "action panel",
+    "action status",
+    "recommendation",
+    "broker",
+    "order",
+    "alert",
+    "submit",
+    "buy",
+    "sell",
+    "rank",
+    "ranking",
+    "score",
+    "scoring",
+)
+
 _TEXT_COLLECTION_NAMES = (
     "title",
     "header",
@@ -165,9 +181,15 @@ _FORBIDDEN_EXACT_LABELS_NORMALIZED = {
     for label in RENDERED_FORBIDDEN_EXACT_LABELS
 }
 _ALLOWED_EXACT_LABELS_NORMALIZED = {
-    _normalize_rendered_text(label).casefold()
+    _normalize_rendered_text(label).casefold(): label
     for label in RENDERED_ALLOWED_EXACT_LABELS
 }
+_ALLOWED_EXACT_LABEL_PATTERNS = tuple(
+    (label, _phrase_regex(label)) for label in RENDERED_ALLOWED_EXACT_LABELS
+)
+_ALLOWED_VARIANT_DANGEROUS_TERM_PATTERNS = tuple(
+    (term, _phrase_regex(term)) for term in RENDERED_ALLOWED_VARIANT_DANGEROUS_TERMS
+)
 
 
 def _iter_collection(app: Any, name: str) -> Iterable[Any]:
@@ -292,6 +314,10 @@ def scan_rendered_governance(app: Any) -> list[RenderedGovernanceFinding]:
         folded = normalized.casefold()
         if folded in _ALLOWED_EXACT_LABELS_NORMALIZED:
             continue
+        variant_finding = _scan_allowed_label_variant(item, normalized)
+        if variant_finding is not None:
+            findings.append(variant_finding)
+            continue
         exact_pattern = _FORBIDDEN_EXACT_LABELS_NORMALIZED.get(folded)
         if exact_pattern is not None:
             findings.append(
@@ -312,6 +338,29 @@ def scan_rendered_governance(app: Any) -> list[RenderedGovernanceFinding]:
                     )
                 )
     return findings
+
+
+def _scan_allowed_label_variant(
+    item: RenderedText,
+    normalized: str,
+) -> RenderedGovernanceFinding | None:
+    for allowed_label, allowed_pattern in _ALLOWED_EXACT_LABEL_PATTERNS:
+        match = allowed_pattern.search(normalized)
+        if match is None:
+            continue
+
+        remainder = f"{normalized[:match.start()]} {normalized[match.end():]}".strip()
+        if not remainder:
+            continue
+
+        for term, term_pattern in _ALLOWED_VARIANT_DANGEROUS_TERM_PATTERNS:
+            if term_pattern.search(remainder):
+                return RenderedGovernanceFinding(
+                    source=item.source,
+                    text=item.text,
+                    pattern=f"{allowed_label} variant with {term}",
+                )
+    return None
 
 
 def assert_rendered_governance_safe(app: Any) -> None:

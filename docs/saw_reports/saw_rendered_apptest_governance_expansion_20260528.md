@@ -36,6 +36,7 @@ Add a narrow rendered-output governance harness for Streamlit AppTest so markdow
 
 | Severity | Impact | Fix | Owner | Status |
 |---|---|---|---|---|
+| High | Exact allowed rendered labels could be extended into action-shaped variants such as `Entry/Exit Strategy action panel` without findings. | Added allowed-label variant guarding plus regression coverage proving exact labels pass and dangerous suffix variants fail. | Repair worker | PASS |
 | None | Static source governance did not prove runtime dataframe/widget labels stayed safe after AppTest rendering. | Added `tests/rendered_governance.py` and synthetic AppTest cases for text widgets, downloads, dataframes, tables, allowed labels, and forbidden labels. | Implementer | PASS |
 | None | Optimizer AppTest smoke rendered the view but did not apply a rendered governance scan. | Added optimizer companion assertion using the rendered scanner. | Implementer | PASS |
 | None | Scanner dataframe quarantine was source-level and dataframe-model tested, not rendered through Streamlit. | Added a synthetic AppTest dataframe render of `build_scanner_research_display_frame`. | Implementer | PASS |
@@ -52,8 +53,8 @@ out-of-scope findings/actions: boot-preflight wiring for this new rendered scann
 
 | Path | Change Summary | Reviewer Status |
 |---|---|---|
-| `tests/rendered_governance.py` | New AppTest rendered-output collector and forbidden-label scanner helper. | PASS |
-| `tests/test_rendered_apptest_governance.py` | Added synthetic rendered allow/fail cases plus scanner-display rendered dataframe quarantine coverage. | PASS |
+| `tests/rendered_governance.py` | New AppTest rendered-output collector, forbidden-label scanner helper, and exact-allow variant guard. | PASS |
+| `tests/test_rendered_apptest_governance.py` | Added synthetic rendered allow/fail cases, exact-allow variant guard coverage, and scanner-display rendered dataframe quarantine coverage. | PASS |
 | `tests/test_optimizer_view.py` | Added optimizer rendered-output governance companion test. | PASS |
 | `docs/lessonss.md` | Added guardrail for rendered UI governance after source-level quarantine. | PASS |
 | `docs/saw_reports/saw_rendered_apptest_governance_expansion_20260528.md` | Published this SAW report. | PASS |
@@ -62,7 +63,7 @@ out-of-scope findings/actions: boot-preflight wiring for this new rendered scann
 
 | EvidenceID | Command | Result |
 |---|---|---|
-| EVD-01 | `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_rendered_apptest_governance.py tests/test_optimizer_view.py -q` | PASS |
+| EVD-01 | `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_rendered_apptest_governance.py tests/test_optimizer_view.py -q` | PASS, 11 passed |
 | EVD-02 | `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight_governance.py tests/test_boot_preflight.py tests/test_boot_status_contract.py -q` | PASS |
 | EVD-03 | `E:\Code\Quant\.venv\Scripts\python.exe scripts/governance_preflight.py --repo-root . --json` | PASS |
 | EVD-04 | `E:\Code\Quant\.venv\Scripts\python.exe scripts/boot_preflight.py --repo-root . --mode strict --require-github --smoke --run-focused-contract` | PASS, runtime status not written |
@@ -73,8 +74,8 @@ out-of-scope findings/actions: boot-preflight wiring for this new rendered scann
 
 | TaskID | Task | Artifact | Check | Status | EvidenceID |
 |---|---|---|---|---|---|
-| TSK-01 | Add rendered text collector and scanner | `tests/rendered_governance.py` | synthetic fail/allow cases inspect labels and dataframe cells | PASS | EVD-01 |
-| TSK-02 | Add rendered policy AppTest coverage | `tests/test_rendered_apptest_governance.py` | forbidden labels fail, allowed labels pass, downloads/dataframes are collected | PASS | EVD-01 |
+| TSK-01 | Add rendered text collector and scanner | `tests/rendered_governance.py` | synthetic fail/allow cases inspect labels, dataframe cells, and exact-label variants | PASS | EVD-01 |
+| TSK-02 | Add rendered policy AppTest coverage | `tests/test_rendered_apptest_governance.py` | forbidden labels fail, exact allowed labels pass, dangerous allowed-label variants fail, downloads/dataframes are collected | PASS | EVD-01 |
 | TSK-03 | Add optimizer rendered companion coverage | `tests/test_optimizer_view.py` | optimizer AppTest passes rendered governance scan | PASS | EVD-01 |
 | TSK-04 | Preserve boot/governance/safe-boot baseline | boot/governance scripts unchanged | focused boot tests, governance preflight, strict safe boot pass | PASS | EVD-02/EVD-03/EVD-04 |
 | TSK-05 | Publish docs/validation closeout | SAW report and lesson entry | validators pass | PASS | EVD-05/EVD-06 |
@@ -86,7 +87,7 @@ EvidenceRows: EVD-01|ROUND-20260528-RENDERED-APPTEST-GOVERNANCE-EXPANSION|2026-0
 
 Implementer pass: PASS. The helper covers AppTest-visible rendered text and the tests prove fail-closed behavior for forbidden rendered labels.
 
-Reviewer A pass: PASS. This round does not loosen governance policy, certify replay output, or authorize recommendations/ranking/scoring/broker actions.
+Reviewer A pass: PASS after repair. Initial review found exact allow-list labels could be extended with action-shaped terms; the repair closes that variant hole without loosening governance policy, certifying replay output, or authorizing recommendations/ranking/scoring/broker actions.
 
 Reviewer B pass: PASS. Runtime status was not regenerated, safe-boot derivation was not changed, and strict preflight stayed read-only.
 

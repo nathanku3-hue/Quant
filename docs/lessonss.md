@@ -1011,3 +1011,11 @@ Application pattern:
 - Fix applied: Added a reusable rendered AppTest text collector/scanner, synthetic allow/fail AppTest cases, optimizer rendered-output governance coverage, and scanner-display rendered dataframe quarantine coverage.
 - Guardrail for next time: Any UI surface that can render governance-sensitive labels must have rendered-output coverage before broadening product claims; source/static scans remain necessary but are not sufficient for dataframe/widget display safety.
 - Evidence paths: `tests/rendered_governance.py`, `tests/test_rendered_apptest_governance.py`, `tests/test_optimizer_view.py`, `docs/saw_reports/saw_rendered_apptest_governance_expansion_20260528.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_rendered_apptest_governance.py tests/test_optimizer_view.py -q`.
+
+## 2026-05-28 Round Entry (Exact Allowed UI Labels Need Variant Guards)
+- Date: 2026-05-28
+- Mistake or miss: The rendered governance helper allowed exact safe labels but did not flag dangerous longer variants such as `Entry/Exit Strategy action panel`.
+- Root cause: Exact allow-list matching skipped only exact text, while the later forbidden phrase scan did not recognize all action-shaped suffixes attached to otherwise allowed labels.
+- Fix applied: Added a narrow allowed-label variant guard for action/recommendation/broker/order/alert/submit/buy/sell/rank/score terms and regression coverage proving exact labels pass while action-shaped variants fail.
+- Guardrail for next time: Any exact allow-list entry must be treated as exact only; rendered variants that add action, recommendation, broker/order, alert, ranking, or scoring semantics should fail unless explicitly approved with tests.
+- Evidence paths: `tests/rendered_governance.py`, `tests/test_rendered_apptest_governance.py`, `docs/saw_reports/saw_rendered_apptest_governance_expansion_20260528.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_rendered_apptest_governance.py tests/test_optimizer_view.py -q`.
