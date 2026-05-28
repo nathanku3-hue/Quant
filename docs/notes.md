@@ -5142,3 +5142,19 @@ replay_tickers = SCANNER_TICKERS ∪ get_pinned_tickers()
    - Missing `yahoo_patch` remains `WARN` unless the selected endpoint certificate explicitly states `patch_required=false` and `no_patch_certified=true`.
 5. Boundary:
    - No provider calls, repairs, replay rebuilds, canonical data writes, runtime boot-status generation, recommendations, alerts, broker calls, or safe-boot status writes are authorized by the data-readiness certs alone.
+
+## Execution Module Inventory Gate Notes (2026-05-28)
+
+1. Inventory formula:
+   - `execution_inventory_valid = all(detected_sensitive_terms are covered by manifest entry) AND all(manifest classifications in allowed set) AND no unknown_blocker AND all(required evidence tokens appear in classified source) AND no default dashboard/view import of execution modules`.
+   - Code path: `scripts/governance_preflight.py`.
+2. Manifest path:
+   - `docs/context/execution_module_inventory_current.json`.
+   - Schema: `execution-module-inventory/v0`.
+3. Classification vocabulary:
+   - `dead_code_historical`, `test_fixture`, `ops_health_only`, `research_only_blocked`, `unknown_blocker`.
+   - `unknown_blocker` is a governance failure.
+4. Scanned surfaces:
+   - `execution/broker_api.py`, `execution/rebalancer.py`, `main_console.py`, `main_bot_orchestrator.py`, `scripts/test_rebalance.py`, `scripts/test_alpaca_connection.py`, `scripts/execution_bridge.py`, `data/providers/alpaca_provider.py`, `execution/execution_payload_*.json`, and `views/drift_monitor_view.py`.
+5. Boundary:
+   - GOV-009 is an inventory and boot-safety gate. It does not authorize broker calls, order submission, Discord/webhook alerts, provider refresh, recommendations, replay-output certification, or trading. It only proves current execution-sensitive surfaces are classified and not reachable from default research boot.

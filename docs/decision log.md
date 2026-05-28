@@ -5800,3 +5800,22 @@ Data Readiness Durable Certification v0 (2026-05-28)
     - Pre-commit strict boot preflight reached PASS for data readiness, governance, context validation, AppTest smoke, focused replay/dashboard contract, and boot-control tests; final pre-commit verdict failed only because the worktree was intentionally dirty before commit.
   - Contract lock:
     - `DATA_READINESS_DURABLE_CERTIFICATION_V0 := VALID iff (selected_endpoint_cert_hash_bound = 1) and (replay_selection_cert_hash_bound = 1) and (cert_origin_session_state = 0) and (provider_calls_allowed = 0) and (repair_during_boot = 0) and (rebuild_during_boot = 0) and (bad_hash_fails = 1) and (missing_cert_warns = 1) and (expired_cert_warns = 1) and (yahoo_patch_no_patch_cert_required = 1) and (runtime_status_write = 0)`.
+
+Execution Module Inventory Gate v0 (2026-05-28)
+
+  - Decision record:
+    - add a mechanical governance gate for broker/order/rebalance/notifier/alert surfaces before broader BootReady claims.
+    - keep existing real broker/order paths only as explicitly classified research-only blocked, test fixture, ops-health-only, or historical surfaces.
+    - make unclassified broker/order/webhook paths fail `governance_preflight`, which already blocks strict boot through existing integration.
+  - The Decision (Hardcoded):
+    - GOV-009 scans the fixed execution-sensitive path set plus `execution/execution_payload_*.json`.
+    - `docs/context/execution_module_inventory_current.json` must use schema `execution-module-inventory/v0` and review scope `ROUND-20260528-EXECUTION-MODULE-INVENTORY`.
+    - every detected sensitive term must be covered by a manifest entry with one of `dead_code_historical`, `test_fixture`, `ops_health_only`, `research_only_blocked`, or `unknown_blocker`.
+    - `unknown_blocker`, uncovered terms, stale terms, missing manifest evidence tokens, invalid classifications, missing paths, or default dashboard/view imports from `execution` fail GOV-009.
+    - replay output remains `UNCERTIFIED_OUTPUT_NOT_CLAIMED`; this gate does not certify replay outputs.
+  - Evidence:
+    - `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight_governance.py tests/test_boot_preflight.py tests/test_boot_status_contract.py -q` PASS.
+    - `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_execution_controls.py -q` PASS.
+    - `E:\Code\Quant\.venv\Scripts\python.exe scripts/governance_preflight.py --repo-root . --json` PASS with `GOV-009`.
+  - Contract lock:
+    - `EXECUTION_MODULE_INVENTORY_V0 := VALID iff (execution_sensitive_paths_scanned = 1) and (manifest_schema_valid = 1) and (all_sensitive_terms_classified = 1) and (unknown_blockers = 0) and (evidence_tokens_present = 1) and (default_research_boot_execution_imports = 0) and (safe_boot_derivation_changed = 0) and (runtime_status_write = 0)`.

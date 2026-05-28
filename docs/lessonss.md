@@ -979,3 +979,11 @@ Application pattern:
 - Fix applied: Added `portfolio_replay_selection_status` for the durable selection proof, kept legacy `portfolio_replay_output_status=UNCERTIFIED_OUTPUT_NOT_CLAIMED`, and updated tests/docs/registry wording to preserve the boundary.
 - Guardrail for next time: Selection/request certificates may only certify selection readiness; output status may become `CERTIFIED` only when a concrete output artifact has its own identity, hash-bound evidence, and test coverage.
 - Evidence paths: `core/data_readiness_gate.py`, `tests/test_data_readiness_gate.py`, `data/registry/portfolio_replay_selection_certification_v0.json`, `docs/architecture/data_readiness_gate_v0.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py -q`, direct strict gate output showing `portfolio_replay_selection_status=CERTIFIED` and `portfolio_replay_output_status=UNCERTIFIED_OUTPUT_NOT_CLAIMED`.
+
+## 2026-05-28 Round Entry (Execution Paths Need Mechanical Inventory)
+- Date: 2026-05-28
+- Mistake or miss: Safe boot could be true while tracked broker/order/rebalance/notifier paths existed outside the governance scanner's executable inventory.
+- Root cause: GOV-007 scanned dashboard/view action tokens but did not scan `execution/`, manual scripts, Alpaca provider bridges, historical execution payloads, or notifier/webhook paths.
+- Fix applied: Added GOV-009 execution-module inventory with a manifest-backed classification gate, evidence-token validation, default dashboard/view execution-import blocking, and tests for unclassified broker/webhook paths.
+- Guardrail for next time: Any new broker/order/notifier/alert path must be added to `docs/context/execution_module_inventory_current.json` with a non-overclaiming classification and guard evidence, or strict governance/boot must fail.
+- Evidence paths: `scripts/governance_preflight.py`, `docs/context/execution_module_inventory_current.json`, `tests/test_boot_preflight_governance.py`, `tests/test_boot_preflight.py`, `docs/architecture/governance_boundary_policy.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight_governance.py tests/test_boot_preflight.py tests/test_boot_status_contract.py -q`.

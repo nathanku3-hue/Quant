@@ -192,6 +192,66 @@ RUNTIME_FORBIDDEN_TOKENS = (
     "ticker_action_alert",
 )
 
+EXECUTION_INVENTORY_PATH = Path("docs/context/execution_module_inventory_current.json")
+EXECUTION_INVENTORY_SCHEMA_VERSION = "execution-module-inventory/v0"
+EXECUTION_INVENTORY_REVIEW_SCOPE_ID = "ROUND-20260528-EXECUTION-MODULE-INVENTORY"
+
+EXECUTION_INVENTORY_EXACT_PATHS = (
+    "execution/broker_api.py",
+    "execution/rebalancer.py",
+    "main_console.py",
+    "main_bot_orchestrator.py",
+    "scripts/test_rebalance.py",
+    "scripts/test_alpaca_connection.py",
+    "scripts/execution_bridge.py",
+    "data/providers/alpaca_provider.py",
+    "views/drift_monitor_view.py",
+)
+
+EXECUTION_INVENTORY_GLOBS = (
+    "execution/execution_payload_*.json",
+)
+
+EXECUTION_ALLOWED_CLASSIFICATIONS = frozenset(
+    {
+        "dead_code_historical",
+        "test_fixture",
+        "ops_health_only",
+        "research_only_blocked",
+        "unknown_blocker",
+    }
+)
+
+EXECUTION_BLOCKING_CLASSIFICATIONS = frozenset({"unknown_blocker"})
+
+EXECUTION_SENSITIVE_PATTERNS: Mapping[str, re.Pattern[str]] = {
+    "AlpacaBroker": re.compile(r"(?<![A-Za-z0-9_])AlpacaBroker(?![A-Za-z0-9_])"),
+    "PortfolioRebalancer": re.compile(r"(?<![A-Za-z0-9_])PortfolioRebalancer(?![A-Za-z0-9_])"),
+    "submit_order": re.compile(r"(?<![A-Za-z0-9_])submit_order(?![A-Za-z0-9_])"),
+    "close_all_positions": re.compile(r"(?<![A-Za-z0-9_])close_all_positions(?![A-Za-z0-9_])"),
+    "execute_orders": re.compile(r"(?<![A-Za-z0-9_])execute_orders(?![A-Za-z0-9_])"),
+    "execute_orders_with_idempotent_retry": re.compile(
+        r"(?<![A-Za-z0-9_])execute_orders_with_idempotent_retry(?![A-Za-z0-9_])"
+    ),
+    "generate_execution_payload": re.compile(
+        r"(?<![A-Za-z0-9_])generate_execution_payload(?![A-Za-z0-9_])"
+    ),
+    "notify_pm": re.compile(r"(?<![A-Za-z0-9_])notify_pm(?![A-Za-z0-9_])"),
+    "DISCORD_WEBHOOK_URL": re.compile(r"(?<![A-Za-z0-9_])DISCORD_WEBHOOK_URL(?![A-Za-z0-9_])"),
+    "requests.post": re.compile(r"(?<![A-Za-z0-9_])requests\.post(?![A-Za-z0-9_])"),
+    "webhook": re.compile(r"(?<![A-Za-z0-9_])webhook(?![A-Za-z0-9_])", re.IGNORECASE),
+    "tradeapi": re.compile(r"(?<![A-Za-z0-9_])tradeapi(?![A-Za-z0-9_])"),
+    "APCA": re.compile(r"(?<![A-Za-z0-9_])APCA_[A-Za-z0-9_]+(?![A-Za-z0-9_])"),
+    "ALPACA": re.compile(r"(?<![A-Za-z0-9_])ALPACA[A-Za-z0-9_]*(?![A-Za-z0-9_])"),
+    "execution_orders": re.compile(r"(?<![A-Za-z0-9_])execution_orders(?![A-Za-z0-9_])"),
+    "BUY_ACTION": re.compile(r'"action"\s*:\s*"BUY"'),
+    "MARKET_ORDER_TYPE": re.compile(r'"order_type"\s*:\s*"MARKET"'),
+    "DriftAlertManager": re.compile(r"(?<![A-Za-z0-9_])DriftAlertManager(?![A-Za-z0-9_])"),
+    "process_drift_result": re.compile(r"(?<![A-Za-z0-9_])process_drift_result(?![A-Za-z0-9_])"),
+    "acknowledge_alert": re.compile(r"(?<![A-Za-z0-9_])acknowledge_alert(?![A-Za-z0-9_])"),
+    "resolve_alert": re.compile(r"(?<![A-Za-z0-9_])resolve_alert(?![A-Za-z0-9_])"),
+}
+
 FALSEY_ENV_VALUES = {"", "0", "false", "no", "off", "disabled"}
 TRUTHY_ENV_VALUES = {"1", "true", "yes", "on", "enabled"}
 
@@ -248,6 +308,22 @@ class GovernancePreflightResult:
         }
 
 
+@dataclass(frozen=True)
+class ExecutionSurfaceEntry:
+    path: str
+    classification: str
+    terms: tuple[str, ...]
+    evidence_tokens: tuple[str, ...]
+    rationale: str
+
+
+@dataclass(frozen=True)
+class ExecutionSurfaceHit:
+    path: str
+    term: str
+    line: int | None
+
+
 def run_governance_preflight(repo_root: str | Path) -> GovernancePreflightResult:
     root = _resolve_repo_root(repo_root)
     findings: list[GovernanceFinding] = []
@@ -258,6 +334,7 @@ def run_governance_preflight(repo_root: str | Path) -> GovernancePreflightResult
     _check_ui_strings(root, findings, checks)
     _check_candidate_cards(root, findings, checks)
     _check_runtime_forbidden_tokens(root, findings, checks)
+    _check_execution_module_inventory(root, findings, checks)
 
     return GovernancePreflightResult(
         passed=not any(finding.severity == "fail" for finding in findings),
@@ -768,6 +845,326 @@ def _check_runtime_forbidden_tokens(
     }
 
 
+def _check_execution_module_inventory(
+    root: Path,
+    findings: list[GovernanceFinding],
+    checks: dict[str, Any],
+) -> None:
+    files = tuple(_execution_inventory_files(root))
+    hits = tuple(_execution_surface_hits(root, files))
+    unique_hits: dict[tuple[str, str], ExecutionSurfaceHit] = {}
+    for hit in hits:
+        unique_hits.setdefault((hit.path, hit.term), hit)
+
+    manifest_path = root / EXECUTION_INVENTORY_PATH
+    entries = _load_execution_inventory(root, manifest_path, findings) if manifest_path.exists() else ()
+    entry_by_path: dict[str, list[ExecutionSurfaceEntry]] = {}
+    for entry in entries:
+        entry_by_path.setdefault(entry.path, []).append(entry)
+
+    if hits and not manifest_path.exists():
+        findings.append(
+            GovernanceFinding(
+                code="GOV-009",
+                severity="fail",
+                path=EXECUTION_INVENTORY_PATH.as_posix(),
+                message=(
+                    "execution inventory manifest is required when broker/order/notifier "
+                    "surfaces are present"
+                ),
+            )
+        )
+
+    covered_keys: set[tuple[str, str]] = set()
+    for key, hit in unique_hits.items():
+        matching_entries = [
+            entry
+            for entry in entry_by_path.get(hit.path, [])
+            if hit.term in entry.terms
+        ]
+        if not matching_entries:
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=hit.path,
+                    line=hit.line,
+                    message=(
+                        f"unclassified execution-sensitive term {hit.term!r}; "
+                        "add an explicit execution inventory classification"
+                    ),
+                )
+            )
+            continue
+        covered_keys.add(key)
+        for entry in matching_entries:
+            if entry.classification in EXECUTION_BLOCKING_CLASSIFICATIONS:
+                findings.append(
+                    GovernanceFinding(
+                        code="GOV-009",
+                        severity="fail",
+                        path=entry.path,
+                        line=hit.line,
+                        message=(
+                            f"execution surface {hit.term!r} is classified as "
+                            f"{entry.classification}"
+                        ),
+                    )
+                )
+            _check_execution_entry_evidence(root, entry, findings)
+
+    detected_keys = set(unique_hits)
+    for entry in entries:
+        path = root / entry.path
+        if not _inside_existing_path(root, path):
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=entry.path,
+                    message="execution inventory entry points to a missing path",
+                )
+            )
+            continue
+        for term in entry.terms:
+            if term not in EXECUTION_SENSITIVE_PATTERNS:
+                findings.append(
+                    GovernanceFinding(
+                        code="GOV-009",
+                        severity="fail",
+                        path=entry.path,
+                        message=f"execution inventory term {term!r} is not a known scanner term",
+                    )
+                )
+            elif (entry.path, term) not in detected_keys:
+                findings.append(
+                    GovernanceFinding(
+                        code="GOV-009",
+                        severity="fail",
+                        path=entry.path,
+                        message=f"execution inventory term {term!r} is stale or no longer detected",
+                    )
+                )
+
+    boot_import_hits = _execution_import_hits_in_boot_surfaces(root)
+    for rel_path, line in boot_import_hits:
+        findings.append(
+            GovernanceFinding(
+                code="GOV-009",
+                severity="fail",
+                path=rel_path,
+                line=line,
+                message="default research boot surface imports execution modules",
+            )
+        )
+
+    checks["GOV-009"] = {
+        "status": "FAIL"
+        if any(finding.code == "GOV-009" and finding.severity == "fail" for finding in findings)
+        else "PASS",
+        "manifest_path": EXECUTION_INVENTORY_PATH.as_posix(),
+        "schema_version": EXECUTION_INVENTORY_SCHEMA_VERSION,
+        "files_scanned": [_rel(root, path) for path in files],
+        "surface_count": len(unique_hits),
+        "covered_surface_count": len(covered_keys),
+        "manifest_surface_count": len(entries),
+        "classifications": sorted(EXECUTION_ALLOWED_CLASSIFICATIONS),
+        "boot_import_hits": [
+            {"path": rel_path, "line": line}
+            for rel_path, line in boot_import_hits
+        ],
+        "detected_surfaces": [
+            {
+                "path": hit.path,
+                "term": hit.term,
+                "line": hit.line,
+            }
+            for hit in sorted(unique_hits.values(), key=lambda item: (item.path, item.term, item.line or 0))
+        ],
+    }
+
+
+def _load_execution_inventory(
+    root: Path,
+    manifest_path: Path,
+    findings: list[GovernanceFinding],
+) -> tuple[ExecutionSurfaceEntry, ...]:
+    payload = _load_json(root, manifest_path, "GOV-009", findings)
+    rel_manifest = _rel(root, manifest_path)
+    if not isinstance(payload, Mapping):
+        return ()
+    if payload.get("schema_version") != EXECUTION_INVENTORY_SCHEMA_VERSION:
+        findings.append(
+            GovernanceFinding(
+                code="GOV-009",
+                severity="fail",
+                path=rel_manifest,
+                message=f"execution inventory schema_version must be {EXECUTION_INVENTORY_SCHEMA_VERSION}",
+            )
+        )
+    if payload.get("review_scope_id") != EXECUTION_INVENTORY_REVIEW_SCOPE_ID:
+        findings.append(
+            GovernanceFinding(
+                code="GOV-009",
+                severity="fail",
+                path=rel_manifest,
+                message=f"execution inventory review_scope_id must be {EXECUTION_INVENTORY_REVIEW_SCOPE_ID}",
+            )
+        )
+    surfaces = payload.get("surfaces")
+    if not isinstance(surfaces, list):
+        findings.append(
+            GovernanceFinding(
+                code="GOV-009",
+                severity="fail",
+                path=rel_manifest,
+                message="execution inventory surfaces must be a list",
+            )
+        )
+        return ()
+
+    entries: list[ExecutionSurfaceEntry] = []
+    for index, raw_entry in enumerate(surfaces):
+        entry_path = f"{rel_manifest}#/surfaces/{index}"
+        if not isinstance(raw_entry, Mapping):
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=entry_path,
+                    message="execution inventory surface entry must be an object",
+                )
+            )
+            continue
+        path = _normalize_path(str(raw_entry.get("path") or ""))
+        classification = str(raw_entry.get("classification") or "").strip()
+        terms = _string_tuple(raw_entry.get("terms"))
+        evidence_tokens = _string_tuple(raw_entry.get("evidence_tokens"))
+        rationale = str(raw_entry.get("rationale") or "").strip()
+        if not path or path.startswith("../") or path.startswith("/"):
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=entry_path,
+                    message="execution inventory path must be repo-relative",
+                )
+            )
+            continue
+        if classification not in EXECUTION_ALLOWED_CLASSIFICATIONS:
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=entry_path,
+                    message=f"invalid execution inventory classification {classification!r}",
+                )
+            )
+        if not terms:
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=entry_path,
+                    message="execution inventory entry must list detected terms",
+                )
+            )
+        if not evidence_tokens:
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=entry_path,
+                    message="execution inventory entry must list evidence tokens",
+                )
+            )
+        if not rationale:
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=entry_path,
+                    message="execution inventory entry must include rationale",
+                )
+            )
+        entries.append(
+            ExecutionSurfaceEntry(
+                path=path,
+                classification=classification,
+                terms=terms,
+                evidence_tokens=evidence_tokens,
+                rationale=rationale,
+            )
+        )
+    return tuple(entries)
+
+
+def _check_execution_entry_evidence(
+    root: Path,
+    entry: ExecutionSurfaceEntry,
+    findings: list[GovernanceFinding],
+) -> None:
+    path = root / entry.path
+    if not _inside_existing_path(root, path):
+        return
+    text = _read_text(path)
+    for token in entry.evidence_tokens:
+        if token not in text:
+            findings.append(
+                GovernanceFinding(
+                    code="GOV-009",
+                    severity="fail",
+                    path=entry.path,
+                    message=(
+                        f"execution inventory evidence token {token!r} missing for "
+                        f"classification {entry.classification}"
+                    ),
+                )
+            )
+
+
+def _execution_inventory_files(root: Path) -> Iterable[Path]:
+    files: list[Path] = []
+    for rel_path in EXECUTION_INVENTORY_EXACT_PATHS:
+        path = root / rel_path
+        if _inside_existing_path(root, path) and path.is_file():
+            files.append(path.resolve())
+    for pattern in EXECUTION_INVENTORY_GLOBS:
+        for path in sorted(root.glob(pattern)):
+            if _inside_existing_path(root, path) and path.is_file():
+                files.append(path.resolve())
+    return tuple(dict.fromkeys(files))
+
+
+def _execution_surface_hits(root: Path, files: Iterable[Path]) -> Iterable[ExecutionSurfaceHit]:
+    hits: list[ExecutionSurfaceHit] = []
+    for path in files:
+        rel_path = _rel(root, path)
+        for line_number, line in enumerate(_read_text(path).splitlines(), start=1):
+            for term, pattern in EXECUTION_SENSITIVE_PATTERNS.items():
+                if pattern.search(line):
+                    hits.append(ExecutionSurfaceHit(path=rel_path, term=term, line=line_number))
+    return tuple(hits)
+
+
+def _execution_import_hits_in_boot_surfaces(root: Path) -> tuple[tuple[str, int], ...]:
+    files: list[Path] = []
+    dashboard = root / "dashboard.py"
+    if _inside_existing_path(root, dashboard) and dashboard.is_file():
+        files.append(dashboard.resolve())
+    views = root / "views"
+    if _inside_existing_path(root, views) and views.is_dir():
+        files.extend(_confined_glob(root, views, "*.py"))
+
+    pattern = re.compile(r"^\s*(from\s+execution(?:\.|\s)|import\s+execution(?:\.|\s|$))")
+    hits: list[tuple[str, int]] = []
+    for path in files:
+        for line_number, line in enumerate(_read_text(path).splitlines(), start=1):
+            if pattern.search(line):
+                hits.append((_rel(root, path), line_number))
+    return tuple(hits)
+
+
 def _ui_files(root: Path) -> Iterable[Path]:
     dashboard = root / "dashboard.py"
     if _inside_existing_path(root, dashboard):
@@ -864,6 +1261,17 @@ def _normalize_key(key: str) -> str:
 
 def _normalize_path(path: str | Path) -> str:
     return str(path).replace("\\", "/").lstrip("./")
+
+
+def _string_tuple(value: Any) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        return ()
+    items: list[str] = []
+    for raw_item in value:
+        item = str(raw_item).strip()
+        if item:
+            items.append(item)
+    return tuple(items)
 
 
 def _rel(root: Path, path: Path) -> str:

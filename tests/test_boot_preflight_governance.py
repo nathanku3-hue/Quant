@@ -96,6 +96,24 @@ def _base_card() -> dict:
     }
 
 
+def _write_execution_inventory_manifest(root: Path, surfaces: list[dict]) -> Path:
+    manifest_path = root / "docs" / "context" / "execution_module_inventory_current.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": "execution-module-inventory/v0",
+                "review_scope_id": "ROUND-20260528-EXECUTION-MODULE-INVENTORY",
+                "surfaces": surfaces,
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    return manifest_path
+
+
 def test_scanner_does_not_import_boot_preflight_module() -> None:
     source = Path("scripts/governance_preflight.py").read_text(encoding="utf-8")
     test_source = Path("tests/test_boot_preflight_governance.py").read_text(encoding="utf-8")
@@ -393,6 +411,123 @@ def test_runtime_order_flags_fail_closed(tmp_path: Path, monkeypatch: pytest.Mon
 
     assert not result.passed
     assert any(finding.code == "GOV-001" and "T0_ORDERS_ENABLED" in finding.message for finding in result.findings)
+
+
+def test_execution_inventory_gate_is_reported() -> None:
+    result = run_governance_preflight(Path.cwd())
+
+    assert "GOV-009" in result.checks
+    assert result.checks["GOV-009"]["manifest_path"] == "docs/context/execution_module_inventory_current.json"
+    assert result.checks["GOV-009"]["status"] == "PASS"
+
+
+def test_unclassified_broker_order_path_fails_execution_inventory(tmp_path: Path) -> None:
+    broker_path = tmp_path / "execution" / "broker_api.py"
+    broker_path.parent.mkdir(parents=True)
+    broker_path.write_text(
+        "class AlpacaBroker:\n"
+        "    def submit_order(self):\n"
+        "        return {'ok': True}\n",
+        encoding="utf-8",
+    )
+
+    result = run_governance_preflight(tmp_path)
+
+    assert not result.passed
+    assert any(
+        finding.code == "GOV-009" and "unclassified execution-sensitive term" in finding.message
+        for finding in result.findings
+    )
+
+
+def test_classified_default_blocked_execution_path_passes_inventory(tmp_path: Path) -> None:
+    broker_path = tmp_path / "execution" / "broker_api.py"
+    broker_path.parent.mkdir(parents=True)
+    broker_path.write_text(
+        "PAPER_BASE_URL = 'https://paper-api.alpaca.markets'\n"
+        "LIVE_TRADING_BREAK_GLASS_ENV = 'TZ_ALPACA_ALLOW_LIVE'\n"
+        "TZ_SIGNED_LIVE_TRADING_DECISION = 'YES'\n"
+        "assert_egress_url_allowed = object()\n"
+        "class AlpacaBroker:\n"
+        "    def submit_order(self):\n"
+        "        return {'ok': False}\n",
+        encoding="utf-8",
+    )
+    _write_execution_inventory_manifest(
+        tmp_path,
+        [
+            {
+                "path": "execution/broker_api.py",
+                "classification": "research_only_blocked",
+                "terms": ["AlpacaBroker", "submit_order"],
+                "evidence_tokens": [
+                    "PAPER_BASE_URL",
+                    "LIVE_TRADING_BREAK_GLASS_ENV",
+                    "TZ_SIGNED_LIVE_TRADING_DECISION",
+                    "assert_egress_url_allowed",
+                ],
+                "rationale": "synthetic classified broker path",
+            }
+        ],
+    )
+
+    result = run_governance_preflight(tmp_path)
+
+    assert result.passed, [finding.format() for finding in result.findings]
+    assert result.checks["GOV-009"]["covered_surface_count"] == 2
+
+
+def test_webhook_notifier_path_fails_without_classification(tmp_path: Path) -> None:
+    bridge_path = tmp_path / "scripts" / "execution_bridge.py"
+    bridge_path.parent.mkdir(parents=True)
+    bridge_path.write_text(
+        "import requests\n"
+        "def notify_pm():\n"
+        "    webhook = 'https://discord.com/api/webhooks/test'\n"
+        "    return requests.post(webhook, json={})\n",
+        encoding="utf-8",
+    )
+
+    result = run_governance_preflight(tmp_path)
+
+    assert not result.passed
+    assert any(finding.code == "GOV-009" and finding.path == "scripts/execution_bridge.py" for finding in result.findings)
+
+
+def test_classified_default_disabled_webhook_path_passes_inventory(tmp_path: Path) -> None:
+    bridge_path = tmp_path / "scripts" / "execution_bridge.py"
+    bridge_path.parent.mkdir(parents=True)
+    bridge_path.write_text(
+        "import requests\n"
+        "DISCORD_WEBHOOK_URL = 'env-name-only'\n"
+        "assert_egress_url_allowed = object()\n"
+        "require_hmac_rotation_compliance = object()\n"
+        "def notify_pm():\n"
+        "    webhook = DISCORD_WEBHOOK_URL\n"
+        "    return requests.post(webhook, json={})\n",
+        encoding="utf-8",
+    )
+    _write_execution_inventory_manifest(
+        tmp_path,
+        [
+            {
+                "path": "scripts/execution_bridge.py",
+                "classification": "research_only_blocked",
+                "terms": ["DISCORD_WEBHOOK_URL", "notify_pm", "requests.post", "webhook"],
+                "evidence_tokens": [
+                    "DISCORD_WEBHOOK_URL",
+                    "assert_egress_url_allowed",
+                    "require_hmac_rotation_compliance",
+                    "requests.post",
+                ],
+                "rationale": "synthetic classified webhook path",
+            }
+        ],
+    )
+
+    result = run_governance_preflight(tmp_path)
+
+    assert result.passed, [finding.format() for finding in result.findings]
 
 
 def test_negated_governance_text_can_mention_prohibited_words(tmp_path: Path) -> None:

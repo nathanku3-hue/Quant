@@ -38,11 +38,33 @@ GOV-005 replay-code display:
   Internal BUY/SELL/HOLD/ENTER/EXIT replay codes are allowed in storage and logic, but v0 display phrase checks must keep them from being presented as trade instructions.
 
 GOV-007 dashboard/view action-token scan:
-  Default dashboard and view source paths must not contain broker/order/trade-alert action tokens such as submit_order, broker_call, order_action, buy_alert, sell_alert, entry_alert, exit_alert, rebalance_alert, or ticker_action_alert. Full execution-module broker/order inventory is a follow-up gate and is not claimed by v0 scanner PASS.
+  Default dashboard and view source paths must not contain broker/order/trade-alert action tokens such as submit_order, broker_call, order_action, buy_alert, sell_alert, entry_alert, exit_alert, rebalance_alert, or ticker_action_alert.
 
 GOV-008 manifest binding:
   Candidate cards must point to sidecar manifests whose artifact_uri and artifact_sha256 match the card bytes.
+
+GOV-009 execution-module inventory:
+  Broker/order/rebalance/notifier/alert surfaces in execution-sensitive files must be scanned and classified through docs/context/execution_module_inventory_current.json. Classifications are dead_code_historical, test_fixture, ops_health_only, research_only_blocked, and unknown_blocker. Any unknown_blocker, uncovered sensitive term, stale manifest entry, missing evidence token, or execution import from default dashboard/view boot surfaces fails governance preflight.
 ```
+
+## Execution Inventory Scope
+
+GOV-009 scans these execution-sensitive surfaces by default:
+
+```text
+execution/broker_api.py
+execution/rebalancer.py
+main_console.py
+main_bot_orchestrator.py
+scripts/test_rebalance.py
+scripts/test_alpaca_connection.py
+scripts/execution_bridge.py
+data/providers/alpaca_provider.py
+execution/execution_payload_*.json
+views/drift_monitor_view.py
+```
+
+The inventory is a research-only boot proof, not an authorization layer. Real broker/order paths remain blocked from default research boot unless separately approved; historical execution payloads remain inert; drift alerts are ops-health only when no broker/order/webhook path is reachable; replay output remains outside this gate and is still uncertified unless a separate replay-output artifact certificate exists.
 
 ## Candidate-Card Required Flags
 

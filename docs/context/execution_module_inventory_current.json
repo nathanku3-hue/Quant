@@ -1,0 +1,194 @@
+{
+  "schema_version": "execution-module-inventory/v0",
+  "review_scope_id": "ROUND-20260528-EXECUTION-MODULE-INVENTORY",
+  "authority": "mechanical governance inventory only; does not authorize broker calls, alerts, recommendations, strategy validity, replay-output certification, or provider refresh",
+  "classification_set": [
+    "dead_code_historical",
+    "test_fixture",
+    "ops_health_only",
+    "research_only_blocked",
+    "unknown_blocker"
+  ],
+  "surfaces": [
+    {
+      "path": "execution/broker_api.py",
+      "classification": "research_only_blocked",
+      "terms": [
+        "ALPACA",
+        "APCA",
+        "AlpacaBroker",
+        "close_all_positions",
+        "submit_order",
+        "tradeapi"
+      ],
+      "evidence_tokens": [
+        "PAPER_BASE_URL",
+        "LIVE_TRADING_BREAK_GLASS_ENV",
+        "TZ_SIGNED_LIVE_TRADING_DECISION",
+        "assert_egress_url_allowed"
+      ],
+      "rationale": "Real Alpaca broker operations exist, including submit and close-all paths; non-paper URLs require break-glass and signed live decision, and default research boot must not import this module."
+    },
+    {
+      "path": "execution/rebalancer.py",
+      "classification": "research_only_blocked",
+      "terms": [
+        "AlpacaBroker",
+        "PortfolioRebalancer",
+        "execute_orders",
+        "submit_order"
+      ],
+      "evidence_tokens": [
+        "dry_run",
+        "RiskInterceptor",
+        "self.broker.submit_order",
+        "max_orders_per_run"
+      ],
+      "rationale": "PortfolioRebalancer can submit via a broker when explicitly called; this is classified as outside research boot and remains subject to risk interception and explicit caller controls."
+    },
+    {
+      "path": "main_console.py",
+      "classification": "research_only_blocked",
+      "terms": [
+        "AlpacaBroker",
+        "PortfolioRebalancer",
+        "execute_orders_with_idempotent_retry",
+        "execution_orders",
+        "generate_execution_payload",
+        "notify_pm"
+      ],
+      "evidence_tokens": [
+        "confirm_execution_intent",
+        "LOCAL_SUBMIT_ENV",
+        "TZ_EXECUTION_CONFIRM",
+        "verify_local_submit_envelope_and_replay"
+      ],
+      "rationale": "Console execution payload and local submit paths require explicit confirmation and local-submit environment gates and are not part of default research boot."
+    },
+    {
+      "path": "main_bot_orchestrator.py",
+      "classification": "research_only_blocked",
+      "terms": [
+        "PortfolioRebalancer",
+        "execute_orders",
+        "execute_orders_with_idempotent_retry"
+      ],
+      "evidence_tokens": [
+        "execute_orders_with_idempotent_retry",
+        "client_order_id",
+        "dry_run=False"
+      ],
+      "rationale": "Idempotent execution helper can call the rebalancer submit path, but it is not imported by default dashboard boot and remains explicitly inventoried as execution-capable code."
+    },
+    {
+      "path": "scripts/test_rebalance.py",
+      "classification": "test_fixture",
+      "terms": [
+        "AlpacaBroker",
+        "PortfolioRebalancer",
+        "execute_orders_with_idempotent_retry"
+      ],
+      "evidence_tokens": [
+        "Target weights",
+        "Execution results",
+        "if __name__ == \"__main__\""
+      ],
+      "rationale": "Manual rebalance script is historical/test-operator material, not imported by default research boot; it remains classified so future scanner output cannot silently add order paths."
+    },
+    {
+      "path": "scripts/test_alpaca_connection.py",
+      "classification": "test_fixture",
+      "terms": [
+        "ALPACA",
+        "APCA",
+        "AlpacaBroker"
+      ],
+      "evidence_tokens": [
+        "Connected to Alpaca Paper Trading.",
+        "_mask_key",
+        "Alpaca connection failed"
+      ],
+      "rationale": "Manual connection test probes Alpaca paper account state only when run directly; it is not part of default research boot."
+    },
+    {
+      "path": "scripts/execution_bridge.py",
+      "classification": "research_only_blocked",
+      "terms": [
+        "BUY_ACTION",
+        "DISCORD_WEBHOOK_URL",
+        "MARKET_ORDER_TYPE",
+        "execution_orders",
+        "generate_execution_payload",
+        "notify_pm",
+        "requests.post",
+        "webhook"
+      ],
+      "evidence_tokens": [
+        "DISCORD_WEBHOOK_URL",
+        "assert_egress_url_allowed",
+        "require_hmac_rotation_compliance",
+        "requests.post"
+      ],
+      "rationale": "Execution bridge can generate order-shaped payloads and send Discord webhook notifications only when explicitly invoked/configured; default research boot cannot treat this as an alert or broker authorization."
+    },
+    {
+      "path": "data/providers/alpaca_provider.py",
+      "classification": "research_only_blocked",
+      "terms": [
+        "AlpacaBroker"
+      ],
+      "evidence_tokens": [
+        "AlpacaMarketDataProvider",
+        "resolve_alpaca_data_feed",
+        "broker if broker is not None else AlpacaBroker()"
+      ],
+      "rationale": "Alpaca market-data provider depends on broker credentials when selected; it is inventoried as outside default research boot and not a provider-refresh authorization."
+    },
+    {
+      "path": "views/drift_monitor_view.py",
+      "classification": "ops_health_only",
+      "terms": [
+        "DriftAlertManager",
+        "acknowledge_alert",
+        "process_drift_result",
+        "resolve_alert"
+      ],
+      "evidence_tokens": [
+        "DriftAlertManager",
+        "Force Drift Check",
+        "_load_alert_history"
+      ],
+      "rationale": "Drift monitor alert lifecycle is local ops-health state only; this view has no broker, order, webhook, or notifier path."
+    },
+    {
+      "path": "execution/execution_payload_20260225.json",
+      "classification": "dead_code_historical",
+      "terms": [
+        "BUY_ACTION",
+        "MARKET_ORDER_TYPE",
+        "execution_orders"
+      ],
+      "evidence_tokens": [
+        "\"timestamp\"",
+        "\"execution_orders\"",
+        "\"risk_checks\""
+      ],
+      "rationale": "Historical order-shaped payload retained as inert artifact; it is not generated, submitted, or read by research boot."
+    },
+    {
+      "path": "execution/execution_payload_20260301T082149Z_20260301-23ddd147a0fddb6c.json",
+      "classification": "dead_code_historical",
+      "terms": [
+        "BUY_ACTION",
+        "MARKET_ORDER_TYPE",
+        "execution_orders"
+      ],
+      "evidence_tokens": [
+        "\"timestamp\"",
+        "\"execution_orders\"",
+        "\"risk_checks\""
+      ],
+      "rationale": "Historical order-shaped payload retained as inert artifact; it is not generated, submitted, or read by research boot."
+    }
+  ]
+}

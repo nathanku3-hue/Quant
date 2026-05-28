@@ -806,6 +806,30 @@ def test_boot_preflight_integration_blocks_on_governance_failure(
     assert status["checks"]["governance"]["status"] == "FAIL"
 
 
+def test_strict_boot_blocks_on_unclassified_execution_inventory_path(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo, **_kwargs: _clean_git_state())
+    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+    broker_path = tmp_path / "execution" / "broker_api.py"
+    broker_path.parent.mkdir(parents=True)
+    broker_path.write_text(
+        "class AlpacaBroker:\n"
+        "    def submit_order(self):\n"
+        "        return {'ok': True}\n",
+        encoding="utf-8",
+    )
+
+    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--mode", "strict", "--no-tests"])
+    status, exit_code = boot_preflight.build_status(args)
+
+    assert exit_code == 1
+    assert status["verdict"] == "FAIL"
+    assert status["checks"]["governance"]["status"] == "FAIL"
+    assert any(finding["code"] == "GOV-009" for finding in status["checks"]["governance"]["findings"])
+
+
 def test_pytest_gate_uses_argv_not_shell(tmp_path: Path, monkeypatch) -> None:
     seen: list[tuple[object, bool, float | None]] = []
 
