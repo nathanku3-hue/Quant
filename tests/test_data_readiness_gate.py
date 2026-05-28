@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 from pathlib import Path
 
@@ -105,6 +106,108 @@ def _write_minimal_data(repo: Path, *, price_file: str = "prices_tri.parquet") -
     universe = repo / "data/universe"
     universe.mkdir(parents=True, exist_ok=True)
     (universe / "pinned_thesis_universe.yml").write_text("tickers:\n  - AAA\n", encoding="utf-8")
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _registry(repo: Path) -> Path:
+    path = repo / "data/registry"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def _certified_artifact(path: str, repo: Path) -> dict[str, object]:
+    artifact_path = repo / path
+    return {
+        "path": path,
+        "sha256": _sha256(artifact_path),
+        "size_bytes": artifact_path.stat().st_size,
+    }
+
+
+def _write_selected_endpoint_cert(
+    repo: Path,
+    *,
+    expires_at_utc: str = "2099-01-01T00:00:00Z",
+    artifacts: list[dict[str, object]] | None = None,
+    selected_assets: list[str] | None = None,
+    no_yahoo_patch: bool = False,
+) -> Path:
+    certified_artifacts = artifacts or [
+        _certified_artifact("data/processed/prices_tri.parquet", repo),
+        _certified_artifact("data/processed/tickers.parquet", repo),
+    ]
+    payload: dict[str, object] = {
+        "schema_version": gate.SELECTED_ENDPOINT_CERT_SCHEMA_VERSION,
+        "certification_id": "selected-endpoint-test-cert",
+        "review_scope_id": "ROUND-20260527-DATA-READINESS-CERTIFICATION",
+        "route_id": "portfolio_allocation.strict.v0",
+        "issued_at_utc": "2026-05-27T00:00:00Z",
+        "expires_at_utc": expires_at_utc,
+        "origin": "durable_registry_certificate",
+        "not_from_streamlit_session_state": True,
+        "provider_calls_allowed": False,
+        "repair_during_boot_allowed": False,
+        "rebuild_during_boot_allowed": False,
+        "selected_assets": selected_assets or ["AAA", "BBB"],
+        "selected_endpoint_id": "portfolio-allocation-test-selected-assets",
+        "latest_price_date": "2026-01-05",
+        "artifacts": certified_artifacts,
+    }
+    if no_yahoo_patch:
+        payload["yahoo_patch_policy"] = {
+            "patch_required": False,
+            "no_patch_certified": True,
+            "reason": "test route uses local prices_tri/tickers only",
+        }
+    path = _registry(repo) / gate.SELECTED_ENDPOINT_CERT_PATH.name
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return path
+
+
+def _write_replay_selection_cert(
+    repo: Path,
+    *,
+    origin: str = "durable_registry_certificate",
+    not_from_streamlit_session_state: bool = True,
+    expires_at_utc: str = "2099-01-01T00:00:00Z",
+) -> Path:
+    payload = {
+        "schema_version": gate.REPLAY_SELECTION_CERT_SCHEMA_VERSION,
+        "certification_id": "replay-selection-test-cert",
+        "review_scope_id": "ROUND-20260527-DATA-READINESS-CERTIFICATION",
+        "route_id": "portfolio_allocation.strict.v0",
+        "issued_at_utc": "2026-05-27T00:00:00Z",
+        "expires_at_utc": expires_at_utc,
+        "origin": origin,
+        "not_from_streamlit_session_state": not_from_streamlit_session_state,
+        "provider_calls_allowed": False,
+        "repair_during_boot_allowed": False,
+        "rebuild_during_boot_allowed": False,
+        "replay_selection_id": "portfolio-replay-test-selection",
+        "method": "equal_weight",
+        "selected_assets": ["AAA", "BBB"],
+        "date_window": {"start": "2026-01-02", "end": "2026-01-05"},
+        "artifacts": [
+            _certified_artifact("data/processed/prices_tri.parquet", repo),
+            _certified_artifact("data/processed/universe_r3000_daily.parquet", repo),
+        ],
+    }
+    path = _registry(repo) / gate.REPLAY_SELECTION_CERT_PATH.name
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return path
+
+
+def _check_by_id(status: dict[str, object], check_id: str) -> dict[str, object]:
+    checks = status["checks"]
+    assert isinstance(checks, list)
+    return next(check for check in checks if check["id"] == check_id)
 
 
 def test_gate_reports_contracts_missing_as_fail(tmp_path: Path) -> None:
@@ -247,6 +350,139 @@ def test_replay_output_stays_uncertified_without_durable_selection(tmp_path: Pat
     )
     assert replay["status"] == "WARN"
     assert "outside Streamlit session state" in replay["reason"]
+
+
+def test_missing_selected_endpoint_cert_warns_in_strict_mode(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    selected = _check_by_id(status, "freshness.selected_assets_v0")
+    assert selected["status"] == "WARN"
+    assert "missing" in selected["reason"]
+
+
+def test_valid_selected_endpoint_cert_passes_selected_endpoint_check(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+    _write_selected_endpoint_cert(tmp_path, no_yahoo_patch=True)
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    selected = _check_by_id(status, "freshness.selected_assets_v0")
+    assert selected["status"] == "PASS"
+    assert selected["metrics"]["selected_asset_endpoint_status"] == "CERTIFIED"
+
+
+def test_stale_selected_endpoint_cert_warns_in_strict_mode(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+    _write_selected_endpoint_cert(tmp_path, expires_at_utc="2020-01-01T00:00:00Z")
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    selected = _check_by_id(status, "freshness.selected_assets_v0")
+    assert selected["status"] == "WARN"
+    assert "expired_cert" in selected["reason"]
+
+
+def test_selected_endpoint_cert_bad_hash_fails_strict_mode(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+    artifact = _certified_artifact("data/processed/prices_tri.parquet", tmp_path)
+    artifact["sha256"] = "0" * 64
+    _write_selected_endpoint_cert(tmp_path, artifacts=[artifact])
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    selected = _check_by_id(status, "freshness.selected_assets_v0")
+    assert status["overall_status"] == "FAIL"
+    assert selected["status"] == "FAIL"
+    assert "sha256_mismatch" in selected["reason"]
+
+
+def test_missing_replay_cert_warns_in_strict_mode(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    replay = _check_by_id(status, "replay_artifact.durable_selection_v0")
+    assert replay["status"] == "WARN"
+    assert "missing" in replay["reason"]
+
+
+def test_valid_replay_cert_passes_replay_certification(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+    _write_replay_selection_cert(tmp_path)
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    replay = _check_by_id(status, "replay_artifact.durable_selection_v0")
+    assert replay["status"] == "PASS"
+    assert replay["metrics"]["portfolio_replay_output_status"] == "CERTIFIED"
+    assert status["route_readiness"]["portfolio_replay_output_status"] == "CERTIFIED"
+
+
+def test_replay_cert_sourced_from_streamlit_session_state_fails(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+    _write_replay_selection_cert(
+        tmp_path,
+        origin="streamlit.session_state",
+        not_from_streamlit_session_state=False,
+    )
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    replay = _check_by_id(status, "replay_artifact.durable_selection_v0")
+    assert status["overall_status"] == "FAIL"
+    assert replay["status"] == "FAIL"
+    assert "streamlit_session_state_origin" in replay["reason"]
+
+
+def test_missing_yahoo_patch_without_no_patch_cert_warns(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+    _write_selected_endpoint_cert(tmp_path)
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    yahoo_patch = _check_by_id(status, "patch_policy.yahoo_patch_v0")
+    assert yahoo_patch["status"] == "WARN"
+    assert "no_patch_cert_missing" in yahoo_patch["reason"]
+
+
+def test_missing_yahoo_patch_with_valid_no_patch_cert_has_no_yahoo_patch_warning(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+    _write_selected_endpoint_cert(tmp_path, no_yahoo_patch=True)
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    yahoo_patch = _check_by_id(status, "patch_policy.yahoo_patch_v0")
+    assert yahoo_patch["status"] == "PASS"
+    assert "no_patch_certified" in yahoo_patch["reason"]
+    assert not any("yahoo_patch" in warning for warning in status["summary"]["warnings"])
+
+
+def test_certification_validation_is_read_only_and_leaves_no_tmp_residue(tmp_path: Path) -> None:
+    _write_contracts(tmp_path)
+    _write_minimal_data(tmp_path)
+    _write_selected_endpoint_cert(tmp_path, no_yahoo_patch=True)
+    _write_replay_selection_cert(tmp_path)
+    before = gate.capture_boot_write_snapshot(tmp_path)
+
+    status = gate.run_data_readiness_gate(tmp_path, mode="strict")
+
+    after = gate.capture_boot_write_snapshot(tmp_path)
+    diff = gate.diff_boot_write_snapshot(before, after, repo_root=tmp_path)
+    assert status["overall_status"] == "PASS"
+    assert diff["status"] == "PASS"
+    assert diff["changed"] == []
+    assert list((tmp_path / "data/registry").glob("*.tmp")) == []
 
 
 def test_canonical_context_files_are_the_only_contract_locations() -> None:

@@ -963,3 +963,11 @@ Application pattern:
 - Fix applied: Wired read-only data-readiness, context validation, Portfolio AppTest smoke, and focused replay/dashboard contract into boot preflight; changed status mapping so warning/skipped/deferred/failed required gates keep `safe_boot=false`; documented the new contract.
 - Guardrail for next time: A boot-status artifact may set `safe_boot=true` only when every named required gate is present, strict, GitHub-required, passing, and post-write Git proof remains clean/aligned.
 - Evidence paths: `core/boot_status.py`, `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `tests/test_boot_status_contract.py`, `docs/architecture/boot_preflight_contract.md`.
+
+## 2026-05-28 Round Entry (Data Readiness PASS Needs Durable Certificates)
+- Date: 2026-05-28
+- Mistake or miss: The selected endpoint and replay readiness checks were stuck at WARN because the gate had no durable, hash-bound proof outside Streamlit/session state; missing `yahoo_patch` also risked being overread as harmless.
+- Root cause: Data readiness had local artifact probes but no portable certificate schema that bound route identity, review scope, selected assets, no-provider/no-repair policy, and referenced file hashes.
+- Fix applied: Added selected endpoint and replay selection certificate validation, created tracked registry certificates bound to existing local artifacts, and required an explicit selected-endpoint no-patch policy before suppressing the `yahoo_patch` WARN.
+- Guardrail for next time: A data-readiness WARN may become PASS only through durable non-session-state proof with repo-relative artifact paths, SHA-256 checks, no provider/repair/rebuild flags, and focused failure tests for missing/stale/bad-hash/session-state cases.
+- Evidence paths: `core/data_readiness_gate.py`, `tests/test_data_readiness_gate.py`, `data/registry/portfolio_selected_endpoint_certification_v0.json`, `data/registry/portfolio_replay_selection_certification_v0.json`, `docs/architecture/data_readiness_gate_v0.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py -q`.

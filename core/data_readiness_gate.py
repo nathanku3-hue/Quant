@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import os
 import tempfile
@@ -26,6 +27,12 @@ SCHEMA_VERSION = "data_readiness_gate.v0"
 DEFAULT_TAXONOMY_PATH = Path("docs/context/data_artifact_taxonomy_current.json")
 DEFAULT_ROUTE_CONTRACT_PATH = Path("docs/context/portfolio_allocation_route_contract_v0.json")
 DEFAULT_STATUS_PATH = BOOT_STATUS_CURRENT_PATH
+SELECTED_ENDPOINT_CERT_PATH = Path("data/registry/portfolio_selected_endpoint_certification_v0.json")
+REPLAY_SELECTION_CERT_PATH = Path("data/registry/portfolio_replay_selection_certification_v0.json")
+SELECTED_ENDPOINT_CERT_SCHEMA_VERSION = "portfolio_selected_endpoint_certification.v0"
+REPLAY_SELECTION_CERT_SCHEMA_VERSION = "portfolio_replay_selection_certification.v0"
+DATA_READINESS_REVIEW_SCOPE_ID = "ROUND-20260527-DATA-READINESS-CERTIFICATION"
+DATA_READINESS_ROUTE_ID = "portfolio_allocation.strict.v0"
 ALLOWED_BOOT_WRITES = {DEFAULT_STATUS_PATH.as_posix()}
 BOOT_WRITE_GUARD_ROOTS = (
     "app.py",
@@ -45,6 +52,12 @@ BOOT_WRITE_GUARD_ROOTS = (
     "data/discovery",
     "data/registry",
 )
+CERTIFICATION_TMP_RESIDUE_ROOTS = (
+    "runtime",
+    "data/processed",
+    "data/runtime_cache",
+    "data/registry",
+)
 
 PROVIDER_FORBIDDEN_IMPORT_ROOTS = (
     "yfinance",
@@ -60,6 +73,8 @@ PROVIDER_FORBIDDEN_CALLS = (
     "repair_stale_price_endpoints_with_live_overlay",
     "run_and_save_scan",
 )
+
+SESSION_STATE_ORIGIN_TOKENS = ("streamlit", "session_state")
 
 
 @dataclass(frozen=True)
@@ -119,6 +134,169 @@ def _load_json(path: Path) -> tuple[dict[str, Any] | None, str | None]:
     if not isinstance(payload, dict):
         return None, "json_payload_not_object"
     return payload, None
+
+
+def _parse_utc_timestamp(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip()
+    if text.endswith("Z"):
+        text = f"{text[:-1]}+00:00"
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _is_relative_repo_path(value: str) -> bool:
+    candidate = Path(value)
+    return bool(value.strip()) and not candidate.is_absolute() and ".." not in candidate.parts
+
+
+def _validate_certified_artifacts(
+    repo_root: Path,
+    artifacts: Any,
+) -> tuple[list[str], list[str], list[str]]:
+    failures: list[str] = []
+    evidence: list[str] = []
+    checked: list[str] = []
+    if not isinstance(artifacts, list) or not artifacts:
+        return ["empty_artifacts"], evidence, checked
+    for index, artifact in enumerate(artifacts):
+        if not isinstance(artifact, Mapping):
+            failures.append(f"artifact_not_object:{index}")
+            continue
+        path_value = str(artifact.get("path", "")).replace("\\", "/")
+        if not _is_relative_repo_path(path_value):
+            failures.append(f"artifact_bad_path:{index}")
+            continue
+        expected_sha = str(artifact.get("sha256", "")).strip().lower()
+        if len(expected_sha) != 64 or any(char not in "0123456789abcdef" for char in expected_sha):
+            failures.append(f"artifact_bad_sha256:{path_value}")
+            continue
+        path = repo_root / path_value
+        checked.append(path_value)
+        if not path.exists() or not path.is_file():
+            failures.append(f"artifact_missing:{path_value}")
+            continue
+        actual_sha = _sha256_file(path)
+        if actual_sha != expected_sha:
+            failures.append(f"sha256_mismatch:{path_value}")
+            continue
+        expected_size = artifact.get("size_bytes")
+        if expected_size is not None:
+            try:
+                size_int = int(expected_size)
+            except (TypeError, ValueError):
+                failures.append(f"artifact_bad_size:{path_value}")
+                continue
+            if path.stat().st_size != size_int:
+                failures.append(f"size_mismatch:{path_value}")
+                continue
+        evidence.append(path_value)
+    return failures, evidence, checked
+
+
+def _validate_common_certificate(
+    repo_root: Path,
+    cert_path: Path,
+    *,
+    expected_schema_version: str,
+    required_identity_field: str,
+    selection_field: str,
+    missing_status: str,
+) -> tuple[str, str, str, str, tuple[str, ...], tuple[str, ...], Mapping[str, Any]]:
+    rel = _rel(cert_path, repo_root)
+    if not cert_path.exists():
+        return (
+            missing_status,
+            missing_status,
+            missing_status,
+            f"missing:{rel}",
+            (rel,),
+            (),
+            {},
+        )
+    payload, error = _load_json(cert_path)
+    if error or payload is None:
+        return "FAIL", "FAIL", "FAIL", str(error), (rel,), (), {}
+
+    failures: list[str] = []
+    warnings: list[str] = []
+    schema_version = str(payload.get("schema_version", ""))
+    if schema_version != expected_schema_version:
+        failures.append(f"schema_version_mismatch:{schema_version}")
+    route_id = str(payload.get("route_id", ""))
+    if route_id != DATA_READINESS_ROUTE_ID:
+        failures.append(f"route_id_mismatch:{route_id}")
+    review_scope_id = str(payload.get("review_scope_id", ""))
+    if review_scope_id != DATA_READINESS_REVIEW_SCOPE_ID:
+        failures.append(f"review_scope_id_mismatch:{review_scope_id}")
+    identity = str(payload.get(required_identity_field, "")).strip()
+    if not identity:
+        failures.append(f"missing_{required_identity_field}")
+    selection = payload.get(selection_field)
+    if not isinstance(selection, list) or not [str(item).strip() for item in selection if str(item).strip()]:
+        failures.append(f"empty_{selection_field}")
+    origin = str(payload.get("origin", "")).strip().lower()
+    if not origin:
+        failures.append("missing_origin")
+    if any(token in origin for token in SESSION_STATE_ORIGIN_TOKENS) or payload.get("not_from_streamlit_session_state") is not True:
+        failures.append("streamlit_session_state_origin")
+    if payload.get("provider_calls_allowed") is not False:
+        failures.append("provider_calls_allowed_not_false")
+    if payload.get("repair_during_boot_allowed") is not False:
+        failures.append("repair_during_boot_not_false")
+    if payload.get("rebuild_during_boot_allowed") is not False:
+        failures.append("rebuild_during_boot_not_false")
+
+    issued_at = _parse_utc_timestamp(payload.get("issued_at_utc"))
+    expires_at = _parse_utc_timestamp(payload.get("expires_at_utc"))
+    if issued_at is None:
+        failures.append("issued_at_unparseable")
+    if expires_at is None:
+        failures.append("expires_at_unparseable")
+    elif expires_at <= datetime.now(timezone.utc):
+        warnings.append("expired_cert")
+
+    artifact_failures, artifact_evidence, artifact_inputs = _validate_certified_artifacts(
+        repo_root,
+        payload.get("artifacts"),
+    )
+    failures.extend(artifact_failures)
+
+    if failures:
+        status = planning = strict = "FAIL"
+        reason = ";".join(failures)
+    elif warnings:
+        status = planning = strict = "WARN"
+        reason = ";".join(warnings)
+    else:
+        status = planning = strict = "PASS"
+        reason = "durable certificate is present, fresh, non-session-state, and hash-bound"
+
+    metrics = {
+        "certification_id": str(payload.get("certification_id", "")),
+        "review_scope_id": review_scope_id,
+        "route_id": route_id,
+        "origin": origin,
+        "artifact_count": len(artifact_evidence),
+        selection_field: [str(item) for item in selection] if isinstance(selection, list) else [],
+    }
+    inputs = tuple([rel, *artifact_inputs])
+    evidence = tuple([rel, *artifact_evidence]) if status == "PASS" else tuple(artifact_evidence)
+    return status, planning, strict, reason, inputs, evidence, metrics
 
 
 def _status_from_effect(mode: str, planning: str, strict: str) -> str:
@@ -200,6 +378,9 @@ def _check_canonical_presence(repo_root: Path, artifacts: Sequence[Mapping[str, 
             continue
         required_for = artifact.get("required_for", [])
         if not isinstance(required_for, list) or not any(str(item).startswith("portfolio_allocation") for item in required_for):
+            continue
+        if path_glob == "data/processed/yahoo_patch.parquet" and _selected_endpoint_no_patch_certified(repo_root):
+            checked.append(path_glob)
             continue
         alternative_group = str(artifact.get("alternative_group", "")).strip()
         if alternative_group:
@@ -456,36 +637,157 @@ def _check_provider_boundary(repo_root: Path, module_paths: Sequence[Path], mode
     )
 
 
-def _check_replay_certification(mode: str) -> GateCheck:
+def _check_replay_certification(repo_root: Path, mode: str) -> GateCheck:
+    status, planning, strict, reason, inputs, evidence, metrics = _validate_common_certificate(
+        repo_root,
+        repo_root / REPLAY_SELECTION_CERT_PATH,
+        expected_schema_version=REPLAY_SELECTION_CERT_SCHEMA_VERSION,
+        required_identity_field="replay_selection_id",
+        selection_field="selected_assets",
+        missing_status="WARN",
+    )
+    metrics = {
+        **dict(metrics),
+        "portfolio_replay_output_status": "CERTIFIED" if status == "PASS" else "UNCERTIFIED",
+    }
+    if status == "WARN" and reason.startswith("missing:"):
+        reason = (
+            f"{reason}; No durable PortfolioReplaySelection is certified outside Streamlit session state; "
+            "replay output remains UNCERTIFIED."
+        )
     return GateCheck(
         id="replay_artifact.durable_selection_v0",
         category="replay_artifact",
-        status="WARN",
-        planning="WARN",
-        strict="WARN",
+        status=status,
+        planning=planning,
+        strict=strict,
         repair_policy="never_during_boot",
-        inputs=("PortfolioReplaySelection",),
-        evidence=(),
-        reason="No durable PortfolioReplaySelection is certified outside Streamlit session state in v0; replay output remains UNCERTIFIED.",
-        metrics={"portfolio_replay_output_status": "UNCERTIFIED"},
+        inputs=inputs,
+        evidence=evidence,
+        reason=reason,
+        metrics=metrics,
     )
 
 
-def _check_selected_endpoint_freshness_v0(mode: str) -> GateCheck:
+def _check_selected_endpoint_freshness_v0(repo_root: Path, mode: str) -> GateCheck:
+    status, planning, strict, reason, inputs, evidence, metrics = _validate_common_certificate(
+        repo_root,
+        repo_root / SELECTED_ENDPOINT_CERT_PATH,
+        expected_schema_version=SELECTED_ENDPOINT_CERT_SCHEMA_VERSION,
+        required_identity_field="selected_endpoint_id",
+        selection_field="selected_assets",
+        missing_status="WARN",
+    )
+    metrics = {
+        **dict(metrics),
+        "selected_asset_endpoint_status": "CERTIFIED" if status == "PASS" else "UNCERTIFIED",
+    }
     return GateCheck(
         id="freshness.selected_assets_v0",
         category="freshness",
+        status=status,
+        planning=planning,
+        strict=strict,
+        repair_policy="never_during_boot",
+        inputs=inputs,
+        evidence=evidence,
+        reason=reason,
+        metrics=metrics,
+    )
+
+
+def _selected_endpoint_no_patch_certified(repo_root: Path) -> bool:
+    cert_path = repo_root / SELECTED_ENDPOINT_CERT_PATH
+    status, _, _, _, _, _, _ = _validate_common_certificate(
+        repo_root,
+        cert_path,
+        expected_schema_version=SELECTED_ENDPOINT_CERT_SCHEMA_VERSION,
+        required_identity_field="selected_endpoint_id",
+        selection_field="selected_assets",
+        missing_status="WARN",
+    )
+    if status != "PASS":
+        return False
+    payload, error = _load_json(cert_path)
+    if error or not payload:
+        return False
+    policy = payload.get("yahoo_patch_policy")
+    if not isinstance(policy, Mapping):
+        return False
+    return policy.get("patch_required") is False and policy.get("no_patch_certified") is True
+
+
+def _check_yahoo_patch_policy(repo_root: Path, mode: str) -> GateCheck:
+    patch_rel = "data/processed/yahoo_patch.parquet"
+    patch_path = repo_root / patch_rel
+    selected_rel = SELECTED_ENDPOINT_CERT_PATH.as_posix()
+    if patch_path.exists():
+        return GateCheck(
+            id="patch_policy.yahoo_patch_v0",
+            category="patch_policy",
+            status="PASS",
+            planning="PASS",
+            strict="PASS",
+            repair_policy="never_during_boot",
+            inputs=(patch_rel,),
+            evidence=(patch_rel,),
+            reason="yahoo_patch artifact exists; no provider patch repair was attempted",
+            metrics={"yahoo_patch_policy_status": "PATCH_PRESENT"},
+        )
+    if _selected_endpoint_no_patch_certified(repo_root):
+        return GateCheck(
+            id="patch_policy.yahoo_patch_v0",
+            category="patch_policy",
+            status="PASS",
+            planning="PASS",
+            strict="PASS",
+            repair_policy="never_during_boot",
+            inputs=(patch_rel, selected_rel),
+            evidence=(selected_rel,),
+            reason="yahoo_patch missing but selected endpoint certificate explicitly no_patch_certified",
+            metrics={"yahoo_patch_policy_status": "NO_PATCH_CERTIFIED"},
+        )
+    return GateCheck(
+        id="patch_policy.yahoo_patch_v0",
+        category="patch_policy",
         status="WARN",
         planning="WARN",
         strict="WARN",
         repair_policy="never_during_boot",
-        inputs=("durable PortfolioAllocation route request",),
+        inputs=(patch_rel, selected_rel),
         evidence=(),
-        reason=(
-            "No durable selected-asset request is available to the v0 gate; selected endpoint freshness "
-            "remains UNCERTIFIED rather than repaired or inferred from Streamlit session state."
-        ),
-        metrics={"selected_asset_endpoint_status": "UNCERTIFIED"},
+        reason="yahoo_patch missing and no_patch_cert_missing",
+        metrics={"yahoo_patch_policy_status": "UNCERTIFIED"},
+    )
+
+
+def _check_no_tmp_residue(repo_root: Path, mode: str) -> GateCheck:
+    residue: list[str] = []
+    for root_item in CERTIFICATION_TMP_RESIDUE_ROOTS:
+        root = _repo_path(repo_root, root_item)
+        if not root.exists():
+            continue
+        paths = [root] if root.is_file() else (path for path in root.rglob("*") if path.is_file())
+        for path in paths:
+            rel = _rel(path, repo_root)
+            if _is_snapshot_ignored(rel):
+                continue
+            normalized = _normalize_allowed_path(rel)
+            name = path.name.lower()
+            if normalized.endswith(".tmp") or name.startswith(".tmp") or ".tmp." in name:
+                residue.append(normalized)
+    status = "FAIL" if residue else "PASS"
+    return GateCheck(
+        id="write_guard.no_boot_tmp_residue",
+        category="write_guard",
+        status=status,
+        planning=status,
+        strict=status,
+        repair_policy="never_during_boot",
+        inputs=tuple(str(item).replace("\\", "/") for item in CERTIFICATION_TMP_RESIDUE_ROOTS),
+        evidence=(),
+        reason="tmp_residue_detected" if residue else "no boot tmp residue detected",
+        metrics={"tmp_residue": sorted(residue)},
     )
 
 
@@ -524,6 +826,7 @@ def _route_readiness(checks: Sequence[GateCheck], mode: str) -> dict[str, Any]:
         "canonical_presence.portfolio_allocation",
         "price_return_integrity.selected_sample",
         "freshness.selected_assets_v0",
+        "patch_policy.yahoo_patch_v0",
         "provider_boundary.boot_gate_no_live_imports",
     )
     replay_ids = (
@@ -533,17 +836,20 @@ def _route_readiness(checks: Sequence[GateCheck], mode: str) -> dict[str, Any]:
         "price_return_integrity.selected_sample",
         "pit.pinned_universe_v0",
         "replay_artifact.durable_selection_v0",
+        "patch_policy.yahoo_patch_v0",
         "provider_boundary.boot_gate_no_live_imports",
     )
+    replay_cert = by_id.get("replay_artifact.durable_selection_v0")
+    replay_status = "CERTIFIED" if replay_cert and replay_cert.status == "PASS" else "UNCERTIFIED"
     return {
         "portfolio_allocation.local_data_prerequisites": combine(local_ids),
         "portfolio_allocation.optimizer_current": combine(optimizer_ids),
         "portfolio_allocation.daily_replay": combine(replay_ids),
         "portfolio_allocation.benchmarks": "WARN",
-        "portfolio_replay_output_status": "UNCERTIFIED",
+        "portfolio_replay_output_status": replay_status,
         "notes": [
             "Optimizer/replay output certification is route-conditional.",
-            "No durable PortfolioReplaySelection is inspected in v0.",
+            "Replay certification requires a durable non-session-state PortfolioReplaySelection certificate.",
         ],
     }
 
@@ -581,7 +887,8 @@ def run_data_readiness_gate(
             _check_canonical_presence(repo, artifacts, mode),
             _check_price_return_sanity(repo, mode),
             _check_pit_and_pinned(repo, mode),
-            _check_selected_endpoint_freshness_v0(mode),
+            _check_selected_endpoint_freshness_v0(repo, mode),
+            _check_yahoo_patch_policy(repo, mode),
             _check_provider_boundary(
                 repo,
                 (
@@ -592,7 +899,8 @@ def run_data_readiness_gate(
                 ),
                 mode,
             ),
-            _check_replay_certification(mode),
+            _check_replay_certification(repo, mode),
+            _check_no_tmp_residue(repo, mode),
         ]
     )
     check_payload = [check.to_dict() for check in checks]
@@ -617,6 +925,7 @@ def run_data_readiness_gate(
             "canonical_writes_allowed": False,
             "broker_calls_allowed": False,
             "replay_rebuild_allowed": False,
+            "selected_endpoint_rebuild_allowed": False,
             "repairs_performed": [],
             "allowed_boot_writes": sorted(ALLOWED_BOOT_WRITES),
             "canonical_boot_status_path": DEFAULT_STATUS_PATH.as_posix(),

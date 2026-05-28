@@ -1,0 +1,66 @@
+{
+  "artifact_scope": "certifies durable replay selection identity/evidence only; does not fabricate or promote strategy results",
+  "artifacts": [
+    {
+      "path": "data/registry/g5_single_canonical_replay_report.json",
+      "sha256": "15fb31547514c6274064d8bd1c1e283d46e6887062bf202b12bb742e28686ab3",
+      "size_bytes": 31021
+    },
+    {
+      "path": "data/registry/g5_single_canonical_replay_report.json.manifest.json",
+      "sha256": "fc876db41a5a3d0d5443c49a3aa1ad1277876036fa7281c140e8de097379a55f",
+      "size_bytes": 811
+    },
+    {
+      "path": "data/registry/g4_real_canonical_readiness_report.json",
+      "sha256": "5f40570613230e5c289bfb112f2acf813d52690022ddd88d49891b2aa11e5b28",
+      "size_bytes": 1160
+    },
+    {
+      "path": "data/registry/g4_real_canonical_readiness_report.json.manifest.json",
+      "sha256": "2416acad93574edf35f80861f5bb6c2e40e6df14a5b3e46709364c92538ec6d8",
+      "size_bytes": 787
+    },
+    {
+      "path": "data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet",
+      "sha256": "23e5ab23030c5f56018580968afc0dbcbde18f3bdc7ce1914e73c933e9d5e9a7",
+      "size_bytes": 5477
+    },
+    {
+      "path": "data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet.manifest.json",
+      "sha256": "fbb6771ff357961c31ffa629b584b10dc6e19bf73036e436bbe5298a7a22df51",
+      "size_bytes": 1382
+    },
+    {
+      "path": "docs/context/portfolio_allocation_route_contract_v0.json",
+      "sha256": "12c9ddbca0e345708ba6fda3edbd53ede2e81216292be88cfa747a16dda2bf2d",
+      "size_bytes": 6446
+    }
+  ],
+  "broker_calls_allowed": false,
+  "canonical_writes_allowed": false,
+  "certification_id": "portfolio-replay-selection-certification-20260528-v0",
+  "date_window": {
+    "end": "2024-02-29",
+    "start": "2024-01-02"
+  },
+  "engine_name": "core.engine.run_simulation",
+  "expires_at_utc": "2026-06-11T00:00:00Z",
+  "issued_at_utc": "2026-05-28T00:00:00Z",
+  "method": "mechanical_equal_weight_canonical_replay",
+  "not_from_streamlit_session_state": true,
+  "origin": "durable_registry_certificate",
+  "provider_calls_allowed": false,
+  "rebuild_during_boot_allowed": false,
+  "repair_during_boot_allowed": false,
+  "replay_selection_id": "PH65_G5_SINGLE_CANONICAL_REPLAY_001",
+  "review_scope_id": "ROUND-20260527-DATA-READINESS-CERTIFICATION",
+  "route_id": "portfolio_allocation.strict.v0",
+  "schema_version": "portfolio_replay_selection_certification.v0",
+  "selected_assets": [
+    "ORCL",
+    "MSFT",
+    "NVDA"
+  ],
+  "selection_source": "data/registry/g5_single_canonical_replay_report.json existing canonical mechanical replay report"
+}

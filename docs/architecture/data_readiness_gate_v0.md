@@ -101,6 +101,33 @@ Required for strict trusted output:
 
 Strict replay rule: v0 should not rebuild a replay. It may probe the selected saved artifact or declare replay output not certified. Transitional in-memory replay build belongs to dashboard runtime, not boot certification.
 
+### Durable certification addendum — 2026-05-28
+
+The strict gate may now move selected endpoint and replay checks from `WARN` to
+`PASS` only through durable registry certificates:
+
+```text
+data/registry/portfolio_selected_endpoint_certification_v0.json
+data/registry/portfolio_replay_selection_certification_v0.json
+```
+
+Both certificates must be repo-relative, non-session-state, not expired,
+`route_id = portfolio_allocation.strict.v0`, and
+`review_scope_id = ROUND-20260527-DATA-READINESS-CERTIFICATION`. They must set
+`provider_calls_allowed=false`, `repair_during_boot_allowed=false`, and
+`rebuild_during_boot_allowed=false`, and every referenced artifact must exist
+with matching `sha256` and optional `size_bytes`.
+
+`data/processed/yahoo_patch.parquet` remains governed optional evidence. Missing
+`yahoo_patch` is still a strict `WARN` unless the selected endpoint certificate
+contains an explicit `yahoo_patch_policy` with
+`patch_required=false` and `no_patch_certified=true`. Boot must not infer that a
+missing patch is harmless and must not repair or rebuild the patch.
+
+These certificates are proof of local data/replay-selection readiness only. They
+do not promote strategy results, validate alpha, authorize recommendations,
+write runtime status, call providers, or regenerate replay artifacts.
+
 ### Subroute C — benchmark/YTD display readiness
 
 Required only when benchmark-relative performance is displayed as trusted.

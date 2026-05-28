@@ -5780,3 +5780,22 @@ Strict Clean-Tree Phase-Close Contract v0 (2026-05-27)
     - `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight.py tests/test_boot_status_contract.py -q` PASS in `E:\Code\Quant_strict_phase_close_work`.
   - Contract lock:
     - `STRICT_CLEAN_TREE_PHASE_CLOSE_V0 := VALID iff (detached_expected_ref_sha_proof = 1) and (no_expected_proof_blocks = 1) and (missing_governed_data_is_data_quarantine = 1) and (boot_ready_blocks_on_missing_data = 1) and (failed_preflight_default_write = 0) and (governance_preflight_required_in_boot0a = 0)`.
+
+Data Readiness Durable Certification v0 (2026-05-28)
+
+  - Decision record:
+    - move `data_readiness_gate` selected endpoint and replay checks from provisional WARN to truthful PASS only when durable registry certificates exist and validate.
+    - resolve missing `data/processed/yahoo_patch.parquet` through an explicit no-patch policy in the selected endpoint certificate, not by downgrading or ignoring the WARN.
+    - keep large local data artifacts ignored; commit only small hash-bound certification JSONs in `data/registry`.
+  - The Decision (Hardcoded):
+    - `core.data_readiness_gate` validates cert schema, `route_id`, `review_scope_id`, expiry, non-session-state origin, no provider/repair/rebuild flags, non-empty selected assets, referenced file presence, SHA-256, and optional size.
+    - selected endpoint cert path is `data/registry/portfolio_selected_endpoint_certification_v0.json`.
+    - replay selection cert path is `data/registry/portfolio_replay_selection_certification_v0.json`.
+    - bad hash or session-state-sourced replay cert is strict FAIL; missing cert is strict WARN; expired cert is strict WARN.
+    - `yahoo_patch` missing is strict WARN unless selected endpoint cert declares `patch_required=false` and `no_patch_certified=true`.
+  - Evidence:
+    - `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py -q` PASS, 27 passed.
+    - Direct strict data-readiness gate PASS with selected endpoint certified, replay output `CERTIFIED`, no `yahoo_patch` warnings, no blockers, and no boot/data/cert temp residue.
+    - Pre-commit strict boot preflight reached PASS for data readiness, governance, context validation, AppTest smoke, focused replay/dashboard contract, and boot-control tests; final pre-commit verdict failed only because the worktree was intentionally dirty before commit.
+  - Contract lock:
+    - `DATA_READINESS_DURABLE_CERTIFICATION_V0 := VALID iff (selected_endpoint_cert_hash_bound = 1) and (replay_selection_cert_hash_bound = 1) and (cert_origin_session_state = 0) and (provider_calls_allowed = 0) and (repair_during_boot = 0) and (rebuild_during_boot = 0) and (bad_hash_fails = 1) and (missing_cert_warns = 1) and (expired_cert_warns = 1) and (yahoo_patch_no_patch_cert_required = 1) and (runtime_status_write = 0)`.

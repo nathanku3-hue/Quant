@@ -5124,3 +5124,20 @@ replay_tickers = SCANNER_TICKERS ∪ get_pinned_tickers()
    - `tests/test_research_benchmarks.py`
    - `tests/test_research_backtest_runner.py`
    - `tests/test_research_rule100_adapter.py`
+
+## Data Readiness Durable Certification Notes (2026-05-28)
+
+1. Certificate validation formula:
+   - `cert_valid = schema_ok AND route_id_ok AND review_scope_ok AND not_expired AND non_session_state AND provider_calls_allowed=false AND repair_during_boot_allowed=false AND rebuild_during_boot_allowed=false AND selected_assets_nonempty AND all(sha256(file_bytes) == declared_sha256)`.
+   - Code path: `core/data_readiness_gate.py`.
+2. Selected endpoint certification:
+   - Certificate path: `data/registry/portfolio_selected_endpoint_certification_v0.json`.
+   - Bound local artifacts: `data/processed/prices_tri.parquet`, `data/processed/tickers.parquet`, `data/processed/universe_r3000_daily.parquet`, `data/universe/pinned_thesis_universe.yml`, and `docs/context/portfolio_allocation_route_contract_v0.json`.
+3. Replay selection certification:
+   - Certificate path: `data/registry/portfolio_replay_selection_certification_v0.json`.
+   - Bound evidence: existing G5/G4 registry reports and the G4 canonical tiny-slice fixture. This certifies durable replay-selection identity/evidence only; it does not fabricate or promote strategy results.
+4. Yahoo patch policy:
+   - `yahoo_patch_required = exists(data/processed/yahoo_patch.parquet) OR selected_endpoint_cert.yahoo_patch_policy.no_patch_certified`.
+   - Missing `yahoo_patch` remains `WARN` unless the selected endpoint certificate explicitly states `patch_required=false` and `no_patch_certified=true`.
+5. Boundary:
+   - No provider calls, repairs, replay rebuilds, canonical data writes, runtime boot-status generation, recommendations, alerts, broker calls, or safe-boot status writes are authorized by the data-readiness certs alone.

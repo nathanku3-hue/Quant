@@ -1,0 +1,62 @@
+{
+  "artifacts": [
+    {
+      "path": "data/processed/prices_tri.parquet",
+      "sha256": "36c3b0836a9d20fce89165ef83d11e121809e065f6ce09cf394840239d328afb",
+      "size_bytes": 351206655
+    },
+    {
+      "path": "data/processed/tickers.parquet",
+      "sha256": "ea5b2033f13bdb93750ea7e9956b48859b185e615e72f1fc5dcad66890707c41",
+      "size_bytes": 264719
+    },
+    {
+      "path": "data/processed/universe_r3000_daily.parquet",
+      "sha256": "a994a316b26509fa9607acb99df8d8d0e30022d3726e79941f0ec30678019fec",
+      "size_bytes": 17665203
+    },
+    {
+      "path": "data/universe/pinned_thesis_universe.yml",
+      "sha256": "448cafae2b4a5be9d44dfef533e7bd6f1bc45b5b663907af1cafd57ec9e0572a",
+      "size_bytes": 1343
+    },
+    {
+      "path": "docs/context/portfolio_allocation_route_contract_v0.json",
+      "sha256": "12c9ddbca0e345708ba6fda3edbd53ede2e81216292be88cfa747a16dda2bf2d",
+      "size_bytes": 6446
+    }
+  ],
+  "broker_calls_allowed": false,
+  "canonical_writes_allowed": false,
+  "certification_id": "portfolio-selected-endpoint-certification-20260528-v0",
+  "expires_at_utc": "2026-06-11T00:00:00Z",
+  "issued_at_utc": "2026-05-28T00:00:00Z",
+  "latest_price_date": "2026-05-13",
+  "not_from_streamlit_session_state": true,
+  "origin": "durable_registry_certificate",
+  "provider_calls_allowed": false,
+  "rebuild_during_boot_allowed": false,
+  "repair_during_boot_allowed": false,
+  "review_scope_id": "ROUND-20260527-DATA-READINESS-CERTIFICATION",
+  "route_id": "portfolio_allocation.strict.v0",
+  "schema_version": "portfolio_selected_endpoint_certification.v0",
+  "selected_assets": [
+    "MU",
+    "AMD",
+    "AVGO",
+    "TSM",
+    "INTC",
+    "LRCX",
+    "SNDK",
+    "WDC",
+    "NVDA",
+    "AMAT"
+  ],
+  "selected_endpoint_id": "portfolio_allocation.strict.v0.selected_endpoint.local_prices_tri.20260528",
+  "selection_source": "data/universe/pinned_thesis_universe.yml plus local data/processed price/ticker evidence",
+  "yahoo_patch_policy": {
+    "no_patch_certified": true,
+    "patch_required": false,
+    "reason": "data/processed/prices_tri.parquet is the certified local price source for safe-boot readiness; boot must not repair or rebuild yahoo_patch."
+  }
+}
