@@ -4,6 +4,17 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, strategy search, candidate ranking, candidate scoring, thesis validation, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: provide the planner with a compact fresh world model after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Feature Development Reopen Anchor
+
+- `CURRENT_DELTA`: `Research-only feature development is reopened from codex/optimizer-core-structured-diagnostics at adf882d9409e76ab7b3a65ae98e6df3e14233ac1.`
+- `SAW_VERDICT`: `PASS_WITH_NOTES for ROUND-20260528-FEATURE-DEVELOPMENT-REOPEN-ANCHOR.`
+- `SAFE_BOOT_BASELINE`: `SafeBoot TRUE, RuntimeStatus ready, GovernanceGateV0 PASS, DataReadinessGate PASS, ContextPacketValidation PASS, GOV-009 ExecutionInventoryGate PASS.`
+- `FEATURE_LANES`: `Green lanes include research-only card readers, market-behavior signal-card scaffolding, status views, rendered dataframe/AppTest governance expansion, provenance UX, and context improvements.`
+- `BLOCKED_LANES`: `Live trading, broker/order execution, recommendations, ranking, scoring, action alerts, autonomous allocation, provider refresh during boot, and replay-output certification remain blocked.`
+- `MANUAL_EXECUTION_DECISION`: `Manual execution scripts remain classified outside default boot and are not importable or reachable from safe_boot runtime; touching them reopens GOV-009.`
+- `NEXT_STEP`: `review_merge_feature_development_reopen_anchor_then_choose_rendered_apptest_governance_expansion_or_g9_market_behavior_signal_card.`
+- `DO_NOT_REDECIDE`: `Do not regenerate runtime boot status or claim trading/recommendation clearance inside ordinary feature branches.`
+
 ## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
 
 - `CURRENT_DELTA`: `Boot preflight data-readiness integration is pushed and audited at 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e.`

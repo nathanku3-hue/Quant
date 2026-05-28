@@ -995,3 +995,11 @@ Application pattern:
 - Fix applied: Extended GOV-009 exact-path scanning and sensitive-term patterns to the core alert/escalation surfaces, classified them as `ops_health_only` or `test_fixture` in the manifest with evidence tokens, and added an explicit missing-manifest regression.
 - Guardrail for next time: An execution inventory gate must include alert/escalation lifecycle code, not just broker/order code; `ops_health_only` requires local-only/default-disabled evidence and no broker/order/webhook delivery path.
 - Evidence paths: `scripts/governance_preflight.py`, `docs/context/execution_module_inventory_current.json`, `tests/test_boot_preflight_governance.py`, `docs/architecture/governance_boundary_policy.md`, `E:\Code\Quant\.venv\Scripts\python.exe scripts/governance_preflight.py --repo-root . --json`.
+
+## 2026-05-28 Round Entry (Safe Boot Is Not Feature Authorization)
+- Date: 2026-05-28
+- Mistake or miss: A green safe-boot baseline could be overread as permission to start live, recommendation, ranking, scoring, action-alert, or replay-output-certification features.
+- Root cause: Safe boot proves the research-only runtime gates are mechanically enforced; it does not approve new product semantics or certify future feature classes.
+- Fix applied: Added a feature-development reopen anchor that separates green/yellow/red feature lanes, keeps manual execution scripts outside default boot, and requires governance gates to reopen for broker/order/alert/recommendation/scoring/ranking changes.
+- Guardrail for next time: Treat `safe_boot=true` as permission for research-only feature branches only; live execution, recommendations, ranking, scoring, action alerts, and replay-output certification require explicit gates and SAW evidence.
+- Evidence paths: `docs/context/feature_development_reopen_anchor_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/planner_packet_current.md`, `docs/saw_reports/saw_feature_development_reopen_anchor_20260528.md`.

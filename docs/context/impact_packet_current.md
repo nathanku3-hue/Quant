@@ -4,6 +4,37 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, broker calls, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: provide a compact view of the Portfolio Optimizer View Test and Performance Hardening implementation and affected interfaces.
 
+## Latest Addendum - Feature Development Reopen Anchor
+
+### Anchor Commit Scope
+
+```text
+docs/context/feature_development_reopen_anchor_current.md
+docs/context/bridge_contract_current.md
+docs/context/planner_packet_current.md
+docs/context/impact_packet_current.md
+docs/lessonss.md
+docs/saw_reports/saw_feature_development_reopen_anchor_20260528.md
+```
+
+### Impact
+
+- `FeatureDevelopment`: `CLEAR_FOR_RESEARCH_ONLY_FEATURES_WITH_GUARDRAILS`
+- `LiveRecommendationTradingFeatures`: `NOT_CLEAR`
+- `RuntimeStatus`: `ready`, ignored, untracked, generated only through strict preflight.
+- `ExecutionInventoryGate`: `GOV-009 PASS`, with manual execution scripts classified outside default boot.
+
+### Touched Interfaces
+
+- Planner/PM context surfaces now point to the safe-boot green baseline and feature guardrails.
+- No code, safe-boot derivation, governance scanner logic, runtime status, or data artifacts are changed by this anchor.
+
+### Open Risks
+
+- Replay output remains intentionally uncertified.
+- Manual execution scripts remain classified outside default boot, not removed.
+- Future broker/order/alert/recommendation/scoring/ranking work must reopen governance gates.
+
 ## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
 
 ### Pushed Commit
