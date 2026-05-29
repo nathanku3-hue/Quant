@@ -35,7 +35,7 @@ Inspected but not changed by this final reconciliation:
 Scope split:
 
 - in-scope: finalize the accepted public route contract, confirm rendered-governance exact label repair for `Discovery & Analysis`, record independent Reviewer A/B/C PASS results, validate the closure packet and SAW report blocks, and keep the branch post-push PR-review/no-root-mutation boundary explicit.
-- inherited out-of-scope: dirty implementation/test files already present in the navigation branch before this final reconciliation, dirty root worktree state in `E:\Code\Quant`, product semantics beyond navigation, provider/data/execution behavior, replay-output certification, and any target-branch merge action.
+- inherited out-of-scope: implementation/test files already present in the navigation branch before this final reconciliation, dirty root worktree state in `E:\Code\Quant`, product semantics beyond navigation, provider/data/execution behavior, replay-output certification, and any target-branch merge action.
 
 ## PostPushAddendum
 
@@ -91,7 +91,7 @@ Out-of-scope list:
 
 ## Acceptance Checks
 
-- `CHK-01`: Confirm branch/status and preserve non-owned dirty code/test files as inherited work.
+- `CHK-01`: Confirm branch/status and preserve non-owned implementation/test files as implementation-commit scope.
 - `CHK-02`: Inspect implementation route contract and record exact public title/slug/default mapping.
 - `CHK-03`: Confirm `docs/decision log.md` contains route decision fields, previous public contract anchor, route mapping, and out-of-scope list.
 - `CHK-04`: Confirm `docs/lessonss.md` contains dirty-route-candidate and rendered-route-label synchronization guardrails.
@@ -174,7 +174,7 @@ Document Sorting: follows `docs/checklist_milestone_review.md` changed-doc order
 | EVID-03 | `git show bf81ba8:views/page_registry.py` | PASS: previous public contract was eight pages: Command Center, Opportunities, Thesis Card, Market Behavior, Entry & Hold Discipline, Portfolio & Allocation, Research Lab, Settings & Ops. |
 | EVID-04 | `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests\test_dash_1_page_registry_shell.py tests\test_full_dashboard_apptest_governance.py tests\test_dashboard_wide_apptest_governance.py tests\test_rendered_apptest_governance.py -q` | PASS: focused route/governance suite passed, `24 passed`. |
 | EVID-05 | `E:\Code\Quant\.venv\Scripts\python.exe scripts\governance_preflight.py --repo-root . --json` | PASS: governance preflight returned `status=PASS`, `passed=true`, `finding_count=0`. |
-| EVID-06 | `git diff --name-status` | PASS: tracked navigation/repair/doc changes captured; untracked views and SAW report captured separately by `git status --short`. |
+| EVID-06 | `git diff --name-status` | PASS: PR branch diff captures navigation/repair/doc changes; post-push reconciliation commits are docs-only. |
 | EVID-07 | `git diff --check` | PASS: exit code 0; line-ending warnings only. |
 | EVID-08 | `git status --short` | PASS: post-push reconciliation status was verified; PR/merge review remains the active gate. |
 | EVID-09 | `.codex/skills/_shared/scripts/validate_closure_packet.py` | PASS: `VALID`. |
@@ -217,7 +217,7 @@ SAWBlockValidation: PASS
 Open Risks:
 
 - None for this final SAW reconciliation scope.
-- Inherited dirty implementation/test files remain present for branch review and are not treated as root `E:\Code\Quant` truth.
+- Inherited implementation/test files remain part of branch review and are not treated as root `E:\Code\Quant` truth.
 
 Next action:
 
