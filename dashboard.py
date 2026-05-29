@@ -24,9 +24,14 @@ from views.regime_view import render_regime_banner_from_macro
 from views.auto_backtest_view import render_auto_backtest_view
 from views.optimizer_view import render_optimizer_view
 from views.shadow_portfolio_view import render_shadow_portfolio_view
+from views.page_registry import DISCOVERY_ANALYSIS_TITLE
+from views.page_registry import PORTFOLIO_ALLOCATION_TITLE
+from views.page_registry import STRATEGY_RESEARCH_REPLAY_TITLE
 from views.page_registry import build_dashboard_navigation
+from views.discovery_view import render_discovery_analysis_view
 from views.scanner_display import build_scanner_research_display_frame
 from views.scanner_display import style_scanner_research_display_frame
+from views.strategy_view import render_strategy_research_replay_view
 from strategies.portfolio_universe import (
     DEFAULT_OPTIMIZER_UNIVERSE_POLICY,
     build_optimizer_universe,
@@ -2028,7 +2033,7 @@ def _render_portfolio_builder_placeholder():
 
 
 def _render_command_center_page() -> None:
-    _render_placeholder_page("Command Center")
+    _render_portfolio_allocation_page()
 
 
 def _render_placeholder_page(title: str) -> None:
@@ -2044,19 +2049,23 @@ def _render_portfolio_allocation_page() -> None:
 
 
 def _render_research_lab_page() -> None:
-    st.header("Research Lab")
-    selected_section = st.radio(
-        "Research workflow",
-        ["Daily Scan", "Backtest Lab", "Modular Strategies"],
-        horizontal=True,
-        label_visibility="collapsed",
+    _render_strategy_research_replay_page()
+
+
+def _render_discovery_analysis_page() -> None:
+    render_discovery_analysis_view(
+        _render_opportunities_page,
+        _render_data_health_section,
+        _render_drift_monitor_section,
     )
-    if selected_section == "Daily Scan":
-        _render_daily_scan_section()
-    elif selected_section == "Backtest Lab":
-        _render_backtest_lab_section()
-    else:
-        _render_modular_strategies_section()
+
+
+def _render_strategy_research_replay_page() -> None:
+    render_strategy_research_replay_view(
+        _render_daily_scan_section,
+        _render_backtest_lab_section,
+        _render_modular_strategies_section,
+    )
 
 
 def _render_settings_ops_page() -> None:
@@ -2076,14 +2085,9 @@ def _render_settings_ops_page() -> None:
 def _build_dashboard_page():
     page = build_dashboard_navigation(
         {
-            "Command Center": _render_command_center_page,
-            "Opportunities": _render_opportunities_page,
-            "Thesis Card": lambda: _render_placeholder_page("Thesis Card"),
-            "Market Behavior": lambda: _render_placeholder_page("Market Behavior"),
-            "Entry & Hold Discipline": lambda: _render_placeholder_page("Entry & Hold Discipline"),
-            "Portfolio & Allocation": _render_portfolio_allocation_page,
-            "Research Lab": _render_research_lab_page,
-            "Settings & Ops": _render_settings_ops_page,
+            PORTFOLIO_ALLOCATION_TITLE: _render_portfolio_allocation_page,
+            DISCOVERY_ANALYSIS_TITLE: _render_discovery_analysis_page,
+            STRATEGY_RESEARCH_REPLAY_TITLE: _render_strategy_research_replay_page,
         }
     )
     return page

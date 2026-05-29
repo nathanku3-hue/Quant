@@ -5842,3 +5842,33 @@ Execution Module Inventory Gate v0 (2026-05-28)
     - `E:\Code\Quant\.venv\Scripts\python.exe scripts/governance_preflight.py --repo-root . --json` PASS with `GOV-009`.
   - Contract lock:
     - `EXECUTION_MODULE_INVENTORY_V0 := VALID iff (execution_sensitive_paths_scanned = 1) and (manifest_schema_valid = 1) and (all_sensitive_terms_classified = 1) and (unknown_blockers = 0) and (evidence_tokens_present = 1) and (default_research_boot_execution_imports = 0) and (safe_boot_derivation_changed = 0) and (runtime_status_write = 0)`.
+
+Navigation Contract Registration (2026-05-29)
+
+  - Round:
+    - `ROUND-20260529-NAVIGATION-CONTRACT-REGISTRATION`
+    - `SCOPE-3-PAGE-PUBLIC-ROUTE-CONTRACT-REGISTRATION`
+  - Decision record:
+    - `Candidate3PageRouteContract: ACCEPTED`
+    - `ProductionRouteContract: INTENTIONAL_3_PAGE_PUBLIC_REGISTRY`
+    - `PreviousPublicContract: 8_PAGE_PUBLIC_REGISTRY_AT_bf81ba8`
+    - `MutationAllowed: TRUE_NAV_ONLY_BRANCH`
+    - Accept the dirty route candidate in `views/page_registry.py` as the intentional public route contract for this nav-only branch, subject to independent Reviewer A/B/C closeout before final PASS.
+  - Exact route mapping:
+    - `Portfolio & Allocation` -> `portfolio-and-allocation` -> default route `true`.
+    - `Discovery & Analysis` -> `discovery-and-analysis` -> default route `false`.
+    - `Strategy Research Replay` -> `strategy-research-replay` -> default route `false`.
+    - Public group: `Research Console` contains exactly the three routes above.
+  - Legacy movement:
+    - `Command Center`, `Portfolio Builder`, and `Shadow Portfolio` move under `Portfolio & Allocation`.
+    - `Opportunities`, `Thesis Card`, `Market Behavior`, `Settings & Ops`, `Ticker Pool & Proxies`, `Data Health`, and `Drift Monitor` move under `Discovery & Analysis`.
+    - `Entry & Hold Discipline`, `Research Lab`, `Daily Scan`, `Backtest Lab`, `Modular Strategies`, and `Hedge Harvester` move under `Strategy Research Replay`.
+  - Out of scope:
+    - no provider ingestion, canonical market-data write, broker/order path, action alert, recommendation, ranking, scoring, candidate-card promotion, replay-output certification, safe-boot derivation change, runtime-status generation, or dirty-root mutation.
+    - no code/test edits in this governance closeout unless a validator or focused verification failure proves a tiny correction necessary.
+  - Evidence:
+    - `views/page_registry.py` exposes `PAGE_ROUTE_CONTRACT`, `APPROVED_PAGE_TITLES`, and `APPROVED_PAGE_SLUGS` for the three-page public registry.
+    - `tests/test_dash_1_page_registry_shell.py` locks the route titles, slugs, default tuple, legacy movement, and fail-closed missing renderer behavior.
+    - `tests/test_full_dashboard_apptest_governance.py` includes clickable AppTest route coverage for each approved slug.
+  - Contract lock:
+    - `NAVIGATION_CONTRACT_REGISTRATION_V0 := VALID iff (candidate_3_page_route_contract = ACCEPTED) and (production_route_contract = INTENTIONAL_3_PAGE_PUBLIC_REGISTRY) and (previous_public_contract = 8_PAGE_PUBLIC_REGISTRY_AT_bf81ba8) and (mutation_allowed = TRUE_NAV_ONLY_BRANCH) and (public_route_count = 3) and (default_route = portfolio-and-allocation) and (clickable_apptest_claim_requires_explicit_public_route_decision = 1) and (route_contract_nav_only = 1) and (provider_ingestion = 0) and (broker_order_path_enabled = 0) and (ranking_or_scoring_enabled = 0)`.

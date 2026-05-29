@@ -5,9 +5,12 @@ from pathlib import Path
 
 import pytest
 from streamlit.testing.v1 import AppTest
+from streamlit.util import calc_md5
 
 from rendered_governance import assert_rendered_governance_safe
 from rendered_governance import collect_rendered_text
+from views.page_registry import APPROVED_PAGE_SLUGS
+from views.page_registry import APPROVED_PAGE_TITLES
 
 
 DASHBOARD_PATH = Path("dashboard.py")
@@ -63,9 +66,11 @@ def test_actual_dashboard_shell_renders_with_app_test_and_no_side_effects(
     rendered_text = {item.text for item in collect_rendered_text(app)}
 
     assert "Terminal Zero GodView" in rendered_text
-    assert "Command Center" in rendered_text
+    assert "Portfolio & Allocation" in rendered_text
     assert "Research-only dashboard shell rendered with provider refresh disabled." in rendered_text
-    assert "DASH-1 shell placeholder. Content design is held for a later approved dashboard phase." in rendered_text
+    assert "Command Center" not in rendered_text
+    assert "Research Lab" not in rendered_text
+    assert "Settings & Ops" not in rendered_text
     _assert_snapshot_unchanged(before)
 
 
@@ -117,4 +122,27 @@ dashboard._render_portfolio_allocation_page()
     rendered_text = {item.text for item in collect_rendered_text(app)}
     assert "Portfolio & Allocation" in rendered_text
     assert "YTD Performance" in rendered_text
+    _assert_snapshot_unchanged(before)
+
+
+@pytest.mark.parametrize(
+    ("slug", "title"),
+    tuple(zip(APPROVED_PAGE_SLUGS, APPROVED_PAGE_TITLES)),
+)
+def test_actual_dashboard_approved_routes_render_with_governance(
+    monkeypatch: pytest.MonkeyPatch,
+    slug: str,
+    title: str,
+) -> None:
+    before = _snapshot(SIDE_EFFECT_SENTINELS)
+
+    monkeypatch.setenv("T0_DASHBOARD_APPTEST_SAFE", "1")
+    app = AppTest.from_file(str(DASHBOARD_PATH))
+    app._page_hash = calc_md5(slug)
+    app.run(timeout=30)
+
+    assert not app.exception
+    assert_rendered_governance_safe(app)
+    rendered_text = {item.text for item in collect_rendered_text(app)}
+    assert title in rendered_text
     _assert_snapshot_unchanged(before)
