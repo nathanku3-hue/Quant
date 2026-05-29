@@ -4,6 +4,28 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, candidate validation, provider ingestion, strategy search, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: make drift visible early after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
+
+## High-Risk Attempts
+
+- Treating `T0_DASHBOARD_APPTEST_SAFE=1` as product runtime behavior or data readiness proof.
+- Reintroducing provider refresh, scan-cache writes, drift/escalation initialization, or page execution at dashboard import time.
+- Letting actual dashboard AppTest coverage regress to synthetic shell coverage only.
+- Treating clean-clone strict boot data-readiness blockers as fixed by AppTest governance work.
+
+## Drift Signal
+
+- This round is dashboard AppTest governance and side-effect quarantine only. It proves actual shell rendering can be scanned safely; it does not change safe boot, data readiness, replay output, broker/order, alert, ranking, scoring, or recommendation authority.
+- Strict boot in the feature clone remains blocked by dirty files and missing local data artifacts, while governance, boot-control, context validation, Portfolio AppTest smoke, and focused replay/dashboard contract pass.
+
+## Evidence Used
+
+- `dashboard.py`
+- `tests/test_full_dashboard_apptest_governance.py`
+- `scripts/boot_preflight.py`
+- `tests/test_boot_preflight.py`
+- `docs/saw_reports/saw_full_dashboard_apptest_side_effect_quarantine_20260529.md`
+
 ## Latest Addendum - Dashboard Unified Data Cache Performance Fix
 
 ## High-Risk Attempts

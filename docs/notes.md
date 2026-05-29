@@ -5159,3 +5159,18 @@ replay_tickers = SCANNER_TICKERS ∪ get_pinned_tickers()
    - Core drift/escalation surfaces may classify as `ops_health_only` only when evidence proves local alert persistence/telemetry or default-disabled configuration and no broker/order/webhook delivery path.
 5. Boundary:
    - GOV-009 is an inventory and boot-safety gate. It does not authorize broker calls, order submission, Discord/webhook alerts, provider refresh, recommendations, replay-output certification, or trading. It only proves current execution-sensitive surfaces are classified and not reachable from default research boot.
+
+## Full Dashboard AppTest Side-Effect Quarantine Notes (2026-05-29)
+
+1. Dashboard import/render contract:
+   - `dashboard_import_safe = import dashboard AND no st.set_page_config AND no st.navigation AND no page.run AND no provider_download AND no runtime_status_write AND no scan_cache_write AND no backtest_pid_write`.
+   - Code path: `dashboard.py`, `tests/test_full_dashboard_apptest_governance.py`.
+2. AppTest safe-mode contract:
+   - `actual_dashboard_apptest_safe = T0_DASHBOARD_APPTEST_SAFE=1 AND AppTest.from_file("dashboard.py").run() AND rendered_governance_safe AND sentinel_files_unchanged`.
+   - Sentinel files: `runtime/boot_status_current.json`, `data/last_scan_state.json`, and `data/.backtest_pid`.
+3. Boot-smoke wiring:
+   - Portfolio AppTest smoke now includes `tests/test_full_dashboard_apptest_governance.py` before the rendered helper and optimizer AppTest cases.
+4. Dependency mirror:
+   - `filelock==3.24.3` is explicit in `pyproject.toml` and `requirements.txt`, matching `requirements.lock`, because `dashboard.py` imports `FileLock` for backtest cache locking.
+5. Boundary:
+   - AppTest safe mode is governance/testability only. It does not approve provider refresh, canonical data writes, runtime boot-status generation, replay-output certification, broker/order paths, recommendations, ranking, scoring, alerts, or dashboard product-copy expansion.

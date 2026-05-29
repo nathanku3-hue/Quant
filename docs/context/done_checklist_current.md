@@ -4,6 +4,22 @@ Status: Current with Portfolio Universe Construction PASS and optimizer-core qua
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, thesis validation, or scope widening by itself.
 Purpose: define machine-checkable done criteria for current Phase 65 portfolio universe and candidate-card work.
 
+## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
+
+- [x] `dashboard.py` exposes `render_dashboard_app()` as the explicit Streamlit entrypoint.
+- [x] Plain `import dashboard` does not execute `st.set_page_config`, `st.navigation`, `page.run()`, provider refresh, runtime status write, scan-cache write, or backtest PID write.
+- [x] `T0_DASHBOARD_APPTEST_SAFE=1` renders actual `dashboard.py` through Streamlit `AppTest` without exceptions.
+- [x] Actual rendered dashboard shell passes `assert_rendered_governance_safe(...)`.
+- [x] AppTest safe mode blocks `run_and_save_scan()`, avoids yfinance-backed macro/breadth refresh, and covers the Portfolio body safe-mode yfinance/YTD probe.
+- [x] Drift/escalation manager imports and drift view imports are lazy and not initialized by the AppTest-safe shell.
+- [x] Portfolio AppTest smoke includes `tests/test_full_dashboard_apptest_governance.py`.
+- [x] `filelock==3.24.3` is mirrored in `pyproject.toml` and `requirements.txt`.
+- [x] Focused actual/synthetic rendered dashboard suite passes: 19 passed after the Portfolio safe-mode yfinance/YTD probe.
+- [x] Boot/status/governance/data focused suite passes: 122 passed.
+- [x] Governance preflight passes with `finding_count=0`.
+- [x] `runtime/boot_status_current.json`, `data/last_scan_state.json`, and `data/.backtest_pid` remain absent after AppTest/smoke checks.
+- [ ] Strict boot in this clean feature clone remains blocked by dirty feature files and missing local strict data artifacts; rerun from a clean data-complete target if safe-boot closure is required.
+
 ## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
 
 - [x] Boot preflight data-readiness integration commit is pushed: `7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e`.

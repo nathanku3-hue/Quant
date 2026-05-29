@@ -4,6 +4,17 @@ Status: Current integration bridge
 Authority: advisory-only PM/planner bridge. This file does not authorize live trading, broker automation, promotion, provider ingestion, strategy search, candidate ranking, candidate scoring, candidate validation, alerts, dashboard content redesign, macro scoring, factor scoring, or scope widening.
 Purpose: connect Quant's technical state back to product/system truth after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
+
+- `SYSTEM_DELTA`: `Full dashboard.py AppTest is now feasible in a no-refresh safe mode. dashboard.py import is inert, and render_dashboard_app() owns explicit Streamlit execution.`
+- `PM_DELTA`: `Rendered governance now covers the actual dashboard shell, not only synthetic dashboard-like shells, while preserving research-only boundaries.`
+- `GOVERNANCE_DELTA`: `Portfolio AppTest smoke includes tests/test_full_dashboard_apptest_governance.py; focused rendered/dashboard tests PASS and governance_preflight PASS with finding_count=0.`
+- `RUNTIME_DELTA`: `T0_DASHBOARD_APPTEST_SAFE=1 disables provider refresh, parquet load, drone-intel reads, drift/escalation initialization, scan-cache write, runtime-status write, and backtest PID creation during the AppTest proof.`
+- `DEPENDENCY_DELTA`: `filelock==3.24.3 is mirrored into pyproject.toml and requirements.txt because dashboard.py imports FileLock.`
+- `OPEN_DECISION`: `Review and merge codex/full-dashboard-apptest-side-effect-quarantine, then rerun strict boot from a clean data-complete target if milestone closure requires safe-boot proof.`
+- `RECOMMENDED_NEXT_STEP`: `review_merge_full_dashboard_apptest_side_effect_quarantine_then_clean_data_complete_strict_boot_if_needed.`
+- `DO_NOT_REDECIDE`: `Do not treat AppTest safe mode as provider refresh, runtime-status generation, replay-output certification, broker/order clearance, recommendation, ranking, scoring, or action-alert authorization.`
+
 ## Latest Addendum - Feature Development Reopen Anchor
 
 - `SYSTEM_DELTA`: `Target branch codex/optimizer-core-structured-diagnostics is safe-boot ready for research-only feature development at adf882d9409e76ab7b3a65ae98e6df3e14233ac1.`

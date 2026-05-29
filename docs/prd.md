@@ -14,6 +14,13 @@ This historical PRD remains for continuity, but G7.1A supersedes the old product
 
 G8 Candidate-Card Notice (2026-05-10)
 
+Full Dashboard AppTest Side-Effect Quarantine Notice (2026-05-29)
+
+- Full `dashboard.py` import is now side-effect quarantined for governance tests: importing the module defines helpers only and does not execute `page.run()`.
+- Actual dashboard-shell AppTest renders under `T0_DASHBOARD_APPTEST_SAFE=1`, passes rendered governance scanning, and preserves no-write sentinels for runtime boot status, scan cache, and backtest PID files.
+- The safe AppTest path is test/governance-only and does not authorize provider refresh, safe-boot status writes, replay-output certification, broker/order behavior, alerts, recommendations, ranking, or scoring.
+- Immediate next action: `review_merge_full_dashboard_apptest_side_effect_quarantine_then_rerun_strict_boot_from_clean_data_complete_target_if_needed`.
+
 - G8 creates exactly one human-nominated Supercycle Gem Candidate Card for `MU`.
 - The card is a structured research object, not an investment recommendation.
 - It records thesis placeholder, source-quality labels, missing evidence, thesis breakers, provider gaps, and forbidden state transitions.

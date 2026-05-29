@@ -5727,6 +5727,27 @@ Phase 65 Dashboard Unified Data Cache Performance Fix (2026-05-11)
   - Contract lock:
     - `DASHBOARD_UNIFIED_DATA_CACHE := VALID iff (streamlit_cache_resource = 1) and (cache_key_includes_loader_args = 1) and (cache_key_includes_source_parquet_signature = 1) and (source_parquet_rewrite_invalidates = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0)`.
 
+Full Dashboard AppTest Side-Effect Quarantine (2026-05-29)
+
+  - Decision record:
+    - make full `dashboard.py` AppTest feasible by moving dashboard runtime setup behind an explicit `render_dashboard_app()` entrypoint.
+    - keep plain dashboard import inert so governance tests can prove no provider refresh, runtime status write, scan cache write, replay rebuild, or backtest PID creation occurs at import time.
+    - add `T0_DASHBOARD_APPTEST_SAFE=1` as a test/governance render mode for the actual dashboard shell, not as product behavior.
+    - include the actual dashboard AppTest governance suite in Portfolio AppTest smoke so future boot smoke does not regress to synthetic-only shell coverage.
+    - sync `filelock==3.24.3` into dependency mirrors because clean-clone dashboard import requires it.
+  - The Decision (Hardcoded):
+    - `dashboard.py` calls `page.run()` only through `render_dashboard_app()` under the Streamlit file entrypoint.
+    - AppTest safe mode uses a fallback payload, skips provider-backed macro/breadth calls, skips the Portfolio YTD yfinance path under the safe-mode body probe, skips parquet load, skips drone-intel reads, skips drift/escalation initialization, and raises if `run_and_save_scan()` is called.
+    - Actual dashboard AppTest must preserve sentinel files: `runtime/boot_status_current.json`, `data/last_scan_state.json`, and `data/.backtest_pid`.
+    - This round does not change safe-boot derivation, `SAFE_BOOT_REQUIRED_GATES`, provider ingestion, runtime-status generation, replay-output certification, broker/order behavior, alerts, recommendations, ranking, scoring, or dashboard product action semantics.
+  - Evidence:
+    - `E:\Code\Quant_full_dashboard_apptest\.venv\Scripts\python.exe -m pytest tests/test_full_dashboard_apptest_governance.py tests/test_dashboard_wide_apptest_governance.py tests/test_rendered_apptest_governance.py tests/test_optimizer_view.py -q` PASS, 19 passed after the Portfolio safe-mode yfinance/YTD probe.
+    - `E:\Code\Quant_full_dashboard_apptest\.venv\Scripts\python.exe -m pytest tests/test_boot_status_contract.py tests/test_boot_preflight.py tests/test_boot_preflight_governance.py tests/test_data_readiness_gate.py tests/test_data_readiness_gate_write_guard.py -q` PASS, 122 passed.
+    - `E:\Code\Quant_full_dashboard_apptest\.venv\Scripts\python.exe scripts/governance_preflight.py --repo-root . --json` PASS with `finding_count=0`.
+    - Strict boot preflight from the feature branch preserved PASS for governance, boot-control tests, context validation, Portfolio AppTest smoke, and focused replay/dashboard contract, but remained blocked by dirty feature files and missing clean-clone local data artifacts.
+  - Contract lock:
+    - `FULL_DASHBOARD_APPTEST_SIDE_EFFECT_QUARANTINE := VALID iff (dashboard_import_executes_page = 0) and (import_provider_refresh = 0) and (import_runtime_status_write = 0) and (safe_mode_render_actual_dashboard = 1) and (safe_mode_provider_refresh = 0) and (safe_mode_scan_cache_write = 0) and (safe_mode_backtest_pid_write = 0) and (rendered_governance_safe = 1) and (portfolio_apptest_smoke_includes_actual_dashboard = 1) and (replay_output_certified = 0) and (broker_order_path_enabled = 0) and (ranking_or_scoring_enabled = 0)`.
+
 Phase 65 Research Validity Runner v0 (2026-05-26)
 
   - Decision record:

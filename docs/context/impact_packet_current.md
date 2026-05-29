@@ -4,6 +4,60 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, broker calls, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: provide a compact view of the Portfolio Optimizer View Test and Performance Hardening implementation and affected interfaces.
 
+## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
+
+### Changed Files
+
+```text
+dashboard.py
+tests/test_full_dashboard_apptest_governance.py
+scripts/boot_preflight.py
+tests/test_boot_preflight.py
+pyproject.toml
+requirements.txt
+PRD.md
+PRODUCT_SPEC.md
+docs/prd.md
+docs/spec.md
+docs/notes.md
+docs/decision log.md
+docs/lessonss.md
+docs/saw_reports/saw_full_dashboard_apptest_side_effect_quarantine_20260529.md
+docs/context/bridge_contract_current.md
+docs/context/planner_packet_current.md
+docs/context/impact_packet_current.md
+docs/context/done_checklist_current.md
+docs/context/multi_stream_contract_current.md
+docs/context/post_phase_alignment_current.md
+docs/context/observability_pack_current.md
+```
+
+### Touched Interfaces
+
+- `Dashboard entrypoint`: `dashboard.py::render_dashboard_app()` now owns explicit Streamlit execution; plain module import is inert.
+- `Dashboard AppTest safe mode`: `T0_DASHBOARD_APPTEST_SAFE=1` renders actual dashboard shell without provider refresh, scan-cache write, runtime-status write, parquet load, drone-intel read, drift/escalation initialization, replay rebuild, or backtest PID creation.
+- `Boot Portfolio AppTest smoke`: `scripts/boot_preflight.py` includes `tests/test_full_dashboard_apptest_governance.py`.
+- `Dependency mirror`: clean `.venv` install includes `filelock==3.24.3`.
+
+### Passing Checks
+
+- Actual/synthetic rendered AppTest suite: PASS, 19 passed after the Portfolio safe-mode yfinance/YTD probe.
+- Boot/status/governance/data focused suite: PASS, 122 passed.
+- Governance preflight: PASS, `finding_count=0`.
+- Boot-control tests: PASS, 95 passed.
+- Expanded Portfolio AppTest smoke command: PASS, 11 passed.
+- Runtime sentinels: `runtime/boot_status_current.json`, `data/last_scan_state.json`, and `data/.backtest_pid` absent.
+
+### Failing / Incomplete Checks
+
+- Strict boot preflight in this feature branch remains BLOCKED by dirty feature files and missing clean-clone local strict data artifacts. Governance preflight, boot-control tests, context validation, Portfolio AppTest smoke, and focused replay/dashboard contract PASS inside that run.
+
+### Open Risks
+
+- Strict data readiness requires a data-complete target worktree or restored governed local artifacts.
+- Actual dashboard AppTest covers the default shell render plus the Portfolio body safe-mode yfinance/YTD probe; full clickable navigation to every page remains future expansion.
+- Replay output remains `UNCERTIFIED_OUTPUT_NOT_CLAIMED`.
+
 ## Latest Addendum - Feature Development Reopen Anchor
 
 ### Anchor Commit Scope
