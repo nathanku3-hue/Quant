@@ -39,7 +39,7 @@ Scope split:
 
 ## PostPushAddendum
 
-- Branch `codex/navigation-contract-registration` is public at `e40fa37`.
+- Implementation commit `e40fa37` is public on branch `codex/navigation-contract-registration`; the branch may include later docs-only PR-readiness reconciliation commits before merge review.
 - Target `codex/optimizer-core-structured-diagnostics` remains `bf81ba8` by local audited ref check; if remote refs advance later, use the newer audited tip only after separate verification.
 - PR/merge review is the active gate.
 - Publication added no runtime status, safe_boot, data/readiness, provider refresh, replay-output certification, broker/order/action-alert, ranking/scoring/recommendation scope.
@@ -200,7 +200,7 @@ Active Stage Level: L3
 | Executing          | helper/test/docs     | 100/100| Repair implemented; no production code touched in repair.    |
 | Iterate Loop       | reviewer rechecks    | 100/100| Reviewer A/B/C PASS; no in-scope High remains.               |
 | Final Verification | commands+validators  | 100/100| Final checks pass; hold for review/merge decision.           |
-| CI/CD              | post-push review     | 100/100| Public branch at e40fa37; PR/merge review is active gate.    |
+| CI/CD              | post-push review     | 100/100| Implementation is public; PR/merge review is active gate.    |
 +--------------------+----------------------+--------+--------------------------------------------------------------+
 ```
 
