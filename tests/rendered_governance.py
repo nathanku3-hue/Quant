@@ -16,6 +16,7 @@ RENDERED_ALLOWED_EXACT_LABELS = frozenset(
         "Current Weight",
         "Current allocation",
         "Current allocation snapshot",
+        "Discovery & Analysis",
         "ENTER event",
         "ENTER/EXIT Events",
         "Entry/Exit Events",

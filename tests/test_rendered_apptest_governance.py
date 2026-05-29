@@ -88,6 +88,7 @@ st.table(pd.DataFrame({"Replay Decision-Code Audit Log": ["Research Bucket"]}))
 ALLOWED_VARIANT_RENDERED_APP = r"""
 import streamlit as st
 
+st.caption("Discovery & Analysis")
 st.header("Portfolio & Allocation")
 st.caption("Historical Replay Lifecycle Events")
 st.metric("Research Optimizer - Simulation Only", "ready")
@@ -96,6 +97,7 @@ st.metric("Research Optimizer - Simulation Only", "ready")
 DANGEROUS_ALLOWED_VARIANT_RENDERED_APP = r"""
 import streamlit as st
 
+st.markdown("Discovery & Analysis action panel")
 st.caption("Portfolio & Allocation action panel")
 st.metric("Research Optimizer - Simulation Only action panel", "blocked")
 st.markdown("Simulation Weight Table score panel")
@@ -156,6 +158,7 @@ def test_rendered_governance_allows_exact_labels_but_blocks_action_variants() ->
 
     findings = scan_rendered_governance(variant_app)
     assert {
+        "Discovery & Analysis variant with action panel",
         "Portfolio & Allocation variant with action panel",
         "Research Optimizer - Simulation Only variant with action panel",
         "Simulation Weight Table variant with score",

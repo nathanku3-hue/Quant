@@ -1043,3 +1043,27 @@ Application pattern:
 - Fix applied: Added import-safe dashboard globals, `render_dashboard_app()`, AppTest safe mode, lazy drift/escalation imports, no-refresh/no-provider guards, full-dashboard AppTest rendered-governance coverage, boot-smoke wiring, and explicit `filelock==3.24.3` dependency mirror.
 - Guardrail for next time: Full dashboard AppTest must import the module without rendering and render the real file with safe-mode sentinels proving no provider refresh, runtime status write, replay rebuild, or backtest PID side effect before claiming dashboard-wide rendered governance.
 - Evidence paths: `dashboard.py`, `tests/test_full_dashboard_apptest_governance.py`, `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `pyproject.toml`, `requirements.txt`, `docs/saw_reports/saw_full_dashboard_apptest_side_effect_quarantine_20260529.md`, `E:\Code\Quant_full_dashboard_apptest\.venv\Scripts\python.exe -m pytest tests/test_full_dashboard_apptest_governance.py tests/test_dashboard_wide_apptest_governance.py tests/test_rendered_apptest_governance.py tests/test_optimizer_view.py -q`.
+
+## 2026-05-29 Round Entry (Navigation Contracts Need Explicit Public Truth)
+- Date: 2026-05-29
+- Mistake or miss: Dirty local route candidates could be overread as public dashboard truth, and clickable AppTest route claims could be made before an explicit production route decision was recorded.
+- Root cause: The navigation refactor changed public route titles/slugs in a dirty nav-only branch, while earlier public truth still pointed to the eight-page registry at `bf81ba8`.
+- Fix applied: Recorded `Candidate3PageRouteContract: ACCEPTED`, `ProductionRouteContract: INTENTIONAL_3_PAGE_PUBLIC_REGISTRY`, `PreviousPublicContract: 8_PAGE_PUBLIC_REGISTRY_AT_bf81ba8`, and the exact three-route mapping in the decision log and SAW closeout.
+- Guardrail for next time: Dirty local route candidates must not be treated as public truth; require an explicit production route decision before clickable AppTest claims, and keep route-contract work nav-only unless a separate approval opens product semantics.
+- Evidence paths: `views/page_registry.py`, `tests/test_dash_1_page_registry_shell.py`, `tests/test_full_dashboard_apptest_governance.py`, `docs/decision log.md`, `docs/saw_reports/saw_navigation_contract_registration_20260529.md`.
+
+## 2026-05-29 Round Entry (Rendered Route Labels Must Mirror Public Route Contract)
+- Date: 2026-05-29
+- Mistake or miss: `Discovery & Analysis` was accepted as a public route title but was absent from rendered governance exact allowed labels, so dangerous variants could bypass the allowed-label variant guard.
+- Root cause: Route-contract registration and rendered-governance allow-list updates were not treated as one synchronized invariant.
+- Fix applied: Added `Discovery & Analysis` to `RENDERED_ALLOWED_EXACT_LABELS` and added regression coverage proving exact label pass plus `Discovery & Analysis action panel` failure.
+- Guardrail for next time: Every approved public route title must be present in rendered governance exact-label policy and have exact-pass plus dangerous-variant regression coverage in the same round.
+- Evidence paths: `tests/rendered_governance.py`, `tests/test_rendered_apptest_governance.py`, `docs/saw_reports/saw_navigation_contract_registration_20260529.md`.
+
+## 2026-05-29 Round Entry (Post-Push Evidence Must Match Branch State)
+- Date: 2026-05-29
+- Mistake or miss: The pushed navigation-contract branch still carried pre-publication SAW wording such as local hold/no-push evidence after the branch became public.
+- Root cause: The implementation closeout was committed before the publication state changed, and the PR review gate did not have a committed post-push evidence addendum yet.
+- Fix applied: Added a docs-only post-push addendum to the navigation SAW report, recorded public branch/target branch state, and kept PR/merge review as the active gate.
+- Guardrail for next time: Before opening a PR from a previously local-only governance branch, scan committed SAW evidence for stale publication wording and reconcile it in the branch or PR body before review.
+- Evidence paths: `docs/saw_reports/saw_navigation_contract_registration_20260529.md`, `docs/lessonss.md`, `git diff --check`.
