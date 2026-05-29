@@ -1059,3 +1059,11 @@ Application pattern:
 - Fix applied: Added `Discovery & Analysis` to `RENDERED_ALLOWED_EXACT_LABELS` and added regression coverage proving exact label pass plus `Discovery & Analysis action panel` failure.
 - Guardrail for next time: Every approved public route title must be present in rendered governance exact-label policy and have exact-pass plus dangerous-variant regression coverage in the same round.
 - Evidence paths: `tests/rendered_governance.py`, `tests/test_rendered_apptest_governance.py`, `docs/saw_reports/saw_navigation_contract_registration_20260529.md`.
+
+## 2026-05-29 Round Entry (Post-Push Evidence Must Match Branch State)
+- Date: 2026-05-29
+- Mistake or miss: The pushed navigation-contract branch still carried pre-publication SAW wording such as local hold/no-push evidence after the branch became public.
+- Root cause: The implementation closeout was committed before the publication state changed, and the PR review gate did not have a committed post-push evidence addendum yet.
+- Fix applied: Added a docs-only post-push addendum to the navigation SAW report, recorded public branch/target branch state, and kept PR/merge review as the active gate.
+- Guardrail for next time: Before opening a PR from a previously local-only governance branch, scan committed SAW evidence for stale publication wording and reconcile it in the branch or PR body before review.
+- Evidence paths: `docs/saw_reports/saw_navigation_contract_registration_20260529.md`, `docs/lessonss.md`, `git diff --check`.

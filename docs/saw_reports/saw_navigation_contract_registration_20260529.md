@@ -34,8 +34,16 @@ Inspected but not changed by this final reconciliation:
 
 Scope split:
 
-- in-scope: finalize the accepted public route contract, confirm rendered-governance exact label repair for `Discovery & Analysis`, record independent Reviewer A/B/C PASS results, validate the closure packet and SAW report blocks, and keep the branch no-push/no-root-mutation boundary explicit.
-- inherited out-of-scope: dirty implementation/test files already present in the navigation branch before this final reconciliation, dirty root worktree state in `E:\Code\Quant`, product semantics beyond navigation, provider/data/execution behavior, replay-output certification, and any push/merge action.
+- in-scope: finalize the accepted public route contract, confirm rendered-governance exact label repair for `Discovery & Analysis`, record independent Reviewer A/B/C PASS results, validate the closure packet and SAW report blocks, and keep the branch post-push PR-review/no-root-mutation boundary explicit.
+- inherited out-of-scope: dirty implementation/test files already present in the navigation branch before this final reconciliation, dirty root worktree state in `E:\Code\Quant`, product semantics beyond navigation, provider/data/execution behavior, replay-output certification, and any target-branch merge action.
+
+## PostPushAddendum
+
+- Branch `codex/navigation-contract-registration` is public at `e40fa37`.
+- Target `codex/optimizer-core-structured-diagnostics` remains `bf81ba8` by local audited ref check; if remote refs advance later, use the newer audited tip only after separate verification.
+- PR/merge review is the active gate.
+- Publication added no runtime status, safe_boot, data/readiness, provider refresh, replay-output certification, broker/order/action-alert, ranking/scoring/recommendation scope.
+- This post-push evidence reconciliation is docs-only; any commit, push, or PR action for this addendum is limited to the navigation review branch and does not merge the target branch, edit production code, or mutate root `E:\Code\Quant`.
 
 ## Route Contract
 
@@ -78,7 +86,7 @@ Out-of-scope list:
 - safe-boot derivation changes
 - runtime-status generation
 - dirty-root mutation in `E:\Code\Quant`
-- push or merge action
+- target-branch merge action
 - non-navigation product semantics
 
 ## Acceptance Checks
@@ -168,7 +176,7 @@ Document Sorting: follows `docs/checklist_milestone_review.md` changed-doc order
 | EVID-05 | `E:\Code\Quant\.venv\Scripts\python.exe scripts\governance_preflight.py --repo-root . --json` | PASS: governance preflight returned `status=PASS`, `passed=true`, `finding_count=0`. |
 | EVID-06 | `git diff --name-status` | PASS: tracked navigation/repair/doc changes captured; untracked views and SAW report captured separately by `git status --short`. |
 | EVID-07 | `git diff --check` | PASS: exit code 0; line-ending warnings only. |
-| EVID-08 | `git status --short` | PASS: branch remains dirty as expected; no staging and no push. |
+| EVID-08 | `git status --short` | PASS: post-push reconciliation status was verified; PR/merge review remains the active gate. |
 | EVID-09 | `.codex/skills/_shared/scripts/validate_closure_packet.py` | PASS: `VALID`. |
 | EVID-10 | `.codex/skills/_shared/scripts/validate_saw_report_blocks.py --report-file docs/saw_reports/saw_navigation_contract_registration_20260529.md` | PASS: `VALID`. |
 | EVID-11 | Reviewer A recheck | PASS: exact `Discovery & Analysis` passes, `Discovery & Analysis action panel` fails, route contract exact, no action-shaped top-level route. |
@@ -192,7 +200,7 @@ Active Stage Level: L3
 | Executing          | helper/test/docs     | 100/100| Repair implemented; no production code touched in repair.    |
 | Iterate Loop       | reviewer rechecks    | 100/100| Reviewer A/B/C PASS; no in-scope High remains.               |
 | Final Verification | commands+validators  | 100/100| Final checks pass; hold for review/merge decision.           |
-| CI/CD              | no push              | 100/100| Hold local branch; user requested no push.                   |
+| CI/CD              | post-push review     | 100/100| Public branch at e40fa37; PR/merge review is active gate.    |
 +--------------------+----------------------+--------+--------------------------------------------------------------+
 ```
 
@@ -228,7 +236,7 @@ Assumptions:
 
 - Implementation code/tests were intentionally prepared before this final reconciliation.
 - `bf81ba8` is the previous public contract anchor requested by the closeout inputs.
-- No push or root-worktree mutation is authorized in this round.
+- No target-branch merge or root-worktree mutation is authorized by this post-push evidence reconciliation round.
 
 Rollback Note:
 
