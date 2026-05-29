@@ -7,6 +7,14 @@ Scope: docs and architecture only
 
 ## Current Phase 65 Notices
 
+Full Dashboard AppTest Side-Effect Quarantine (2026-05-29):
+
+- Full `dashboard.py` can now be imported without executing the Streamlit page, refreshing providers, writing scan cache, generating runtime boot status, or creating a backtest PID.
+- The actual dashboard shell renders under Streamlit `AppTest` with `T0_DASHBOARD_APPTEST_SAFE=1` and passes rendered governance scanning.
+- AppTest safe mode is a test/governance quarantine only; it disables provider refresh, parquet data loading, drone/fresh-finds reads, and drift/escalation initialization for the render proof.
+- The boot Portfolio AppTest smoke now includes the actual dashboard AppTest governance suite, not only synthetic dashboard-like shells.
+- This does not authorize provider ingestion, runtime status regeneration, replay-output certification, broker/order behavior, alerts, recommendations, ranking, scoring, or dashboard product-copy expansion.
+
 Research Validity Runner v0 (2026-05-26):
 
 - Terminal Zero now has a mechanical research-validity contract: `No cartridge + no canonical engine run + no PIT proof + no benchmark + no costs + no evidence packet = not research-valid`.

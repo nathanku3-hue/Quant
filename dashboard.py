@@ -23,7 +23,6 @@ from core.data_orchestrator import load_unified_data
 from views.regime_view import render_regime_banner_from_macro
 from views.auto_backtest_view import render_auto_backtest_view
 from views.optimizer_view import render_optimizer_view
-from views.drift_monitor_view import render_drift_monitor_view
 from views.shadow_portfolio_view import render_shadow_portfolio_view
 from views.page_registry import build_dashboard_navigation
 from views.scanner_display import build_scanner_research_display_frame
@@ -36,9 +35,6 @@ from strategies.scanner import build_price_technicals
 from strategies.scanner import calculate_macro_score
 from strategies.scanner import classify_breadth_status
 from strategies.scanner import enrich_scan_frame
-from core.drift_alert_manager import DriftAlertManager
-from core.drift_detector import DriftDetector
-from core.dashboard_escalation import initialize_escalation_manager
 from utils.process import pid_is_running
 # st_autorefresh removed in V3.10 — replaced by @st.fragment(run_every=)
 
@@ -134,16 +130,76 @@ try:
     from scripts.alpha_quad_scanner import run_alpha_sovereign_scan
     from scripts.high_freq_data import AutoFetcher
     from scripts.options_hedging import calculate_optimal_hedge
-except ImportError:
-    st.error("Engine modules not found. Please run from the root directory.")
-    st.stop()
-
-st.set_page_config(page_title="Terminal Zero GodView", layout="wide", page_icon="🎯")
+    _ENGINE_IMPORT_ERROR = None
+except ImportError as exc:
+    run_alpha_sovereign_scan = None
+    AutoFetcher = None
+    calculate_optimal_hedge = None
+    _ENGINE_IMPORT_ERROR = exc
 
 # --- Persistence Layer ---
 CACHE_DIR = "data"
 CACHE_FILE = os.path.join(CACHE_DIR, "last_scan_state.json")
-os.makedirs(CACHE_DIR, exist_ok=True)
+DASHBOARD_APPTEST_SAFE_ENV = "T0_DASHBOARD_APPTEST_SAFE"
+REQUIRED_SCAN_COLUMNS = [
+    "Proxy_Type",
+    "P_Value",
+    "Proxy_Content",
+    "Proxy_Signal",
+    "Tech_Support_Dist",
+    "Entry_Price",
+    "Stop_Loss",
+    "Target_Price",
+    "Leverage",
+    "Cluster",
+    "Tactical_Warning",
+    "Max_Flush",
+    "Premium",
+]
+FRESH_FINDS_FILE = "data/fresh_finds.json"
+
+payload: dict = {}
+parquet_data_available = False
+prices_wide = pd.DataFrame()
+returns_wide = pd.DataFrame()
+ticker_map_parquet = {}
+sector_map_parquet = None
+fundamentals_wide = None
+df_scan = pd.DataFrame()
+proxy_data: dict = {}
+data_health = derive_hf_proxy_data_health({})
+time_str = "not synced"
+health_status = str(data_health.get("status", "DEGRADED")).upper()
+health_ratio = float(data_health.get("degraded_ratio", 1.0))
+macro = None
+breadth = "UNKNOWN"
+breadth_color = "#888"
+macro_features = pd.DataFrame()
+drone_finds: list[dict] = []
+drone_count = 0
+drone_timestamp = ""
+drift_alert_manager = None
+drift_detector = None
+baseline_weights = None
+baseline_metadata = None
+live_weights = None
+
+
+def _dashboard_apptest_safe_mode() -> bool:
+    return os.getenv(DASHBOARD_APPTEST_SAFE_ENV, "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _ensure_engine_modules_available() -> None:
+    if _ENGINE_IMPORT_ERROR is None:
+        return
+    st.error("Engine modules not found. Please run from the root directory.")
+    st.caption(type(_ENGINE_IMPORT_ERROR).__name__)
+    st.stop()
 
 
 def _atomic_json_write(path: Path, payload: dict) -> None:
@@ -326,6 +382,7 @@ PROXY_DB = {
 }
 
 def fetch_auto_data():
+    _ensure_engine_modules_available()
     auto = AutoFetcher()
     return {
         "tsmc_monthly_yoy": auto.fetch_tsmc_yoy() or {"val": 0.20, "span": "YoY"},
@@ -337,6 +394,8 @@ def fetch_auto_data():
 
 @st.cache_data(ttl=3600*4) # cache for 4 hours
 def fetch_macro_score():
+    if _dashboard_apptest_safe_mode():
+        return None
     try:
         df = yf.download(["^TNX", "VWEHX", "VFISX"], period="2y", progress=False)["Close"]
         return calculate_macro_score(df)
@@ -350,6 +409,8 @@ def get_breadth_status():
     Detects Internal Rot (RSP vs SPY Divergence).
     Returns: status_label, status_color
     """
+    if _dashboard_apptest_safe_mode():
+        return "UNKNOWN (AppTest safe)", "#888"
     try:
         data = yf.download(["RSP", "SPY"], period="6mo", progress=False)["Close"]
         return classify_breadth_status(data)
@@ -384,6 +445,11 @@ def _load_unified_data_cached(
 def get_prices_and_technicals(tickers):
     if not tickers:
         return {}
+    if _dashboard_apptest_safe_mode():
+        return {
+            t: {"price": 0.0, "ema21": 0.0, "sma50": 0.0, "sma200": 0.0, "atr": 0.0, "convexity": 1.0}
+            for t in tickers
+        }
     try:
         hist_all = yf.download(tickers, period="1y", progress=False)
         return build_price_technicals(hist_all, tickers)
@@ -394,6 +460,9 @@ def get_prices_and_technicals(tickers):
         }
 
 def run_and_save_scan():
+    if _dashboard_apptest_safe_mode():
+        raise RuntimeError("Dashboard scan refresh is disabled during AppTest safe mode.")
+    _ensure_engine_modules_available()
     with st.spinner("Booting Sensors & Firing Physics Engine..."):
         proxy_data = fetch_auto_data()
         data_health = derive_hf_proxy_data_health(proxy_data)
@@ -422,122 +491,168 @@ def run_and_save_scan():
             return payload
     return None
 
-# --- Load State ---
-payload = _load_cached_scan_payload(Path(CACHE_FILE))
-if payload is None:
-    payload = run_and_save_scan()
-
-if not payload:
-    st.error("Engine failed to boot and no cache available.")
-    st.stop()
-
-# --- Load Institutional-Grade Parquet Data (for Tabs 3 & 5) ---
-# Dashboard uses custom yfinance scanning for alpha discovery (Tabs 1,2,4)
-# But Tab 3 (Backtest) and Tab 5 (Portfolio) require TRI-based institutional data
-parquet_data_available = False
-prices_wide = pd.DataFrame()
-returns_wide = pd.DataFrame()
-ticker_map_parquet = {}
-sector_map_parquet = None
-fundamentals_wide = None
-
-try:
-    # Attempt to load historical parquet data
-    unified_package = _load_unified_data_cached(
-        mode="historical",
-        top_n=2000,
-        start_year=2000,
-        universe_mode="top_liquid",
-        asof_date=None,
-        processed_dir="./data/processed",
-        static_dir="./data/static",
-        data_signature=build_unified_data_cache_signature(
-            processed_dir="./data/processed",
-            static_dir="./data/static",
-        ),
+def _empty_scan_payload(reason: str = "AppTest safe fallback") -> dict:
+    proxy = {
+        "tsmc_monthly_yoy": {"val": None, "span": ""},
+        "energy_price_trend": {"val": None, "span": ""},
+    }
+    payload_out = {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "proxy": proxy,
+        "data": [],
+    }
+    payload_out["data_health"] = derive_hf_proxy_data_health(proxy)
+    payload_out["data_health"]["signals"].append(
+        {
+            "signal": "__dashboard__",
+            "status": "DEGRADED",
+            "reason": reason,
+            "value": None,
+            "span": "",
+        }
     )
+    payload_out["data_health"]["status"] = "DEGRADED"
+    payload_out["data_health"]["degraded_count"] = sum(
+        1 for signal in payload_out["data_health"]["signals"] if signal.get("status") == "DEGRADED"
+    )
+    payload_out["data_health"]["total_signals"] = len(payload_out["data_health"]["signals"])
+    payload_out["data_health"]["degraded_ratio"] = 1.0
+    return payload_out
 
-    prices_wide = unified_package.prices
-    returns_wide = unified_package.returns
-    ticker_map_parquet = unified_package.ticker_map
-    sector_map_parquet = unified_package.sector_map
-    fundamentals_wide = unified_package.fundamentals
 
-    # Check if data loaded successfully
-    if not prices_wide.empty and not returns_wide.empty:
-        parquet_data_available = True
-        st.sidebar.success(f"✅ Parquet TRI data loaded: {prices_wide.shape[1]} tickers")
-    else:
-        st.sidebar.warning("⚠️ Parquet data empty - Tabs 3 & 5 in placeholder mode")
+def _load_dashboard_payload(*, allow_refresh: bool) -> dict | None:
+    cached_payload = _load_cached_scan_payload(Path(CACHE_FILE))
+    if cached_payload is None and allow_refresh:
+        return run_and_save_scan()
+    if cached_payload is None and _dashboard_apptest_safe_mode():
+        return _empty_scan_payload("AppTest safe mode does not refresh providers")
+    return cached_payload
 
-except Exception as e:
-    st.sidebar.warning(f"⚠️ Parquet data unavailable: {type(e).__name__}")
-    st.sidebar.caption("Tabs 3 & 5 will display placeholders. Custom alpha scanning (Tabs 1,2,4) unaffected.")
-    # Continue with yfinance-only mode
 
-# Process Payload
-df_scan = pd.DataFrame(payload.get("data", []))
-proxy_data = payload.get("proxy", {})
-if not isinstance(proxy_data, dict):
-    proxy_data = {}
-data_health = ensure_payload_data_health(payload)
+def _payload_needs_refresh(payload_candidate: dict, frame: pd.DataFrame, proxy_candidate: dict) -> bool:
+    is_legacy_data = not isinstance(proxy_candidate.get("energy_price_trend", {}), dict)
+    return bool(is_legacy_data or not all(col in frame.columns for col in REQUIRED_SCAN_COLUMNS))
 
-# Schema Mismatch Check (Force refresh if legacy cache missing Phase 56 tactical execution columns)
-required_cols = ['Proxy_Type', 'P_Value', 'Proxy_Content', 'Proxy_Signal', 'Tech_Support_Dist', 'Entry_Price', 'Stop_Loss', 'Target_Price', 'Leverage', 'Cluster', 'Tactical_Warning', 'Max_Flush', 'Premium']
-is_legacy_data = not isinstance(proxy_data.get('energy_price_trend', {}), dict)
 
-if is_legacy_data or not all(col in df_scan.columns for col in required_cols):
-    refreshed_payload = run_and_save_scan()
-    if refreshed_payload:
-        payload = refreshed_payload
-        df_scan = pd.DataFrame(payload.get("data", []))
-        proxy_data = payload.get("proxy", {})
-        if not isinstance(proxy_data, dict):
-            proxy_data = {}
-        data_health = ensure_payload_data_health(payload)
-    else:
-        if is_legacy_data and all(col in df_scan.columns for col in required_cols):
-            st.warning("Engine refresh failed. Using previous cached payload for this session.")
+def _resolve_dashboard_payload() -> tuple[dict, pd.DataFrame, dict, dict]:
+    allow_refresh = not _dashboard_apptest_safe_mode()
+    resolved_payload = _load_dashboard_payload(allow_refresh=allow_refresh)
+    if not resolved_payload:
+        if _dashboard_apptest_safe_mode():
+            resolved_payload = _empty_scan_payload("AppTest safe mode has no cached scan")
         else:
-            st.error("Engine refresh failed and cached schema is not runnable. Retry with Force Engine Refresh.")
+            st.error("Engine failed to boot and no cache available.")
             st.stop()
 
-last_updated_raw = str(payload.get("timestamp", "")).strip()
-try:
-    last_updated = datetime.datetime.fromisoformat(last_updated_raw) if last_updated_raw else datetime.datetime.now()
-except ValueError:
-    last_updated = datetime.datetime.now()
+    resolved_frame = pd.DataFrame(resolved_payload.get("data", []))
+    resolved_proxy = resolved_payload.get("proxy", {})
+    if not isinstance(resolved_proxy, dict):
+        resolved_proxy = {}
+    resolved_health = ensure_payload_data_health(resolved_payload)
 
-# Time ago string
-now = datetime.datetime.now()
-diff = now - last_updated
-mins_ago = int(diff.total_seconds() / 60)
-if mins_ago == 0:
-    time_str = "just now"
-elif mins_ago < 60:
-    time_str = f"{mins_ago} min ago"
-else:
+    if _payload_needs_refresh(resolved_payload, resolved_frame, resolved_proxy):
+        if allow_refresh:
+            refreshed_payload = run_and_save_scan()
+            if refreshed_payload:
+                resolved_payload = refreshed_payload
+                resolved_frame = pd.DataFrame(resolved_payload.get("data", []))
+                resolved_proxy = resolved_payload.get("proxy", {})
+                if not isinstance(resolved_proxy, dict):
+                    resolved_proxy = {}
+                resolved_health = ensure_payload_data_health(resolved_payload)
+            elif all(col in resolved_frame.columns for col in REQUIRED_SCAN_COLUMNS):
+                st.warning("Engine refresh failed. Using previous cached payload for this session.")
+            else:
+                st.error("Engine refresh failed and cached schema is not runnable. Retry with Force Engine Refresh.")
+                st.stop()
+        elif resolved_frame.empty:
+            resolved_payload = _empty_scan_payload("AppTest safe mode skipped legacy scan refresh")
+            resolved_frame = pd.DataFrame(resolved_payload.get("data", []))
+            resolved_proxy = resolved_payload.get("proxy", {})
+            resolved_health = ensure_payload_data_health(resolved_payload)
+
+    return resolved_payload, resolved_frame, resolved_proxy, resolved_health
+
+
+def _load_dashboard_parquet_data() -> None:
+    global parquet_data_available, prices_wide, returns_wide, ticker_map_parquet
+    global sector_map_parquet, fundamentals_wide
+
+    parquet_data_available = False
+    prices_wide = pd.DataFrame()
+    returns_wide = pd.DataFrame()
+    ticker_map_parquet = {}
+    sector_map_parquet = None
+    fundamentals_wide = None
+
+    if _dashboard_apptest_safe_mode():
+        st.sidebar.warning("Parquet data unavailable: AppTest safe mode")
+        st.sidebar.caption("Provider refresh and replay rebuilds are disabled for dashboard AppTest.")
+        return
+
+    try:
+        unified_package = _load_unified_data_cached(
+            mode="historical",
+            top_n=2000,
+            start_year=2000,
+            universe_mode="top_liquid",
+            asof_date=None,
+            processed_dir="./data/processed",
+            static_dir="./data/static",
+            data_signature=build_unified_data_cache_signature(
+                processed_dir="./data/processed",
+                static_dir="./data/static",
+            ),
+        )
+
+        prices_wide = unified_package.prices
+        returns_wide = unified_package.returns
+        ticker_map_parquet = unified_package.ticker_map
+        sector_map_parquet = unified_package.sector_map
+        fundamentals_wide = unified_package.fundamentals
+
+        if not prices_wide.empty and not returns_wide.empty:
+            parquet_data_available = True
+            st.sidebar.success(f"Parquet TRI data loaded: {prices_wide.shape[1]} tickers")
+        else:
+            st.sidebar.warning("Parquet data empty - research lab and portfolio views in placeholder mode")
+
+    except Exception as e:
+        st.sidebar.warning(f"Parquet data unavailable: {type(e).__name__}")
+        st.sidebar.caption("Research lab and portfolio views will display placeholders.")
+
+
+def _format_payload_age(payload_candidate: dict) -> str:
+    last_updated_raw = str(payload_candidate.get("timestamp", "")).strip()
+    try:
+        last_updated = datetime.datetime.fromisoformat(last_updated_raw) if last_updated_raw else datetime.datetime.now()
+    except ValueError:
+        last_updated = datetime.datetime.now()
+
+    diff = datetime.datetime.now() - last_updated
+    mins_ago = int(diff.total_seconds() / 60)
+    if mins_ago == 0:
+        return "just now"
+    if mins_ago < 60:
+        return f"{mins_ago} min ago"
     hours = mins_ago // 60
-    time_str = f"{hours} hours ago"
+    return f"{hours} hours ago"
 
-# --- Sidebar ---
-# --- Calculate health status for sidebar badge ---
-health_status = str(data_health.get("status", "DEGRADED")).upper()
-health_ratio = data_health.get("degraded_count", 0) / max(data_health.get("total_signals", 1), 1)
 
-# --- Sidebar ---
-with st.sidebar:
-    st.markdown(f"**Last Sync:** {time_str}")
-    if st.button("🔄 Force Engine Refresh", type="primary"):
-        run_and_save_scan()
-        st.rerun()
+def _render_sidebar_status() -> None:
+    with st.sidebar:
+        st.markdown(f"**Last Sync:** {time_str}")
+        if _dashboard_apptest_safe_mode():
+            st.caption("AppTest safe mode: refresh disabled.")
+        elif st.button("Force Engine Refresh", type="primary"):
+            run_and_save_scan()
+            st.rerun()
 
-    # Compact health badge
-    badge_color = "#00cc66" if health_status == "HEALTHY" else "#ffb020"
-    st.markdown(
-        f'<span style="color:{badge_color};">● {health_status}</span>',
-        unsafe_allow_html=True
-    )
+        badge_color = "#00cc66" if health_status == "HEALTHY" else "#ffb020"
+        st.markdown(
+            f'<span style="color:{badge_color};">● {health_status}</span>',
+            unsafe_allow_html=True,
+        )
 
 def _render_hedge_harvester_section() -> None:
     st.subheader("Hedge Harvester")
@@ -554,124 +669,146 @@ def _render_hedge_harvester_section() -> None:
             else:
                 st.error(str(res))
 
-# --- Load Drone Intel (Fresh Finds) ---
-FRESH_FINDS_FILE = "data/fresh_finds.json"
-drone_finds = []
-drone_count = 0
-drone_timestamp = ""
-if os.path.exists(FRESH_FINDS_FILE):
+def _load_drone_intel() -> None:
+    global drone_finds, drone_count, drone_timestamp
+
+    drone_finds = []
+    drone_count = 0
+    drone_timestamp = ""
+    if _dashboard_apptest_safe_mode() or not os.path.exists(FRESH_FINDS_FILE):
+        return
     try:
-        with open(FRESH_FINDS_FILE, "r") as f:
+        with open(FRESH_FINDS_FILE, "r", encoding="utf-8") as f:
             drone_data = json.load(f)
-            drone_count = drone_data.get("count", 0)
-            drone_finds = drone_data.get("assets", [])
+            drone_count = int(drone_data.get("count", 0) or 0)
+            raw_assets = drone_data.get("assets", [])
+            drone_finds = raw_assets if isinstance(raw_assets, list) else []
             if "timestamp" in drone_data:
                 dt_obj = datetime.datetime.fromisoformat(drone_data["timestamp"])
                 drone_timestamp = dt_obj.strftime("%H:%M")
     except Exception:
         pass
 
-# --- Header ---
-st.title("Terminal Zero GodView")
-st.markdown(f"Page Registry Shell | Proxy Integrity Lock <span style='color:#888;font-size:0.9em;'>(Updated: {time_str})</span>", unsafe_allow_html=True)
-health_ratio = float(data_health.get("degraded_ratio", 1.0))
-health_ratio = max(0.0, min(1.0, health_ratio))
 
-macro = fetch_macro_score()
-breadth, breadth_color = get_breadth_status()
+def _render_dashboard_header() -> None:
+    global macro_features
 
-# --- FR-041 Governor: Persistent Regime Banner (Institutional Standard) ---
-# Load institutional-grade macro features for RegimeManager
-try:
-    macro_features = get_macro_features(prefer_tri=True)
-    # Use most recent date from available data
-    if not macro_features.empty and 'date' in macro_features.columns:
-        macro_features = macro_features.set_index('date')
-    render_regime_banner_from_macro(
-        macro=macro_features,
-        index=macro_features.index,
-        title="FR-041 Governor",
-        simplified=True,  # Progressive disclosure: 3 visible metrics
+    st.title("Terminal Zero GodView")
+    st.markdown(
+        "Page Registry Shell | Proxy Integrity Lock "
+        f"<span style='color:#888;font-size:0.9em;'>(Updated: {time_str})</span>",
+        unsafe_allow_html=True,
     )
-except Exception as e:
-    # Fallback: Show legacy macro gravity score if RegimeManager unavailable
-    st.warning(f"⚠️ FR-041 Governor unavailable ({type(e).__name__}). Displaying legacy macro score.")
-    if macro:
-        score = macro['score']
 
-        # Execution Rule (Legacy)
-        if score >= 80:
-            if "HEALTHY" not in breadth:
-                regime = "1.00x (Margin Restricted)"
-                color = "#00cc66"
-            else:
-                regime = "1.25x (Leveraged Expansion)"
-                color = "#00FFAA"
-        elif score >= 50:
-            if "HEALTHY" not in breadth:
-                regime = "0.80x (Breadth Trim)"
-                color = "#00cc66"
-            else:
-                regime = "1.00x (Strategic Deploy)"
-                color = "#00cc66"
-        elif score >= 30:
-            regime = "0.50x (Defensive Core)"
-            color = "#FFD700"
+    if _dashboard_apptest_safe_mode():
+        macro_features = pd.DataFrame()
+        st.caption("Research-only dashboard shell rendered with provider refresh disabled.")
+    else:
+        try:
+            macro_features = get_macro_features(prefer_tri=True)
+            if not macro_features.empty and "date" in macro_features.columns:
+                macro_features = macro_features.set_index("date")
+            render_regime_banner_from_macro(
+                macro=macro_features,
+                index=macro_features.index,
+                title="FR-041 Governor",
+                simplified=True,
+            )
+        except Exception as e:
+            st.warning(f"FR-041 Governor unavailable ({type(e).__name__}). Displaying legacy macro score.")
+            _render_legacy_macro_banner()
+
+    if drone_count > 0:
+        st.info(f"DRONE INTEL: {drone_count} New Targets Detected dynamically by Scout Drone (Last Sweep: {drone_timestamp})")
+
+
+def _render_legacy_macro_banner() -> None:
+    if not macro:
+        return
+    score = macro["score"]
+
+    if score >= 80:
+        if "HEALTHY" not in breadth:
+            regime = "1.00x (Margin Restricted)"
+            color = "#00cc66"
         else:
-            regime = "0.00x (Liquidity Vacuum)"
-            color = "#ff4444"
+            regime = "1.25x (Leveraged Expansion)"
+            color = "#00FFAA"
+    elif score >= 50:
+        if "HEALTHY" not in breadth:
+            regime = "0.80x (Breadth Trim)"
+            color = "#00cc66"
+        else:
+            regime = "1.00x (Strategic Deploy)"
+            color = "#00cc66"
+    elif score >= 30:
+        regime = "0.50x (Defensive Core)"
+        color = "#FFD700"
+    else:
+        regime = "0.00x (Liquidity Vacuum)"
+        color = "#ff4444"
 
-        st.markdown(f"""
-        <div style="padding:15px; border:1px solid {color}; border-radius:5px; background-color:rgba(0,0,0,0.2); margin-bottom: 20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <h4 style="margin:0; color:#aaa; font-size:0.9rem; text-transform:uppercase;">MACRO GRAVITY SCORE (LEGACY)</h4>
-                    <div style="font-size: 2.5rem; font-weight: 800; color:{color}; line-height: 1;">{score} <span style="font-size:1rem; color:#888;">/ 100</span></div>
-                    <div style="margin-top: 5px; font-size: 0.9rem;">
-                        <b>BREADTH (Internal):</b> <span style="color:{breadth_color}; font-weight:bold;">{breadth}</span>
-                    </div>
+    st.markdown(f"""
+    <div style="padding:15px; border:1px solid {color}; border-radius:5px; background-color:rgba(0,0,0,0.2); margin-bottom: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h4 style="margin:0; color:#aaa; font-size:0.9rem; text-transform:uppercase;">MACRO GRAVITY SCORE (LEGACY)</h4>
+                <div style="font-size: 2.5rem; font-weight: 800; color:{color}; line-height: 1;">{score} <span style="font-size:1rem; color:#888;">/ 100</span></div>
+                <div style="margin-top: 5px; font-size: 0.9rem;">
+                    <b>BREADTH (Internal):</b> <span style="color:{breadth_color}; font-weight:bold;">{breadth}</span>
                 </div>
-                <div style="text-align: right;">
-                    <h4 style="margin:0; color:#aaa; font-size:0.9rem; text-transform:uppercase;">ALLOWABLE EXPOSURE</h4>
-                    <div style="font-size: 1.5rem; font-weight: 600; color:{color};">{regime}</div>
-                    <div style="font-size: 0.8rem; color:#888; margin-top:5px;">
-                        Rates: {macro['rate_score']}/50 | Credit: {macro['credit_score']}/50
-                    </div>
+            </div>
+            <div style="text-align: right;">
+                <h4 style="margin:0; color:#aaa; font-size:0.9rem; text-transform:uppercase;">ALLOWABLE EXPOSURE</h4>
+                <div style="font-size: 1.5rem; font-weight: 600; color:{color};">{regime}</div>
+                <div style="font-size: 0.8rem; color:#888; margin-top:5px;">
+                    Rates: {macro['rate_score']}/50 | Credit: {macro['credit_score']}/50
                 </div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
-if drone_count > 0:
-    st.info(f"🛸 **DRONE INTEL:** {drone_count} New Targets Detected dynamically by Scout Drone (Last Sweep: {drone_timestamp})")
 
-# --- Drift Monitor setup (shared across sidebar + Tab 6) ---
-drift_alert_manager = None
-drift_detector = None
-baseline_weights, baseline_metadata = _load_baseline_from_latest_pointer()
-live_weights = _load_weight_series_from_json(Path("data/live_positions/latest.json"))
+def _setup_drift_monitor() -> None:
+    global drift_alert_manager, drift_detector, baseline_weights, baseline_metadata, live_weights
 
-if live_weights is None:
-    live_candidate = st.session_state.get("live_weights")
-    if live_candidate is None:
-        live_candidate = st.session_state.get("optimizer_weights")
-    live_weights = _coerce_weight_series(live_candidate)
+    drift_alert_manager = None
+    drift_detector = None
+    baseline_weights, baseline_metadata = _load_baseline_from_latest_pointer()
+    live_weights = _load_weight_series_from_json(Path("data/live_positions/latest.json"))
 
-try:
-    drift_alert_manager = DriftAlertManager(db_path=Path("data/drift_alerts.duckdb"))
-    drift_detector = DriftDetector(sigma_threshold=2.0)
+    if live_weights is None:
+        live_candidate = st.session_state.get("live_weights")
+        if live_candidate is None:
+            live_candidate = st.session_state.get("optimizer_weights")
+        live_weights = _coerce_weight_series(live_candidate)
 
-    # Phase 33B Slice 4.3: Escalation manager initialization (extracted to shared function)
-    initialize_escalation_manager(
-        alert_manager=drift_alert_manager,
-        session_state=st.session_state,
-    )
+    if _dashboard_apptest_safe_mode():
+        with st.sidebar:
+            st.caption("Drift monitor: disabled for AppTest safe mode.")
+        return
 
-except Exception as exc:
-    with st.sidebar:
-        st.warning(f"⚠️ Drift monitor disabled: {type(exc).__name__}")
+    try:
+        from core.dashboard_escalation import initialize_escalation_manager
+        from core.drift_alert_manager import DriftAlertManager
+        from core.drift_detector import DriftDetector
 
-if drift_alert_manager is not None:
+        drift_alert_manager = DriftAlertManager(db_path=Path("data/drift_alerts.duckdb"))
+        drift_detector = DriftDetector(sigma_threshold=2.0)
+        initialize_escalation_manager(
+            alert_manager=drift_alert_manager,
+            session_state=st.session_state,
+        )
+
+    except Exception as exc:
+        with st.sidebar:
+            st.warning(f"Drift monitor disabled: {type(exc).__name__}")
+
+
+def _render_drift_sidebar_status() -> None:
+    if drift_alert_manager is None:
+        return
     try:
         sidebar_alerts = drift_alert_manager.get_active_alerts()
         sidebar_level = "GREEN"
@@ -683,13 +820,12 @@ if drift_alert_manager is not None:
             )
         with st.sidebar:
             if sidebar_level == "RED":
-                st.error(f"🔴 Drift: {len(sidebar_alerts)} active")
+                st.error(f"Drift: {len(sidebar_alerts)} active")
             elif sidebar_level == "YELLOW":
-                st.warning(f"🟡 Drift: {len(sidebar_alerts)} active")
+                st.warning(f"Drift: {len(sidebar_alerts)} active")
             else:
-                st.success("🟢 Drift: clear")
+                st.success("Drift: clear")
     except Exception:
-        # Keep optional sidebar indicator fail-safe.
         pass
 
 # --- DASH-1 page registry shell: new top-level pages, legacy content preserved below. ---
@@ -755,10 +891,11 @@ def _render_data_health_section() -> None:
 # TAB 3: DRIFT MONITOR (PROMOTED)
 # ==========================================
 def _render_drift_monitor_section() -> None:
-    from views.drift_monitor_view import render_drift_monitor_view
     if drift_alert_manager is None or drift_detector is None:
         st.info("Drift monitor unavailable.")
     else:
+        from views.drift_monitor_view import render_drift_monitor_view
+
         render_drift_monitor_view(
             alert_manager=drift_alert_manager,
             drift_detector=drift_detector,
@@ -1596,6 +1733,8 @@ def _extract_yfinance_close(raw: pd.DataFrame, tickers: tuple[str, ...]) -> pd.D
 def _download_ytd_close_prices(tickers: tuple[str, ...], start_iso: str) -> pd.DataFrame:
     if not tickers:
         return pd.DataFrame()
+    if _dashboard_apptest_safe_mode():
+        return pd.DataFrame()
     raw = yf.download(
         list(tickers),
         start=start_iso,
@@ -1934,17 +2073,50 @@ def _render_settings_ops_page() -> None:
         _render_drift_monitor_section()
 
 
-page = build_dashboard_navigation(
-    {
-        "Command Center": _render_command_center_page,
-        "Opportunities": _render_opportunities_page,
-        "Thesis Card": lambda: _render_placeholder_page("Thesis Card"),
-        "Market Behavior": lambda: _render_placeholder_page("Market Behavior"),
-        "Entry & Hold Discipline": lambda: _render_placeholder_page("Entry & Hold Discipline"),
-        "Portfolio & Allocation": _render_portfolio_allocation_page,
-        "Research Lab": _render_research_lab_page,
-        "Settings & Ops": _render_settings_ops_page,
-    }
-)
-page.run()
+def _build_dashboard_page():
+    page = build_dashboard_navigation(
+        {
+            "Command Center": _render_command_center_page,
+            "Opportunities": _render_opportunities_page,
+            "Thesis Card": lambda: _render_placeholder_page("Thesis Card"),
+            "Market Behavior": lambda: _render_placeholder_page("Market Behavior"),
+            "Entry & Hold Discipline": lambda: _render_placeholder_page("Entry & Hold Discipline"),
+            "Portfolio & Allocation": _render_portfolio_allocation_page,
+            "Research Lab": _render_research_lab_page,
+            "Settings & Ops": _render_settings_ops_page,
+        }
+    )
+    return page
+
+
+def _initialize_dashboard_state() -> None:
+    global payload, df_scan, proxy_data, data_health, time_str, health_status
+    global health_ratio, macro, breadth, breadth_color
+
+    payload, df_scan, proxy_data, data_health = _resolve_dashboard_payload()
+    time_str = _format_payload_age(payload)
+    health_status = str(data_health.get("status", "DEGRADED")).upper()
+    health_ratio = float(data_health.get("degraded_ratio", 1.0))
+    health_ratio = max(0.0, min(1.0, health_ratio))
+    macro = fetch_macro_score()
+    breadth, breadth_color = get_breadth_status()
+    _load_dashboard_parquet_data()
+    _load_drone_intel()
+    _setup_drift_monitor()
+
+
+def render_dashboard_app() -> None:
+    st.set_page_config(page_title="Terminal Zero GodView", layout="wide")
+    if not _dashboard_apptest_safe_mode():
+        _ensure_engine_modules_available()
+    _initialize_dashboard_state()
+    _render_sidebar_status()
+    _render_dashboard_header()
+    _render_drift_sidebar_status()
+    page = _build_dashboard_page()
+    page.run()
+
+
+if __name__ == "__main__":
+    render_dashboard_app()
 

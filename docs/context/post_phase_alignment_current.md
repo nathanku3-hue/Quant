@@ -4,6 +4,26 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, candidate validation, provider ingestion, strategy search, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: update the multi-stream map after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
+
+## What Changed This Round
+
+- Moved dashboard runtime setup behind `dashboard.render_dashboard_app()` so plain module import is inert.
+- Added `T0_DASHBOARD_APPTEST_SAFE=1` for actual-dashboard AppTest rendering without provider refresh, scan-cache write, runtime-status write, parquet load, drone-intel read, drift/escalation initialization, replay rebuild, or backtest PID creation.
+- Added `tests/test_full_dashboard_apptest_governance.py` to prove import side-effect quarantine, actual rendered dashboard governance safety, and unchanged runtime sentinels.
+- Wired actual dashboard AppTest governance into boot Portfolio AppTest smoke.
+- Mirrored `filelock==3.24.3` into clean-install dependency surfaces.
+- Updated docs/current truth surfaces and published SAW evidence.
+
+## Current Bottleneck
+
+- The actual dashboard AppTest side-effect quarantine is PASS. Strict boot in this clean clone remains blocked by missing local strict data artifacts and dirty feature files, so safe-boot closure proof must be rerun from a clean data-complete target if needed.
+
+## What Should Not Be Done Next
+
+- Do not treat AppTest safe mode as provider refresh, runtime status generation, replay-output certification, broker/order clearance, recommendation, ranking, scoring, action-alert, or broad dashboard product expansion.
+- Do not resume stale BOOT-0A/0B staging or regenerate `runtime/boot_status_current.json` inside this feature branch.
+
 ## Latest Addendum - Dashboard Unified Data Cache Performance Fix
 
 ## What Changed This Round

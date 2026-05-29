@@ -7,6 +7,15 @@ Scope: docs and architecture only
 
 ## Current Phase 65 Notices
 
+Full Dashboard AppTest Side-Effect Quarantine (2026-05-29):
+
+- `dashboard.py` exposes `render_dashboard_app()` and keeps plain module import inert for tests and governance scans.
+- `T0_DASHBOARD_APPTEST_SAFE=1` provides a no-refresh render path for actual-dashboard AppTest: fallback scan payload, no yfinance-backed macro/breadth fetch, no parquet loader, no drone-intel read, and no drift/escalation initialization.
+- `tests/test_full_dashboard_apptest_governance.py` proves import side-effect quarantine, actual shell rendered-governance safety, and unchanged runtime sentinels for `runtime/boot_status_current.json`, `data/last_scan_state.json`, and `data/.backtest_pid`.
+- `scripts/boot_preflight.py` includes the actual dashboard AppTest suite in the Portfolio AppTest smoke command.
+- `filelock==3.24.3` is explicit in dependency mirrors because `dashboard.py` imports `FileLock`.
+- No safe-boot derivation, provider ingestion, runtime-status write, replay-output certification, broker/order path, alert, recommendation, ranking, or scoring behavior is approved.
+
 Research Validity Runner v0 (2026-05-26):
 
 - `research.backtest_runner.run_research_backtest(...)` is the v0 canonical evidence wrapper over `core.engine.run_simulation(...)`.

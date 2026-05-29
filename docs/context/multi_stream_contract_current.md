@@ -4,6 +4,41 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: coordinate streams after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
+
+### Frontend/UI
+
+- **Status**: actual `dashboard.py` shell renders under Streamlit AppTest safe mode and passes rendered governance.
+- **Must Deliver**: keep dashboard import inert and safe-mode rendering no-refresh/no-write.
+- **Owned Files**:
+  - `dashboard.py`
+  - `tests/test_full_dashboard_apptest_governance.py`
+
+### Backend/Ops
+
+- **Status**: boot Portfolio AppTest smoke includes actual dashboard AppTest governance; boot-control tests pass.
+- **Must Deliver**: preserve strict boot no-write behavior and keep runtime status generated only by explicit strict preflight write-status flow.
+- **Owned Files**:
+  - `scripts/boot_preflight.py`
+  - `tests/test_boot_preflight.py`
+
+### Data/Ops
+
+- **Status**: no provider refresh, data repair, replay rebuild, scan-cache write, or runtime status write occurs in AppTest safe mode.
+- **Must Deliver**: strict data readiness remains separate and must be proven from a data-complete target environment.
+- **Owned Files**:
+  - `pyproject.toml`
+  - `requirements.txt`
+
+### Docs/Ops
+
+- **Status**: PRD/spec, notes, decision log, current truth surfaces, lesson, and SAW report updated.
+- **Must Deliver**: carry inherited clean-clone data-readiness blocker without downgrading the actual dashboard AppTest PASS.
+
+### Blocked
+
+- Runtime status regeneration, safe-boot derivation changes, provider ingestion, replay-output certification, broker/order/rebalance behavior, action alerts, recommendations, ranking, scoring, and broad dashboard copy/product expansion.
+
 ## Latest Addendum - Dashboard Unified Data Cache Performance Fix
 
 ### Frontend/UI

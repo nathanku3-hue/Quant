@@ -14,6 +14,14 @@ This historical technical specification remains for continuity, but G7.1A supers
 
 G8 Candidate-Card Notice (2026-05-10)
 
+Full Dashboard AppTest Side-Effect Quarantine Notice (2026-05-29)
+
+- `dashboard.py` keeps module import inert and exposes `render_dashboard_app()` as the explicit Streamlit entrypoint.
+- `T0_DASHBOARD_APPTEST_SAFE=1` disables provider refresh, parquet loading, drone-intel reads, drift/escalation initialization, and scan-cache writes while rendering the actual dashboard shell through Streamlit AppTest.
+- `tests/test_full_dashboard_apptest_governance.py` is the actual-dashboard rendered governance proof and is included in boot Portfolio AppTest smoke.
+- The dependency mirror includes `filelock==3.24.3` because dashboard imports `FileLock` for backtest cache locking.
+- This is governance/testability work only; no product action states, provider ingestion, runtime-status generation, replay-output certification, broker/order path, alert, recommendation, ranking, or scoring behavior is approved.
+
 - G8 creates exactly one human-nominated Supercycle Gem Candidate Card for `MU`.
 - The card is a structured research object, not an investment recommendation.
 - Initial state is limited to `THESIS_CANDIDATE` or `EVIDENCE_BUILDING`.

@@ -4,6 +4,17 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, strategy search, candidate ranking, candidate scoring, thesis validation, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: provide the planner with a compact fresh world model after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
+
+- `CURRENT_DELTA`: `dashboard.py is import-safe and actual dashboard-shell AppTest renders under T0_DASHBOARD_APPTEST_SAFE=1 without provider refresh or runtime writes.`
+- `SAW_VERDICT`: `PASS for ROUND-20260529-FULL-DASHBOARD-APPTEST-SIDE-EFFECT-QUARANTINE.`
+- `IMPLEMENTATION_ARTIFACTS`: `dashboard.py, tests/test_full_dashboard_apptest_governance.py, scripts/boot_preflight.py, tests/test_boot_preflight.py, pyproject.toml, requirements.txt.`
+- `TEST_DELTA`: `Actual dashboard AppTest governance suite PASS; synthetic dashboard-wide/rendered/optimizer suite PASS; boot/status/governance/data focused suite PASS; governance_preflight PASS finding_count=0.`
+- `STRICT_BOOT_DELTA`: `Strict boot in the clean clone remains BLOCKED only by dirty feature files and missing local strict data artifacts; Governance, boot-control tests, context validation, Portfolio AppTest smoke, and focused replay/dashboard contract PASS.`
+- `BOUNDARY`: `No provider ingestion, runtime boot-status generation, safe-boot derivation change, replay-output certification, broker/order path, action alert, recommendation, ranking, or scoring was added.`
+- `NEXT_STEP`: `review_merge_full_dashboard_apptest_side_effect_quarantine_then_rerun_strict_boot_from_clean_data_complete_target_if_needed.`
+- `DO_NOT_REDECIDE`: `Do not resume stale BOOT-0A/0B closure or regenerate runtime status inside this feature branch.`
+
 ## Latest Addendum - Feature Development Reopen Anchor
 
 - `CURRENT_DELTA`: `Research-only feature development is reopened from codex/optimizer-core-structured-diagnostics at adf882d9409e76ab7b3a65ae98e6df3e14233ac1.`

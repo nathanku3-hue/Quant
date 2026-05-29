@@ -177,6 +177,7 @@ def test_strict_gates_run_real_checks_when_requested(
         boot_preflight.PORTFOLIO_APPTEST_SMOKE_COMMAND,
         boot_preflight.FOCUSED_REPLAY_DASHBOARD_CONTRACT_COMMAND,
     ]
+    assert "tests/test_full_dashboard_apptest_governance.py" in boot_preflight.PORTFOLIO_APPTEST_SMOKE_COMMAND
     assert "tests/test_rendered_apptest_governance.py" in boot_preflight.PORTFOLIO_APPTEST_SMOKE_COMMAND
     assert (
         "tests/test_optimizer_view.py::test_optimizer_view_rendered_labels_are_governance_safe"
