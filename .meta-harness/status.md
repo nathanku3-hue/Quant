@@ -31,4 +31,4 @@ Stop criteria:
 Fresh human and Codex worker can resume from local harness state.
 
 Updated:
-2026-06-01T11:19:56.738Z
+2026-06-01T11:20:39.751Z
