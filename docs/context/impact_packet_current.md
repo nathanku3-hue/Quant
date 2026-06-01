@@ -4,6 +4,54 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, broker calls, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: provide a compact view of the Portfolio Optimizer View Test and Performance Hardening implementation and affected interfaces.
 
+## Latest Addendum - Meta-Harness Workflow Visibility Install
+
+### Changed Files
+
+```text
+.meta-harness/
+.codex/skills/boundary-gate/SKILL.md
+.codex/skills/expert-context-packer/SKILL.md
+.codex/skills/harness-feedback/SKILL.md
+.codex/skills/scope-selector/SKILL.md
+docs/templates/expert_reconciliation_matrix.md
+docs/templates/stream_contract.md
+docs/templates/worker_done_contract.md
+AGENTS.md
+docs/context/bridge_contract_current.md
+docs/context/planner_packet_current.md
+docs/context/impact_packet_current.md
+docs/context/done_checklist_current.md
+docs/context/multi_stream_contract_current.md
+docs/context/post_phase_alignment_current.md
+docs/context/observability_pack_current.md
+docs/decision log.md
+docs/notes.md
+docs/lessonss.md
+docs/saw_reports/saw_meta_harness_install_20260601.md
+```
+
+### Touched Interfaces
+
+- Docs/Ops workflow visibility only.
+- Meta-harness CLI/state: `.meta-harness/status.md`, `.meta-harness/events.jsonl`, `.meta-harness/templates/*`.
+- Codex repo-local workflow skills: `boundary-gate`, `expert-context-packer`, `harness-feedback`, `scope-selector`.
+- Handoff templates: worker done contract, expert reconciliation matrix, and stream contract.
+
+### Failing / Incomplete Checks
+
+- Full app/runtime tests are not required for this docs-only control-plane install.
+- Original `E:\Code\Quant` worktree remains dirty and untouched; installation occurred in clean `E:\Code\Quant-meta-harness-install`.
+
+### Forbidden Actions
+
+- no boot preflight patch
+- no runtime boot-status write
+- no provider ingestion
+- no data artifact generation or commit
+- no strategy/dashboard behavior change
+- no ranking, scoring, recommendation, alert, broker/order, or BootReady claim
+
 ## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
 
 ### Changed Files

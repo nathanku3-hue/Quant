@@ -5174,3 +5174,17 @@ replay_tickers = SCANNER_TICKERS ∪ get_pinned_tickers()
    - `filelock==3.24.3` is explicit in `pyproject.toml` and `requirements.txt`, matching `requirements.lock`, because `dashboard.py` imports `FileLock` for backtest cache locking.
 5. Boundary:
    - AppTest safe mode is governance/testability only. It does not approve provider refresh, canonical data writes, runtime boot-status generation, replay-output certification, broker/order paths, recommendations, ranking, scoring, alerts, or dashboard product-copy expansion.
+
+## Meta-Harness Workflow Visibility Install Notes (2026-06-01)
+
+1. Source provenance:
+   - Meta-harness source commit: `daa786b38f5b4335d8d06fa43df907f2a9075be7`.
+   - Install branch/worktree: `codex/meta-harness-install` at `E:\Code\Quant-meta-harness-install`.
+2. Install formula:
+   - `HARNESS_INSTALL_VALID = source_commit_pushed AND clean_install_worktree AND meta_harness_state_exists AND packaged_templates_mirrored AND quant_active_skill_adapters_present AND no_forbidden_runtime_or_data_files_changed`.
+3. Installed surfaces:
+   - `.meta-harness/status.md`, `.meta-harness/events.jsonl`, `.meta-harness/templates/`.
+   - `.codex/skills/boundary-gate/SKILL.md`, `.codex/skills/expert-context-packer/SKILL.md`, `.codex/skills/harness-feedback/SKILL.md`, `.codex/skills/scope-selector/SKILL.md`.
+   - `docs/templates/worker_done_contract.md`, `docs/templates/expert_reconciliation_matrix.md`, `docs/templates/stream_contract.md`.
+4. Boundary:
+   - This is Docs/Ops workflow visibility only. It does not approve provider ingestion, canonical data writes, runtime boot-status generation, data artifact generation, replay-output certification, broker/order paths, recommendations, ranking, scoring, alerts, or BootReady claims.

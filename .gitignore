@@ -20,6 +20,7 @@ tmp_*/
 /tests/pytest_out.txt
 *.jsonl
 !data/registry/candidate_events.jsonl
+!.meta-harness/events.jsonl
 
 # Runtime-local generated status
 /runtime/boot_status_current.json

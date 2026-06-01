@@ -1,6 +1,13 @@
 Decision Log: Terminal Zero
 Author: Atomic Mesh | Last Updated: 2026-03-01 (Stream 1 fail-loud bootstrap + Stream 4 strict container draft)
 
+## 2026-06-01 - Meta-Harness Workflow Visibility Install
+
+- Decision: install meta-harness workflow visibility in an isolated clean Quant worktree on `codex/meta-harness-install`, sourced from meta-harness commit `daa786b38f5b4335d8d06fa43df907f2a9075be7`.
+- Scope: Docs/Ops control plane only; `.meta-harness/`, repo-local workflow skills, and handoff/reconciliation templates are installed without changing app, data, boot, runtime, strategy, or dashboard behavior.
+- Boundary: the install does not authorize provider ingestion, runtime boot-status generation, data artifact generation, safe boot, replay certification, ranking, scoring, recommendations, alerts, broker/order behavior, or cleaning the original dirty `E:\Code\Quant` worktree.
+- Formula: `HARNESS_INSTALL_VALID := source_commit_pushed AND clean_install_worktree AND meta_harness_state_exists AND packaged_templates_mirrored AND quant_active_skill_adapters_present AND no_forbidden_runtime_or_data_files_changed`.
+
 Part 1: Master Decision Log
 
 | ID   | Component  | The Friction Point          | The Decision (Hardcoded)       | Rationale                                                |

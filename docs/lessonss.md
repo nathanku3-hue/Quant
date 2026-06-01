@@ -1067,3 +1067,11 @@ Application pattern:
 - Fix applied: Added a docs-only post-push addendum to the navigation SAW report, recorded public branch/target branch state, and kept PR/merge review as the active gate.
 - Guardrail for next time: Before opening a PR from a previously local-only governance branch, scan committed SAW evidence for stale publication wording and reconcile it in the branch or PR body before review.
 - Evidence paths: `docs/saw_reports/saw_navigation_contract_registration_20260529.md`, `docs/lessonss.md`, `git diff --check`.
+
+## 2026-06-01 Round Entry (Install Control-Plane Updates In A Clean Worktree)
+- Date: 2026-06-01
+- Mistake or miss: The original `E:\Code\Quant` worktree was requested as the install target but was dirty and behind remote, so installing directly would have mixed workflow-control changes with unrelated boot/data/runtime residue.
+- Root cause: The meta-harness source update and Quant adoption were separate repo states, and Quant already carried local uncommitted residue that was not clean GitHub truth.
+- Fix applied: Committed and pushed meta-harness first, then created isolated Quant worktree `E:\Code\Quant-meta-harness-install` on `codex/meta-harness-install` from remote tip before installing `.meta-harness`, workflow skills, and templates.
+- Guardrail for next time: Install cross-repo control-plane updates only from a pushed source commit into a clean target worktree or explicit branch; never apply them directly into a dirty production worktree.
+- Evidence paths: `E:\Code\meta-harness` commit `daa786b38f5b4335d8d06fa43df907f2a9075be7`, `.meta-harness/status.md`, `.codex/skills/scope-selector/SKILL.md`, `docs/templates/worker_done_contract.md`, `git status --short --branch`.

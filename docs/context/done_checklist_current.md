@@ -4,6 +4,21 @@ Status: Current with Portfolio Universe Construction PASS and optimizer-core qua
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, thesis validation, or scope widening by itself.
 Purpose: define machine-checkable done criteria for current Phase 65 portfolio universe and candidate-card work.
 
+## Latest Addendum - Meta-Harness Workflow Visibility Install
+
+- [x] Meta-harness source commit is recorded: `daa786b38f5b4335d8d06fa43df907f2a9075be7`.
+- [x] Install branch is isolated from the dirty original worktree: `codex/meta-harness-install` at `E:\Code\Quant-meta-harness-install`.
+- [x] `.meta-harness/status.md` exists.
+- [x] `.meta-harness/events.jsonl` records init and install events.
+- [x] `.meta-harness/templates/skills/*.md` exists for boundary gate, expert context packer, harness feedback, and scope selector.
+- [x] `.meta-harness/templates/contracts/*.md` exists for worker done, expert reconciliation, and stream contracts.
+- [x] `.codex/skills/*/SKILL.md` contains Quant-specific active adapters that preserve the `docs/context` truth-surface entry sequence.
+- [x] `docs/templates/*` includes worker done, expert reconciliation, and stream contract templates.
+- [x] `AGENTS.md` records the harness workflow hook.
+- [x] Current truth surfaces record that this is a Docs/Ops-only control-plane install.
+- [ ] Merge review for `codex/meta-harness-install` is still pending.
+- [ ] Original dirty `E:\Code\Quant` worktree remains intentionally untouched.
+
 ## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
 
 - [x] `dashboard.py` exposes `render_dashboard_app()` as the explicit Streamlit entrypoint.

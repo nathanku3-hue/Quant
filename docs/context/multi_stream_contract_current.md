@@ -4,6 +4,30 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
 Purpose: coordinate streams after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Meta-Harness Workflow Visibility Install
+
+### Docs/Ops
+
+- **Status**: meta-harness state, packaged templates, repo-local workflow skills, and docs handoff templates are installed in a clean isolated worktree.
+- **Must Deliver**: keep this as workflow visibility only and preserve existing product/runtime/data boundaries.
+- **Owned Files**:
+  - `.meta-harness/`
+  - `.codex/skills/boundary-gate/SKILL.md`
+  - `.codex/skills/expert-context-packer/SKILL.md`
+  - `.codex/skills/harness-feedback/SKILL.md`
+  - `.codex/skills/scope-selector/SKILL.md`
+  - `docs/templates/expert_reconciliation_matrix.md`
+  - `docs/templates/stream_contract.md`
+  - `docs/templates/worker_done_contract.md`
+
+### Deferred Streams
+
+- Backend, Frontend/UI, and Data are unchanged by this install.
+
+### Blocked
+
+- Boot preflight edits, runtime status generation, provider ingestion, data generation, strategy/dashboard behavior changes, broker/order paths, alerts, recommendations, ranking, scoring, replay certification, and BootReady claims.
+
 ## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
 
 ### Frontend/UI

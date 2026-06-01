@@ -4,6 +4,18 @@ Status: Current integration bridge
 Authority: advisory-only PM/planner bridge. This file does not authorize live trading, broker automation, promotion, provider ingestion, strategy search, candidate ranking, candidate scoring, candidate validation, alerts, dashboard content redesign, macro scoring, factor scoring, or scope widening.
 Purpose: connect Quant's technical state back to product/system truth after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Meta-Harness Workflow Visibility Install
+
+- `RoundID`: `ROUND-20260601-META-HARNESS-INSTALL`
+- `ScopeID`: `SCOPE-DOCS-OPS-META-HARNESS-VISIBILITY`
+- `SYSTEM_DELTA`: `Quant now has local meta-harness workflow visibility state and reusable harness templates installed on clean branch codex/meta-harness-install.`
+- `PM_DELTA`: `Planning, delegation, worker handoff, expert packet, reconciliation, and repeated-friction feedback now have durable Markdown surfaces without changing product/runtime behavior.`
+- `SOURCE_DELTA`: `Installed from meta-harness commit daa786b38f5b4335d8d06fa43df907f2a9075be7 after that branch was committed and pushed.`
+- `BOUNDARY_DELTA`: `The install is Docs/Ops only and does not authorize provider refresh, runtime boot status generation, data artifact generation, strategy validity, ranking, scoring, recommendations, alerts, broker/order behavior, replay certification, or BootReady.`
+- `OPEN_DECISION`: `Review and merge codex/meta-harness-install when the control-plane diff is accepted.`
+- `RECOMMENDED_NEXT_STEP`: `review_meta_harness_install_diff_then_merge_or_continue_docs_ops_harness_adoption.`
+- `DO_NOT_REDECIDE`: `Do not clean, revert, or mix the original dirty E:\Code\Quant worktree into this install branch; do not treat this install as safe-boot or data-readiness evidence.`
+
 ## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
 
 - `SYSTEM_DELTA`: `Full dashboard.py AppTest is now feasible in a no-refresh safe mode. dashboard.py import is inert, and render_dashboard_app() owns explicit Streamlit execution.`

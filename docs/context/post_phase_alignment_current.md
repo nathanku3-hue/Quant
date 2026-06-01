@@ -4,6 +4,23 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, candidate validation, provider ingestion, strategy search, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: update the multi-stream map after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Meta-Harness Workflow Visibility Install
+
+## What Changed This Round
+
+- Initialized `.meta-harness/` in a clean isolated Quant worktree.
+- Installed packaged meta-harness skill and contract templates from source commit `daa786b38f5b4335d8d06fa43df907f2a9075be7`.
+- Installed Quant-adapted active workflow skills into `.codex/skills/` and mirrored contracts into `docs/templates/`.
+- Recorded the install as Docs/Ops workflow visibility with no app, data, boot, runtime, strategy, or UI behavior change.
+
+## Current Bottleneck
+
+- Merge review for the control-plane install branch is pending. The original dirty `E:\Code\Quant` worktree remains untouched and must be handled separately.
+
+## What Should Not Be Done Next
+
+- Do not treat this install as safe boot, data readiness, provider refresh, replay certification, ranking, scoring, recommendations, alerts, broker/order authority, or permission to clean/revert the original dirty worktree.
+
 ## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
 
 ## What Changed This Round

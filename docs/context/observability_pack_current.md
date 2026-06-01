@@ -4,6 +4,29 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, candidate validation, provider ingestion, strategy search, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: make drift visible early after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Meta-Harness Workflow Visibility Install
+
+## High-Risk Attempts
+
+- Treating meta-harness install as product/runtime/data readiness evidence.
+- Installing into the dirty original `E:\Code\Quant` worktree and mixing unrelated local residue into the control-plane branch.
+- Overwriting repo-specific Codex workflow hooks without recording the source commit and boundaries.
+
+## Drift Signal
+
+- This round is Docs/Ops workflow visibility only. It adds `.meta-harness` state and reusable handoff/review templates; it does not change app code, boot behavior, runtime status, provider ingestion, data artifacts, strategy outputs, dashboard product behavior, ranking, scoring, recommendations, alerts, broker/order paths, or BootReady.
+
+## Evidence Used
+
+- `E:\Code\meta-harness` commit `daa786b38f5b4335d8d06fa43df907f2a9075be7`
+- `.meta-harness/status.md`
+- `.meta-harness/templates/`
+- `.codex/skills/boundary-gate/SKILL.md`
+- `.codex/skills/expert-context-packer/SKILL.md`
+- `.codex/skills/harness-feedback/SKILL.md`
+- `.codex/skills/scope-selector/SKILL.md`
+- `docs/templates/`
+
 ## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
 
 ## High-Risk Attempts

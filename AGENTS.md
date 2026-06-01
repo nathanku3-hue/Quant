@@ -231,6 +231,7 @@ SAW must run after each work round (even docs-only rounds):
 ## 13. Skill Hooks (Mandatory)
 - Call `$saw` (`.codex/skills/saw/SKILL.md`) for SAW rounds and reporting structure.
 - Call `$research-analysis` (`.codex/skills/research-analysis/SKILL.md`) when plan confidence should be backed by external research evidence.
+- Harness workflow skills/templates: use `scope-selector` before choosing bounded work, `expert-context-packer` before external/specialist review, then reconcile via `worker_done_contract`, `expert_reconciliation_matrix`, `stream_contract`, and `harness-feedback` when repeated workflow friction appears.
 - Optional trigger-based skills (not mandatory on day 1):
   - `$se-executor` (`.codex/skills/se-executor/SKILL.md`) for software-engineering execution rigor on multi-file/high-risk changes.
   - `$architect-review` (`.codex/skills/architect-review/SKILL.md`) for architecture/coupling/scaling/security tradeoff reviews.

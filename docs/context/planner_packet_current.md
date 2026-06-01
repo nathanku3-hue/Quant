@@ -4,6 +4,18 @@ Status: Current
 Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, strategy search, candidate ranking, candidate scoring, thesis validation, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
 Purpose: provide the planner with a compact fresh world model after the Portfolio Optimizer View Test and Performance Hardening round.
 
+## Latest Addendum - Meta-Harness Workflow Visibility Install
+
+- `CURRENT_DELTA`: `Meta-harness is installed in an isolated clean Quant worktree at E:\Code\Quant-meta-harness-install from meta-harness source commit daa786b38f5b4335d8d06fa43df907f2a9075be7.`
+- `RoundID`: `ROUND-20260601-META-HARNESS-INSTALL`
+- `ScopeID`: `SCOPE-DOCS-OPS-META-HARNESS-VISIBILITY`
+- `STARTING_VERDICT`: `PASS`
+- `INSTALL_DELTA`: `.meta-harness/ runtime state exists; packaged templates are mirrored into .meta-harness/templates; Quant-adapted active Codex skills exist in .codex/skills; handoff/reconciliation templates exist in docs/templates.`
+- `BOUNDARY`: `Docs/Ops control-plane install only; no app code, boot preflight, runtime boot status, provider ingestion, data artifacts, strategy behavior, dashboard product behavior, ranking, scoring, alerts, broker/order path, or BootReady claim changed.`
+- `OPEN_DECISION`: `Review and merge codex/meta-harness-install when ready; original E:\Code\Quant dirty worktree remains intentionally untouched.`
+- `RECOMMENDED_NEXT_STEP`: `review_meta_harness_install_diff_then_merge_or_continue_docs_ops_harness_adoption.`
+- `DO_NOT_REDECIDE`: `Do not treat meta-harness install as data readiness, safe boot, provider refresh, replay certification, recommendation/ranking/scoring authority, or permission to clean/revert the original dirty worktree.`
+
 ## Latest Addendum - Full Dashboard AppTest Side-Effect Quarantine
 
 - `CURRENT_DELTA`: `dashboard.py is import-safe and actual dashboard-shell AppTest renders under T0_DASHBOARD_APPTEST_SAFE=1 without provider refresh or runtime writes.`
