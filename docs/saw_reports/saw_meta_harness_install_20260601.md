@@ -112,10 +112,9 @@ Document Sorting: maintained for current docs/context and SAW evidence surfaces.
 - Original `E:\Code\Quant` dirty worktree remains intentionally untouched and must not be merged into this install branch.
 - Full app/runtime tests were not run because this round is docs-only and changed no runtime paths.
 
-Next action: Commit and push the reconciled Quant install branch, then review or open PR for `codex/meta-harness-install`.
+Next action: Review or open PR for `codex/meta-harness-install`.
 
-ClosurePacket: RoundID=ROUND-20260601-META-HARNESS-INSTALL; ScopeID=SCOPE-DOCS-OPS-META-HARNESS-VISIBILITY; ChecksTotal=10; ChecksPassed=10; ChecksFailed=0; Verdict=PASS; OpenRisks=original_dirty_quant_worktree_out_of_scope; NextAction=commit_and_push_install_branch
+ClosurePacket: RoundID=ROUND-20260601-META-HARNESS-INSTALL; ScopeID=SCOPE-DOCS-OPS-META-HARNESS-VISIBILITY; ChecksTotal=10; ChecksPassed=10; ChecksFailed=0; Verdict=PASS; OpenRisks=original_dirty_quant_worktree_out_of_scope; NextAction=review_or_open_pr_for_install_branch
 
 ClosureValidation: PASS
 SAWBlockValidation: PASS
-
