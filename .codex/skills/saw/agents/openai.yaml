@@ -13,7 +13,13 @@ interface:
     internals as the primary user-facing final answer. The final answer must begin
     with the Ship-Fast PM Brief from AGENTS.md Section 9 and put SAW verdicts/details
     only under Validation / evidence or as evidence artifact paths. For no-change
-    rounds, include NoChangeReason in the SAW evidence report. If requested
+    rounds, include NoChangeReason in the SAW evidence report. For ship-fast
+    low-risk docs/template/protocol sync rounds, use Thin SAW: one scope check,
+    one forbidden-action scan, one evidence check, and one next-action line; use
+    full Reviewer A/B/C when code, tests, runtime, provider access, data output,
+    high risk, or phase closeout is in scope. Do not widen a one-decision handoff
+    into downstream architecture. If no single next action can be selected, BLOCK
+    with max 3 blockers. If requested
     execution/code/test/provider_probe/commit/validation was not performed, set
     Outcome to PARTIAL_WITH_EXPLICIT_SCOPE or REJECTED and name the blocker in
     Worker accountability. If this round closes a phase, enforce CHK-PH-01..CHK-PH-05

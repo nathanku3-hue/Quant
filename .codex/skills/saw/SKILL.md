@@ -14,6 +14,13 @@ Output boundary:
 - Do not lead the final response with numbered reviewer passes, command logs, ClosurePacket lines, or SAW internals.
 - Put SAW verdicts, closure validation, and reviewer detail under `Validation / evidence` or publish them as evidence artifacts.
 
+Ship-Fast boundary:
+- For low-risk docs/template/protocol sync, use Thin SAW unless the user explicitly requests full SAW or phase-end closeout applies.
+- Thin SAW requires one scope check, one forbidden-action scan, one evidence check, and one next-action line.
+- Full Reviewer A/B/C remains mandatory for code, tests, runtime, provider access, data output, high-risk work, or phase-end closeout.
+- SAW must not widen one-decision handoffs into downstream architecture.
+- If no single next action can be selected, publish `SAW Verdict: BLOCK` with max 3 blockers.
+
 ## 0. Project Init Hierarchy Confirmation (Hard Stop)
 1. At project init, load:
    - `../_shared/hierarchy_template.md`

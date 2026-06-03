@@ -25,6 +25,20 @@ What I did: <one paragraph answering what actually changed and practical effect>
 PM-facing status: <one short paragraph naming current state and blocked/unblocked status>
 ```
 
+## Ship-Fast Decision Gate
+
+```text
+What is done:
+What is blocked:
+User order interpreted as:
+Recommended next step:
+Why this is correct:
+Alternatives considered:
+Decision needed from user: <approve|redirect|hold>
+Scope limit:
+Stop rule:
+```
+
 ## Scope And Artifacts
 
 ```text
@@ -72,6 +86,7 @@ remaining_blocker: <blocker or none>
 
 Rules:
 - The first paragraph must answer what actually changed.
+- The Ship-Fast Decision Gate must choose one next decision before governance expansion.
 - Do not lead with command logs, reviewer chatter, or numbered SAW/logsheet detail.
 - Evidence artifacts are files, reports, commits, hashes, or zips; they are not the same field as passed validations.
 - If requested work was not performed, set `Outcome: PARTIAL_WITH_EXPLICIT_SCOPE` or `REJECTED` and name the blocker.

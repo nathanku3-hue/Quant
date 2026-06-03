@@ -117,6 +117,11 @@ Risk tier checks:
 - Do not publish loose sidecar files such as `main.diff`, `main_next_scope.md`, or separate packet folders as deliverables; if those aids are needed, include them inside the zip.
 - Keep Quant packet build artifacts under the ignored `tmp\expert_packets\` area inside `E:\Code\Quant` rather than creating additional sibling folders under `E:\Code`.
 - The zip remains advisory evidence only and does not authorize execution, provider ingestion, data generation, ranking/scoring, alerts, broker/order paths, or dashboard runtime scope widening.
+- Before any expert handoff, approval gate, execution packet, or closure report, complete or reference the Ship-Fast Decision Gate from `docs/templates/ship_fast_decision_gate.md` and answer exactly one next decision before expanding into governance.
+- Expert handoffs must use `docs/templates/ship_fast_expert_handoff_v0.md`: one question, current delta, evidence needed, forbidden scope, max 3 preconditions, max 3 stop rules, and one-line next action.
+- Each expert/review/execution/closure artifact must declare exactly one mode: `ADVISORY_REVIEW`, `APPROVAL_GATE`, `EXECUTION_PACKET`, or `CLOSURE_REPORT`; no artifact may use more than one mode.
+- If an expert report predates current truth, prepend: `Superseded on authorization status by <RoundID>; still valid only for guardrails.`
+- Expert and reviewer outputs must not design downstream architecture unless it changes the immediate decision.
 
 ## 8. Definition of Done
 - Code implemented with acceptance criteria met.
@@ -174,6 +179,9 @@ Every plan response must be concise and decision-oriented:
 SAW must run after each work round (even docs-only rounds):
 - SAW reconciliation/report publication is terminal for the round and does not recursively trigger another SAW round.
 - Exception: if the user explicitly requests a test-only rerun and explicitly waives SAW for that round, SAW may be skipped for that single round; still report test evidence.
+- Ship-fast low-risk docs/template/protocol sync may use Thin SAW: one scope check, one forbidden-action scan, one evidence check, and one next-action line.
+- Full Reviewer A/B/C SAW remains mandatory for code, tests, runtime, provider access, data output, high-risk work, or phase-end closeout.
+- If SAW cannot select one next action, publish `SAW Verdict: BLOCK` with max 3 blockers.
 1. Implementer pass
    - Owned files, acceptance checks, and non-destructive constraints.
 2. Reviewer A/B/C pass (independent from implementer ownership)
