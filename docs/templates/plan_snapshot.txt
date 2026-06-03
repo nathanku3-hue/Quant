@@ -15,6 +15,8 @@ Planning token rule: Boundary=<...>; Owner/Handoff=<...>; Acceptance Checks=<...
 Row rule: keep single-line cells; shorten/truncate text to avoid wrap.
 Remark: 2) <secondary item> [00/100]: <one-line reason> (optional; show only if next_step_certainty < 75 and rating_diff_between_top_next_steps < 20)
 
+Final-response boundary: this snapshot is a planning artifact only. Do not use it as the final response structure. Final responses must start with the Ship-Fast PM Brief fields: Outcome, Round, Progress, Confidence. SAW Verdict, ClosurePacket, ClosureValidation, and SAWBlockValidation belong under Validation / evidence only.
+
 Expanded Stage (optional, one stage only)
 +--------------------+------------------------------+--------+--------------------------+--------------------------+
 | Sub-Stage          | Output Artifact              | Rating | Next Action              | Done When                |

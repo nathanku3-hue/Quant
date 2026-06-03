@@ -134,9 +134,10 @@ Risk tier checks:
 ## 9. Observability and Reporting (Mandatory)
 - Final responses must use the Ship-Fast PM Brief unless the user explicitly asks for raw logs, code review format, or a narrow Q&A answer.
 - The first paragraph must answer: what actually changed, what artifact/result was produced, and practical effect.
-- If the requested work type is execution/code/test/provider_probe/commit/validation, the final response must explicitly say whether that work was performed; if not, `Outcome` must be `REJECTED` or `PARTIAL_WITH_EXPLICIT_SCOPE`.
+- If the requested work type is execution/code/test/provider_probe/commit/validation/data_output, the final response must explicitly say whether that work was performed; if not, `Outcome` must be `REJECTED` or `PARTIAL_WITH_EXPLICIT_SCOPE`.
 - Do not lead with numbered command logs, subagent chatter, SAW internals, or generic activity summaries.
 - Do not say work is docs-only unless the requested work was docs-only or execution was explicitly rejected/blocked.
+- The final answer must start with `Outcome`, `Round`, `Progress`, and `Confidence`; do not start with `# Worker Report`, `Worker Report`, SAW Verdict, ClosurePacket, numbered reviewer passes, numbered command logs, or SAW internals.
 - Required top fields:
   - `Outcome: DONE / PARTIAL_WITH_EXPLICIT_SCOPE / REJECTED`
   - `Round: <round/task>`
@@ -205,6 +206,7 @@ SAW must run after each work round (even docs-only rounds):
    - Document sorting order is maintained in `docs/checklist_milestone_review.md`.
 5. Final-response rule
    - SAW detail is evidence, not the primary final answer.
+   - SAW is an evidence artifact only. It must never be the primary final-answer skeleton.
    - The final answer must begin with the Ship-Fast PM Brief from Section 9.
    - Include SAW details only under `Validation / evidence` or as an evidence artifact path.
    - A verbose numbered SAW/logsheet cannot be the primary final response.
@@ -244,7 +246,7 @@ SAW must run after each work round (even docs-only rounds):
   - Skill closure tokens are internal validation evidence.
   - They do not replace the Section 9 PM brief.
   - If requested work was code/test/provider/commit/validation, the worker accountability block must state what was actually performed.
-  - Silent downgrade from execution work to docs-only work is forbidden; use `Outcome: REJECTED` or `PARTIAL_WITH_EXPLICIT_SCOPE` and name the blocker.
+  - Silent downgrade from execution, code, test, provider_probe, commit, validation, or data_output work to docs-only work is forbidden; use `Outcome: REJECTED` or `PARTIAL_WITH_EXPLICIT_SCOPE` and name the blocker.
 - Evidence-link minimums by skill:
   - `$se-executor`: every task must have `TaskID` and linked `EvidenceID`; unlinked task => `BLOCK`.
   - `$research-analysis`: every high-confidence claim must include `ClaimID` + source locator (`SourceID`, page/section); missing locator => `BLOCK`.

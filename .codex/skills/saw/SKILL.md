@@ -10,8 +10,8 @@ When the round closes a phase, execute Section 6 in the same round before publis
 
 Output boundary:
 - SAW output is validation evidence, not the primary final answer.
-- The user-facing final response must begin with the Ship-Fast PM Brief from `AGENTS.md` Section 9.
-- Do not lead the final response with numbered reviewer passes, command logs, ClosurePacket lines, or SAW internals.
+- The user-facing final response must begin with the Ship-Fast PM Brief top fields: `Outcome`, `Round`, `Progress`, `Confidence`.
+- Never use `# Worker Report`, numbered reviewer passes, command logs, ClosurePacket lines, SAW Verdict, or SAW internals as the primary final answer.
 - Put SAW verdicts, closure validation, and reviewer detail under `Validation / evidence` or publish them as evidence artifacts.
 
 Ship-Fast boundary:
@@ -132,7 +132,8 @@ Ship-Fast boundary:
 
 ## 4.1 Final Response Boundary
 1. The final response must answer `what actually changed?` before reporting reviewer mechanics.
-2. Required final response shape:
+2. The first visible block must be the PM brief fields: `Outcome`, `Round`, `Progress`, and `Confidence`.
+3. Required final response shape:
    - `Outcome`
    - `Round`
    - `Progress`
@@ -144,9 +145,9 @@ Ship-Fast boundary:
    - `What is still blocked`
    - `Next round recommendation`
    - `Worker accountability`
-3. `SAW Verdict`, `ClosurePacket`, `ClosureValidation`, and `SAWBlockValidation` belong in `Validation / evidence` or a SAW report artifact.
-4. A verbose numbered SAW/logsheet is invalid as the primary final answer.
-5. If execution/code/test/provider_probe/commit/validation was requested but not performed, the final response must set `Outcome: PARTIAL_WITH_EXPLICIT_SCOPE` or `Outcome: REJECTED` and name the blocker.
+4. `SAW Verdict`, `ClosurePacket`, `ClosureValidation`, and `SAWBlockValidation` are evidence only and belong in `Validation / evidence` or a SAW report artifact.
+5. A verbose numbered SAW/logsheet is invalid as the primary final answer.
+6. If execution/code/test/provider_probe/commit/validation/data_output was requested but not performed, the final response must set `Outcome: PARTIAL_WITH_EXPLICIT_SCOPE` or `Outcome: REJECTED` and name the blocker.
 
 ## 5. Top-Down Snapshot Guardrail
 1. Use project-based hierarchy (`L1` project pillar, `L2` streams, `L3` stages).

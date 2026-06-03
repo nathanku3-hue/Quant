@@ -9,10 +9,13 @@ interface:
     ScopeID=<...>; ChecksTotal=<int>; ChecksPassed=<int>; ChecksFailed=<int>;
     Verdict=<PASS|BLOCK>; OpenRisks=<...>; NextAction=<...>. Run shared validators
     and output both ClosureValidation: PASS/BLOCK and SAWBlockValidation: PASS/BLOCK.
-    Do not use numbered reviewer passes, ClosurePacket lines, command logs, or SAW
-    internals as the primary user-facing final answer. The final answer must begin
-    with the Ship-Fast PM Brief from AGENTS.md Section 9 and put SAW verdicts/details
-    only under Validation / evidence or as evidence artifact paths. For no-change
+    Do not use # Worker Report, numbered reviewer passes, ClosurePacket lines,
+    command logs, SAW Verdict, or SAW internals as the primary user-facing final
+    answer. The final answer must start with Outcome, Round, Progress, and
+    Confidence from the Ship-Fast PM Brief in AGENTS.md Section 9 and put SAW
+    verdicts/details only under Validation / evidence or as evidence artifact
+    paths. Do not add SAW or ClosurePacket details after the PM Brief as a
+    second primary report skeleton. For no-change
     rounds, include NoChangeReason in the SAW evidence report. For ship-fast
     low-risk docs/template/protocol sync rounds, use Thin SAW: one scope check,
     one forbidden-action scan, one evidence check, and one next-action line; use
@@ -20,9 +23,10 @@ interface:
     high risk, or phase closeout is in scope. Do not widen a one-decision handoff
     into downstream architecture. If no single next action can be selected, BLOCK
     with max 3 blockers. If requested
-    execution/code/test/provider_probe/commit/validation was not performed, set
-    Outcome to PARTIAL_WITH_EXPLICIT_SCOPE or REJECTED and name the blocker in
-    Worker accountability. If this round closes a phase, enforce CHK-PH-01..CHK-PH-05
+    execution/code/test/provider_probe/commit/validation/data_output was not
+    performed, set Outcome to PARTIAL_WITH_EXPLICIT_SCOPE or REJECTED and name
+    the blocker in Worker accountability. If this round closes a phase, enforce
+    CHK-PH-01..CHK-PH-07
     including runtime smoke timeout_sec=180 and reproducible E2E evidence, generate
     docs/handover/phase<NN>_handover.md using the SAW phase-end template, emit
     ContextPacketReady, ConfirmationRequired: YES, and NextPhaseApproval: PENDING,
