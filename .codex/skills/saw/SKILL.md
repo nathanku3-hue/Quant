@@ -1,12 +1,18 @@
 ---
 name: saw
-description: Subagents-After-Work execution and review protocol for non-trivial changes. Use when a work round finishes and Codex must run implementer/reviewer passes, reconcile findings, and publish a PASS/BLOCK report with document-change visibility, GitHub-optimized doc sorting, and project-init hierarchy confirmation.
+description: Subagents-After-Work execution and review protocol for non-trivial changes. Use when a work round finishes and Codex must run implementer/reviewer passes, reconcile findings, and publish a PASS/BLOCK SAW evidence report. Final user-facing responses must remain PM briefs, not SAW logsheets.
 ---
 
 # SAW Skill
 
 Execute this workflow after each work round.
 When the round closes a phase, execute Section 6 in the same round before publishing final status.
+
+Output boundary:
+- SAW output is validation evidence, not the primary final answer.
+- The user-facing final response must begin with the Ship-Fast PM Brief from `AGENTS.md` Section 9.
+- Do not lead the final response with numbered reviewer passes, command logs, ClosurePacket lines, or SAW internals.
+- Put SAW verdicts, closure validation, and reviewer detail under `Validation / evidence` or publish them as evidence artifacts.
 
 ## 0. Project Init Hierarchy Confirmation (Hard Stop)
 1. At project init, load:
@@ -65,7 +71,9 @@ When the round closes a phase, execute Section 6 in the same round before publis
 2. Do not close SAW while any in-scope Critical/High finding is unresolved unless user explicitly accepts risk.
 3. Inherited out-of-scope Critical/High findings must be recorded in `Open Risks` with owner and target milestone.
 4. Publish `SAW Verdict: PASS` or `SAW Verdict: BLOCK`.
-5. SAW report publication is terminal for the round and must not trigger nested SAW recursion.
+5. SAW report publication is terminal for the SAW evidence artifact and must not trigger nested SAW recursion.
+   - It does not replace the PM-facing final response.
+   - The final response still uses the Ship-Fast PM Brief and summarizes SAW only where it affects PM decisions.
 6. Emit closure counts:
    - `ChecksTotal`, `ChecksPassed`, `ChecksFailed` from the `CHK-*` set.
    - `ChecksFailed` includes explicit fails and missing/not-run checks.
@@ -114,6 +122,24 @@ When the round closes a phase, execute Section 6 in the same round before publis
 10. New-context block (required only when phase closes):
    - `ContextPacketReady: PASS/BLOCK`
    - `ConfirmationRequired: YES`
+
+## 4.1 Final Response Boundary
+1. The final response must answer `what actually changed?` before reporting reviewer mechanics.
+2. Required final response shape:
+   - `Outcome`
+   - `Round`
+   - `Progress`
+   - `Confidence`
+   - `What I did`
+   - `PM-facing status`
+   - `Key decisions made`
+   - `Validation / evidence`
+   - `What is still blocked`
+   - `Next round recommendation`
+   - `Worker accountability`
+3. `SAW Verdict`, `ClosurePacket`, `ClosureValidation`, and `SAWBlockValidation` belong in `Validation / evidence` or a SAW report artifact.
+4. A verbose numbered SAW/logsheet is invalid as the primary final answer.
+5. If execution/code/test/provider_probe/commit/validation was requested but not performed, the final response must set `Outcome: PARTIAL_WITH_EXPLICIT_SCOPE` or `Outcome: REJECTED` and name the blocker.
 
 ## 5. Top-Down Snapshot Guardrail
 1. Use project-based hierarchy (`L1` project pillar, `L2` streams, `L3` stages).

@@ -112,6 +112,12 @@ Risk tier checks:
 - Read files before overwriting; preserve surrounding architecture style.
 - Keep new dependencies minimal and justified.
 
+### 7.1 Expert Packet Deliverables
+- When packing current status for expert guidance, produce exactly one deliverable zip.
+- Do not publish loose sidecar files such as `main.diff`, `main_next_scope.md`, or separate packet folders as deliverables; if those aids are needed, include them inside the zip.
+- Keep Quant packet build artifacts under the ignored `tmp\expert_packets\` area inside `E:\Code\Quant` rather than creating additional sibling folders under `E:\Code`.
+- The zip remains advisory evidence only and does not authorize execution, provider ingestion, data generation, ranking/scoring, alerts, broker/order paths, or dashboard runtime scope widening.
+
 ## 8. Definition of Done
 - Code implemented with acceptance criteria met.
 - Tests and smoke checks pass.
@@ -121,20 +127,25 @@ Risk tier checks:
 - Operational impact and rollback path are documented.
 
 ## 9. Observability and Reporting (Mandatory)
-- Every normal report/conversation must include one rating:
-- `Progress: X/100` for execution status updates.
-- `Confidence: Y/10` for proposals/analysis.
-- If no separate planning response is required, include:
-  - `TODO:` concise execution checklist
-  - `Confidence: Y/10`
-  - `Critical Mission:` one line naming the highest-impact objective for the round
-- For strict-schema subagent review outputs, the rating may be emitted once in the parent orchestration summary for that round.
-- If `Confidence < 7/10`, include `Unknowns:` and `Next verification step:`.
-- Milestone report footer format is required:
-- `Evidence:`
-- `Assumptions:`
-- `Open Risks:`
-- `Rollback Note:`
+- Final responses must use the Ship-Fast PM Brief unless the user explicitly asks for raw logs, code review format, or a narrow Q&A answer.
+- The first paragraph must answer: what actually changed, what artifact/result was produced, and practical effect.
+- If the requested work type is execution/code/test/provider_probe/commit/validation, the final response must explicitly say whether that work was performed; if not, `Outcome` must be `REJECTED` or `PARTIAL_WITH_EXPLICIT_SCOPE`.
+- Do not lead with numbered command logs, subagent chatter, SAW internals, or generic activity summaries.
+- Do not say work is docs-only unless the requested work was docs-only or execution was explicitly rejected/blocked.
+- Required top fields:
+  - `Outcome: DONE / PARTIAL_WITH_EXPLICIT_SCOPE / REJECTED`
+  - `Round: <round/task>`
+  - `Progress: <before>/100 -> <after>/100`
+  - `Confidence: <0-10>/10`
+- Required sections:
+  - `What I did`
+  - `PM-facing status`
+  - `Key decisions made`
+  - `Validation / evidence`
+  - `What is still blocked`
+  - `Next round recommendation`
+  - `Worker accountability`
+- Keep validation details PM-scannable: passed checks, skipped checks with reason, and evidence artifacts.
 
 ## 10. Self-Learning Feedback Loop (Mandatory)
 - Source of truth: `docs/lessonss.md`.
@@ -149,58 +160,15 @@ Risk tier checks:
 - If the same mistake repeats, promote the guardrail into this file (`AGENTS.md`) in the same milestone.
 
 ## 11. Plan Response Contract (Mandatory for Every Plan Request)
-Every plan response must contain these sections:
-1. High Confidence Items
-   - One line per item + one-line reason.
-   - Reason must be one of: `industry standard`, `given repo constraints`, or `research evidence via skill`.
-2. Not Clear / Low Certainty
-   - One line per item + one-line reason.
-   - For each low-certainty item, propose more than one method, then state preferred method + one-line reason.
-3. Out of Boundary / Need Extra Help
-   - One line per item + one-line reason.
-4. Top-Down Snapshot
-   - Use a project-based hierarchy (not technical layers).
-   - Initialize/confirm at project start:
-     - `L1`: Project Pillar (example: `Backtest Engine (Signal System)`).
-     - `L2`: Streams (`Backend`, `Frontend/UI`, `Data`, `Ops`).
-     - `L3`: Stage flow (`Planning -> Executing -> Iterate Loop -> Final Verification -> CI/CD`).
-   - For each plan output, include this hierarchy header block:
-     - `L1: <project pillar>`
-     - `L2 Active Streams: <list>`
-     - `L2 Deferred Streams: <list or none>`
-     - `L3 Stage Flow: Planning -> Executing -> Iterate Loop -> Final Verification -> CI/CD`
-     - `Active Stream: <one stream>`
-     - `Active Stage Level: <L2|L3|L4>`
-   - Main table must show only stage rows under the active stage level and selected active stream.
-   - Stage set must be MECE under the same parent scope.
-   - Use terminal-safe fixed-width ASCII format (not Markdown tables).
-   - Use compact columns only: `Stage`, `Current Scope`, `Rating`, `Next Scope`.
-   - Stage rows must be specific to the selected active stream.
-   - Planning stage must confirm stream boundary, owner/handoff, and acceptance checks before execution starts.
-   - Planning row must explicitly include `Boundary`, `Owner/Handoff`, and `Acceptance Checks` (concise tokens are acceptable).
-   - Keep each row single-line (no wrapped cells). If needed, shorten/truncate text to fit.
-   - Primary next step goes inside `Next Scope` and should include rating plus one-line reason.
-   - Guardrail: if all rows share the same scope, show `L1: <scope>` as the top-left header line and do not repeat `L1` as a table row or column.
-   - Secondary next suggestion must be outside the table as `Remark:` and is optional.
-   - Show the secondary suggestion only when both are true:
-     - `next_step_certainty < 75`
-     - `rating_diff_between_top_next_steps < 20`
-   - Scoring rubric:
-     - `Rating`: `0-100` progress/readiness for the current stage row.
-     - `next_step_certainty`: `0-100` confidence for the next-step recommendation.
-     - `rating_diff_between_top_next_steps`: absolute delta between primary and secondary next-step ratings.
-   - One-stage expansion rule:
-     - Keep the main table at the active stage level.
-     - Expand only one stage row (the top next step) into the next depth (`L4`) when needed.
-     - Expansion triggers:
-       - two or more plausible sub-steps are blocking start, or
-       - `next_step_certainty < 75`, or
-       - high-payoff but ambiguous path, or
-       - handoff risk.
-     - Expanded mini-table must have 3-5 MECE children with concrete artifact and done condition.
-     - After action, collapse back to the active level when certainty is `>= 75`; if still `< 75`, keep the expanded set capped at 5 and replace (do not append).
-   - Canonical policy is documented in `docs/spec.md`; live loop state is tracked in active `docs/phase*-brief.md`.
-   - Canonical sample format lives in `docs/templates/plan_snapshot.txt`.
+Every plan response must be concise and decision-oriented:
+- State the recommended next action first.
+- Separate high-confidence items from unknowns.
+- Name P0/P1 risks before implementation.
+- Name the exact files expected to change.
+- Include forbidden scope when scope creep is likely.
+- Use the Top-Down Snapshot only when the user asks for a formal plan or when multi-stream coordination is actually needed.
+- Planning must not become the final report format.
+- Canonical sample format lives in `docs/templates/plan_snapshot.txt`, but final answers use Section 9.
 
 ## 12. SAW: Subagents After Work (Mandatory)
 SAW must run after each work round (even docs-only rounds):
@@ -227,10 +195,16 @@ SAW must run after each work round (even docs-only rounds):
    - Hierarchy Confirmation stamp (`Approved | Session | Trigger | Domains`)
    - Document Changes Showing: path + change summary + reviewer status
    - Document sorting order is maintained in `docs/checklist_milestone_review.md`.
+5. Final-response rule
+   - SAW detail is evidence, not the primary final answer.
+   - The final answer must begin with the Ship-Fast PM Brief from Section 9.
+   - Include SAW details only under `Validation / evidence` or as an evidence artifact path.
+   - A verbose numbered SAW/logsheet cannot be the primary final response.
 
 ## 13. Skill Hooks (Mandatory)
 - Call `$saw` (`.codex/skills/saw/SKILL.md`) for SAW rounds and reporting structure.
 - Call `$research-analysis` (`.codex/skills/research-analysis/SKILL.md`) when plan confidence should be backed by external research evidence.
+- Harness workflow skills/templates: use `scope-selector` before choosing bounded work, `expert-context-packer` before external/specialist review, then reconcile via `worker_done_contract`, `expert_reconciliation_matrix`, `stream_contract`, and `harness-feedback` when repeated workflow friction appears.
 - Optional trigger-based skills (not mandatory on day 1):
   - `$se-executor` (`.codex/skills/se-executor/SKILL.md`) for software-engineering execution rigor on multi-file/high-risk changes.
   - `$architect-review` (`.codex/skills/architect-review/SKILL.md`) for architecture/coupling/scaling/security tradeoff reviews.
@@ -258,6 +232,11 @@ SAW must run after each work round (even docs-only rounds):
   - Validate using:
     - `.venv\Scripts\python .codex/skills/_shared/scripts/validate_closure_packet.py --packet "<ClosurePacket line>" --require-open-risks-when-block --require-next-action-when-block`
   - Any missing packet field forces `Verdict: BLOCK` for closure.
+- Skill-output boundary:
+  - Skill closure tokens are internal validation evidence.
+  - They do not replace the Section 9 PM brief.
+  - If requested work was code/test/provider/commit/validation, the worker accountability block must state what was actually performed.
+  - Silent downgrade from execution work to docs-only work is forbidden; use `Outcome: REJECTED` or `PARTIAL_WITH_EXPLICIT_SCOPE` and name the blocker.
 - Evidence-link minimums by skill:
   - `$se-executor`: every task must have `TaskID` and linked `EvidenceID`; unlinked task => `BLOCK`.
   - `$research-analysis`: every high-confidence claim must include `ClaimID` + source locator (`SourceID`, page/section); missing locator => `BLOCK`.
