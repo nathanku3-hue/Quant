@@ -26,12 +26,14 @@ DecisionState: <PENDING|APPROVED|BLOCKED|DEFERRED>
 ## Matrix
 
 ```text
-Expert: <name or role>
-Recommendation: <short rec>
-Veto: <Y/N + reason>
-LowConfidence: <Y/N + reason>
-OutOfBoundary: <Y/N + boundary>
-OrchestratorDecision: <accept/defer/reject>
++--------------+----------------+------+----------------+-----------------+--------------+-----------------------+
+| Expert       | Recommendation | Veto | LowConfidence  | OutOfBoundary   | StreamOrder  | OrchestratorDecision  |
++--------------+----------------+------+----------------+-----------------+--------------+-----------------------+
+| Product      | <short rec>    | Y/N  | Y/N + reason   | Y/N + boundary  | <1..N/hold>  | <accept/defer/reject> |
+| Architecture | <short rec>    | Y/N  | Y/N + reason   | Y/N + boundary  | <1..N/hold>  | <accept/defer/reject> |
+| Domain       | <short rec>    | Y/N  | Y/N + reason   | Y/N + boundary  | <1..N/hold>  | <accept/defer/reject> |
+| Ops          | <short rec>    | Y/N  | Y/N + reason   | Y/N + boundary  | <1..N/hold>  | <accept/defer/reject> |
++--------------+----------------+------+----------------+-----------------+--------------+-----------------------+
 ```
 
 ## Findings
