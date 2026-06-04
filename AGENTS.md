@@ -211,6 +211,11 @@ SAW must run after each work round (even docs-only rounds):
    - Include SAW details only under `Validation / evidence` or as an evidence artifact path.
    - A verbose numbered SAW/logsheet cannot be the primary final response.
 
+### 12.1 Post-worker GitHub Actions / SAW Checks
+Post-worker GitHub Actions / SAW checks are read-only evidence wrappers. They may validate worker-report v2 shape, changed-file allowlists, YAML/Markdown hygiene, and SAW evidence placement. They must not use secrets, provider access, WRDS, runtime/data output, or repair edits without a separate approved round.
+
+Quant vendors the post-worker SAW workflow locally because the reusable source workflow lives in private meta-harness and this repo is public. Keep the workflow aligned with meta-harness during explicit sync rounds only.
+
 ## 13. Skill Hooks (Mandatory)
 - Call `$saw` (`.codex/skills/saw/SKILL.md`) for SAW rounds and reporting structure.
 - Call `$research-analysis` (`.codex/skills/research-analysis/SKILL.md`) when plan confidence should be backed by external research evidence.
