@@ -1,0 +1,40 @@
+{
+  "boundary_verdict": "v2_blocked_from_promotion",
+  "candidate_event_id": "9ef178ff-e8cb-4db8-89e1-7309da9608ed",
+  "candidate_id": "PH65_G2_SYNTHETIC_FIXTURE_001",
+  "canonical_engine_required": true,
+  "code_ref": "v2_discovery/replay/canonical_replay.py@phase65-g3",
+  "comparison_fields": [
+    "positions",
+    "cash",
+    "turnover",
+    "transaction_cost",
+    "gross_exposure",
+    "net_exposure",
+    "row_count",
+    "date_range",
+    "manifest_uri",
+    "source_quality",
+    "candidate_id"
+  ],
+  "comparison_result": "match",
+  "data_snapshot": {
+    "asof": "2026-05-09",
+    "dataset": "g1_synthetic_v2_proxy_fixture",
+    "manifest_sha256": "d35153d7e27dcfc421d013599e0b0ddf2ef6037ecd3d8277adf8aee475215659"
+  },
+  "family_id": "PH65_G2_SINGLE_REGISTERED_FIXTURE",
+  "manifest_sha256": "d35153d7e27dcfc421d013599e0b0ddf2ef6037ecd3d8277adf8aee475215659",
+  "manifest_uri": "data/fixtures/v2_proxy/synthetic_manifest.json",
+  "mismatch_count": 0,
+  "promotion_ready": false,
+  "proxy_run_id": "PH65_G2_SINGLE_FIXTURE_PROXY_RUN_001",
+  "registry_note_event_id": "7887053a-1437-4c6b-9851-f261a79e1e53",
+  "schema_version": "1.0.0",
+  "source_quality": "non_canonical",
+  "v1_engine_name": "core.engine.run_simulation",
+  "v1_engine_version": "phase65-g3-core-engine-current",
+  "v1_replay_id": "PH65_G3_V1_CANONICAL_REPLAY_001",
+  "v2_engine_name": "v2_proxy",
+  "v2_engine_version": "0.1.0"
+}

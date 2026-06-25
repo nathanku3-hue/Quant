@@ -1,0 +1,495 @@
+{
+  "artifact_groups": {
+    "fundamentals": {
+      "candidates": [
+        {
+          "columns": [
+            "permno",
+            "ticker",
+            "fiscal_period_end",
+            "release_date",
+            "filing_date",
+            "published_at",
+            "fyearq",
+            "fqtr",
+            "revenue",
+            "operating_income",
+            "total_revenue_q",
+            "operating_income_q",
+            "total_assets_q",
+            "inventory_q",
+            "capex_q",
+            "depreciation_q",
+            "gross_profit_q",
+            "cogs_q",
+            "receivables_q",
+            "deferred_revenue_q",
+            "delta_deferred_revenue_q",
+            "operating_margin_q",
+            "operating_margin_delta_q",
+            "gross_margin_q",
+            "gm_accel_q",
+            "capex_sales_q",
+            "delta_capex_sales",
+            "book_to_bill_proxy_q",
+            "dso_q",
+            "delta_dso_q",
+            "revenue_inventory_q",
+            "delta_revenue_inventory",
+            "asset_growth_yoy",
+            "net_income_q",
+            "equity_q",
+            "eps_basic_q",
+            "eps_diluted_q",
+            "eps_q",
+            "eps_ttm",
+            "eps_growth_yoy",
+            "roe_q",
+            "invested_capital",
+            "roic",
+            "revenue_growth_yoy",
+            "oibdpq",
+            "atq",
+            "ltq",
+            "xrdq",
+            "oancfy",
+            "oancf_q",
+            "oancf_ttm",
+            "ebitda_ttm",
+            "revenue_ttm",
+            "xrd_ttm",
+            "dlttq",
+            "dlcq",
+            "cheq",
+            "cshoq",
+            "prcraq",
+            "mv_q",
+            "total_debt",
+            "net_debt",
+            "ev",
+            "ev_ebitda",
+            "leverage_ratio",
+            "rd_intensity",
+            "quality_pass_mvq",
+            "source",
+            "ingested_at"
+          ],
+          "date_range": {
+            "end": null,
+            "start": null
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\processed\\fundamentals.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 431678
+        },
+        {
+          "columns": [
+            "gvkey",
+            "datadate",
+            "rdq",
+            "available_date",
+            "fyearq",
+            "fqtr",
+            "revtq",
+            "oibdpq",
+            "niq",
+            "epspxq",
+            "epsfxq",
+            "atq",
+            "ltq",
+            "ceqq",
+            "cheq",
+            "invtq",
+            "rectq",
+            "dlcq",
+            "dlttq",
+            "oancfy",
+            "capxy",
+            "cshoq",
+            "prccq",
+            "source"
+          ],
+          "date_range": {
+            "end": null,
+            "start": null
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\processed\\fundamentals_pit.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 295785
+        },
+        {
+          "columns": [
+            "date",
+            "permno",
+            "ticker",
+            "release_date",
+            "published_at",
+            "roic",
+            "operating_margin_q",
+            "operating_margin_delta_q",
+            "gross_margin_q",
+            "gm_accel_q",
+            "capex_sales_q",
+            "delta_capex_sales",
+            "book_to_bill_proxy_q",
+            "dso_q",
+            "delta_dso_q",
+            "revenue_inventory_q",
+            "delta_revenue_inventory",
+            "cogs_q",
+            "receivables_q",
+            "deferred_revenue_q",
+            "delta_deferred_revenue_q",
+            "asset_growth_yoy",
+            "roe_q",
+            "eps_q",
+            "eps_ttm",
+            "eps_growth_yoy",
+            "revenue_growth_yoy",
+            "ev_ebitda",
+            "leverage_ratio",
+            "rd_intensity",
+            "oancf_ttm",
+            "ebitda_ttm",
+            "quality_pass"
+          ],
+          "date_range": {
+            "end": "2026-02-13",
+            "start": "2000-02-07"
+          },
+          "duplicate_date_permno": 0,
+          "exists": true,
+          "null_key_rows": 0,
+          "path": "E:\\Code\\Quant\\data\\processed\\daily_fundamentals_panel.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 15332489
+        }
+      ],
+      "present": true,
+      "primary_path": "E:\\Code\\Quant\\data\\processed\\fundamentals.parquet"
+    },
+    "liquidity": {
+      "candidates": [
+        {
+          "columns": [
+            "date",
+            "walcl_mm",
+            "wdtgal_mm",
+            "rrp_bn",
+            "sofr_rate",
+            "effr_rate",
+            "dtb3_rate",
+            "vix_level",
+            "dxy_px",
+            "spx_px",
+            "us_net_liquidity_mm",
+            "liquidity_impulse",
+            "repo_spread_bps",
+            "repo_stress",
+            "lrp_index",
+            "dollar_stress_corr",
+            "global_dollar_stress",
+            "smart_money_flow",
+            "realized_vol_21d",
+            "vrp"
+          ],
+          "date_range": {
+            "end": "2026-02-13",
+            "start": "2000-01-03"
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\processed\\liquidity_features.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 6590
+        }
+      ],
+      "present": true,
+      "primary_path": "E:\\Code\\Quant\\data\\processed\\liquidity_features.parquet"
+    },
+    "macro": {
+      "candidates": [
+        {
+          "columns": [
+            "date",
+            "vix_level",
+            "vix3m_level",
+            "vvix_level",
+            "dxy_px",
+            "spx_px",
+            "hyg_px",
+            "lqd_px",
+            "mtum_px",
+            "spy_close",
+            "qqq_close",
+            "bnd_px",
+            "btc_px",
+            "sofr_rate",
+            "effr_rate",
+            "t10y2y_rate",
+            "dfii10_rate",
+            "vix_proxy",
+            "vix_vix3m_spread",
+            "vix_term_ratio",
+            "vix_backwardation",
+            "liquidity_air_pocket",
+            "qqq_ret_1d",
+            "qqq_ret_5d",
+            "qqq_ret_21d",
+            "qqq_peak_252d",
+            "qqq_drawdown_252d",
+            "qqq_sma50",
+            "qqq_ma200",
+            "qqq_ma200_trend_gate",
+            "qqq_ret_1d_z_adapt",
+            "qqq_ret_5d_z_adapt",
+            "qqq_ret_21d_z_adapt",
+            "qqq_drawdown_252d_z_adapt",
+            "qqq_drawdown_5d_delta",
+            "qqq_drawdown_21d_delta",
+            "qqq_drawdown_5d_delta_z_adapt",
+            "qqq_drawdown_21d_delta_z_adapt",
+            "slow_bleed_label",
+            "sharp_shock_label",
+            "dxy_spx_corr_20d",
+            "dollar_squeeze",
+            "sofr_effr_spread",
+            "collateral_crisis",
+            "hyg_lqd_ratio",
+            "hyg_lqd_ratio_z63",
+            "credit_freeze",
+            "mtum_spy_corr_60d",
+            "momentum_crowding",
+            "vvix_pct_252",
+            "repo_spread_diff_1d",
+            "month_end_rebalance_flag",
+            "month_end_rebalance_direction",
+            "stress_count",
+            "regime_scalar"
+          ],
+          "date_range": {
+            "end": "2024-12-31",
+            "start": "2015-01-02"
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\processed\\macro_features.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 2523
+        },
+        {
+          "columns": [
+            "date",
+            "spy_close",
+            "vix_proxy"
+          ],
+          "date_range": {
+            "end": "2026-02-27",
+            "start": "2000-01-31"
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\processed\\macro.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 6559
+        }
+      ],
+      "present": true,
+      "primary_path": "E:\\Code\\Quant\\data\\processed\\macro_features.parquet"
+    },
+    "prices_tri": {
+      "candidates": [
+        {
+          "columns": [
+            "date",
+            "permno",
+            "ticker",
+            "tri",
+            "total_ret",
+            "legacy_adj_close",
+            "raw_close",
+            "volume"
+          ],
+          "date_range": {
+            "end": "2024-12-31",
+            "start": "2015-01-02"
+          },
+          "duplicate_date_permno": 0,
+          "exists": true,
+          "null_key_rows": 0,
+          "path": "E:\\Code\\Quant\\data\\processed\\prices_tri.parquet",
+          "price_null_ratio": 0.004354386173231259,
+          "return_null_ratio": 0.0,
+          "row_count": 20531941
+        }
+      ],
+      "present": true,
+      "primary_path": "E:\\Code\\Quant\\data\\processed\\prices_tri.parquet"
+    },
+    "sector_map": {
+      "candidates": [
+        {
+          "columns": [
+            "ticker",
+            "permno",
+            "sector",
+            "industry",
+            "quote_type",
+            "source",
+            "updated_at"
+          ],
+          "date_range": {
+            "end": null,
+            "start": null
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\static\\sector_map.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 3000
+        }
+      ],
+      "present": true,
+      "primary_path": "E:\\Code\\Quant\\data\\static\\sector_map.parquet"
+    },
+    "sidecars": {
+      "candidates": [
+        {
+          "columns": [
+            "date",
+            "permno",
+            "sp_rating",
+            "sp_score",
+            "price",
+            "total_return",
+            "cusip",
+            "isin",
+            "ticker",
+            "company_name",
+            "issue_date",
+            "source_as_of_date",
+            "source_file",
+            "source_sheet"
+          ],
+          "date_range": {
+            "end": "2023-11-27",
+            "start": "2023-01-03"
+          },
+          "duplicate_date_permno": 0,
+          "exists": true,
+          "null_key_rows": 0,
+          "path": "E:\\Code\\Quant\\data\\processed\\sidecar_sp500_pro_2023_2024.parquet",
+          "price_null_ratio": 0.0,
+          "return_null_ratio": 0.0,
+          "row_count": 227
+        },
+        {
+          "columns": [
+            "fiscal_date",
+            "median_inventory_turnover",
+            "median_acquisition_yield"
+          ],
+          "date_range": {
+            "end": null,
+            "start": null
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\processed\\orbis_daily_aligned.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 2609
+        },
+        {
+          "columns": [
+            "date",
+            "permno",
+            "moodys_rating",
+            "moodys_score"
+          ],
+          "date_range": {
+            "end": null,
+            "start": null
+          },
+          "duplicate_date_permno": 0,
+          "exists": true,
+          "null_key_rows": 0,
+          "path": "E:\\Code\\Quant\\data\\processed\\sidecar_moodys_bd.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 0
+        }
+      ],
+      "present": true,
+      "primary_path": "E:\\Code\\Quant\\data\\processed\\sidecar_sp500_pro_2023_2024.parquet"
+    },
+    "ticker_map": {
+      "candidates": [
+        {
+          "columns": [
+            "permno",
+            "ticker"
+          ],
+          "date_range": {
+            "end": null,
+            "start": null
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\processed\\tickers.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 20974
+        },
+        {
+          "columns": [
+            "permno",
+            "symbol",
+            "cusip",
+            "snapshot_date"
+          ],
+          "date_range": {
+            "end": null,
+            "start": null
+          },
+          "duplicate_date_permno": null,
+          "exists": true,
+          "null_key_rows": null,
+          "path": "E:\\Code\\Quant\\data\\static\\instrument_mapping.parquet",
+          "price_null_ratio": null,
+          "return_null_ratio": null,
+          "row_count": 20974
+        }
+      ],
+      "present": true,
+      "primary_path": "E:\\Code\\Quant\\data\\processed\\tickers.parquet"
+    }
+  },
+  "blockers": [],
+  "generated_at_utc": "2026-05-10T03:46:31Z",
+  "ready_for_paper_alerts": true,
+  "schema_version": "1.0.0",
+  "scope": "US equities daily bars paper-alert readiness",
+  "warnings": [
+    "stale_sidecars_max_date_2023-11-27"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "round": "replay_selected_price_loading_mu_sndk_trace",
+  "date": "2026-05-15",
+  "selected_loader_elapsed_sec": 0.5015,
+  "batched_metadata": {
+    "permnos_loaded": 27,
+    "price_permnos_loaded": 2,
+    "price_load_scope": "selected_pit_membership_intersection",
+    "selected_permnos_requested": [
+      53613,
+      82618
+    ],
+    "selected_permnos_in_pit_window": [
+      53613,
+      82618
+    ],
+    "pit_membership_proof": "full_window_membership_index",
+    "trading_dates_count": 89,
+    "membership_dates_count": 89,
+    "date_range": {
+      "start": "2026-01-02",
+      "end": "2026-05-11"
+    }
+  },
+  "raw_prices_shape": [
+    89,
+    2
+  ],
+  "raw_returns_shape": [
+    89,
+    2
+  ],
+  "membership_dates_sample": [
+    "2026-01-02",
+    "2026-01-05",
+    "2026-05-08",
+    "2026-05-11"
+  ],
+  "trace": [
+    {
+      "ticker": "MU",
+      "pinned_thesis_universe": true,
+      "permno": 53613,
+      "ticker_map_status": "OK",
+      "replay_dates": 339,
+      "pit_member_dates": 339,
+      "local_price_return_dates": 339,
+      "feature_dates": 339,
+      "rule100_history_dates": 104,
+      "eligible_feature_dates": 70,
+      "latest_replay_date": "2026-05-11",
+      "latest_pit_member": true,
+      "latest_local_price_return": true,
+      "latest_rule100_history_present": false,
+      "latest_sizing_eligible": false,
+      "latest_current_hold_state": "FLAT",
+      "latest_exclusion_gate": "technical quality",
+      "latest_exclusion_detail": "technical_entry_zone_failed"
+    },
+    {
+      "ticker": "SNDK",
+      "pinned_thesis_universe": true,
+      "permno": 82618,
+      "ticker_map_status": "OK",
+      "replay_dates": 339,
+      "pit_member_dates": 311,
+      "local_price_return_dates": 339,
+      "feature_dates": 339,
+      "rule100_history_dates": 0,
+      "eligible_feature_dates": 0,
+      "latest_replay_date": "2026-05-11",
+      "latest_pit_member": true,
+      "latest_local_price_return": true,
+      "latest_rule100_history_present": false,
+      "latest_sizing_eligible": false,
+      "latest_current_hold_state": "FLAT",
+      "latest_exclusion_gate": "factor threshold",
+      "latest_exclusion_detail": "technical_entry_zone_failed,factor_confirmation_failed_2_of_4"
+    }
+  ]
+}

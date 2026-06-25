@@ -1,0 +1,1070 @@
+=== PDF PAGE 1 ===
+*Corresponding author. Tel.: 773 702 7282; fax: 773 702 9937; e-mail: eugene.fama@gsb.uchicago.
+edu.
+1The comments of Brad Barber, David Hirshleifer, S.P. Kothari, Owen Lamont, Mark Mitchell,
+Hersh Shefrin, Robert Shiller, Rex SinqueÞeld, Richard Thaler, Theo Vermaelen, Robert Vishny, Ivo
+Welch, and a referee have been helpful. Kenneth French and Jay Ritter get special thanks.
+Journal of Financial Economics 49 (1998) 283Ð306
+Market e¦ciency, long-term returns, and behavioral
+Þnance1
+Eugene F. Fama*
+Graduate School of Business, Uni versity of Chicago, Chicago, IL 60637, USA
+Received 17 March 1997; received in revised form 3 October 1997
+Abstract
+Market e¦ciency survives the challenge from the literature on long-term return
+anomalies. Consistent with the market e¦ciency hypothesis that the anomalies are
+chance results, apparent overreaction to information is about as common as underreac-
+tion, and post-event continuation of pre-event abnormal returns is about as frequent as
+post-event reversal. Most important, consistent with the market e¦ciency prediction that
+apparent anomalies can be due to methodology, most long-term return anomalies tend to
+disappear with reasonable changes in technique.( 1998 Elsevier Science S.A. All rights
+reserved.
+JEL classiÞcation: G14; G12
+Keywords: Market e¦ciency; Behavioral Þnance
+1. Introduction
+Event studies, introduced by Fama et al. (1969), produce useful evidence on
+how stock prices respond to information. Many studies focus on returns in
+a short window (a few days) around a cleanly dated event. An advantage of this
+approach is that because daily expected returns are close to zero, the model for
+expected returns does not have a big e¤ect on inferences about abnormal returns.
+0304-405X/98/$19.00 ( 1998 Elsevier Science S.A. All rights reserved
+PII S0304-405X(98)00026-9
+
+=== PDF PAGE 2 ===
+The assumption in studies that focus on short return windows is that any lag
+in the response of prices to an event is short-lived. There is a developing
+literature that challenges this assumption, arguing instead that stock prices
+adjust slowly to information, so one must examine returns over long horizons to
+get a full view of market ine¦ciency.
+If one accepts their stated conclusions, many of the recent studies on long-
+term returns suggest market ine¦ciency, speciÞcally, long-term underreaction
+or overreaction to information. It is time, however, to ask whether this litera-
+ture, viewed as a whole, suggests that e¦ciency should be discarded. My answer
+is a solid no, for two reasons.
+First, an e¦cient market generates categories of events that individually
+suggest that prices over-react to information. But in an e¦cient market, appar-
+ent underreaction will be about as frequent as overreaction. If anomalies split
+randomly between underreaction and overreaction, they are consistent with
+market e¦ciency. We shall see that a roughly even split between apparent
+overreaction and underreaction is a good description of the menu of existing
+anomalies.
+Second, and more important, if the long-term return anomalies are so large
+they cannot be attributed to chance, then an even split between over- and
+underreaction is a pyrrhic victory for market e¦ciency. We shall Þnd, however,
+that the long-term return anomalies are sensitive to methodology. They tend to
+become marginal or disappear when exposed to di¤erent models for expected
+(normal) returns or when di¤erent statistical approaches are used to measure
+them. Thus, even viewed one-by-one, most long-term return anomalies can
+reasonably be attributed to chance.
+A problem in developing an overall perspective on long-term return studies is
+that they rarely test a speciÞc alternative to market e¦ciency. Instead, the
+alternative hypothesis is vague, market ine¦ciency. This is unacceptable. Like
+all models, market e¦ciency (the hypothesis that prices fully reßect available
+information) is a faulty description of price formation. Following the standard
+scientiÞc rule, however, market e¦ciency can only be replaced by a better
+speciÞc model of price formation, itself potentially rejectable by empirical tests.
+Any alternative model has a daunting task. It must specify biases in informa-
+tion processing that cause the same investors to under-react to some types of
+events and over-react to others. The alternative must also explain the range of
+observed results better than the simple market e¦ciency story; that is, the
+expected value of abnormal returns is zero, but chance generates deviations
+from zero (anomalies) in both directions.
+Since the anomalies literature has not settled on a speciÞc alternative to
+market e¦ciency, to get the ball rolling, I assume reasonable alternatives must
+choose between overreaction or underreaction. Using this perspective, Section 2
+reviews existing studies, without questioning their inferences. My conclusion is
+that, viewed as a whole, the long-term return literature does not identify
+284 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 3 ===
+overreaction or underreaction as the dominant phenomenon. The random split
+predicted by market e¦ciency holds up rather well.
+Two recent papers, Barberis et al. (1998) and Daniel et al. (1997), present
+behavioral models that accommodate overreaction and underreaction. To their
+credit, these models present rejectable hypotheses. Section 3 argues that, not
+surprisingly, the two behavioral models work well on the anomalies they are
+designed to explain. Other anomalies are, however, embarrassing. The problem
+is that both models predict post-event return reversals in response to long-term
+pre-event abnormal returns. In fact, post-event return continuation is about as
+frequent as reversalÐ a result that is more consistent with market e¦ciency than
+with the two behavioral models.
+Section 4 examines the problems in drawing inferences about long-term
+returns. Foremost is an unavoidable bad-model problem. Market e¦ciency
+must be tested jointly with a model for expected (normal) returns, and all models
+show problems describing average returns. The bad-model problem is ubiqui-
+tous, but it is more serious in long-term returns. The reason is that bad-model
+errors in expected returns grow faster with the return horizon than the volatility
+of returns. Section 4 also argues that theoretical and statistical considerations
+alike suggest that formal inferences about long-term returns should be based on
+averages or sums of short-term abnormal returns (AARs or CARs) rather than
+the currently popular buy-and-hold abnormal returns (BHARs).
+In categorizing studies on long-term returns, Sections 2 and 3 do not question
+their inferences. Dissection of individual studies takes place in Section 5. The
+bottom line is that the evidence against market e¦ciency from the long-term return
+studies is fragile. Reasonable changes in the approach used to measure abnormal
+returns typically suggest that apparent anomalies are methodological illusions.
+2. Overreaction and underreaction: An overview
+One of the Þrst papers on long-term return anomalies is DeBondt and Thaler
+(1985). They Þnd that when stocks are ranked on three- to Þve-year past returns,
+past winners tend to be future losers, and vice versa. They attribute these
+long-term return reversals to investor overreaction. In forming expectations,
+investors give too much weight to the past performance of Þrms and too little to
+the fact that performance tends to mean-revert. DeBondt and Thaler seem to
+argue that overreaction to past information is a general prediction of the
+behavioral decision theory of Kahneman and Tversky (1982). Thus, one could
+take overreaction to be the prediction of a behavioral Þnance alternative to
+market e¦ciency. For the most part, however, the anomalies literature has not
+accepted the discipline of an alternative hypothesis.
+An exception is Lakonishok et al. (1994). They argue that ratios involving
+stock prices proxy for past performance. Firms with high ratios of earnings to
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 285
+
+=== PDF PAGE 4 ===
+price (E/P), cashßow to price (C/P), and book-to-market equity (BE/ME) tend
+to have poor past earnings growth, and Þrms with lowE/P, C/P, and BE/ME
+tend to have strong past earnings growth. Because the market over-reacts to
+past growth, it is surprised when earnings growth mean reverts. As a result, high
+E/P, C/P, and BE/ME stocks (poor past performers) have high future returns,
+and low E/P, C/P, and BE/ME stocks (strong past performers) have low future
+returns.
+I also classify the poor long-term post-event returns of initial public o¤erings
+(IPOs) (Ritter, 1991; Loughran and Ritter, 1995) and seasoned equity o¤erings
+(SEOs) (Loughran and Ritter, 1995; Spiess and A§eck-Graves, 1995) in the
+overreaction camp. Mitchell and Sta¤ord (1997) show that SEOs have strong
+stock returns in the three years prior to the issue. It seems safe to presume that
+these strong returns reßect strong earnings. It also seems safe to presume that
+IPOs have strong past earnings to display when going public. If the market does
+not understand that earnings growth tends to mean revert, stock prices at the
+time of the equity issue (IPO or SEO) are too high. If the market only gradually
+recognizes its mistakes, the overreaction to past earnings growth is corrected
+slowly in the future. Finally, Dharan and Ikenberry (1995) argue that the long-
+term negative post-listing abnormal stock returns of Þrms that newly list on the
+NYSE or Amex are due to overreaction. Firms list their stocks to take advant-
+age of the marketÕs overreaction to their recent strong performance.
+If apparent overreaction was the general result in studies of long-term returns,
+market e¦ciency would be dead, replaced by the behavioral alternative of
+DeBondt and Thaler (1985). In fact, apparent underreaction is about as fre-
+quent. The granddaddy of underreaction events is the evidence that stock prices
+seem to respond to earnings for about a year after they are announced (Ball and
+Brown, 1968; Bernard and Thomas, 1990). More recent is the momentum e¤ect
+identiÞed by Jegadeesh and Titman (1993); stocks with high returns over the
+past year tend to have high returns over the following three to six months.
+Other recent event studies also produce long-term post-event abnormal
+returns that suggest underreaction. Cusatis et al. (1993) Þnd positive post-event
+abnormal returns for divesting Þrms and the Þrms they divest. They attribute the
+result to market underreaction to an enhanced probability that, after a spino¤,
+both the parent and the spino¤ are likely to become merger targets, and the
+recipients of premiums. Desai and Jain (1997) and Ikenberry et al. (1996) Þnd
+that Þrms that split their stock experience long-term positive abnormal returns
+both before and after the split. They attribute the post-split returns to market
+underreaction to the positive information signaled by a split. Lakonishok and
+Vermaelen (1990) Þnd positive long-term post-event abnormal returns when
+Þrms tender for their stock. Ikenberry et al. (1995) observe similar results for
+open-market share repurchases. The story in both cases is that the market
+under-reacts to the positive signal in share repurchases about future perfor-
+mance. Finally, Michaely et al. (1995) Þnd that stock prices seem to under-react
+286 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 5 ===
+to the negative information in dividend omissions and the positive information
+in initiations.
+Some long-term return anomalies are di¦cult to classify. For example,
+Asquith (1983) and Agrawal et al. (1992) Þnd negative long-term abnormal
+returns to acquiring Þrms following mergers. This might be attributed to market
+underreaction to a poor investment decision (Roll, 1986) or overreaction to the
+typically strong performance of acquiring Þrms in advance of mergers,
+documented in Mitchell and Sta¤ord (1997). Ikenberry and Lakonishok (1993)
+Þnd negative post-event abnormal returns for Þrms involved in proxy contests.
+One story is that stock prices under-react to the poor performance of these Þrms
+before the proxy contest, but another is that prices over-react to the information
+in a proxy that something is likely to change.
+Given the ambiguities in classifying some anomalies, and given that the
+review above is surely incomplete, I shall not do a count of underreaction versus
+overreaction studies. The important point is that the literature does not lean
+cleanly toward either as the behavioral alternative to market e¦ciency. This is
+not lost on behavioral Þnance researchers who acknowledge the issue:
+We hope future research will help us understand why the market appears to
+overreact in some circumstances and underreact in others. (Michaely et al.,
+1995, p. 606).
+The market e¦ciency hypothesis o¤ers a simple answer to this question
+Ð chance. SpeciÞcally, the expected value of abnormal returns is zero, but chance
+generates apparent anomalies that split randomly between overreaction and
+underreaction.
+Is the weight of the evidence on long-term return anomalies so overwhelming
+that market e¦ciency is not a viable working model even in the absence of an
+alternative that explains both under- and overreaction? My answer to this
+question is no, for three reasons.
+First, I doubt that the literature presents a random sample of events. Splashy
+results get more attention, and this creates an incentive to Þnd them. That
+dredging for anomalies is a rewarding occupation is suggested by the fact that
+the anomalies literature shows so little sensitivity to the alternative hypothesis
+problem. The same authors, viewing di¤erent events, are often content with
+overreaction or underreaction, and are willing to infer that both warrant
+rejecting market e¦ciency.
+Second, some apparent anomalies may be generated by rational asset pricing.
+Fama and French (1996) Þnd that the long-term return reversals of DeBondt
+and Thaler (1985) and the contrarian returns of Lakonishok et al. (1994) are
+captured by a multifactor asset pricing model. In a nutshell, return covariation
+among long-term losers seems to be associated with a risk premium that can
+explain why they have higher future average returns than long-term winners.
+Fama and French (1996) discuss the quarrels with their multifactor model, but
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 287
+
+=== PDF PAGE 6 ===
+their results su¦ce to illustrate an important point: Inferences about market
+e¦ciency can be sensitive to the assumed model for expected returns.
+Finally, but most important, a roughly even split between overreaction and
+underreaction would not be much support for market e¦ciency if the long-term
+return anomalies are so large they cannot possibly be attributed to chance.
+Section 5 argues, however, that even viewed individually, most anomalies are
+shaky. They tend to disappear when reasonable alternative approaches are used
+to measure them.
+3. Behavioral models of underreaction and overreaction
+Before examining individual long-term return studies, I Þrst consider two
+behavioral models, recently proposed by Barberis, Shleifer, and Vishny (BSV
+1998) and Daniel, Hirshleifer, and Subramanyam (DHS 1997), to explain how
+the judgment biases of investors can produce overreaction to some events and
+underreaction to others.
+The BSV model is motivated by evidence from cognitive psychology of two
+judgment biases. (i) The representativeness bias of Kahneman and Tversky
+(1982): People give too much weight to recent patterns in the data and too little
+to the properties of the population that generates the data. (ii) Conservatism,
+attributed to Edwards (1968): The slow updating of models in the face of new
+evidence.
+In the model of stock prices proposed by BSV to capture the two judgment
+biases, earnings are a random walk, but investors falsely perceive that there are
+two earnings regimes. In regime A, which investors assume is more likely,
+earnings are mean-reverting. When investors decide regime A holds, a stockÕs
+price under-reacts to a change in earnings because investors mistakenly think
+the change is likely to be temporary. When this expectation is not conÞrmed by
+later earnings, stock prices show a delayed response to earlier earnings. In
+regime B, which investors think is less likely, a run of earnings changes of the
+same sign leads investors to perceive that a ÞrmÕs earnings are trending. Once
+investors are convinced that the trending regime B holds, they incorrectly
+extrapolate the trend and the stock price over-reacts. Because earnings are
+a random walk, the overreaction is exposed by future earnings, leading to
+reversal of long-term returns.
+Regime A in the BSV model is motivated by the evidence of short-term
+momentum in stock returns (Jegadeesh and Titman, 1993) and the evidence of
+delayed short-term responses of stock prices to earnings announcements (Ball
+and Brown, 1968; Bernard and Thomas, 1990). Regime B is meant to explain the
+long-term return reversals of DeBondt and Thaler (1985) and the returns to the
+contrarian investment strategies of Lakonishok et al. (1994). How does the
+model do on other anomalies?
+288 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 7 ===
+The prediction of regime B is reversal of long-term abnormal returns. SpeciÞ-
+cally, persistent long-term pre-event returns are evidence of market overreaction
+which should eventually be corrected in post-event returns. In addition to
+DeBondt and Thaler (1985) and Lakonishok et al. (1994), other events consistent
+with this prediction are seasoned equity o¤erings (Loughran and Ritter, 1995;
+Mitchell and Sta¤ord, 1997), new exchange listings (Dharan and Ikenberry,
+1995), and returns to acquiring Þrms in mergers (Asquith, 1983). All these events
+are characterized by positive long-term abnormal returns before the event and
+negative abnormal returns thereafter.
+But long-term return reversal is not the norm. Events characterized by
+long-term post-event abnormal returns of the same sign as long-term pre-event
+returns include dividend initiations and omissions (Michaely et al., 1995), stock
+splits (Ikenberry et al., 1996; Desai and Jain, 1997), proxy contests (Ikenberry
+and Lakonishok, 1993), and spino¤s (Miles and Rosenfeld, 1983; Cusatis et al.,
+1993).
+In short, and not surprisingly, the BSV model does well on the anomalies it
+was designed to explain. But its prediction of long-term return reversal does not
+capture the range of long-term results observed in the literature. On the whole,
+the long-term return literature seems more consistent with the market e¦ciency
+prediction that long-term return continuation and long-term return reversal are
+equally likely chance results.
+The DHS model has di¤erent behavioral foundations than the BSV model. In
+DHS there are informed and uninformed investors. The uninformed are not
+subject to judgment biases. But stock prices are determined by the informed
+investors, and they are subject to two biases, overconÞdence and biased self-
+attribution. OverconÞdence leads them to exaggerate the precision of their
+private signals about a stockÕs value. Biased self-attribution causes them to
+downweight public signals about value, especially when the public signals
+contradict their private signals. Overreaction to private information and under-
+reaction to public information tend to produce short-term continuation of stock
+returns but long-term reversals as public information eventually overwhelms the
+behavioral biases. Thus, though based on di¤erent behavioral premises, the
+DHS predictions are close to those of BSV, and the DHS model shares the
+empirical successes and failures of the BSV model. This last comment also
+applies to Hong and Stein (1997).
+DHS make a special prediction about what they call selective events. These
+are events that occur to take advantage of the mispricing of a ÞrmÕs stock. For
+example, managers announce a new stock issue when a ÞrmÕs stock price is too
+high, or they repurchase shares when the stock price is too low. This public
+signal produces an immediate price reaction that absorbs some of the mispric-
+ing. But in the DHS model, the announcement period price response is incom-
+plete because informed investors overweight their prior beliefs about the stockÕs
+value. (The conservatism bias of the BSV model would produce a similar result.)
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 289
+
+=== PDF PAGE 8 ===
+Table 1
+Signs of long-term pre-event, announcement, and long-term post-event returns for various long-
+term return studies
+Event Long-term
+pre-event
+return
+Announcement
+return
+Long-term
+post-event
+return
+Initial public o¤erings (IPOs)
+(Ibbotson, 1975; Loughran and Ritter, 1995)
+Not
+available
+#!
+Seasoned equity o¤erings
+(Loughran and Ritter, 1995)
+#! !
+Mergers (acquiring Þrm)
+(Asquith, 1983;
+Agrawal et al., 1992)
+# 0 !
+Dividend initiations
+(Michaely et al., 1995)
+## #
+Dividend omissions
+(Michaely et al., 1995)
+!! !
+Earnings announcements
+(Ball and Brown, 1968; Bernard
+and Thomas, 1990)
+Not
+available
+##
+New exchange listings
+(Dharan and Ikenberry, 1995)
+## !
+Share repurchases (open market)
+(Ikenberry et al., 1995; Mitchell and
+Sta¤ord, 1997)
+0 ##
+Share repurchases (tenders)
+(Lakonishok and Vermaelen, 1990;
+Mitchell and Sta¤ord, 1997)
+0 ##
+Proxy Þghts
+(Ikenberry and Lakonishok, 1993)
+!# ! (or 0)
+Stock splits
+(Dharan and Ikenberry, 1995; Ikenberry
+et al., 1996)
+## #
+Spino¤s
+(Miles and Rosenfeld, 1983; Cusatis
+et al., 1993)
+## # (or 0)
+Eventually, the mispricing is fully absorbed as further public information con-
+Þrms the information implied by the event announcement. The general predic-
+tion for selective events is thus momentum; stock returns after an event an-
+nouncement will tend to have the same sign as the announcement period return.
+Does the DHS prediction about selective events stand up to the data? Table 1
+summarizes the signs of short-term announcement returns and long-term
+290 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 9 ===
+post-announcement returns for the major long-term return studies. Except for
+earnings announcements, all these events seem selective. As predicted by DHS,
+announcement and post-announcement returns have the same sign for SEOs,
+dividend initiations and omissions, share repurchases, stock splits, and spino¤s.
+But announcement and post-announcement returns have opposite signs for new
+exchange listings and proxy Þghts, and the negative post-event returns to
+acquiring Þrms in mergers are not preceded by negative announcement returns.
+Most embarrassing for the DHS prediction, the long-term negative post-event
+returns of IPOs (the premier long-term return anomaly) are preceded by positive
+returns for a few months following the event (Ibbotson, 1975; Ritter, 1991).
+Finally, given the demonstrated ingenuity of the theory branch of Þnance, and
+given the long litany of apparent judgment biases unearthed by cognitive
+psychologists (DeBondt and Thaler, 1995), it is safe to predict that we will soon
+see a menu of behavioral models that can be mixed and matched to explain
+speciÞc anomalies. My view is that any new model should be judged (as above)
+on how it explains the big picture. The question should be: Does the new model
+produce rejectable predictions that capture the menu of anomalies better than
+market e¦ciency? For existing behavioral models, my answer to this question
+(perhaps predictably) is an emphatic no.
+The main task that remains is to examine the long-term return anomalies one
+at a time to see if they deliver on their claims. We set the stage with a discussion
+of some of the general problems that arise in tests on long-term returns.
+4. Drawing inferences from long-term returns
+Fama (1970) emphasizes that market e¦ciency must be tested jointly with
+a model for expected (normal) returns. The problem is that all models for
+expected returns are incomplete descriptions of the systematic patterns in
+average returns during any sample period. As a result, tests of e¦ciency are
+always contaminated by a bad-model problem.
+The bad-model problem is less serious in event studies that focus on short
+return windows (a few days) since daily expected returns are close to zero and so
+have little e¤ect on estimates of unexpected (abnormal) returns. But the problem
+grows with the return horizon. A bad-model problem that produces a spurious
+abnormal average return of x% per month eventually becomes statistically
+reliable in cumulative monthly abnormal returns (CARs). The reason is that the
+mean of the CAR increases like N, the number of months summed, but the
+standard error of the CAR increases like N1@2. In AARs (averages of monthly
+abnormal returns), the pricing error is constant atx%, but the standard error of
+the AAR decreases like N~1@2. Bad-model problems are most acute with long-
+term buy-and-hold abnormal returns (BHARs), which compound (multiply) an
+expected-return modelÕs problems in explaining short-term returns.
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 291
+
+=== PDF PAGE 10 ===
+This section discusses various approaches that attempt to limit bad-model
+problems. It also discusses a related issue, the relevant return metric in tests on
+long-term returns. I argue that theoretical and statistical considerations alike
+suggest that CARs (or AARs) should be used, rather than BHARs.
+4.1. Bad- model problems
+Bad-model problems are of two types. First, any asset pricing model is just
+a model and so does not completely describe expected returns. For example, the
+CAPM of Sharpe (1964) and Lintner (1965) does not seem to describe expected
+returns on small stocks (Banz, 1981). If an event sample is tilted toward small
+stocks, risk adjustment with the CAPM can produce spurious abnormal returns.
+Second, even if there were a true model, any sample period produces systematic
+deviations from the modelÕs predictions, that is, sample-speciÞc patterns in
+average returns that are due to chance. If an event sample is tilted toward
+sample-speciÞc patterns in average returns, a spurious anomaly can arise even
+with risk adjustment using the true asset pricing model.
+One approach to limiting bad-model problems bypasses formal asset pricing
+models by using Þrm-speciÞc models for expected returns. For example, the
+stock split study of Fama et al. (1969) uses the market model to measure
+abnormal returns. The intercept and slope from the regression of a stockÕs return
+on the market return, estimated outside the event period, are used to estimate
+the stockÕs expected returns conditional on market returns during the event
+period. MasulisÕs (1980) comparison period approach uses a stockÕs average
+return outside the event period as the estimate of its expected return during the
+event period.
+Unlike formal asset pricing models, the market model and the comparison
+period approach produce Þrm-speciÞc expected return estimates; that is,
+a stockÕs expected return is estimated without constraining the cross-section of
+expected returns. Thus, these approaches can be used to study the reaction of
+stock prices to Þrm-speciÞc events (splits, earnings, etc.). But they cannot
+identify anomalies in the cross-section of average returns, like the size e¤ect of
+Banz (1981), since such anomalies must be measured relative to predictions
+about the cross-section of average returns.
+The hypothesis in studies that focus on long-term returns is that the adjust-
+ment of stock prices to an event may be spread over a long post-event period.
+For many events, long periods of unusual pre-event returns are common.
+Thus, the choice of a normal period to estimate a stockÕs expected return or
+its market model parameters is problematic. Perhaps because of this
+problem, event studies often control for expected returns with approaches that
+constrain the cross-section of expected returns. An advantage of these
+approaches is that they do not require out-of-sample parameter estimates.
+A disadvantage is that constraints on the cross-section of expected returns
+292 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 11 ===
+always produce imperfect descriptions of average returns, and so can lead to
+bad-model problems.
+For example, one approach estimates an abnormal return as the di¤erence
+between an event ÞrmÕs return and the return on a non-event Þrm or portfolio
+that is similar on characteristics known to be related to average returns. The
+hope in this matching approach is to control for cross-Þrm variation in average
+returns due both to di¤erences in expected returns and to chance sample-speciÞc
+patterns in average returns. For example, following BanzÕ (1981) evidence that
+small stocks have higher average returns than predicted by the CAPM, an event
+stockÕs abnormal return is often estimated as the di¤erence between its return
+and the return on non-event stocks matched to the event stock on size. Follow-
+ing the evidence of Fama and French (1992) that average stock returns are also
+related to book-to-market equity ( BE/ME), it is now common to estimate
+abnormal returns by matching event stocks with non-event stocks similar in
+terms of size and BE/ME.
+When we analyze individual event studies, we shall see that matching on size
+can produce much di¤erent abnormal returns than matching on size and
+BE/ME. And size and BE/ME surely do not capture all relevant cross-Þrm
+variation in average returns due to expected returns or sample-speciÞc patterns
+in average returns. In short, the matching approach is not a panacea for
+bad-model problems in studies of long-term abnormal returns.
+Another method of estimating abnormal returns is to use an asset pricing
+model to estimate expected returns. Early studies of long-term abnormal returns
+(Ja¤e, 1974; Mandelker, 1974; Asquith, 1983) use the CAPM. Some recent
+studies use the three-factor model of Fama and French (1993). Like all asset
+pricing models, however, the CAPM and the FamaÐFrench model are incom-
+plete descriptions of average returns. The shortcomings of the CAPM are well
+known (Fama and French, 1992). Fama and French (1993) show that their
+three-factor model does not even provide a full explanation of average returns
+on portfolios formed on size andBE/ME, the dimensions of average returns that
+the modelÕs risk factors are designed to capture.
+In short, bad-model problems are unavoidable, and they are more serious in
+tests on long-term returns. When we review individual studies in Section 5, the
+tracks of the bad-model problem will be clear. Di¤erent models for expected
+returns produce di¤erent estimates of long-term abnormal returns. And a rea-
+sonable change of models often causes an anomaly to disappear. I argue that
+when this happens, the anomaly is not much evidence against market e¦ciency.
+4.2. The return metric
+Studies of long-term returns are also sensitive to the way the tests are done.
+Average monthly abnormal returns (AARs or CARs) can produce di¤erent
+inferences than buy-and-hold abnormal returns (BHARs). Equal-weight returns
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 293
+
+=== PDF PAGE 12 ===
+produce di¤erent results than value-weight returns. And failure to account for
+the cross-correlation of event Þrm returns during long post-event periods can
+a¤ect inferences. These implementation issues are discussed next.
+4.2.1. The return metric: theoretical issues
+In principle, the model of market equilibrium jointly tested with market
+e¦ciency speciÞes the unit of time for returns. For example, if the model deÞnes
+equilibrium in terms of monthly expected returns, average monthly returns
+should be the metric used to test market e¦ciency. To examine how prices
+respond over periods longer than a month, one can average (AARs) or sum
+(CARs) the average monthly abnormal returns. Beginning with Fama et al.
+(1969), AARs and CARs are a common approach to examining long-term
+returns.
+A criticism of this approach is that an average monthly return does not
+accurately measure the return to an investor who holds a security for a long
+post-event period. Long-term investor experience is better captured by com-
+pounding short-term returns to obtain long-term buy-and-hold returns. Much
+of the recent literature tests buy-and-hold abnormal returns for periods up to
+Þve years after an event.
+Investor experience is interesting, and long-term BHARs are thus interesting.
+But formal tests for abnormal returns should use the return metric called for by
+the model invoked to estimate expected (normal) returns. The problem, of
+course, is that discrete-time asset pricing models are silent on the relevant
+interval for expected returns. Nevertheless, there are at least three theoretical
+reasons to lean toward shorter intervals:
+(i) Asset pricing models, like the Sharpe (1964)ÐLintner (1965) CAPM and the
+discrete-time version of MertonÕs (1973) ICAPM, commonly assume nor-
+mally distributed returns. Normality is a better approximation for short
+horizons like a month than for longer horizons, where skewness becomes
+increasingly important (Fama, 1976, 1996).
+(ii) The empirical tests of asset pricing models, invoked to justify applying the
+models in tests of market e¦ciency, typically use monthly returns. I know
+of no tests of asset pricing models on Þve-year returns.
+(iii) Mitchell and Sta¤ord (1997) point out that BHARs can give false impres-
+sions of the speed of price adjustment to an event. The reason is that
+BHARs can grow with the return horizon even when there is no abnormal
+return after the Þrst period. For example, suppose returns for the Þrst year
+after the event are 10% for event Þrms and zero for benchmark Þrms, so
+the Þrst-year abnormal return is 10%. Suppose event and benchmark
+Þrms both have a 100% buy-and-hold return over the next four years.
+Although there is no abnormal return after the Þrst year, the BHAR after
+Þve years grows to 20% [i.e., (1.1]2.0)!(1.0]2.0)].
+294 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 13 ===
+4.2.2. The return metric: statistical issues
+AARs and CARs also pose fewer statistical problems than long-term BHARs.
+Barber and Lyon (1997) provide the most complete discussion of the inference
+problems in tests on long-term returns. [See also Kothari and Warner (1997).]
+Barber and Lyon favor BHARs, but their tests show that inferences are less
+problematic for average monthly returns (AARs or CARs). In a follow-up paper,
+Lyon et al. (1997) develop elaborate techniques for correcting some of the
+inference problems of BHARs. But they acknowledge that their improved
+methods for BHARs produce inferences no more reliable than simpler methods
+applied to monthly AARs or CARs. The reason is that average monthly returns
+avoid the problems (e.g., extreme skewness) produced by compounding monthly
+returns to get long-term BHARs.
+Brav (1997) emphasizes that all existing methods for drawing inferences from
+BHARs, including those in Lyon et al. (1997), fail to correct fully for the
+correlation of returns across events not absorbed by the model used to adjust for
+expected returns. The problem is more severe in long-term BHARs because
+more Þrms have events within, say, a given Þve-year window than within
+a three-day window. Brav (1997) presents an elaborate scheme to adjust for the
+cross-correlation of long-term BHARs in special cases (e.g., when it is due to
+industry e¤ects). But a full solution is not typically available because the number
+of return covariances to be estimated is greater than the number of time-series
+observations.
+In contrast, if average monthly returns are used, there has long been a full
+solution to the cross-correlation problem. Suppose the post-event period of
+interest is Þve years. For each calendar month, calculate the abnormal return on
+each stock that had an event in the last Þve years. (Abnormal returns can be
+estimated in any reasonable way, for example, with a matching Þrm or matching
+portfolio approach, or with an asset pricing model.) Then average the abnormal
+returns for the calendar month across stocks to get the abnormal return for the
+month on the portfolio of stocks with an event in the last Þve years. Re-form the
+portfolio every month. The time-series variation of the monthly abnormal
+return on this portfolio accurately captures the e¤ects of the correlation of
+returns across event stocks missed by the model for expected returns. The mean
+and variance of the time series of abnormal portfolio returns can be used to test
+the average monthly response of the prices of event stocks for Þve years
+following the event. The approach can also be reÞned to allow for heteroskedas-
+ticity of the portfolioÕs abnormal return due to changes through time in the
+composition of the portfolio. This rolling portfolio approach (with reÞnements)
+was Þrst used by Ja¤e (1974) and Mandelker (1974).
+A referee suggests that the portfolio approach described above can cause an
+anomaly to be understated if events bunch in time because Þrms exploit pricing
+errors during windows of opportunity. For example, Loughran and Ritter (1995)
+suggest that IPOs bunch because particular industries tend to be overvalued at
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 295
+
+=== PDF PAGE 14 ===
+speciÞc times. This criticism of the portfolio approach is valid if monthly
+abnormal portfolio returns are weighted equally in calculating an overall aver-
+age monthly abnormal return. One solution to the problem is to adjust for
+heteroskedasticity. SpeciÞcally, following Ja¤e (1974) and Mandelker (1974),
+divide the abnormal portfolio return for each month by an estimate of its
+standard deviation. The overall abnormal return is then estimated by averag-
+ing the standardized monthly abnormal returns. This approach is attractive
+because it weights each monthÕs abnormal return by its statistical precision,
+which seems like the right way to capture the increased information due to
+event bunching. More generally, however, one can weight the portfolio
+abnormal return for a month in any way that captures the economic hypothesis
+of interest.
+4.2.3. The return metric: value weights versus equal weights
+In the review of individual studies that follows, we Þnd that apparent
+anomalies in long-term post-event returns typically shrink a lot and often
+disappear when event Þrms are value-weighted rather than equal-weighted. One
+can argue that value-weight returns give the right perspective on an anomaly
+because they more accurately capture the total wealth e¤ects experienced by
+investors. But I am more concerned about bad-model problems. All the com-
+mon asset pricing models, including the Fama ÐFrench (1993) three-factor
+model, have systematic problems explaining the average returns on categories of
+small stocks. Since equal-weight portfolio returns give more weight to small
+stocks, bad-model problems are more severe in inferences from equal-weight
+returns.
+Many readers suggest that more serious mispricing of small stocks is a
+general prediction of behavioral Þnance. It is thus worth noting that the
+two behavioral pricing models reviewed in Section 3 do not produce this
+prediction. In Barberis et al. (1998), pricing is dominated by a representative
+investor, and there is no prediction that the judgment biases of this investor are
+more severe for small stocks. In Daniel et al. (1997), pricing is dominated by
+informed investors subject to judgment biases. Uninformed investors have no
+such biases. Thus, if large stocks attract more interest from informed investors
+(e.g., security analysts), mispricing problems might be more severe for large
+stocks.
+Most important, the cognitive psychology literature does not seem to say that
+di¤erent classes of people are more subject to judgment biases. The same biases
+that plague college students (the subjects of most cognitive psychology experi-
+ments) also occur among experts (see the references in Barberis et al.). Thus,
+cognitive psychology, the basis of behavioral Þnance, does not seem to provide
+a basis for the common presumption that small stocks are more likely to be
+mispriced.
+296 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 15 ===
+5. The reliability of individual studies
+The summary of long-term return studies in Sections 2 and 3 accepts the
+conclusions of the papers at face value. Now the gloves come o¤. Examining
+long-term return anomalies one at a time, I argue that most are fragile. Abnor-
+mal returns often disappear with reasonable changes in the way they are
+measured.
+5.1. IPOs and SEOs
+Among the more striking of the long-term return anomalies is the study of
+initial public o¤erings (IPOs) and seasoned equity o¤erings (SEOs) by Loughran
+and Ritter (1995). They Þnd that the total wealth generated at the end of Þve
+years if one invests $1 in each IPO or SEO immediately following the event is
+about 70% of that produced by the same buy-and-hold strategy applied to
+a sample of stocks matched to the IPOs and SEOs on size.
+IPOs and SEOs clearly have poor long-term returns during the Lough-
+ranÐRitter sample period (1970Ð1990). The interesting question is whether the
+returns are really abnormal or whether they are shared with non-event Þrms
+similar on characteristics related to average returns. During the Lough-
+ranÐRitter period, variables known to be related to average stock return include
+size and book-to-market equity (Fama and French, 1992), and short-term past
+return (Jegadeesh and Titman, 1993). Since the long-term buy-and-hold returns
+in Loughran and Ritter only control for size, their results might be a¤ected by
+other variables that are systematically related to average return.
+Following up on this possibility, Brav and Gompers (1997) compare Þve-year
+buy-and-hold returns on IPOs with the returns on portfolios that match the
+IPOs on size and book-to-market equity (BE/ME) but exclude SEOs as well as
+IPOs. The Þve-year wealth relative (the ratio of Þve-year buy-and-hold wealth
+for IPOs to Þve-year buy-and-hold wealth for the benchmarks) rises from about
+0.7 with the LoughranÐRitter size benchmarks to a bit more than 1.0 (that is, the
+anomaly disappears) when the benchmarks control forBE/ME as well as size.
+Similarly, Brav et al. (1995) Þnd that the Þve-year buy-and-hold returns on
+SEOs are close to those of non-event portfolios matched on size andBE/ME.
+Brav (1997) and Mitchell and Sta¤ord (1997) show that IPOs and SEOs are
+typically small growth stocks. Fama and French (1993) show that such stocks
+have low returns during the post-1963 period. The results of Brav and Gompers
+(1997) and Brav et al. (1995) then suggest that explaining the IPO-SEO anomaly
+reduces to explaining why small growth stocks in general have poor returns
+during the IPO-SEO sample period. In other words, if there is a mispricing
+problem, it is not special to IPO-SEO stocks.
+Brav and Gompers (1997) and Brav et al. (1995) also Þnd that when IPOs and
+SEOs are value-weighted, Þve-year abnormal buy-and-hold returns shrink a lot,
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 297
+
+=== PDF PAGE 16 ===
+whatever the benchmark. For IPOs, value-weight Þve-year wealth relatives are
+0.86 or greater for all benchmarks, and four of six benchmarks produce wealth
+relatives in excess of 0.9. For SEOs, value-weight Þve-year wealth relatives are
+0.88 or greater for all benchmarks; three of six are in excess of 0.98. The message
+is that many IPO and SEO stocks are tiny, and they are inßuential in the returns
+observed when sample Þrms are equal-weighted. This result is general. We shall
+see that apparent anomalies typically shrink a lot when viewed in terms of
+value-weight returns.
+Loughran and Ritter (1995), Brav and Gompers (1997), and Brav et al. (1995)
+do not engage in the treacherous game of drawing statistical inferences from
+long-term buy-and-hold returns. Their inferences are based on average monthly
+returns. Every month they calculate the return on a portfolio that contains all
+Þrms with an IPO or SEO in the last Þve years. The three-factor model of Fama
+and French (FF 1993) is then used to estimate the portfolioÕs abnormal returns.
+The average monthly abnormal return during the Þve-year post-event period is
+the intercept, a1, of the time-series regression
+R1t!R&t"aP#b1[RMt!R&t]#s1SMB#h1HML#e1t, (1)
+where R1t is the monthly return on the IPO or SEO portfolio, R&t is the
+one-month Treasury bill rate, RMt is the monthly return on a value-weight
+market portfolio of NYSE, Amex, and Nasdaq stocks, SMB is the di¤erence
+between the returns on portfolios of small and big stocks (below or above the
+NYSE median), and HML is the di¤erence between the returns on portfolios of
+high- and low- BE/ME stocks (above and below the 0.7 and 0.3 fractiles of
+BE/ME).
+Brav et al. (1995) estimate the intercepts in (1) for equal- and value-weight
+portfolios of the SEOs of their 1975 Ð92 sample period. The intercept for the
+equal-weight portfolio is!0.42% per month (t"!4.8), but the intercept for
+the value-weight portfolio is!0.14% per month (t"!1.18). Similarly, Brav
+and Gompers (1997) Þnd that the intercepts for equal- and value-weight port-
+folios of IPOs that are not backed by venture capitalists are !0.52%
+(t"!2.80) and !0.29% (t"!1.84). For IPOs backed by venture capital-
+ists, the intercepts are slightly positive. Loughran and Ritter (1995) only show
+regressions that combine IPOs and SEOs, but their results are similar: Equal-
+weight portfolios produce reliably negative intercepts, but abnormal returns for
+value-weight portfolios are economically and statistically close to zero.
+Since inferences about abnormal returns from estimates of (1) on rolling
+post-event portfolio returns are common in the recent anomalies literature, it is
+important to note three potential problems.
+First, since the Þrms in the event portfolio change through time, the true
+slopes on the risk factors in (1) are time-varying. Mitchell and Sta¤ord (1997)
+conÞrm that for three important events (mergers, share repurchases, and SEOs),
+changes in the composition of the event portfolio generate substantial variation
+298 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 17 ===
+in the slopes in (1). For SEOs, they Þnd that the intercepts for their 1960 Ð93
+period for equal- and value-weight portfolios drop from!0.38 (t"4.47) and
+!0.14 (t"!1.51) in the constant slope regressions, to !0.24 (t"!3.64)
+and!0.07 (t"!0.81) in the regressions that allow the slopes to vary through
+time.
+Second, the number of Þrms in the event portfolio changes through time,
+creating residual heteroskedasticity that can a¤ect inferences about the inter-
+cept. [Solutions to this problem like those in Ja¤e (1974) and Mandelker (1974)
+are apparently a lost technology.]
+Third, but most important, Fama and French (1993) show that the three-
+factor model is not a perfect story for average returns. This bad-model problem
+can produce spurious anomalies in event studies. For example, IPOs and SEOs
+tend to be small, low- BE/ME Þrms. Fama and French (1993) show that the
+three-factor model overestimates average returns on such Þrms during the
+IPO-SEO sample periods. This bad-model problem can explain why estimates
+of (1) on equal-weight IPO and SEO portfolios produce reliably negative
+intercepts, but estimates on value-weight portfolios produce intercepts close to
+zero. It can also explain why the intercepts in (1), which control for loadings on
+risk factors related to size andBE/ME, suggest abnormal post-event returns for
+equal-weight IPO and SEO portfolios. But with direct benchmark matching on
+size and BE/ME, the abnormal returns largely disappear.
+I emphasize, however, that the results for IPOs and SEOs do not imply that
+benchmark matching on size and BE/ME is always superior to estimating
+abnormal returns as the intercepts from (1). All methods for estimating abnor-
+mal returns are subject to bad-model problems, and no method is likely to
+minimize bad-model problems for all classes of events. The important general
+message from the IPO-SEO results is one of caution: Two approaches that seem
+closely related (both attempt to control for variation in average returns related
+to size and BE/ME) can produce much di¤erent estimates of long-term abnor-
+mal returns.
+In sum, I read Brav and Gompers (1997) and Brav et al. (1995) as showing that
+the poor long-term buy-and-hold returns following IPOs and SEOs are not
+a special anomaly. The low returns are shared with other Þrms similar on two
+dimensions, size andBE/ME, known to be related to average return. Moreover,
+when IPOs and SEOs are value-weighted, abnormal returns shrink for all
+benchmarks, and they are not reliably di¤erent from zero. Thus, if there is an
+IPO-SEO anomaly, it seems to be largely restricted to tiny Þrms.
+5.2. Mergers
+Asquith (1983) and Agrawal et al. (1992) Þnd negative abnormal returns for
+acquiring Þrms for up to Þve years following merger announcements. Using
+a comprehensive sample of mergers for 1960Ð93, Mitchell and Sta¤ord (1997)
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 299
+
+=== PDF PAGE 18 ===
+also Þnd negative long-term abnormal returns for acquiring Þrms. Since these
+studies produce similar results, I focus on Mitchell and Sta¤ord (MS 1997).
+MS Þnd that the three-year post-event buy-and-hold return for equal-
+weighted acquiring Þrms is on average 4% lower than for portfolios matched to
+acquiring Þrms on size and BE/ME. In economic terms, this is not a dramatic
+anomaly. For formal inferences, MS estimate the three-factor model (1) on the
+monthly returns on a rolling portfolio that includes Þrms with acquisitions
+during the preceding three years. When the acquirers are equal-weighted, the
+intercept in Eq. (1), that is, the average monthly abnormal return for the three
+years after a merger, is !0.25% per month (!25 basis points, t"!3.49),
+which is larger than but roughly consistent with the BH returns. When acquiring
+Þrms are value-weighted, the intercept in Eq. (1) drops to!0.11% per month
+(t"!1.55). Thus, if there is an anomaly, it is more important for smaller
+acquiring Þrms. Finally, MS and Loughran and Vijh (1997) show that abnormal
+post-announcement average returns to acquiring Þrms are limited to mergers
+Þnanced with stock, that is, mergers that are also SEOs. When mergers are
+Þnanced without issuing stock, the negative abnormal post-event returns disap-
+pear. This suggests that there is no distinct merger anomaly. Any merger
+anomaly may be the SEO anomaly in disguise.
+5.3. Stock splits
+Desai and Jain (1997) and Ikenberry et al. (1996) Þnd that for the 17-year
+1975Ð91 period, stock splits are followed by positive abnormal returns of about
+7% in the year after the split. Abnormal returns are calculated relative to
+benchmarks that control for size,BE/ME, and, in Desai and Jain, past one-year
+return.
+One way to test whether such an anomaly is real or the sample-speciÞc result
+of chance is to examine a di¤erent sample period. Fama et al. (1969) examine
+splits during the 33-year 1927 Ð59 period. They Þnd no drift in cumulative
+abnormal returns during the 30 months following splits. Since the split anomaly
+fails the out-of-sample test provided by FFJR, it seems reasonable to conclude
+that the 1975Ð91 anomaly is not real, unless the market has recently become
+ine¦cient.
+Desai and Jain (1997) and Ikenberry et al. (1996) do provide neat evidence on
+one of the pitfalls in using buy-and-hold abnormal returns to judge the long-
+term return drift associated with an event. As noted earlier, Mitchell and
+Sta¤ord (1997) point out that BHARs are likely to grow with the return horizon
+even when there is no abnormal return after the Þrst period. For the 1975Ð91
+period, the abnormal return is about 7% for the Þrst year following stock splits,
+but it is close to zero in the following two years (slightly negative in the second
+and slightly positive in the third). BHARs, however, rise from 7% to about 12%
+after three years.
+300 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 19 ===
+One way to avoid the distorted perspective on long-term drift produced by
+BHARs is to examine ratios rather than di¤erences of the cumulative wealths
+generated by event and benchmark Þrms, as in Ritter (1991) and Loughran and
+Ritter (1995). Another is the time-worn CAR approach of FFJR, which sums
+returns rather than compounding them, or the rolling portfolio average monthly
+abnormal return (AAR) approach of Ja¤e (1974) and Mandelker (1974).
+5.4. Self- tenders and share repurchases
+Lakonishok and Vermaelen (1990) examine long-term returns following self-
+tender o¤ers (tenders by Þrms for their own shares) during the 1962Ð86 period.
+Ikenberry et al. (1995) examine long-term returns following share repurchases
+during the 1980Ð90 period. Mitchell and Sta¤ord (1997) study both self-tenders
+and repurchases for the 1960Ð93 period. Since the MS results are similar to but
+more comprehensive than those in the earlier papers, the discussion focuses on
+them.
+MS Þnd that three-year post-event BHARs, computed relative to matching
+portfolios that control for size andBE/ME, are 9% for self-tenders (475 events)
+and 19% for the much larger sample of 2,542 repurchases. When they estimate
+the three-factor regression (1) for the monthly returns on an equal-weight
+portfolio that contains all self-tenders and repurchases in the last three years,
+however, the average abnormal monthly return is puny, 0.11% per month
+(t"1.62). Any hint of signiÞcance, economic or statistical, disappears entirely
+when the stocks in the rolling portfolio are value-weighted. The intercept for the
+value-weight portfolio of self-tenders and repurchases is !0.03% (!3 basis
+points per month, t"!0.34). In short, viewed from the perspective of the
+three-factor model of Eq. (1), there is no share repurchase anomaly.
+Note, once again, that two apparently similar methods for estimating abnor-
+mal returns, (i) a matching portfolio control for size and BE/ME and (ii) an
+asset pricing regression that adjusts for sensitivity to risk factors related to size
+and BE/ME, produce somewhat di¤erent results. This again illustrates that
+estimates of long-term abnormal returns can be sensitive to apparently small
+changes in technique.
+5.5. Exchange listings
+Dharan and Ikenberry (1995) Þnd that during the 1962Ð90 period, stocks that
+newly list on the NYSE, or move from Nasdaq to Amex, have negative post-
+listing abnormal returns. When returns are risk-adjusted using matching port-
+folios formed on size and BE/ME, the three-year average abnormal return is
+!7.02%. The t-statistic for this CAR is !2.78, but this is without a full
+adjustment for the correlation of abnormal returns across Þrms. Moreover,
+Dharan and Ikenberry show that the negative post-listing abnormal returns are
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 301
+
+=== PDF PAGE 20 ===
+limited to Þrms below the NYSE-Amex median in size. Thus, once again, an
+apparent anomaly is limited to small stocks.
+Mitchell and Sta¤ord (1997) o¤er concrete perspective on how signiÞcance
+levels can be overstated because of the failure to adjust for the correlation across
+Þrms of post-event abnormal returns. Using the three-factor model (1), they
+calculate the standard deviations of abnormal returns for portfolios of Þrms
+with an event during the most recent 36 months. The proportions vary some-
+what through time and across their three event classes (mergers, share repur-
+chases, and SEOs), but on average the covariances of event-Þrm abnormal
+returns account for about half the standard deviation of the event portfolioÕs
+abnormal return. Thus, if the covariances are ignored, the standard error of the
+abnormal portfolio return is too small by about 50%! This estimate need not
+apply intact to the exchange listings of Dharan and Ikenberry (1995), but it
+suggests that a full adjustment for the cross-correlation of post-listing abnormal
+returns could cause the statistical reliability ( t"!2.78) of their !7.02%
+post-event three-year CAR to disappear.
+Dharan and IkenberryÕs explanation of their negative post-listing abnormal
+returns is that Þrms are opportunistic, and they list their stocks to take advant-
+age of the marketÕs overreaction to their recent good times. This explanation
+seems shaky, however, given that any overreaction to past performance has
+already occurred and will soon be reversed. Moreover, standard signaling
+theory (e.g., Ross, 1977) does not predict that Þrms will incur costs to make
+a false signal whose price e¤ects are soon obliterated. On the contrary, since
+listing involves costs, it should be a signal that the Þrm is under-valued.
+5.6. Di vidend initiations and omissions
+Michaely et al. (1995) Þnd that during the 1964Ð88 period, Þrms that initiate
+dividends have positive abnormal stock returns for three years after the event,
+and Þrms omitting dividends have negative abnormal returns. For the same
+sample, Brav (1997) Þnds that the three-year post-event abnormal return follow-
+ing initiations disappears with benchmarks that control for size and BE/ME.
+Michaely et al. (1995) show that the negative three-year abnormal returns
+following omissions, conÞrmed by Brav (1997), are largely concentrated in the
+second half of their 1964 Ð88 sample period. All this suggests that inferences
+about long-term returns following changes in dividends should probably await
+an out-of-sample test.
+The Þnding that stock prices under-react to dividend announcements is
+suspect on other grounds. It seems reasonable that underreaction would occur
+because the market underestimates the information in dividends about future
+earnings. However, from Watts (1973) to Benartzi et al. (1997), there is little
+evidence that changes in dividends predict changes in earnings.
+302 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 21 ===
+5.7. Spino ¤s
+Cusatis et al. (1993) study the post-event returns of spino¤s and their parents
+for the 1965Ð88 period. The benchmarks are Þrms matched to the event Þrms on
+size and industry, and abnormal returns are BHARs. Both parents and spino¤s
+have positive abnormal returns in the three years after the event. The abnormal
+returns are, however, limited to event Þrms (parents and spino¤s) acquired in
+mergers. The conclusion is that the market does not properly assess the in-
+creased probability of takeover (and the attendant buyout premiums) following
+spino¤s.
+The t-statistics for the three-year BHARs for spino¤s range from 0.58 to 2.55,
+hardly overwhelming. Moreover, in calculating the t-statistics, the BHARs of
+the event Þrms are assumed to be independent. It would not take a large
+adjustment for cross-correlation to produce t-statistics that suggest no real
+anomaly.
+5.8. Proxy contests
+Ikenberry and Lakonishok (1993) examine stock returns following proxy
+contests during the 1968 Ð87 period. They Þnd negative post-event abnormal
+returns relative to benchmarks that control for marketb and size. In the results
+for all proxy contests, the post-event abnormal returns are not statistically
+reliable. The negative post-event returns are only statistically reliable for the
+50-odd proxy contests in which the dissidents win board representation. Since
+this result is not an ex ante prediction, the weak evidence for the overall sample
+seems more relevant, and it does not suggest a reliable anomaly. This is more or
+less the conclusion of the authors.
+5.9. Summary
+If a reasonable change in the method of estimating abnormal returns causes
+an anomaly to disappear, the anomaly is on shaky footing, and it is reasonable
+to suggest that it is an illusion. Included in this category are IPOs, SEOs,
+self-tenders, share repurchases, and dividend initiations. Moreover, the doubts
+about these anomalies are the result of replication and robustness checks that
+followed publication of the original studies. Other anomalies will likely fall prey
+to the same process.
+Other long-term return anomalies are economically or statistically marginal.
+The negative post-event abnormal returns to acquiring Þrms in mergers are
+economically small. For exchange listings, spino¤s, and proxy contests, a full
+correction for the cross-correlation of long-term post-event abnormal returns
+could easily reduce them to former anomalies.
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 303
+
+=== PDF PAGE 22 ===
+Some anomalies do not stand up to out-of-sample replication. Foremost (in
+my mind) is the stock split anomaly observed after 1975, which is contradicted
+by the earlier FFJR study. The long-term negative post-event returns of divi-
+dend-omitting Þrms also seem sensitive to sample period.
+Whenever value-weight returns are examined, apparent anomalies shrink
+a lot and typically become statistically unreliable. At a minimum, this suggests
+that anomalies are largely limited to small stocks. But a reasonable alternative
+explanation is that small stocks are just a sure source of bad-model problems.
+Small stocks always pose problems in tests of asset pricing models, so they are
+prime candidates for bad-model problems in tests of market e¦ciency on
+long-term returns.
+Which anomalies are above suspicion? The post-earnings-announcement drift
+Þrst reported by Ball and Brown (1968) has survived robustness checks, includ-
+ing extension to more recent data (Bernard and Thomas, 1990; Chan et al.,
+1996). Again, though, the anomaly is stronger for small stocks. The short-term
+continuation of returns documented by Jegadeesh and Titman (1993) is also an
+open puzzle, but it is still rather new and further tests are in order.
+6. Conclusions
+The recent Þnance literature seems to produce many long-term return
+anomalies. Subjected to scrutiny, however, the evidence does not suggest that
+market e¦ciency should be abandoned. Consistent with the market e¦ciency
+hypothesis that the anomalies are chance results, apparent overreaction of stock
+prices to information is about as common as underreaction. And post-event
+continuation of pre-event abnormal returns is about as frequent as post-event
+reversal. Most important, the long-term return anomalies are fragile. They tend
+to disappear with reasonable changes in the way they are measured.
+References
+Agrawal, A., Ja¤e, Mandelker, G., 1992. The post-merger performance of acquiring Þrms: a re-
+examination of an anomaly. Journal of Finance 47, 1605Ð1621.
+Asquith, P., 1983. Merger bids, uncertainty and stockholder returns. Journal of Financial Econ-
+omics 11, 51Ð83.
+Ball, R., Brown, P., 1968. An empirical evaluation of accounting income numbers. Journal of
+Accounting Research 6, 159Ð178.
+Banz, R., 1981. The relationship between return and market value of common stocks. Journal of
+Financial Economics 9, 3Ð18.
+Barber, B., Lyon, J., 1997. Detecting long-horizon abnormal stock returns: the empirical power and
+speciÞcation of test statistics. Journal of Financial Economics 43, 341.
+Barberis, N., Shleifer, A., Vishny, R., 1998. A model of investor sentiment. Journal of Financial
+Economics 49, 307Ð343 (this issue).
+304 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306
+
+=== PDF PAGE 23 ===
+Benartzi, S., Michaely, R., Thaler, R., 1997. Do dividend changes signal the future or the past.
+Journal of Finance 52, 1007Ð1034.
+Bernard, V., Thomas, J., 1990. Evidence that stock prices do not fully reßect the implications of
+current earnings for future earnings. Journal of Accounting and Economics 13, 305.
+Brav, A., 1997. Inference in long-horizon event studies: a re-evaluation of the evidence. Unpublished
+working paper. Graduate School of Business, University of Chicago.
+Brav, A., Gompers, P., 1997. Myth or reality? The long-run underperformance of initial public
+o¤erings: evidence from venture and nonventure capital-backed companies. Journal of Finance
+52, 1791Ð1821.
+Brav, A., Geczy, C., Gompers, P., 1995. The long-run underperformance of seasoned equity o¤erings
+revisited. Unpublished working paper. Graduate School of Business, University of Chicago.
+Chan, L., Jegadeesh, N., Lakonishok, J., 1996. Momentum strategies. Journal of Finance 51,
+1681Ð1713.
+Cusatis, P., Miles, J., Woolridge, J., 1993. Restructuring through spino¤s. Journal of Financial
+Economics 33, 293Ð311.
+Daniel, K., Hirshleifer, D., Subrahmanyam, A., 1997. A theory of overconÞdence, self-attribution,
+and security market under- and over-reactions. Unpublished working paper. University of
+Michigan.
+DeBondt, W., Thaler, R., 1985. Does the stock market overreact? Journal of Finance 40, 793Ð805.
+DeBondt, W., Thaler, R., 1995. Financial decision-making in markets and Þrms: a behavioral
+perspective. In: Jarrow, R. et al. (Eds.), Handbooks in OR and MS, vol. 9, Elsevier, Amsterdam,
+pp. 385Ð410.
+Desai, H., Jain, P., 1997. Long-run common stock returns following splits and reverse splits. Journal
+of Business 70, 409Ð433.
+Dharan, B., Ikenberry, D., 1995. The long-run negative drift of post-listing stock returns. Journal of
+Finance 50, 1547Ð1574.
+Edwards, W., 1968. Conservatism in human information processing. In: Kleinmutz, B. (Ed.), Formal
+Representation of Human Judgement. Wiley, New York.
+Fama, E., 1970. E¦cient capital markets: a review of theory and empirical work. Journal of Finance
+25, 383Ð417.
+Fama, E., 1976. Foundations of Finance. Basic Books, New York.
+Fama, E., 1996. Discounting under uncertainty. Journal of Business 69, 415Ð428.
+Fama, E., Fisher, L., Jensen, M., Roll, R., 1969. The adjustment of stock prices to new information.
+International Economic Review 10, 1Ð21.
+Fama, E., French, K., 1992. The cross-section of expected stock returns. Journal of Finance 47,
+427Ð465.
+Fama, E., French, K., 1993. Common risk factors in the returns on stocks and bonds. Journal of
+Financial Economics 33, 3Ð56.
+Fama, E., French, K., 1996. Multifactor explanations of asset pricing anomalies. Journal of Finance
+51, 55Ð84.
+Hong, H., Stein, J., 1997. A uniÞed theory of underreaction, momentum trading, and overreaction in
+asset markets. Unpublished working paper. Sloan School of Management, Massachusetts
+Institute of Technology.
+Ibbotson, R., 1975. Price performance of common stock new issues. Journal of Financial Economics
+2, 235Ð272.
+Ikenberry, D., Lakonishok, J., 1993. Corporate governance through the proxy contest: evidence and
+implications. Journal of Business 66, 405Ð435.
+Ikenberry, D., Lakonishok, J., Vermaelen, T., 1995. Market underreaction to open market share
+repurchases. Journal of Financial Economics 39, 181Ð208.
+Ikenberry, D., Rankine, G., Stice, E., 1996. What do stock splits really signal? Journal of Financial
+and Quantitative Analysis 31, 357Ð377.
+E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306 305
+
+=== PDF PAGE 24 ===
+Ja¤e, J., 1974. Special information and insider trading. Journal of Business 47, 410Ð428.
+Jegadeesh, N., Titman, S., 1993. Returns to buying winners and selling losers: implications for stock
+market e¦ciency. Journal of Finance 48, 65Ð91.
+Kahneman, D., Tversky, A., 1982. Intuitive predictions: biases and corrective procedures. Reprinted
+in Kahneman, Slovic, and Tversky, Judgement under Uncertainty: Heuristics and Biases.
+Cambridge University Press, Cambridge, England.
+Kothari, S., Warner, J., 1997. Measuring long-horizon security price performance. Journal of
+Financial Economics 43, 301Ð339.
+Lakonishok, J., Shleifer, A., Vishny, R., 1994. Contrarian investment, extrapolation, and risk.
+Journal of Finance 49, 1541Ð1578.
+Lakonishok, J., Vermaelen, T., 1990. Anomalous price behavior around repurchase tender o¤ers.
+Journal of Finance 45, 455Ð477.
+Lintner, J., 1965. The valuation of risk assets and the selection of risky investments in stock
+portfolios and capital budgets. Review of Economics and Statistics 47, 13Ð37.
+Loughran, T., Ritter, J., 1995. The new issues puzzle. Journal of Finance 50, 23Ð51.
+Loughran, T., Vijh, A., 1997. Do long-term shareholders beneÞt from corporate acquisitions?
+Journal of Finance 52, 1765Ð1790.
+Lyon, J., Barber, B., Tsai, C., 1997. Improved methods for tests of long-run abnormal returns.
+Unpublished working paper. Graduate School of Management, University of California, Davis.
+Mandelker, G., 1974. Risk and return: the case of merging Þrms. Journal of Financial Economics 1,
+303.
+Masulis, R., 1980. The e¤ects of capital structure changes on security prices: a study of exchange
+o¤ers. Journal of Financial Economics 8, 139Ð177.
+Merton, R., 1973. An intertemporal capital asset pricing model. Econometrica 41, 867Ð887.
+Michaely, R., Thaler, R., Womack, K., 1995. Price reactions to dividend initiations and omissions.
+Journal of Finance 50, 573Ð608.
+Miles, J., Rosenfeld, J., 1983. The e¤ect of voluntary spino¤ announcements on shareholder wealth.
+Journal of Finance 38, 1597Ð1606.
+Mitchell, M., Sta¤ord, E., 1997. Managerial decisions and long-term stock price performance.
+Unpublished working paper. Graduate School of Business, University of Chicago.
+Ritter, J., 1991. The long-term performance of initial public o¤erings. Journal of Finance 46, 3Ð27.
+Roll, R., 1986. The hubris hypothesis of corporate takeovers. Journal of Business 59, 197Ð216.
+Ross, S., 1977. The determinants of Þnancial structure: the incentive signaling approach. Bell Journal
+of Economics 8, 23Ð40.
+Sharpe, W., 1964. Capital asset prices: a theory of market equilibrium under conditions of risk.
+Journal of Finance 19, 425.
+Spiess, D., A§eck-Graves, J., 1995. Underperformance in long-run stock returns following seasoned
+equity o¤erings. Journal of Financial Economics 38, 243Ð267.
+Watts, R., 1973. The information content of dividends. Journal of Business 46, 191Ð211.
+306 E.F. Fama /Journal of Financial Economics 49 (1998) 283 Ð306

@@ -1,0 +1,114 @@
+{
+  "manifest_id": "SUPERCYCLE_CANDIDATE_INTAKE_QUEUE_V0_MANIFEST",
+  "artifact_uri": "data/discovery/supercycle_candidate_intake_queue_v0.json",
+  "artifact_sha256": "d478a9f9bd681c05005508dff127f5a7e54bc883bb6ba1d18ebfd7cbf691eee1",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "scope": "PH65_G8_1_INTAKE_ONLY",
+  "queue_id": "SUPERCYCLE_CANDIDATE_INTAKE_QUEUE_V0",
+  "row_count": 6,
+  "seed_tickers": [
+    "MU",
+    "DELL",
+    "INTC",
+    "AMD",
+    "LRCX",
+    "ALB"
+  ],
+  "status_policy": {
+    "candidate_card_exists": [
+      "MU"
+    ],
+    "intake_only": [
+      "DELL",
+      "INTC",
+      "AMD",
+      "LRCX",
+      "ALB"
+    ]
+  },
+  "origin_policy": {
+    "allowed_origin_values": [
+      "USER_SEEDED",
+      "THEME_ADJACENT",
+      "SUPPLY_CHAIN_ADJACENT",
+      "PEER_CLUSTER",
+      "CUSTOMER_SUPPLIER_LINK",
+      "ETF_HOLDING_LINK",
+      "SEC_INDUSTRY_LINK",
+      "NEWS_RESEARCH_CAPTURE",
+      "LOCAL_FACTOR_SCOUT",
+      "SYSTEM_SCOUTED"
+    ],
+    "g8_1a_seed_origin_policy": {
+      "MU": [
+        "USER_SEEDED"
+      ],
+      "DELL": [
+        "USER_SEEDED",
+        "THEME_ADJACENT"
+      ],
+      "INTC": [
+        "USER_SEEDED",
+        "THEME_ADJACENT"
+      ],
+      "AMD": [
+        "USER_SEEDED",
+        "THEME_ADJACENT"
+      ],
+      "LRCX": [
+        "USER_SEEDED",
+        "SUPPLY_CHAIN_ADJACENT"
+      ],
+      "ALB": [
+        "USER_SEEDED",
+        "THEME_ADJACENT"
+      ]
+    },
+    "is_system_scouted": false,
+    "local_factor_scout": "defined_for_g8_1b_not_used_in_g8_1a"
+  },
+  "source_policy": {
+    "allowed_sources": [
+      "manual theme mapping",
+      "user-supplied official-source leads",
+      "existing static MU candidate card reference",
+      "future official filing or investor-relations evidence after separate approval"
+    ],
+    "forbidden_sources": [
+      "live provider calls",
+      "new ingestion",
+      "scraped live data",
+      "yfinance as canonical evidence",
+      "ranked screen results",
+      "unmanifested sources"
+    ],
+    "canonical_sources": [],
+    "source_notes": [
+      {
+        "source_id": "user_supplied_source_leads_20260510",
+        "quality_label": "research_only",
+        "canonical": false,
+        "note": "The queue records source leads only. No source is promoted to canonical evidence in G8.1."
+      }
+    ]
+  },
+  "allowed_use": [
+    "theme-to-candidate intake planning",
+    "evidence requirement capture",
+    "provider-gap capture",
+    "future planner handoff"
+  ],
+  "forbidden_use": [
+    "alpha search",
+    "candidate ranking",
+    "candidate scoring",
+    "validated thesis",
+    "action-state promotion",
+    "backtest",
+    "replay",
+    "provider ingestion",
+    "dashboard runtime behavior",
+    "alerts",
+    "broker behavior"
+  ]
+}

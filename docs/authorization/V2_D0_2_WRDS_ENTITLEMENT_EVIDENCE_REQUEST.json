@@ -1,0 +1,111 @@
+{
+  "packet_id": "V2_D0_2_WRDS_ENTITLEMENT_EVIDENCE_REQUEST",
+  "round_id": "ROUND-20260603-V2-D0-2-ENTITLEMENT-EVIDENCE-REQUEST",
+  "scope_id": "V2_D0_2_WRDS_ENTITLEMENT_EVIDENCE_REQUEST_NO_CREDENTIAL_USE",
+  "status": "REQUEST_PREPARED_EVIDENCE_MISSING",
+  "artifact_type": "pm_subagent_task_evidence_request",
+  "authority": "evidence request only; no credential use, provider access, row approval, probe, snapshot, data output, or runtime authority",
+  "mission": "Convert V2-D0.1 from authorization-intent-only to table-specific permission truth by obtaining non-secret dated attributable entitlement evidence.",
+  "source_state": {
+    "v2_d0_1_authorization_intent_exists": true,
+    "v2_d0_1_markdown": "docs/authorization/V2_D0_1_WRDS_PERMISSION_TRUTH_AUTHORIZATION.md",
+    "v2_d0_1_json": "docs/authorization/V2_D0_1_WRDS_PERMISSION_TRUTH_AUTHORIZATION.json",
+    "evidence_missing_for_all_rows": true
+  },
+  "artifact_status": {
+    "request_prepared": true,
+    "evidence_missing": true,
+    "saw_verdict_expected": "BLOCK",
+    "saw_block_is_correct": true,
+    "blocking_reason": "Non-secret dated attributable entitlement evidence has not been obtained."
+  },
+  "rows": [
+    {
+      "library_table": "crsp.dsf",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    },
+    {
+      "library_table": "crsp.stocknames",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    },
+    {
+      "library_table": "crsp.ccmxpf_linktable",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    },
+    {
+      "library_table": "comp.fundq",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    },
+    {
+      "library_table": "ibes.det_epsus",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    }
+  ],
+  "required_evidence": [
+    "non_secret",
+    "dated",
+    "attributable",
+    "account_or_license_owner",
+    "account_or_institutional_scope",
+    "exact_library_table_permissions",
+    "license_access_constraints",
+    "date_or_as_of_coverage",
+    "permission_to_store_as_non_secret_internal_documentation"
+  ],
+  "acceptable_evidence_sources": [
+    "institutional_data_librarian",
+    "WRDS_representative",
+    "PI",
+    "license_owner",
+    "data_administrator"
+  ],
+  "copyable_evidence_request_message": "Subject: Non-secret WRDS entitlement confirmation request for five table-level permissions\n\nHello,\n\nI am preparing an internal permission-truth record for a local quantitative research project. Please do not send credentials, passwords, tokens, SSH details, WRDS connection strings, data extracts, snapshots, schema listings, table listings, row counts, or query output.\n\nCould you provide a dated, attributable, non-secret entitlement confirmation for whether our account/institution/license has permission to access the following exact WRDS library.table rows for internal research/provenance documentation use?\n\n- crsp.dsf\n- crsp.stocknames\n- crsp.ccmxpf_linktable\n- comp.fundq\n- ibes.det_epsus\n\nPlease include, if available:\n\n1. account or license owner;\n2. account or institutional scope;\n3. exact table-level permission status for each listed library.table;\n4. license/access constraints and allowed use notes;\n5. date or as-of coverage for the permission statement;\n6. your name, role, institution or WRDS/licensing relationship, and contact channel;\n7. whether this confirmation may be stored as non-secret entitlement evidence in internal project documentation.\n\nThis request is only for entitlement evidence. It does not request credentials, provider access, probes, snapshots, schema discovery, table discovery, row counts, data output, or runtime validation.\n\nThank you.",
+  "forbidden_scope": [
+    "credentials",
+    "passwords",
+    "tokens",
+    "ssh_details",
+    "connection_strings",
+    "provider_access",
+    "wrds_access",
+    "login",
+    "ssh",
+    "python_wrds",
+    "sas",
+    "sql",
+    "schema_discovery",
+    "table_listings",
+    "row_counts",
+    "snapshots",
+    "data_output",
+    "runtime_checks",
+    "read_secret_txt",
+    "quote_secret_txt",
+    "test_secret_txt",
+    "validate_secret_txt",
+    "use_secret_txt",
+    "row_approval",
+    "approval_ref_assignment",
+    "final_permission_truth",
+    "clean_room_proof",
+    "legacy_cleanup",
+    "secret_remediation",
+    "SafeBoot",
+    "BootReady"
+  ],
+  "pm_subagent_task": {
+    "task": "Send the copyable evidence-request message to an institutional data librarian, WRDS representative, PI, license owner, or data administrator.",
+    "acceptance_condition": "Obtain non-secret dated attributable evidence that explicitly covers each of the five rows, or record that evidence was declined/unavailable.",
+    "next_action": "collect_or_decline_non_secret_entitlement_evidence_then_prepare_separate_approval_ref_artifact_if_qualifying_evidence_exists"
+  }
+}

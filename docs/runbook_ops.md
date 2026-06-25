@@ -449,3 +449,33 @@ Use this minimal loop when one or two repos are active and manual visual evidenc
   - `.venv\Scripts\python E:\Code\SOP\quant_current_scope\scripts\manual_capture_watcher.py --dry-run --index E:\Code\Quant\docs\context\e2e_evidence\index.md --queue E:\Code\Quant\docs\context\e2e_evidence\manual_capture_queue.json --alerts E:\Code\Quant\docs\context\e2e_evidence\manual_capture_alerts.json --drop-dir C:\Users\Lenovo\OneDrive\桌面\Evidence_Drop --evidence-dir E:\Code\Quant\docs\context\e2e_evidence --accept-any-filename --single-occupancy --owner-id ManualCapture-Quant-P31 --repo-key Quant --repo-root E:\Code\Quant --print-json`
 - **Drop-and-go behavior:**
   - user can drop screenshots with any filename into `E2E Evidence Drop`; worker auto-assigns FIFO and auto-renames into canonical evidence filenames.
+
+## 8. V2 PEAD D2B Fixed Event-Security Window Build / Verify / Rollback
+
+Scope: bounded 500-GVKEY sample only. Do not use this procedure for a full build, provider fetch, benchmark acquisition, CAR/alpha interpretation, dashboard integration, ranking, alerts, broker paths, staging, or commit.
+
+### Build
+
+1. Confirm the D1 and D2A stable manifests resolve to the approved immutable artifacts.
+2. Optional schema-only check:
+   - `.venv\Scripts\python scripts\pead_d2b_event_window_contract.py --schema-check`
+3. Build the approved sample:
+   - `.venv\Scripts\python scripts\pead_d2b_event_window_contract.py --sample`
+4. Expected commit order: capture and hash-validate D1/D2A byte snapshots, build in memory, write temporary Parquet, hash it, move it to an immutable hash-named Parquet, then atomically replace `data/processed/pead_d2b_event_windows_sample.parquet.manifest.json` under the writer lock.
+5. `--build` must fail closed; it is outside this round.
+
+### Verify
+
+- Focused contract: `.venv\Scripts\python -m pytest tests\test_pead_d2b_event_window_contract.py -q` (expected current evidence: 26 passed).
+- Combined contract: `.venv\Scripts\python -m pytest tests\test_pead_d2b_event_window_contract.py tests\test_pead_d2_returns.py tests\test_pead_event_study.py -q` (expected current evidence: 58 passed).
+- Context/docs gate: `.venv\Scripts\python scripts\build_context_packet.py` followed by `.venv\Scripts\python scripts\build_context_packet.py --validate`.
+- Manifest checks: output SHA256 must be `8e2f39c2cb12bd0b50c9a134b280b5ecb8cd438f8a2249c6842c226250228b99`; rows `754920`; events `12582`; eligible events `4867`; session spine `2862`, 2015-01-02 through 2026-03-06.
+- Strategy adapter checks: 4,867 eligible events; 881,588 unique canonical return rows; zero duplicate `(security_id,date)` keys; 292,020 complete strategy-window rows; identical global session spine.
+- Ensure no `.tmp` or `.lock` remains and the manifest-referenced immutable Parquet hash matches `output.sha256`.
+
+### Rollback
+
+- Before a later rebuild, retain the known-good manifest bytes as the rollback pointer. Never edit a hash-named Parquet in place.
+- If failure occurs before manifest commit, the old manifest remains authoritative; verify cleanup and take no pointer action.
+- If a committed output must be rolled back, atomically restore the prior known-good manifest bytes, then revalidate its referenced Parquet hash, schema, row count, and session-spine record before readers resume.
+- Keep both immutable Parquet objects until no manifest/evidence references them. Do not delete the active object as a rollback mechanism.

@@ -1,0 +1,40 @@
+{
+  "manifest_id": "LOCAL_FACTOR_SCOUT_OUTPUT_TINY_V0_MANIFEST",
+  "artifact_uri": "data/discovery/local_factor_scout_output_tiny_v0.json",
+  "artifact_sha256": "16402cd7edb3ea0fa160f47d4f523e5304d9bbd2af2396327b8763b1bb9a6658",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "scope": "PH65_G8_1B_SCOUT_OUTPUT_TINY",
+  "scout_model_id": "LOCAL_FACTOR_EQUAL_WEIGHT_V0",
+  "scout_model_version": "0.1.0",
+  "row_count": 1,
+  "baseline_artifact_uri": "data/discovery/local_factor_scout_baseline_v0.json",
+  "baseline_manifest_uri": "data/discovery/local_factor_scout_baseline_v0.manifest.json",
+  "source_artifact": "data/processed/phase34_factor_scores.parquet",
+  "source_artifact_sha256": "647b69a9db313df0e1f25927583d2f6e4b73216bf724c91597149cf827f8248c",
+  "asof_date": "2026-02-13",
+  "item_count": 1,
+  "tickers": [
+    "MSFT"
+  ],
+  "allowed_use": [
+    "one LOCAL_FACTOR_SCOUT intake-only fixture",
+    "schema validation for G8.1B",
+    "planner handoff only"
+  ],
+  "forbidden_use": [
+    "candidate ranking",
+    "candidate scoring",
+    "recommendation language",
+    "validated thesis claims",
+    "action-state promotion",
+    "dashboard runtime behavior",
+    "alerts",
+    "broker behavior"
+  ],
+  "source_policy": {
+    "canonical_sources": [],
+    "yfinance_canonical": false,
+    "provider_calls": false,
+    "source_quality": "local_artifact_governance_only"
+  }
+}

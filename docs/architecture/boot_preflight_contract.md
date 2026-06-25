@@ -1,16 +1,15 @@
 # Boot Preflight Contract v0
 
 Status: implementation contract
-Scope: boot-core control plane plus standalone data-readiness gate integration
-Non-scope: governance preflight, context rebuilding, replay behavior, optimizer behavior, dashboard semantics, research-validity claims, data repair, provider ingestion, broker actions, strategy logic
+Scope: boot-core control plane plus Governance Gate v0 scanner integration
+Non-scope: data-readiness, context rebuilding, replay behavior, optimizer behavior, dashboard runtime semantics, data repair, provider ingestion, broker actions, strategy logic
 
 ## Mission
 
 Terminal Zero must expose one deterministic boot-status contract before broad
-feature buckets are staged. The current slice keeps the boot path narrow: it
-proves the status vocabulary, schema, launch dispatch, basic Git/dirty
-inspection, preflight pass/fail shell, and the already-pushed standalone
-data-readiness gate.
+feature buckets are staged. The first slice is intentionally narrow: it proves
+the status vocabulary, schema, launch dispatch, Governance Gate v0 scanner
+integration, basic Git/dirty inspection, and preflight pass/fail shell.
 
 ## Commands
 
@@ -44,45 +43,22 @@ Boot-core v0 may check:
 
 - required boot-core files are present,
 - `docs/context/boot_status_current.schema.json` matches the boot-status vocabulary,
+- `scripts/governance_preflight.py` passes Governance Gate v0,
 - Git state is readable,
 - dirty files are classified at a basic safety level,
-- the data-readiness gate runs in read-only mode and reports structured readiness,
 - boot-control tests pass in strict mode unless `--no-tests` is supplied,
 - `--require-github` has a clean worktree and upstream-aligned HEAD.
 
-Boot-core v0 may import:
-
-- `core.data_readiness_gate.run_data_readiness_gate`.
-
 Boot-core v0 must not import or execute:
 
-- `scripts.governance_preflight`,
+- `core.data_readiness_gate`,
 - `scripts/build_context_packet.py --validate`,
 - dashboard AppTest smoke paths,
 - replay/dashboard focused-contract commands,
 - optimizer, Rule100, replay, or data repair modules.
 
-Governance, context-packet, smoke, replay/dashboard, optimizer, Rule100, and
-data-repair checks remain deferred until their own slices are approved.
-
-## Data-Readiness Gate Policy
-
-`scripts/boot_preflight.py` calls `run_data_readiness_gate(repo_root, mode=...)`
-directly. It does not call the CLI wrapper and does not write status files unless
-the operator explicitly supplies `--write-status`. Even with `--write-status`,
-failed preflight does not refresh the runtime status artifact; it reports
-`blocked-until-pass` in the transient result instead.
-
-Gate status maps into boot status as:
-
-- `PASS`: readiness check `pass`, severity `ready`,
-- `WARN`: readiness check `warn`, severity `degraded`, boot preflight exit code remains `0`,
-- `FAIL`: readiness check `fail`, severity `blocked`, boot preflight exit code is `1`,
-- `DEFER` or `DEFERRED`: readiness check `deferred`, severity `degraded`.
-
-Required data-readiness contract failures must not be silently downgraded to
-warnings. Optional missing artifacts may degrade the boot status when the gate
-reports `WARN`.
+Those checks are represented as deferred readiness checks until their own slice
+is approved.
 
 ## Status Artifact Policy
 
@@ -99,7 +75,14 @@ runtime/boot_status_current.json
 ```
 
 The status writer must resolve output paths inside the repository and allow only
-`runtime/boot_status_current.json` for durable v0 boot-status output.
+`runtime/boot_status_current.json` for durable v0 boot-status output. This JSON
+file is the canonical safe-boot verdict for v0. `docs/context/boot_status_current.json`
+is a noncanonical docs/context snapshot path only, and boot-status readers must
+not fall back to it or any alternate mirror/compatibility path.
+
+Strict preflight without `--write-status` must not create any boot-status
+artifact. With `--write-status`, preflight may write only
+`runtime/boot_status_current.json` after a PASS verdict.
 
 `boot_status_current.md` is outside v0. JSON plus schema is enough for the first
 boot-core slice.
@@ -134,6 +117,6 @@ Advisory only:
 
 ## Deferred Scope
 
-The next slice may add the governance/context-packet dependency set. It must be
-staged separately and must not be retroactively mixed into the boot-core or
-data-readiness integration commits.
+The next slice may add the data-readiness/runtime-smoke dependency set. It must
+be staged separately and must not be retroactively mixed into this boot-core
+commit.

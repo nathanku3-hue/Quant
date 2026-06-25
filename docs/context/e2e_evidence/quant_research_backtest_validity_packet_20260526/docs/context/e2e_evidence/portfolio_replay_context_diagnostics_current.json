@@ -1,0 +1,34 @@
+{
+  "closed_trade_return_summary": {
+    "closed_trades": 0,
+    "mean_return": 0.0,
+    "median_return": 0.0
+  },
+  "exit_reason_quality": {
+    "exit_rows": 7,
+    "missing_reason_rate": 0.0,
+    "missing_reason_rows": 0
+  },
+  "hold_time_summary": {
+    "closed_trades": 0,
+    "max_days": 0,
+    "mean_days": 0.0,
+    "median_days": 0.0
+  },
+  "identity": {
+    "cache_signature_hash": "0d3889ab20ced91867ad5b199200117ac69ff9b160405d86b81fe0d98d1d695f",
+    "method_id": "Rule of 100",
+    "run_id": "strategy_replay_27ba3938afb6fad49e",
+    "source_id": "selected_method_replay:Rule of 100:strategy_replay_27ba3938afb6fad49e",
+    "source_mode": "transitional_build"
+  },
+  "reason_code_concentration": {
+    "top_reason": "hard_stop",
+    "top_reason_share": 0.36363636363636365,
+    "unique_reasons": 3
+  },
+  "zero_exposure_buy_rows": {
+    "count": 0,
+    "rows": []
+  }
+}

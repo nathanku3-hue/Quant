@@ -1,8 +1,9 @@
 # Terminal Zero Boot
 
 Boot-core v0 is the first executable control-plane slice. It proves the boot
-status contract, basic Git/dirty inspection, CLI wiring, and status artifact
-shape without importing the broader data-readiness/governance graph.
+status contract, governance scanner integration, basic Git/dirty inspection,
+CLI wiring, and status artifact shape without importing the broader
+data-readiness/runtime-smoke graph.
 
 Normal boot-core check:
 
@@ -31,7 +32,7 @@ Final GitHub-aligned proof after an intentional status commit:
 Generated boot status:
 
 ```text
-docs/context/boot_status_current.json
+runtime/boot_status_current.json
 ```
 
 Schema:
@@ -40,10 +41,14 @@ Schema:
 docs/context/boot_status_current.schema.json
 ```
 
+The runtime JSON file is the only canonical generated boot-status verdict for
+v0. `docs/context/boot_status_current.json` is a noncanonical docs/context
+snapshot path only; strict preflight must not read, write, mirror, or fall back
+to it for safe-boot truth.
+
 Deferred from boot-core v0:
 
 - data-readiness gates
-- governance preflight
 - context packet rebuild/validation
 - Portfolio AppTest smoke
 - focused replay/dashboard contract

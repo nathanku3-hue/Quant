@@ -1,0 +1,83 @@
+{
+  "url": "http://127.0.0.1:8509/",
+  "body_head": "Portfolio & Allocation\nDiscovery & Analysis\nEntry/Exit Strategy\n\u2705 Parquet TRI data loaded: 2000 tickers\nLast Sync: 33 hours ago\n\ud83d\udd04 Force Engine Refresh\n\u25cf HEALTHY\n\ud83d\udfe2 Drift: clear\nDeploy\nTerminal Zero GodView\nPage Registry Shell | Proxy Integrity Lock (Updated: 33 hours ago)\nFR-041 Governor\n\ud83d\udfe2 GREEN\nGREEN: no RED/AMBER trigger\nTarget Exposure\n1.30x\nBOCPD\n0.01\nkeyboard_arrow_right\n\ud83d\udd27 Advanced Regime Metrics\n\ud83d\udef8 DRONE INTEL: 67 New Targets Detected dynamically by Scout Drone (Last Sweep: 19:07)\nPortfolio & Allocation\n\ud83d\udce6 Portfolio Optimizer\nUniverse Audit\nIncluded\n3\nExcluded\n22\nMissing Map\n0\nHistory Fail\n1\nSelect assets\nAMAT (14702)\nLRCX (48486)\nTSM (85442)\nPrice data through 2026-05-11 (local TRI).\nMethod\nInverse Volatility\nMax weight\n0.35\nPortfolio value ($)\nEnable Sector Constraint\nMax sector weight\n0.30\nNo new PIT ENTER candidates today. Showing open lifecycle holdings with residual cash.\nAMAT10%\nLRCX10%\nTSM10%\nCASH70%\nAMAT\nLRCX\nTSM\nCASH\nAllocation (Lifecycle Holds)\nSector Exposure\nAllocation Table\n\ud83d\udcc8 Portfolio Performance\nYTD\n1Y\n3Y\n5Y\nMax\nJan 112026\nJan 25\nFeb 8\nFeb 22\nMar 8\nMar 22\nApr 5\nApr 19\nMay 3\n0\n2M\n4M\n6M\n8M\nPortfolio\nSPY\nQQQ\nYTD Return (%)\nPortfolio\n+7645112.18%\nSPY\n+44.96%\nQQQ\n+34.93%\nStock prices refreshed through 2026-05-11 (portfolio: optimized local; benchmarks: local).\nPosition Lifecycle Replay\n1M\n3M\n6M\nYTD\n1Y\nALL\nAMAT\nAMZN\nAVGO\nLRCX\nMSFT\nMU\nTSLA\nTSM\nWDC\nJan 2025\nMar 2025\nMay 2025\nJul 2025\nSep 2025\nNov 2025\nJan 2026\nMar 2026\nMay 2026\nAMZN\nTSM\nTSLA\nMSFT\nLRCX\nMU\nAMAT\nWDC\nAVGO\nENTER\nEXIT\nkeyboard_arrow_right\nTransaction Log\nShadow Portfolio\nReference alert: RED | Review hold: True | Selected variant: v_3516a4bd6b65\nRead-only Phase 59 surface built from allocator_state research data plus historical phase50_shadow_ship reference artifacts.\nResearch Sharpe\n-0.8036\nResearch CAGR\n-5.89%\nHoldings Overlap\n0.00%\nGross Exposure Delta\n1.0000\nTurnover Delta Rel\n0.19%\n2016\n2018\n2020\n2022\n2024\n2026\n0.6\n0.7\n0.8\n0.9\n1\nPhase59 Research Equity\nPhase50 Shadow Reference Equity\nShadow Research vs Reference Equity\nDate\nEquity\nAlert Contract\nComparator Snapshot\n\ud83c\udfe5 Data Health Monitor\nDATA HEALTH\nHEALTHY\nDegraded: 0%\nSignals degraded: 0/5\nCurrent level: GREEN | Active alerts: 0 | Last check: Never\nForce Drift Check\nActive Alerts\nNo active drift alerts.\nAllocation Comparison\nBaseline weights unavailable. Allocation comparison disabled.\nHistorical Timeline\nNo alert history available yet.\nPage not found\nThe page that you have requested does not seem to exist. Running the app's main page.",
+  "contains": {
+    "AMAT": true,
+    "LRCX": true,
+    "TSM": true,
+    "CASH": true,
+    "SPY": true,
+    "QQQ": true,
+    "100.0% Cash": false,
+    "No optimizer-eligible assets": false,
+    "benchmarks: local": true
+  },
+  "traces": [
+    {
+      "count": 1,
+      "idx": 0,
+      "names": [
+        null
+      ]
+    },
+    {
+      "count": 3,
+      "idx": 1,
+      "names": [
+        "Portfolio",
+        "SPY",
+        "QQQ"
+      ]
+    },
+    {
+      "count": 2,
+      "idx": 2,
+      "names": [
+        "ENTER",
+        "EXIT"
+      ]
+    },
+    {
+      "count": 2,
+      "idx": 3,
+      "names": [
+        "Phase59 Research Equity",
+        "Phase50 Shadow Reference Equity"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "idx": 0,
+      "text": ""
+    },
+    {
+      "idx": 1,
+      "text": "TickerPermnoStatusReasonRatingActionHistory Obs0AMAT14702included_current_holdopen_lifecycle_positionEXIT / TRAIL TIGHT (Mania Top)BUY AGGRESSIVE28551LRCX48486included_current_holdopen_lifecycle_positionEXIT / TRAIL TIGHT (Mania Top)BUY AGGRESSIVE28552TSM85442included_current_holdopen_lifecycle_positionEXIT (Macro/Sector Rot)KILL28553AMD61241excludedexit_or_killEXIT / TRAIL TIGHT (Mania Top)BUY AGGRESSIVE28554WDC66384excludedexit_or_killEXIT / TRAIL TIGHT (Mania Top)BUY AGGRESSIVE28555GOOGL90319excludedexit_or_killEXIT / TRAIL TIGHT (Mania Top)BUY AGGRESSIVE25166INTC59328excludedexit_or_killEXIT / TRAIL TIGHT (Mania Top)BUY AGGRESSIVE28557MU53613excludedexit_or_killEXIT (Macro/Sector Rot)KILL2855"
+    },
+    {
+      "idx": 2,
+      "text": ""
+    },
+    {
+      "idx": 3,
+      "text": "SectorWeight0Cash0.71Technology0.30000000000000004"
+    },
+    {
+      "idx": 4,
+      "text": ""
+    },
+    {
+      "idx": 5,
+      "text": "PermnoTickerSectorWeightAllocation ($)Latest Price ($)Estimated Shares014702AMATTechnology0.110000.0247909761965274840337.25788257067148486LRCXTechnology0.110000.01135870441794395488038.2095708245285442TSMTechnology0.11000-0.0143315047025680543CASHCASHCash0.77000"
+    },
+    {
+      "idx": 6,
+      "text": ""
+    },
+    {
+      "idx": 7,
+      "text": ""
+    }
+  ]
+}

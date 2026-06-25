@@ -1,0 +1,103 @@
+{
+  "artifact_id": "V2_D0_4C_LOCAL_READ_ONLY_PERMISSION_PROBE_APPROVAL",
+  "status": "PASS_DOCS_ONLY_APPROVAL",
+  "round_id": "ROUND-20260603-V2-D0-4C-LOCAL-READ-ONLY-PERMISSION-PROBE-APPROVAL",
+  "scope_id": "V2_D0_4C_LOCAL_READ_ONLY_PERMISSION_PROBE_APPROVAL_DOCS_ONLY",
+  "authority": "docs_only_approval_for_future_local_human_permission_probe_not_execution",
+  "date": "2026-06-03",
+  "saw_verdict_fields": [
+    "PASS_DOCS_ONLY_APPROVAL",
+    "LOCAL_READ_ONLY_PERMISSION_PROBE_APPROVED_FOR_LOCAL_HUMAN_RUN",
+    "WRDS_OUTPUT_BLOCKED",
+    "DISCOVERY_BLOCKED",
+    "FORMAL_PERMISSION_TRUTH_NOT_CLOSED"
+  ],
+  "execution_in_this_artifact": false,
+  "codex_or_subagent_login_allowed": false,
+  "credential_handling": "local_only_do_not_read_do_not_quote_do_not_log_do_not_commit_do_not_share",
+  "secret_txt": "do_not_read_do_not_quote_do_not_test_do_not_validate_do_not_use",
+  "permission_truth": "not_closed",
+  "formal_approval_ref": null,
+  "execution_status": "awaiting_separate_local_human_run",
+  "data_output_status": "blocked",
+  "discovery_status": "blocked",
+  "rows": [
+    {
+      "library_table": "crsp.dsf",
+      "probe_status": "probe_approved_not_executed",
+      "approval_status": "not_formally_approved",
+      "approval_ref": null
+    },
+    {
+      "library_table": "crsp.stocknames",
+      "probe_status": "probe_approved_not_executed",
+      "approval_status": "not_formally_approved",
+      "approval_ref": null
+    },
+    {
+      "library_table": "crsp.ccmxpf_linktable",
+      "probe_status": "probe_approved_not_executed",
+      "approval_status": "not_formally_approved",
+      "approval_ref": null
+    },
+    {
+      "library_table": "comp.fundq",
+      "probe_status": "probe_approved_not_executed",
+      "approval_status": "not_formally_approved",
+      "approval_ref": null
+    },
+    {
+      "library_table": "ibes.det_epsus",
+      "probe_status": "probe_approved_not_executed",
+      "approval_status": "not_formally_approved",
+      "approval_ref": null
+    }
+  ],
+  "allowed_future_output_shape": {
+    "crsp.dsf": "accessible=true/false/redacted_error",
+    "crsp.stocknames": "accessible=true/false/redacted_error",
+    "crsp.ccmxpf_linktable": "accessible=true/false/redacted_error",
+    "comp.fundq": "accessible=true/false/redacted_error",
+    "ibes.det_epsus": "accessible=true/false/redacted_error"
+  },
+  "forbidden": [
+    "read_secret_txt",
+    "quote_secret_txt",
+    "test_secret_txt",
+    "validate_secret_txt",
+    "use_secret_txt",
+    "print_credentials",
+    "log_credentials",
+    "commit_credentials",
+    "share_credentials_with_agents",
+    "codex_login",
+    "subagent_login",
+    "wrds_execution_in_d0_4c",
+    "list_libraries",
+    "list_tables",
+    "schema_discovery",
+    "table_discovery",
+    "row_counts",
+    "sample_rows",
+    "sql_result_exports",
+    "raw_sql_logs_with_provider_output",
+    "snapshots",
+    "data_output",
+    "runtime_dashboard_scoring_broker_writes",
+    "approval_ref_change",
+    "formal_row_approval"
+  ],
+  "public_doc_basis": {
+    "scope": "public_support_for_access_routes_and_credential_confidentiality_not_entitlement_evidence",
+    "sources": [
+      "https://wrds-www.wharton.upenn.edu/pages/about/3-ways-use-wrds/",
+      "https://wrds-www.wharton.upenn.edu/pages/grid-items/using-python-wrds-platform/",
+      "https://wrds-www.wharton.upenn.edu/users/tou/"
+    ]
+  },
+  "next_packet": {
+    "packet_id": "V2_D0_4D_LOCAL_HUMAN_PROBE_EXECUTION_PACKET",
+    "status": "queued_not_run",
+    "allowed_record": "exact_five_row_boolean_or_redacted_error_outcomes_only"
+  }
+}

@@ -1,0 +1,20 @@
+25341e5 (origin/codex/meta-harness-install, codex/meta-harness-install) Refresh meta-harness handoff timestamp
+6b02827 Sync meta-harness install handoff status
+5fa9059 Record meta-harness install publication
+d0e62e7 Install meta-harness workflow visibility
+eb3b0ec (origin/codex/optimizer-core-structured-diagnostics) Merge pull request #1 from nathanku3-hue/codex/navigation-contract-registration
+a783852 (origin/codex/navigation-contract-registration) Clean navigation PR evidence wording
+d1defc8 Clarify navigation branch post-push evidence
+2c01bcd Reconcile navigation contract post-push evidence
+e40fa37 Register three-page navigation contract
+bf81ba8 Merge dashboard AppTest side-effect quarantine
+242074b (origin/codex/full-dashboard-apptest-side-effect-quarantine) Quarantine dashboard AppTest side effects
+8fd462b (origin/codex/dashboard-wide-apptest-governance) Expand dashboard rendered governance AppTest
+586cf1d (origin/codex/rendered-governance-boot-preflight-wiring) Wire rendered governance into boot smoke
+4b266e1 (origin/codex/rendered-apptest-governance-scan) Guard rendered allowed-label variants
+457363e Add rendered AppTest governance scan
+e6c880c (origin/codex/feature-development-reopen-anchor) Anchor research-only feature development reopen
+adf882d (origin/codex/execution-module-inventory-gate) Update execution inventory SAW repair note
+40a662e Cover alert escalation surfaces in execution inventory
+d0716b9 Record execution inventory SAW evidence
+9eedb8a Add execution module inventory governance gate

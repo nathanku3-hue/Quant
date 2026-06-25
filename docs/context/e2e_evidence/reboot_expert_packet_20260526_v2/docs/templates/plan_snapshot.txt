@@ -1,0 +1,23 @@
+Top-Down Snapshot
+L1: <project pillar>
+L2 Active Streams: <stream1, stream2, ...>
+L2 Deferred Streams: <stream3, ... | none>
+L3 Stage Flow: Planning -> Executing -> Iterate Loop -> Final Verification -> CI/CD
+Active Stream: <one stream>
+Active Stage Level: <L2|L3|L4>
+
++--------------------+----------------------+--------+--------------------------------------------------------------+
+| Stage              | Current Scope        | Rating | Next Scope                                                   |
++--------------------+----------------------+--------+--------------------------------------------------------------+
+| <Planning|...>     | <B/OH/AC token>      | 00/100 | 1) <primary item> [00/100]: <one-line reason>               |
++--------------------+----------------------+--------+--------------------------------------------------------------+
+Planning token rule: Boundary=<...>; Owner/Handoff=<...>; Acceptance Checks=<...>.
+Row rule: keep single-line cells; shorten/truncate text to avoid wrap.
+Remark: 2) <secondary item> [00/100]: <one-line reason> (optional; show only if next_step_certainty < 75 and rating_diff_between_top_next_steps < 20)
+
+Expanded Stage (optional, one stage only)
++--------------------+------------------------------+--------+--------------------------+--------------------------+
+| Sub-Stage          | Output Artifact              | Rating | Next Action              | Done When                |
++--------------------+------------------------------+--------+--------------------------+--------------------------+
+| <child item>       | <path/snippet/checklist>     | 00/100 | <one-line next action>   | <clear stop condition>   |
++--------------------+------------------------------+--------+--------------------------+--------------------------+

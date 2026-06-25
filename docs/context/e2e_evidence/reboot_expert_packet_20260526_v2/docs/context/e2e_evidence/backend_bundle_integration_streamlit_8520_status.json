@@ -1,0 +1,13 @@
+{
+  "port": 8520,
+  "url": "http://127.0.0.1:8520/portfolio-and-allocation",
+  "status_code": 200,
+  "readiness_ok": true,
+  "cleanup_ok": true,
+  "process_exited_after_stop": true,
+  "port_closed_after_stop": true,
+  "exit_code_after_stop": -1,
+  "readiness_error": null,
+  "cleanup_error": null,
+  "checked_at_local": "2026-05-14T17:09:33"
+}

@@ -1,6 +1,182 @@
 # lessonss.md
 
-Last updated: 2026-03-20
+Last updated: 2026-06-25
+
+## 2026-06-25 Round Entry (Bounded B Runs Need Eligibility and Commit Atomicity Together)
+- Date: 2026-06-25
+- Mistake or miss: Reviewer A/C terminal-window repair and Reviewer B commit-path repair could have been split into separate regenerations of the same B artifact.
+- Root cause: The prior path treated "which events are eligible" and "how B outputs are committed" as separable even though both converge on regenerating the same JSON/parquet pair.
+- Fix applied: Repaired in one ordered round: full-window event eligibility first, then gate-first rollback-protected `--commit-bestavail-run`, followed by one B regeneration through the new path.
+- Guardrail for next time: For any bounded diagnostic that emits paired data artifacts, fix selection eligibility before output commit semantics, then regenerate once through the final commit path.
+- Evidence paths: `scripts/pead_m6b_bestavail_illustrative_2015_2019.py`, `tests/test_pead_m6b_bestavail_illustrative_2015_2019.py`, `docs/context/e2e_evidence/pead_m6b_bestavail_illustrative_2015_2019.json`, `data/processed/pead_m6b_bestavail_illustrative_2015_2019_daily_returns.parquet`, `docs/saw_reports/saw_v2_pead_m6b_bestavail_option1_repair_20260625.md`.
+
+## 2026-06-25 Round Entry (Illustrative B Curves Still Need Terminal Window Completeness)
+- Date: 2026-06-25
+- Mistake or miss: A best-available illustrative curve passed flag/hash/parquet checks while still including terminal cohorts that could not complete the configured 60-session holding rule inside the declared 2015-2019 return frame.
+- Root cause: The standalone B selection capped return rows at 2019-12-31 but did not also cap eligible events by `exit_idx <= max(return_idx)` before the sparse engine call.
+- Fix applied: Reviewer C blocked closure and recorded the exact data-integrity failure: 1,796 / 29,737 selected events exceeded the return-calendar max index.
+- Guardrail for next time: Every future bounded-window diagnostic must verify full holding-window completeness before emitting or accepting curve metrics, even when the artifact is illustrative-only and hard-flagged as non-alpha/non-tradable.
+- Evidence paths: `docs/saw_reports/saw_v2_pead_m6b_bestavail_option1_reviewer_c_20260625.md`, `scripts/pead_m6b_bestavail_illustrative_2015_2019.py`, `docs/context/e2e_evidence/pead_m6b_bestavail_illustrative_2015_2019.json`, `data/processed/pead_m6b_bestavail_illustrative_2015_2019_daily_returns.parquet`.
+
+## 2026-06-25 Round Entry (Review Evidence Must Match Current Revision)
+- Date: 2026-06-25
+- Mistake or miss: A prior reviewer artifact did not match the current revision.
+- Root cause: Revision matching was not rechecked before using the artifact as terminal evidence.
+- Fix applied: Published an independent current revision review and kept the unmatched reviewer rerun open.
+- Guardrail for next time: Confirm reviewed implementation identity before accepting terminal review evidence.
+- Evidence paths: `docs/saw_reports/saw_v2_pead_m6a_reviewer_b_rerun_20260625.md`, `docs/context/planner_packet_current.md`.
+
+## 2026-06-25 Round Entry (Reviewer-Only PASS Must Leave Remaining Reviewers Explicit)
+- Date: 2026-06-25
+- Mistake or miss: A reviewer-only terminal PASS can be overread as full SAW closure if current truth surfaces still say all reviewers are pending or if the report omits the remaining reviewer boundary.
+- Root cause: Reviewer A/B/C evidence is collected independently, while the prior status language grouped them together as one unresolved gate.
+- Fix applied: Published a separate Reviewer A rerun artifact, validated its closure and SAW blocks, and updated current truth surfaces to show Reviewer A PASS while Reviewer B/C remain pending.
+- Guardrail for next time: When only one terminal reviewer reruns, publish a distinct reviewer artifact and update planner/bridge/impact/done surfaces to name exactly which reviewers remain.
+- Evidence paths: `docs/saw_reports/saw_v2_pead_m6a_reviewer_a_rerun_20260625.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/impact_packet_current.md`, `docs/context/done_checklist_current.md`.
+
+## 2026-06-24 Round Entry (PIT Timing Alignment Must Not Be Overclaimed as EPS Vintage PIT)
+- Date: 2026-06-24
+- Mistake or miss: An M6 equity-curve runner could have treated RDQ/release-date timing alignment as full PIT safety and emitted a fake tradable curve from current-vintage EPS plus non-delisting-adjusted Compustat returns.
+- Root cause: Prior PEAD evidence used the broad word PIT while the data contract actually has two layers: timing availability and unrevised/first-public vintage availability. M5a also labelled net output even though the cost parameter was zero.
+- Fix applied: Implemented M6a as a fail-closed input-contract and framework runner that labels current EPS as `release_date_aligned_but_restated`, requires nonzero explicit costs, and refuses `--run` curve output when strict vintage, delisting-adjusted tradable returns, or full as-of tradability screens are missing.
+- Guardrail for next time: Every future PIT/backtest claim must separately state `timing_pit_status`, `eps_vintage_status`, return-source/tradability status, delisting status, and whether net costs are nonzero before emitting CAGR or equity curves.
+- Evidence paths: `scripts/pead_m6_pit_walk_forward_equity_curve.py`, `tests/test_pead_m6_pit_walk_forward_equity_curve.py`, `docs/context/e2e_evidence/pead_m6_pit_walk_forward_equity_curve.json`, `.venv\Scripts\python.exe -m pytest tests/test_pead_m6_pit_walk_forward_equity_curve.py -q`, `.venv\Scripts\python.exe scripts/pead_m6_pit_walk_forward_equity_curve.py --run`.
+
+## 2026-06-24 Round Entry (Lineage Validation Errors Due to Sample vs Full Universe Manifest Mismatch)
+- Date: 2026-06-24
+- Mistake or miss: `pead_m5a_net_multifactor_alpha_test.py` failed with a `ValueError: D2B manifest path drift` because the loaded `d3` manifest expected the full universe manifest, while the default loaded `d2b` was the sample manifest.
+- Root cause: The daily benchmark `pead_d3_ken_french_daily_benchmark` on the system was built against the full universe manifest `pead_d2b_event_windows.parquet.manifest.json` during the M4B phase, whereas the M5a factor builder and diagnostic script defaulted to the sample manifest `pead_d2b_event_windows_sample.parquet.manifest.json`.
+- Fix applied: Ran both scripts explicitly passing the full universe D2B manifest (`--d2b-manifest data/processed/pead_d2b_event_windows.parquet.manifest.json`) and bypassed counts check using `--no-enforce-counts` on the diagnostic runner.
+- Guardrail for next time: Always verify whether the active benchmark artifact is aligned with the sample or the full universe manifest, and pass the corresponding `--d2b-manifest` and count enforcement flags explicitly to keep the lineage consistent.
+- Evidence paths: `scripts/pead_m5a_multifactor_factors.py`, `scripts/pead_m5a_net_multifactor_alpha_test.py`, `docs/context/e2e_evidence/pead_m5a_net_multifactor_alpha_test.json`, `data/processed/pead_d3m_ken_french_daily_multifactor.parquet.manifest.json`.
+
+## 2026-06-23 Round Entry (Context Hygiene Tests Enforce Historical Sub-Milestone Presence)
+- Date: 2026-06-23
+- Mistake or miss: Context hygiene test failed due to missing "M4A" string in `current_context.json`'s `what_was_done` field.
+- Root cause: The previous round's status update replaced the "M4A" string with M4B.1 reclassification details, violating the test's `assert "M4A" in joined_done` constraint.
+- Fix applied: Restored the M4A status reference to the `what_was_done` array in `docs/context/current_context.json` and validated all tests passed cleanly.
+- Guardrail for next time: Ensure historical sub-milestone references within the active phase are not completely removed from context files during status updates unless the test assertions are explicitly modified or retired.
+- Evidence paths: `docs/context/current_context.json`, `tests/test_phase61_context_hygiene.py::test_current_context_promotes_latest_active_phase`.
+
+## 2026-06-22 Round Entry (Full-Universe Inference Requires Memory-Conscious DataFrame Lifecycle)
+- Date: 2026-06-22
+- Mistake or miss: Full-universe calendar-time portfolio regressions failed with a `numpy.core.exceptions._ArrayMemoryError` during groupby and copy operations.
+- Root cause: Pandas DataFrames containing 13.6M+ rows were duplicated and cast repeatedly, and unneeded columns (e.g. `issuer_id`, `coverage_reason`, `handoff_eligible`) were retained in memory, exceeding local RAM limits.
+- Fix applied: Updated `scripts/pead_real_data_validation.py` to drop unused columns from `d2b.frame` before subset filtering, pre-compute lineage metadata records early to allow immediate deletion of `d1` and `d2b` snapshots, and invoke explicit garbage collection (`gc.collect()`) prior to running the inference estimator.
+- Guardrail for next time: For large-scale datasets (10M+ rows), proactively prune columns before filtering, clear objects early, call garbage collection, and avoid deep copies or string type castings of large columns.
+- Evidence paths: `scripts/pead_real_data_validation.py`, `docs/context/e2e_evidence/pead_calendar_time_inference_m1b_full_universe.json`, `docs/context/e2e_evidence/pead_real_data_validation_full_universe.json`.
+
+## 2026-06-22 Round Entry (Clean-Exit Failures Need Process-Liveness Proof Before Code Changes)
+- Date: 2026-06-22
+- Mistake or miss: The M4A execution_microstructure/full-suite blocker was initially treated as a possible teardown/status code defect even though stale pytest and Streamlit smoke processes were still alive.
+- Root cause: The first full-suite clean-exit rerun used an insufficient timeout and did not prove process liveness before classifying the failure.
+- Fix applied: Stopped the stale pytest/Streamlit smoke processes after verifying their command lines, reran targeted execution_microstructure/status checks, reran the full repository pytest with a longer timeout, and confirmed no lingering Python processes remained.
+- Guardrail for next time: Before editing code for a pytest hang or missing exit code, enumerate active Python processes with command lines, clear only verified stale test/smoke processes, rerun a targeted teardown matrix, then rerun full pytest with a timeout long enough for the current suite size.
+- Evidence paths: `docs/saw_reports/saw_v2_pead_m4a_clean_exit_rerun_20260622.md`, `docs/saw_reports/se_v2_pead_m4a_clean_exit_rerun_20260622.md`, `.venv\Scripts\python -m pytest tests\test_execution_microstructure.py -q`, `.venv\Scripts\python -m pytest tests\test_execution_microstructure.py tests\test_phase61_context_hygiene.py tests\test_policy_target_timeline_apptest.py -q`, `.venv\Scripts\python -m pytest -q`.
+
+## 2026-06-22 Round Entry (Terminal Reviewer Capacity Must Be Reserved Before Implementation)
+- Date: 2026-06-22
+- Mistake or miss: M4A implementation reached passing focused and PEAD regression tests, but the implementer subagent hit the usage limit before returning a report and before terminal Reviewer A/B/C capacity could be reserved.
+- Root cause: Reviewer capacity was acknowledged as a known closure dependency but not preflighted before starting the final implementation loop.
+- Fix applied: Kept M4A terminal SAW at BLOCK, recorded the usage-limit blocker, and separated local implementation evidence from closure authority.
+- Guardrail for next time: Before starting any code round that requires full Reviewer A/B/C SAW, reserve or preflight terminal reviewers first; if capacity is unavailable, publish BLOCK immediately or ask the user whether to proceed with local-only implementation evidence.
+- Evidence paths: scripts/pead_d2_return_contract.py, scripts/pead_d2b_event_window_contract.py, tests/test_pead_d2_returns.py, tests/test_pead_d2b_event_window_contract.py, docs/saw_reports/saw_v2_pead_m4a_memory_bounded_full_universe_20260622.md.
+
+## 2026-06-21 Round Entry (Read-Only Evidence UI Must Not Become Approval UI)
+- Date: 2026-06-21
+- Mistake or miss: A frontend status surface for closed M1B evidence could either imply alpha approval or overcorrect by leading with hashes/manifests instead of PM-readable readiness.
+- Root cause: Evidence integrity and product readiness are related but different surfaces; showing audit plumbing can obscure the approval boundary, while showing inference status without blocked states can imply promotion.
+- Fix applied: M2 verifies validation and M1B JSON hashes internally, renders locked evidence and blocked alpha/promotion states, sanitizes fail-closed UI errors, and tests that successful rendering exposes no SHA/path/manifest strings.
+- Guardrail for next time: Read-only evidence dashboards must separate internal verification from visible readiness and always show blocked approval/action states when evidence is not an authorization.
+- Evidence paths: `views/pead_validation_evidence.py`, `views/strategy_view.py`, `tests/test_pead_validation_evidence.py`, `docs/context/observability_pack_current.md`.
+
+## 2026-06-21 Round Entry (Cross-Artifact Invariants Must Precede Estimation)
+- Date: 2026-06-21
+- Mistake or miss: The first M1B implementation validated D2B and D3 separately but did not reject off-spine D2B return dates, and its CLI/schema boundaries allowed alternate output targets and underconstrained count/null fields.
+- Root cause: Artifact-local schema checks were treated as sufficient without enumerating cross-artifact set invariants and protected output identities.
+- Fix applied: Added the D2B-to-D3 date-subset gate, canonical M1B output lock, exact HAC correction flag, reconciled nonnegative count/rate validation, zero-session null semantics, and negative regressions.
+- Guardrail for next time: Before publishing derived evidence, enumerate and test source-to-source set relationships, protected output paths, empty-state representation, and every arithmetic identity in the evidence schema.
+- Evidence paths: `scripts/pead_real_data_validation.py`, `strategies/pead_event_study.py`, `tests/test_pead_real_data_validation.py`, `docs/context/e2e_evidence/pead_calendar_time_inference_m1b.json`, `AGENTS.md`.
+
+## 2026-06-21 Round Entry (Reserve Terminal Review Capacity Before Final Repair)
+- Date: 2026-06-21
+- Mistake or miss: M1B reached repaired code, deterministic evidence, and technical Reviewer A/B/C approval before the final hierarchy-only Reviewer C confirmation again hit the subagent usage limit.
+- Root cause: Terminal reviewer capacity was still consumed reactively after reconciliation instead of reserved before the last repair loop.
+- Fix applied: Kept terminal SAW at BLOCK, recorded the exact unavailable check, and promoted reviewer-capacity preflight into `AGENTS.md`.
+- Guardrail for next time: Preflight and reserve all required terminal reviewers before the final repair loop; if capacity is unavailable, publish BLOCK immediately rather than performing closure work that cannot be independently sealed.
+- Evidence paths: `AGENTS.md`, `docs/saw_reports/saw_v2_pead_calendar_time_inference_m1b_20260621.md`, Reviewer C hierarchy-audit usage-limit result.
+
+## 2026-06-21 Round Entry (Terminal Review Must Recheck Corrected Counts)
+- Date: 2026-06-21
+- Mistake or miss: The first M1A feasibility text recorded null-`return_date` exclusions as 327 and treated the methodology gate as approved before final Reviewer C could rerun after the count correction.
+- Root cause: Event/skeleton count language was conflated with row-count schema language, and reviewer capacity was discovered only after local reconciliation.
+- Fix applied: Reran the parent-side count check, corrected the contract to 19,812 null-`return_date` rows, 226,772 extreme expected rows, and 1,519 missing rows, then published a BLOCK SAW status instead of starting M1B.
+- Guardrail for next time: For every future evidence schema field named `*_rows_*`, rerun a parent-side exact row-count command and require independent Reviewer C terminal recheck before approval or implementation starts.
+- Evidence paths: `docs/phase_brief/v2-pead-alpha-inference-methodology-gate.md`, `docs/saw_reports/saw_v2_pead_alpha_inference_methodology_gate_20260621.md`, `docs/context/planner_packet_current.md`.
+
+## 2026-06-20 Round Entry (Name the Product Surface, Then Execute the Approval)
+- Date: 2026-06-20
+- Mistake or miss: The first response treated the approved D4 work as another status/approval handoff and retained the ambiguous phrase `status-only dashboard`.
+- Root cause: Execution-state language was allowed to replace the product-surface contract even though the user had already bounded and authorized implementation.
+- Fix applied: Implemented the slice directly, renamed it `read-only evidence dashboard`, and used status language only for artifact integrity fields inside the panel.
+- Guardrail for next time: After explicit bounded approval, execute without inserting another approval packet; name a surface by user-visible capability and forbidden actions, not by internal workflow state.
+- Evidence paths: `views/pead_validation_evidence.py`, `views/strategy_view.py`, `dashboard.py`, `tests/test_pead_validation_evidence.py`, `docs/phase_brief/v2-pead-read-only-evidence-dashboard-brief.md`.
+
+## 2026-06-20 Round Entry (Historical BLOCK Evidence Needs Separate PASS Rerun Artifact)
+- Date: 2026-06-20
+- Mistake or miss: Terminal closure could be overread if the prior BLOCK SAW were edited in place after reviewer capacity returned.
+- Root cause: The D2B technical state was already repaired, but the missing proof was reviewer availability, so the terminal state changed because of new review evidence rather than a new implementation.
+- Fix applied: Left `docs/saw_reports/saw_v2_d2b_session_spine_repair_20260619.md` intact and published `docs/saw_reports/saw_v2_d2b_session_spine_repair_rerun_20260620.md` as a separate PASS artifact.
+- Guardrail for next time: When reviewer capacity returns after a BLOCK caused by unavailable reviewers, publish a new rerun artifact and update current truth surfaces instead of mutating the historical BLOCK report.
+- Evidence paths: `docs/saw_reports/saw_v2_d2b_session_spine_repair_rerun_20260620.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `.venv\Scripts\python -m pytest tests\test_pead_d2_returns.py tests\test_pead_d2b_event_window_contract.py tests\test_pead_d3_benchmark_artifact.py tests\test_pead_event_study.py -q`.
+
+## 2026-06-20 Round Entry (Reviewer Capacity Is a Closure Dependency)
+- Date: 2026-06-20
+- Mistake or miss: The D2B session-spine repair reached code, artifact, test, and smoke evidence before confirming that final independent Reviewer A/B/C capacity was available for the post-fix state.
+- Root cause: Reviewer capacity was treated as a terminal action instead of a closure dependency that can block after local reconciliation fixes are already complete.
+- Fix applied: Published a terminal BLOCK SAW report with `ChecksFailed=1`, refreshed current truth surfaces to say final Reviewer A/B/C is unavailable rather than merely pending, and kept D3 publication separate.
+- Guardrail for next time: Before the final code-fix loop, preflight reviewer availability; if final A/B/C cannot run, publish BLOCK immediately and do not imply milestone closure from machine evidence alone.
+- Evidence paths: `docs/saw_reports/saw_v2_d2b_session_spine_repair_20260619.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/context/observability_pack_current.md`.
+
+## 2026-06-19 Round Entry (Filter Before Full-Frame Strategy Normalization)
+- Date: 2026-06-19
+- Mistake or miss: The first repaired strategy handoff deep-copied and sorted all 1.49 million D2A rows before filtering selected securities, causing a reproducible active-scale `ArrayMemoryError`.
+- Root cause: Input validation, canonical normalization, and selected-security projection were coupled in one full-frame operation.
+- Fix applied: Added bounded chunk validation across all D2A rows, retained only selected-security return columns with a shared categorical identity dtype, and derived event metadata from one eligible row per event.
+- Guardrail for next time: At large dataframe boundaries, validate globally in bounded chunks and project/filter before normalization or sorting; synthetic adapter tests must be paired with one active-scale memory smoke.
+- Evidence paths: `scripts/pead_d2b_event_window_contract.py`, `tests/test_pead_d2b_event_window_contract.py`, `docs/phase_brief/v2-pead-d2b-session-spine-repair-brief.md`, active-scale smoke output for `ROUND-20260619-V2-D2B-SESSION-SPINE-REPAIR`.
+
+## 2026-06-19 Round Entry (Source Row Dates Are Not Calendar Authority)
+- Date: 2026-06-19
+- Mistake or miss: D2B treated every distinct D2A source row date as a market session, allowing 52 exchange-closed dates to enter liquidity lookbacks and `+1..+60` event windows.
+- Root cause: D2A observation availability and market-calendar authority were collapsed into one date union.
+- Fix applied: Added an explicit source-backed Ken French daily session spine, recorded its release/hash and excluded dates in the D2B manifest, rebuilt D2B, and made D3 validate the same upstream source/session hash.
+- Guardrail for next time: Every event-study window builder must receive an explicit authoritative calendar; never infer market sessions solely from security-row dates.
+- Evidence paths: `scripts/pead_d2b_event_window_contract.py`, `scripts/pead_d3_benchmark_artifact.py`, `tests/test_pead_d2b_event_window_contract.py`, `tests/test_pead_d3_benchmark_artifact.py`, `data/processed/pead_d2b_event_windows_sample.parquet.manifest.json`.
+
+## 2026-06-18 Round Entry (Closure References Must Resolve Before PASS)
+- Date: 2026-06-18
+- Mistake or miss: The first parent-closure bridge addendum referenced a SAW filename that did not exist while a concurrent worker had already published the authoritative full D1 SAW under a different path.
+- Root cause: Closure drafting began from an earlier truth snapshot and did not re-resolve the evidence path after concurrent context updates.
+- Fix applied: Re-read current truth, retained the existing full D1 SAW as authoritative, published only a thin reconciliation report, corrected the bridge paths, and disclosed untracked local D1 ownership.
+- Guardrail for next time: Immediately before closure PASS, resolve every evidence path on disk, distinguish authoritative implementation SAW from reconciliation SAW, and never duplicate promotion ownership after concurrent publication.
+- Evidence paths: `docs/saw_reports/saw_v2_d1_repair_20260618.md`, `docs/saw_reports/saw_v2_d1_parent_closure_reconciliation_20260618.md`, `docs/context/bridge_contract_current.md`, `docs/context/impact_packet_current.md`.
+
+## 2026-06-18 Round Entry (Identity Dedup Must Precede Stateful Transforms)
+- Date: 2026-06-18
+- Mistake or miss: RDQ deduplication was applied after lag computation, allowing rows that were later removed to make events appear lag-valid.
+- Root cause: Stage-order review missed upstream-row contamination in stateful lag and rolling transforms.
+- Fix applied: Moved `(gvkey, rdq)` identity deduplication before exact t-4 lag and rolling calculations, rebuilt D1, and removed 1,447 contaminated lag-valid events.
+- Guardrail for next time: Resolve identity duplicates before any stateful lag or rolling transform and require a duplicate-key counterexample regression test.
+- Evidence paths: `scripts/pead_d1_sue_builder.py`, `tests/test_pead_d1_sue.py`, `docs/phase_brief/v2-pead-d1-repair-brief.md`, `data/processed/pead_d1_sue_signal.parquet`, `data/processed/pead_d1_sue_signal.parquet.manifest.json`.
+
+## 2026-06-18 Round Entry (Empty D1 Output Must Preserve Existing Bundle)
+- Date: 2026-06-18
+- Mistake or miss: The first D1 repair write path could promote an empty Parquet before later summary code failed.
+- Root cause: Atomic publication was verified for normal writes, but the all-filtered edge case did not have a pre-write fail-closed gate.
+- Fix applied: Added a pre-write empty-output guard and tests for dry-run and production paths, plus temp/manifest failure-order regressions.
+- Guardrail for next time: Any data builder that publishes a replace bundle must prove empty-output preservation before production rebuild evidence can count.
+- Evidence paths: `scripts/pead_d1_sue_builder.py`, `tests/test_pead_d1_sue.py`, `.venv\Scripts\python -m pytest tests\test_pead_d1_sue.py tests\test_pead_event_study.py -q`, `data/processed/pead_d1_sue_signal.parquet.manifest.json`.
 
 ## Purpose
 Track mistakes, root causes, and guardrails so repeated errors are prevented.
@@ -13,6 +189,29 @@ Track mistakes, root causes, and guardrails so repeated errors are prevented.
 ## Entries
 | Date | Scope | Mistake/Miss | Root Cause | Fix Applied | Guardrail | Evidence |
 |---|---|---|---|---|---|---|
+| 2026-06-18 | V2 PEAD strategy SAW rerun | Promotion evidence could be confused with the earlier BLOCK report or a pasted 4-check ClosurePacket | The original implementation round had valid code/tests but incomplete reviewer rerun, and later audit found reporting drift between pasted status and saved artifact | Published a separate rerun SAW PASS artifact, kept the old BLOCK report as historical evidence, refreshed current truth, and recorded exact reviewer/test/validator gates | Never rewrite historical BLOCK evidence into PASS; promotion after reviewer capacity returns must use a new artifact with its own closure packet and validator output | `docs/saw_reports/saw_v2_pead_strategy_contract_rerun_20260618.md`, `docs/saw_reports/saw_v2_pead_strategy_contract_20260618.md`, `docs/context/planner_packet_current.md`, `.venv\Scripts\python -m pytest tests\test_pead_event_study.py tests\test_statistics.py tests\test_phase56_pead_runner.py -q` |
+| 2026-06-18 | V2 PEAD strategy contract | A strategy skeleton could silently treat raw compounded return as CAR or accept partial `+60` windows while the data contract is still under repair | Return semantics and future-window coverage were implicit in upstream artifacts instead of enforced at the strategy boundary | Added explicit raw/CAR/BHAR formulas, strict post-event indexing, complete-window eligibility, cohort quantiles, HAC spread inference, and synthetic failure-path tests | Never label raw returns as CAR; require an explicit benchmark and complete event window before abnormal-return analysis, and keep strategy tests separate from real-alpha evidence | `strategies/pead_event_study.py`, `tests/test_pead_event_study.py`, `docs/phase_brief/v2-pead-strategy-contract-brief.md`, `.venv\Scripts\python -m pytest tests\test_pead_event_study.py -q` |
+| 2026-06-03 | V2-D0.4C probe approval fast gate | A fast unblock approval artifact could be misread as permission for Codex/subagents to run WRDS or capture provider output | D0.4C approves a future local human probe, but the operational vocabulary includes access checks and table names | Created D0.4C as docs-only approval with exact five-row scope, allowed output shape only, D0.4D queued but not run, and explicit blocks on credentials, discovery, row counts, samples, snapshots, data output, runtime writes, and formal approval_ref changes | Keep approval, execution, and outcome recording in separate packets; D0.4C approves future local human execution only, while D0.4D is the first packet that may record redacted outcomes | `docs/authorization/V2_D0_4C_LOCAL_READ_ONLY_PERMISSION_PROBE_APPROVAL.md`, `docs/authorization/V2_D0_4C_LOCAL_READ_ONLY_PERMISSION_PROBE_APPROVAL.json`, `docs/saw_reports/saw_v2_d0_4c_local_read_only_permission_probe_20260603.md` |
+| 2026-06-03 | V2-D0.4B WRDS local auth correction | Overbroad `WRDS/provider access blocked` language could hide a user-attested local auth method while still not proving login or permissions | Prior docs collapsed auth-method availability, credential handling, provider execution, and formal table permission truth into one blocked label | Added V2-D0.4B correction artifacts and refreshed current truth/product docs with local-auth-available, login-unverified, credentials-unread, permission-not-closed states | Split local auth availability from actual login verification and table-level permission truth; never read or use `secret.txt`/credentials, and keep rows not_approved until separate approval_ref evidence exists | `docs/authorization/V2_D0_4B_WRDS_LOCAL_AUTH_METHOD_CONFIRMED.md`, `docs/authorization/V2_D0_4B_WRDS_LOCAL_AUTH_METHOD_CONFIRMED.json`, `docs/context/planner_packet_current.md`, `PRD.md`, `PRODUCT_SPEC.md` |
+| 2026-05-28 | Governed data source provenance intake `ROUND-20260528-GOVERNED-DATA-SOURCE-PROVENANCE-INTAKE` / `SCOPE-APPROVE-RAW-SOURCES-BEFORE-ARTIFACT-GENERATION` | Source acquisition planning could still be mistaken for permission to generate processed artifacts | The previous packet named source/generator gaps but did not require explicit raw source ownership, access, as-of coverage, license, manifest path, and SHA256 policy before generation | Added a source-provenance intake packet and refreshed truth surfaces with a no-generation boundary and per-line provenance fields | Before any governed regeneration, approve raw/source provenance first; generator argv and artifact writes stay blocked until provenance, manifests, hashes, and validation commands are documented | `docs/architecture/governed_data_source_provenance_intake_20260528.md`, `docs/context/bridge_contract_current.md`, `docs/context/impact_packet_current.md`, `docs/context/done_checklist_current.md`, `docs/context/planner_packet_current.md`, `docs/context/multi_stream_contract_current.md`, `docs/context/post_phase_alignment_current.md`, `docs/context/observability_pack_current.md`, `docs/decision log.md`, `docs/notes.md`, `docs/phase_brief/phase65-brief.md` |
+| 2026-05-28 | Governed data source acquisition planning | Source/generator approval could be conflated with the prior governed artifact authorization PASS | The prior packet approved the next decision surface but did not enumerate source inputs and generator gaps per strict-readiness artifact in dependency order | Added a source-acquisition planning packet and refreshed truth surfaces with BLOCK state, explicit A/B/C decision, no-generation boundary, and per-artifact source/schema/manifest/rollback rules | Before any data-readiness recovery, split authorization, source acquisition, generator approval, data generation, and BootReady proof into separate docs/check gates | `docs/architecture/governed_data_source_acquisition_20260528.md`, `docs/context/bridge_contract_current.md`, `docs/context/impact_packet_current.md`, `docs/context/done_checklist_current.md`, `docs/context/planner_packet_current.md`, `docs/context/multi_stream_contract_current.md`, `docs/context/post_phase_alignment_current.md`, `docs/context/observability_pack_current.md`, `docs/decision log.md`, `docs/notes.md`, `docs/phase_brief/phase65-brief.md` |
+| 2026-05-26 | Boot status path contract SAW | Executable code and tests could be corrected to runtime while docs/context contracts still snapped back to docs/context as canonical | The path contract lived in multiple docs and JSON policy surfaces, so code-only sentinels did not catch stale docs-as-code authority | Patched BOOT.md, boot/data-readiness architecture docs, taxonomy, and route contract to runtime canonical and reran focused tests plus stale-authority grep | Path contract rounds must run both import sentinels and stale-authority grep over docs/context policy JSON before SAW closure | `BOOT.md`, `docs/architecture/boot_preflight_contract.md`, `docs/architecture/data_readiness_gate_v0.md`, `docs/context/data_artifact_taxonomy_current.json`, `docs/context/portfolio_allocation_route_contract_v0.json`, `.venv\Scripts\python -m pytest tests\test_boot_preflight.py tests\test_boot_preflight_governance.py tests\test_boot_status_contract.py tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py -q`, `.venv\Scripts\python -c "from core import boot_status as b; from scripts import boot_preflight as p; import core.data_readiness_gate as d; ..."` |
+| 2026-05-26 | Data Readiness Gate v0 recovery | The boot-status path was patched to docs/context by subagents and briefly passed, then snapped back to runtime after the agents closed | Multiple live Codex/app-server streams in the shared workspace could still rewrite the same root files, and no safe single writer PID was identifiable | Stopped broad implementation, closed subagents, preserved BLOCK evidence, and did not stage or claim boot readiness | When a path sentinel flips after all patch lanes report PASS, stop immediately, keep BLOCK, and require a fresh isolated workspace or explicit process freeze before another path-lock attempt | `core/boot_status.py`, `tests/test_boot_status_contract.py`, `docs/saw_reports/saw_data_readiness_gate_v0_recovery_20260526.md`, `.venv\Scripts\python -c "from core.boot_status import BOOT_STATUS_CURRENT_PATH, DEFAULT_BOOT_STATUS_PATH; ..."` |
+| 2026-05-26 | Boot status path contract | A stale `docs/context/boot_status_current.json` snapshot still claimed docs/context was canonical after runtime code had moved to `runtime/boot_status_current.json` | Snapshot evidence was treated like current runtime truth during earlier boot-control streams | Deleted the stale noncanonical snapshot, locked runtime-only reader/writer tests, and integrated Governance Gate v0 into boot preflight so GOV-000 proves root application | Never generate or preserve `docs/context/boot_status_current.json` as safe-boot evidence; runtime truth is `runtime/boot_status_current.json`, and docs/context snapshots must be explicit exports only | `core/boot_status.py`, `scripts/boot_preflight.py`, `tests/test_boot_status_contract.py`, `tests/test_boot_preflight.py`, `tests/test_boot_preflight_governance.py`, `.venv\Scripts\python scripts\governance_preflight.py --repo-root . --json`, `.venv\Scripts\python -m pytest tests\test_boot_preflight.py tests\test_boot_preflight_governance.py tests\test_boot_status_contract.py tests\test_data_readiness_gate_write_guard.py -q` |
+| 2026-05-26 | Boot control stabilization | The boot-status canonical path flipped during verification after an attempted runtime-path patch, so targeted tests could pass against one contract while the live sentinel reported another | Multiple dirty boot-control streams and parked patches/artifacts were still influencing the same root files, leaving `core/boot_status.py`, docs, and tests out of sync | Stopped implementation, preserved governance/data/preflight evidence, closed subagents, and published a SAW BLOCK instead of claiming boot-ready | If the boot-status sentinel changes during a round, stop coding, freeze competing writers, choose one path contract in a single clean slice, and rerun sentinel before and after every focused suite | `core/boot_status.py`, `tests/test_boot_status_contract.py`, `tests/test_data_readiness_gate_write_guard.py`, `docs/saw_reports/saw_boot_control_stabilization_20260526.md`, `.venv\Scripts\python scripts\governance_preflight.py --repo-root . --json`, `.venv\Scripts\python scripts\run_data_readiness_gate.py --strict`, `.venv\Scripts\python -m pytest tests\test_boot_status_contract.py tests\test_data_readiness_gate_write_guard.py tests\test_boot_preflight.py tests\test_boot_preflight_governance.py tests\test_data_readiness_gate.py -q`, `.venv\Scripts\python scripts\boot_preflight.py --repo-root . --strict --json --no-tests` |
+| 2026-05-15 | Strategy Replay Timeline visualization QA | The stacked replay timeline was guarded by source text but did not yet prove the actual Plotly traces were stacked step areas | The first visualization check locked the implementation string instead of exercising the rendered `go.Figure` contract | Added an executable Plotly trace regression that captures the chart and asserts stacked `weights`, `hv` line shape, marker-free traces, fixed 0-100% y-axis, and muted last `CASH` trace | Visualization behavior should have at least one rendered-figure assertion when the user-visible fix depends on trace semantics, not just source text | `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py::test_replay_timeline_uses_stacked_replay_targets tests\test_dash_2_portfolio_ytd.py::test_replay_timeline_stacked_chart_traces_are_allocation_areas -q`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py -q` |
+| 2026-05-15 | Dashboard replay horizon asset universe | The page was mechanically single-source but the single replay source was scoped only to current signed holds, so MU was dropped from 1Y trade history after becoming flat | Replay identity hardening correctly removed broad fallbacks but did not distinguish current allocation assets from horizon lifecycle/history assets | Added horizon-aware `replay_assets`, current-only `allocation_assets`, cache identity for both, zero-weight context-only rows for history tickers, coverage pre-gate filtering, and MU/coverage/cache regressions | Single-source replay must prove its bundle universe covers the selected horizon while optimizer/PIT allocation, cache identity, and coverage emission remain current-selection-aware | `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py -q`, `.venv\Scripts\python -m pytest tests\test_optimizer_view.py tests\test_strategy_replay.py tests\test_strategy_replay_coverage.py -q` |
+| 2026-05-15 | Dashboard selected-method replay runtime | YTD replay was scoped to the YTD date list but still felt like a full-history replay because each date loaded a PIT input slice from the full history start | The dashboard transitional build reused the safe per-date PIT loader pattern after the batched replay loader existed, so correctness was preserved but runtime paid repeated wide data loads | Switched the dashboard transitional replay path to one cached `load_batched_pit_replay_data(...)` call per selected window, wrapped by `build_batched_pit_input_loader(...)`, and filtered each PIT input to the signed replay assets | Forward-walk dashboard replay should bulk-load PIT source data once per selected window, then slice per date; keep signed asset filtering after any broad PIT source load | `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `tests/test_optimizer_view.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py -q`, `.venv\Scripts\python -m pytest tests\test_strategy_replay_coverage.py -q` |
+| 2026-05-14 | Saved artifact replay aux surfaces | Saved-artifact mode could still show separately loaded ENTER/EXIT or Buy/Sell rows when the artifact had daily portfolio rows but empty event/decision rows | The adapter treated empty artifact aux frames as missing data and backfilled from fallback dashboard frames, weakening `source_mode="saved_artifact"` | Removed aux-frame fallback in `_dashboard_context_from_artifact_read(...)`, added a regression with empty saved aux rows and non-empty fallback rows, and mirrored SAW evidence under `docs/saw_reports/` | In saved-artifact mode, empty artifact surfaces are valid evidence and must be preserved exactly; any mixed-source fallback must be explicitly labeled outside `source_mode="saved_artifact"` | `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `docs/saw_reports/saw_frontend_ui_saved_replay_source_selector_20260514.md`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q` |
+| 2026-05-14 | Saved selected-method replay artifact reader | Saved replay-output artifacts could be written but not safely consumed, leaving future readers to risk trusting stale manifest/parquet pairs or carrying prior weights on budget misses | Writer tests covered bundle atomicity, but there was no reader-side context signature, source-file signature, schema, identity, timing, or performance-budget gate | Added `read_selected_method_replay_artifact(...)`, `ReplayBudgetPolicy`, `SelectedMethodReplayResult`, DataFrame control content hashes, strict parquet identity checks, timing validation, budget-wrapped build support, CLI budget flags, and stale/mismatch/over-budget regressions | Any saved replay artifact consumer must validate parquet+manifest as a bundle, match method/controls/date/input/source signatures including DataFrame content, enforce row/date/time budgets, and return unavailable instead of stale replay output | `strategies/strategy_replay.py`, `scripts/build_strategy_replay_artifact.py`, `tests/test_strategy_replay_artifact.py`, `tests/test_strategy_replay_coverage.py`, `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py -q --durations=12` |
+| 2026-05-14 | Replay coverage contract audit | Initial closeout framed a 31s daily replay path as a timing flake and suggested threshold relaxation before proving the hot path | The audit looked only at one loaded-machine timing and missed per-date DataFrame/performance/concat work, row-heavy unavailable windows, same-date return alignment, and duplicate shadowed tests | Batched uncovered-date cash-closed rows, added fast row-heavy unavailable emission, shifted replay performance to next tradable returns, recomputed loader equity once per run, added a small-frame performance lookup, added a bound-feasible inverse-volatility fast path, removed duplicate tests, and reran focused/affected/full pytest | Performance-budget misses must be profiled before relaxing thresholds; replay performance must prove no same-date lookahead; duplicate pytest definitions are test debt and must be removed in the same audit fix | `strategies/strategy_replay.py`, `strategies/optimizer.py`, `tests/test_strategy_replay.py`, `tests/test_strategy_replay_coverage.py`, `tests/test_optimizer_core_policy.py`, `.venv\Scripts\python -m pytest tests\test_strategy_replay_coverage.py -q --durations=12`, `.venv\Scripts\python -m pytest -q` |
+| 2026-05-14 | Scaled live overlay anchor | Initial freshness regressions covered stale selected-asset dropping only when another asset had overlap; they did not pin local ending `2026-02-27` and live starting `2026-05-01` for selected or benchmark overlay paths | The overlay scaler still allowed no-overlap display scaling, and evidence paths could reuse that synthetic stitch | Made `scale_live_overlay_to_local(...)` require same-column overlap by default with no permissive public flag, made benchmark overlays use the same invariant, and added no-overlap/drop regressions | Any scaled overlay that can feed allocation, YTD, optimizer, or benchmark evidence must prove a same-ticker overlap anchor; no overlap means unavailable/dropped, not synthetic continuity | `core/data_orchestrator.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py -q` |
+| 2026-05-13 | Selected-method replay artifact atomicity | Initial artifact tests proved temp cleanup but still allowed an orphan parquet if manifest promotion failed after parquet promotion | Writer treated parquet and manifest as two independent atomic writes instead of one evidence bundle | Staged parquet and manifest first, added rollback promotion, and added a regression that fails manifest replace after parquet replace | Saved evidence must be bundle-atomic: parquet and manifest promote together or neither remains as current evidence | `strategies/strategy_replay.py`, `tests/test_strategy_replay_artifact.py`, `.venv\Scripts\python -m pytest tests\test_strategy_replay_artifact.py -q` |
+| 2026-05-13 | Selected-method replay evidence/docs handoff | Runtime patches existed, but the current docs still split backend replay, dashboard context, timeframe/PIT, and latest-trades UX rules into separate fragments | Evidence was recorded per worker lane instead of as one cross-surface selected-method source invariant | Added a combined evidence handoff across phase brief, notes, decision log, context packets, done checklist, observability, alignment, and SAW report | After parallel replay workers land, publish one docs/evidence handoff that states the source invariant, timeframe/PIT rule, latest-trades default, rollback, and open risks before claiming closure | `docs/phase_brief/phase65-brief.md`, `docs/notes.md`, `docs/context/*.md`, `docs/saw_reports/saw_backend_shared_replay_source_20260513.md`, `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_replay_non_cash_closed.py -q`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q` |
+| 2026-05-13 | Rule100 dynamic UI/replay sizing | First plan risked regenerating frozen Rule100 history at the new 35% visible UI cap | Audit/history and UI/replay paths shared softmax sizing, making default mutation or artifact rewrite look simpler than caller-specific policy | Preserved `Rule100SoftmaxConfig()` defaults, added `rule100_config_from_max_weight(max_weight)` for UI/replay only, and left `data/processed/rule100_softmax_v1_history.csv` untouched unless a versioned artifact is approved | If an artifact says audit/history/frozen, never rewrite it to match live UI controls; add a runtime adapter or versioned policy artifact and test both semantics | `strategies/rule100_softmax.py`, `strategies/strategy_replay.py`, `views/optimizer_view.py`, `tests/test_rule100_softmax.py`, `tests/test_optimizer_view.py`, `docs/saw_reports/saw_rule100_dynamic_ui_replay_ytd_20260513.md` |
+| 2026-05-12 | Rule100 history overlay | Buy/sell and lifecycle history still looked like stale 10% sizing after the live Rule of 100 UI switched to softmax v1 | The history table displayed the immutable v0 event `weight` column from the lifecycle ledger, while softmax v1 existed only as current target allocation and PIT audit artifacts | Added `data/processed/rule100_softmax_v1_history.csv`, wired the transaction log to show `Event Weight` beside `Softmax v1 Target` and `Softmax v1 Cash`, and added current TSM regression coverage | Historical execution/event ledgers must not be silently repurposed as target-weight histories; add explicit overlay columns and source labels for new sizing policies | `scripts/rule100_softmax_v1_audit.py`, `dashboard.py`, `tests/test_rule100_softmax.py`, `tests/test_position_lifecycle.py`, `data/processed/rule100_softmax_v1_history.csv` |
+| 2026-05-12 | Rule100 softmax v1 UI wiring | Softmax v1 artifacts existed but the live Rule of 100 UI still rendered lifecycle `last_weight`, so the screen stayed at AMAT/LRCX/TSM 10% and YTD +14.25% | The audit stack was not connected to `views/optimizer_view.py`, and docs still framed softmax as artifacts-only | Routed explicit `Rule of 100` to `softmax_v1_weights(...)`, stored `source=rule100_softmax_v1`, and added regressions proving TSM drops to 0% while cash rises to 80% | Any sizing artifact intended for a visible method must have a UI/session-state regression that proves the method consumes the new weight source, not only artifact tests | `views/optimizer_view.py`, `tests/test_optimizer_view.py`, `data/processed/rule100_softmax_v1_comparison.csv`, `.venv\Scripts\python -m pytest tests\test_optimizer_view.py tests\test_rule100_softmax.py tests\test_portfolio_universe.py tests\test_dash_2_portfolio_ytd.py -q`, `.venv\Scripts\python -m pytest -q` |
+| 2026-05-12 | Rule100 softmax v1 audit | Kelly comparator initially redistributed leftover budget into zero-edge names, which made the comparator look like a second full stack instead of a thin ablation | Generic cap-and-redistribute logic was reused for Kelly without preserving the positive-edge subset boundary | Restricted Kelly to the positive-edge candidate subset and let residual cash remain explicit; kept softmax as the primary sizing path | Kelly-style comparators must never backfill cash into names with zero edge; if the comparator cannot fund only positive-edge names, the leftover stays cash | `strategies/rule100_softmax.py`, `scripts/rule100_softmax_v1_audit.py`, `tests/test_rule100_softmax.py`, `.venv\Scripts\python -m pytest tests\test_rule100_softmax.py -q`, `.venv\Scripts\python scripts\rule100_softmax_v1_audit.py --as-of-date 2026-05-12`, `.venv\Scripts\python -m pytest -q` |
 | 2026-05-11 | Dashboard scanner testability hardening | Core scanner formulas lived as dashboard runtime closures and had no focused boundary tests | Streamlit orchestration, provider calls, row math, and label rules were coupled in one large `run_and_save_scan` path | Extracted deterministic scanner math to `strategies/scanner.py`, kept provider calls in `dashboard.py`, and added boundary tests plus strategy/config/ETL coverage | Scanner formula changes must land in `strategies/scanner.py` with `tests/test_scanner.py` boundary coverage before dashboard wiring is accepted | `strategies/scanner.py`, `dashboard.py`, `tests/test_scanner.py`, `tests/test_adaptive_trend.py`, `tests/test_production_config.py`, `tests/test_core_etl.py`, `.venv\Scripts\python -m pytest tests\test_scanner.py tests\test_strategy.py tests\test_phase15_integration.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\test_process_utils.py -q` |
 | 2026-03-20 | Post-phase GitHub alignment | Repo fell 30+ phases behind public GitHub; CEO handover links would 404 | No git-sync checkpoint in phase closeout SAW template | Added `CHK-PH-07` Git sync gate to SAW protocol and milestone review checklist | `git status --porcelain` empty AND `git log origin/main..HEAD --oneline` empty before phase-close SAW verdict PASS | `docs/checklist_milestone_review.md`, `.codex/skills/saw/SKILL.md` |
 | 2026-02-18 | Governance bootstrap | No persistent self-learning log existed | Process control gap | Added mandatory feedback-loop policy | Append one lesson after each execution/review round | `AGENTS.md`, `docs/lessonss.md` |
@@ -876,6 +1075,22 @@ Application pattern:
 - Root cause: The stitch step used row concatenation plus duplicate-date `keep=last`, which was fine for full live rows but unsafe for sparse live frames.
 - Fix applied: Changed selected-price stitching to `scaled_live_overlay.combine_first(local_TRI_prices)`, deduped duplicate anchor dates before scaling, fail-softened background refresh submission, and locked stale-while-revalidate behavior with focused tests.
 - Guardrail for next time: Any display overlay that is allowed to be sparse must merge cell-wise and must prove missing live cells preserve canonical local values.
+## 2026-05-13 Round Entry (Selected Method Replay Needs One Source)
+- Date: 2026-05-13
+- Mistake or miss: The architecture note named one replay engine and one evidence artifact, but did not yet make the cross-surface invariant machine-checkable for YTD, latest allocation, Strategy Replay, annotations, decision logs, and saved evidence.
+- Root cause: The handoff was framed as a future architecture direction instead of an enforceable selected-method source contract with explicit temporary-bridge limits and performance gates.
+- Fix applied: Updated the phase brief, notes, decision log, done checklist, bridge, planner, impact, multi-stream, observability, and SAW report to require one selected-method replay run/source and to mark shared source/adapters/YTD/annotations/decision-log/evidence/performance as incomplete until implemented.
+- Guardrail for next time: Any replay architecture milestone must name every downstream consumer of the selected-method source and include a failure rule for stale, partial, over-budget, or non-PIT replay dates before code work starts.
+- Evidence paths: `docs/phase_brief/phase65-brief.md`, `docs/notes.md`, `docs/decision log.md`, `docs/context/done_checklist_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/planner_packet_current.md`, `docs/context/impact_packet_current.md`, `docs/context/multi_stream_contract_current.md`, `docs/context/observability_pack_current.md`, `docs/saw_reports/saw_ultra_modular_replay_architecture_note_20260513.md`.
+
+## 2026-05-13 Round Entry (PIT Replay Safety Must Reach Public Helpers And UI Consumers)
+- Date: 2026-05-13
+- Mistake or miss: The replay input artifact slice fixed the happy-path loader but still left audit risk around public cache signatures, caller-controlled cache roots, and dashboard replay consuming raw global price matrices.
+- Root cause: PIT safety was treated as a loader concern rather than an end-to-end contract across signature generation, artifact write roots, and replay output consumers.
+- Fix applied: Made `build_strategy_replay_cache_signature(...)` default to and require `r3000_pit`, confined repo-local artifacts to `data/runtime_cache/strategy_replay`, wired dashboard Strategy Replay through per-date `StrategyReplayInputs` before `build_strategy_replay(...)`, and preserved empty/failed replay dates as explicit cash-closed rows.
+- Guardrail for next time: Every replay path must prove PIT-safe universe membership at the public helper boundary and at the UI/output consumer boundary; source guards should reject raw global `prices_wide` replay calls and dropped replay dates.
+- Evidence paths: `core/data_orchestrator.py`, `dashboard.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_strategy_replay_artifact.py`, `tests/test_optimizer_view.py`, `tests/test_position_lifecycle.py`, `tests/test_policy_target_timeline_apptest.py`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py tests\test_dash_1_page_registry_shell.py tests\test_dash_2_portfolio_ytd.py tests\test_portfolio_universe.py tests\test_pinned_universe.py -q`.
+
 - Evidence paths: `core/data_orchestrator.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `docs/saw_reports/saw_portfolio_data_boundary_refactor_20260511.md`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py -q`.
 
 ## 2026-05-11 Round Entry (PID Probes Must Be Shared And Windows-Safe)
@@ -916,6 +1131,30 @@ Application pattern:
 4. Loader validates strictly: rejects empty groups, blank tickers, duplicates, unresolved permnos.
 5. Incremental no-op checks pinned coverage before returning "up to date".
 
+## 2026-05-13 Round Entry (Do Not Rewrite Frozen History For UI Policy)
+- Date: 2026-05-13
+- Mistake or miss: The first patch plan suggested regenerating the frozen Rule100 history artifact with the 35% UI cap, which would blur audit-baseline semantics with live UI policy.
+- Root cause: I treated the cap/budget mismatch as a global sizing default problem instead of separating audit history defaults from dynamic UI/replay controls.
+- Fix applied: Added `rule100_config_from_max_weight(max_weight)` and used it only in direct Rule100 UI allocation and Strategy Replay; left `Rule100SoftmaxConfig()` and `rule100_softmax_v1_history.csv` frozen unless a future labeled artifact is approved.
+- Guardrail for next time: Any artifact with `history`, `audit`, or `comparison` in the name must preserve its existing policy defaults unless the patch explicitly creates a new versioned/labeled artifact and updates downstream labels.
+- Evidence paths: `strategies/rule100_softmax.py`, `views/optimizer_view.py`, `strategies/strategy_replay.py`, `tests/test_rule100_softmax.py`, `tests/test_optimizer_view.py`, `.venv\Scripts\python -m pytest tests\test_rule100_softmax.py tests\test_strategy_replay.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py -q`.
+
+## 2026-05-13 Round Entry (Benchmark Freshness Is Per Column)
+- Date: 2026-05-13
+- Mistake or miss: QQQ could be forward-filled flat through 2026-05-11 because benchmark fallback treated local SPY/QQQ data as one freshness unit.
+- Root cause: `_build_benchmark_equity(...)` accepted the local benchmark frame if any local data existed, then forward-filled each column without checking that every ticker was current to the same local cutoff.
+- Fix applied: Added `build_benchmark_equity_from_prices(...)` with per-ticker stale detection, stale-only live overlay, `local+live_overlay` source labeling, and a no-forward-fill guard for stale columns that cannot be refreshed.
+- Guardrail for next time: Wide benchmark or comparison frames must compute freshness per column before any `ffill`; frame-level latest dates are insufficient when constituent histories can diverge.
+- Evidence paths: `core/data_orchestrator.py`, `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py -q`.
+
+## 2026-05-14 Round Entry (Freshness Is Per Asset, Not Per Matrix)
+- Date: 2026-05-14
+- Mistake or miss: Portfolio & Allocation could still treat stale ragged price columns as current because some paths used a shared matrix/benchmark max date, forward-filled stale weighted legs, or counted history rows without endpoint freshness.
+- Root cause: Freshness metadata was not carried per asset through benchmark YTD, portfolio YTD, selected-price overlay prep, default optimizer ordering, and universe eligibility.
+- Fix applied: Added per-column endpoint helpers, dropped or failed closed stale columns at benchmark/portfolio/optimizer boundaries, demoted stale default-order assets, and excluded stale universe assets even with sufficient history observations.
+- Guardrail for next time: Any display or allocation surface that consumes a wide price matrix must prove each nonzero weighted/selected asset reaches the required endpoint; shared max dates are captions only, never asset freshness proof.
+- Evidence paths: `core/data_orchestrator.py`, `dashboard.py`, `views/optimizer_view.py`, `strategies/portfolio_universe.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_dash_2_portfolio_ytd.py`, `tests/test_optimizer_view.py`, `tests/test_portfolio_universe.py`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py -q`.
+
 **Guardrail for next time**:
 - Any universe selector that can silently exclude named strategy tickers must have a pinned override lane.
 - `except: pass` on universe/manifest loaders is forbidden — use fail-closed with explicit override.
@@ -924,6 +1163,254 @@ Application pattern:
 
 **Evidence**: `tests/test_pinned_universe.py` (27 tests), `tests/test_feature_store.py` (34 tests), PIT replay diagnostics showing all 10 pinned tickers accounted for.
 
+## 2026-05-12 Round Entry (Lifecycle Replay Needs State, Not Raw Flips)
+- Date: 2026-05-12
+- Mistake or miss: Position Lifecycle Replay was too eager: raw PIT gate flips created frequent trading, and ENTER weights were stuck at 4% because sizing was derived from the full replay universe length.
+- Root cause: Replay treated universe breadth as portfolio capacity and used one-day entry/exit predicates without entry confirmation, minimum holding period, exit confirmation, or cooldown state.
+- Fix applied: Added 10% max-10 sizing, 3-of-4 PIT lifecycle factor confirmation, 3-day entry confirmation, 20-day minimum hold, 2-day exit confirmation, 20% hard-exit override, and 10-day re-entry cooldown.
+- Guardrail for next time: Any lifecycle replay change must prove event count, ENTER weights, current open holds, and short-hold churn before publishing a runtime log.
+- Evidence paths: `scripts/pit_lifecycle_replay.py`, `tests/test_pinned_universe.py`, `data/portfolio_lifecycle_log.jsonl`, `docs/context/e2e_evidence/optimal_lifecycle_replay_tmp.jsonl`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_pinned_universe.py tests\test_position_lifecycle.py tests\test_portfolio_universe.py tests\test_optimizer_view.py -q`.
+
+## 2026-05-13 Round Entry (Replay Output Must Carry Its Own Evidence Context)
+- Date: 2026-05-13
+- Mistake or miss: Strategy Replay had target-weight rows, but event annotations, buy/sell decisions, and performance derivation could still be pulled from separate dashboard-local paths.
+- Root cause: The first replay helper stopped at weights plus cash and did not expose a typed backend bundle for context or per-date return/equity evidence.
+- Fix applied: Added `build_selected_method_replay(...)` and typed replay context objects, kept `build_strategy_replay(...)` as the shared frame source, attached PIT-filtered event/decision frames, and added asset/portfolio return columns to the replay frame.
+- Guardrail for next time: Any selected-method replay API must prove Rule100 and non-Rule100 methods share one schema, include CASH rows, attach explicit empty or PIT-filtered context, and derive YTD/performance without optimizer session weights.
+- Evidence paths: `strategies/strategy_replay.py`, `tests/test_strategy_replay.py`, `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py -q`, `.venv\Scripts\python -m pytest tests\test_replay_non_cash_closed.py -q`.
+
+## 2026-05-14 Round Entry (Bootstrap Packets Must Preserve Baseline Anchors)
+- Date: 2026-05-14
+- Mistake or miss: Fixing stale bootstrap selection initially replaced the older Rule100/YTD context packet with replay-audit truth but dropped the closed `R64.1` baseline token used by context hygiene tests.
+- Root cause: The packet refresh focused on latest-round correctness and did not preserve legacy anti-regression anchors that still prove provenance/dependency hygiene is not being forgotten.
+- Fix applied: Added current-truth packet selection in `scripts/build_context_packet.py`, added drift/heading regressions, rebuilt `docs/context/current_context.*`, and preserved the D-353/R64.1 baseline sentence in the replay-audit New Context Packet.
+- Guardrail for next time: When a current context packet supersedes an older handover, include both the latest round truth and any closed baseline tokens that existing hygiene tests intentionally assert.
+- Evidence paths: `scripts/build_context_packet.py`, `tests/test_build_context_packet.py`, `docs/context/planner_packet_current.md`, `docs/context/current_context.md`, `.venv\Scripts\python -m pytest tests\test_build_context_packet.py tests\test_phase61_context_hygiene.py -q`.
+
+## 2026-05-15 Round Entry (Optimize Replay Prices, Not PIT Proof)
+- Date: 2026-05-15
+- Mistake or miss: Replay performance work could accidentally become watchlist-only replay if selected-asset filtering happens before PIT membership proof or if MU/SNDK diagnosis is folded into the hot path.
+- Root cause: Full membership proof and selected price loading both use the word "universe", but only the price matrix needs shrinking for the dashboard replay hot path.
+- Fix applied: Kept full-window `r3000_pit` membership index construction intact, limited batched price/return loading to selected permnos after membership proof, added a separate `trace_thesis_ticker_eligibility(...)` diagnostic for MU/SNDK gates, and reconciled the review finding so non-finite `total_ret` rows cannot count as local price/return evidence.
+- Guardrail for next time: Performance slices may reduce loaded data only after PIT proof is already materialized; named-ticker disappearance investigations must report gate truth separately from replay asset selection and reject non-finite price/return evidence.
+- Evidence paths: `core/data_orchestrator.py`, `dashboard.py`, `scripts/pit_lifecycle_replay.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_optimizer_view.py`, `tests/test_pinned_universe.py`, `docs/context/e2e_evidence/replay_selected_price_loading_mu_sndk_trace_20260515.json`.
+
+## 2026-05-14 Round Entry (Saved Replay Artifacts Need UI Signatures Too)
+- Date: 2026-05-14
+- Mistake or miss: It would be easy for Portfolio & Allocation to accept a backend-valid saved replay artifact that does not prove the current dashboard method/cap/assets/date/data context.
+- Root cause: Backend artifact freshness and dashboard render freshness overlap but are not identical; the UI also needs the selected assets, replay dates, sampling, and loaded dashboard data signature.
+- Fix applied: Added a pure `DashboardReplayRequest`, required exact `dashboard_cache_signature` for saved-artifact UI consumption, used backend `read_selected_method_replay_artifact(...)`, and added executable tests for valid saved-artifact consumption plus stale-artifact session clearing.
+- Guardrail for next time: A saved replay artifact must pass both backend bundle validation and dashboard cache-signature validation before it can feed YTD/latest snapshot/events/decisions.
+- Evidence paths: `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `tests/test_optimizer_view.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q`.
+
+## 2026-05-14 Round Entry (Manifest Identity Must Be Semantic)
+- Date: 2026-05-14
+- Mistake or miss: Saved replay manifest validation checked that `run_id`, `source_id`, and `method_id` existed, but did not reject blank strings when the caller omitted expected run/source ids.
+- Root cause: Identity validation relied on presence and parquet/manifest equality, so matching blank manifest and parquet values could pass before any caller-supplied identity check applied.
+- Fix applied: Added non-empty trimmed string validation for manifest identity, added regressions where manifest and parquet identities are blank and expected ids are omitted, and published the backend SAW report artifact.
+- Guardrail for next time: Durable artifact identity fields need semantic non-empty validation at the manifest boundary before equality checks or optional caller assertions.
+- Evidence paths: `strategies/strategy_replay.py`, `tests/test_strategy_replay_artifact.py`, `docs/saw_reports/saw_backend_replay_reader_identity_hardening_20260514.md`, `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py -q --durations=12`.
+
+## 2026-05-12 Round Entry (Do Not Name Returns Prices)
+- Date: 2026-05-12
+- Mistake or miss: Portfolio Performance displayed `+7645112.18%` because daily returns were passed through the `prices` slot and then compounded with `pct_change`.
+- Root cause: `core.data_orchestrator._load_historical_data()` unpacked `load_dashboard_data()` outputs in the wrong order: returns were assigned to `prices_wide`, and TRI levels were assigned to `returns_wide`.
+- Fix applied: Corrected the unpacking order, added a regression test that `UnifiedDataPackage.prices` holds price levels and `.returns` holds returns, and made Portfolio/benchmark YTD prefer local TRI history before live yfinance fallback.
+- Guardrail for next time: Any data package boundary must assert semantic ranges, not only shapes; price-like matrices should be positive levels, while return-like matrices should be small signed values.
+- Evidence paths: `core/data_orchestrator.py`, `dashboard.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_dash_2_portfolio_ytd.py`, `docs/context/e2e_evidence/portfolio_ytd_return_fix_8509_smoke.json`.
+
+## 2026-05-14 Round Entry (Truth Surfaces Must Follow Verified Code)
+- Date: 2026-05-14
+- Mistake or miss: Current truth surfaces still claimed dashboard backend-bundle consumption was open even though `dashboard.py::_build_dashboard_strategy_replay_context(...)` already called `build_selected_method_replay(...)` with a PIT input loader.
+- Root cause: The earlier Evidence/Docs handoff did not re-audit the source-guard tests and dashboard context function after follow-on implementation landed, so stale open-risk language survived.
+- Fix applied: Verified the dashboard backend-bundle path, full pytest, and Streamlit readiness smoke, then refreshed planner, bridge, impact, done checklist, alignment, observability, notes, decision log, PRD/spec surfaces, and SAW report.
+- Guardrail for next time: Before carrying an integration blocker forward, inspect the named function and the current source-guard tests; only keep the blocker if executable evidence still supports it.
+- Evidence paths: `dashboard.py`, `tests/test_optimizer_view.py`, `tests/test_dash_2_portfolio_ytd.py`, `docs/context/e2e_evidence/backend_bundle_integration_streamlit_8520_status.json`, `.venv\Scripts\python -m pytest -q`.
+
+## 2026-05-14 Round Entry (Freshness Tolerance Must Have One Owner)
+- Date: 2026-05-14
+- Mistake or miss: Endpoint freshness semantics were split between `core.data_orchestrator` and `strategies.portfolio_universe`, so strict display freshness and universe policy tolerance could drift apart.
+- Root cause: The first stale-data fix moved endpoint checks into several call sites but left universe eligibility with private endpoint/tolerance helpers instead of consuming the core contract.
+- Fix applied: Added shared `price_column_latest_date(...)` and `price_endpoint_is_fresh(..., max_staleness_days=0)` helpers in `core.data_orchestrator`, rewired `portfolio_universe` to import them, and added strict-vs-tolerant plus source-guard regressions.
+- Guardrail for next time: When a freshness or PIT predicate differs only by caller policy, centralize the predicate and make the policy argument explicit; add a source guard if duplicate helpers caused the bug class.
+- Evidence paths: `core/data_orchestrator.py`, `strategies/portfolio_universe.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_portfolio_universe.py`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py -q`.
+
+## 2026-05-14 Round Entry (Freshness Correctness Needs One Shared Endpoint Snapshot)
+- Date: 2026-05-14
+- Mistake or miss: The initial stale-data fail-closed fix preserved correctness but allowed dashboard YTD, optimizer prep/order, and universe eligibility to rescan the full price matrix independently on render paths.
+- Root cause: Per-asset endpoint freshness was added as helper calls, not as a reusable loaded-matrix artifact tied to the dashboard data signature.
+- Fix applied: Added `PriceEndpointFreshness`, cached one snapshot for the loaded `prices_wide` package, threaded it through dashboard YTD, optimizer rendering, and universe construction, and added reuse regressions.
+- Guardrail for next time: Any freshness consumer added after a matrix load must accept the shared endpoint snapshot or build exactly one local snapshot at its boundary.
+- Evidence paths: `core/data_orchestrator.py`, `dashboard.py`, `views/optimizer_view.py`, `strategies/portfolio_universe.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_optimizer_view.py`, `tests/test_portfolio_universe.py`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_optimizer_view.py tests\test_portfolio_universe.py tests\test_dash_2_portfolio_ytd.py -q`.
+
+## 2026-05-12 Round Entry (Decision Exports Must Match Replay Semantics)
+- Date: 2026-05-12
+- Mistake or miss: The first full lifecycle decision export falsely produced extra AMZN/MSFT/VRT buys because missing `dist_sma20` values were coerced to `0.0`.
+- Root cause: The export path used a cleaner numeric coercion helper than the replay gate, accidentally changing NaN semantics; the replay treats NaN technical-entry distance as ineligible.
+- Fix applied: Preserved NaN in gate inputs, added `technical_entry_zone_missing` reasons, regenerated the export, and added a regression that exported BUY/SELL rows exactly match `run_pit_replay(...)` ENTER/EXIT events.
+- Guardrail for next time: Audit/export paths must be tested against the authoritative replay event sequence, not only against schema shape or row existence.
+- Evidence paths: `scripts/pit_lifecycle_replay.py`, `tests/test_pinned_universe.py`, `data/portfolio_lifecycle_decision_log.jsonl`, `data/portfolio_lifecycle_buy_sell_log.jsonl`, `docs/context/e2e_evidence/lifecycle_decision_audit_20260512.json`.
+
+## 2026-05-14 Round Entry (Sampled Views Are Not Replay Sources)
+- Date: 2026-05-14
+- Mistake or miss: The first Portfolio single-source plan allowed weekly sampled replay requests and legacy optimizer fallback to remain close enough to the replay-facing performance path that the page could still look coherent while mixing sources.
+- Root cause: I treated sampling and fallback as performance optimizations instead of source-identity changes on a page whose product contract is one daily forward-walk replay source.
+- Fix applied: Built one daily `DashboardReplayContext` before replay-facing surfaces render, made Portfolio Performance refuse non-daily replay and optimizer fallback, converted weekly timeline sampling into a display transform over daily rows, replaced the top allocation display with the latest daily replay snapshot, and derived latest buys/sells from `bundle.decision_rows`.
+- Guardrail for next time: Any replay-facing Portfolio surface must accept the daily replay context explicitly; sampled views, latest-trade summaries, and allocation snapshots are views of that context, not loaders or fallback sources.
+- Evidence paths: `dashboard.py`, `views/optimizer_view.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_policy_target_timeline_apptest.py tests\test_position_lifecycle.py tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py -q`.
+
+## 2026-05-15 Round Entry (Replay Selection Must Be Explicit)
+- Date: 2026-05-15
+- Mistake or miss: Portfolio replay identity still depended on hidden `optimizer_universe` session state and could fall back to the first 10 price columns.
+- Root cause: Controls-only optimizer rendering wrote a side-effect key that dashboard replay treated as source truth, so skipped/error/stale controls could leave a plausible but wrong replay universe.
+- Fix applied: Added signed `PortfolioReplaySelection`, made dashboard validate it before replay request construction, bound typed asset identities plus selected price content, removed first-10 fallback, and cleared selection/replay/allocation caches on optimizer builder errors.
+- Guardrail for next time: Any replay-facing universe handoff must be an explicit signed state object or bundle field with typed asset identity and source/content binding; hidden widget/session mirrors are compatibility only and must fail closed when absent or stale.
+- Evidence paths: `views/optimizer_view.py`, `dashboard.py`, `tests/test_optimizer_view.py`, `tests/test_dash_2_portfolio_ytd.py`.
+
+## 2026-05-15 Round Entry (Replay Rows Need Durable Roles)
+- Date: 2026-05-15
+- Mistake or miss: Portfolio replay tables could still rely on generic `Weight` labels and `status=context_only` instead of a durable schema distinction between lifecycle audit intent and replay exposure truth.
+- Root cause: Role semantics were spread across UI labels, `target_weight`, `audit_weight`, and `status`, while dashboard kept a private context normalizer that could drift from `strategies.strategy_replay`.
+- Fix applied: Added `context_role` and `row_role` to replay/context/artifact schemas, hydrated defaults for legacy selected-method artifacts, delegated dashboard context normalization to `normalize_context_frame_for_replay(...)`, renamed visible replay/latest weights, and added diagnostics from `DashboardReplayContext`.
+- Guardrail for next time: Replay-facing rows must carry machine-checkable role fields at the schema boundary; UI copy is not an adequate semantic contract, and diagnostics must bind to the same replay identity rendered on the page.
+- Evidence paths: `strategies/strategy_replay.py`, `dashboard.py`, `tests/test_strategy_replay.py`, `tests/test_strategy_replay_artifact.py`, `tests/test_dash_2_portfolio_ytd.py`.
+
+## 2026-05-15 Round Entry (Pandas Series Needs `.dt` For Replay Date Normalization)
+- Date: 2026-05-15
+- Mistake or miss: Max-window Strategy Replay timeline sampling grouped dates into a pandas `Series` and then called `.normalize()` directly, crashing the Portfolio page for long replay windows.
+- Root cause: The sampler was written like it still had a `DatetimeIndex`; after `to_series().groupby(...).last()` the object was a `Series`, where datetime operations must go through `.dt`.
+- Fix applied: Normalized grouped weekly keep-dates with `pd.to_datetime(...).dropna().dt.normalize()` and added a max-window regression with more than 160 business dates.
+- Guardrail for next time: Any replay display sampler that changes pandas container type must have an executable long-window test, not only source-guard assertions.
+- Evidence paths: `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py -q`.
+
+## 2026-05-15 Round Entry (Horizon Cache Must Allow Proven Supersets)
+- Date: 2026-05-15
+- Mistake or miss: Switching from a wider replay horizon to a shorter one still rebuilt daily replay even when the wider in-session daily replay already covered the shorter window.
+- Root cause: Replay cache validation bound exact `replay_dates`, and the page-level `_ensure_daily_portfolio_replay_context(...)` entered the build path before consulting reusable cached context.
+- Fix applied: Added in-session superset reuse that ignores only `replay_dates` after method/cap/controls/signed assets/sampling/data signature match, verifies actual replay row coverage, and returns a horizon-scoped context before the spinner/build path.
+- Guardrail for next time: Time-window cache keys should distinguish durable artifact identity from in-session superset reuse; never reuse a wider replay unless actual row coverage is proven and the returned context is scoped to the selected horizon.
+- Evidence paths: `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py -q`.
+
+## 2026-05-14 Round Entry (Scaled Live Overlays Need Anchors)
+- Date: 2026-05-14
+- Mistake or miss: The stale-data fail-closed fix still left a scaled live-overlay bridge that could connect a stale local endpoint to fresh live rows without any same-asset overlap date.
+- Root cause: Overlay scaling treated first-live-to-last-local scaling as a display convenience, but selected-price and benchmark paths could use that stitched series as current evidence.
+- Fix applied: Made `scale_live_overlay_to_local(...)` require same-column local/live overlap, made benchmark live overlays use the same anchor invariant, and added no-overlap regressions for selected assets and benchmark YTD.
+- Guardrail for next time: Any scaled overlay that can feed allocation, YTD, optimizer, or benchmark evidence must prove a same-ticker overlap anchor; no overlap means unavailable/dropped, not synthetic continuity.
+- Evidence paths: `core/data_orchestrator.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_dash_2_portfolio_ytd.py`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py -q`.
+
+## 2026-05-12 Round Entry (Do Not Abstract Before The Strategy Exists)
+- Date: 2026-05-12
+- Mistake or miss: The first planning answer suggested a generic replay/audit contract before the concrete Rule100 lifecycle policy was implemented.
+- Root cause: Framework thinking was applied with only one strategy and before the actual lifecycle transitions, sizing, and trim/tighten semantics existed.
+- Fix applied: Implemented the concrete Rule100 Lifecycle Policy v0 directly in `scripts/pit_lifecycle_replay.py`, kept TRIM/TIGHTEN audit-only, and produced a delta against the 33-event baseline.
+- Guardrail for next time: Extract common strategy contracts only after at least two concrete strategies expose real shared shape; otherwise finish the strategy layer first.
+- Evidence paths: `scripts/pit_lifecycle_replay.py`, `tests/test_pinned_universe.py`, `data/portfolio_lifecycle_log.jsonl`, `docs/context/e2e_evidence/rule100_v0_lifecycle_replay_tmp.jsonl`, `docs/context/e2e_evidence/lifecycle_decision_audit_20260512.json`.
+
+## 2026-05-12 Round Entry (Method Labels Must Declare Their Execution Path)
+- Date: 2026-05-12
+- Mistake or miss: The Rule100 lifecycle policy existed, but the Portfolio Optimizer `Method` dropdown did not expose it under the user's intended `Rule of 100` label.
+- Root cause: The lifecycle current-hold path was implemented as a fallback branch, not as a named method in the optimizer registry.
+- Fix applied: Added `OptimizationMethod.RULE_OF_100 = "Rule of 100"` and routed that method directly to lifecycle holdings plus residual cash before optimizer execution.
+- Guardrail for next time: A method label must map to one explicit execution path and declare whether it runs optimizer math, lifecycle replay state, or cash-only fallback.
+- Evidence paths: `strategies/optimizer.py`, `views/optimizer_view.py`, `tests/test_optimizer_view.py`, `tests/test_portfolio_universe.py`, `.venv\Scripts\python -m pytest tests\test_optimizer_view.py tests\test_portfolio_universe.py -q`.
+
+## 2026-05-12 Round Entry (Streamlit Page API Must Be Verified Before Using Extra Keywords)
+- Date: 2026-05-12
+- Mistake or miss: The first navigation patch used `st.Page(..., visibility="hidden")`, which is not supported in the Streamlit build in this workspace.
+- Root cause: I assumed a newer page API than the installed runtime actually provides, so the route smoke failed with a `TypeError` before the app could render.
+- Fix applied: Switched to the supported `st.Page(..., title=..., url_path=..., default=...)` contract and kept `Portfolio & Allocation` as the visible default page.
+- Guardrail for next time: Before using navigation/page keywords, confirm the exact `st.Page` signature in the active environment and prefer the narrow supported contract.
+- Evidence paths: `views/page_registry.py`, `tests/test_dash_1_page_registry_shell.py`, `dashboard.py`, `AppTest.from_file("dashboard.py")` route smoke.
+
+## 2026-05-12 Round Entry (v1.1 Artifacts Must Match Their Contract)
+- Date: 2026-05-12
+- Mistake or miss: Rule100 softmax v1.1 looked current but kept a stale `rule100_softmax_v1_1_history.csv`, inflated factor coverage by counting alternate columns, and tested Policy Target Timeline through copied mini-apps.
+- Root cause: The v1.1 contract changed to comparison/summary-only, but artifact cleanup and tests did not enforce the new boundary; factor coverage reused flattened column logic instead of group semantics.
+- Fix applied: Retired the stale v1.1 history artifact, counted one value per approved factor group, added neutral missing-factor shrinkage toward `0.50`, and replaced copied AppTests with `AppTest.from_file("dashboard.py")` route coverage.
+- Guardrail for next time: Every research artifact contract change must include an active-artifact source guard, stale-artifact cleanup, group-vs-column coverage tests, and one real app render test for dashboard-facing evidence.
+- Evidence paths: `strategies/rule100_softmax_v1_1.py`, `scripts/rule100_softmax_v1_1_audit.py`, `tests/test_rule100_softmax_v1_1.py`, `tests/test_policy_target_timeline_apptest.py`, `data/processed/rule100_softmax_v1_1_summary.json`, `.venv\Scripts\python -m pytest tests\test_rule100_softmax_v1_1.py tests\test_policy_target_timeline_apptest.py tests\test_rule100_softmax.py tests\test_position_lifecycle.py tests\test_dash_1_page_registry_shell.py -q`.
+
+## 2026-05-12 Round Entry (Rows Are Not The Whole PIT Boundary)
+- Date: 2026-05-12
+- Mistake or miss: The first replay artifact loader clamped rows to `as_of_date` but defaulted to the full-history `top_liquid` universe selector, which could leak future membership through columns.
+- Root cause: I treated date slicing as sufficient PIT safety and did not account for the upstream universe-selection query semantics.
+- Fix applied: Strategy replay inputs now default to and require `universe_mode="r3000_pit"`, the CLI uses the same default, and tests reject non-PIT universe mode.
+- Guardrail for next time: Every replay input must validate both row-date availability and asset-universe availability as of the replay date.
+- Evidence paths: `core/data_orchestrator.py`, `scripts/build_strategy_replay_artifact.py`, `tests/test_data_orchestrator_portfolio_runtime.py`, `tests/test_strategy_replay_artifact.py`, `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_strategy_replay_artifact.py -q`.
+
+## 2026-05-12 Round Entry (Method Replay Must Fail Closed Per Date)
+- Date: 2026-05-12
+- Mistake or miss: Method-aware replay could accidentally be implemented as a carry-forward allocator, reusing a prior day's weights or optimizer fallback weights when one date failed.
+- Root cause: Optimizer outputs and replay outputs share the same weight shape, so stale/fallback vectors look valid unless diagnostics and per-date status are checked explicitly.
+- Fix applied: Added `strategies/strategy_replay.py::build_strategy_replay(...)` with PIT `<= as_of` price slicing, explicit CASH rows, per-date `cash_closed` status on optimizer fallback/failure, and Rule100 replay cap separation from the frozen audit default.
+- Guardrail for next time: Any forward-walk allocation replay must test both PIT slice inputs and a two-day success-then-failure case proving failed days emit cash instead of stale or fallback weights.
+- Evidence paths: `strategies/strategy_replay.py`, `tests/test_strategy_replay.py`, `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_optimizer_core_policy.py -q`.
+
+## 2026-05-13 Round Entry (Architecture Notes Must Separate Patch From Milestone)
+- Date: 2026-05-13
+- Mistake or miss: A focused visible UI/YTD patch can be overread as authorization to start a broad replay architecture rewrite.
+- Root cause: Rule100, Strategy Replay, and YTD evidence share vocabulary with the future AI auto-research loop, so packet language can blur current patch scope and next milestone scope.
+- Fix applied: Added a concise milestone note that separates QQQ/default-method visible fixes from the urgent ultra-modular replay architecture and locks the target contracts and guardrails.
+- Guardrail for next time: Any architecture handoff after a tactical UI/data patch must explicitly name current scope, next milestone scope, non-goals, and acceptance tests before implementation starts.
+- Evidence paths: `docs/phase_brief/phase65-brief.md`, `docs/context/bridge_contract_current.md`, `docs/context/planner_packet_current.md`, `docs/context/done_checklist_current.md`, `docs/context/impact_packet_current.md`.
+
+## 2026-05-13 Round Entry (Audit UI Must Not Sit Behind Heavy Replay)
+- Date: 2026-05-13
+- Mistake or miss: The Buy/Sell Decision Log existed and was wired, but it rendered after the expensive forward-walk replay loop, so the user could still perceive it as missing while replay warmed.
+- Root cause: The audit tape was placed at the end of `_render_strategy_replay_section()` with ENTER/EXIT annotations, coupling a cheap audit surface to the slowest replay computation.
+- Fix applied: Moved `_render_buy_sell_decision_log()` directly under the Strategy Replay caption so it appears before PIT replay dates are loaded and target weights are built.
+- Guardrail for next time: Cheap audit/context surfaces should render before expensive replay or data-refresh loops, especially when they are acceptance evidence for visible UI behavior.
+- Evidence paths: `dashboard.py`, `docs/notes.md`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py tests\test_policy_target_timeline_apptest.py tests\test_position_lifecycle.py -q`, browser DOM audit on `http://localhost:8509/`.
+
+## 2026-05-13 Round Entry (Replay Surfaces Need One Bundle)
+- Date: 2026-05-13
+- Mistake or miss: Dashboard Strategy Replay rendered one replay output while latest allocation/YTD, ENTER/EXIT annotations, and Buy/Sell audit rows still came from separate dashboard reads.
+- Root cause: The UI had grown surface-by-surface around `portfolio_allocation_state`, `read_lifecycle_log()`, and a direct compact JSONL read instead of one selected-method replay context.
+- Fix applied: Added `DashboardReplayContext`, moved annotation/audit reads behind cached context loaders, made the render path consume context fields, and primed latest selected-method replay weights before Portfolio YTD.
+- Guardrail for next time: Any new replay-facing dashboard surface must accept a replay context/bundle argument or explicitly label and test itself as a transitional fallback.
+- Evidence paths: `dashboard.py`, `tests/test_dash_2_portfolio_ytd.py`, `tests/test_policy_target_timeline_apptest.py`, `tests/test_position_lifecycle.py`, `tests/test_optimizer_view.py`, `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_policy_target_timeline_apptest.py tests\test_position_lifecycle.py tests\test_optimizer_view.py -q`.
+
+## 2026-05-15 Round Entry (History Fail Is Not Endpoint Staleness)
+- Date: 2026-05-15
+- Mistake or miss: The optimizer UI mixed true missing local price history and stale local endpoints under one `History Fail` label, making GOOGL-style stale endpoint rows look like short-history rows.
+- Root cause: The backend fail-closed bucket was correct but the visible diagnostic label collapsed multiple price-readiness failure modes.
+- Fix applied: Split visible diagnostics into `Missing History` and `Stale Endpoint`, added `Latest Price Date` to the Universe Audit table, and added focused unit/AppTest regressions.
+- Guardrail for next time: Any fail-closed data-readiness bucket that contains more than one operational cause must expose separate visible sub-buckets before users audit data repairs.
+- Evidence paths: `strategies/portfolio_universe.py`, `views/optimizer_view.py`, `tests/test_portfolio_universe.py`, `tests/test_optimizer_view.py`, `.venv\Scripts\python -m pytest tests\test_portfolio_universe.py tests\test_optimizer_view.py -q`.
+
+## 2026-05-26 Round Entry (Expert Packets Need Explicit GitHub vs Local Truth)
+- Date: 2026-05-26
+- Mistake or miss: A curated expert packet could be read as the clean GitHub state even though it intentionally includes local uncommitted truth surfaces and selected dirty-worktree context.
+- Root cause: The repo's current planning truth is richer than the pushed commit, so packet portability creates a second interpretation risk unless GitHub alignment and dirty-worktree caveats are first-class packet fields.
+- Fix applied: Added GitHub repo/branch/commit links, local HEAD/remote alignment notes, dirty-worktree snapshot, file manifest, and explicit "not a pure GitHub snapshot" caveats to the Data Engineering / Market-Data Integrity packet.
+- Guardrail for next time: Every expert packet must include `GITHUB_ALIGNMENT.txt`, `GIT_STATUS_SHORT.txt`, a packet file manifest, and a question-packet caveat separating committed baseline from local review truth.
+- Evidence paths: `docs/context/e2e_evidence/data_engineering_market_integrity_packet_20260526/PACKET_INDEX.md`, `docs/context/e2e_evidence/data_engineering_market_integrity_packet_20260526/DATA_ENGINEERING_QUESTIONS.md`, `docs/context/e2e_evidence/data_engineering_market_integrity_packet_20260526.zip`, `docs/saw_reports/saw_data_engineering_market_integrity_packet_20260526.md`.
+
+## 2026-05-26 Round Entry (Boot-Status Snapback Means BLOCK, Not More Patching)
+- Date: 2026-05-26
+- Mistake or miss: The Data Readiness Gate recovery kept attempting to patch the canonical boot-status path while active root files and tests repeatedly snapped back to the rejected `runtime/boot_status_current.json` contract.
+- Root cause: Multiple boot-status control-plane streams and stale tests were still asserting runtime-path semantics in the shared dirty workspace, so a local patch could pass an immediate read and then fail the next import/test window.
+- Fix applied: Stopped the implementation loop, closed reviewer subagents, published a SAW BLOCK recovery report, and preserved the failed path sentinel plus focused pytest evidence.
+- Guardrail for next time: If a canonical path, write guard, or default output flips during verification, stop source edits immediately; freeze competing streams first, then run a single path-lock slice with pre-suite and post-suite sentinels.
+- Evidence paths: `core/boot_status.py`, `scripts/boot_preflight.py`, `tests/test_boot_status_contract.py`, `tests/test_boot_preflight.py`, `tests/test_data_readiness_gate_write_guard.py`, `docs/saw_reports/saw_data_readiness_gate_v0_recovery_20260526.md`.
+
+## 2026-05-26 Round Entry (Governance Packets Must Separate Labels From Actions)
+- Date: 2026-05-26
+- Mistake or miss: Governance/risk review can become too generic if the packet only asks about compliance broadly instead of exposing the exact repo terms that may read as advice.
+- Root cause: Terminal Zero uses research, replay, optimizer, and lifecycle vocabulary where labels such as BUY/SELL/ENTER/EXIT/WATCH/allocation can be audit semantics in code but action-shaped language to a reviewer or user.
+- Fix applied: Created a dedicated Governance / Risk packet with GitHub alignment, local dirty-worktree caveat, label/action boundary questions, UI-language questions, alert/broker boundary questions, and focused files/tests for candidate-card, dashboard, optimizer, replay, and escalation review.
+- Guardrail for next time: Any governance expert packet must list the risky terms and ask for term/context rules, not just a general policy review.
+- Evidence paths: `docs/context/e2e_evidence/governance_risk_boundary_packet_20260526/PACKET_INDEX.md`, `docs/context/e2e_evidence/governance_risk_boundary_packet_20260526/GOVERNANCE_RISK_QUESTIONS.md`, `docs/context/e2e_evidence/governance_risk_boundary_packet_20260526.zip`, `docs/saw_reports/saw_governance_risk_boundary_packet_20260526.md`.
+
+## 2026-05-26 Round Entry (Product UX Packets Need Boundary Rails)
+- Date: 2026-05-26
+- Mistake or miss: A Product / UX expert packet can drift into optimizer policy, ranking/scoring, alerts, or trading semantics if the question packet only asks for a better first screen.
+- Root cause: Terminal Zero's dashboard, replay, candidate-card, and portfolio vocabulary share action-shaped terms, so UX review needs explicit product-boundary rails before asking workflow questions.
+- Fix applied: Created a Product / UX ready-workflow packet with GitHub alignment, current truth, dashboard IA, view/test context, and explicit non-goals against recommendations, rankings, scoring, alerts, provider ingestion, and broker paths.
+- Guardrail for next time: Any UX/product expert packet must ask for screen/workflow/copy decisions while explicitly forbidding product-authority expansion; include GitHub/local-truth caveats and focused UI tests.
+- Evidence paths: `docs/context/e2e_evidence/product_ux_ready_workflow_packet_20260526/EXPERT_QUESTIONS.md`, `docs/context/e2e_evidence/product_ux_ready_workflow_packet_20260526/PACKET_INDEX.md`, `docs/context/e2e_evidence/product_ux_ready_workflow_packet_20260526.zip`, `docs/saw_reports/saw_product_ux_ready_workflow_packet_20260526.md`.
+
 ## 2026-05-26 Round Entry (Evidence Runners Need Output-Path and Completion Gates)
 - Date: 2026-05-26
 - Mistake or miss: Research-validity runner v0 initially focused on PIT/cost/benchmark math but did not fully prove evidence-output containment, atomic writes, or stale final-manifest cleanup.
@@ -931,3 +1418,312 @@ Application pattern:
 - Fix applied: Rejected unsafe `run_id` values, resolved evidence run directories under the cartridge output root, wrote JSON/CSV artifacts through same-directory temp files plus `os.replace`, removed stale `evidence_packet.json` before same-run rewrites, emitted final manifest last, and added focused regressions.
 - Guardrail for next time: Any runner that emits evidence must test path confinement, temp-to-replace writes, final-manifest ordering, stale-manifest failure behavior, and malformed-input blocked paths before SAW closure.
 - Evidence paths: `research/backtest_runner.py`, `research/evidence_schema.py`, `tests/test_research_backtest_runner.py`, `tests/test_research_evidence_schema.py`, `.venv\Scripts\python -m pytest tests\test_research_status.py tests\test_research_evidence_schema.py tests\test_research_benchmarks.py tests\test_research_backtest_runner.py tests\test_research_rule100_adapter.py tests\test_engine.py -q`.
+
+## 2026-05-26 Round Entry (Route Smokes Need Fail-Closed Alternatives)
+- Date: 2026-05-26
+- Mistake or miss: The Portfolio route smoke required replay/current allocation tables even when the route rendered an explicit fail-closed replay-unavailable state.
+- Root cause: The smoke contract only recognized the success table path and did not encode the page's valid unavailable-state copy.
+- Fix applied: Updated the AppTest smoke to accept either role-aware replay/current allocation dataframes or the full explicit unavailable state, and restored strict preflight to run that smoke by default.
+- Guardrail for next time: A boot smoke may accept a fail-closed state, but it must assert the exact visible unavailable messages; never downgrade to header-only, and never skip the route smoke in strict boot.
+- Evidence paths: `tests/test_dash_1_page_registry_shell.py`, `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `.venv\Scripts\python -m pytest tests\test_dash_1_page_registry_shell.py::test_dash_1_portfolio_allocation_route_renders_without_overlay -q`, `.venv\Scripts\python launch.py --preflight --strict`.
+
+## 2026-05-26 Round Entry (Runtime Boot Truth Is Not Context Documentation)
+- Date: 2026-05-26
+- Mistake or miss: The first shared boot-status patch treated `docs/context/boot_status_current.json` as both canonical runtime artifact and legacy compatibility path.
+- Root cause: BOOT-0A mixed context-packet truth with runtime preflight truth, so tests and docs accidentally preserved the old docs/context-only path.
+- Fix applied: Set `core.boot_status.DEFAULT_BOOT_STATUS_PATH` to `runtime/boot_status_current.json`, kept `docs/context/boot_status_current.json` as `LEGACY_BOOT_STATUS_PATH`, updated preflight/data write guards, and added canonical-vs-legacy tests.
+- Guardrail for next time: Runtime verdicts belong under `runtime/`; docs/context may provide schemas, context packets, or temporary compatibility fallbacks, but not the canonical generated boot verdict.
+- Evidence paths: `core/boot_status.py`, `scripts/boot_preflight.py`, `core/data_readiness_gate.py`, `tests/test_boot_status_contract.py`, `tests/test_boot_preflight.py`, `tests/test_data_readiness_gate_write_guard.py`, `.venv\Scripts\python -m pytest tests\test_boot_status_contract.py tests\test_boot_preflight.py tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py tests\test_boot_preflight_governance.py -q`.
+
+## 2026-05-26 Round Entry (Boot Preflight Commands Must Be Argv-Bounded)
+- Date: 2026-05-26
+- Mistake or miss: BOOT-0A initially ran `current_context.first_command` through `shell=True` and relied on entry-state Git checks for `--require-github`.
+- Root cause: The preflight treated the context packet command as trusted operator text and treated GitHub alignment as a precondition rather than an after-gates proof.
+- Fix applied: Parsed focused commands with `shlex`, allowed only Python `-m pytest`, rejected shell metacharacters, ran without shell, added gate timeouts, path-confined status writers, and rechecked Git after all gates in `--require-github`.
+- Guardrail for next time: Any boot/control-plane command sourced from an artifact must be parsed into argv, allowlisted, timeout-bounded, and followed by a post-run mutation proof before claiming read-only alignment.
+- Evidence paths: `scripts/boot_preflight.py`, `core/boot_status.py`, `tests/test_boot_preflight.py`, `tests/test_boot_status_contract.py`, `.venv\Scripts\python -m pytest tests\test_boot_status_contract.py tests\test_boot_preflight.py tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py tests\test_boot_preflight_governance.py -q`.
+
+## 2026-05-26 Round Entry (Boot-Status Contract Contention Must Stop Work)
+- Date: 2026-05-26
+- Mistake or miss: I continued reconciling Data Readiness Gate v0 after boot-status files repeatedly flipped between the user-locked `docs/context/boot_status_current.json` contract and a competing `runtime/boot_status_current.json` contract.
+- Root cause: Multiple active boot/status streams were operating in the same dirty workspace, so focused tests could pass once and then fail after a concurrent or reapplied patch restored older semantics.
+- Fix applied: Stopped the implementation loop, preserved the deterministic residue/import evidence, and published a SAW BLOCK instead of claiming boot readiness.
+- Guardrail for next time: If a canonical boot/status path or write guard changes during verification, stop coding immediately, freeze competing streams, choose the contract explicitly, and only then rerun tests.
+- Evidence paths: `core/boot_status.py`, `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `tests/test_boot_status_contract.py`, `tests/test_data_readiness_gate_write_guard.py`, `docs/saw_reports/saw_data_readiness_gate_v0_20260526.md`.
+
+## 2026-05-26 Round Entry (Strict Boot Must Stay Fast And Governance-Exact)
+- Date: 2026-05-26
+- Mistake or miss: Strict boot preflight semantics drifted between packet-era assumptions and root truth: governance WARN was sometimes treated as blocking, while focused-contract execution was described as printed-only in places.
+- Root cause: Boot readiness, safe-boot evidence, governance copy policy, and final GitHub proof were conflated while multiple BOOT-0A streams were active.
+- Fix applied: Made governance WARN advisory/degraded, kept governance FAIL blocked, made default strict run boot-control tests, Portfolio smoke, and the focused current-context command, and kept `--require-github` as final read-only alignment proof rather than the `safe_boot` flag owner.
+- Guardrail for next time: Keep verdict semantics in `core.boot_status` and producer mapping tests first; distinguish `safe_boot` from GitHub alignment proof, and test exact allowed labels separately from blocked action-shaped copy including whitespace variants.
+- Evidence paths: `scripts/boot_preflight.py`, `scripts/governance_preflight.py`, `tests/test_boot_preflight.py`, `tests/test_boot_preflight_governance.py`, `docs/architecture/data_readiness_gate_v0.md`, `.venv\Scripts\python -m pytest tests\test_boot_preflight.py tests\test_boot_preflight_governance.py tests\test_boot_status_contract.py tests\test_data_readiness_gate_write_guard.py -q`, `.venv\Scripts\python launch.py --preflight --strict`.
+
+## 2026-05-26 Round Entry (Root Evidence Beats Packet Artifacts)
+- Date: 2026-05-26
+- Mistake or miss: Governance Gate v0 packet artifacts and patch files were initially treated too much like implementation evidence, while live root files were still flipping under concurrent boot-control writers.
+- Root cause: Multiple streams were editing `scripts/boot_preflight.py` and `tests/test_boot_preflight.py`, so a passing targeted run could become stale before strict root proof completed.
+- Fix applied: Re-verified the live root after each flip, stopped background boot-preflight runners, mapped governance WARN to degraded and FAIL to blocked, made default strict execute the focused current-context contract, and separated `safe_boot` from the final `--require-github` GitHub-alignment proof.
+- Guardrail for next time: If boot-control semantics change during verification, stop broad work, freeze to a single writer, rerun the root-supported commands, and label packet/zip/patch outputs as porting inputs until root preflight and tests prove them.
+- Evidence paths: `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `scripts/governance_preflight.py`, `docs/architecture/boot_preflight_contract.md`, `.venv\Scripts\python -m pytest tests\test_boot_preflight.py tests\test_boot_preflight_governance.py -q`, `.venv\Scripts\python scripts\governance_preflight.py --repo-root . --json`, `.venv\Scripts\python scripts\boot_preflight.py --repo-root . --strict --json`.
+
+## 2026-05-26 Round Entry (Post-Test Sentinels Must Prove BOOT File Stability)
+- Date: 2026-05-26
+- Mistake or miss: BOOT-0A could have been closed from a passing targeted test even though earlier evidence showed untracked boot files sometimes snapped back to stale semantics after verification.
+- Root cause: The key files were untracked and competing BOOT streams had previously run background preflight/test processes, so a single passing test was not enough proof of live-root stability.
+- Fix applied: Added before/after root sentinels for governance WARN mapping, `safe_boot`/GitHub separation, final-verdict blocking, and stale test names; reran the full BOOT-0A suite and only closed after the post-suite sentinel still matched.
+- Guardrail for next time: For untracked control-plane files, treat post-test source sentinels as acceptance evidence, not optional debugging.
+- Evidence paths: `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `docs/saw_reports/saw_boot_0a_shared_boot_status_contract_20260526.md`, `.venv\Scripts\python -m pytest tests\test_boot_status_contract.py tests\test_boot_preflight.py tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py tests\test_boot_preflight_governance.py -q`.
+
+## 2026-05-26 Round Entry (Boot Gate Copy And Writes Need Their Own Guards)
+- Date: 2026-05-26
+- Mistake or miss: The first boot-preflight data-readiness integration carried data-gate `next_actions` into boot-status details and allowed failed preflight to refresh runtime boot-status evidence when `--write-status` was supplied.
+- Root cause: The integration reused the gate payload too directly and treated explicit write intent as enough authority even after the assembled preflight verdict was blocked.
+- Fix applied: Added a boot-facing sanitizer that keeps only data-readiness blockers/warnings, explicitly deferred research-validity in boot metadata/docs, blocked status writes until preflight PASS, and added focused regressions.
+- Guardrail for next time: Any boot/control-plane integration must separately test copy sanitization and failed-run write blocking; explicit write flags should authorize a path, not override a blocked verdict.
+- Evidence paths: `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `docs/architecture/boot_preflight_contract.md`, `docs/saw_reports/saw_boot_preflight_data_readiness_integration_20260526.md`, `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight.py tests/test_boot_status_contract.py -q`.
+
+## 2026-05-27 Round Entry (Dirty-Worktree Classification Must Follow Live Root State)
+- Date: 2026-05-27
+- Mistake or miss: The first pass at BOOT-0A/BOOT-0B classification relied too much on stale manifest/context text and not enough on the live `git status` / `git diff` split.
+- Root cause: The repository already carried mixed BOOT, governance, UI, and evidence residue, so archived truth surfaces no longer matched the current dirty worktree exactly.
+- Fix applied: Reclassified from live root diffs, kept `core/boot_status.py` and `tests/test_boot_status_contract.py` in BOOT-0A, kept `scripts/governance_preflight.py` and `tests/test_boot_preflight_governance.py` in BOOT-0B, and kept `dashboard.py` and broad docs/evidence/runtime residue out of the boot-control closure.
+- Guardrail for next time: Never promote a dirty-worktree manifest over live `git status` when deciding boot buckets; split mixed boot/governance files before any strict `--require-github` claim.
+- Evidence paths: `git status --short`, `git diff --name-status`, `scripts/governance_preflight.py`, `tests/test_boot_preflight_governance.py`, `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `scripts\boot_preflight.py --repo-root . --mode strict --no-tests`, `scripts\boot_preflight.py --repo-root . --mode strict --require-github --no-tests`.
+
+## 2026-06-02 Round Entry (Matrix Bookkeeping Must Not Become Provider Approval)
+- Date: 2026-06-02
+- Mistake or miss: Resolving `TODO-MATRIX-001` could be mistaken for entitlement approval, WRDS access, or probe readiness if the docs only say the matrix gap is closed.
+- Root cause: The new permission-truth artifact is close to provider permission language, but it is an offline metadata contract with no entitlement evidence or approval text.
+- Fix applied: Refreshed current truth, product/spec, phase brief, notes, decision log, and SAW bookkeeping to mark only the metadata/builder gap as resolved while preserving entitlement, approval, clean-room, legacy cleanup, validity/C3, and public/main gaps.
+- Guardrail for next time: Whenever a permission artifact moves from TODO to resolved, state the allowed-use limit, approval_ref requirement, test evidence, and forbidden provider/probe/snapshot/runtime boundaries in the same docs round.
+- Evidence paths: `v2_discovery/data_lab/permission_truth.py`, `tests/test_v2_wrds_permission_truth_scope.py`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/context/impact_packet_current.md`, `docs/context/multi_stream_contract_current.md`, `docs/context/post_phase_alignment_current.md`, `docs/context/observability_pack_current.md`, `docs/notes.md`, `docs/decision log.md`, `docs/saw_reports/saw_v2_d0_1_todo_matrix_bookkeeping_20260602.md`.
+
+## 2026-05-28 Round Entry (Local Ignored Data Is Not BootReady Truth)
+- Date: 2026-05-28
+- Mistake or miss: Local ignored data and dirty-worktree artifacts can be mistaken for clean GitHub truth or BootReady evidence during strict data-readiness recovery.
+- Root cause: The repository can contain useful local artifacts that are intentionally not tracked, but strict BootReady requires governed provenance, manifest/hash proof, and an approved intake or regeneration path before the artifacts count.
+- Fix applied: Refreshed current truth surfaces for `ROUND-20260528-GOVERNED-DATA-ARTIFACT-AUTHORIZATION`, kept DataReadyStrict blocked, and recorded that authorization packets must precede regeneration or external-bundle intake.
+- Guardrail for next time: Before regenerating or accepting strict-readiness artifacts, publish/approve the bounded authorization packet and keep local ignored artifacts out of GitHub truth and BootReady claims.
+- Evidence paths: `docs/architecture/governed_data_artifact_authorization_20260528.md`, `docs/context/bridge_contract_current.md`, `docs/context/impact_packet_current.md`, `docs/context/done_checklist_current.md`, `docs/context/planner_packet_current.md`, `docs/context/observability_pack_current.md`, `docs/notes.md`, `docs/decision log.md`.
+
+## 2026-05-28 Round Entry (Boot Preflight Is Not Artifact Authorization Evidence)
+- Date: 2026-05-28
+- Mistake or miss: The governed artifact-authorization packet listed `.venv\Scripts\python launch.py --preflight --strict` as a read-only validation command, which could be misread as DataReadyStrict or BootReady proof.
+- Root cause: Boot-control preflight evidence was conflated with docs-only artifact authorization while inherited boot-control diffs and data-readiness deferral remained unresolved.
+- Fix applied: Removed launch preflight from the packet validation commands, added a warning, and refreshed current truth surfaces so inherited boot-control diffs are open risk, out-of-scope, and not evidence for or against this packet.
+- Guardrail for next time: Do not list boot preflight commands as artifact-authorization validation when data readiness is blocked; keep BootReady BLOCKED until a separate boot-control round proves readiness.
+- Evidence paths: `docs/architecture/governed_data_artifact_authorization_20260528.md`, `docs/context/impact_packet_current.md`, `docs/context/planner_packet_current.md`, `docs/context/observability_pack_current.md`, `docs/notes.md`, `docs/lessonss.md`.
+
+## 2026-05-30 Round Entry (Harness Flow Must Be Recorded Without Overlapping Owners)
+- Date: 2026-05-30
+- Mistake or miss: New harness workflow names can drift into overlapping template/skill implementation work if the docs worker records too much.
+- Root cause: The workflow spans scope selection, expert context, worker done state, reconciliation, stream coordination, and feedback, but another worker owns the actual skills/templates and packet script.
+- Fix applied: Added only light-touch governance records for `scope-selector`, `expert-context-packer`, `worker_done_contract`, `expert_reconciliation_matrix`, `stream_contract`, and `harness-feedback` in the owned docs files.
+- Guardrail for next time: When parallel workers own skills/templates, docs workers should record the workflow contract and boundaries only; do not edit templates, skills, packet scripts, code, or truth packets.
+- Evidence paths: `AGENTS.md`, `docs/decision log.md`, `docs/notes.md`, `docs/lessonss.md`.
+
+## 2026-06-01 Round Entry (Expert Packets Must Label Dirty Harness Evidence)
+- Date: 2026-06-01
+- Mistake or miss: A meta-harness expert packet could be misread as permission to continue from the dirty root if copied harness skills, truth surfaces, and git evidence are not labeled by authority.
+- Root cause: The local root contains useful meta-harness evidence and many dirty/untracked artifacts, but the clean implementation authority must come from an approved branch/worktree decision.
+- Fix applied: Created the expert direction packet with explicit `Not Authorized` and non-authoritative dirty/local artifact sections, plus branch-state evidence and bounded expert output requirements.
+- Guardrail for next time: Every expert packet built from a dirty root must include an authority model, forbidden claims, and a clean-worktree precondition before it is zipped or shared.
+- Evidence paths: `docs/context/expert_packets/quant_meta_harness_direction_packet_20260601/EXPERT_DIRECTION_PACKET.md`, `docs/context/expert_packets/quant_meta_harness_direction_packet_20260601/AUTHORITY_AND_BOUNDARIES.md`, `docs/context/expert_packets/quant_meta_harness_direction_packet_20260601.zip`, `docs/saw_reports/saw_meta_harness_expert_packet_20260601.md`.
+
+## 2026-06-01 Round Entry (Directive Intake Must Not Become Approval)
+- Date: 2026-06-01
+- Mistake or miss: A strong product directive for WRDS/PIT alpha-factory work could be mistaken for approval to run WRDS probes, generate snapshots, add SQLite, or begin candidate ranking/scoring.
+- Root cause: The directive included concrete paths, CLI examples, and output artifacts, but current repo truth still blocks provider access, data generation, BootReady claims, and SQLite without explicit approval.
+- Fix applied: Recorded the directive across product/spec/current-truth docs as idea/directive intake only, with WRDS/PIT/provenance first and explicit approval gates for provider access, snapshots, SQLite, scoring/ranking, and promotion.
+- Guardrail for next time: When a pasted roadmap includes executable-looking commands, split "todo order" from "authorization" in every current truth surface before any implementation plan.
+- Evidence paths: `docs/architecture/v2_alpha_factory_immediate_todo_directive_20260601.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/impact_packet_current.md`, `docs/context/done_checklist_current.md`, `PRD.md`, `PRODUCT_SPEC.md`, `docs/saw_reports/saw_v2_alpha_factory_directive_20260601.md`.
+
+## 2026-06-01 Round Entry (Contract Substrate Must Stay Non-Executable)
+- Date: 2026-06-01
+- Mistake or miss: A V2-D0 permission/snapshot substrate can be overread as permission to connect to WRDS or generate planned snapshots if the contract code looks too close to an executable data pipeline.
+- Root cause: The approved next stream names WRDS probes and PIT snapshots, but the approval covers offline contracts and provenance design only.
+- Fix applied: Built dataclass and JSON Schema contracts with root provider/output/write flags forced literal false, blocked V1/boot/non-sandbox storage targets including Windows absolute/UNC paths, expanded denied-action vocabulary, aligned schema/dataclass payload validation, declared `jsonschema`, and added source-inspection/no-write tests.
+- Guardrail for next time: Any future transition from contract to read-only probe or snapshot generation must require a new explicit approval, separate tests, fresh context addenda, and reviewer proof before code can import provider clients or write outputs.
+- Evidence paths: `v2_discovery/data_lab/permission_matrix.py`, `v2_discovery/data_lab/snapshot_manifest.py`, `v2_discovery/data_lab/schema_registry.py`, `contracts/data_snapshot/wrds_permission_matrix.schema.json`, `contracts/data_snapshot/wrds_snapshot_manifest.schema.json`, `pyproject.toml`, `requirements.txt`, `tests/test_v2_wrds_permission_matrix.py`, `tests/test_v2_snapshot_manifest_contract.py`, `tests/test_v2_data_lab_no_v1_writes.py`.
+
+## 2026-06-02 Round Entry (Low Confidence Routes To Expert Gate, Not Implementation)
+- Date: 2026-06-02
+- Mistake or miss: The V2-D0 expert packet could have been overread as permission to run a WRDS probe after the packet itself passed.
+- Root cause: Low-confidence items were framed close to next-step implementation language, while actual WRDS entitlement truth was still absent.
+- Fix applied: Ran Expert A/B/C reconciliation, patched Backend contract drift findings, published `MULTI_EXPERT_RECONCILED_VERDICT_20260602.md`, and kept the next stream at permission-truth authorization only.
+- Guardrail for next time: Treat low-confidence WRDS/provider/snapshot/dashboard items as expert questions or approval gates until the reconciled verdict supplies explicit authorization and tests prove no-write boundaries.
+- Evidence paths: `docs/handover/MULTI_EXPERT_RECONCILED_VERDICT_20260602.md`, `docs/saw_reports/saw_v2_d0_multi_expert_reconciliation_20260602.md`, `v2_discovery/data_lab/wrds_probe.py`, `v2_discovery/data_lab/snapshot_manifest.py`, `tests/test_v2_wrds_permission_matrix.py`, `tests/test_v2_snapshot_manifest_contract.py`, `.venv\Scripts\python -m pytest tests\test_v2_wrds_permission_matrix.py tests\test_v2_snapshot_manifest_contract.py tests\test_v2_data_lab_no_v1_writes.py -q`.
+
+## 2026-06-02 Round Entry (Parallel Scope Status Needs Separate Fields)
+- Date: 2026-06-02
+- Mistake or miss: A single permission-status field can blur V2-D0.1 entitlement truth with PEAD_V2_001 starter dependency status, especially for `ibes.det_epsus`.
+- Root cause: The same row can be pending for entitlement truth while deliberately not requested for the starter research packet.
+- Fix applied: Added the V2-D0.1 scope/runtime decision artifact, resolved the PEAD starter decision, recorded the I/B/E/S dual-status rule, and originally kept `TODO-MATRIX-001` open for separate entitlement-status and PEAD-starter-scope metadata. Superseded on 2026-06-02 by the permission-truth bookkeeping round that resolved `TODO-MATRIX-001`.
+- Guardrail for next time: When one artifact spans multiple scopes, require separate status fields per scope before marking a row unknown, pending, approved, or not_requested.
+- Evidence paths: `docs/handover/V2_D0_1_SCOPE_AND_CLEANROOM_RUNTIME_DECISION_20260602.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/context/impact_packet_current.md`, `docs/context/multi_stream_contract_current.md`, `docs/context/post_phase_alignment_current.md`, `docs/context/observability_pack_current.md`, `docs/architecture/v2_wrds_data_lab_policy.md`, `docs/phase_brief/phase65-brief.md`, `docs/notes.md`, `docs/decision log.md`, `PRD.md`, `PRODUCT_SPEC.md`, `docs/prd.md`, `docs/spec.md`.
+
+## 2026-06-02 Round Entry (Expert Follow-Ups Need Conflict Labels, Not Flattened Agreement)
+- Date: 2026-06-02
+- Mistake or miss: Expert follow-ups with high agreement can still contain a real cross-expert conflict, especially when one expert permits a Compustat-rdq PEAD starter and another prefers I/B/E/S analyst-surprise as the first primary signal.
+- Root cause: Agreement level summarizes direction, but it does not prove every expert made the same scope choice.
+- Fix applied: Added the V2-D0.1 follow-up reconciliation artifact, marked Quant Research as `PARTIAL_AGREE_HIGH`, recorded the PEAD starter conflict, and converted unresolved gaps into stable TODO IDs.
+- Guardrail for next time: When recording expert agreement, always separate agreement level from decision conflicts; promote only the concrete shared gates and leave conflicting choices as explicit TODOs or real follow-up questions.
+- Evidence paths: `docs/handover/V2_D0_1_EXPERT_1_6_FOLLOWUP_RECONCILIATION_20260602.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/context/impact_packet_current.md`, `docs/context/multi_stream_contract_current.md`, `docs/context/post_phase_alignment_current.md`, `docs/context/observability_pack_current.md`, `docs/phase_brief/phase65-brief.md`, `docs/notes.md`, `docs/decision log.md`, `PRD.md`, `PRODUCT_SPEC.md`, `docs/prd.md`, `docs/spec.md`.
+
+## 2026-06-02 Round Entry (Agreement Ratings Must Not Become Authorization)
+- Date: 2026-06-02
+- Mistake or miss: Expert 1-6 high agreement could be misread as approval for WRDS probes, PEAD work, or V2 alpha validity claims.
+- Root cause: Agreement ratings and high-confidence TODOs summarize direction, but current authority still lacks entitlement evidence, approval text, WRDS/PIT approval, and V2 alpha validity packet structure.
+- Fix applied: Refreshed current truth surfaces and product/spec logs with entitlement-only V2-D0.1 gates, `PATCH_RESOLVED` row-validator status, Security approval-text/quarantine risk, conditional `PEAD_V2_001_BOUNDARY_PACKET`, and `V2_ALPHA_VALIDITY_PACKET` requirement.
+- Guardrail for next time: Record agreement ratings as decision-support metadata only; never treat them as provider, probe, snapshot, data-write, dashboard, scoring, or research-validity authorization.
+- Evidence paths: `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/context/impact_packet_current.md`, `docs/context/multi_stream_contract_current.md`, `docs/context/post_phase_alignment_current.md`, `docs/context/observability_pack_current.md`, `docs/phase_brief/phase65-brief.md`, `docs/notes.md`, `docs/decision log.md`, `PRD.md`, `PRODUCT_SPEC.md`, `docs/prd.md`, `docs/spec.md`.
+
+## 2026-06-02 Round Entry (Parent SAW Must Reconcile Worker Evidence)
+- Date: 2026-06-02
+- Mistake or miss: Worker B recorded the initial 28-test bookkeeping evidence, but parent reconciliation later added root-constant drift coverage and expanded the final focused suite to 51 tests.
+- Root cause: The docs worker completed before reviewer-driven parent hardening, so evidence lines could have stayed stale without a final parent grep and context rebuild.
+- Fix applied: Added V2-D0.1 `permission_truth.py`, closed `TODO-MATRIX-001`, patched stale PEAD/TODO wording, added root-constant regression tests, refreshed docs/current truth to the 51-test evidence, and validated the parent SAW report.
+- Guardrail for next time: After subagent implementation and review, parent must rerun evidence, grep stale test-count/TODO markers, rebuild context, and update the terminal SAW report before final response.
+- Evidence paths: `v2_discovery/data_lab/permission_truth.py`, `tests/test_v2_wrds_permission_truth_scope.py`, `docs/saw_reports/saw_v2_d0_1_todo_matrix_bookkeeping_20260602.md`, `docs/context/planner_packet_current.md`, `.venv\Scripts\python -m pytest tests\test_v2_wrds_permission_truth_scope.py tests\test_v2_wrds_permission_matrix.py tests\test_v2_snapshot_manifest_contract.py tests\test_v2_data_lab_no_v1_writes.py -q`, `.venv\Scripts\python scripts\build_context_packet.py --validate`.
+
+## 2026-06-03 Round Entry (Secret Material Is Not Entitlement Evidence)
+- Date: 2026-06-03
+- Mistake or miss: Approval intent plus local secret material could be mistaken for non-secret entitlement evidence or final row approval.
+- Root cause: The user approved aligned intent and identified local secret material, but boundary/evidence subagents found no qualifying non-secret entitlement evidence for the five WRDS rows.
+- Fix applied: Created an authorization-intent packet, kept all five rows evidence_missing/pending with approval_ref null, and recorded that `secret.txt` is local secret material and is not non-secret entitlement evidence.
+- Guardrail for next time: Never treat local secret-bearing files as entitlement evidence; require non-secret account/library/table evidence before approval_ref or row approval can be recorded.
+- Evidence paths: `docs/authorization/V2_D0_1_WRDS_PERMISSION_TRUTH_AUTHORIZATION.md`, `docs/authorization/V2_D0_1_WRDS_PERMISSION_TRUTH_AUTHORIZATION.json`, `docs/saw_reports/saw_v2_d0_1_authorization_intent_20260603.md`.
+
+## 2026-06-03 Round Entry (Evidence Requests Must Stay Non-Executable)
+- Date: 2026-06-03
+- Mistake or miss: A WRDS entitlement evidence request could drift into credential handling, provider probing, schema/table discovery, row counts, or premature approval if the request text is not explicit.
+- Root cause: The next safe step asks external institutional contacts for permission truth, but the same domain vocabulary can sound like access validation unless forbidden actions are repeated in the artifact.
+- Fix applied: Created V2-D0.2 request artifacts with copyable non-secret evidence-request language, all five rows still evidence_missing/pending with approval_ref null, and SAW BLOCK recorded as the correct protective status.
+- Guardrail for next time: Evidence-request artifacts must ask only for dated attributable non-secret entitlement confirmation and must explicitly forbid credentials, provider access, probes, discovery, data output, and row approval.
+- Evidence paths: `docs/authorization/V2_D0_2_WRDS_ENTITLEMENT_EVIDENCE_REQUEST.md`, `docs/authorization/V2_D0_2_WRDS_ENTITLEMENT_EVIDENCE_REQUEST.json`.
+
+## 2026-06-17 Round Entry (Current Context Must Track Latest Complete Packet)
+- Date: 2026-06-17
+- Mistake or miss: `scripts/build_context_packet.py` validated successfully while selecting the older V2-D0.1 bookkeeping New Context Packet instead of the latest V2-D0.4C progress state.
+- Root cause: The latest D0.4C addendum in `docs/context/planner_packet_current.md` did not include a complete `## New Context Packet`, so the builder fell through to the next complete packet.
+- Fix applied: Added a complete D0.4C New Context Packet under the latest addendum, rebuilt `docs/context/current_context.md` and `docs/context/current_context.json`, and revalidated the context-packet contract.
+- Guardrail for next time: Every current-truth addendum that should drive session bootstrap must include a complete New Context Packet before running or trusting `scripts/build_context_packet.py --validate`.
+- Evidence paths: `docs/context/planner_packet_current.md`, `docs/context/current_context.md`, `docs/context/current_context.json`, `.venv\Scripts\python scripts\build_context_packet.py --validate`, `.venv\Scripts\python -m pytest tests\test_build_context_packet.py -q`.
+
+## 2026-06-19 Round Entry (Superseded Data Evidence Must Be Archived Before Promotion)
+- Date: 2026-06-19
+- Mistake or miss: The corrected D2A sample was promoted to the legacy sample path before the invalid prior sample was archived under an explicit superseded-evidence name.
+- Root cause: Atomic output replacement protected the active Parquet/manifest pair but did not distinguish active-output rollback from historical-evidence retention.
+- Fix applied: Reproduced the legacy Parquet byte-for-byte at its original SHA256, published it under a `legacy_formula_superseded` filename with a manifest that forbids validation/strategy use, and retained the corrected sample at the active path.
+- Guardrail for next time: Before replacing a known-invalid but evidence-bearing artifact, archive and hash-verify it under an explicit superseded name; atomic promotion alone is not evidence retention.
+- Evidence paths: `data/processed/pead_d2_daily_returns_sample_legacy_formula_superseded_20260618.parquet`, `data/processed/pead_d2_daily_returns_sample_legacy_formula_superseded_20260618.parquet.manifest.json`, `data/processed/pead_d2_daily_returns_sample.parquet`, `scripts/pead_d2_return_contract.py`.
+
+## 2026-06-19 Round Entry (Single-Event Smokes Miss Overlap and TOCTOU)
+- Date: 2026-06-19
+- Mistake or miss: A single-event strategy smoke missed duplicate canonical return keys created by overlapping event windows, and the input contract could validate a path hash before reopening a concurrently replaced file.
+- Root cause: The fixture covered only a happy-path event, while input loading used a path-based two-step validate-then-read sequence.
+- Fix applied: Added a full-sample canonical adapter smoke with overlapping events and unique return-key assertions, and bound manifest validation, hashing, schema checks, and pandas reads to stable captured byte snapshots.
+- Guardrail for next time: Every future artifact contract must include a multi-event overlapping-window regression and a concurrent path-replacement regression before handoff or promotion.
+- Evidence paths: `scripts/pead_d2b_event_window_contract.py`, `tests/test_pead_d2b_event_window_contract.py`, `data/processed/pead_d2b_event_windows_sample.parquet.manifest.json`, `docs/phase_brief/v2-pead-d2b-event-iid-window-brief.md`.
+
+## 2026-06-19 Round Entry (Benchmark Excess Return Must Not Become Total Return)
+- Date: 2026-06-19
+- Mistake or miss: The existing local `ff_factors.parquet` could be overread as the D3 benchmark input even though it lacks the full D2B date spine, and `mktrf` could be mistaken for total market return.
+- Root cause: Prior factor ingestion stored factor fields without a PEAD-specific benchmark manifest, source-release contract, or explicit `mktrf + rf` total-return formula.
+- Fix applied: Added the D3 benchmark-input contract, recorded the formula in notes and decision log, and refreshed current truth to keep implementation/provider/CAR interpretation blocked.
+- Guardrail for next time: Before benchmark implementation or CAR/BHAR interpretation, require an immutable manifest that proves full D2B session coverage, decimal units, `benchmark_return = mktrf + rf`, source citation, hashes, and no missing-date fill.
+- Evidence paths: `docs/phase_brief/v2-pead-d3-benchmark-input-contract.md`, `docs/notes.md`, `docs/decision log.md`, `data/processed/ff_factors.parquet`.
+
+## 2026-06-19 Round Entry (D2B Session Spine Can Contain Non-Benchmark Trading Dates)
+- Date: 2026-06-19
+- Mistake or miss: The D3 implementation assumption treated the D2B 2,862-session spine as benchmark-compatible market sessions, but the spine contains 52 dates absent from official Ken French daily factors.
+- Root cause: D2B inherited its global session spine from D2A source dates; those dates include U.S. market holidays/special closures such as 2015-01-19, 2018-12-05, 2022-06-20, and 2025-01-09.
+- Fix applied: Added `scripts/pead_d3_benchmark_artifact.py` with strict D2B/D2A session coverage validation, official source release/hash capture, and fail-closed missing-date handling; no benchmark artifact was published.
+- Guardrail for next time: Before rerunning D3 artifact publication, audit and repair the D2B/D2A market-session spine so required benchmark dates represent actual tradable sessions; never coerce benchmark coverage by filling or dropping dates inside D3.
+- Evidence paths: `scripts/pead_d3_benchmark_artifact.py`, `tests/test_pead_d3_benchmark_artifact.py`, `docs/phase_brief/v2-pead-d3-benchmark-artifact-implementation.md`, `.venv\Scripts\python -m pytest tests\test_pead_d3_benchmark_artifact.py -q`, `.venv\Scripts\python scripts\pead_d3_benchmark_artifact.py --build`.
+## 2026-06-19 Round Entry (Benchmark Missingness Must Not Erase Raw Asset Returns)
+- Date: 2026-06-19
+- Mistake or miss: The first D3 regression expected raw `cumulative_total_return` to become null when only benchmark observations were incomplete.
+- Root cause: The test conflated benchmark-adjusted completeness with asset-return completeness even though the D3 contract blocks CAR/BHAR, not raw asset return, on missing benchmark dates.
+- Fix applied: Repaired `strategies/pead_event_study.py` so complete asset windows preserve raw cumulative return while benchmark return, CAR, BHAR, `window_complete`, and `eligible_for_analysis` remain benchmark-gated; updated the D3 regression accordingly.
+- Guardrail for next time: Separate asset-window completeness from benchmark-window completeness in tests and reports; missing benchmark coverage blocks abnormal-return claims, not raw-return arithmetic.
+- Evidence paths: `strategies/pead_event_study.py`, `tests/test_pead_d3_benchmark_artifact.py`, `docs/phase_brief/v2-pead-d3-benchmark-artifact-implementation.md`, `.venv\Scripts\python -m pytest tests\test_pead_d3_benchmark_artifact.py tests\test_pead_event_study.py -q`.
+
+## 2026-06-20 Round Entry (Benchmark Publication Needs Source-Bound Session Proof)
+- Date: 2026-06-20
+- Mistake or miss: A D3 benchmark publication gate could overread "builder exists" or "in-memory coverage passed" as enough proof to publish the artifact.
+- Root cause: The publication step depends on three independent locks: exact Ken French source bytes, repaired D2B session-spine hash, and immutable Parquet/manifest integrity.
+- Fix applied: Ran the focused D3/D2B gate first, published only through `scripts/pead_d3_benchmark_artifact.py --build`, and independently verified manifest hash, row count, zero missing sessions, zero duplicate dates, finite numeric fields, and formula error `0.0`.
+- Guardrail for next time: Before any downstream CAR/BHAR or strategy handoff, validate the benchmark manifest first and treat benchmark-input availability as separate from alpha interpretation authority.
+- Evidence paths: `data/processed/pead_d3_ken_french_daily_benchmark.parquet.manifest.json`, `data/processed/pead_d3_ken_french_daily_benchmark.f7dede990475b4ecf499fbf1dee3c4a81298073f018cc3a1ba1559f3e702c589.parquet`, `scripts/pead_d3_benchmark_artifact.py`, `tests/test_pead_d3_benchmark_artifact.py`, `.venv\Scripts\python -m pytest tests\test_pead_d3_benchmark_artifact.py tests\test_pead_d2b_event_window_contract.py -q`, `.venv\Scripts\python scripts\pead_d3_benchmark_artifact.py --build`.
+
+## 2026-06-20 Round Entry (Published Inputs Still Need an Artifact-to-Consumer Gate)
+- Date: 2026-06-20
+- Mistake or miss: D2B and D3 artifacts and isolated strategy tests were individually valid, but no single regression proved their full join cardinality, coverage, and formula handoff.
+- Root cause: Publication tests and synthetic strategy tests stopped at their own component boundaries.
+- Fix applied: Added `tests/test_pead_d3_strategy_handoff.py` to validate both manifest pointers, the full many-to-one join, 60-observation completeness, real-event CAR/BHAR formulas, and missing-benchmark behavior.
+- Guardrail for next time: Before declaring an artifact handoff complete, add one consumer-level test that reads the published manifest pointers and proves cardinality, coverage, formulas, and fail-closed missingness together.
+- Evidence paths: `tests/test_pead_d3_strategy_handoff.py`, `data/processed/pead_d2b_event_windows_sample.parquet.manifest.json`, `data/processed/pead_d3_ken_french_daily_benchmark.parquet.manifest.json`, `strategies/pead_event_study.py`, `docs/saw_reports/saw_v2_d3_strategy_benchmark_handoff_20260620.md`, `.venv\Scripts\python -m pytest tests\test_pead_d3_strategy_handoff.py -q`.
+
+## 2026-06-20 Round Entry (A Handoff Test Does Not Replace Numerical Evidence)
+- Date: 2026-06-20
+- Mistake or miss: The completed D3 artifact-to-strategy handoff was initially
+  translated directly into a dashboard-scoping recommendation even though no
+  reproducible real-data CAR/BHAR/quintile artifact existed.
+- Root cause: Mechanical handoff proof and numerical research evidence were
+  treated as the same gate, and the proposed fallback was an ad hoc console dump
+  rather than a reviewable artifact.
+- Fix applied: Added a bounded validation CLI and focused tests, published one
+  strict atomic JSON with D1/D2B/D3 lineage, locked daily and descriptive
+  quarterly outputs, explicit limitations, and no interpretation, then ran the
+  full PEAD regression and independent SAW review.
+- Guardrail for next time: After an artifact-to-consumer handoff passes, require
+  one deterministic, lineage-bound evidence artifact before recommending product
+  or dashboard scoping; preserve fail-closed statistical gaps instead of tuning
+  cohort frequency or HAC lags.
+- Evidence paths: `scripts/pead_real_data_validation.py`,
+  `tests/test_pead_real_data_validation.py`,
+  `docs/context/e2e_evidence/pead_real_data_validation_20260620.json`,
+  `docs/phase_brief/v2-pead-real-data-validation-brief.md`,
+  `.venv\Scripts\python -m pytest tests\test_pead_real_data_validation.py -q`.
+
+## 2026-06-21 Round Entry (Inference Repair Must Change the Estimator, Not the Label)
+- Date: 2026-06-21
+- Mistake or miss: The proposed fast path treated quarterly aggregation and removal of `ex_post_descriptive_only` as an inference repair even though both actions would change statistical policy without an approved estimator contract.
+- Root cause: A non-null quarterly t-stat was mistaken for evidence that the irregular, overlapping event-cohort dependence problem had been solved.
+- Fix applied: Approved a separate calendar-time portfolio methodology with outcome-independent signal formation, deterministic overlap handling, minimum leg counts, fixed HAC(59), and robustness-only stationary bootstrap; retained quarterly as descriptive-only.
+- Guardrail for next time: Never promote a descriptive aggregation because it yields a non-null statistic; predeclare the estimand, dependence model, overlap rule, missingness rule, and claim boundary before implementation.
+- Evidence paths: `docs/phase_brief/v2-pead-alpha-inference-methodology-gate.md`, `strategies/pead_event_study.py`, `scripts/pead_real_data_validation.py`, `docs/context/e2e_evidence/pead_real_data_validation_20260620.json`.
+
+## 2026-06-21 Round Entry (No-Security Extreme Rows Can Vanish in Overlap Grouping)
+- Date: 2026-06-21
+- Mistake or miss: A naive parent-side implementation prep grouped overlap candidates by `(security_id, return_date)` and dropped null-`security_id` no-eligible-security rows, undercounting expected extreme rows by 240.
+- Root cause: The latest-event overlap rule is security-keyed, but no-eligible-security extreme rows are still expected-missing diagnostics and cannot pass through a default pandas groupby on null keys.
+- Fix applied: M1B separates non-null-security overlap resolution from no-security extreme diagnostics; no-security Q1/Q5 rows remain expected missing and never contribute finite returns.
+- Guardrail for next time: Any security-keyed portfolio formation must explicitly define the null-security lane before grouping; reviewer count contracts should include no-security expected/missing rows.
+- Evidence paths: `strategies/pead_event_study.py`, `tests/test_pead_event_study.py`, `scripts/pead_real_data_validation.py`, `docs/context/e2e_evidence/pead_calendar_time_inference_m1b.json`.
+
+## 2026-06-21 Round Entry (Dashboard Contract Drift Must Be Fixed at the Source)
+- Date: 2026-06-21
+- Mistake or miss: The full repository suite stayed red because event-ledger trace labels drifted from the production/test contract names `ENTER` and `EXIT` even though the filters still used the correct actions.
+- Root cause: A presentation wording improvement crossed the legend-label contract boundary and was not isolated to hover text.
+- Fix applied: Restored the Plotly trace names in `dashboard.py` to `ENTER` and `EXIT`, preserved the newer lifecycle hover wording, reran the focused lifecycle regression and full pytest, and completed Reviewer A/B/C closure.
+- Guardrail for next time: When UI wording changes are intentional, keep machine-checked identifiers and legend/action contracts stable unless the test and product contract are explicitly approved for migration.
+- Evidence paths: `dashboard.py`, `tests/test_position_lifecycle.py`, `docs/saw_reports/saw_v2_pead_calendar_time_inference_m1b_20260621.md`, `.venv\Scripts\python -m pytest tests\test_position_lifecycle.py::test_event_ledger_chart_unchanged_enter_exit_markers -q`, `.venv\Scripts\python -m pytest -q`.
+
+## 2026-06-25 Round Entry (Sparse Engines Need Explicit Exit Parity, Not Just a Loop Removal)
+- Date: 2026-06-25
+- Mistake or miss: The first M6a framework engine was accepted as synthetic-only without an active-scale architecture check; it used event-row iteration and a dense return-date-by-security pivot for turnover.
+- Root cause: Small synthetic tests hid the `events x horizon x securities` materialization shape and did not force trade-to-zero parity at the final exit.
+- Fix applied: Replaced the loop/pivot path with a DuckDB ASOF start lookup, bounded return-ordinal interval join, direct sparse daily aggregation, sparse previous/current turnover union, and explicit final exit. Added full-scale smoke plus entry/exit/overlap fixture coverage.
+- Guardrail for next time: For every portfolio engine, test the exact turnover semantics for entry, overlap, exit, and final liquidation; add a full-scale bounded-memory smoke and a source guard against wide-matrix construction before allowing real-data wiring.
+- Evidence paths: `scripts/pead_m6_pit_walk_forward_equity_curve.py`, `tests/test_pead_m6_pit_walk_forward_equity_curve.py`, `docs/context/e2e_evidence/pead_m6_pit_walk_forward_equity_curve.json`.
+
+## 2026-06-25 Round Entry (Sparse Scale Fix Must Include Calendar, Dtypes, and Determinism)
+- Date: 2026-06-25
+- Mistake or miss: The first sparse repair removed the loop and pivot but still used per-security return ordinals, passed object-valued identifiers into the relational boundary, and lacked a repeatable output-hash proof.
+- Root cause: Memory scale was treated as the only Reviewer C concern; calendar boundary semantics and floating aggregation reproducibility were left implicit.
+- Fix applied: Added a global `return_idx:int32` calendar with explicit `entry_idx/exit_idx` interval bounds, numeric-only DuckDB relations with object-dtype rejection, one-worker compensated aggregation, canonical daily SHA-256 hashing, and shuffled-input parity coverage.
+- Guardrail for next time: A sparse portfolio engine is not complete until calendar membership, relational dtypes, entry/overlap/exit liquidation turnover, and reproducible final output are each independently tested under the full-universe smoke bound.
+- Evidence paths: `scripts/pead_m6_pit_walk_forward_equity_curve.py`, `tests/test_pead_m6_pit_walk_forward_equity_curve.py`, `docs/phase_brief/v2-pead-m6-pit-walk-forward-equity-curve.md`.

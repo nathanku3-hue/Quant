@@ -1,0 +1,20 @@
+b3f3f40 Anchor boot preflight data-readiness audit
+7cbe3c0 Wire data-readiness gate into boot preflight
+22f2788 Add data-readiness gate v0
+37abd44 Add boot-core preflight contract v0
+c78d024 Anchor research-validity runner v0 context
+8716c51 Add research-validity runner v0 evidence gate
+cec7931 Harden pinned strategy universe
+d93c416 docs: refresh context surfaces, decision log, and runtime evidence after worktree reconciliation
+c43d8a0 test: Phase 65 test suites - G0-G8.2, optimizer policy, portfolio universe, dashboard, v2 proxy
+a5ee6f0 feat: runtime source - optimizer diagnostics, portfolio universe, data orchestrator, dashboard safety, page registry
+c300d21 feat: opportunity engine, discovery data, fixtures, registry, and v2 replay/proxy engine
+9fe39c5 docs: Phase 65 G0-G8.2 architecture, handover, SAW reports, context surfaces, and product canon
+a2d2d2a chore: update .gitignore for runtime cache and transient artifacts
+c6de96f feat: add phase65 candidate registry
+2cb8fb3 docs: close r64 hygiene and approve candidate registry
+7f602b5 feat: add readiness audit and validation lab
+ba16f6e feat: add provenance gates and alpaca provider boundary
+6588378 governance: D-352 truth-surface reconciliation — Phase 62 READY
+b266870 governance: Phase 61 complete + D-352 Terminal Zero v2.6 roadmap lock
+53b5865 governance: complete post_phase_alignment_current.md Phase 60 reconciliation

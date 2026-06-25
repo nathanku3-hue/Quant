@@ -1,0 +1,67 @@
+{
+  "manifest_id": "MU_SUPERCYCLE_CANDIDATE_CARD_V0_MANIFEST",
+  "artifact_uri": "data/candidate_cards/MU_supercycle_candidate_card_v0.json",
+  "artifact_sha256": "d757181c9740b15819799154475d38699c96002dab8cb96ffec6467b17a41496",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "scope": "PH65_G8_CANDIDATE_CARD_ONLY",
+  "candidate_id": "MU_SUPERCYCLE_CANDIDATE_CARD_V0",
+  "ticker": "MU",
+  "row_count": 1,
+  "source_policy": {
+    "allowed_sources": [
+      "existing static fixtures",
+      "official/public source notes",
+      "SEC fixture-style source references",
+      "manual research notes"
+    ],
+    "forbidden_sources": [
+      "live provider calls",
+      "new ingestion",
+      "yfinance as canonical evidence",
+      "ranked screen results",
+      "paid options/IV/gamma data",
+      "unmanifested sources"
+    ],
+    "canonical_sources": [
+      {
+        "source_id": "manual_human_nomination_20260510",
+        "source_type": "manual_research_note",
+        "quality_label": "research_only",
+        "canonical": true,
+        "canonical_for": "candidate-card identity and thesis placeholder only"
+      }
+    ],
+    "source_notes": [
+      {
+        "source_id": "manual_human_nomination_20260510",
+        "quality_label": "research_only",
+        "canonical": true,
+        "note": "Human nomination creates the candidate-card object only; it is not alpha evidence."
+      },
+      {
+        "source_id": "web_or_provider_review",
+        "quality_label": "not_canonical",
+        "canonical": false,
+        "note": "No live web or provider review is used by this manifest."
+      }
+    ]
+  },
+  "allowed_use": [
+    "definition/evidence-card validation",
+    "state-framework mapping",
+    "source-quality gap labeling",
+    "future planner handoff"
+  ],
+  "forbidden_use": [
+    "alpha search",
+    "candidate screening",
+    "ranking",
+    "backtest",
+    "replay",
+    "provider ingestion",
+    "dashboard runtime",
+    "buy/sell alert",
+    "broker calls",
+    "investment recommendation"
+  ]
+}

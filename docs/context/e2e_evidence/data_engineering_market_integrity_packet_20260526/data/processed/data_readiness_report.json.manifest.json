@@ -1,0 +1,17 @@
+{
+  "artifact_path": "E:\\Code\\Quant\\data\\processed\\data_readiness_report.json",
+  "asof_ts": "2026-05-10T03:46:31Z",
+  "date_range": {
+    "end": "2026-05-10T03:46:31Z",
+    "start": "2026-05-10T03:46:31Z"
+  },
+  "license_scope": "internal_governance_report",
+  "manifest_created_at_utc": "2026-05-10T03:46:31Z",
+  "manifest_schema_version": "1.0.0",
+  "provider": "terminal_zero",
+  "provider_feed": "data_readiness_audit",
+  "row_count": 1,
+  "schema_version": "1.0.0",
+  "sha256": "4c2c2803481a7c107d20f74b4255ac2e00c0fd72a5356900d4e68a1d34700ce5",
+  "source_quality": "canonical"
+}

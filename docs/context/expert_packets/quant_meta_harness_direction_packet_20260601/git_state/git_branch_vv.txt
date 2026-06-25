@@ -1,0 +1,33 @@
++ boot-gov-proof-runtime-status-governance               9e9d7ae (E:/Code/Quant_boot_gov_proof) [origin/boot-gov-proof-runtime-status-governance] Close governance proof review gaps
+  codex/boot-preflight-data-gate-agent-impl              22f2788 Add data-readiness gate v0
++ codex/boot-preflight-source-stability                  c78d024 (E:/Code/Quant_boot_preflight_stability) Anchor research-validity runner v0 context
++ codex/boot0a-runtime-path-followup                     2a13724 (E:/Code/Quant_boot0a_runtime_path) Harden boot status runtime path contract
+  codex/dash-1-page-registry-shell                       c6de96f feat: add phase65 candidate registry
+  codex/dashboard-ia-godview-redesign-plan               c6de96f feat: add phase65 candidate registry
++ codex/meta-harness-install                             25341e5 (E:/Code/Quant-meta-harness-install) [origin/codex/meta-harness-install] Refresh meta-harness handoff timestamp
+  codex/optimizer-core-policy-audit-lower-bounds-slsqp   c6de96f feat: add phase65 candidate registry
+* codex/optimizer-core-structured-diagnostics            b3f3f40 [origin/codex/optimizer-core-structured-diagnostics: behind 30] Anchor boot preflight data-readiness audit
+  codex/phase65-candidate-registry                       c6de96f [origin/codex/phase65-candidate-registry] feat: add phase65 candidate registry
+  codex/phase65-g1-fast-proxy-synthetic                  c6de96f feat: add phase65 candidate registry
+  codex/phase65-g2-single-fixture-candidate              c6de96f feat: add phase65 candidate registry
+  codex/phase65-g3-canonical-replay-fixture              c6de96f feat: add phase65 candidate registry
+  codex/phase65-g4-real-canonical-readiness-fixture      c6de96f feat: add phase65 candidate registry
+  codex/phase65-g5-single-canonical-replay-no-alpha      c6de96f feat: add phase65 candidate registry
+  codex/phase65-g6-v1-v2-real-slice-mechanical           c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-1-roadmap-realignment-product-charter c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-1a-starter-docs-product-spec          c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-1b-data-infra-gap-assessment          c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-1c-source-audit-public-godview        c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-1d-sec-tiny-fixture                   c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-1e-finra-short-interest-tiny-fixture  c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-1f-cftc-tff-tiny-fixture              c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-1g-fred-ken-french-tiny-fixture       c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-2-opportunity-state-machine           c6de96f feat: add phase65 candidate registry
+  codex/phase65-g7-candidate-family-definition           c6de96f feat: add phase65 candidate registry
+  codex/phase65-g8-1-supercycle-discovery-intake         c6de96f feat: add phase65 candidate registry
+  codex/phase65-g8-1a-discovery-drift-correction         c6de96f feat: add phase65 candidate registry
+  codex/phase65-g8-1b-pipeline-first-discovery-scout     c6de96f feat: add phase65 candidate registry
+  codex/phase65-g8-one-supercycle-gem-candidate-card     c6de96f feat: add phase65 candidate registry
+  codex/phase65-v2-proxy-boundary                        c6de96f feat: add phase65 candidate registry
+  codex/r64-closeout-dependency-hygiene                  2cb8fb3 [origin/codex/r64-closeout-dependency-hygiene] docs: close r64 hygiene and approve candidate registry
+  main                                                   6588378 [origin/main] governance: D-352 truth-surface reconciliation — Phase 62 READY

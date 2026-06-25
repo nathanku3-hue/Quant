@@ -46,3 +46,24 @@ docs/context/dispatch_manifest.json
 docs/context/worker_reply_packet.json
 docs/context/worker_status_aggregate.json
 docs/context/phase_end_logs/
+
+# Local / transient credentials and patches
+secret.txt
+.boot0a_hash_before.csv
+.boot0a_hash_after.csv
+V2_D0_4D_PERMISSION_PROBE_RESULTS.redacted.json
+boot0_shared_boot_status_contract_20260526.patch
+boot_preflight_v0.patch
+governance_gate_v0.patch
+BOOT0_SHARED_BOOT_STATUS_PACKAGE_20260526.zip
+BOOT0_SHARED_BOOT_STATUS_RECONCILIATION_20260526.md
+PRODUCT_UX_RECONCILIATION_20260526.md
+reboot_expert_packet_20260526_boot_preflight_v0.zip
+governance_gate_v0_implementation_20260526.zip
+local_wrds_column_probe.py
+local_wrds_pead_v2_fetcher.py
+local_wrds_permission_probe_d0_4d.py
+be very rigorous with the citation such that every.pdf
+Quant-g9-market-behavior-signal-card/
+Quant-meta-harness-install/
+

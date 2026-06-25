@@ -1,6 +1,728 @@
 Decision Log: Terminal Zero
 Author: Atomic Mesh | Last Updated: 2026-03-01 (Stream 1 fail-loud bootstrap + Stream 4 strict container draft)
 
+V2 PEAD M6b Best-Available Option 1 Repair (2026-06-25)
+- Decision:
+    - repair Reviewer A/C terminal-window blocker and Reviewer B commit-path blocker in one ordered round.
+    - enforce full 60-session event eligibility before B engine execution.
+    - add direct `--commit-bestavail-run` that runs the data gate first, stages B parquet/JSON, and commits the public run package with rollback protection.
+- Rationale:
+    - both blockers require regenerating the same B JSON/parquet pair; splitting them would regenerate with a soon-to-be-retired path and duplicate review work.
+    - bounded diagnostic metrics must not include terminal-truncated cohorts even when illustrative-only.
+- Formula:
+    - `full_window_eligible_event := searchsorted(return_calendar, decision_date, side="right") <= len(return_calendar) - holding_period_sessions`.
+    - For B, this enforces `entry_idx + 60 - 1 <= max_return_idx` before `build_daily_portfolio_returns(...)`.
+- Evidence:
+    - repaired evidence records `selected_events_with_incomplete_60_session_window=0`, 975 daily rows, `2016-01-15..2019-11-27`, and parquet SHA `10bba1fb7189af3c629a28e9ef39d674db80fe9816bbf4a13254384ea1eda01e`.
+    - validation passed: direct `--data-gate`, direct `--commit-bestavail-run`, B focused pytest 5/5, M6 sparse-engine pytest 12/12, compile.
+- Boundary:
+    - B remains illustrative-only, not alpha, not tradable, and not strict M6b readiness evidence.
+
+V2 PEAD M6a PIT Walk-Forward Equity Framework (2026-06-24)
+- Decision:
+    - split M6 into M6a framework/input-contract evidence and M6b data-prep/real-run.
+    - implement M6a now as a fail-closed backend evidence runner with walk-forward, portfolio, cost, equity, CAGR, drawdown, Sharpe, turnover, and fold metric functions.
+    - keep true `--run` equity-curve emission blocked until strict EPS vintage/return/tradability data exists.
+- Evidence:
+    - `scripts/pead_m6_pit_walk_forward_equity_curve.py` and `tests/test_pead_m6_pit_walk_forward_equity_curve.py`.
+    - `docs/context/e2e_evidence/pead_m6_pit_walk_forward_equity_curve.json` records `workflow_status = blocked_fail_closed` for current artifacts.
+    - failure reasons are `pit_vintage_blocked`, `delisting_missing`, `tradable_return_missing`, and `tradability_liquidity_screen_missing`.
+    - `--validate-inputs` writes blocked evidence successfully; `--run` writes blocked evidence and exits with code 2.
+    - focused M6 tests pass 7/7, M5a+M6 tests pass 11/11, and the broader PEAD regression slice passes 104/104.
+- Claim boundary:
+    - timing PIT is available through RDQ/release-date alignment, but strict EPS vintage/unrestated PIT is not established.
+    - current EPS label is `release_date_aligned_but_restated`.
+    - no daily return parquet, equity curve, CAGR, strategy promotion, ranking/scoring, alert, recommendation, or broker/order path is authorized.
+- Contract lock:
+    - `M6A_VALID := framework_implemented AND nonzero_cost_model_required AND walk_forward_split_by_decision_date AND synthetic_strict_input_equity_metrics_pass AND current_artifacts_fail_closed AND claim_boundary_distinguishes_timing_PIT_from_vintage_PIT`.
+    - `M6_REAL_RUN_ALLOWED := strict_unrestated_EPS_vintage AND delisting_adjusted_tradable_returns AND full_asof_tradability_screen AND explicit_cost_model`.
+- Next decision:
+    - authorize M6b data-prep: first-public/unrestated EPS vintage or explicit best-available restated acceptance, plus delisting-adjusted tradable returns and full as-of liquidity/tradability filters.
+
+V2 PEAD Alpha Interpretation Gate (2026-06-24)
+- Decision:
+    - open a docs-only Alpha Interpretation Gate before any further dashboard expansion.
+    - classify the current full-universe M1B intercept/t-stat as descriptive methodology evidence only, not alpha.
+    - replace dashboard-first routing with Path A descriptive evidence panel after gate approval or Path B M5 PIT/data/method upgrade before any real alpha assertion.
+- Evidence:
+    - `docs/context/e2e_evidence/pead_calendar_time_inference_m1b_full_universe.json` records the statistic, evidence policy, and limitations.
+    - evidence policy allows bounded methodology review only and leaves interpretation, promotion, ranking/scoring, alerts/recommendations, and order authority false.
+    - limitations record current-vintage EPS, Compustat proxy returns, no delisting adjustment, gross single-factor equal-weight Q5-minus-Q1, and fixed sample scope.
+- Not authorized:
+    - alpha-named dashboard/code, alpha claim, strategy promotion, ranking/scoring, alerts, recommendations, order paths, provider access, evidence/data mutation, staging, or commit.
+- Contract lock:
+    - `V2_PEAD_ALPHA_INTERPRETATION_GATE_OPEN := evidence_policy_self_limits AND limitations_material AND max_claim_descriptive_only AND path_A_or_B_branch_defined AND alpha_code_blocked_until_gate_approval`.
+
+V2 PEAD M4A Memory-Bounded Full-Universe Expansion (2026-06-22)
+- Decision:
+    - implement the approved M4A code/test slice as bounded local full-universe D2A/D2B builders.
+    - preserve D2A formulas, IID lag scope, D2B fixed-security selection, authoritative sessions, and atomic manifest publication semantics.
+    - keep M3 WRDS/PIT entitlement, estimator/UI, alpha verdict, ranking/scoring, alerts, recommendations, broker/order actions, and new artifact publication out of scope.
+- Evidence:
+    - scripts/pead_d2_return_contract.py, scripts/pead_d2b_event_window_contract.py, tests/test_pead_d2_returns.py, and tests/test_pead_d2b_event_window_contract.py.
+    - focused M4A tests PASS 55/55.
+    - broader PEAD D2/D3/event-study tests PASS 79/79.
+    - latest targeted non-M4A rerun fails in execution microstructure spooler status/teardown; context-hygiene and timing checks pass.
+    - full repository pytest rerun reached 100% with no failure summary but did not return an exit code and was stopped.
+- Rollback:
+    - no data artifact was published; rollback is code/test-only for the four M4A files.
+    - any future published D2A/D2B artifact still rolls back by atomically restoring the prior manifest pointer and retaining immutable Parquet files.
+- Not authorized:
+    - provider access, PIT EPS/population/tradable alpha claims, estimator/UI changes, ranking/scoring, alerts, recommendations, broker/order paths, staging, commit, or new data publication.
+- Contract lock:
+    - V2_PEAD_M4A_LOCAL_FULL_BUILD_READY := D2A_bounded_full_path AND D2B_bounded_full_path AND formulas_unchanged AND IID_semantics_unchanged AND atomic_publication_preserved AND focused_tests_PASS AND PEAD_regression_PASS.
+    - V2_PEAD_M4A_TERMINAL_CLOSED := V2_PEAD_M4A_LOCAL_FULL_BUILD_READY AND full_pytest_clean_exit AND Reviewer_A_PASS AND Reviewer_B_PASS AND Reviewer_C_PASS.
+
+V2 PEAD Read-Only Evidence Dashboard (2026-06-20)
+- Decision:
+    - implement the explicitly approved D4 slice as a product-facing `read-only evidence dashboard`, not another status/approval packet.
+    - add the panel to Strategy Research Replay through the smallest additive composition change.
+    - verify the exact evidence JSON hash and required schema before rendering; all integrity failures stop the panel before metrics or lineage appear.
+- Evidence:
+    - `views/pead_validation_evidence.py`, `views/strategy_view.py`, `dashboard.py`, and `tests/test_pead_validation_evidence.py`.
+    - locked JSON SHA256 `96cdc975d0b4798c6775b12e7bc9dc6af4fb7e9178a4d0ad54feeab8100e980e`.
+- Rollback:
+    - remove the optional evidence renderer argument/import and the evidence module; the original Strategy Matrix and Backtest Lab paths remain unchanged.
+- Not authorized:
+    - PEAD recomputation, provider access, Parquet reads, artifact writes, alpha interpretation/promotion, ranking/scoring, alerts, recommendations, or broker/order paths.
+
+V2 PEAD D2B Terminal Reviewer Rerun PASS (2026-06-20)
+- Decision:
+    - promote the repaired D2B authoritative market-session spine from terminal SAW BLOCK to terminal SAW PASS after final independent Reviewer A/B/C reran against the repaired state.
+    - preserve `docs/saw_reports/saw_v2_d2b_session_spine_repair_20260619.md` as historical BLOCK evidence for the pre-rerun state.
+    - publish `docs/saw_reports/saw_v2_d2b_session_spine_repair_rerun_20260620.md` as the current terminal PASS evidence.
+- Evidence:
+    - parent focused matrix passed 70 collected tests across D2A, D2B, D3, and strategy handoff.
+    - Reviewer A PASS with no Critical/High strategy-correctness findings.
+    - Reviewer B PASS with no Critical/High runtime/ops findings.
+    - Reviewer C PASS with no Critical/High data-integrity/performance findings.
+    - no `data/processed/pead_d3_ken_french_daily_benchmark*` artifact exists.
+- Not authorized:
+    - D3 artifact publication, CAR/BHAR or quintile interpretation, dashboard, ranking/scoring, alerts, broker/order paths, full build, staging, or commit.
+- Contract lock:
+    - `V2_D2B_SESSION_SPINE_TERMINAL_PASS := V2_D2B_SESSION_SPINE_REPAIRED AND reviewer_A_PASS AND reviewer_B_PASS AND reviewer_C_PASS AND focused_70_tests_PASS AND d3_artifact_absent AND forbidden_actions_zero`.
+
+V2 PEAD D2B Market-Session Spine Repair (2026-06-19)
+- Decision:
+    - stop treating every distinct D2A row date as a market session.
+    - use official Ken French daily factor dates, restricted to the D2A date range, as D2B calendar authority.
+    - preserve D2B security-selection semantics and D2A return rows; exclude non-session dates only from liquidity lookback and event-time indexing.
+    - require D3 to validate the exact upstream source release/hash and session hash before benchmark construction.
+    - validate D2A for strategy handoff in bounded chunks and materialize only selected-security return columns; never deep-copy/sort the complete D2A frame at this boundary.
+- Evidence:
+    - session count `2,862 -> 2,810`; excluded dates `52`.
+    - D2B event/row counts unchanged at 12,582 / 754,920.
+    - selected-security changes `2 / 12,582`; eligible handoffs `4,867 -> 11,450`.
+    - new SHA256 `c3da606af340ba5b531d3d0382e1f2c83469e29a42dd7c0cc9c356cba82594a1`; prior immutable SHA retained.
+    - D3 in-memory coverage 2,810 / 2,810 with no publication; strategy smoke 687,000 complete rows.
+    - active-scale strategy smoke peaks at 1,756.7 MiB RSS and completes without `ArrayMemoryError`.
+    - cross-row event metadata/timing drift and normalized duplicate D2A keys fail closed through direct regressions.
+- Rollback:
+    - atomically restore the prior D2B manifest bytes pointing to SHA `8e2f39...`; do not delete either immutable artifact.
+- Not authorized:
+    - D3 artifact publication, CAR/BHAR or quintile interpretation, dashboard, ranking/scoring, alerts, broker/order paths, full build, staging, or commit.
+- Contract lock:
+    - `V2_D2B_SESSION_SPINE_REPAIRED := authoritative_source_provenance_match AND session_hash_match AND excluded_52_non_sessions AND fixed_security_semantics_unchanged AND exact_60_rows AND no_imputation AND atomic_manifest_publish AND chunked_full_D2A_validation AND active_scale_strategy_handoff_pass`.
+
+V2 PEAD D1 Parent Closure Reconciliation (2026-06-18)
+- Decision:
+    - treat `docs/saw_reports/saw_v2_d1_repair_20260618.md` as the authoritative full D1 repair SAW and do not publish a second repair/promotion claim.
+    - publish only a thin docs-only reconciliation report for the parent-closure pass.
+    - accept the matching Parquet/manifest SHA256 as closure evidence while keeping untracked local ownership explicit.
+    - preserve the current-vintage Compustat/restatement-hindsight limitation; do not claim strict filing-vintage PIT EPS.
+- Ownership:
+    - `scripts/pead_d1_sue_builder.py`, `tests/test_pead_d1_sue.py`, `docs/phase_brief/v2-pead-d1-repair-brief.md`, and D1 SAW reports are local untracked D1-owned files.
+    - evidence closure is reconciled, but clean tracked-repo closure is not claimed.
+- Not performed or authorized:
+    - no D1 code/data change, test, rebuild, provider access, D2/Ken French work, dashboard work, strategy execution, staging, or commit.
+- Next decision:
+    - start D2 return/IID repair in a separate round; dashboard remains downstream of corrected D1+D2 and strategy smoke.
+- Contract lock:
+    - `V2_D1_PARENT_CLOSURE_RECONCILED := authoritative_D1_SAW_present AND parquet_manifest_sha_match AND current_vintage_limitation_preserved AND untracked_ownership_disclosed AND no_duplicate_promotion_claim AND forbidden_actions_zero`.
+
+V2 PEAD D1 Repair (2026-06-18)
+- Decision:
+    - repair D1 as a bounded Data/Docs slice and keep D2 separate.
+    - use raw numeric `epspxq` without `ajexq` division while retaining `adj_eps` for compatibility.
+    - deduplicate `(gvkey, rdq)` before exact t-4 lag and rolling calculations.
+    - retain raw SUE, add RDQ cross-sectional `+/-5` standard-deviation clipping, and add a units-correct liquidity flag without filtering rows or changing `valid_sue`.
+    - publish the Parquet and manifest through temp-to-replace operations.
+- Reconciliation:
+    - moving RDQ deduplication before stateful transforms removed 1,447 contaminated lag-valid events, changing valid SUE from 235,033 to 233,586.
+- Artifact:
+    - 346,511 rows; 13,216 GVKEYs; RDQ 2015-01-02 through 2026-06-16; SHA256 `81b2689b48943373f58586ddc382fb609dbce022cde93d4d502333cae5541855`.
+- Quality / limitation:
+    - manifest records raw `abs(SUE) > 5` share of 0.001887955613778223, below the 0.005 fail-closed threshold.
+    - empty processed-output paths preserve the prior Parquet/manifest bundle.
+    - Compustat fundamentals are current-vintage; strict filing-vintage PIT EPS is not established.
+- Rollback:
+    - restore the prior builder and artifact/manifest pair together; never mix versions.
+- Next decision:
+    - separate D2 repair starting with `gvkey+iid` returns before any daily ADV selection.
+- Not authorized:
+    - D2 edits/builds, Ken French acquisition, provider access, strategy interpretation, UI, alerts, ranking, promotion, or broker paths.
+- Contract lock:
+    - `V2_D1_REPAIRED := raw_epspxq AND no_ajexq_division AND rdq_identity_dedup_before_stateful_transforms AND exact_t4 AND raw_and_clipped_sue AND liquidity_flag_only AND quality_gate_pass AND empty_output_preserves_prior_bundle AND current_vintage_limitation_recorded AND atomic_bundle_publication`.
+
+V2 PEAD Strategy Contract SAW Rerun Promotion Gate (2026-06-18)
+- Decision:
+    - promote the PEAD strategy skeleton to corrected-D1/D2-handoff-ready after independent Reviewer A/B/C rerun returned PASS with no in-scope Critical/High findings.
+    - preserve `docs/saw_reports/saw_v2_pead_strategy_contract_20260618.md` as historical BLOCK evidence for the pre-rerun state; publish `docs/saw_reports/saw_v2_pead_strategy_contract_rerun_20260618.md` as the promotion artifact.
+- Non-blocking follow-ups:
+    - add direct tests for non-primary rejection, duplicate issuer/date rejection, insufficient future sessions, tied-SUE quantiles, and `summarize_event_outcomes_from_inputs`.
+    - optimize batch summarizer return normalization before very-large production runs if needed.
+- Not authorized:
+    - Data-stream D1/D2 repairs, provider probes, Parquet writes, runtime smoke, UI, real quintile/CAR/backtest interpretation, candidate ranking, promotion, alerts, or broker paths.
+- Contract lock:
+    - `V2_PEAD_STRATEGY_HANDOFF_READY := V2_PEAD_STRATEGY_READY AND reviewer_A_PASS AND reviewer_B_PASS AND reviewer_C_PASS AND focused_tests_PASS AND data_layer_untouched`.
+
+V2 PEAD Strategy Contract (2026-06-18)
+- Decision:
+    - ship the data-source-agnostic strategy schema, event-window, statistics, and synthetic-test skeleton while the Data stream repairs D1/D2.
+    - require strict post-event `+1..+60` trading observations and exclude incomplete windows from analysis.
+    - keep raw compounded return distinct from benchmark-adjusted CAR/BHAR; no benchmark means no CAR claim.
+    - compute SUE quantiles within explicit event-date cohorts and HAC inference on cohort-level high-minus-low spreads.
+- Ownership:
+    - Strategy owns `strategies/pead_event_study.py` and `tests/test_pead_event_study.py`.
+    - Data retains D1 SUE adjustment basis, D2 total-return level, primary-security mapping, benchmark, delisting, and artifact construction.
+- Not authorized:
+    - data/provider writes, builder edits, real quintile/CAR/backtest interpretation, candidate ranking, promotion, UI, alerts, or broker paths.
+- Contract lock:
+    - `V2_PEAD_STRATEGY_READY := schema_tests_pass AND strict_event_timing AND complete_window_gate AND raw_vs_abnormal_semantics_separated AND cohort_quantiles_hac_available AND data_layer_untouched`.
+
+V2-D0.4C Local Read-Only Permission Probe Approval (2026-06-03)
+- Decision:
+    - approve one future local human read-only WRDS permission probe for exactly five hard-coded rows.
+    - keep D0.4C as docs-only approval; do not execute WRDS in this artifact.
+    - queue D0.4D as the first local human execution packet.
+- The Decision (Hardcoded):
+    - rows are `probe_approved_not_executed`, `not_formally_approved`, and `approval_ref=null`.
+    - allowed future output is one boolean/redacted-error outcome per exact table only.
+    - discovery helpers, schema discovery, row counts, samples, snapshots, provider output, runtime writes, and formal approval_ref changes remain forbidden.
+- Evidence:
+    - `docs/authorization/V2_D0_4C_LOCAL_READ_ONLY_PERMISSION_PROBE_APPROVAL.md`.
+    - `docs/authorization/V2_D0_4C_LOCAL_READ_ONLY_PERMISSION_PROBE_APPROVAL.json`.
+    - `docs/saw_reports/saw_v2_d0_4c_local_read_only_permission_probe_20260603.md`.
+- Contract lock:
+    - `V2_D0_4C_PROBE_APPROVAL := PASS_DOCS_ONLY_APPROVAL iff (execution_in_d0_4c = 0) and (exact_five_rows = 1) and (all_rows_probe_approved_not_executed = 1) and (all_approval_ref_null = 1) and (formal_permission_truth_closed = 0) and (wrds_output = 0) and (discovery = 0) and (data_output = 0) and (runtime_write = 0)`.
+
+V2-D0.4B WRDS Local Auth Method Confirmed (2026-06-03)
+- Decision:
+    - record V2-D0.4B as a correction artifact, not execution approval.
+    - replace overbroad `WRDS/provider access blocked` language with: `WRDS local authentication method is user-attested available through user-owned local credentials, but actual login has not been verified by Codex/subagents, credentials were not read, and formal table-level permission truth is not closed.`
+    - keep `actual_login_verified_by_agent=false`, `formal_approval_ref=null`, `permission_truth=not_closed`, and `wrds_execution=governance_blocked_until_probe_approval`.
+    - keep `secret_txt=do_not_read_do_not_quote_do_not_use` and `credentials=local_only_do_not_read_do_not_quote_do_not_commit`.
+    - set `s_and_p_capital_iq_pro=deferred_fallback`.
+    - keep `crsp.dsf`, `crsp.stocknames`, `crsp.ccmxpf_linktable`, `comp.fundq`, and `ibes.det_epsus` as `probe_plan_pending`, `not_approved`, and `approval_ref=null`.
+- Evidence:
+    - `docs/authorization/V2_D0_4B_WRDS_LOCAL_AUTH_METHOD_CONFIRMED.md`.
+    - `docs/authorization/V2_D0_4B_WRDS_LOCAL_AUTH_METHOD_CONFIRMED.json`.
+- Still open:
+    - separate approval for any local read-only permission probe execution.
+    - formal table-level permission truth and exact approval_ref.
+- Not authorized:
+    - secret.txt or credential read/use/quote/test; WRDS/provider login/access; SSH; Python WRDS; SAS; SQL; library/table/schema discovery; row counts; sample rows; provider-output logs; snapshots; data output; runtime/dashboard/scoring/broker writes; approval_ref fabrication; row approval.
+- The Decision (Hardcoded):
+    - `V2_D0_4B_VALID := VALID iff (local_auth_method = user_attested_local_auth_available) and (actual_login_verified_by_agent = false) and (credentials_not_read = 1) and (secret_txt_not_used = 1) and (formal_approval_ref = null) and (permission_truth = not_closed) and (wrds_execution = governance_blocked_until_probe_approval) and (all_rows_probe_plan_pending_not_approved = 1) and (provider_execution = 0) and (data_output = 0)`.
+
+V2-D0.1 TODO-MATRIX-001 Permission Truth Bookkeeping (2026-06-02)
+- Decision:
+    - mark `TODO-MATRIX-001` RESOLVED for offline V2-D0.1 permission-truth metadata.
+    - record `v2_discovery/data_lab/permission_truth.py` as the artifact that separates V2-D0.1 entitlement status from PEAD_V2_001 starter scope.
+    - keep V2-D0.1 rows exact and default-pending: `crsp.dsf`, `crsp.stocknames`, `crsp.ccmxpf_linktable`, `comp.fundq`, and `ibes.det_epsus`.
+    - approve rows only with row/table `approval_ref` and `allowed_uses=["provenance_contract"]`.
+    - keep `ibes.det_epsus` pending for V2-D0.1 and not_requested for PEAD starter.
+- Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_v2_wrds_permission_truth_scope.py tests\test_v2_wrds_permission_matrix.py tests\test_v2_snapshot_manifest_contract.py tests\test_v2_data_lab_no_v1_writes.py -q` -> PASS, 51 passed.
+    - `.venv\Scripts\python -m compileall v2_discovery\data_lab -q` -> PASS.
+- Still open:
+    - entitlement evidence, explicit approval text, clean-room/proof packet, legacy WRDS cleanup, validity/C3 lock, and public/main mismatch.
+- Not authorized:
+    - WRDS/provider access, credentials, probe execution, snapshots, data writes, dashboard reader, scoring/ranking, alerts, broker paths, SQLite, SafeBoot, BootReady, legacy cleanup, public/main closure, or V2 validity/C3 lock claim.
+
+V2-D0.1 Scope and Clean-Room Runtime Decision (2026-06-02)
+
+  - Decision record:
+    - make V2-D0.1 entitlement-truth request cover all five default rows now: `crsp.dsf`, `crsp.stocknames`, `crsp.ccmxpf_linktable`, `comp.fundq`, and `ibes.det_epsus`.
+    - keep PEAD_V2_001 starter execution scoped to the four-row Compustat PEAD set: `crsp.dsf`, `crsp.stocknames`, `crsp.ccmxpf_linktable`, and `comp.fundq`.
+    - set `ibes.det_epsus` as `pending` for V2-D0.1 once requested, but `not_requested` for PEAD_V2_001 starter.
+    - exclude `schema_registry.py` from credentialed clean-room runtime by default; keep it as non-credentialed review/source anchor unless explicit exception criteria are met.
+    - mark `TODO-PEAD-DECISION-001` and `TODO-CLEANROOM-RUNTIME-001` as resolved.
+    - keep entitlement evidence, approval text, full clean-room proof packet, V2-D0.1 matrix metadata/builder, legacy WRDS cleanup authority, V2 validity packet/C3 lock, and public-main status open.
+  - Forbidden actions:
+    - no WRDS/provider access, credentials, probe execution, snapshots, data writes, dashboard reader, scoring/ranking, alerts, broker/order paths, SQLite, SafeBoot, BootReady, or legacy cleanup action.
+  - The Decision (Hardcoded):
+    - `V2_D0_1_SCOPE_RUNTIME_DECISION_VALID := VALID iff (v2_d0_1_rows = five_default_rows) and (pead_starter_rows = four_compustat_rows) and (ibes_det_epsus_v2_d0_1_status = pending_once_requested) and (ibes_det_epsus_pead_starter_scope = not_requested) and (schema_registry_credentialed_runtime_default = excluded) and (provider_access = 0) and (probe_execution = 0) and (credential_use = 0) and (snapshot_generation = 0) and (data_write = 0) and (legacy_cleanup_action = 0)`.
+
+V2-D0.1 Expert 1-6 Follow-Up Reconciliation (2026-06-02)
+
+  - Decision record:
+    - record the Expert 1-6 follow-up agreement/confidence matrix and only real high-value follow-up questions.
+    - keep V2-D0.1 entitlement-only and no-provider.
+    - record `PATCH_RESOLVED_LOCAL` for Backend/Data local raw-payload strictness while keeping public/main status open.
+    - record V2-D0.1 five-row entitlement target: `crsp.dsf`, `crsp.stocknames`, `crsp.ccmxpf_linktable`, `comp.fundq`, `ibes.det_epsus`.
+    - mark the PEAD primary-signal conflict as open: I/B/E/S analyst-surprise PEAD vs Compustat-rdq PEAD starter.
+    - record Research Validity thresholds and `C3_LOCK_PEAD_V2_001_v1` as required before any `research_valid` PEAD claim.
+    - record Security/Ops approval addendum, audit schema, denylist, stop rules, and legacy WRDS handling sequence as future gates only.
+  - TODO gaps:
+    - `TODO-ENTITLEMENT-001`: missing non-secret entitlement evidence.
+    - `TODO-APPROVAL-001`: missing explicit approval text.
+    - `TODO-PEAD-DECISION-001`: unresolved PEAD starter signal.
+    - `TODO-CLEANROOM-001`: clean-room probe surface not built.
+    - `TODO-LEGACY-WRDS-001`: legacy WRDS/BvD triage/cleanup authority open.
+    - `TODO-VALIDITY-001`: V2 alpha validity packet and C3 lock missing.
+    - `TODO-PUBLIC-MAIN-001`: public/main status mismatch open.
+    - `TODO-MATRIX-001`: superseded by `ROUND-20260602-V2-D0-1-TODO-MATRIX-001-BOOKKEEPING`; V2-D0.1 permission-truth builder/override now exists, while entitlement evidence and approval text remain pending.
+  - Forbidden actions:
+    - no WRDS/provider access, credentials, probe execution, snapshots, data writes, dashboard reader, scoring/ranking, alerts, broker/order paths, SQLite, SafeBoot, BootReady, or legacy cleanup action.
+  - The Decision (Hardcoded):
+    - `V2_D0_1_FOLLOWUP_VALID := VALID iff (agreement_matrix_recorded = 1) and (real_followups_only = 1) and (todo_gaps_marked = 1) and (entitlement_only = 1) and (provider_access = 0) and (probe_execution = 0) and (snapshot_generation = 0) and (data_write = 0) and (legacy_cleanup_action = 0)`.
+
+V2-D0.1 Expert 1-6 Agreement and High-Confidence TODO Gates (2026-06-02)
+
+  - Decision record:
+    - record Expert 1-6 agreement ratings as high-confidence TODO gates without inventing missing numeric source values.
+    - keep V2-D0.1 entitlement-only: collect non-secret WRDS entitlement evidence and explicit approval text only.
+    - record Backend/Data row-level validator as PATCH_RESOLVED after tests.
+    - record Security approval-text requirement and legacy WRDS helper/quarantine risk.
+    - make Quant Research `PEAD_V2_001_BOUNDARY_PACKET` conditional after WRDS/PIT authority.
+    - record Research Validity truth: no V2 alpha is currently `research_valid`; `V2_ALPHA_VALIDITY_PACKET` template is needed.
+  - Forbidden actions:
+    - no WRDS/provider access.
+    - no probe execution.
+    - no snapshots or data writes.
+    - no dashboard reader.
+    - no scoring/ranking.
+    - no alerts or broker/order paths.
+    - no SQLite.
+    - no SafeBoot or BootReady.
+  - Contract lock:
+    - `V2_D0_1_EXPERT_TODO_GATES := VALID iff (expert_1_6_agreement_recorded = 1) and (numeric_ratings_inferred = 0) and (entitlement_only = 1) and (row_validator_patch_resolved = 1) and (security_approval_text_required = 1) and (legacy_wrds_quarantine_risk_open = 1) and (PEAD_boundary_conditional_after_WRDS_PIT = 1) and (no_v2_alpha_research_valid = 1) and (V2_ALPHA_VALIDITY_PACKET_template_needed = 1) and (provider_access = 0) and (probe_execution = 0) and (snapshot_generation = 0) and (data_write = 0) and (dashboard_reader = 0) and (ranking_scoring = 0) and (alerts_brokers = 0) and (sqlite = 0) and (safe_boot_claim = 0) and (boot_ready_claim = 0)`.
+
+V2 Alpha Factory Immediate Todo Directive Intake (2026-06-01)
+
+  - Directive record, not decision:
+    - record the user's immediate TODO-first order as idea/directive intake.
+    - first: WRDS Permission + PIT Snapshot + Provenance Layer.
+    - second: PEAD Variant Factory.
+    - third: Corporate Actions / Capital Return Edge Lab.
+    - fourth: Meta-labeling / Edge Survival Model.
+    - fifth: Orbis/BvD Private Company Network Edge.
+    - defer LLM market-news agents, DRL allocation, and live routing.
+  - Boundary:
+    - this record does not authorize WRDS/provider access, data generation, SQLite, candidate scoring/ranking, promotion, live trading, broker/order execution, alerts, recommendations, autonomous allocation, runtime behavior, or BootReady claims.
+    - SQLite remains forbidden without explicit approval.
+  - Immediate planning directive:
+    - prepare an approval-ready WRDS permission/PIT/provenance scope before any alpha-family implementation.
+  - Contract lock:
+    - `V2_ALPHA_FACTORY_DIRECTIVE := VALID iff (directive_recorded = 1) and (implementation_approval = 0) and (provider_access = 0) and (snapshot_generation = 0) and (candidate_scoring_or_ranking = 0) and (sqlite_approval = 0) and (BootReady_claim = 0)`.
+
+Harness Skill/Template Flow Recording (2026-05-30)
+
+  - Decision record:
+    - record the harness workflow as a skill/template flow, not as new runtime behavior.
+    - use `scope-selector` to choose bounded work before execution, and `expert-context-packer` to prepare compact specialist review packets.
+    - use `worker_done_contract`, `expert_reconciliation_matrix`, and `stream_contract` as reconciliation/coordination templates when workers or streams hand off work.
+    - use `harness-feedback` only for repeated workflow friction after a harness or SAW round.
+  - Boundary:
+    - this record does not create or modify templates, skills, packet scripts, truth packets, code, tests, data artifacts, or runtime behavior.
+  - Contract lock:
+    - `HARNESS_FLOW_RECORD := VALID iff (scope_selection_before_execution = 1) and (expert_context_packet_before_review = 1) and (worker_done_contract_for_handoff = 1) and (expert_reconciliation_matrix_for_findings = 1) and (stream_contract_for_cross_stream_coordination = 1) and (harness_feedback_for_repeated_friction = 1) and (runtime_behavior_change = 0)`.
+
+Governed Data Source Provenance Intake (2026-05-28)
+
+  - Decision record:
+    - keep ROUND-20260528-GOVERNED-DATA-SOURCE-PROVENANCE-INTAKE as docs-only source-provenance intake until the user approves raw/source provenance before artifact generation.
+    - use ScopeID SCOPE-APPROVE-RAW-SOURCES-BEFORE-ARTIFACT-GENERATION to separate source approval from bounded offline regeneration and boot proof.
+    - treat RuntimeBootStatus, ignored local artifacts, and dirty context as local / ignored / not commit evidence.
+  - The Decision (Hardcoded):
+    - packet path: `docs/architecture/governed_data_source_provenance_intake_20260528.md`.
+    - StartingVerdict: BLOCK.
+    - current state: GovernanceGateV0 PASS; BootStatusPathContract PASS; GovernedDataAuthorizationPacket PASS; DataSourceAcquisitionPacket PASS.
+    - blocked truth: DataReadyStrict BLOCKED_MISSING_GOVERNED_ARTIFACTS; SafeBoot false; BootReady BLOCKED.
+    - BlockingReason: strict data readiness still lacks approved source provenance, manifests, hashes, generated artifacts, and validation proof.
+    - required intake lines are prices source -> `data/processed/prices.parquet` -> `data/processed/prices_tri.parquet`; ticker/security master source -> `data/processed/tickers.parquet`; WRDS/R3000 membership source -> `data/processed/universe_r3000_daily.parquet`; Rule100 history source/generator -> `data/processed/rule100_softmax_v1_history.csv`.
+    - correct sequence is approve source provenance first; then approve bounded offline regeneration; then emit manifests and hashes; then run strict data-readiness validation; then rerun strict `--require-github`; then regenerate runtime boot status only after strict PASS.
+  - Forbidden actions:
+    - no boot_preflight.py patch.
+    - no DataReadyStrict weakening.
+    - no data/processed generation from incomplete provenance.
+    - no placeholder parquet/CSV.
+    - no runtime/boot_status_current.json edit.
+    - no ignored/local-governed data commit unless policy changes.
+    - no BootReady claim.
+  - Contract lock:
+    - `GOVERNED_DATA_SOURCE_PROVENANCE_INTAKE := VALID iff (provenance_packet_exists = 1) and (source_provenance_approval_complete = 0) and (data_generation = 0) and (runtime_status_write = 0) and (boot_preflight_patch = 0) and (DataReadyStrict = BLOCKED_MISSING_GOVERNED_ARTIFACTS) and (SafeBoot = false) and (BootReady BLOCKED)`.
+
+Governed Data Source Acquisition / Bounded Regeneration Planning (2026-05-28)
+
+  - Decision record:
+    - keep ROUND-20260528-GOVERNED-DATA-SOURCE-ACQUISITION as docs-only planning/source acquisition until the user approves either a trusted external governed bundle or source acquisition plus bounded offline regeneration.
+    - use ScopeID SCOPE-SOURCE-INPUTS-AND-GENERATORS-FOR-STRICT-DATA-READINESS to separate source inputs/generator planning from data generation.
+    - treat RuntimeBootStatus, ignored local artifacts, and dirty context as local / ignored / not commit evidence.
+  - The Decision (Hardcoded):
+    - packet path: `docs/architecture/governed_data_source_acquisition_20260528.md`.
+    - StartingVerdict: BLOCK.
+    - current state: GovernanceGateV0 PASS; BootStatusPathContract PASS; GovernedDataAuthorizationPacket PASS; StrictProof PASS / DEGRADED.
+    - blocked truth: DataReadyStrict BLOCKED_MISSING_GOVERNED_ARTIFACTS; SafeBoot false; BootReady BLOCKED.
+    - BlockingReason: required canonical data artifacts are absent/ignored/local-governed and not backed by approved source manifests or generators.
+    - required dependency order is raw prices CSV/source -> `data/processed/prices.parquet`; `prices.parquet` -> `data/processed/prices_tri.parquet`; approved ticker/security master -> `data/processed/tickers.parquet`; approved WRDS/R3000 membership -> `data/processed/universe_r3000_daily.parquet`; approved Rule100 replay/history source or generator -> `data/processed/rule100_softmax_v1_history.csv`.
+    - correct next decision is A trusted external governed bundle, B source acquisition + bounded offline regeneration planning, or C quarantine BootReady.
+    - recommended next step is B unless a trusted governed bundle already exists.
+  - Forbidden actions:
+    - no boot_preflight.py patch.
+    - no DataReadyStrict weakening.
+    - no placeholder parquet/CSV.
+    - no generation during boot.
+    - no runtime/boot_status_current.json edit.
+    - no data/processed commit unless policy changes.
+    - no BootReady claim.
+  - Contract lock:
+    - `GOVERNED_DATA_SOURCE_ACQUISITION := VALID iff (planning_packet_exists = 1) and (source_generation_approval = 0) and (data_generation = 0) and (runtime_status_write = 0) and (boot_preflight_patch = 0) and (DataReadyStrict = BLOCKED_MISSING_GOVERNED_ARTIFACTS) and (SafeBoot = false) and (BootReady BLOCKED)`.
+
+Governed Data Artifact Authorization (2026-05-28)
+
+  - Decision record:
+    - keep ROUND-20260528-GOVERNED-DATA-ARTIFACT-AUTHORIZATION advisory-only until the user approves either bounded offline regeneration or a trusted external bundle.
+    - use ScopeID SCOPE-APPROVE-INTAKE-OR-REGENERATION-FOR-STRICT-DATA-READINESS to separate authorization from execution.
+    - treat local artifacts and dirty context as not clean GitHub truth and not BootReady evidence.
+  - The Decision (Hardcoded):
+    - packet path: `docs/architecture/governed_data_artifact_authorization_20260528.md`.
+    - gate truth: GovernanceGateV0 PASS; BootStatusPathContract PASS; StrictProof PASS/degraded.
+    - blocked truth: DataReadyStrict BLOCKED_MISSING_GOVERNED_ARTIFACTS; SafeBoot false; BootReady BLOCKED.
+    - governed artifacts requiring approval are `data/processed/prices_tri.parquet`, `data/processed/prices.parquet`, `data/processed/tickers.parquet`, `data/processed/universe_r3000_daily.parquet`, and `data/processed/rule100_softmax_v1_history.csv`.
+    - recommended next step is approve bounded offline regeneration authorization or approved external bundle; otherwise quarantine BootReady.
+  - Forbidden actions:
+    - no boot_preflight.py patch.
+    - no DataReadyStrict weakening.
+    - no generation during boot.
+    - no placeholder parquet/CSV.
+    - no data/processed commit unless policy changes.
+    - no runtime/boot_status_current.json edit.
+    - no BootReady claim.
+  - Contract lock:
+    - `GOVERNED_DATA_ARTIFACT_AUTHORIZATION := VALID iff (authorization_packet_exists = 1) and (data_generation = 0) and (runtime_status_write = 0) and (boot_preflight_patch = 0) and (DataReadyStrict = BLOCKED_MISSING_GOVERNED_ARTIFACTS) and (SafeBoot = false) and (BootReady BLOCKED)`.
+
+Phase 65 Dashboard Replay Aux Weight Semantics + Stacked Timeline (2026-05-15)
+
+  - Decision record:
+    - make every replay-facing Portfolio surface display weights from the same daily selected-method replay `target_weight` truth.
+    - preserve legacy lifecycle/event/decision `weight` fields as audit metadata, not as the primary visible replay weight.
+    - replace the line-heavy Strategy Replay Timeline with a stacked step-area allocation view over replay target weights.
+  - The Decision (Hardcoded):
+    - `strategies.strategy_replay._normalize_context_frame(...)` joins context rows to replay rows by normalized `(date, ticker)` and emits replay-derived `target_weight`.
+    - dashboard saved-artifact and transitional context adapters call `_align_context_weights_to_replay(...)` before storing/rendering event and decision rows.
+    - `audit_weight` stores the original auxiliary row weight when present; `weight` is reset to replay `target_weight` for UI compatibility.
+    - `_render_replay_timeline_chart(...)` pivots replay rows to `date x ticker` and renders stacked `go.Scatter(..., stackgroup="weights", line.shape="hv")`.
+    - `_render_strategy_replay_section(...)` treats missing latest-snapshot display schema or missing event action schema as unavailable/empty UI state instead of raising.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py strategies\strategy_replay.py tests\test_dash_2_portfolio_ytd.py tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py` PASS.
+    - Targeted aux/timeline/fail-soft regressions PASS.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py -q` PASS, 80 passed.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q` PASS, 134 passed.
+  - Contract lock:
+    - `DASHBOARD_REPLAY_AUX_WEIGHT_SEMANTICS := VALID iff (timeline_weight_source = replay_df.target_weight) and (event_visible_weight_source = replay_df.target_weight) and (decision_visible_weight_source = replay_df.target_weight) and (aux_legacy_weight_preserved_as_audit = 1) and (partial_aux_schema_crash = 0) and (single_dashboard_replay_context = 1) and (second_source_render_path = 0) and (broker_or_alert = 0)`.
+
+Phase 65 Dashboard Replay Horizon Superset Cache Fix (2026-05-15)
+
+  - Decision record:
+    - reuse an already-built wider in-session daily replay when the user switches to a shorter Portfolio horizon and the wider replay is a proven superset.
+    - keep saved replay artifact acceptance exact-signature only; do not accept durable 5Y/Max artifacts for shorter windows in this UI cache fix.
+    - scope reused contexts to the selected horizon before feeding allocation snapshot, Portfolio Performance, Strategy Replay, events, and decisions.
+  - The Decision (Hardcoded):
+    - `_ensure_daily_portfolio_replay_context(...)` calls `_valid_cached_ytd_replay_context(horizon_start)` before entering the `Building daily portfolio replay source...` build path.
+    - `_valid_cached_ytd_replay_context(...)` accepts exact signatures only when actual replay rows cover all requested dates.
+    - for in-session superset reuse, `_replay_signature_without_dates(...)` must match on method, max-weight, controls, typed replay assets, sampling, and dashboard data signature.
+    - `_dashboard_context_covers_replay_dates(...)` requires requested dates to be present in both `context.replay_dates` and `context.replay_df["date"]`.
+    - `_scope_dashboard_replay_context_to_dates(...)` restricts daily replay rows to requested dates and filters event/decision context by requested date window before returning the reused context.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py tests\test_dash_2_portfolio_ytd.py` PASS.
+    - targeted superset-cache regressions PASS, 3 passed.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py -q` PASS, 56 passed.
+    - `.venv\Scripts\python -m pytest tests\test_optimizer_view.py tests\test_strategy_replay_coverage.py -q` PASS, 50 passed.
+  - Contract lock:
+    - `DASHBOARD_REPLAY_HORIZON_SUPERSET_CACHE := VALID iff (ensure_checks_cache_before_build = 1) and (signature_without_dates_match = 1) and (actual_replay_rows_cover_requested_dates = 1) and (scoped_context_returned = 1) and (saved_artifact_exact_signature_required = 1) and (provider_ingestion = 0) and (canonical_write = 0) and (broker_or_alert = 0)`.
+
+Phase 65 Max Replay Timeline Sampling Fix (2026-05-15)
+
+  - Decision record:
+    - keep Strategy Replay timeline sampling as a display-only transform over daily replay rows.
+    - normalize grouped weekly keep-dates through the pandas Series `.dt` accessor so max-window replay does not crash after weekly grouping.
+  - The Decision (Hardcoded):
+    - `_sample_replay_timeline_from_daily(...)` builds unique normalized daily dates from replay rows.
+    - when the daily date count is above the display threshold, it keeps the last date per `(ISO year, ISO week)` plus the final daily replay date.
+    - grouped weekly dates use `pd.to_datetime(...).dropna().dt.normalize()`, not `Series.normalize()`.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py tests\test_dash_2_portfolio_ytd.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py::test_dash_2_weekly_sampling_normalizes_grouped_dates_for_max_replay tests\test_dash_2_portfolio_ytd.py::test_dash_2_weekly_sampling_is_display_only_from_daily_replay -q` PASS, 2 passed.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py -q` PASS, 53 passed.
+  - Contract lock:
+    - `MAX_REPLAY_TIMELINE_SAMPLING := VALID iff (weekly_dates_from_daily_rows = 1) and (series_dt_normalize = 1) and (final_daily_date_retained = 1) and (sampled_replay_request = 0) and (portfolio_performance_from_sample = 0) and (provider_ingestion = 0) and (canonical_write = 0) and (broker_or_alert = 0)`.
+
+Phase 65 Dashboard Batched Replay Runtime Fix (2026-05-15)
+
+  - Decision record:
+    - keep Portfolio replay scoped to the selected UI horizon rather than silently building five years for YTD.
+    - replace the transitional dashboard replay hot path's per-date full PIT input reload with one batched PIT source load per selected date window.
+    - keep signed replay asset identity as the only asset filter after the batched source load.
+  - The Decision (Hardcoded):
+    - `_build_dashboard_replay_request(...)` derives `replay_dates` from `horizon_start`; YTD starts at January 1 of the current year.
+    - `_build_dashboard_strategy_replay_context(...)` calls `_load_dashboard_batched_pit_replay_data_cached(...)` and `build_batched_pit_input_loader(...)` before `build_selected_method_replay(...)`.
+    - `_filter_dashboard_replay_inputs_to_assets(...)` filters batched R3000 PIT input frames back to `request.replay_assets`.
+    - saved artifacts still require exact dashboard cache signatures; a five-year superset artifact is not accepted for shorter windows without future reader/subset policy.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py -q` PASS, 89 passed.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay_coverage.py -q` PASS, 12 passed.
+    - Streamlit readiness `http://127.0.0.1:8509` PASS, HTTP 200.
+  - Contract lock:
+    - `DASHBOARD_BATCHED_REPLAY_RUNTIME := VALID iff (selected_horizon_dates = 1) and (ytd_five_year_date_request = 0) and (batched_pit_source_load = 1) and (signed_asset_filter_after_batch = 1) and (saved_artifact_exact_signature_required = 1) and (provider_ingestion = 0) and (canonical_write = 0) and (broker_or_alert = 0)`.
+
+Phase 65 Portfolio Single-Source Replay Page (2026-05-14)
+
+  - Decision record:
+    - make Portfolio & Allocation a single daily replay-source page for replay-facing evidence.
+    - replace ambiguous top optimizer allocation output with the latest daily replay snapshot.
+    - remove duplicate Trade Event Log table while preserving ENTER/EXIT event visualization and Buy/Sell Decision Log.
+  - The Decision (Hardcoded):
+    - `/portfolio-and-allocation` builds one daily `DashboardReplayContext` before rendering replay-facing surfaces.
+    - Portfolio Performance only compounds daily `portfolio_return` from that context; sampled replay, optimizer weights, local weighted prices, live weighted prices, and equal-weight local paths are not fallback evidence for the replay-facing performance curve.
+    - Strategy Replay Timeline may sample only as a display transform over daily replay rows; no weekly/sampled replay request can become a second source.
+    - top allocation display is `Allocation (Latest Daily Replay Snapshot)` from `DashboardReplayContext.latest_snapshot`.
+    - optimizer view is controls-only in this page flow; it can set method, max weight, risk-free rate, and universe, but does not render a separate allocation evidence panel.
+    - Portfolio Performance, allocation snapshot, Strategy Replay Timeline, ENTER/EXIT Events, Latest Buys/Sells, and Buy/Sell Decision Log share `run_id`, `source_id`, `method_id`, and `date_window`.
+    - Latest Buys/Sells is a filtered view of `bundle.decision_rows`; no separate latest-trades loader/cache/fallback is allowed in the render path.
+    - missing aux rows render empty/unavailable, not fallback rows.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py views\optimizer_view.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_policy_target_timeline_apptest.py tests\test_position_lifecycle.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_policy_target_timeline_apptest.py tests\test_position_lifecycle.py tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py -q` PASS, 178 passed.
+    - Streamlit readiness smoke `http://127.0.0.1:8526/portfolio-and-allocation` PASS, HTTP 200.
+  - Contract lock:
+    - `PORTFOLIO_SINGLE_SOURCE_REPLAY_PAGE := VALID iff (daily_dashboard_replay_context = 1) and (performance_from_daily_portfolio_return = 1) and (optimizer_performance_fallback = 0) and (sampled_replay_build = 0) and (timeline_sampling_from_daily_rows = 1) and (allocation_from_latest_replay_snapshot = 1) and (latest_buys_sells_from_decision_rows = 1) and (direct_render_path_trade_jsonl_reads = 0) and (shared_run_source_method_window = 1) and (broker_or_alert = 0)`.
+
+Phase 65 Saved Selected-Method Replay Artifact Reader + Budget (2026-05-14)
+
+  - Decision record:
+    - consume saved selected-method replay artifacts only when parquet and manifest validate as one fresh bundle.
+    - make performance budgets explicit for both cold build and rerun/cache reads.
+    - fail closed on stale or over-budget replay evidence instead of carrying forward prior selected-method weights.
+  - The Decision (Hardcoded):
+    - `read_selected_method_replay_artifact(...)` returns `SelectedMethodReplayResult`; `available=False` means downstream callers must treat replay evidence as unavailable and not reuse prior output.
+    - `ReplayBudgetPolicy(cold_start_max_seconds, rerun_cache_max_seconds, max_rows, max_dates, max_elapsed_ms)` is the backend budget contract.
+    - saved artifact reads validate `run_id`, `source_id`, `method_id`, `artifact_type`, `row_count`, `row_counts`, `status_counts`, `date_window`, `input_signatures`, `controls_signature`, `timing`, schema, and parquet/manifest agreement.
+    - top-level manifest `run_id`, `source_id`, and `method_id` must be non-empty strings after trimming; blank manifest identity fails before optional caller expected ids can be omitted.
+    - stale method/control/date/input-signature/source-file-signature/schema/manifest mismatches are rejected before a replay bundle can be returned.
+    - DataFrame controls carry deterministic content hashes so same-shape/date Rule100 candidate-frame edits invalidate saved replay artifacts.
+    - parquet rows must exactly match manifest identity fields (`artifact_scope`, `run_id`, `source_id`, `method`, `row_type`) with no null/blank identity tolerance.
+    - malformed timing is invalid unless both manifest and run metadata include finite non-negative `elapsed_ms`.
+    - `build_selected_method_replay_with_budget(...)` wraps the existing builder without changing `build_selected_method_replay(...)` semantics or `REPLAY_COLUMNS`.
+    - the selected-method output CLI uses the budget wrapper and exposes row/date/elapsed budget flags.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile strategies\strategy_replay.py scripts\build_strategy_replay_artifact.py tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay_artifact.py::test_read_selected_method_replay_artifact_rejects_blank_manifest_identity_without_expected_ids -q` PASS, 3 passed.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py -q --durations=12` PASS, 79 passed.
+  - Contract lock:
+    - `SELECTED_REPLAY_ARTIFACT_READER := VALID iff (bundle_manifest_parquet_validation = 1) and (method_controls_dates_signatures_match = 1) and (source_file_signatures_match_when_supplied = 1) and (budget_policy_enforced = 1) and (over_budget_available = 0) and (stale_carry_forward = 0) and (replay_columns_preserved = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0) and (broker_or_alert = 0)`.
+
+Phase 65 Portfolio Market-Data Freshness Endpoint Cache (2026-05-14)
+
+  - Decision record:
+    - keep the per-asset fail-closed freshness contract, but compute endpoint freshness once per loaded `prices_wide` signature and pass the result downstream.
+    - avoid repeated full-matrix endpoint scans in dashboard portfolio YTD, optimizer selected-price prep/default ordering, and optimizer universe eligibility.
+  - The Decision (Hardcoded):
+    - `PriceEndpointFreshness` stores `latest_by_column`, `required_latest`, column count, and row count.
+    - `dashboard.py` caches the snapshot with unified source file signatures, loader arguments, and matrix shape.
+    - `views.optimizer_view` accepts the snapshot for default ordering and selected-price prep.
+    - `strategies.portfolio_universe.build_optimizer_universe(...)` accepts the snapshot for required endpoint and per-column endpoint checks.
+    - weighted portfolio YTD requires all positive-weight assets to be present in the price frame before computing returns, including live fallback frames.
+    - replay-derived latest weights are used only when their replay signature matches the current latest-date method, cap, assets, and data signature.
+    - cached full replay/YTD contexts are used only when their replay signature matches the current full-horizon method, cap, assets, data, replay dates, and sampling signature.
+  - Evidence:
+    - Actual local matrix `(2857, 2000)`: snapshot `0.2966s`, legacy loop `0.9555s`, endpoint maps matched exactly, 50 downstream snapshot lookups `0.001531s`.
+    - `.venv\Scripts\python -m py_compile core\data_orchestrator.py dashboard.py views\optimizer_view.py strategies\portfolio_universe.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_optimizer_view.py tests\test_portfolio_universe.py tests\test_dash_2_portfolio_ytd.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_optimizer_view.py tests\test_portfolio_universe.py -q` PASS, 113 passed.
+  - Contract lock:
+    - `PRICE_ENDPOINT_CACHE := VALID iff (one_snapshot_per_loaded_prices_signature = 1) and (per_column_endpoints_reused_downstream = 1) and (required_latest_reused_downstream = 1) and (all_positive_weight_assets_present = 1) and (replay_latest_weights_signature_bound = 1) and (full_ytd_replay_context_signature_bound = 1) and (fail_closed_stale_assets_preserved = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0)`.
+
+Phase 65 Portfolio Market-Data Freshness Fail-Closed Fix (2026-05-14)
+
+  - Decision record:
+    - treat market-data freshness as a per-asset endpoint contract across Portfolio & Allocation.
+    - fail closed on stale ragged columns instead of using shared matrix max dates, forward-filled stale legs, or partial overlay cache output as current evidence.
+    - keep live overlays display-only and non-canonical.
+  - The Decision (Hardcoded):
+    - `endpoint_i = max(valid_positive_price_date_i)`.
+    - `fresh_i(required_endpoint, tolerance_days) = endpoint_i is present and ((required_endpoint is absent) or ((required_endpoint - endpoint_i).days <= tolerance_days))`.
+    - strict display freshness uses `tolerance_days = 0`; optimizer universe eligibility must pass `OptimizerUniversePolicy.max_endpoint_staleness_days` explicitly.
+    - endpoint/tolerance detection lives in `core.data_orchestrator`; `strategies.portfolio_universe` must not reimplement private endpoint freshness helpers.
+    - scaled live overlays require same-column local/live overlap; no-overlap scaling from first live to last stale local is not allocation or benchmark evidence.
+    - scaled-overlay cache stores only overlap-anchored results; there is no permissive no-overlap evidence mode.
+    - benchmark YTD drops stale benchmark tickers that cannot be live-overlaid and reports a common endpoint for remaining curves.
+    - portfolio YTD local fallback returns unavailable when any nonzero weighted leg is stale at the required endpoint.
+    - optimizer selected-price prep drops stale assets before optimization; default ordering demotes stale endpoint assets.
+    - optimizer universe eligibility checks endpoint freshness in addition to history observation count.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile core\data_orchestrator.py dashboard.py views\optimizer_view.py strategies\portfolio_universe.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py --disable-warnings` PASS, 112 passed after SAW rerun reconciliation.
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_replay_non_cash_closed.py -q` PASS, 171 passed.
+  - Contract lock:
+    - `MARKET_DATA_FRESHNESS_FAIL_CLOSED := VALID iff (per_asset_endpoint = 1) and (benchmark_shared_endpoint = 1) and (stale_benchmark_drop = 1) and (weighted_portfolio_stale_leg_unavailable = 1) and (optimizer_selected_stale_drop = 1) and (universe_endpoint_gate = 1) and (canonical_provider_ingestion = 0) and (broker_call = 0) and (ranking = 0) and (scoring = 0)`.
+Phase 65 Dashboard Backend Bundle Integration Verification (2026-05-14)
+
+  - Decision record:
+    - close the stale open risk that dashboard replay still bypasses the backend selected-method bundle.
+    - treat `dashboard.py::_build_dashboard_strategy_replay_context(...)` as the verified transitional dashboard consumer of `build_selected_method_replay(...)`.
+    - keep saved artifact-reader consumption and explicit cold-start/rerun performance budget as separate future work.
+  - The Decision (Hardcoded):
+    - dashboard selected-method replay must call `build_selected_method_replay(...)` through the dashboard context builder.
+    - dashboard replay must pass a per-date PIT `input_loader` that loads `end_date=as_of_date` and `universe_mode="r3000_pit"`.
+    - source mode remains `transitional_build` until a saved artifact-reader path is separately approved.
+    - no provider ingestion, live trading, alerts, rankings, recommendations, candidate scoring, autonomous allocation, or promotion claim is authorized.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py strategies\strategy_replay.py core\data_orchestrator.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay_artifact.py tests\test_strategy_replay.py tests\test_replay_non_cash_closed.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q` PASS.
+    - `.venv\Scripts\python -m pytest -q` PASS.
+    - Streamlit readiness smoke `http://127.0.0.1:8520/portfolio-and-allocation` PASS, HTTP 200.
+  - Open risk:
+    - saved artifact-reader consumption and explicit cold-start/rerun performance-budget enforcement remain future architecture work.
+
+Phase 65 Replay Coverage Contract Audit Fix (2026-05-14)
+
+  - Decision record:
+    - resolve the SAW audit BLOCK findings for the v6 selected-method replay coverage contract through implementation first, not threshold-only relaxation.
+    - preserve specific coverage failure reasons in replay rows and metadata so PM/planner context can distinguish membership gaps, missing priced members, and candidate coverage boundaries.
+    - treat uncovered-date routing as a batch emission problem; per-date DataFrame/performance/concat work is rejected for daily-scale replay windows.
+    - accept a deterministic inverse-volatility optimizer fast path only when the closed-form inverse-vol target already satisfies the approved max-weight cap.
+  - The Decision (Hardcoded):
+    - uncovered replay dates must emit `input_unavailable:<coverage_reason>`.
+    - `date_window["coverage_segments"]` is part of selected-method replay metadata.
+    - daily-scale all-uncovered routing must stay below the Windows-safe 10s budget without calling the input loader or optimizer, including row-heavy `no_priced_members` windows.
+    - the 4-asset 5Y monthly covered path remains below the 5s budget after the small-frame performance path and inverse-vol fast path.
+    - replay performance uses next-tradable-return alignment; same-date close returns are not credited to weights generated from that same close.
+    - loader-based replay performance is attached once after raw rows are combined so `portfolio_equity` is run-level continuous.
+    - context bootstrap selection treats current truth surfaces with complete New Context Packets as fresher than older same-phase handovers.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay_coverage.py -q` PASS, 11 passed.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay_coverage.py -q --durations=12` PASS; 4-asset 5Y 3.93s, row-heavy no-priced-members daily-scale 3.77s, CASH-only daily-scale 0.72s.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_replay_non_cash_closed.py tests\test_strategy_replay_coverage.py tests\test_optimizer_core_policy.py -q` PASS, 68 passed.
+    - `.venv\Scripts\python -m pytest -q` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_build_context_packet.py -q` covers current-truth selection and drift validation.
+    - Formal SAW Implementer and Reviewer A/B/C rechecks PASS.
+  - Open risk:
+    - dashboard backend-bundle consumption was verified later on 2026-05-14; this audit fix itself does not authorize provider ingestion, live trading, alerts, rankings, recommendations, candidate scoring, or promotion claims.
+
+Phase 65 Selected-Method Replay Source Evidence Handoff (2026-05-13)
+
+  - Decision record:
+    - record the combined backend + dashboard implementation truth for the urgent ultra-modular replay slice.
+    - treat the selected-method replay source invariant as implemented for focused backend and dashboard paths, but not as full milestone closure.
+    - durable saved replay-output artifact/run-id support now exists; dashboard backend-bundle consumption was verified on 2026-05-14, while saved artifact-reader consumption remains future work.
+  - The Decision (Hardcoded):
+    - `build_selected_method_replay(...)` is the backend bundle API for selected-method replay evidence.
+    - `write_selected_method_replay_artifact_atomic(...)` persists selected-method replay output as display-only parquet plus manifest with `run_id`, `source_id`, `method_id`, input signatures, date window, row/status counts, and timing.
+    - selected-method replay output writes are rollback-safe at the bundle level: parquet and manifest are both staged before promotion, and manifest promotion failure rolls back parquet promotion.
+    - `DashboardReplayContext` is the dashboard bundle for Strategy Replay rows, latest snapshot, ENTER/EXIT annotations, and Buy/Sell Decision Log rows.
+    - Portfolio Performance may use `YTD`, `1Y`, `3Y`, `5Y`, or `Max` display horizons, but each replay date still requires PIT input loading with `end_date=as_of_date` and `universe_mode="r3000_pit"`.
+    - Buy/Sell Decision Log defaults to latest trades first and remains replay-audit-only, not live orders or trade signals.
+    - missing/stale/failed replay dates must emit explicit `cash_closed` or unavailable state; stale carry-forward is invalid.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile strategies\strategy_replay.py dashboard.py tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_replay_non_cash_closed.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay_artifact.py -q` PASS, 16 passed.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_replay_non_cash_closed.py -q` PASS, 21 passed.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q` PASS, 89 passed.
+  - Open risk:
+    - full regression/runtime smoke and dashboard backend-bundle consumption were verified on 2026-05-14; saved artifact-reader consumption and explicit cold-start/rerun performance budget remain future work.
+
+Phase 65 Backend Shared Selected-Method Replay Source (2026-05-13)
+
+  - Decision record:
+    - add a backend bundle API for selected-method replay instead of creating a parallel replay engine.
+    - keep `build_strategy_replay(...)` as the one target-weight frame source for Rule of 100 and optimizer methods.
+    - attach event annotations and buy/sell decision context through typed optional frames, with explicit empty status when context is unavailable.
+  - The Decision (Hardcoded):
+    - `build_selected_method_replay(...)` returns `StrategyReplayBundle` with `replay`, `event_context`, and `decision_context`.
+    - replay rows include target weights, `CASH`, cap metadata, source/status/reason, and per-date performance fields.
+    - YTD/performance consumers can derive returns from replay rows via `portfolio_return` and `portfolio_equity`, without reading optimizer session weights separately.
+    - missing or failed dates remain `cash_closed`; stale weights may not be carried forward.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py -q` PASS, 27 passed.
+    - `.venv\Scripts\python -m pytest tests\test_replay_non_cash_closed.py -q` PASS, 2 passed.
+  - Open risk:
+    - the later dashboard source-guard tests now pass against `_build_dashboard_strategy_replay_context()`; saved artifact-reader consumption remains future work.
+
+Phase 65 Visible Rule100 / QQQ / Buy-Sell Replay Audit (2026-05-13)
+
+  - Decision record:
+    - close the focused visible Portfolio & Allocation patch as implemented after runtime audit.
+    - keep the buy/sell decision tape visible before heavy forward-walk replay computation so audit context is not blocked by replay cold-start cost.
+    - move the next architecture step to the urgent ultra-modular replay milestone.
+  - The Decision (Hardcoded):
+    - default optimizer method is `Rule of 100`.
+    - default optimizer asset ordering uses trailing 1-year return, not YTD.
+    - benchmark YTD displays both SPY and QQQ; stale local benchmark series may render as partial curves but may not be forward-filled into fresh-looking future dates.
+    - `Buy/Sell Decision Log` remains replay/audit context only and must not be interpreted as live orders or trade signals.
+  - Evidence:
+    - focused pytest for YTD, optimizer view, portfolio universe, policy timeline, and lifecycle renderers passed.
+    - browser DOM audit on `http://localhost:8509/` showed `Rule of 100`, `SPY +11.07%`, `QQQ +15.50%`, and `Buy/Sell Decision Log (29 trades, replay audit only)` with `BUY 16` / `SELL 13`.
+  - Open risk:
+    - full YTD forward-walk replay cold-start cost remains a performance target for the ultra-modular replay architecture milestone.
+
+Phase 65 Urgent Ultra-Modular Replay Architecture Milestone Note (2026-05-13)
+
+  - Decision record:
+    - keep the current work focused on visible Portfolio & Allocation fixes: default method, QQQ/YTD freshness, Rule100 visible sizing parity, and stale benchmark handling.
+    - queue a separate urgent ultra-modular replay architecture milestone after those visible fixes.
+    - define the replay milestone as an AI auto-research loop that proposes, replays, annotates, compares, and saves evidence for human review.
+    - explicitly reject interpreting the loop as an unchecked optimizer, autonomous allocator, broker, live-trading system, ranking engine, or recommendation engine.
+  - The Decision (Hardcoded):
+    - target architecture contract is exactly: one replay engine, one strategy plug-in contract, one daily portfolio output format, one event/annotation format, one YTD/performance path, and one saved evidence artifact.
+    - every replay input must prove PIT row-date validity and PIT universe membership for each replay date.
+    - stale/missing replay inputs must fail closed with explicit status, not forward-fill into fresh-looking evidence.
+    - promotion claims require delta metrics against the latest baseline in the same window, same costs, and same `engine.run_simulation` path.
+    - no replay output may authorize broker calls, live trading, alerts, rankings, recommendations, or unchecked optimization.
+  - Acceptance lock:
+    - `ULTRA_MODULAR_REPLAY_ARCHITECTURE_READY := VALID iff (default_method_visible_fix_verified = 1) and (qqq_ytd_visible_fix_verified = 1) and (rule100_ui_replay_sizing_tests_pass = 1) and (frozen_rule100_audit_defaults_unchanged = 1) and (single_replay_engine_contract_documented = 1) and (strategy_plugin_contract_documented = 1) and (daily_portfolio_output_contract_documented = 1) and (event_annotation_contract_documented = 1) and (single_performance_path_documented = 1) and (saved_evidence_artifact_contract_documented = 1) and (broker_live_trading = 0)`.
+
+Phase 65 Rule100 Dynamic UI/Replay Sizing + Benchmark Stale Overlay (2026-05-13)
+
+  - Decision record:
+    - keep the frozen Rule100 softmax audit defaults stable and do not rewrite `rule100_softmax_v1_history.csv` as a 35% UI-policy artifact.
+    - add an explicit dynamic UI/replay helper, `rule100_config_from_max_weight(max_weight)`, for visible Rule of 100 allocation and Strategy Replay.
+    - make direct Rule of 100 UI allocation and Strategy Replay use the same max-weight-derived Rule100 config.
+    - make benchmark YTD fallback stale-aware per ticker so local SPY can remain local while stale/missing QQQ attempts live overlay.
+  - The Decision (Hardcoded):
+    - `Rule100SoftmaxConfig()` stays audit-default: `gross_budget_per_name=0.10`, `max_single_name_weight=0.15`.
+    - `rule100_config_from_max_weight(0.35)` produces UI/replay semantics with `max_single_name_weight=0.35`, `gross_budget_per_name=0.35`, and `gross_budget_cap=1.0`.
+    - Direct UI Rule100 allocation and `strategies.strategy_replay._build_rule100_weights_for_date(...)` call the dynamic helper; history/audit callers remain default unless explicitly passed a labeled config.
+    - `core.data_orchestrator.build_benchmark_equity_from_prices(...)` attempts live overlay only for stale/missing benchmark tickers and drops stale benchmark columns that cannot be refreshed.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile core\data_orchestrator.py strategies\rule100_softmax.py strategies\strategy_replay.py views\optimizer_view.py dashboard.py tests\test_rule100_softmax.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_rule100_softmax.py tests\test_strategy_replay.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py -q` PASS, 83 passed.
+    - `.venv\Scripts\python -m pytest tests\test_rule100_softmax.py tests\test_rule100_softmax_v1_1.py tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q` PASS, 151 passed.
+  - Contract lock:
+    - `RULE100_VISIBLE_SIZING := VALID iff (audit_default_budget_per_name = 0.10) and (ui_replay_budget_per_name = controls.max_weight) and (ui_replay_cap = controls.max_weight) and (direct_ui_weights = strategy_replay_weights) and (history_artifact_rewrite = 0)`.
+    - `BENCHMARK_YTD_FRESHNESS := VALID iff (local_history_first = 1) and (stale_detection_per_ticker = 1) and (live_overlay_scope = stale_tickers_only) and (stale_column_forward_fill_without_live_attempt = 0) and (canonical_market_data_write = 0)`.
+
+Phase 65 Data/PIT Strategy Replay Hardening + UI Wiring (2026-05-13)
+
+  - Decision record:
+    - fix the audit BLOCK by making the public cache-signature helper PIT-safe by default and reject non-`r3000_pit` universe modes at that boundary.
+    - keep repo-local display-only strategy replay artifacts confined to `data/runtime_cache/strategy_replay`, even when callers provide a custom `cache_dir`.
+    - wire dashboard Strategy Replay to consume per-date `StrategyReplayInputs` from `load_strategy_replay_inputs(...)` instead of raw global `prices_wide` slices.
+    - keep replay input artifacts as price/return matrix inputs; actual target-weight replay output remains owned by `strategies.strategy_replay.build_strategy_replay(...)`.
+  - The Decision (Hardcoded):
+    - `build_strategy_replay_cache_signature(..., universe_mode="r3000_pit")` is the only accepted cache-signature mode.
+    - `_validate_strategy_replay_artifact_path(...)` rejects repo `data/` outputs outside `data/runtime_cache/strategy_replay` and rejects `cache_dir` values such as `data/processed`.
+    - `dashboard.py::_load_dashboard_strategy_replay_inputs_cached(...)` calls `load_strategy_replay_inputs(..., end_date=as_of_date, universe_mode="r3000_pit")`.
+    - `dashboard.py::_render_strategy_replay_section(...)` calls `build_strategy_replay(..., prices=replay_inputs, as_of_range=None)` per replay date and concatenates target-weight output.
+    - Empty PIT selected-asset slices and per-date PIT input exceptions emit explicit `cash_closed` CASH rows instead of dropping the date or aborting the full replay section.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile core\data_orchestrator.py dashboard.py strategies\strategy_replay.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q` PASS, 93 passed.
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py tests\test_dash_1_page_registry_shell.py tests\test_dash_2_portfolio_ytd.py tests\test_portfolio_universe.py tests\test_pinned_universe.py -q` PASS, 179 passed.
+  - Contract lock:
+    - `DATA_PIT_REPLAY_UI_WIRING := VALID iff (signature_universe_default = r3000_pit) and (signature_rejects_non_pit = 1) and (repo_data_artifact_root = data/runtime_cache/strategy_replay) and (dashboard_replay_inputs_per_date = StrategyReplayInputs) and (raw_prices_wide_replay = 0) and (empty_pit_dates_emit_cash_closed = 1) and (target_weights_built_by_build_strategy_replay = 1) and (provider_call = 0) and (canonical_market_data_write = 0)`.
+
 Part 1: Master Decision Log
 
 | ID   | Component  | The Friction Point          | The Decision (Hardcoded)       | Rationale                                                |
@@ -132,6 +854,11 @@ Part 1: Master Decision Log
 | D-156 | data/feature-store bootstrap safety | Manifest bootstrap relied on partition file mtime ranking when pointer lineage was missing, creating non-deterministic state reconstruction risk | Remove mtime winner heuristic and raise `AmbiguousFeatureStoreStateError` for existing partitioned stores without verifiable v2 lineage; allow unsealed bootstrap only for same-process full-rebuild handoff | Enforces Jidoka fail-loud semantics and prevents silent state drift from filesystem timestamp inference. |
 | D-157 | data/feature-store tombstone governance | Tombstone retention/prioritization contracts were declared but not fully enforced on read acceptance | Enforce tombstone schema (`retained_until_utc` required) and block scans when active files overlap tombstoned files (`tombstone_priority` hard gate), with adversarial tests | Physically blocks zombie-read windows and aligns reader behavior to strict tombstone-over-cache invariants. |
 | D-158 | release/mlops container determinism | Existing runtime image lock was present but lacked a strict orchestrator-focused draft with deterministic snapshot apt policy and explicit OS package pins | Add `Dockerfile.orchestrator.strict` draft using digest-pinned base, fixed Debian snapshot source, version-pinned runtime libs, and SHA-256 lock-artifact verification before dependency install | Establishes an immutable artifact baseline for orchestrator deployment hardening and prepares Stream 4 deterministic release promotion path. |
+| D-159 | rule100 sizing / audit | Softmax v1 was being shaped as a second full stack and Kelly had no thin shared comparator harness | Split pure softmax v1 sizing into `strategies/rule100_softmax.py`, keep Kelly comparator-only, and add a single replay/audit runner in `scripts/rule100_softmax_v1_audit.py` with focused tests | Keeps softmax as the primary sizing path, preserves explicit cash residual, and makes Kelly a narrow ablation instead of a second policy stack. |
+| D-160 | rule100 ui sizing source | The live Rule of 100 page still displayed lifecycle `last_weight` despite softmax v1 artifacts existing | Route the explicit `Rule of 100` UI branch to `softmax_v1_weights(...)`, store `portfolio_allocation_state.source=rule100_softmax_v1`, and fail closed to cash for all-ineligible candidates | Makes the visible method consume the primary softmax path; current target is AMAT 10%, LRCX 10%, TSM 0%, CASH 80%, while Kelly remains artifact-only comparator. |
+| D-161 | rule100 history audit | Position Lifecycle Replay history still implied stale 10% sizing because it displayed only the v0 event `weight` column | Add `data/processed/rule100_softmax_v1_history.csv` as a PIT softmax v1 target-weight overlay and render it beside immutable `Event Weight` in the dashboard transaction log | Preserves replay audit truth while making v1 target sizing visible in history; current TSM shows event weight 10%, softmax target 0%, and cash 80%. |
+| D-162 | rule100 softmax versioning | All eligible BUY rows produce identical score (0.25) because v1 uses binary `factor_positive_count` and `technical_quality`; equal score + budget 0.10×N yields uniform 10% sizing with no differentiation | Freeze v1 as the ordinal audit baseline (binary inputs, equal-weight proof). Open v1.1 as a separate research-only continuous-input line without mutating the frozen baseline. The early draft contract is superseded by D-163 for artifact set, factor coverage, and shrinkage details. | Clean audit trail: v1 proves the softmax allocation pipe works end-to-end; v1.1 proves differentiated sizing without silently mutating the frozen baseline. Replay chart fix (D-161) changes displayed/active target-weight source only; it does not alter v1 scoring. |
+| D-163 | rule100 softmax v1.1 contract correction | v1.1 artifact and scoring details drifted: stale `rule100_softmax_v1_1_history.csv` remained on disk, factor coverage counted raw columns, missing factor strength filled toward 0.0, and AppTest coverage used copied mini-apps | Supersede D-162 implementation details for v1.1: active artifacts are only `rule100_softmax_v1_1_comparison.csv` and `rule100_softmax_v1_1_summary.json`; retire stale history; count one value per approved factor group; shrink missing factor strength toward neutral `0.50`; capture real `AppTest.from_file("dashboard.py")` Policy Target Timeline proof | v1 remains frozen/runtime; v1.1 remains research-only. Current comparison shows AMAT/LRCX/TSM `factor_present_count=4`, no active v1.1 history CSV, and real dashboard TSM 2026-05-11 target 0%, event 10%, cash 80%. |
 
 Part 2: Decision Rationale (Phase 4 — Optimizer)
 
@@ -5616,9 +6343,10 @@ Phase 65 Dashboard Scanner Testability Hardening (2026-05-11)
     - `tests/test_scanner.py` is the scanner formula guardrail; `tests/test_process_utils.py` remains the process-liveness guardrail.
     - no scanner semantics, provider authority, candidate-card state, ranking/scoring policy, alert, broker behavior, or dashboard redesign is approved by this round.
   - Evidence:
-    - `.venv\Scripts\python -m pytest tests\test_scanner.py tests\test_strategy.py tests\test_phase15_integration.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\test_process_utils.py -q` PASS, 46 passed.
+    - `.venv\Scripts\python -m pytest tests\test_scanner.py tests\test_strategy.py tests\test_phase15_integration.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\test_process_utils.py -q` PASS, 49 passed.
     - `.venv\Scripts\python -m py_compile strategies\scanner.py dashboard.py tests\test_scanner.py tests\test_strategy.py tests\test_adaptive_trend.py tests\test_production_config.py tests\test_core_etl.py tests\conftest.py` PASS.
     - `.venv\Scripts\python -m pytest -q` PASS.
+    - SAW Reviewer C rerun PASS after latest invalid credit denominator reconciliation.
     - `tests/pytest_out.txt` refreshed with the current full-suite PASS summary.
   - Contract lock:
     - `DASHBOARD_SCANNER_TESTABILITY_HARDENING := VALID iff (scanner_math_owner = strategies/scanner.py) and (dashboard_provider_boundary_preserved = 1) and (scanner_boundary_tests = 1) and (process_guardrail_still_passing = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0) and (ranking_policy_change = 0) and (alert_or_broker = 0)`.
@@ -5727,6 +6455,331 @@ Phase 65 Dashboard Unified Data Cache Performance Fix (2026-05-11)
   - Contract lock:
     - `DASHBOARD_UNIFIED_DATA_CACHE := VALID iff (streamlit_cache_resource = 1) and (cache_key_includes_loader_args = 1) and (cache_key_includes_source_parquet_signature = 1) and (source_parquet_rewrite_invalidates = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0)`.
 
+Phase 65 Portfolio Lifecycle Current Holds Fix (2026-05-11)
+
+  - Decision record:
+    - make Position Lifecycle Replay the authority for current open holdings on Portfolio & Allocation.
+    - if lifecycle replay is not sell-all, the current allocation must not render as 100% cash only because today's scanner has no fresh PIT ENTER candidates.
+    - ignore future-dated replay rows when reconstructing current holdings.
+    - preserve residual cash when current holdings sum below 100%.
+  - The Decision (Hardcoded):
+    - `data.portfolio_lifecycle_log.get_open_lifecycle_positions(...)` reconstructs open positions from latest ENTER/EXIT events with `event_date <= as_of`.
+    - `append_lifecycle_event(...)` writes lifecycle JSONL through lock + temp + `os.replace`, and malformed JSONL rows fail closed with a visible error.
+    - `strategies.portfolio_universe.load_current_position_memory(...)` prefers lifecycle replay state over stale JSON position memory when replay evidence exists.
+    - `strategies.portfolio_universe.map_permno_weights_to_ticker_weights(...)` preserves residual cash in live ticker YTD weights unless mapped weights exceed 100%.
+    - `build_optimizer_universe(...)` includes open lifecycle holdings as `included_current_hold`, even when today's scanner label is EXIT/KILL; only lifecycle EXIT closes the position.
+    - `views.optimizer_view.render_optimizer_view(...)` renders lifecycle holds plus residual cash when no fresh PIT ENTER candidate exists.
+    - `dashboard._current_optimizer_weights(...)` preserves residual cash by normalizing only when stored weights exceed 100%.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile data\portfolio_lifecycle_log.py strategies\portfolio_universe.py views\optimizer_view.py dashboard.py tests\test_position_lifecycle.py tests\test_portfolio_universe.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_position_lifecycle.py tests\test_portfolio_universe.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py -q` PASS, 58 passed.
+    - `.venv\Scripts\python -m pytest -q` PASS.
+    - Browser smoke `http://127.0.0.1:8509/portfolio-and-allocation` PASS: Universe Audit included lifecycle holds and the residual-cash message rendered.
+    - Local lifecycle replay currently reconstructs open holdings for `AMAT`, `AVGO`, and `TSLA`, so the page should not treat the current portfolio as sell-all cash.
+  - Contract lock:
+    - `PORTFOLIO_LIFECYCLE_CURRENT_HOLDS := VALID iff (latest_event_as_of_now = ENTER => included_current_hold) and (future_lifecycle_rows_ignored = 1) and (malformed_lifecycle_rows_fail_closed = 1) and (lifecycle_append_temp_replace = 1) and (lifecycle_sell_all_overrides_stale_json = 1) and (no_fresh_PIT_ENTER_with_open_holds_renders_hold_plus_cash = 1) and (current_hold_cash_residual_preserved = 1) and (live_ytd_cash_residual_preserved = 1) and (provider_ingestion = 0) and (broker_call = 0)`.
+
+Phase 65 Lifecycle Replay Churn + Weight Policy (2026-05-12)
+
+  - Decision record:
+    - fix the immediate 4% stale-weight bug by sizing replay ENTER events from a max-10 portfolio budget, not from the full replay ticker universe.
+    - fix frequent lifecycle churn by adding entry confirmation, minimum hold, exit confirmation, hard-exit override, and post-exit cooldown state.
+    - use the Rule-of-100 four-factor idea only as a PIT lifecycle confirmation layer over current feature-store columns.
+    - do not reopen the rejected Phase 54 Rule-of-100 core sleeve and do not add ranking, scoring, promotion, broker, alert, or optimizer objective behavior.
+  - The Decision (Hardcoded):
+    - `scripts.pit_lifecycle_replay.replay_entry_weight()` returns `round(1 / DEFAULT_MAX_POSITIONS, 4)` with `DEFAULT_MAX_POSITIONS = 10`.
+    - lifecycle confirmation uses `z_demand`, `z_moat`, `z_inventory_quality_proxy`, and `z_discipline_cond`; at least 3 must be present and positive.
+    - `emit_enter = raw_enter and lifecycle_factor_confirmed and entry_streak >= 3 and not reentry_cooldown_active`.
+    - `emit_exit = (dist_sma20 > 0.20) or ((dist_sma20 > 0.12 or trend_veto) and hold_days >= 20 and exit_streak >= 2)`.
+    - `reentry_cooldown_active = trade_date < last_exit_date + 10 calendar days`.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile scripts\pit_lifecycle_replay.py tests\test_pinned_universe.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_pinned_universe.py tests\test_position_lifecycle.py tests\test_portfolio_universe.py tests\test_optimizer_view.py -q` PASS, 91 passed.
+    - Replay evidence: `docs/context/e2e_evidence/portfolio_lifecycle_log_pre_dropin_20260512.jsonl` = 103 events with `0.04` ENTER weights; `docs/context/e2e_evidence/dropin_lifecycle_replay_tmp.jsonl` = 69 events with `0.10` ENTER weights; `docs/context/e2e_evidence/optimal_lifecycle_replay_tmp.jsonl` = 33 events with `0.10` ENTER weights, no `<=5` day round trips, and current open holds `AMAT`, `LRCX`, `TSM`.
+  - Contract lock:
+    - `LIFECYCLE_REPLAY_CHURN_WEIGHT_POLICY := VALID iff (entry_weight = round(1/10,4)) and (raw_enter = pit_gate) and (lifecycle_factor_confirmed = at_least_3_of_4_present_positive) and (entry_streak >= 3) and (min_hold_days = 20) and (exit_confirm_days = 2) and (hard_exit_dist_sma20 = 0.20) and (reentry_cooldown_days = 10) and (phase54_rule100_sleeve_reopened = 0) and (ranking = 0) and (scoring = 0) and (broker_call = 0)`.
+
+Phase 65 Urgent Ultra-Modular Replay Architecture Enforcement (2026-05-13)
+
+  - Decision record:
+    - enforce the selected-method replay-source invariant as the next architecture milestone gate.
+    - for any selected method, YTD, current allocation/latest snapshot, Strategy Replay, ENTER/EXIT annotations, Buy/Sell Decision Log, and saved evidence must come from one replay run/source.
+    - distinguish the architecture goal from temporary transitional bridges; bridges may preserve UI continuity but are non-canonical and cannot become a second replay stack.
+  - The Decision (Hardcoded):
+    - `SELECTED_METHOD_REPLAY_SOURCE := VALID iff (one_run_source = 1) and (feeds_ytd = 1) and (feeds_latest_allocation = 1) and (feeds_strategy_replay = 1) and (feeds_annotations = 1) and (feeds_buy_sell_decision_log = 1) and (feeds_saved_evidence = 1)`.
+    - `TRANSITIONAL_BRIDGE := ALLOWED iff (labeled_transitional = 1) and (bounded_source = 1) and (canonical_evidence_claim = 0) and (second_replay_stack = 0)`.
+    - failed, stale, partial, over-budget, or non-PIT replay dates must emit unavailable/cash-closed state; stale-data carry-forward is invalid.
+    - improvement claims require same-window, same-cost, same-engine deltas vs latest C3 baseline plus saved replay evidence.
+  - Evidence:
+    - Docs-only Worker 3 update; no code files changed.
+    - `docs/phase_brief/phase65-brief.md`
+    - `docs/context/done_checklist_current.md`
+    - `docs/context/bridge_contract_current.md`
+    - `docs/context/planner_packet_current.md`
+    - `docs/context/impact_packet_current.md`
+    - `docs/context/multi_stream_contract_current.md`
+    - `docs/context/observability_pack_current.md`
+    - `docs/saw_reports/saw_ultra_modular_replay_architecture_note_20260513.md`
+  - Contract lock:
+    - `ULTRA_MODULAR_REPLAY_MILESTONE := BLOCK until (shared_replay_source = 1) and (selected_method_adapters = 1) and (shared_ytd_performance = 1) and (shared_latest_snapshot = 1) and (shared_annotation_source = 1) and (shared_decision_log_source = 1) and (saved_evidence_artifact = 1) and (performance_budget = 1)`.
+    - `FORBIDDEN := broker/live_trading OR alert OR ranking OR recommendation OR candidate_score OR autonomous_allocation OR fake_improvement OR overfit_promotion OR future_data_leak OR stale_carry_forward`.
+
+Phase 65 Portfolio YTD Price/Return Slot Fix (2026-05-12)
+
+  - Decision record:
+    - fix the source of the visible `+7645112.18%` portfolio return by restoring the correct price/return assignment in `core.data_orchestrator._load_historical_data`.
+    - prefer local TRI history for Portfolio YTD and SPY/QQQ benchmark curves; use live yfinance only as fallback when local history is unavailable.
+  - The Decision (Hardcoded):
+    - `load_dashboard_data(...)` returns `(returns_wide, prices_wide, macro, ticker_map, fundamentals_wide)`.
+    - `UnifiedDataPackage.prices` must hold positive TRI/price levels; `UnifiedDataPackage.returns` must hold daily return values.
+    - Portfolio YTD computes `pct_change` only on price/TRI levels and preserves residual cash when weights sum below 100%.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_portfolio_universe.py -q` PASS, 57 passed.
+    - Direct current-hold calculation on local TRI gives `+14.252580373698297%` YTD from `2026-01-02` to `2026-05-11`.
+    - Browser smoke on `http://127.0.0.1:8509/portfolio-and-allocation` shows Portfolio `+14.25%`, SPY/QQQ traces, January chart start, and no `7645112.18%`.
+  - Contract lock:
+    - `PORTFOLIO_YTD_PRICE_RETURN_SLOT := VALID iff (package.prices = price_levels) and (package.returns = daily_returns) and (portfolio_ytd_uses_local_history_first = 1) and (benchmark_ytd_uses_local_history_first = 1) and (residual_cash_preserved = 1)`.
+
+Phase 65 Frontend/UI Saved Replay Source Selector (2026-05-14)
+
+  - Decision record:
+    - Portfolio & Allocation now chooses one replay context through a source selector.
+    - prefer a valid saved selected-method replay artifact when backend and dashboard signatures both match.
+    - use the transitional backend build only as a labeled fallback while saved artifacts without dashboard cache signatures are unavailable/stale for UI consumption.
+    - stale saved artifacts must clear replay/YTD session state and cannot reuse prior latest weights.
+  - The Decision (Hardcoded):
+    - `_build_dashboard_replay_request(...)` is the pure request constructor for method, cap, controls, assets, dates, sampling, and data signature.
+    - `_read_dashboard_saved_replay_artifact(...)` calls `strategies.strategy_replay.read_selected_method_replay_artifact(...)`.
+    - `dashboard_cache_signature` binds `method`, `max_weight`, controls, `replay_assets`, `replay_dates`, `sampling`, and dashboard data signature.
+    - `_dashboard_context_from_artifact_read(...)` and `_dashboard_context_from_backend_bundle(...)` adapt saved/backend sources into one `DashboardReplayContext`.
+    - `_render_strategy_replay_section()` labels source as saved artifact, transitional build, or saved artifact unavailable.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py::test_dash_2_dashboard_replay_context_prefers_valid_saved_artifact tests\test_dash_2_portfolio_ytd.py::test_dash_2_stale_saved_artifact_clears_replay_state_when_no_fallback tests\test_optimizer_view.py::test_dashboard_replay_request_constructor_is_pure tests\test_optimizer_view.py::test_dashboard_strategy_replay_calls_build_strategy_replay -q` PASS, 4 passed.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py tests\test_position_lifecycle.py tests\test_policy_target_timeline_apptest.py -q` PASS, 105 passed.
+  - Contract lock:
+    - `FRONTEND_REPLAY_SOURCE_SELECTOR := VALID iff (pure_request_constructor = 1) and (valid_saved_artifact_preferred = 1) and (saved_artifact_empty_aux_rows_preserved = 1) and (transitional_build_labeled = 1) and (stale_artifact_clears_replay_ytd_state = 1) and (dashboard_cache_signature_binds_method_cap_assets_dates_data = 1) and (single_DashboardReplayContext_feeds_ytd_snapshot_rows_events_decisions = 1) and (direct_render_lifecycle_jsonl_read = 0) and (direct_render_buy_sell_jsonl_read = 0)`.
+  - Repair addendum:
+    - `_dashboard_context_from_artifact_read(...)` must not fill empty saved artifact event/decision rows from separately loaded dashboard fallback frames.
+    - `test_dash_2_saved_artifact_context_preserves_empty_event_and_decision_rows` covers daily saved rows with empty saved aux rows and non-empty fallback frames.
+    - focused frontend suite now passes with 106 tests, and the SAW report is mirrored at `docs/saw_reports/saw_frontend_ui_saved_replay_source_selector_20260514.md`.
+
+Phase 65 Lifecycle Decision Export (2026-05-12)
+
+  - Decision record:
+    - export a PIT-safe buy/sell/hold/no-action decision tape before implementing the true Rule-of-100 lifecycle policy.
+    - keep export mode side-effect safe: generating the decision tape must not append duplicate ENTER/EXIT rows to the runtime lifecycle log.
+    - keep BUY/SELL as replay-analysis labels only; they do not authorize broker orders, alerts, recommendations, ranking, scoring, dashboard action-label changes, provider ingestion, or canonical writes.
+  - The Decision (Hardcoded):
+    - `scripts.pit_lifecycle_replay.export_lifecycle_decision_log(...)` writes the full daily decision tape.
+    - `scripts.pit_lifecycle_replay.build_lifecycle_decision_audit(...)` summarizes action counts, reason counts, open holds, round trips, and audit flags.
+    - `BUY` rows must match replay `ENTER` events; `SELL` rows must match replay `EXIT` events.
+    - Rule-of-100 audit fields use explicit current proxies: demand=`z_demand`, supply=`z_inventory_quality_proxy`, pricing=`z_moat`, margin=`z_discipline_cond`.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile scripts\pit_lifecycle_replay.py tests\test_pinned_universe.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_pinned_universe.py -q` PASS, 34 passed.
+    - Export run PASS: `data/portfolio_lifecycle_decision_log.jsonl` has 5424 rows; `data/portfolio_lifecycle_buy_sell_log.jsonl` has 33 rows (18 BUY / 15 SELL), open AMAT/LRCX/TSM, and no `<=5` day round trips.
+  - Contract lock:
+    - `LIFECYCLE_DECISION_EXPORT := VALID iff (export_only_mutates_event_log = 0) and (buy_rows_match_enter_events = 1) and (sell_rows_match_exit_events = 1) and (reason_codes_present = 1) and (rule100_proxy_sources_explicit = 1) and (broker_call = 0) and (alert = 0) and (ranking = 0) and (scoring = 0) and (provider_ingestion = 0) and (canonical_write = 0)`.
+
+Phase 65 Rule100 Lifecycle Policy v0 (2026-05-12)
+
+  - Decision record:
+    - promote the concrete lifecycle replay strategy to Rule100 Lifecycle Policy v0.
+    - do not build a generic strategy replay/audit contract before a second concrete strategy exists.
+    - keep TRIM and TIGHTEN as audit-only lifecycle actions in v0; they do not change portfolio weights.
+    - use conviction sizing at entry while preserving dashboard-compatible ENTER/EXIT runtime events.
+  - The Decision (Hardcoded):
+    - `Rule100State` maps demand=`z_demand`, supply=`z_inventory_quality_proxy`, pricing=`z_moat`, margin=`z_discipline_cond`, with explicit provenance.
+    - `BUY = FLAT + 3/4 Rule100 factors + technical entry zone + 3-day confirmation + no cooldown`.
+    - `HOLD = HELD + at least 2/4 Rule100 factors intact`.
+    - `TIGHTEN = HELD + fewer than 2/4 factors intact`; audit-only.
+    - `TRIM = HELD + 12%-20% stretch above SMA20`; audit-only, suggested delta `-0.025`.
+    - `EXIT = HELD + hard stop >20% stretch OR confirmed trend veto`.
+    - `target_weight = min(0.10 + 0.025 * max(0, factor_positive_count - 3), 0.15)`.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile scripts\pit_lifecycle_replay.py tests\test_pinned_universe.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_pinned_universe.py -q` PASS, 36 passed.
+    - `.venv\Scripts\python -m pytest tests\test_position_lifecycle.py tests\test_portfolio_universe.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py -q` PASS, 61 passed.
+    - `.venv\Scripts\python -m pytest -q` PASS.
+    - Runtime HTTP smoke at `http://127.0.0.1:8509/portfolio-and-allocation` PASS after Streamlit restart.
+    - V0 runtime replay PASS: 29 events, 16 ENTER, 13 EXIT, open AMAT/LRCX/TSM.
+    - V0 audit PASS: BUY=16, SELL=13, HOLD=739, TRIM=55, TIGHTEN=257, NO_ACTION=4344, trade_event_delta=-4 vs baseline.
+  - Contract lock:
+    - `RULE100_LIFECYCLE_POLICY_V0 := VALID iff (rule100_state_proxy_provenance = 1) and (buy_requires_3_of_4 = 1) and (hold_tolerates_2_of_4 = 1) and (trim_tighten_audit_only = 1) and (exit_requires_hard_stop_or_confirmed_trend_veto = 1) and (entry_weight = min(0.10 + 0.025 * max(0, positives - 3), 0.15)) and (generic_strategy_contract = 0) and (phase54_sleeve_reopen = 0) and (broker_call = 0) and (alert = 0) and (ranking = 0) and (scoring = 0)`.
+
+Phase 65 Dashboard Replay Horizon-Aware Asset Universe Fix (2026-05-15)
+
+  - Decision record:
+    - keep current allocation scoped to the signed current `PortfolioReplaySelection`.
+    - widen only the replay bundle universe so selected-horizon trade history is not shrunk to current positive holds.
+    - preserve strict backend context normalization rather than displaying out-of-bundle lifecycle rows.
+  - The Decision (Hardcoded):
+    - `DashboardReplayRequest.replay_assets = current signed assets + mapped ENTER/EXIT tickers in replay window + mapped BUY/SELL tickers in replay window + mapped Rule100 history tickers in replay window`.
+    - `DashboardReplayRequest.allocation_assets = current signed PortfolioReplaySelection assets`.
+    - selected PIT loading, per-date input filtering, and coverage pre-gate unavailable row emission use `allocation_assets`, not widened context assets.
+    - history-only replay assets are appended after backend bundle construction as zero-weight `context_only` rows for strict event/decision normalization.
+    - replay cache signatures bind both `replay_assets` and `allocation_assets`.
+    - `_current_full_replay_signature(...)` computes the same horizon-aware replay asset union as `_build_dashboard_replay_request(...)`.
+    - `_current_replay_assets_key()` continues to expose only the signed current selection.
+    - MU can be flat in the latest allocation while retained in 1Y replay decisions when MU BUY/SELL rows fall inside the selected replay window.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py tests\test_dash_2_portfolio_ytd.py` PASS.
+    - Targeted MU/context/coverage/cache regressions PASS, 4 passed.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py -q` PASS, 61 passed.
+    - `.venv\Scripts\python -m pytest tests\test_optimizer_view.py tests\test_strategy_replay.py tests\test_strategy_replay_coverage.py -q` PASS, 71 passed.
+  - Contract lock:
+    - `DASHBOARD_REPLAY_HORIZON_ASSET_UNIVERSE := VALID iff (current_selection_unchanged = 1) and (allocation_assets_current_only = 1) and (replay_assets_horizon_union = 1) and (signature_binds_allocation_assets = 1) and (history_assets_context_only_zero_weight = 1) and (coverage_pregate_filtered_to_allocation_assets = 1) and (mu_history_retained_when_in_window = 1) and (mu_current_positive_weight_forced = 0) and (normalize_context_loosened = 0) and (split_source_history_panel = 0) and (provider_ingestion = 0) and (canonical_write = 0) and (ranking = 0) and (scoring = 0) and (broker_call = 0)`.
+
+Phase 65 Replay Selected Price Loading + MU/SNDK Eligibility Trace (2026-05-15)
+
+  - Decision record:
+    - keep dashboard replay optimization focused on full PIT membership proof plus selected-asset price/return loading.
+    - add MU/SNDK eligibility trace as separate strategy/data diagnostics, not as a replay performance input.
+    - explicitly reject watchlist-only replay as a shortcut because it would hide PIT membership and gate failures.
+  - The Decision (Hardcoded):
+    - `load_batched_pit_replay_data(..., selected_permnos=...)` builds full-window `r3000_pit` membership first, then loads prices only for `selected_permnos ∩ PIT membership union`.
+    - dashboard passes `_numeric_replay_permnos(request.replay_assets)` into the batched PIT loader.
+    - `trace_thesis_ticker_eligibility(("MU", "SNDK"), ...)` reports pinned-universe presence, ticker-map permno, PIT membership, local price/return rows, Rule100 history presence, sizing eligibility, current-hold state, and final failed gate.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile core\data_orchestrator.py dashboard.py scripts\pit_lifecycle_replay.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_optimizer_view.py tests\test_pinned_universe.py` PASS.
+    - Focused selected-loader/diagnostic regressions PASS, including non-finite return rejection and executable selected-permno dashboard handoff.
+    - Affected data/optimizer/pinned/replay/dashboard guard suite PASS, 112 passed.
+    - Local selected-load probe: 27 PIT members proved, 2 selected price columns loaded, 89 trading dates, refreshed elapsed 0.5015s.
+    - MU/SNDK trace evidence: `docs/context/e2e_evidence/replay_selected_price_loading_mu_sndk_trace_20260515.json`.
+    - SAW Reviewer C high finding reconciled: non-finite `total_ret` no longer counts as valid local price/return evidence.
+  - Contract lock:
+    - `REPLAY_SELECTED_PRICE_LOADING_TRACE := VALID iff (full_pit_membership_index = 1) and (price_load_scope = selected_pit_membership_intersection) and (watchlist_only_replay = 0) and (mu_sndk_trace_hot_path_dependency = 0) and (pinned_map_pit_price_rule100_gate_trace = 1) and (provider_ingestion = 0) and (canonical_write = 0) and (ranking = 0) and (scoring = 0) and (broker_call = 0)`.
+
+Phase 65 Portfolio Replay Selection Identity Hardening (2026-05-15)
+
+  - Decision record:
+    - introduce explicit `PortfolioReplaySelection` state for the Portfolio replay universe handoff.
+    - require dashboard replay requests to validate the signed selection before building saved-artifact or transitional replay context.
+    - remove hidden `optimizer_universe` and first-10 price-column fallback as replay asset sources.
+    - keep transitional aux row loading in dashboard as an open backend producer follow-up tied to `dashboard_cache_signature` emission.
+  - The Decision (Hardcoded):
+    - `portfolio_replay_selection` is the only optimizer-control replay universe handoff.
+    - `selection_signature = f(version, method, max_weight, risk_free_rate, typed_replay_assets, price_frame_identity_with_selected_price_hash)`.
+    - `_build_dashboard_replay_request(...)` returns `portfolio_replay_selection_unavailable` when selection is missing, stale, or mismatched.
+    - optimizer builder errors clear both `portfolio_replay_selection` and replay/YTD session caches.
+    - `optimizer_universe` cannot drive replay identity.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py views\optimizer_view.py tests\test_dash_2_portfolio_ytd.py tests\test_optimizer_view.py` PASS.
+    - Focused replay-selection/advisory regressions PASS, 6 passed.
+    - Focused optimizer-selection AppTests PASS, 6 passed.
+  - Contract lock:
+    - `PORTFOLIO_REPLAY_SELECTION_IDENTITY := VALID iff (explicit_selection_state = 1) and (selected_price_hash_bound = 1) and (typed_asset_identity = 1) and (first_10_fallback = 0) and (optimizer_universe_replay_source = 0) and (builder_error_clears_selection = 1) and (aux_backend_followup_recorded = 1) and (broker_call = 0) and (alert = 0) and (ranking = 0) and (scoring = 0)`.
+
+Phase 65 Rule of 100 Method Label (2026-05-12)
+
+  - Decision record:
+    - label the Portfolio Optimizer `Method` dropdown option exactly `Rule of 100`.
+    - bind that label to the current Rule100 lifecycle allocation path, not to a new optimizer objective.
+    - preserve residual cash from current lifecycle holdings.
+  - The Decision (Hardcoded):
+    - `OptimizationMethod.RULE_OF_100.value == "Rule of 100"`.
+    - `OptimizationMethod.RULE_OF_100` is included in `OPTIMIZATION_METHOD_OPTIONS`.
+    - selecting `Rule of 100` in `views.optimizer_view.render_optimizer_view(...)` renders current lifecycle holdings and returns before `_run_optimizer_cached(...)`.
+    - empty lifecycle state under this method renders cash-only session state.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile strategies\optimizer.py views\optimizer_view.py tests\test_optimizer_view.py tests\test_portfolio_universe.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_optimizer_view.py tests\test_portfolio_universe.py -q` PASS, 25 passed.
+    - Browser smoke `http://127.0.0.1:8509/portfolio-and-allocation` PASS; Method dropdown options include `Rule of 100`.
+  - Contract lock:
+    - `RULE_OF_100_METHOD_LABEL := VALID iff (dropdown_label = "Rule of 100") and (registry_option = 1) and (mean_variance_method = 0) and (lifecycle_holds_plus_cash = 1) and (cached_optimizer_called = 0) and (new_optimizer_objective = 0) and (ranking = 0) and (scoring = 0) and (broker_call = 0)`.
+
+Phase 65 Portfolio Allocation State Split + Route Smoke (2026-05-12)
+
+  - Decision record:
+    - separate optimizer output, cash-only fallback, and lifecycle replay output into an explicit dashboard allocation state object instead of relying only on legacy session keys.
+    - keep the visible Portfolio & Allocation page as the default Streamlit page and route `/portfolio-and-allocation` through the explicit page url path.
+    - keep the Rule of 100 path as non-optimizer output; after D-160 it uses Rule100 softmax v1 target weights over lifecycle holds, not lifecycle `last_weight`.
+  - The Decision (Hardcoded):
+    - `portfolio_allocation_state.mode` is one of `optimizer`, `cash_only`, `current_hold_replay`, or `rule_of_100_replay`.
+    - `portfolio_allocation_state.source` is `optimizer` for optimizer output and `lifecycle_replay` for replay output.
+    - `portfolio_allocation_state.weights` mirrors the active allocation weights while legacy keys (`optimizer_weights`, `optimizer_cash_only`, `optimizer_price_latest_date`) stay available for compatibility.
+    - `views.page_registry.build_dashboard_navigation(...)` keeps `Portfolio & Allocation` as the default page and assigns its explicit `url_path` to `portfolio-and-allocation`.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py views\optimizer_view.py views\page_registry.py tests\test_optimizer_view.py tests\test_dash_1_page_registry_shell.py tests\test_dash_2_portfolio_ytd.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_1_page_registry_shell.py tests\test_optimizer_view.py tests\test_dash_2_portfolio_ytd.py tests\test_portfolio_universe.py -q` PASS.
+    - `AppTest.from_file("dashboard.py")` with `query_params["page"]="portfolio-and-allocation"` passed with no exception and rendered the Portfolio page plus current-hold replay output.
+  - Contract lock:
+    - `PORTFOLIO_ALLOCATION_STATE_SPLIT := VALID iff (state_mode ∈ {optimizer, cash_only, current_hold_replay, rule_of_100_replay}) and (legacy_mirrors_present = 1) and (portfolio_route_default = 1) and (portfolio_url_path = portfolio-and-allocation) and (optimizer_output != replay_output) and (rule100_path = rule100_softmax_v1_non_optimizer_output)`.
+
+Phase 65 Frontend/UI Shared Replay Bundle (2026-05-13)
+
+  - Decision record:
+    - rewire the dashboard Strategy Replay surfaces to consume one selected-method `DashboardReplayContext`.
+    - make latest snapshot and Portfolio YTD prefer the selected-method replay snapshot before legacy optimizer allocation state.
+    - keep cheap Buy/Sell audit display before the heavy replay loop, but source it from the shared replay context.
+  - The Decision (Hardcoded):
+    - `DashboardReplayContext` includes `replay_df`, `latest_snapshot`, `event_annotations`, and `buy_sell_decisions`.
+    - `_render_strategy_replay_section()` calls `_build_dashboard_strategy_replay_context(...)` and passes that context into `_render_buy_sell_decision_log(context)`.
+    - `_render_strategy_replay_section()` does not call `read_lifecycle_log()` and does not read `data/portfolio_lifecycle_buy_sell_log.jsonl` directly.
+    - `_prime_strategy_replay_latest_snapshot_for_ytd()` runs before `_render_portfolio_ytd_chart()` so YTD can share selected-method replay weights.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile dashboard.py tests\test_dash_2_portfolio_ytd.py tests\test_policy_target_timeline_apptest.py tests\test_position_lifecycle.py tests\test_optimizer_view.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_2_portfolio_ytd.py tests\test_policy_target_timeline_apptest.py tests\test_position_lifecycle.py tests\test_optimizer_view.py -q` PASS, 89 passed.
+  - Contract lock:
+    - `FRONTEND_SHARED_REPLAY_BUNDLE := VALID iff (one_selected_method_context = 1) and (latest_snapshot_from_context = 1) and (ytd_prefers_replay_snapshot = 1) and (enter_exit_from_context = 1) and (buy_sell_from_context = 1) and (direct_surface_jsonl_read = 0) and (direct_surface_lifecycle_read = 0) and (backend_replay_artifact_followup_recorded = 1)`.
+
+Phase 65 Optimizer History Diagnostics Split (2026-05-15)
+
+  - Decision record:
+    - keep `insufficient_history` as the backend fail-closed optimizer universe gate.
+    - split the visible Portfolio Optimizer diagnostics into `Missing History` and `Stale Endpoint`.
+    - expose `Latest Price Date` in Universe Audit rows so stale endpoints do not look like short local history.
+  - The Decision (Hardcoded):
+    - `optimizer_universe_health_summary(...)` returns `missing_history` and `stale_endpoint` counts.
+    - `_render_universe_audit(...)` renders `Missing History` and `Stale Endpoint` metrics.
+    - `_render_allocation_explanation(...)` uses split labels and does not use `Price-history failures`.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile views\optimizer_view.py strategies\portfolio_universe.py tests\test_optimizer_view.py tests\test_portfolio_universe.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_portfolio_universe.py tests\test_optimizer_view.py -q` PASS, 62 passed.
+  - Contract lock:
+    - `OPTIMIZER_HISTORY_DIAGNOSTIC_SPLIT := VALID iff (stale_endpoint_rows_remain_ineligible = 1) and (missing_history_label_visible = 1) and (stale_endpoint_label_visible = 1) and (latest_price_date_visible = 1) and (provider_ingestion = 0) and (canonical_market_data_write = 0)`.
+
+Phase 65 Portfolio Replay Role Contract (2026-05-15)
+
+  - Decision record:
+    - make replay exposure truth mechanically distinguishable from lifecycle audit intent using explicit role columns.
+    - make strategy replay the owner of aux context normalization and dashboard a caller of that shared contract.
+    - keep diagnostics as post-processing over the visible `DashboardReplayContext`, not a second replay build.
+  - The Decision (Hardcoded):
+    - `REPLAY_COLUMNS`, `REPLAY_CONTEXT_COLUMNS`, and `SELECTED_METHOD_REPLAY_ARTIFACT_COLUMNS` include `context_role` / `row_role`.
+    - `context_role` values distinguish current holdings, historical context rows, flat replay rows, cash, and unavailable rows.
+    - legacy selected-method artifacts without role columns hydrate default roles on read; unrelated schema drift remains `schema_mismatch`.
+    - Dashboard latest snapshot labels replay exposure as `Replay Weight`; allocation snapshot labels latest exposure as `Current Weight`.
+    - Diagnostic artifact generation records replay identity and cache-signature hash from the same rendered context.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile strategies\strategy_replay.py dashboard.py tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_dash_2_portfolio_ytd.py tests\test_dash_1_page_registry_shell.py tests\test_policy_target_timeline_apptest.py` PASS.
+    - Targeted role/compat/diagnostic hardening regressions PASS, 3 passed after SAW Reviewer C suggestions.
+    - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py tests\test_dash_2_portfolio_ytd.py tests\test_dash_1_page_registry_shell.py tests\test_policy_target_timeline_apptest.py -q` PASS, 169 passed.
+    - SAW Implementer and Reviewer A/B/C PASS.
+  - Contract lock:
+    - `PORTFOLIO_REPLAY_ROLE_CONTRACT := VALID iff (context_role_schema = 1) and (row_role_schema = 1) and (strategy_replay_normalizer_owner = 1) and (dashboard_private_normalizer = 0) and (legacy_artifact_roles_hydrate = 1) and (diagnostics_from_dashboard_context = 1) and (diagnostic_replay_rebuild = 0)`.
+
+Phase 65 Data/PIT Strategy Replay Artifact (2026-05-12)
+
+  - Decision record:
+    - provide local-first replay input artifacts for full forward-walk strategy replay without provider calls or canonical market-data writes.
+    - use local `prices_tri.parquet` when available, with TRI levels as the price matrix and `total_ret` as the return matrix.
+    - require `r3000_pit` membership for replay input generation; row slicing alone is not enough PIT protection.
+    - keep persisted outputs display-only under `data/runtime_cache/strategy_replay`.
+  - The Decision (Hardcoded):
+    - `core.data_orchestrator.load_strategy_replay_inputs(...)` returns `StrategyReplayInputs` with `prices`, `returns`, `ticker_map`, `cache_signature`, `cache_key`, and metadata.
+    - replay matrix slices clamp dates to `date <= min(end_date, as_of_date)`.
+    - `build_strategy_replay_cache_signature(...)` includes source file signatures, method, controls, date range, as-of date, `max_weight`, `top_n`, `start_year`, and `universe_mode`.
+    - `write_strategy_replay_artifact_atomic(...)` rejects repo `data/` output paths outside the configured runtime cache, pre-serializes manifest JSON, and uses temp files plus `os.replace`.
+    - artifacts store compact wide `matrix=price` / `matrix=return` rows; ticker labels live in the manifest map.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_data_orchestrator_portfolio_runtime.py tests\test_strategy_replay_artifact.py -q` PASS, 22 passed.
+    - `.venv\Scripts\python -m py_compile core\data_orchestrator.py scripts\build_strategy_replay_artifact.py tests\test_data_orchestrator_portfolio_runtime.py tests\test_strategy_replay_artifact.py` PASS.
+    - `docs/saw_reports/saw_data_pit_strategy_replay_artifact_20260512.md` records initial SAW blockers and local reconciliation; post-fix independent recheck is blocked by account usage limit.
+  - Contract lock:
+    - `DATA_PIT_STRATEGY_REPLAY_ARTIFACT := VALID iff (local_prices_tri_source = 1) and (replay_universe_mode = r3000_pit) and (future_rows_excluded = 1) and (provider_call = 0) and (canonical_market_data_write = 0) and (cache_key_tracks_source_method_controls_dates_max_weight = 1) and (artifact_path_confined_to_runtime_cache = 1) and (atomic_temp_replace = 1)`.
+
 Phase 65 Research Validity Runner v0 (2026-05-26)
 
   - Decision record:
@@ -5747,3 +6800,422 @@ Phase 65 Research Validity Runner v0 (2026-05-26)
     - `.venv\Scripts\python -m pytest tests\test_strategy_replay.py tests\test_strategy_replay_artifact.py tests\test_strategy_replay_coverage.py tests\test_position_lifecycle.py tests\test_pinned_universe.py tests\test_portfolio_universe.py tests\test_optimizer_core_policy.py -q` PASS, 186 passed.
   - Contract lock:
     - `RESEARCH_VALIDITY_RUNNER_V0 := VALID iff (closed_status_vocab = 1) and (canonical_engine_wrapper = 1) and (strict_missing_returns_forced = 1) and (cash_column_forbidden = 1) and (implicit_cash_residual = 1) and (full_calendar_target_weights = 1) and (run_id_path_confined = 1) and (evidence_writes_atomic = 1) and (final_manifest_last = 1) and (pit_equal_weight_benchmark_same_engine = 1) and (rule100_adapter_diagnostic_only = 1) and (replay_equity_authority = 0) and (provider_ingestion = 0) and (canonical_market_data_write = 0) and (ranking = 0) and (scoring = 0) and (broker_call = 0)`.
+
+BOOT-0A Shared Boot Status Contract (2026-05-26)
+
+  - Decision record:
+    - reconcile the living boot preflight with a shared `core.boot_status` contract instead of replacing `scripts/boot_preflight.py`.
+    - keep `core.data_readiness_gate` as the data authority and make `core.boot_status` the verdict/schema authority.
+    - move the canonical generated status artifact to `runtime/boot_status_current.json` and treat `docs/context/boot_status_current.json` only as a noncanonical context snapshot path.
+    - keep `dashboard.py`, `views/page_registry.py`, `dashboard_preflight.py`, and Command Center work out of BOOT-0A.
+  - The Decision (Hardcoded):
+    - `BootStatus` derives `ready`, `degraded`, or `blocked` from typed readiness checks.
+    - `local_planning`, `boot_candidate`, and `safe_boot` are flags, not separate primary verdicts.
+    - data readiness `PASS/WARN/FAIL` maps to `ready/degraded/blocked`.
+    - missing or invalid boot-status artifacts load as `blocked`.
+    - strict default runs boot-control tests, the Portfolio route smoke, and `current_context.first_command` unless `--no-tests` is passed.
+    - `--require-github` blocks non-identical status writes; the safe-boot flow is write first, commit/push, then read-only GitHub proof.
+    - focused commands must parse as `python -m pytest`, run without `shell=True`, reject shell metacharacters, and use bounded timeouts.
+    - `--require-github` performs a final post-run Git proof so a gate cannot mutate the worktree and still claim read-only GitHub alignment.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_boot_status_contract.py tests\test_boot_preflight.py tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py tests\test_boot_preflight_governance.py -q` PASS, 108 passed.
+    - `.venv\Scripts\python -m py_compile core\boot_status.py core\data_readiness_gate.py scripts\boot_preflight.py scripts\run_data_readiness_gate.py scripts\governance_preflight.py tests\test_boot_status_contract.py tests\test_boot_preflight.py tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py tests\test_boot_preflight_governance.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_dash_1_page_registry_shell.py::test_dash_1_portfolio_allocation_route_renders_without_overlay -q` PASS.
+    - `.venv\Scripts\python scripts\governance_preflight.py --json` PASS, zero findings.
+    - Temp-repo probe wrote `runtime/boot_status_current.json`, did not write `docs/context/boot_status_current.json`, and produced a fail-closed `blocked` artifact when context/data were absent.
+  - Contract lock:
+    - `BOOT_0A_SHARED_STATUS := VALID iff (boot_status_contract_owner = core.boot_status) and (data_readiness_owner = core.data_readiness_gate) and (canonical_status_path = runtime/boot_status_current.json) and (docs_context_status_fallback = 0) and (missing_artifact_blocked = 1) and (invalid_artifact_blocked = 1) and (strict_data_fail_blocked = 1) and (strict_route_smoke_default = 1) and (strict_focused_command_default = 1) and (focused_command_shell = 0) and (focused_command_allowlisted_pytest = 1) and (strict_gate_timeouts = 1) and (require_github_status_mutation = 0) and (require_github_postrun_git_proof = 1) and (dashboard_route_change = 0) and (command_center_added = 0)`.
+
+Boot Status Path Contract + Governance Scanner Integration (2026-05-26)
+
+  - Decision record:
+    - choose exactly one canonical boot-status path for runtime/safe-boot truth: `runtime/boot_status_current.json`.
+    - treat `docs/context/boot_status_current.json` as a noncanonical docs/context snapshot path only; delete stale snapshots rather than letting them masquerade as current runtime truth.
+    - integrate Governance Gate v0 directly into `scripts/boot_preflight.py --repo-root` so GOV-000 can prove root application instead of artifact-only presence.
+    - keep data-readiness, dashboard smoke, replay/optimizer certification, and GitHub clean safe-boot proof out of this narrow path-contract repair.
+  - The Decision (Hardcoded):
+    - `core.boot_status._resolve_boot_status_target(...)` allows only `runtime/boot_status_current.json`.
+    - `core.boot_status.load_boot_status_fail_closed()` reads the runtime canonical path only when no explicit path is supplied and does not fall back to docs/context.
+    - `scripts.boot_preflight.BOOT_CONTROL_TEST_COMMAND` includes `tests/test_boot_preflight_governance.py`.
+    - `scripts.boot_preflight.build_status(...)` records `checks["governance"]` and fails closed on governance `FAIL`.
+    - strict `--write-status` writes only after PASS and only to the runtime path.
+  - Evidence:
+    - `.venv\Scripts\python -c "from core import boot_status as b; from scripts import boot_preflight as p; import core.data_readiness_gate as d; ..."` -> runtime path sentinel PASS.
+    - `.venv\Scripts\python scripts\governance_preflight.py --repo-root . --json` PASS, zero findings.
+    - `.venv\Scripts\python -m pytest tests\test_boot_preflight.py tests\test_boot_preflight_governance.py tests\test_boot_status_contract.py tests\test_data_readiness_gate_write_guard.py -q` PASS, 80 passed.
+    - `.venv\Scripts\python scripts\run_data_readiness_gate.py --strict` exits 0 with `overall_status=WARN`, no blockers.
+    - `.venv\Scripts\python scripts\boot_preflight.py --repo-root . --mode strict --no-tests --json` FAIL only because dirty source/test/runtime files remain unclassified.
+  - Contract lock:
+    - `BOOT_STATUS_PATH_CONTRACT := VALID iff (canonical_status_path = runtime/boot_status_current.json) and (docs_context_status_fallback = 0) and (runtime_writer_only = 1) and (write_status_requires_pass = 1) and (governance_scanner_integrated = 1) and (governance_fail_blocks = 1) and (boot_ready_claim = 0 until strict_clean_github_preflight_passes)`.
+
+Boot Status Path Contract SAW Reconciliation (2026-05-26)
+
+  - Decision record:
+    - keep `runtime/boot_status_current.json` as the only executable boot-status current path.
+    - keep `docs/context/boot_status_current.json` as a noncanonical context snapshot path only; it is not a reader fallback, writer fallback, mirror, or safe-boot source.
+    - require path-contract closure evidence to include both runtime import sentinels and docs/context stale-authority grep.
+    - do not generate canonical runtime boot status while strict preflight is blocked by dirty source/test/runtime files.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_boot_preflight.py tests\test_boot_preflight_governance.py tests\test_boot_status_contract.py tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py -q` PASS, 92 passed.
+    - `.venv\Scripts\python scripts\governance_preflight.py --repo-root . --json` PASS, zero findings.
+    - `.venv\Scripts\python scripts\run_data_readiness_gate.py --strict` exits 0 with `overall_status=WARN` and no blockers.
+    - runtime path sentinel reports `core.boot_status`, `scripts.boot_preflight`, and `core.data_readiness_gate` all using `runtime/boot_status_current.json`; docs/context snapshot constant exists but no legacy fallback exists.
+    - strict `--require-github --no-tests` preflight fails because dirty source/test/runtime files remain and the worktree is not clean; HEAD is aligned.
+  - Contract lock:
+    - `BOOT_STATUS_PATH_SAW := BLOCK_UNTIL_STRICT_CLEAN iff (runtime_current_path = 1) and (docs_context_fallback = 0) and (docs_context_allowed_write = 0) and (governance_pass = 1) and (data_readiness_blockers = 0) and (strict_preflight_dirty_blocker = 1) and (boot_ready_claim = 0)`.
+
+Governance Gate v0 Root Application (2026-05-26)
+
+  - Decision record:
+    - treat Governance Gate v0 packet/patch/zip files as porting inputs until root preflight and tests prove the actual implementation.
+    - integrate `scripts.governance_preflight.run_governance_preflight(...)` into the existing `scripts/boot_preflight.py --repo-root` flow.
+    - make governance `FAIL` fail closed in both raw preflight and normalized boot-status output; governance `WARN` is advisory/degraded.
+    - separate `safe_boot` from final GitHub proof: strict all-gates PASS can set `safe_boot`, while `--require-github` remains the clean pushed-alignment proof.
+    - strengthen the boot write guard so atomic-write `.tmp` residue under guarded data/cache roots is disallowed evidence of mutation.
+  - The Decision (Hardcoded):
+    - `GOV-000` blocks packet-artifact drift when expected root policy/test/integration files are missing.
+    - `GOV-001/002/003/004/005/007/008` run as a root scanner over dashboard/view literals and candidate-card bundles.
+    - `make_boot_status_from_preflight(...)` maps governance `PASS/WARN/FAIL` to readiness `pass/warn/fail` and severity `ready/degraded/blocked`.
+    - default strict runs boot-control tests, Portfolio route smoke, and `current_context.first_command`.
+    - `core.data_readiness_gate._is_snapshot_ignored(...)` ignores bytecode/cache artifacts but not `.tmp` files in guarded roots.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_boot_preflight.py tests\test_boot_preflight_governance.py -q` PASS, 74 passed.
+    - `.venv\Scripts\python -m pytest tests\test_data_readiness_gate_write_guard.py -q` PASS, 6 passed.
+    - `.venv\Scripts\python -m pytest tests\test_boot_status_contract.py tests\test_data_readiness_gate.py tests\test_data_readiness_gate_write_guard.py tests\test_g8_2_system_scouted_candidate_card.py -q` PASS, 46 passed.
+    - `.venv\Scripts\python scripts\governance_preflight.py --repo-root . --json` PASS, zero findings.
+    - `.venv\Scripts\python scripts\boot_preflight.py --repo-root . --strict --json` returns `primary_verdict=blocked`, `preflight_verdict=ERROR`, governance PASS, data readiness WARN, and write guard FAIL due to disallowed runtime/evidence/code mutation.
+  - Contract lock:
+    - `GOVERNANCE_GATE_V0_ROOT := VALID iff (artifact_drift_guard = 1) and (root_governance_scanner_pass = 1) and (governance_fail_blocks = 1) and (governance_warn_degrades = 1) and (candidate_card_governance_required = 1) and (candidate_manifest_hash_bound = 1) and (strict_focused_contract_default = 1) and (safe_boot_github_proof_separated = 1) and (tmp_residue_guarded = 1) and (boot_ready_claim = 0 until strict_preflight_passes_cleanly)`.
+
+V2-D0 WRDS Permission + Snapshot Provenance Contract (2026-06-01)
+
+  - Decision record:
+    - accept G9 FINRA signal-card packet as ADVISORY_PASS context-only.
+    - hold the dashboard reader as the immediate main stream.
+    - start `V2-D0_WRDS_PERMISSION_AND_SNAPSHOT_PROVENANCE_CONTRACT` as offline Data/Backend + Docs/Ops substrate.
+    - implement permission and snapshot provenance contracts before any PEAD, corporate-actions, meta-labeling, Orbis/BvD, dashboard, or runtime widening.
+  - The Decision (Hardcoded):
+    - `WrdsPermissionMatrix` root flags force `provider_access_allowed=false`, `snapshot_generation_allowed=false`, `data_output_allowed=false`, and `v1_canonical_write_allowed=false`.
+    - `build_wrds_permission_probe_contract(...)` returns `execution_mode="offline_contract_only"` and `wrds_connection_attempted=false`.
+    - `WrdsSnapshotManifest` forces `manifest_status="contract_only"` and rejects planned storage under `data/processed/`, `data/registry/`, `runtime/boot_status_current.json`, and `docs/context/boot_status_current.json`.
+    - JSON Schema contracts live under `contracts/data_snapshot/` and are validation contracts only.
+    - actual WRDS permission truth, read-only probes, snapshot generation, storage path, and rollback/removal rules remain separate approval gates.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile v2_discovery\data_lab\__init__.py v2_discovery\data_lab\permission_matrix.py v2_discovery\data_lab\wrds_probe.py v2_discovery\data_lab\snapshot_manifest.py v2_discovery\data_lab\schema_registry.py tests\test_v2_wrds_permission_matrix.py tests\test_v2_snapshot_manifest_contract.py tests\test_v2_data_lab_no_v1_writes.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_v2_wrds_permission_matrix.py tests\test_v2_snapshot_manifest_contract.py tests\test_v2_data_lab_no_v1_writes.py -q` PASS, 17 passed.
+    - Reviewer A/B/C reconciliation tightened literal-false validation, denied-action vocabulary, schema/dataclass parity, sandbox-only storage path confinement, full data-lab source guards, and direct `jsonschema==4.26.0` dependency declaration.
+  - Contract lock:
+    - `V2_D0_WRDS_DATA_LAB := VALID iff (g9_context_only = 1) and (dashboard_reader_hold = 1) and (provider_access = 0) and (wrds_connection_attempt = 0) and (snapshot_generation = 0) and (committed_wrds_output = 0) and (data_processed_write = 0) and (v1_canonical_write = 0) and (dashboard_runtime_integration = 0) and (ranking_scoring = 0) and (alerts_brokers = 0) and (sqlite = 0) and (safe_boot_claim = 0) and (boot_ready_claim = 0)`.
+
+V2-D0 Multi-Expert Reconciliation Gate (2026-06-02)
+
+  - Decision record:
+    - run Expert A/B/C reconciliation before any WRDS permission probe or feature widening.
+    - accept Expert A PASS on data/provenance boundary but keep probe authorization blocked until non-secret user/source WRDS entitlement evidence exists.
+    - accept Expert B PATCH on backend contract strictness and fix it before closing the gate.
+    - accept Expert C PASS on governance/product boundary; dashboard reader remains HOLD and G9 remains context-only.
+    - set the next stream to `V2-D0.1_WRDS_PERMISSION_TRUTH_AUTHORIZATION`, not a probe.
+  - The Decision (Hardcoded):
+    - `validate_wrds_permission_probe_contract(...)` rejects unexpected root fields, credential/connection/output-like extra keys, changed `next_allowed_action`, changed `denied_actions`, changed `code_ref`, non-exact dataset rows, empty WRDS row fields, and approved rows without `approval_ref`.
+    - `snapshot_manifest._normalize_storage_uri(...)` rejects bare `data/runtime_cache/v2_data_lab` so dataclass acceptance matches `wrds_snapshot_manifest.schema.json`.
+  - Evidence:
+    - Expert A Data/WRDS/Provenance: PASS, probe authorization NEEDS USER EVIDENCE.
+    - Expert B Backend/Contracts/Tests: PATCH, fixed in current round.
+    - Expert C Strategy/Product/Governance: PASS, dashboard HOLD.
+    - `.venv\Scripts\python -m pytest tests\test_v2_wrds_permission_matrix.py tests\test_v2_snapshot_manifest_contract.py tests\test_v2_data_lab_no_v1_writes.py -q` PASS, 20 passed.
+    - `.venv\Scripts\python -m compileall v2_discovery\data_lab tests\test_v2_wrds_permission_matrix.py tests\test_v2_snapshot_manifest_contract.py tests\test_v2_data_lab_no_v1_writes.py -q` PASS.
+  - Contract lock:
+    - `MULTI_EXPERT_RECONCILIATION_GATE := PASS iff (expert_a_boundary_pass = 1) and (expert_a_probe_authorization != YES) and (expert_b_patch_fixed = 1) and (expert_c_dashboard_hold = 1) and (focused_v2_d0_tests_pass = 1) and (provider_access = 0) and (snapshot_generation = 0) and (data_output = 0) and (dashboard_runtime = 0) and (sqlite = 0) and (boot_ready_claim = 0)`.
+
+V2-D0.1 Authorization Intent Evidence Missing (2026-06-03)
+
+  - Decision record:
+    - record user approval intent as an authorization-intent packet only.
+    - do not mark any row approved because boundary/evidence subagents found no qualifying non-secret entitlement evidence.
+    - keep `TODO-ENTITLEMENT-001` and `TODO-APPROVAL-001` pending/blocking.
+    - record `secret.txt` as local secret material, not non-secret entitlement evidence, without reading or quoting it.
+  - The Decision (Hardcoded):
+    - every V2-D0.1 row remains `evidence_status=evidence_missing`, `permission_status=pending`, and `approval_ref=null`.
+    - future row approval requires non-secret entitlement evidence plus exact row/table approval_ref.
+    - the proposed approval text is a template only and is not approved in this round.
+  - Evidence:
+    - `docs/authorization/V2_D0_1_WRDS_PERMISSION_TRUTH_AUTHORIZATION.md`.
+    - `docs/authorization/V2_D0_1_WRDS_PERMISSION_TRUTH_AUTHORIZATION.json`.
+    - `docs/saw_reports/saw_v2_d0_1_authorization_intent_20260603.md`.
+  - Contract lock:
+    - `V2_D0_1_AUTHORIZATION_INTENT := BLOCKED_PENDING_EVIDENCE iff (approval_intent_recorded = 1) and (non_secret_entitlement_evidence = 0) and (approval_ref_valid = 0) and (provider_access = 0) and (probe_execution = 0) and (snapshot_generation = 0) and (data_write = 0) and (runtime_scope = 0) and (secret_txt_used_as_evidence = 0)`.
+
+V2-D0.2 WRDS Entitlement Evidence Request - No Credential Use (2026-06-03)
+
+  - Decision record:
+    - create a PM/subagent task and request artifact for non-secret WRDS table-level entitlement evidence.
+    - do not use account names/passwords or local secret material as permission evidence.
+    - keep V2-D0.1 blocked until a dated, attributable, non-secret response explicitly covers the five requested rows.
+  - The Decision (Hardcoded):
+    - send only the copyable evidence request to an institutional data librarian, WRDS representative, PI, license owner, or data administrator.
+    - rows remain `evidence_status=evidence_missing`, `permission_status=pending`, and `approval_ref=null` until qualifying evidence exists.
+    - successful login, old output, table visibility, library listing, or `secret.txt` does not satisfy entitlement evidence.
+  - Evidence:
+    - `docs/authorization/V2_D0_2_WRDS_ENTITLEMENT_EVIDENCE_REQUEST.md`.
+    - `docs/authorization/V2_D0_2_WRDS_ENTITLEMENT_EVIDENCE_REQUEST.json`.
+  - Contract lock:
+    - `V2_D0_2_EVIDENCE_REQUEST := REQUEST_PREPARED_EVIDENCE_MISSING iff (request_artifact_exists = 1) and (non_secret_entitlement_evidence = 0) and (approval_ref_valid = 0) and (provider_access = 0) and (credential_use = 0) and (probe_execution = 0) and (schema_table_discovery = 0) and (row_count_output = 0) and (snapshot_generation = 0) and (data_output = 0)`.
+V2 PEAD D2A Security-Level Return Repair (2026-06-18)
+
+  - Decision record:
+    - repair only the 500-GVKEY D2A sample before any D2B event extraction or strategy smoke.
+    - preserve every `(gvkey, iid)` series and expose canonical `security_id` and `total_return`.
+    - supersede the old `trfd_t / trfd_{t-1} - 1` method with the adjusted total-return level method.
+    - retain daily `dollar_volume` without calling it ADV; defer primary-IID policy to D2B.
+  - The Decision (Hardcoded):
+    - `TR_level_t = prccd_t * trfd_t / ajexdi_t`.
+    - `total_return_t = TR_level_t / TR_level_{t-1} - 1`, grouped only by `(gvkey, iid)`.
+    - if either total-return level is unavailable, use same-security `price_level_t / price_level_{t-1} - 1`, where `price_level = prccd / ajexdi`.
+    - fail closed on duplicate same-source identities, duplicate `(security_id,date)` output, invalid identity, empty output, formula mismatch, fewer than 500 sample GVKEYs, concurrent publication, or non-atomic publication.
+    - publish an immutable hash-named Parquet before atomically replacing the manifest commit pointer; readers resolve `manifest.parquet_file`.
+    - reject `--build` during D2A.
+    - reject `--event-window-only`; D2B owns fixed event-level IID selection and `+60` market-session extraction.
+  - Contract lock:
+    - `V2_D2A_SAMPLE := PASS iff (security_level_continuity = 1) and (total_return_level_formula = 1) and (no_cross_iid_lag = 1) and (unique_security_date = 1) and (immutable_parquet_atomic_manifest_pointer = 1) and (sample_gvkeys = 500) and (full_build = 0) and (d2b_scope = 0)`.
+
+V2 PEAD D2B Fixed Event-Security Window Closure (2026-06-19)
+
+  - Decision record:
+    - close D2B as a bounded Data slice, not PEAD phase-end and not final reviewer promotion.
+    - select one fixed security per event from the previous 20 global sessions strictly before the event, using finite arithmetic-mean `dollar_volume` with at least 15 observations.
+    - use deterministic order: score DESC, count DESC, normalized `iid` ASC, `security_id` ASC; do not prefer or fall back to `IID01` and do not switch after the event.
+    - retain exact global `+1..+60` rows and missingness; do not impute returns or add a delisting label.
+    - hand only eligible events, unique canonical D2A returns, and the identical session spine to the existing strategy window implementation.
+  - Evidence:
+    - 12,582 events, 362 issuers, 754,920 rows, 12,568 selected, 14 no-security, 522 short, 7,179 missing/non-finite, and 4,867 eligible.
+    - 2,862 sessions from 2015-01-02 through 2026-03-06; output SHA256 `8e2f39c2cb12bd0b50c9a134b280b5ecb8cd438f8a2249c6842c226250228b99`.
+    - 26 focused and 58 combined tests PASS; full-sample adapter smoke has 4,867 events, 881,588 unique return rows, zero duplicate keys, and 292,020 complete rows.
+    - Reviewer A/B initial High overlap-handoff and input-TOCTOU findings are fixed; final recheck remains pending.
+  - The Decision (Hardcoded):
+    - input validation/read is bound to stable hash-validated byte snapshots; output publication is immutable Parquet then atomic manifest with pre-commit `BaseException` cleanup.
+    - `handoff_eligible` is true only when the fixed security exists and all 60 global dates and returns are present/finite.
+    - D2B completion does not authorize provider, benchmark implementation, CAR/alpha interpretation, dashboard, ranking, alerts, broker, full build, staging, or commit.
+  - Contract lock:
+    - `V2_D2B_SAMPLE := DONE iff (prior_sessions = 20) and (minimum_finite_liquidity_observations = 15) and (fixed_event_security = 1) and (global_event_days = 60) and (missingness_retained = 1) and (handoff_eligible_events = 4867) and (immutable_parquet_atomic_manifest = 1) and (second_strategy_window_algorithm = 0)`.
+  - Single next decision/action:
+    - approve or hold a bounded D3 benchmark-input contract/design gate; provider fetch and alpha interpretation require separate approval.
+
+V2 PEAD D3 Benchmark Input Design Gate (2026-06-19)
+
+  - Decision record:
+    - canonical PEAD benchmark input is Ken French daily market factor, not yfinance `^GSPC` and not local `mktrf` alone.
+    - keep this round docs-only; no provider download, benchmark Parquet write, strategy code change, CAR/quintile interpretation, dashboard, staging, or commit.
+    - require the future artifact to cover the D2B 2,862-session spine from 2015-01-02 through 2026-03-06 before any CAR/BHAR production.
+    - preserve missing benchmark dates as missing; no fill, interpolation, zero substitution, fallback benchmark, or silent regime splice.
+    - call existing strategy `car` beta-1 market-adjusted CAR, not regression alpha.
+  - The Decision (Hardcoded):
+    - `mktrf = mktrf_percent / 100`.
+    - `rf = rf_percent / 100`.
+    - `benchmark_return = mktrf + rf`.
+    - `benchmark_return = mktrf` alone is invalid because `mktrf` is excess market return.
+    - CAR/BHAR requires 60 asset returns and 60 benchmark returns in the event window.
+  - Evidence:
+    - official source page: `https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html`.
+    - official methodology page: `https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/f-f_factors.html`.
+    - local `data/processed/ff_factors.parquet` read-only audit: 1,003 rows, 2022-01-03 through 2025-12-31, insufficient for D2B.
+  - Contract lock:
+    - `V2_D3_BENCHMARK_INPUT_CONTRACT := DONE iff (canonical_source = ken_french_daily_3_factors) and (units = decimal_returns) and (benchmark_return = mktrf + rf) and (mktrf_alone_total_return = 0) and (join_key = return_date) and (required_benchmark_observations = 60) and (missing_fill = 0) and (manifest_contract = 1) and (provider_fetch = 0) and (car_alpha_interpretation = 0)`.
+  - Single next decision/action:
+    - approve or hold a bounded D3 benchmark artifact implementation round; provider fetch and alpha interpretation still require separate approval.
+
+V2 PEAD D3 Benchmark Artifact Implementation (2026-06-19)
+
+  - Decision record:
+    - implement the bounded D3 benchmark builder and tests, but do not publish a benchmark artifact unless every required D2B session is present in the official Ken French daily source.
+    - derive required sessions from the D2A input recorded in the D2B manifest and verify that list against D2B `session_spine`.
+    - preserve `benchmark_return = mktrf + rf` after percent-to-decimal conversion.
+    - stop on any missing benchmark date; do not fill, drop, interpolate, zero, substitute, or splice regimes.    - preserve raw cumulative asset return in the strategy summary when asset windows are complete but benchmark coverage is missing; keep CAR/BHAR and eligibility benchmark-gated.
+  - The Decision (Hardcoded):
+    - D3 builder path is `scripts/pead_d3_benchmark_artifact.py`.
+    - focused test path is `tests/test_pead_d3_benchmark_artifact.py`.
+    - official source release observed is `This file was created by using the 202604 CRSP database.`.
+    - official source download SHA256 observed is `4b384ddeed3ba5541c433071272aece0734129ff5a016790333632eee8eac518`.
+    - D3 artifact publication is blocked because 52 D2B-required sessions are missing from Ken French daily factors.
+  - Evidence:
+    - `.venv\Scripts\python -m py_compile scripts\pead_d3_benchmark_artifact.py tests\test_pead_d3_benchmark_artifact.py` PASS.
+    - `.venv\Scripts\python -m pytest tests\test_pead_d3_benchmark_artifact.py -q` PASS, 7 passed.    - post-review regression for D3 and strategy summary semantics PASS after the bounded `strategies/pead_event_study.py` repair.
+    - `.venv\Scripts\python scripts\pead_d3_benchmark_artifact.py --build` failed closed before publication with missing benchmark sessions.
+    - required D2B sessions = 2,862; official source rows = 26,233 from 1926-07-01 through 2026-04-30; missing sessions = 52.
+  - Contract lock:
+    - `V2_D3_BENCHMARK_ARTIFACT_BUILDER := PARTIAL iff (builder_tests_pass = 1) and (official_source_fetch = 1) and (source_percent_to_decimal = 1) and (benchmark_return_eq_mktrf_plus_rf = 1) and (d2b_session_coverage_complete = 0) and (missing_fill = 0) and (artifact_published = 0) and (strategy_summary_raw_return_preserved = 1) and (strategy_interpretation = 0)`.
+  - Single next decision/action:
+    - run a bounded D2B/D2A market-session spine audit/repair before rerunning D3 artifact publication.
+
+V2 PEAD D3 Benchmark Artifact Publication (2026-06-20)
+
+  - Decision record:
+    - execute exactly one bounded D3 benchmark artifact publication gate against the repaired 2,810-session D2B spine.
+    - publish only if the official Ken French source bytes match the D2B-recorded source and all required D2B sessions are present.
+    - preserve `benchmark_return = mktrf + rf` after percent-to-decimal conversion.
+    - do not run CAR/BHAR interpretation, quintiles, dashboard integration, ranking/scoring, alerts, broker/order paths, full build, staging, or commit.
+  - The Decision (Hardcoded):
+    - D3 manifest pointer is `data/processed/pead_d3_ken_french_daily_benchmark.parquet.manifest.json`.
+    - active Parquet is `data/processed/pead_d3_ken_french_daily_benchmark.f7dede990475b4ecf499fbf1dee3c4a81298073f018cc3a1ba1559f3e702c589.parquet`.
+    - `benchmark_return = (Mkt-RF_percent / 100) + (RF_percent / 100)`.
+    - artifact SHA256 is `f7dede990475b4ecf499fbf1dee3c4a81298073f018cc3a1ba1559f3e702c589`.
+    - required D2B sessions = matched D2B sessions = 2,810; missing sessions = 0.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_pead_d3_benchmark_artifact.py tests\test_pead_d2b_event_window_contract.py -q` PASS, 38 passed.
+    - `.venv\Scripts\python scripts\pead_d3_benchmark_artifact.py --build` PASS, `[coverage] 2810/2810 2015-01-02..2026-03-06`.
+    - independent artifact validation: manifest hash match, formula error `0.0`, finite numeric fields, duplicate date count 0.
+  - Contract lock:
+    - `V2_D3_BENCHMARK_ARTIFACT := DONE iff (source_hash_matches_d2b = 1) and (d2b_session_coverage_complete = 1) and (artifact_published = 1) and (missing_fill = 0) and (formula_mktrf_plus_rf = 1) and (car_bhar_interpretation = 0) and (dashboard_scope = 0)`.
+  - Single next decision/action:
+    - approve or hold a bounded D3 strategy benchmark handoff validation round; do not interpret alpha in the same round.
+
+V2 PEAD D3 Strategy Benchmark Handoff Validation (2026-06-20)
+
+  - Decision record:
+    - close only the published D2B/D3 artifact-to-strategy validation gate with a focused artifact-backed test.
+    - preserve all production strategy code and published data artifacts unless a direct regression proves a defect.
+    - keep D4 dashboard implementation and alpha interpretation outside this closure.
+  - The Decision (Hardcoded):
+    - test path is `tests/test_pead_d3_strategy_handoff.py`.
+    - D2B-to-D3 join is `LEFT JOIN ... ON return_date` with many-to-one validation and 754,920 rows preserved.
+    - every complete event requires 60 benchmark observations.
+    - CAR is `sum(asset_return - benchmark_return)`; BHAR is `product(1 + asset_return) - product(1 + benchmark_return)`.
+    - missing benchmark coverage masks CAR/BHAR and preserves complete raw cumulative asset return.
+  - Evidence:
+    - `.venv\Scripts\python -m pytest tests\test_pead_d3_strategy_handoff.py -q` PASS, 5 passed.
+    - combined handoff, D3 artifact, and strategy regression PASS, 26 passed.
+    - no strategy production code or data artifact changed.
+  - Contract lock:
+    - `V2_D3_STRATEGY_BENCHMARK_HANDOFF := DONE iff (manifest_hash_valid = 1) and (join_many_to_one = 1) and (rows_preserved = 754920) and (complete_benchmark_observations = 60) and (car_formula_match = 1) and (bhar_formula_match = 1) and (missing_benchmark_fail_closed = 1) and (production_defect_fix = 0)`.
+  - Single next decision/action:
+    - approve or hold bounded D4 dashboard-integration scoping; implementation remains separate.
+
+V2 PEAD Real-Data CAR/BHAR/Quintile Validation (2026-06-20)
+
+  - Decision record:
+    - supersede the direct-to-dashboard next-step recommendation with one bounded,
+      reproducible real-data evidence run followed by owner review.
+    - publish event-date evidence using the locked daily cohort and fail-closed HAC
+      gap behavior.
+    - publish quarterly evidence only with `ex_post_descriptive_only = true`; do
+      not replace or tune the event-date result.
+    - preserve all D1/D2B/D3 artifacts and `strategies/pead_event_study.py` as
+      read-only inputs.
+  - The Decision (Hardcoded):
+    - implementation path is `scripts/pead_real_data_validation.py`.
+    - focused test path is `tests/test_pead_real_data_validation.py`.
+    - evidence path is
+      `docs/context/e2e_evidence/pead_real_data_validation_20260620.json`.
+    - event-date config keeps `cohort_frequency = D`, `hac_maxlags = 4`, and
+      fail-closed null HAC inference when gaps exist.
+    - quarterly config keeps `cohort_frequency = Q`, `hac_maxlags = 4`,
+      `allow_ex_post_cohorts = true`, and `ex_post_descriptive_only = true`.
+  - Evidence:
+    - atomic JSON SHA256 is
+      `96cdc975d0b4798c6775b12e7bc9dc6af4fb7e9178a4d0ad54feeab8100e980e`;
+      deterministic rerun reproduced the same bytes.
+    - inputs produce 12,582 events, 362 issuers, 11,450 eligible events, and
+      1,132 ineligible events.
+    - daily CAR/BHAR each retain 2,777 HAC gaps and null HAC SE/t-stat.
+    - quarterly CAR/BHAR evidence is labeled descriptive-only; its numerical
+      outputs are stored without interpretation in the JSON.
+    - focused tests passed 10/10; the full PEAD regression passed 99/99.
+  - Contract lock:
+    - `V2_PEAD_REAL_DATA_VALIDATION := DONE iff (D1_D2B_D3_lineage_valid = 1)
+      and (rows_preserved = 754920) and (events = 12582) and
+      (eligible_events = 11450) and (daily_HAC_gap_fail_closed = 1) and
+      (quarterly_ex_post_descriptive_only = 1) and (atomic_strict_JSON = 1) and
+      (interpretation = 0) and (dashboard_change = 0)`.
+  - Single next decision/action:
+    - owner reviews the numbers-only evidence and decides whether it is sufficient
+      to open a separate dashboard-scoping round; no dashboard implementation is
+      authorized by this validation.
+
+V2 PEAD Alpha Inference Methodology Gate (2026-06-21)
+
+  - Decision record:
+    - select calendar-time daily Q5-minus-Q1 portfolio regression as the sole primary M1B estimator candidate.
+    - use outcome-independent event-date signal buckets, authoritative `+1..+60` sessions, all-quantile latest-event overlap resolution before Q1/Q5 filtering, equal weighting, and at least 10 finite securities per leg.
+    - fix Newey-West HAC at 59 lags; retain paired stationary block bootstrap as robustness-only.
+    - reject observed-event-date HAC and calendar-month/quarterly aggregation as primary formal inference; quarterly stays descriptive-only.
+  - The Decision (Hardcoded):
+    - `R_HL,t = EW(raw return | active Q5) - EW(raw return | active Q1)`.
+    - `R_HL,t = alpha_CT + beta_M * mktrf_t + epsilon_t`.
+    - `HAC_maxlags = 59`; `use_correction = true`; no lag or significance tuning.
+    - exact evidence path is `docs/context/e2e_evidence/pead_calendar_time_inference_m1b.json`; strict canonical JSON publication is atomic.
+    - M1A selects methodology only; terminal approval is blocked pending Reviewer C count recheck. M1B implementation and alpha interpretation are not performed.
+  - Evidence:
+    - `docs/phase_brief/v2-pead-alpha-inference-methodology-gate.md`.
+    - two independent read-only subagent reviews converged on calendar-time inference; parent feasibility found a 2,539-session contiguous count-qualified interval.
+    - corrected parent-side count check records 19,812 null-`return_date` rows excluded, 226,772 extreme expected rows, and 1,519 missing asset rows.
+    - Fama (1998), journal page 295 / PDF page 13, directly supports rolling calendar-time portfolios for cross-event return correlation.
+  - Contract lock:
+    - `V2_PEAD_M1A := TERMINAL_APPROVED iff (primary = calendar_time_single_factor) and (signal_only_assignment = 1) and (latest_event_security_date = 1) and (minimum_leg_count = 10) and (HAC_lags = 59) and (quarterly_descriptive_only = 1) and (M1B_executed = 0) and (alpha_claim = 0) and (reviewer_C_terminal_count_recheck = PASS)`.
+  - Single next decision/action:
+    - rerun independent Reviewer C on the corrected count contract; after PASS only, execute the bounded four-file M1B implementation and publish a new evidence artifact without changing the locked validation JSON.
+
+V2 PEAD Calendar-Time Inference M1B Implementation (2026-06-21)
+
+  - Decision record:
+    - accept terminal Reviewer C PASS on the corrected M1A count/data-integrity contract.
+    - implement the bounded four-file M1B calendar-time estimator and publish one strict JSON evidence artifact.
+    - preserve D1/D2B/D3 artifacts and the protected 20260620 validation JSON unchanged.
+    - keep interpretation, promotion, product actions, ranking/scoring, alerts, recommendations, and broker/order paths blocked.
+  - The Decision (Hardcoded):
+    - implementation paths are `strategies/pead_event_study.py` and `scripts/pead_real_data_validation.py`.
+    - focused test paths are `tests/test_pead_event_study.py` and `tests/test_pead_real_data_validation.py`.
+    - evidence path is `docs/context/e2e_evidence/pead_calendar_time_inference_m1b.json`.
+    - `R_HL,t = EW(raw return | active Q5) - EW(raw return | active Q1)`.
+    - `R_HL,t = alpha_CT + beta_M * mktrf_t + epsilon_t`.
+    - `HAC_maxlags = 59`; `use_correction = true`; no lag or significance tuning.
+    - paired stationary block bootstrap uses expected block length 60, 10,000 replications, seed 20260621, and max batch size 256 as robustness-only evidence.
+    - require every non-null D2B return date to exist on the authoritative D3 spine before estimation.
+    - fix M1B CLI output to the canonical resolved evidence path and reject alternate targets before any build/write.
+    - require nonnegative and reconciled count/rate fields; zero retained sessions use null date endpoints and null inference.
+  - Evidence:
+    - independent Reviewer C recheck PASS with no findings.
+    - focused PEAD tests PASS, 50 tests after SAW data-integrity hardening.
+    - M1B CLI PASS and wrote SHA256 `c80bb7ed583a933dae664251ffe1fc56a0bcaf5f9a086b1e42740047a5018b76`.
+    - protected validation JSON remains SHA256 `96cdc975d0b4798c6775b12e7bc9dc6af4fb7e9178a4d0ad54feeab8100e980e`.
+    - published counts: 19,812 null-date rows excluded; 226,772 expected extreme rows; 1,519 missing rows; 2,539 retained sessions; zero internal gaps.
+  - Contract lock:
+    - `V2_PEAD_M1B := DONE iff (reviewer_C_M1A_count_recheck = PASS) and (all_quantile_latest_event_resolution = 1) and (no_security_extreme_expected_missing = 1) and (minimum_leg_count = 10) and (HAC_lags = 59) and (bootstrap_robustness_only = 1) and (strict_JSON_schema = 1) and (protected_validation_json_hash_unchanged = 1) and (interpretation = 0) and (product_action = 0)`.
+  - Single next decision/action:
+    - run independent SAW review for M1B and then decide whether to open a separate alpha-verdict review; no action surface is authorized by M1B.
+
+V2 PEAD M6a.1 Sparse Portfolio Engine Scale Remediation (2026-06-25)
+
+  - Decision record:
+    - accept Reviewer C's finding that the event-row loop and dense turnover pivot are a structural full-universe blocker.
+    - replace only `build_daily_portfolio_returns` and necessary sparse interval construction; do not alter schemas, data inputs, D2B/D3 artifacts, UI, provider access, or M6b data scope.
+    - require entry/exit/overlap turnover parity, a static no-loop/no-pivot guard, a configured memory cap, and a full-universe synthetic latency smoke.
+  - The Decision (Hardcoded):
+    - event starts use DuckDB ASOF lookup; active rows are bounded by return ordinals to `holding_period_sessions`.
+    - daily normalization occurs over active event counts by `(return_date, side)`.
+    - turnover is the sparse union of previous and current security weights plus final trade-to-zero liquidation.
+    - `m6b_real_run_wiring_allowed=true` is engine-scale-only; `m6b_data_contract_ready=false` remains an independent fail-closed data gate.
+  - Evidence:
+    - focused M6 tests PASS 10/10; M5a+M6 PASS 14/14; broader PEAD slice PASS 107/107.
+    - 196,638 selected events x 60 sessions completes in 5.59 seconds under the configured DuckDB 1024MB cap without a dense matrix.
+    - `--validate-inputs` returns 0 with blocked evidence; `--run` returns 2 and emits no curve.
+  - Contract lock:
+    - `V2_PEAD_M6A_SCALE := READY iff (python_event_row_loop = 0) and (dense_position_matrix = 0) and (entry_exit_overlap_turnover_parity = 1) and (full_universe_smoke_under_cap = 1) and (m6b_data_contract_ready = 0)`.
+  - Single next decision/action:
+    - run independent Reviewer A/B/C for the code-change round; after that, M6b may begin only as data-prep for its own strict input gates.
+
+V2 PEAD M6a.1 Core Guard Completion (2026-06-25)
+
+  - Decision record:
+    - accept the narrow core scope: DuckDB sparse interval engine, trading-calendar integer index, projection/dtype guards, turnover parity, deterministic output hash, and full-universe smoke.
+    - keep physical repartitioning, chunking/streaming, Numba, and multiprocessing deferred unless a future profile proves they are required to meet a published bound.
+  - The Decision (Hardcoded):
+    - build one sorted global trading-calendar `return_idx:int32`; selected events use `entry_idx` and `exit_idx`, and sparse membership is `entry_idx <= return_idx <= exit_idx`.
+    - project only engine-required columns; encode event/security keys as `int32`; refuse object-dtype relations before DuckDB registration.
+    - use one DuckDB worker plus compensated `fsum`, canonical date ordering, and `daily_portfolio_output_hash` SHA-256 parity across shuffled input order.
+    - retain sparse previous/current-union turnover and final trade-to-zero liquidation unchanged.
+  - Evidence:
+    - focused M6 PASS 12/12; M5a+M6 PASS 16/16; broader PEAD slice PASS 109/109.
+    - the 196,638-event x 60-session smoke remains within the configured 1024MB/60-second bound.
+  - Contract lock:
+    - `V2_PEAD_M6A_CORE := READY iff (calendar_interval_index = 1) and (numeric_projection_guard = 1) and (object_duckdb_relation = 0) and (turnover_entry_overlap_exit_final_parity = 1) and (shuffled_input_output_hash_parity = 1) and (full_universe_smoke_under_cap = 1)`.
+  - Single next decision/action:
+    - obtain independent Reviewer A/B/C terminal review; do not begin M6b or real-run wiring before that review and its separate data gates.

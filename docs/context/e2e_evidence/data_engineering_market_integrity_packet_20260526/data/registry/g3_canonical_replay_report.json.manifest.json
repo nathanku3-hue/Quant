@@ -1,0 +1,23 @@
+{
+  "artifact_path": "data\\registry\\g3_canonical_replay_report.json",
+  "asof_ts": "2026-05-09T08:02:42Z",
+  "date_range": {
+    "end": "2026-05-09",
+    "start": "2026-05-09"
+  },
+  "extra": {
+    "boundary_verdict": "v2_blocked_from_promotion",
+    "candidate_id": "PH65_G2_SYNTHETIC_FIXTURE_001",
+    "proxy_run_id": "PH65_G2_SINGLE_FIXTURE_PROXY_RUN_001",
+    "v1_replay_id": "PH65_G3_V1_CANONICAL_REPLAY_001"
+  },
+  "license_scope": "synthetic_fixture_only",
+  "manifest_created_at_utc": "2026-05-09T08:02:42Z",
+  "manifest_schema_version": "1.0.0",
+  "provider": "synthetic_fixture",
+  "provider_feed": "g3_canonical_replay_report",
+  "row_count": 1,
+  "schema_version": "1.0.0",
+  "sha256": "4c341391484def4025cbbecd583e217fa2d78d47dffd938eb4ed1536166f5f05",
+  "source_quality": "non_canonical"
+}

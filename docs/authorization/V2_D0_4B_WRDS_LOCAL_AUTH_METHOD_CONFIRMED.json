@@ -1,0 +1,97 @@
+{
+  "artifact_id": "V2_D0_4B_WRDS_LOCAL_AUTH_METHOD_CONFIRMED",
+  "status": "WRDS_LOCAL_AUTH_USER_ATTESTED_AVAILABLE",
+  "formal_permission_truth_status": "FORMAL_PERMISSION_TRUTH_NOT_CLOSED",
+  "authority": "correction_artifact_only_not_execution_approval",
+  "date": "2026-06-03",
+  "round_id": "ROUND-20260603-V2-D0-4B-WRDS-LOCAL-AUTH-METHOD-CONFIRMED",
+  "scope_id": "V2_D0_4B_WRDS_LOCAL_AUTH_METHOD_CONFIRMED_NO_EXECUTION",
+  "required_decision_language": "WRDS local authentication method is user-attested available through user-owned local credentials, but actual login has not been verified by Codex/subagents, credentials were not read, and formal table-level permission truth is not closed.",
+  "states": {
+    "local_auth_method": "user_attested_local_auth_available",
+    "actual_login_verified_by_agent": false,
+    "credentials": "local_only_do_not_read_do_not_quote_do_not_commit",
+    "secret_txt": "do_not_read_do_not_quote_do_not_use",
+    "formal_approval_ref": null,
+    "permission_truth": "not_closed",
+    "wrds_execution": "governance_blocked_until_probe_approval",
+    "s_and_p_capital_iq_pro": "deferred_fallback"
+  },
+  "saw_status_fields": [
+    "WRDS_LOCAL_AUTH_USER_ATTESTED_AVAILABLE",
+    "FORMAL_PERMISSION_TRUTH_NOT_CLOSED",
+    "ALLOW_LOCAL_READ_ONLY_PERMISSION_PROBE_PLAN_ONLY",
+    "BLOCK_PROBE_EXECUTION_UNTIL_SEPARATE_APPROVAL",
+    "BLOCK_DATA_OUTPUT_RUNTIME_SNAPSHOTS"
+  ],
+  "rows": [
+    {
+      "library_table": "crsp.dsf",
+      "probe_plan_status": "probe_plan_pending",
+      "approval_status": "not_approved",
+      "approval_ref": null
+    },
+    {
+      "library_table": "crsp.stocknames",
+      "probe_plan_status": "probe_plan_pending",
+      "approval_status": "not_approved",
+      "approval_ref": null
+    },
+    {
+      "library_table": "crsp.ccmxpf_linktable",
+      "probe_plan_status": "probe_plan_pending",
+      "approval_status": "not_approved",
+      "approval_ref": null
+    },
+    {
+      "library_table": "comp.fundq",
+      "probe_plan_status": "probe_plan_pending",
+      "approval_status": "not_approved",
+      "approval_ref": null
+    },
+    {
+      "library_table": "ibes.det_epsus",
+      "probe_plan_status": "probe_plan_pending",
+      "approval_status": "not_approved",
+      "approval_ref": null
+    }
+  ],
+  "allowed_in_artifact": [
+    "status_correction",
+    "hard_coded_probe_plan_outline",
+    "validation_rules",
+    "no_execution_guardrails"
+  ],
+  "forbidden": [
+    "read_secret_txt",
+    "quote_secret_txt",
+    "test_secret_txt",
+    "validate_secret_txt",
+    "use_secret_txt",
+    "print_or_commit_credentials",
+    "wrds_login",
+    "provider_access",
+    "ssh",
+    "python_wrds",
+    "sas",
+    "sql",
+    "list_libraries",
+    "list_tables",
+    "describe",
+    "schema_discovery",
+    "row_counts",
+    "sample_rows",
+    "sql_logs_with_provider_output",
+    "snapshots",
+    "runtime_dashboard_scoring_broker_writes",
+    "approval_ref_fabrication",
+    "row_approval"
+  ],
+  "public_doc_basis": {
+    "scope": "public_support_only_not_permission_evidence",
+    "sources": [
+      "https://wrds-www.wharton.upenn.edu/pages/about/3-ways-use-wrds/",
+      "https://wrds-www.wharton.upenn.edu/pages/about/wrds-account-types/"
+    ]
+  }
+}

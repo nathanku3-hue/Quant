@@ -4,6 +4,25 @@ Date: 2026-05-26
 Scope: Terminal Zero / Quant research, replay, backtest, optimizer, candidate-card, and dashboard promotion boundaries.
 Status: Draft decision record for implementation.
 
+## 2026-06-02 V2-D0.1 Follow-Up Validity Addendum
+
+Source: `docs/handover/V2_D0_1_EXPERT_1_6_FOLLOWUP_RECONCILIATION_20260602.md`
+
+PEAD is not `research_valid` unless `C3_LOCK_PEAD_V2_001_v1` exists and the run passes all fail-closed gates below:
+
+- HAC one-sided 95% lower confidence bound on annualized daily net alpha delta vs locked C3 is greater than zero.
+- Annualized daily net alpha delta point estimate is at least +2.00% per year vs locked C3.
+- Family-level FDR adjusted q is at most 0.05.
+- Deflated Sharpe Ratio confidence is at least 0.95 after effective-trial adjustment.
+- PBO is at most 0.10 for `research_valid`.
+- Base turnover cost `0.0010` and 2x cost stress `0.0020` both pass.
+- PEAD-specific one-way adverse slippage stress of at least +5 bps passes unless a larger model-based stress applies.
+- OOS/walk-forward evidence, PIT event timestamp leakage audit, negative controls, robustness windows, concentration checks, and reproducibility rerun pass.
+
+For PEAD, default `hac_lag = min(63, max(5, primary_holding_window_trading_days))`. For a 20-trading-day primary holding window, `hac_lag = 20`.
+
+Without a PIT event ledger or canonical `core.engine.run_simulation(..., strict_missing_returns=True)` run, PEAD status is `blocked`, not exploratory. Without the locked C3 comparator, PEAD can be exploratory at most.
+
 ## 1. Promotion Rule
 
 The repo-level quant promotion rule is:

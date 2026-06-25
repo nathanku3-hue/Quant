@@ -174,7 +174,7 @@
       "repair_policy": "automatic_requested_output",
       "planning_missing_status": "WARN",
       "strict_missing_status": "WARN",
-      "notes": "Canonical runtime boot-status JSON and the only durable boot write allowed during boot. docs/context/boot_status_current.json is legacy fallback only. No markdown companion is part of v0."
+      "notes": "Canonical v0 boot-status JSON and the only durable boot write allowed during boot. docs/context/boot_status_current.json is a noncanonical context snapshot only; no markdown companion, fallback, mirror, or compatibility path is part of v0."
     }
   ]
 }

@@ -1,0 +1,44 @@
+{
+  "active_phase": 60,
+  "allocator_carry_forward_authorized": false,
+  "audit_status": "blocked",
+  "book_id": "PHASE60_GOVERNED_BOOK_V1",
+  "comparator_available": false,
+  "comparator_error": "Missing 274 return cells on executed exposures.",
+  "core_sleeve_inclusion_authorized": false,
+  "delta_rows_reviewed": 2,
+  "disposition": "evidence_only_hold",
+  "end_date": "2024-12-31",
+  "evidence_rows_reviewed": 502,
+  "hold_reason": "same_period_c3_comparator_unavailable_under_strict_missing_return_rules",
+  "input_artifacts": {
+    "audit_delta_path": "data/processed/phase60_governed_audit_delta.csv",
+    "audit_evidence_path": "data/processed/phase60_governed_audit_evidence.csv",
+    "audit_summary_path": "data/processed/phase60_governed_audit_summary.json",
+    "preflight_path": "docs/context/e2e_evidence/phase60_d340_preflight_20260319_summary.json"
+  },
+  "kernel_mutation_authorized": false,
+  "kill_switches_triggered": [
+    "KS-03_same_period_c3_unavailable"
+  ],
+  "missing_executed_exposure_return_cells": 274,
+  "output_artifacts": {
+    "findings_path": "docs/context/e2e_evidence/phase60_d341_review_20260319_findings.csv",
+    "status_path": "docs/context/e2e_evidence/phase60_d341_review_20260319.status.txt",
+    "summary_path": "docs/context/e2e_evidence/phase60_d341_review_20260319_summary.json"
+  },
+  "packet_id": "PHASE60_D341_BLOCKED_AUDIT_REVIEW_V1",
+  "preflight_passed": true,
+  "promotion_authorized": false,
+  "remediation_authorized": false,
+  "research_data_mutation_authorized": false,
+  "review_scope": "blocked_audit_review_evidence_only",
+  "review_status": "blocked_confirmed",
+  "reviewed_delta_lanes": [
+    "5bps_gate",
+    "10bps_sensitivity"
+  ],
+  "source_packet_id": "PHASE60_GOVERNED_AUDIT_V1",
+  "start_date": "2023-01-01",
+  "widening_authorized": false
+}

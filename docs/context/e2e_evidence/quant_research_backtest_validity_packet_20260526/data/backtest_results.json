@@ -1,0 +1,23 @@
+{
+  "The Infinity Governor": {
+    "cagr": 0.254107,
+    "max_dd": -0.523445,
+    "sharpe": 1.0976,
+    "timestamp": "2026-03-01T01:37:41.240361",
+    "script": "rule_100_backtest_decades.py"
+  },
+  "The Derivatives Trinity": {
+    "cagr": 0.168822,
+    "max_dd": -1.000321,
+    "sharpe": 1.0698,
+    "timestamp": "2026-03-01T02:04:38.769171",
+    "script": "derivative_backtest.py"
+  },
+  "Empirical Stink Bid": {
+    "cagr": 0.219733,
+    "max_dd": -0.37656,
+    "sharpe": 0.7651,
+    "timestamp": "2026-03-01T02:24:47.084541",
+    "script": "smart_entry_backtest.py"
+  }
+}

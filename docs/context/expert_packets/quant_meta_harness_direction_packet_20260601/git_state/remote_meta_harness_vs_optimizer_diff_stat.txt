@@ -1,0 +1,37 @@
+ .codex/skills/boundary-gate/SKILL.md               |  38 +++++++
+ .codex/skills/expert-context-packer/SKILL.md       |  38 +++++++
+ .codex/skills/harness-feedback/SKILL.md            |  31 ++++++
+ .codex/skills/scope-selector/SKILL.md              |  46 ++++++++
+ .gitignore                                         |   1 +
+ .meta-harness/events.jsonl                         |   6 ++
+ .meta-harness/phase-map.md                         |  17 +++
+ .meta-harness/repos.json                           |   3 +
+ .meta-harness/status.md                            |  34 ++++++
+ .meta-harness/streams/coding.md                    |  25 +++++
+ .meta-harness/streams/research.md                  |  25 +++++
+ .meta-harness/streams/review.md                    |  25 +++++
+ .meta-harness/streams/writing.md                   |  25 +++++
+ .../contracts/expert-reconciliation-matrix.md      |  63 +++++++++++
+ .../templates/contracts/stream-contract.md         |  37 +++++++
+ .../templates/contracts/worker-done-contract.md    |  46 ++++++++
+ .meta-harness/templates/skills/boundary-gate.md    |  43 ++++++++
+ .../templates/skills/expert-context-packer.md      |  42 ++++++++
+ .meta-harness/templates/skills/harness-feedback.md |  30 ++++++
+ .meta-harness/templates/skills/scope-selector.md   |  47 ++++++++
+ .meta-harness/workers/worker-report-template.md    |  20 ++++
+ AGENTS.md                                          |   1 +
+ docs/context/bridge_contract_current.md            |  12 +++
+ docs/context/done_checklist_current.md             |  15 +++
+ docs/context/impact_packet_current.md              |  48 +++++++++
+ docs/context/multi_stream_contract_current.md      |  24 +++++
+ docs/context/observability_pack_current.md         |  23 ++++
+ docs/context/planner_packet_current.md             |  12 +++
+ docs/context/post_phase_alignment_current.md       |  17 +++
+ docs/decision log.md                               |   7 ++
+ docs/lessonss.md                                   |   8 ++
+ docs/notes.md                                      |  14 +++
+ .../saw_meta_harness_install_20260601.md           | 120 +++++++++++++++++++++
+ docs/templates/expert_reconciliation_matrix.md     |  63 +++++++++++
+ docs/templates/stream_contract.md                  |  37 +++++++
+ docs/templates/worker_done_contract.md             |  46 ++++++++
+ 36 files changed, 1089 insertions(+)

@@ -1,0 +1,36 @@
+{
+  "authoritative_missing_executed_exposure_return_cells": 274,
+  "authority_anchor": "D-341 evidence-only hold root cause",
+  "current_live_drift_detected": true,
+  "identifier_type": "CUSIP9",
+  "live_reconstruction_missing_executed_exposure_return_cells": 275,
+  "local_pair_csv_path": "E:\\code\\Quant\\data\\processed\\d341_missing_executed_exposure_permno_cusip.csv",
+  "local_pair_parquet_path": "E:\\code\\Quant\\data\\processed\\d341_missing_executed_exposure_permno_cusip.parquet",
+  "mapping_rows": [
+    {
+      "CUSIP": "095229100",
+      "PERMNO": 86544
+    }
+  ],
+  "notes": [
+    "D-341 is the authoritative bounded scope for the missing-cell root cause (274 cells).",
+    "Current live reconstruction yields 275 missing cells, but the missing-cell universe still collapses to PERMNO 86544.",
+    "Outputs remain additive only; no mutation of prices_tri.parquet or other bedrock price stores occurred."
+  ],
+  "packet_id": "PHASE60_D350_CUSIP_EXTRACT_V1",
+  "raw_identifier_source": "E:\\code\\Quant\\data\\hkcj1itkyvfsmibz.csv",
+  "raw_lineage": {
+    "cusip8": "09522910",
+    "cusip9": "095229100",
+    "first_date": "2000-01-03",
+    "last_date": "2023-11-28",
+    "names": "AVANTAX INC | INFOSPACE INC | BLUCORA INC | INFOSPACE COM",
+    "permno": 86544,
+    "row_count": 6015,
+    "tickers": "AVTA,BCOR,INSP"
+  },
+  "rows_emitted": 1,
+  "scope": "readonly_d341_missing_executed_exposure_identifier_extract",
+  "sp_input_path": "E:\\code\\Quant\\data\\processed\\d341_missing_executed_exposure_cusips.txt",
+  "unique_permno_count": 1
+}

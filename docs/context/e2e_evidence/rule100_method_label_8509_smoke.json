@@ -1,0 +1,15 @@
+{
+  "body_has_portfolio_optimizer": true,
+  "body_has_method": true,
+  "current_method_text": "Method\nInverse Volatility",
+  "dropdown_options": [
+    "Historical Best CAGR Strategy",
+    "Historical Max Sharpe Strategy",
+    "Inverse Volatility",
+    "Rule of 100",
+    "Thesis-Neutral Max Sharpe",
+    "Mean-Variance (Min Volatility)",
+    "Mean-Variance (Max Return)"
+  ],
+  "has_rule_of_100": true
+}

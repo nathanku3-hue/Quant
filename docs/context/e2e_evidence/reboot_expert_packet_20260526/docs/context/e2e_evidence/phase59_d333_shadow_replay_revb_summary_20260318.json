@@ -1,0 +1,109 @@
+{
+  "baseline_config_id": "C3_LEAKY_INTEGRATOR_V1",
+  "catalog_distinct_variants": 165,
+  "catalog_max_snapshot_date": "2022-12-21",
+  "catalog_min_snapshot_date": "2001-05-08",
+  "catalog_rows": 105081,
+  "cost_bps": 5.0,
+  "delta_path": "E:\\Code\\Quant\\docs\\context\\e2e_evidence\\phase59_d333_shadow_replay_revb_delta_vs_c3_20260318.csv",
+  "end_date": "2022-12-31",
+  "evidence_path": "E:\\Code\\Quant\\docs\\context\\e2e_evidence\\phase59_d333_shadow_replay_revb_evidence_20260318.csv",
+  "max_date": "2022-12-31",
+  "packet_id": "PHASE59_SHADOW_MONITOR_V1",
+  "review_hold": true,
+  "review_hold_reasons": [
+    "phase59_shadow_research_sharpe_delta < 0",
+    "phase59_shadow_research_cagr_delta < 0",
+    "phase50_shadow_reference_alert_level = RED"
+  ],
+  "same_window_same_cost_same_engine": true,
+  "selected_variant": {
+    "cagr": -0.05889864053976657,
+    "calendar_rows": 2087,
+    "first_observed_date": "2015-11-02",
+    "last_observed_date": "2022-01-31",
+    "max_dd": -0.4151519743100388,
+    "mean_outer_test_sharpe": -3.0620623742929296,
+    "median_outer_test_sharpe": -2.861197048552474,
+    "net_return_total": -0.39512815934563494,
+    "observed_days": 20,
+    "observed_rows": 20,
+    "positive_outer_fold_share": 0.3,
+    "same_engine_source": "allocator_state_source_{i,t} = melt(phase17_3_parameter_sweep_return_streams)",
+    "same_window_same_cost_same_engine": true,
+    "selection_count": 10,
+    "selection_policy": "selected_variant = argmax(selection_count, median_outer_test_sharpe, variant_id_ascending)",
+    "sharpe": -0.8036313887871052,
+    "turnover_annual": NaN,
+    "turnover_metric_available": false,
+    "ulcer": 31.866947767982605,
+    "variant_id": "v_3516a4bd6b65"
+  },
+  "shadow_reference": {
+    "alert_level": "RED",
+    "alert_reasons": [
+      "shadow latest basket vs locked C3 sample output",
+      "shadow latest gross exposure vs locked C3 top20 exposure latest row"
+    ],
+    "alert_rows": [
+      {
+        "metric_level": "RED",
+        "metric_name": "holdings_overlap",
+        "metric_value": 0.0,
+        "reason": "shadow latest basket vs locked C3 sample output"
+      },
+      {
+        "metric_level": "RED",
+        "metric_name": "gross_exposure_delta",
+        "metric_value": 0.9999999999999998,
+        "reason": "shadow latest gross exposure vs locked C3 top20 exposure latest row"
+      },
+      {
+        "metric_level": "GREEN",
+        "metric_name": "turnover_delta_rel",
+        "metric_value": 0.0019000000000000006,
+        "reason": "shadow average turnover delta vs C3 from phase50 aggregated telemetry"
+      }
+    ],
+    "all_intents_simulated": true,
+    "average_slippage_bps": 7.5,
+    "average_turnover": 1.0,
+    "baseline_evidence_mode": "demo_only_governance_accepted",
+    "broker_calls_detected_total": 0,
+    "cumulative_return_pct": 2.669512253252204,
+    "curve_day_completed": 30,
+    "curve_end_date": "2026-04-10",
+    "curve_horizon_days": 30,
+    "curve_rows": 31,
+    "curve_start_date": "2026-03-11",
+    "gross_exposure_core_latest": 0.0,
+    "gross_exposure_delta": 0.9999999999999998,
+    "gross_exposure_shadow": 0.9999999999999998,
+    "holdings_overlap": 0.0,
+    "holdings_overlap_window": 1.0,
+    "latest_notional_equity": 102669.5122532522,
+    "phase50_gate_path": "E:\\Code\\Quant\\data\\processed\\phase50_shadow_ship\\gate_recommendation.json",
+    "phase54_core_sample_path": "E:\\Code\\Quant\\data\\processed\\phase54_core_sleeve_sample_output.csv",
+    "phase54_top20_exposure_path": "E:\\Code\\Quant\\data\\processed\\phase54_core_sleeve_top20_exposure.csv",
+    "positions_first_path": "E:\\Code\\Quant\\data\\processed\\phase50_shadow_ship\\paper_curve_positions_day1.csv",
+    "positions_latest_path": "E:\\Code\\Quant\\data\\processed\\phase50_shadow_ship\\paper_curve_positions_day30.csv",
+    "production_default_selector": "sovereign_alpha_physics_engine",
+    "reference_only": true,
+    "turnover_delta_abs": 0.0019000000000000006,
+    "turnover_delta_rel": 0.0019000000000000006
+  },
+  "source_paths": {
+    "baseline_summary_path": "E:\\Code\\Quant\\data\\processed\\phase54_core_sleeve_summary.json",
+    "phase50_curve_path": "E:\\Code\\Quant\\data\\processed\\phase50_shadow_ship\\phase50_curve_full_20260410.csv",
+    "phase50_gate_path": "E:\\Code\\Quant\\data\\processed\\phase50_shadow_ship\\gate_recommendation.json",
+    "phase50_telemetry_path": "E:\\Code\\Quant\\data\\processed\\phase50_shadow_ship\\phase50_aggregated_telemetry_20260410.json",
+    "phase54_sample_output_path": "E:\\Code\\Quant\\data\\processed\\phase54_core_sleeve_sample_output.csv",
+    "phase54_top20_exposure_path": "E:\\Code\\Quant\\data\\processed\\phase54_core_sleeve_top20_exposure.csv",
+    "phase55_evidence_path": "E:\\Code\\Quant\\data\\processed\\phase55_allocator_cpcv_evidence.json",
+    "research_catalog_path": "E:\\Code\\Quant\\research_data\\catalog.duckdb",
+    "research_connector_path": "E:\\Code\\Quant\\data\\research_connector.py"
+  },
+  "start_date": "2015-01-01",
+  "strategy_id": "PHASE59_SHADOW_MONITOR_V1",
+  "summary_path": "E:\\Code\\Quant\\docs\\context\\e2e_evidence\\phase59_d333_shadow_replay_revb_summary_20260318.json"
+}

@@ -1,0 +1,23 @@
+{
+  "artifact_path": "data\\registry\\g5_single_canonical_replay_report.json",
+  "asof_ts": "2026-05-09T09:28:28Z",
+  "date_range": {
+    "end": "2024-02-29",
+    "start": "2024-01-02"
+  },
+  "extra": {
+    "dataset_name": "prices_tri_real_canonical_tiny_slice",
+    "mechanical_replay_result": "completed",
+    "promotion_ready": false,
+    "replay_run_id": "PH65_G5_SINGLE_CANONICAL_REPLAY_001"
+  },
+  "license_scope": "internal_governance_report",
+  "manifest_created_at_utc": "2026-05-09T09:28:28Z",
+  "manifest_schema_version": "1.0.0",
+  "provider": "terminal_zero",
+  "provider_feed": "g5_single_canonical_replay_report",
+  "row_count": 1,
+  "schema_version": "1.0.0",
+  "sha256": "15fb31547514c6274064d8bd1c1e283d46e6887062bf202b12bb742e28686ab3",
+  "source_quality": "canonical"
+}

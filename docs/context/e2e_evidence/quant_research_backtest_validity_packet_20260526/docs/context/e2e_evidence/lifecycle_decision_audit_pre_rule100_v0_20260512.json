@@ -1,0 +1,203 @@
+{
+  "actions": {
+    "BUY": 18,
+    "HOLD": 993,
+    "NO_ACTION": 4398,
+    "SELL": 15
+  },
+  "buy_sell_rows": 33,
+  "current_open_holds": [
+    {
+      "entry_date": "2026-03-05",
+      "entry_price": 346.53,
+      "primary_reason": "pit_lifecycle_confirmed",
+      "ticker": "AMAT",
+      "weight": 0.1
+    },
+    {
+      "entry_date": "2026-04-29",
+      "entry_price": 248.75,
+      "primary_reason": "pit_lifecycle_confirmed",
+      "ticker": "LRCX",
+      "weight": 0.1
+    },
+    {
+      "entry_date": "2025-06-03",
+      "entry_price": 197.61,
+      "primary_reason": "pit_lifecycle_confirmed",
+      "ticker": "TSM",
+      "weight": 0.1
+    }
+  ],
+  "date_range": {
+    "end": "2026-05-11",
+    "start": "2025-01-02"
+  },
+  "decision_rows": 5424,
+  "does_well": [
+    "No <=5-day round trips in the exported buy/sell tape.",
+    "Replay is not sell-all; open holds remain after the latest exported date.",
+    "Both buy and sell decisions are explainable with explicit reason codes."
+  ],
+  "needs_audit": [
+    "389 held ticker-days have factor deterioration without a full exit.",
+    "33 raw exit ticker-days were suppressed by min-hold/confirmation guards.",
+    "45 entry ticker-days were delayed by multi-day confirmation.",
+    "Supply/pricing/margin are currently proxy-mapped from feature-store columns; literal Rule-of-100 columns are not yet present."
+  ],
+  "reason_counts": {
+    "capital_cycle_gate_failed": 1039,
+    "demand_gate_failed": 2306,
+    "entry_confirmation_pending": 45,
+    "exit_pending_confirmation": 18,
+    "exit_pending_min_hold": 15,
+    "factor_confirmation_failed_0_of_3": 48,
+    "factor_confirmation_failed_0_of_4": 2,
+    "factor_confirmation_failed_1_of_3": 592,
+    "factor_confirmation_failed_1_of_4": 1135,
+    "factor_confirmation_failed_2_of_3": 76,
+    "factor_confirmation_failed_2_of_4": 1727,
+    "factor_coverage_missing": 82,
+    "hold_factor_deterioration_no_exit": 389,
+    "hold_factors_intact": 562,
+    "hold_no_exit_signal": 9,
+    "parabolic_stretch": 7,
+    "pit_lifecycle_confirmed": 18,
+    "technical_entry_zone_failed": 1333,
+    "technical_entry_zone_missing": 992,
+    "trend_veto": 1034
+  },
+  "round_trips": [
+    {
+      "entry_date": "2025-01-10",
+      "exit_date": "2025-02-28",
+      "exit_reason": "trend_veto",
+      "hold_days": 49,
+      "ticker": "TSM"
+    },
+    {
+      "entry_date": "2025-02-03",
+      "exit_date": "2025-03-07",
+      "exit_reason": "trend_veto",
+      "hold_days": 32,
+      "ticker": "TSLA"
+    },
+    {
+      "entry_date": "2025-01-06",
+      "exit_date": "2025-03-10",
+      "exit_reason": "trend_veto",
+      "hold_days": 63,
+      "ticker": "AMZN"
+    },
+    {
+      "entry_date": "2025-03-26",
+      "exit_date": "2025-04-15",
+      "exit_reason": "trend_veto",
+      "hold_days": 20,
+      "ticker": "AMZN"
+    },
+    {
+      "entry_date": "2025-07-18",
+      "exit_date": "2025-08-18",
+      "exit_reason": "trend_veto",
+      "hold_days": 31,
+      "ticker": "AMAT"
+    },
+    {
+      "entry_date": "2025-07-03",
+      "exit_date": "2025-09-11",
+      "exit_reason": "parabolic_stretch",
+      "hold_days": 70,
+      "ticker": "MU"
+    },
+    {
+      "entry_date": "2025-06-02",
+      "exit_date": "2025-09-12",
+      "exit_reason": "parabolic_stretch",
+      "hold_days": 102,
+      "ticker": "LRCX"
+    },
+    {
+      "entry_date": "2025-05-27",
+      "exit_date": "2026-01-05",
+      "exit_reason": "trend_veto",
+      "hold_days": 223,
+      "ticker": "MSFT"
+    },
+    {
+      "entry_date": "2025-10-14",
+      "exit_date": "2026-01-06",
+      "exit_reason": "parabolic_stretch",
+      "hold_days": 84,
+      "ticker": "LRCX"
+    },
+    {
+      "entry_date": "2025-11-24",
+      "exit_date": "2026-01-06",
+      "exit_reason": "parabolic_stretch",
+      "hold_days": 43,
+      "ticker": "WDC"
+    },
+    {
+      "entry_date": "2025-11-14",
+      "exit_date": "2026-02-06",
+      "exit_reason": "trend_veto",
+      "hold_days": 84,
+      "ticker": "AMZN"
+    },
+    {
+      "entry_date": "2025-12-16",
+      "exit_date": "2026-03-04",
+      "exit_reason": "trend_veto",
+      "hold_days": 78,
+      "ticker": "AVGO"
+    },
+    {
+      "entry_date": "2026-02-24",
+      "exit_date": "2026-04-09",
+      "exit_reason": "parabolic_stretch",
+      "hold_days": 44,
+      "ticker": "WDC"
+    },
+    {
+      "entry_date": "2026-02-05",
+      "exit_date": "2026-04-10",
+      "exit_reason": "parabolic_stretch",
+      "hold_days": 64,
+      "ticker": "LRCX"
+    },
+    {
+      "entry_date": "2026-02-06",
+      "exit_date": "2026-04-15",
+      "exit_reason": "parabolic_stretch",
+      "hold_days": 68,
+      "ticker": "MU"
+    }
+  ],
+  "rule100_proxy_sources": {
+    "demand": "z_demand",
+    "margin": "z_discipline_cond",
+    "pricing": "z_moat",
+    "supply": "z_inventory_quality_proxy"
+  },
+  "short_round_trip_count": 0,
+  "tickers": [
+    "AMAT",
+    "AMD",
+    "AMZN",
+    "AVGO",
+    "GOOGL",
+    "INTC",
+    "LRCX",
+    "META",
+    "MSFT",
+    "MU",
+    "NVDA",
+    "SNDK",
+    "TSLA",
+    "TSM",
+    "VRT",
+    "WDC"
+  ],
+  "unmatched_sell_count": 0
+}

@@ -31,7 +31,7 @@ live_overlay_allowed = false
 scan_refresh_allowed = false
 replay_rebuild_allowed = false
 automatic_repair_allowed = false
-allowed_boot_write = docs/context/boot_status_current.json
+allowed_boot_write = runtime/boot_status_current.json
 ```
 
 ### Subroute A — current optimizer/allocation readiness
@@ -287,16 +287,18 @@ Run the gate inside a file mutation guard. The only allowed automatic write is:
 runtime/boot_status_current.json
 ```
 
-`docs/context/boot_status_current.json` is a legacy fallback/read path during
-the BOOT-0A migration, not the canonical generated runtime verdict. No markdown
-companion or alternate durable boot-status path is part of v0.
+`runtime/boot_status_current.json` is the canonical v0 JSON output.
+`docs/context/boot_status_current.json` is a noncanonical context snapshot path
+only and must not be used as a safe-boot fallback, mirror, or compatibility
+path. No markdown companion is part of v0.
 
 Strict FAIL if any other file changes, appears, disappears, or has modified hash/mtime/size.
 
 ## 7. Minimal `boot_status_current.json` for v0
 
 The canonical v0 payload lives at `runtime/boot_status_current.json`.
-`docs/context/boot_status_current.json` is legacy compatibility evidence only.
+Boot-status readers must not fall back to `docs/context/boot_status_current.json`
+or any other alternate default, mirror, or compatibility path.
 
 v0 should implement a smaller payload than the target schema:
 

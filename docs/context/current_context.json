@@ -1,7 +1,14 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-05-11T09:56:50Z",
+  "generated_at_utc": "2026-06-25T00:00:00Z",
   "source_files": [
+    "docs/context/bridge_contract_current.md",
+    "docs/context/done_checklist_current.md",
+    "docs/context/impact_packet_current.md",
+    "docs/context/multi_stream_contract_current.md",
+    "docs/context/observability_pack_current.md",
+    "docs/context/planner_packet_current.md",
+    "docs/context/post_phase_alignment_current.md",
     "docs/decision log.md",
     "docs/handover/dash_1_page_registry_shell_handover_20260510.md",
     "docs/handover/dashboard_ia_handover_20260510.md",
@@ -47,6 +54,7 @@
     "docs/handover/phase65_g8_supercycle_candidate_card_handover.md",
     "docs/handover/phase65_handover.md",
     "docs/handover/phase65_optimizer_core_structured_diagnostics_handover.md",
+    "docs/handover/phase65_rule100_dynamic_ui_replay_ytd_handover.md",
     "docs/lessonss.md",
     "docs/phase_brief/phase0-brief.md",
     "docs/phase_brief/phase10-brief.md",
@@ -106,45 +114,22 @@
   ],
   "active_phase": 65,
   "what_was_done": [
-    "Implemented the Dashboard Architecture Safety Slice.",
-    "Added `utils/process.py::pid_is_running` and routed Windows-reachable runtime PID probes through it.",
-    "Removed dashboard backtest spawn's unverified PID-file-owner termination path; live PID files now fail closed.",
-    "Collapsed dashboard strategy-matrix initialization into one helper path.",
-    "Delegated dashboard portfolio price cleanup to `core.data_orchestrator.clean_price_frame`.",
-    "Implemented Dashboard Scanner Testability Hardening.",
-    "Added `strategies/scanner.py` for deterministic scanner macro, breadth, technical, entry, tactic, proxy, rating, and leverage math.",
-    "Updated `dashboard.py` to preserve provider/cache/payload ownership while delegating scanner enrichment to `strategies.scanner.enrich_scan_frame`.",
-    "Added scanner boundary tests plus direct `AdaptiveTrendStrategy`, `ProductionConfig`, `core.etl`, and InvestorCockpit quality-cap coverage.",
-    "Refreshed `tests/pytest_out.txt` from the stale two-test artifact to the current full-suite PASS summary.",
-    "Preserved D-353 provenance gates and R64.1 dependency hygiene as closed baseline truth.",
-    "Implemented optimizer structured diagnostics as a diagnostics-only round.",
-    "Added `strategies/optimizer_diagnostics.py` with feasibility, bound, constraint, solver, severity, and fallback report objects.",
-    "Updated `strategies/optimizer.py` with diagnostic-returning optimizer methods while preserving existing weight-returning methods.",
-    "Updated `views/optimizer_view.py` to show optimization status, feasibility status, active constraints, assets at max cap, assets at lower bound, equal-weight-forced status, residuals, and fallback labels.",
-    "Converted optimizer audit strict xfail debt into passing diagnostics tests.",
-    "Reconciled SAW data-integrity review by making non-finite diagnostic weights fail closed as errors.",
-    "Published SAW PASS for `OPTIMIZER_CORE_STRUCTURED_DIAGNOSTICS_20260510`."
+    "Completed the sparse-engine core: DuckDB direct aggregation, global trading-calendar `return_idx:int32`, `entry_idx/exit_idx` interval bounds, numeric-only projected relations, object-dtype rejection, single-thread compensated aggregation, and canonical daily SHA-256 output hashing.",
+    "Turnover continues to preserve entry, overlap, exit, and final trade-to-zero parity; no wide matrix, chunking, physical repartitioning, Numba, or multiprocessing was added.",
+    "Focused M6 PASS 12/12; M5a+M6 PASS 16/16; broader PEAD PASS 109/109; 11,798,280-position-day smoke is within the configured bound.",
+    "M4A full-universe expansion remains a prior verified milestone reference for context hygiene."
   ],
   "what_is_locked": [
-    "Direct runtime `os.kill(pid, 0)` PID liveness probes remain blocked outside `utils/process.py`.",
-    "Dashboard backtest spawn must not terminate unverified PID-file owners.",
-    "Dashboard architecture safety changes do not authorize provider ingestion, canonical writes, strategy search, ranking, scoring, alerts, brokers, or dashboard redesign.",
-    "Scanner extraction is behavior-preserving testability work; it does not authorize scanner semantic changes, provider ingestion, canonical writes, ranking/scoring policy changes, alerts, brokers, dashboard redesign, or candidate-card dashboard integration.",
-    "Scanner formula changes must land in `strategies/scanner.py` with `tests/test_scanner.py` boundary coverage.",
-    "The quarantined lower-bound/SLSQP diff remains rejected as-is.",
-    "The approved optimizer objective remains unchanged.",
-    "Lower-bound feasibility diagnostics do not approve lower-bound allocation policy.",
-    "MU conviction, WATCH investability expansion, Black-Litterman, simple tilt, new objectives, scanner rules, manual overrides, providers, alerts, brokers, and replay behavior remain blocked."
+    "Engine completion does not satisfy M6b data readiness. Strict EPS vintage, delisting-adjusted tradable returns, and full as-of tradability/liquidity remain absent and fail closed.",
+    "No provider/data/UI/alpha/ranking/action/real-curve scope was opened."
   ],
   "what_is_next": [
-    "Continue review or hold.",
-    "Diagnostics closure is PASS; either hold or plan `PORTFOLIO_THESIS_ANCHOR_POLICY_PLANNING`.",
-    "Do not approve conviction, Black-Litterman, MU policy, or WATCH investability without a separate planning round."
+    "**Single next action: obtain a fresh independent Reviewer C terminal review for the completed M6a.1 sparse core; Reviewer A and Reviewer B have passed. Only then start M6b data-prep for its independent data gates.**"
   ],
-  "first_command": ".venv\\Scripts\\python -m pytest tests\\test_scanner.py tests\\test_strategy.py tests\\test_phase15_integration.py tests\\test_adaptive_trend.py tests\\test_production_config.py tests\\test_core_etl.py tests\\test_process_utils.py -q",
+  "first_command": ".venv\\\\Scripts\\\\python.exe -m pytest tests\\\\test_pead_m6_pit_walk_forward_equity_curve.py -q",
   "next_todos": [
-    "Hold or approve a separate thesis-anchor planning round.",
-    "Full pytest passed for the scanner hardening addendum; keep using focused tests for formula changes and full pytest for closure claims.",
-    "Keep inherited yfinance display refresh and YTD equal-weight fallback visible as future policy/hygiene items."
+    "`V2-PEAD-M6A-SCALE-SPARSE-PORTFOLIO-ENGINE`: core implementation complete locally; Reviewer A and Reviewer B passed; fresh Reviewer C rerun pending.",
+    "`V2-PEAD-M6B-DATA-PREP`: blocked by independent strict data decisions.",
+    "`V2-PEAD-REAL-RUN-EQUITY-CURVE`: blocked until M6b closes its data contract."
   ]
 }

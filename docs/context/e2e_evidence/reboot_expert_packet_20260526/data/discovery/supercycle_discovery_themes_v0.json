@@ -1,0 +1,107 @@
+{
+  "taxonomy_id": "SUPERCYCLE_DISCOVERY_THEMES_V0",
+  "created_at": "2026-05-10T00:00:00+08:00",
+  "scope": "PH65_G8_1_INTAKE_ONLY",
+  "authority": "definition_only_candidate_discovery_intake",
+  "themes": [
+    {
+      "theme_id": "AI_COMPUTE_INFRA",
+      "label": "AI compute infrastructure",
+      "description": "Compute, accelerator, and data-center infrastructure names that may warrant intake research for AI-capacity buildout exposure.",
+      "evidence_requirements": [
+        "official segment revenue or order evidence",
+        "capex or customer-demand evidence from official filings",
+        "thesis-breaker evidence for margin, supply, or customer concentration"
+      ]
+    },
+    {
+      "theme_id": "AI_SERVER_SUPPLY_CHAIN",
+      "label": "AI server supply chain",
+      "description": "Server, systems, networking, and integration names that may sit in the AI infrastructure supply chain.",
+      "evidence_requirements": [
+        "official backlog or order evidence",
+        "customer concentration and margin evidence",
+        "supply-chain capacity and execution-risk evidence"
+      ]
+    },
+    {
+      "theme_id": "MEMORY_STORAGE_SUPERCYCLE",
+      "label": "Memory and storage supercycle",
+      "description": "Memory, storage, and related cyclicals that may benefit from structural demand or supply discipline.",
+      "evidence_requirements": [
+        "official memory or storage cycle evidence",
+        "supply discipline and pricing evidence",
+        "cycle-breaker evidence for oversupply, capex, or margin pressure"
+      ]
+    },
+    {
+      "theme_id": "SEMICAP_EQUIPMENT",
+      "label": "Semiconductor capital equipment",
+      "description": "Semiconductor equipment and process-control names that may benefit from AI, memory, logic, or reshoring capex.",
+      "evidence_requirements": [
+        "official order, backlog, or WFE demand evidence",
+        "customer capex and cycle evidence",
+        "export-control, concentration, and cancellation-risk evidence"
+      ]
+    },
+    {
+      "theme_id": "POWER_COOLING_GRID",
+      "label": "Power, cooling, and grid bottlenecks",
+      "description": "Electricity, cooling, grid, and infrastructure names tied to data-center and industrial power constraints.",
+      "evidence_requirements": [
+        "official demand, contract, or utility-load evidence",
+        "capacity and permitting evidence",
+        "commodity, regulation, and execution-risk evidence"
+      ]
+    },
+    {
+      "theme_id": "CRITICAL_MINERALS_LITHIUM",
+      "label": "Critical minerals and lithium",
+      "description": "Lithium and critical-mineral names that may sit in battery, storage, and electrification supply chains.",
+      "evidence_requirements": [
+        "official production, price, and volume evidence",
+        "cost-curve and balance-sheet evidence",
+        "oversupply, substitution, and demand-risk evidence"
+      ]
+    },
+    {
+      "theme_id": "RESHORING_FOUNDRY",
+      "label": "Reshoring and foundry",
+      "description": "Foundry, manufacturing, and national-capacity names that may connect to reshoring, supply security, or AI PC cycles.",
+      "evidence_requirements": [
+        "official capex, subsidy, or foundry-customer evidence",
+        "yield and utilization evidence",
+        "turnaround, execution, and balance-sheet breaker evidence"
+      ]
+    },
+    {
+      "theme_id": "DEFENSE_INDUSTRIAL",
+      "label": "Defense industrial",
+      "description": "Defense, aerospace, and industrial-base names that may warrant intake under supply-chain rebuilding themes.",
+      "evidence_requirements": [
+        "official backlog, bookings, or program evidence",
+        "budget and procurement evidence",
+        "execution, margin, and program-cancellation breaker evidence"
+      ]
+    },
+    {
+      "theme_id": "BIOTECH_PLATFORM",
+      "label": "Biotech platform",
+      "description": "Biotech platform names that may warrant intake where evidence supports durable platform leverage rather than single-event speculation.",
+      "evidence_requirements": [
+        "official clinical, regulatory, or partnership evidence",
+        "platform-repeatability evidence",
+        "cash runway, dilution, and trial-failure breaker evidence"
+      ]
+    }
+  ],
+  "forbidden_use": [
+    "candidate ranking",
+    "candidate scoring",
+    "validated thesis",
+    "buying range",
+    "alerts",
+    "broker behavior",
+    "provider ingestion"
+  ]
+}

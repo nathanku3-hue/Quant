@@ -1,0 +1,75 @@
+{
+  "packet_id": "V2_D0_1_WRDS_PERMISSION_TRUTH_AUTHORIZATION",
+  "round_id": "ROUND-20260603-V2-D0-1-AUTHORIZATION-INTENT",
+  "scope_id": "V2_D0_1_WRDS_PERMISSION_TRUTH_AUTHORIZATION_INTENT",
+  "status": "INTENT_RECORDED_EVIDENCE_MISSING",
+  "artifact_type": "authorization_intent_packet",
+  "is_final_approval_artifact": false,
+  "authority": "permission-truth authorization intent only",
+  "user_approval_intent_recorded": true,
+  "exact_approval_ref_valid": false,
+  "blocking_reason": "No qualifying non-secret entitlement evidence exists for the five V2-D0.1 WRDS rows.",
+  "secret_handling": {
+    "local_secret_material_path": "secret.txt",
+    "statement": "secret.txt is local secret material and is not non-secret entitlement evidence.",
+    "read_or_quoted": false,
+    "usable_as_entitlement_evidence": false,
+    "must_remain_ignored_local": true
+  },
+  "rows": [
+    {
+      "library_table": "crsp.dsf",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    },
+    {
+      "library_table": "crsp.stocknames",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    },
+    {
+      "library_table": "crsp.ccmxpf_linktable",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    },
+    {
+      "library_table": "comp.fundq",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    },
+    {
+      "library_table": "ibes.det_epsus",
+      "evidence_status": "evidence_missing",
+      "permission_status": "pending",
+      "approval_ref": null
+    }
+  ],
+  "proposed_future_approval_text_template": "I approve V2-D0.1 WRDS permission-truth recording for provenance_contract use only for the following exact WRDS rows: crsp.dsf, crsp.stocknames, crsp.ccmxpf_linktable, comp.fundq, and ibes.det_epsus. I confirm non-secret entitlement evidence exists for these rows, including account/license owner, account scope, exact library.table permissions, license/access constraints, and date/as-of coverage. I authorize recording row/table approval_ref values only after that non-secret evidence is attached. This approval does not authorize provider access, credential use, WRDS probes, snapshots, data writes, dashboard/runtime work, scoring/ranking, alerts, broker/order paths, legacy cleanup, SafeBoot, or BootReady.",
+  "todos": {
+    "TODO-ENTITLEMENT-001": "pending_blocking",
+    "TODO-APPROVAL-001": "pending_blocking",
+    "TODO-CLEANROOM-001": "pending",
+    "TODO-LEGACY-WRDS-001": "open_blocked",
+    "TODO-VALIDITY-001": "pending",
+    "TODO-PUBLIC-MAIN-001": "open"
+  },
+  "blocked_scope": [
+    "provider_access",
+    "wrds_imports",
+    "credentials_use",
+    "probe_execution",
+    "snapshots",
+    "data_writes",
+    "dashboard_runtime",
+    "scoring",
+    "broker_paths",
+    "legacy_cleanup",
+    "secret_remediation",
+    "SafeBoot",
+    "BootReady"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "artifacts": {
+    "cash_csv": "E:\\Code\\Quant\\data\\processed\\rule100_softmax_v1_cash_allocation.csv",
+    "comparison_csv": "E:\\Code\\Quant\\data\\processed\\rule100_softmax_v1_comparison.csv",
+    "history_csv": "E:\\Code\\Quant\\data\\processed\\rule100_softmax_v1_history.csv",
+    "sample_csv": "E:\\Code\\Quant\\data\\processed\\rule100_softmax_v1_sample_output.csv",
+    "summary_json": "E:\\Code\\Quant\\data\\processed\\rule100_softmax_v1_summary.json"
+  },
+  "as_of_date": "2026-05-12",
+  "boundary": {
+    "broker_or_alert_behavior": false,
+    "kelly_comparator_only": true,
+    "mutates_lifecycle_log": false,
+    "mutates_position_memory": false,
+    "runtime_ui_wiring_changed": false,
+    "softmax_v1_primary": true
+  },
+  "current_v0_summary": {
+    "cash_residual": 0.7,
+    "gross_weight": 0.30000000000000004,
+    "herfindahl": 0.3333333333333333,
+    "max_weight": 0.1,
+    "nonzero_names": 3
+  },
+  "feature_dates_used": [
+    "2026-05-11"
+  ],
+  "kelly_config": {
+    "gross_budget_cap": 1.0,
+    "gross_budget_per_name": 0.1,
+    "max_single_name_weight": 0.15,
+    "odds": 1.0
+  },
+  "scope": "rule100_softmax_v1_audit",
+  "sizing_summary": {
+    "eligible_count": 2,
+    "gross_budget": 0.2,
+    "kelly_ablation": {
+      "cash_residual": 1.0,
+      "gross_weight": 0.0,
+      "herfindahl": 0.0,
+      "max_weight": 0.0,
+      "nonzero_names": 0
+    },
+    "kelly_comparator_only": true,
+    "kelly_odds": 1.0,
+    "max_single_name_weight": 0.15,
+    "softmax": {
+      "cash_residual": 0.8,
+      "gross_weight": 0.2,
+      "herfindahl": 0.5,
+      "max_weight": 0.1,
+      "nonzero_names": 2
+    },
+    "temperature": 1.0
+  },
+  "softmax_config": {
+    "age_penalty_weight": 0.0,
+    "factor_weight": 0.75,
+    "gross_budget_cap": 1.0,
+    "gross_budget_per_name": 0.1,
+    "hold_weight": 0.0,
+    "max_single_name_weight": 0.15,
+    "technical_weight": 0.25,
+    "temperature": 1.0,
+    "trim_penalty_weight": 0.0
+  },
+  "status": "ok"
+}

@@ -1,0 +1,66 @@
+{
+  "checks": {
+    "PF-01": true,
+    "PF-02": true,
+    "PF-03": true,
+    "PF-04": true,
+    "PF-05": true,
+    "PF-06": true,
+    "SEMANTIC": true
+  },
+  "details": {
+    "PF-01": {
+      "cost_bps_gate": 5.0,
+      "end_date": "2022-12-31",
+      "max_date": "2022-12-31",
+      "packet_id": "PHASE60_GOVERNED_CUBE_V1",
+      "start_date": "2015-01-01"
+    },
+    "PF-02": {
+      "cube_rows": 72471,
+      "daily_rows": 2021,
+      "missing_fields": [],
+      "uses_phase50_fill": false
+    },
+    "PF-03": {
+      "cost_bps_gate": 5.0,
+      "expected_sensitivity_bps": 10.0
+    },
+    "PF-04": {
+      "gates": [
+        "GATE-01",
+        "GATE-02",
+        "GATE-03",
+        "GATE-04",
+        "GATE-05"
+      ],
+      "kill_switches": [
+        "KS-01",
+        "KS-02",
+        "KS-03",
+        "KS-04",
+        "KS-05"
+      ]
+    },
+    "PF-05": {
+      "cube_path": "E:\\Code\\Quant\\data\\processed\\phase60_governed_cube.csv",
+      "daily_path": "E:\\Code\\Quant\\data\\processed\\phase60_governed_cube_daily.csv",
+      "summary_path": "E:\\Code\\Quant\\data\\processed\\phase60_governed_cube_summary.json"
+    },
+    "PF-06": {
+      "summary_cube_path": "E:\\Code\\Quant\\data\\processed\\phase60_governed_cube.csv",
+      "summary_daily_path": "E:\\Code\\Quant\\data\\processed\\phase60_governed_cube_daily.csv",
+      "summary_summary_path": "E:\\Code\\Quant\\data\\processed\\phase60_governed_cube_summary.json"
+    },
+    "allocator_overlay_abs_sum": 0.0,
+    "allowed_sleeves": [
+      "phase56_event_pead",
+      "phase57_event_corporate_actions"
+    ],
+    "book_id_values": [
+      "PHASE60_GOVERNED_BOOK_V1"
+    ]
+  },
+  "packet_id": "PHASE60_D340_PREFLIGHT_V1",
+  "passed": true
+}

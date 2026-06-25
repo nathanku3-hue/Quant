@@ -1,0 +1,7 @@
+GitHub repo: https://github.com/nathanku3-hue/Quant.git
+GitHub branch: https://github.com/nathanku3-hue/Quant/tree/codex/optimizer-core-structured-diagnostics
+Commit: https://github.com/nathanku3-hue/Quant/commit/cec79312e091107e9a4bbd14ba855c59f2ca5a75
+Local HEAD: cec79312e091107e9a4bbd14ba855c59f2ca5a75
+Remote branch line: cec79312e091107e9a4bbd14ba855c59f2ca5a75	refs/heads/codex/optimizer-core-structured-diagnostics
+Local HEAD equals remote branch HEAD as of packet creation when the hashes match above.
+Local workspace has uncommitted changes; see GIT_STATUS_SHORT.txt and docs/context/dirty_worktree_manifest.md when present.

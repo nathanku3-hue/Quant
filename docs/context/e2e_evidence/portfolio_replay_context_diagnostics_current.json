@@ -1,0 +1,41 @@
+{
+  "closed_trade_return_summary": {
+    "closed_trades": 0,
+    "mean_return": 0.0,
+    "median_return": 0.0
+  },
+  "exit_reason_quality": {
+    "exit_rows": 0,
+    "missing_reason_rate": 0.0,
+    "missing_reason_rows": 0
+  },
+  "hold_time_summary": {
+    "closed_trades": 0,
+    "max_days": 0,
+    "mean_days": 0.0,
+    "median_days": 0.0
+  },
+  "identity": {
+    "cache_signature_hash": "1d6e02b94b7bf4b42e21ddd07b3c4a8174818966c7bc4c2c9fb367d7d7aa4eeb",
+    "method_id": "Inverse Volatility",
+    "run_id": "strategy_replay_522b42498c8ff446a4",
+    "source_id": "selected_method_replay:Inverse Volatility:strategy_replay_522b42498c8ff446a4",
+    "source_mode": "transitional_build"
+  },
+  "reason_code_concentration": {
+    "top_reason": "missing_reason",
+    "top_reason_share": 1.0,
+    "unique_reasons": 1
+  },
+  "zero_exposure_buy_rows": {
+    "count": 1,
+    "rows": [
+      {
+        "date": "2026-04-24",
+        "reason": "",
+        "target_weight": 0.0,
+        "ticker": "MU"
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+BranchState: advisory evidence from dirty local root
+Branch: codex/optimizer-core-structured-diagnostics
+LocalHEAD: b3f3f40c7a8e6874084bf3a37ca4e20e89696621
+Upstream: eb3b0ec05201fcb8b26924b631ad502e9f7fb255
+AheadBehind_HEAD_vs_upstream: 0	30 (left=ahead, right=behind)
+TrackedDirtyCount: 55
+UntrackedCount: 181
+RemoteOptimizerTip: eb3b0ec05201fcb8b26924b631ad502e9f7fb255
+RemoteMetaHarnessTip: 25341e5d980a016dca35a1e05a00fae65b9b07c5
+Authority: Local dirty/untracked files are non-authoritative and must not be treated as implementation-ready truth.
+ExecutionNote: This packet did not fetch, pull, create a branch, run provider ingestion, generate data, or touch runtime boot status.

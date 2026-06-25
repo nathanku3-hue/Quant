@@ -132,26 +132,15 @@ Risk tier checks:
 - Operational impact and rollback path are documented.
 
 ## 9. Observability and Reporting (Mandatory)
-- Final responses must use the Ship-Fast PM Brief unless the user explicitly asks for raw logs, code review format, or a narrow Q&A answer.
-- The first paragraph must answer: what actually changed, what artifact/result was produced, and practical effect.
-- If the requested work type is execution/code/test/provider_probe/commit/validation/data_output, the final response must explicitly say whether that work was performed; if not, `Outcome` must be `REJECTED` or `PARTIAL_WITH_EXPLICIT_SCOPE`.
+- Worker reports and SAW packets are evidence artifacts, not the default chat response.
+- Final chat responses use at most four short plain-language lines: `Status`, `Why`, `Next`, and `Decision needed`.
+- Lead with the practical result or blocker. Do not lead with internal workflow metadata.
+- If requested execution, code, tests, provider access, commit, validation, or data output was not performed, state that plainly in `Status` or `Why` without exposing internal outcome enums.
 - Do not lead with numbered command logs, subagent chatter, SAW internals, or generic activity summaries.
 - Do not say work is docs-only unless the requested work was docs-only or execution was explicitly rejected/blocked.
-- The final answer must start with `Outcome`, `Round`, `Progress`, and `Confidence`; do not start with `# Worker Report`, `Worker Report`, SAW Verdict, ClosurePacket, numbered reviewer passes, numbered command logs, or SAW internals.
-- Required top fields:
-  - `Outcome: DONE / PARTIAL_WITH_EXPLICIT_SCOPE / REJECTED`
-  - `Round: <round/task>`
-  - `Progress: <before>/100 -> <after>/100`
-  - `Confidence: <0-10>/10`
-- Required sections:
-  - `What I did`
-  - `PM-facing status`
-  - `Key decisions made`
-  - `Validation / evidence`
-  - `What is still blocked`
-  - `Next round recommendation`
-  - `Worker accountability`
-- Keep validation details PM-scannable: passed checks, skipped checks with reason, and evidence artifacts.
+- Hide `Outcome`, `Round`, `Progress`, `Confidence`, ship-gate labels, SAW internals, hashes, absolute paths, file allowlists, command logs, and accountability fields unless the user asks for the artifact or evidence.
+- When the user asks for approval text, return only the pasteable approval block.
+- Detailed validation remains in the worker report or SAW artifact. Chat includes only the evidence needed to make the next decision.
 
 ## 10. Self-Learning Feedback Loop (Mandatory)
 - Source of truth: `docs/lessonss.md`.
@@ -190,6 +179,7 @@ SAW must run after each work round (even docs-only rounds):
    - Reviewer B: runtime and operational resilience.
    - Reviewer C: data integrity and performance path.
    - Record ownership check: implementer and reviewers must be different agents; include this check in the SAW report.
+   - Before the final repair loop, preflight terminal Reviewer A/B/C capacity. If a required terminal rerun cannot be reserved, publish `SAW Verdict: BLOCK` immediately and do not imply closure from local machine evidence.
 3. Reconciliation pass
    - Fix all Critical/High findings in current-round scope.
    - For inherited out-of-scope Critical/High findings, carry them in `Open Risks` with owner and target milestone, and request explicit user acceptance before milestone close if they remain unresolved.

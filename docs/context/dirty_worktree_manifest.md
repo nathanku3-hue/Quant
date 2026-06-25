@@ -1,239 +1,419 @@
 # Dirty Worktree Classification Manifest
 
-Status: Current classification artifact
-Date: 2026-05-11
+Status: Current local intake artifact
+Date: 2026-05-26
 Workspace: `E:\Code\Quant`
 Branch: `codex/optimizer-core-structured-diagnostics`
-Authority: advisory-only worktree classification. This file does not authorize staging, deletion, revert, provider ingestion, dashboard redesign, scoring, ranking, alerting, broker behavior, live trading, or scope widening by itself.
+Authority: advisory-only worktree classification. This file does not authorize staging, deletion, revert, provider ingestion, dashboard redesign, scoring, ranking, alerting, broker behavior, live trading, expanded boot-preflight implementation, or scope widening by itself.
 
-## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
+## Anchor State
 
-Remote truth is anchored at:
+Current remote anchor:
 
 ```text
-7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e
+37abd445bdee5ab771c85dc544c9ec1489b9cee3 Add boot-core preflight contract v0
 ```
 
-Accepted audit verdict:
+Pushed anchors:
 
 ```text
-PASS_WITH_NOTES
+8716c51781d8524de4147cf42f17e52466913de4 Add research-validity runner v0 evidence gate
+c78d024618bb5553053e26b710904593b55492c6 Anchor research-validity runner v0 context
+37abd445bdee5ab771c85dc544c9ec1489b9cee3 Add boot-core preflight contract v0
 ```
 
-The accepted audit confirmed the `22f2788..7cbe3c0` range changed only:
+Verification at reconciliation:
 
 ```text
+HEAD == origin/codex/optimizer-core-structured-diagnostics == 37abd445bdee5ab771c85dc544c9ec1489b9cee3
+git diff --cached --name-status == empty
+boot-core tracked file diff == empty
+```
+
+Boot-core pushed files now treated as GitHub truth:
+
+```text
+BOOT.md
+launch.py
+core/boot_status.py
+scripts/boot_preflight.py
+tests/test_boot_preflight.py
+tests/test_boot_status_contract.py
 docs/architecture/boot_preflight_contract.md
+docs/context/boot_status_current.schema.json
+```
+
+Boot-core phase-2 residue:
+
+```text
+Classification: phase-2 expanded preflight/data-readiness work; not a blocking boot-core bug fix.
+Action: reset from worktree after snapshot.
+Preserved at: E:\Code\quant_dirty_snapshots\20260526_post_boot_core_reconciliation\boot_core_phase2_residue.patch
+Additional core/boot_status.py residue preserved at: E:\Code\quant_dirty_snapshots\20260526_post_boot_core_reconciliation\core_boot_status_second_residue.patch
+Reappeared core/boot_status.py residue preserved at: E:\Code\quant_dirty_snapshots\20260526_post_boot_core_reconciliation\core_boot_status_reappeared_residue.patch
+Earlier residue snapshot: E:\Code\quant_dirty_snapshots\20260526_boot_core_post_commit_residue\boot_phase2_residue.patch
+```
+
+## Intake Rule
+
+Do not implement expanded boot-preflight/data-readiness, stage files, commit files, delete files, clean files, stash files, or treat local dirty files as GitHub truth until this classification is reviewed.
+
+## Bucket Definitions
+
+- `A expanded boot-preflight/data-readiness candidate`: files that may belong to the next narrow data-readiness/preflight round.
+- `B context/governance update`: files that document current state or policy.
+- `C local evidence/archive only`: audit packets, generated evidence, review bundles, and archives that should not normally be committed.
+- `D generated noise/delete-ignore`: pid/stdout/stderr/status/log/scratch outputs and timestamp-only noise.
+- `E unrelated future work`: source/test/docs work outside the expanded preflight/data-readiness bucket.
+- `F unknown/leave unstaged`: files whose role is unclear or patch bundles requiring explicit review.
+
+## Bucket A - Expanded Boot-Preflight/Data-Readiness Candidate
+
+Remaining dirty/untracked files that can plausibly belong to the next narrow slice:
+
+```text
+core/data_readiness_gate.py
+scripts/run_data_readiness_gate.py
+tests/test_data_readiness_gate.py
+tests/test_data_readiness_gate_write_guard.py
+tests/test_provider_ports.py
+docs/architecture/data_readiness_gate_v0.md
+docs/context/data_artifact_taxonomy_current.json
+docs/context/portfolio_allocation_route_contract_v0.json
+```
+
+Potential integration files, currently clean after residue reset and not staged:
+
+```text
+core/boot_status.py
 scripts/boot_preflight.py
 tests/test_boot_preflight.py
 ```
 
-Remaining dirty local files are inherited/local context and are not GitHub truth. They must not be used as phase-close evidence, boot readiness evidence, research-validity evidence, strategy-validity evidence, alpha evidence, recommendation authority, or dashboard-promotion authority.
-
-Generated bundles, zips, packet folders, patches, runtime stdout/stderr/pid/status files, and evidence captures remain excluded from the audit-anchor commit unless a later explicit artifact policy approves them.
-
-The `generated_at_utc` byte-for-byte JSON determinism note from the audit is a future schema/test-hardening item, not a cleanup or implementation instruction for this anchor.
-
-## Purpose
-
-Classify the broader dirty worktree into reviewable buckets before any staging or cleanup action. This manifest is the handoff artifact for the next staging plan.
-
-## Current Local Evidence
-
-- `git diff --name-only` observed `36` tracked modified files.
-- `git ls-files --others --exclude-standard` observed `350` untracked files after this manifest was created and context validation was rerun.
-- Commit 1 (`a2d2d2a`, `.gitignore`) ignored root temp/runtime/vendor artifacts and reduced the visible untracked count to `346`.
-- Prior inventory used `345` untracked files; after Commit 1 the remaining visible drift is `+1` and sits inside the docs/source staging surface, not the ignore bucket.
-- `scripts/build_context_packet.py --validate` passed in the immediately preceding planning pass.
-- No files were staged, deleted, reverted, or cleaned as part of this manifest write.
-
-## Buckets
-
-- `accepted-source`: source, tests, docs, fixtures, policies, and static data intended to become reviewable committed work after validation.
-- `generated-evidence`: generated context, smoke, capture, audit, or profiling artifacts. Keep only when referenced by docs/tests or needed for evidence.
-- `quarantine`: preserved out-of-scope diffs or notes that should not be merged into active runtime behavior without a separate approval.
-- `ignore`: local temp/runtime/vendor artifacts that should not be staged.
-
-## Tracked Modified Files
-
-### accepted-source
+If the next slice needs those integration files, reapply only the reviewed data-readiness portions from:
 
 ```text
-.gitignore
-README.md
-core/data_orchestrator.py
+E:\Code\quant_dirty_snapshots\20260526_post_boot_core_reconciliation\boot_core_phase2_residue.patch
+```
+
+Do not include in the first expanded data-readiness slice without explicit approval:
+
+```text
+scripts/governance_preflight.py
+tests/test_boot_preflight_governance.py
+docs/architecture/governance_boundary_policy.md
+docs/context/boot_status_current.json
+docs/saw_reports/saw_data_readiness_gate_v0_20260526.md
 dashboard.py
-views/optimizer_view.py
-strategies/optimizer.py
-data/updater.py
-scripts/build_context_packet.py
-scripts/check_user_tickers.py
-scripts/parameter_sweep.py
-scripts/release_controller.py
-backtests/optimize_phase16_parameters.py
-tests/conftest.py
-tests/test_build_context_packet.py
-tests/test_dashboard_sprint_a.py
-tests/test_strategy.py
+views/page_registry.py
+tests/test_dash_1_page_registry_shell.py
+```
+
+## Bucket B - Context/Governance Documentation
+
+Tracked context and governance docs:
+
+```text
+PRD.md
+PRODUCT_SPEC.md
 docs/prd.md
 docs/spec.md
 docs/notes.md
 docs/lessonss.md
 docs/decision log.md
 docs/phase_brief/phase65-brief.md
-docs/phase_brief/dashboard-ui-fixes-sprint-a.md
-data/registry/candidate_events.jsonl
-data/registry/candidate_snapshot.json
-```
-
-### generated-evidence
-
-```text
 docs/context/bridge_contract_current.md
+docs/context/current_context.json
+docs/context/current_context.md
+docs/context/dirty_worktree_manifest.md
 docs/context/done_checklist_current.md
-docs/context/planner_packet_current.md
 docs/context/impact_packet_current.md
 docs/context/multi_stream_contract_current.md
 docs/context/observability_pack_current.md
+docs/context/planner_packet_current.md
 docs/context/post_phase_alignment_current.md
-docs/context/current_context.json
-docs/context/current_context.md
+docs/saw_reports/saw_research_validity_runner_v0_20260526.md
+```
+
+Untracked context/governance docs and reports:
+
+```text
+BOOT0_SHARED_BOOT_STATUS_RECONCILIATION_20260526.md
+PRODUCT_UX_RECONCILIATION_20260526.md
+docs/context/saw_frontend_ui_saved_replay_source_selector_20260514.md
+docs/handover/phase65_rule100_dynamic_ui_replay_ytd_handover.md
+docs/saw_reports/*.md
+```
+
+Context/governance warning:
+
+```text
+Do not create a broad docs/context-only commit from the current dirty docs.
+The diff is mixed, large, and includes stale local context.
+If a classification commit is needed, stage only this manifest after review.
+```
+
+## Bucket C - Local Evidence/Archive Only
+
+Root packet and implementation archives:
+
+```text
+BOOT0_SHARED_BOOT_STATUS_PACKAGE_20260526.zip
+governance_gate_v0_implementation_20260526.zip
+reboot_expert_packet_20260526_boot_preflight_v0.zip
+```
+
+Expert packets and extracted packet folders:
+
+```text
+docs/context/e2e_evidence/data_engineering_market_integrity_packet_20260526.zip
+docs/context/e2e_evidence/data_engineering_market_integrity_packet_20260526/
+docs/context/e2e_evidence/governance_risk_boundary_packet_20260526.zip
+docs/context/e2e_evidence/governance_risk_boundary_packet_20260526/
+docs/context/e2e_evidence/product_ux_ready_workflow_packet_20260526.zip
+docs/context/e2e_evidence/product_ux_ready_workflow_packet_20260526/
+docs/context/e2e_evidence/quant_research_backtest_validity_packet_20260526.zip
+docs/context/e2e_evidence/quant_research_backtest_validity_packet_20260526/
+docs/context/e2e_evidence/reboot_expert_packet_20260526.zip
+docs/context/e2e_evidence/reboot_expert_packet_20260526/
+docs/context/e2e_evidence/reboot_expert_packet_20260526_v2/
+docs/context/e2e_evidence/rule100_softmax_v1_expert_packet_20260512.zip
+docs/context/e2e_evidence/rule100_softmax_v1_expert_packet_20260512/
+```
+
+Generated evidence JSONs and smoke outputs to archive only unless referenced by a committed evidence policy:
+
+```text
+docs/context/e2e_evidence/*smoke.json
+docs/context/e2e_evidence/*audit*.json
+docs/context/e2e_evidence/portfolio_replay_context_diagnostics_current.json
+docs/context/e2e_evidence/replay_selected_price_loading_mu_sndk_trace_20260515.json
+docs/context/e2e_evidence/lifecycle_churn_weight_8509_smoke.json
+docs/context/e2e_evidence/lifecycle_decision_audit_20260512.json
+docs/context/e2e_evidence/lifecycle_decision_audit_20260513.json
+docs/context/e2e_evidence/lifecycle_decision_audit_pre_rule100_v0_20260512.json
+docs/context/e2e_evidence/portfolio_ytd_return_fix_8509_smoke.json
+docs/context/e2e_evidence/rule100_method_label_8509_smoke.json
+```
+
+Packet/review reports that are archive-only unless explicitly promoted:
+
+```text
+docs/saw_reports/saw_reboot_expert_packet_20260526.md
+docs/saw_reports/saw_quant_research_backtest_validity_packet_20260526.md
+docs/saw_reports/saw_product_ux_ready_workflow_packet_20260526.md
+docs/saw_reports/saw_data_engineering_market_integrity_packet_20260526.md
+docs/saw_reports/saw_governance_risk_boundary_packet_20260526.md
+research_backtest_runner_v0_codex_prompt.md
+research_validity_contract.md
+```
+
+## Bucket D - Generated Noise/Delete-Ignore Candidate
+
+Root generated hash/scratch files:
+
+```text
+.boot0a_hash_after.csv
+.boot0a_hash_before.csv
+```
+
+Untracked runtime/process logs:
+
+```text
+docs/context/e2e_evidence/*_pid.txt
+docs/context/e2e_evidence/*_stdout.txt
+docs/context/e2e_evidence/*_stderr.txt
+docs/context/e2e_evidence/*_status.json
+docs/context/e2e_evidence/debug_import_8531_stdout.txt
+docs/context/e2e_evidence/debug_import_8531_stderr.txt
+```
+
+Tracked timestamp-only noise:
+
+```text
 docs/context/e2e_evidence/manual_capture_alerts.json
 docs/context/e2e_evidence/manual_capture_queue.json
 ```
 
-## Untracked Files By Group
-
-| Bucket | Group | Count | Staging Guidance |
-| --- | --- | ---: | --- |
-| accepted-source | `docs/architecture` | 71 | Stage by phase or policy family after doc-review pass. |
-| accepted-source | `docs/saw_reports` | 36 | Stage with matching phase/source changes after SAW validation. |
-| accepted-source | `docs/handover` | 34 | Stage with matching phase/source changes. |
-| accepted-source | `tests` | 33 source tests plus ignored `tests/pytest_out.txt` | Stage test files with owned source buckets only. |
-| accepted-source | `v2_discovery` | 28 | Stage as a dedicated V2 discovery bucket after focused tests. |
-| accepted-source | `data/fixtures` | 20 | Stage with manifest/hash checks. |
-| accepted-source | `data/registry` | 13 | Stage with registry report validation. |
-| accepted-source | `opportunity_engine` | 12 | Stage as opportunity-engine bucket after focused tests. |
-| accepted-source | `data/discovery` | 7 | Stage with discovery-policy docs and manifest checks. |
-| accepted-source | `data/candidate_cards` | 4 | Stage with candidate-card tests and manifest hash checks. |
-| accepted-source | `strategies` (`optimizer_diagnostics.py`, `portfolio_universe.py`, `scanner.py`) | 3 | Stage with optimizer/portfolio/scanner-focused tests. |
-| accepted-source | `scripts/strong_buy_scan.py` | 1 | Stage only if paired with tests or docs proving boundary. |
-| accepted-source | `utils/process.py` | 1 | Stage with process utility tests. |
-| accepted-source | `views/page_registry.py` | 1 | Stage with dashboard page-registry tests. |
-| accepted-source | `PRD.md`, `PRODUCT_SPEC.md` | 2 | Stage with docs-as-code changes. |
-| accepted-source | `docs/research/g7_1c_*.md` | 1 | Stage with research/source-audit docs. |
-| generated-evidence | `docs/context/e2e_evidence` | 73 | Stage only evidence files referenced by SAW/context docs. |
-| generated-evidence | `data/test_audit.json` | 1 | Stage only if referenced by a validation artifact. |
-| generated-evidence | `docs/architect/profile_outcomes.csv` | 1 | Stage only if referenced by architecture review evidence. |
-| quarantine | `docs/quarantine` (`patch` + `note`) | 2 | Preserve; do not merge quarantined runtime diff without separate approval. |
-| ignore | `SPGlobal_Avantax,Inc._SecurityDetail_19-Mar-2026.xlsx` | 1 | Do not stage; add ignore/quarantine decision before cleanup. |
-| ignore | `_optimizer_diff_tmp.txt` | 1 | Do not stage; delete only after explicit cleanup approval. |
-| ignore | `_untracked_tmp.txt` | 1 | Do not stage; delete only after explicit cleanup approval. |
-| ignore | `backtest_results.json` | 1 | Do not stage; already expected runtime output. |
-| ignore | `tests/pytest_out.txt` | 1 | Do not stage; generated test output. |
-
-## High-Risk Diff Verdict
-
-### `strategies/optimizer.py`
-
-Classification: `accepted-source`.
-
-Verdict: the current `strategies/optimizer.py` diff is classified as the accepted Optimizer Core Structured Diagnostics implementation, including `OptimizationMethod`, diagnostic-returning methods, SLSQP status capture, and feasibility checks.
-
-Boundary: this is not the quarantined lower-bound/SLSQP policy diff. The quarantined lower-bound policy remains preserved under `docs/quarantine` and must not be merged as active optimizer policy without a separate approved implementation round.
-
-## Required Reconciliation Before Staging
-
-1. Reconcile the current `346` untracked-file count against the prior `345` inventory before committing docs canon.
-2. Confirm each generated-evidence file is referenced by a SAW report, context packet, or evidence matrix before staging.
-3. Keep `ignore` artifacts unstaged; update `.gitignore` only for recurring runtime/temp artifacts after inspection.
-4. Stage `accepted-source` in logical buckets, not as one broad commit.
-5. Run focused tests for each bucket before staging.
-6. Run context rebuild and validation after context/docs buckets.
-7. Run SAW/review before claiming milestone closure.
-
-## Suggested Staging Buckets
+Cleanup rule:
 
 ```text
-1. process-safety-runtime
-   utils/process.py
-   dashboard.py
-   data/updater.py
-   scripts/parameter_sweep.py
-   scripts/release_controller.py
-   backtests/optimize_phase16_parameters.py
-   tests/test_process_utils.py
-
-2. optimizer-diagnostics-and-view
-   strategies/optimizer.py
-   strategies/optimizer_diagnostics.py
-   core/data_orchestrator.py
-   views/optimizer_view.py
-   tests/test_optimizer_core_policy.py
-   tests/test_optimizer_view.py
-   tests/test_data_orchestrator_portfolio_runtime.py
-
-3. portfolio-universe-and-dashboard
-   strategies/portfolio_universe.py
-   views/page_registry.py
-   tests/test_portfolio_universe.py
-   tests/test_dash_1_page_registry_shell.py
-   tests/test_dash_2_portfolio_ytd.py
-   tests/test_dashboard_sprint_a.py
-
-4. opportunity-engine-and-candidate-cards
-   opportunity_engine/
-   data/discovery/
-   data/candidate_cards/
-   tests/test_g8_supercycle_candidate_card.py
-   tests/test_g8_1_supercycle_discovery_intake.py
-   tests/test_g8_1b_pipeline_first_discovery_scout.py
-   tests/test_g8_2_system_scouted_candidate_card.py
-
-5. v2-discovery-fixtures-and-registry
-   v2_discovery/
-   data/fixtures/
-   data/registry/
-   tests/test_v2_*.py
-   tests/test_g4_*.py
-   tests/test_g5_*.py
-   tests/test_g6_*.py
-   tests/test_g7_*.py
-
-6. governance-docs-and-context
-   docs/architecture/
-   docs/handover/
-   docs/saw_reports/
-   docs/context/
-   docs/phase_brief/
-   docs/prd.md
-   docs/spec.md
-   docs/notes.md
-   docs/lessonss.md
-   docs/decision log.md
-   README.md
-   PRD.md
-   PRODUCT_SPEC.md
+Preview with git clean -nd before deleting anything.
+No deletion was performed in this reconciliation round.
+Do not run broad git clean -fdx.
+Delete only explicit generated-noise paths after review and after preserving an external snapshot.
 ```
 
-## Minimum Verification Matrix
+## Bucket E - Unrelated Future Work
+
+Backend/data/dashboard/optimizer/replay work outside the expanded preflight/data-readiness staging set:
 
 ```text
-.venv\Scripts\python -m pytest tests\test_process_utils.py -q
-.venv\Scripts\python -m pytest tests\test_optimizer_core_policy.py tests\test_optimizer_view.py tests\test_data_orchestrator_portfolio_runtime.py -q
-.venv\Scripts\python -m pytest tests\test_portfolio_universe.py tests\test_dash_1_page_registry_shell.py tests\test_dash_2_portfolio_ytd.py -q
-.venv\Scripts\python -m pytest tests\test_g8_supercycle_candidate_card.py tests\test_g8_1_supercycle_discovery_intake.py tests\test_g8_1b_pipeline_first_discovery_scout.py tests\test_g8_2_system_scouted_candidate_card.py -q
-.venv\Scripts\python -m pytest tests\test_build_context_packet.py -q
-.venv\Scripts\python scripts\build_context_packet.py --validate
+core/data_orchestrator.py
+dashboard.py
+data/portfolio_lifecycle_log.py
+opportunity_engine/candidate_card_schema.py
+scripts/build_context_packet.py
+scripts/pit_lifecycle_replay.py
+scripts/build_strategy_replay_artifact.py
+scripts/build_synthetic_r3000_universe.py
+scripts/rule100_softmax_v1_audit.py
+scripts/rule100_softmax_v1_1_audit.py
+strategies/adapter.py
+strategies/adapter_registry.py
+strategies/optimizer.py
+strategies/portfolio_universe.py
+strategies/rule100_adapter.py
+strategies/rule100_softmax.py
+strategies/rule100_softmax_v1_1.py
+strategies/strategy_replay.py
+views/detail_view.py
+views/optimizer_view.py
+views/discovery_view.py
+views/strategy_view.py
+```
+
+Candidate card/data changes outside the preflight slice:
+
+```text
+data/candidate_cards/MSFT_supercycle_candidate_card_v0.json
+data/candidate_cards/MSFT_supercycle_candidate_card_v0.manifest.json
+data/candidate_cards/MU_supercycle_candidate_card_v0.json
+data/candidate_cards/MU_supercycle_candidate_card_v0.manifest.json
+```
+
+Unrelated or later-slice tests:
+
+```text
+tests/test_build_context_packet.py
+tests/test_dash_1_page_registry_shell.py
+tests/test_dash_2_portfolio_ytd.py
+tests/test_data_orchestrator_portfolio_runtime.py
+tests/test_optimizer_core_policy.py
+tests/test_optimizer_view.py
+tests/test_pinned_universe.py
+tests/test_portfolio_universe.py
+tests/test_policy_target_timeline_apptest.py
+tests/test_position_lifecycle.py
+tests/test_replay_non_cash_closed.py
+tests/test_rule100_softmax.py
+tests/test_rule100_softmax_v1_1.py
+tests/test_strategy_adapter.py
+tests/test_strategy_replay.py
+tests/test_strategy_replay_artifact.py
+tests/test_strategy_replay_coverage.py
+```
+
+Later-slice docs:
+
+```text
+docs/strategy_stream_v1_1_contract.md
+```
+
+## Bucket F - Unknown / Leave Unstaged
+
+Patch bundles requiring explicit review before use:
+
+```text
+boot_preflight_v0.patch
+boot0_shared_boot_status_contract_20260526.patch
+governance_gate_v0.patch
+```
+
+Root operator note needing an explicit role decision:
+
+```text
+quant.md
+```
+
+Unknown directory reported in previous cleanup preview:
+
+```text
+youtube_algorithm_flag/
+```
+
+Leave unknown paths untouched until their origin is confirmed.
+
+## Proposed Expanded-Preflight/Data-Readiness v0 Staging Set
+
+Do not stage yet. Proposed next staging set:
+
+```text
+core/data_readiness_gate.py
+scripts/run_data_readiness_gate.py
+tests/test_data_readiness_gate.py
+tests/test_data_readiness_gate_write_guard.py
+tests/test_provider_ports.py
+docs/architecture/data_readiness_gate_v0.md
+docs/context/data_artifact_taxonomy_current.json
+docs/context/portfolio_allocation_route_contract_v0.json
+```
+
+Optional integration files only if the next implementation explicitly wires data readiness into boot status/preflight:
+
+```text
+core/boot_status.py
+scripts/boot_preflight.py
+tests/test_boot_preflight.py
+docs/architecture/boot_preflight_contract.md
+docs/context/boot_status_current.schema.json
+```
+
+Do not stage:
+
+```text
+docs/context/boot_status_current.json
+docs/saw_reports/saw_data_readiness_gate_v0_20260526.md
+scripts/governance_preflight.py
+tests/test_boot_preflight_governance.py
+docs/architecture/governance_boundary_policy.md
+dashboard.py
+views/page_registry.py
+tests/test_dash_1_page_registry_shell.py
+packet zips
+patch bundles
+hash residue
+runtime pid/stdout/stderr/status files
+```
+
+## Required Pre-Staging Checks
+
+Before any expanded-preflight/data-readiness staging:
+
+```text
+git status --short --branch
+git diff --name-status
+git diff --stat
+git diff --cached --name-status
+```
+
+Then stage only by explicit path. Never use `git add .`.
+
+Before any commit:
+
+```text
+git diff --cached --name-status
+git diff --cached --stat
+git diff --cached --check
+```
+
+## Subagent Classification Evidence
+
+```text
+Boot-core residue classifier: PASS
+Bucket A classifier: PASS from prior sidecar result
+Non-implementation classifier: PASS from prior sidecar result
+One attempted sidecar failed externally with 403 insufficient balance and made no changes.
 ```
 
 ## Open Risks
 
-- Count drift remains unresolved until the next inventory pass explains the current `346` untracked files versus the prior `345`.
-- Generated evidence may include obsolete smoke logs and should not be staged blindly.
-- Full repository regression previously timed out in a dashboard architecture safety round; a longer window is required for phase-close proof.
-- Dirty worktree breadth makes one-shot staging high risk; staged buckets should stay logically small and independently verified.
+- The worktree remains dirty and is not safe-boot truth.
+- Expanded data-readiness integration needs explicit staging approval before reapplying boot-preflight residue.
+- Broad docs/context diffs contain stale or mixed context; do not commit them as a blanket docs-only bucket.
+- Local packet archives and extracted packet folders are valuable evidence but should be archived outside the product repo unless an explicit evidence-retention policy says otherwise.
+- Generated pid/stdout/stderr/status files should be deleted or ignored only after explicit cleanup approval.
 
 ## Next Action
 
-Proceed to the staging plan: reconcile the count drift, then stage only the first logical bucket after focused verification.
+Review this refreshed classification, then approve the exact expanded-preflight/data-readiness v0 staging set or request reclassification of specific paths.
