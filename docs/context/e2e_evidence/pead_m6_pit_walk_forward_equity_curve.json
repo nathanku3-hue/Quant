@@ -1,0 +1,223 @@
+{
+  "artifact_name": "pead_m6_pit_walk_forward_equity_curve",
+  "claim_boundary": {
+    "allowed_claim": "M6a input-contract and walk-forward equity-curve framework evidence only; no tradable curve is emitted while strict data inputs are missing.",
+    "eps_vintage_status": "release_date_aligned_but_restated",
+    "next_if_blocked": "M6b data-prep round: add unrestated/first-public EPS vintage or explicitly accept best-available restated flag, plus delisting-adjusted tradable daily returns and full as-of liquidity/tradability screen. The engine-scale flag does not waive these independent data gates.",
+    "not_allowed_claim": "strict vintage-PIT, delisting-adjusted tradable net CAGR, live alpha, strategy promotion, ranking/scoring, alerts, recommendations, or orders",
+    "timing_pit_status": "available"
+  },
+  "cost_model": {
+    "daily_short_borrow_bps": 1.0,
+    "entry_cost_bps": 5.0,
+    "exit_cost_bps": 5.0,
+    "net_return_formula": "daily_net_return = daily_gross_return - turnover_cost - short_borrow_cost",
+    "nonzero_explicit_costs": true,
+    "one_way_turnover_cost_bps": 7.5,
+    "short_borrow_cost_formula": "short_borrow_cost = short_exposure * daily_short_borrow_bps / 10000",
+    "slippage_bps": 2.5,
+    "turnover_cost_formula": "turnover_cost = turnover * one_way_turnover_cost_bps / 10000"
+  },
+  "coverage": {
+    "d1_rows": 346511,
+    "d2a_rows": 54489659,
+    "d2b_events": 233586,
+    "d2b_rows": 14015160
+  },
+  "daily_return_summary": {
+    "reason": "input_contract_blocked",
+    "status": "not_emitted"
+  },
+  "data_validity_flags": {
+    "allow_release_date_aligned_but_restated": false,
+    "compustat_return_proxy_detected": true,
+    "current_vintage_compustat_eps_detected": true,
+    "daily_returns_emitted": false,
+    "delisting_adjusted_returns": false,
+    "eps_vintage": "release_date_aligned_but_restated",
+    "equity_curve_emitted": false,
+    "evidence_only": true,
+    "liquidity_selection_available": true,
+    "m6_full_asof_liquidity_screen": false,
+    "m6a_scale_engine_ready": true,
+    "m6b_data_contract_ready": false,
+    "m6b_data_dependency_required": true,
+    "m6b_real_run_wiring_allowed": true,
+    "price_return_fallback_count": 22083974,
+    "strict_pit_eps_vintage": false,
+    "timing_pit_release_date_or_rdq_aligned": true,
+    "tradable_return_source": false,
+    "validate_inputs_fail_closed": true
+  },
+  "engine_runtime": {
+    "calendar_index": {
+      "calendar_source": "projected distinct return_date sorted ascending",
+      "entry_exit_predicate": "entry_idx <= return_idx <= exit_idx",
+      "index_dtype": "int32",
+      "index_name": "return_idx"
+    },
+    "dense_return_date_by_security_matrix_materialized": false,
+    "determinism": {
+      "canonical_daily_output_sha256": true,
+      "compensated_fsum_aggregates": true,
+      "single_duckdb_thread": true
+    },
+    "duckdb_memory_limit": "1024MB",
+    "duckdb_threads": 1,
+    "engine_architecture": "duckdb_sparse_interval_window_join_direct_daily_aggregate_v2",
+    "holding_period_sessions": 60,
+    "input_projection": {
+      "duckdb_identifier_dtype": "int32",
+      "duckdb_object_dtype_relations_forbidden": true,
+      "event_columns": [
+        "event_id",
+        "security_id",
+        "decision_date",
+        "signal",
+        "tradable",
+        "liquidity_pass"
+      ],
+      "return_columns": [
+        "security_id",
+        "return_date",
+        "tradable_total_return"
+      ]
+    },
+    "m6a_scale_engine_ready": true,
+    "m6b_real_run_wiring_allowed": true,
+    "m6b_real_run_wiring_allowed_semantics": "engine scale only; strict PIT vintage, delisting-adjusted returns, and as-of tradability/liquidity data gates remain independent and fail closed",
+    "position_day_output_persisted": false,
+    "position_day_upper_bound_formula": "eligible_selected_events * holding_period_sessions",
+    "python_event_row_loop": false,
+    "turnover_rule": "sparse union of previous and current security weights, plus final trade-to-zero exit"
+  },
+  "equity_curve_summary": {
+    "reason": "input_contract_blocked",
+    "status": "not_emitted"
+  },
+  "evidence_policy": {
+    "alerts_or_recommendations_authorized": false,
+    "allowed_use": "m6a_framework_and_input_contract_review_only",
+    "broker_or_order_path_authorized": false,
+    "forbidden_use": [
+      "alerts",
+      "alpha_claims",
+      "broker_or_order_paths",
+      "capacity_claims",
+      "causal_claims",
+      "current_vintage_eps_fallback",
+      "live_alpha",
+      "ranking_or_scoring",
+      "recommendations",
+      "strategy_promotion"
+    ],
+    "interpretation_performed": false,
+    "ranking_or_scoring_authorized": false,
+    "strategy_promotion_authorized": false
+  },
+  "failure_reasons": [
+    "delisting_missing",
+    "pit_vintage_blocked",
+    "tradability_liquidity_screen_missing",
+    "tradable_return_missing"
+  ],
+  "fold_results": [],
+  "lineage": {
+    "d1_sue_signal": {
+      "artifact_name": "scripts/pead_d1_sue_builder.py",
+      "exists": true,
+      "path": "data/processed/pead_d1_sue_signal.parquet.manifest.json",
+      "row_count": 346511,
+      "schema_version": "1.0"
+    },
+    "d2a_daily_returns": {
+      "artifact_name": "full_universe_security_level",
+      "exists": true,
+      "path": "data/processed/pead_d2_daily_returns.parquet.manifest.json",
+      "row_count": 54489659,
+      "schema_version": "2.0"
+    },
+    "d2b_event_windows": {
+      "artifact_name": "full_universe_fixed_event_security_plus_60",
+      "exists": true,
+      "path": "data/processed/pead_d2b_event_windows.parquet.manifest.json",
+      "row_count": 14015160,
+      "schema_version": "1.0"
+    },
+    "m5a_reference": {
+      "artifact_name": "pead_m5a_net_multifactor_alpha_test",
+      "diagnostic_only": true,
+      "path": "docs/context/e2e_evidence/pead_m5a_net_multifactor_alpha_test.json",
+      "scope_id": "V2_PEAD_M5A_NET_MULTIFACTOR_DIAGNOSTIC_ONLY"
+    }
+  },
+  "method_id": "pit_contract_then_walk_forward_dollar_neutral_q5_q1_sparse_v2",
+  "mode": "run",
+  "pit_data_contract": {
+    "available_now": {
+      "best_available_eps_vintage_label": "release_date_aligned_but_restated",
+      "d2b_liquidity_basis": "arithmetic mean of finite dollar_volume",
+      "return_source_basis": "Compustat total-return proxy with price-return fallback",
+      "timing_pit_layer": true,
+      "vintage_unrestated_layer": false
+    },
+    "blocked": true,
+    "failure_reasons": [
+      "delisting_missing",
+      "pit_vintage_blocked",
+      "tradability_liquidity_screen_missing",
+      "tradable_return_missing"
+    ],
+    "flags": {
+      "allow_release_date_aligned_but_restated": false,
+      "compustat_return_proxy_detected": true,
+      "current_vintage_compustat_eps_detected": true,
+      "delisting_adjusted_returns": false,
+      "eps_vintage": "release_date_aligned_but_restated",
+      "liquidity_selection_available": true,
+      "m6_full_asof_liquidity_screen": false,
+      "price_return_fallback_count": 22083974,
+      "strict_pit_eps_vintage": false,
+      "timing_pit_release_date_or_rdq_aligned": true,
+      "tradable_return_source": false
+    },
+    "required_fields": [
+      "event_id",
+      "gvkey/permno/security_id",
+      "announcement_date",
+      "decision_date",
+      "PIT EPS/SUE value as of decision_date",
+      "security tradability flag as of decision_date",
+      "daily tradable total return",
+      "delisting return if applicable",
+      "price/liquidity screen"
+    ]
+  },
+  "portfolio_construction": {
+    "delisting_rule": "must be handled upstream by a delisting-adjusted tradable return column or fail closed",
+    "entry_rule": "first market session strictly after decision_date",
+    "exit_rule": "drop after holding_period_sessions global trading-calendar return sessions",
+    "gross_exposure_target": 1.0,
+    "holding_period_sessions": 60,
+    "long_quantile": 5,
+    "min_leg_count": 10,
+    "missing_return_rule": "missing or non-finite tradable return rows are excluded before active-weight construction",
+    "overlap_rule": "overlapping cohorts allowed; active names are renormalized daily to target gross exposure",
+    "quantiles": 5,
+    "short_quantile": 1,
+    "signal_rule": "sort by SUE/signal into event-date quantiles; long Q5 and short Q1",
+    "weight_rule": "+0.5 gross exposure across active long names and -0.5 across active short names"
+  },
+  "risk_metrics": {},
+  "round_id": "ROUND-20260625-V2-PEAD-M6A-SCALE-SPARSE-PORTFOLIO-ENGINE",
+  "schema_version": "1.0",
+  "scope_id": "V2_PEAD_M6A_SCALE_SPARSE_PORTFOLIO_ENGINE",
+  "walk_forward_config": {
+    "fold_frequency": "annual_expanding_train",
+    "initial_train_years": 3,
+    "min_test_days": 1,
+    "parameter_freeze_rule": "holding period, quantiles, leg definitions, min leg count, liquidity filters, and cost assumptions are fixed before each test period",
+    "split_key": "decision_date/event_date, never hindsight return dates"
+  },
+  "workflow_status": "blocked_fail_closed"
+}

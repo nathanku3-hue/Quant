@@ -1,0 +1,320 @@
+{
+  "artifact_name": "pead_m5a_net_multifactor_alpha_test",
+  "claim_boundary": {
+    "allowed_claim": "diagnostic-only multi-factor and net-cost filter over current-vintage EPS/proxy-return/no-delisting PEAD evidence",
+    "next_if_survives": "PIT EPS vintage plus delisting-adjusted tradable returns before any alpha assertion",
+    "not_allowed_claim": "alpha, tradeable alpha, PIT alpha, net performance, strategy promotion, rank, recommendation, alert, or order readiness"
+  },
+  "cost_assumption": {
+    "exact_turnover_model": false,
+    "method": "constant_daily_spread_cost_bps_diagnostic",
+    "spread_cost_bps_per_day": 0.0
+  },
+  "daily_summary": {
+    "gross_spread": {
+      "maximum": 0.025685547715947527,
+      "mean": 0.0006903400931746636,
+      "minimum": -0.07206643659815849,
+      "observations": 2552,
+      "standard_deviation": 0.0045385853070612405
+    },
+    "hml": {
+      "maximum": 0.0673,
+      "mean": -1.0815047021943536e-05,
+      "minimum": -0.050300000000000004,
+      "observations": 2552,
+      "standard_deviation": 0.009152365079919818
+    },
+    "mktrf": {
+      "maximum": 0.0965,
+      "mean": 0.0005410266457680251,
+      "minimum": -0.1201,
+      "observations": 2552,
+      "standard_deviation": 0.011672061119788569
+    },
+    "net_spread": {
+      "maximum": 0.025685547715947527,
+      "mean": 0.0006903400931746636,
+      "minimum": -0.07206643659815849,
+      "observations": 2552,
+      "standard_deviation": 0.0045385853070612405
+    },
+    "sessions": 2552,
+    "smb": {
+      "maximum": 0.0545,
+      "mean": -5.764106583072101e-05,
+      "minimum": -0.0353,
+      "observations": 2552,
+      "standard_deviation": 0.006687361512444558
+    }
+  },
+  "data_validity_flags": {
+    "delisting_adjusted_returns": false,
+    "diagnostic_only": true,
+    "exact_turnover_cost_model": false,
+    "ff5_factors_ingested": false,
+    "locked_d3_rewritten": false,
+    "m5a_preserves_smb_hml_from_existing_ken_french_source": true,
+    "mom_factor_ingested": false,
+    "strict_pit_eps_vintage": false,
+    "tradable_return_source": false
+  },
+  "evidence_policy": {
+    "alerts_or_recommendations_authorized": false,
+    "allowed_use": "diagnostic_methodology_review_only",
+    "broker_or_order_path_authorized": false,
+    "forbidden_use": [
+      "alerts",
+      "alpha_claims",
+      "broker_or_order_paths",
+      "causal_claims",
+      "full_factor_alpha_claims",
+      "net_performance_claims",
+      "population_validity_claims",
+      "ranking_or_scoring",
+      "recommendations",
+      "strategy_promotion",
+      "strict_point_in_time_claims",
+      "tradability_claims"
+    ],
+    "interpretation_performed": false,
+    "ranking_or_scoring_authorized": false,
+    "strategy_promotion_authorized": false
+  },
+  "lineage": {
+    "d1": {
+      "manifest_path": "data/processed/pead_d1_sue_signal.parquet.manifest.json",
+      "manifest_sha256": "ee9e7617b98b3e6c19acccb327b20ecccfc2bc35ef44087f9ea9e23c9ede24da",
+      "parquet_path": "data/processed/pead_d1_sue_signal.parquet",
+      "parquet_sha256": "81b2689b48943373f58586ddc382fb609dbce022cde93d4d502333cae5541855",
+      "rows": 346511
+    },
+    "d2b": {
+      "manifest_path": "data/processed/pead_d2b_event_windows.parquet.manifest.json",
+      "manifest_sha256": "3a3c030a0b0cdc6170e0fb3656239102b2aa24d3b345b664e4d32045d0ca62b5",
+      "parquet_path": "data/processed/pead_d2b_event_windows.24f3b759e525cdc04d58e23785d86b6bebcf8ca122f2802008ac321e444d4fea.parquet",
+      "parquet_sha256": "24f3b759e525cdc04d58e23785d86b6bebcf8ca122f2802008ac321e444d4fea",
+      "rows": 14015160
+    },
+    "d3_locked": {
+      "manifest_path": "data/processed/pead_d3_ken_french_daily_benchmark.parquet.manifest.json",
+      "manifest_sha256": "30e82e9ef698112e4294cd69e08a4abba6d1769aaaf852ea3f4489e1058ee07e",
+      "parquet_path": "data/processed/pead_d3_ken_french_daily_benchmark.f7dede990475b4ecf499fbf1dee3c4a81298073f018cc3a1ba1559f3e702c589.parquet",
+      "parquet_sha256": "f7dede990475b4ecf499fbf1dee3c4a81298073f018cc3a1ba1559f3e702c589",
+      "rows": 2810
+    },
+    "d3m_multifactor": {
+      "manifest_path": "data/processed/pead_d3m_ken_french_daily_multifactor.parquet.manifest.json",
+      "manifest_sha256": "1ac1f3bc5d3dea68cec1d16e57968ec64448e2f9dffcf9f5107be96f1145c9be",
+      "parquet_path": "data/processed/pead_d3m_ken_french_daily_multifactor.2ed91edd464ebbacee8882e0208c92d0b5274f3b80818da302cee6787b31a9ef.parquet",
+      "parquet_sha256": "2ed91edd464ebbacee8882e0208c92d0b5274f3b80818da302cee6787b31a9ef",
+      "rows": 2810
+    }
+  },
+  "m1b_reference": {
+    "daily_summary": {
+      "factor": {
+        "maximum": 0.0965,
+        "mean": 0.0005410266457680251,
+        "minimum": -0.1201,
+        "observations": 2552,
+        "standard_deviation": 0.011672061119788569
+      },
+      "q1": {
+        "maximum_finite": 1286,
+        "median_finite": 1031.0,
+        "minimum_finite": 10,
+        "missing_rate": 0.013382325375693062,
+        "total_expected": 2523403,
+        "total_finite": 2489634,
+        "total_missing": 33769
+      },
+      "q5": {
+        "maximum_finite": 1322,
+        "median_finite": 1078.0,
+        "minimum_finite": 14,
+        "missing_rate": 0.011936482931865186,
+        "total_expected": 2635701,
+        "total_finite": 2604240,
+        "total_missing": 31461
+      },
+      "sessions": 2552,
+      "spread": {
+        "maximum": 0.025685547715947527,
+        "mean": 0.0006903400931746636,
+        "minimum": -0.07206643659815849,
+        "observations": 2552,
+        "standard_deviation": 0.0045385853070612405
+      }
+    },
+    "session_coverage": {
+      "authoritative_date_max": "2026-03-06",
+      "authoritative_date_min": "2015-01-02",
+      "authoritative_sessions": 2810,
+      "extreme_expected_rows": 5159218,
+      "extreme_finite_rows": 5093988,
+      "extreme_missing_rows": 65230,
+      "internal_gap_count": 0,
+      "latest_event_ambiguity_cells": 0,
+      "null_return_date_rows_excluded": 227362,
+      "q1": {
+        "expected": 2523457,
+        "finite": 2489688,
+        "missing": 33769,
+        "missing_rate": 0.013382039004429242
+      },
+      "q5": {
+        "expected": 2635761,
+        "finite": 2604300,
+        "missing": 31461,
+        "missing_rate": 0.011936211211866327
+      },
+      "retained_date_max": "2026-03-06",
+      "retained_date_min": "2016-01-12",
+      "retained_sessions": 2552
+    },
+    "source_m1b_primary_inference": {
+      "alpha_ct": 0.0007053337347976517,
+      "alpha_hac_standard_error": 7.360593708087265e-05,
+      "alpha_hac_t_stat": 9.582565792521386,
+      "alpha_hac_two_sided_p_value": 9.466348098844091e-22,
+      "beta_m": -0.0277133145664281,
+      "dependent_variable": "R_HL",
+      "failure_reasons": [],
+      "hac_maxlags_requested": 59,
+      "hac_maxlags_used": 59,
+      "observations": 2552,
+      "regressor": "mktrf",
+      "status": "valid",
+      "use_correction": true
+    }
+  },
+  "method_id": "calendar_time_q5_q1_ff3_net_cost_diagnostic_v1",
+  "model_spec": {
+    "covariance": "HAC with finite-sample correction",
+    "daily_spread": "R_HL = equal_weight(Q5 asset_return) - equal_weight(Q1 asset_return)",
+    "gross_dependent_variable": "gross_R_HL",
+    "hac_maxlags": 59,
+    "models": {
+      "ff3": [
+        "mktrf",
+        "smb",
+        "hml"
+      ],
+      "mkt_only": [
+        "mktrf"
+      ]
+    },
+    "net_dependent_variable": "net_R_HL",
+    "net_formula": "net_R_HL = gross_R_HL - spread_cost_bps_per_day / 10000"
+  },
+  "results": {
+    "gross": {
+      "ff3": {
+        "dependent_variable": "gross_R_HL",
+        "factor_betas": {
+          "hml": -0.1078144016804653,
+          "mktrf": -0.02587668498685648,
+          "smb": -0.06742648377416759
+        },
+        "factor_hac_t_stats": {
+          "hml": -1.9427244616201735,
+          "mktrf": -1.4128468795499132,
+          "smb": -2.7376116475232926
+        },
+        "factors": [
+          "mktrf",
+          "smb",
+          "hml"
+        ],
+        "failure_reasons": [],
+        "hac_maxlags_requested": 59,
+        "hac_maxlags_used": 59,
+        "intercept": 0.0006992875170429098,
+        "intercept_hac_standard_error": 7.79147581487169e-05,
+        "intercept_hac_t_stat": 8.975032890536228,
+        "intercept_hac_two_sided_p_value": 2.8326714577068494e-19,
+        "observations": 2552,
+        "status": "valid",
+        "use_correction": true
+      },
+      "mkt_only": {
+        "dependent_variable": "gross_R_HL",
+        "factor_betas": {
+          "mktrf": -0.0277133145664281
+        },
+        "factor_hac_t_stats": {
+          "mktrf": -1.5150707018789427
+        },
+        "factors": [
+          "mktrf"
+        ],
+        "failure_reasons": [],
+        "hac_maxlags_requested": 59,
+        "hac_maxlags_used": 59,
+        "intercept": 0.0007053337347976517,
+        "intercept_hac_standard_error": 7.360593708087265e-05,
+        "intercept_hac_t_stat": 9.582565792521386,
+        "intercept_hac_two_sided_p_value": 9.466348098844091e-22,
+        "observations": 2552,
+        "status": "valid",
+        "use_correction": true
+      }
+    },
+    "net": {
+      "ff3": {
+        "dependent_variable": "net_R_HL",
+        "factor_betas": {
+          "hml": -0.1078144016804653,
+          "mktrf": -0.02587668498685648,
+          "smb": -0.06742648377416759
+        },
+        "factor_hac_t_stats": {
+          "hml": -1.9427244616201735,
+          "mktrf": -1.4128468795499132,
+          "smb": -2.7376116475232926
+        },
+        "factors": [
+          "mktrf",
+          "smb",
+          "hml"
+        ],
+        "failure_reasons": [],
+        "hac_maxlags_requested": 59,
+        "hac_maxlags_used": 59,
+        "intercept": 0.0006992875170429098,
+        "intercept_hac_standard_error": 7.79147581487169e-05,
+        "intercept_hac_t_stat": 8.975032890536228,
+        "intercept_hac_two_sided_p_value": 2.8326714577068494e-19,
+        "observations": 2552,
+        "status": "valid",
+        "use_correction": true
+      },
+      "mkt_only": {
+        "dependent_variable": "net_R_HL",
+        "factor_betas": {
+          "mktrf": -0.0277133145664281
+        },
+        "factor_hac_t_stats": {
+          "mktrf": -1.5150707018789427
+        },
+        "factors": [
+          "mktrf"
+        ],
+        "failure_reasons": [],
+        "hac_maxlags_requested": 59,
+        "hac_maxlags_used": 59,
+        "intercept": 0.0007053337347976517,
+        "intercept_hac_standard_error": 7.360593708087265e-05,
+        "intercept_hac_t_stat": 9.582565792521386,
+        "intercept_hac_two_sided_p_value": 9.466348098844091e-22,
+        "observations": 2552,
+        "status": "valid",
+        "use_correction": true
+      }
+    }
+  },
+  "round_id": "ROUND-20260624-V2-PEAD-M5A-NET-MULTIFACTOR-DIAGNOSTIC",
+  "schema_version": "1.0",
+  "scope_id": "V2_PEAD_M5A_NET_MULTIFACTOR_DIAGNOSTIC_ONLY"
+}

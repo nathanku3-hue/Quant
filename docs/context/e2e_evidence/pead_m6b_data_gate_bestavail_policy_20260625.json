@@ -1,0 +1,68 @@
+{
+  "artifact_name": "pead_m6b_data_gate_bestavail_policy_20260625",
+  "claim_boundary": {
+    "allowed_claim": "read-only policy gate only; no curve",
+    "next_allowed_step": "standalone 2015-2019 illustrative diagnostic only",
+    "not_allowed_claim": "strict readiness, alpha inference, or tradable claim"
+  },
+  "claim_ceiling_flags": [
+    "illustrative_only",
+    "restated_vintage",
+    "no_delisting",
+    "survivorship_biased",
+    "coverage_2015_2019",
+    "provider_limited",
+    "not_alpha",
+    "not_tradable_claim"
+  ],
+  "data_validity_flags": {
+    "coverage_2015_2019": true,
+    "coverage_end": "2019-12-31",
+    "coverage_start": "2015-01-01",
+    "curve_emitted": false,
+    "daily_return_parquet_emitted": false,
+    "delisting_adjusted_returns": false,
+    "illustrative_only": true,
+    "local_only": true,
+    "m6b_strict_readiness": false,
+    "no_delisting": true,
+    "no_delisting_adjustment": true,
+    "not_alpha": true,
+    "not_tradable_claim": true,
+    "provider_ingestion_performed": false,
+    "provider_limited": true,
+    "restated_vintage": true,
+    "restated_vintage_eps": true,
+    "single_source": true,
+    "survivorship_biased": true,
+    "unrestated_eps_vintage_available": false,
+    "usable_for_alpha_inference": false
+  },
+  "decision": {
+    "bestavail_run_authorized_after_gate": true,
+    "eps_vintage_policy": "accept_best_available_restated_with_flags_only",
+    "gate_outputs_curve": false,
+    "provider_policy": "accept_single_source_local_compustat_with_flags_only",
+    "return_policy": "accept_local_compustat_no_delisting_with_flags_only",
+    "strict_m6b_data_contract_ready": false
+  },
+  "lineage_read_only": {
+    "d1_rdq_max": "2026-06-16",
+    "d1_rdq_min": "2015-01-02",
+    "d1_rows": 346511,
+    "d2a_date_max": "2026-03-06",
+    "d2a_date_min": "2015-01-02",
+    "d2a_rows": 54489659,
+    "d2a_sources": [
+      "comp_secd_2015_2019",
+      "prices_daily_compustat"
+    ],
+    "d2b_events": 233586,
+    "d2b_rows": 14015160
+  },
+  "mode": "data_gate_read_only_policy_decision",
+  "round_id": "ROUND-20260625-V2-PEAD-M6B-BESTAVAIL-OPTION1",
+  "schema_version": "1.0",
+  "scope_id": "V2_PEAD_M6B_DATA_GATE_BESTAVAIL_POLICY_READ_ONLY",
+  "workflow_status": "policy_locked_best_available_with_flags_no_curve"
+}

@@ -1,0 +1,108 @@
+{
+  "artifact_name": "pead_m6b_bestavail_illustrative_2015_2019",
+  "claim_boundary": {
+    "allowed_claim": "standalone engine sanity diagnostic only",
+    "not_allowed_claim": "strict readiness, alpha inference, or tradable claim"
+  },
+  "claim_ceiling_flags": [
+    "illustrative_only",
+    "restated_vintage",
+    "no_delisting",
+    "survivorship_biased",
+    "coverage_2015_2019",
+    "provider_limited",
+    "not_alpha",
+    "not_tradable_claim"
+  ],
+  "commit_protocol": {
+    "command": "--commit-bestavail-run",
+    "gate_precedes_run_commit": true,
+    "rollback_protected_package": [
+      "data/processed/pead_m6b_bestavail_illustrative_2015_2019_daily_returns.parquet",
+      "docs/context/e2e_evidence/pead_m6b_bestavail_illustrative_2015_2019.json"
+    ],
+    "run_outputs_staged_before_public_replace": true
+  },
+  "daily_return_summary": {
+    "end_date": "2019-11-27",
+    "hit_rate_by_day": 0.5815384615384616,
+    "mean_gross_return": 0.00037682648913810114,
+    "mean_net_return": 0.00027787802435322583,
+    "sessions": 975,
+    "start_date": "2016-01-15"
+  },
+  "daily_returns_output": {
+    "path": "data/processed/pead_m6b_bestavail_illustrative_2015_2019_daily_returns.parquet",
+    "rows": 975,
+    "sha256": "10bba1fb7189af3c629a28e9ef39d674db80fe9816bbf4a13254384ea1eda01e"
+  },
+  "data_gate_reference": {
+    "curve_emitted_by_gate": false,
+    "scope_id": "V2_PEAD_M6B_DATA_GATE_BESTAVAIL_POLICY_READ_ONLY"
+  },
+  "data_validity_flags": {
+    "coverage_2015_2019": true,
+    "coverage_end": "2019-12-31",
+    "coverage_start": "2015-01-01",
+    "curve_emitted": true,
+    "daily_return_parquet_emitted": true,
+    "delisting_adjusted_returns": false,
+    "illustrative_only": true,
+    "local_only": true,
+    "m6b_strict_readiness": false,
+    "no_delisting": true,
+    "no_delisting_adjustment": true,
+    "not_alpha": true,
+    "not_tradable_claim": true,
+    "provider_ingestion_performed": false,
+    "provider_limited": true,
+    "restated_vintage": true,
+    "restated_vintage_eps": true,
+    "single_source": true,
+    "survivorship_biased": true,
+    "unrestated_eps_vintage_available": false,
+    "usable_for_alpha_inference": false
+  },
+  "equity_curve_summary": {
+    "calendar_days": 1412,
+    "ending_equity": 1.308773232049656,
+    "equity_reproducible_from_daily_net_returns": true,
+    "gross_CAGR": 0.09916367316407104,
+    "gross_ending_equity": 1.4412547707769297,
+    "max_drawdown": -0.03241803602226401,
+    "net_CAGR": 0.07208686258066677,
+    "starting_equity": 1.0,
+    "status": "valid"
+  },
+  "mode": "standalone_best_available_illustrative_run",
+  "risk_metrics": {
+    "Sharpe": 2.291868835916293,
+    "annualized_volatility": 0.03055378258983861,
+    "average_gross_exposure": 0.9838467555940865,
+    "average_net_exposure": -3.3893827915239153e-19,
+    "average_turnover": 0.06634150267356134,
+    "long_leg_contribution": 0.4692879228417909,
+    "short_leg_contribution": -0.10188209593214224
+  },
+  "round_id": "ROUND-20260625-V2-PEAD-M6B-BESTAVAIL-OPTION1",
+  "schema_version": "1.0",
+  "scope_id": "V2_PEAD_M6B_RUN_BESTAVAIL_ILLUSTRATIVE_2015_2019_STANDALONE",
+  "terminal_window_eligibility": {
+    "events_after_full_window_filter": 73624,
+    "events_before_full_window_filter": 78348,
+    "events_removed_by_full_window_filter": 4724,
+    "full_60_session_eligibility_enforced": true,
+    "holding_period_sessions": 60,
+    "latest_eligible_entry_session": "2019-10-08",
+    "max_entry_idx_for_full_holding_window": 1218,
+    "max_return_idx": 1277,
+    "return_calendar_end": "2019-12-31",
+    "return_calendar_max_idx": 1277,
+    "return_calendar_sessions": 1278,
+    "return_calendar_start": "2015-01-05",
+    "selected_events_after_signal_filter": 27941,
+    "selected_events_with_incomplete_60_session_window": 0,
+    "selected_max_exit_idx": 1270
+  },
+  "workflow_status": "illustrative_curve_emitted_with_hard_limitations"
+}
