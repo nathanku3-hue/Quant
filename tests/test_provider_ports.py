@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import ast
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -79,3 +81,51 @@ def test_direct_yfinance_uses_stay_within_migration_allowlist():
 
     assert unexpected == []
     assert missing == []
+
+
+def test_boot_gate_modules_do_not_import_provider_or_audit_writers():
+    repo = Path(__file__).resolve().parents[1]
+    guarded = [
+        repo / "core/boot_status.py",
+        repo / "core/data_readiness_gate.py",
+        repo / "scripts/run_data_readiness_gate.py",
+        repo / "scripts/boot_preflight.py",
+    ]
+    forbidden_import_roots = {
+        "yfinance",
+        "alpaca",
+        "data.providers.registry",
+        "data.providers.yahoo_provider",
+        "data.providers.alpaca_provider",
+        "execution.broker_api",
+        "scripts.audit_data_readiness",
+    }
+    forbidden_calls = {
+        "build_market_data_provider",
+        "download_recent_close_prices",
+        "repair_stale_price_endpoints_with_live_overlay",
+        "run_and_save_scan",
+        "write_report_with_manifest",
+        "run_audit",
+    }
+    hits: list[str] = []
+    for path in guarded:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        rel = path.relative_to(repo).as_posix()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    imported = alias.name
+                    if any(imported == root or imported.startswith(f"{root}.") for root in forbidden_import_roots):
+                        hits.append(f"{rel}:import:{imported}")
+            elif isinstance(node, ast.ImportFrom):
+                imported = node.module or ""
+                if any(imported == root or imported.startswith(f"{root}.") for root in forbidden_import_roots):
+                    hits.append(f"{rel}:from:{imported}")
+            elif isinstance(node, ast.Call):
+                func = node.func
+                name = func.id if isinstance(func, ast.Name) else func.attr if isinstance(func, ast.Attribute) else ""
+                if name in forbidden_calls:
+                    hits.append(f"{rel}:call:{name}")
+
+    assert hits == []

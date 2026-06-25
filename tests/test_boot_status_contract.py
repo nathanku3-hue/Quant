@@ -6,10 +6,12 @@ from pathlib import Path
 import pytest
 
 from core.boot_status import (
+    BOOT_STATUS_CONTEXT_SNAPSHOT_PATH,
     BOOT_STATUS_CURRENT_PATH,
     BootContextFlags,
     BootStatus,
     BootStatusValidationError,
+    DEFAULT_BOOT_STATUS_PATH,
     NextSafeAction,
     ReadinessCheck,
     deferred_check,
@@ -27,6 +29,21 @@ def _ready_check() -> ReadinessCheck:
         severity="ready",
         summary="Boot core passed.",
     )
+
+
+def _boot_status(*, safe_boot: bool, source: str = "test") -> BootStatus:
+    return make_boot_status(
+        source=source,
+        flags=BootContextFlags(safe_boot=safe_boot, boot_candidate=True),
+        checks=(_ready_check(),),
+        generated_at="2026-05-26T00:00:00Z",
+    )
+
+
+def test_boot_status_path_is_runtime_contract() -> None:
+    assert BOOT_STATUS_CURRENT_PATH == Path("runtime/boot_status_current.json")
+    assert DEFAULT_BOOT_STATUS_PATH == BOOT_STATUS_CURRENT_PATH
+    assert BOOT_STATUS_CONTEXT_SNAPSHOT_PATH == Path("docs/context/boot_status_current.json")
 
 
 def test_ready_requires_safe_boot_flag() -> None:
@@ -100,11 +117,81 @@ def test_write_boot_status_file_is_path_confined(tmp_path: Path) -> None:
         write_boot_status_file(status, tmp_path.parent / "boot_status_current.json", repo_root=tmp_path)
 
 
+def test_write_boot_status_file_rejects_docs_context_snapshot_path(tmp_path: Path) -> None:
+    status = _boot_status(safe_boot=True)
+
+    with pytest.raises(BootStatusValidationError):
+        write_boot_status_file(status, BOOT_STATUS_CONTEXT_SNAPSHOT_PATH, repo_root=tmp_path)
+
+    assert not (tmp_path / BOOT_STATUS_CONTEXT_SNAPSHOT_PATH).exists()
+
+
 def test_load_boot_status_fail_closed_for_missing_artifact(tmp_path: Path) -> None:
     status = load_boot_status_fail_closed(tmp_path / "missing.json")
 
     assert status.primary_verdict == "blocked"
     assert status.checks[0].id == "boot_status_artifact"
+
+
+def test_load_boot_status_without_explicit_path_uses_runtime_canonical(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    canonical_path = tmp_path / BOOT_STATUS_CURRENT_PATH
+    canonical_path.parent.mkdir(parents=True)
+    canonical_path.write_text(_boot_status(safe_boot=True, source="runtime").to_json_text(), encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    status = load_boot_status_fail_closed()
+
+    assert status.metadata["loaded_from"] == BOOT_STATUS_CURRENT_PATH.as_posix()
+    assert status.metadata["source_role"] == "canonical"
+    assert status.flags.safe_boot is True
+    assert status.primary_verdict == "ready"
+
+
+def test_docs_context_snapshot_cannot_override_runtime_canonical(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    canonical_path = tmp_path / DEFAULT_BOOT_STATUS_PATH
+    canonical_path.parent.mkdir(parents=True)
+    canonical_path.write_text(_boot_status(safe_boot=True, source="runtime").to_json_text(), encoding="utf-8")
+    snapshot_path = tmp_path / BOOT_STATUS_CONTEXT_SNAPSHOT_PATH
+    snapshot_path.parent.mkdir(parents=True)
+    snapshot_path.write_text(_boot_status(safe_boot=False, source="docs-context").to_json_text(), encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    status = load_boot_status_fail_closed()
+
+    assert status.metadata["loaded_from"] == DEFAULT_BOOT_STATUS_PATH.as_posix()
+    assert status.metadata["source_role"] == "canonical"
+    assert status.flags.safe_boot is True
+    assert status.primary_verdict == "ready"
+
+
+def test_missing_runtime_canonical_does_not_fallback_to_docs_context_snapshot(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    snapshot_path = tmp_path / BOOT_STATUS_CONTEXT_SNAPSHOT_PATH
+    snapshot_path.parent.mkdir(parents=True)
+    snapshot_path.write_text(_boot_status(safe_boot=True, source="docs-context").to_json_text(), encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    status = load_boot_status_fail_closed()
+
+    assert status.primary_verdict == "blocked"
+    assert status.flags.safe_boot is False
+    assert status.checks[0].id == "boot_status_artifact"
+    assert DEFAULT_BOOT_STATUS_PATH.as_posix() in str(status.checks[0].evidence_ref)
+
+
+def test_docs_context_snapshot_path_is_not_loaded_by_default_source_text() -> None:
+    source = Path("core/boot_status.py").read_text(encoding="utf-8")
+
+    assert "LEGACY_BOOT_STATUS_PATH" not in source
+    assert "BOOT_STATUS_CONTEXT_SNAPSHOT_PATH.exists()" not in source
 
 
 def test_schema_file_declares_boot_status_contract() -> None:

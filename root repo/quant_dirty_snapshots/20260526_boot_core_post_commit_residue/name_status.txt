@@ -1,0 +1,4 @@
+M	core/boot_status.py
+M	scripts/boot_preflight.py
+M	tests/test_boot_preflight.py
+M	tests/test_boot_status_contract.py

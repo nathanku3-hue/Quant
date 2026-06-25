@@ -1,0 +1,24 @@
+{
+  "name": "codex-reply",
+  "description": "Continue a Codex conversation by providing the thread id and prompt.",
+  "inputSchema": {
+    "properties": {
+      "conversationId": {
+        "description": "DEPRECATED: use threadId instead.",
+        "type": "string"
+      },
+      "prompt": {
+        "description": "The *next user prompt* to continue the Codex conversation.",
+        "type": "string"
+      },
+      "threadId": {
+        "description": "The thread id for this Codex session. This field is required, but we keep it optional here for backward compatibility for clients that still use conversationId.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "prompt"
+    ],
+    "type": "object"
+  }
+}

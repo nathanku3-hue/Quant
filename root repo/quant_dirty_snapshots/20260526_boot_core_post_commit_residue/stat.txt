@@ -1,0 +1,5 @@
+ core/boot_status.py                |  44 ++
+ scripts/boot_preflight.py          | 979 +++++++++++++++++++++++++------------
+ tests/test_boot_preflight.py       | 578 ++++++++++++++++------
+ tests/test_boot_status_contract.py |  66 +++
+ 4 files changed, 1205 insertions(+), 462 deletions(-)

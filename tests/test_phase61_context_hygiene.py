@@ -25,7 +25,7 @@ def test_current_context_promotes_latest_active_phase() -> None:
     payload = json.loads(CURRENT_CONTEXT_JSON.read_text(encoding="utf-8"))
     assert int(payload["active_phase"]) == 65
     joined_done = " ".join(str(x) for x in payload["what_was_done"])
-    assert "R64.1" in joined_done
+    assert "M4A" in joined_done
 
 
 def test_planner_bridge_and_readme_no_longer_advertise_phase60_hold_as_current() -> None:

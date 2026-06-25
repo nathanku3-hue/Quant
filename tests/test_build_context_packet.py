@@ -690,6 +690,219 @@ def test_optimizer_diagnostics_handover_sorts_after_g82_but_before_g9(tmp_path: 
     assert packet["what_was_done"] == ["Completed G9 context."]
 
 
+def test_rule100_ytd_handover_sorts_after_optimizer_diagnostics_but_before_g9(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    _write(
+        repo / "docs/handover/phase65_optimizer_core_structured_diagnostics_handover.md",
+        "\n".join(
+            [
+                "# Phase 65 Optimizer Diagnostics Handover",
+                "",
+                "## New Context Packet",
+                "## What Was Done",
+                "- Completed optimizer diagnostics context.",
+                "## What Is Locked",
+                "- Diagnostics-only lock.",
+                "## What Is Next",
+                "- Hold or plan thesis anchor policy.",
+                "## First Command",
+                "```text",
+                ".venv\\Scripts\\python -m pytest tests/test_optimizer_core_policy.py -q",
+                "```",
+            ]
+        ),
+    )
+    _write(
+        repo / "docs/handover/phase65_rule100_dynamic_ui_replay_ytd_handover.md",
+        "\n".join(
+            [
+                "# Phase 65 Rule100 Dynamic UI Replay YTD Handover",
+                "",
+                "## New Context Packet",
+                "## What Was Done",
+                "- Completed Rule100 YTD context.",
+                "## What Is Locked",
+                "- Rule100 audit history stays frozen.",
+                "## What Is Next",
+                "- Manual audit visible weights.",
+                "## First Command",
+                "```text",
+                ".venv\\Scripts\\python -m pytest tests/test_rule100_softmax.py -q",
+                "```",
+            ]
+        ),
+    )
+
+    packet = build_context_packet(
+        repo_root=repo,
+        generated_at_utc=datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    )
+    assert packet["what_was_done"] == ["Completed Rule100 YTD context."]
+
+    _write(
+        repo / "docs/handover/phase65_g9_market_behavior_signal_card_handover.md",
+        "\n".join(
+            [
+                "# Phase 65 G9 Handover",
+                "",
+                "## New Context Packet",
+                "## What Was Done",
+                "- Completed G9 context.",
+                "## What Is Locked",
+                "- G9 lock.",
+                "## What Is Next",
+                "- Hold.",
+                "## First Command",
+                "```text",
+                ".venv\\Scripts\\python -m pytest tests/test_g9.py -q",
+                "```",
+            ]
+        ),
+    )
+
+    packet = build_context_packet(
+        repo_root=repo,
+        generated_at_utc=datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    )
+    assert packet["what_was_done"] == ["Completed G9 context."]
+
+
+def test_current_truth_context_source_overrides_older_handover(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    _write(
+        repo / "docs/context/planner_packet_current.md",
+        "\n".join(
+            [
+                "# Planner Packet - Current",
+                "",
+                "## Latest Addendum - Replay Coverage Contract Audit Fix",
+                "",
+                "- `CURRENT_DELTA`: `Replay audit truth is current.`",
+                "",
+                "## New Context Packet - Replay Coverage Contract Audit Fix",
+                "",
+                "## What Was Done",
+                "- Rebuilt replay coverage context from current truth.",
+                "",
+                "## What Is Locked",
+                "- Older handovers cannot supersede current truth surfaces.",
+                "",
+                "## What Is Next",
+                "- Validate context packet selection.",
+                "",
+                "## First Command",
+                "```text",
+                ".venv\\Scripts\\python scripts\\build_context_packet.py --validate",
+                "```",
+                "",
+                "## Next Todos",
+                "- Keep planner, bridge, and bootstrap truth aligned.",
+                "",
+                "## Latest Addendum - Older Context",
+                "- This section is outside the new context packet.",
+            ]
+        ),
+    )
+
+    packet = build_context_packet(
+        repo_root=repo,
+        generated_at_utc=datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    )
+
+    assert int(packet["active_phase"]) == 7
+    assert packet["what_was_done"] == ["Rebuilt replay coverage context from current truth."]
+    assert packet["what_is_locked"] == ["Older handovers cannot supersede current truth surfaces."]
+    assert packet["what_is_next"] == ["Validate context packet selection."]
+    assert packet["next_todos"] == [
+        "Keep planner, bridge, and bootstrap truth aligned."
+    ]
+
+
+def test_context_packet_extraction_prefers_heading_over_preamble_mentions(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    _write(
+        repo / "docs/context/planner_packet_current.md",
+        "\n".join(
+            [
+                "# Planner Packet - Current",
+                "",
+                "- `BOOTSTRAP_DELTA`: `Current truth surfaces can carry a complete New Context Packet.`",
+                "",
+                "## New Context Packet - Replay Coverage Contract Audit Fix",
+                "",
+                "## What Was Done",
+                "- Parsed packet heading, not preamble prose.",
+                "",
+                "## What Is Locked",
+                "- Preamble mentions cannot steal extraction.",
+                "",
+                "## What Is Next",
+                "- Validate extraction.",
+                "",
+                "## First Command",
+                "```text",
+                ".venv\\Scripts\\python scripts\\build_context_packet.py --validate",
+                "```",
+            ]
+        ),
+    )
+
+    packet = build_context_packet(
+        repo_root=repo,
+        generated_at_utc=datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    )
+
+    assert packet["what_was_done"] == ["Parsed packet heading, not preamble prose."]
+
+
+def test_validate_mode_fails_when_current_truth_context_changes(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    planner_packet = repo / "docs/context/planner_packet_current.md"
+    _write(
+        planner_packet,
+        "\n".join(
+            [
+                "# Planner Packet - Current",
+                "",
+                "## New Context Packet - Replay Coverage Contract Audit Fix",
+                "## What Was Done",
+                "- Current truth v1.",
+                "## What Is Locked",
+                "- Current truth surfaces are authoritative.",
+                "## What Is Next",
+                "- Validate v1.",
+                "## First Command",
+                "```text",
+                ".venv\\Scripts\\python scripts\\build_context_packet.py --validate",
+                "```",
+            ]
+        ),
+    )
+    build = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH), "--repo-root", str(repo)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert build.returncode == 0, build.stderr
+
+    planner_packet.write_text(
+        planner_packet.read_text(encoding="utf-8").replace(
+            "Current truth v1.", "Current truth v2."
+        ),
+        encoding="utf-8",
+    )
+    validate = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH), "--repo-root", str(repo), "--validate"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert validate.returncode != 0
+    assert "context artifacts are stale" in validate.stderr.lower()
+
+
 def test_markdown_first_command_uses_fenced_block_when_backticks_present() -> None:
     packet = {
         "schema_version": "1.0.0",

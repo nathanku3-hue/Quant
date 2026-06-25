@@ -1,0 +1,1309 @@
+diff --git a/BOOT.md b/BOOT.md
+index 411f165..e3075f1 100644
+--- a/BOOT.md
++++ b/BOOT.md
+@@ -28,10 +28,10 @@ Final GitHub-aligned proof after an intentional status commit:
+ .\.venv\Scripts\python launch.py --preflight --strict --require-github
+ ```
+ 
+-Generated boot status:
++Generated runtime boot status:
+ 
+ ```text
+-docs/context/boot_status_current.json
++runtime/boot_status_current.json
+ ```
+ 
+ Schema:
+@@ -40,14 +40,14 @@ Schema:
+ docs/context/boot_status_current.schema.json
+ ```
+ 
+-Deferred from boot-core v0:
++Legacy fallback:
++
++```text
++docs/context/boot_status_current.json
++```
+ 
+-- data-readiness gates
+-- governance preflight
+-- context packet rebuild/validation
+-- Portfolio AppTest smoke
+-- focused replay/dashboard contract
+-- optimizer, Rule100, replay, and data-repair work
++The docs/context artifact is compatibility evidence only; do not treat it as
++the canonical generated runtime verdict.
+ 
+ `BOOT.md` is intentionally static. The living verdict is the generated JSON
+ status, and safe boot still requires a later full safe-boot slice.
+diff --git a/core/boot_status.py b/core/boot_status.py
+index 6e8833a..3bcd07c 100644
+--- a/core/boot_status.py
++++ b/core/boot_status.py
+@@ -10,9 +10,8 @@ from typing import Any, Mapping, Sequence
+ 
+ 
+ SCHEMA_VERSION = "boot-status/v1"
+-DEFAULT_BOOT_STATUS_PATH = Path("runtime/boot_status_current.json")
+-BOOT_STATUS_CURRENT_PATH = DEFAULT_BOOT_STATUS_PATH
+-LEGACY_BOOT_STATUS_PATH = Path("docs/context/boot_status_current.json")
++BOOT_STATUS_CURRENT_PATH = Path("docs/context/boot_status_current.json")
++DEFAULT_BOOT_STATUS_PATH = BOOT_STATUS_CURRENT_PATH
+ 
+ PRIMARY_VERDICTS = ("ready", "degraded", "blocked")
+ CHECK_STATUSES = ("pass", "warn", "fail", "not_applicable", "deferred")
+@@ -381,6 +380,50 @@ def deferred_check(check_id: str, label: str, summary: str, *, destination: str
+     )
+ 
+ 
++def readiness_check_from_data_readiness(status: Mapping[str, Any]) -> ReadinessCheck:
++    raw_status = str(status.get("overall_status", "FAIL")).strip().upper()
++    if raw_status == "PASS":
++        check_status = "pass"
++        severity = "ready"
++        summary = "Data readiness gate passed for boot preflight."
++    elif raw_status in {"WARN", "DEFER", "DEFERRED"}:
++        check_status = "warn" if raw_status == "WARN" else "deferred"
++        severity = "degraded"
++        summary = "Data readiness gate is degraded or uncertified for boot preflight."
++    else:
++        check_status = "fail"
++        severity = "blocked"
++        summary = "Data readiness gate failed for boot preflight."
++
++    details: dict[str, Any] = {
++        "overall_status": raw_status,
++        "planning_status": status.get("planning_status"),
++        "strict_status": status.get("strict_status"),
++        "mode": status.get("mode"),
++        "route_id": status.get("route_id"),
++        "route_readiness": status.get("route_readiness"),
++    }
++    summary_payload = status.get("summary")
++    if isinstance(summary_payload, Mapping):
++        details["summary"] = dict(summary_payload)
++        blockers = summary_payload.get("blockers")
++        warnings = summary_payload.get("warnings")
++        if raw_status == "FAIL" and blockers:
++            summary = f"Data readiness gate failed: {len(blockers)} blocker(s)."
++        elif raw_status == "WARN" and warnings:
++            summary = f"Data readiness gate warned: {len(warnings)} warning(s)."
++
++    return ReadinessCheck(
++        id="data_readiness_gate",
++        label="Data readiness gate",
++        status=check_status,
++        severity=severity,
++        summary=summary,
++        destination="Boot Status",
++        details=details,
++    )
++
++
+ def status_json_text(status: BootStatus | Mapping[str, Any]) -> str:
+     parsed = status if isinstance(status, BootStatus) else BootStatus.from_json_dict(status)
+     return parsed.to_json_text()
+@@ -388,7 +431,7 @@ def status_json_text(status: BootStatus | Mapping[str, Any]) -> str:
+ 
+ def _resolve_boot_status_target(path: str | Path, repo_root: str | Path | None) -> Path:
+     target = Path(path)
+-    allowed_paths = {DEFAULT_BOOT_STATUS_PATH.as_posix(), LEGACY_BOOT_STATUS_PATH.as_posix()}
++    allowed_paths = {BOOT_STATUS_CURRENT_PATH.as_posix()}
+     if repo_root is None:
+         if target.is_absolute() or target.as_posix() not in allowed_paths:
+             raise BootStatusValidationError(
+@@ -484,8 +527,6 @@ def _load_boot_status_path(path: Path, *, source_role: str) -> BootStatus:
+ def load_boot_status_fail_closed(path: str | Path | None = None) -> BootStatus:
+     if path is not None:
+         return _load_boot_status_path(Path(path), source_role="explicit")
+-    if DEFAULT_BOOT_STATUS_PATH.exists():
+-        return _load_boot_status_path(DEFAULT_BOOT_STATUS_PATH, source_role="canonical")
+-    if LEGACY_BOOT_STATUS_PATH.exists():
+-        return _load_boot_status_path(LEGACY_BOOT_STATUS_PATH, source_role="legacy")
+-    return blocked_boot_status("Boot status artifact is missing.", path=DEFAULT_BOOT_STATUS_PATH)
++    if BOOT_STATUS_CURRENT_PATH.exists():
++        return _load_boot_status_path(BOOT_STATUS_CURRENT_PATH, source_role="canonical")
++    return blocked_boot_status("Boot status artifact is missing.", path=BOOT_STATUS_CURRENT_PATH)
+diff --git a/docs/architecture/boot_preflight_contract.md b/docs/architecture/boot_preflight_contract.md
+index 2c55b41..1e002dd 100644
+--- a/docs/architecture/boot_preflight_contract.md
++++ b/docs/architecture/boot_preflight_contract.md
+@@ -1,15 +1,16 @@
+ # Boot Preflight Contract v0
+ 
+ Status: implementation contract
+-Scope: boot-core control plane only
+-Non-scope: data-readiness, governance preflight, context rebuilding, replay behavior, optimizer behavior, dashboard semantics, data repair, provider ingestion, broker actions, strategy logic
++Scope: boot preflight control plane plus read-only governance/data-readiness gates
++Non-scope: replay behavior, optimizer behavior, dashboard semantics, data repair, provider ingestion, broker actions, strategy logic
+ 
+ ## Mission
+ 
+ Terminal Zero must expose one deterministic boot-status contract before broad
+-feature buckets are staged. The first slice is intentionally narrow: it proves
+-the status vocabulary, schema, launch dispatch, basic Git/dirty inspection, and
+-preflight pass/fail shell.
++feature buckets are staged. The v0 slice proves the status vocabulary, schema,
++launch dispatch, Git/dirty inspection, read-only governance/data-readiness
++gates, optional route smoke, optional focused-contract execution, and a
++fail-closed write guard.
+ 
+ ## Commands
+ 
+@@ -43,22 +44,22 @@ Boot-core v0 may check:
+ 
+ - required boot-core files are present,
+ - `docs/context/boot_status_current.schema.json` matches the boot-status vocabulary,
++- `scripts/build_context_packet.py --validate` passes and exposes a first command,
+ - Git state is readable,
+ - dirty files are classified at a basic safety level,
++- governance and data-readiness gates are read-only and local-first,
+ - boot-control tests pass in strict mode unless `--no-tests` is supplied,
++- Portfolio AppTest smoke runs only when `--smoke` is supplied,
++- focused replay/dashboard contract runs only when `--run-focused-contract` is supplied,
++- whole-run write containment proves no durable mutation happened before explicit status write,
+ - `--require-github` has a clean worktree and upstream-aligned HEAD.
+ 
+-Boot-core v0 must not import or execute:
++Boot preflight v0 must not import or execute:
+ 
+-- `core.data_readiness_gate`,
+-- `scripts.governance_preflight`,
+-- `scripts/build_context_packet.py --validate`,
+-- dashboard AppTest smoke paths,
+-- replay/dashboard focused-contract commands,
+ - optimizer, Rule100, replay, or data repair modules.
+ 
+-Those checks are represented as deferred readiness checks until their own slice
+-is approved.
++Portfolio smoke and focused replay/dashboard commands are opt-in evidence gates,
++not default strict boot gates.
+ 
+ ## Status Artifact Policy
+ 
+@@ -70,12 +71,21 @@ docs/context/boot_status_current.schema.json
+ 
+ Generated status:
+ 
++```text
++runtime/boot_status_current.json
++```
++
++Legacy fallback:
++
+ ```text
+ docs/context/boot_status_current.json
+ ```
+ 
+-The status writer must resolve output paths inside the repository and allow only
+-`docs/context/boot_status_current.json` for durable v0 boot-status output.
++The default producer path is `runtime/boot_status_current.json`. The loader may
++read `docs/context/boot_status_current.json` only as a legacy fallback when the
++runtime artifact is missing. The status writer must resolve output paths inside
++the repository and allow the runtime path by default; legacy writes are
++compatibility-only during the migration.
+ 
+ `boot_status_current.md` is outside v0. JSON plus schema is enough for the first
+ boot-core slice.
+diff --git a/scripts/boot_preflight.py b/scripts/boot_preflight.py
+index 6724b57..f171474 100644
+--- a/scripts/boot_preflight.py
++++ b/scripts/boot_preflight.py
+@@ -5,6 +5,7 @@ import fnmatch
+ import hashlib
+ import json
+ import os
++import shlex
+ import subprocess
+ import sys
+ from dataclasses import dataclass
+@@ -23,15 +24,19 @@ from core.boot_status import (
+     BootContextFlags,
+     BootStatus,
+     ReadinessCheck,
+-    deferred_check,
+     make_boot_status,
++    readiness_check_from_data_readiness,
+     write_boot_status_file,
+ )
+ 
+ 
+ SCHEMA_VERSION = "boot-preflight.v1"
++DEFAULT_CONTEXT_JSON = Path("docs/context/current_context.json")
++DEFAULT_DIRTY_MANIFEST = Path("docs/context/dirty_worktree_manifest.md")
+ DEFAULT_STATUS_JSON = BOOT_STATUS_CURRENT_PATH
+ DEFAULT_PYTEST_GATE_TIMEOUT_SECONDS = 180.0
++DEFAULT_FOCUSED_GATE_TIMEOUT_SECONDS = 420.0
++
+ BOOT_CONTROL_TEST_COMMAND = (
+     "-m",
+     "pytest",
+@@ -39,43 +44,26 @@ BOOT_CONTROL_TEST_COMMAND = (
+     "tests/test_boot_status_contract.py",
+     "-q",
+ )
++PORTFOLIO_SMOKE_COMMAND = (
++    "-m",
++    "pytest",
++    "tests/test_dash_1_page_registry_shell.py::test_dash_1_portfolio_allocation_route_renders_without_overlay",
++    "-q",
++)
+ BOOT_CORE_REQUIRED_FILES = (
+     "BOOT.md",
+     "launch.py",
+     "core/boot_status.py",
++    "core/data_readiness_gate.py",
+     "scripts/boot_preflight.py",
++    "scripts/governance_preflight.py",
+     "tests/test_boot_preflight.py",
++    "tests/test_boot_preflight_governance.py",
+     "tests/test_boot_status_contract.py",
+     "docs/architecture/boot_preflight_contract.md",
++    "docs/architecture/governance_boundary_policy.md",
+     "docs/context/boot_status_current.schema.json",
+ )
+-DEFERRED_DEPENDENCY_CHECKS = (
+-    (
+-        "data_readiness_gate",
+-        "Data readiness gate",
+-        "Deferred from boot-core v0; stage data-readiness/governance in its own slice.",
+-    ),
+-    (
+-        "governance_preflight",
+-        "Governance boundary preflight",
+-        "Deferred from boot-core v0; no governance module is imported or executed by default.",
+-    ),
+-    (
+-        "context_packet_validation",
+-        "Context packet rebuild/validation",
+-        "Deferred from boot-core v0; context generation remains a separate governance step.",
+-    ),
+-    (
+-        "portfolio_apptest_smoke",
+-        "Portfolio AppTest smoke",
+-        "Deferred from boot-core v0; dashboard smoke must be approved as a later slice.",
+-    ),
+-    (
+-        "focused_replay_dashboard_contract",
+-        "Focused replay/dashboard contract",
+-        "Deferred from boot-core v0; replay/dashboard tests are not default boot-core gates.",
+-    ),
+-)
+ 
+ BOOT_CORE_SOURCE = set(BOOT_CORE_REQUIRED_FILES)
+ GENERATED_EVIDENCE_PATTERNS = (
+@@ -106,6 +94,7 @@ SENSITIVE_PATTERNS = (
+     "tests/**",
+     "views/**",
+ )
++FOCUSED_FORBIDDEN_SHELL_TOKENS = ("&&", "||", ";", "|", ">", "<")
+ 
+ 
+ @dataclass(frozen=True)
+@@ -150,10 +139,12 @@ def _matches(path: str, patterns: Iterable[str]) -> bool:
+     return any(fnmatch.fnmatch(path, pattern) for pattern in patterns)
+ 
+ 
+-def classify_path(path: str) -> tuple[str, str, str]:
++def classify_path(path: str, *, classified_paths: set[str] | None = None) -> tuple[str, str, str]:
+     normalized = _normalize_path(path)
+     if normalized in BOOT_CORE_SOURCE:
+-        return "boot-core-candidate", "advisory", "approved boot-core v0 file"
++        return "boot-core-candidate", "advisory", "approved boot-control file"
++    if classified_paths and normalized in classified_paths:
++        return "classified-manifest", "advisory", "classified in dirty worktree manifest"
+     if _matches(normalized, IGNORE_PATTERNS):
+         return "ignore", "advisory", "local runtime/temp output"
+     if _matches(normalized, GENERATED_EVIDENCE_PATTERNS):
+@@ -165,10 +156,35 @@ def classify_path(path: str) -> tuple[str, str, str]:
+     return "unclassified-advisory", "advisory", "unclassified non-runtime file"
+ 
+ 
+-def classify_dirty_entries(entries: Sequence[DirtyEntry]) -> dict[str, Any]:
++def _load_dirty_manifest_paths(repo_root: Path) -> set[str]:
++    path = repo_root / DEFAULT_DIRTY_MANIFEST
++    if not path.exists():
++        return set()
++    text = path.read_text(encoding="utf-8")
++    paths: set[str] = set()
++    for raw_line in text.splitlines():
++        line = raw_line.strip().strip("`")
++        if not line or line.startswith("#") or line.startswith("- "):
++            continue
++        if "(" in line:
++            line = line.split("(", 1)[0].strip()
++        normalized = _normalize_path(line)
++        if "/" not in normalized and "\\" not in line and "." not in normalized:
++            continue
++        if normalized.endswith("/"):
++            normalized = normalized.rstrip("/")
++        paths.add(normalized)
++    return paths
++
++
++def classify_dirty_entries(
++    entries: Sequence[DirtyEntry],
++    *,
++    classified_paths: set[str] | None = None,
++) -> dict[str, Any]:
+     classifications: list[DirtyClassification] = []
+     for entry in entries:
+-        bucket, severity, reason = classify_path(entry.path)
++        bucket, severity, reason = classify_path(entry.path, classified_paths=classified_paths)
+         classifications.append(
+             DirtyClassification(
+                 status=entry.status,
+@@ -189,6 +205,8 @@ def classify_dirty_entries(entries: Sequence[DirtyEntry]) -> dict[str, Any]:
+     return {
+         "status": "FAIL" if blockers else "PASS",
+         "dirty_state": dirty_state,
++        "manifest_path": DEFAULT_DIRTY_MANIFEST.as_posix(),
++        "manifest_classified_count": len(classified_paths or ()),
+         "counts": counts,
+         "blockers": [item.__dict__ for item in blockers],
+         "warnings": [item.__dict__ for item in warnings],
+@@ -263,7 +281,7 @@ def _validate_status_schema_file(repo_root: Path, schema_path: Path) -> tuple[bo
+     status_enum = check_properties.get("status", {}).get("enum", [])
+     required_statuses = {"pass", "warn", "fail", "not_applicable", "deferred"}
+     if not required_statuses.issubset(set(status_enum)):
+-        return False, "schema check status enum is missing boot-core statuses"
++        return False, "schema check status enum is missing boot-control statuses"
+     if properties.get("schema_version", {}).get("const") != "boot-status/v1":
+         return False, "schema_version const must be boot-status/v1"
+     try:
+@@ -272,7 +290,7 @@ def _validate_status_schema_file(repo_root: Path, schema_path: Path) -> tuple[bo
+         return False, "schema path must stay inside repository"
+     if relative != "docs/context/boot_status_current.schema.json":
+         return False, "schema path must be docs/context/boot_status_current.schema.json"
+-    return True, "schema JSON matches boot-core v0 status vocabulary"
++    return True, "schema JSON matches boot status vocabulary"
+ 
+ 
+ def validate_boot_core(repo_root: Path) -> dict[str, Any]:
+@@ -386,6 +404,91 @@ def _run_pytest_gate(
+     }
+ 
+ 
++def _load_context(repo_root: Path) -> dict[str, Any]:
++    path = repo_root / DEFAULT_CONTEXT_JSON
++    try:
++        payload = json.loads(path.read_text(encoding="utf-8"))
++    except FileNotFoundError as exc:
++        raise PreflightConfigError(f"{DEFAULT_CONTEXT_JSON.as_posix()} is missing") from exc
++    except json.JSONDecodeError as exc:
++        raise PreflightConfigError(f"{DEFAULT_CONTEXT_JSON.as_posix()} is invalid JSON: {exc}") from exc
++    if not isinstance(payload, dict):
++        raise PreflightConfigError("Context JSON payload must be an object")
++    return payload
++
++
++def _validate_context(repo_root: Path) -> tuple[dict[str, Any], CommandResult]:
++    payload = _load_context(repo_root)
++    command = _python_command(("scripts/build_context_packet.py", "--validate"))
++    result = _run_command(command, cwd=repo_root, timeout=DEFAULT_PYTEST_GATE_TIMEOUT_SECONDS)
++    return payload, result
++
++
++def _run_governance_gate(repo_root: Path) -> dict[str, Any]:
++    from scripts.governance_preflight import run_governance_preflight
++
++    result = run_governance_preflight(repo_root)
++    payload = result.to_dict()
++    payload["status"] = result.status
++    return payload
++
++
++def _run_data_readiness_gate(repo_root: Path, mode: str) -> dict[str, Any]:
++    from core.data_readiness_gate import run_data_readiness_gate
++
++    return run_data_readiness_gate(repo_root, mode=mode)
++
++
++def _capture_write_snapshot(repo_root: Path) -> dict[str, tuple[int, int]]:
++    from core.data_readiness_gate import capture_boot_write_snapshot
++
++    return capture_boot_write_snapshot(repo_root)
++
++
++def _diff_write_snapshot(
++    before: Mapping[str, tuple[int, int]],
++    after: Mapping[str, tuple[int, int]],
++) -> dict[str, Any]:
++    from core.data_readiness_gate import diff_boot_write_snapshot
++
++    return diff_boot_write_snapshot(before, after)
++
++
++def _focused_command_to_argv(first_command: str) -> list[str]:
++    if any(token in first_command for token in FOCUSED_FORBIDDEN_SHELL_TOKENS):
++        raise PreflightConfigError("focused command contains shell control tokens")
++    parts = shlex.split(first_command, posix=False)
++    if len(parts) < 3:
++        raise PreflightConfigError("focused command is too short")
++    executable = parts[0].replace("/", "\\").lower()
++    if not (executable.endswith("\\python") or executable.endswith("\\python.exe") or executable in {"python", "python.exe"}):
++        raise PreflightConfigError("focused command must invoke Python")
++    if parts[1:3] != ["-m", "pytest"]:
++        raise PreflightConfigError("focused command must be a Python pytest module invocation")
++    return [sys.executable, *parts[1:]]
++
++
++def _run_focused_contract(
++    repo_root: Path,
++    first_command: str,
++    *,
++    timeout: float | None = DEFAULT_FOCUSED_GATE_TIMEOUT_SECONDS,
++) -> dict[str, Any]:
++    try:
++        argv = _focused_command_to_argv(first_command)
++    except PreflightConfigError as exc:
++        return {"status": "FAIL", "command": first_command, "returncode": 2, "stderr_tail": str(exc)}
++    result = _run_command(argv, cwd=repo_root, timeout=timeout)
++    return {
++        "status": "PASS" if result.returncode == 0 else "FAIL",
++        "command": first_command,
++        "argv": argv,
++        "returncode": result.returncode,
++        "stdout_tail": _tail(result.stdout),
++        "stderr_tail": _tail(result.stderr),
++    }
++
++
+ def _check_from_gate(
+     check_id: str,
+     label: str,
+@@ -393,7 +496,8 @@ def _check_from_gate(
+     *,
+     destination: str = "Boot Status",
+ ) -> ReadinessCheck:
+-    if gate.get("status") == "PASS":
++    status = str(gate.get("status", "")).upper()
++    if status == "PASS":
+         return ReadinessCheck(
+             id=check_id,
+             label=label,
+@@ -404,12 +508,23 @@ def _check_from_gate(
+             destination=destination,
+             details=dict(gate),
+         )
+-    if gate.get("status") in {"SKIPPED", "DEFERRED"}:
++    if status == "WARN":
++        return ReadinessCheck(
++            id=check_id,
++            label=label,
++            status="warn",
++            severity="degraded",
++            summary=str(gate.get("reason", f"{label} returned warnings.")),
++            evidence_ref=str(gate.get("command", "")) or None,
++            destination=destination,
++            details=dict(gate),
++        )
++    if status in {"SKIPPED", "DEFERRED"}:
+         return ReadinessCheck(
+             id=check_id,
+             label=label,
+-            status="not_applicable" if gate.get("status") == "SKIPPED" else "deferred",
+-            severity="ready" if gate.get("status") == "SKIPPED" else "degraded",
++            status="not_applicable" if status == "SKIPPED" else "deferred",
++            severity="ready" if status == "SKIPPED" else "degraded",
+             summary=str(gate.get("reason", f"{label} was not run.")),
+             evidence_ref=str(gate.get("command", "")) or None,
+             destination=destination,
+@@ -476,30 +591,99 @@ def _status_from_git(git: Mapping[str, Any], require_github: bool) -> ReadinessC
+ def make_boot_status_from_preflight(preflight_status: Mapping[str, Any]) -> BootStatus:
+     checks_payload = preflight_status.get("checks")
+     checks_map = checks_payload if isinstance(checks_payload, Mapping) else {}
+-    boot_core = checks_map.get("boot_core", {})
+-    dirty = checks_map.get("dirty", {})
+-    boot_tests = checks_map.get("boot_control_tests", {})
+     checks: list[ReadinessCheck] = [
+-        _check_from_gate("boot_core", "Boot-core file contract", boot_core if isinstance(boot_core, Mapping) else {}),
++        _check_from_gate(
++            "context_packet",
++            "Context packet validation",
++            checks_map.get("context", {}) if isinstance(checks_map.get("context", {}), Mapping) else {},
++        ),
++        _check_from_gate(
++            "boot_core",
++            "Boot-control file contract",
++            checks_map.get("boot_core", {}) if isinstance(checks_map.get("boot_core", {}), Mapping) else {},
++        ),
+         _status_from_git(
+             checks_map.get("git", {}) if isinstance(checks_map.get("git", {}), Mapping) else {},
+             bool(preflight_status.get("require_github")),
+         ),
+-        _check_from_gate("dirty_worktree", "Dirty worktree classification", dirty if isinstance(dirty, Mapping) else {}),
+         _check_from_gate(
+-            "boot_control_tests",
+-            "Boot-control tests",
+-            boot_tests if isinstance(boot_tests, Mapping) else {},
++            "dirty_worktree",
++            "Dirty worktree classification",
++            checks_map.get("dirty", {}) if isinstance(checks_map.get("dirty", {}), Mapping) else {},
++        ),
++        _check_from_gate(
++            "governance",
++            "Governance Gate v0",
++            checks_map.get("governance", {}) if isinstance(checks_map.get("governance", {}), Mapping) else {},
+         ),
+     ]
++    data_status = checks_map.get("data_readiness", {})
++    if isinstance(data_status, Mapping):
++        checks.append(readiness_check_from_data_readiness(data_status))
++    else:
++        checks.append(
++            ReadinessCheck(
++                id="data_readiness_gate",
++                label="Data readiness gate",
++                status="fail",
++                severity="blocked",
++                summary="Data readiness gate did not return a structured status.",
++                destination="Boot Status",
++            )
++        )
+     checks.extend(
+-        deferred_check(check_id, label, summary)
+-        for check_id, label, summary in DEFERRED_DEPENDENCY_CHECKS
++        (
++            _check_from_gate(
++                "write_guard",
++                "Preflight write guard",
++                checks_map.get("write_guard", {}) if isinstance(checks_map.get("write_guard", {}), Mapping) else {},
++            ),
++            _check_from_gate(
++                "boot_control_tests",
++                "Boot-control tests",
++                checks_map.get("boot_control_tests", {})
++                if isinstance(checks_map.get("boot_control_tests", {}), Mapping)
++                else {},
++            ),
++            _check_from_gate(
++                "portfolio_smoke",
++                "Portfolio route smoke",
++                checks_map.get("portfolio_smoke", {})
++                if isinstance(checks_map.get("portfolio_smoke", {}), Mapping)
++                else {},
++            ),
++            _check_from_gate(
++                "focused_contract",
++                "Focused context command",
++                checks_map.get("focused_contract", {})
++                if isinstance(checks_map.get("focused_contract", {}), Mapping)
++                else {},
++            ),
++        )
++    )
++    final_git = checks_map.get("final_git")
++    if isinstance(final_git, Mapping):
++        checks.append(_status_from_git(final_git, bool(preflight_status.get("require_github"))))
++
++    mode = str(preflight_status.get("mode", "planning"))
++    verdict = str(preflight_status.get("verdict", "FAIL"))
++    require_github = bool(preflight_status.get("require_github"))
++    focused_ok = (
++        not bool(preflight_status.get("run_focused_contract"))
++        or checks_map.get("focused_contract", {}).get("status") == "PASS"
++    )
++    smoke_ok = checks_map.get("portfolio_smoke", {}).get("status") in {"PASS", "SKIPPED"}
++    data_ok = isinstance(data_status, Mapping) and str(data_status.get("overall_status", "")).upper() == "PASS"
++    final_git_ok = not require_github or (
++        isinstance(final_git, Mapping)
++        and bool(final_git.get("worktree_clean"))
++        and bool(final_git.get("aligned"))
+     )
++    safe_boot = mode == "strict" and verdict == "PASS" and require_github and focused_ok and smoke_ok and data_ok and final_git_ok
+     flags = BootContextFlags(
+-        safe_boot=False,
+-        boot_candidate=preflight_status.get("mode") == "strict" and preflight_status.get("verdict") == "PASS",
+-        local_planning=preflight_status.get("mode") == "planning",
++        safe_boot=safe_boot,
++        boot_candidate=mode == "strict" and verdict == "PASS",
++        local_planning=mode == "planning",
+     )
+     return make_boot_status(
+         source="scripts.boot_preflight",
+@@ -510,9 +694,9 @@ def make_boot_status_from_preflight(preflight_status: Mapping[str, Any]) -> Boot
+         warnings=tuple(str(item) for item in preflight_status.get("warnings", [])),
+         metadata={
+             "preflight_schema_version": preflight_status.get("schema_version"),
+-            "mode": preflight_status.get("mode"),
++            "mode": mode,
+             "require_github": preflight_status.get("require_github"),
+-            "deferred_scope": "data-readiness/governance/dashboard/replay/optimizer",
++            "run_focused_contract": preflight_status.get("run_focused_contract"),
+         },
+     )
+ 
+@@ -521,24 +705,70 @@ def _boot_status_json_text(preflight_status: Mapping[str, Any]) -> str:
+     return make_boot_status_from_preflight(preflight_status).to_json_text()
+ 
+ 
++def _blocked_status(args: argparse.Namespace, message: str) -> tuple[dict[str, Any], int]:
++    status = {
++        "schema_version": SCHEMA_VERSION,
++        "generated_at_utc": _utc_now(),
++        "mode": args.mode,
++        "require_github": bool(args.require_github),
++        "run_focused_contract": bool(args.run_focused_contract),
++        "verdict": "ERROR",
++        "exit_code": 2,
++        "failures": [],
++        "warnings": [],
++        "errors": [message],
++        "checks": {},
++        "status_write": "blocked-until-pass" if args.write_status else None,
++    }
++    return status, 2
++
++
+ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+     repo_root = Path(args.repo_root).resolve()
+     failures: list[str] = []
+     warnings: list[str] = []
++    errors: list[str] = []
+     checks: dict[str, Any] = {}
++    first_command = ""
++    snapshot_before = _capture_write_snapshot(repo_root)
++
++    try:
++        context, context_result = _validate_context(repo_root)
++        first_command = str(context.get("first_command", "")).strip()
++        checks["context"] = {
++            "status": "PASS" if context_result.returncode == 0 and first_command else "FAIL",
++            "command": " ".join(str(part) for part in context_result.args)
++            if isinstance(context_result.args, Sequence) and not isinstance(context_result.args, str)
++            else str(context_result.args),
++            "returncode": context_result.returncode,
++            "first_command": first_command,
++            "generated_at_utc": context.get("generated_at_utc"),
++            "stdout_tail": _tail(context_result.stdout),
++            "stderr_tail": _tail(context_result.stderr),
++        }
++        if context_result.returncode != 0:
++            failures.append("context validation failed")
++        if not first_command:
++            failures.append("current_context.first_command is missing")
++    except PreflightConfigError as exc:
++        checks["context"] = {"status": "FAIL", "error": str(exc)}
++        failures.append(str(exc))
+ 
+     boot_core = validate_boot_core(repo_root)
+     checks["boot_core"] = boot_core
+     if boot_core["status"] != "PASS":
+-        failures.append("boot-core file contract failed")
++        failures.append("boot-control file contract failed")
+ 
+     git_state = collect_git_state(repo_root)
+     checks["git"] = git_state
+     dirty_entries = [DirtyEntry(**entry) for entry in git_state.get("entries", [])]
+-    dirty = classify_dirty_entries(dirty_entries)
++    classified_paths = _load_dirty_manifest_paths(repo_root)
++    dirty = classify_dirty_entries(dirty_entries, classified_paths=classified_paths)
+     checks["dirty"] = dirty
+     if dirty["status"] != "PASS":
+         failures.append("unclassified source/test/runtime dirty files are present")
++    elif dirty["warnings"]:
++        warnings.append("dirty worktree contains classified advisory files")
+ 
+     if args.require_github:
+         if not git_state.get("available"):
+@@ -548,7 +778,25 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+         if not git_state.get("aligned"):
+             failures.append("--require-github requires HEAD to match upstream")
+ 
+-    if args.mode == "strict" and not args.no_tests:
++    governance = _run_governance_gate(repo_root)
++    checks["governance"] = governance
++    if governance.get("status") == "FAIL":
++        failures.append("governance preflight did not pass: FAIL")
++    elif governance.get("status") == "WARN":
++        warnings.append("governance preflight returned warnings")
++
++    data_readiness = _run_data_readiness_gate(repo_root, args.mode)
++    checks["data_readiness"] = data_readiness
++    data_status = str(data_readiness.get("overall_status", "FAIL")).upper()
++    if data_status == "FAIL":
++        failures.append("data readiness gate did not pass: FAIL")
++    elif data_status == "WARN":
++        warnings.append("data readiness gate returned warnings")
++    elif data_status not in {"PASS"}:
++        failures.append(f"data readiness gate returned unknown status: {data_status}")
++
++    run_tests = args.mode == "strict" and not args.no_tests
++    if run_tests:
+         checks["boot_control_tests"] = _run_pytest_gate(
+             repo_root,
+             BOOT_CONTROL_TEST_COMMAND,
+@@ -559,82 +807,138 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+     else:
+         checks["boot_control_tests"] = {
+             "status": "SKIPPED",
+-            "reason": "boot-control tests run only in strict mode unless --no-tests is used",
++            "reason": "strict boot-control tests skipped by mode or --no-tests",
+             "command": " ".join(_python_command(BOOT_CONTROL_TEST_COMMAND)),
+         }
+ 
+-    for key, _label, summary in DEFERRED_DEPENDENCY_CHECKS:
+-        checks[key] = {"status": "DEFERRED", "reason": summary}
+-    if args.smoke:
+-        warnings.append("Portfolio AppTest smoke is deferred from boot-core v0 and was not run.")
++    run_smoke = bool(args.smoke) and not args.no_tests
++    if run_smoke:
++        checks["portfolio_smoke"] = _run_pytest_gate(
++            repo_root,
++            PORTFOLIO_SMOKE_COMMAND,
++            timeout=DEFAULT_PYTEST_GATE_TIMEOUT_SECONDS,
++        )
++        if checks["portfolio_smoke"]["status"] != "PASS":
++            failures.append("Portfolio route smoke failed")
++    else:
++        smoke_reason = "Portfolio route smoke skipped unless --smoke is supplied"
++        if args.no_tests and args.smoke:
++            smoke_reason = "Portfolio route smoke skipped by --no-tests"
++        checks["portfolio_smoke"] = {
++            "status": "SKIPPED",
++            "reason": smoke_reason,
++            "command": " ".join(_python_command(PORTFOLIO_SMOKE_COMMAND)),
++        }
++
+     if args.run_focused_contract:
+-        warnings.append("Focused replay/dashboard contract is deferred from boot-core v0 and was not run.")
++        checks["focused_contract"] = _run_focused_contract(repo_root, first_command)
++        if checks["focused_contract"]["status"] != "PASS":
++            failures.append("focused context command failed")
++    else:
++        checks["focused_contract"] = {
++            "status": "SKIPPED",
++            "reason": "use --run-focused-contract to execute current_context.first_command",
++            "command": first_command,
++        }
++
++    snapshot_after_pre_status = _capture_write_snapshot(repo_root)
++    write_guard = _diff_write_snapshot(snapshot_before, snapshot_after_pre_status)
++    checks["write_guard"] = write_guard
++    if write_guard.get("changed"):
++        failures.append("preflight changed files before explicit status write")
++    if write_guard.get("status") != "PASS":
++        failures.append("preflight write guard detected disallowed mutations")
+ 
+     status: dict[str, Any] = {
+         "schema_version": SCHEMA_VERSION,
+         "generated_at_utc": _utc_now(),
+         "mode": args.mode,
+         "require_github": bool(args.require_github),
+-        "verdict": "FAIL" if failures else "PASS",
+-        "exit_code": 1 if failures else 0,
++        "run_smoke": bool(args.smoke),
++        "run_focused_contract": bool(args.run_focused_contract),
++        "verdict": "ERROR" if errors else "FAIL" if failures else "PASS",
++        "exit_code": 2 if errors else 1 if failures else 0,
+         "failures": failures,
+         "warnings": warnings,
++        "errors": errors,
+         "checks": checks,
+     }
+ 
+     if args.require_github:
+-        post_git = collect_git_state(repo_root)
+-        status["post_git"] = post_git
+-        if not post_git.get("worktree_clean") or not post_git.get("aligned"):
++        final_git = collect_git_state(repo_root)
++        checks["final_git"] = final_git
++        status["post_git"] = final_git
++        if not final_git.get("worktree_clean") or not final_git.get("aligned"):
+             status["verdict"] = "FAIL"
+             status["exit_code"] = 1
+             status["failures"].append("--require-github post-check is not clean/aligned")
+ 
+     if args.write_status:
++        if status["verdict"] != "PASS":
++            status["verdict"] = "FAIL"
++            status["exit_code"] = 1
++            status["status_write"] = "blocked-until-pass"
++            return status, 1
+         boot_status = make_boot_status_from_preflight(status)
+         write_result = write_boot_status_file(boot_status, args.status_out, repo_root=repo_root)
+         status["status_write"] = {"path": _normalize_path(args.status_out), "result": write_result}
++        snapshot_after_write = _capture_write_snapshot(repo_root)
++        post_write_guard = _diff_write_snapshot(snapshot_after_pre_status, snapshot_after_write)
++        checks["post_write_guard"] = post_write_guard
++        if post_write_guard.get("status") != "PASS":
++            status["verdict"] = "ERROR"
++            status["exit_code"] = 2
++            status["failures"].append("status write guard detected disallowed mutations")
+ 
+     return status, int(status["exit_code"])
+ 
+ 
+ def render_human(status: Mapping[str, Any]) -> str:
+     boot_status = make_boot_status_from_preflight(status)
++    checks = status.get("checks", {}) if isinstance(status.get("checks"), Mapping) else {}
+     lines = [
+         f"BOOT VERDICT: {status.get('verdict')}",
+         f"Mode: {status.get('mode')}",
+         f"Boot status: {boot_status.primary_verdict}",
++        f"Governance: {checks.get('governance', {}).get('status', 'UNKNOWN') if isinstance(checks.get('governance'), Mapping) else 'UNKNOWN'}",
++        f"Data readiness: {checks.get('data_readiness', {}).get('overall_status', 'UNKNOWN') if isinstance(checks.get('data_readiness'), Mapping) else 'UNKNOWN'}",
+     ]
++    first_command = ""
++    if isinstance(checks.get("context"), Mapping):
++        first_command = str(checks["context"].get("first_command") or "")
++    if first_command:
++        lines.extend(["First command:", first_command])
+     failures = status.get("failures") or []
+     warnings = status.get("warnings") or []
+-    if failures:
+-        lines.append("Failures:")
+-        lines.extend(f"- {item}" for item in failures)
++    errors = status.get("errors") or []
+     if warnings:
+         lines.append("Warnings:")
+         lines.extend(f"- {item}" for item in warnings)
+-    lines.append("Deferred:")
+-    for _check_id, label, _summary in DEFERRED_DEPENDENCY_CHECKS:
+-        lines.append(f"- {label}")
++    if failures:
++        lines.append("Failures:")
++        lines.extend(f"- {item}" for item in failures)
++    if errors:
++        lines.append("Errors:")
++        lines.extend(f"- {item}" for item in errors)
+     return "\n".join(lines) + "\n"
+ 
+ 
+ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+-    parser = argparse.ArgumentParser(description="Terminal Zero boot-core preflight v0")
++    parser = argparse.ArgumentParser(description="Terminal Zero boot preflight")
+     parser.add_argument("--repo-root", default=".", help="Repository root to inspect.")
+     parser.add_argument("--mode", choices=("planning", "strict"), default="planning")
+     parser.add_argument("--strict", action="store_true", help="Alias for --mode strict.")
+     parser.add_argument("--require-github", action="store_true", help="Require clean upstream-aligned Git state.")
+-    parser.add_argument("--write-status", action="store_true", help="Write docs/context/boot_status_current.json.")
+-    parser.add_argument("--status-out", default=DEFAULT_STATUS_JSON.as_posix())
+-    parser.add_argument("--json", action="store_true", help="Print machine-readable preflight JSON.")
+-    parser.add_argument("--no-tests", action="store_true", help="Skip strict boot-control pytest gate.")
+-    parser.add_argument("--smoke", action="store_true", help="Accepted for compatibility; deferred in boot-core v0.")
+     parser.add_argument(
+-        "--run-focused-contract",
++        "--write-status",
+         action="store_true",
+-        help="Accepted for compatibility; deferred in boot-core v0.",
++        help="Write runtime/boot_status_current.json after PASS.",
+     )
++    parser.add_argument("--status-out", default=DEFAULT_STATUS_JSON.as_posix())
++    parser.add_argument("--json", action="store_true", help="Print machine-readable preflight JSON.")
++    parser.add_argument("--no-tests", action="store_true", help="Skip strict boot-control pytest and route-smoke gates.")
++    parser.add_argument("--smoke", action="store_true", help="Run opt-in Portfolio route smoke.")
++    parser.add_argument("--run-focused-contract", action="store_true", help="Run current_context.first_command.")
+     args = parser.parse_args(argv)
+     if args.strict:
+         args.mode = "strict"
+diff --git a/tests/test_boot_preflight.py b/tests/test_boot_preflight.py
+index 037fdfc..70090bc 100644
+--- a/tests/test_boot_preflight.py
++++ b/tests/test_boot_preflight.py
+@@ -9,6 +9,16 @@ from scripts import boot_preflight
+ from scripts.boot_preflight import CommandResult, DirtyEntry
+ 
+ 
++def _ok_context() -> tuple[dict[str, str], CommandResult]:
++    return (
++        {
++            "generated_at_utc": "2026-05-26T00:00:00Z",
++            "first_command": ".venv\\Scripts\\python -m pytest tests/test_strategy_replay.py -q",
++        },
++        CommandResult(args=["python", "scripts/build_context_packet.py", "--validate"], returncode=0),
++    )
++
++
+ def _clean_git_state() -> dict[str, object]:
+     return {
+         "available": True,
+@@ -26,6 +36,44 @@ def _clean_git_state() -> dict[str, object]:
+     }
+ 
+ 
++def _passing_data(mode: str = "strict") -> dict[str, object]:
++    return {
++        "overall_status": "PASS",
++        "planning_status": "PASS",
++        "strict_status": "PASS",
++        "mode": mode,
++        "summary": {"blockers": [], "warnings": [], "next_actions": []},
++    }
++
++
++def _passing_governance() -> dict[str, object]:
++    return {"status": "PASS", "passed": True, "finding_count": 0, "findings": [], "checks": {}}
++
++
++def _clean_write_guard() -> dict[str, object]:
++    return {
++        "status": "PASS",
++        "changed": [],
++        "allowed_changed": [],
++        "disallowed_changed": [],
++        "post_boot_only_allowed_delta": True,
++    }
++
++
++def _patch_integrated_green(monkeypatch, *, data_status: dict[str, object] | None = None) -> None:
++    monkeypatch.setattr(boot_preflight, "_validate_context", lambda _repo: _ok_context())
++    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
++    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
++    monkeypatch.setattr(boot_preflight, "_run_governance_gate", lambda _repo: _passing_governance())
++    monkeypatch.setattr(
++        boot_preflight,
++        "_run_data_readiness_gate",
++        lambda _repo, mode: data_status or _passing_data(mode),
++    )
++    monkeypatch.setattr(boot_preflight, "_capture_write_snapshot", lambda _repo: {})
++    monkeypatch.setattr(boot_preflight, "_diff_write_snapshot", lambda _before, _after: _clean_write_guard())
++
++
+ def test_generated_expert_packets_are_advisory_evidence() -> None:
+     bucket, severity, reason = boot_preflight.classify_path(
+         "docs/context/e2e_evidence/reboot_expert_packet_20260526/PACKET_INDEX.md"
+@@ -58,6 +106,17 @@ def test_dirty_classifier_marks_boot_core_files_as_classified() -> None:
+     assert summary["counts"]["boot-core-candidate"] == 2
+ 
+ 
++def test_dirty_classifier_allows_manifest_classified_source() -> None:
++    summary = boot_preflight.classify_dirty_entries(
++        [DirtyEntry(status="M", path="core/data_orchestrator.py")],
++        classified_paths={"core/data_orchestrator.py"},
++    )
++
++    assert summary["status"] == "PASS"
++    assert summary["dirty_state"] == "classified"
++    assert summary["counts"]["classified-manifest"] == 1
++
++
+ def test_validate_boot_core_requires_exact_schema_path(tmp_path: Path) -> None:
+     for relative in boot_preflight.BOOT_CORE_REQUIRED_FILES:
+         path = tmp_path / relative
+@@ -97,14 +156,59 @@ def test_validate_boot_core_requires_exact_schema_path(tmp_path: Path) -> None:
+     assert result["required_files"] == list(boot_preflight.BOOT_CORE_REQUIRED_FILES)
+ 
+ 
+-def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
++def test_planning_mode_allows_data_readiness_warn(monkeypatch, tmp_path: Path) -> None:
++    _patch_integrated_green(
++        monkeypatch,
++        data_status={
++            "overall_status": "WARN",
++            "planning_status": "WARN",
++            "strict_status": "WARN",
++            "mode": "planning",
++            "summary": {"blockers": [], "warnings": ["uncertified replay"], "next_actions": []},
++        },
++    )
++
++    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--mode", "planning"])
++    status, exit_code = boot_preflight.build_status(args)
++
++    assert exit_code == 0
++    assert status["verdict"] == "PASS"
++    assert "data readiness gate returned warnings" in status["warnings"]
++    assert status["checks"]["boot_control_tests"]["status"] == "SKIPPED"
++    assert status["checks"]["portfolio_smoke"]["status"] == "SKIPPED"
++
++
++def test_strict_data_readiness_warn_degrades_without_blocking_local_boot(monkeypatch, tmp_path: Path) -> None:
++    _patch_integrated_green(
++        monkeypatch,
++        data_status={
++            "overall_status": "WARN",
++            "planning_status": "WARN",
++            "strict_status": "WARN",
++            "mode": "strict",
++            "summary": {"blockers": [], "warnings": ["uncertified replay"], "next_actions": []},
++        },
++    )
++    monkeypatch.setattr(
++        boot_preflight,
++        "_run_pytest_gate",
++        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
++    )
++
++    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
++    status, exit_code = boot_preflight.build_status(args)
++
++    assert exit_code == 0
++    assert status["verdict"] == "PASS"
++    assert "data readiness gate returned warnings" in status["warnings"]
++
++
++def test_strict_default_runs_boot_control_not_smoke_or_focused(
+     tmp_path: Path,
+     monkeypatch,
+ ) -> None:
+     pytest_commands: list[tuple[str, ...]] = []
+-
+-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
++    _patch_integrated_green(monkeypatch)
+ 
+     def fake_pytest_gate(
+         _repo: Path,
+@@ -116,41 +220,74 @@ def test_strict_default_runs_only_boot_control_tests_and_defers_broader_gates(
+         return {"status": "PASS", "command": "pytest", "returncode": 0}
+ 
+     monkeypatch.setattr(boot_preflight, "_run_pytest_gate", fake_pytest_gate)
++    monkeypatch.setattr(
++        boot_preflight,
++        "_run_focused_contract",
++        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("focused should not run")),
++    )
+ 
+-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--smoke", "--run-focused-contract"])
++    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict"])
+     status, exit_code = boot_preflight.build_status(args)
+-    boot_status = boot_preflight.make_boot_status_from_preflight(status)
+ 
+     assert exit_code == 0
+     assert status["verdict"] == "PASS"
+     assert pytest_commands == [boot_preflight.BOOT_CONTROL_TEST_COMMAND]
+-    assert status["checks"]["data_readiness_gate"]["status"] == "DEFERRED"
+-    assert status["checks"]["governance_preflight"]["status"] == "DEFERRED"
+-    assert status["checks"]["portfolio_apptest_smoke"]["status"] == "DEFERRED"
+-    assert status["checks"]["focused_replay_dashboard_contract"]["status"] == "DEFERRED"
+-    assert boot_status.primary_verdict == "degraded"
+-    assert boot_status.flags.boot_candidate is True
+-    assert boot_status.flags.safe_boot is False
++    assert status["checks"]["portfolio_smoke"]["status"] == "SKIPPED"
++    assert status["checks"]["focused_contract"]["status"] == "SKIPPED"
+ 
+ 
+-def test_planning_mode_does_not_run_tests(tmp_path: Path, monkeypatch) -> None:
+-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
+-    monkeypatch.setattr(boot_preflight, "collect_git_state", lambda _repo: _clean_git_state())
++def test_portfolio_smoke_runs_only_when_requested(
++    tmp_path: Path,
++    monkeypatch,
++) -> None:
++    pytest_commands: list[tuple[str, ...]] = []
++    _patch_integrated_green(monkeypatch)
++
++    def fake_pytest_gate(
++        _repo: Path,
++        command_parts: tuple[str, ...],
++        *,
++        timeout: float | None = None,
++    ) -> dict[str, object]:
++        pytest_commands.append(command_parts)
++        return {"status": "PASS", "command": "pytest", "returncode": 0}
++
++    monkeypatch.setattr(boot_preflight, "_run_pytest_gate", fake_pytest_gate)
++
++    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--smoke"])
++    status, exit_code = boot_preflight.build_status(args)
++
++    assert exit_code == 0
++    assert status["verdict"] == "PASS"
++    assert pytest_commands == [boot_preflight.BOOT_CONTROL_TEST_COMMAND, boot_preflight.PORTFOLIO_SMOKE_COMMAND]
++    assert status["checks"]["portfolio_smoke"]["status"] == "PASS"
++
++
++def test_focused_contract_runs_only_when_requested(tmp_path: Path, monkeypatch) -> None:
++    focused_commands: list[str] = []
++    _patch_integrated_green(monkeypatch)
+     monkeypatch.setattr(
+         boot_preflight,
+         "_run_pytest_gate",
+-        lambda *_args, **_kwargs: {"status": "FAIL", "command": "should not run"},
++        lambda *_args, **_kwargs: {"status": "PASS", "command": "pytest", "returncode": 0},
+     )
+ 
+-    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--mode", "planning"])
++    def fake_focused(_repo: Path, first_command: str, *, timeout: float | None = None) -> dict[str, object]:
++        focused_commands.append(first_command)
++        return {"status": "PASS", "command": first_command, "returncode": 0}
++
++    monkeypatch.setattr(boot_preflight, "_run_focused_contract", fake_focused)
++
++    args = boot_preflight.parse_args(["--repo-root", str(tmp_path), "--strict", "--run-focused-contract"])
+     status, exit_code = boot_preflight.build_status(args)
+ 
+     assert exit_code == 0
+-    assert status["checks"]["boot_control_tests"]["status"] == "SKIPPED"
++    assert focused_commands == [".venv\\Scripts\\python -m pytest tests/test_strategy_replay.py -q"]
++    assert status["checks"]["focused_contract"]["status"] == "PASS"
+ 
+ 
+ def test_require_github_blocks_dirty_or_unaligned_state(tmp_path: Path, monkeypatch) -> None:
+-    monkeypatch.setattr(boot_preflight, "validate_boot_core", lambda _repo: {"status": "PASS", "blockers": []})
++    _patch_integrated_green(monkeypatch)
+     monkeypatch.setattr(
+         boot_preflight,
+         "collect_git_state",
+@@ -167,6 +304,7 @@ def test_require_github_blocks_dirty_or_unaligned_state(tmp_path: Path, monkeypa
+ 
+     assert exit_code == 1
+     assert "--require-github requires HEAD to match upstream" in status["failures"]
++    assert "--require-github post-check is not clean/aligned" in status["failures"]
+ 
+ 
+ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
+@@ -175,14 +313,21 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
+         "generated_at_utc": "2026-05-26T00:00:00Z",
+         "mode": "strict",
+         "require_github": False,
++        "run_focused_contract": False,
+         "verdict": "PASS",
+         "exit_code": 0,
+         "warnings": [],
+         "checks": {
++            "context": {"status": "PASS", "command": "context"},
+             "boot_core": {"status": "PASS", "command": "file-contract"},
+             "git": _clean_git_state(),
+             "dirty": {"status": "PASS", "dirty_state": "clean"},
++            "governance": {"status": "PASS"},
++            "data_readiness": _passing_data(),
++            "write_guard": _clean_write_guard(),
+             "boot_control_tests": {"status": "PASS", "command": "pytest"},
++            "portfolio_smoke": {"status": "PASS", "command": "pytest smoke"},
++            "focused_contract": {"status": "SKIPPED", "reason": "not requested"},
+         },
+     }
+ 
+@@ -190,7 +335,39 @@ def test_make_boot_status_from_preflight_is_schema_valid() -> None:
+     round_trip = BootStatus.from_json_dict(json.loads(boot_status.to_json_text()))
+ 
+     assert round_trip.primary_verdict == "degraded"
+-    assert any(check.id == "data_readiness_gate" and check.status == "deferred" for check in round_trip.checks)
++    assert any(check.id == "data_readiness_gate" and check.status == "pass" for check in round_trip.checks)
++    assert round_trip.flags.safe_boot is False
++
++
++def test_safe_boot_requires_strict_require_github_focused_smoke_and_data_pass() -> None:
++    preflight_status = {
++        "schema_version": boot_preflight.SCHEMA_VERSION,
++        "generated_at_utc": "2026-05-26T00:00:00Z",
++        "mode": "strict",
++        "require_github": True,
++        "run_focused_contract": True,
++        "verdict": "PASS",
++        "exit_code": 0,
++        "warnings": [],
++        "checks": {
++            "context": {"status": "PASS"},
++            "boot_core": {"status": "PASS"},
++            "git": _clean_git_state(),
++            "dirty": {"status": "PASS"},
++            "governance": {"status": "PASS"},
++            "data_readiness": _passing_data(),
++            "write_guard": _clean_write_guard(),
++            "boot_control_tests": {"status": "PASS"},
++            "portfolio_smoke": {"status": "PASS"},
++            "focused_contract": {"status": "PASS"},
++            "final_git": _clean_git_state(),
++        },
++    }
++
++    boot_status = boot_preflight.make_boot_status_from_preflight(preflight_status)
++
++    assert boot_status.flags.safe_boot is True
++    assert boot_status.primary_verdict == "ready"
+ 
+ 
+ def test_launch_preflight_dispatch_adds_repo_root(monkeypatch) -> None:
+@@ -233,12 +410,13 @@ def test_launch_preflight_enforces_project_venv(monkeypatch) -> None:
+     assert launch.main() == 1
+ 
+ 
+-def test_no_boot_core_imports_for_deferred_dependency_modules() -> None:
++def test_governance_and_data_gates_are_integrated_lazily() -> None:
+     source = Path(boot_preflight.__file__).read_text(encoding="utf-8")
+ 
+-    assert "from scripts.governance_preflight" not in source
+-    assert "import scripts.governance_preflight" not in source
+-    assert "core.data_readiness_gate" not in source
++    assert "run_governance_preflight" in source
++    assert '"governance"' in source or "'governance'" in source
++    assert "core.data_readiness_gate" in source
++    assert "def _run_data_readiness_gate" in source
+ 
+ 
+ def test_pytest_gate_uses_argv_not_shell(tmp_path: Path, monkeypatch) -> None:
+@@ -262,3 +440,13 @@ def test_pytest_gate_uses_argv_not_shell(tmp_path: Path, monkeypatch) -> None:
+     assert seen
+     assert seen[0][1] is False
+     assert seen[0][2] == 12.5
++
++
++def test_focused_contract_rejects_shell_metacharacters() -> None:
++    result = boot_preflight._run_focused_contract(
++        Path("."),
++        ".venv\\Scripts\\python -m pytest tests/test_boot_preflight.py -q && echo unsafe",
++    )
++
++    assert result["status"] == "FAIL"
++    assert result["returncode"] == 2
+diff --git a/tests/test_boot_status_contract.py b/tests/test_boot_status_contract.py
+index a6d0f00..f278623 100644
+--- a/tests/test_boot_status_contract.py
++++ b/tests/test_boot_status_contract.py
+@@ -7,6 +7,7 @@ import pytest
+ 
+ from core.boot_status import (
+     BOOT_STATUS_CURRENT_PATH,
++    DEFAULT_BOOT_STATUS_PATH,
+     BootContextFlags,
+     BootStatus,
+     BootStatusValidationError,
+@@ -100,6 +101,53 @@ def test_write_boot_status_file_is_path_confined(tmp_path: Path) -> None:
+         write_boot_status_file(status, tmp_path.parent / "boot_status_current.json", repo_root=tmp_path)
+ 
+ 
++def test_runtime_boot_status_path_is_canonical_and_docs_context_is_legacy() -> None:
++    assert DEFAULT_BOOT_STATUS_PATH == Path("docs/context/boot_status_current.json")
++    assert BOOT_STATUS_CURRENT_PATH == DEFAULT_BOOT_STATUS_PATH
++
++
++def test_load_boot_status_reads_docs_context_canonical(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
++    canonical = tmp_path / DEFAULT_BOOT_STATUS_PATH
++    canonical.parent.mkdir(parents=True)
++
++    canonical_status = make_boot_status(
++        source="docs-context-test",
++        flags=BootContextFlags(safe_boot=False, boot_candidate=True),
++        checks=(_ready_check(),),
++        generated_at="2026-05-26T00:00:00Z",
++        metadata={"source_marker": "docs-context"},
++    )
++    canonical.write_text(canonical_status.to_json_text(), encoding="utf-8")
++
++    monkeypatch.chdir(tmp_path)
++    loaded = load_boot_status_fail_closed()
++
++    assert loaded.source == "docs-context-test"
++    assert loaded.metadata["loaded_from"] == DEFAULT_BOOT_STATUS_PATH.as_posix()
++    assert loaded.metadata["source_role"] == "canonical"
++
++
++def test_load_boot_status_ignores_noncanonical_runtime_artifact(
++    tmp_path: Path,
++    monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    runtime = tmp_path / "runtime" / DEFAULT_BOOT_STATUS_PATH.name
++    runtime.parent.mkdir(parents=True)
++    runtime_status = make_boot_status(
++        source="runtime-test",
++        flags=BootContextFlags(safe_boot=False, boot_candidate=True),
++        checks=(_ready_check(),),
++        generated_at="2026-05-26T00:00:00Z",
++    )
++    runtime.write_text(runtime_status.to_json_text(), encoding="utf-8")
++
++    monkeypatch.chdir(tmp_path)
++    loaded = load_boot_status_fail_closed()
++
++    assert loaded.primary_verdict == "blocked"
++    assert loaded.checks[0].evidence_ref == DEFAULT_BOOT_STATUS_PATH.as_posix()
++
++
+ def test_load_boot_status_fail_closed_for_missing_artifact(tmp_path: Path) -> None:
+     status = load_boot_status_fail_closed(tmp_path / "missing.json")
+ 

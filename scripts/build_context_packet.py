@@ -69,6 +69,7 @@ class ContextPacketError(RuntimeError):
 class SourceDocs:
     phase_briefs: list[Path]
     phase_handovers: list[Path]
+    current_truth_surfaces: list[Path]
     decision_log: Path
     lessons: Path
 
@@ -107,6 +108,8 @@ def _phase_number(path: Path) -> int:
         return 65
     if "dash_1_page_registry_shell_handover" in name:
         return 65
+    if "rule100_dynamic_ui_replay_ytd_handover" in name:
+        return 65
     match = _PHASE_RE.search(path.name)
     if not match:
         return -1
@@ -121,6 +124,8 @@ def _subphase_number(path: Path) -> int:
         return 80175
     if "optimizer_core_structured_diagnostics_handover" in name:
         return 80500
+    if "rule100_dynamic_ui_replay_ytd_handover" in name:
+        return 81200
     match = _SUBPHASE_RE.search(path.name)
     if not match:
         return 0
@@ -146,6 +151,7 @@ def _subphase_number(path: Path) -> int:
 
 def _discover_sources(repo_root: Path) -> SourceDocs:
     docs_root = repo_root / "docs"
+    context_root = docs_root / "context"
     phase_briefs = sorted(
         (docs_root / "phase_brief").glob("phase*-brief.md"),
         key=lambda p: (_phase_number(p), p.as_posix()),
@@ -155,9 +161,23 @@ def _discover_sources(repo_root: Path) -> SourceDocs:
             *(docs_root / "handover").glob("phase*_handover.md"),
             *(docs_root / "handover").glob("dashboard_ia_handover_*.md"),
             *(docs_root / "handover").glob("dash_1_page_registry_shell_handover_*.md"),
+            *(docs_root / "handover").glob("rule100_dynamic_ui_replay_ytd_handover_*.md"),
         ],
         key=lambda p: (_phase_number(p), p.as_posix()),
     )
+    current_truth_surfaces = [
+        context_root / name
+        for name in (
+            "planner_packet_current.md",
+            "bridge_contract_current.md",
+            "done_checklist_current.md",
+            "impact_packet_current.md",
+            "multi_stream_contract_current.md",
+            "post_phase_alignment_current.md",
+            "observability_pack_current.md",
+        )
+        if (context_root / name).exists()
+    ]
     decision_log = docs_root / "decision log.md"
     lessons = docs_root / "lessonss.md"
 
@@ -177,6 +197,7 @@ def _discover_sources(repo_root: Path) -> SourceDocs:
     return SourceDocs(
         phase_briefs=phase_briefs,
         phase_handovers=phase_handovers,
+        current_truth_surfaces=current_truth_surfaces,
         decision_log=decision_log,
         lessons=lessons,
     )
@@ -186,9 +207,15 @@ def _extract_context_block(text: str) -> list[str]:
     lines = text.splitlines()
     start = None
     for idx, line in enumerate(lines):
-        if _normalize_label(line).find("new context packet") >= 0:
+        heading_match = _HEADING_RE.match(line)
+        if heading_match and _normalize_label(heading_match.group("label")).find("new context packet") >= 0:
             start = idx + 1
             break
+    if start is None:
+        for idx, line in enumerate(lines):
+            if _normalize_label(line).find("new context packet") >= 0:
+                start = idx + 1
+                break
     if start is None:
         return lines
 
@@ -260,9 +287,17 @@ def _parse_context_sections(text: str) -> dict[str, list[str]]:
 
 
 def _select_context_source(
-    phase_briefs: list[Path], phase_handovers: list[Path]
+    phase_briefs: list[Path],
+    phase_handovers: list[Path],
+    current_truth_surfaces: list[Path] | None = None,
 ) -> tuple[Path, dict[str, list[str]]]:
     candidates: list[tuple[int, int, Path]] = []
+    current_truth_phase = max(
+        [_phase_number(path) for path in [*phase_briefs, *phase_handovers]],
+        default=-1,
+    )
+    for path in current_truth_surfaces or []:
+        candidates.append((current_truth_phase, -1, path))
     for path in phase_handovers:
         candidates.append((_phase_number(path), 0, path))
     for path in phase_briefs:
@@ -368,7 +403,9 @@ def build_context_packet(
 ) -> dict[str, object]:
     sources = _discover_sources(repo_root=repo_root)
     source_doc, sections = _select_context_source(
-        phase_briefs=sources.phase_briefs, phase_handovers=sources.phase_handovers
+        phase_briefs=sources.phase_briefs,
+        phase_handovers=sources.phase_handovers,
+        current_truth_surfaces=sources.current_truth_surfaces,
     )
 
     first_command = sections["first_command"][0].strip()
@@ -385,6 +422,7 @@ def build_context_packet(
             for path in (
                 [*sources.phase_briefs]
                 + [*sources.phase_handovers]
+                + [*sources.current_truth_surfaces]
                 + [sources.decision_log, sources.lessons]
             )
         }

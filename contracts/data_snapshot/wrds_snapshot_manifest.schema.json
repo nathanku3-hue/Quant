@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terminal-zero.local/contracts/data_snapshot/wrds_snapshot_manifest.schema.json",
+  "title": "V2-D0 WRDS Snapshot Manifest Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "scope_id",
+    "manifest_status",
+    "provider",
+    "provider_access_allowed",
+    "snapshot_generation_allowed",
+    "committed_wrds_output_allowed",
+    "data_output_allowed",
+    "v1_canonical_write_allowed",
+    "planned_storage_uri",
+    "permission_matrix_id",
+    "permission_matrix_sha256",
+    "datasets",
+    "pit_policy",
+    "schema_registry_uri",
+    "denied_actions",
+    "created_at_utc",
+    "code_ref"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "manifest_id": {
+      "const": "V2_D0_WRDS_SNAPSHOT_MANIFEST_CONTRACT"
+    },
+    "scope_id": {
+      "const": "V2-D0_WRDS_PERMISSION_AND_SNAPSHOT_PROVENANCE_CONTRACT"
+    },
+    "manifest_status": {
+      "const": "contract_only"
+    },
+    "provider": {
+      "const": "wrds"
+    },
+    "provider_access_allowed": {
+      "const": false
+    },
+    "snapshot_generation_allowed": {
+      "const": false
+    },
+    "committed_wrds_output_allowed": {
+      "const": false
+    },
+    "data_output_allowed": {
+      "const": false
+    },
+    "v1_canonical_write_allowed": {
+      "const": false
+    },
+    "planned_storage_uri": {
+      "type": "string",
+      "pattern": "^data/runtime_cache/v2_data_lab/.*"
+    },
+    "permission_matrix_id": {
+      "const": "V2_D0_WRDS_PERMISSION_MATRIX"
+    },
+    "permission_matrix_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "datasets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "dataset_id",
+          "wrds_library",
+          "wrds_table",
+          "permission_status",
+          "primary_key",
+          "point_in_time_fields",
+          "release_date_field",
+          "effective_date_field"
+        ],
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "wrds_library": {
+            "type": "string",
+            "minLength": 1
+          },
+          "wrds_table": {
+            "type": "string",
+            "minLength": 1
+          },
+          "permission_status": {
+            "enum": [
+              "unknown",
+              "pending",
+              "approved",
+              "denied",
+              "not_requested"
+            ]
+          },
+          "primary_key": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "point_in_time_fields": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "release_date_field": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "effective_date_field": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "pit_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "point_in_time_required",
+        "release_date_required",
+        "no_future_leakage",
+        "snapshot_as_of_required",
+        "extraction_log_required",
+        "manifest_hash_required"
+      ],
+      "properties": {
+        "point_in_time_required": {
+          "const": true
+        },
+        "release_date_required": {
+          "const": true
+        },
+        "no_future_leakage": {
+          "const": true
+        },
+        "snapshot_as_of_required": {
+          "const": true
+        },
+        "extraction_log_required": {
+          "const": true
+        },
+        "manifest_hash_required": {
+          "const": true
+        }
+      }
+    },
+    "schema_registry_uri": {
+      "const": "contracts/data_snapshot/wrds_snapshot_manifest.schema.json"
+    },
+    "denied_actions": {
+      "const": [
+        "wrds_provider_connection",
+        "pit_snapshot_generation",
+        "committed_wrds_output",
+        "v1_canonical_data_write",
+        "data_processed_write",
+        "candidate_ranking",
+        "candidate_scoring",
+        "candidate_promotion",
+        "recommendations",
+        "dashboard_runtime_integration",
+        "alert_or_broker_path",
+        "sqlite_storage",
+        "safe_boot_claim",
+        "boot_ready_claim"
+      ]
+    },
+    "created_at_utc": {
+      "type": "string",
+      "minLength": 1
+    },
+    "code_ref": {
+      "const": "v2_discovery/data_lab/snapshot_manifest.py@v2-d0"
+    }
+  }
+}

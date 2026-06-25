@@ -1,0 +1,173 @@
+diff --git a/docs/context/bridge_contract_current.md b/docs/context/bridge_contract_current.md
+index b5ccd1c..c41c5aa 100644
+--- a/docs/context/bridge_contract_current.md
++++ b/docs/context/bridge_contract_current.md
+@@ -4,6 +4,17 @@ Status: Current integration bridge
+ Authority: advisory-only PM/planner bridge. This file does not authorize live trading, broker automation, promotion, provider ingestion, strategy search, candidate ranking, candidate scoring, candidate validation, alerts, dashboard content redesign, macro scoring, factor scoring, or scope widening.
+ Purpose: connect Quant's technical state back to product/system truth after the Portfolio Optimizer View Test and Performance Hardening round.
+ 
++## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
++
++- `SYSTEM_DELTA`: `Boot preflight now has a pushed, audited data-readiness integration anchor at 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e.`
++- `PM_DELTA`: `The system can report data-readiness state during boot without treating that state as research validity, strategy validity, alpha, a recommendation, or a dashboard promotion claim.`
++- `AUDIT_DELTA`: `Clean remote audit returned PASS_WITH_NOTES for 22f2788..7cbe3c0 and confirmed only the approved three files changed.`
++- `GIT_DELTA`: `GitHub is aligned through 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e on origin/codex/optimizer-core-structured-diagnostics.`
++- `DIRTY_WORKTREE_DELTA`: `Remaining local dirty/untracked files are quarantined local context and are not GitHub truth.`
++- `OPEN_DECISION`: `Run clean remote phase-close regression from this audit anchor before any further implementation.`
++- `RECOMMENDED_NEXT_STEP`: `run_clean_remote_phase_close_regression_from_7cbe3c0.`
++- `DO_NOT_REDECIDE`: `Do not broaden into governance/context-packet, dashboard, replay, optimizer, Rule100, research-validity, or generated_at_utc determinism work before phase-close status is known.`
++
+ ## Latest Addendum - Research Validity Runner v0 GitHub Anchor
+ 
+ - `SYSTEM_DELTA`: `Research-validity evidence gating exists in pushed commit 8716c51781d8524de4147cf42f17e52466913de4.`
+diff --git a/docs/context/dirty_worktree_manifest.md b/docs/context/dirty_worktree_manifest.md
+index 8ee288d..0a2a4f2 100644
+--- a/docs/context/dirty_worktree_manifest.md
++++ b/docs/context/dirty_worktree_manifest.md
+@@ -6,6 +6,34 @@ Workspace: `E:\Code\Quant`
+ Branch: `codex/optimizer-core-structured-diagnostics`
+ Authority: advisory-only worktree classification. This file does not authorize staging, deletion, revert, provider ingestion, dashboard redesign, scoring, ranking, alerting, broker behavior, live trading, or scope widening by itself.
+ 
++## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
++
++Remote truth is anchored at:
++
++```text
++7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e
++```
++
++Accepted audit verdict:
++
++```text
++PASS_WITH_NOTES
++```
++
++The accepted audit confirmed the `22f2788..7cbe3c0` range changed only:
++
++```text
++docs/architecture/boot_preflight_contract.md
++scripts/boot_preflight.py
++tests/test_boot_preflight.py
++```
++
++Remaining dirty local files are inherited/local context and are not GitHub truth. They must not be used as phase-close evidence, boot readiness evidence, research-validity evidence, strategy-validity evidence, alpha evidence, recommendation authority, or dashboard-promotion authority.
++
++Generated bundles, zips, packet folders, patches, runtime stdout/stderr/pid/status files, and evidence captures remain excluded from the audit-anchor commit unless a later explicit artifact policy approves them.
++
++The `generated_at_utc` byte-for-byte JSON determinism note from the audit is a future schema/test-hardening item, not a cleanup or implementation instruction for this anchor.
++
+ ## Purpose
+ 
+ Classify the broader dirty worktree into reviewable buckets before any staging or cleanup action. This manifest is the handoff artifact for the next staging plan.
+diff --git a/docs/context/done_checklist_current.md b/docs/context/done_checklist_current.md
+index f9956fa..70b6fc2 100644
+--- a/docs/context/done_checklist_current.md
++++ b/docs/context/done_checklist_current.md
+@@ -4,6 +4,22 @@ Status: Current with Portfolio Universe Construction PASS and optimizer-core qua
+ Authority: advisory-only integration artifact. This file does not authorize live trading, broker automation, promotion, strategy search, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, thesis validation, or scope widening by itself.
+ Purpose: define machine-checkable done criteria for current Phase 65 portfolio universe and candidate-card work.
+ 
++## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
++
++- [x] Boot preflight data-readiness integration commit is pushed: `7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e`.
++- [x] Clean remote audit verdict recorded: `PASS_WITH_NOTES`.
++- [x] Audit range recorded: `22f2788a18e9ea38896b688a818f58b5f7576dfb..7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e`.
++- [x] Audit confirmed only the three approved files changed in the range.
++- [x] Audit confirmed boot preflight calls the pushed data-readiness gate.
++- [x] Audit confirmed `PASS/WARN/FAIL` maps to ready/degraded/blocked.
++- [x] Audit confirmed failed preflight cannot refresh `runtime/boot_status_current.json`.
++- [x] Audit confirmed boot-facing data-readiness details sanitize research-trust `next_actions`.
++- [x] Audit confirmed no governance/context-packet/dashboard/replay/optimizer/Rule100/research-validity integration was added.
++- [x] Audit confirmed default behavior remains read-only unless `--write-status` is explicitly supplied.
++- [x] Audit note accepted: `generated_at_utc` makes byte-for-byte `--json` output non-deterministic; deterministic JSON output is future hardening.
++- [ ] Clean remote phase-close regression from `7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e` has not yet been run.
++- [ ] Main dirty worktree remains local context and is not GitHub truth.
++
+ ## Latest Addendum - Research Validity Runner v0 GitHub Anchor
+ 
+ - [x] Research-validity runner v0 exists in an isolated commit.
+diff --git a/docs/context/impact_packet_current.md b/docs/context/impact_packet_current.md
+index f5d7357..10c2d46 100644
+--- a/docs/context/impact_packet_current.md
++++ b/docs/context/impact_packet_current.md
+@@ -4,6 +4,57 @@ Status: Current
+ Authority: advisory-only integration artifact. This file does not authorize live trading, promotion, strategy search, provider ingestion, alerts, broker calls, dashboard content redesign, signal ranking, macro scoring, factor scoring, candidate ranking, candidate scoring, or scope widening by itself.
+ Purpose: provide a compact view of the Portfolio Optimizer View Test and Performance Hardening implementation and affected interfaces.
+ 
++## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
++
++### Pushed Commit
++
++```text
++7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e Wire data-readiness gate into boot preflight
++```
++
++### Audit Verdict
++
++```text
++PASS_WITH_NOTES
++```
++
++### Audited Diff Range
++
++```text
++22f2788a18e9ea38896b688a818f58b5f7576dfb..7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e
++```
++
++### Committed Files In Range
++
++```text
++docs/architecture/boot_preflight_contract.md
++scripts/boot_preflight.py
++tests/test_boot_preflight.py
++```
++
++### Audit Confirmed
++
++- `scripts/boot_preflight.py` calls `core.data_readiness_gate.run_data_readiness_gate(...)`.
++- Data-readiness `PASS`, `WARN`, and `FAIL` map to ready, degraded, and blocked behavior.
++- Failed preflight cannot refresh `runtime/boot_status_current.json`; it reports `blocked-until-pass`.
++- Boot-facing data-readiness details sanitize research-trust `next_actions`.
++- No governance, context-packet, dashboard, replay, optimizer, Rule100, or research-validity integration was added.
++- Default behavior remains read-only unless `--write-status` is explicitly supplied.
++
++### Audit Checks
++
++- `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_boot_preflight.py tests/test_boot_status_contract.py -q` -> PASS, 24 passed.
++- `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_data_readiness_gate.py tests/test_data_readiness_gate_write_guard.py -q` -> PASS, 15 passed.
++- `E:\Code\Quant\.venv\Scripts\python.exe -m pytest tests/test_engine.py -q` -> PASS, 4 passed.
++- `E:\Code\Quant\.venv\Scripts\python.exe scripts/boot_preflight.py --help` -> PASS.
++- `E:\Code\Quant\.venv\Scripts\python.exe scripts/run_data_readiness_gate.py --help` -> PASS.
++
++### Notes And Open Risks
++
++- Optional `scripts/boot_preflight.py --json` byte-for-byte audit was skipped because `generated_at_utc` is intentionally time-varying; deterministic JSON output is future hardening, not a blocker.
++- Full repo phase-close regression has not been run from this anchor.
++- Main worktree remains dirty/local and must not be treated as GitHub truth.
++
+ ## Latest Addendum - Research Validity Runner v0 GitHub Anchor
+ 
+ ### Pushed Commit
+diff --git a/docs/context/planner_packet_current.md b/docs/context/planner_packet_current.md
+index d827b5d..07acdeb 100644
+--- a/docs/context/planner_packet_current.md
++++ b/docs/context/planner_packet_current.md
+@@ -4,6 +4,18 @@ Status: Current
+ Authority: advisory-only integration artifact. This file does not authorize execution, promotion, live trading, strategy search, candidate ranking, candidate scoring, thesis validation, provider ingestion, alerts, dashboard content redesign, signal ranking, macro scoring, factor scoring, or scope widening by itself.
+ Purpose: provide the planner with a compact fresh world model after the Portfolio Optimizer View Test and Performance Hardening round.
+ 
++## Latest Addendum - Boot Preflight Data-Readiness Audit Anchor
++
++- `CURRENT_DELTA`: `Boot preflight data-readiness integration is pushed and audited at 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e.`
++- `AUDIT_VERDICT`: `PASS_WITH_NOTES; accepted as the remote-safe audit anchor.`
++- `AUDIT_RANGE`: `22f2788a18e9ea38896b688a818f58b5f7576dfb..7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e contained only docs/architecture/boot_preflight_contract.md, scripts/boot_preflight.py, and tests/test_boot_preflight.py.`
++- `CONFIRMED_BEHAVIOR`: `boot_preflight calls the pushed data-readiness gate; PASS/WARN/FAIL maps to ready/degraded/blocked; failed preflight cannot refresh runtime/boot_status_current.json; boot-facing details sanitize research-trust next_actions.`
++- `BOUNDARY`: `No governance, context-packet, dashboard, replay, optimizer, Rule100, or research-validity integration was added. This audit does not authorize strategy validity, alpha, recommendations, or dashboard promotion.`
++- `NOTE`: `Optional --json byte-for-byte audit was skipped because generated_at_utc is intentionally time-varying; deterministic JSON output is future schema/test hardening, not a blocker.`
++- `GITHUB_DELTA`: `GitHub is aligned through 7cbe3c0e827b0237f8e28ef0463deed9f6fcaa3e; remaining dirty local files are not GitHub truth.`
++- `NEXT_STEP`: `run_clean_remote_phase_close_regression_from_the_audit_anchor.`
++- `DO_NOT_REDECIDE`: `Do not patch generated_at_utc determinism, stage dirty context, or start governance/context-packet implementation before the clean phase-close regression verdict.`
++
+ ## Latest Addendum - Research Validity Runner v0 GitHub Anchor
+ 
+ - `CURRENT_DELTA`: `Research Validity Runner v0 is isolated and pushed in commit 8716c51781d8524de4147cf42f17e52466913de4.`

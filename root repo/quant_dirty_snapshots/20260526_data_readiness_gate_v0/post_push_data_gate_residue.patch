@@ -1,0 +1,167 @@
+diff --git a/core/data_readiness_gate.py b/core/data_readiness_gate.py
+index 1385170..71172ae 100644
+--- a/core/data_readiness_gate.py
++++ b/core/data_readiness_gate.py
+@@ -693,6 +693,8 @@ def write_boot_status(path: str | Path, status: Mapping[str, Any], *, repo_root:
+     rel = _rel(target, repo)
+     if rel not in ALLOWED_BOOT_WRITES:
+         raise ValueError(f"boot status write not allowed: {rel}")
++    if str(status.get("overall_status", "")).strip().upper() != "PASS":
++        raise ValueError("boot status write requires PASS data-readiness status")
+     boot_status = make_boot_status(
+         source="core.data_readiness_gate",
+         flags=BootContextFlags(safe_boot=False),
+diff --git a/docs/architecture/data_readiness_gate_v0.md b/docs/architecture/data_readiness_gate_v0.md
+index 1c4757f..5687953 100644
+--- a/docs/architecture/data_readiness_gate_v0.md
++++ b/docs/architecture/data_readiness_gate_v0.md
+@@ -31,7 +31,7 @@ live_overlay_allowed = false
+ scan_refresh_allowed = false
+ replay_rebuild_allowed = false
+ automatic_repair_allowed = false
+-allowed_boot_write = docs/context/boot_status_current.json
++allowed_boot_write = runtime/boot_status_current.json
+ ```
+ 
+ ### Subroute A — current optimizer/allocation readiness
+@@ -287,16 +287,18 @@ Run the gate inside a file mutation guard. The only allowed automatic write is:
+ runtime/boot_status_current.json
+ ```
+ 
+-`docs/context/boot_status_current.json` is a legacy fallback/read path during
+-the BOOT-0A migration, not the canonical generated runtime verdict. No markdown
+-companion or alternate durable boot-status path is part of v0.
++`docs/context/boot_status_current.json` is a noncanonical snapshot/evidence path
++only. It cannot override runtime safe-boot truth, and readers must not fall back
++between `runtime/boot_status_current.json` and `docs/context/boot_status_current.json`.
++No markdown companion or alternate durable boot-status path is part of v0.
+ 
+ Strict FAIL if any other file changes, appears, disappears, or has modified hash/mtime/size.
+ 
+ ## 7. Minimal `boot_status_current.json` for v0
+ 
+ The canonical v0 payload lives at `runtime/boot_status_current.json`.
+-`docs/context/boot_status_current.json` is legacy compatibility evidence only.
++`docs/context/boot_status_current.json` may exist only as noncanonical
++documentation evidence and must not be written by the gate or used as fallback.
+ 
+ v0 should implement a smaller payload than the target schema:
+ 
+diff --git a/docs/context/data_artifact_taxonomy_current.json b/docs/context/data_artifact_taxonomy_current.json
+index 0afbe41..00de1ec 100644
+--- a/docs/context/data_artifact_taxonomy_current.json
++++ b/docs/context/data_artifact_taxonomy_current.json
+@@ -30,7 +30,7 @@
+     }
+   },
+   "allowed_boot_writes": [
+-    "runtime/boot_status_current.json"
++    "docs/context/boot_status_current.json"
+   ],
+   "artifacts": [
+     {
+@@ -166,7 +166,7 @@
+       "notes": "Probe only selected artifact; fail if reused and identity/signature/window/schema mismatches."
+     },
+     {
+-      "path_glob": "runtime/boot_status_current.json",
++      "path_glob": "docs/context/boot_status_current.json",
+       "taxonomy": "derived",
+       "source_quality": "not_applicable",
+       "required_for": ["boot"],
+@@ -174,7 +174,7 @@
+       "repair_policy": "automatic_requested_output",
+       "planning_missing_status": "WARN",
+       "strict_missing_status": "WARN",
+-      "notes": "Canonical runtime boot-status JSON and the only durable boot write allowed during boot. docs/context/boot_status_current.json is legacy fallback only. No markdown companion is part of v0."
++      "notes": "Canonical boot-status JSON and the only durable boot write allowed during boot. runtime/boot_status_current.json is not a canonical, fallback, or mirror path. No markdown companion is part of v0."
+     }
+   ]
+ }
+diff --git a/docs/context/portfolio_allocation_route_contract_v0.json b/docs/context/portfolio_allocation_route_contract_v0.json
+index 2af68a7..0a65627 100644
+--- a/docs/context/portfolio_allocation_route_contract_v0.json
++++ b/docs/context/portfolio_allocation_route_contract_v0.json
+@@ -11,7 +11,7 @@
+     "scan_refresh_allowed": false,
+     "replay_rebuild_allowed": false,
+     "allowed_boot_writes": [
+-      "runtime/boot_status_current.json"
++      "docs/context/boot_status_current.json"
+     ]
+   },
+   "subroutes": [
+diff --git a/tests/test_data_readiness_gate_write_guard.py b/tests/test_data_readiness_gate_write_guard.py
+index 7b0e9c7..99cc9aa 100644
+--- a/tests/test_data_readiness_gate_write_guard.py
++++ b/tests/test_data_readiness_gate_write_guard.py
+@@ -5,17 +5,28 @@ from pathlib import Path
+ 
+ import pytest
+ 
+-from core.boot_status import BootStatus
++from core.boot_status import BOOT_STATUS_CURRENT_PATH, LEGACY_BOOT_STATUS_PATH, BootStatus
+ from core import data_readiness_gate as gate
+ 
+ 
++def test_data_readiness_gate_boot_status_path_contract_is_runtime_only() -> None:
++    assert gate.DEFAULT_STATUS_PATH == Path("runtime/boot_status_current.json")
++    assert gate.DEFAULT_STATUS_PATH == BOOT_STATUS_CURRENT_PATH
++    assert gate.DEFAULT_STATUS_PATH != LEGACY_BOOT_STATUS_PATH
++    assert gate.ALLOWED_BOOT_WRITES == {BOOT_STATUS_CURRENT_PATH.as_posix()}
++    assert LEGACY_BOOT_STATUS_PATH.as_posix() not in gate.ALLOWED_BOOT_WRITES
++
++
+ def test_write_boot_status_allows_only_boot_status_path(tmp_path: Path) -> None:
+     status = {"schema_version": gate.SCHEMA_VERSION, "overall_status": "PASS"}
+ 
+     with pytest.raises(ValueError):
+         gate.write_boot_status("docs/context/not_boot_status.json", status, repo_root=tmp_path)
++    with pytest.raises(ValueError):
++        gate.write_boot_status(LEGACY_BOOT_STATUS_PATH, status, repo_root=tmp_path)
+ 
+     assert not (tmp_path / "docs/context/not_boot_status.json").exists()
++    assert not (tmp_path / LEGACY_BOOT_STATUS_PATH).exists()
+ 
+ 
+ def test_write_boot_status_uses_atomic_target_and_leaves_no_temp_file(tmp_path: Path) -> None:
+@@ -87,10 +98,10 @@ def test_boot_write_snapshot_rejects_temp_residue_in_guarded_data_roots(tmp_path
+     ]
+ 
+ 
+-def test_noncanonical_runtime_boot_status_path_is_not_an_allowed_write() -> None:
++def test_docs_context_boot_status_path_is_not_an_allowed_write() -> None:
+     before = gate.capture_boot_write_snapshot(Path("."))
+     after = dict(before)
+-    forbidden_path = "docs/context/" + gate.DEFAULT_STATUS_PATH.name
++    forbidden_path = LEGACY_BOOT_STATUS_PATH.as_posix()
+     after[forbidden_path] = (17, 123, False)
+ 
+     diff = gate.diff_boot_write_snapshot(before, after)
+@@ -100,6 +111,26 @@ def test_noncanonical_runtime_boot_status_path_is_not_an_allowed_write() -> None
+     assert diff["disallowed_changed"] == [forbidden_path]
+ 
+ 
++def test_docs_context_boot_status_delta_cannot_ride_with_canonical_write(tmp_path: Path) -> None:
++    before = gate.capture_boot_write_snapshot(tmp_path)
++    gate.write_boot_status(
++        gate.DEFAULT_STATUS_PATH,
++        {"schema_version": gate.SCHEMA_VERSION, "overall_status": "PASS"},
++        repo_root=tmp_path,
++    )
++    legacy_path = tmp_path / LEGACY_BOOT_STATUS_PATH
++    legacy_path.parent.mkdir(parents=True, exist_ok=True)
++    legacy_path.write_text('{"noncanonical": true}\n', encoding="utf-8")
++    after = gate.capture_boot_write_snapshot(tmp_path)
++
++    diff = gate.diff_boot_write_snapshot(before, after)
++
++    assert diff["status"] == "FAIL"
++    assert diff["allowed_changed"] == [gate.DEFAULT_STATUS_PATH.as_posix()]
++    assert diff["disallowed_changed"] == [LEGACY_BOOT_STATUS_PATH.as_posix()]
++    assert diff["post_boot_only_allowed_delta"] is False
++
++
+ def test_runtime_boot_status_path_is_allowed_only_when_schema_valid() -> None:
+     before = gate.capture_boot_write_snapshot(Path("."))
+     after = dict(before)

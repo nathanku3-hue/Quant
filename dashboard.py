@@ -7,33 +7,60 @@ import numpy as np
 import os
 import sys
 import json
+import hashlib
 import subprocess
 import datetime
 import atexit
 from pathlib import Path
+from dataclasses import dataclass, field, replace
 from functools import reduce
 from filelock import FileLock
 from core.release_metadata import build_release_cache_fingerprint
 from core.dashboard_control_plane import derive_hf_proxy_data_health
 from core.dashboard_control_plane import ensure_payload_data_health
 from core.data_orchestrator import build_unified_data_cache_signature
+from core.data_orchestrator import build_batched_pit_input_loader
+from core.data_orchestrator import build_benchmark_equity_from_prices
+from core.data_orchestrator import build_price_endpoint_freshness
 from core.data_orchestrator import clean_price_frame
+from core.data_orchestrator import filter_price_frame_to_fresh_columns
 from core.data_orchestrator import get_macro_features
+from core.data_orchestrator import load_batched_pit_replay_data
+from core.data_orchestrator import load_strategy_replay_inputs
 from core.data_orchestrator import load_unified_data
+from core.data_orchestrator import repair_stale_price_endpoints_with_live_overlay
 from views.regime_view import render_regime_banner_from_macro
 from views.auto_backtest_view import render_auto_backtest_view
-from views.optimizer_view import render_optimizer_view
+from views.optimizer_view import (
+    PORTFOLIO_ALLOCATION_STATE_KEY,
+    PORTFOLIO_CURRENT_HOLD_REPLAY_KEY,
+    PORTFOLIO_REPLAY_SELECTION_KEY,
+    PortfolioReplaySelection,
+    build_portfolio_replay_selection_signature,
+    portfolio_replay_asset_identity,
+    render_optimizer_view,
+)
 from views.drift_monitor_view import render_drift_monitor_view
-from views.shadow_portfolio_view import render_shadow_portfolio_view
+
 from views.page_registry import build_dashboard_navigation
+from views.page_registry import DISCOVERY_PAGE_TITLE
+from views.page_registry import PORTFOLIO_PAGE_TITLE
+from views.page_registry import STRATEGY_PAGE_TITLE
+from views.discovery_view import render_discovery_page
+from views.pead_validation_evidence import render_pead_validation_evidence
+from views.strategy_view import render_strategy_page
 from strategies.portfolio_universe import (
     DEFAULT_OPTIMIZER_UNIVERSE_POLICY,
     build_optimizer_universe,
+    load_current_position_memory,
+    map_permno_weights_to_ticker_weights,
 )
 from strategies.scanner import build_price_technicals
 from strategies.scanner import calculate_macro_score
 from strategies.scanner import classify_breadth_status
 from strategies.scanner import enrich_scan_frame
+from strategies.strategy_replay import REPLAY_CONTEXT_COLUMNS
+from strategies.strategy_replay import normalize_context_frame_for_replay
 from core.drift_alert_manager import DriftAlertManager
 from core.drift_detector import DriftDetector
 from core.dashboard_escalation import initialize_escalation_manager
@@ -44,6 +71,71 @@ from utils.process import pid_is_running
 BT_CACHE_PATH = Path("data/backtest_results.json")
 BT_LOCK_PATH = str(BT_CACHE_PATH) + ".lock"
 BT_PID_FILE = Path("data/.backtest_pid")
+RULE100_SOFTMAX_V1_HISTORY_PATH = Path("data/processed/rule100_softmax_v1_history.csv")
+LIFECYCLE_BUY_SELL_LOG_PATH = Path("data/portfolio_lifecycle_buy_sell_log.jsonl")
+SELECTED_METHOD_REPLAY_CACHE_DIR = Path("data/runtime_cache/strategy_replay")
+DASHBOARD_REPLAY_ARTIFACT_MAX_ROWS = 250_000
+DASHBOARD_REPLAY_ARTIFACT_MAX_DATES = 3_000
+STRATEGY_REPLAY_CONTEXT_KEY = "strategy_replay_context"
+STRATEGY_REPLAY_LATEST_WEIGHTS_KEY = "strategy_replay_latest_weights"
+STRATEGY_REPLAY_CACHE_SIGNATURE_KEY = "strategy_replay_cache_signature"
+STRATEGY_REPLAY_YTD_CONTEXT_KEY = "_replay_context_for_ytd"
+PORTFOLIO_STALE_ENDPOINT_REPAIR_KEY = "portfolio_stale_endpoint_repair"
+PORTFOLIO_STALE_ENDPOINT_REPAIR_FRAME_KEY = "portfolio_stale_endpoint_repair_frame"
+
+
+def _stable_json_hash(value: object) -> str:
+    payload = json.dumps(value, sort_keys=True, default=str, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+@dataclass(frozen=True)
+class DashboardReplayContext:
+    method: str
+    max_weight: float
+    controls: dict
+    cache_signature: dict
+    source_label: str
+    replay_df: pd.DataFrame
+    latest_snapshot: pd.DataFrame
+    event_annotations: pd.DataFrame
+    buy_sell_decisions: pd.DataFrame
+    replay_dates: list[str]
+    sampling: str  # "daily" or "weekly"
+    status: str  # "building", "ready", "stale", "failed", "input_unavailable"
+    reason: str
+    source_mode: str = "transitional_build"  # "saved_artifact" | "transitional_build" | "unavailable"
+    input_coverage_start: str = ""  # from run_metadata; empty means unknown
+    run_id: str = ""
+    source_id: str = ""
+    method_id: str = ""
+    date_window: dict[str, object] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class DashboardReplayRequest:
+    method: str
+    max_weight: float
+    controls: dict
+    cache_signature: dict
+    replay_assets: tuple[object, ...]
+    replay_dates: list[str]
+    sampling: str
+    data_signature: tuple
+    full_history_start: str
+    include_replay: bool
+    allocation_assets: tuple[object, ...] = ()
+
+
+@dataclass(frozen=True)
+class DashboardReplayArtifactRead:
+    status: str
+    reason: str
+    bundle: object | None = None
+    artifact_path: Path | None = None
+    manifest_path: Path | None = None
+    manifest: dict | None = None
+    frame: pd.DataFrame | None = None
 
 
 def _release_bound_cache_version(version: str) -> str:
@@ -238,6 +330,97 @@ def _load_weight_series_from_json(path: Path) -> pd.Series | None:
     return None
 
 
+def _load_rule100_softmax_v1_history(path: Path | None = None) -> pd.DataFrame:
+    """Load the additive v1 sizing history artifact for lifecycle audit display."""
+
+    history_path = path or RULE100_SOFTMAX_V1_HISTORY_PATH
+    if not history_path.exists() or history_path.stat().st_size == 0:
+        return pd.DataFrame()
+    history = pd.read_csv(history_path)
+    if history.empty:
+        return history
+    history["date"] = pd.to_datetime(history.get("date"), errors="coerce")
+    if "ticker" in history.columns:
+        history["ticker"] = history["ticker"].astype(str).str.upper().str.strip()
+    return history
+
+
+def _ensure_rule100_softmax_v1_history() -> pd.DataFrame:
+    """Load history, building the additive artifact on a local miss."""
+
+    try:
+        history = _load_rule100_softmax_v1_history()
+    except Exception:
+        history = pd.DataFrame()
+    if not history.empty:
+        return history
+    try:
+        from scripts.rule100_softmax_v1_audit import write_rule100_softmax_v1_history
+
+        write_rule100_softmax_v1_history(output_path=RULE100_SOFTMAX_V1_HISTORY_PATH)
+        return _load_rule100_softmax_v1_history()
+    except Exception:
+        return pd.DataFrame()
+
+
+def _merge_rule100_softmax_v1_history(df_events: pd.DataFrame) -> pd.DataFrame:
+    """Attach PIT v1 target weights without mutating lifecycle event weights."""
+
+    if not isinstance(df_events, pd.DataFrame) or df_events.empty:
+        return df_events
+    out = df_events.copy()
+    try:
+        history = _load_rule100_softmax_v1_history()
+    except Exception:
+        history = pd.DataFrame()
+    out["rule100_softmax_v1_target_weight"] = pd.NA
+    out["rule100_softmax_v1_cash_residual"] = pd.NA
+    out["rule100_softmax_v1_eligibility"] = ""
+    if history.empty:
+        history = _ensure_rule100_softmax_v1_history()
+        if history.empty:
+            return out
+
+    key_frame = out[["date", "ticker"]].copy()
+    key_frame["_event_row"] = out.index
+    key_frame["date_key"] = pd.to_datetime(key_frame["date"], errors="coerce").dt.normalize()
+    key_frame["ticker_key"] = key_frame["ticker"].astype(str).str.upper().str.strip()
+
+    hist_cols = [
+        "date",
+        "ticker",
+        "softmax_v1_target_weight",
+        "softmax_v1_cash_residual",
+        "eligibility_reason",
+    ]
+    missing = [col for col in hist_cols if col not in history.columns]
+    if missing:
+        return out
+    hist = history[hist_cols].copy()
+    hist["date_key"] = pd.to_datetime(hist["date"], errors="coerce").dt.normalize()
+    hist["ticker_key"] = hist["ticker"].astype(str).str.upper().str.strip()
+    hist = (
+        hist.dropna(subset=["date_key"])
+        .sort_values(["date_key", "ticker_key"], kind="mergesort")
+        .drop_duplicates(["date_key", "ticker_key"], keep="last")
+    )
+    merged = key_frame.merge(
+        hist[[
+            "date_key",
+            "ticker_key",
+            "softmax_v1_target_weight",
+            "softmax_v1_cash_residual",
+            "eligibility_reason",
+        ]],
+        on=["date_key", "ticker_key"],
+        how="left",
+    ).set_index("_event_row")
+    out.loc[merged.index, "rule100_softmax_v1_target_weight"] = merged["softmax_v1_target_weight"]
+    out.loc[merged.index, "rule100_softmax_v1_cash_residual"] = merged["softmax_v1_cash_residual"]
+    out.loc[merged.index, "rule100_softmax_v1_eligibility"] = merged["eligibility_reason"].fillna("")
+    return out
+
+
 def _load_baseline_from_latest_pointer() -> tuple[pd.Series | None, dict | None]:
     """
     Load baseline weights and metadata from latest pointer.
@@ -379,6 +562,15 @@ def _load_unified_data_cached(
     )
 
 
+@st.cache_resource(show_spinner=False)
+def _price_endpoint_freshness_cached(
+    _prices: pd.DataFrame,
+    matrix_signature: tuple,
+):
+    # matrix_signature keeps this endpoint snapshot tied to the loaded parquet package and loader shape.
+    return build_price_endpoint_freshness(_prices)
+
+
 def get_prices_and_technicals(tickers):
     if not tickers:
         return {}
@@ -438,9 +630,14 @@ returns_wide = pd.DataFrame()
 ticker_map_parquet = {}
 sector_map_parquet = None
 fundamentals_wide = None
+price_endpoint_freshness = None
 
 try:
     # Attempt to load historical parquet data
+    unified_data_signature = build_unified_data_cache_signature(
+        processed_dir="./data/processed",
+        static_dir="./data/static",
+    )
     unified_package = _load_unified_data_cached(
         mode="historical",
         top_n=2000,
@@ -449,10 +646,7 @@ try:
         asof_date=None,
         processed_dir="./data/processed",
         static_dir="./data/static",
-        data_signature=build_unified_data_cache_signature(
-            processed_dir="./data/processed",
-            static_dir="./data/static",
-        ),
+        data_signature=unified_data_signature,
     )
 
     prices_wide = unified_package.prices
@@ -463,6 +657,19 @@ try:
 
     # Check if data loaded successfully
     if not prices_wide.empty and not returns_wide.empty:
+        price_matrix_signature = (
+            unified_data_signature,
+            "historical",
+            2000,
+            2000,
+            "top_liquid",
+            None,
+            tuple(prices_wide.shape),
+        )
+        price_endpoint_freshness = _price_endpoint_freshness_cached(
+            prices_wide,
+            price_matrix_signature,
+        )
         parquet_data_available = True
         st.sidebar.success(f"✅ Parquet TRI data loaded: {prices_wide.shape[1]} tickers")
     else:
@@ -538,19 +745,19 @@ with st.sidebar:
     )
 
 def _render_hedge_harvester_section() -> None:
-    st.subheader("Hedge Harvester")
-    hedge_ticker = st.text_input("Enter Ticker for Collar:", value="MU").upper()
-    if st.button("Generate Option Yield"):
+    st.subheader("Options Scenario Research")
+    hedge_ticker = st.text_input("Ticker for collar scenario:", value="MU").upper()
+    if st.button("Estimate Scenario Premium"):
         with st.spinner(f"Pricing vol for {hedge_ticker}..."):
             res = calculate_optimal_hedge(hedge_ticker)
             if "Action" not in res:
                 st.error("Engine error retrieving chain.")
-            elif res.get("Action") in ["SELL CALL", "DO NOT SELL"]:
+            else:
                 st.success(f"Strike: ${res.get('Strike')} | Exp: {res.get('Exp')} Days")
                 if 'Est_Yield' in res:
-                    st.write(f"**Premium Yield:** {res['Est_Yield']*100:.2f}%")
-            else:
-                st.error(str(res))
+                    st.write(f"**Scenario premium:** {res['Est_Yield']*100:.2f}%")
+                if res.get("Reason"):
+                    st.caption(str(res["Reason"]))
 
 # --- Load Drone Intel (Fresh Finds) ---
 FRESH_FINDS_FILE = "data/fresh_finds.json"
@@ -643,10 +850,10 @@ except Exception as e:
 if drone_count > 0:
     st.info(f"🛸 **DRONE INTEL:** {drone_count} New Targets Detected dynamically by Scout Drone (Last Sweep: {drone_timestamp})")
 
-# Custom Sort: Prioritize Actionable Ratings
+# Custom Sort: Prioritize legacy scanner research buckets
 def rate_weight(val):
     v = str(val).upper()
-    if "ENTER: STRONG BUY" in v: return 1
+    if "ENTER:" in v and "STRONG" in v and "BUY" in v: return 1
     if "ENTER: BUY" in v: return 2
     if "EXIT" in v: return 3
     if "WATCH (" in v and "Miss" not in v and "No" not in v: return 4
@@ -667,7 +874,11 @@ live_weights = _load_weight_series_from_json(Path("data/live_positions/latest.js
 if live_weights is None:
     live_candidate = st.session_state.get("live_weights")
     if live_candidate is None:
-        live_candidate = st.session_state.get("optimizer_weights")
+        portfolio_state = st.session_state.get("portfolio_allocation_state")
+        if isinstance(portfolio_state, dict):
+            live_candidate = portfolio_state.get("weights")
+        if live_candidate is None:
+            live_candidate = st.session_state.get("optimizer_weights")
     live_weights = _coerce_weight_series(live_candidate)
 
 try:
@@ -919,7 +1130,7 @@ def _render_daily_scan_section() -> None:
     def get_plot_category(score, dist):
         if score == 100:
             if dist > 5.0: return "Wait (Extended)"
-            elif dist >= -2.0: return "Strong Buy (Max Alpha)"
+            elif dist >= -2.0: return "Research focus (support zone)"
             else: return "Buy"
         elif score >= 90: return "Watch / Hold"
         return "Ignore"
@@ -1099,7 +1310,7 @@ def _render_daily_scan_section() -> None:
             y_range = [15, 108]
         
         color_discrete_map = {
-            "Strong Buy (Max Alpha)": "#00FFAA",
+            "Research focus (support zone)": "#00FFAA",
             "Buy": "#00cc66",
             "Wait (Extended)": "#FFB020",
             "Watch / Hold": "#FFD700",
@@ -1120,7 +1331,7 @@ def _render_daily_scan_section() -> None:
             labels={
                 "Tech_Support_Dist": "Distance from Dynamic Support (%)",
                 "Display_Score": "Fundamental Physics Score",
-                "Plot_Category": "Action Status",
+                "Plot_Category": "Research Bucket",
                 "Support_Label": "Active Rail",
                 "Source": "Intel Source"
             }
@@ -1133,7 +1344,7 @@ def _render_daily_scan_section() -> None:
                 marker=dict(size=14, symbol="circle", line=dict(width=1, color='DarkSlateGrey'))
             )
         
-        # Draw Max Alpha Zone
+        # Draw Research Support Zone
         fig.add_shape(
             type="rect",
             x0=-2, y0=90, x1=5, y1=102,
@@ -1142,7 +1353,7 @@ def _render_daily_scan_section() -> None:
             opacity=0.15,
             layer="below"
         )
-        fig.add_annotation(x=1.5, y=96, text="MAX ALPHA ZONE", showarrow=False, font=dict(color="#00FFAA", size=14))
+        fig.add_annotation(x=1.5, y=96, text="RESEARCH SUPPORT ZONE", showarrow=False, font=dict(color="#00FFAA", size=14))
         
         # Draw Extended Zone (Wait for Support)
         fig.add_shape(
@@ -1736,18 +1947,53 @@ def _extract_yfinance_close(raw: pd.DataFrame, tickers: tuple[str, ...]) -> pd.D
 def _download_ytd_close_prices(tickers: tuple[str, ...], start_iso: str) -> pd.DataFrame:
     if not tickers:
         return pd.DataFrame()
+    if "pytest" in sys.modules:
+        return pd.DataFrame()
     raw = yf.download(
         list(tickers),
         start=start_iso,
         progress=False,
         auto_adjust=True,
         threads=True,
+        timeout=3,
     )
     return _extract_yfinance_close(raw, tickers)
 
 
+def _local_benchmark_close_prices(tickers: tuple[str, ...], ytd_start: pd.Timestamp) -> pd.DataFrame:
+    """Fallback benchmark close prices from the local TRI parquet package."""
+    if not tickers or not parquet_data_available or not ticker_map_parquet or prices_wide.empty:
+        return pd.DataFrame()
+    ticker_to_permno = {str(ticker).upper(): permno for permno, ticker in ticker_map_parquet.items()}
+    selected = {
+        ticker: ticker_to_permno[ticker]
+        for ticker in [str(t).upper() for t in tickers]
+        if ticker in ticker_to_permno and ticker_to_permno[ticker] in prices_wide.columns
+    }
+    if not selected:
+        return pd.DataFrame()
+    local_prices = prices_wide.loc[prices_wide.index >= ytd_start, list(selected.values())].copy()
+    local_prices = local_prices.rename(columns={permno: ticker for ticker, permno in selected.items()})
+    return _clean_portfolio_price_frame(local_prices)
+
+
+def _build_benchmark_equity(
+    tickers: tuple[str, ...],
+    ytd_start: pd.Timestamp,
+) -> tuple[dict[str, pd.Series], pd.Timestamp | None, str]:
+    """Build benchmark curves with local TRI plus per-ticker stale live overlay."""
+    return build_benchmark_equity_from_prices(
+        tickers=tickers,
+        ytd_start=ytd_start,
+        local_prices=_local_benchmark_close_prices(tickers, ytd_start),
+        live_loader=_download_ytd_close_prices,
+    )
+
+
 def _current_optimizer_weights() -> pd.Series:
-    raw = st.session_state.get("optimizer_weights")
+    state = _portfolio_allocation_state()
+    replay_raw = _valid_strategy_replay_latest_weights()
+    raw = replay_raw if replay_raw is not None else (state.get("weights") if state else st.session_state.get("optimizer_weights"))
     if isinstance(raw, pd.Series):
         weights = raw.copy()
     elif isinstance(raw, dict):
@@ -1757,54 +2003,114 @@ def _current_optimizer_weights() -> pd.Series:
     weights = pd.to_numeric(weights, errors="coerce").replace([np.inf, -np.inf], np.nan)
     weights = weights.dropna()
     weights = weights[weights > 0]
-    if weights.empty or float(weights.sum()) <= 0:
+    total = float(weights.sum()) if not weights.empty else 0.0
+    if weights.empty or total <= 0:
         return pd.Series(dtype="float64")
-    return weights / float(weights.sum())
+    if total > 1.0:
+        return weights / total
+    return weights
+
+
+def _clear_portfolio_allocation_session_state() -> None:
+    st.session_state[PORTFOLIO_ALLOCATION_STATE_KEY] = {
+        "mode": "unavailable",
+        "source": "optimizer",
+        "weights": {},
+        "cash_only": False,
+        "latest_price_date": "",
+    }
+    st.session_state["portfolio_allocation_mode"] = "unavailable"
+    st.session_state["portfolio_allocation_source"] = "optimizer"
+    st.session_state["portfolio_allocation_weights"] = {}
+    st.session_state["portfolio_allocation_cash_only"] = False
+    st.session_state["portfolio_allocation_price_latest_date"] = ""
+    st.session_state["optimizer_weights"] = {}
+    st.session_state["optimizer_price_latest_date"] = ""
+    st.session_state["optimizer_cash_only"] = False
+    st.session_state.pop(PORTFOLIO_CURRENT_HOLD_REPLAY_KEY, None)
+
+
+def _current_optimizer_is_cash_only() -> bool:
+    replay_raw = _valid_strategy_replay_latest_weights()
+    if isinstance(replay_raw, dict) and not replay_raw:
+        return True
+    state = _portfolio_allocation_state()
+    if state and "cash_only" in state:
+        return bool(state.get("cash_only", False))
+    return bool(st.session_state.get("optimizer_cash_only", False))
+
+
+def _portfolio_allocation_state() -> dict[str, object]:
+    state = st.session_state.get("portfolio_allocation_state")
+    return state if isinstance(state, dict) else {}
 
 
 def _weights_by_ticker(weights: pd.Series) -> pd.Series:
-    ticker_lookup = ticker_map_parquet if isinstance(ticker_map_parquet, dict) else {}
-    rows: dict[str, float] = {}
-    for permno, weight in weights.items():
-        ticker = ticker_lookup.get(permno)
-        if ticker is None:
-            try:
-                ticker = ticker_lookup.get(int(permno))
-            except Exception:
-                ticker = None
-        if ticker:
-            rows[str(ticker).upper()] = rows.get(str(ticker).upper(), 0.0) + float(weight)
-    out = pd.Series(rows, dtype="float64")
-    if out.empty or float(out.sum()) <= 0:
-        return pd.Series(dtype="float64")
-    return out / float(out.sum())
+    return map_permno_weights_to_ticker_weights(weights, ticker_map_parquet)
 
 
 def _weighted_equity_curve(
     prices: pd.DataFrame,
     weights: pd.Series,
     name: str,
+    required_latest: pd.Timestamp | None = None,
+    price_freshness=None,
 ) -> pd.Series | None:
     prices = _clean_portfolio_price_frame(prices)
     if prices.empty or weights.empty:
         return None
-    cols = [col for col in weights.index if col in prices.columns]
+    positive_weights = pd.to_numeric(weights, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+    positive_weights = positive_weights[positive_weights > 0]
+    if positive_weights.empty:
+        return None
+    missing_cols = [col for col in positive_weights.index if col not in prices.columns]
+    if missing_cols:
+        return None
+    cols = list(positive_weights.index)
     if not cols:
         return None
-    aligned_prices = prices.reindex(columns=cols).ffill().dropna(how="all")
+    aligned_prices, _target_latest, stale_cols = filter_price_frame_to_fresh_columns(
+        prices,
+        cols,
+        required_latest=required_latest,
+        freshness=price_freshness,
+    )
+    if stale_cols:
+        return None
+    aligned_prices = aligned_prices.reindex(columns=cols).where(aligned_prices > 0)
+    aligned_prices = aligned_prices.dropna(how="all")
     if aligned_prices.shape[0] < 2:
         return None
-    aligned_weights = weights.reindex(cols).fillna(0.0)
-    if float(aligned_weights.sum()) <= 0:
+    aligned_weights = positive_weights.reindex(cols).fillna(0.0)
+    aligned_total = float(aligned_weights.sum())
+    if aligned_total <= 0:
         return None
-    aligned_weights = aligned_weights / float(aligned_weights.sum())
+    if aligned_total > 1.0:
+        aligned_weights = aligned_weights / aligned_total
     daily_returns = aligned_prices.pct_change(fill_method=None).iloc[1:]
-    weighted_returns = daily_returns.mul(aligned_weights, axis=1).sum(axis=1, min_count=1)
-    weighted_returns = weighted_returns.dropna()
+    daily_returns = daily_returns.replace([np.inf, -np.inf], np.nan)
+    weighted_returns = daily_returns.mul(aligned_weights, axis=1).sum(axis=1, min_count=len(cols))
+    weighted_returns = weighted_returns.replace([np.inf, -np.inf], np.nan).dropna()
     if weighted_returns.empty:
         return None
     equity = (1 + weighted_returns).cumprod()
+    equity = equity.replace([np.inf, -np.inf], np.nan).dropna()
+    if equity.empty:
+        return None
     equity.name = name
+    return equity
+
+
+def _cash_equity_curve(ytd_start: pd.Timestamp) -> pd.Series:
+    start = pd.Timestamp(ytd_start).normalize()
+    end = pd.Timestamp.now().normalize()
+    if end <= start:
+        index = pd.DatetimeIndex([start])
+        values = [1.0]
+    else:
+        index = pd.DatetimeIndex([start, end])
+        values = [1.0, 1.0]
+    equity = pd.Series(values, index=index, dtype="float64", name="Portfolio (Cash)")
     return equity
 
 
@@ -1812,10 +2118,31 @@ def _build_portfolio_ytd_equity(
     weights: pd.Series,
     ytd_start: pd.Timestamp,
 ) -> tuple[pd.Series | None, pd.Timestamp | None, str]:
-    start_iso = ytd_start.strftime("%Y-%m-%d")
+    if _current_optimizer_is_cash_only():
+        cash_equity = _cash_equity_curve(ytd_start)
+        return cash_equity, cash_equity.index.max(), "cash-only"
+
+    if not weights.empty and parquet_data_available and not prices_wide.empty:
+        ytd_prices = prices_wide.loc[prices_wide.index >= ytd_start]
+        ytd_prices = ytd_prices.reindex(columns=weights.index)
+        required_latest = (
+            price_endpoint_freshness.required_latest
+            if price_endpoint_freshness is not None
+            else None
+        )
+        local_equity = _weighted_equity_curve(
+            prices=ytd_prices,
+            weights=weights,
+            name="Portfolio",
+            required_latest=required_latest,
+            price_freshness=price_endpoint_freshness,
+        )
+        if local_equity is not None:
+            return local_equity, local_equity.index.max(), "optimized local fresh"
+
     ticker_weights = _weights_by_ticker(weights)
     if not ticker_weights.empty:
-        live_prices = _download_ytd_close_prices(tuple(ticker_weights.index), start_iso)
+        live_prices = _download_ytd_close_prices(tuple(ticker_weights.index), ytd_start.strftime("%Y-%m-%d"))
         live_equity = _weighted_equity_curve(
             prices=live_prices,
             weights=ticker_weights,
@@ -1823,17 +2150,6 @@ def _build_portfolio_ytd_equity(
         )
         if live_equity is not None:
             return live_equity, live_prices.index.max(), "optimized live"
-
-    if not weights.empty and parquet_data_available and not prices_wide.empty:
-        ytd_prices = prices_wide.loc[prices_wide.index >= ytd_start]
-        ytd_prices = ytd_prices.reindex(columns=weights.index)
-        local_equity = _weighted_equity_curve(
-            prices=ytd_prices,
-            weights=weights,
-            name="Portfolio",
-        )
-        if local_equity is not None:
-            return local_equity, _clean_portfolio_price_frame(ytd_prices).index.max(), "optimized local"
 
     if parquet_data_available and not prices_wide.empty:
         ytd_prices = prices_wide.loc[prices_wide.index >= ytd_start].copy()
@@ -1846,30 +2162,108 @@ def _build_portfolio_ytd_equity(
     return None, None, "unavailable"
 
 
-def _render_portfolio_ytd_chart() -> None:
-    """Render Portfolio YTD performance vs SPY and QQQ benchmarks."""
-    st.subheader("📈 YTD Performance")
+def _build_portfolio_ytd_equity_from_replay(
+    context: DashboardReplayContext,
+    horizon_start: pd.Timestamp,
+) -> tuple[pd.Series | None, pd.Timestamp | None, str]:
+    """Compound daily portfolio_return from replay_df into a cumulative equity curve."""
+    if context.status != "ready" or context.sampling != "daily":
+        return None, None, "daily replay performance unavailable"
+    replay_df = context.replay_df
+    if not isinstance(replay_df, pd.DataFrame) or replay_df.empty:
+        return None, None, "replay unavailable"
+    if "portfolio_return" not in replay_df.columns or "date" not in replay_df.columns:
+        return None, None, "replay missing columns"
 
-    ytd_start = pd.Timestamp(datetime.datetime.now().year, 1, 1)
-    weights = _current_optimizer_weights()
-    portfolio_equity, portfolio_latest, portfolio_source = _build_portfolio_ytd_equity(
-        weights=weights,
-        ytd_start=ytd_start,
+    df = replay_df.copy()
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df = df.dropna(subset=["date"])
+    df = df[df["date"] >= horizon_start]
+    if df.empty:
+        return None, None, "no replay data in window"
+
+    # portfolio_return is the same for all asset rows on a given date; take one per date
+    daily_ret = (
+        df.drop_duplicates(subset=["date"])
+        .set_index("date")
+        .sort_index()["portfolio_return"]
+    )
+    daily_ret = pd.to_numeric(daily_ret, errors="coerce").fillna(0.0)
+    if daily_ret.empty:
+        return None, None, "replay returns empty"
+
+    # Compound daily returns into cumulative equity starting at 1.0
+    equity = (1 + daily_ret).cumprod()
+    equity.name = "Portfolio (Replay)"
+    return equity, equity.index.max(), f"replay:{context.method}"
+
+
+def _replay_identity_caption(context: DashboardReplayContext) -> str:
+    run_id = str(context.run_id or "unknown")
+    source_id = str(context.source_id or context.source_mode or "unknown")
+    method_id = str(context.method_id or context.method or "unknown")
+    window = context.date_window if isinstance(context.date_window, dict) else {}
+    start = window.get("replay_start") or window.get("requested_start") or (
+        context.replay_dates[0] if context.replay_dates else "unknown"
+    )
+    end = window.get("replay_end") or window.get("requested_end") or (
+        context.replay_dates[-1] if context.replay_dates else "unknown"
+    )
+    return (
+        f"run_id={run_id} | source_id={source_id} | method_id={method_id} | "
+        f"date_window={start}..{end}"
     )
 
-    benchmark_equity = {}
-    benchmark_latest = None
-    try:
-        bench_data = _download_ytd_close_prices(("SPY", "QQQ"), ytd_start.strftime("%Y-%m-%d"))
-        if not bench_data.empty:
-            benchmark_latest = bench_data.index.max()
-            bench_returns = bench_data.pct_change(fill_method=None).iloc[1:]
-            for col in ["SPY", "QQQ"]:
-                if col in bench_returns.columns:
-                    eq = (1 + bench_returns[col]).cumprod()
-                    benchmark_equity[col] = eq
-    except Exception:
-        pass
+
+def _portfolio_horizon_start(horizon: str, now: datetime.datetime) -> pd.Timestamp:
+    if horizon == "1Y":
+        return pd.Timestamp(now) - pd.DateOffset(years=1)
+    if horizon == "3Y":
+        return pd.Timestamp(now) - pd.DateOffset(years=3)
+    if horizon == "5Y":
+        return pd.Timestamp(now) - pd.DateOffset(years=5)
+    if horizon == "Max":
+        return pd.Timestamp("2000-01-01")
+    return pd.Timestamp(now.year, 1, 1)
+
+
+def _render_portfolio_horizon_control() -> tuple[str, pd.Timestamp]:
+    now = datetime.datetime.now()
+    horizon = st.radio(
+        "Time horizon",
+        ["YTD", "1Y", "3Y", "5Y", "Max"],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="portfolio_replay_horizon",
+    )
+    horizon_start = _portfolio_horizon_start(horizon, now)
+    st.session_state["_portfolio_horizon_start"] = horizon_start
+    return horizon, horizon_start
+
+
+def _render_portfolio_ytd_chart(
+    replay_context: DashboardReplayContext | None = None,
+    *,
+    horizon: str,
+    ytd_start: pd.Timestamp,
+) -> None:
+    """Render Portfolio YTD performance vs SPY and QQQ benchmarks."""
+    st.subheader("📈 Portfolio Performance")
+
+    portfolio_equity = None
+    portfolio_latest = None
+    portfolio_source = "unavailable"
+    cached_context = replay_context if replay_context is not None else _valid_cached_ytd_replay_context(ytd_start)
+    if cached_context is not None and cached_context.sampling == "daily":
+        portfolio_equity, portfolio_latest, portfolio_source = _build_portfolio_ytd_equity_from_replay(
+            cached_context, ytd_start
+        )
+
+    if portfolio_equity is None:
+        portfolio_source = "daily replay performance unavailable"
+        st.info("Daily replay performance unavailable for this method/window.")
+
+    benchmark_equity, benchmark_latest, benchmark_source = _build_benchmark_equity(("SPY", "QQQ"), ytd_start)
 
     if not benchmark_equity and portfolio_equity is None:
         st.info("No YTD data available yet. Benchmarks and portfolio data will appear once market data is loaded.")
@@ -1889,11 +2283,12 @@ def _render_portfolio_ytd_chart() -> None:
 
     color_map = {"SPY": "#6366F1", "QQQ": "#F59E0B"}
     for ticker, eq in benchmark_equity.items():
+        trace_name = ticker if benchmark_latest is None or eq.index.max() >= benchmark_latest else f"{ticker} (stale)"
         fig.add_trace(go.Scatter(
             x=eq.index,
             y=(eq - 1) * 100,
             mode="lines",
-            name=ticker,
+            name=trace_name,
             line=dict(color=color_map.get(ticker, "#888888"), width=1.8, dash="dot"),
         ))
 
@@ -1902,7 +2297,7 @@ def _render_portfolio_ytd_chart() -> None:
     fig.update_layout(
         template="plotly_dark",
         height=420,
-        yaxis_title="YTD Return (%)",
+        yaxis_title=f"{horizon} Return (%)",
         xaxis_title="",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(l=40, r=20, t=30, b=30),
@@ -1914,13 +2309,19 @@ def _render_portfolio_ytd_chart() -> None:
     col_idx = 0
     if portfolio_equity is not None:
         pf_ret = float(portfolio_equity.iloc[-1] - 1) * 100 if len(portfolio_equity) > 0 else 0.0
+        if not np.isfinite(pf_ret):
+            pf_ret = 0.0
         with metric_cols[col_idx]:
             st.metric(portfolio_equity.name, f"{pf_ret:+.2f}%")
         col_idx += 1
     for ticker in ["SPY", "QQQ"]:
         if ticker in benchmark_equity and col_idx < len(metric_cols):
             eq = benchmark_equity[ticker]
+            if benchmark_latest is not None and eq.index.max() < benchmark_latest:
+                continue
             ret = float(eq.iloc[-1] - 1) * 100 if len(eq) > 0 else 0.0
+            if not np.isfinite(ret):
+                ret = 0.0
             with metric_cols[col_idx]:
                 st.metric(ticker, f"{ret:+.2f}%")
             col_idx += 1
@@ -1928,42 +2329,2338 @@ def _render_portfolio_ytd_chart() -> None:
     latest_dates = [d for d in [portfolio_latest, benchmark_latest] if d is not None]
     if latest_dates:
         latest_date = max(latest_dates)
-        st.caption(f"Stock prices refreshed through {latest_date.date()} ({portfolio_source}).")
+        st.caption(
+            f"Stock prices refreshed through {latest_date.date()} "
+            f"(portfolio: {portfolio_source}; benchmarks: {benchmark_source})."
+        )
+    if cached_context is not None and portfolio_equity is not None:
+        st.caption(f"Replay identity: {_replay_identity_caption(cached_context)}")
 
 
 def _render_portfolio_builder_section() -> None:
     if parquet_data_available and fundamentals_wide is not None:
         try:
+            position_memory = load_current_position_memory()
             universe = build_optimizer_universe(
                 df_scan=df_scan,
                 ticker_map=ticker_map_parquet,
                 prices_wide=prices_wide,
                 policy=DEFAULT_OPTIMIZER_UNIVERSE_POLICY,
+                position_memory=position_memory,
+                price_freshness=price_endpoint_freshness,
             )
+            st.session_state.pop(PORTFOLIO_STALE_ENDPOINT_REPAIR_KEY, None)
+            st.session_state.pop(PORTFOLIO_STALE_ENDPOINT_REPAIR_FRAME_KEY, None)
+            optimizer_prices = prices_wide
+            optimizer_freshness = price_endpoint_freshness
+            stale_columns = tuple(
+                record.permno
+                for record in universe.stale_endpoints
+                if record.permno is not None and record.permno in prices_wide.columns
+            )
+            if stale_columns:
+                repair = repair_stale_price_endpoints_with_live_overlay(
+                    prices_wide,
+                    ticker_map_parquet,
+                    stale_columns,
+                    required_latest=price_endpoint_freshness.required_latest if price_endpoint_freshness is not None else None,
+                    price_freshness=price_endpoint_freshness,
+                    max_staleness_days=DEFAULT_OPTIMIZER_UNIVERSE_POLICY.max_endpoint_staleness_days,
+                )
+                st.session_state[PORTFOLIO_STALE_ENDPOINT_REPAIR_KEY] = {
+                    "source": repair.source,
+                    "display_only": repair.display_only,
+                    "canonical_market_data_write": repair.canonical_market_data_write,
+                    "repaired_columns": [portfolio_replay_asset_identity(col) for col in repair.repaired_columns],
+                    "unrepaired_columns": [portfolio_replay_asset_identity(col) for col in repair.unrepaired_columns],
+                    "required_latest": repair.required_latest.date().isoformat() if repair.required_latest is not None else "",
+                    "diagnostics": list(repair.diagnostics),
+                }
+                if repair.repaired_columns:
+                    st.session_state[PORTFOLIO_STALE_ENDPOINT_REPAIR_FRAME_KEY] = repair.prices.reindex(
+                        columns=list(repair.repaired_columns)
+                    )
+                    optimizer_prices = repair.prices
+                    optimizer_freshness = repair.freshness
+                    universe = build_optimizer_universe(
+                        df_scan=df_scan,
+                        ticker_map=ticker_map_parquet,
+                        prices_wide=optimizer_prices,
+                        policy=DEFAULT_OPTIMIZER_UNIVERSE_POLICY,
+                        position_memory=position_memory,
+                        price_freshness=optimizer_freshness,
+                    )
+                    repaired_labels = [
+                        str(ticker_map_parquet.get(col, col)).upper()
+                        for col in repair.repaired_columns
+                    ]
+                    st.caption(
+                        "Display-only stale endpoint repair applied for: "
+                        + ", ".join(repaired_labels)
+                        + "."
+                    )
             render_optimizer_view(
-                prices_wide=prices_wide,
+                prices_wide=optimizer_prices,
                 ticker_map=ticker_map_parquet,
                 sector_map=sector_map_parquet,
                 selected_permnos=universe.included_permnos,
                 universe_audit=universe,
+                position_memory=position_memory,
+                price_freshness=optimizer_freshness,
+                show_allocation_outputs=False,
             )
         except Exception as e:
+            st.session_state.pop(PORTFOLIO_STALE_ENDPOINT_REPAIR_KEY, None)
+            st.session_state.pop(PORTFOLIO_STALE_ENDPOINT_REPAIR_FRAME_KEY, None)
+            st.session_state.pop(PORTFOLIO_REPLAY_SELECTION_KEY, None)
+            _clear_strategy_replay_session_cache(include_context=True)
+            _clear_portfolio_allocation_session_state()
             st.error(f"Optimizer unavailable: {type(e).__name__}: {e}")
     else:
+        st.session_state.pop(PORTFOLIO_STALE_ENDPOINT_REPAIR_KEY, None)
+        st.session_state.pop(PORTFOLIO_STALE_ENDPOINT_REPAIR_FRAME_KEY, None)
+        st.session_state.pop(PORTFOLIO_REPLAY_SELECTION_KEY, None)
+        _clear_strategy_replay_session_cache(include_context=True)
+        _clear_portfolio_allocation_session_state()
         _render_portfolio_builder_placeholder()
 
-    st.divider()
-    _render_portfolio_ytd_chart()
+def _render_replay_allocation_snapshot(context: DashboardReplayContext) -> None:
+    st.subheader("Allocation Snapshot")
+    if context.status != "ready" or context.sampling != "daily":
+        st.info("Daily replay allocation snapshot unavailable for this method/window.")
+        return
+    latest_rows = context.latest_snapshot.copy()
+    if latest_rows.empty:
+        st.info("Daily replay allocation snapshot unavailable for this method/window.")
+        return
+    if "target_weight" not in latest_rows.columns:
+        st.info("Daily replay allocation snapshot missing target weights.")
+        return
+    display = latest_rows.copy()
+    display["target_weight"] = pd.to_numeric(display["target_weight"], errors="coerce").fillna(0.0)
+    display = display[display["target_weight"] > 0].copy()
+    if display.empty:
+        st.info("Daily replay allocation snapshot is cash-only for this method/window.")
+        return
+    if "date" in display.columns:
+        display["date"] = pd.to_datetime(display["date"], errors="coerce")
+        latest_date = display["date"].max()
+    else:
+        latest_date = pd.NaT
+    title_date = latest_date.strftime("%Y-%m-%d") if pd.notna(latest_date) else "latest"
+    st.caption(f"Latest daily replay snapshot ({title_date}). {_replay_identity_caption(context)}")
+
+    chart_df = display.copy()
+    if "ticker" not in chart_df.columns:
+        chart_df["ticker"] = chart_df.get("permno", "").astype(str)
+    fig = go.Figure(
+        data=[
+            go.Pie(
+                labels=chart_df["ticker"].astype(str),
+                values=chart_df["target_weight"],
+                hole=0.35,
+                sort=False,
+                textinfo="label+percent",
+                hovertemplate="%{label}<br>Weight: %{value:.2%}<extra></extra>",
+            )
+        ]
+    )
+    fig.update_layout(
+        title="Allocation (Latest Daily Replay Snapshot)",
+        margin=dict(l=20, r=20, t=50, b=20),
+        height=420,
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    preferred_cols = ["date", "ticker", "permno", "context_role", "target_weight", "cash_residual", "status", "reason"]
+    cols = [col for col in preferred_cols if col in display.columns]
+    table = display[cols].copy()
+    if "date" in table.columns:
+        table["date"] = table["date"].dt.strftime("%Y-%m-%d")
+    table = table.rename(
+        columns={
+            "date": "Date",
+            "ticker": "Ticker",
+            "permno": "Permno",
+            "context_role": "Context Role",
+            "target_weight": "Current Weight",
+            "cash_residual": "Cash Residual",
+            "status": "Status",
+            "reason": "Reason",
+        }
+    )
+    format_cols = {col: "{:.2%}" for col in ["Current Weight", "Cash Residual"] if col in table.columns}
+    st.dataframe(table.style.format(format_cols), use_container_width=True, hide_index=True)
 
 
 # ==========================================
-# TAB 8: SHADOW PORTFOLIO
+# STRATEGY REPLAY
 # ==========================================
-def _render_shadow_portfolio_section() -> None:
+
+
+def _get_replay_source_label(method_value: str, max_weight: float, source: str) -> str:
+    """Build structured source label: method | cap_used | cap_source | artifact."""
+    return (
+        f"method={method_value} | cap_used={max_weight:.0%} | "
+        f"cap_source=controls.max_weight | source={source}"
+    )
+
+
+def _dashboard_file_signature(path: Path) -> tuple[str, int | None, int | None]:
+    resolved = path.resolve(strict=False)
     try:
-        render_shadow_portfolio_view()
+        stat = resolved.stat()
+    except OSError:
+        return (str(resolved), None, None)
+    return (str(resolved), int(stat.st_mtime_ns), int(stat.st_size))
+
+
+def _dashboard_replay_data_signature() -> tuple:
+    repair_state = st.session_state.get(PORTFOLIO_STALE_ENDPOINT_REPAIR_KEY)
+    repair_signature = (
+        repair_state
+        if isinstance(repair_state, dict)
+        else {"source": "none", "repaired_columns": [], "required_latest": ""}
+    )
+    return (
+        build_unified_data_cache_signature(
+            processed_dir="./data/processed",
+            static_dir="./data/static",
+        ),
+        _dashboard_file_signature(Path("data/portfolio_lifecycle_log.jsonl")),
+        _dashboard_file_signature(LIFECYCLE_BUY_SELL_LOG_PATH),
+        _dashboard_file_signature(RULE100_SOFTMAX_V1_HISTORY_PATH),
+        repair_signature,
+    )
+
+
+@st.cache_data(ttl=900, show_spinner=False)
+def _load_dashboard_replay_event_annotations_cached(data_signature: tuple) -> pd.DataFrame:
+    """Load ENTER/EXIT annotations for the shared dashboard replay context."""
+    del data_signature
+    try:
+        from data.portfolio_lifecycle_log import read_lifecycle_log
+
+        events = read_lifecycle_log()
+    except Exception:
+        return pd.DataFrame()
+    if not isinstance(events, pd.DataFrame) or events.empty:
+        return pd.DataFrame()
+    events = _merge_rule100_softmax_v1_history(events)
+    events["date"] = pd.to_datetime(events.get("date"), errors="coerce")
+    return events.dropna(subset=["date"]).reset_index(drop=True)
+
+
+@st.cache_data(ttl=900, show_spinner=False)
+def _load_dashboard_replay_buy_sell_decisions_cached(data_signature: tuple) -> pd.DataFrame:
+    """Load compact BUY/SELL audit rows for the shared dashboard replay context."""
+    del data_signature
+    if not LIFECYCLE_BUY_SELL_LOG_PATH.exists():
+        return pd.DataFrame()
+    try:
+        decisions = pd.read_json(LIFECYCLE_BUY_SELL_LOG_PATH, lines=True)
+    except Exception:
+        return pd.DataFrame()
+    if not isinstance(decisions, pd.DataFrame) or decisions.empty:
+        return pd.DataFrame()
+    decisions["date"] = pd.to_datetime(decisions.get("date"), errors="coerce")
+    return (
+        decisions.dropna(subset=["date"])
+        .sort_values("date", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+@st.cache_data(ttl=900, show_spinner=False)
+def _load_dashboard_strategy_replay_inputs_cached(
+    *,
+    as_of_date: str,
+    start_date: str,
+    method: str,
+    controls_json: str,
+    max_weight: float,
+    replay_assets: tuple[object, ...],
+    data_signature: tuple,
+):
+    """Load one local PIT replay slice for the dashboard replay section."""
+    del data_signature  # cache invalidation key; consumed by Streamlit hashing
+    controls = json.loads(controls_json or "{}")
+    inputs = load_strategy_replay_inputs(
+        as_of_date=as_of_date,
+        start_date=start_date,
+        end_date=as_of_date,
+        method=method,
+        controls=controls,
+        max_weight=max_weight,
+        universe_mode="r3000_pit",
+        processed_dir="./data/processed",
+        static_dir="./data/static",
+    )
+    selected_columns: list[object] = []
+    for asset in replay_assets:
+        candidate = asset
+        if candidate in inputs.prices.columns and candidate not in selected_columns:
+            selected_columns.append(candidate)
+    if selected_columns:
+        prices = inputs.prices.reindex(columns=selected_columns)
+        returns = inputs.returns.reindex(columns=selected_columns)
+    else:
+        prices = inputs.prices.iloc[:, 0:0]
+        returns = inputs.returns.iloc[:, 0:0]
+    return type(inputs)(
+        as_of_date=inputs.as_of_date,
+        prices=prices,
+        returns=returns,
+        ticker_map=inputs.ticker_map,
+        cache_signature=inputs.cache_signature,
+        cache_key=inputs.cache_key,
+        metadata=inputs.metadata,
+    )
+
+
+@st.cache_data(ttl=900, show_spinner=False)
+def _load_dashboard_batched_pit_replay_data_cached(
+    *,
+    start_date: str,
+    end_date: str,
+    selected_permnos: tuple[int, ...] | None,
+    data_signature: tuple,
+):
+    """Load PIT replay source data once for a dashboard replay window."""
+
+    del data_signature  # cache invalidation key; consumed by Streamlit hashing
+    return load_batched_pit_replay_data(
+        processed_dir="./data/processed",
+        static_dir="./data/static",
+        start_date=start_date,
+        end_date=end_date,
+        start_year=2000,
+        selected_permnos=selected_permnos,
+    )
+
+
+def _numeric_replay_permnos(replay_assets: tuple[object, ...]) -> tuple[int, ...] | None:
+    """Return selected replay assets that can be represented as permnos."""
+
+    permnos: list[int] = []
+    for asset in replay_assets:
+        parsed = pd.to_numeric(pd.Series([asset]), errors="coerce").iloc[0]
+        if pd.notna(parsed) and np.isfinite(float(parsed)):
+            permnos.append(int(parsed))
+    return tuple(dict.fromkeys(permnos)) or None
+
+
+def _price_frame_for_replay_selection_signature(replay_assets: tuple[object, ...]) -> pd.DataFrame:
+    repair_overlay = _portfolio_repair_overlay_frame(replay_assets)
+    if repair_overlay.empty:
+        return prices_wide
+    combined = repair_overlay.combine_first(prices_wide)
+    return clean_price_frame(combined.reindex(columns=list(prices_wide.columns)))
+
+
+def _portfolio_repair_overlay_frame(replay_assets: tuple[object, ...]) -> pd.DataFrame:
+    repair_state = st.session_state.get(PORTFOLIO_STALE_ENDPOINT_REPAIR_KEY)
+    if not isinstance(repair_state, dict):
+        return pd.DataFrame()
+    repaired_identities = set(repair_state.get("repaired_columns") or ())
+    if not repaired_identities:
+        return pd.DataFrame()
+    selected = [
+        asset
+        for asset in replay_assets
+        if portfolio_replay_asset_identity(asset) in repaired_identities
+        and asset in prices_wide.columns
+    ]
+    if not selected:
+        return pd.DataFrame()
+    repair_frame = st.session_state.get(PORTFOLIO_STALE_ENDPOINT_REPAIR_FRAME_KEY)
+    if not isinstance(repair_frame, pd.DataFrame) or repair_frame.empty:
+        return pd.DataFrame()
+    return clean_price_frame(repair_frame.reindex(columns=selected))
+
+
+def _filter_dashboard_replay_inputs_to_assets(
+    inputs,
+    replay_assets: tuple[object, ...],
+):
+    """Limit batched PIT inputs to the signed dashboard replay assets."""
+
+    selected_columns: list[object] = []
+    column_lookup = {str(col): col for col in inputs.prices.columns}
+    repair_overlay = _portfolio_repair_overlay_frame(replay_assets)
+    if not repair_overlay.empty:
+        repair_overlay = repair_overlay.loc[repair_overlay.index <= pd.Timestamp(inputs.as_of_date).normalize()]
+    for asset in replay_assets:
+        candidate = asset if asset in inputs.prices.columns else column_lookup.get(str(asset))
+        if candidate is None and asset in repair_overlay.columns:
+            candidate = asset
+        if (
+            candidate is not None
+            and (candidate in inputs.prices.columns or candidate in repair_overlay.columns)
+            and candidate not in selected_columns
+        ):
+            selected_columns.append(candidate)
+    if selected_columns:
+        prices = inputs.prices.reindex(columns=selected_columns)
+        returns = inputs.returns.reindex(columns=selected_columns)
+    else:
+        prices = inputs.prices.iloc[:, 0:0]
+        returns = inputs.returns.iloc[:, 0:0]
+    overlay_columns = [col for col in repair_overlay.columns if col in selected_columns]
+    if overlay_columns:
+        prices = clean_price_frame(repair_overlay.reindex(columns=overlay_columns).combine_first(prices))
+        returns = prices.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan)
+        returns = returns.reindex(columns=selected_columns)
+    metadata = dict(inputs.metadata) if isinstance(inputs.metadata, dict) else {}
+    metadata["dashboard_replay_assets"] = [
+        portfolio_replay_asset_identity(asset) for asset in replay_assets
+    ]
+    metadata["dashboard_selected_columns"] = [
+        portfolio_replay_asset_identity(asset) for asset in selected_columns
+    ]
+    metadata["dashboard_repair_overlay_columns"] = [
+        portfolio_replay_asset_identity(asset) for asset in overlay_columns
+    ]
+    signature = dict(inputs.cache_signature) if isinstance(inputs.cache_signature, dict) else {"cache_signature": inputs.cache_signature}
+    signature["dashboard_replay_assets"] = metadata["dashboard_replay_assets"]
+    signature["dashboard_selected_columns"] = metadata["dashboard_selected_columns"]
+    signature["dashboard_repair_overlay_columns"] = metadata["dashboard_repair_overlay_columns"]
+    return type(inputs)(
+        as_of_date=inputs.as_of_date,
+        prices=prices,
+        returns=returns,
+        ticker_map=inputs.ticker_map,
+        cache_signature=signature,
+        cache_key=f"{inputs.cache_key}:dashboard_selected:{_stable_json_hash(metadata['dashboard_selected_columns'])}",
+        metadata=metadata,
+    )
+
+
+def _context_replay_ticker_map(
+    *,
+    replay_assets: tuple[object, ...],
+    allocation_assets: tuple[object, ...],
+    ticker_map: dict | None,
+) -> dict[object, str]:
+    out: dict[object, str] = {}
+    source_map = ticker_map if isinstance(ticker_map, dict) else {}
+    allocation_set = set(allocation_assets)
+    for asset in replay_assets:
+        if asset in allocation_set or asset == "CASH":
+            continue
+        ticker = source_map.get(asset)
+        if ticker is None:
+            try:
+                ticker = source_map.get(int(asset))
+            except Exception:
+                ticker = None
+        if ticker:
+            out[asset] = str(ticker).upper().strip()
+    return out
+
+
+def _append_context_only_replay_rows(
+    replay_df: pd.DataFrame,
+    *,
+    replay_assets: tuple[object, ...],
+    allocation_assets: tuple[object, ...],
+    ticker_map: dict | None,
+    method: str,
+    max_weight: float,
+) -> pd.DataFrame:
+    """Add zero-weight rows for historical context tickers without making them allocatable."""
+
+    context_map = _context_replay_ticker_map(
+        replay_assets=replay_assets,
+        allocation_assets=allocation_assets,
+        ticker_map=ticker_map,
+    )
+    if not context_map or not isinstance(replay_df, pd.DataFrame) or replay_df.empty or "date" not in replay_df.columns:
+        return replay_df
+    dates = pd.to_datetime(replay_df["date"], errors="coerce").dropna().dt.date.astype(str).drop_duplicates()
+    if dates.empty:
+        return replay_df
+    existing = set()
+    if {"date", "permno"}.issubset(replay_df.columns):
+        existing = {
+            (pd.Timestamp(row["date"]).date().isoformat(), row["permno"])
+            for _, row in replay_df[["date", "permno"]].dropna(subset=["date"]).iterrows()
+        }
+    rows: list[dict[str, object]] = []
+    for date_value in dates:
+        for asset, ticker in context_map.items():
+            if (date_value, asset) in existing:
+                continue
+            rows.append(
+                {
+                    "date": date_value,
+                    "method": method,
+                    "ticker": ticker,
+                    "permno": asset,
+                    "target_weight": 0.0,
+                    "cash_residual": np.nan,
+                    "asset_return": 0.0,
+                    "weight_for_return": 0.0,
+                    "return_contribution": 0.0,
+                    "portfolio_return": np.nan,
+                    "portfolio_equity": np.nan,
+                    "cap_used": float(max_weight),
+                    "cap_source": "context_only",
+                    "source": "strategy_replay:context_only_asset",
+                    "row_role": "daily_portfolio",
+                    "context_role": "historical_context",
+                    "status": "context_only",
+                    "reason": "historical_context_asset_not_current_allocation",
+                }
+            )
+    if not rows:
+        return replay_df
+    combined = pd.concat([replay_df, pd.DataFrame(rows)], ignore_index=True, sort=False)
+    return combined
+
+
+def _normalize_dashboard_context_frame(
+    frame: pd.DataFrame,
+    *,
+    context_type: str,
+    method: str,
+    replay: pd.DataFrame,
+) -> pd.DataFrame:
+    """Dashboard adapter for the shared strategy replay context contract."""
+
+    if not isinstance(frame, pd.DataFrame) or frame.empty:
+        return pd.DataFrame(columns=REPLAY_CONTEXT_COLUMNS)
+    normalized = normalize_context_frame_for_replay(
+        frame,
+        context_type=context_type,
+        method=method,
+        replay=replay,
+    )
+    return normalized.reindex(columns=REPLAY_CONTEXT_COLUMNS).reset_index(drop=True)
+
+
+def _replay_context_weight_lookup(replay: pd.DataFrame) -> pd.DataFrame:
+    if not isinstance(replay, pd.DataFrame) or replay.empty:
+        return pd.DataFrame(columns=["date", "ticker", "replay_target_weight"])
+    if "date" not in replay.columns or "ticker" not in replay.columns or "target_weight" not in replay.columns:
+        return pd.DataFrame(columns=["date", "ticker", "replay_target_weight"])
+    lookup = replay[["date", "ticker", "target_weight"]].copy()
+    lookup["date"] = pd.to_datetime(lookup["date"], errors="coerce").dt.normalize()
+    lookup["ticker"] = lookup["ticker"].astype(str).str.upper().str.strip()
+    lookup["replay_target_weight"] = pd.to_numeric(lookup["target_weight"], errors="coerce").fillna(0.0).clip(lower=0.0)
+    lookup = lookup[(lookup["date"].notna()) & (lookup["ticker"] != "") & (lookup["ticker"] != "CASH")]
+    if lookup.empty:
+        return pd.DataFrame(columns=["date", "ticker", "replay_target_weight"])
+    lookup = lookup.sort_values(["date", "ticker"], kind="mergesort")
+    return lookup.drop_duplicates(["date", "ticker"], keep="last")[["date", "ticker", "replay_target_weight"]]
+
+
+def _align_context_weights_to_replay(frame: pd.DataFrame, replay: pd.DataFrame) -> pd.DataFrame:
+    if not isinstance(frame, pd.DataFrame) or frame.empty:
+        return pd.DataFrame() if not isinstance(frame, pd.DataFrame) else frame.copy()
+    if "date" not in frame.columns or "ticker" not in frame.columns:
+        return frame.copy()
+    context_type = "decision_context"
+    if "context_type" in frame.columns:
+        non_empty = frame["context_type"].dropna().astype(str).str.strip()
+        if not non_empty.empty and non_empty.iloc[0]:
+            context_type = non_empty.iloc[0]
+    method_value = str(frame["method"].dropna().astype(str).iloc[0]) if "method" in frame.columns and not frame["method"].dropna().empty else ""
+    if method_value.strip().lower() in {"", "all", "nan", "none"}:
+        method_values = replay["method"].dropna().astype(str) if "method" in replay.columns else pd.Series(dtype=object)
+        method_value = method_values.iloc[0] if not method_values.empty else ""
+    normalized = normalize_context_frame_for_replay(
+        frame,
+        context_type=context_type,
+        method=method_value,
+        replay=replay,
+    )
+    out = normalized.copy()
+    original_weight = frame[["date", "ticker", "weight"]].copy() if "weight" in frame.columns else pd.DataFrame()
+    if not original_weight.empty:
+        original_weight["date"] = pd.to_datetime(original_weight["date"], errors="coerce").dt.date.astype(str)
+        original_weight["ticker"] = original_weight["ticker"].astype(str).str.upper().str.strip()
+        original_weight["audit_weight"] = pd.to_numeric(original_weight["weight"], errors="coerce")
+        out = out.merge(original_weight[["date", "ticker", "audit_weight"]], on=["date", "ticker"], how="left")
+    if "audit_weight" not in out.columns:
+        out["audit_weight"] = pd.to_numeric(out.get("weight", pd.Series(pd.NA, index=out.index)), errors="coerce")
+    out["weight"] = out["target_weight"]
+    return out
+
+
+def _dashboard_filter_coverage_plan_to_assets(
+    coverage_plan: list[object] | None,
+    replay_assets: tuple[object, ...],
+) -> list[object] | None:
+    if coverage_plan is None:
+        return None
+    selected_permnos = set(_numeric_replay_permnos(replay_assets) or ())
+    if not selected_permnos:
+        return coverage_plan
+    filtered: list[object] = []
+    for entry in coverage_plan:
+        expected = [int(value) for value in getattr(entry, "expected_members", []) if int(value) in selected_permnos]
+        try:
+            filtered.append(replace(entry, expected_members=expected))
+        except TypeError:
+            filtered.append(entry)
+    return filtered
+
+
+def _strategy_replay_cache_signature(
+    *,
+    method: str,
+    max_weight: float,
+    controls: dict,
+    replay_assets: tuple[object, ...],
+    allocation_assets: tuple[object, ...] | None = None,
+    replay_dates: list[str],
+    sampling: str,
+    data_signature: tuple,
+) -> dict:
+    controls_for_signature = {
+        key: value
+        for key, value in controls.items()
+        if not isinstance(value, pd.DataFrame)
+    }
+    return {
+        "method": str(method),
+        "max_weight": float(max_weight),
+        "risk_free_rate": float(controls_for_signature.get("risk_free_rate", 0.0)),
+        "controls": controls_for_signature,
+        "replay_assets": [portfolio_replay_asset_identity(asset) for asset in replay_assets],
+        "allocation_assets": [
+            portfolio_replay_asset_identity(asset)
+            for asset in (allocation_assets if allocation_assets is not None else replay_assets)
+        ],
+        "replay_dates": list(replay_dates),
+        "sampling": str(sampling),
+        "data_signature": list(data_signature),
+    }
+
+
+def _make_dashboard_replay_request(
+    *,
+    method: str,
+    max_weight: float,
+    controls: dict,
+    data_signature: tuple,
+    replay_assets: tuple[object, ...],
+    allocation_assets: tuple[object, ...] | None = None,
+    replay_dates: list[str],
+    sampling: str,
+    full_history_start: str,
+    include_replay: bool,
+) -> DashboardReplayRequest:
+    """Return a replay request value without touching artifact or backend sources."""
+
+    return DashboardReplayRequest(
+        method=method,
+        max_weight=max_weight,
+        controls=controls,
+        cache_signature=_strategy_replay_cache_signature(
+            method=method,
+            max_weight=max_weight,
+            controls=controls,
+            replay_assets=replay_assets,
+            allocation_assets=allocation_assets,
+            replay_dates=replay_dates,
+            sampling=sampling,
+            data_signature=data_signature,
+        ),
+        replay_assets=replay_assets,
+        replay_dates=list(replay_dates),
+        sampling=sampling,
+        data_signature=data_signature,
+        full_history_start=full_history_start,
+        include_replay=include_replay,
+        allocation_assets=tuple(allocation_assets if allocation_assets is not None else replay_assets),
+    )
+
+
+def _dashboard_request_with_sampling(
+    request: DashboardReplayRequest,
+    *,
+    replay_dates: list[str],
+    sampling: str,
+) -> DashboardReplayRequest:
+    return _make_dashboard_replay_request(
+        method=request.method,
+        max_weight=request.max_weight,
+        controls=request.controls,
+        data_signature=request.data_signature,
+        replay_assets=request.replay_assets,
+        allocation_assets=request.allocation_assets,
+        replay_dates=replay_dates,
+        sampling=sampling,
+        full_history_start=request.full_history_start,
+        include_replay=request.include_replay,
+    )
+
+
+def _replay_signatures_match(left: dict | None, right: dict | None) -> bool:
+    if left is None or right is None:
+        return False
+    return json.dumps(left, sort_keys=True, default=str) == json.dumps(right, sort_keys=True, default=str)
+
+
+def _replay_signature_without_dates(signature: dict | None) -> dict | None:
+    if not isinstance(signature, dict):
+        return None
+    out = dict(signature)
+    out.pop("replay_dates", None)
+    return out
+
+
+def _normalized_replay_date_strings(values: list[object] | tuple[object, ...] | pd.Series) -> list[str]:
+    dates = pd.to_datetime(pd.Series(list(values), dtype=object), errors="coerce").dropna()
+    return [pd.Timestamp(value).date().isoformat() for value in dates]
+
+
+def _frame_date_strings(frame: pd.DataFrame) -> set[str]:
+    if not isinstance(frame, pd.DataFrame) or frame.empty or "date" not in frame.columns:
+        return set()
+    dates = pd.to_datetime(frame["date"], errors="coerce").dropna()
+    return {pd.Timestamp(value).date().isoformat() for value in dates}
+
+
+def _filter_frame_to_replay_dates(frame: pd.DataFrame, replay_dates: list[str]) -> pd.DataFrame:
+    if not isinstance(frame, pd.DataFrame) or frame.empty or "date" not in frame.columns:
+        return frame.copy() if isinstance(frame, pd.DataFrame) else pd.DataFrame()
+    requested = set(replay_dates)
+    out = frame.copy()
+    normalized = pd.to_datetime(out["date"], errors="coerce")
+    mask = normalized.dt.date.astype(str).isin(requested)
+    return out[mask].copy()
+
+
+def _filter_frame_to_replay_window(frame: pd.DataFrame, replay_dates: list[str]) -> pd.DataFrame:
+    if not isinstance(frame, pd.DataFrame) or frame.empty or "date" not in frame.columns or not replay_dates:
+        return frame.copy() if isinstance(frame, pd.DataFrame) else pd.DataFrame()
+    out = frame.copy()
+    normalized = pd.to_datetime(out["date"], errors="coerce")
+    start = pd.Timestamp(replay_dates[0])
+    end = pd.Timestamp(replay_dates[-1])
+    return out[(normalized >= start) & (normalized <= end)].copy()
+
+
+def _dashboard_context_covers_replay_dates(
+    context: DashboardReplayContext,
+    replay_dates: list[str],
+) -> bool:
+    requested_dates = set(_normalized_replay_date_strings(replay_dates))
+    if not requested_dates:
+        return False
+    context_dates = set(_normalized_replay_date_strings(context.replay_dates))
+    if not requested_dates.issubset(context_dates):
+        return False
+    replay_frame_dates = _frame_date_strings(context.replay_df)
+    return requested_dates.issubset(replay_frame_dates)
+
+
+def _scope_dashboard_replay_context_to_dates(
+    context: DashboardReplayContext,
+    *,
+    replay_dates: list[str],
+    cache_signature: dict,
+) -> DashboardReplayContext:
+    scoped_replay = _filter_frame_to_replay_dates(context.replay_df, replay_dates)
+    scoped_events = _filter_frame_to_replay_window(context.event_annotations, replay_dates)
+    scoped_decisions = _filter_frame_to_replay_window(context.buy_sell_decisions, replay_dates)
+    latest_snapshot = _strategy_replay_latest_snapshot(scoped_replay)
+    date_window = dict(context.date_window) if isinstance(context.date_window, dict) else {}
+    actual_dates = sorted(_frame_date_strings(scoped_replay))
+    date_window.update(
+        {
+            "requested_start": replay_dates[0] if replay_dates else None,
+            "requested_end": replay_dates[-1] if replay_dates else None,
+            "replay_start": actual_dates[0] if actual_dates else None,
+            "replay_end": actual_dates[-1] if actual_dates else None,
+        }
+    )
+    return replace(
+        context,
+        cache_signature=cache_signature,
+        replay_df=scoped_replay,
+        latest_snapshot=latest_snapshot,
+        event_annotations=scoped_events,
+        buy_sell_decisions=scoped_decisions,
+        replay_dates=list(replay_dates),
+        date_window=date_window,
+    )
+
+
+def _current_portfolio_replay_selection(
+    *,
+    method: str,
+    max_weight: float,
+    risk_free_rate: float,
+) -> PortfolioReplaySelection | None:
+    if not parquet_data_available or prices_wide.empty:
+        st.session_state.pop(PORTFOLIO_REPLAY_SELECTION_KEY, None)
+        return None
+    selection = st.session_state.get(PORTFOLIO_REPLAY_SELECTION_KEY)
+    if not isinstance(selection, PortfolioReplaySelection):
+        st.session_state.pop(PORTFOLIO_REPLAY_SELECTION_KEY, None)
+        return None
+    replay_assets = tuple(selection.replay_assets)
+    if not replay_assets:
+        st.session_state.pop(PORTFOLIO_REPLAY_SELECTION_KEY, None)
+        return None
+    available = set(prices_wide.columns)
+    if any(asset not in available for asset in replay_assets):
+        st.session_state.pop(PORTFOLIO_REPLAY_SELECTION_KEY, None)
+        _clear_strategy_replay_session_cache(include_context=True)
+        return None
+    signature_prices = _price_frame_for_replay_selection_signature(replay_assets)
+    expected_signature = build_portfolio_replay_selection_signature(
+        prices_wide=signature_prices,
+        replay_assets=replay_assets,
+        method=method,
+        max_weight=max_weight,
+        risk_free_rate=risk_free_rate,
+    )
+    if not _replay_signatures_match(selection.signature, expected_signature):
+        st.session_state.pop(PORTFOLIO_REPLAY_SELECTION_KEY, None)
+        _clear_strategy_replay_session_cache(include_context=True)
+        return None
+    return selection
+
+
+def _current_replay_assets_key() -> tuple[str, ...]:
+    main_method = st.session_state.get("optimizer_method", "Inverse Volatility")
+    main_max_weight = float(st.session_state.get("optimizer_max_weight", 0.35))
+    risk_free_rate = float(st.session_state.get("optimizer_risk_free_rate", 0.0))
+    selection = _current_portfolio_replay_selection(
+        method=main_method,
+        max_weight=main_max_weight,
+        risk_free_rate=risk_free_rate,
+    )
+    if selection is None:
+        return ()
+    return tuple(selection.replay_assets)
+
+
+def _ticker_to_dashboard_permno(ticker: object) -> object | None:
+    ticker_key = str(ticker).upper().strip()
+    if not ticker_key or not ticker_map_parquet:
+        return None
+    for permno, mapped_ticker in ticker_map_parquet.items():
+        if str(mapped_ticker).upper().strip() == ticker_key and permno in prices_wide.columns:
+            return permno
+    return None
+
+
+def _context_tickers_for_replay_window(
+    frame: pd.DataFrame,
+    *,
+    replay_dates: list[str],
+    actions: set[str],
+) -> set[str]:
+    if not isinstance(frame, pd.DataFrame) or frame.empty or "date" not in frame.columns or "ticker" not in frame.columns:
+        return set()
+    dates = pd.to_datetime(pd.Series(replay_dates), errors="coerce").dropna()
+    if dates.empty:
+        return set()
+    work = frame.copy()
+    work["date"] = pd.to_datetime(work["date"], errors="coerce").dt.normalize()
+    work["ticker"] = work["ticker"].astype(str).str.upper().str.strip()
+    work = work.dropna(subset=["date"])
+    work = work[(work["date"] >= dates.min().normalize()) & (work["date"] <= dates.max().normalize())]
+    if actions:
+        action_values = pd.Series("", index=work.index, dtype=object)
+        if "action" in work.columns:
+            action_values = work["action"]
+        elif "buy_sell" in work.columns:
+            action_values = work["buy_sell"]
+        action_values = action_values.astype(str).str.upper().str.strip()
+        work = work[action_values.isin(actions)]
+    return {ticker for ticker in work["ticker"].dropna().unique() if ticker and ticker != "CASH"}
+
+
+def _horizon_replay_assets_for_window(
+    *,
+    current_assets: tuple[object, ...],
+    replay_dates: list[str],
+    event_annotations: pd.DataFrame,
+    buy_sell_decisions: pd.DataFrame,
+    rule100_history: pd.DataFrame | None,
+) -> tuple[object, ...]:
+    """Return current signed assets plus mapped lifecycle assets active in the replay window."""
+
+    assets: list[object] = []
+    for asset in current_assets:
+        if asset in prices_wide.columns and asset not in assets:
+            assets.append(asset)
+
+    tickers = set()
+    tickers.update(
+        _context_tickers_for_replay_window(
+            event_annotations,
+            replay_dates=replay_dates,
+            actions={"ENTER", "EXIT"},
+        )
+    )
+    tickers.update(
+        _context_tickers_for_replay_window(
+            buy_sell_decisions,
+            replay_dates=replay_dates,
+            actions={"BUY", "SELL", "ENTER", "EXIT"},
+        )
+    )
+    if isinstance(rule100_history, pd.DataFrame):
+        tickers.update(
+            _context_tickers_for_replay_window(
+                rule100_history,
+                replay_dates=replay_dates,
+                actions=set(),
+            )
+        )
+
+    for ticker in sorted(tickers):
+        permno = _ticker_to_dashboard_permno(ticker)
+        if permno is not None and permno not in assets:
+            assets.append(permno)
+    return tuple(assets)
+
+
+def _current_latest_replay_signature() -> dict | None:
+    if not parquet_data_available or prices_wide.empty:
+        return None
+    latest_date = pd.Timestamp(prices_wide.index[-1]).date().isoformat()
+    main_method = st.session_state.get("optimizer_method", "Inverse Volatility")
+    main_max_weight = float(st.session_state.get("optimizer_max_weight", 0.35))
+    risk_free_rate = float(st.session_state.get("optimizer_risk_free_rate", 0.0))
+    selection = _current_portfolio_replay_selection(
+        method=main_method,
+        max_weight=main_max_weight,
+        risk_free_rate=risk_free_rate,
+    )
+    if selection is None:
+        return None
+    controls = {
+        "max_weight": main_max_weight,
+        "risk_free_rate": risk_free_rate,
+    }
+    return _strategy_replay_cache_signature(
+        method=main_method,
+        max_weight=main_max_weight,
+        controls=controls,
+        replay_assets=tuple(selection.replay_assets),
+        allocation_assets=tuple(selection.replay_assets),
+        replay_dates=[latest_date],
+        sampling="daily",
+        data_signature=_dashboard_replay_data_signature(),
+    )
+
+
+def _current_full_replay_signature(
+    *,
+    horizon_start: pd.Timestamp,
+    sampling: str = "daily",
+) -> dict | None:
+    if not parquet_data_available or prices_wide.empty:
+        return None
+    main_method = st.session_state.get("optimizer_method", "Inverse Volatility")
+    main_max_weight = float(st.session_state.get("optimizer_max_weight", 0.35))
+    risk_free_rate = float(st.session_state.get("optimizer_risk_free_rate", 0.0))
+    selection = _current_portfolio_replay_selection(
+        method=main_method,
+        max_weight=main_max_weight,
+        risk_free_rate=risk_free_rate,
+    )
+    if selection is None:
+        return None
+    replay_dates = [
+        pd.Timestamp(value).date().isoformat()
+        for value in prices_wide.index[prices_wide.index >= pd.Timestamp(horizon_start)]
+    ]
+    data_signature = _dashboard_replay_data_signature()
+    event_annotations = _load_dashboard_replay_event_annotations_cached(data_signature)
+    buy_sell_decisions = _load_dashboard_replay_buy_sell_decisions_cached(data_signature)
+    controls = {
+        "max_weight": main_max_weight,
+        "risk_free_rate": risk_free_rate,
+    }
+    rule100_hist = None
+    if main_method == "Rule of 100":
+        rule100_hist = _load_rule100_softmax_v1_history()
+        controls["rule100_candidate_frame"] = rule100_hist
+    replay_assets = _horizon_replay_assets_for_window(
+        current_assets=tuple(selection.replay_assets),
+        replay_dates=replay_dates,
+        event_annotations=event_annotations,
+        buy_sell_decisions=buy_sell_decisions,
+        rule100_history=rule100_hist,
+    )
+    return _strategy_replay_cache_signature(
+        method=main_method,
+        max_weight=main_max_weight,
+        controls=controls,
+        replay_assets=replay_assets,
+        allocation_assets=tuple(selection.replay_assets),
+        replay_dates=replay_dates,
+        sampling=sampling,
+        data_signature=data_signature,
+    )
+
+
+def _build_dashboard_replay_request(
+    *,
+    replay_dates_override: list[str] | None = None,
+    include_replay: bool = True,
+    horizon_start: pd.Timestamp | None = None,
+) -> tuple[DashboardReplayRequest, pd.DataFrame, pd.DataFrame, str]:
+    """Build a pure selected-method replay request and cheap context frames."""
+
+    main_method = st.session_state.get("optimizer_method", "Inverse Volatility")
+    main_max_weight = float(st.session_state.get("optimizer_max_weight", 0.35))
+    controls: dict = {
+        "max_weight": main_max_weight,
+        "risk_free_rate": float(st.session_state.get("optimizer_risk_free_rate", 0.0)),
+    }
+    data_signature = _dashboard_replay_data_signature()
+    event_annotations = _load_dashboard_replay_event_annotations_cached(data_signature)
+    buy_sell_decisions = _load_dashboard_replay_buy_sell_decisions_cached(data_signature)
+
+    if main_method == "Rule of 100":
+        rule100_hist = _load_rule100_softmax_v1_history()
+        required_cols = {"date", "ticker", "factor_positive_count", "technical_quality"}
+        if required_cols.issubset(rule100_hist.columns):
+            controls["rule100_candidate_frame"] = rule100_hist
+        else:
+            request = _make_dashboard_replay_request(
+                method=main_method,
+                max_weight=main_max_weight,
+                controls=controls,
+                data_signature=data_signature,
+                replay_assets=(),
+                allocation_assets=(),
+                replay_dates=[],
+                sampling="daily",
+                full_history_start="",
+                include_replay=include_replay,
+            )
+            missing = required_cols - set(rule100_hist.columns)
+            return request, event_annotations, buy_sell_decisions, f"Rule100 history missing required columns: {missing}"
+
+    if not include_replay:
+        request = _make_dashboard_replay_request(
+            method=main_method,
+            max_weight=main_max_weight,
+            controls=controls,
+            data_signature=data_signature,
+            replay_assets=(),
+            allocation_assets=(),
+            replay_dates=[],
+            sampling="daily",
+            full_history_start="",
+            include_replay=False,
+        )
+        return request, event_annotations, buy_sell_decisions, ""
+
+    if not parquet_data_available or prices_wide.empty:
+        request = _make_dashboard_replay_request(
+            method=main_method,
+            max_weight=main_max_weight,
+            controls=controls,
+            data_signature=data_signature,
+            replay_assets=(),
+            allocation_assets=(),
+            replay_dates=[],
+            sampling="daily",
+            full_history_start="",
+            include_replay=True,
+        )
+        return request, event_annotations, buy_sell_decisions, "price_data_unavailable"
+
+    selection = _current_portfolio_replay_selection(
+        method=main_method,
+        max_weight=main_max_weight,
+        risk_free_rate=float(controls.get("risk_free_rate", 0.0)),
+    )
+    if selection is None:
+        request = _make_dashboard_replay_request(
+            method=main_method,
+            max_weight=main_max_weight,
+            controls=controls,
+            data_signature=data_signature,
+            replay_assets=(),
+            allocation_assets=(),
+            replay_dates=[],
+            sampling="daily",
+            full_history_start=pd.Timestamp(prices_wide.index.min()).date().isoformat(),
+            include_replay=True,
+        )
+        return request, event_annotations, buy_sell_decisions, "portfolio_replay_selection_unavailable"
+
+    replay_assets_key = tuple(asset for asset in selection.replay_assets if asset in prices_wide.columns)
+    if not replay_assets_key:
+        request = _make_dashboard_replay_request(
+            method=main_method,
+            max_weight=main_max_weight,
+            controls=controls,
+            data_signature=data_signature,
+            replay_assets=(),
+            allocation_assets=(),
+            replay_dates=[],
+            sampling="daily",
+            full_history_start=pd.Timestamp(prices_wide.index.min()).date().isoformat(),
+            include_replay=True,
+        )
+        return request, event_annotations, buy_sell_decisions, "no_assets_selected_for_replay"
+
+    latest_ts = pd.Timestamp(prices_wide.index[-1])
+    ytd_start = horizon_start if horizon_start is not None else pd.Timestamp(f"{latest_ts.year}-01-01")
+    replay_dates = [
+        pd.Timestamp(value).date().isoformat()
+        for value in prices_wide.index[prices_wide.index >= pd.Timestamp(ytd_start)]
+    ]
+    if replay_dates_override is not None:
+        replay_dates = list(replay_dates_override)
+    elif "pytest" in sys.modules:
+        replay_dates = replay_dates[-1:]
+    replay_assets_for_window = _horizon_replay_assets_for_window(
+        current_assets=replay_assets_key,
+        replay_dates=replay_dates,
+        event_annotations=event_annotations,
+        buy_sell_decisions=buy_sell_decisions,
+        rule100_history=controls.get("rule100_candidate_frame") if main_method == "Rule of 100" else None,
+    )
+    request = _make_dashboard_replay_request(
+        method=main_method,
+        max_weight=main_max_weight,
+        controls=controls,
+        data_signature=data_signature,
+        replay_assets=replay_assets_for_window,
+        allocation_assets=replay_assets_key,
+        replay_dates=replay_dates,
+        sampling="daily",
+        full_history_start=pd.Timestamp(prices_wide.index.min()).date().isoformat(),
+        include_replay=True,
+    )
+    return request, event_annotations, buy_sell_decisions, ""
+
+
+def _valid_cached_ytd_replay_context(horizon_start: pd.Timestamp) -> DashboardReplayContext | None:
+    cached_context = st.session_state.get(STRATEGY_REPLAY_YTD_CONTEXT_KEY)
+    if not isinstance(cached_context, DashboardReplayContext):
+        return None
+    if cached_context.status != "ready" or cached_context.sampling != "daily" or len(cached_context.replay_dates) < 2:
+        _clear_strategy_replay_session_cache(include_context=True)
+        return None
+    current_signature = _current_full_replay_signature(
+        horizon_start=horizon_start,
+        sampling=cached_context.sampling,
+    )
+    if current_signature is None:
+        _clear_strategy_replay_session_cache(include_context=True)
+        return None
+    requested_dates = list(current_signature.get("replay_dates") or [])
+    if _replay_signatures_match(cached_context.cache_signature, current_signature):
+        if _dashboard_context_covers_replay_dates(cached_context, requested_dates):
+            return cached_context
+        st.session_state.pop(STRATEGY_REPLAY_YTD_CONTEXT_KEY, None)
+        st.session_state.pop(STRATEGY_REPLAY_LATEST_WEIGHTS_KEY, None)
+        return None
+    if _replay_signatures_match(
+        _replay_signature_without_dates(cached_context.cache_signature),
+        _replay_signature_without_dates(current_signature),
+    ):
+        if _dashboard_context_covers_replay_dates(cached_context, requested_dates):
+            return _scope_dashboard_replay_context_to_dates(
+                cached_context,
+                replay_dates=requested_dates,
+                cache_signature=current_signature,
+            )
+    st.session_state.pop(STRATEGY_REPLAY_YTD_CONTEXT_KEY, None)
+    st.session_state.pop(STRATEGY_REPLAY_LATEST_WEIGHTS_KEY, None)
+    return None
+
+
+def _clear_strategy_replay_session_cache(*, include_context: bool = False) -> None:
+    if include_context:
+        st.session_state.pop(STRATEGY_REPLAY_CONTEXT_KEY, None)
+    st.session_state.pop(STRATEGY_REPLAY_LATEST_WEIGHTS_KEY, None)
+    st.session_state.pop(STRATEGY_REPLAY_CACHE_SIGNATURE_KEY, None)
+    st.session_state.pop(STRATEGY_REPLAY_YTD_CONTEXT_KEY, None)
+
+
+def _valid_strategy_replay_latest_weights() -> dict | None:
+    raw = st.session_state.get(STRATEGY_REPLAY_LATEST_WEIGHTS_KEY)
+    if not isinstance(raw, dict):
+        return None
+    stored_signature = st.session_state.get(STRATEGY_REPLAY_CACHE_SIGNATURE_KEY)
+    if not _replay_signatures_match(stored_signature, _current_latest_replay_signature()):
+        st.session_state.pop(STRATEGY_REPLAY_LATEST_WEIGHTS_KEY, None)
+        return None
+    return raw
+
+
+def _dashboard_replay_cash_closed_frame(
+    *,
+    replay_date: str,
+    method: str,
+    max_weight: float,
+    reason: str,
+) -> pd.DataFrame:
+    """Return a visible cash-closed row for one failed dashboard replay date."""
+    return pd.DataFrame(
+        [
+            {
+                "date": replay_date,
+                "method": method,
+                "ticker": "CASH",
+                "permno": "CASH",
+                "target_weight": 1.0,
+                "cash_residual": 1.0,
+                "cap_used": float(max_weight),
+                "cap_source": "controls.max_weight",
+                "source": "strategy_replay:dashboard_pit_loader",
+                "status": "cash_closed",
+                "reason": reason,
+            }
+        ]
+    )
+
+
+def _strategy_replay_latest_snapshot(replay_df: pd.DataFrame) -> pd.DataFrame:
+    if not isinstance(replay_df, pd.DataFrame) or replay_df.empty or "date" not in replay_df.columns:
+        return pd.DataFrame()
+    out = replay_df.copy()
+    out["date"] = pd.to_datetime(out["date"], errors="coerce")
+    latest_date = out["date"].max()
+    if pd.isna(latest_date):
+        return pd.DataFrame()
+    latest = out[out["date"] == latest_date].copy()
+    if "row_role" not in latest.columns:
+        latest["row_role"] = "daily_portfolio"
+    if "context_role" not in latest.columns:
+        ticker = latest["ticker"].astype(str).str.upper().str.strip() if "ticker" in latest.columns else pd.Series("", index=latest.index)
+        status = latest["status"].astype(str).str.lower().str.strip() if "status" in latest.columns else pd.Series("", index=latest.index)
+        target = pd.to_numeric(latest.get("target_weight", pd.Series(0.0, index=latest.index)), errors="coerce").fillna(0.0)
+        role = pd.Series("flat_in_replay", index=latest.index, dtype=object)
+        role.loc[target > 0.0] = "current_holding"
+        role.loc[ticker == "CASH"] = "cash"
+        role.loc[status == "context_only"] = "historical_context"
+        role.loc[status.str.contains("unavailable|missing", na=False)] = "unavailable"
+        latest["context_role"] = role
+    return latest
+
+
+def _build_replay_context_diagnostics(context: DashboardReplayContext) -> dict[str, object]:
+    """Compute audit diagnostics from the already-selected dashboard replay context."""
+
+    replay = context.replay_df.copy() if isinstance(context.replay_df, pd.DataFrame) else pd.DataFrame()
+    decisions = context.buy_sell_decisions.copy() if isinstance(context.buy_sell_decisions, pd.DataFrame) else pd.DataFrame()
+    events = context.event_annotations.copy() if isinstance(context.event_annotations, pd.DataFrame) else pd.DataFrame()
+    identity = {
+        "run_id": context.run_id,
+        "source_id": context.source_id,
+        "method_id": context.method_id or context.method,
+        "source_mode": context.source_mode,
+        "cache_signature_hash": _stable_json_hash(context.cache_signature),
+    }
+    diagnostics: dict[str, object] = {
+        "identity": identity,
+        "closed_trade_return_summary": {"closed_trades": 0, "mean_return": 0.0, "median_return": 0.0},
+        "exit_reason_quality": {"exit_rows": 0, "missing_reason_rows": 0, "missing_reason_rate": 0.0},
+        "zero_exposure_buy_rows": {"count": 0, "rows": []},
+        "hold_time_summary": {"closed_trades": 0, "mean_days": 0.0, "median_days": 0.0, "max_days": 0},
+        "reason_code_concentration": {"top_reason": "", "top_reason_share": 0.0, "unique_reasons": 0},
+    }
+    if decisions.empty:
+        return diagnostics
+
+    decisions["date"] = pd.to_datetime(decisions.get("date"), errors="coerce")
+    decisions["ticker"] = decisions.get("ticker", pd.Series("", index=decisions.index)).astype(str).str.upper().str.strip()
+    decisions["action"] = decisions.get("action", decisions.get("buy_sell", pd.Series("", index=decisions.index))).astype(str).str.upper().str.strip()
+    decisions["target_weight"] = pd.to_numeric(decisions.get("target_weight", pd.Series(np.nan, index=decisions.index)), errors="coerce")
+    decisions["reason"] = decisions.get("reason", pd.Series("", index=decisions.index)).fillna("").astype(str)
+    buys = decisions[decisions["action"].isin(["BUY", "ENTER"])].copy()
+    sells = decisions[decisions["action"].isin(["SELL", "EXIT"])].copy()
+    zero_buys = buys[(buys["target_weight"].fillna(0.0) == 0.0)].copy()
+    diagnostics["zero_exposure_buy_rows"] = {
+        "count": int(len(zero_buys)),
+        "rows": zero_buys[["date", "ticker", "target_weight", "reason"]]
+        .assign(date=lambda df: df["date"].dt.date.astype(str))
+        .head(50)
+        .to_dict("records"),
+    }
+
+    if not sells.empty:
+        missing_reason = sells["reason"].str.strip().eq("")
+        diagnostics["exit_reason_quality"] = {
+            "exit_rows": int(len(sells)),
+            "missing_reason_rows": int(missing_reason.sum()),
+            "missing_reason_rate": float(missing_reason.mean()) if len(sells) else 0.0,
+        }
+
+    reasons = decisions["reason"].replace("", "missing_reason")
+    if not reasons.empty:
+        counts = reasons.value_counts(dropna=False)
+        diagnostics["reason_code_concentration"] = {
+            "top_reason": str(counts.index[0]),
+            "top_reason_share": float(counts.iloc[0] / max(1, counts.sum())),
+            "unique_reasons": int(len(counts)),
+        }
+
+    closed_rows: list[dict[str, object]] = []
+    if not buys.empty and not sells.empty:
+        replay_work = replay.copy()
+        if not replay_work.empty and {"date", "ticker"}.issubset(replay_work.columns):
+            replay_work["date"] = pd.to_datetime(replay_work["date"], errors="coerce")
+            replay_work["ticker"] = replay_work["ticker"].astype(str).str.upper().str.strip()
+            replay_daily = (
+                replay_work.dropna(subset=["date"])
+                .groupby(["date", "ticker"], as_index=False)["portfolio_return"]
+                .last()
+                if "portfolio_return" in replay_work.columns
+                else pd.DataFrame(columns=["date", "ticker", "portfolio_return"])
+            )
+        else:
+            replay_daily = pd.DataFrame(columns=["date", "ticker", "portfolio_return"])
+        for ticker, ticker_buys in buys.dropna(subset=["date"]).groupby("ticker", sort=False):
+            ticker_sells = sells[(sells["ticker"] == ticker) & sells["date"].notna()].sort_values("date")
+            for _, buy_row in ticker_buys.sort_values("date").iterrows():
+                later_sells = ticker_sells[ticker_sells["date"] >= buy_row["date"]]
+                if later_sells.empty:
+                    continue
+                sell_row = later_sells.iloc[0]
+                hold_days = int((sell_row["date"] - buy_row["date"]).days)
+                window = replay_daily[
+                    (replay_daily["date"] >= buy_row["date"])
+                    & (replay_daily["date"] <= sell_row["date"])
+                ]
+                returns = pd.to_numeric(window.get("portfolio_return", pd.Series(dtype=float)), errors="coerce").fillna(0.0)
+                closed_return = float((1.0 + returns).prod() - 1.0) if not returns.empty else 0.0
+                closed_rows.append({"ticker": ticker, "hold_days": hold_days, "return": closed_return})
+        if closed_rows:
+            returns = pd.Series([row["return"] for row in closed_rows], dtype="float64")
+            holds = pd.Series([row["hold_days"] for row in closed_rows], dtype="float64")
+            diagnostics["closed_trade_return_summary"] = {
+                "closed_trades": int(len(closed_rows)),
+                "mean_return": float(returns.mean()),
+                "median_return": float(returns.median()),
+            }
+            diagnostics["hold_time_summary"] = {
+                "closed_trades": int(len(closed_rows)),
+                "mean_days": float(holds.mean()),
+                "median_days": float(holds.median()),
+                "max_days": int(holds.max()),
+            }
+    if not events.empty and not {"BUY", "SELL", "ENTER", "EXIT"}.intersection(set(decisions["action"])):
+        diagnostics["exit_reason_quality"] = {
+            "exit_rows": int((events.get("action", pd.Series(dtype=object)).astype(str).str.upper() == "EXIT").sum()),
+            "missing_reason_rows": 0,
+            "missing_reason_rate": 0.0,
+        }
+    return diagnostics
+
+
+def _write_replay_context_diagnostic_artifact(
+    context: DashboardReplayContext,
+    *,
+    output_path: Path = Path("docs/context/e2e_evidence/portfolio_replay_context_diagnostics_current.json"),
+) -> Path:
+    payload = _build_replay_context_diagnostics(context)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = output_path.with_name(f".{output_path.name}.tmp")
+    temp_path.write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
+    os.replace(temp_path, output_path)
+    return output_path
+
+
+def _store_strategy_replay_context(context: DashboardReplayContext) -> None:
+    st.session_state[STRATEGY_REPLAY_CONTEXT_KEY] = {
+        "method": context.method,
+        "max_weight": context.max_weight,
+        "cache_signature": context.cache_signature,
+        "source_label": context.source_label,
+        "status": context.status,
+        "reason": context.reason,
+        "run_id": context.run_id,
+        "source_id": context.source_id,
+        "method_id": context.method_id,
+        "date_window": context.date_window,
+    }
+    if context.status != "ready":
+        _clear_strategy_replay_session_cache()
+        return
+    try:
+        _write_replay_context_diagnostic_artifact(context)
+    except Exception:
+        pass
+    latest = context.latest_snapshot
+    if isinstance(latest, pd.DataFrame) and not latest.empty:
+        positive = latest[pd.to_numeric(latest.get("target_weight"), errors="coerce").fillna(0.0) > 0].copy()
+        if not positive.empty:
+            positive_assets = positive[positive["permno"].astype(str).str.upper() != "CASH"].copy()
+            if positive_assets.empty:
+                _clear_strategy_replay_session_cache()
+                return
+            weights = pd.Series(
+                pd.to_numeric(positive_assets["target_weight"], errors="coerce").values,
+                index=positive_assets["permno"].values,
+                dtype="float64",
+            ).dropna()
+            weights = weights[weights > 0]
+            if not weights.empty:
+                st.session_state[STRATEGY_REPLAY_CACHE_SIGNATURE_KEY] = context.cache_signature
+                st.session_state[STRATEGY_REPLAY_LATEST_WEIGHTS_KEY] = weights.to_dict()
+                return
+    _clear_strategy_replay_session_cache()
+
+
+def _has_cached_replay_artifact(cache_signature: dict | None = None) -> bool:
+    """True when a full daily replay context is already cached in session state."""
+    ctx = st.session_state.get(STRATEGY_REPLAY_YTD_CONTEXT_KEY)
+    if not isinstance(ctx, DashboardReplayContext) or ctx.status != "ready" or ctx.sampling != "daily":
+        return False
+    if cache_signature is None:
+        return True
+    return _replay_signatures_match(ctx.cache_signature, cache_signature)
+
+
+def _sample_replay_timeline_from_daily(replay_df: pd.DataFrame) -> tuple[pd.DataFrame, str]:
+    """Return a display-only weekly sample from daily replay rows."""
+    if not isinstance(replay_df, pd.DataFrame) or replay_df.empty or "date" not in replay_df.columns:
+        return pd.DataFrame(), "daily"
+    out = replay_df.copy()
+    out["date"] = pd.to_datetime(out["date"], errors="coerce")
+    out = out.dropna(subset=["date"])
+    if out.empty:
+        return out, "daily"
+    unique_dates = pd.DatetimeIndex(sorted(out["date"].dt.normalize().unique()))
+    if len(unique_dates) <= 160:
+        return out, "daily"
+    iso = unique_dates.isocalendar()
+    weekly_index = unique_dates.to_series().groupby([iso.year, iso.week]).last()
+    keep_dates = set(pd.to_datetime(weekly_index, errors="coerce").dropna().dt.normalize())
+    keep_dates.add(pd.Timestamp(unique_dates[-1]).normalize())
+    sampled = out[out["date"].dt.normalize().isin(keep_dates)].copy()
+    return sampled, "weekly_display_from_daily"
+
+
+def _dashboard_saved_replay_artifact_paths(cache_dir: Path | None = None) -> list[Path]:
+    root = cache_dir or SELECTED_METHOD_REPLAY_CACHE_DIR
+    if not root.exists():
+        return []
+    return sorted(
+        root.glob("*.selected_method_replay.parquet.manifest.json"),
+        key=lambda path: path.stat().st_mtime_ns if path.exists() else 0,
+        reverse=True,
+    )
+
+
+def _dashboard_saved_replay_manifest_matches(
+    manifest: dict,
+    request: DashboardReplayRequest,
+) -> tuple[bool, str]:
+    dashboard_signature = manifest.get("dashboard_cache_signature")
+    if not isinstance(dashboard_signature, dict):
+        return False, "missing_dashboard_cache_signature"
+    if not _replay_signatures_match(dashboard_signature, request.cache_signature):
+        return False, "dashboard_cache_signature_mismatch"
+    if len(request.replay_dates) > DASHBOARD_REPLAY_ARTIFACT_MAX_DATES:
+        return False, "request_over_date_budget"
+    return True, "ok"
+
+
+def _read_dashboard_saved_replay_artifact(
+    request: DashboardReplayRequest,
+    *,
+    cache_dir: Path | None = None,
+) -> DashboardReplayArtifactRead:
+    """Read a saved selected-method replay artifact only when backend and dashboard signatures match."""
+
+    from strategies.strategy_replay import ReplayBudgetPolicy, read_selected_method_replay_artifact
+
+    last_reason = "saved_artifact_not_found"
+    for manifest_path in _dashboard_saved_replay_artifact_paths(cache_dir):
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            last_reason = f"manifest_read_failed:{type(exc).__name__}"
+            continue
+        matches, reason = _dashboard_saved_replay_manifest_matches(manifest, request)
+        if not matches:
+            last_reason = reason
+            continue
+        artifact_path = manifest_path.with_name(manifest_path.name.removesuffix(".manifest.json"))
+        result = read_selected_method_replay_artifact(
+            artifact_path,
+            method=request.method,
+            controls=request.controls,
+            start_date=request.full_history_start,
+            end_date=request.replay_dates[-1] if request.replay_dates else None,
+            as_of_range=request.replay_dates,
+            expected_date_window={
+                "replay_start": request.replay_dates[0] if request.replay_dates else None,
+                "replay_end": request.replay_dates[-1] if request.replay_dates else None,
+            },
+            budget_policy=ReplayBudgetPolicy(
+                max_rows=DASHBOARD_REPLAY_ARTIFACT_MAX_ROWS,
+                max_dates=DASHBOARD_REPLAY_ARTIFACT_MAX_DATES,
+            ),
+            cache_dir=cache_dir or SELECTED_METHOD_REPLAY_CACHE_DIR,
+        )
+        if not result.available:
+            return DashboardReplayArtifactRead(
+                status="unavailable",
+                reason=result.reason,
+                artifact_path=result.artifact_path,
+                manifest_path=result.manifest_path,
+                manifest=result.manifest or manifest,
+            )
+        return DashboardReplayArtifactRead(
+            status="ready",
+            reason="ok",
+            bundle=result.bundle,
+            artifact_path=result.artifact_path,
+            manifest_path=result.manifest_path,
+            manifest=result.manifest or manifest,
+        )
+    return DashboardReplayArtifactRead(status="unavailable", reason=last_reason)
+
+
+def _dashboard_context_from_artifact_read(
+    artifact_read: DashboardReplayArtifactRead,
+    request: DashboardReplayRequest,
+    *,
+    event_annotations: pd.DataFrame,
+    buy_sell_decisions: pd.DataFrame,
+) -> DashboardReplayContext:
+    """Adapt a valid saved replay artifact frame to DashboardReplayContext."""
+
+    manifest = artifact_read.manifest or {}
+    bundle = artifact_read.bundle
+    if bundle is not None:
+        daily = bundle.replay.copy()
+        events = bundle.event_rows.copy()
+        decisions = bundle.decision_rows.copy()
+    else:
+        frame = artifact_read.frame if isinstance(artifact_read.frame, pd.DataFrame) else pd.DataFrame()
+        daily = pd.DataFrame()
+        events = pd.DataFrame()
+        decisions = pd.DataFrame()
+        if not frame.empty and "row_type" in frame.columns:
+            daily = frame[frame["row_type"] == "daily_portfolio"].copy()
+            events = frame[frame["row_type"] == "event_annotation"].copy()
+            decisions = frame[frame["row_type"] == "buy_sell_decision"].copy()
+        elif not frame.empty:
+            daily = frame.copy()
+    events = _align_context_weights_to_replay(events, daily)
+    decisions = _align_context_weights_to_replay(decisions, daily)
+    if not daily.empty and "date" in daily.columns:
+        actual_dates = set(pd.to_datetime(daily["date"], errors="coerce").dropna().dt.date.astype(str))
+        required_dates = set(request.replay_dates)
+        if required_dates and not required_dates.issubset(actual_dates):
+            _clear_strategy_replay_session_cache(include_context=True)
+            return DashboardReplayContext(
+                method=request.method,
+                max_weight=request.max_weight,
+                controls=request.controls,
+                cache_signature=request.cache_signature,
+                source_label=_get_replay_source_label(request.method, request.max_weight, "saved_artifact:missing_requested_dates"),
+                replay_df=pd.DataFrame(),
+                latest_snapshot=pd.DataFrame(),
+                event_annotations=event_annotations,
+                buy_sell_decisions=buy_sell_decisions,
+                replay_dates=request.replay_dates,
+                sampling=request.sampling,
+                status="stale",
+                reason="saved_artifact_missing_requested_dates",
+                source_mode="unavailable",
+            )
+    latest_snapshot = _strategy_replay_latest_snapshot(daily)
+    run_metadata = manifest.get("run_metadata") if isinstance(manifest.get("run_metadata"), dict) else {}
+    bundle_metadata = getattr(bundle, "run_metadata", None)
+    bundle_date_window = getattr(bundle_metadata, "date_window", None) if bundle_metadata is not None else None
+    date_window = (
+        bundle_date_window
+        if isinstance(bundle_date_window, dict)
+        else manifest.get("date_window") if isinstance(manifest.get("date_window"), dict) else {}
+    )
+    source = str(manifest.get("source_id") or "saved_artifact")
+    context = DashboardReplayContext(
+        method=request.method,
+        max_weight=request.max_weight,
+        controls=request.controls,
+        cache_signature=request.cache_signature,
+        source_label=_get_replay_source_label(request.method, request.max_weight, source),
+        replay_df=daily,
+        latest_snapshot=latest_snapshot,
+        event_annotations=events,
+        buy_sell_decisions=decisions,
+        replay_dates=request.replay_dates,
+        sampling=request.sampling,
+        status="ready" if not daily.empty else "failed",
+        reason="" if not daily.empty else "saved artifact has no daily portfolio rows",
+        source_mode="saved_artifact",
+        input_coverage_start=str(run_metadata.get("input_coverage_start") or ""),
+        run_id=str(getattr(bundle_metadata, "run_id", "") or manifest.get("run_id") or ""),
+        source_id=str(getattr(bundle_metadata, "source_id", "") or manifest.get("source_id") or source),
+        method_id=str(getattr(bundle_metadata, "method_id", "") or manifest.get("method_id") or request.method),
+        date_window=dict(date_window),
+    )
+    return context
+
+
+def _dashboard_context_from_backend_bundle(
+    bundle,
+    request: DashboardReplayRequest,
+    *,
+    event_annotations: pd.DataFrame,
+    buy_sell_decisions: pd.DataFrame,
+) -> DashboardReplayContext:
+    """Adapt a backend selected-method replay bundle to DashboardReplayContext."""
+
+    replay_df = bundle.replay
+    bundle_events = bundle.event_rows
+    bundle_decisions = bundle.decision_rows
+    aligned_events = _align_context_weights_to_replay(bundle_events, replay_df)
+    aligned_decisions = _align_context_weights_to_replay(bundle_decisions, replay_df)
+    first_source = str(replay_df["source"].iloc[0]) if not replay_df.empty and "source" in replay_df.columns else "strategy_replay"
+    latest_snapshot = _strategy_replay_latest_snapshot(replay_df)
+    run_metadata = getattr(bundle, "run_metadata", None)
+    _coverage_start = getattr(run_metadata, "input_coverage_start", "") or ""
+    date_window = getattr(run_metadata, "date_window", {}) if run_metadata is not None else {}
+    context = DashboardReplayContext(
+        method=request.method,
+        max_weight=request.max_weight,
+        controls=request.controls,
+        cache_signature=request.cache_signature,
+        source_label=_get_replay_source_label(request.method, request.max_weight, first_source),
+        replay_df=replay_df,
+        latest_snapshot=latest_snapshot,
+        event_annotations=aligned_events if isinstance(bundle_events, pd.DataFrame) else event_annotations,
+        buy_sell_decisions=aligned_decisions if isinstance(bundle_decisions, pd.DataFrame) else buy_sell_decisions,
+        replay_dates=request.replay_dates,
+        sampling=request.sampling,
+        status="ready" if not replay_df.empty else "failed",
+        reason="" if not replay_df.empty else "No strategy replay data produced.",
+        source_mode="transitional_build",
+        input_coverage_start=_coverage_start,
+        run_id=str(getattr(run_metadata, "run_id", "") or ""),
+        source_id=str(getattr(run_metadata, "source_id", "") or first_source),
+        method_id=str(getattr(run_metadata, "method_id", "") or request.method),
+        date_window=dict(date_window) if isinstance(date_window, dict) else {},
+    )
+    return context
+
+
+def _build_dashboard_strategy_replay_context(
+    *,
+    replay_dates_override: list[str] | None = None,
+    include_replay: bool = True,
+    horizon_start: pd.Timestamp | None = None,
+    allow_transitional_fallback: bool = True,
+) -> DashboardReplayContext:
+    """Build the selected-method replay bundle consumed by dashboard replay surfaces.
+
+    Saved selected-method artifacts are preferred when their dashboard cache signature
+    exactly matches the current method, cap, assets, dates, and data signature.
+    Transitional backend build is an explicit fallback while artifact coverage matures.
+    """
+    from strategies.strategy_replay import build_selected_method_replay
+
+    request, event_annotations, buy_sell_decisions, unavailable_reason = _build_dashboard_replay_request(
+        replay_dates_override=replay_dates_override,
+        include_replay=include_replay,
+        horizon_start=horizon_start,
+    )
+    if unavailable_reason.startswith("Rule100 history"):
+        _clear_strategy_replay_session_cache(include_context=True)
+        return DashboardReplayContext(
+            method=request.method,
+            max_weight=request.max_weight,
+            controls=request.controls,
+            cache_signature=request.cache_signature,
+            source_label=_get_replay_source_label(request.method, request.max_weight, "rule100_history_missing_required_columns"),
+            replay_df=pd.DataFrame(),
+            latest_snapshot=pd.DataFrame(),
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+            replay_dates=[],
+            sampling=request.sampling,
+            status="input_unavailable",
+            reason=unavailable_reason,
+            source_mode="unavailable",
+        )
+    if not include_replay:
+        return DashboardReplayContext(
+            method=request.method,
+            max_weight=request.max_weight,
+            controls=request.controls,
+            cache_signature=request.cache_signature,
+            source_label=_get_replay_source_label(request.method, request.max_weight, "strategy_replay:not_built_yet"),
+            replay_df=pd.DataFrame(),
+            latest_snapshot=pd.DataFrame(),
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+            replay_dates=[],
+            sampling=request.sampling,
+            status="building",
+            reason="replay_not_built_yet",
+            source_mode="transitional_build",
+        )
+    if unavailable_reason == "price_data_unavailable":
+        _clear_strategy_replay_session_cache(include_context=True)
+        return DashboardReplayContext(
+            method=request.method,
+            max_weight=request.max_weight,
+            controls=request.controls,
+            cache_signature=request.cache_signature,
+            source_label=_get_replay_source_label(request.method, request.max_weight, "strategy_replay:no_price_data"),
+            replay_df=pd.DataFrame(),
+            latest_snapshot=pd.DataFrame(),
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+            replay_dates=[],
+            sampling=request.sampling,
+            status="input_unavailable",
+            reason="price_data_unavailable",
+            source_mode="unavailable",
+        )
+    if unavailable_reason == "no_assets_selected_for_replay":
+        _clear_strategy_replay_session_cache(include_context=True)
+        return DashboardReplayContext(
+            method=request.method,
+            max_weight=request.max_weight,
+            controls=request.controls,
+            cache_signature=request.cache_signature,
+            source_label=_get_replay_source_label(request.method, request.max_weight, "strategy_replay:no_assets"),
+            replay_df=pd.DataFrame(),
+            latest_snapshot=pd.DataFrame(),
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+            replay_dates=[],
+            sampling=request.sampling,
+            status="input_unavailable",
+            reason="no_assets_selected_for_replay",
+            source_mode="unavailable",
+        )
+    if unavailable_reason == "portfolio_replay_selection_unavailable":
+        _clear_strategy_replay_session_cache(include_context=True)
+        return DashboardReplayContext(
+            method=request.method,
+            max_weight=request.max_weight,
+            controls=request.controls,
+            cache_signature=request.cache_signature,
+            source_label=_get_replay_source_label(request.method, request.max_weight, "strategy_replay:no_selection"),
+            replay_df=pd.DataFrame(),
+            latest_snapshot=pd.DataFrame(),
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+            replay_dates=[],
+            sampling=request.sampling,
+            status="input_unavailable",
+            reason="portfolio_replay_selection_unavailable",
+            source_mode="unavailable",
+        )
+
+    artifact_read = _read_dashboard_saved_replay_artifact(request)
+    if artifact_read.status == "ready":
+        context = _dashboard_context_from_artifact_read(
+            artifact_read,
+            request,
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+        )
+        _store_strategy_replay_context(context)
+        return context
+    if not allow_transitional_fallback:
+        _clear_strategy_replay_session_cache(include_context=True)
+        return DashboardReplayContext(
+            method=request.method,
+            max_weight=request.max_weight,
+            controls=request.controls,
+            cache_signature=request.cache_signature,
+            source_label=_get_replay_source_label(request.method, request.max_weight, f"saved_artifact:{artifact_read.reason}"),
+            replay_df=pd.DataFrame(),
+            latest_snapshot=pd.DataFrame(),
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+            replay_dates=request.replay_dates,
+            sampling=request.sampling,
+            status="stale",
+            reason=f"saved_artifact_unavailable:{artifact_read.reason}",
+            source_mode="unavailable",
+        )
+
+    if not _replay_signatures_match(request.cache_signature, st.session_state.get(STRATEGY_REPLAY_CACHE_SIGNATURE_KEY)):
+        st.session_state.pop(STRATEGY_REPLAY_LATEST_WEIGHTS_KEY, None)
+    replay_start = request.replay_dates[0] if request.replay_dates else request.full_history_start
+    replay_end = request.replay_dates[-1] if request.replay_dates else request.full_history_start
+    try:
+        batched_replay_data = _load_dashboard_batched_pit_replay_data_cached(
+            start_date=replay_start,
+            end_date=replay_end,
+            selected_permnos=_numeric_replay_permnos(request.allocation_assets),
+            data_signature=request.data_signature,
+        )
+        # Replaces the older per-date _load_dashboard_strategy_replay_inputs_cached(...) path.
     except Exception as exc:
-        st.warning(f"⚠️ Shadow portfolio monitor unavailable: {type(exc).__name__}: {exc}")
+        return DashboardReplayContext(
+            method=request.method,
+            max_weight=request.max_weight,
+            controls=request.controls,
+            cache_signature=request.cache_signature,
+            source_label=_get_replay_source_label(request.method, request.max_weight, f"strategy_replay:pit_batch_failed:{type(exc).__name__}"),
+            replay_df=pd.DataFrame(),
+            latest_snapshot=pd.DataFrame(),
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+            replay_dates=request.replay_dates,
+            sampling=request.sampling,
+            status="failed",
+            reason=f"load_batched_pit_replay_data failed: {type(exc).__name__}: {exc}",
+            source_mode="transitional_build",
+        )
+    batched_loader = build_batched_pit_input_loader(batched_replay_data)
+
+    def _dashboard_input_loader(
+        *,
+        as_of_date: str,
+        start_date: str,
+        end_date: str,
+        method: str,
+        controls: dict | None = None,
+        max_weight: float | None = None,
+        **_kwargs,
+    ):
+        del start_date, end_date, method, controls, max_weight
+        inputs = batched_loader(as_of_date=as_of_date)
+        return _filter_dashboard_replay_inputs_to_assets(
+            inputs,
+            replay_assets=request.allocation_assets,
+        )
+
+    try:
+        from strategies.strategy_replay import _coerce_method, _compute_coverage_plan
+
+        coverage_plan = _compute_coverage_plan(
+            _coerce_method(request.method),
+            request.controls,
+            [pd.Timestamp(value) for value in request.replay_dates],
+            batched=batched_replay_data,
+        )
+        coverage_plan = _dashboard_filter_coverage_plan_to_assets(
+            coverage_plan,
+            request.allocation_assets,
+        )
+    except Exception:
+        coverage_plan = None
+
+    # Pass event/decision context so the bundle attaches them filtered to replay window
+    request.controls["event_context_frame"] = event_annotations
+    request.controls["decision_context_frame"] = buy_sell_decisions
+
+    try:
+        bundle = build_selected_method_replay(
+            method=request.method,
+            controls=request.controls,
+            prices=None,
+            input_loader=_dashboard_input_loader,
+            start_date=request.full_history_start,
+            end_date=request.replay_dates[-1] if request.replay_dates else None,
+            as_of_range=request.replay_dates,
+            coverage_plan=coverage_plan,
+        )
+    except Exception as exc:
+        return DashboardReplayContext(
+            method=request.method,
+            max_weight=request.max_weight,
+            controls=request.controls,
+            cache_signature=request.cache_signature,
+            source_label=_get_replay_source_label(request.method, request.max_weight, f"strategy_replay:failed:{type(exc).__name__}"),
+            replay_df=pd.DataFrame(),
+            latest_snapshot=pd.DataFrame(),
+            event_annotations=event_annotations,
+            buy_sell_decisions=buy_sell_decisions,
+            replay_dates=request.replay_dates,
+            sampling=request.sampling,
+            status="failed",
+            reason=f"build_selected_method_replay failed: {type(exc).__name__}: {exc}",
+            source_mode="transitional_build",
+        )
+
+    context = _dashboard_context_from_backend_bundle(
+        bundle,
+        request,
+        event_annotations=event_annotations,
+        buy_sell_decisions=buy_sell_decisions,
+    )
+    if request.allocation_assets and tuple(request.allocation_assets) != tuple(request.replay_assets):
+        replay_with_context_assets = _append_context_only_replay_rows(
+            context.replay_df,
+            replay_assets=request.replay_assets,
+            allocation_assets=request.allocation_assets,
+            ticker_map=ticker_map_parquet,
+            method=request.method,
+            max_weight=request.max_weight,
+        )
+        event_ctx = _normalize_dashboard_context_frame(
+            event_annotations,
+            context_type="event_annotations",
+            method=request.method,
+            replay=replay_with_context_assets,
+        )
+        decision_ctx = _normalize_dashboard_context_frame(
+            buy_sell_decisions,
+            context_type="decision_context",
+            method=request.method,
+            replay=replay_with_context_assets,
+        )
+        context = replace(
+            context,
+            replay_df=replay_with_context_assets,
+            latest_snapshot=_strategy_replay_latest_snapshot(replay_with_context_assets),
+            event_annotations=_align_context_weights_to_replay(event_ctx, replay_with_context_assets),
+            buy_sell_decisions=_align_context_weights_to_replay(decision_ctx, replay_with_context_assets),
+        )
+    _store_strategy_replay_context(context)
+    return context
+
+
+def _ensure_daily_portfolio_replay_context(horizon_start: pd.Timestamp | None = None) -> DashboardReplayContext:
+    """Build the one daily replay context used by Portfolio replay-facing surfaces."""
+    if horizon_start is not None:
+        cached_context = _valid_cached_ytd_replay_context(horizon_start)
+        if cached_context is not None:
+            return cached_context
+    with st.spinner("Building daily portfolio replay source..."):
+        context = _build_dashboard_strategy_replay_context(horizon_start=horizon_start)
+    if context.status == "ready" and context.sampling == "daily" and len(context.replay_dates) >= 2:
+        st.session_state[STRATEGY_REPLAY_YTD_CONTEXT_KEY] = context
+    else:
+        st.session_state.pop(STRATEGY_REPLAY_YTD_CONTEXT_KEY, None)
+        st.session_state.pop(STRATEGY_REPLAY_LATEST_WEIGHTS_KEY, None)
+        st.session_state.pop(STRATEGY_REPLAY_CACHE_SIGNATURE_KEY, None)
+    return context
+
+
+def _render_strategy_replay_section(full_context: DashboardReplayContext) -> None:
+    """Strategy Replay: transitional bundle viewer for selected-method replay."""
+    st.subheader("Strategy Replay")
+
+    # Display which method/cap is being replayed (read-only from main controls)
+    st.caption(f"Replaying: {full_context.method} | max_weight={full_context.max_weight:.0%} (from main optimizer controls)")
+
+    if full_context.source_mode == "saved_artifact":
+        st.caption("Replay source: saved artifact.")
+    if full_context.source_mode == "transitional_build":
+        st.caption("Replay source: transitional build (saved artifact unavailable or stale).")
+    if full_context.source_mode == "unavailable":
+        st.caption("Replay source: saved artifact unavailable.")
+
+    if full_context.status == "input_unavailable" and full_context.reason == "price_data_unavailable":
+        st.info("Strategy Replay requires price data. Load parquet data to enable.")
+        return
+    if full_context.status == "input_unavailable" and full_context.reason == "no_assets_selected_for_replay":
+        st.info("No assets selected for replay. Select assets in the optimizer above.")
+        return
+    if full_context.status == "input_unavailable" and full_context.reason == "portfolio_replay_selection_unavailable":
+        st.info("Replay selection unavailable. Use the optimizer controls above to select a valid replay universe.")
+        return
+    if full_context.status in ("input_unavailable", "failed"):
+        st.warning(full_context.reason)
+        return
+    if full_context.status == "stale":
+        st.warning(full_context.reason or "Strategy replay source is stale.")
+        return
+    replay_df = full_context.replay_df
+    if replay_df.empty:
+        st.info("No strategy replay data produced.")
+        return
+
+    source_label = full_context.source_label
+    st.caption(f"Source: {source_label}")
+    st.caption(f"Replay identity: {_replay_identity_caption(full_context)}")
+
+    # Coverage-gap warning: if selected horizon starts before strategy input coverage
+    horizon_start = st.session_state.get("_portfolio_horizon_start")
+    coverage_start = full_context.input_coverage_start
+    if horizon_start is not None and coverage_start:
+        coverage_ts = pd.Timestamp(coverage_start)
+        if pd.notna(coverage_ts) and pd.Timestamp(horizon_start) < coverage_ts:
+            st.info(
+                f"Strategy input coverage starts {coverage_ts.strftime('%Y-%m-%d')}; "
+                f"earlier dates are cash/input unavailable."
+            )
+
+    # Show unsupported/failed status explicitly
+    if "status" in replay_df.columns:
+        failed = replay_df[replay_df["status"] == "cash_closed"]
+        if not failed.empty:
+            unique_reasons = failed["reason"].unique()
+            for reason in unique_reasons[:3]:
+                st.warning(f"Replay status: cash_closed - {reason}")
+
+    # ── Strategy Replay Timeline ──
+    timeline_df, timeline_sampling = _sample_replay_timeline_from_daily(replay_df)
+    _sampling_tag = f" | display sample: {timeline_sampling}" if timeline_sampling != "daily" else ""
+    st.markdown(f"**Strategy Replay Timeline** *(source: {source_label}{_sampling_tag})*")
+    _render_replay_timeline_chart(timeline_df)
+
+    # ── Latest Snapshot ──
+    latest_rows = full_context.latest_snapshot.copy()
+    latest_date = latest_rows["date"].max() if not latest_rows.empty else pd.NaT
+    if not latest_rows.empty:
+        required_snapshot_cols = {"date", "ticker", "target_weight"}
+        if required_snapshot_cols.issubset(latest_rows.columns):
+            optional_cols = [c for c in ["context_role", "cap_used", "cap_source", "source", "status"] if c in latest_rows.columns]
+            snap_df = latest_rows[["ticker", "target_weight", *optional_cols]].copy()
+            snap_df = snap_df.rename(
+                columns={
+                    "ticker": "Ticker",
+                    "target_weight": "Replay Weight",
+                    "context_role": "Context Role",
+                }
+            )
+            snap_df["Replay Weight"] = pd.to_numeric(snap_df["Replay Weight"], errors="coerce").fillna(0.0)
+            snap_df = snap_df[snap_df["Replay Weight"] > 0].sort_values("Replay Weight", ascending=False)
+            title_date = pd.Timestamp(latest_date).strftime("%Y-%m-%d") if pd.notna(latest_date) else "unknown"
+            st.markdown(f"**Latest Snapshot** ({title_date})")
+            st.dataframe(snap_df.style.format({"Replay Weight": "{:.2%}"}), use_container_width=True, hide_index=True)
+        else:
+            st.info("Latest replay snapshot unavailable for this source schema.")
+
+    # Historical Replay Lifecycle Events (same bundle identity as daily replay rows)
+    event_df = full_context.event_annotations.copy()
+    required_event_cols = {"date", "ticker", "action"}
+    if not event_df.empty and required_event_cols.issubset(event_df.columns):
+        event_df = event_df[event_df["action"].isin(("ENTER", "EXIT", "ADJUST"))].copy()
+        event_df["date"] = pd.to_datetime(event_df["date"], errors="coerce")
+        horizon_start = st.session_state.get("_portfolio_horizon_start")
+        if horizon_start is not None:
+            event_df = event_df[event_df["date"] >= pd.Timestamp(horizon_start)]
+        event_df = event_df[event_df["date"].notna()].sort_values("date", ascending=False)
+    else:
+        event_df = pd.DataFrame()
+    if not event_df.empty:
+        st.markdown(f"**Historical Replay Lifecycle Events** *(replay: {full_context.method}; source: {full_context.source_id or full_context.source_mode})*")
+        _render_event_ledger_chart(event_df, list(event_df["ticker"].unique()))
+    else:
+        st.info("No replay lifecycle events in this replay window.")
+
+    # Replay Decision-Code Audit Log (same bundle.decision_rows source)
+    decision_df = full_context.buy_sell_decisions.copy()
+    if not decision_df.empty:
+        if "date" in decision_df.columns:
+            decision_df["date"] = pd.to_datetime(decision_df["date"], errors="coerce")
+            horizon_start = st.session_state.get("_portfolio_horizon_start")
+            if horizon_start is not None:
+                decision_df = decision_df[decision_df["date"] >= pd.Timestamp(horizon_start)]
+            decision_df = decision_df.sort_values("date", ascending=False)
+        dec_cols = [
+            c for c in ["date", "ticker", "context_role", "action", "reason", "target_weight", "audit_weight"]
+            if c in decision_df.columns
+        ]
+        latest_trades = decision_df[decision_df.get("action", pd.Series(dtype=object)).isin(("BUY", "SELL"))].head(9).copy()
+        if not latest_trades.empty:
+            st.markdown("**Latest Replay Decision-Code Changes**")
+            latest_show = latest_trades[dec_cols].copy()
+            if "date" in latest_show.columns:
+                latest_show["date"] = latest_show["date"].dt.strftime("%Y-%m-%d")
+            for weight_col in ["target_weight", "audit_weight"]:
+                if weight_col in latest_show.columns:
+                    latest_show[weight_col] = pd.to_numeric(latest_show[weight_col], errors="coerce").map("{:.1%}".format)
+            latest_show = latest_show.rename(
+                columns={
+                    "context_role": "Context Role",
+                    "target_weight": "Replay Target",
+                    "audit_weight": "Aux Audit Wt",
+                }
+            )
+            st.dataframe(latest_show, use_container_width=True, hide_index=True)
+        with st.expander(f"**Replay Decision-Code Audit Log** ({len(decision_df)} rows)", expanded=False):
+            st.caption("Bundle decision context (replay audit only - not live orders or trade signals).")
+            dec_show = decision_df[dec_cols].copy()
+            if "date" in dec_show.columns:
+                dec_show["date"] = dec_show["date"].dt.strftime("%Y-%m-%d")
+            for weight_col in ["target_weight", "audit_weight"]:
+                if weight_col in dec_show.columns:
+                    dec_show[weight_col] = pd.to_numeric(dec_show[weight_col], errors="coerce").map("{:.1%}".format)
+            dec_show = dec_show.rename(
+                columns={
+                    "context_role": "Context Role",
+                    "target_weight": "Replay Target",
+                    "audit_weight": "Aux Audit Wt",
+                }
+            )
+            st.dataframe(dec_show, use_container_width=True, hide_index=True)
+
+
+def _render_replay_timeline_chart(replay_df: pd.DataFrame) -> None:
+    """Render target weights as one stacked replay allocation timeline."""
+    if replay_df.empty or "date" not in replay_df.columns or "ticker" not in replay_df.columns:
+        st.info("No replay target weights available.")
+        return
+    if "target_weight" not in replay_df.columns:
+        st.info("No replay target weights available.")
+        return
+    replay_df = replay_df.copy()
+    replay_df["date"] = pd.to_datetime(replay_df["date"], errors="coerce")
+    replay_df["ticker"] = replay_df["ticker"].astype(str).str.upper().str.strip()
+    replay_df["target_weight"] = pd.to_numeric(replay_df.get("target_weight"), errors="coerce").fillna(0.0).clip(lower=0.0)
+    replay_df = replay_df[(replay_df["date"].notna()) & (replay_df["ticker"] != "")]
+    if replay_df.empty:
+        st.info("No replay target weights available.")
+        return
+    weights = (
+        replay_df.pivot_table(
+            index="date",
+            columns="ticker",
+            values="target_weight",
+            aggfunc="last",
+        )
+        .sort_index()
+        .fillna(0.0)
+    )
+    if weights.empty:
+        st.info("No replay target weights available.")
+        return
+    latest = weights.iloc[-1].drop(labels=["CASH"], errors="ignore")
+    active_days = (weights.drop(columns=["CASH"], errors="ignore") > 0).sum()
+    ordered_equities = sorted(
+        latest.index,
+        key=lambda ticker: (float(latest.get(ticker, 0.0)), int(active_days.get(ticker, 0)), str(ticker)),
+        reverse=True,
+    )
+    tickers = [ticker for ticker in ordered_equities if float(weights[ticker].abs().max()) > 0.0]
+    if "CASH" in weights.columns:
+        tickers.append("CASH")
+    fig = go.Figure()
+    for ticker in tickers:
+        if ticker not in weights.columns:
+            continue
+        is_cash = ticker == "CASH"
+        fig.add_trace(go.Scatter(
+            x=weights.index,
+            y=weights[ticker],
+            mode="lines",
+            name=ticker,
+            stackgroup="weights",
+            line=dict(shape="hv", width=1.5, color="#8E8E8E") if is_cash else dict(shape="hv", width=1.6),
+            fillcolor="rgba(142,142,142,0.28)" if is_cash else None,
+            opacity=0.72 if is_cash else 0.92,
+            hovertemplate=(
+                f"<b>{ticker}</b><br>" + "%{x|%Y-%m-%d}"
+                "<br>Replay Target: %{y:.1%}<extra></extra>"
+            ),
+        ))
+    fig.update_layout(
+        template="plotly_dark",
+        height=340,
+        yaxis_title="Target Weight",
+        yaxis_tickformat=".0%",
+        yaxis=dict(range=[0, 1], tickformat=".0%"),
+        xaxis_title="",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(l=60, r=20, t=30, b=30),
+        hovermode="x unified",
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def _render_policy_target_freshness() -> None:
+    """Show freshness metadata for the policy target history artifact."""
+    import datetime
+
+    path = RULE100_SOFTMAX_V1_HISTORY_PATH
+    if not path.exists() or path.stat().st_size == 0:
+        st.warning(
+            "⚠️ Policy target history artifact missing or empty. "
+            f"Expected: {path}. Rebuild required."
+        )
+        return
+    mtime = datetime.datetime.fromtimestamp(path.stat().st_mtime)
+    age_hours = (datetime.datetime.now() - mtime).total_seconds() / 3600
+    freshness_label = f"Generated: {mtime:%Y-%m-%d %H:%M} ({age_hours:.1f}h ago)"
+    if age_hours > 48:
+        st.warning(f"⚠️ Policy target history is stale. {freshness_label} | Path: {path}")
+    else:
+        st.caption(f"📄 {path.name} | {freshness_label}")
+
+
+def _render_policy_target_timeline(hist: pd.DataFrame, selected_tickers: list, *, show_cash: bool = False, max_weight: float = 0.35) -> None:
+    """Render daily policy target weight chart and table from v1 history CSV."""
+    fig = go.Figure()
+    for ticker in selected_tickers:
+        tk = hist[hist["ticker"].str.upper().str.strip() == ticker]
+        if tk.empty:
+            continue
+        target_wt = pd.to_numeric(tk["softmax_v1_target_weight"], errors="coerce").fillna(0.0)
+        fig.add_trace(go.Scatter(
+            x=tk["date"],
+            y=target_wt,
+            mode="lines+markers",
+            name=ticker,
+            marker=dict(size=4),
+            hovertemplate=(
+                "<b>" + ticker + "</b><br>%{x|%Y-%m-%d}"
+                "<br>Policy Target: %{y:.1%}<extra></extra>"
+            ),
+        ))
+    # CASH trace: residual weight per date
+    if show_cash and "softmax_v1_cash_residual" in hist.columns:
+        cash_by_date = hist.groupby("date")["softmax_v1_cash_residual"].first().reset_index()
+        cash_wt = pd.to_numeric(cash_by_date["softmax_v1_cash_residual"], errors="coerce").fillna(1.0)
+        fig.add_trace(go.Scatter(
+            x=cash_by_date["date"],
+            y=cash_wt,
+            mode="lines",
+            name="CASH",
+            line=dict(dash="dot", color="#888888"),
+            hovertemplate="<b>CASH</b><br>%{x|%Y-%m-%d}<br>Weight: %{y:.1%}<extra></extra>",
+        ))
+    fig.update_layout(
+        template="plotly_dark",
+        height=300,
+        yaxis_title="Policy Target Weight",
+        yaxis_tickformat=".0%",
+        xaxis_title="",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(l=60, r=20, t=30, b=30),
+        hovermode="x unified",
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Policy Target Table
+    with st.expander("Policy Target History"):
+        tbl = hist[["date", "ticker", "event_weight", "softmax_v1_target_weight",
+                     "softmax_v1_cash_residual", "eligibility_reason"]].copy()
+        tbl["event_weight"] = pd.to_numeric(tbl["event_weight"], errors="coerce")
+        tbl["softmax_v1_target_weight"] = pd.to_numeric(tbl["softmax_v1_target_weight"], errors="coerce")
+        tbl["softmax_v1_cash_residual"] = pd.to_numeric(tbl["softmax_v1_cash_residual"], errors="coerce")
+        tbl["target_minus_event"] = tbl["softmax_v1_target_weight"] - tbl["event_weight"]
+        tbl["date"] = tbl["date"].dt.strftime("%Y-%m-%d")
+        tbl = tbl.rename(columns={
+            "date": "Date",
+            "ticker": "Ticker",
+            "event_weight": "Lifecycle Event Wt",
+            "softmax_v1_target_weight": "Policy Target Weight",
+            "softmax_v1_cash_residual": "Cash Residual",
+            "eligibility_reason": "Eligibility Reason",
+            "target_minus_event": "Target - Event",
+        })
+        tbl = tbl[["Date", "Ticker", "Policy Target Weight", "Lifecycle Event Wt",
+                    "Target - Event", "Cash Residual", "Eligibility Reason"]]
+        st.dataframe(tbl, use_container_width=True, hide_index=True)
+
+
+def _derive_replay_trade_events(replay_df: pd.DataFrame) -> pd.DataFrame:
+    """Derive ENTER/EXIT trade events from replay_df target_weight transitions.
+
+    Returns a DataFrame with columns: date, ticker, action, weight, reason
+    compatible with _render_event_ledger_chart.
+    """
+    if replay_df.empty or "target_weight" not in replay_df.columns:
+        return pd.DataFrame(columns=["date", "ticker", "action", "weight", "reason"])
+    # Exclude CASH rows
+    df = replay_df[replay_df["ticker"] != "CASH"].copy()
+    if df.empty:
+        return pd.DataFrame(columns=["date", "ticker", "action", "weight", "reason"])
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df = df.sort_values(["ticker", "date"])
+    # Pivot: for each ticker, get previous weight
+    df["prev_weight"] = df.groupby("ticker")["target_weight"].shift(1).fillna(0.0)
+    # ENTER: prev == 0 and current > 0
+    enters = df[(df["prev_weight"] == 0) & (df["target_weight"] > 0)].copy()
+    enters["action"] = "ENTER"
+    enters["weight"] = enters["target_weight"]
+    enters["reason"] = enters["target_weight"].map(lambda v: f"replay target_weight 0→{v:.1%}")
+    # EXIT: prev > 0 and current == 0
+    exits = df[(df["prev_weight"] > 0) & (df["target_weight"] == 0)].copy()
+    exits["action"] = "EXIT"
+    exits["weight"] = exits["prev_weight"]
+    exits["reason"] = exits["prev_weight"].map(lambda v: f"replay target_weight {v:.1%}→0")
+    events = pd.concat([enters, exits], ignore_index=True)
+    if events.empty:
+        return pd.DataFrame(columns=["date", "ticker", "action", "weight", "reason"])
+    return events[["date", "ticker", "action", "weight", "reason"]].sort_values("date", ascending=False).reset_index(drop=True)
+
+
+def _numeric_weight_series(frame: pd.DataFrame, column: str) -> pd.Series:
+    if column in frame.columns:
+        return pd.to_numeric(frame[column], errors="coerce").fillna(0.0)
+    return pd.Series(0.0, index=frame.index, dtype="float64")
+
+
+def _render_event_ledger_chart(df_filtered: pd.DataFrame, selected_tickers: list) -> None:
+    """Render replay lifecycle-code markers from the event ledger."""
+    fig = go.Figure()
+
+    enters = df_filtered[df_filtered["action"] == "ENTER"]
+    exits = df_filtered[df_filtered["action"] == "EXIT"]
+
+    if not enters.empty:
+        if "target_weight" in enters.columns:
+            enter_target = _numeric_weight_series(enters, "target_weight")
+        elif "rule100_softmax_v1_target_weight" in enters.columns:
+            enter_target = _numeric_weight_series(enters, "rule100_softmax_v1_target_weight")
+        else:
+            enter_target = pd.Series(0.0, index=enters.index, dtype="float64")
+        enter_audit_wt = _numeric_weight_series(enters, "audit_weight")
+        enter_customdata = pd.DataFrame({
+            "target": enter_target,
+            "audit_wt": enter_audit_wt,
+            "event_code": enters["action"].values,
+            "reason": enters["reason"].values,
+        }).values
+        fig.add_trace(go.Scatter(
+            x=enters["date"],
+            y=enters["ticker"],
+            mode="markers",
+            name="ENTER",
+            marker=dict(symbol="triangle-up", size=14, color="#00FFAA"),
+            hovertemplate=(
+                "<b>%{y}</b><br>Lifecycle open code %{x|%Y-%m-%d}"
+                "<br>Policy Target: %{customdata[0]:.1%} (Replay Target)"
+                "<br>Lifecycle Event Wt: %{customdata[1]:.1%} (Aux Audit Wt)"
+                "<br>Decision Code: %{customdata[2]}"
+                "<br>Reason: %{customdata[3]}<extra></extra>"
+            ),
+            customdata=enter_customdata,
+        ))
+
+    if not exits.empty:
+        exit_reason = exits["reason"].values if "reason" in exits.columns else [""] * len(exits)
+        exit_rating = exits["rating"].values if "rating" in exits.columns else ["—"] * len(exits)
+        exit_target = _numeric_weight_series(exits, "target_weight")
+        exit_audit_wt = _numeric_weight_series(exits, "audit_weight")
+        fig.add_trace(go.Scatter(
+            x=exits["date"],
+            y=exits["ticker"],
+            mode="markers",
+            name="EXIT",
+            marker=dict(symbol="triangle-down", size=14, color="#FF4444"),
+            hovertemplate=(
+                "<b>%{y}</b><br>Lifecycle close code %{x|%Y-%m-%d}"
+                "<br>Decision Code: lifecycle close"
+                "<br>Policy Target: %{customdata[2]:.1%} (Replay Target)"
+                "<br>Lifecycle Event Wt: %{customdata[3]:.1%} (Aux Audit Wt)"
+                "<br>Rating: %{customdata[0]}"
+                "<br>Reason: %{customdata[1]}<extra></extra>"
+            ),
+            customdata=list(zip(exit_rating, exit_reason, exit_target, exit_audit_wt)),
+        ))
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=max(200, 60 * len(selected_tickers)),
+        yaxis_title="",
+        xaxis_title="",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(l=80, r=20, t=30, b=30),
+        hovermode="closest",
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+
+
 
 
 def _render_portfolio_builder_placeholder():
@@ -1986,7 +4683,7 @@ def _render_portfolio_builder_placeholder():
 
         # Build AND-chained logic string
         logic_str = " **AND** ".join(f"({n})" for n in names)
-        st.markdown(f"**EXECUTE IF:** {logic_str}")
+        st.markdown(f"**Research filter expression:** {logic_str}")
 
         # AND compounding warning
         if len(names) >= 3:
@@ -2011,9 +4708,9 @@ def _render_portfolio_builder_placeholder():
             st.error(f"Signal compiler error: {e}")
             df_scan["Sovereign_Command"] = False
 
-        # --- 7. Qualifying Tickers Readout ---
+        # --- 7. Rows Passing Research Filter Readout ---
         st.divider()
-        st.subheader("🎯 Qualifying Tickers")
+        st.subheader("Rows Passing Research Filter")
         qualifying = df_scan[df_scan.get("Sovereign_Command", pd.Series(False, index=df_scan.index)) == True]
 
         if qualifying.empty:
@@ -2039,10 +4736,38 @@ def _render_placeholder_page(title: str) -> None:
 
 
 def _render_portfolio_allocation_page() -> None:
-    st.header("Portfolio & Allocation")
+    st.header(PORTFOLIO_PAGE_TITLE)
+    st.caption("Optimizer controls select the method and universe. Allocation, performance, timeline, events, and decisions are rendered from one daily replay source.")
     _render_portfolio_builder_section()
     st.divider()
-    _render_shadow_portfolio_section()
+    horizon, horizon_start = _render_portfolio_horizon_control()
+    daily_replay_context = _ensure_daily_portfolio_replay_context(horizon_start=horizon_start)
+    _render_replay_allocation_snapshot(daily_replay_context)
+    st.divider()
+    _render_portfolio_ytd_chart(daily_replay_context, horizon=horizon, ytd_start=horizon_start)
+    st.divider()
+    _render_strategy_replay_section(daily_replay_context)
+    st.divider()
+    _render_data_health_section()
+    st.divider()
+    _render_drift_monitor_section()
+
+
+def _render_discovery_page() -> None:
+    st.header(DISCOVERY_PAGE_TITLE)
+    render_discovery_page(
+        render_opportunities=_render_opportunities_page,
+        render_confluence_scan=_render_daily_scan_section,
+    )
+
+
+def _render_strategy_page() -> None:
+    st.header(STRATEGY_PAGE_TITLE)
+    render_strategy_page(
+        render_modular_strategies=_render_modular_strategies_section,
+        render_backtest_lab=_render_backtest_lab_section,
+        render_pead_validation_evidence=render_pead_validation_evidence,
+    )
 
 
 def _render_research_lab_page() -> None:
@@ -2077,14 +4802,9 @@ def _render_settings_ops_page() -> None:
 
 page = build_dashboard_navigation(
     {
-        "Command Center": _render_command_center_page,
-        "Opportunities": _render_opportunities_page,
-        "Thesis Card": lambda: _render_placeholder_page("Thesis Card"),
-        "Market Behavior": lambda: _render_placeholder_page("Market Behavior"),
-        "Entry & Hold Discipline": lambda: _render_placeholder_page("Entry & Hold Discipline"),
-        "Portfolio & Allocation": _render_portfolio_allocation_page,
-        "Research Lab": _render_research_lab_page,
-        "Settings & Ops": _render_settings_ops_page,
+        PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page,
+        DISCOVERY_PAGE_TITLE: _render_discovery_page,
+        STRATEGY_PAGE_TITLE: _render_strategy_page,
     }
 )
 page.run()

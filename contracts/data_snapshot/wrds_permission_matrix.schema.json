@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terminal-zero.local/contracts/data_snapshot/wrds_permission_matrix.schema.json",
+  "title": "V2-D0 WRDS Permission Matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "matrix_id",
+    "scope_id",
+    "authority",
+    "provider",
+    "provider_access_allowed",
+    "snapshot_generation_allowed",
+    "data_output_allowed",
+    "v1_canonical_write_allowed",
+    "entries",
+    "denied_actions",
+    "created_at_utc",
+    "code_ref"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "matrix_id": {
+      "const": "V2_D0_WRDS_PERMISSION_MATRIX"
+    },
+    "scope_id": {
+      "const": "V2-D0_WRDS_PERMISSION_AND_SNAPSHOT_PROVENANCE_CONTRACT"
+    },
+    "authority": {
+      "const": "offline_contract_only"
+    },
+    "provider": {
+      "const": "wrds"
+    },
+    "provider_access_allowed": {
+      "const": false
+    },
+    "snapshot_generation_allowed": {
+      "const": false
+    },
+    "data_output_allowed": {
+      "const": false
+    },
+    "v1_canonical_write_allowed": {
+      "const": false
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "dataset_id",
+          "wrds_library",
+          "wrds_table",
+          "dataset_name",
+          "permission_status",
+          "allowed_uses",
+          "license_scope",
+          "pit_required",
+          "provider_access_allowed",
+          "snapshot_generation_allowed",
+          "data_output_allowed",
+          "v1_canonical_write_allowed",
+          "approval_ref",
+          "notes"
+        ],
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "wrds_library": {
+            "type": "string",
+            "minLength": 1
+          },
+          "wrds_table": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dataset_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "permission_status": {
+            "enum": [
+              "unknown",
+              "pending",
+              "approved",
+              "denied",
+              "not_requested"
+            ]
+          },
+          "allowed_uses": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "enum": [
+                "read_only_permission_probe",
+                "pit_snapshot_design",
+                "schema_discovery",
+                "provenance_contract"
+              ]
+            }
+          },
+          "license_scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pit_required": {
+            "type": "boolean"
+          },
+          "provider_access_allowed": {
+            "const": false
+          },
+          "snapshot_generation_allowed": {
+            "const": false
+          },
+          "data_output_allowed": {
+            "const": false
+          },
+          "v1_canonical_write_allowed": {
+            "const": false
+          },
+          "approval_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "permission_status": {
+                  "const": "approved"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "denied_actions": {
+      "const": [
+        "wrds_provider_connection",
+        "pit_snapshot_generation",
+        "committed_wrds_output",
+        "v1_canonical_data_write",
+        "data_processed_write",
+        "candidate_ranking",
+        "candidate_scoring",
+        "candidate_promotion",
+        "recommendations",
+        "dashboard_runtime_integration",
+        "alert_or_broker_path",
+        "sqlite_storage",
+        "safe_boot_claim",
+        "boot_ready_claim"
+      ]
+    },
+    "created_at_utc": {
+      "type": "string",
+      "minLength": 1
+    },
+    "code_ref": {
+      "const": "v2_discovery/data_lab/permission_matrix.py@v2-d0"
+    }
+  }
+}

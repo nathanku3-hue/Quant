@@ -9,8 +9,10 @@ Validates:
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
+import pandas as pd
 import pytest
 import yaml
 
@@ -115,10 +117,17 @@ def test_eligibility_reject_trend_veto() -> None:
     assert not is_pit_eligible(z_demand=0.5, capital_cycle_score=0.1, dist_sma20=0.03, trend_veto=True)
 
 
-def test_exit_on_parabolic() -> None:
+def test_parabolic_zone_is_trim_not_exit() -> None:
+    from scripts.pit_lifecycle_replay import is_pit_exit, is_pit_trim
+
+    assert not is_pit_exit(dist_sma20=0.15, trend_veto=False)
+    assert is_pit_trim(dist_sma20=0.15)
+
+
+def test_hard_stop_is_exit() -> None:
     from scripts.pit_lifecycle_replay import is_pit_exit
 
-    assert is_pit_exit(dist_sma20=0.15, trend_veto=False)
+    assert is_pit_exit(dist_sma20=0.21, trend_veto=False)
 
 
 def test_exit_on_trend_veto() -> None:
@@ -131,6 +140,144 @@ def test_no_exit_when_normal() -> None:
     from scripts.pit_lifecycle_replay import is_pit_exit
 
     assert not is_pit_exit(dist_sma20=0.08, trend_veto=False)
+
+
+def test_replay_entry_weight_uses_max_positions_not_universe_size() -> None:
+    from scripts.pit_lifecycle_replay import replay_entry_weight, rule100_target_weight, build_rule100_state
+
+    assert replay_entry_weight() == pytest.approx(0.10)
+    assert replay_entry_weight(max_positions=20) == pytest.approx(0.05)
+    three_factor_state = build_rule100_state(
+        pd.Series(
+            {
+                "z_demand": 0.4,
+                "z_moat": 0.2,
+                "z_inventory_quality_proxy": 0.1,
+                "z_discipline_cond": -0.3,
+            }
+        )
+    )
+    four_factor_state = build_rule100_state(
+        pd.Series(
+            {
+                "z_demand": 0.4,
+                "z_moat": 0.2,
+                "z_inventory_quality_proxy": 0.1,
+                "z_discipline_cond": 0.3,
+            }
+        )
+    )
+    assert rule100_target_weight(three_factor_state) == pytest.approx(0.10)
+    assert rule100_target_weight(four_factor_state) == pytest.approx(0.125)
+
+
+def test_rule100_state_exposes_proxy_provenance() -> None:
+    from scripts.pit_lifecycle_replay import build_rule100_state
+
+    state = build_rule100_state(
+        pd.Series(
+            {
+                "z_demand": 0.4,
+                "z_moat": 0.2,
+                "z_inventory_quality_proxy": 0.1,
+                "z_discipline_cond": -0.3,
+            }
+        )
+    )
+
+    assert state.to_record()["rule100_provenance"] == {
+        "demand": "z_demand",
+        "supply": "z_inventory_quality_proxy",
+        "pricing": "z_moat",
+        "margin": "z_discipline_cond",
+    }
+    assert state.confirmed
+    assert state.hold_intact
+
+
+def test_lifecycle_factor_confirmation_requires_three_positive_vectors() -> None:
+    from scripts.pit_lifecycle_replay import lifecycle_factor_confirmation
+
+    confirmed, coverage, positives = lifecycle_factor_confirmation(
+        pd.Series(
+            {
+                "z_demand": 0.4,
+                "z_moat": 0.2,
+                "z_inventory_quality_proxy": 0.1,
+                "z_discipline_cond": -0.3,
+            }
+        )
+    )
+    assert confirmed
+    assert coverage == 4
+    assert positives == 3
+
+    rejected, coverage, positives = lifecycle_factor_confirmation(
+        pd.Series(
+            {
+                "z_demand": 0.4,
+                "z_moat": None,
+                "z_inventory_quality_proxy": 0.1,
+                "z_discipline_cond": -0.3,
+            }
+        )
+    )
+    assert not rejected
+    assert coverage == 3
+    assert positives == 2
+
+
+def test_exit_guard_requires_hard_exit_or_confirmed_trend_veto() -> None:
+    from scripts.pit_lifecycle_replay import MIN_HOLD_DAYS, should_emit_exit
+
+    assert not should_emit_exit(
+        entry_date="2026-01-01",
+        dt="2026-01-02",
+        dist_sma20=0.13,
+        trend_veto=False,
+        exit_streak=2,
+    )
+    assert not should_emit_exit(
+        entry_date="2026-01-01",
+        dt=pd.Timestamp("2026-01-01") + pd.Timedelta(days=MIN_HOLD_DAYS),
+        dist_sma20=0.13,
+        trend_veto=False,
+        exit_streak=2,
+    )
+    assert not should_emit_exit(
+        entry_date="2026-01-01",
+        dt=pd.Timestamp("2026-01-01") + pd.Timedelta(days=MIN_HOLD_DAYS),
+        dist_sma20=0.13,
+        trend_veto=False,
+        exit_streak=1,
+    )
+    assert should_emit_exit(
+        entry_date="2026-01-01",
+        dt=pd.Timestamp("2026-01-01") + pd.Timedelta(days=MIN_HOLD_DAYS),
+        dist_sma20=0.03,
+        trend_veto=True,
+        exit_streak=2,
+    )
+
+
+def test_drop_in_exit_guard_allows_hard_stretch_override() -> None:
+    from scripts.pit_lifecycle_replay import should_emit_exit
+
+    assert should_emit_exit(
+        entry_date="2026-01-01",
+        dt="2026-01-02",
+        dist_sma20=0.21,
+        trend_veto=False,
+        exit_streak=1,
+    )
+
+
+def test_reentry_cooldown_blocks_until_expiry() -> None:
+    from scripts.pit_lifecycle_replay import is_reentry_blocked
+
+    cooldown_until = pd.Timestamp("2026-01-11")
+    assert is_reentry_blocked(pd.Timestamp("2026-01-10"), cooldown_until)
+    assert not is_reentry_blocked(pd.Timestamp("2026-01-11"), cooldown_until)
 
 
 # ── Diagnostics ──────────────────────────────────────────────────────────
@@ -164,6 +311,289 @@ def test_diagnose_no_silent_exclusions() -> None:
     diagnosed_tickers = set(diag["ticker"].values)
     for ticker in pinned:
         assert ticker in diagnosed_tickers, f"Pinned ticker {ticker} silently excluded from diagnostics"
+
+
+def test_trace_thesis_ticker_eligibility_answers_mu_sndk_gates(tmp_path: Path) -> None:
+    from scripts.pit_lifecycle_replay import trace_thesis_ticker_eligibility
+
+    manifest = tmp_path / "pinned.yml"
+    manifest.write_text(
+        yaml.safe_dump(
+            {
+                "supercycle_thesis": [
+                    {"ticker": "MU", "start": "2025-01-02", "source": "fixture"},
+                    {"ticker": "SNDK", "start": "2025-01-02", "source": "fixture"},
+                ]
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    tickers = pd.DataFrame({"permno": [101, 202], "ticker": ["MU", "SNDK"]})
+    universe = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2026-01-02", "2026-01-02", "2026-01-03", "2026-01-03"]),
+            "permno": [101, 202, 101, 202],
+            "ticker": ["MU", "SNDK", "MU", "SNDK"],
+        }
+    )
+    prices = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2026-01-02", "2026-01-02", "2026-01-03", "2026-01-03"]),
+            "permno": [101, 202, 101, 202],
+            "ticker": ["MU", "SNDK", "MU", "SNDK"],
+            "tri": [10.0, 20.0, 11.0, 21.0],
+            "total_ret": [0.0, 0.0, 0.1, 0.05],
+        }
+    )
+    features = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2026-01-02", "2026-01-02", "2026-01-03", "2026-01-03"]),
+            "permno": [101, 202, 101, 202],
+            "ticker": ["MU", "SNDK", "MU", "SNDK"],
+            "adj_close": [10.0, 20.0, 11.0, 21.0],
+            "dist_sma20": [0.01, 0.01, 0.08, 0.01],
+            "trend_veto": [False, False, False, False],
+            "z_demand": [0.4, -0.2, 0.5, -0.1],
+            "capital_cycle_score": [0.3, 0.2, 0.4, 0.2],
+            "z_moat": [0.2, 0.1, 0.2, 0.1],
+            "z_inventory_quality_proxy": [0.2, 0.1, 0.2, 0.1],
+            "z_discipline_cond": [0.2, -0.1, 0.2, -0.1],
+        }
+    )
+    history = pd.DataFrame(
+        {
+            "date": ["2026-01-02"],
+            "ticker": ["MU"],
+            "permno": [101],
+            "sizing_eligible": [True],
+            "eligibility_reason": ["eligible_buy_or_hold"],
+        }
+    )
+    decisions = pd.DataFrame(
+        {
+            "date": ["2026-01-03", "2026-01-03"],
+            "ticker": ["MU", "SNDK"],
+            "position_state_after": ["FLAT", "FLAT"],
+        }
+    )
+
+    tickers_path = tmp_path / "tickers.parquet"
+    universe_path = tmp_path / "universe.parquet"
+    prices_path = tmp_path / "prices.parquet"
+    features_path = tmp_path / "features.parquet"
+    history_path = tmp_path / "history.csv"
+    decisions_path = tmp_path / "decisions.jsonl"
+    tickers.to_parquet(tickers_path, index=False)
+    universe.to_parquet(universe_path, index=False)
+    prices.to_parquet(prices_path, index=False)
+    features.to_parquet(features_path, index=False)
+    history.to_csv(history_path, index=False)
+    decisions.to_json(decisions_path, orient="records", lines=True)
+
+    trace = trace_thesis_ticker_eligibility(
+        ("MU", "SNDK"),
+        start_date="2026-01-02",
+        end_date="2026-01-03",
+        replay_dates=["2026-01-02", "2026-01-03"],
+        manifest_path=manifest,
+        tickers_path=tickers_path,
+        universe_path=universe_path,
+        prices_path=prices_path,
+        features_path=features_path,
+        rule100_history_path=history_path,
+        decision_log_path=decisions_path,
+    ).set_index("ticker")
+
+    assert bool(trace.loc["MU", "pinned_thesis_universe"]) is True
+    assert int(trace.loc["MU", "permno"]) == 101
+    assert trace.loc["MU", "ticker_map_status"] == "OK"
+    assert bool(trace.loc["MU", "latest_pit_member"]) is True
+    assert bool(trace.loc["MU", "latest_local_price_return"]) is True
+    assert int(trace.loc["MU", "rule100_history_dates"]) == 1
+    assert trace.loc["MU", "latest_exclusion_gate"] == "technical quality"
+
+    assert bool(trace.loc["SNDK", "pinned_thesis_universe"]) is True
+    assert int(trace.loc["SNDK", "permno"]) == 202
+    assert bool(trace.loc["SNDK", "latest_pit_member"]) is True
+    assert bool(trace.loc["SNDK", "latest_local_price_return"]) is True
+    assert int(trace.loc["SNDK", "rule100_history_dates"]) == 0
+    assert trace.loc["SNDK", "latest_exclusion_gate"] == "factor threshold"
+
+
+def test_trace_thesis_ticker_eligibility_reports_pit_membership_gate(tmp_path: Path) -> None:
+    from scripts.pit_lifecycle_replay import trace_thesis_ticker_eligibility
+
+    manifest = tmp_path / "pinned.yml"
+    manifest.write_text(
+        yaml.safe_dump({"supercycle_thesis": [{"ticker": "SNDK", "start": "2025-01-02", "source": "fixture"}]}),
+        encoding="utf-8",
+    )
+    tickers_path = tmp_path / "tickers.parquet"
+    universe_path = tmp_path / "universe.parquet"
+    prices_path = tmp_path / "prices.parquet"
+    features_path = tmp_path / "features.parquet"
+    pd.DataFrame({"permno": [202], "ticker": ["SNDK"]}).to_parquet(tickers_path, index=False)
+    pd.DataFrame({"date": pd.to_datetime(["2026-01-02"]), "permno": [202], "ticker": ["SNDK"]}).to_parquet(universe_path, index=False)
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2026-01-02", "2026-01-03"]),
+            "permno": [202, 202],
+            "ticker": ["SNDK", "SNDK"],
+            "tri": [20.0, 21.0],
+            "total_ret": [0.0, 0.05],
+        }
+    ).to_parquet(prices_path, index=False)
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2026-01-03"]),
+            "permno": [202],
+            "ticker": ["SNDK"],
+            "dist_sma20": [0.01],
+            "trend_veto": [False],
+            "z_demand": [0.5],
+            "capital_cycle_score": [0.2],
+            "z_moat": [0.1],
+            "z_inventory_quality_proxy": [0.1],
+            "z_discipline_cond": [0.1],
+        }
+    ).to_parquet(features_path, index=False)
+
+    trace = trace_thesis_ticker_eligibility(
+        ("SNDK",),
+        start_date="2026-01-02",
+        end_date="2026-01-03",
+        replay_dates=["2026-01-03"],
+        manifest_path=manifest,
+        tickers_path=tickers_path,
+        universe_path=universe_path,
+        prices_path=prices_path,
+        features_path=features_path,
+        rule100_history_path=tmp_path / "missing_history.csv",
+        decision_log_path=tmp_path / "missing_decisions.jsonl",
+    )
+
+    assert bool(trace.loc[0, "latest_pit_member"]) is False
+    assert trace.loc[0, "latest_exclusion_gate"] == "PIT membership"
+
+
+def test_trace_thesis_ticker_eligibility_rejects_non_finite_return_rows(tmp_path: Path) -> None:
+    from scripts.pit_lifecycle_replay import trace_thesis_ticker_eligibility
+
+    manifest = tmp_path / "pinned.yml"
+    manifest.write_text(
+        yaml.safe_dump({"supercycle_thesis": [{"ticker": "MU", "start": "2025-01-02", "source": "fixture"}]}),
+        encoding="utf-8",
+    )
+    tickers_path = tmp_path / "tickers.parquet"
+    universe_path = tmp_path / "universe.parquet"
+    prices_path = tmp_path / "prices.parquet"
+    features_path = tmp_path / "features.parquet"
+    pd.DataFrame({"permno": [101], "ticker": ["MU"]}).to_parquet(tickers_path, index=False)
+    pd.DataFrame({"date": pd.to_datetime(["2026-01-03"]), "permno": [101], "ticker": ["MU"]}).to_parquet(universe_path, index=False)
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2026-01-03"]),
+            "permno": [101],
+            "ticker": ["MU"],
+            "tri": [11.0],
+            "total_ret": [float("inf")],
+        }
+    ).to_parquet(prices_path, index=False)
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2026-01-03"]),
+            "permno": [101],
+            "ticker": ["MU"],
+            "dist_sma20": [0.01],
+            "trend_veto": [False],
+            "z_demand": [0.5],
+            "capital_cycle_score": [0.2],
+            "z_moat": [0.1],
+            "z_inventory_quality_proxy": [0.1],
+            "z_discipline_cond": [0.1],
+        }
+    ).to_parquet(features_path, index=False)
+
+    trace = trace_thesis_ticker_eligibility(
+        ("MU",),
+        start_date="2026-01-03",
+        end_date="2026-01-03",
+        replay_dates=["2026-01-03"],
+        manifest_path=manifest,
+        tickers_path=tickers_path,
+        universe_path=universe_path,
+        prices_path=prices_path,
+        features_path=features_path,
+        rule100_history_path=tmp_path / "missing_history.csv",
+        decision_log_path=tmp_path / "missing_decisions.jsonl",
+    )
+
+    assert bool(trace.loc[0, "latest_pit_member"]) is True
+    assert bool(trace.loc[0, "latest_local_price_return"]) is False
+    assert trace.loc[0, "latest_exclusion_gate"] == "data unavailable"
+    assert trace.loc[0, "latest_exclusion_detail"] == "no local price/return row on latest replay date"
+
+
+def test_export_lifecycle_decision_log_writes_buy_sell_and_reasons(tmp_path: Path) -> None:
+    from scripts.pit_lifecycle_replay import export_lifecycle_decision_log
+
+    decision_path = tmp_path / "decision_log.jsonl"
+    buy_sell_path = tmp_path / "buy_sell_log.jsonl"
+    audit_path = tmp_path / "audit.json"
+
+    df = export_lifecycle_decision_log(
+        start_date="2025-01-02",
+        end_date="2025-03-31",
+        output_path=decision_path,
+        buy_sell_path=buy_sell_path,
+        audit_summary_path=audit_path,
+        tickers=["TSM"],
+    )
+
+    assert decision_path.exists()
+    assert buy_sell_path.exists()
+    assert audit_path.exists()
+    assert not df.empty
+    assert {"BUY", "SELL"}.issubset(set(df["buy_sell"].dropna()))
+    assert "primary_reason" in df.columns
+    assert "reason_codes" in df.columns
+    assert "rule100_confirmed" in df.columns
+    assert "target_weight" in df.columns
+    assert "suggested_weight_delta" in df.columns
+    assert "rule100_provenance" in df.columns
+
+    buy_sell_rows = [json.loads(line) for line in buy_sell_path.read_text(encoding="utf-8").splitlines()]
+    assert buy_sell_rows
+    assert all(row["buy_sell"] in {"BUY", "SELL"} for row in buy_sell_rows)
+    assert all(row["primary_reason"] for row in buy_sell_rows)
+    assert all(row["reason_codes"] for row in buy_sell_rows)
+    assert all(row["target_weight"] >= 0 for row in buy_sell_rows)
+
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    assert audit["buy_sell_rows"] == len(buy_sell_rows)
+    assert "rule100_proxy_sources" in audit
+    assert "baseline_comparison" in audit
+
+
+def test_export_lifecycle_decision_log_matches_replay_events(tmp_path: Path) -> None:
+    from scripts.pit_lifecycle_replay import export_lifecycle_decision_log, run_pit_replay
+
+    events = run_pit_replay(
+        start_date="2026-01-01",
+        end_date="2026-05-11",
+        log_path=tmp_path / "events.jsonl",
+    )
+    decisions = export_lifecycle_decision_log(
+        start_date="2026-01-01",
+        end_date="2026-05-11",
+    )
+    trades = decisions[decisions["buy_sell"].isin(["BUY", "SELL"])].copy()
+    trades["event_action"] = trades["buy_sell"].map({"BUY": "ENTER", "SELL": "EXIT"})
+
+    event_keys = list(zip(events["date"], events["ticker"], events["action"]))
+    trade_keys = list(zip(trades["date"], trades["ticker"], trades["event_action"]))
+    assert trade_keys == event_keys
 
 
 

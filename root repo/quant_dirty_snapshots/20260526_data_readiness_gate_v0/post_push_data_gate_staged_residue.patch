@@ -1,0 +1,13 @@
+diff --git a/core/data_readiness_gate.py b/core/data_readiness_gate.py
+index 1385170..71172ae 100644
+--- a/core/data_readiness_gate.py
++++ b/core/data_readiness_gate.py
+@@ -693,6 +693,8 @@ def write_boot_status(path: str | Path, status: Mapping[str, Any], *, repo_root:
+     rel = _rel(target, repo)
+     if rel not in ALLOWED_BOOT_WRITES:
+         raise ValueError(f"boot status write not allowed: {rel}")
++    if str(status.get("overall_status", "")).strip().upper() != "PASS":
++        raise ValueError("boot status write requires PASS data-readiness status")
+     boot_status = make_boot_status(
+         source="core.data_readiness_gate",
+         flags=BootContextFlags(safe_boot=False),

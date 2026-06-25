@@ -97,6 +97,24 @@ def test_optimizer_detects_max_weight_sum_below_one() -> None:
     assert result.diagnostics.fallback_used is False
 
 
+def test_inverse_volatility_skips_slsqp_when_target_is_bound_feasible(monkeypatch: pytest.MonkeyPatch) -> None:
+    def _fail(*args, **kwargs):
+        raise RuntimeError("SLSQP should not be needed for a feasible inverse-vol target")
+
+    monkeypatch.setattr("strategies.optimizer.minimize", _fail)
+    optimizer = PortfolioOptimizer()
+    result = optimizer.optimize_inverse_volatility_with_diagnostics(
+        _prices(["A", "B", "C", "D"]),
+        max_weight=0.35,
+    )
+
+    assert result.diagnostics.solver_success is True
+    assert result.diagnostics.solver_status == "deterministic_inverse_volatility_target"
+    assert result.diagnostics.fallback_used is False
+    assert result.weights.max() <= 0.35 + 1e-9
+    assert abs(float(result.weights.sum()) - 1.0) <= 1e-9
+
+
 def test_optimizer_reports_active_lower_bound() -> None:
     diagnostics = diagnose_bound_activity(
         pd.Series({"A": 0.0, "B": 0.4, "C": 0.6}),

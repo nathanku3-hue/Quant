@@ -27,6 +27,7 @@ class OptimizationMethod(StrEnum):
     HISTORICAL_BEST_CAGR = "Historical Best CAGR Strategy"
     HISTORICAL_MAX_SHARPE = "Historical Max Sharpe Strategy"
     INVERSE_VOLATILITY = "Inverse Volatility"
+    RULE_OF_100 = "Rule of 100"
     THESIS_NEUTRAL_MAX_SHARPE = "Thesis-Neutral Max Sharpe"
     MEAN_VARIANCE_MIN_VOLATILITY = "Mean-Variance (Min Volatility)"
     MEAN_VARIANCE_MAX_RETURN = "Mean-Variance (Max Return)"
@@ -40,11 +41,12 @@ OPTIMIZATION_METHOD_OPTIONS = (
     OptimizationMethod.HISTORICAL_BEST_CAGR,
     OptimizationMethod.HISTORICAL_MAX_SHARPE,
     OptimizationMethod.INVERSE_VOLATILITY,
+    OptimizationMethod.RULE_OF_100,
     OptimizationMethod.THESIS_NEUTRAL_MAX_SHARPE,
     OptimizationMethod.MEAN_VARIANCE_MIN_VOLATILITY,
     OptimizationMethod.MEAN_VARIANCE_MAX_RETURN,
 )
-DEFAULT_OPTIMIZATION_METHOD = OptimizationMethod.INVERSE_VOLATILITY
+DEFAULT_OPTIMIZATION_METHOD = OptimizationMethod.RULE_OF_100
 MEAN_VARIANCE_METHODS = (
     OptimizationMethod.THESIS_NEUTRAL_MAX_SHARPE,
     OptimizationMethod.MEAN_VARIANCE_MIN_VOLATILITY,
@@ -520,6 +522,23 @@ class PortfolioOptimizer:
             )
 
         target = (inv_vol / inv_vol.sum()).to_numpy(dtype=float)
+        if np.all(target <= max_weight + 1e-9):
+            optimized = pd.Series(target, index=investable_assets, dtype=float)
+            weights = self._expand_to_all_assets(all_assets, optimized)
+            diagnostics = build_solver_diagnostics(
+                solver_success=True,
+                solver_status="deterministic_inverse_volatility_target",
+                solver_message="Inverse-volatility target satisfied bounds without SLSQP.",
+                objective_name="inverse_volatility",
+                n_assets=n_assets,
+                max_weight=max_weight,
+                weights=optimized,
+                feasibility_report=feasibility,
+                fallback_used=False,
+                result_is_optimized=True,
+            )
+            return self._diagnostic_result(weights, diagnostics)
+
         objective = lambda w: float(np.dot(w - target, w - target))
         x0 = np.full(n_assets, 1.0 / n_assets, dtype=float)
 
