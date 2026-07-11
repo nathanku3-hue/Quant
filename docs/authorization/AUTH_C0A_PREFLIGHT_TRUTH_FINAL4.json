@@ -1,0 +1,37 @@
+{
+  "round_id": "ROUND-20260712-C0A-PREFLIGHT-TRUTH-FINAL4",
+  "scope_id": "C0A_PREFLIGHT_TRUTH_FINAL4",
+  "mode": "EXECUTION_PACKET",
+  "date": "2026-07-12",
+  "status": "AUTHORIZED_FOR_THREE_COMMIT_EXECUTION",
+  "success_contract": {
+    "focused_tests": "PASS",
+    "live_preflight_with_unregistered_gitlinks": "FAIL_EXPECTED",
+    "planning_green_not_required": true,
+    "terminal_saw_self_binding": false,
+    "commit3_identity_not_claimed": true
+  },
+  "behaviors": [
+    "status_ignore_submodules_all",
+    "preserve_successful_identity_fields_on_non_status_identity_fail",
+    "dirty_STATUS_UNAVAILABLE_on_status_fail",
+    "dirty_clean_superproject_only_when_empty_porcelain_and_gitlinks_remain",
+    "unregistered_gitlinks_fail_closed_without_gitmodules",
+    "unmerged_or_nonzero_stage_separate_fail",
+    "dirt_complete_only_when_status_ok_and_total_gitlinks_zero"
+  ],
+  "forbidden": [
+    "c0b_deindex",
+    "c1_quarantine",
+    "c2_c3_m7",
+    "fetch_push",
+    "switch_dirty_primary",
+    "claim_preflight_pass_with_gitlinks",
+    "terminal_saw_self_attestation"
+  ],
+  "commit_protocol": {
+    "commit_1": "auth_brief_code_tests",
+    "commit_2": "reviewer_abc_truth_lessons_pin_commit_1",
+    "commit_3": "detached_envelope_bind_commit_2_plus_terminal_saw"
+  }
+}
