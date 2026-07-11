@@ -1,5 +1,83 @@
 # Impact Packet - Current
 
+## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+
+- Changed scope: current truth surfaces, detached-binding policy, exact banking of the four 20260701 request artifacts, and quarantine of the false dispatch Markdown/JSON and dependent PASS report.
+- Touched interfaces: Docs/Ops artifact identity and lifecycle truth only; no runtime, data, provider, validator, strategy, or UI interface.
+- Preserved semantics: the four request artifacts remain byte-identical request-preparation records; no request text, gate semantics, or factual readiness evidence changed.
+- Identity result: `e470137` did not contain the four artifacts. Commit 1 banks them; Commit 2 must bind Commit 1 through a detached envelope because payload self-binding is impossible without changing payload bytes.
+- Current risk: dispatch is denied until the detached envelope and fresh checks complete. No remote, dispatch, source/provider access, factual validation, readiness, Gate D, publication, or data output is permitted.
+
+## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
+
+- Changed/banked: Path A pair, PEAD claim-boundary module, PEAD status wording, MSFT/MU manifests; commit `e470137`.
+- Validation: governance PASS; planning boot preflight PASS.
+- Open risk: residual advisory dirt may remain; hygiene status does not establish request-artifact identity or permit dispatch.
+
+## Prior Addendum — P0 Trust-Substrate Repair (2026-07-11)
+
+- Changed code/test: `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, Path A gate/tests (later banked in hygiene recovery).
+- Touched interfaces: boot Git identity status now carries replacement-ref detection, raw commit/tree proof, and `identity_verified`; strict current-evidence and authorization JSON now require unambiguous object-member names.
+- Fail-closed result: ambient Git redirection, a non-commit/broken/unborn identity, or any loose/packed replacement ref blocks preflight; duplicate JSON fails before authorization evaluation and before atomic output creation.
+- Validation: focused P0 test matrix plus terminal Reviewer A/B/C pass. Hygiene recovery subsequently cleared planning preflight.
+- Open risk: authority transfer still needs explicit Gate A/B/C or P2 decision after green preflight.
+
+## Active Addendum - M6b Slice 0 Contract Correction (2026-07-02)
+
+- Active M6b contract: first-public/unrestated EPS is the sole strict Gate A pass route; restated EPS remains non-strict and cannot promote strict readiness.
+- Template update: approval/request packets must verify repository remote/root, commit, tree, artifact path, and artifact hash before authority can proceed.
+- Local identity result: Quant does not resolve `cc96053513f445f143632103c478367bbf674e12`, and no root `R0.1-preflight-plan.md` exists; no R0.1 material was introduced.
+- Scope result: documentation and current-truth updates only; no data, source, provider, ETL, curve, readiness, or runtime interface changed.
+- Next action: request-dispatch sequencing only for the prepared Gate A and Gate B/C source-access requests.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+- Changed successor artifacts: `docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.{json,md}` and `docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.{json,md}`.
+- Historical preservation: all corresponding 20260630 artifacts remain unchanged and are referenced through `supersedes` metadata and recomputed predecessor hashes.
+- Active contract hash: `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063`.
+- Active request hash: `913196ba279dd49442ce6b3bbde54d185c188a2d26e21cf462d853bbe295505b`.
+- Touched interface: Docs/Ops request semantics only—conditional timing artifact, immutable calendar artifact, eligible trading sessions including early closes, replayable session mapping, and source-capability attestation during data-owner approval.
+- No source/data/runtime interface changed: no raw bytes inspected, provider/API/credential action, data transformation, return/curve/alpha output, validator/test change, or readiness action.
+- Open decisions: separate data-owner responses for Gate A and Gate B/C; Gate D remains deferred on an existing consumer-interface proof gap.
+- Status claim: canonical current evidence and strict readiness remain unchanged.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+- Infrastructure artifacts: `scripts/pead_m6b_strict_path_a_data_gate.py`, `tests/test_pead_m6b_strict_path_a_data_gate.py`, `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json`.
+- Truth refresh: `current_context.json`, `observability_pack_current.md`, `multi_stream_contract_current.md`, `post_phase_alignment_current.md`, `bridge_contract_current.md`, `impact_packet_current.md`, `done_checklist_current.md`, `planner_packet_current.md`, `notes.md`, `decision log.md`, and `lessonss.md`.
+- Touched interface: malformed authorization JSON/schema and synthetic-test-plus-authorization now exit 2 without output; structurally valid unapproved/mismatched authorization exits 0 with fail-closed JSON; current gate PASS requires detached authorization and all four source-byte hashes verified. No provider, source extraction, B import, locked artifact, UI, strategy, return, curve, CAGR, alpha, or tradability interface changed.
+- Validation: strict-gate tests PASS 68/68; M6a tests PASS 12/12; compile, current-evidence CLI, deterministic replay, explicit-`--output` argparse rejection, synthetic canonical-output rejection before atomic write, payload-only restated-approval rejection, malformed-evidence/authorization no-output checks, authorization mismatch, source tamper, atomic cleanup, static isolation, output-isolation, and canonical context build/validation checks PASS.
+- Evidence: A/B/C/D=`BLOCKED`, source bytes unverified, restated-EPS exception=`NOT_AUTHORIZED`, `strict_vintage_pit=false`, `m6b_data_contract_ready=false`; readiness JSON SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Exception reconciliation: inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception cannot satisfy strict Gate A.
+- Inherited dirty overlap: the six June 29 Path-A addenda in bridge/done/impact/multi-stream/planner/post-phase files were preserved; pre-existing line-ending-only dirtiness in the other five truth files was not normalized.
+- Review boundary: terminal Reviewer A/B/C infrastructure review remains pending and cannot change strict readiness.
+- Failing checks: none in implementer validation; the data contract itself remains intentionally blocked.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gates Opened (2026-06-29)
+
+### Changed / Owned Files
+
+- `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md`
+- `docs/context/multi_stream_contract_current.md`
+- `docs/context/post_phase_alignment_current.md`
+- `docs/context/bridge_contract_current.md`
+- `docs/context/impact_packet_current.md`
+- `docs/context/planner_packet_current.md`
+- `docs/context/done_checklist_current.md`
+
+### Touched Interfaces
+
+- Docs/Ops: Stale cross-stream docs refreshed to June 25 M6 truth; strict M6b Path A gates opened.
+- Data/Ops: Strict M6b Path A data prep gates defined (EPS vintage, delisting returns, liquidity screen, borrow assumptions).
+- No provider ingestion, strict M6b readiness flag promotion, M6a evidence flag change, UI, alpha, ranking/scoring, alert, recommendation, live/paper, broker/order, or strict daily-return parquet interface changed.
+
+### Passing Checks
+
+- Cross-stream contracts refreshed to June 25 M6 truth.
+- Strict M6b Path A brief adheres to `APPROVAL_GATE` single-mode rule and explicit gate acceptance criteria.
+- Fail-closed principle preserved for `m6b_data_contract_ready = false`.
+
 ## Authoritative Addendum - V2 PEAD M6b Option 1 Repair PASS (2026-06-25)
 
 ### Changed / Owned Files

@@ -1,5 +1,43 @@
 Decision Log: Terminal Zero
-Author: Atomic Mesh | Last Updated: 2026-03-01 (Stream 1 fail-loud bootstrap + Stream 4 strict container draft)
+Author: Atomic Mesh | Last Updated: 2026-07-11 (request artifact identity repair v1)
+
+V2 PEAD Request Artifact Identity Repair V1 (2026-07-11)
+- Decision: approve the bounded two-commit repair and keep dispatch denied. Commit 1 restores BLOCK truth, quarantines false dispatch evidence, clarifies detached binding, and banks the exact four current 20260701 request artifacts without byte changes.
+- Decision: Commit 2 must create a separate tracked identity envelope binding Commit 1's canonical remote, repository root, commit, tree, four artifact paths, and four distinct SHA-256 values. The envelope lifecycle is `PREPARED_NOT_SENT` and grants no downstream authority.
+- Decision: reject legacy, divergent, reconstructed, redirected, cherry-picked, self-referential, ambiguously hashed, or otherwise unbound artifacts. Do not use `51b1471ff93741fd339d506399413c928479db5a` as a substitute.
+- Evidence: `e470137d64eb44829e8977c1aaf60bdcc64117d5` / tree `3374b7fcc72f2fb0d53e6e85ad347729e647dba0` contains none of the four current request artifacts. The denied dispatch Markdown SHA-256 is `ed2db3015413bc71edea919d5c15800514e74b5918253af3d86788614baf872d`; the denied dispatch JSON SHA-256 is separately `5975304aee17b6b46a481f690b3be7ac76ee37d5000e9e1e58fcbed1b88b8a30`.
+- Boundary: no remotes, dispatch, source/provider access, factual validation, readiness, Gate D, publication, strategy/UI work, or data output.
+- Next action: create the detached identity envelope, rerun governance and planning boot preflights, and run fresh A/B/C identity reviews.
+
+V2 PEAD P0 Trust-Substrate Repair (2026-07-11)
+- Decision: repair Git identity and JSON authority ambiguity together as one P0 trust boundary; replacement refs or duplicate JSON object members deny authority before any artifact, approval, request, or output is trusted.
+- Decision: all `boot_preflight` Git subprocesses remove ambient Git redirection/configuration, set `GIT_NO_REPLACE_OBJECTS=1`, enumerate `refs/replace/*` through Git (including packed refs), and require raw HEAD/upstream commits plus a verified HEAD tree before identity can pass.
+- Decision: strict Path A evidence and authorization JSON use a duplicate-key-rejecting loader at all nesting levels; legacy ambiguous JSON is invalid and receives no compatibility path.
+- Evidence: focused adversarial tests and fresh independent Reviewer A/B/C pass for environment isolation, loose/packed replacement refs, forged displayed ancestry, unborn/broken/tag-shaped identities, top-level/nested duplicate keys, and no output/temp file after duplicate JSON input.
+- Boundary: source-owner requests, P2 publication, remote actions, Gate D, source/provider work, Strategy/UI, data output, and readiness promotion are frozen.
+- Current blocker: the checkout verifies Git identity with replacement refs clear, but it is dirty/unclassified and broader governance preflight fails. Reconcile those independent checkout blockers before any authority transfer.
+
+V2 PEAD M6b Slice 0 Active-Contract Deconfliction (2026-07-02)
+- Decision: first-public/unrestated EPS is the sole strict Gate A pass route. Restated EPS remains non-strict diagnostic evidence and cannot satisfy strict readiness.
+- Decision: `docs/templates/ship_fast_decision_gate.md` now requires repository identity and artifact verification for approval/request packets.
+- Evidence: the denied external R0.1 reference does not resolve in Quant, and the asserted root plan is absent.
+- Boundary: Slice 0 is active-document and template work only; no runtime or data work.
+- Next action: dispatch only the existing Gate A and Gate B/C source-access requests.
+
+V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+- Decision:
+    - accept the repaired bounded evidence-only validator, focused tests, and atomic readiness JSON for terminal infrastructure review.
+    - evidence payload content cannot self-authorize; current authorization must be a distinct well-formed artifact bound to the exact evidence-file SHA-256 and correct round/scope/mode/action, and current gate PASS requires all four local source-byte hashes to verify.
+    - malformed authorization JSON/schema and synthetic-test-plus-authorization are CLI input errors with no output artifact; structurally valid but unapproved or mismatched current-evidence authorization remains `NOT_AUTHORIZED` and forces A/B/C/D `BLOCKED`.
+    - keep A/B/C/D `BLOCKED`, `m6b_data_contract_ready=false`, and all product/strategy promotion held until authoritative gate evidence passes.
+    - restated-EPS exception=`NOT_AUTHORIZED`; current release-date-aligned/restated EPS retains `strict_vintage_pit=false`. Inherited exception wording is superseded on current truth surfaces and cannot satisfy strict Gate A.
+- Evidence:
+    - strict-gate tests PASS 68/68; M6a tests PASS 12/12; compile, two-run deterministic CLI, missing explicit `--output`, synthetic canonical-output rejection before atomic write, payload-only restated-approval rejection, malformed-evidence and malformed-authorization JSON/schema CLI errors with no output, authorization mismatch, source-byte tamper, atomic-cleanup, static-isolation, output-isolation, and canonical context build/validation checks PASS.
+    - `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json` SHA-256 is `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Boundary:
+    - terminal Reviewer A/B/C validates infrastructure only; synthetic fixtures, tests, validator existence, reviewer approval, and illustrative B cannot promote strict readiness.
+    - no provider read, source extraction, B import, locked-artifact mutation, UI, strategy, real return, curve, CAGR, alpha, or tradability output is authorized.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
 
 V2 PEAD M6b Best-Available Option 1 Repair (2026-06-25)
 - Decision:

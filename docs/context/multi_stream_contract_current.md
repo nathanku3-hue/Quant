@@ -1,5 +1,88 @@
 # Multi-Stream Contract - Quant Current
 
+## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | Identity repair active; exact 20260701 request payloads banked in Commit 1, detached envelope pending | Keep lifecycle fail-closed; no dispatch claim |
+| Data | Held | No source-byte inspection, provider, validation, readiness, or data output |
+| Strategy | Held | No return/curve/alpha/tradability work |
+| Frontend/UI | Held | No readiness or strategy surface expansion |
+
+- Cross-stream rule: tracked payload bytes alone are not dispatch authority. A detached envelope may prove identity but must remain `PREPARED_NOT_SENT` and cannot authorize downstream work.
+- Next action: bind Commit 1 in a tracked detached envelope, rerun preflights and fresh A/B/C, and keep dispatch denied.
+
+## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | Hygiene green at `e470137`; exact request-artifact identity still failed | See active identity-repair addendum |
+| Data / Strategy / Frontend | Held | Unchanged holds |
+
+## Prior Addendum — P0 Trust-Substrate Repair (2026-07-11)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | P0 identity repair banked; hygiene recovery subsequently cleared planning preflight | See active addendum |
+| Data | Held | Unchanged hold |
+| Strategy | Held | Unchanged hold |
+| Frontend/UI | Held except GOV-002 wording repair in hygiene recovery | Unchanged hold on product claims |
+
+- Cross-stream rule: a duplicate JSON key, ambient Git redirection, a non-commit/broken identity, or any Git replacement-ref state invalidates authority before downstream work begins.
+
+## Active Addendum - V2 PEAD M6b Slice 0 Contract Correction (2026-07-02)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | Held at request-dispatch sequencing; strict Gate A accepts only first-public/unrestated EPS | No source inspection, factual validation, or readiness promotion |
+| Strategy | Held | No return, curve, CAGR, alpha, or tradability work |
+| Frontend/UI | Held | No readiness or strategy surface |
+| Docs/Ops | Active phase brief corrected; repository-identity gate added to canonical approval/request template | Historical addenda remain unchanged; Thin SAW evidence is required before dispatch |
+
+- Cross-stream rule: `release_date_aligned_but_restated` may remain a non-strict diagnostic label but cannot satisfy strict Gate A, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- Repository-identity rule: a request or approval packet must resolve its declared repository, commit, tree, artifact path, and artifact hash before it can transfer authority.
+- Next action: dispatch only the already prepared Gate A and Gate B/C source-access requests.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | Gate A successor contract/request prepared; A blocked, B candidate-only, C attribute-scope blocked, D deferred | Await separate data-owner source-access approvals; no artifact inspection before approval |
+| Strategy | Held | No flagged curve, long-only substitute, returns, CAGR, alpha, or tradability work |
+| Frontend/UI | Held | No readiness or strategy surface |
+| Docs/Ops | Successor contract/request artifacts and governance refresh in scope | Thin SAW is request-only and cannot substitute for real-artifact A/B/C review |
+
+- Cross-stream dependency: Gate A approval must bind PIT-family bytes, timing artifact only when selected EPS timing is insufficient, and an immutable calendar source of record.
+- Open decisions: data owner must approve or decline Gate A and Gate B/C source-access requests; Gate D waits for source-independent consumer-interface proof.
+- Status claim: canonical current evidence and strict readiness remain unchanged.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | Active Path A; Gates A/B/C/D `BLOCKED`; restated-EPS exception `NOT_AUTHORIZED` | Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate. |
+| Strategy | M6a sparse engine/framework evidence only; promotion held | No real return, curve, CAGR, alpha, or tradability output while `m6b_data_contract_ready=false` |
+| Frontend/UI | Held | No alpha/readiness surface or action path |
+| Docs/Ops | Evidence-only validator, tests, and fail-closed readiness JSON locally validated; terminal A/B/C infrastructure review pending | Review cannot promote data readiness |
+
+- Cross-stream rule: B stays an isolated illustrative diagnostic and is never a strict-data fallback.
+- Authorization rule: evidence content cannot self-authorize; malformed authorization JSON/schema is a CLI input error, and current gate PASS requires distinct exact-file-hash/scope/mode/action authorization plus all four verified local source-byte hashes.
+- Exception reconciliation: inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception remains `NOT_AUTHORIZED` and cannot satisfy strict Gate A.
+- Evidence: `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json`, SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`; strict-gate 68/68 and M6a 12/12 tests pass; well-formed authorization mismatch keeps A-D blocked with exit 0.
+- Current contract: `strict_vintage_pit=false`, `m6b_data_contract_ready=false`, `workflow_status=blocked_fail_closed`.
+
+## Latest Addendum - V2 PEAD M6b Option 1 Repair PASS & Strict M6b Path A Alignment (2026-06-25)
+
+| Stream | M6b status | Boundary |
+|---|---|---|
+| Data | Option 1 B (Best-Available) diagnostic repaired for engine sanity; Strict M6b Path A data prep not yet "done done" (fails on restated EPS, proxy returns, missing liquidity screen) | Open only strict M6b gates next: first-public EPS or explicit flagged exception, delisting-adjusted tradable returns, as-of liquidity/tradability, borrow assumptions |
+| Strategy | M6a.1 sparse portfolio engine core locally complete and Reviewer C rerun PASS; final closure pending Reviewer B | No tradable equity curve, CAGR, or alpha claims until strict M6b data gates pass |
+| Frontend/UI | Held behind Alpha Interpretation Gate | No alpha-named panel, route, card, field, label, or dashboard action state |
+| Docs/Ops | Stale cross-stream docs refreshed to June 25 M6 truth | Keep B path as illustrative engine sanity diagnostic only; align with original intent |
+
+- Cross-stream rule: Fastest valid reboot is strict M6b Data Path A, not Strategy or Frontend. Best-available B artifacts remain illustrative-only / not_alpha / not_tradable_claim.
+- Current bottleneck: Strict M6b data readiness fails due to restated EPS vintage, proxy/non-delisting returns, and lack of full as-of tradability/liquidity screen. Strategy closure is not cleanly reconciled; new frontend remains held behind the alpha-interpretation gate.
+
 ## Latest Addendum - V2 PEAD Alpha Interpretation Gate OPEN (2026-06-24)
 
 | Stream | Gate status | Boundary |

@@ -1,5 +1,50 @@
 # Observability Pack - Current
 
+## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+
+- `ObservabilityRating`: AMBER for bounded identity repair; RED for dispatch and strict M6b readiness. No Gate A or Gate B/C message is proven sent.
+- Payload sentinel: the four exact 20260701 request artifacts must remain byte-identical and tracked in payload Commit 1.
+- Detached-binding sentinel: commit/tree identity is valid only through a separate tracked envelope binding Commit 1's canonical remote/root/commit/tree and four distinct path/hash pairs. Payload self-binding is invalid.
+- Hash-label sentinel: Markdown and JSON hashes are separate values. The quarantined dispatch Markdown is `ed2db301...`; the quarantined dispatch JSON is `5975304a...`.
+- Quarantine sentinel: former dispatch and dependent PASS artifacts are `INVALID_NOT_DISPATCHED` and must never be reused as active evidence.
+- Git sentinel: every identity check removes ambient Git redirection/configuration, sets `GIT_NO_REPLACE_OBJECTS=1`, and rejects replacement refs or non-commit identity.
+- JSON sentinel: duplicate keys at any nesting level in authority/evidence/request/envelope JSON fail closed; ambiguous legacy JSON is invalid.
+- Scope sentinel: no remotes, dispatch, Gate D, source/provider work, validation, Strategy/UI, publication, data output, or readiness promotion.
+- Next-action sentinel: create the detached envelope with `PREPARED_NOT_SENT`, then rerun both preflights and fresh A/B/C.
+
+## Active Addendum - V2 PEAD M6b Slice 0 Contract Correction (2026-07-02)
+
+- `ObservabilityRating`: GREEN for active-contract deconfliction and approval/request identity hardening; RED for strict data readiness, unchanged.
+- Strict-Gate-A sentinel: only `eps_vintage=first_public_unrestated` can pass Gate A. `release_date_aligned_but_restated` remains non-strict and cannot promote `strict_vintage_pit` or `m6b_data_contract_ready`.
+- Repository-identity sentinel: every approval/request packet must resolve declared repository remote/root, commit, tree, artifact path, and artifact hash; any mismatch is a denial, not a recoverable approval condition.
+- R0.1 sentinel: Quant does not resolve `cc96053513f445f143632103c478367bbf674e12`; root `R0.1-preflight-plan.md` is absent. The denied R0.1 packet stays out of this repository.
+- Scope sentinel: no data, source-byte, provider, ETL, curve, readiness, or runtime activity in Slice 0.
+- Next-action sentinel: dispatch only the prepared Gate A and Gate B/C requests.
+
+## Latest Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+- `ObservabilityRating`: GREEN for historical-preserving successor request preparation; RED for strict data readiness.
+- Lineage sentinel: 20260630 request artifacts remain preserved; active 20260701 Gate A contract SHA-256 is `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063`.
+- Timing sentinel: eligible source timing must be minute-or-finer with an unambiguous IANA zone or UTC offset, or use an authorized one-to-one timing artifact.
+- Calendar sentinel: Gate A requires an immutable authorized calendar artifact with coverage, `is_trading_session`, `scheduled_close_local`, holiday, and early-close provenance; generic weekday logic is prohibited.
+- Scope sentinel: no raw source inspection, credentials, provider/API activity, data generation, factual gate validation, strategy output, or readiness change occurred.
+- Review sentinel: the Phase 0 Thin SAW is request-only and cannot substitute for fresh independent real-artifact Reviewer A/B/C review.
+- Status claim: canonical current evidence and strict readiness remain unchanged.
+
+## Latest Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+- `ObservabilityRating`: GREEN for repaired validator authorization/source-byte enforcement, determinism, and output isolation; RED for strict M6b data readiness.
+- Readiness sentinel: Gates A/B/C/D are `BLOCKED`; `m6b_data_contract_ready=false`; workflow remains `blocked_fail_closed`.
+- Vintage sentinel: current release-date-aligned/restated EPS has `strict_vintage_pit=false`; its exception is `NOT_AUTHORIZED`.
+- Authorization sentinel: evidence content cannot self-authorize; malformed authorization JSON/schema is a CLI input error, while well-formed unapproved/mismatched authorization is `NOT_AUTHORIZED` and blocks A-D.
+- Exception reconciliation: inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception remains `NOT_AUTHORIZED` and cannot satisfy strict Gate A.
+- Source sentinel: any unverified current source bytes block all four gates; no current gate can pass without detached authorization and all four verified source-byte hashes.
+- Evidence sentinel: `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json` SHA-256 is `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`; strict-gate tests pass 68/68 and M6a tests pass 12/12.
+- Isolation sentinel: no daily-return parquet, equity curve, CAGR, alpha result, or tradable status is emitted; B is not imported or referenced by the strict validator.
+- Stream sentinel: Data Path A is active; UI/frontend and strategy promotion are held; B remains illustrative-only and cannot serve as a strict-data fallback.
+- Review sentinel: terminal Reviewer A/B/C may validate infrastructure only; reviewer approval cannot change gate evidence or readiness.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
 ## Latest Addendum - V2 PEAD Alpha Interpretation Gate OPEN (2026-06-24)
 
 - `ObservabilityRating`: AMBER for gate-open status; GREEN for docs-only scope containment.

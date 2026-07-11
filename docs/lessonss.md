@@ -1,6 +1,56 @@
 # lessonss.md
 
-Last updated: 2026-06-25
+Last updated: 2026-07-11
+
+## 2026-07-11 Round Entry (Payload Identity Must Use a Detached Envelope)
+- Date: 2026-07-11
+- Mistake or miss: Dispatch and reviewer PASS were claimed against commit `e470137` even though the four current 20260701 request artifacts were untracked and absent from that commit; the dispatch Markdown also labeled the JSON hash as its own.
+- Root cause: Artifact identity was treated as narrative metadata inside or beside the payload instead of an exact object-store binding. Embedding a payload's final commit/tree in that payload is self-referential, and one ambiguous packet hash cannot identify separate Markdown and JSON bytes.
+- Fix applied: Restored truth to BLOCK, quarantined the false dispatch outputs and dependent PASS report, banked the exact four request payloads unchanged in Commit 1, and required a separate tracked Commit 2 envelope binding Commit 1's remote/root/commit/tree plus distinct path/hash pairs.
+- Guardrail for next time: Bank payload bytes first, then bind them from a detached envelope. Reject legacy, divergent, reconstructed, redirected, cherry-picked, self-referential, ambiguously hashed, or otherwise unbound artifacts. `PREPARED_NOT_SENT` is never dispatch proof.
+- Evidence paths: `docs/phase_brief/v2-pead-m6b-request-artifact-identity-repair-v1.md`, `docs/quarantine/request_artifact_identity_repair_v1/QUARANTINE_MANIFEST.md`, the four 20260701 request artifacts, and the tracked identity envelope created in Commit 2.
+
+## 2026-07-11 Round Entry (Planning Preflight Hard Dirty Is Path-Classified, Not Every Dirty File)
+- Date: 2026-07-11
+- Mistake or miss: Early planning treated boot-core dirty files as the hard dirty blocker; the real hard fail was the untracked Path A source/test pair. Separately, GOV-002 failed PEAD *denial* copy that contained the token `recommendation`, and GOV-008 failed on stale candidate-card manifest hashes. Locked PEAD evidence JSON had CRLF bytes under assume-unchanged, breaking SHA verification without showing as ordinary git dirty.
+- Root cause: Dirty classification is code-path severity, not “any modified file.” UI scanners match substrings regardless of negation. Manifest hashes drift silently if card bytes change without rebinding. Windows line-ending + assume-unchanged can desync content hashes from Git’s dirty view.
+- Fix applied: Banked Path A pair; reworded PEAD denial UI without forbidden tokens; moved M1B schema claim-boundary names to non-UI core; rebound MSFT/MU manifests to current card SHA-256; restored locked evidence LF blobs from HEAD; acceptance governance+planning preflight PASS at commit `e470137`.
+- Guardrail for next time: When preflight fails dirty, list `severity=fail` paths only before planning work. Rebind manifests mechanically when cards change. Never put product-action tokens in UI-scanned string literals even in denials—use allowed wording or non-UI schema modules. Clear assume-unchanged and restore LF when evidence SHA verification drifts without porcelain dirt.
+- Evidence paths: `core/pead_evidence_claim_boundary.py`, `views/pead_validation_evidence.py`, `data/candidate_cards/*manifest.json`, Path A script/tests, `scripts/governance_preflight.py` PASS, `scripts/boot_preflight.py --mode planning --no-tests` PASS, commit `e470137`.
+
+## 2026-07-11 Round Entry (Authority Identity Requires an Unambiguous Parser and Object Store)
+- Date: 2026-07-11
+- Mistake or miss: Approval/evidence JSON accepted duplicate members under Python's last-key-wins default, while Git ancestry checks could be affected by replacement refs and did not reject their presence.
+- Root cause: Repository identity and JSON syntax were treated as ordinary input details rather than authority preconditions.
+- Fix applied: Sanitized Git identity subprocesses, disabled replacement objects, rejected loose/packed replacement refs, required raw HEAD/upstream commit objects plus a verified HEAD tree, and added all-depth duplicate-key rejection to strict evidence and authorization JSON parsing before output creation. Fresh A/B/C review passed after the repair.
+- Guardrail for next time: An authority packet is valid only when Git redirection is sanitized, raw commit/tree identity and replacement state are verified, and every JSON object member is unique; unavailable/non-commit identity, any replacement ref, or any duplicate key blocks the packet with no compatibility bypass.
+- Evidence paths: `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `scripts/pead_m6b_strict_path_a_data_gate.py`, `tests/test_pead_m6b_strict_path_a_data_gate.py`, focused P0 test output, final Reviewer A/B/C evidence, and this round's SAW report.
+
+## 2026-07-02 Round Entry (Repository Identity Must Be a Packet Gate, Not a Narrative Rule)
+- Date: 2026-07-02
+- Mistake or miss: An R0.1 approval/denial packet was evaluated against Quant even though its claimed commit and root plan did not resolve here; the active M6b phase brief also retained stale language implying a restated-EPS exception could satisfy strict Gate A.
+- Root cause: Repository identity was described as an operational principle rather than required fields and verification evidence in the canonical approval/request template; active and historical wording were not separated tightly enough.
+- Fix applied: Added a repository remote/root, commit, tree, artifact path, and artifact hash gate to `docs/templates/ship_fast_decision_gate.md`; corrected only the active M6b phase brief so first-public/unrestated EPS is the sole strict Gate A pass route.
+- Guardrail for next time: Deny any approval/request packet whose declared repository, commit, tree, artifact path, or artifact hash cannot resolve exactly; never repair a missing external governance chain by importing it into the wrong repository. Preserve historical addenda while correcting active truth.
+- Evidence paths: `docs/templates/ship_fast_decision_gate.md`, `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md`, current truth surfaces, and this round's Thin SAW report.
+
+## 2026-06-30 Round Entry (Windows Sandbox Failure Requires an Explicit WSL Repo Guard)
+- Date: 2026-06-30
+- Mistake or miss: Reinstalling Codex did not repair the Windows sandbox helper, and a malformed WindowsApps-based working directory could have redirected validation away from the intended repository.
+- Root cause: The Windows sandbox setup executable had a missing-module failure, while the WSL handoff inherited an invalid composite cwd instead of the mounted E: workspace.
+- Fix applied: Bound every command to `/mnt/e/Code/Quant`, confirmed the working path before validation, used the repo `.venv` through WSL interop, and preserved the canonical brief and unrelated dirty files.
+- Guardrail for next time: On WSL recovery, hard-stop unless `pwd` is exactly `/mnt/e/Code/Quant`; never accept a cwd containing `WindowsApps` or a composite `resources/E:/...` path.
+- Evidence paths: `scripts/pead_m6b_strict_path_a_data_gate.py`, `tests/test_pead_m6b_strict_path_a_data_gate.py`, `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json`, focused pytest/compile/CLI output from this round.
+
+## 2026-06-30 Round Entry (Evidence Content Must Never Carry Its Own Authority)
+- Date: 2026-06-30
+- Mistake or miss: The current-evidence payload could set its own authorization boolean, malformed authorization was silently downgraded to `NOT_AUTHORIZED`, and structurally passing gates could report `PASS` without detached authority or complete source-byte verification.
+- Root cause: Authorization schema validity, authorization outcome, evidence content, byte provenance, and gate status were evaluated as separable local checks instead of global current-evidence prerequisites.
+- Fix applied: Made malformed authorization JSON/schema and synthetic-test-plus-authorization CLI input errors; retained fail-closed JSON for structurally valid unapproved/mismatched current-evidence authorization; and required detached authorization plus all four verified source hashes before any current gate can pass.
+- Guardrail for next time: Never emit a current gate `PASS` unless detached authority and the complete source-byte set are verified; never convert malformed control artifacts into ordinary authorization denials or accept authorization flags in synthetic validation.
+- Observed state: A/B/C/D are `BLOCKED`; the restated-EPS exception is `NOT_AUTHORIZED`; `strict_vintage_pit=false`; `m6b_data_contract_ready=false`. Inherited exception wording is superseded on current truth surfaces and cannot satisfy strict Gate A.
+- Evidence: strict-gate tests PASS 68/68; M6a tests PASS 12/12; malformed and synthetic-test authorization combinations exit 2 without output; mismatched current-evidence authorization exits 0 with A-D blocked; canonical context build/validation passes; readiness JSON SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
 
 ## 2026-06-25 Round Entry (Bounded B Runs Need Eligibility and Commit Atomicity Together)
 - Date: 2026-06-25
@@ -1727,3 +1777,11 @@ Application pattern:
 - Fix applied: Added a global `return_idx:int32` calendar with explicit `entry_idx/exit_idx` interval bounds, numeric-only DuckDB relations with object-dtype rejection, one-worker compensated aggregation, canonical daily SHA-256 hashing, and shuffled-input parity coverage.
 - Guardrail for next time: A sparse portfolio engine is not complete until calendar membership, relational dtypes, entry/overlap/exit liquidation turnover, and reproducible final output are each independently tested under the full-universe smoke bound.
 - Evidence paths: `scripts/pead_m6_pit_walk_forward_equity_curve.py`, `tests/test_pead_m6_pit_walk_forward_equity_curve.py`, `docs/phase_brief/v2-pead-m6-pit-walk-forward-equity-curve.md`.
+
+## 2026-07-01 Round Entry (Session Mapping Needs Immutable Calendar and Linkage Evidence)
+- Date: 2026-07-01
+- Mistake or miss: Earlier strict Gate A request preparation treated timezone normalization and generic session wording as sufficient, without binding immutable calendar provenance, eligible early-close sessions, conditional timing linkage, and mechanically replayable close classification.
+- Root cause: Event-time semantics were described as an implementation detail rather than as first-class evidence dependencies that a reviewer must reproduce from locked bytes.
+- Fix applied: Created versioned successor Gate A contract and request artifacts that bind an authorized calendar source of record, define eligible trading sessions, require an executable no-same-session mapping rule, make a timing artifact conditional on selected-source capability, and require one-to-one linkage when separate timing is used.
+- Guardrail for next time: Any strict timing-PIT claim must preserve predecessor hashes, bind the source/timing/calendar artifacts by SHA-256, define session mapping mechanically, and fail closed for ambiguous timestamps, non-one-to-one timing joins, or calendar gaps.
+- Evidence paths: `docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.json`, `docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.json`, `docs/saw_reports/saw_v2_pead_m6b_strict_data_authorization_request_20260701.md`.

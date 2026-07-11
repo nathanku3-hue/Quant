@@ -1,5 +1,42 @@
 # Feature Engineering Notes
 
+## 2026-07-11 Request Artifact Identity Repair V1 Registry
+
+- RoundID: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-REPAIR-V1`; ScopeID: `REQUEST_ARTIFACT_IDENTITY_REPAIR_V1`.
+- Payload identity formula: `payload_identity_valid := canonical_remote_match AND repository_root_match AND payload_commit_resolves_as_commit AND payload_tree_matches_commit AND every_declared_path_exists_in_payload_commit AND every_declared_SHA256_matches_exact_blob_bytes`.
+- Detached-binding formula: `identity_envelope_valid := tracked_separate_envelope AND envelope_binds_prior_payload_commit AND distinct_markdown_json_paths_and_hashes AND lifecycle_status == PREPARED_NOT_SENT`. The envelope never binds its own commit/tree.
+- Failure rule: `legacy OR divergent OR reconstructed OR redirected OR cherry_picked OR self_referential OR ambiguous_hash_label OR unbound => dispatch_denied`.
+- Current boundary: Commit 1 banks exact 20260701 request payloads and quarantines false dispatch evidence; Commit 2 supplies the detached envelope. No remote, dispatch, source/provider access, validation, readiness, Gate D, publication, strategy/UI, or data output.
+
+## 2026-07-11 P0 Trust-Substrate Repair Registry
+
+- RoundID: `ROUND-20260711-V2-PEAD-P0-TRUST-SUBSTRATE-REPAIR`; ScopeID: `V2_PEAD_P0_TRUST_SUBSTRATE_REPAIR`.
+- Git identity formula: `git_identity_valid := git_worktree_available AND git_redirection_env_sanitized AND GIT_NO_REPLACE_OBJECTS == "1" AND replacement_refs_status == CLEAR AND raw_HEAD == HEAD^{commit} AND raw_upstream == @{u}^{commit} AND tree == HEAD^{tree} AND identity_verified`. Any false term is a hard authority failure; loose and packed refs are both enumerated through Git.
+- JSON authority formula: `authority_json_valid := JSON_object_parse_succeeds AND every_object_member_name_is_unique`. `duplicate_key_at_any_depth => authority_json_valid = false` before authorization, schema, source-byte, or output-write evaluation.
+- Current state: the adversarial code/test matrix and fresh independent A/B/C review pass; this checkout reports `git_identity_valid = true`, but dirty/unclassified workspace state and broader governance-preflight failure keep authority transfer blocked. P2 remains locally reviewed and non-publishable.
+- Boundary: no backward compatibility for ambiguous JSON; no source-owner dispatch, publication, remote action, source/provider work, Gate D, Strategy/UI, data output, or readiness promotion.
+
+## 2026-07-02 V2 PEAD M6b Slice 0 Active-Contract Deconfliction Registry
+
+- RoundID: `ROUND-20260702-V2-PEAD-M6B-SLICE0-CONTRACT-DECONFLICTION`; ScopeID: `V2_PEAD_M6B_SLICE0_ACTIVE_CONTRACT_DECONFLICTION_DOCS_ONLY`.
+- Strict Gate A rule: `strict_gate_A_PASS := eps_vintage == first_public_unrestated AND all other locked Gate A provenance and validation requirements pass`. `release_date_aligned_but_restated` is non-strict diagnostic evidence only and cannot satisfy `strict_gate_A_PASS`, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- Repository-identity rule for approval/request packets: `identity_valid := commit_resolves AND commit_tree == declared_tree AND artifact_exists_at_declared_path AND SHA256(artifact_bytes) == declared_artifact_sha256 AND payload_identity_matches`. Any false term requires denial and repository rerouting.
+- Quant verification: `cc96053513f445f143632103c478367bbf674e12` does not resolve as a Quant commit and `R0.1-preflight-plan.md` is absent at the repository root; no R0.1 authority is valid here.
+- Boundary: historical addenda are preserved; Slice 0 changes active contract and packet-template language only. No data, provider, source-byte, ETL, curve, readiness, or R0.1 work.
+- Next action: dispatch only the existing Gate A and Gate B/C source-access requests.
+
+## 2026-06-30 V2 PEAD Strict M6b Path A Gate Formula Registry
+
+- RoundID: `ROUND-20260629-V2-PEAD-M6B-STRICT-PATH-A-INFRA`; implementation: `scripts/pead_m6b_strict_path_a_data_gate.py`; tests: `tests/test_pead_m6b_strict_path_a_data_gate.py`.
+- Authorization formula: evidence payload fields never authorize; `authoritative_current_evidence := distinct_authorization_artifact AND exact_evidence_file_sha256_match AND round/scope/mode/action_match`. Malformed authorization JSON/schema and any authorization supplied for `synthetic_test` are CLI input errors; structurally valid but unapproved or mismatched current-evidence authorization is `NOT_AUTHORIZED`.
+- Gate formula: current `gate_status_g = PASS` only when detached authorization is `AUTHORIZED`, all four source-byte SHA-256 checks are verified, and the gate's required provenance, complete coverage, temporal proofs, gate-specific evidence, and validation checks pass; otherwise every current gate is `BLOCKED`.
+- Readiness formula used in the script: `m6b_data_contract_ready := authoritative_current_evidence AND all(A,B,C,D = PASS) AND strict_vintage_pit`.
+- Restatement rule: release-date-aligned/restated EPS has `strict_vintage_pit=false` and is `BLOCKED`; its exception is `NOT_AUTHORIZED`. Inherited exception wording is superseded on current truth surfaces, and even an explicitly approved exception retains hard flags and cannot make strict Gate A or readiness pass.
+- Current evidence: A/B/C/D=`BLOCKED`, source bytes unverified, `m6b_data_contract_ready=false`, `workflow_status=blocked_fail_closed`; JSON SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Validation: strict-gate tests PASS 68/68; existing M6a tests PASS 12/12; compile, deterministic atomic CLI replay, missing explicit `--output`, synthetic canonical-output rejection before atomic write, payload-only restated-approval rejection, malformed-evidence and malformed-authorization JSON/schema CLI errors with no output, authorization mismatch, source-byte tamper, static-isolation, output-isolation, and canonical context build/validation checks PASS.
+- Boundary: M6a remains sparse engine/framework evidence only; Data Path A is active; UI/frontend and Strategy promotion are held; B remains illustrative-only and is never a strict-data fallback.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
 ## 2026-06-25 V2 PEAD M6b Best-Available Option 1 Repair Registry
 
 - RoundID: `ROUND-20260625-V2-PEAD-M6B-BESTAVAIL-OPTION1-REPAIR`.

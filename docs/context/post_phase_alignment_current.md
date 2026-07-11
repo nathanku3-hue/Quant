@@ -1,5 +1,67 @@
 # Post-Phase Alignment - Phase 65 G8.2
 
+## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+
+- What changed: Docs/Ops restored dispatch truth to BLOCK, quarantined the invalid dispatch outputs, preserved exact current request semantics, and adopted detached two-commit artifact identity.
+- Stream status update: Docs/Ops owns identity repair only. Data, Strategy, and Frontend remain held; no external response is pending because no send is proven.
+- Evidence: `e470137` lacked all four current request artifacts; the prior dispatch Markdown and JSON also used incorrectly conflated hash labeling.
+- Current bottleneck: a tracked envelope must bind Commit 1's remote/root/commit/tree and four separate artifact paths/hashes.
+- Next active stream: Docs/Ops detached-envelope construction and fail-closed preflight/reviewer verification only.
+
+## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
+
+- What changed: planning preflight green at `e470137`.
+- Current bottleneck: exact request-artifact identity remained unresolved after hygiene green.
+- Next active stream: see the active identity-repair addendum.
+
+## Prior Addendum — P0 Trust-Substrate Repair (2026-07-11)
+
+- What changed: hardened Git identity verification and authority/evidence JSON parsing with focused adversarial coverage and fresh A/B/C review.
+- Stream status update: P0 banked; subsequent hygiene recovery cleared planning preflight.
+- Evidence: replacement refs (loose/packed) and duplicate keys are rejected fail-closed.
+- Current bottleneck: superseded by active hygiene recovery (green for planning).
+- Next active stream: see active addendum.
+
+## Active Addendum - V2 PEAD M6b Slice 0 Contract Correction (2026-07-02)
+
+- What changed: corrected only the active M6b phase brief so first-public/unrestated EPS is the sole strict Gate A pass route; restated EPS stays non-strict diagnostic evidence.
+- Contract impact: no explicit or implicit restated-EPS exception can satisfy strict Gate A, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- Approval/request impact: the canonical Ship-Fast Decision Gate now requires repository remote/root, commit, tree, artifact path, and artifact hash verification; an identity mismatch denies the packet rather than creating synthetic authorization.
+- Evidence: Quant does not resolve `cc96053513f445f143632103c478367bbf674e12`, and root `R0.1-preflight-plan.md` is absent. This confirms the R0.1 denial without changing Quant scope.
+- Do not do next: no data, provider, source-byte, ETL, curve, readiness, or R0.1 work.
+- Next active stream: request-dispatch sequencing only for the existing Gate A and Gate B/C source-access requests.
+
+## Latest Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+- What changed: Created versioned successor Gate A contract and strict source-access requests, preserving 20260630 predecessor evidence.
+- Stream status update: Docs/Ops completed request semantics only; Data remains blocked pending data-owner approvals and named immutable artifacts; Strategy and Frontend/UI remain held.
+- Contract impact: Gate A now requires capability attestation during source-access approval, conditional one-to-one timing linkage, an authorized calendar artifact, and replayable session mapping that includes early-close sessions.
+- Open decisions: approve or decline Gate A and Gate B/C source access; resolve Gate D consumer-interface gap separately.
+- Do not do next: do not inspect local sources, use credentials/providers, run factual gate validation, generate research outputs, or update readiness.
+- Status claim: canonical current evidence and strict readiness remain unchanged.
+
+## Latest Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+- What changed: Repaired the bounded evidence-only strict Path A gate validator so malformed authorization is a CLI input error and no current gate can pass unless detached authorization and all four local source-byte hashes verify.
+- Stream status update: Data Path A is active; M6a remains sparse engine/framework evidence only; Strategy promotion and Frontend/UI remain held.
+- Evidence: strict-gate tests pass 68/68, M6a tests pass 12/12, compile/determinism/isolation pass, missing explicit `--output`, malformed evidence/authorization, and synthetic canonical-output targeting exit 2 without output, payload-only restated approval remains `NOT_AUTHORIZED`, mismatched authorization exits 0 fail-closed, and readiness JSON SHA-256 is `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Current bottleneck: A/B/C/D are `BLOCKED`; current restated EPS has `strict_vintage_pit=false`, its exception is `NOT_AUTHORIZED`, and `m6b_data_contract_ready=false`.
+- Exception reconciliation: inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception cannot satisfy strict Gate A.
+- Interface drift: evidence-only CLI/JSON infrastructure; no provider, extraction, B import, locked artifact, UI, strategy, return, curve, CAGR, alpha, or tradability output.
+- Review boundary: terminal Reviewer A/B/C validates infrastructure only and cannot promote strict readiness.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+- Do not do next: use B as fallback, infer readiness from synthetic fixtures/tests/review, or open UI/strategy promotion.
+
+## Latest Addendum - V2 PEAD M6b Option 1 Repair PASS & Strict M6b Path A Alignment (2026-06-25)
+
+- What changed: Docs/Ops refreshed stale cross-stream docs to the June 25 M6 truth. Data Option 1 B (Best-Available) repair PASS locally as an illustrative engine sanity diagnostic. M6a.1 sparse portfolio engine core complete with Reviewer C rerun PASS.
+- Stream status update: Data is done for diagnostic/M6a-engine use but not "done done" for a tradable research run; Strategy M6a engine ready but closure not cleanly reconciled (Reviewer B pending); Frontend/UI remains held behind alpha-interpretation gate; Docs/Ops aligns with original intent before deciding next steps.
+- Evidence: M6b Option 1 B repair reports 27,941 selected events with full 60-session eligibility enforced and matching parquet SHA; M6a.1 sparse core passes Reviewer C terminal rerun.
+- Interface drift: None in runtime. Fastest valid reboot is strict M6b Data Path A, not Strategy or Frontend.
+- Current bottleneck: M6a engine is ready, yet strict data still fails: restated EPS, proxy/non-delisting returns, and no full as-of tradability/liquidity screen. Strategy closure is not cleanly reconciled; new frontend remains held behind the alpha-interpretation gate.
+- Next active stream: Data stream for strict M6b Path A gates: first-public EPS or explicit flagged exception, delisting-adjusted tradable returns, as-of liquidity/tradability, borrow assumptions.
+- Do not do next: Do not wire best-available B into strict M6b, do not modify strict readiness flags, do not use B as alpha/tradable evidence, and do not build alpha-named frontend or strategy code before strict data gates pass.
+
 ## Latest Addendum - V2 PEAD Alpha Interpretation Gate OPEN (2026-06-24)
 
 - What changed: Docs/Ops opened a docs-only interpretation gate and changed the next-step route from dashboard-first to interpretation-first.

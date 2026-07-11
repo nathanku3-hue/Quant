@@ -1,5 +1,94 @@
 # Done Checklist - Phase 65 G8.2 System-Scouted Candidate Card
 
+## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+
+- [x] Reviewer A/B/C BLOCK findings accepted: dispatch identity at `e470137` failed because the four current 20260701 request artifacts were absent.
+- [x] False dispatch Markdown, JSON, and dependent PASS report quarantined as `INVALID_NOT_DISPATCHED`; no message is proven sent.
+- [x] Dispatch Markdown and JSON hashes labeled separately: Markdown `ed2db3015413bc71edea919d5c15800514e74b5918253af3d86788614baf872d`; JSON `5975304aee17b6b46a481f690b3be7ac76ee37d5000e9e1e58fcbed1b88b8a30`.
+- [x] Exact four current request artifacts selected for Commit 1 without semantic or byte changes.
+- [x] Detached-binding policy clarified: payload commit/tree identity belongs in a separate later envelope, never inside the payload being identified.
+- [x] Legacy, divergent, reconstructed, redirected, cherry-picked, and otherwise unbound artifacts remain rejected.
+- [x] Factual A/B/C/D statuses and `m6b_data_contract_ready=false` remain unchanged.
+- [x] No remotes, dispatch, source inspection, provider use, factual validation, readiness, Gate D, publication, or data output.
+- [ ] Commit 1 exact payload commit/tree recorded in a tracked detached identity envelope.
+- [ ] Governance and planning boot preflights rerun after repair.
+- [ ] Fresh Reviewer A/B/C identity checks completed and reconciled.
+- Next action: create Commit 2 detached identity envelope with status `PREPARED_NOT_SENT`; dispatch remains denied.
+
+## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
+
+- [x] Hard dirty blocker identified as untracked Path A pair only (boot-core dirty remains advisory).
+- [x] Path A source/test banked; GOV-002/GOV-008 fixed; evidence LF restored.
+- [x] Governance PASS; planning boot preflight PASS; commit `e470137`.
+- [x] Hygiene recovery completed, but exact request-artifact identity was not established and dispatch remained invalid.
+- [ ] P2 publication / remotes / dispatch / source inspection / readiness promotion; still forbidden without separate authority.
+- Next action: see the active request-artifact identity repair checklist.
+
+## Prior Addendum — P0 Trust-Substrate Repair (2026-07-11)
+
+- [x] Every `scripts/boot_preflight.py` Git subprocess sets `GIT_NO_REPLACE_OBJECTS=1`.
+- [x] Git identity removes ambient Git redirection/configuration and requires raw HEAD/upstream commits plus a verified HEAD tree; unborn, broken, and tag-shaped identities fail closed.
+- [x] Loose and packed `refs/replace/*` are discovered by Git enumeration and hard-fail identity verification before ancestry can be trusted.
+- [x] Strict Path A evidence and authorization JSON rejects duplicate keys at any object depth before evaluation or output write; ambiguous legacy JSON is invalid.
+- [x] Focused P0 adversarial tests pass for replacement-ref and duplicate-key paths.
+- [x] This workspace reports verified Git identity with no replacement refs.
+- [x] Planning governance preflight and hard unclassified dirty blockers cleared by hygiene recovery addendum above.
+- [x] Fresh independent Reviewer A/B/C review and reconciliation is complete with no in-scope Critical/High findings for P0.
+- [ ] P2 publication or Gate A/B/C source-access dispatch is authorized; still a separate decision after hygiene green.
+- Next action: see active hygiene recovery checklist.
+
+## Active Addendum - V2 PEAD M6b Slice 0 Contract Correction (2026-07-02)
+
+- [x] Corrected only the active M6b phase brief so first-public/unrestated EPS is the sole strict Gate A pass route.
+- [x] Declared `release_date_aligned_but_restated` non-strict; it cannot satisfy strict Gate A, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- [x] Added repository remote/root, commit, tree, artifact path, artifact-hash, and mismatch-denial fields to the canonical Ship-Fast approval/request template.
+- [x] Verified locally that the denied R0.1 commit does not resolve in Quant and root `R0.1-preflight-plan.md` is absent; no R0.1 material was introduced.
+- [x] Refreshed bridge, impact, planner, multi-stream, post-phase, observability, current-context, notes, decision-log, and lesson current truth.
+- [x] Thin SAW verifies active-contract correction, no forbidden Slice 0 action, evidence structure, and a single next action.
+- [ ] Gate A/B/C factual evidence or source access is authorized; still absent.
+- [ ] Strict M6b readiness is authorized; it remains false.
+- Next action: submit only the prepared Gate A and Gate B/C data-owner source-access requests.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+- [x] Preserved 20260630 contract, request, and Thin SAW artifacts without mutation; created 20260701 successors with supersedes metadata and recomputed predecessor hashes.
+- [x] Bound successor request JSON only to successor Gate A contract SHA-256 `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063`.
+- [x] Added source-capability attestation-at-approval, conditional timing-artifact, immutable calendar source-of-record, eligible-session, and replayable session-mapping requirements to the successor Gate A contract.
+- [x] Preserved Gate B candidate-only, Gate C attribute-scope-blocked, and Gate D integration-gap statuses in successor requests.
+- [ ] Data owner has approved Gate A or Gate B/C source access; not supplied.
+- [ ] Named local immutable source artifacts and fresh real-artifact reviewer capacity exist; not supplied.
+- [ ] Gate A/B/C/D factual verification has occurred; prohibited in this round.
+- [ ] Strict M6b readiness is authorized; it remains false.
+- Next action: complete request-only Thin SAW closure, then submit the successor Gate A and Gate B/C data-owner requests.
+- Status claim: canonical current evidence and strict readiness remain unchanged.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+- [x] Evidence-only strict Gate A-D validator writes only atomic JSON; payload content cannot self-authorize.
+- [x] Distinct authorization is bound to exact evidence-file bytes and scope/mode/action; current gate PASS requires detached authorization and all four verified local source-byte hashes.
+- [x] Focused strict-gate tests pass 68/68; existing M6a tests pass 12/12; compile passes.
+- [x] Exact current-evidence CLI and deterministic second replay pass with SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- [x] Missing explicit `--output`, malformed evidence, malformed authorization JSON/schema, current-evidence-plus-authorization, and synthetic-test-plus-authorization exit 2 with no output or temporary file; synthetic canonical-output targeting is rejected before atomic write; payload-only restated approval is `NOT_AUTHORIZED`; well-formed authorization mismatch exits 0 with A-D blocked; source-byte, static/B-import isolation, output-isolation, and atomic temporary-file cleanup checks pass.
+- [x] Current artifact records A/B/C/D `BLOCKED`, `strict_vintage_pit=false`, restated-EPS exception `NOT_AUTHORIZED`, and `m6b_data_contract_ready=false`.
+- [x] M6a remains sparse engine/framework evidence only; Data Path A is active; UI/frontend and Strategy promotion are held; B remains isolated illustrative-only.
+- [x] One post-validation truth refresh and canonical context build/validation record observed results without using synthetic fixtures, validator existence, tests, or review as readiness evidence.
+- [ ] Terminal independent Reviewer A/B/C infrastructure review and reconciliation complete.
+- [ ] Any strict data gate has authoritative `PASS` evidence; none currently does.
+- [ ] Strict M6b readiness is authorized; it remains false.
+- [x] Inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception is `NOT_AUTHORIZED` and cannot satisfy strict Gate A.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gates Opened (2026-06-29)
+
+- [x] Refreshed stale cross-stream docs (`multi_stream_contract_current.md`, `post_phase_alignment_current.md`) to the June 25 M6 truth.
+- [x] Opened strict M6b Path A data gates in `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md`.
+- [x] Defined Gate 1: First-public EPS vintage or explicit flagged exception.
+- [x] Defined Gate 2: Delisting-adjusted tradable returns.
+- [x] Defined Gate 3: Full as-of liquidity and tradability screen.
+- [x] Defined Gate 4: Borrow assumptions and short-cost evidence.
+- [x] Maintained fail-closed principle for `m6b_data_contract_ready = false`.
+- [ ] Execute strict M6b Path A data prep for Gates 1-4; blocked pending separate data stream implementation and Reviewer C verification.
+
 ## Authoritative Addendum - V2 PEAD M6b Option 1 Repair PASS (2026-06-25)
 
 - [x] Full 60-session eligibility is enforced before the B engine run.

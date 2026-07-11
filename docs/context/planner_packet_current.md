@@ -1,5 +1,191 @@
 # Planner Packet - Current
 
+## New Context Packet — Request Artifact Identity Repair V1
+
+## What Was Done
+
+- Accepted Reviewer A/B/C's fail-closed identity finding: commit `e470137d64eb44829e8977c1aaf60bdcc64117d5` / tree `3374b7fcc72f2fb0d53e6e85ad347729e647dba0` contains none of the four current 20260701 request artifacts.
+- Quarantined the false dispatch Markdown, JSON, and dependent PASS report as `INVALID_NOT_DISPATCHED`; no Gate A or Gate B/C message is proven sent.
+- Preserved the exact four current request artifact bytes for Commit 1 and clarified the detached two-commit identity rule.
+
+## What Is Locked
+
+- Dispatch remains denied. The four payloads are request-preparation artifacts only until a tracked detached envelope binds Commit 1's remote/root/commit/tree/paths/hashes.
+- Reject legacy, divergent, reconstructed, redirected, cherry-picked, or unbound artifacts, including the separate `51b1471ff93741fd339d506399413c928479db5a` lineage.
+- No remotes, dispatch, source/provider access, validation, readiness, Gate D, publication, strategy/UI work, or data output. A/B/C/D factual statuses and `m6b_data_contract_ready=false` are unchanged.
+
+## What Is Next
+
+Create Commit 2's tracked Gate A/B/C identity envelope with status `PREPARED_NOT_SENT`, then rerun governance and planning boot preflights plus fresh Reviewer A/B/C identity checks.
+
+## First Command
+
+```text
+git show --stat --oneline HEAD
+```
+
+## End Context Packet
+
+## Prior Context Packet — Checkout Hygiene / Governance Recovery PASS
+
+## What Was Done
+
+- Closed hard unclassified dirty blocker by banking Path A source/test pair; fixed GOV-002/GOV-008; restored locked PEAD evidence LF; planning preflight green at commit `e470137`.
+
+## What Is Locked
+
+- Hygiene green did not establish request-artifact identity and is not dispatch, source-access, or readiness authority.
+
+## What Is Next
+
+Superseded by the active request-artifact identity repair packet above.
+
+## First Command
+
+```text
+.venv/Scripts/python.exe scripts/boot_preflight.py --repo-root . --mode planning --no-tests
+```
+
+## End Context Packet
+
+## Prior Context Packet — P0 Trust-Substrate Repair Active
+
+## What Was Done
+
+- Hardened the boot Git gateway against ambient redirection, replacement-object ancestry, and non-commit identities; hardened strict Path A JSON parsing against duplicate-member ambiguity. Focused adversarial tests and fresh A/B/C review pass.
+
+## What Is Locked
+
+- P2 publication, Gate A/B/C dispatch, remote actions, Gate D, Strategy/UI, source access, data output, and readiness promotion are frozen until separately reopened after hygiene green.
+- P0 identity repair is banked; hygiene/governance was the subsequent blocker and is now cleared for planning preflight.
+
+## What Is Next
+
+See active hygiene recovery packet above.
+
+## First Command
+
+```text
+.venv/Scripts/python.exe scripts/boot_preflight.py --repo-root . --mode planning --no-tests
+```
+
+## End Context Packet
+
+## New Context Packet - V2 PEAD M6b Slice 0 Active-Contract Deconfliction
+
+## What Was Done
+
+- Corrected only the active M6b phase brief: first-public/unrestated EPS is now the sole strict Gate A pass route; restated EPS remains non-strict diagnostic evidence.
+- Added concrete repository remote/root, commit, tree, artifact path, and artifact-hash verification fields to the canonical Ship-Fast approval/request template.
+- Verified that the denied R0.1 commit and root plan do not resolve in Quant; no R0.1 work was imported or recreated.
+
+## What Is Locked
+
+- `release_date_aligned_but_restated` cannot satisfy strict Gate A, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- Historical addenda are preserved. No data, provider, source-byte, ETL, curve, readiness, or R0.1 work occurred.
+- Gate A/B/C/D factual statuses and strict readiness remain unchanged.
+
+## What Is Next
+
+Next action: dispatch only the existing Gate A and Gate B/C data-owner source-access requests.
+
+## First Command
+
+```text
+Review docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.md and send only its approved data-owner request content.
+```
+
+## End Context Packet
+
+## New Context Packet - V2 PEAD Strict M6b Phase 0 Successor Requests
+
+## What Was Done
+
+- Created 20260701 successor Gate A definition/session-mapping contract and strict source-access request bundle without altering 20260630 historical request artifacts.
+- Bound the active successor request only to Gate A contract SHA-256 `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063`.
+- Added data-owner capability attestation at approval, conditional timing-artifact rules, immutable calendar provenance, and Reviewer C replayable session mapping.
+
+## What Is Locked
+
+- A=`BLOCKED_STRICT_PIT_ARTIFACT_MISSING`; B=`CANDIDATE_LOCAL_INPUT_PRESENT__AUTHORIZATION_AND_FACTUAL_VERIFICATION_PENDING`; C=`BLOCKED_ATTRIBUTE_SCOPE_UNVERIFIED`; D=`DEFERRED_SOURCE_INDEPENDENT_INTEGRATION_GAP`.
+- No source artifact, provider, credential, raw-data inspection, Gate validation, or readiness work occurred.
+- Canonical current evidence and strict readiness remain unchanged.
+
+## What Is Next
+
+Next action: close the request-only Thin SAW, then submit separate Gate A and Gate B/C data-owner source-access requests.
+
+## First Command
+
+```text
+Review docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.md and send only its approved data-owner request content.
+```
+
+## End Context Packet
+
+## New Context Packet - V2 PEAD Strict M6b Path A Gate Infrastructure
+
+## What Was Done
+
+- Repaired and locally validated the bounded evidence-only Gate A-D validator: payloads cannot self-authorize, malformed authorization and synthetic-test-plus-authorization are CLI input errors, and no current gate can pass without detached authorization plus all four verified source-byte hashes.
+- Passed 68 focused tests, 12 existing M6a tests, compile, deterministic atomic current-evidence CLI, explicit-`--output` argparse rejection, synthetic canonical-output rejection, payload-only restated-approval rejection, malformed-evidence/authorization no-output checks, authorization mismatch, source tamper, isolation checks, and canonical context build/validation.
+- Published fail-closed evidence at `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json`, SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+
+## What Is Locked
+
+- A/B/C/D are `BLOCKED`; `m6b_data_contract_ready=false`; current restated EPS has `strict_vintage_pit=false`; its exception is `NOT_AUTHORIZED`.
+- Inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception cannot satisfy strict Gate A.
+- M6a is sparse engine/framework evidence only. Data Path A is active; Frontend/UI and Strategy promotion are held.
+- B stays an isolated illustrative diagnostic and is never a strict-data fallback.
+- Terminal A/B/C review remains infrastructure-only and cannot promote readiness.
+
+## What Is Next
+
+Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
+## First Command
+
+```text
+.venv/Scripts/python.exe -m pytest tests/test_pead_m6b_strict_path_a_data_gate.py -q --basetemp=tmp/pytest/strict_path_a_repair
+```
+
+## Next Todos
+
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
+## End Context Packet
+
+## New Context Packet - V2 PEAD Strict M6b Path A Gates Opened
+
+## What Was Done
+
+- Refreshed stale cross-stream docs (`multi_stream_contract_current.md`, `post_phase_alignment_current.md`) to the June 25 M6 truth.
+- Opened strict M6b Path A data gates in `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md` for first-public EPS vintage, delisting-adjusted tradable returns, as-of liquidity/tradability screen, and short borrow assumptions.
+- Established fail-closed acceptance criteria for strict M6b data readiness (`m6b_data_contract_ready = false`).
+
+## What Is Locked
+
+- Fastest valid reboot is strict M6b Data Path A, not Strategy or Frontend. Data is done for diagnostic/M6a-engine use but not "done done" for a tradable research run.
+- Best-Available Option 1 B artifacts remain illustrative-only / not_alpha / not_tradable_claim and cannot be wired into strict M6b.
+- No provider ingestion, strict M6b adapter, M6a readiness-flag promotion, UI, ranking/scoring, alert, recommendation, live/paper, or broker/order path was opened.
+
+## What Is Next
+
+**Single next action: execute the strict M6b Path A data prep for Gates 1-4 (first-public EPS or explicit flagged exception, delisting-adjusted tradable returns, as-of liquidity/tradability screen, borrow assumptions).**
+
+## First Command
+
+```text
+.venv\Scripts\python.exe -m pytest tests\test_pead_m6_pit_walk_forward_equity_curve.py -q
+```
+
+## Next Todos
+
+- [ ] Execute strict M6b Path A data prep for Gate 1 (EPS Vintage).
+- [ ] Execute strict M6b Path A data prep for Gate 2 (Delisting Returns).
+- [ ] Execute strict M6b Path A data prep for Gate 3 (Liquidity Screen).
+- [ ] Execute strict M6b Path A data prep for Gate 4 (Borrow Assumptions).
+
 ## New Context Packet - V2 PEAD M6b Best-Available Option 1 Repair PASS
 
 ## What Was Done

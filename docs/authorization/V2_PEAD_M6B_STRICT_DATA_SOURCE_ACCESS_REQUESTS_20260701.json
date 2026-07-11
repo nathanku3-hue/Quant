@@ -1,0 +1,188 @@
+{
+  "packet_id": "V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701",
+  "round_id": "ROUND-20260701-V2-PEAD-M6B-STRICT-DATA-PHASE0-SUCCESSOR",
+  "scope_id": "V2_PEAD_M6B_STRICT_DATA_PHASE0_DOCS_ONLY",
+  "status": "REQUEST_PREPARED_EVIDENCE_MISSING",
+  "artifact_type": "source_specific_data_owner_request_bundle",
+  "authority": "request preparation only; not source-access authorization, entitlement proof, export authority, archive inspection authority, provider access, data output, factual gate validation, or strict readiness authority",
+  "lineage": {
+    "supersedes": "docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260630.json",
+    "prior_artifact_sha256": "fdf315a1ee8ab5a0ef3db3e02ac54823bd93d1f9ad450a2eb6369d12ace98b74",
+    "supersession_reason": "bind successor Gate A contract hash and add source-capability, conditional timing-artifact, authorized calendar, and corrected B/C/D boundary requirements",
+    "historical_artifact_mutated": false
+  },
+  "ship_fast_decision": {
+    "what_is_done": "Successor request artifacts specify strict local-only source-access prerequisites without authorizing any export, inspection, provider activity, or readiness change.",
+    "what_is_blocked": "No source-specific data-owner authorizations, named immutable local artifacts, or fresh real-artifact reviewer capacity exist.",
+    "recommended_next_step": "After data-owner review, collect separate Gate A and Gate B/C approvals; defer Gate D archive intake pending source-independent consumer-interface proof.",
+    "scope_limit": "authorization request preparation only",
+    "stop_rule": "do not inspect archives, use credentials, access providers, export data, or alter canonical readiness from this packet"
+  },
+  "global_controls": {
+    "agent_access": "named_local_bytes_read_only_after_separate_source_access_authorization",
+    "licensed_raw_data_git_policy": "outside_git_by_default; only non-secret manifests, schemas, hashes, query specifications, and validation reports may enter the repository unless the data owner expressly authorizes raw-byte storage",
+    "forbidden": [
+      "read_secret_txt",
+      "credential_use",
+      "provider_login",
+      "API_call",
+      "network_request",
+      "download",
+      "source_extraction",
+      "ETL",
+      "data_generation",
+      "validator_or_test_redesign",
+      "best_available_B_reuse",
+      "return_or_curve_output",
+      "canonical_readiness_promotion"
+    ]
+  },
+  "requests": [
+    {
+      "gate_scope": "A",
+      "status": "BLOCKED_STRICT_PIT_ARTIFACT_MISSING",
+      "requested_authorization_record": "AUTH_compustat_pit_gateA_<date>.md and .json",
+      "source_family": "S&P Compustat PIT family",
+      "exact_licensed_table_or_view_names": "DATA_OWNER_TO_CONFIRM_FROM_CURRENT_ENTITLEMENT_AND_LICENSED_DICTIONARY; no mnemonics are assumed in this request",
+      "local_archive_path": "DATA_OWNER_TO_ASSIGN_OUTSIDE_GIT",
+      "active_definition_contract": {
+        "path": "docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.json",
+        "sha256": "27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063",
+        "status": "PROPOSED_FOR_DATA_OWNER_APPROVAL"
+      },
+      "source_capability_attestation": {
+        "required_as_part_of": "data_owner_approval_of_this_export_source_access_request_before_human_export_or_agent_inspection",
+        "must_confirm": [
+          "first_public_identity_field_and_dictionary_definition",
+          "revision_original_restated_or_source_update_status_field_and_dictionary_definition",
+          "minute_or_finer_release_timestamp_capability",
+          "unambiguous_IANA_timezone_or_explicit_UTC_offset",
+          "issuer_quarter_identity",
+          "date_ranged_issuer_security_mapping"
+        ]
+      },
+      "conditional_timing_artifact": {
+        "required": "iff selected EPS source record lacks a complete eligible release timestamp with unambiguous timezone semantics",
+        "when_required": [
+          "separately_authorized_immutable_local_artifact",
+          "licensed_dictionary",
+          "source_as_of_and_export_provenance",
+          "sha256",
+          "deterministic_one_to_one_join_to_selected_issuer_quarter_or_source_record"
+        ],
+        "failure_rule": "missing, zero-match, many-match, ambiguous, or coverage-gap timing linkage blocks Gate A"
+      },
+      "calendar_source_of_record": {
+        "required_with_this_authorization": true,
+        "must_name": [
+          "calendar_artifact_id",
+          "source_identity",
+          "license_or_owner_attestation",
+          "exchange_timezone",
+          "export_or_version_provenance",
+          "local_or_approved_versioned_repository_path",
+          "sha256",
+          "coverage_start_and_end",
+          "is_trading_session_field",
+          "scheduled_close_local_field",
+          "holiday_schedule",
+          "early_close_schedule"
+        ],
+        "replay_rule": "Reviewer C must replay session mapping from the exact named calendar artifact and SHA-256"
+      },
+      "requested_export_boundary": "approved M6b issuer-quarter universe; only semantic fields required to identify issuer-quarter, first-public company-reported GAAP diluted EPS, record/update/revision status, release/effective/thru/delivery timing, fiscal identity, currency/share treatment, date-ranged historical identifier/CCM mapping, and the authorized calendar/timing dependencies required by the successor Gate A contract",
+      "required_source_components": [
+        "Snapshot lineage support",
+        "Preliminary History first-public candidate layer",
+        "Unrestated Quarterly original 10-Q corroboration",
+        "Point-in-Time revision/effective/thru/delivery lineage",
+        "historical identifier and CCM mappings",
+        "licensed data dictionaries",
+        "human export/query specification",
+        "non-secret manifest with source-as-of timestamp, row counts, and SHA-256 hashes"
+      ],
+      "hard_stops": [
+        "current_vintage_or_release_date_only_source",
+        "missing_first_public_classification",
+        "missing_revision_effective_thru_delivery_lineage",
+        "missing_source_capability_attestation",
+        "missing_complete_eligible_timestamp_and_no_approved_timing_artifact",
+        "missing_or_unapproved_calendar_artifact",
+        "calendar_not_covering_event_date_or_decision_mapping",
+        "missing_dictionary_support",
+        "missing_date_ranged_mapping",
+        "missing_timezone_semantics"
+      ],
+      "copyable_request_message": "Subject: Request for strict M6b Gate A local Compustat PIT-family export/source-access approval\n\nHello,\n\nPlease do not send credentials, passwords, tokens, connection strings, provider output, data extracts by email, or API instructions.\n\nFor a local-only strict research-data verification workflow, please confirm whether you can approve a human-owned local export from the licensed S&P Compustat PIT family for the approved M6b issuer-quarter universe. This request binds the successor Gate A semantic contract at docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.json, SHA-256 27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063.\n\nAs part of approval, please provide a non-secret source-capability attestation identifying the exact entitled fields and licensed dictionary definitions for first-public identity, revision/original/restated or source-update status, minute-or-finer release timestamp capability, unambiguous timezone, issuer-quarter identity, and date-ranged mapping. If the selected PIT record lacks complete eligible timing, please name a separately authorized immutable timing artifact and a deterministic one-to-one join.\n\nPlease also bind an immutable market-calendar artifact with source identity, license/owner attestation, exchange timezone, version/export provenance, path, SHA-256, coverage, is_trading_session, scheduled_close_local, holiday schedule, and early-close schedule.\n\nPlease confirm the exact currently entitled tables/views and field names from the licensed dictionary, approved outside-Git local artifact paths, source-as-of/export timestamps, and permission for an agent to inspect only named local bytes after human export.\n\nThis request is source-access approval only. It does not authorize agent login, credentials, provider/API access, downloads, extraction, data generation, factual Gate A validation, or strict readiness.\n\nThank you."
+    },
+    {
+      "gate_scope": "B",
+      "status": "CANDIDATE_LOCAL_INPUT_PRESENT__AUTHORIZATION_AND_FACTUAL_VERIFICATION_PENDING",
+      "requested_authorization_record": "AUTH_crsp_gateB_<date>.md and .json",
+      "source_family": "CRSP daily security return and delisting data",
+      "exact_licensed_table_or_view_names": "DATA_OWNER_TO_CONFIRM_FROM_CURRENT_ENTITLEMENT_AND_LICENSED_DICTIONARY; no mnemonics are assumed in this request",
+      "local_archive_path": "DATA_OWNER_TO_ASSIGN_OUTSIDE_GIT",
+      "requested_export_boundary": "approved M6b issuer-security-date universe; only fields required to assess existing Gate B return, delisting event, delisting return, coverage, and dictionary sufficiency",
+      "required_source_components": [
+        "daily security return fields",
+        "delisting event and return fields",
+        "licensed data dictionaries",
+        "human export/query specification",
+        "non-secret manifest with source-as-of timestamp, row counts, and SHA-256 hashes"
+      ],
+      "hard_stops": [
+        "proxy_return_substitution",
+        "missing_delisting_evidence",
+        "archive_not_named_or_not_hashable",
+        "coverage_or_dictionary_unverified"
+      ]
+    },
+    {
+      "gate_scope": "C",
+      "status": "BLOCKED_ATTRIBUTE_SCOPE_UNVERIFIED",
+      "requested_authorization_record": "AUTH_crsp_gateC_<date>.md and .json",
+      "source_family": "CRSP daily market-attribute, corporate-action, active-listing, and historical mapping data",
+      "exact_licensed_table_or_view_names": "DATA_OWNER_TO_CONFIRM_FROM_CURRENT_ENTITLEMENT_AND_LICENSED_DICTIONARY; no mnemonics are assumed in this request",
+      "local_archive_path": "DATA_OWNER_TO_ASSIGN_OUTSIDE_GIT",
+      "requested_export_boundary": "approved M6b issuer-security-date universe; only fields required to assess decision-date price, volume, shares, active listing/trading status, exchange/share-class eligibility, corporate-action/delisting eligibility, and date-ranged mappings",
+      "required_source_components": [
+        "daily price, volume, and shares fields",
+        "date-ranged active listing or trading-status fields",
+        "date-ranged EXCHCD and SHRCD or licensed-dictionary-documented equivalent fields with identical decision-time semantics",
+        "corporate-action and eligibility fields",
+        "date-ranged historical identifiers and mappings",
+        "licensed data dictionaries",
+        "human export/query specification",
+        "non-secret manifest with source-as-of timestamp, row counts, and SHA-256 hashes"
+      ],
+      "hard_stops": [
+        "missing_date_ranged_EXCHCD",
+        "missing_date_ranged_SHRCD",
+        "missing_licensed_dictionary_documented_equivalent",
+        "missing_active_listing_trading_status_as_of_decision_timestamp",
+        "COMNAM_CUSIP_ticker_or_current_identity_inference_used_as_substitute",
+        "archive_not_named_or_not_hashable"
+      ]
+    },
+    {
+      "gate_scope": "D",
+      "status": "DEFERRED_SOURCE_INDEPENDENT_INTEGRATION_GAP",
+      "requested_authorization_record": "AUTH_securities_finance_gateD_<date>.md and .json",
+      "source_family": "licensed dated securities-finance data",
+      "exact_licensed_table_or_view_names": "DATA_OWNER_TO_CONFIRM_ONLY_AFTER_THE_EXISTING_CANONICAL_CONSUMER_INTERFACE_AND_ENFORCEMENT_TEST_ARE_IDENTIFIED",
+      "local_archive_path": "DO_NOT_ASSIGN_OR_INSPECT_UNTIL_SOURCE_INDEPENDENT_INTEGRATION_GAP_IS_RESOLVED",
+      "integration_gap": {
+        "observed_interface": "scripts/pead_m6_pit_walk_forward_equity_curve.py CostModel consumes scalar daily_short_borrow_bps and deducts short_borrow_cost from daily_net_return",
+        "missing_proof": "no identified canonical consumer interface or existing test/reference proves per-security dated borrow availability, fee-threshold exclusion, and missing-borrow fail-close enforcement",
+        "required_next_check": "perform a separate source-independent interface audit; do not build, modify, or simulate the model in this data-layer request round"
+      }
+    }
+  ],
+  "canonical_state": {
+    "comp_fundq_gate_a_status": "rejected_as_strict_evidence; rdq_cross_check_only",
+    "api_gate_a_status": "noncanonical_fixture_only_after_separate_authorization",
+    "m6b_data_contract_ready": false,
+    "canonical_current_evidence": "unchanged",
+    "detached_current_evidence_authorization": "not_requested_in_this_round"
+  }
+}

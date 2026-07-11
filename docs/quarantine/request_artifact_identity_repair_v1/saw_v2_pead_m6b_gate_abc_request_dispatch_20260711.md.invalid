@@ -1,0 +1,68 @@
+# SAW Report — Gate A/B/C Source-Access Request Dispatch
+
+ArtifactMode: CLOSURE_REPORT  
+SAW Verdict: PASS  
+Hierarchy Confirmation: Approved | Session: current-thread | Trigger: owner-REOPEN-dispatch | Domains: Docs/Ops request dispatch; Data held; Strategy/UI held
+
+RoundID: `ROUND-20260711-V2-PEAD-M6B-GATE-ABC-REQUEST-DISPATCH`  
+ScopeID: `V2_PEAD_M6B_GATE_ABC_SOURCE_ACCESS_DISPATCH_ONLY`
+
+## Ownership check
+
+| Role | Agent | Same as implementer? |
+|---|---|---|
+| Implementer | integrity verification subagent | — |
+| Reviewer A | claim-boundary subagent | No (independent) |
+| Reviewer B | ops-boundary subagent | No (independent) |
+| Reviewer C | hash/evidence subagent | No (independent) |
+| Reconciliation | parent orchestrator | Distinct from A/B/C |
+
+Ownership check: **PASS** (implementer ≠ reviewers).
+
+## Outcome and boundary
+
+Request-dispatch only. Not source-access authorization, entitlement proof, export authority, archive inspection, provider access, factual gate validation, data output, P2 publication, Gate D, or strict readiness.
+
+## Terminal review
+
+| Reviewer | Domain | Verdict | Critical/High | Notes |
+|---|---|---|---|---|
+| Implementer | Integrity (13 checks) | PASS | 0 | Hashes, preflight, copyable messages, HEAD `e470137` |
+| Reviewer A | Strategy / claim boundary | PASS | 0 | Two optional Low polish items (process wording; optional first-public inline sentence) |
+| Reviewer B | Runtime / ops | PASS | 0 | Forbidden list complete; next action human-owned |
+| Reviewer C | Data integrity / hashes | PASS | 0 | Contract/bundle/dispatch hashes match; readiness still fail-closed read-only |
+
+## Reconciliation
+
+| Severity | Impact | Fix | Owner | Status |
+|---|---|---|---|---|
+| Low | “In flight” could be read as already emailed | Clarify delivery state as packet-recorded / human-send pending | Docs/Ops | Fixed in dispatch packet + bridge |
+| Low | JSON forbidden list lacked explicit `remotes` token | Add `remotes` next to P2 | Docs/Ops | Fixed |
+| Low | Gate A email omits explicit “restated cannot pass strict A” | Optional inline sentence | Docs/Ops | Carried (contract SHA bound; non-blocking) |
+
+No in-scope Critical/High remain.
+
+## Evidence
+
+| Item | Value |
+|---|---|
+| HEAD | `e470137d64eb44829e8977c1aaf60bdcc64117d5` |
+| Gate A contract SHA-256 | `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063` |
+| Request bundle SHA-256 | `913196ba279dd49442ce6b3bbde54d185c188a2d26e21cf462d853bbe295505b` |
+| Dispatch packet SHA-256 (post-polish) | `5975304aee17b6b46a481f690b3be7ac76ee37d5000e9e1e58fcbed1b88b8a30` |
+| Governance preflight | PASS, 0 findings |
+| Planning boot preflight | PASS (degraded deferred only) |
+| Readiness JSON (read-only) | `m6b_data_contract_ready=false`; A–D BLOCKED |
+| Delivery state | `PACKET_RECORDED_HUMAN_SEND_PENDING_OR_EXTERNAL` |
+
+## Forbidden-action scan
+
+No source inspection, credentials, provider, ETL, factual validation, P2/remotes, readiness flip, Gate D, or PEAD authority transfer performed by agents.
+
+## Next action
+
+Human sends Gate A and Gate B/C copyable messages if not already sent; await separate data-owner responses; do not inspect sources until per-gate authorization and named immutable artifacts exist.
+
+## ClosurePacket
+
+`ClosurePacket: RoundID=ROUND-20260711-V2-PEAD-M6B-GATE-ABC-REQUEST-DISPATCH; ScopeID=V2_PEAD_M6B_GATE_ABC_SOURCE_ACCESS_DISPATCH_ONLY; ChecksTotal=4; ChecksPassed=4; ChecksFailed=0; Verdict=PASS; OpenRisks=human-send-and-data-owner-responses-pending; NextAction=send-copyable-gate-a-and-gate-bc-messages-then-await-responses`
