@@ -67,3 +67,46 @@ be very rigorous with the citation such that every.pdf
 Quant-g9-market-behavior-signal-card/
 Quant-meta-harness-install/
 
+
+# C0X: exact nested worktree gitlink paths (deindexed; do not re-add)
+root repo/Quant_2a13724_clean
+root repo/Quant_2a137_clean
+root repo/Quant_51e1359_audit
+root repo/Quant_51e1359_boot_reconcile
+root repo/Quant_51e1359_reconcile
+root repo/Quant_51e1359_reconcile2
+root repo/Quant_51e1359_reconcile3
+root repo/Quant_51e1359_reconcile4
+root repo/Quant_51e1359_reconcile_20260528
+root repo/Quant_a5f2_clean
+root repo/Quant_audit_7cbe3c
+root repo/Quant_audit_anchor_7cbe3c
+root repo/Quant_boot0a_runtime_path
+root repo/Quant_boot0a_verify
+root repo/Quant_boot0a_verify_2
+root repo/Quant_boot0b_verify
+root repo/Quant_boot_gov_proof
+root repo/Quant_boot_preflight_stability
+root repo/Quant_clickable_nav_apptest
+root repo/Quant_clickable_nav_apptest_backup
+root repo/Quant_current_public_review
+root repo/Quant_execution_inventory
+root repo/Quant_full_dashboard_apptest
+root repo/Quant_navigation_contract
+root repo/Quant_phase_close_a5f2e9a
+root repo/Quant_phase_close_fb31170
+root repo/Quant_phase_close_fb31170_agent
+root repo/Quant_phase_close_validate
+root repo/Quant_pr1_postmerge_20260530_002251
+root repo/Quant_pr1_review_20260530_002251
+root repo/Quant_proof_review
+root repo/Quant_remote_tip_audit
+root repo/Quant_replay_fixture_audit
+root repo/Quant_replay_fixture_validate
+root repo/Quant_replay_fixture_validate2
+root repo/Quant_replay_fixture_work
+root repo/Quant_safe_boot_gates
+root repo/Quant_safe_boot_merge_review
+root repo/Quant_strict_phase_close_validate
+root repo/Quant_strict_phase_close_work
+root repo/Quant_three_page_apptest_audit

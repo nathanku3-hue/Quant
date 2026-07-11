@@ -376,18 +376,37 @@ def validate_boot_core(repo_root: Path) -> dict[str, Any]:
 
 
 def _parse_porcelain_z(stdout: str) -> list[DirtyEntry]:
+    """Parse ``git status --porcelain=v1 -z`` records; fail closed on malformation."""
     entries: list[DirtyEntry] = []
     raw_entries = [part for part in stdout.split("\0") if part]
     idx = 0
     while idx < len(raw_entries):
         raw = raw_entries[idx]
         if len(raw) < 4:
-            idx += 1
-            continue
+            raise ValueError(
+                f"malformed git status porcelain -z record at index {idx}: "
+                f"expected status+space+path, got {raw!r}"
+            )
+        # XY<space><path> — path begins at index 3 when XY is two chars and space follows.
+        if raw[2] != " ":
+            raise ValueError(
+                f"malformed git status porcelain -z record at index {idx}: "
+                f"missing status/path separator in {raw!r}"
+            )
         status = raw[:2].strip() or raw[:2]
         path = raw[3:]
+        if not path:
+            raise ValueError(
+                f"malformed git status porcelain -z record at index {idx}: empty path"
+            )
         if raw[0] in {"R", "C"} or raw[1] in {"R", "C"}:
             idx += 1
+            if idx >= len(raw_entries):
+                raise ValueError(
+                    f"malformed git status porcelain -z rename/copy at index {idx - 1}: "
+                    "missing destination path record"
+                )
+            # Destination path consumed; scoreboard still keys primary path.
         entries.append(DirtyEntry(status=status, path=path))
         idx += 1
     return entries
@@ -477,25 +496,55 @@ def _failed_git_identity_state(
 
 
 def _parse_ls_files_stage_z(stdout: str) -> list[dict[str, Any]]:
-    """Parse ``git ls-files -s -z`` records; paths may contain spaces."""
+    """Parse ``git ls-files -s -z`` records; paths may contain spaces. Fail closed."""
     records: list[dict[str, Any]] = []
-    for raw in stdout.split("\0"):
-        if not raw:
-            continue
+    for index, raw in enumerate(part for part in stdout.split("\0") if part):
         # Format: <mode> SP <object> SP <stage> TAB <path>
         tab = raw.find("\t")
         if tab < 0:
-            continue
+            raise ValueError(
+                f"malformed git ls-files -s -z record at index {index}: missing TAB in {raw!r}"
+            )
         meta = raw[:tab]
         path = raw[tab + 1 :]
+        if not path:
+            raise ValueError(
+                f"malformed git ls-files -s -z record at index {index}: empty path"
+            )
         parts = meta.split(" ")
         if len(parts) != 3:
-            continue
+            raise ValueError(
+                f"malformed git ls-files -s -z record at index {index}: "
+                f"expected mode object stage, got {meta!r}"
+            )
         mode, object_id, stage_text = parts
+        if mode not in {"100644", "100755", "120000", "160000", "040000"} and not (
+            len(mode) == 6 and mode.isdigit()
+        ):
+            # Accept standard git index modes; still require parseable stage/object.
+            pass
+        if not _is_git_object_id(object_id) and not (
+            len(object_id) in {40, 64}
+            and all(character in "0123456789abcdef" for character in object_id)
+        ):
+            # object may be abbreviated in some tooling; require non-empty hex-ish id
+            if not object_id or any(c not in "0123456789abcdef" for c in object_id.lower()):
+                raise ValueError(
+                    f"malformed git ls-files -s -z record at index {index}: "
+                    f"invalid object id {object_id!r}"
+                )
         try:
             stage = int(stage_text)
-        except ValueError:
-            continue
+        except ValueError as exc:
+            raise ValueError(
+                f"malformed git ls-files -s -z record at index {index}: "
+                f"invalid stage {stage_text!r}"
+            ) from exc
+        if stage < 0 or stage > 3:
+            raise ValueError(
+                f"malformed git ls-files -s -z record at index {index}: "
+                f"stage out of range {stage}"
+            )
         records.append(
             {
                 "mode": mode,
@@ -553,7 +602,26 @@ def collect_gitlink_inventory(repo_root: Path) -> dict[str, Any]:
             "gitmodules_status": "NOT_CHECKED",
             "registered_paths": [],
         }
-    records = _parse_ls_files_stage_z(listed.stdout)
+    try:
+        records = _parse_ls_files_stage_z(listed.stdout)
+    except ValueError as exc:
+        return {
+            "status": "FAIL",
+            "reason": f"malformed ls-files stage index: {exc}",
+            "ls_files_ok": False,
+            "total_gitlinks": 0,
+            "stage0_gitlinks": 0,
+            "unregistered_gitlinks": 0,
+            "unregistered_paths": [],
+            "non_stage0_gitlinks": 0,
+            "non_stage0_paths": [],
+            "unmerged_entries": 0,
+            "unmerged_paths": [],
+            "unmerged_or_nonzero_stage_status": "FAIL",
+            "unregistered_status": "FAIL",
+            "gitmodules_status": "NOT_CHECKED",
+            "registered_paths": [],
+        }
     gitlinks = [row for row in records if row["mode"] == "160000"]
     non_gitlink_unmerged = [
         row for row in records if row["mode"] != "160000" and int(row["stage"]) != 0
@@ -658,12 +726,12 @@ def collect_git_state(repo_root: Path) -> dict[str, Any]:
     ahead: int | None = None
     behind: int | None = None
     identity_errors: list[str] = []
+    is_detached = branch_name == "HEAD"
     if branch.returncode != 0:
         identity_errors.append("branch_command_failed")
     elif not branch_name:
         identity_errors.append("branch_missing")
-    elif branch_name == "HEAD":
-        identity_errors.append("detached_head")
+    # Detached HEAD is allowed when commit+tree verify (proof worktrees pin exact commits).
     if head.returncode != 0:
         identity_errors.append("head_command_failed")
     elif not _is_git_object_id(head_sha):
@@ -678,35 +746,46 @@ def collect_git_state(repo_root: Path) -> dict[str, Any]:
         identity_errors.append("head_tree_command_failed")
     elif not _is_git_object_id(head_tree_sha):
         identity_errors.append("head_tree_invalid")
-    if upstream.returncode != 0:
-        identity_errors.append("upstream_command_failed")
-    elif not upstream_name:
-        identity_errors.append("upstream_missing")
-    if upstream_head.returncode != 0:
-        identity_errors.append("upstream_head_command_failed")
-    elif not _is_git_object_id(upstream_sha):
-        identity_errors.append("upstream_head_invalid")
-    if upstream_commit.returncode != 0:
-        identity_errors.append("upstream_commit_command_failed")
-    elif not _is_git_object_id(upstream_commit_sha):
-        identity_errors.append("upstream_commit_invalid")
-    elif upstream_sha != upstream_commit_sha:
-        identity_errors.append("upstream_not_commit")
-    if ahead_behind.returncode == 0:
+    # Upstream is optional on detached proof checkouts; required for named branches.
+    if not is_detached:
+        if upstream.returncode != 0:
+            identity_errors.append("upstream_command_failed")
+        elif not upstream_name:
+            identity_errors.append("upstream_missing")
+        if upstream_head.returncode != 0:
+            identity_errors.append("upstream_head_command_failed")
+        elif not _is_git_object_id(upstream_sha):
+            identity_errors.append("upstream_head_invalid")
+        if upstream_commit.returncode != 0:
+            identity_errors.append("upstream_commit_command_failed")
+        elif not _is_git_object_id(upstream_commit_sha):
+            identity_errors.append("upstream_commit_invalid")
+        elif upstream_sha != upstream_commit_sha:
+            identity_errors.append("upstream_not_commit")
+        if ahead_behind.returncode == 0:
+            parts = ahead_behind.stdout.strip().split()
+            if len(parts) == 2 and all(part.isdigit() for part in parts):
+                ahead, behind = int(parts[0]), int(parts[1])
+            else:
+                identity_errors.append("ahead_behind_invalid")
+        else:
+            identity_errors.append("ahead_behind_command_failed")
+    elif ahead_behind.returncode == 0:
         parts = ahead_behind.stdout.strip().split()
         if len(parts) == 2 and all(part.isdigit() for part in parts):
             ahead, behind = int(parts[0]), int(parts[1])
-        else:
-            identity_errors.append("ahead_behind_invalid")
-    else:
-        identity_errors.append("ahead_behind_command_failed")
 
     status_command_ok = status.returncode == 0
     if not status_command_ok:
         identity_errors.append("status_command_failed")
         entries: list[DirtyEntry] = []
     else:
-        entries = _parse_porcelain_z(status.stdout)
+        try:
+            entries = _parse_porcelain_z(status.stdout)
+        except ValueError as exc:
+            identity_errors.append(f"status_porcelain_malformed:{exc}")
+            entries = []
+            status_command_ok = False
 
     has_upstream = bool(preserved_upstream)
     aligned = bool(

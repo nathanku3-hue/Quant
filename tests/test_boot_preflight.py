@@ -780,6 +780,29 @@ def test_parse_ls_files_stage_z_preserves_paths_with_spaces() -> None:
     assert rows[0]["path"] == "root repo/Quant_example"
 
 
+def test_parse_ls_files_stage_z_fail_closed_on_malformed() -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="missing TAB"):
+        boot_preflight._parse_ls_files_stage_z("160000 " + ("a" * 40) + " 0 root repo/no_tab\0")
+    with pytest.raises(ValueError, match="invalid stage"):
+        boot_preflight._parse_ls_files_stage_z("160000 " + ("a" * 40) + " x\tpath\0")
+    with pytest.raises(ValueError, match="empty path"):
+        boot_preflight._parse_ls_files_stage_z("160000 " + ("a" * 40) + " 0\t\0")
+
+
+def test_parse_porcelain_z_fail_closed_on_malformed() -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="malformed git status porcelain"):
+        boot_preflight._parse_porcelain_z("??\0")
+    with pytest.raises(ValueError, match="malformed git status porcelain"):
+        boot_preflight._parse_porcelain_z("??x\0")
+    rows = boot_preflight._parse_porcelain_z(" M path/with space.py\0")
+    assert len(rows) == 1
+    assert rows[0].path == "path/with space.py"
+
+
 def test_collect_git_state_uses_ignore_submodules_and_preserves_dirt_on_upstream_fail(
     tmp_path: Path,
 ) -> None:
