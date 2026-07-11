@@ -1793,3 +1793,11 @@ Application pattern:
 - Fix applied: Ran a bounded docs-only truth reconciliation across all mandatory current-truth surfaces, preserved the payload and envelope bytes, regenerated/validated current context, reran governance and planning preflight, and published Thin SAW evidence.
 - Guardrail for next time: After any terminal evidence-only commit changes a milestone verdict, immediately compare every active current-truth surface against the new verdict before declaring closure; preflight PASS does not substitute for semantic truth reconciliation.
 - Evidence paths: `docs/saw_reports/saw_request_artifact_identity_terminal_review_v1_20260711.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/saw_reports/saw_request_artifact_identity_truth_reconciliation_v1_20260711.md`.
+
+## 2026-07-12 Round Entry (C0X→M7F0-v4)
+- Date: 2026-07-12
+- Mistake or miss: C0A closure claimed PASS with wrong envelope hashes; porcelain and ls-files parsers silently skipped malformed records; nested gitlinks poisoned dirt completeness.
+- Root cause: Closure theater over object-store truth; parsers optimized for lenience; proof used branch checkout that cannot attach twice.
+- Fix applied: Fork `aee7f4c`, fail-close both parsers, deindex+ignore 41 gitlinks, detached proof worktree planning PASS; M7F0-v4 mechanical vertical with v4 clock/overlap/live-name/cost locks.
+- Guardrail for next time: Prove exact commits detached; never source-wide nonnumeric gates on CRSP; formation after map/window filters; bind ignored parquet via tracked manifest.
+- Evidence paths: commits `17cb830`, `d4fcfcb`; `docs/context/e2e_evidence/pead_m7f0_v4_2019_crsp_vertical.json`; `docs/saw_reports/saw_c0x_m7f0_v4_20260712.md`.
