@@ -1,5 +1,32 @@
 # Planner Packet - Current
 
+## New Context Packet — C0X → M7F0-v4 (2026-07-12)
+
+## What Was Done
+
+- C0X on branch `c0x/m7f0-v4` from `aee7f4c`: fail-closed dual index/porcelain parsers; deindexed+ignored exactly 41 gitlinks; commit `17cb830`; detached proof worktree planning PASS via primary `.venv`.
+- M7F0-v4 2019 RDQ CRSP Q5 long-only mechanical vertical executed with v4 contract locks; evidence + tracked parquet manifest published.
+- Invalid C0A closure commits abandoned (not repaired).
+
+## What Is Locked
+
+- `link_model=current_snapshot_cusip8`; `as_of_link=false`; research-only; `m6b_data_contract_ready=false`.
+- No D2B/M6 portfolio reuse; no alpha/tradable; no WRDS login.
+
+## What Is Next
+
+Owner accept mechanical M7F0-v4 evidence under research-validity ceiling ~30, or authorize separate as-of link work. Do not run C0B as a phase.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4	ests	est_pead_m7f0_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+# Planner Packet - Current
+
 ## New Context Packet — Request Artifact Identity Truth Reconciliation V1
 
 ## What Was Done

@@ -1,5 +1,16 @@
 # Bridge Contract - Current
 
+## Active Addendum — C0X → M7F0-v4 (2026-07-12)
+
+- `SYSTEM_DELTA`: C0X trust bootstrap + M7F0-v4 2019 CRSP Q5 long-only mechanical vertical on branch `c0x/m7f0-v4` (base `aee7f4c`). C0A closure theater abandoned.
+- `PM / Product Delta`: Mechanical flagged research curve evidence available under snapshot CUSIP8 ceiling; not strict M6b; not alpha.
+- `OPEN_DECISION`: Accept mechanical evidence vs authorize as-of link upgrade.
+- `RECOMMENDED_NEXT_STEP`: Owner acceptance of M7F0-v4 evidence package; keep readiness false.
+- `DO_NOT_REDECIDE`: Do not repair invalid C0A envelopes; do not claim as-of link; do not flip `m6b_data_contract_ready`.
+- `PHASE_STATUS`: C0X PASS (planning proof); M7F0-v4 mechanical PASS (ADVISORY on full A/B/C identity).
+
+# Bridge Contract - Current
+
 ## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - `RoundID`: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-TRUTH-RECONCILIATION-V1`; `ScopeID`: `REQUEST_ARTIFACT_IDENTITY_TRUTH_RECONCILIATION_V1`.

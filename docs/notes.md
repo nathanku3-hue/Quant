@@ -6414,3 +6414,11 @@ Focused tests: `tests/test_pead_m6_pit_walk_forward_equity_curve.py`.
 - Lifecycle boundary: `PREPARED_NOT_SENT`; no message is proven sent and dispatch remains denied.
 - Authority boundary: identity closure does not authorize remotes, source/provider access, factual validation, readiness promotion, Gate D, publication, strategy/UI work, or data output.
 - Formula impact: none; no quantitative formula, estimator, or runtime path changed.
+
+## M7F0-v4 formulas (scripts/pead_m7f0_2019_crsp_vertical.py)
+- Entry session: first CRSP trading date strictly after RDQ (day +1); window = that date + 59 subsequent CRSP sessions (60 total).
+- Delist-day return: r = (1+RET)*(1+DLRET)-1 if RET finite; else r = DLRET if DLRET finite; else event window fails.
+- After delist day: position return = 0 (cash) for remaining sessions in the 60-day window.
+- Weights: equal-weight across live equity PERMNOs on day t; at most one claim per PERMNO via earliest-event-wins.
+- Cost: cost_t = 0.00075 * sum_i |w_i,t - w_i,t-1| (terminal liquidation included on final day).
+- Net: r_net,t = r_gross,t - cost_t.
