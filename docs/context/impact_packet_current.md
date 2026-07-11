@@ -5,8 +5,9 @@
 - Changed scope: current truth surfaces, detached-binding policy, exact banking of the four 20260701 request artifacts, and quarantine of the false dispatch Markdown/JSON and dependent PASS report.
 - Touched interfaces: Docs/Ops artifact identity and lifecycle truth only; no runtime, data, provider, validator, strategy, or UI interface.
 - Preserved semantics: the four request artifacts remain byte-identical request-preparation records; no request text, gate semantics, or factual readiness evidence changed.
-- Identity result: `e470137` did not contain the four artifacts. Commit 1 banks them; Commit 2 must bind Commit 1 through a detached envelope because payload self-binding is impossible without changing payload bytes.
-- Current risk: dispatch is denied until the detached envelope and fresh checks complete. No remote, dispatch, source/provider access, factual validation, readiness, Gate D, publication, or data output is permitted.
+- Identity result: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` contains all four exact payloads; the tracked detached envelope binds its remote/root/commit/tree and four distinct hashes with status `PREPARED_NOT_SENT`.
+- Validation result: governance PASS with 0 findings, planning boot PASS, and fresh A/B/C technical check sets PASS. Terminal SAW remains BLOCK only because distinct-agent ownership is unavailable.
+- Current risk: dispatch remains denied. No remote, source/provider access, factual validation, readiness, Gate D, publication, or data output is permitted.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

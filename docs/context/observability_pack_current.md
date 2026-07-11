@@ -2,15 +2,16 @@
 
 ## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
 
-- `ObservabilityRating`: AMBER for bounded identity repair; RED for dispatch and strict M6b readiness. No Gate A or Gate B/C message is proven sent.
-- Payload sentinel: the four exact 20260701 request artifacts must remain byte-identical and tracked in payload Commit 1.
-- Detached-binding sentinel: commit/tree identity is valid only through a separate tracked envelope binding Commit 1's canonical remote/root/commit/tree and four distinct path/hash pairs. Payload self-binding is invalid.
+- `ObservabilityRating`: GREEN for the bounded technical identity repair, AMBER for terminal ownership review, and RED for dispatch and strict M6b readiness. No Gate A or Gate B/C message is proven sent.
+- Payload sentinel: the four exact 20260701 request artifacts are byte-identical and tracked in Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11`.
+- Detached-binding sentinel: the tracked envelope binds Commit 1's canonical remote/root/commit/tree and four distinct path/hash pairs with `PREPARED_NOT_SENT`; payload and envelope self-binding remain invalid.
 - Hash-label sentinel: Markdown and JSON hashes are separate values. The quarantined dispatch Markdown is `ed2db301...`; the quarantined dispatch JSON is `5975304a...`.
 - Quarantine sentinel: former dispatch and dependent PASS artifacts are `INVALID_NOT_DISPATCHED` and must never be reused as active evidence.
 - Git sentinel: every identity check removes ambient Git redirection/configuration, sets `GIT_NO_REPLACE_OBJECTS=1`, and rejects replacement refs or non-commit identity.
 - JSON sentinel: duplicate keys at any nesting level in authority/evidence/request/envelope JSON fail closed; ambiguous legacy JSON is invalid.
 - Scope sentinel: no remotes, dispatch, Gate D, source/provider work, validation, Strategy/UI, publication, data output, or readiness promotion.
-- Next-action sentinel: create the detached envelope with `PREPARED_NOT_SENT`, then rerun both preflights and fresh A/B/C.
+- Validation sentinel: governance PASS 0 findings, planning boot PASS, and Reviewer A/B/C technical check sets PASS. Distinct-agent ownership is unavailable, forcing terminal SAW BLOCK.
+- Next-action sentinel: reserve distinct agents and rerun terminal ownership review without changing or dispatching the envelope.
 
 ## Active Addendum - V2 PEAD M6b Slice 0 Contract Correction (2026-07-02)
 

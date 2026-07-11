@@ -1,0 +1,103 @@
+{
+  "envelope_id": "V2_PEAD_M6B_GATE_ABC_REQUEST_ARTIFACT_IDENTITY_ENVELOPE_20260711",
+  "round_id": "ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-REPAIR-V1",
+  "scope_id": "REQUEST_ARTIFACT_IDENTITY_REPAIR_V1",
+  "artifact_type": "detached_request_artifact_identity_envelope",
+  "status": "PREPARED_NOT_SENT",
+  "authority": "artifact identity evidence only; not dispatch proof, source-access authorization, entitlement proof, export authority, archive inspection authority, provider access, factual gate validation, Gate D authority, publication authority, data-output authority, or strict readiness authority",
+  "binding_model": {
+    "type": "detached_prior_commit_binding",
+    "payload_commit_relation": "immediately_prior_commit",
+    "self_binding": false,
+    "rule": "The payload files are banked first. This separate envelope binds the prior payload commit and does not claim to bind the envelope's own commit or tree."
+  },
+  "repository_identity": {
+    "canonical_remote": "https://github.com/nathanku3-hue/Quant.git",
+    "repository_root": "E:/code/quant",
+    "branch_observed": "main",
+    "payload_commit_sha": "a86c3a0fcc34d29e8d76cded5616c6cbe77f500e",
+    "payload_tree_sha": "17d7dd85bee600b3658337b129774ffc629bad11",
+    "payload_commit_object_type": "commit",
+    "payload_tree_object_type": "tree"
+  },
+  "artifacts": [
+    {
+      "gate_scope": "A",
+      "artifact_role": "gate_a_contract_markdown",
+      "format": "Markdown",
+      "path": "docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.md",
+      "sha256": "90d7e203262e2e03cabcf1db943a82d18ad7d4bea86bdeda733de09f9a2e6df4"
+    },
+    {
+      "gate_scope": "A",
+      "artifact_role": "gate_a_contract_json",
+      "format": "JSON",
+      "path": "docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.json",
+      "sha256": "27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063"
+    },
+    {
+      "gate_scope": "B_C",
+      "artifact_role": "strict_source_access_request_bundle_markdown",
+      "format": "Markdown",
+      "path": "docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.md",
+      "sha256": "a8538e04e10308b4a621e08dc5f52396fe91848a04ca7556205be07acdd8563d"
+    },
+    {
+      "gate_scope": "B_C",
+      "artifact_role": "strict_source_access_request_bundle_json",
+      "format": "JSON",
+      "path": "docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.json",
+      "sha256": "913196ba279dd49442ce6b3bbde54d185c188a2d26e21cf462d853bbe295505b"
+    }
+  ],
+  "hash_label_policy": {
+    "aggregate_packet_hash_used": false,
+    "markdown_and_json_hashes_are_separate": true,
+    "ambiguous_hash_labels_rejected": true
+  },
+  "lifecycle": {
+    "prepared": true,
+    "sent": false,
+    "dispatch_proven": false,
+    "data_owner_response_received": false,
+    "source_access_authorized": false,
+    "factual_gate_validation_authorized": false,
+    "strict_readiness_authorized": false
+  },
+  "verification": {
+    "payload_commit_resolves": true,
+    "payload_tree_matches_commit": true,
+    "all_artifact_paths_exist_in_payload_commit": true,
+    "all_artifact_sha256_values_match_payload_commit_bytes": true,
+    "request_semantics_preserved": true,
+    "governance_preflight": "PASS_0_FINDINGS",
+    "planning_boot_preflight": "PASS",
+    "reviewer_a_semantic_check": "PASS",
+    "reviewer_b_identity_check": "PASS",
+    "reviewer_c_integrity_scope_check": "PASS",
+    "distinct_agent_ownership_check": "UNAVAILABLE_BLOCKING",
+    "preflight_and_fresh_review_status": "TECHNICAL_PASS__TERMINAL_OWNERSHIP_BLOCKED",
+    "terminal_saw_verdict": "BLOCK"
+  },
+  "rejection_rules": {
+    "legacy_or_unbound_artifacts": "REJECT",
+    "divergent_commit_51b1471ff93741fd339d506399413c928479db5a": "REJECT_DO_NOT_REDIRECT_OR_CHERRY_PICK",
+    "reconstructed_or_synthetic_identity": "REJECT",
+    "self_referential_payload_identity": "REJECT",
+    "single_hash_for_multiple_files": "REJECT"
+  },
+  "forbidden_scope": [
+    "remote_operation",
+    "request_dispatch",
+    "source_or_provider_access",
+    "credential_use",
+    "archive_inspection",
+    "export_or_download",
+    "factual_gate_validation",
+    "readiness_promotion",
+    "Gate_D_work",
+    "publication",
+    "strategy_or_frontend_work",
+    "data_output"
+  ]
+}

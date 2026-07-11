@@ -5,9 +5,9 @@ V2 PEAD Request Artifact Identity Repair V1 (2026-07-11)
 - Decision: approve the bounded two-commit repair and keep dispatch denied. Commit 1 restores BLOCK truth, quarantines false dispatch evidence, clarifies detached binding, and banks the exact four current 20260701 request artifacts without byte changes.
 - Decision: Commit 2 must create a separate tracked identity envelope binding Commit 1's canonical remote, repository root, commit, tree, four artifact paths, and four distinct SHA-256 values. The envelope lifecycle is `PREPARED_NOT_SENT` and grants no downstream authority.
 - Decision: reject legacy, divergent, reconstructed, redirected, cherry-picked, self-referential, ambiguously hashed, or otherwise unbound artifacts. Do not use `51b1471ff93741fd339d506399413c928479db5a` as a substitute.
-- Evidence: `e470137d64eb44829e8977c1aaf60bdcc64117d5` / tree `3374b7fcc72f2fb0d53e6e85ad347729e647dba0` contains none of the four current request artifacts. The denied dispatch Markdown SHA-256 is `ed2db3015413bc71edea919d5c15800514e74b5918253af3d86788614baf872d`; the denied dispatch JSON SHA-256 is separately `5975304aee17b6b46a481f690b3be7ac76ee37d5000e9e1e58fcbed1b88b8a30`.
-- Boundary: no remotes, dispatch, source/provider access, factual validation, readiness, Gate D, publication, strategy/UI work, or data output.
-- Next action: create the detached identity envelope, rerun governance and planning boot preflights, and run fresh A/B/C identity reviews.
+- Evidence: `e470137d64eb44829e8977c1aaf60bdcc64117d5` lacked all four current artifacts. Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` banks their exact bytes; the tracked detached envelope binds four distinct path/hash pairs with `PREPARED_NOT_SENT`. Governance PASS 0 findings, planning boot PASS, and fresh A/B/C technical checks PASS.
+- Boundary: no remotes, dispatch, source/provider access, factual validation, readiness, Gate D, publication, strategy/UI work, or data output. Distinct-agent ownership is unavailable, so terminal SAW remains BLOCK.
+- Next action: reserve distinct implementer/Reviewer A/B/C agents and rerun terminal ownership review against the unchanged envelope; do not dispatch.
 
 V2 PEAD P0 Trust-Substrate Repair (2026-07-11)
 - Decision: repair Git identity and JSON authority ambiguity together as one P0 trust boundary; replacement refs or duplicate JSON object members deny authority before any artifact, approval, request, or output is trusted.

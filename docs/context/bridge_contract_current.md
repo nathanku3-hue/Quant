@@ -4,12 +4,12 @@
 
 - `RoundID`: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-REPAIR-V1`; `ScopeID`: `REQUEST_ARTIFACT_IDENTITY_REPAIR_V1`.
 - `SYSTEM_DELTA`: Restored fail-closed truth. The former dispatch Markdown, JSON, and dependent PASS report are quarantined as `INVALID_NOT_DISPATCHED`; no Gate A or Gate B/C message is proven sent.
-- `PM / Product Delta`: The exact four current 20260701 request artifacts are being banked unchanged. They remain request-preparation artifacts only and carry no source-access, validation, readiness, or dispatch authority.
-- `EVIDENCE_DELTA`: Artifact identity at `e470137d64eb44829e8977c1aaf60bdcc64117d5` / tree `3374b7fcc72f2fb0d53e6e85ad347729e647dba0` failed because all four current artifacts were absent. The dispatch Markdown SHA-256 is `ed2db3015413bc71edea919d5c15800514e74b5918253af3d86788614baf872d`; the dispatch JSON SHA-256 is separately `5975304aee17b6b46a481f690b3be7ac76ee37d5000e9e1e58fcbed1b88b8a30`.
-- `OPEN_DECISION`: None for Commit 1. Commit 2 must create a detached identity envelope binding Commit 1's remote/root/commit/tree and four distinct artifact path/hash pairs.
-- `RECOMMENDED_NEXT_STEP`: Complete the detached envelope, rerun governance and planning boot preflights, and run fresh A/B/C identity reviews. Keep lifecycle status `PREPARED_NOT_SENT` at most.
+- `PM / Product Delta`: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` banks the exact four current 20260701 request artifacts unchanged. A tracked detached envelope now binds its remote/root/commit/tree and four distinct path/hash pairs with lifecycle `PREPARED_NOT_SENT`.
+- `EVIDENCE_DELTA`: Governance preflight PASS with 0 findings; planning boot preflight PASS; Reviewer A semantic, Reviewer B Git/blob identity, and Reviewer C integrity/scope check sets PASS. Distinct-agent ownership is unavailable in this session, so terminal SAW remains BLOCK. The denied dispatch Markdown and JSON retain separately labeled hashes `ed2db301...` and `5975304a...`.
+- `OPEN_DECISION`: Terminal ownership review by distinct agents remains open. It does not permit dispatch.
+- `RECOMMENDED_NEXT_STEP`: Rerun implementer and Reviewer A/B/C with distinct agent ownership against the unchanged envelope; keep status `PREPARED_NOT_SENT`.
 - `DO_NOT_REDECIDE`: Do not redirect to or cherry-pick divergent `51b1471ff93741fd339d506399413c928479db5a`; reject legacy, reconstructed, or unbound artifacts. No remotes, dispatch, source/provider access, validation, readiness, Gate D, publication, or data output.
-- `PHASE_STATUS`: BLOCK. Dispatch remains denied; A/B/C/D factual statuses and `m6b_data_contract_ready=false` remain unchanged.
+- `PHASE_STATUS`: BLOCK on terminal ownership only. The bounded two-commit technical repair is complete; dispatch remains denied and A/B/C/D factual statuses plus `m6b_data_contract_ready=false` remain unchanged.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

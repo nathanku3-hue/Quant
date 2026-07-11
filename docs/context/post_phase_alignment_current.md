@@ -4,9 +4,9 @@
 
 - What changed: Docs/Ops restored dispatch truth to BLOCK, quarantined the invalid dispatch outputs, preserved exact current request semantics, and adopted detached two-commit artifact identity.
 - Stream status update: Docs/Ops owns identity repair only. Data, Strategy, and Frontend remain held; no external response is pending because no send is proven.
-- Evidence: `e470137` lacked all four current request artifacts; the prior dispatch Markdown and JSON also used incorrectly conflated hash labeling.
-- Current bottleneck: a tracked envelope must bind Commit 1's remote/root/commit/tree and four separate artifact paths/hashes.
-- Next active stream: Docs/Ops detached-envelope construction and fail-closed preflight/reviewer verification only.
+- Evidence: `e470137` lacked all four current request artifacts and the prior dispatch hashes were conflated. Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` now banks exact bytes; the tracked envelope is `PREPARED_NOT_SENT`; governance PASS 0 findings, planning boot PASS, and A/B/C technical checks PASS.
+- Current bottleneck: distinct-agent ownership is unavailable, so terminal SAW remains BLOCK and dispatch remains denied.
+- Next active stream: distinct-agent terminal ownership review only; no envelope mutation or downstream work unless a finding requires repair.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

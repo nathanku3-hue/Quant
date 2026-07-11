@@ -10,10 +10,12 @@
 - [x] Legacy, divergent, reconstructed, redirected, cherry-picked, and otherwise unbound artifacts remain rejected.
 - [x] Factual A/B/C/D statuses and `m6b_data_contract_ready=false` remain unchanged.
 - [x] No remotes, dispatch, source inspection, provider use, factual validation, readiness, Gate D, publication, or data output.
-- [ ] Commit 1 exact payload commit/tree recorded in a tracked detached identity envelope.
-- [ ] Governance and planning boot preflights rerun after repair.
-- [ ] Fresh Reviewer A/B/C identity checks completed and reconciled.
-- Next action: create Commit 2 detached identity envelope with status `PREPARED_NOT_SENT`; dispatch remains denied.
+- [x] Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` recorded in a tracked detached identity envelope with four distinct path/hash pairs.
+- [x] Governance preflight rerun: PASS, 0 findings.
+- [x] Planning boot preflight rerun: PASS; expected deferred readiness/context/UI checks only.
+- [x] Fresh Reviewer A/B/C technical check sets completed: semantic PASS, Git/blob identity PASS, integrity/scope PASS.
+- [ ] Distinct-agent ownership check; unavailable in this tool session, therefore terminal SAW remains BLOCK.
+- Next action: reserve distinct agents and rerun terminal ownership review against the unchanged `PREPARED_NOT_SENT` envelope; dispatch remains denied.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

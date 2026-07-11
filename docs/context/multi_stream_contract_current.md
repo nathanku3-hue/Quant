@@ -4,13 +4,14 @@
 
 | Stream | Current status | Handoff / boundary |
 |---|---|---|
-| Docs/Ops | Identity repair active; exact 20260701 request payloads banked in Commit 1, detached envelope pending | Keep lifecycle fail-closed; no dispatch claim |
+| Docs/Ops | Two-commit identity repair technically complete; envelope `PREPARED_NOT_SENT`; terminal ownership review blocked | Keep lifecycle fail-closed; no dispatch claim |
 | Data | Held | No source-byte inspection, provider, validation, readiness, or data output |
 | Strategy | Held | No return/curve/alpha/tradability work |
 | Frontend/UI | Held | No readiness or strategy surface expansion |
 
 - Cross-stream rule: tracked payload bytes alone are not dispatch authority. A detached envelope may prove identity but must remain `PREPARED_NOT_SENT` and cannot authorize downstream work.
-- Next action: bind Commit 1 in a tracked detached envelope, rerun preflights and fresh A/B/C, and keep dispatch denied.
+- Validation: governance PASS 0 findings, planning boot PASS, fresh A/B/C technical check sets PASS; distinct-agent ownership unavailable, so terminal SAW BLOCK.
+- Next action: reserve distinct agents and rerun terminal ownership review against the unchanged envelope; keep dispatch denied.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

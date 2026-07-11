@@ -6,7 +6,8 @@
 - Payload identity formula: `payload_identity_valid := canonical_remote_match AND repository_root_match AND payload_commit_resolves_as_commit AND payload_tree_matches_commit AND every_declared_path_exists_in_payload_commit AND every_declared_SHA256_matches_exact_blob_bytes`.
 - Detached-binding formula: `identity_envelope_valid := tracked_separate_envelope AND envelope_binds_prior_payload_commit AND distinct_markdown_json_paths_and_hashes AND lifecycle_status == PREPARED_NOT_SENT`. The envelope never binds its own commit/tree.
 - Failure rule: `legacy OR divergent OR reconstructed OR redirected OR cherry_picked OR self_referential OR ambiguous_hash_label OR unbound => dispatch_denied`.
-- Current boundary: Commit 1 banks exact 20260701 request payloads and quarantines false dispatch evidence; Commit 2 supplies the detached envelope. No remote, dispatch, source/provider access, validation, readiness, Gate D, publication, strategy/UI, or data output.
+- Current evidence: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11`; tracked detached envelope with four distinct path/hash pairs and `PREPARED_NOT_SENT`; governance PASS 0 findings; planning boot PASS; fresh A/B/C technical check sets PASS.
+- Current boundary: distinct-agent ownership unavailable, therefore terminal SAW BLOCK. No remote, dispatch, source/provider access, validation, readiness, Gate D, publication, strategy/UI, or data output.
 
 ## 2026-07-11 P0 Trust-Substrate Repair Registry
 
