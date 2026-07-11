@@ -1,17 +1,17 @@
 # Multi-Stream Contract - Quant Current
 
-## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 | Stream | Current status | Handoff / boundary |
 |---|---|---|
-| Docs/Ops | Two-commit identity repair technically complete; envelope `PREPARED_NOT_SENT`; terminal ownership review blocked | Keep lifecycle fail-closed; no dispatch claim |
-| Data | Held | No source-byte inspection, provider, validation, readiness, or data output |
+| Docs/Ops | Request-artifact identity repair and independent terminal review PASS; envelope remains `PREPARED_NOT_SENT` | Hold verified artifacts; no dispatch without separate owner authorization |
+| Data | Held | No source-byte inspection, provider, factual validation, readiness promotion, or data output |
 | Strategy | Held | No return/curve/alpha/tradability work |
 | Frontend/UI | Held | No readiness or strategy surface expansion |
 
-- Cross-stream rule: tracked payload bytes alone are not dispatch authority. A detached envelope may prove identity but must remain `PREPARED_NOT_SENT` and cannot authorize downstream work.
-- Validation: governance PASS 0 findings, planning boot PASS, fresh A/B/C technical check sets PASS; distinct-agent ownership unavailable, so terminal SAW BLOCK.
-- Next action: reserve distinct agents and rerun terminal ownership review against the unchanged envelope; keep dispatch denied.
+- Cross-stream rule: tracked payload bytes and terminal identity PASS are not dispatch authority. The detached envelope proves identity only and remains `PREPARED_NOT_SENT`.
+- Validation: commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` records three distinct read-only Reviewer A/B/C PASS reports and terminal SAW PASS against unchanged fixed artifacts.
+- Next action: no implementation or reviewer rerun. Hold/no-dispatch unless a separate explicit owner decision authorizes Gate A/B/C dispatch.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

@@ -1,13 +1,13 @@
 # Impact Packet - Current
 
-## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
-- Changed scope: current truth surfaces, detached-binding policy, exact banking of the four 20260701 request artifacts, and quarantine of the false dispatch Markdown/JSON and dependent PASS report.
-- Touched interfaces: Docs/Ops artifact identity and lifecycle truth only; no runtime, data, provider, validator, strategy, or UI interface.
-- Preserved semantics: the four request artifacts remain byte-identical request-preparation records; no request text, gate semantics, or factual readiness evidence changed.
-- Identity result: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` contains all four exact payloads; the tracked detached envelope binds its remote/root/commit/tree and four distinct hashes with status `PREPARED_NOT_SENT`.
-- Validation result: governance PASS with 0 findings, planning boot PASS, and fresh A/B/C technical check sets PASS. Terminal SAW remains BLOCK only because distinct-agent ownership is unavailable.
-- Current risk: dispatch remains denied. No remote, source/provider access, factual validation, readiness, Gate D, publication, or data output is permitted.
+- Changed scope: mandatory current-truth surfaces, the active identity-repair phase status, decision/lesson records, generated current context, and one Thin SAW report only.
+- Touched interfaces: Docs/Ops governance truth only; no request payload, envelope, reviewer report, runtime, data, provider, validator, strategy, or UI interface.
+- Preserved semantics: the four request artifacts and detached envelope remain byte-identical; lifecycle stays `PREPARED_NOT_SENT`; no request text, gate semantics, factual gate evidence, or readiness evidence changed.
+- Identity result: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` contains all four exact payloads; commit `c642a94944831adbd7ecc06fb16259c87fcdd213` contains the detached envelope; terminal review commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` records independent Reviewer A/B/C PASS and terminal SAW PASS.
+- Validation result: terminal reviewer independence is closed PASS; context validation PASS; governance preflight PASS with 0 findings; planning boot preflight PASS; fixed payload/envelope/reviewer evidence byte checks PASS. Thin SAW is the final in-round close gate before commit.
+- Current risk: dispatch remains denied pending a separate explicit owner decision. No remote, source/provider access, factual validation, readiness promotion, Gate D, publication, or data output is permitted.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

@@ -1,21 +1,23 @@
 # Done Checklist - Phase 65 G8.2 System-Scouted Candidate Card
 
-## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
-- [x] Reviewer A/B/C BLOCK findings accepted: dispatch identity at `e470137` failed because the four current 20260701 request artifacts were absent.
+- [x] Original Reviewer A/B/C BLOCK findings accepted: dispatch identity at `e470137` failed because the four current 20260701 request artifacts were absent.
 - [x] False dispatch Markdown, JSON, and dependent PASS report quarantined as `INVALID_NOT_DISPATCHED`; no message is proven sent.
-- [x] Dispatch Markdown and JSON hashes labeled separately: Markdown `ed2db3015413bc71edea919d5c15800514e74b5918253af3d86788614baf872d`; JSON `5975304aee17b6b46a481f690b3be7ac76ee37d5000e9e1e58fcbed1b88b8a30`.
-- [x] Exact four current request artifacts selected for Commit 1 without semantic or byte changes.
-- [x] Detached-binding policy clarified: payload commit/tree identity belongs in a separate later envelope, never inside the payload being identified.
+- [x] Dispatch Markdown and JSON hashes remain separately labeled: Markdown `ed2db3015413bc71edea919d5c15800514e74b5918253af3d86788614baf872d`; JSON `5975304aee17b6b46a481f690b3be7ac76ee37d5000e9e1e58fcbed1b88b8a30`.
+- [x] Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` banks the exact four current request artifacts without semantic or byte changes.
+- [x] Commit `c642a94944831adbd7ecc06fb16259c87fcdd213` contains the detached identity envelope with four distinct path/hash pairs and lifecycle `PREPARED_NOT_SENT`.
+- [x] Three distinct read-only Reviewer A/B/C agents reviewed the fixed commits in separate pinned worktrees and returned PASS.
+- [x] Terminal reviewer-independence SAW at commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` is PASS.
+- [x] Mandatory current-truth surfaces no longer report the superseded ownership BLOCK.
 - [x] Legacy, divergent, reconstructed, redirected, cherry-picked, and otherwise unbound artifacts remain rejected.
 - [x] Factual A/B/C/D statuses and `m6b_data_contract_ready=false` remain unchanged.
-- [x] No remotes, dispatch, source inspection, provider use, factual validation, readiness, Gate D, publication, or data output.
-- [x] Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` recorded in a tracked detached identity envelope with four distinct path/hash pairs.
-- [x] Governance preflight rerun: PASS, 0 findings.
-- [x] Planning boot preflight rerun: PASS; expected deferred readiness/context/UI checks only.
-- [x] Fresh Reviewer A/B/C technical check sets completed: semantic PASS, Git/blob identity PASS, integrity/scope PASS.
-- [ ] Distinct-agent ownership check; unavailable in this tool session, therefore terminal SAW remains BLOCK.
-- Next action: reserve distinct agents and rerun terminal ownership review against the unchanged `PREPARED_NOT_SENT` envelope; dispatch remains denied.
+- [x] No remotes, dispatch, source inspection, provider use, factual validation, readiness promotion, Gate D, publication, or data output.
+- [x] Request-artifact identity repair and terminal reviewer independence are closed PASS.
+- [x] Context validation PASS; governance preflight PASS with 0 findings; planning boot preflight PASS; fixed-artifact byte checks PASS.
+- [x] Thin SAW PASS published for the bounded truth-reconciliation slice.
+- [ ] Gate A/B/C dispatch is authorized; a separate explicit owner decision is still absent.
+- Next action: hold the unchanged envelope at `PREPARED_NOT_SENT`; do not rerun implementation or reviewers and do not dispatch.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

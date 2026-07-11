@@ -7257,3 +7257,17 @@ V2 PEAD M6a.1 Core Guard Completion (2026-06-25)
     - `V2_PEAD_M6A_CORE := READY iff (calendar_interval_index = 1) and (numeric_projection_guard = 1) and (object_duckdb_relation = 0) and (turnover_entry_overlap_exit_final_parity = 1) and (shuffled_input_output_hash_parity = 1) and (full_universe_smoke_under_cap = 1)`.
   - Single next decision/action:
     - obtain independent Reviewer A/B/C terminal review; do not begin M6b or real-run wiring before that review and its separate data gates.
+
+Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+
+  - Decision record:
+    - accept terminal reviewer-independence PASS at commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` as the authoritative closure of the ownership blocker.
+    - reconcile only mandatory current-truth surfaces and closure records; do not rerun implementation or reviewers.
+    - preserve payload commit `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e`, envelope commit `c642a94944831adbd7ecc06fb16259c87fcdd213`, all four request payload bytes, and the envelope bytes unchanged.
+    - keep lifecycle `PREPARED_NOT_SENT`; terminal identity PASS does not authorize dispatch or downstream work.
+  - Contract lock:
+    - `REQUEST_ARTIFACT_IDENTITY_CLOSED = true` only for artifact identity and reviewer independence.
+    - `REQUEST_DISPATCH_AUTHORIZED = false` until a separate explicit owner decision.
+    - A/B/C/D factual gate statuses and `m6b_data_contract_ready=false` remain unchanged.
+  - Single next decision/action:
+    - hold/no-dispatch. A future Gate A/B/C dispatch action requires a separate explicit owner authorization.

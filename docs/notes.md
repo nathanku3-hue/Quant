@@ -6406,3 +6406,11 @@ Focused tests: `tests/test_pead_m6_pit_walk_forward_equity_curve.py`.
 - Projection/dtype guard: DuckDB receives only `event_idx/security_idx/entry_idx/exit_idx/side`, `security_idx/return_idx/tradable_total_return`, and `return_idx/return_date`. Event/security identifiers are numeric `int32`; object-dtype DuckDB relations are rejected before registration.
 - Determinism: relations are canonically sorted, DuckDB runs one worker with compensated `fsum`, output rows are ordered by `return_idx`, and `daily_portfolio_output_hash = SHA256(canonical_daily_csv_bytes)`; shuffled event/return input must preserve the same hash.
 - Scope boundary: do not introduce physical repartitioning, chunking, Numba, or fold multiprocessing unless a future profile demonstrates a breached memory/latency bound and identifies it as the necessary lever.
+
+# Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+
+- Closure evidence: terminal reviewer-independence PASS is fixed at commit `e50219051df8bc8fc1f21312325f01cea4a8e18d`, reviewing envelope commit `c642a94944831adbd7ecc06fb16259c87fcdd213` and payload commit `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e`.
+- Byte boundary: the four request payloads and detached envelope are unchanged; this round updates governance truth only.
+- Lifecycle boundary: `PREPARED_NOT_SENT`; no message is proven sent and dispatch remains denied.
+- Authority boundary: identity closure does not authorize remotes, source/provider access, factual validation, readiness promotion, Gate D, publication, strategy/UI work, or data output.
+- Formula impact: none; no quantitative formula, estimator, or runtime path changed.

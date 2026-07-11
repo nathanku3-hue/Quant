@@ -1785,3 +1785,11 @@ Application pattern:
 - Fix applied: Created versioned successor Gate A contract and request artifacts that bind an authorized calendar source of record, define eligible trading sessions, require an executable no-same-session mapping rule, make a timing artifact conditional on selected-source capability, and require one-to-one linkage when separate timing is used.
 - Guardrail for next time: Any strict timing-PIT claim must preserve predecessor hashes, bind the source/timing/calendar artifacts by SHA-256, define session mapping mechanically, and fail closed for ambiguous timestamps, non-one-to-one timing joins, or calendar gaps.
 - Evidence paths: `docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.json`, `docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.json`, `docs/saw_reports/saw_v2_pead_m6b_strict_data_authorization_request_20260701.md`.
+
+## 2026-07-11 Round Entry (Terminal Evidence Must Be Reconciled Into Current Truth)
+- Date: 2026-07-11
+- Mistake or miss: Terminal reviewer-independence PASS was committed, but planner, bridge, done, and related current-truth surfaces still reported the superseded ownership BLOCK.
+- Root cause: The review-only reconciliation intentionally committed only reviewer reports and terminal SAW evidence, while semantic drift detection was outside governance and planning preflight coverage.
+- Fix applied: Ran a bounded docs-only truth reconciliation across all mandatory current-truth surfaces, preserved the payload and envelope bytes, regenerated/validated current context, reran governance and planning preflight, and published Thin SAW evidence.
+- Guardrail for next time: After any terminal evidence-only commit changes a milestone verdict, immediately compare every active current-truth surface against the new verdict before declaring closure; preflight PASS does not substitute for semantic truth reconciliation.
+- Evidence paths: `docs/saw_reports/saw_request_artifact_identity_terminal_review_v1_20260711.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/saw_reports/saw_request_artifact_identity_truth_reconciliation_v1_20260711.md`.

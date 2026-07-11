@@ -1,15 +1,15 @@
 # Bridge Contract - Current
 
-## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
-- `RoundID`: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-REPAIR-V1`; `ScopeID`: `REQUEST_ARTIFACT_IDENTITY_REPAIR_V1`.
-- `SYSTEM_DELTA`: Restored fail-closed truth. The former dispatch Markdown, JSON, and dependent PASS report are quarantined as `INVALID_NOT_DISPATCHED`; no Gate A or Gate B/C message is proven sent.
-- `PM / Product Delta`: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` banks the exact four current 20260701 request artifacts unchanged. A tracked detached envelope now binds its remote/root/commit/tree and four distinct path/hash pairs with lifecycle `PREPARED_NOT_SENT`.
-- `EVIDENCE_DELTA`: Governance preflight PASS with 0 findings; planning boot preflight PASS; Reviewer A semantic, Reviewer B Git/blob identity, and Reviewer C integrity/scope check sets PASS. Distinct-agent ownership is unavailable in this session, so terminal SAW remains BLOCK. The denied dispatch Markdown and JSON retain separately labeled hashes `ed2db301...` and `5975304a...`.
-- `OPEN_DECISION`: Terminal ownership review by distinct agents remains open. It does not permit dispatch.
-- `RECOMMENDED_NEXT_STEP`: Rerun implementer and Reviewer A/B/C with distinct agent ownership against the unchanged envelope; keep status `PREPARED_NOT_SENT`.
-- `DO_NOT_REDECIDE`: Do not redirect to or cherry-pick divergent `51b1471ff93741fd339d506399413c928479db5a`; reject legacy, reconstructed, or unbound artifacts. No remotes, dispatch, source/provider access, validation, readiness, Gate D, publication, or data output.
-- `PHASE_STATUS`: BLOCK on terminal ownership only. The bounded two-commit technical repair is complete; dispatch remains denied and A/B/C/D factual statuses plus `m6b_data_contract_ready=false` remain unchanged.
+- `RoundID`: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-TRUTH-RECONCILIATION-V1`; `ScopeID`: `REQUEST_ARTIFACT_IDENTITY_TRUTH_RECONCILIATION_V1`.
+- `SYSTEM_DELTA`: Reconciled mandatory current truth to the valid terminal reviewer-independence PASS at commit `e50219051df8bc8fc1f21312325f01cea4a8e18d`. The former dispatch Markdown, JSON, and dependent PASS report remain quarantined as `INVALID_NOT_DISPATCHED`; no Gate A or Gate B/C message is proven sent.
+- `PM / Product Delta`: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` still banks the exact four request payloads, and commit `c642a94944831adbd7ecc06fb16259c87fcdd213` still holds the detached envelope with lifecycle `PREPARED_NOT_SENT`. No payload or envelope bytes changed.
+- `EVIDENCE_DELTA`: Three distinct read-only Reviewer A/B/C agents, each pinned to `c642a94944831adbd7ecc06fb16259c87fcdd213`, independently passed semantics, raw Git/blob identity, and hash/lifecycle/forbidden-scope checks against payload commit `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e`; terminal SAW is PASS. Truth reconciliation context validation, governance preflight, planning boot preflight, and fixed-artifact byte checks also PASS.
+- `OPEN_DECISION`: None for request-artifact identity closure. Gate A/B/C dispatch is a separate explicit owner decision and remains denied by default.
+- `RECOMMENDED_NEXT_STEP`: Hold the verified artifacts at `PREPARED_NOT_SENT`; do not rerun implementation or reviewers and do not dispatch without a separate owner authorization.
+- `DO_NOT_REDECIDE`: Do not redirect to or cherry-pick divergent `51b1471ff93741fd339d506399413c928479db5a`; reject legacy, reconstructed, or unbound artifacts. No remotes, dispatch, source/provider access, factual validation, readiness promotion, Gate D, publication, or data output.
+- `PHASE_STATUS`: PASS for request-artifact identity repair and terminal reviewer independence. Dispatch remains denied; A/B/C/D factual statuses and `m6b_data_contract_ready=false` remain unchanged.
 
 ## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
 

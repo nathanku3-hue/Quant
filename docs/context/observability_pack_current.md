@@ -1,17 +1,18 @@
 # Observability Pack - Current
 
-## Active Addendum — Request Artifact Identity Repair V1 (2026-07-11)
+## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
-- `ObservabilityRating`: GREEN for the bounded technical identity repair, AMBER for terminal ownership review, and RED for dispatch and strict M6b readiness. No Gate A or Gate B/C message is proven sent.
+- `ObservabilityRating`: GREEN for request-artifact identity repair, reviewer independence, and truth reconciliation; RED for dispatch and strict M6b readiness. No Gate A or Gate B/C message is proven sent.
 - Payload sentinel: the four exact 20260701 request artifacts are byte-identical and tracked in Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11`.
-- Detached-binding sentinel: the tracked envelope binds Commit 1's canonical remote/root/commit/tree and four distinct path/hash pairs with `PREPARED_NOT_SENT`; payload and envelope self-binding remain invalid.
+- Detached-binding sentinel: the tracked envelope at commit `c642a94944831adbd7ecc06fb16259c87fcdd213` binds Commit 1's canonical remote/root/commit/tree and four distinct path/hash pairs with `PREPARED_NOT_SENT`; payload and envelope self-binding remain invalid.
+- Reviewer sentinel: commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` records three distinct read-only Reviewer A/B/C PASS reports and terminal SAW PASS against the fixed commits.
 - Hash-label sentinel: Markdown and JSON hashes are separate values. The quarantined dispatch Markdown is `ed2db301...`; the quarantined dispatch JSON is `5975304a...`.
 - Quarantine sentinel: former dispatch and dependent PASS artifacts are `INVALID_NOT_DISPATCHED` and must never be reused as active evidence.
 - Git sentinel: every identity check removes ambient Git redirection/configuration, sets `GIT_NO_REPLACE_OBJECTS=1`, and rejects replacement refs or non-commit identity.
 - JSON sentinel: duplicate keys at any nesting level in authority/evidence/request/envelope JSON fail closed; ambiguous legacy JSON is invalid.
-- Scope sentinel: no remotes, dispatch, Gate D, source/provider work, validation, Strategy/UI, publication, data output, or readiness promotion.
-- Validation sentinel: governance PASS 0 findings, planning boot PASS, and Reviewer A/B/C technical check sets PASS. Distinct-agent ownership is unavailable, forcing terminal SAW BLOCK.
-- Next-action sentinel: reserve distinct agents and rerun terminal ownership review without changing or dispatching the envelope.
+- Scope sentinel: no remotes, dispatch, Gate D, source/provider work, factual validation, Strategy/UI, publication, data output, or readiness promotion.
+- Validation sentinel: context validation PASS; governance preflight PASS with 0 findings; planning boot preflight PASS; fixed payload/envelope/reviewer evidence byte checks PASS.
+- Next-action sentinel: hold the verified artifacts at `PREPARED_NOT_SENT`; do not rerun implementation or reviewers and do not dispatch without a separate explicit owner decision.
 
 ## Active Addendum - V2 PEAD M6b Slice 0 Contract Correction (2026-07-02)
 
