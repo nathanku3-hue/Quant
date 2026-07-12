@@ -1,31 +1,33 @@
-"""M7F2-v6-final (RETIRED EXECUTABLE — use pead_m7f3_v7): 2019 RDQ PEAD Q5 vertical + residual outcome envelope (flagged research).
+"""M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH: 2019 RDQ PEAD Q5 vertical (flagged research).
 
-Supersedes M7F1-v5.2-final and earlier M7F0/M7F1 diagnostics with no compatibility path.
+Hard-replaces M7F2-v6 diagnostic package for portfolio-truth closure (score path ~70-73;
+research validity ceiling remains ~30). Selection set is frozen at 2448 events; bridge
+parity changes only window status, never selection membership.
 
-Semantic locks (M7F2-v6-final):
-1. Exclude known pre-entry delists (DLSTCD>=200 on a session strictly before entry)
-   BEFORE formation breadth/Q5; then rerank Q5 on the surviving set. Policy is
-   structural (delist timing), not event-id allowlists (ids only in tests).
-2. Bridge only a blank post-entry one-session RET gap when adjacent abs(PRC)>0
-   and the next session finite RET prove price continuity; never bridge letter
-   specials (B/C/S/...) or multi-session gaps.
-3. Residual outcome ambiguities emit a diagnostic package: strict_curve_status=
-   BLOCKED plus neutral carry-to-cash and -100% write-down sensitivity curves
-   with per-event attribution. Neutral carry is not a justified finite upper bound.
-4. Map is a future-informed identity selection input (CUSIP8->PERMNO); never claim
-   used_for_selection=false. It is not a return-window completeness gate.
+Semantic locks:
+1. Pre-entry delist exclude (DLSTCD>=200 strictly before entry) before breadth/Q5 + rerank.
+2. Bridge: blank one-session RET only + conservative adjacent price/RET parity within
+   BRIDGE_PRICE_RET_PARITY_ABS_TOL; mismatch -> residual (never invent return; gap r=0).
+3. Daily sequence: drifted prior weights -> trade to target (equity turnover only) ->
+   apply today RET -> close-state transitions. Cash weight changes do not double-count.
+4. write_down_100pct sleeve dies at zero weight after -100% (not recapitalized into EW).
+5. Residual primary metric: sum of first-bad-date target weights (~0.72% band), not
+   event-count share and not weight-time integral.
+6. Exact 16-state Shapley attribution over the four residual ambiguities; contributions
+   sum to scenario NAV gap vs ok-only.
+7. Canonical selected-event set is SHA-256 hashed; map used_for_selection=true identity.
+8. Neutral carry is not a justified finite upper bound; strict_curve BLOCKED on residual.
 
-Other locks retained: formation-first source-wide spine; prior-20 tradability gate;
-equal-weight active slots incl post-delist cash; atomic writes; map always rebuilt;
-research_use_only; snapshot non-PIT; not alpha/tradable; m6b_data_contract_ready=false;
-research validity ceiling ~30.
+Forbidden: CCM/as-of link, readiness flip, alpha/tradable, UI, WRDS login, event-id policy.
 """
+
 
 
 from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import json
 import math
 import os
@@ -54,10 +56,10 @@ MIN_FORMATION_NAMES = 50
 MIN_ACTIVE_SLOTS = 10
 COHORT_YEAR = 2019
 LINK_MODEL = "cross_vintage_snapshot_cusip8_non_pit"
-ARTIFACT_NAME = "pead_m7f2_v6_2019_crsp_vertical"
-ROUND_ID = "ROUND-20260712-M7F2-V6-FINAL"
-SCOPE_ID = "M7F2_V6_FINAL_2019_OUTCOME_ENVELOPE"
-IMPLEMENTATION_VERSION = "m7f2-v6-final"
+ARTIFACT_NAME = "pead_m7f3_v7_2019_crsp_vertical"
+ROUND_ID = "ROUND-20260712-M7F3-V7-SELF-FINANCING"
+SCOPE_ID = "M7F3_V7_SELF_FINANCING_PORTFOLIO_TRUTH"
+IMPLEMENTATION_VERSION = "m7f3-v7"
 ROADMAP_DEVIATION = (
     "prior20_formation_tradability_restriction_not_map_repair: "
     ">=15/20 strictly pre-entry sessions require finite RET, abs(PRC)>0, VOL>0"
@@ -66,8 +68,17 @@ PRE_ENTRY_DELIST_RULE = (
     "exclude_before_breadth_q5_if_dlstcd_ge_200_on_any_session_strictly_before_entry"
 )
 BRIDGE_RULE = (
-    "blank_post_entry_one_session_gap_only_when_adjacent_abs_prc_gt_0_and_next_ret_numeric"
+    "blank_post_entry_one_session_gap_only_when_adjacent_price_ret_parity_within_tol"
 )
+BRIDGE_PRICE_RET_PARITY_ABS_TOL = 1e-4  # conservative abs tol on |PRC_next|/|PRC_prev|-1 - RET_next
+DAILY_SEQUENCE = (
+    "drifted_prior_weights->"
+    "trade_to_target_charge_equity_turnover->"
+    "apply_today_ret->"
+    "close_state_transitions"
+)
+RESIDUAL_EXPOSURE_METRIC = "summed_first_bad_date_target_weight"
+ATTRIBUTION_METHOD = "exact_16_state_shapley_four_residuals"
 OUTCOME_ENVELOPE_LEGS = (
     "strict_block",
     "neutral_carry_to_cash",
@@ -77,21 +88,21 @@ OUTCOME_ENVELOPE_LEGS = (
 DEFAULT_D1 = Path("data/processed/pead_d1_sue_signal.parquet")
 DEFAULT_SEC = Path("data/processed/security_master_compustat.parquet")
 DEFAULT_CRSP = Path("data/hkcj1itkyvfsmibz.csv")
-DEFAULT_EVIDENCE = Path("docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json")
-DEFAULT_PARQUET = Path("data/processed/pead_m7f2_v6_2019_daily_returns.parquet")
+DEFAULT_EVIDENCE = Path("docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json")
+DEFAULT_PARQUET = Path("data/processed/pead_m7f3_v7_2019_daily_returns.parquet")
 DEFAULT_MANIFEST = Path(
-    "docs/context/e2e_evidence/pead_m7f2_v6_2019_daily_returns.parquet.manifest.json"
+    "docs/context/e2e_evidence/pead_m7f3_v7_2019_daily_returns.parquet.manifest.json"
 )
 DEFAULT_CUSIP_MAP = Path(
-    "data/processed/pead_m7f2_v6_crsp_cusip8_permno_source_max_date.parquet"
+    "data/processed/pead_m7f3_v7_crsp_cusip8_permno_source_max_date.parquet"
 )
-DEFAULT_LEDGER = Path("data/processed/pead_m7f2_v6_2019_event_ledger.parquet")
+DEFAULT_LEDGER = Path("data/processed/pead_m7f3_v7_2019_event_ledger.parquet")
 DEFAULT_LEDGER_MANIFEST = Path(
-    "docs/context/e2e_evidence/pead_m7f2_v6_2019_event_ledger.parquet.manifest.json"
+    "docs/context/e2e_evidence/pead_m7f3_v7_2019_event_ledger.parquet.manifest.json"
 )
 
 
-class M7F2BlockedError(RuntimeError):
+class M7F3BlockedError(RuntimeError):
     """Fail-closed research run blocker."""
 
 
@@ -326,7 +337,7 @@ def _git_cmd(repo_root: Path, *args: str) -> str:
         env=env,
     )
     if completed.returncode != 0:
-        raise M7F2BlockedError(
+        raise M7F3BlockedError(
             f"git_command_failed:{' '.join(args)}:{completed.stderr.strip()}"
         )
     return completed.stdout.strip()
@@ -347,7 +358,7 @@ def resolve_run_identity(
     )
     detached = sym.returncode != 0
     if detached and not detached_proof_mode:
-        raise M7F2BlockedError(
+        raise M7F3BlockedError(
             "detached_head_requires_explicit_detached_proof_mode"
         )
     if detached_proof_mode and not detached:
@@ -381,6 +392,10 @@ def resolve_run_identity(
         "map_selection_role": "identity_cusip8_to_permno_eligibility",
         "pre_entry_delist_rule": PRE_ENTRY_DELIST_RULE,
         "bridge_rule": BRIDGE_RULE,
+        "bridge_price_ret_parity_abs_tol": BRIDGE_PRICE_RET_PARITY_ABS_TOL,
+        "daily_sequence": DAILY_SEQUENCE,
+        "residual_exposure_metric": RESIDUAL_EXPOSURE_METRIC,
+        "attribution_method": ATTRIBUTION_METHOD,
         "outcome_envelope_legs": list(OUTCOME_ENVELOPE_LEGS),
         "weights": "equal_weight_active_slots_including_post_delist_cash",
         "overlap": "suppress_later_event_entirely_on_entry_overlap",
@@ -591,7 +606,7 @@ def panel_load_window(sessions: pd.DatetimeIndex) -> tuple[str, str, dict[str, A
     cohort_start = pd.Timestamp(f"{COHORT_YEAR}-01-01")
     pre = sessions[sessions < cohort_start]
     if len(pre) < PRIOR_SESSIONS:
-        raise M7F2BlockedError(
+        raise M7F3BlockedError(
             f"source_spine_lacks_prior20_before_{COHORT_YEAR}:have={len(pre)}"
         )
     start_ts = pd.Timestamp(pre[-PRIOR_SESSIONS]).normalize()
@@ -1122,9 +1137,13 @@ def resolve_event_window(
                     prev_prc = _to_finite_float(prev_rec["prc_raw"])
             next_prc = _to_finite_float(next_rec["prc_raw"])
             gap_prc = _to_finite_float(rec["prc_raw"])
-            prev_ok = prev_prc is not None and abs(prev_prc) > 0.0
-            next_ok = next_prc is not None and abs(next_prc) > 0.0
-            if next_ret is not None and prev_ok and next_ok:
+            ok_parity, parity_err = bridge_parity_ok(
+                prev_prc=prev_prc,
+                next_prc=next_prc,
+                next_ret=next_ret,
+                tol=BRIDGE_PRICE_RET_PARITY_ABS_TOL,
+            )
+            if ok_parity:
                 rows.append(
                     _cell(
                         offset=offset,
@@ -1146,9 +1165,10 @@ def resolve_event_window(
                 "rows": None,
                 "partial_rows": list(rows),
                 "failure_detail": (
-                    f"blank_ret_unbridgeable;session={session.date()};"
+                    f"blank_ret_unbridgeable_or_parity_fail;session={session.date()};"
                     f"next_ret={next_rec['ret_raw']!r};prev_prc={prev_prc!r};"
-                    f"next_prc={next_prc!r};gap_prc={gap_prc!r}"
+                    f"next_prc={next_prc!r};gap_prc={gap_prc!r};"
+                    f"parity_abs_err={parity_err!r};tol={BRIDGE_PRICE_RET_PARITY_ABS_TOL}"
                 ),
                 "panel_first_date": first_d,
                 "panel_last_date": last_d,
@@ -1198,6 +1218,37 @@ def resolve_event_window(
     }
 
 
+
+def price_ret_parity_error(prev_prc: float, next_prc: float, next_ret: float) -> float:
+    """Absolute parity residual: | |PRC_next|/|PRC_prev| - 1 - RET_next |."""
+    ratio = abs(float(next_prc)) / abs(float(prev_prc))
+    return abs(ratio - 1.0 - float(next_ret))
+
+
+def bridge_parity_ok(
+    *,
+    prev_prc: float | None,
+    next_prc: float | None,
+    next_ret: float | None,
+    tol: float = BRIDGE_PRICE_RET_PARITY_ABS_TOL,
+) -> tuple[bool, float | None]:
+    if prev_prc is None or next_prc is None or next_ret is None:
+        return False, None
+    if abs(prev_prc) <= 0.0 or abs(next_prc) <= 0.0:
+        return False, None
+    if not math.isfinite(next_ret):
+        return False, None
+    err = price_ret_parity_error(prev_prc, next_prc, next_ret)
+    return err <= float(tol), float(err)
+
+
+def hash_selected_event_set(event_ids: Sequence[str]) -> str:
+    """Canonical SHA-256 of sorted unique event_id lines."""
+    lines = sorted({str(e) for e in event_ids})
+    payload = "\n".join(lines) + ("\n" if lines else "")
+    return _sha256_text(payload)
+
+
 def expand_outcome_scenario_rows(
     resolved: Mapping[str, Any],
     *,
@@ -1207,11 +1258,17 @@ def expand_outcome_scenario_rows(
     """Build full 60-session rows for sensitivity legs from partial + scenario.
 
     scenario:
-      - neutral_carry_to_cash: from first bad session, r=0 cash remainder
-      - write_down_100pct: first bad session r=-1 once, then cash remainder
+      - neutral_carry_to_cash: from first bad session, r=0 cash remainder (active cash sleeve)
+      - write_down_100pct: first bad session r=-1 once, then dead zero-weight (not recapitalized)
     """
     if resolved.get("status") == "ok" and resolved.get("rows"):
-        return list(resolved["rows"])
+        rows = []
+        for r in resolved["rows"]:
+            d = dict(r)
+            d.setdefault("dead_sleeve", False)
+            d.setdefault("outcome_scenario", None)
+            rows.append(d)
+        return rows
     entry = resolved.get("entry")
     if entry is None:
         return None
@@ -1226,23 +1283,39 @@ def expand_outcome_scenario_rows(
     if first_bad is None:
         return None
     first_bad_ts = pd.Timestamp(first_bad).normalize()
-    # keep partial rows strictly before first bad
     kept = [
         dict(r)
         for r in partial
         if pd.Timestamp(r["return_date"]).normalize() < first_bad_ts
     ]
+    for r in kept:
+        r.setdefault("dead_sleeve", False)
+        r.setdefault("outcome_scenario", None)
     start_offset = len(kept) + 1
     for offset in range(start_offset, HOLDING_SESSIONS + 1):
         session = pd.Timestamp(window_dates[offset - 1]).normalize()
-        if offset == start_offset and scenario == "write_down_100pct":
-            r = -1.0
-            live = True
-            cash = False
-        else:
+        if scenario == "write_down_100pct":
+            if offset == start_offset:
+                # -100% once while still marked live for return application, then dies
+                r = -1.0
+                live = True
+                cash = False
+                active = True
+                dead = False
+            else:
+                r = 0.0
+                live = False
+                cash = False
+                active = False
+                dead = True
+        elif scenario == "neutral_carry_to_cash":
             r = 0.0
             live = False
             cash = True
+            active = True
+            dead = False
+        else:
+            raise ValueError(f"unknown_scenario:{scenario}")
         kept.append(
             {
                 "event_id": resolved["event_id"],
@@ -1257,7 +1330,8 @@ def expand_outcome_scenario_rows(
                 "live_equity": live,
                 "cash_slot": cash,
                 "delist_day": False,
-                "active_slot": True,
+                "active_slot": active,
+                "dead_sleeve": dead,
                 "bridged_gap": False,
                 "outcome_scenario": scenario,
             }
@@ -1265,12 +1339,361 @@ def expand_outcome_scenario_rows(
     return kept
 
 
+def first_bad_date_residual_exposure(
+    resolved_list: Sequence[Mapping[str, Any]],
+    *,
+    scenario: str,
+    sessions: pd.DatetimeIndex,
+) -> dict[str, Any]:
+    """Sum of target weights on each residual event's first-bad date (not weight-time).
+
+    Target weight on date t = 1/n_active_slots among active (non-dead) slots that day.
+    """
+    residuals = [r for r in resolved_list if r.get("status") != "ok"]
+    # Build active membership by date from scenario rows for ALL selected events
+    pos_rows: list[dict[str, Any]] = []
+    for r in resolved_list:
+        scen = expand_outcome_scenario_rows(r, sessions=sessions, scenario=scenario)
+        if scen:
+            pos_rows.extend(scen)
+    if not pos_rows:
+        return {
+            "metric": RESIDUAL_EXPOSURE_METRIC,
+            "scenario": scenario,
+            "summed_first_bad_date_target_weight": 0.0,
+            "per_event": [],
+        }
+    frame = pd.DataFrame(pos_rows)
+    frame["return_date"] = pd.to_datetime(frame["return_date"]).dt.normalize()
+    if "dead_sleeve" not in frame.columns:
+        frame["dead_sleeve"] = False
+    frame["dead_sleeve"] = frame["dead_sleeve"].fillna(False).astype(bool)
+    frame["active_slot"] = frame["active_slot"].fillna(False).astype(bool)
+    frame["ew_active"] = frame["active_slot"] & ~frame["dead_sleeve"]
+
+    per_event: list[dict[str, Any]] = []
+    total = 0.0
+    for r in residuals:
+        fb = r.get("first_bad_session")
+        if fb is None:
+            continue
+        fb_ts = pd.Timestamp(fb).normalize()
+        eid = str(r["event_id"])
+        day = frame.loc[frame["return_date"] == fb_ts]
+        active_ids = set(day.loc[day["ew_active"], "event_id"].astype(str))
+        # On first bad day for write_down, event is still active for the -100% return
+        if eid not in active_ids:
+            # still count if present on day with a row (pre-transition target)
+            if eid in set(day["event_id"].astype(str)):
+                active_ids.add(eid)
+        n_active = len(active_ids)
+        w = (1.0 / n_active) if n_active > 0 and eid in active_ids else 0.0
+        total += w
+        per_event.append(
+            {
+                "event_id": eid,
+                "first_bad_session": fb_ts.strftime("%Y-%m-%d"),
+                "window_status": r.get("status"),
+                "n_active_slots_that_day": int(n_active),
+                "target_weight_first_bad": float(w),
+            }
+        )
+    return {
+        "metric": RESIDUAL_EXPOSURE_METRIC,
+        "scenario": scenario,
+        "summed_first_bad_date_target_weight": float(total),
+        "n_residual_events": int(len(per_event)),
+        "per_event": per_event,
+        "note": "sum of first-bad-date equal-weight target exposures; not weight-time share; not n_bad/n_selected",
+    }
+
+
+
+def build_daily_portfolio(position_days: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Self-financing daily engine with locked sequence.
+
+    Sequence per day:
+      1) drifted prior weights (open = prior close after RET + transitions)
+      2) trade to today's target; charge equity-only L1 turnover (cash not double-counted)
+      3) apply today's RET
+      4) close-state transitions (dead sleeves zeroed)
+
+    write_down dead sleeves are excluded from equal-weight targets after death.
+    """
+    if position_days.empty:
+        raise M7F3BlockedError("no_active_position_days")
+    work = position_days.copy()
+    work["return_date"] = pd.to_datetime(work["return_date"]).dt.normalize()
+    for col, default in (
+        ("dead_sleeve", False),
+        ("cash_slot", False),
+        ("live_equity", True),
+        ("active_slot", True),
+    ):
+        if col not in work.columns:
+            work[col] = default
+        work[col] = work[col].fillna(default).astype(bool)
+    work["event_id"] = work["event_id"].astype(str)
+    work = work.drop_duplicates(["return_date", "event_id"], keep="last")
+    work["r"] = pd.to_numeric(work["r"], errors="coerce").fillna(0.0).astype(float)
+
+    dates = sorted(work["return_date"].unique())
+    by_date = {d: g for d, g in work.groupby("return_date", sort=True)}
+    records: list[dict[str, Any]] = []
+    open_w: dict[str, float] = {}
+    final_date = dates[-1]
+
+    for dt in dates:
+        day = by_date[dt]
+        ew_mask = day["active_slot"].to_numpy() & ~day["dead_sleeve"].to_numpy()
+        ew = day.loc[ew_mask]
+        n_active = int(len(ew))
+        n_live_equity = int(ew["live_equity"].sum()) if n_active else 0
+        n_cash = int(ew["cash_slot"].sum()) if n_active else 0
+        is_final = dt == final_date
+        if n_active > 0 and n_active < MIN_ACTIVE_SLOTS and not is_final:
+            raise M7F3BlockedError(
+                f"active_slots_below_min:{n_active}_on_{pd.Timestamp(dt).date()}"
+            )
+        if n_active == 0:
+            target: dict[str, float] = {}
+        else:
+            w = 1.0 / n_active
+            target = {eid: w for eid in ew["event_id"].tolist()}
+
+        # row lookups
+        live_map = dict(zip(day["event_id"], day["live_equity"]))
+        cash_map = dict(zip(day["event_id"], day["cash_slot"]))
+        dead_map = dict(zip(day["event_id"], day["dead_sleeve"]))
+        ret_map = dict(zip(day["event_id"], day["r"]))
+
+        def _is_equity_name(eid: str) -> bool:
+            if eid in live_map:
+                if live_map[eid]:
+                    return True
+                if cash_map.get(eid, False) and not live_map.get(eid, False):
+                    return False
+                if dead_map.get(eid, False):
+                    return open_w.get(eid, 0.0) > 0.0
+            return open_w.get(eid, 0.0) > 0.0
+
+        turnover = 0.0
+        for eid in set(open_w) | set(target):
+            if not _is_equity_name(eid):
+                continue
+            turnover += abs(target.get(eid, 0.0) - open_w.get(eid, 0.0))
+        cost = ONE_WAY_COST * float(turnover)
+
+        post_trade = dict(target)
+        gross = 0.0
+        post_ret: dict[str, float] = {}
+        for eid, ww in post_trade.items():
+            r_i = float(ret_map.get(eid, 0.0))
+            gross += ww * r_i
+            post_ret[eid] = ww * (1.0 + r_i)
+
+        for eid in list(post_ret.keys()):
+            if dead_map.get(eid, False):
+                post_ret[eid] = 0.0
+            elif live_map.get(eid, False) and float(ret_map.get(eid, 0.0)) <= -1.0 + 1e-12 and not cash_map.get(eid, False):
+                post_ret[eid] = 0.0
+
+        pos_sum = float(sum(v for v in post_ret.values() if v > 0.0))
+        if pos_sum > 0.0:
+            open_w = {e: v / pos_sum for e, v in post_ret.items() if v > 0.0}
+        else:
+            open_w = {}
+
+        net = float(gross - cost)
+        records.append(
+            {
+                "return_date": pd.Timestamp(dt),
+                "n_active_slots": n_active,
+                "n_live_equity": n_live_equity,
+                "n_cash_slots": n_cash,
+                "daily_gross_return": float(gross),
+                "turnover_l1": float(turnover),
+                "daily_cost": float(cost),
+                "daily_net_return": net,
+            }
+        )
+
+    if open_w:
+        term = float(sum(abs(w) for w in open_w.values()))
+        records[-1]["turnover_l1"] = float(records[-1]["turnover_l1"] + term)
+        records[-1]["daily_cost"] = float(ONE_WAY_COST * records[-1]["turnover_l1"])
+        records[-1]["daily_net_return"] = float(
+            records[-1]["daily_gross_return"] - records[-1]["daily_cost"]
+        )
+        records[-1]["includes_terminal_liquidation"] = True
+
+    daily = pd.DataFrame.from_records(records).sort_values("return_date").reset_index(drop=True)
+    equity = (1.0 + daily["daily_net_return"]).cumprod()
+    daily["equity_net"] = equity
+    stats = {
+        "n_days": int(len(daily)),
+        "start": str(daily["return_date"].iloc[0].date()) if len(daily) else None,
+        "end": str(daily["return_date"].iloc[-1].date()) if len(daily) else None,
+        "total_net_return": float(equity.iloc[-1] - 1.0) if len(daily) else None,
+        "terminal_equity_net": float(equity.iloc[-1]) if len(daily) else None,
+        "min_active_slots": int(daily["n_active_slots"].min()) if len(daily) else None,
+        "mean_active_slots": float(daily["n_active_slots"].mean()) if len(daily) else None,
+        "min_live_equity": int(daily["n_live_equity"].min()) if len(daily) else None,
+        "mean_live_equity": float(daily["n_live_equity"].mean()) if len(daily) else None,
+        "total_turnover_l1": float(daily["turnover_l1"].sum()) if len(daily) else None,
+        "total_cost": float(daily["daily_cost"].sum()) if len(daily) else None,
+        "daily_sequence": DAILY_SEQUENCE,
+    }
+    return daily, stats
+
+
+
+def _scenario_terminal_nav(
+    resolved_list: Sequence[Mapping[str, Any]],
+    *,
+    sessions: pd.DatetimeIndex,
+    residual_ids_in_scenario: set[str],
+    scenario: str,
+    ok_rows: list[dict[str, Any]] | None = None,
+    residual_rows_by_id: Mapping[str, list[dict[str, Any]]] | None = None,
+) -> float:
+    """NAV (terminal equity_net) when residual ids in set use scenario treatment;
+    residual ids outside set are omitted; ok events always included.
+    """
+    pos_rows: list[dict[str, Any]] = []
+    if ok_rows is not None:
+        pos_rows.extend(ok_rows)
+    else:
+        for r in resolved_list:
+            if r.get("status") == "ok":
+                scen = expand_outcome_scenario_rows(r, sessions=sessions, scenario=scenario)
+                if scen:
+                    pos_rows.extend(scen)
+    if residual_rows_by_id is not None:
+        for eid in residual_ids_in_scenario:
+            rows = residual_rows_by_id.get(eid)
+            if rows:
+                pos_rows.extend(rows)
+    else:
+        for r in resolved_list:
+            eid = str(r["event_id"])
+            if r.get("status") == "ok":
+                continue
+            if eid not in residual_ids_in_scenario:
+                continue
+            scen = expand_outcome_scenario_rows(r, sessions=sessions, scenario=scenario)
+            if scen:
+                pos_rows.extend(scen)
+    if not pos_rows:
+        return 1.0
+    _daily, stats = build_daily_portfolio(pd.DataFrame(pos_rows))
+    return float(stats.get("terminal_equity_net") or 1.0)
+
+
+def shapley_16_residual_attribution(
+    resolved_list: Sequence[Mapping[str, Any]],
+    *,
+    sessions: pd.DatetimeIndex,
+    scenario: str,
+) -> dict[str, Any]:
+    """Exact Shapley over 2^K states for residual events (K<=4 => 16 states).
+
+    v(S) = terminal NAV with residual events in S under scenario treatment and
+    residual events outside S omitted; ok events always held.
+    phi_i sum to v(N) - v({}) = scenario NAV gap vs ok-only.
+    """
+    residuals = [r for r in resolved_list if r.get("status") != "ok"]
+    ids = [str(r["event_id"]) for r in residuals]
+    k = len(ids)
+    if k == 0:
+        return {
+            "method": ATTRIBUTION_METHOD,
+            "scenario": scenario,
+            "n_residual": 0,
+            "n_states": 1,
+            "v_empty_ok_only": 1.0,
+            "v_full_scenario": 1.0,
+            "scenario_nav_gap": 0.0,
+            "contributions": [],
+            "sum_contributions": 0.0,
+            "sum_equals_gap_abs_err": 0.0,
+        }
+
+    # Prebuild rows once
+    ok_rows: list[dict[str, Any]] = []
+    for r in resolved_list:
+        if r.get("status") == "ok":
+            scen = expand_outcome_scenario_rows(r, sessions=sessions, scenario=scenario)
+            if scen:
+                ok_rows.extend(scen)
+    residual_rows_by_id: dict[str, list[dict[str, Any]]] = {}
+    for r in residuals:
+        eid = str(r["event_id"])
+        scen = expand_outcome_scenario_rows(r, sessions=sessions, scenario=scenario)
+        residual_rows_by_id[eid] = scen or []
+
+    v: dict[frozenset[str], float] = {}
+    for r in range(0, k + 1):
+        for combo in itertools.combinations(ids, r):
+            s = frozenset(combo)
+            v[s] = _scenario_terminal_nav(
+                resolved_list,
+                sessions=sessions,
+                residual_ids_in_scenario=set(s),
+                scenario=scenario,
+                ok_rows=ok_rows,
+                residual_rows_by_id=residual_rows_by_id,
+            )
+
+    empty = frozenset()
+    full = frozenset(ids)
+    gap = float(v[full] - v[empty])
+    n = k
+    contribs: list[dict[str, Any]] = []
+    for eid in ids:
+        phi = 0.0
+        others = [x for x in ids if x != eid]
+        for r in range(0, n):
+            for combo in itertools.combinations(others, r):
+                s = frozenset(combo)
+                s_i = frozenset(set(s) | {eid})
+                weight = (
+                    math.factorial(len(s))
+                    * math.factorial(n - len(s) - 1)
+                    / math.factorial(n)
+                )
+                phi += weight * (v[s_i] - v[s])
+        status = next(
+            (rr.get("status") for rr in residuals if str(rr["event_id"]) == eid), None
+        )
+        contribs.append(
+            {
+                "event_id": eid,
+                "window_status": status,
+                "shapley_nav_contribution": float(phi),
+            }
+        )
+
+    sum_phi = float(sum(c["shapley_nav_contribution"] for c in contribs))
+    return {
+        "method": ATTRIBUTION_METHOD,
+        "scenario": scenario,
+        "n_residual": k,
+        "n_states": int(2**k),
+        "v_empty_ok_only": float(v[empty]),
+        "v_full_scenario": float(v[full]),
+        "scenario_nav_gap": gap,
+        "contributions": contribs,
+        "sum_contributions": sum_phi,
+        "sum_equals_gap_abs_err": abs(sum_phi - gap),
+        "note": "exact Shapley; contributions sum to scenario terminal NAV gap vs ok-only",
+    }
+
+
 def slot_weight_attribution(
     resolved_list: Sequence[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Per-event residual slot-weight share (1/n_active approximation via equal event share of active days)."""
-    # Approximate combined exposure: each selected event occupies 60 slot-days;
-    # weight share = 60 / sum_i 60 = 1/n_selected for equal-length windows.
+    """Legacy non-authoritative debug: 1/n_selected share (NOT residual exposure metric)."""
     n_sel = len(resolved_list)
     if n_sel == 0:
         return []
@@ -1291,82 +1714,12 @@ def slot_weight_attribution(
                 "failure_detail": r.get("failure_detail"),
                 "outcome_class": r.get("outcome_class"),
                 "bridge_applied": bool(r.get("bridge_applied")),
-                "approx_event_slot_share": share,
+                "approx_event_slot_share_non_authoritative": share,
                 "holding_sessions": HOLDING_SESSIONS,
             }
         )
     return out
 
-
-def build_daily_portfolio(position_days: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
-    """Equal-weight all active slots including post-delist cash slots."""
-    if position_days.empty:
-        raise M7F2BlockedError("no_active_position_days")
-    work = position_days.copy()
-    work["return_date"] = pd.to_datetime(work["return_date"]).dt.normalize()
-    dates = sorted(work["return_date"].unique())
-    records: list[dict[str, Any]] = []
-    prev_w: dict[str, float] = {}
-    final_date = dates[-1]
-    for dt in dates:
-        day = work.loc[work["return_date"] == dt]
-        slots = day.drop_duplicates("event_id")
-        n_active = int(len(slots))
-        n_live_equity = int(slots["live_equity"].sum()) if "live_equity" in slots else n_active
-        n_cash = int(slots["cash_slot"].sum()) if "cash_slot" in slots else 0
-        is_final = dt == final_date
-        if n_active > 0 and n_active < MIN_ACTIVE_SLOTS and not is_final:
-            raise M7F2BlockedError(
-                f"active_slots_below_min:{n_active}_on_{pd.Timestamp(dt).date()}"
-            )
-        if n_active == 0:
-            weights: dict[str, float] = {}
-            gross = 0.0
-        else:
-            w = 1.0 / n_active
-            weights = {str(r.event_id): w for r in slots.itertuples(index=False)}
-            ret_map = {str(r.event_id): float(r.r) for r in slots.itertuples(index=False)}
-            gross = float(sum(weights[e] * ret_map[e] for e in weights))
-        all_ids = set(prev_w) | set(weights)
-        turnover = float(sum(abs(weights.get(e, 0.0) - prev_w.get(e, 0.0)) for e in all_ids))
-        cost = ONE_WAY_COST * turnover
-        net = gross - cost
-        records.append(
-            {
-                "return_date": pd.Timestamp(dt),
-                "n_active_slots": n_active,
-                "n_live_equity": n_live_equity,
-                "n_cash_slots": n_cash,
-                "daily_gross_return": gross,
-                "turnover_l1": turnover,
-                "daily_cost": cost,
-                "daily_net_return": net,
-            }
-        )
-        prev_w = weights
-    if prev_w:
-        turnover = float(sum(abs(0.0 - w) for w in prev_w.values()))
-        cost = ONE_WAY_COST * turnover
-        records[-1]["turnover_l1"] = float(records[-1]["turnover_l1"] + turnover)
-        records[-1]["daily_cost"] = float(records[-1]["daily_cost"] + cost)
-        records[-1]["daily_net_return"] = float(
-            records[-1]["daily_gross_return"] - records[-1]["daily_cost"]
-        )
-        records[-1]["includes_terminal_liquidation"] = True
-    daily = pd.DataFrame.from_records(records).sort_values("return_date").reset_index(drop=True)
-    equity = (1.0 + daily["daily_net_return"]).cumprod()
-    daily["equity_net"] = equity
-    stats = {
-        "n_days": int(len(daily)),
-        "start": str(daily["return_date"].iloc[0].date()) if len(daily) else None,
-        "end": str(daily["return_date"].iloc[-1].date()) if len(daily) else None,
-        "total_net_return": float(equity.iloc[-1] - 1.0) if len(daily) else None,
-        "min_active_slots": int(daily["n_active_slots"].min()) if len(daily) else None,
-        "mean_active_slots": float(daily["n_active_slots"].mean()) if len(daily) else None,
-        "min_live_equity": int(daily["n_live_equity"].min()) if len(daily) else None,
-        "mean_live_equity": float(daily["n_live_equity"].mean()) if len(daily) else None,
-    }
-    return daily, stats
 
 
 def _ledger_row_from_resolved(r: Mapping[str, Any]) -> dict[str, Any]:
@@ -1428,11 +1781,11 @@ def run_vertical(
         con, d1_path=d1_path, sec_path=sec_path, cusip_map_path=cusip_map_path
     )
     if mapped.empty:
-        raise M7F2BlockedError("no_unique_mapped_events")
+        raise M7F3BlockedError("no_unique_mapped_events")
 
     sessions = load_source_session_spine(con, crsp_path=crsp_path)
     if len(sessions) == 0:
-        raise M7F2BlockedError("empty_source_session_spine")
+        raise M7F3BlockedError("empty_source_session_spine")
     panel_start, panel_end, panel_window_meta = panel_load_window(sessions)
     panel = load_crsp_panel(
         con,
@@ -1442,7 +1795,7 @@ def run_vertical(
         end=panel_end,
     )
     if panel.empty:
-        raise M7F2BlockedError("empty_crsp_panel")
+        raise M7F3BlockedError("empty_crsp_panel")
     panel["date"] = pd.to_datetime(panel["date"]).dt.normalize()
     panel_by = {int(p): g.copy() for p, g in panel.groupby("permno")}
 
@@ -1461,7 +1814,7 @@ def run_vertical(
     kept_q5, suppressed, overlap_stats = suppress_entry_overlap(q5, sessions)
     if kept_q5.empty:
         _invalidate_stale_curve(parquet_path)
-        raise M7F2BlockedError("no_q5_events_after_formation_and_overlap")
+        raise M7F3BlockedError("no_q5_events_after_formation_and_overlap")
 
     # --- Post-select window resolution (bridge blanks; residual -> envelope) ---
     resolved: list[dict[str, Any]] = []
@@ -1670,14 +2023,14 @@ def run_vertical(
         "research_validity_ceiling_note": "snapshot_link_ceiling_approx_30_of_100",
     }
     supersedes = {
-        "artifact_name": "pead_m7f1_v5_2019_crsp_vertical",
+        "artifact_name": "pead_m7f2_v6_2019_crsp_vertical",
         "prior_implementation_versions": [
             "m7f1-v5",
             "m7f1-v5.1",
             "m7f1-v5.2-final",
         ],
         "reason": (
-            "m7f2-v6-final: pre-entry delist exclude before breadth/Q5 + rerank; "
+            "M7F3-v7: pre-entry delist exclude before breadth/Q5 + rerank; "
             "blank one-day bridge with adjacent price+next RET proof; "
             "strict BLOCK + neutral carry-to-cash + write_down_100pct envelope; "
             "map used_for_selection=true (identity); no v5.2 compatibility path"
@@ -1710,26 +2063,36 @@ def run_vertical(
     }
 
 
+    selected_event_ids = [str(r["event_id"]) for r in resolved]
+    selected_event_set_sha256 = hash_selected_event_set(selected_event_ids)
+
     if bad:
         block_reason = "selected_window_invalid:" + ",".join(
             f"{k}={v}" for k, v in sorted(reason_counts.items())
         )
         stale = _invalidate_stale_curve(parquet_path)
-        # Sensitivity legs (not a justified finite upper bound for neutral carry).
-        attrib = slot_weight_attribution(resolved)
-        residual_attrib = [a for a in attrib if a.get("window_status") != "ok"]
-        residual_share = float(sum(a["approx_event_slot_share"] for a in residual_attrib))
+        # Non-authoritative legacy share kept only as debug foil
+        debug_attrib = slot_weight_attribution(resolved)
+        residual_debug = [a for a in debug_attrib if a.get("window_status") != "ok"]
         envelope_stats: dict[str, Any] = {
             "legs": list(OUTCOME_ENVELOPE_LEGS),
             "n_residual_ambiguous": int(len(bad)),
-            "approx_combined_residual_slot_share": residual_share,
-            "per_event_attribution": residual_attrib,
+            "residual_exposure_metric": RESIDUAL_EXPOSURE_METRIC,
+            "debug_non_authoritative_event_count_share": float(len(bad) / max(len(resolved), 1)),
+            "debug_per_event_slot_share": residual_debug,
             "note": (
                 "neutral_carry_to_cash is a sensitivity scenario, not a justified "
-                "finite upper bound on residual outcomes"
+                "finite upper bound on residual outcomes; residual primary metric is "
+                "summed first-bad-date target weight; attribution is exact 16-state Shapley"
             ),
+            "daily_sequence": DAILY_SEQUENCE,
+            "bridge_price_ret_parity_abs_tol": BRIDGE_PRICE_RET_PARITY_ABS_TOL,
+            "write_down_policy": "dead_zero_weight_no_recapitalization_after_minus_100pct",
+            "turnover_policy": "equity_l1_only_cash_not_double_counted",
         }
         leg_paths: dict[str, Any] = {}
+        residual_exposures: dict[str, Any] = {}
+        shapley_by_leg: dict[str, Any] = {}
         for scenario in ("neutral_carry_to_cash", "write_down_100pct"):
             pos_rows: list[dict[str, Any]] = []
             for r in resolved:
@@ -1761,8 +2124,25 @@ def run_vertical(
                 "sha256": scen_sha,
                 "rows": int(len(daily_out_s)),
                 "portfolio": port_scen,
+                "total_turnover_l1": port_scen.get("total_turnover_l1"),
+                "total_cost": port_scen.get("total_cost"),
             }
+            residual_exposures[scenario] = first_bad_date_residual_exposure(
+                resolved, scenario=scenario, sessions=sessions
+            )
+            shapley_by_leg[scenario] = shapley_16_residual_attribution(
+                resolved, sessions=sessions, scenario=scenario
+            )
         envelope_stats["leg_artifacts"] = leg_paths
+        envelope_stats["residual_exposure_by_leg"] = residual_exposures
+        envelope_stats["shapley_attribution_by_leg"] = shapley_by_leg
+        # Primary residual figure: prefer write_down first-bad sum (audit ~0.72%)
+        primary_res = residual_exposures.get("write_down_100pct") or residual_exposures.get(
+            "neutral_carry_to_cash"
+        )
+        envelope_stats["summed_first_bad_date_target_weight"] = (
+            None if not primary_res else primary_res.get("summed_first_bad_date_target_weight")
+        )
         source_hashes = {
             "d1_sha256": _sha256_file(d1_path),
             "security_master_sha256": _sha256_file(sec_path),
@@ -1791,7 +2171,13 @@ def run_vertical(
             "contract": contract,
             "map_meta": map_meta,
             "stale_curve_invalidation": stale,
-            "counts": {**base_counts, "portfolio": None},
+            "counts": {
+                **base_counts,
+                "portfolio": None,
+                "selected_event_set_sha256": selected_event_set_sha256,
+                "n_selected_event_set": int(len(selected_event_ids)),
+            },
+            "selected_event_set_sha256": selected_event_set_sha256,
             "outcome_envelope": envelope_stats,
             "lineage": {
                 "d1_path": d1_path.as_posix(),
@@ -1972,7 +2358,7 @@ def run_vertical(
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="M7F2-v6-final 2019 CRSP PEAD outcome-envelope vertical"
+        description="M7F3-v7 2019 CRSP PEAD outcome-envelope vertical"
     )
     p.add_argument("--repo-root", type=Path, default=Path("."))
     p.add_argument("--d1", type=Path, default=None)
@@ -1994,12 +2380,84 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """v6 executable path removed. Historical evidence retained; use m7f3-v7."""
-    sys.stderr.write(
-        "M7F2-v6 executable path is retired. Use scripts/pead_m7f3_v7_2019_crsp_vertical.py "
-        "(SELF_FINANCING_PORTFOLIO_TRUTH). Historical v6 evidence JSON remains for audit only.\n"
+    args = parse_args(argv)
+    repo_root = args.repo_root.resolve()
+    data_root = args.data_root.resolve() if args.data_root else repo_root
+
+    def _resolve(p: Path | None, default: Path) -> Path:
+        if p is not None:
+            return p if p.is_absolute() else (repo_root / p).resolve()
+        candidate = (data_root / default).resolve()
+        if candidate.is_file() or default.parts[0] != "data":
+            return candidate
+        return (repo_root / default).resolve() if "docs" in default.parts else candidate
+
+    d1 = _resolve(args.d1, DEFAULT_D1)
+    sec = _resolve(args.security_master, DEFAULT_SEC)
+    crsp = _resolve(args.crsp, DEFAULT_CRSP)
+    evidence = (
+        args.evidence_out.resolve()
+        if args.evidence_out
+        else (repo_root / DEFAULT_EVIDENCE).resolve()
     )
-    return 2
+    parquet = (
+        args.parquet_out.resolve()
+        if args.parquet_out
+        else (data_root / DEFAULT_PARQUET).resolve()
+    )
+    manifest = (
+        args.manifest_out.resolve()
+        if args.manifest_out
+        else (repo_root / DEFAULT_MANIFEST).resolve()
+    )
+    cusip_map = (
+        args.cusip_map.resolve()
+        if args.cusip_map
+        else (data_root / DEFAULT_CUSIP_MAP).resolve()
+    )
+    ledger = (
+        args.ledger_out.resolve()
+        if args.ledger_out
+        else (data_root / DEFAULT_LEDGER).resolve()
+    )
+    ledger_manifest = (
+        args.ledger_manifest_out.resolve()
+        if args.ledger_manifest_out
+        else (repo_root / DEFAULT_LEDGER_MANIFEST).resolve()
+    )
+
+    try:
+        evidence_obj = run_vertical(
+            repo_root=repo_root,
+            d1_path=d1,
+            sec_path=sec,
+            crsp_path=crsp,
+            evidence_path=evidence,
+            parquet_path=parquet,
+            manifest_path=manifest,
+            cusip_map_path=cusip_map,
+            ledger_path=ledger,
+            ledger_manifest_path=ledger_manifest,
+            detached_proof_mode=bool(args.detached_proof_mode),
+        )
+    except M7F3BlockedError as exc:
+        print(f"M7F2_BLOCKED: {exc}", file=sys.stderr)
+        if evidence.is_file():
+            print(
+                json.dumps(
+                    {
+                        "status": "BLOCKED",
+                        "artifact": ARTIFACT_NAME,
+                        "evidence": evidence.as_posix(),
+                        "block_reason": str(exc),
+                    },
+                    sort_keys=True,
+                )
+            )
+        return 2
+    print(json.dumps({"status": evidence_obj.get("status"), "artifact": ARTIFACT_NAME}, sort_keys=True))
+    return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
