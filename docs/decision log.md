@@ -1,3 +1,9 @@
+
+## 2026-07-12 — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH close
+- Decision: Accept M7F3-v7 as active flagged diagnostic package (strict curve BLOCKED); supersede v6 as close authority; keep research validity ~30.
+- Commits: A `bae1f656` code; B `b5c66bc` evidence; C SAW+truth.
+- Forbidden held: CCM, readiness, alpha/tradable, UI, as-of link.
+
 Decision Log: Terminal Zero
 Author: Atomic Mesh | Last Updated: 2026-07-12 (M7F1-v5.2-final durable residual BLOCK)
 

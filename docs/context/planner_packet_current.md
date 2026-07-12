@@ -1,5 +1,37 @@
 # Planner Packet - Current
 
+## New Context Packet — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH DIAGNOSTIC_COMPLETE (2026-07-12)
+
+## What Was Done
+
+- Commit A `bae1f65609b723cc6462d9bbd1967340a0cb3310` / tree `5d3a685e392b21551db25ccda26d5aeb043cd3b0`: m7f3-v7 self-financing engine + tests + brief; v6 CLI retired (exit 2).
+- Daily sequence locked: drifted prior → equity turnover trade → apply RET → close transitions; cash not double-counted; write_down dead zero weight.
+- Bridge price/RET parity tol 1e-4 changes **window status only**; selection set fixed 2448 (sha `caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d`).
+- Commit B `b5c66bc740926fc51294107a8951c2993400203a`: evidence only (no seven-surface reconcile).
+- Full run: DIAGNOSTIC_COMPLETE; strict_curve BLOCKED; ok 2444/2448; invalid 4; bridged 2; first-bad residual sum **0.007208 (~0.721%)**; Shapley 16-state both legs sum-to-gap err≈0; leg turnovers differ.
+- Distinct Reviewer A/B/C PASS; Commit C SAW + seven-surface reconcile.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; snapshot non-PIT; readiness false; research validity ~30; score path ~70–73 diagnostic.
+- Primary strict curve not promoted; no CCM/as-of link; no alpha/tradable/UI.
+- v6 historical evidence retained; v6 executable path inactive.
+
+## What Is Next
+
+Hold readiness/UI/strategy/historical-link/CCM. Optional polish: rename stderr `M7F2_BLOCKED` → `M7F3_BLOCKED`. Do not reopen residual selection policy without owner decision.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f3_v7_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+
+# Planner Packet - Current
+
 ## New Context Packet — M7F2-v6-final Outcome Envelope DIAGNOSTIC_COMPLETE (2026-07-12)
 
 ## What Was Done

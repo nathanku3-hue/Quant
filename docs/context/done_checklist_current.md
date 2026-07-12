@@ -1,5 +1,25 @@
 # Done Checklist - Current
 
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- [x] Owner GO with deltas recorded (daily sequence, first-bad residual, dead write-down, cash no double-count, Shapley-16, selection hash, v6 path removed, Commit C truth).
+- [x] Commit A code/tests/brief + v6 CLI retire: `bae1f65609b723cc6462d9bbd1967340a0cb3310`.
+- [x] Focused tests 24/24 PASS.
+- [x] Full 2019 rerun DIAGNOSTIC_COMPLETE; selection 2448 hash `caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d`.
+- [x] first-bad residual sum 0.007208; Shapley 16-state sum-to-gap; legs differ in turnover/cost.
+- [x] Commit B evidence only: `b5c66bc740926fc51294107a8951c2993400203a` (no full truth in B).
+- [x] Distinct Reviewer A/B/C PASS.
+- [x] Commit C SAW + seven-surface reconcile.
+- [x] `m6b_data_contract_ready=false`; strict_curve BLOCKED; no CCM.
+- [ ] Strict primary curve PASS; readiness/UI/alpha/as-of link — blocked by design.
+
+## Prior Addendum — M7F2-v6-final (superseded as active close)
+
+- Historical v6 diagnostic retained; not valid 70–74 close (audit 61). Executable path retired.
+
+
+# Done Checklist - Current
+
 ## Active Addendum — M7F2-v6-final (2026-07-12)
 
 - [x] Hard-rename/replace v5 runner/tests/brief with m7f2-v6-final (no compatibility path).

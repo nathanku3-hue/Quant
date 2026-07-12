@@ -1,6 +1,15 @@
 # lessonss.md
 
-Last updated: 2026-07-11
+Last updated: 2026-07-12
+
+## 2026-07-12 Round Entry (Self-Financing Truth Before Score Close)
+- Date: 2026-07-12
+- Mistake or miss: M7F2-v6 claimed diagnostic 70–74 close while residual exposure used event-count share (0.163% vs ~0.72% first-bad), turnover ignored drift/equity-cash transitions (identical leg costs), bridge lacked price/RET parity, and A/B/C identities were unproven while truth still said Commit C pending.
+- Root cause: Portfolio mechanics and governance closure were treated as hash/test PASS rather than self-financing path + independent review pins.
+- Fix applied: M7F3-v7 locked drifted-prior→equity trade→RET→close sequence; first-bad residual metric; dead write-down sleeves; equity-only turnover; 16-state Shapley; selection-set hash; v6 CLI retired; Commit B evidence-only; Commit C after distinct A/B/C.
+- Guardrail for next time: Never score a portfolio diagnostic close without (1) explicit daily trade sequence, (2) residual exposure defined as first-bad weight sum when that is the audit metric, (3) non-identical leg costs when residual paths differ, (4) distinct reviewer agent IDs, (5) seven-surface reconcile only after reviewers.
+- Evidence paths: `scripts/pead_m7f3_v7_2019_crsp_vertical.py`, `docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json`, `docs/saw_reports/saw_c0x_m7f3_v7_self_financing_20260712.md`.
+
 
 ## 2026-07-11 Round Entry (Payload Identity Must Use a Detached Envelope)
 - Date: 2026-07-11

@@ -1,5 +1,22 @@
 # Impact Packet - Current
 
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- Changed code/tests: `scripts/pead_m7f3_v7_2019_crsp_vertical.py`, `tests/test_pead_m7f3_v7_2019_crsp_vertical.py`, `scripts/pead_m7f2_v6_2019_crsp_vertical.py` (CLI retired).
+- Brief: `docs/phase_brief/v2-pead-m7f3-v7-self-financing-portfolio-truth.md`.
+- Evidence: `docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json` SHA-256 `49c594c8ac6e71d50dcc6f021e9e3ee5af29a4ca68717b72a90cbab11c00b488`.
+- Legs under `E:/Code/Quant/data/processed/pead_m7f3_v7_2019_daily_returns_*.parquet`.
+- Touched interfaces: Data/research diagnostic only; Strategy/UI frozen; readiness false.
+- Failing checks: none in focused suite (24/24). Strict curve intentionally BLOCKED.
+- Open risk: residual 4-event envelope; snapshot link ceiling ~30; low stderr label polish.
+
+## Prior Addendum — M7F2-v6-final (superseded as active package)
+
+- Retained as audit foil; not active product path.
+
+
+# Impact Packet - Current
+
 ## Active Addendum — M7F2-v6-final (2026-07-12)
 
 - Changed code/tests/brief: scripts/pead_m7f2_v6_2019_crsp_vertical.py, tests/test_pead_m7f2_v6_2019_crsp_vertical.py, docs/phase_brief/v2-pead-m7f2-v6-2019-crsp-vertical.md (Commit A `c7724adcaa85`); removed v5.2 runner/tests/brief.

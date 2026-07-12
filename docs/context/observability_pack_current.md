@@ -1,5 +1,15 @@
 # Observability Pack - Current
 
+## Active Addendum — M7F3-v7 (2026-07-12)
+
+- Drift cleared: v6 false 70–74 close / unproven A/B/C / residual metric 0.163% vs ~0.72% / identical leg turnover.
+- Markers: selection hash locked; first-bad residual 0.721%; Shapley conserved; distinct A/B/C IDs recorded in SAW.
+- Budget: full 2019+Shapley ~15 min acceptable for diagnostic package.
+- Score: path ~70–73 diagnostic; research validity ~30; not readiness.
+
+
+# Observability Pack - Current
+
 ## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
 
 - ObservabilityRating: AMBER for residual strict-curve BLOCK; GREEN for diagnostic package completeness after Commit C if SAW validators PASS. RED for readiness/alpha.

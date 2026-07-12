@@ -1,3 +1,17 @@
+# Multi-Stream Contract - Current
+
+## Active Addendum — M7F3-v7 (2026-07-12)
+
+- **Data:** M7F3-v7 self-financing diagnostic vertical active on c0x/m7f0-v4; strict curve BLOCKED; residual envelope only.
+- **Backend/Strategy:** No promotion; no engine_run_simulation claim upgrade.
+- **Frontend/UI:** Frozen.
+- **Docs/Ops:** Commit C truth surfaces + SAW PASS; research validity ~30.
+
+## Stream freeze
+
+No CCM, WRDS login, readiness flip, alpha UI, or multi-year expansion in this round.
+
+
 # Multi-Stream Contract - Quant Current
 
 ## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)

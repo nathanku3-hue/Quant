@@ -1,5 +1,15 @@
 # Post-Phase Alignment - Current
 
+## Active Addendum — M7F3-v7 close (2026-07-12)
+
+- **Data stream:** DIAGNOSTIC_COMPLETE with self-financing truth; bottleneck remains residual 4 windows + snapshot non-PIT ceiling.
+- **Strategy/UI:** Held.
+- **Bottleneck:** Not mechanical turnover/attribution (closed in v7); residual outcome policy + link PIT for any higher research validity.
+- **Next:** Hold readiness; do not open CCM.
+
+
+# Post-Phase Alignment - Current
+
 ## Active Addendum — M7F2-v6-final (2026-07-12)
 
 - What changed: Hard-replaced M7F1-v5.2 with M7F2-v6-final outcome envelope (pre-entry exclude, blank bridge, dual sensitivity legs, map selection honesty).

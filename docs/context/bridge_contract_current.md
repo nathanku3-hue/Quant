@@ -1,5 +1,21 @@
 # Bridge Contract - Current
 
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- `SYSTEM_DELTA`: Hard-replaced M7F2-v6 active executable with M7F3-v7 self-financing portfolio truth on c0x/m7f0-v4. Drifted-prior equity turnover sequence; bridge parity; dead write-down; first-bad residual ~0.721%; exact 16-state Shapley. Commit A `bae1f656`; B evidence `b5c66bc`; C SAW+truth.
+- `PM / Product Delta`: Diagnostic package complete with strict_curve BLOCKED. Score path ~70–73 diagnostic; research validity ~30. Residual exposure is first-bad sum not 4/2448. Selection 2448 unchanged.
+- `OPEN_DECISION`: None for package close. Hold readiness/UI/historical-link/CCM.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion; optional stderr label polish only.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not treat neutral carry as upper bound; do not open CCM; do not claim independent A/B/C without distinct agents (now proven).
+- `PHASE_STATUS`: M7F3-v7 DIAGNOSTIC_COMPLETE; terminal SAW PASS; strict curve BLOCKED.
+
+## Prior Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+- Superseded as active close package by M7F3-v7. Historical v6 evidence retained for audit; v6 executable retired.
+
+
+# Bridge Contract - Current
+
 ## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
 
 - `SYSTEM_DELTA`: Hard-replaced M7F1-v5.2 with M7F2-v6-final on c0x/m7f0-v4. Pre-entry delist exclude before breadth/Q5; blank one-day bridge; strict BLOCK + neutral carry-to-cash + -100% write-down envelope; map identity selection metadata corrected. Commit A `c7724adcaa85`.
