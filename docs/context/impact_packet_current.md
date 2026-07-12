@@ -1,6 +1,14 @@
 # Impact Packet - Current
 
-## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+## Active Addendum — M7F1-v5.2-final (2026-07-12)
+
+- Changed code/tests: `scripts/pead_m7f1_v5_2019_crsp_vertical.py`, `tests/test_pead_m7f1_v5_2019_crsp_vertical.py`, `docs/phase_brief/v2-pead-m7f1-v5-2019-crsp-vertical.md` (Commit A `138c8b7`).
+- Evidence: `docs/context/e2e_evidence/pead_m7f1_v5_2019_crsp_vertical.json` SHA `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292`; ledger/daily manifests; map/ledger under ignored `data/processed/`.
+- Touched interfaces: Data/Research flagged vertical only; Strategy/UI frozen; readiness false.
+- Failing checks: durable residual selected-window BLOCK 7/2448 (5 nonnumeric, 1 unresolved delist, 1 missing session). Unit tests 17/17 PASS.
+- Open risk: residual requires delisting-data/policy gate; snapshot-link ceiling ~30; terminal A/B/C SAW is Commit C only.
+
+## Prior Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - Changed scope: mandatory current-truth surfaces, the active identity-repair phase status, decision/lesson records, generated current context, and one Thin SAW report only.
 - Touched interfaces: Docs/Ops governance truth only; no request payload, envelope, reviewer report, runtime, data, provider, validator, strategy, or UI interface.

@@ -1,5 +1,13 @@
 Decision Log: Terminal Zero
-Author: Atomic Mesh | Last Updated: 2026-07-11 (request artifact identity repair v1)
+Author: Atomic Mesh | Last Updated: 2026-07-12 (M7F1-v5.2-final durable residual BLOCK)
+
+M7F1-v5.2-final Formation Prior-20 Tradability (2026-07-12)
+- Decision: approve M7F1-v5.2-final with four mandatory edits; prior-20 is an explicit roadmap-deviation formation tradability restriction (finite RET, abs(PRC)>0, VOL>0 ≥15/20 pre-entry), not a map repair.
+- Decision: build calendar from source-wide CRSP dates; load ≥20 sessions before 2019; force map rebuild; invalidate stale daily curve on BLOCK; first/last PERMNO dates are diagnostic-only.
+- Decision: three-commit protocol only — A code/tests, B evidence/truth, C full A/B/C+SAW pinned to B. Do not close evidence and terminal review together.
+- Evidence: Commit A `138c8b76028b2094793efb2d066c269bf7b805f6`; rerun BLOCK 2448 selected / 2441 OK / 7 invalid (5 nonnumeric, 1 unresolved delist, 1 missing session); evidence SHA `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292`; score band ~62 residual BLOCK; readiness false; link ceiling ~30.
+- Boundary: no readiness flip; no historical-link slice yet; residual path is delisting-data/policy only.
+- Next action: Commit C terminal Reviewer A/B/C + SAW pinned to B; then owner open delisting policy gate.
 
 V2 PEAD Request Artifact Identity Repair V1 (2026-07-11)
 - Decision: approve the bounded two-commit repair and keep dispatch denied. Commit 1 restores BLOCK truth, quarantines false dispatch evidence, clarifies detached binding, and banks the exact four current 20260701 request artifacts without byte changes.

@@ -1,13 +1,22 @@
 # Bridge Contract - Current
 
-## Active Addendum — C0X → M7F0-v4 (2026-07-12)
+## Active Addendum — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+- `SYSTEM_DELTA`: M7F1-v5.2-final on `c0x/m7f0-v4`: source-wide spine, pre-2019 prior-20 load, pre-Q5 prior-20 tradability gate (roadmap deviation, not map repair), force map rebuild, stale-curve invalidate, ledger failure details. Commit A `138c8b7`; evidence bound to that commit.
+- `PM / Product Delta`: Durable residual BLOCK (~62 band): 7/2448 selected windows invalid (5 special RET, 1 unresolved delist, 1 missing session). Prior-20 removed dead-identity bulk failures. Curve not promoted. Snapshot-link ceiling ~30 remains.
+- `OPEN_DECISION`: Accept durable residual BLOCK and open bounded delisting-data/policy gate for residual specials/`DLRET`/missing-session — or re-scope. Do **not** open historical-link yet.
+- `RECOMMENDED_NEXT_STEP`: Commit C full A/B/C+SAW pinned to evidence Commit B; then delisting policy packet only.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not claim as-of/PIT link; do not restore pre-Q5 complete-60; do not treat uncommitted v5 diagnostic as package.
+- `PHASE_STATUS`: C0X PASS; M7F1-v5.2-final durable residual BLOCK (evidence package); terminal SAW pending Commit C.
+
+## Prior Addendum — C0X → M7F0-v4 (2026-07-12)
 
 - `SYSTEM_DELTA`: C0X trust bootstrap + M7F0-v4 2019 CRSP Q5 long-only mechanical vertical on branch `c0x/m7f0-v4` (base `aee7f4c`). C0A closure theater abandoned.
 - `PM / Product Delta`: Mechanical flagged research curve evidence available under snapshot CUSIP8 ceiling; not strict M6b; not alpha.
-- `OPEN_DECISION`: Accept mechanical evidence vs authorize as-of link upgrade.
-- `RECOMMENDED_NEXT_STEP`: Owner acceptance of M7F0-v4 evidence package; keep readiness false.
+- `OPEN_DECISION`: Superseded by M7F1-v5.2-final residual path.
+- `RECOMMENDED_NEXT_STEP`: See active M7F1-v5.2-final addendum.
 - `DO_NOT_REDECIDE`: Do not repair invalid C0A envelopes; do not claim as-of link; do not flip `m6b_data_contract_ready`.
-- `PHASE_STATUS`: C0X PASS (planning proof); M7F0-v4 mechanical PASS (ADVISORY on full A/B/C identity).
+- `PHASE_STATUS`: C0X PASS; M7F0-v4 superseded as selection contract by v5.2-final.
 
 # Bridge Contract - Current
 

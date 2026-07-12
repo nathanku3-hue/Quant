@@ -1,6 +1,19 @@
 # Done Checklist - Phase 65 G8.2 System-Scouted Candidate Card
 
-## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+## Active Addendum — M7F1-v5.2-final (2026-07-12)
+
+- [x] Four mandatory edits applied: prior-20 roadmap deviation; source-wide spine + pre-2019 load; VOL>0; first/last diagnostic-only; force map rebuild; stale curve invalidate.
+- [x] Clean Commit A code/tests/brief only: `138c8b76028b2094793efb2d066c269bf7b805f6`.
+- [x] Unit tests 17/17 PASS at Commit A.
+- [x] Full 2019 rerun from Commit A with forced map rebuild.
+- [x] Evidence bound to Commit A; curve not promoted; residual BLOCK 7/2448 recorded.
+- [x] Commit B evidence + truth surfaces (this package).
+- [ ] Commit C full independent Reviewer A/B/C + SAW pinned to B.
+- [ ] Residual delisting-data/policy gate authorized/executed.
+- [ ] Curve PASS 68–72; not achieved (durable residual BLOCK ~62).
+- Next action: Commit C terminal A/B/C+SAW; then delisting policy gate only.
+
+## Prior Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - [x] Original Reviewer A/B/C BLOCK findings accepted: dispatch identity at `e470137` failed because the four current 20260701 request artifacts were absent.
 - [x] False dispatch Markdown, JSON, and dependent PASS report quarantined as `INVALID_NOT_DISPATCHED`; no message is proven sent.

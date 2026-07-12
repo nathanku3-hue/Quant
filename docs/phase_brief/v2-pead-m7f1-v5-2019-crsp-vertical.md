@@ -68,3 +68,24 @@ formation-first selection, source-wide session spine, forced map rebuild, and an
 | A | code + tests + this brief only; clean worktree |
 | B | evidence JSON, manifests, truth surfaces (after rerun from A) |
 | C | full independent Reviewer A/B/C + SAW pinned to B |
+
+## Run outcome (2019, Commit A `138c8b7`)
+
+| Metric | Value |
+|--------|------:|
+| D1 valid 2019 events | 21,882 |
+| Unique mapped events | 16,843 |
+| Pre-Q5 prior20 ok / fail | 15,793 / 1,050 |
+| Formation dates ≥50 | 88 |
+| Q5 before overlap | 2,612 |
+| Suppressed entry-overlap | 164 |
+| Q5 after overlap / selected | 2,448 |
+| Selected OK windows | 2,441 |
+| Selected invalid | 7 |
+| Invalid breakdown | nonnumeric=5, unresolved_delist=1, missing_session=1 |
+| Daily curve | **not promoted** (`curve_status=ABSENT`) |
+| Status | `BLOCKED` (durable residual) |
+| Score band note | ~62 durable residual BLOCK |
+| Evidence SHA-256 | `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292` |
+| Map builder | `source_max_date_one_to_one_cusip8_permno` (always rebuilt) |
+| Panel load | 2018-11-30 .. 2020-12-31 (≥20 pre-2019 sessions) |

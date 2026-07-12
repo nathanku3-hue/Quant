@@ -1,6 +1,33 @@
 # Planner Packet - Current
 
-## New Context Packet — C0X → M7F0-v4 (2026-07-12)
+## New Context Packet — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+## What Was Done
+
+- Commit A `138c8b76028b2094793efb2d066c269bf7b805f6` / tree `2b7e216056cad76f87b3aaa3ed57ca1be0f23637`: M7F1-v5.2-final code+tests+brief only (clean worktree).
+- Four mandatory edits: prior-20 is explicit roadmap-deviation tradability gate (not map repair); source-wide spine + ≥20 pre-2019 sessions; VOL>0; first/last-date mismatch diagnostic-only; map always rebuilt; stale curve invalidate on BLOCK.
+- Full 2019 rerun from Commit A: durable **BLOCK** — 2448 selected / 2441 OK / 7 invalid (`nonnumeric=5`, `unresolved_delist=1`, `missing_session=1`). Curve not promoted. Prior-20: 15793 ok / 1050 fail.
+- Evidence SHA-256 `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292` bound to Commit A.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; non-PIT snapshot link; readiness false; research validity ~30.
+- Do not restore pre-Q5 complete-60 / entry-day return filters; do not use full-sample max_date for selection.
+- Residual specials/delist are a **delisting-data/policy** gate next — not historical-link yet.
+
+## What Is Next
+
+Commit C: full independent Reviewer A/B/C + SAW pinned to Commit B evidence. Then owner open bounded delisting-data/policy gate for the 7 residual selected-window invalids.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f1_v5_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+## Prior Context Packet — C0X → M7F0-v4 (2026-07-12)
 
 ## What Was Done
 

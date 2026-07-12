@@ -1,5 +1,15 @@
 # Feature Engineering Notes
 
+## 2026-07-12 M7F1-v5.2-final Registry
+
+- RoundID: `ROUND-20260712-M7F1-V5-2-FINAL`; ScopeID: `M7F1_V5_2_FINAL_2019_FORMATION_FIRST_VERTICAL`.
+- Roadmap deviation formula: `pre_q5_tradable := count_{s in prior20(entry)}(finite(RET_s) AND abs(PRC_s)>0 AND VOL_s>0) >= 15`. Not a map repair; not complete-60.
+- Session spine: source-wide distinct CRSP dates; panel load starts ≥20 sessions before 2019-01-01.
+- Selection: no entry-day return; no future window; no full-sample max_date gate; first/last date mismatch is diagnostic-only.
+- Run: Commit A `138c8b7`; selected 2448; OK 2441; invalid 7 (5 nonnumeric, 1 unresolved delist, 1 missing session); status BLOCKED; curve absent.
+- Evidence SHA-256 `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292`.
+- Boundary: readiness false; snapshot link ceiling ~30; next residual path = delisting-data/policy, not historical-link.
+
 ## 2026-07-11 Request Artifact Identity Repair V1 Registry
 
 - RoundID: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-REPAIR-V1`; ScopeID: `REQUEST_ARTIFACT_IDENTITY_REPAIR_V1`.
