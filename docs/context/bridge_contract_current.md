@@ -5,9 +5,9 @@
 - `SYSTEM_DELTA`: M7F1-v5.2-final on `c0x/m7f0-v4`: source-wide spine, pre-2019 prior-20 load, pre-Q5 prior-20 tradability gate (roadmap deviation, not map repair), force map rebuild, stale-curve invalidate, ledger failure details. Commit A `138c8b7`; evidence bound to that commit.
 - `PM / Product Delta`: Durable residual BLOCK (~62 band): 7/2448 selected windows invalid (5 special RET, 1 unresolved delist, 1 missing session). Prior-20 removed dead-identity bulk failures. Curve not promoted. Snapshot-link ceiling ~30 remains.
 - `OPEN_DECISION`: Accept durable residual BLOCK and open bounded delisting-data/policy gate for residual specials/`DLRET`/missing-session — or re-scope. Do **not** open historical-link yet.
-- `RECOMMENDED_NEXT_STEP`: Commit C full A/B/C+SAW pinned to evidence Commit B; then delisting policy packet only.
-- `DO_NOT_REDECIDE`: Do not flip readiness; do not claim as-of/PIT link; do not restore pre-Q5 complete-60; do not treat uncommitted v5 diagnostic as package.
-- `PHASE_STATUS`: C0X PASS; M7F1-v5.2-final durable residual BLOCK (evidence package); terminal SAW pending Commit C.
+- `RECOMMENDED_NEXT_STEP`: Owner open bounded delisting-data/policy gate for 7 residual invalids only; keep readiness false.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not claim as-of/PIT link; do not restore pre-Q5 complete-60; do not treat uncommitted v5 diagnostic as package; do not open historical-link yet.
+- `PHASE_STATUS`: C0X PASS; M7F1-v5.2-final durable residual BLOCK; Commit C terminal SAW ADVISORY_PASS (A/B/C all PASS).
 
 ## Prior Addendum — C0X → M7F0-v4 (2026-07-12)
 

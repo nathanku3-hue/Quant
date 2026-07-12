@@ -7,11 +7,11 @@
 - [x] Unit tests 17/17 PASS at Commit A.
 - [x] Full 2019 rerun from Commit A with forced map rebuild.
 - [x] Evidence bound to Commit A; curve not promoted; residual BLOCK 7/2448 recorded.
-- [x] Commit B evidence + truth surfaces (this package).
-- [ ] Commit C full independent Reviewer A/B/C + SAW pinned to B.
+- [x] Commit B evidence + truth surfaces: `8740f57763fafc838b07b9bedcf2a593a0787351`.
+- [x] Commit C full independent Reviewer A/B/C + SAW pinned to B (ADVISORY_PASS).
 - [ ] Residual delisting-data/policy gate authorized/executed.
 - [ ] Curve PASS 68–72; not achieved (durable residual BLOCK ~62).
-- Next action: Commit C terminal A/B/C+SAW; then delisting policy gate only.
+- Next action: owner open bounded delisting-data/policy gate for 7 residual invalids only.
 
 ## Prior Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 

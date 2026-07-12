@@ -17,7 +17,7 @@
 
 ## What Is Next
 
-Commit C: full independent Reviewer A/B/C + SAW pinned to Commit B evidence. Then owner open bounded delisting-data/policy gate for the 7 residual selected-window invalids.
+Owner open bounded delisting-data/policy gate for the 7 residual selected-window invalids only. Terminal Commit C SAW is ADVISORY_PASS (Reviewer A/B/C all PASS).
 
 ## First Command
 
