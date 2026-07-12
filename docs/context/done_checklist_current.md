@@ -12,7 +12,7 @@
 - [x] Full 2019 rerun from Commit A: DIAGNOSTIC_COMPLETE; strict_curve_status=BLOCKED.
 - [x] Evidence SHA-256 `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a`.
 - [x] All seven truth surfaces refreshed (this Commit B).
-- [ ] Terminal independent Reviewer A/B/C + validated SAW C.
+- [x] Terminal independent Reviewer A/B/C + validated SAW C.
 - [ ] Curve PASS 68-72 primary; not claimed (strict BLOCKED by residual ambiguities).
 - Next action: Commit C A/B/C + SAW PASS (diagnostic scope) with strict_curve BLOCKED.
 
