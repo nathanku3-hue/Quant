@@ -1,5 +1,21 @@
 # Multi-Stream Contract - Quant Current
 
+## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | M7F2-v6-final diagnostic package complete; strict curve BLOCKED | Residual envelope diagnostics only; no readiness flip |
+| Research | Flagged mechanical vertical under snapshot CUSIP8 ceiling ~30 | Not alpha / not tradable |
+| Docs/Ops | Truth surfaces + evidence refreshed for Commit B | Terminal SAW C next |
+| Strategy | Held | No promotion |
+| Frontend/UI | Held | No readiness surface |
+
+- Cross-stream rule: DIAGNOSTIC_COMPLETE with strict_curve_status=BLOCKED is not readiness or alpha authority.
+- Next action: Commit C independent A/B/C + SAW; hold readiness/UI/strategy/historical-link.
+
+
+# Multi-Stream Contract - Quant Current
+
 ## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 | Stream | Current status | Handoff / boundary |

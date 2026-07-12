@@ -1,5 +1,16 @@
 # Impact Packet - Current
 
+## Active Addendum — M7F2-v6-final (2026-07-12)
+
+- Changed code/tests/brief: scripts/pead_m7f2_v6_2019_crsp_vertical.py, tests/test_pead_m7f2_v6_2019_crsp_vertical.py, docs/phase_brief/v2-pead-m7f2-v6-2019-crsp-vertical.md (Commit A `c7724adcaa85`); removed v5.2 runner/tests/brief.
+- Evidence: docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json SHA `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a`; ledger/daily/envelope manifests; map/ledger under ignored data/processed/.
+- Touched interfaces: Data/Research flagged vertical only; Strategy/UI frozen; readiness false.
+- Failing checks: strict_curve_status=BLOCKED with 4 residual ambiguous selected windows (by design). Unit tests 19/19 PASS.
+- Open risk: residual ambiguities require envelope-only use; snapshot-link ceiling ~30; terminal SAW is Commit C.
+
+
+# Impact Packet - Current
+
 ## Active Addendum — M7F1-v5.2-final (2026-07-12)
 
 - Changed code/tests: `scripts/pead_m7f1_v5_2019_crsp_vertical.py`, `tests/test_pead_m7f1_v5_2019_crsp_vertical.py`, `docs/phase_brief/v2-pead-m7f1-v5-2019-crsp-vertical.md` (Commit A `138c8b7`).

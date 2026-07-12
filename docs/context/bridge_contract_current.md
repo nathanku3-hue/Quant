@@ -1,5 +1,21 @@
 # Bridge Contract - Current
 
+## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+- `SYSTEM_DELTA`: Hard-replaced M7F1-v5.2 with M7F2-v6-final on c0x/m7f0-v4. Pre-entry delist exclude before breadth/Q5; blank one-day bridge; strict BLOCK + neutral carry-to-cash + -100% write-down envelope; map identity selection metadata corrected. Commit A `c7724adcaa85`.
+- `PM / Product Delta`: Diagnostic package complete (DIAGNOSTIC_COMPLETE) with strict_curve_status=BLOCKED. Selected ok 2444/2448; residual invalid 4; bridged 2; pre-entry excluded 12. Score target 70-74 diagnostic; research ceiling ~30; baseline 60 until SAW C closes.
+- `OPEN_DECISION`: Accept diagnostic package and close terminal SAW C, or re-scope residual policy. Do not promote readiness or primary curve PASS.
+- `RECOMMENDED_NEXT_STEP`: Commit C Reviewer A/B/C + validated SAW PASS (diagnostic) with strict_curve BLOCKED.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not claim as-of/PIT link; do not treat neutral carry as justified upper bound; no v5.2 compatibility path; no event-id production policy.
+- `PHASE_STATUS`: M7F2-v6-final evidence complete; terminal SAW pending Commit C.
+
+## Prior Addendum — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+- Superseded on package status by M7F2-v6-final. Historical residual BLOCK evidence remains for audit only.
+
+
+# Bridge Contract - Current
+
 ## Active Addendum — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
 
 - `SYSTEM_DELTA`: M7F1-v5.2-final on `c0x/m7f0-v4`: source-wide spine, pre-2019 prior-20 load, pre-Q5 prior-20 tradability gate (roadmap deviation, not map repair), force map rebuild, stale-curve invalidate, ledger failure details. Commit A `138c8b7`; evidence bound to that commit.

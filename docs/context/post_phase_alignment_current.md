@@ -1,3 +1,14 @@
+# Post-Phase Alignment - Current
+
+## Active Addendum — M7F2-v6-final (2026-07-12)
+
+- What changed: Hard-replaced M7F1-v5.2 with M7F2-v6-final outcome envelope (pre-entry exclude, blank bridge, dual sensitivity legs, map selection honesty).
+- Stream status update: Data/Research diagnostic package written; Docs/Ops truth refresh in Commit B; Strategy/UI held.
+- Evidence: Commit A `c7724adcaa85`; evidence SHA `58f84cd64e31a41e…`; selected ok 2444; residual 4; bridged 2.
+- Current bottleneck: terminal independent Reviewer A/B/C + SAW validators for diagnostic PASS with strict curve BLOCKED.
+- Next active stream: Docs/Ops Commit C SAW; no readiness/strategy/UI work.
+
+
 # Post-Phase Alignment - Phase 65 G8.2
 
 ## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)

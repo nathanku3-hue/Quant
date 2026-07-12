@@ -1,3 +1,22 @@
+# Done Checklist - Current
+
+## Active Addendum — M7F2-v6-final (2026-07-12)
+
+- [x] Hard-rename/replace v5 runner/tests/brief with m7f2-v6-final (no compatibility path).
+- [x] Pre-entry delist exclude before breadth/Q5 + rerank (structural; no event-id policy).
+- [x] Bridge blank post-entry one-session gaps with adjacent price + next RET proof only.
+- [x] Emit strict BLOCK + neutral_carry_to_cash + write_down_100pct with per-event attribution.
+- [x] Map metadata: used_for_selection=true (identity); future_informed_identity_map=true.
+- [x] Unit tests PASS (19/19).
+- [x] Commit A code/tests/brief: `c7724adcaa855076be079c10224ea5cd2f0e60c0`.
+- [x] Full 2019 rerun from Commit A: DIAGNOSTIC_COMPLETE; strict_curve_status=BLOCKED.
+- [x] Evidence SHA-256 `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a`.
+- [x] All seven truth surfaces refreshed (this Commit B).
+- [ ] Terminal independent Reviewer A/B/C + validated SAW C.
+- [ ] Curve PASS 68-72 primary; not claimed (strict BLOCKED by residual ambiguities).
+- Next action: Commit C A/B/C + SAW PASS (diagnostic scope) with strict_curve BLOCKED.
+
+
 # Done Checklist - Phase 65 G8.2 System-Scouted Candidate Card
 
 ## Active Addendum — M7F1-v5.2-final (2026-07-12)

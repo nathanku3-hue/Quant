@@ -1809,3 +1809,11 @@ Application pattern:
 - Fix applied: Commit A code/tests only (`138c8b7`); source-wide spine + pre-2019 load; pre-Q5 prior-20 tradability roadmap deviation (finite RET, abs(PRC)>0, VOL>0); force map rebuild; invalidate stale curve; first/last mismatch diagnostic-only; Commit B evidence/truth; Commit C A/B/C+SAW pinned to B.
 - Guardrail for next time: Never bank evidence before code commit; never reuse map; never close evidence and terminal SAW in one commit; record formation tradability gates as explicit roadmap deviations.
 - Evidence paths: `138c8b7`; `docs/context/e2e_evidence/pead_m7f1_v5_2019_crsp_vertical.json`; residual BLOCK 7/2448.
+
+## 2026-07-12 M7F2-v6-final Outcome Envelope
+
+- Mistake or miss: M7F1-v5.2 claimed map unused for selection and closed with ADVISORY_PASS (validator-invalid); residual 7 invalids mixed pre-entry delist, bridgeable blanks, and genuine ambiguities.
+- Root cause: metadata honesty lag; residual policy deferred; SAW verdict enum not PASS/BLOCK.
+- Fix applied: M7F2-v6-final hard replace — pre-entry exclude before Q5, blank one-day bridge, strict BLOCK + neutral carry + write-down envelope, map used_for_selection=true; SAW may PASS diagnostic with strict_curve BLOCKED.
+- Guardrail for next time: never claim identity maps unused for selection; residual dispositions are structural rules not event-id lists; SAW verdict only PASS or BLOCK; neutral carry is not a finite upper bound.
+- Evidence: scripts/pead_m7f2_v6_2019_crsp_vertical.py; docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json; tests 19/19.

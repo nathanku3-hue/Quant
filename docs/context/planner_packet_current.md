@@ -1,5 +1,38 @@
 # Planner Packet - Current
 
+## New Context Packet — M7F2-v6-final Outcome Envelope DIAGNOSTIC_COMPLETE (2026-07-12)
+
+## What Was Done
+
+- Commit A `c7724adcaa855076be079c10224ea5cd2f0e60c0` / tree `158a0abe4c41215301fcad9abd83d485c230e778`: hard-replace v5.2 runner/tests/brief with m7f2-v6-final (no compatibility path).
+- Four semantic locks: pre-entry delist exclude before breadth/Q5 + rerank; blank one-day bridge with adjacent price+next RET proof; neutral carry-to-cash + write_down_100pct envelope (not a finite upper bound); map used_for_selection=true (identity).
+- Full 2019 rerun from Commit A: status=DIAGNOSTIC_COMPLETE, strict_curve_status=BLOCKED.
+- Counts: pre_entry_delist_excluded=12; selected=2448; ok=2444; invalid=4; bridged=2; residual reasons={'nonnumeric_selected_window': 3, 'unresolved_delist': 1}.
+- Residual combined approx event-slot share=0.0016339869281045752; envelope legs written for neutral_carry_to_cash and write_down_100pct.
+- Evidence SHA-256 `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a` bound to Commit A.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; non-PIT snapshot link; readiness false; research validity ~30.
+- Primary strict curve not promoted; sensitivity curves are diagnostic only.
+- Event-id allowlists forbidden in production policy (ids only in tests).
+- Do not restore pre-Q5 complete-60 / entry-day return filters.
+
+## What Is Next
+
+Terminal Commit C independent Reviewer A/B/C + SAW PASS allowed for completed diagnostic scope while strict_curve_status remains BLOCKED. Do not open readiness/UI/strategy/historical-link.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f2_v6_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+
+# Planner Packet - Current
+
 ## New Context Packet — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
 
 ## What Was Done

@@ -1,5 +1,18 @@
 # Observability Pack - Current
 
+## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+- ObservabilityRating: AMBER for residual strict-curve BLOCK; GREEN for diagnostic package completeness after Commit C if SAW validators PASS. RED for readiness/alpha.
+- Residual sentinel: invalid selected windows=4; reasons={'nonnumeric_selected_window': 3, 'unresolved_delist': 1}; bridged=2; pre_entry_excluded=12.
+- Envelope sentinel: legs neutral_carry_to_cash + write_down_100pct written; approx residual event-slot share=0.0016339869281045752; neutral carry is not a finite upper bound.
+- Map sentinel: used_for_selection=true; future_informed_identity_map=true; used_for_return_window_gate=false.
+- Identity sentinel: evidence bound to Commit A `c7724adcaa85`; evidence SHA `58f84cd64e31a41e…`.
+- Claim sentinel: m6b_data_contract_ready=false; not_alpha; not_tradable; research validity ceiling ~30.
+- Next-action sentinel: Commit C A/B/C + SAW PASS (diagnostic) with strict_curve_status=BLOCKED.
+
+
+# Observability Pack - Current
+
 ## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - `ObservabilityRating`: GREEN for request-artifact identity repair, reviewer independence, and truth reconciliation; RED for dispatch and strict M6b readiness. No Gate A or Gate B/C message is proven sent.

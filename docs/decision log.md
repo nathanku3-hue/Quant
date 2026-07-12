@@ -7279,3 +7279,8 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
     - A/B/C/D factual gate statuses and `m6b_data_contract_ready=false` remain unchanged.
   - Single next decision/action:
     - hold/no-dispatch. A future Gate A/B/C dispatch action requires a separate explicit owner authorization.
+
+## 2026-07-12 — M7F2-v6-final outcome envelope
+
+- Decision: hard-replace M7F1-v5.2 with M7F2-v6-final. Exclude pre-entry delists before breadth/Q5 and rerank; bridge only blank one-session gaps with adjacent prices + next RET; residual ambiguities emit strict BLOCK + neutral carry-to-cash + -100% write-down; map used_for_selection=true; SAW may PASS for diagnostic scope while strict_curve_status=BLOCKED.
+- Not decided: readiness flip, as-of link, alpha/tradable claims.
