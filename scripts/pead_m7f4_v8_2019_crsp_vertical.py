@@ -1,22 +1,28 @@
-"""M7F3-v7 (RETIRED EXECUTABLE — use pead_m7f4_v8): historical flagged-research engine.
+"""M7F4-v8 EXACT_SELF_FINANCING_IDENTITY: 2019 RDQ PEAD Q5 vertical (flagged research).
 
-Hard-replaces M7F2-v6 diagnostic package for portfolio-truth closure (score path ~70-73;
-research validity ceiling remains ~30). Selection set is frozen at 2448 events; bridge
-parity changes only window status, never selection membership.
+Implements the M7F4-v8 exact portfolio-state identity (score remains 66/100 until
+this round closes; research validity ceiling remains ~30). Selection is frozen at 2448
+events; bridge parity changes only window status, never selection membership.
 
 Semantic locks:
 1. Pre-entry delist exclude (DLSTCD>=200 strictly before entry) before breadth/Q5 + rerank.
 2. Bridge: blank one-session RET only + conservative adjacent price/RET parity within
    BRIDGE_PRICE_RET_PARITY_ABS_TOL; mismatch -> residual (never invent return; gap r=0).
-3. Daily sequence: drifted prior weights -> trade to target (equity turnover only) ->
-   apply today RET -> close-state transitions. Cash weight changes do not double-count.
+3. Daily sequence: explicit open equity/event-cash/global-idle-cash dollar state ->
+   solve open cost against actual post-cost equity trades -> scale-all targets from
+   reduced NAV -> apply RET -> charge close equity exits -> terminal equity-only
+   liquidation. Daily net return is the explicit NAV ratio; pre-cost gross is separate.
 4. write_down_100pct sleeve dies at zero weight after -100% (not recapitalized into EW).
 5. Residual primary metric: sum of first-bad-date target weights (~0.72% band), not
    event-count share and not weight-time integral.
 6. Exact 16-state Shapley attribution over the four residual ambiguities; contributions
    sum to scenario NAV gap vs ok-only.
-7. Canonical selected-event set is SHA-256 hashed; map used_for_selection=true identity.
-8. Neutral carry is not a justified finite upper bound; strict_curve BLOCKED on residual.
+7. Canonical selected rows and the selected-event set are separately SHA-256 hashed.
+8. Git-blob code SHA-256 is authoritative; worktree SHA is diagnostic and must be
+   byte-identical after deterministic newline normalization; no fallback authority exists.
+9. Zero active slots preserve carried NAV in explicit global idle cash; exhausted NAV is
+   never recapitalized.
+10. Neutral carry is not a justified finite upper bound; strict_curve BLOCKED on residual.
 
 Forbidden: CCM/as-of link, readiness flip, alpha/tradable, UI, WRDS login, event-id policy.
 """
@@ -49,6 +55,8 @@ if __package__ in (None, ""):
 
 ONE_WAY_BPS = 7.5
 ONE_WAY_COST = ONE_WAY_BPS / 10_000.0
+OPEN_COST_FIXED_POINT_TOL = 1e-14
+OPEN_COST_FIXED_POINT_MAX_ITER = 128
 HOLDING_SESSIONS = 60
 PRIOR_SESSIONS = 20
 MIN_PRIOR_OK = 15
@@ -56,10 +64,10 @@ MIN_FORMATION_NAMES = 50
 MIN_ACTIVE_SLOTS = 10
 COHORT_YEAR = 2019
 LINK_MODEL = "cross_vintage_snapshot_cusip8_non_pit"
-ARTIFACT_NAME = "pead_m7f3_v7_2019_crsp_vertical"
-ROUND_ID = "ROUND-20260712-M7F3-V7-SELF-FINANCING"
-SCOPE_ID = "M7F3_V7_SELF_FINANCING_PORTFOLIO_TRUTH"
-IMPLEMENTATION_VERSION = "m7f3-v7"
+ARTIFACT_NAME = "pead_m7f4_v8_2019_crsp_vertical"
+ROUND_ID = "ROUND-20260712-M7F4-V8-EXACT-SELF-FINANCING-IDENTITY"
+SCOPE_ID = "M7F4_V8_EXACT_SELF_FINANCING_IDENTITY"
+IMPLEMENTATION_VERSION = "m7f4-v8"
 ROADMAP_DEVIATION = (
     "prior20_formation_tradability_restriction_not_map_repair: "
     ">=15/20 strictly pre-entry sessions require finite RET, abs(PRC)>0, VOL>0"
@@ -72,11 +80,18 @@ BRIDGE_RULE = (
 )
 BRIDGE_PRICE_RET_PARITY_ABS_TOL = 1e-4  # conservative abs tol on |PRC_next|/|PRC_prev|-1 - RET_next
 DAILY_SEQUENCE = (
-    "drifted_prior_weights->"
-    "trade_to_target_charge_equity_turnover->"
-    "apply_today_ret->"
-    "close_state_transitions"
+    "open_equity_cash_dollar_state->"
+    "charge_open_equity_L1->"
+    "scale_all_allocate_targets_from_reduced_NAV->"
+    "apply_RET->"
+    "charge_close_equity_exits->"
+    "scale_all->"
+    "terminal_equity_only_liquidation->"
+    "daily_return_from_NAV_ratio"
 )
+NAV_COST_POLICY = "fixed_point_open_trade_parity_then_scale_all_post_cost_nav"
+GLOBAL_IDLE_CASH_POLICY = "explicit_global_idle_cash_preserves_nav_when_no_active_slots"
+COST_SPLIT = "open_actual_equity_trade_dollars_plus_close_equity_exits_plus_terminal_equity_only"
 RESIDUAL_EXPOSURE_METRIC = "summed_first_bad_date_target_weight"
 ATTRIBUTION_METHOD = "exact_16_state_shapley_four_residuals"
 OUTCOME_ENVELOPE_LEGS = (
@@ -88,21 +103,21 @@ OUTCOME_ENVELOPE_LEGS = (
 DEFAULT_D1 = Path("data/processed/pead_d1_sue_signal.parquet")
 DEFAULT_SEC = Path("data/processed/security_master_compustat.parquet")
 DEFAULT_CRSP = Path("data/hkcj1itkyvfsmibz.csv")
-DEFAULT_EVIDENCE = Path("docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json")
-DEFAULT_PARQUET = Path("data/processed/pead_m7f3_v7_2019_daily_returns.parquet")
+DEFAULT_EVIDENCE = Path("docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json")
+DEFAULT_PARQUET = Path("data/processed/pead_m7f4_v8_2019_daily_returns.parquet")
 DEFAULT_MANIFEST = Path(
-    "docs/context/e2e_evidence/pead_m7f3_v7_2019_daily_returns.parquet.manifest.json"
+    "docs/context/e2e_evidence/pead_m7f4_v8_2019_daily_returns.parquet.manifest.json"
 )
 DEFAULT_CUSIP_MAP = Path(
-    "data/processed/pead_m7f3_v7_crsp_cusip8_permno_source_max_date.parquet"
+    "data/processed/pead_m7f4_v8_crsp_cusip8_permno_source_max_date.parquet"
 )
-DEFAULT_LEDGER = Path("data/processed/pead_m7f3_v7_2019_event_ledger.parquet")
+DEFAULT_LEDGER = Path("data/processed/pead_m7f4_v8_2019_event_ledger.parquet")
 DEFAULT_LEDGER_MANIFEST = Path(
-    "docs/context/e2e_evidence/pead_m7f3_v7_2019_event_ledger.parquet.manifest.json"
+    "docs/context/e2e_evidence/pead_m7f4_v8_2019_event_ledger.parquet.manifest.json"
 )
 
 
-class M7F3BlockedError(RuntimeError):
+class M7F4BlockedError(RuntimeError):
     """Fail-closed research run blocker."""
 
 
@@ -124,6 +139,100 @@ def _sha256_bytes(data: bytes) -> str:
 
 def _sha256_text(text: str) -> str:
     return _sha256_bytes(text.encode("utf-8"))
+
+
+def _git_blob_bytes(repo_root: Path, rel_path: str) -> bytes | None:
+    """Return committed HEAD blob bytes without ambient Git redirection."""
+    rel = rel_path.replace("\\", "/").lstrip("./")
+    env = os.environ.copy()
+    env["GIT_NO_REPLACE_OBJECTS"] = "1"
+    for key in list(env):
+        if key.startswith("GIT_") and key != "GIT_NO_REPLACE_OBJECTS":
+            if key in {
+                "GIT_DIR",
+                "GIT_WORK_TREE",
+                "GIT_COMMON_DIR",
+                "GIT_OBJECT_DIRECTORY",
+                "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+                "GIT_INDEX_FILE",
+                "GIT_NAMESPACE",
+            } or key.startswith("GIT_CONFIG"):
+                env.pop(key, None)
+    proc = subprocess.run(
+        ["git", "-C", str(repo_root), "show", f"HEAD:{rel}"],
+        capture_output=True,
+        env=env,
+    )
+    if proc.returncode != 0:
+        return None
+    return proc.stdout
+
+
+def _normalize_source_newlines(data: bytes) -> bytes:
+    """Normalize source newlines for Git-blob/worktree semantic parity."""
+    return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def _resolve_code_identity(repo_root: Path, code_path: Path) -> dict[str, Any]:
+    """Require committed source and semantic worktree parity; Git blob is authoritative."""
+    worktree_bytes = code_path.read_bytes()
+    try:
+        rel_code = str(code_path.resolve().relative_to(repo_root.resolve())).replace("\\", "/")
+    except ValueError as exc:
+        raise M7F4BlockedError("code_path_outside_repo_root") from exc
+    rel_code = rel_code.replace("\\", "/")
+    git_blob_bytes = _git_blob_bytes(repo_root, rel_code)
+    if git_blob_bytes is None:
+        raise M7F4BlockedError(f"code_not_committed_at_head:{rel_code}")
+    worktree_semantic = _normalize_source_newlines(worktree_bytes)
+    git_blob_semantic = _normalize_source_newlines(git_blob_bytes)
+    if worktree_semantic != git_blob_semantic:
+        raise M7F4BlockedError(f"code_worktree_git_blob_semantic_mismatch:{rel_code}")
+    return {
+        "code_path": code_path.as_posix(),
+        "code_rel_path": rel_code,
+        "code_sha256": _sha256_bytes(git_blob_bytes),
+        "code_sha256_git_blob": _sha256_bytes(git_blob_bytes),
+        "code_sha256_worktree": _sha256_bytes(worktree_bytes),
+        "code_sha256_normalized_git_blob": _sha256_bytes(git_blob_semantic),
+        "code_sha256_normalized_worktree": _sha256_bytes(worktree_semantic),
+        "code_normalized_worktree_matches_git_blob": True,
+        "code_hash_authority": "git_blob",
+        "code_hash_fallback": None,
+    }
+
+
+def hash_canonical_selection_rows(rows: Sequence[Mapping[str, Any]]) -> str:
+    """SHA-256 of canonical sorted selection row records (not event_id set alone)."""
+    canon_keys = (
+        "event_id",
+        "gvkey",
+        "permno",
+        "rdq",
+        "entry",
+        "sue",
+        "q5_rank",
+        "formation_n_distinct_permno",
+    )
+    lines: list[str] = []
+    for raw in rows:
+        rec = {k: raw.get(k) for k in canon_keys}
+        if rec.get("rdq") is not None:
+            rec["rdq"] = str(pd.Timestamp(rec["rdq"]).date())
+        if rec.get("entry") is not None:
+            rec["entry"] = str(pd.Timestamp(rec["entry"]).date())
+        if rec.get("permno") is not None:
+            rec["permno"] = int(rec["permno"])
+        if rec.get("sue") is not None:
+            rec["sue"] = float(rec["sue"])
+        if rec.get("q5_rank") is not None:
+            rec["q5_rank"] = int(rec["q5_rank"])
+        if rec.get("formation_n_distinct_permno") is not None:
+            rec["formation_n_distinct_permno"] = int(rec["formation_n_distinct_permno"])
+        lines.append(json.dumps(rec, sort_keys=True, separators=(",", ":")))
+    lines.sort()
+    payload = "\n".join(lines) + ("\n" if lines else "")
+    return _sha256_text(payload)
 
 
 def _atomic_write_text(path: Path, text: str) -> None:
@@ -337,7 +446,7 @@ def _git_cmd(repo_root: Path, *args: str) -> str:
         env=env,
     )
     if completed.returncode != 0:
-        raise M7F3BlockedError(
+        raise M7F4BlockedError(
             f"git_command_failed:{' '.join(args)}:{completed.stderr.strip()}"
         )
     return completed.stdout.strip()
@@ -358,7 +467,7 @@ def resolve_run_identity(
     )
     detached = sym.returncode != 0
     if detached and not detached_proof_mode:
-        raise M7F3BlockedError(
+        raise M7F4BlockedError(
             "detached_head_requires_explicit_detached_proof_mode"
         )
     if detached_proof_mode and not detached:
@@ -368,8 +477,8 @@ def resolve_run_identity(
     else:
         proof_authority = "attached_branch_head"
     branch = sym.stdout.strip() if not detached else None
-    code_path = Path(__file__).resolve()
-    code_sha = _sha256_file(code_path)
+    code_identity = _resolve_code_identity(repo_root, Path(__file__).resolve())
+    code_sha = code_identity["code_sha256"]
     config = {
         "implementation_version": IMPLEMENTATION_VERSION,
         "link_model": LINK_MODEL,
@@ -394,6 +503,13 @@ def resolve_run_identity(
         "bridge_rule": BRIDGE_RULE,
         "bridge_price_ret_parity_abs_tol": BRIDGE_PRICE_RET_PARITY_ABS_TOL,
         "daily_sequence": DAILY_SEQUENCE,
+        "nav_cost_policy": NAV_COST_POLICY,
+        "global_idle_cash_policy": GLOBAL_IDLE_CASH_POLICY,
+        "open_cost_fixed_point_tol": OPEN_COST_FIXED_POINT_TOL,
+        "open_cost_fixed_point_max_iter": OPEN_COST_FIXED_POINT_MAX_ITER,
+        "pre_cost_gross_return": "nav_after_ret/nav_after_open_cost-1",
+        "net_return": "nav_end/nav_open-1",
+        "cost_split": COST_SPLIT,
         "residual_exposure_metric": RESIDUAL_EXPOSURE_METRIC,
         "attribution_method": ATTRIBUTION_METHOD,
         "outcome_envelope_legs": list(OUTCOME_ENVELOPE_LEGS),
@@ -421,8 +537,7 @@ def resolve_run_identity(
         "branch_ref": branch,
         "proof_authority": proof_authority,
         "detached_proof_mode": detached_proof_mode,
-        "code_path": code_path.as_posix(),
-        "code_sha256": code_sha,
+        **code_identity,
         "config": config,
         "config_sha256": config_sha,
         "logical_identity": logical,
@@ -606,7 +721,7 @@ def panel_load_window(sessions: pd.DatetimeIndex) -> tuple[str, str, dict[str, A
     cohort_start = pd.Timestamp(f"{COHORT_YEAR}-01-01")
     pre = sessions[sessions < cohort_start]
     if len(pre) < PRIOR_SESSIONS:
-        raise M7F3BlockedError(
+        raise M7F4BlockedError(
             f"source_spine_lacks_prior20_before_{COHORT_YEAR}:have={len(pre)}"
         )
     start_ts = pd.Timestamp(pre[-PRIOR_SESSIONS]).normalize()
@@ -974,8 +1089,9 @@ def resolve_event_window(
         cash_slot: bool,
         delist_day: bool,
         bridged: bool = False,
+        bridge_parity: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        return {
+        out = {
             "event_id": base["event_id"],
             "gvkey": base["gvkey"],
             "permno": permno,
@@ -991,6 +1107,9 @@ def resolve_event_window(
             "active_slot": True,
             "bridged_gap": bridged,
         }
+        if bridge_parity is not None:
+            out["bridge_parity"] = bridge_parity
+        return out
 
     for offset, session in enumerate(window_dates, start=1):
         session = pd.Timestamp(session).normalize()
@@ -1143,6 +1262,15 @@ def resolve_event_window(
                 next_ret=next_ret,
                 tol=BRIDGE_PRICE_RET_PARITY_ABS_TOL,
             )
+            parity_payload = {
+                "prev_prc": prev_prc,
+                "next_prc": next_prc,
+                "next_ret": next_ret,
+                "gap_prc": gap_prc,
+                "parity_abs_err": parity_err,
+                "parity_ok": bool(ok_parity),
+                "tol": BRIDGE_PRICE_RET_PARITY_ABS_TOL,
+            }
             if ok_parity:
                 rows.append(
                     _cell(
@@ -1153,6 +1281,7 @@ def resolve_event_window(
                         cash_slot=False,
                         delist_day=False,
                         bridged=True,
+                        bridge_parity=parity_payload,
                     )
                 )
                 bridge_applied = True
@@ -1170,6 +1299,7 @@ def resolve_event_window(
                     f"next_prc={next_prc!r};gap_prc={gap_prc!r};"
                     f"parity_abs_err={parity_err!r};tol={BRIDGE_PRICE_RET_PARITY_ABS_TOL}"
                 ),
+                "bridge_parity": parity_payload,
                 "panel_first_date": first_d,
                 "panel_last_date": last_d,
                 "first_bad_session": session.strftime("%Y-%m-%d"),
@@ -1240,6 +1370,56 @@ def bridge_parity_ok(
         return False, None
     err = price_ret_parity_error(prev_prc, next_prc, next_ret)
     return err <= float(tol), float(err)
+
+
+def bridge_parity_records_from_resolved(resolved: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Extract durable bridge inputs/results from successful and failed attempts."""
+    records: list[dict[str, Any]] = []
+    for rows_key in ("rows", "partial_rows"):
+        for cell in resolved.get(rows_key) or []:
+            payload = cell.get("bridge_parity")
+            if not isinstance(payload, Mapping):
+                continue
+            rec = dict(payload)
+            rec["gap_session"] = pd.Timestamp(cell["return_date"]).strftime("%Y-%m-%d")
+            records.append(rec)
+    top_payload = resolved.get("bridge_parity")
+    if isinstance(top_payload, Mapping):
+        rec = dict(top_payload)
+        if resolved.get("first_bad_session") is not None:
+            rec["gap_session"] = str(resolved["first_bad_session"])
+        records.append(rec)
+
+    unique: dict[str, dict[str, Any]] = {}
+    for rec in records:
+        canonical = json.dumps(rec, sort_keys=True, separators=(",", ":"), default=str)
+        unique[canonical] = rec
+    return [unique[key] for key in sorted(unique)]
+
+
+def summarize_bridge_parity(resolved_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Aggregate persisted bridge proof for evidence-level replay."""
+    records: list[dict[str, Any]] = []
+    for resolved in resolved_rows:
+        event_id = str(resolved.get("event_id"))
+        for raw in bridge_parity_records_from_resolved(resolved):
+            rec = dict(raw)
+            rec["event_id"] = event_id
+            records.append(rec)
+    finite_errors = [
+        float(rec["parity_abs_err"])
+        for rec in records
+        if rec.get("parity_abs_err") is not None
+        and math.isfinite(float(rec["parity_abs_err"]))
+    ]
+    return {
+        "n_attempts": int(len(records)),
+        "n_ok": int(sum(bool(rec.get("parity_ok")) for rec in records)),
+        "n_fail": int(sum(not bool(rec.get("parity_ok")) for rec in records)),
+        "max_abs_err": max(finite_errors) if finite_errors else None,
+        "tol": BRIDGE_PRICE_RET_PARITY_ABS_TOL,
+        "records": records,
+    }
 
 
 def hash_selected_event_set(event_ids: Sequence[str]) -> str:
@@ -1409,19 +1589,108 @@ def first_bad_date_residual_exposure(
 
 
 
+def _solve_open_cost_fixed_point(
+    *,
+    nav_open: float,
+    current_equity_dollars: Mapping[str, float],
+    target_equity_weights: Mapping[str, float],
+) -> dict[str, Any]:
+    """Solve cost = one-way-rate * actual post-cost equity trade dollars.
+
+    Target equity dollars depend on post-cost NAV, so a weight-only turnover estimate is
+    not authoritative. The map is a contraction because ONE_WAY_COST < 1 and target
+    equity weights sum to at most one.
+    """
+    nav_open = float(nav_open)
+    if not math.isfinite(nav_open) or nav_open <= 0.0:
+        raise M7F4BlockedError("open_cost_fixed_point_requires_positive_nav")
+    current = {
+        str(eid): float(value)
+        for eid, value in current_equity_dollars.items()
+        if float(value) > 0.0
+    }
+    target_w = {
+        str(eid): float(value)
+        for eid, value in target_equity_weights.items()
+        if float(value) > 0.0
+    }
+    if any(not math.isfinite(value) or value < 0.0 for value in current.values()):
+        raise M7F4BlockedError("invalid_current_equity_dollars")
+    if any(not math.isfinite(value) or value < 0.0 for value in target_w.values()):
+        raise M7F4BlockedError("invalid_target_equity_weights")
+    if sum(target_w.values()) > 1.0 + 1e-12:
+        raise M7F4BlockedError("target_equity_weights_exceed_one")
+
+    cost_dollars = 0.0
+    scale = max(1.0, abs(nav_open))
+    iterations = 0
+    target_dollars: dict[str, float] = {}
+    trade_dollars = 0.0
+    residual = math.inf
+    for iterations in range(1, OPEN_COST_FIXED_POINT_MAX_ITER + 1):
+        nav_after_cost = nav_open - cost_dollars
+        if nav_after_cost < -OPEN_COST_FIXED_POINT_TOL * scale:
+            raise M7F4BlockedError("open_cost_exceeds_nav")
+        nav_after_cost = max(0.0, nav_after_cost)
+        target_dollars = {
+            eid: weight * nav_after_cost for eid, weight in target_w.items()
+        }
+        trade_dollars = float(
+            sum(
+                abs(target_dollars.get(eid, 0.0) - current.get(eid, 0.0))
+                for eid in set(current) | set(target_dollars)
+            )
+        )
+        implied_cost = ONE_WAY_COST * trade_dollars
+        residual = implied_cost - cost_dollars
+        cost_dollars = implied_cost
+        if abs(residual) <= OPEN_COST_FIXED_POINT_TOL * scale:
+            break
+    else:
+        raise M7F4BlockedError("open_cost_fixed_point_did_not_converge")
+
+    nav_after_cost = nav_open - cost_dollars
+    target_dollars = {
+        eid: weight * nav_after_cost for eid, weight in target_w.items()
+    }
+    trade_dollars = float(
+        sum(
+            abs(target_dollars.get(eid, 0.0) - current.get(eid, 0.0))
+            for eid in set(current) | set(target_dollars)
+        )
+    )
+    parity_residual = float(cost_dollars - ONE_WAY_COST * trade_dollars)
+    if abs(parity_residual) > OPEN_COST_FIXED_POINT_TOL * scale:
+        raise M7F4BlockedError("open_cost_trade_parity_fail")
+    return {
+        "nav_after_open_cost": float(nav_after_cost),
+        "target_equity_dollars": target_dollars,
+        "open_equity_trade_dollars": float(trade_dollars),
+        "open_cost_dollars": float(cost_dollars),
+        "open_cost_rate": float(cost_dollars / nav_open),
+        "turnover_open_equity_l1": float(trade_dollars / nav_open),
+        "fixed_point_iterations": int(iterations),
+        "fixed_point_abs_residual_dollars": abs(parity_residual),
+    }
+
+
 def build_daily_portfolio(position_days: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
-    """Self-financing daily engine with locked sequence.
+    """Exact self-financing engine with separate equity/cash dollar states.
 
-    Sequence per day:
-      1) drifted prior weights (open = prior close after RET + transitions)
-      2) trade to today's target; charge equity-only L1 turnover (cash not double-counted)
-      3) apply today's RET
-      4) close-state transitions (dead sleeves zeroed)
+    Locked scale-all sequence per day:
+      1) open equity/event-cash/global-idle-cash dollar state -> NAV_open
+      2) solve open cost = rate * actual post-cost equity trade dollars
+      3) scale-all allocate targets from reduced NAV; no active slots -> global idle cash
+      4) apply RET (equity only; all cash r=0)
+      5) charge mandatory close equity exits (delist_day equity->cash)
+      6) scale-all after close costs
+      7) terminal day: equity-only liquidation + scale-all
+      8) report separate pre-cost gross return and exact NAV-ratio net return
 
-    write_down dead sleeves are excluded from equal-weight targets after death.
+    Duplicate (return_date, event_id) rows fail closed.
     """
     if position_days.empty:
-        raise M7F3BlockedError("no_active_position_days")
+        raise M7F4BlockedError("no_active_position_days")
     work = position_days.copy()
     work["return_date"] = pd.to_datetime(work["return_date"]).dt.normalize()
     for col, default in (
@@ -1429,18 +1698,26 @@ def build_daily_portfolio(position_days: pd.DataFrame) -> tuple[pd.DataFrame, di
         ("cash_slot", False),
         ("live_equity", True),
         ("active_slot", True),
+        ("delist_day", False),
     ):
         if col not in work.columns:
             work[col] = default
         work[col] = work[col].fillna(default).astype(bool)
     work["event_id"] = work["event_id"].astype(str)
-    work = work.drop_duplicates(["return_date", "event_id"], keep="last")
+    dup_mask = work.duplicated(["return_date", "event_id"], keep=False)
+    if bool(dup_mask.any()):
+        n_dup = int(work.loc[dup_mask, ["return_date", "event_id"]].drop_duplicates().shape[0])
+        raise M7F4BlockedError(f"duplicate_position_days:{n_dup}")
     work["r"] = pd.to_numeric(work["r"], errors="coerce").fillna(0.0).astype(float)
 
     dates = sorted(work["return_date"].unique())
     by_date = {d: g for d, g in work.groupby("return_date", sort=True)}
     records: list[dict[str, Any]] = []
-    open_w: dict[str, float] = {}
+    # Dollars / kind for carried state. Capital is initialized exactly once in explicit
+    # global idle cash; no later path may inject fresh NAV.
+    eq_dollars: dict[str, float] = {}
+    cash_dollars: dict[str, float] = {}
+    global_idle_cash = 1.0
     final_date = dates[-1]
 
     for dt in dates:
@@ -1452,100 +1729,284 @@ def build_daily_portfolio(position_days: pd.DataFrame) -> tuple[pd.DataFrame, di
         n_cash = int(ew["cash_slot"].sum()) if n_active else 0
         is_final = dt == final_date
         if n_active > 0 and n_active < MIN_ACTIVE_SLOTS and not is_final:
-            raise M7F3BlockedError(
+            raise M7F4BlockedError(
                 f"active_slots_below_min:{n_active}_on_{pd.Timestamp(dt).date()}"
             )
+
+        live_map = dict(zip(day["event_id"].tolist(), day["live_equity"].tolist()))
+        cash_map = dict(zip(day["event_id"].tolist(), day["cash_slot"].tolist()))
+        dead_map = dict(zip(day["event_id"].tolist(), day["dead_sleeve"].tolist()))
+        delist_map = dict(zip(day["event_id"].tolist(), day["delist_day"].tolist()))
+        ret_map = dict(zip(day["event_id"].tolist(), day["r"].tolist()))
+
         if n_active == 0:
-            target: dict[str, float] = {}
+            target_w: dict[str, float] = {}
         else:
             w = 1.0 / n_active
-            target = {eid: w for eid in ew["event_id"].tolist()}
+            target_w = {str(eid): w for eid in ew["event_id"].tolist()}
 
-        # row lookups
-        live_map = dict(zip(day["event_id"], day["live_equity"]))
-        cash_map = dict(zip(day["event_id"], day["cash_slot"]))
-        dead_map = dict(zip(day["event_id"], day["dead_sleeve"]))
-        ret_map = dict(zip(day["event_id"], day["r"]))
+        global_idle_cash_open = float(global_idle_cash)
+        nav_open = float(
+            sum(eq_dollars.values()) + sum(cash_dollars.values()) + global_idle_cash_open
+        )
+        if not math.isfinite(nav_open) or nav_open <= 0.0:
+            raise M7F4BlockedError(
+                f"portfolio_nav_exhausted_no_recapitalization_on_{pd.Timestamp(dt).date()}"
+            )
 
-        def _is_equity_name(eid: str) -> bool:
-            if eid in live_map:
-                if live_map[eid]:
-                    return True
-                if cash_map.get(eid, False) and not live_map.get(eid, False):
-                    return False
-                if dead_map.get(eid, False):
-                    return open_w.get(eid, 0.0) > 0.0
-            return open_w.get(eid, 0.0) > 0.0
+        # Target equity weights: only live-equity slots. Open cost is solved against
+        # actual target dollars after the cost itself reduces investable NAV.
+        w_tgt_eq: dict[str, float] = {
+            eid: float(wt)
+            for eid, wt in target_w.items()
+            if live_map.get(eid, False)
+        }
+        open_solve = _solve_open_cost_fixed_point(
+            nav_open=nav_open,
+            current_equity_dollars=eq_dollars,
+            target_equity_weights=w_tgt_eq,
+        )
+        nav_after_open_cost = float(open_solve["nav_after_open_cost"])
+        open_trade_dollars = float(open_solve["open_equity_trade_dollars"])
+        cost_open_dollars = float(open_solve["open_cost_dollars"])
+        cost_open_rate = float(open_solve["open_cost_rate"])
+        to_open = float(open_solve["turnover_open_equity_l1"])
+        if abs((nav_open - cost_open_dollars) - nav_after_open_cost) > 1e-12 * max(1.0, nav_open):
+            raise M7F4BlockedError("open_cost_dollar_identity_fail")
 
-        turnover = 0.0
-        for eid in set(open_w) | set(target):
-            if not _is_equity_name(eid):
-                continue
-            turnover += abs(target.get(eid, 0.0) - open_w.get(eid, 0.0))
-        cost = ONE_WAY_COST * float(turnover)
-
-        post_trade = dict(target)
-        gross = 0.0
-        post_ret: dict[str, float] = {}
-        for eid, ww in post_trade.items():
-            r_i = float(ret_map.get(eid, 0.0))
-            gross += ww * r_i
-            post_ret[eid] = ww * (1.0 + r_i)
-
-        for eid in list(post_ret.keys()):
+        # Allocate targets from reduced NAV (scale-all). When there are no active slots,
+        # preserve every post-cost dollar in explicit global idle cash.
+        dollars: dict[str, float] = {}
+        kind: dict[str, str] = {}
+        global_idle_cash_after_open = nav_after_open_cost if n_active == 0 else 0.0
+        for eid, wt in target_w.items():
+            dollars[eid] = float(wt) * nav_after_open_cost
             if dead_map.get(eid, False):
-                post_ret[eid] = 0.0
-            elif live_map.get(eid, False) and float(ret_map.get(eid, 0.0)) <= -1.0 + 1e-12 and not cash_map.get(eid, False):
-                post_ret[eid] = 0.0
+                kind[eid] = "dead"
+                dollars[eid] = 0.0
+            elif live_map.get(eid, False):
+                kind[eid] = "equity"
+            elif cash_map.get(eid, False):
+                kind[eid] = "cash"
+            else:
+                kind[eid] = "dead"
+                dollars[eid] = 0.0
+        allocated_after_open = float(sum(dollars.values()) + global_idle_cash_after_open)
+        if abs(allocated_after_open - nav_after_open_cost) > 1e-12 * max(1.0, nav_after_open_cost):
+            raise M7F4BlockedError("post_open_allocation_identity_fail")
 
-        pos_sum = float(sum(v for v in post_ret.values() if v > 0.0))
-        if pos_sum > 0.0:
-            open_w = {e: v / pos_sum for e, v in post_ret.items() if v > 0.0}
+        # Apply RET to equity only
+        for eid in list(dollars.keys()):
+            if kind.get(eid) != "equity":
+                continue
+            r_i = float(ret_map.get(eid, 0.0))
+            dollars[eid] = float(dollars[eid]) * (1.0 + r_i)
+            if r_i <= -1.0 + 1e-12:
+                dollars[eid] = 0.0
+
+        # Dead sleeves forced zero
+        for eid in list(dollars.keys()):
+            if dead_map.get(eid, False):
+                dollars[eid] = 0.0
+                kind[eid] = "dead"
+
+        nav_after_ret = float(
+            sum(max(v, 0.0) for v in dollars.values()) + global_idle_cash_after_open
+        )
+
+        # Close transitions: mandatory equity exits on delist_day (equity -> cash).
+        close_trade_dollars = 0.0
+        if nav_after_ret > 0.0:
+            for eid, d in list(dollars.items()):
+                if kind.get(eid) != "equity" or d <= 0.0:
+                    continue
+                if delist_map.get(eid, False):
+                    close_trade_dollars += float(d)
+                    kind[eid] = "cash"
+        to_close = float(close_trade_dollars / nav_after_ret) if nav_after_ret > 0.0 else 0.0
+        cost_close_dollars = float(ONE_WAY_COST * close_trade_dollars)
+        cost_close_rate = float(cost_close_dollars / nav_after_ret) if nav_after_ret > 0.0 else 0.0
+        nav_after_close = float(nav_after_ret - cost_close_dollars)
+        if nav_after_ret > 0.0 and cost_close_dollars > 0.0:
+            scale = nav_after_close / nav_after_ret
+            dollars = {e: float(d) * scale for e, d in dollars.items()}
+            global_idle_cash_after_close = float(global_idle_cash_after_open * scale)
         else:
-            open_w = {}
+            global_idle_cash_after_close = float(global_idle_cash_after_open)
+        if abs((nav_after_ret - cost_close_dollars) - nav_after_close) > 1e-12 * max(1.0, nav_after_ret):
+            raise M7F4BlockedError("close_cost_dollar_identity_fail")
 
-        net = float(gross - cost)
-        records.append(
-            {
-                "return_date": pd.Timestamp(dt),
-                "n_active_slots": n_active,
-                "n_live_equity": n_live_equity,
-                "n_cash_slots": n_cash,
-                "daily_gross_return": float(gross),
-                "turnover_l1": float(turnover),
-                "daily_cost": float(cost),
-                "daily_net_return": net,
-            }
+        # Terminal equity-only liquidation.
+        nav_before_terminal = float(nav_after_close)
+        terminal_trade_dollars = 0.0
+        includes_terminal = False
+        if is_final and nav_before_terminal > 0.0:
+            for eid, d in list(dollars.items()):
+                if kind.get(eid) == "equity" and d > 0.0:
+                    terminal_trade_dollars += float(d)
+                    kind[eid] = "cash"
+        to_term = (
+            float(terminal_trade_dollars / nav_before_terminal)
+            if nav_before_terminal > 0.0
+            else 0.0
         )
+        cost_term_dollars = float(ONE_WAY_COST * terminal_trade_dollars)
+        cost_term_rate = (
+            float(cost_term_dollars / nav_before_terminal)
+            if nav_before_terminal > 0.0
+            else 0.0
+        )
+        nav_end = float(nav_before_terminal - cost_term_dollars)
+        global_idle_cash_end = float(global_idle_cash_after_close)
+        if cost_term_dollars > 0.0 and nav_before_terminal > 0.0:
+            scale = nav_end / nav_before_terminal
+            dollars = {e: float(d) * scale for e, d in dollars.items()}
+            global_idle_cash_end *= scale
+            includes_terminal = True
+        if abs((nav_before_terminal - cost_term_dollars) - nav_end) > 1e-12 * max(1.0, nav_before_terminal):
+            raise M7F4BlockedError("terminal_cost_dollar_identity_fail")
 
-    if open_w:
-        term = float(sum(abs(w) for w in open_w.values()))
-        records[-1]["turnover_l1"] = float(records[-1]["turnover_l1"] + term)
-        records[-1]["daily_cost"] = float(ONE_WAY_COST * records[-1]["turnover_l1"])
-        records[-1]["daily_net_return"] = float(
-            records[-1]["daily_gross_return"] - records[-1]["daily_cost"]
+        daily_pre_cost_gross = float(nav_after_ret / nav_after_open_cost - 1.0)
+        daily_net = float(nav_end / nav_open - 1.0)
+        nav_pre_cost_gross_end = float(nav_open * (1.0 + daily_pre_cost_gross))
+        nav_cost_drag_dollars = float(nav_pre_cost_gross_end - nav_end)
+        daily_nav_cost_drag = float(daily_pre_cost_gross - daily_net)
+        direct_cost_dollars = float(
+            cost_open_dollars + cost_close_dollars + cost_term_dollars
         )
-        records[-1]["includes_terminal_liquidation"] = True
+        to_total = float(to_open + to_close + to_term)
+        if nav_cost_drag_dollars < -1e-12 * max(1.0, nav_open):
+            raise M7F4BlockedError("negative_nav_cost_drag")
+
+        # Carry state: equity, event cash, and global idle cash dollars.
+        eq_dollars = {}
+        cash_dollars = {}
+        for eid, d in dollars.items():
+            d = float(d)
+            if d <= 0.0:
+                continue
+            k = kind.get(eid, "cash")
+            if k == "equity":
+                eq_dollars[eid] = d
+            elif k == "cash":
+                cash_dollars[eid] = d
+            # dead discarded
+        global_idle_cash = float(global_idle_cash_end)
+
+        # Identity: carried dollars sum to nav_end, including idle dates.
+        carried = float(
+            sum(eq_dollars.values()) + sum(cash_dollars.values()) + global_idle_cash
+        )
+        if abs(carried - nav_end) > 1e-9 * max(1.0, abs(nav_end)):
+            raise M7F4BlockedError(
+                f"nav_state_mismatch:{carried=!r},{nav_end=!r},date={pd.Timestamp(dt).date()}"
+            )
+
+        rec = {
+            "return_date": pd.Timestamp(dt),
+            "n_active_slots": n_active,
+            "n_live_equity": n_live_equity,
+            "n_cash_slots": n_cash,
+            "nav_open": float(nav_open),
+            "global_idle_cash_open": global_idle_cash_open,
+            "nav_after_open_cost": float(nav_after_open_cost),
+            "global_idle_cash_after_open": float(global_idle_cash_after_open),
+            "nav_after_ret": float(nav_after_ret),
+            "nav_after_close_cost": float(nav_after_close),
+            "nav_before_terminal": float(nav_before_terminal),
+            "global_idle_cash_end": float(global_idle_cash_end),
+            "nav_end": float(nav_end),
+            "open_equity_trade_dollars": open_trade_dollars,
+            "close_equity_trade_dollars": float(close_trade_dollars),
+            "terminal_equity_trade_dollars": float(terminal_trade_dollars),
+            "turnover_open_equity_l1": float(to_open),
+            "turnover_close_equity_exits": float(to_close),
+            "turnover_terminal_equity": float(to_term),
+            "turnover_l1": float(to_total),
+            "open_cost_base_nav": float(nav_open),
+            "open_cost_rate": cost_open_rate,
+            "open_cost_dollars": cost_open_dollars,
+            "close_cost_base_nav": float(nav_after_ret),
+            "close_cost_rate": cost_close_rate,
+            "close_cost_dollars": cost_close_dollars,
+            "terminal_cost_base_nav": float(nav_before_terminal),
+            "terminal_cost_rate": cost_term_rate,
+            "terminal_cost_dollars": cost_term_dollars,
+            "direct_cost_dollars": direct_cost_dollars,
+            "daily_pre_cost_gross_return": float(daily_pre_cost_gross),
+            "nav_pre_cost_gross_end": nav_pre_cost_gross_end,
+            "daily_net_return": float(daily_net),
+            "daily_nav_cost_drag": daily_nav_cost_drag,
+            "nav_cost_drag_dollars": nav_cost_drag_dollars,
+            "open_cost_fixed_point_iterations": int(open_solve["fixed_point_iterations"]),
+            "open_cost_fixed_point_abs_residual_dollars": float(
+                open_solve["fixed_point_abs_residual_dollars"]
+            ),
+            "cost_in_next_day_state": True,
+            "no_recapitalization": True,
+            "global_idle_cash_policy": GLOBAL_IDLE_CASH_POLICY,
+            "nav_cost_policy": NAV_COST_POLICY,
+        }
+        if includes_terminal:
+            rec["includes_terminal_liquidation"] = True
+        records.append(rec)
 
     daily = pd.DataFrame.from_records(records).sort_values("return_date").reset_index(drop=True)
-    equity = (1.0 + daily["daily_net_return"]).cumprod()
-    daily["equity_net"] = equity
+    # Explicit NAV path level (starts at first nav_open, ends at last nav_end)
+    # equity_net is end-of-day NAV level with unit start on first open.
+    if len(daily):
+        # Reconstruct level from successive ratios for identity check
+        level = []
+        nav = float(daily.iloc[0]["nav_open"])
+        # normalize so initial open is 1.0
+        scale0 = 1.0 / nav if nav > 0 else 1.0
+        for _, row in daily.iterrows():
+            level.append(float(row["nav_end"]) * scale0)
+        daily["equity_net"] = level
+        # Verify ratio identity
+        for i, row in daily.iterrows():
+            expected = float(row["nav_end"]) / float(row["nav_open"]) - 1.0
+            if abs(expected - float(row["daily_net_return"])) > 1e-12:
+                raise M7F4BlockedError("daily_return_nav_ratio_identity_fail")
+        # Cumprod path must match equity_net within tol
+        cum = (1.0 + daily["daily_net_return"]).cumprod()
+        if not np.allclose(cum.to_numpy(dtype=float), daily["equity_net"].to_numpy(dtype=float), rtol=0.0, atol=1e-10):
+            raise M7F4BlockedError("nav_state_matches_equity_path_fail")
+        nav_state_matches = True
+    else:
+        nav_state_matches = False
+
     stats = {
         "n_days": int(len(daily)),
         "start": str(daily["return_date"].iloc[0].date()) if len(daily) else None,
         "end": str(daily["return_date"].iloc[-1].date()) if len(daily) else None,
-        "total_net_return": float(equity.iloc[-1] - 1.0) if len(daily) else None,
-        "terminal_equity_net": float(equity.iloc[-1]) if len(daily) else None,
+        "total_net_return": float(daily["equity_net"].iloc[-1] - 1.0) if len(daily) else None,
+        "terminal_equity_net": float(daily["equity_net"].iloc[-1]) if len(daily) else None,
         "min_active_slots": int(daily["n_active_slots"].min()) if len(daily) else None,
         "mean_active_slots": float(daily["n_active_slots"].mean()) if len(daily) else None,
         "min_live_equity": int(daily["n_live_equity"].min()) if len(daily) else None,
         "mean_live_equity": float(daily["n_live_equity"].mean()) if len(daily) else None,
         "total_turnover_l1": float(daily["turnover_l1"].sum()) if len(daily) else None,
-        "total_cost": float(daily["daily_cost"].sum()) if len(daily) else None,
+        "total_turnover_open_equity_l1": float(daily["turnover_open_equity_l1"].sum()) if len(daily) else None,
+        "total_turnover_close_equity_exits": float(daily["turnover_close_equity_exits"].sum()) if len(daily) else None,
+        "total_turnover_terminal_equity": float(daily["turnover_terminal_equity"].sum()) if len(daily) else None,
+        "total_open_cost_dollars": float(daily["open_cost_dollars"].sum()) if len(daily) else None,
+        "total_close_cost_dollars": float(daily["close_cost_dollars"].sum()) if len(daily) else None,
+        "total_terminal_cost_dollars": float(daily["terminal_cost_dollars"].sum()) if len(daily) else None,
+        "total_direct_cost_dollars": float(daily["direct_cost_dollars"].sum()) if len(daily) else None,
+        "total_nav_cost_drag_dollars": float(daily["nav_cost_drag_dollars"].sum()) if len(daily) else None,
+        "max_open_cost_fixed_point_abs_residual_dollars": float(
+            daily["open_cost_fixed_point_abs_residual_dollars"].max()
+        ) if len(daily) else None,
         "daily_sequence": DAILY_SEQUENCE,
+        "nav_cost_policy": NAV_COST_POLICY,
+        "global_idle_cash_policy": GLOBAL_IDLE_CASH_POLICY,
+        "cost_split": COST_SPLIT,
+        "cost_in_next_day_state": True,
+        "no_recapitalization": True,
+        "nav_state_matches_equity_path": bool(nav_state_matches),
     }
     return daily, stats
-
 
 
 def _scenario_terminal_nav(
@@ -1723,6 +2184,14 @@ def slot_weight_attribution(
 
 
 def _ledger_row_from_resolved(r: Mapping[str, Any]) -> dict[str, Any]:
+    bridge_records = bridge_parity_records_from_resolved(r)
+    bridge_errors = [
+        float(rec["parity_abs_err"])
+        for rec in bridge_records
+        if rec.get("parity_abs_err") is not None
+        and math.isfinite(float(rec["parity_abs_err"]))
+    ]
+    bridge_single = bridge_records[0] if len(bridge_records) == 1 else {}
     entry_s = (
         pd.Timestamp(r["entry"]).strftime("%Y-%m-%d") if r.get("entry") is not None else None
     )
@@ -1753,6 +2222,22 @@ def _ledger_row_from_resolved(r: Mapping[str, Any]) -> dict[str, Any]:
         "first_bad_session": r.get("first_bad_session"),
         "bridge_applied": bool(r.get("bridge_applied")),
         "bridge_sessions": ",".join(r.get("bridge_sessions") or []),
+        "bridge_parity_n_attempts": int(len(bridge_records)),
+        "bridge_parity_n_ok": int(sum(bool(rec.get("parity_ok")) for rec in bridge_records)),
+        "bridge_parity_n_fail": int(sum(not bool(rec.get("parity_ok")) for rec in bridge_records)),
+        "bridge_parity_max_abs_err": max(bridge_errors) if bridge_errors else None,
+        "bridge_proof_flattened": len(bridge_records) <= 1,
+        "bridge_gap_session": bridge_single.get("gap_session"),
+        "bridge_prev_prc": bridge_single.get("prev_prc"),
+        "bridge_next_prc": bridge_single.get("next_prc"),
+        "bridge_next_ret": bridge_single.get("next_ret"),
+        "bridge_gap_prc": bridge_single.get("gap_prc"),
+        "bridge_parity_abs_err": bridge_single.get("parity_abs_err"),
+        "bridge_parity_tol": bridge_single.get("tol"),
+        "bridge_parity_ok": bridge_single.get("parity_ok"),
+        "bridge_parity_records_json": json.dumps(
+            bridge_records, sort_keys=True, separators=(",", ":"), default=str
+        ),
         "outcome_class": r.get("outcome_class"),
     }
 
@@ -1781,11 +2266,11 @@ def run_vertical(
         con, d1_path=d1_path, sec_path=sec_path, cusip_map_path=cusip_map_path
     )
     if mapped.empty:
-        raise M7F3BlockedError("no_unique_mapped_events")
+        raise M7F4BlockedError("no_unique_mapped_events")
 
     sessions = load_source_session_spine(con, crsp_path=crsp_path)
     if len(sessions) == 0:
-        raise M7F3BlockedError("empty_source_session_spine")
+        raise M7F4BlockedError("empty_source_session_spine")
     panel_start, panel_end, panel_window_meta = panel_load_window(sessions)
     panel = load_crsp_panel(
         con,
@@ -1795,7 +2280,7 @@ def run_vertical(
         end=panel_end,
     )
     if panel.empty:
-        raise M7F3BlockedError("empty_crsp_panel")
+        raise M7F4BlockedError("empty_crsp_panel")
     panel["date"] = pd.to_datetime(panel["date"]).dt.normalize()
     panel_by = {int(p): g.copy() for p, g in panel.groupby("permno")}
 
@@ -1814,7 +2299,7 @@ def run_vertical(
     kept_q5, suppressed, overlap_stats = suppress_entry_overlap(q5, sessions)
     if kept_q5.empty:
         _invalidate_stale_curve(parquet_path)
-        raise M7F3BlockedError("no_q5_events_after_formation_and_overlap")
+        raise M7F4BlockedError("no_q5_events_after_formation_and_overlap")
 
     # --- Post-select window resolution (bridge blanks; residual -> envelope) ---
     resolved: list[dict[str, Any]] = []
@@ -1830,6 +2315,7 @@ def run_vertical(
     reason_counts: dict[str, int] = {}
     for r in bad:
         reason_counts[r["status"]] = reason_counts.get(r["status"], 0) + 1
+    bridge_parity_summary = summarize_bridge_parity(resolved)
 
     # Post-hoc first/last-date diagnostics only (not selection).
     posthoc: dict[str, int] = {
@@ -1984,7 +2470,16 @@ def run_vertical(
         "overlap": "suppress_later_event_entirely_when_entry_overlaps_earlier_60_session_claim",
         "weights": "equal_weight_active_slots_including_post_delist_cash",
         "one_way_cost": ONE_WAY_COST,
-        "cost_formula": "0.00075 * sum_i abs(delta_w_i) including terminal liquidation",
+        "cost_formula": (
+            "open_cost_dollars=0.00075*actual_post_cost_equity_trade_dollars_fixed_point; "
+            "close_cost_dollars=0.00075*close_equity_trade_dollars; "
+            "terminal_cost_dollars=0.00075*terminal_equity_trade_dollars; "
+            "daily_pre_cost_gross=nav_after_ret/nav_after_open_cost-1; "
+            "daily_net=nav_end/nav_open-1"
+        ),
+        "nav_cost_policy": NAV_COST_POLICY,
+        "global_idle_cash_policy": GLOBAL_IDLE_CASH_POLICY,
+        "cost_split": COST_SPLIT,
         "delist_day_return": "(1+RET)*(1+DLRET)-1 or DLRET if RET blank; then cash slot r=0 remainder",
         "nonnumeric_scope": "selected_windows_only_block_run",
         "posthoc_diagnostics_only": [
@@ -2022,27 +2517,6 @@ def run_vertical(
         "not_tradable_claim": True,
         "research_validity_ceiling_note": "snapshot_link_ceiling_approx_30_of_100",
     }
-    supersedes = {
-        "artifact_name": "pead_m7f2_v6_2019_crsp_vertical",
-        "prior_implementation_versions": [
-            "m7f1-v5",
-            "m7f1-v5.1",
-            "m7f1-v5.2-final",
-        ],
-        "reason": (
-            "M7F3-v7: pre-entry delist exclude before breadth/Q5 + rerank; "
-            "blank one-day bridge with adjacent price+next RET proof; "
-            "strict BLOCK + neutral carry-to-cash + write_down_100pct envelope; "
-            "map used_for_selection=true (identity); no v5.2 compatibility path"
-        ),
-        "also_supersedes": {
-            "artifact_name": "pead_m7f0_v4_2019_crsp_vertical",
-            "reason": (
-                "v4 filtered complete 60d windows before Q5 (lookahead), reallocated delist "
-                "cash into survivors, unbound map lineage, non-atomic parquet"
-            ),
-        },
-    }
     n_bridged = int(sum(1 for r in resolved if r.get("bridge_applied")))
     base_counts = {
         **map_counts,
@@ -2065,6 +2539,20 @@ def run_vertical(
 
     selected_event_ids = [str(r["event_id"]) for r in resolved]
     selected_event_set_sha256 = hash_selected_event_set(selected_event_ids)
+    selected_canonical_rows = [
+        {
+            "event_id": r.get("event_id"),
+            "gvkey": r.get("gvkey"),
+            "permno": r.get("permno"),
+            "rdq": r.get("rdq"),
+            "entry": r.get("entry"),
+            "sue": r.get("sue"),
+            "q5_rank": r.get("q5_rank"),
+            "formation_n_distinct_permno": r.get("formation_n_distinct_permno"),
+        }
+        for r in resolved
+    ]
+    selected_canonical_rows_sha256 = hash_canonical_selection_rows(selected_canonical_rows)
 
     if bad:
         block_reason = "selected_window_invalid:" + ",".join(
@@ -2086,6 +2574,8 @@ def run_vertical(
                 "summed first-bad-date target weight; attribution is exact 16-state Shapley"
             ),
             "daily_sequence": DAILY_SEQUENCE,
+        "nav_cost_policy": NAV_COST_POLICY,
+        "cost_split": COST_SPLIT,
             "bridge_price_ret_parity_abs_tol": BRIDGE_PRICE_RET_PARITY_ABS_TOL,
             "write_down_policy": "dead_zero_weight_no_recapitalization_after_minus_100pct",
             "turnover_policy": "equity_l1_only_cash_not_double_counted",
@@ -2125,7 +2615,8 @@ def run_vertical(
                 "rows": int(len(daily_out_s)),
                 "portfolio": port_scen,
                 "total_turnover_l1": port_scen.get("total_turnover_l1"),
-                "total_cost": port_scen.get("total_cost"),
+                "total_direct_cost_dollars": port_scen.get("total_direct_cost_dollars"),
+                "total_nav_cost_drag_dollars": port_scen.get("total_nav_cost_drag_dollars"),
             }
             residual_exposures[scenario] = first_bad_date_residual_exposure(
                 resolved, scenario=scenario, sessions=sessions
@@ -2151,6 +2642,15 @@ def run_vertical(
             "daily_parquet_sha256": None,
             "event_ledger_sha256": ledger_sha,
             "code_sha256": identity["code_sha256"],
+            "code_sha256_git_blob": identity["code_sha256_git_blob"],
+            "code_sha256_worktree": identity["code_sha256_worktree"],
+            "code_sha256_normalized_git_blob": identity["code_sha256_normalized_git_blob"],
+            "code_sha256_normalized_worktree": identity["code_sha256_normalized_worktree"],
+            "code_normalized_worktree_matches_git_blob": identity[
+                "code_normalized_worktree_matches_git_blob"
+            ],
+            "code_hash_authority": identity["code_hash_authority"],
+            "code_hash_fallback": identity["code_hash_fallback"],
             "config_sha256": identity["config_sha256"],
             "logical_identity_sha256": identity["logical_identity_sha256"],
             "neutral_carry_to_cash_sha256": (leg_paths.get("neutral_carry_to_cash") or {}).get("sha256"),
@@ -2161,7 +2661,6 @@ def run_vertical(
             "round_id": ROUND_ID,
             "scope_id": SCOPE_ID,
             "generated_at_utc": _utc_now(),
-            "supersedes": supersedes,
             "authority": (
                 "flagged research mechanical vertical only; not strict M6b readiness; "
                 "not alpha; not tradable; not as-of/PIT CUSIP link"
@@ -2175,9 +2674,12 @@ def run_vertical(
                 **base_counts,
                 "portfolio": None,
                 "selected_event_set_sha256": selected_event_set_sha256,
+                "selected_canonical_rows_sha256": selected_canonical_rows_sha256,
                 "n_selected_event_set": int(len(selected_event_ids)),
             },
             "selected_event_set_sha256": selected_event_set_sha256,
+            "selected_canonical_rows_sha256": selected_canonical_rows_sha256,
+            "bridge_parity_summary": bridge_parity_summary,
             "outcome_envelope": envelope_stats,
             "lineage": {
                 "d1_path": d1_path.as_posix(),
@@ -2274,6 +2776,15 @@ def run_vertical(
         "daily_parquet_sha256": parquet_sha,
         "event_ledger_sha256": ledger_sha,
         "code_sha256": identity["code_sha256"],
+        "code_sha256_git_blob": identity["code_sha256_git_blob"],
+        "code_sha256_worktree": identity["code_sha256_worktree"],
+        "code_sha256_normalized_git_blob": identity["code_sha256_normalized_git_blob"],
+        "code_sha256_normalized_worktree": identity["code_sha256_normalized_worktree"],
+        "code_normalized_worktree_matches_git_blob": identity[
+            "code_normalized_worktree_matches_git_blob"
+        ],
+        "code_hash_authority": identity["code_hash_authority"],
+        "code_hash_fallback": identity["code_hash_fallback"],
         "config_sha256": identity["config_sha256"],
         "logical_identity_sha256": identity["logical_identity_sha256"],
     }
@@ -2283,7 +2794,6 @@ def run_vertical(
         "round_id": ROUND_ID,
         "scope_id": SCOPE_ID,
         "generated_at_utc": _utc_now(),
-        "supersedes": supersedes,
         "authority": (
             "flagged research mechanical vertical only; not strict M6b readiness; "
             "not alpha; not tradable; not as-of/PIT CUSIP link"
@@ -2293,6 +2803,9 @@ def run_vertical(
         "contract": contract,
         "map_meta": map_meta,
         "counts": {**base_counts, "portfolio": port_stats},
+        "selected_event_set_sha256": selected_event_set_sha256,
+        "selected_canonical_rows_sha256": selected_canonical_rows_sha256,
+        "bridge_parity_summary": bridge_parity_summary,
         "lineage": {
             "d1_path": d1_path.as_posix(),
             "security_master_path": sec_path.as_posix(),
@@ -2358,7 +2871,7 @@ def run_vertical(
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="M7F3-v7 2019 CRSP PEAD outcome-envelope vertical"
+        description="M7F4-v8 2019 CRSP PEAD exact self-financing identity vertical"
     )
     p.add_argument("--repo-root", type=Path, default=Path("."))
     p.add_argument("--d1", type=Path, default=None)
@@ -2380,12 +2893,83 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """v7 executable path removed. Historical evidence retained; use m7f4-v8."""
-    sys.stderr.write(
-        "M7F3-v7 executable path is retired. Use scripts/pead_m7f4_v8_2019_crsp_vertical.py "
-        "(EXACT_SELF_FINANCING_IDENTITY). Historical v7 evidence remains for audit only.\n"
+    args = parse_args(argv)
+    repo_root = args.repo_root.resolve()
+    data_root = args.data_root.resolve() if args.data_root else repo_root
+
+    def _resolve(p: Path | None, default: Path) -> Path:
+        if p is not None:
+            return p if p.is_absolute() else (repo_root / p).resolve()
+        candidate = (data_root / default).resolve()
+        if candidate.is_file() or default.parts[0] != "data":
+            return candidate
+        return (repo_root / default).resolve() if "docs" in default.parts else candidate
+
+    d1 = _resolve(args.d1, DEFAULT_D1)
+    sec = _resolve(args.security_master, DEFAULT_SEC)
+    crsp = _resolve(args.crsp, DEFAULT_CRSP)
+    evidence = (
+        args.evidence_out.resolve()
+        if args.evidence_out
+        else (repo_root / DEFAULT_EVIDENCE).resolve()
     )
-    return 2
+    parquet = (
+        args.parquet_out.resolve()
+        if args.parquet_out
+        else (data_root / DEFAULT_PARQUET).resolve()
+    )
+    manifest = (
+        args.manifest_out.resolve()
+        if args.manifest_out
+        else (repo_root / DEFAULT_MANIFEST).resolve()
+    )
+    cusip_map = (
+        args.cusip_map.resolve()
+        if args.cusip_map
+        else (data_root / DEFAULT_CUSIP_MAP).resolve()
+    )
+    ledger = (
+        args.ledger_out.resolve()
+        if args.ledger_out
+        else (data_root / DEFAULT_LEDGER).resolve()
+    )
+    ledger_manifest = (
+        args.ledger_manifest_out.resolve()
+        if args.ledger_manifest_out
+        else (repo_root / DEFAULT_LEDGER_MANIFEST).resolve()
+    )
+
+    try:
+        evidence_obj = run_vertical(
+            repo_root=repo_root,
+            d1_path=d1,
+            sec_path=sec,
+            crsp_path=crsp,
+            evidence_path=evidence,
+            parquet_path=parquet,
+            manifest_path=manifest,
+            cusip_map_path=cusip_map,
+            ledger_path=ledger,
+            ledger_manifest_path=ledger_manifest,
+            detached_proof_mode=bool(args.detached_proof_mode),
+        )
+    except M7F4BlockedError as exc:
+        print(f"M7F4_BLOCKED: {exc}", file=sys.stderr)
+        if evidence.is_file():
+            print(
+                json.dumps(
+                    {
+                        "status": "BLOCKED",
+                        "artifact": ARTIFACT_NAME,
+                        "evidence": evidence.as_posix(),
+                        "block_reason": str(exc),
+                    },
+                    sort_keys=True,
+                )
+            )
+        return 2
+    print(json.dumps({"status": evidence_obj.get("status"), "artifact": ARTIFACT_NAME}, sort_keys=True))
+    return 0
 
 
 if __name__ == "__main__":
