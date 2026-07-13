@@ -1826,3 +1826,11 @@ Application pattern:
 - Fix applied: M7F2-v6-final hard replace — pre-entry exclude before Q5, blank one-day bridge, strict BLOCK + neutral carry + write-down envelope, map used_for_selection=true; SAW may PASS diagnostic with strict_curve BLOCKED.
 - Guardrail for next time: never claim identity maps unused for selection; residual dispositions are structural rules not event-id lists; SAW verdict only PASS or BLOCK; neutral carry is not a finite upper bound.
 - Evidence: scripts/pead_m7f2_v6_2019_crsp_vertical.py; docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json; tests 19/19.
+
+## 2026-07-13 Round Entry (Residual Evidence Branch Must Be Executed Before Full Scan)
+- Date: 2026-07-13
+- Mistake or miss: The A2 focused suite passed 44/44, but the first full Slice 2 run failed after the expensive CRSP scans because the residual-evidence branch referenced undefined `selected_event_ids` instead of the verified selection contract.
+- Root cause: Tests covered the selection-lock helper and pre-write ordering, but no tiny end-to-end test executed the real `bad` residual branch through evidence and manifest publication.
+- Fix applied: Replaced the stale count reference with `selection_contract["n_selected_events"]`, added a deterministic real residual-evidence regression, removed all failed-run partial outputs, committed A2.1 at `b4d35e1`, reran from a fresh clean worktree, independently audited the published parquets and identities, and banked Commit B at `9f37745`.
+- Guardrail for next time: Every expensive data runner must have a small end-to-end regression for each terminal publication branch, including residual/BLOCK evidence, before a full-file scan is authorized; helper-only tests do not prove branch publication safety.
+- Evidence paths: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_daily_returns.parquet.manifest.json`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_event_ledger.parquet.manifest.json`.
