@@ -81,7 +81,8 @@ For day `t`, maintain explicit equity dollars, event-cash dollars, and global id
 
 - **Commit A (`3671b84`):** v8 functional accounting engine, focused tests, this brief, initial v7 CLI retirement. No full 2019 run.
 - **Commit A2:** sanitize and bind all Git identity calls; reject replacement refs; enforce the exact 2,448-event/count/hash contract before outputs; reduce v7 to a true stub; rerun committed-checkout audit. No full 2019 run.
-- **Commit B:** only after A2 audit GO, run the unchanged 2019 Slice 2 with source-session continuity asserted; publish evidence, ledger, manifests, neutral-carry/write-down legs, and Shapley blocks.
+- **Commit A2.1:** replace the stale residual-evidence count reference with `selection_contract["n_selected_events"]`; add a regression that executes the real residual-evidence publication branch; discard failed-run partial outputs before a fresh rerun. No policy or runtime redesign.
+- **Commit B:** only after A2.1 audit GO, run the unchanged 2019 Slice 2 with source-session continuity asserted; publish evidence, ledger, manifests, neutral-carry/write-down legs, and Shapley blocks.
 - **Commit C:** independent Reviewer A/B/C, validated SAW, decision/lesson/formula records, and seven current-truth surfaces.
 
 ## Commit-A acceptance checks
@@ -100,14 +101,14 @@ For day `t`, maintain explicit equity dollars, event-cash dollars, and global id
 - Bridge parity values/errors are replayable from flattened ledger columns and evidence helpers.
 - Missing committed blob, out-of-root code path, normalized worktree/blob mismatch, repository/Git-dir/common-dir mismatch, ambient Git splice, or replacement ref blocks identity; newline-only CRLF/LF difference passes with Git blob authoritative and no fallback.
 - Count/hash mismatch blocks before map, ledger, curve, evidence, or manifest mutation.
+- The real residual-evidence branch writes `n_selected_event_set` from the verified selection contract and publishes evidence plus both manifests without an undefined-symbol failure.
 - The predecessor module contains only an exit-`2` stub and directs execution to v8 without engine exports, imports, call-through, aliases, fallback, or argument forwarding.
 - Only the exact four A2 paths are staged; no evidence output or truth-surface close is included.
 
-## Expected Commit-A2 paths
+## Expected Commit-A2.1 paths
 
 - `docs/phase_brief/v2-pead-m7f4-v8-exact-self-financing-identity.md`
 - `scripts/pead_m7f4_v8_2019_crsp_vertical.py`
-- `scripts/pead_m7f3_v7_2019_crsp_vertical.py`
 - `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`
 
 ## Forbidden scope
@@ -125,6 +126,7 @@ For day `t`, maintain explicit equity dollars, event-cash dollars, and global id
 
 - Slice 0: brief and functional accounting contract banked.
 - Slice 1 / Commit A: banked at `3671b84`; committed-checkout tests passed 38/38, but audit found identity splicing, unenforced selection identity, and retained v7 engine complexity.
-- Slice 1A / Commit A2: implementation complete locally; Git context is sanitized/bound, replacement refs are rejected, exact selection is output-gating, and v7 is a true stub. Focused suite passes 44/44; commit and committed-checkout audit remain.
-- Slice 2: blocked until A2 is immutable and audit returns GO; then run unchanged 2019 with source-session continuity asserted.
+- Slice 1A / Commit A2: banked at `dd80c46`; committed checkout passed 44/44 and compile. The first Slice 2 attempt survived the high-memory scans but failed during residual-evidence assembly on an undefined stale count variable.
+- Slice 1A.1 / Commit A2.1: bounded repair replaces the stale count reference and adds a real residual-evidence publication regression. Focused suite passes 45/45 and compile; commit and fresh committed-checkout audit remain.
+- Slice 2: blocked until A2.1 is immutable and audit returns GO; then rerun unchanged 2019 with source-session continuity asserted from a new clean worktree.
 - Slice 3: blocked until Commit B evidence exists.

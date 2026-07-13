@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import json
 import math
 import subprocess
 from pathlib import Path
@@ -1368,6 +1369,230 @@ def test_run_vertical_has_no_output_mutation_before_selection_lock() -> None:
     assert "_atomic_write" not in before_gate
     assert "_publish_crsp_cusip_permno_map" not in before_gate
     assert "_invalidate_stale_curve" not in before_gate
+
+
+def test_run_vertical_residual_evidence_uses_locked_selection_count(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Exercise the real residual-evidence writer, not only the lock helper."""
+    rows = _tiny_selection_rows()
+    _set_lock_to_rows(monkeypatch, rows)
+    selected = pd.DataFrame(rows)
+    selected["rdq"] = pd.to_datetime(selected["rdq"])
+    selected["entry"] = pd.to_datetime(selected["entry"])
+    selected["formation_eligible"] = True
+    selected["pre_q5_gate_status"] = "prior20_ok"
+    selected["prior20_n_ok"] = 20
+    empty = selected.iloc[0:0].copy()
+    sessions = pd.date_range("2018-12-03", periods=100, freq="B")
+    panel = pd.DataFrame(
+        {
+            "permno": [1, 2],
+            "date": [sessions[0], sessions[0]],
+            "ret_raw": [0.0, 0.0],
+            "dlret_raw": [None, None],
+            "dlstcd_raw": [None, None],
+            "prc_raw": [10.0, 20.0],
+            "vol_raw": [100.0, 200.0],
+        }
+    )
+    identity = {
+        "commit": "a" * 40,
+        "tree": "b" * 40,
+        "branch_ref": None,
+        "detached": True,
+        "detached_proof_mode": True,
+        "proof_authority": "detached_proof_mode",
+        "code_path": "scripts/pead_m7f4_v8_2019_crsp_vertical.py",
+        "code_sha256": "c" * 64,
+        "code_sha256_git_blob": "c" * 64,
+        "code_sha256_worktree": "c" * 64,
+        "code_sha256_normalized_git_blob": "c" * 64,
+        "code_sha256_normalized_worktree": "c" * 64,
+        "code_normalized_worktree_matches_git_blob": True,
+        "code_hash_authority": "git_blob_sha256",
+        "code_hash_fallback": None,
+        "config_sha256": "d" * 64,
+        "logical_identity_sha256": "e" * 64,
+    }
+
+    monkeypatch.setattr(m7, "resolve_run_identity", lambda *_args, **_kwargs: identity)
+    monkeypatch.setattr(m7.duckdb, "connect", lambda: object())
+    monkeypatch.setattr(
+        m7,
+        "build_crsp_cusip_permno_map",
+        lambda *_args, **_kwargs: (
+            pd.DataFrame({"cusip8": ["00000001", "00000002"], "permno": [1, 2]}),
+            {"source_max_date": "2024-12-31"},
+        ),
+    )
+    monkeypatch.setattr(
+        m7,
+        "load_mapped_events",
+        lambda *_args, **_kwargs: (selected.copy(), {"unique_mapped_events": 2}),
+    )
+    monkeypatch.setattr(m7, "load_source_session_spine", lambda *_args, **_kwargs: sessions)
+    monkeypatch.setattr(
+        m7,
+        "panel_load_window",
+        lambda _sessions: (
+            sessions[0],
+            sessions[-1],
+            {"spine_n_sessions": len(sessions)},
+        ),
+    )
+    monkeypatch.setattr(m7, "load_crsp_panel", lambda *_args, **_kwargs: panel.copy())
+    monkeypatch.setattr(m7, "assign_formation_entry", lambda *_args, **_kwargs: selected.copy())
+    monkeypatch.setattr(
+        m7, "dedup_formation_permno", lambda *_args, **_kwargs: (selected.copy(), 0)
+    )
+    monkeypatch.setattr(
+        m7,
+        "apply_pre_q5_prior20_observability",
+        lambda *_args, **_kwargs: (
+            selected.copy(),
+            empty.copy(),
+            {"pre_q5_prior20_ok": 2},
+        ),
+    )
+    monkeypatch.setattr(
+        m7,
+        "exclude_pre_entry_delists",
+        lambda *_args, **_kwargs: (
+            selected.copy(),
+            empty.copy(),
+            {"pre_entry_delist_excluded": 0},
+        ),
+    )
+    monkeypatch.setattr(
+        m7,
+        "apply_formation_breadth_q5",
+        lambda *_args, **_kwargs: (selected.copy(), {"events_after_breadth": 2}),
+    )
+    monkeypatch.setattr(
+        m7,
+        "suppress_entry_overlap",
+        lambda *_args, **_kwargs: (
+            selected.copy(),
+            empty.copy(),
+            {"q5_events_after_overlap": 2},
+        ),
+    )
+
+    def fake_resolve(*, event: dict[str, object], **_kwargs: object) -> dict[str, object]:
+        base = {
+            **event,
+            "claim_end": sessions[60],
+            "delist_offset": None,
+            "pre_q5_gate_status": "prior20_ok",
+            "prior20_n_ok": 20,
+            "panel_first_date": sessions[0].strftime("%Y-%m-%d"),
+            "panel_last_date": sessions[-1].strftime("%Y-%m-%d"),
+            "bridge_applied": False,
+            "bridge_sessions": [],
+        }
+        if str(event["event_id"]).startswith("a|"):
+            return {
+                **base,
+                "status": "ok",
+                "rows": [{"return_date": sessions[i]} for i in range(1, 61)],
+                "failure_detail": None,
+                "first_bad_session": None,
+                "outcome_class": "observed",
+            }
+        return {
+            **base,
+            "status": "unresolved_delist",
+            "rows": [],
+            "failure_detail": "synthetic_residual",
+            "first_bad_session": sessions[10].strftime("%Y-%m-%d"),
+            "outcome_class": "outcome_ambiguous",
+        }
+
+    monkeypatch.setattr(m7, "resolve_event_window", fake_resolve)
+    monkeypatch.setattr(
+        m7,
+        "expand_outcome_scenario_rows",
+        lambda resolved, **_kwargs: [
+            {
+                "event_id": resolved["event_id"],
+                "return_date": sessions[1],
+                "r": 0.0,
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        m7,
+        "build_daily_portfolio",
+        lambda _positions: (
+            pd.DataFrame({"return_date": [sessions[1]], "daily_net_return": [0.0]}),
+            {
+                "total_turnover_l1": 0.0,
+                "total_direct_cost_dollars": 0.0,
+                "total_nav_cost_drag_dollars": 0.0,
+            },
+        ),
+    )
+    monkeypatch.setattr(
+        m7,
+        "first_bad_date_residual_exposure",
+        lambda *_args, **_kwargs: {
+            "n_residual_events": 1,
+            "summed_first_bad_date_target_weight": 0.5,
+        },
+    )
+    monkeypatch.setattr(
+        m7,
+        "shapley_16_residual_attribution",
+        lambda *_args, **_kwargs: {
+            "n_residual": 1,
+            "sum_equals_gap_abs_err": 0.0,
+        },
+    )
+
+    def publish_map(frame: pd.DataFrame, _meta: dict[str, object], path: Path) -> str:
+        return m7._atomic_write_parquet(frame, path)
+
+    monkeypatch.setattr(m7, "_publish_crsp_cusip_permno_map", publish_map)
+
+    d1_path = tmp_path / "d1.parquet"
+    sec_path = tmp_path / "security.parquet"
+    crsp_path = tmp_path / "crsp.csv"
+    for path, payload in (
+        (d1_path, b"d1"),
+        (sec_path, b"security"),
+        (crsp_path, b"crsp"),
+    ):
+        path.write_bytes(payload)
+    evidence_path = tmp_path / "evidence.json"
+    parquet_path = tmp_path / "daily_returns.parquet"
+    manifest_path = tmp_path / "daily_returns.manifest.json"
+    cusip_map_path = tmp_path / "cusip_map.parquet"
+    ledger_path = tmp_path / "event_ledger.parquet"
+    ledger_manifest_path = tmp_path / "event_ledger.manifest.json"
+
+    evidence = m7.run_vertical(
+        repo_root=tmp_path,
+        d1_path=d1_path,
+        sec_path=sec_path,
+        crsp_path=crsp_path,
+        evidence_path=evidence_path,
+        parquet_path=parquet_path,
+        manifest_path=manifest_path,
+        cusip_map_path=cusip_map_path,
+        ledger_path=ledger_path,
+        ledger_manifest_path=ledger_manifest_path,
+        detached_proof_mode=True,
+    )
+
+    persisted = json.loads(evidence_path.read_text(encoding="utf-8"))
+    assert evidence["status"] == "DIAGNOSTIC_COMPLETE"
+    assert evidence["counts"]["n_selected_event_set"] == 2
+    assert persisted["counts"]["n_selected_event_set"] == 2
+    assert persisted["contract"]["locked_selection_contract"]["n_selected_events"] == 2
+    assert manifest_path.is_file()
+    assert ledger_manifest_path.is_file()
+    assert not parquet_path.exists()
 
 
 def test_git_context_ignores_ambient_repo_splice(

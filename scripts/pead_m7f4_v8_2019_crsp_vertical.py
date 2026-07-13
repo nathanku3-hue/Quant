@@ -2833,7 +2833,7 @@ def run_vertical(
                 "portfolio": None,
                 "selected_event_set_sha256": selected_event_set_sha256,
                 "selected_canonical_rows_sha256": selected_canonical_rows_sha256,
-                "n_selected_event_set": int(len(selected_event_ids)),
+                "n_selected_event_set": int(selection_contract["n_selected_events"]),
             },
             "selected_event_set_sha256": selected_event_set_sha256,
             "selected_canonical_rows_sha256": selected_canonical_rows_sha256,
