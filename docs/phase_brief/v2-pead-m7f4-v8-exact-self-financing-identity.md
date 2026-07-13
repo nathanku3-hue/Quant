@@ -12,7 +12,7 @@ Hierarchy Confirmation: Approved by inherited owner GO | Session: current-thread
 
 ## Purpose and current score
 
-Bank the exact M7F4-v8 portfolio-accounting identity before any new 2019 evidence run. Current score is **66/100**. Commit A is code, focused tests, this brief, and predecessor CLI retirement only. Research validity remains capped near **30/100** because the CUSIP8 link is a non-PIT snapshot.
+Commit A `3671b849dc1f87b4462f980810d25bc3af53367c` is a genuine functional accounting milestone, but Slice 2 remains blocked pending A2. Current score is **68/100**: accounting 82, lineage 64, closure 40, research validity near **30/100** because the CUSIP8 link is a non-PIT snapshot. A2 is limited to checkout identity binding, exact selection enforcement, and true predecessor retirement before any new 2019 evidence run.
 
 ## Locked accounting identity
 
@@ -74,11 +74,14 @@ For day `t`, maintain explicit equity dollars, event-cash dollars, and global id
 - D8: Publish both event-set hash and canonical selected-row hash over stable selection columns.
 - D9: Persist flattened bridge parity inputs and outputs (`prev_prc`, `next_prc`, `next_ret`, `gap_prc`, absolute error, tolerance, pass/fail) in ledger columns and evidence summary.
 - D10: Terminal SAW later requires explicit in-scope/out-of-scope blocks and validator-clean Reviewer A/B/C artifacts.
+- D11: Every Git subprocess must remove all ambient `GIT_*` selectors/config overrides, disable replacements, bind one repository top-level/Git-dir/common-dir context, and reject any `refs/replace/*` before resolving commit, tree, branch, or blob.
+- D12: Before any map, ledger, curve, evidence, or manifest output is published, final selection must equal count `2448`, event-set SHA-256 `caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d`, and canonical-row SHA-256 `7f336eefaf7de6840a907a94361297111a2abc66702ad41b0aa0733016435749`.
 
 ## Commit sequence
 
-- **Commit A:** v8 engine, v8-focused tests, this brief, v7 CLI retirement. No full 2019 run.
-- **Commit B:** full 2019 evidence, ledger, manifests, neutral-carry/write-down legs, Shapley blocks.
+- **Commit A (`3671b84`):** v8 functional accounting engine, focused tests, this brief, initial v7 CLI retirement. No full 2019 run.
+- **Commit A2:** sanitize and bind all Git identity calls; reject replacement refs; enforce the exact 2,448-event/count/hash contract before outputs; reduce v7 to a true stub; rerun committed-checkout audit. No full 2019 run.
+- **Commit B:** only after A2 audit GO, run the unchanged 2019 Slice 2 with source-session continuity asserted; publish evidence, ledger, manifests, neutral-carry/write-down legs, and Shapley blocks.
 - **Commit C:** independent Reviewer A/B/C, validated SAW, decision/lesson/formula records, and seven current-truth surfaces.
 
 ## Commit-A acceptance checks
@@ -95,11 +98,12 @@ For day `t`, maintain explicit equity dollars, event-cash dollars, and global id
 - Pure cash terminal state has zero liquidation turnover; residual equity is charged once.
 - Canonical selection-row hash is shuffle-stable and content-sensitive.
 - Bridge parity values/errors are replayable from flattened ledger columns and evidence helpers.
-- Missing committed blob, out-of-root code path, or normalized worktree/blob mismatch blocks identity; newline-only CRLF/LF difference passes with Git blob authoritative and no fallback.
-- The predecessor CLI exits `2` and directs execution to v8 without call-through or aliasing.
-- Only exact Commit-A paths are staged; no evidence output or truth-surface close is included.
+- Missing committed blob, out-of-root code path, normalized worktree/blob mismatch, repository/Git-dir/common-dir mismatch, ambient Git splice, or replacement ref blocks identity; newline-only CRLF/LF difference passes with Git blob authoritative and no fallback.
+- Count/hash mismatch blocks before map, ledger, curve, evidence, or manifest mutation.
+- The predecessor module contains only an exit-`2` stub and directs execution to v8 without engine exports, imports, call-through, aliases, fallback, or argument forwarding.
+- Only the exact four A2 paths are staged; no evidence output or truth-surface close is included.
 
-## Expected Commit-A paths
+## Expected Commit-A2 paths
 
 - `docs/phase_brief/v2-pead-m7f4-v8-exact-self-financing-identity.md`
 - `scripts/pead_m7f4_v8_2019_crsp_vertical.py`
@@ -119,7 +123,8 @@ For day `t`, maintain explicit equity dollars, event-cash dollars, and global id
 
 ## Live loop state
 
-- Slice 0: brief created in the v8 worktree.
-- Slice 1: engine/test identity repair implemented locally; focused tests pass 38/38; Commit A pending staged-scope and committed-checkout gates.
-- Slice 2: blocked until Commit A exists and focused checks pass.
+- Slice 0: brief and functional accounting contract banked.
+- Slice 1 / Commit A: banked at `3671b84`; committed-checkout tests passed 38/38, but audit found identity splicing, unenforced selection identity, and retained v7 engine complexity.
+- Slice 1A / Commit A2: implementation complete locally; Git context is sanitized/bound, replacement refs are rejected, exact selection is output-gating, and v7 is a true stub. Focused suite passes 44/44; commit and committed-checkout audit remain.
+- Slice 2: blocked until A2 is immutable and audit returns GO; then run unchanged 2019 with source-session continuity asserted.
 - Slice 3: blocked until Commit B evidence exists.

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import inspect
 import math
+import subprocess
 from pathlib import Path
 
 import pandas as pd
@@ -1253,9 +1255,170 @@ def test_v8_source_has_no_m7f3_supersession_or_compatibility_surface() -> None:
     assert "compatibility" not in source.lower()
 
 
-def test_v7_cli_is_retired_and_no_v7_exception_alias(capsys: pytest.CaptureFixture[str]) -> None:
+def _git(repo: Path, *args: str) -> str:
+    completed = subprocess.run(
+        ["git", "-C", str(repo), *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return completed.stdout.strip()
+
+
+def _init_git_repo(repo: Path, content: bytes) -> str:
+    repo.mkdir()
+    _git(repo, "init")
+    _git(repo, "config", "user.name", "M7F4 Test")
+    _git(repo, "config", "user.email", "m7f4@example.invalid")
+    _git(repo, "config", "core.autocrlf", "false")
+    (repo / "tracked.txt").write_bytes(content)
+    _git(repo, "add", "tracked.txt")
+    _git(repo, "commit", "-m", "initial")
+    return _git(repo, "rev-parse", "HEAD")
+
+
+def _tiny_selection_rows() -> list[dict[str, object]]:
+    return [
+        {
+            "event_id": "a|2019-01-02|1",
+            "gvkey": "a",
+            "permno": 1,
+            "rdq": "2019-01-02",
+            "entry": "2019-01-03",
+            "sue": 1.0,
+            "q5_rank": 1,
+            "formation_n_distinct_permno": 55,
+        },
+        {
+            "event_id": "b|2019-01-03|2",
+            "gvkey": "b",
+            "permno": 2,
+            "rdq": "2019-01-03",
+            "entry": "2019-01-04",
+            "sue": 2.0,
+            "q5_rank": 2,
+            "formation_n_distinct_permno": 55,
+        },
+    ]
+
+
+def _set_lock_to_rows(
+    monkeypatch: pytest.MonkeyPatch, rows: list[dict[str, object]]
+) -> None:
+    monkeypatch.setattr(m7, "LOCKED_SELECTED_EVENT_COUNT", len(rows))
+    monkeypatch.setattr(
+        m7,
+        "LOCKED_SELECTED_EVENT_SET_SHA256",
+        m7.hash_selected_event_set([str(row["event_id"]) for row in rows]),
+    )
+    monkeypatch.setattr(
+        m7,
+        "LOCKED_SELECTED_CANONICAL_ROWS_SHA256",
+        m7.hash_canonical_selection_rows(rows),
+    )
+
+
+def test_locked_selection_contract_constants_are_exact() -> None:
+    assert m7.LOCKED_SELECTED_EVENT_COUNT == 2448
+    assert m7.LOCKED_SELECTED_EVENT_SET_SHA256 == (
+        "caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d"
+    )
+    assert m7.LOCKED_SELECTED_CANONICAL_ROWS_SHA256 == (
+        "7f336eefaf7de6840a907a94361297111a2abc66702ad41b0aa0733016435749"
+    )
+
+
+def test_locked_selection_contract_accepts_only_all_three_identities(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows = _tiny_selection_rows()
+    _set_lock_to_rows(monkeypatch, rows)
+    contract = m7.enforce_locked_selection_contract(rows)
+    assert contract["locked_contract_verified"] is True
+    assert contract["n_selected_events"] == 2
+
+    monkeypatch.setattr(m7, "LOCKED_SELECTED_EVENT_SET_SHA256", "0" * 64)
+    with pytest.raises(m7.M7F4BlockedError, match="event_set_sha256"):
+        m7.enforce_locked_selection_contract(rows)
+
+    _set_lock_to_rows(monkeypatch, rows)
+    monkeypatch.setattr(m7, "LOCKED_SELECTED_CANONICAL_ROWS_SHA256", "f" * 64)
+    with pytest.raises(m7.M7F4BlockedError, match="canonical_rows_sha256"):
+        m7.enforce_locked_selection_contract(rows)
+
+
+def test_locked_selection_contract_rejects_count_and_duplicate_event_ids(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows = _tiny_selection_rows()
+    with pytest.raises(m7.M7F4BlockedError, match="count=2:expected=2448"):
+        m7.enforce_locked_selection_contract(rows)
+
+    duplicate_rows = [dict(rows[0]), dict(rows[0])]
+    _set_lock_to_rows(monkeypatch, duplicate_rows)
+    with pytest.raises(m7.M7F4BlockedError, match="unique_event_ids=1:rows=2"):
+        m7.enforce_locked_selection_contract(duplicate_rows)
+
+
+def test_run_vertical_has_no_output_mutation_before_selection_lock() -> None:
+    source = inspect.getsource(m7.run_vertical)
+    before_gate = source.split(
+        "selection_contract = enforce_locked_selection_contract", maxsplit=1
+    )[0]
+    assert "_atomic_write" not in before_gate
+    assert "_publish_crsp_cusip_permno_map" not in before_gate
+    assert "_invalidate_stale_curve" not in before_gate
+
+
+def test_git_context_ignores_ambient_repo_splice(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo_a = tmp_path / "repo-a"
+    repo_b = tmp_path / "repo-b"
+    head_a = _init_git_repo(repo_a, b"A\n")
+    head_b = _init_git_repo(repo_b, b"B\n")
+    assert head_a != head_b
+
+    monkeypatch.setenv("GIT_DIR", str(repo_b / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(repo_b))
+    monkeypatch.setenv("GIT_COMMON_DIR", str(repo_b / ".git"))
+    monkeypatch.setenv("GIT_OBJECT_DIRECTORY", str(repo_b / ".git" / "objects"))
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "core.repositoryformatversion")
+    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "0")
+
+    context = m7._resolve_git_context(repo_a)
+    assert Path(context["repo_root"]) == repo_a.resolve()
+    assert m7._git_cmd(repo_a, "rev-parse", "HEAD", git_context=context) == head_a
+    assert m7._git_blob_bytes(repo_a, "tracked.txt", context) == b"A\n"
+    env = m7._sanitized_git_env()
+    assert env["GIT_NO_REPLACE_OBJECTS"] == "1"
+    assert all(key == "GIT_NO_REPLACE_OBJECTS" or not key.startswith("GIT_") for key in env)
+
+
+def test_git_context_rejects_replacement_refs(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    first = _init_git_repo(repo, b"first\n")
+    (repo / "tracked.txt").write_bytes(b"second\n")
+    _git(repo, "add", "tracked.txt")
+    _git(repo, "commit", "-m", "second")
+    second = _git(repo, "rev-parse", "HEAD")
+    _git(repo, "replace", first, second)
+
+    with pytest.raises(m7.M7F4BlockedError, match="git_replacement_refs_present"):
+        m7._resolve_git_context(repo)
+
+
+def test_v7_cli_is_true_stub_and_no_v7_exception_alias(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     from scripts import pead_m7f3_v7_2019_crsp_vertical as retired_v7
 
-    assert retired_v7.main([]) == 2
+    assert retired_v7.main(["--ignored"]) == 2
     assert "M7F3-v7 executable path is retired" in capsys.readouterr().err
+    assert not hasattr(retired_v7, "run_vertical")
+    assert not hasattr(retired_v7, "build_daily_portfolio")
     assert not hasattr(m7, "M7F3BlockedError")
+    source = Path(retired_v7.__file__).read_text(encoding="utf-8")
+    assert "from scripts import" not in source
+    assert len(source.splitlines()) < 30

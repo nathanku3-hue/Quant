@@ -99,6 +99,13 @@ OUTCOME_ENVELOPE_LEGS = (
     "neutral_carry_to_cash",
     "write_down_100pct",
 )
+LOCKED_SELECTED_EVENT_COUNT = 2448
+LOCKED_SELECTED_EVENT_SET_SHA256 = (
+    "caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d"
+)
+LOCKED_SELECTED_CANONICAL_ROWS_SHA256 = (
+    "7f336eefaf7de6840a907a94361297111a2abc66702ad41b0aa0733016435749"
+)
 
 DEFAULT_D1 = Path("data/processed/pead_d1_sue_signal.parquet")
 DEFAULT_SEC = Path("data/processed/security_master_compustat.parquet")
@@ -141,27 +148,132 @@ def _sha256_text(text: str) -> str:
     return _sha256_bytes(text.encode("utf-8"))
 
 
-def _git_blob_bytes(repo_root: Path, rel_path: str) -> bytes | None:
-    """Return committed HEAD blob bytes without ambient Git redirection."""
-    rel = rel_path.replace("\\", "/").lstrip("./")
-    env = os.environ.copy()
+def _sanitized_git_env() -> dict[str, str]:
+    """Remove every ambient Git selector/config override and disable replacements."""
+    env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
     env["GIT_NO_REPLACE_OBJECTS"] = "1"
-    for key in list(env):
-        if key.startswith("GIT_") and key != "GIT_NO_REPLACE_OBJECTS":
-            if key in {
-                "GIT_DIR",
-                "GIT_WORK_TREE",
-                "GIT_COMMON_DIR",
-                "GIT_OBJECT_DIRECTORY",
-                "GIT_ALTERNATE_OBJECT_DIRECTORIES",
-                "GIT_INDEX_FILE",
-                "GIT_NAMESPACE",
-            } or key.startswith("GIT_CONFIG"):
-                env.pop(key, None)
-    proc = subprocess.run(
-        ["git", "-C", str(repo_root), "show", f"HEAD:{rel}"],
+    return env
+
+
+def _run_git(
+    repo_root: Path,
+    *args: str,
+    git_context: Mapping[str, str] | None = None,
+    text: bool = True,
+) -> subprocess.CompletedProcess[Any]:
+    root = repo_root.resolve()
+    if git_context is None:
+        command = ["git", "--no-replace-objects", "-C", str(root), *args]
+    else:
+        bound_root = Path(git_context["repo_root"]).resolve()
+        if bound_root != root:
+            raise M7F4BlockedError("git_context_repo_root_mismatch")
+        command = [
+            "git",
+            "--no-replace-objects",
+            "--git-dir",
+            git_context["git_dir"],
+            "--work-tree",
+            git_context["repo_root"],
+            *args,
+        ]
+    return subprocess.run(
+        command,
+        check=False,
         capture_output=True,
-        env=env,
+        text=text,
+        env=_sanitized_git_env(),
+    )
+
+
+def _git_cmd(
+    repo_root: Path,
+    *args: str,
+    git_context: Mapping[str, str] | None = None,
+) -> str:
+    completed = _run_git(repo_root, *args, git_context=git_context, text=True)
+    if completed.returncode != 0:
+        raise M7F4BlockedError(
+            f"git_command_failed:{' '.join(args)}:{completed.stderr.strip()}"
+        )
+    return completed.stdout.strip()
+
+
+def _resolve_git_path(raw: str, repo_root: Path) -> Path:
+    path = Path(raw.strip())
+    if not path.is_absolute():
+        path = repo_root / path
+    return path.resolve()
+
+
+def _resolve_git_context(repo_root: Path) -> dict[str, str]:
+    """Bind the checkout, worktree Git dir, and common dir as one immutable context."""
+    root = repo_root.resolve()
+    top = _resolve_git_path(_git_cmd(root, "rev-parse", "--show-toplevel"), root)
+    if top != root:
+        raise M7F4BlockedError(f"git_toplevel_mismatch:{top}:{root}")
+    git_dir = _resolve_git_path(
+        _git_cmd(root, "rev-parse", "--absolute-git-dir"), root
+    )
+    common_dir = _resolve_git_path(
+        _git_cmd(root, "rev-parse", "--path-format=absolute", "--git-common-dir"),
+        root,
+    )
+    if not git_dir.is_dir() or not common_dir.is_dir():
+        raise M7F4BlockedError("git_context_directory_missing")
+    if git_dir != common_dir:
+        try:
+            git_dir.relative_to(common_dir)
+        except ValueError as exc:
+            raise M7F4BlockedError("git_dir_not_bound_to_common_dir") from exc
+    context = {
+        "repo_root": str(root),
+        "git_dir": str(git_dir),
+        "git_common_dir": str(common_dir),
+    }
+    bound_top = _resolve_git_path(
+        _git_cmd(root, "rev-parse", "--show-toplevel", git_context=context), root
+    )
+    bound_common = _resolve_git_path(
+        _git_cmd(
+            root,
+            "rev-parse",
+            "--path-format=absolute",
+            "--git-common-dir",
+            git_context=context,
+        ),
+        root,
+    )
+    if bound_top != root or bound_common != common_dir:
+        raise M7F4BlockedError("git_context_binding_mismatch")
+    replacement_refs = _git_cmd(
+        root,
+        "for-each-ref",
+        "--format=%(refname)",
+        "refs/replace",
+        git_context=context,
+    )
+    if replacement_refs:
+        raise M7F4BlockedError(
+            "git_replacement_refs_present:" + replacement_refs.replace("\n", ",")
+        )
+    return context
+
+
+def _git_blob_bytes(
+    repo_root: Path,
+    rel_path: str,
+    git_context: Mapping[str, str] | None = None,
+) -> bytes | None:
+    """Return committed HEAD blob bytes from the bound, replacement-free context."""
+    rel = rel_path.replace("\\", "/").lstrip("./")
+    context = dict(git_context) if git_context is not None else _resolve_git_context(repo_root)
+    proc = _run_git(
+        repo_root,
+        "show",
+        f"HEAD:{rel}",
+        git_context=context,
+        text=False,
     )
     if proc.returncode != 0:
         return None
@@ -173,7 +285,11 @@ def _normalize_source_newlines(data: bytes) -> bytes:
     return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
 
-def _resolve_code_identity(repo_root: Path, code_path: Path) -> dict[str, Any]:
+def _resolve_code_identity(
+    repo_root: Path,
+    code_path: Path,
+    git_context: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
     """Require committed source and semantic worktree parity; Git blob is authoritative."""
     worktree_bytes = code_path.read_bytes()
     try:
@@ -181,7 +297,7 @@ def _resolve_code_identity(repo_root: Path, code_path: Path) -> dict[str, Any]:
     except ValueError as exc:
         raise M7F4BlockedError("code_path_outside_repo_root") from exc
     rel_code = rel_code.replace("\\", "/")
-    git_blob_bytes = _git_blob_bytes(repo_root, rel_code)
+    git_blob_bytes = _git_blob_bytes(repo_root, rel_code, git_context)
     if git_blob_bytes is None:
         raise M7F4BlockedError(f"code_not_committed_at_head:{rel_code}")
     worktree_semantic = _normalize_source_newlines(worktree_bytes)
@@ -233,6 +349,45 @@ def hash_canonical_selection_rows(rows: Sequence[Mapping[str, Any]]) -> str:
     lines.sort()
     payload = "\n".join(lines) + ("\n" if lines else "")
     return _sha256_text(payload)
+
+
+def enforce_locked_selection_contract(
+    rows: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Fail closed unless the final formation selection is exactly the audited contract."""
+    event_ids = [str(row.get("event_id")) for row in rows]
+    n_rows = len(rows)
+    n_unique_event_ids = len(set(event_ids))
+    event_set_sha256 = hash_selected_event_set(event_ids)
+    canonical_rows_sha256 = hash_canonical_selection_rows(rows)
+    mismatches: list[str] = []
+    if n_rows != LOCKED_SELECTED_EVENT_COUNT:
+        mismatches.append(
+            f"count={n_rows}:expected={LOCKED_SELECTED_EVENT_COUNT}"
+        )
+    if n_unique_event_ids != n_rows:
+        mismatches.append(
+            f"unique_event_ids={n_unique_event_ids}:rows={n_rows}"
+        )
+    if event_set_sha256 != LOCKED_SELECTED_EVENT_SET_SHA256:
+        mismatches.append(
+            "event_set_sha256="
+            f"{event_set_sha256}:expected={LOCKED_SELECTED_EVENT_SET_SHA256}"
+        )
+    if canonical_rows_sha256 != LOCKED_SELECTED_CANONICAL_ROWS_SHA256:
+        mismatches.append(
+            "canonical_rows_sha256="
+            f"{canonical_rows_sha256}:expected={LOCKED_SELECTED_CANONICAL_ROWS_SHA256}"
+        )
+    if mismatches:
+        raise M7F4BlockedError("locked_selection_contract_mismatch:" + ";".join(mismatches))
+    return {
+        "n_selected_events": n_rows,
+        "n_unique_selected_event_ids": n_unique_event_ids,
+        "selected_event_set_sha256": event_set_sha256,
+        "selected_canonical_rows_sha256": canonical_rows_sha256,
+        "locked_contract_verified": True,
+    }
 
 
 def _atomic_write_text(path: Path, text: str) -> None:
@@ -435,35 +590,19 @@ def exclude_pre_entry_delists(
     }
     return kept.reset_index(drop=True), excl.reset_index(drop=True), stats
 
-def _git_cmd(repo_root: Path, *args: str) -> str:
-    env = os.environ.copy()
-    env["GIT_NO_REPLACE_OBJECTS"] = "1"
-    completed = subprocess.run(
-        ["git", "-C", str(repo_root), *args],
-        check=False,
-        capture_output=True,
-        text=True,
-        env=env,
-    )
-    if completed.returncode != 0:
-        raise M7F4BlockedError(
-            f"git_command_failed:{' '.join(args)}:{completed.stderr.strip()}"
-        )
-    return completed.stdout.strip()
-
-
 def resolve_run_identity(
     repo_root: Path, *, detached_proof_mode: bool
 ) -> dict[str, Any]:
-    head = _git_cmd(repo_root, "rev-parse", "HEAD")
-    tree = _git_cmd(repo_root, "rev-parse", "HEAD^{tree}")
-    env = os.environ.copy()
-    env["GIT_NO_REPLACE_OBJECTS"] = "1"
-    sym = subprocess.run(
-        ["git", "-C", str(repo_root), "symbolic-ref", "-q", "HEAD"],
-        capture_output=True,
+    git_context = _resolve_git_context(repo_root)
+    head = _git_cmd(repo_root, "rev-parse", "HEAD", git_context=git_context)
+    tree = _git_cmd(repo_root, "rev-parse", "HEAD^{tree}", git_context=git_context)
+    sym = _run_git(
+        repo_root,
+        "symbolic-ref",
+        "-q",
+        "HEAD",
+        git_context=git_context,
         text=True,
-        env=env,
     )
     detached = sym.returncode != 0
     if detached and not detached_proof_mode:
@@ -477,7 +616,9 @@ def resolve_run_identity(
     else:
         proof_authority = "attached_branch_head"
     branch = sym.stdout.strip() if not detached else None
-    code_identity = _resolve_code_identity(repo_root, Path(__file__).resolve())
+    code_identity = _resolve_code_identity(
+        repo_root, Path(__file__).resolve(), git_context=git_context
+    )
     code_sha = code_identity["code_sha256"]
     config = {
         "implementation_version": IMPLEMENTATION_VERSION,
@@ -528,6 +669,9 @@ def resolve_run_identity(
         "tree": tree,
         "code_sha256": code_sha,
         "config_sha256": config_sha,
+        "repo_root": git_context["repo_root"],
+        "git_dir": git_context["git_dir"],
+        "git_common_dir": git_context["git_common_dir"],
     }
     logical_sha = _sha256_text(json.dumps(logical, sort_keys=True, separators=(",", ":")))
     return {
@@ -537,6 +681,10 @@ def resolve_run_identity(
         "branch_ref": branch,
         "proof_authority": proof_authority,
         "detached_proof_mode": detached_proof_mode,
+        "repo_root": git_context["repo_root"],
+        "git_dir": git_context["git_dir"],
+        "git_common_dir": git_context["git_common_dir"],
+        "replacement_refs_rejected": True,
         **code_identity,
         "config": config,
         "config_sha256": config_sha,
@@ -546,7 +694,7 @@ def resolve_run_identity(
 
 
 def build_crsp_cusip_permno_map(
-    con: duckdb.DuckDBPyConnection, crsp_path: Path, out_path: Path
+    con: duckdb.DuckDBPyConnection, crsp_path: Path
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     """One-to-one CUSIP8→PERMNO at CRSP source max-date (non-PIT cross-vintage snapshot).
 
@@ -626,11 +774,17 @@ def build_crsp_cusip_permno_map(
             "not a future-return selection filter"
         ),
     }
+    return frame, map_meta
+
+
+def _publish_crsp_cusip_permno_map(
+    frame: pd.DataFrame, map_meta: Mapping[str, Any], out_path: Path
+) -> str:
+    """Publish the map only after the locked selection contract has passed."""
     meta_frame = frame.copy()
     meta_frame["link_model"] = LINK_MODEL
-    meta_frame["source_file_max_date"] = source_max_date
-    _atomic_write_parquet(meta_frame, out_path)
-    return frame, map_meta
+    meta_frame["source_file_max_date"] = map_meta.get("source_max_date")
+    return _atomic_write_parquet(meta_frame, out_path)
 
 
 def load_mapped_events(
@@ -638,8 +792,10 @@ def load_mapped_events(
     *,
     d1_path: Path,
     sec_path: Path,
-    cusip_map_path: Path,
+    cusip_map: pd.DataFrame,
 ) -> tuple[pd.DataFrame, dict[str, int]]:
+    relation_name = "_m7f4_cusip_map"
+    con.register(relation_name, cusip_map)
     q = f"""
     WITH d1 AS (
       SELECT
@@ -664,7 +820,7 @@ def load_mapped_events(
       SELECT d1.gvkey, d1.rdq, d1.sue, s.cusip8, m.permno
       FROM d1
       LEFT JOIN sec s ON d1.gvkey = s.gvkey
-      LEFT JOIN read_parquet('{cusip_map_path.as_posix()}') m ON s.cusip8 = m.cusip8
+      LEFT JOIN {relation_name} m ON s.cusip8 = m.cusip8
     ),
     per_event AS (
       SELECT
@@ -678,7 +834,10 @@ def load_mapped_events(
     )
     SELECT * FROM per_event
     """
-    frame = con.execute(q).df()
+    try:
+        frame = con.execute(q).df()
+    finally:
+        con.unregister(relation_name)
     frame["rdq"] = pd.to_datetime(frame["rdq"]).dt.normalize()
     counts = {
         "d1_valid_2019_events": int(len(frame)),
@@ -2259,11 +2418,10 @@ def run_vertical(
     identity = resolve_run_identity(repo_root, detached_proof_mode=detached_proof_mode)
     con = duckdb.connect()
 
-    # Always force-rebuild map (no reuse path).
-    _, map_meta = build_crsp_cusip_permno_map(con, crsp_path, cusip_map_path)
-    map_sha = _sha256_file(cusip_map_path)
+    # Always force-rebuild the map in memory; publishing is selection-gated.
+    map_frame, map_meta = build_crsp_cusip_permno_map(con, crsp_path)
     mapped, map_counts = load_mapped_events(
-        con, d1_path=d1_path, sec_path=sec_path, cusip_map_path=cusip_map_path
+        con, d1_path=d1_path, sec_path=sec_path, cusip_map=map_frame
     )
     if mapped.empty:
         raise M7F4BlockedError("no_unique_mapped_events")
@@ -2297,9 +2455,24 @@ def run_vertical(
     )
     q5, form_stats = apply_formation_breadth_q5(prior_ok)
     kept_q5, suppressed, overlap_stats = suppress_entry_overlap(q5, sessions)
-    if kept_q5.empty:
-        _invalidate_stale_curve(parquet_path)
-        raise M7F4BlockedError("no_q5_events_after_formation_and_overlap")
+    selected_canonical_rows = [
+        {
+            "event_id": row.get("event_id"),
+            "gvkey": row.get("gvkey"),
+            "permno": row.get("permno"),
+            "rdq": row.get("rdq"),
+            "entry": row.get("entry"),
+            "sue": row.get("sue"),
+            "q5_rank": row.get("q5_rank"),
+            "formation_n_distinct_permno": row.get("formation_n_distinct_permno"),
+        }
+        for row in kept_q5.to_dict(orient="records")
+    ]
+    selection_contract = enforce_locked_selection_contract(selected_canonical_rows)
+    selected_event_set_sha256 = selection_contract["selected_event_set_sha256"]
+    selected_canonical_rows_sha256 = selection_contract[
+        "selected_canonical_rows_sha256"
+    ]
 
     # --- Post-select window resolution (bridge blanks; residual -> envelope) ---
     resolved: list[dict[str, Any]] = []
@@ -2447,6 +2620,8 @@ def run_vertical(
         )
     ledger_df = pd.DataFrame(ledger_rows)
 
+    # First externally visible writes occur only after the exact selection lock passes.
+    map_sha = _publish_crsp_cusip_permno_map(map_frame, map_meta, cusip_map_path)
     ledger_sha = _atomic_write_parquet(ledger_df, ledger_path)
 
     contract = {
@@ -2503,6 +2678,7 @@ def run_vertical(
         "pre_entry_delist_rule": PRE_ENTRY_DELIST_RULE,
         "bridge_rule": BRIDGE_RULE,
         "outcome_envelope_legs": list(OUTCOME_ENVELOPE_LEGS),
+        "locked_selection_contract": selection_contract,
     }
     claim_ceiling = {
         "evidence_tier": "M6B_FLAGGED_BEST_AVAILABLE_RESEARCH",
@@ -2530,29 +2706,11 @@ def run_vertical(
         "selected_invalid_reason_counts": reason_counts,
         "posthoc_first_last_diagnostics": posthoc,
         "unique_permnos_selected": int(kept_q5["permno"].nunique()),
-        "n_selected_events": int(len(kept_q5)),
+        "n_selected_events": int(selection_contract["n_selected_events"]),
         "n_selected_ok_windows": int(status_counts.get("ok", 0)),
         "n_selected_invalid_windows": int(len(bad)),
         "n_bridged_windows": n_bridged,
     }
-
-
-    selected_event_ids = [str(r["event_id"]) for r in resolved]
-    selected_event_set_sha256 = hash_selected_event_set(selected_event_ids)
-    selected_canonical_rows = [
-        {
-            "event_id": r.get("event_id"),
-            "gvkey": r.get("gvkey"),
-            "permno": r.get("permno"),
-            "rdq": r.get("rdq"),
-            "entry": r.get("entry"),
-            "sue": r.get("sue"),
-            "q5_rank": r.get("q5_rank"),
-            "formation_n_distinct_permno": r.get("formation_n_distinct_permno"),
-        }
-        for r in resolved
-    ]
-    selected_canonical_rows_sha256 = hash_canonical_selection_rows(selected_canonical_rows)
 
     if bad:
         block_reason = "selected_window_invalid:" + ",".join(
