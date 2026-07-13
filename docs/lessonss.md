@@ -1,6 +1,14 @@
 # lessonss.md
 
-Last updated: 2026-07-12
+Last updated: 2026-07-13
+
+## 2026-07-13 Round Entry (Clean Success Does Not Prove Transactional Recovery)
+- Date: 2026-07-13
+- Mistake or miss: The first Slice 2 attempt left four partial outputs after an OOM-adjacent failure, and the later clean rerun could be overread as proving generalized recovery.
+- Root cause: Individual writes are atomic, but the map, ledger, scenario legs, evidence, and manifests are not committed as one transaction; the full-panel plus dual-Shapley path also has no enforced memory cap or checkpoint.
+- Fix applied: Removed all failed-run partials, reran from a clean committed checkout, reconciled every available artifact hash and row count, and recorded the transactionality/memory limits in independent Reviewer B and terminal SAW evidence.
+- Guardrail for next time: Before any large rerun, require a clean-output preflight and post-run complete-package hash audit; never infer transactionality, bounded memory, or resumability from one successful rerun.
+- Evidence paths: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, `docs/saw_reports/reviewer_b_c0x_m7f4_v8_commit_b_20260713.md`, `docs/saw_reports/saw_c0x_m7f4_v8_terminal_commit_c_20260713.md`.
 
 ## 2026-07-12 Round Entry (Self-Financing Truth Before Score Close)
 - Date: 2026-07-12

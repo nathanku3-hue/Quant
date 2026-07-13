@@ -1,5 +1,22 @@
 # Multi-Stream Contract - Current
 
+## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data/Research | M7F4-v8 Commit B `9f37745` diagnostic package and independent review PASS; strict curve `BLOCKED` | Four residual windows and non-PIT link ceiling remain |
+| Docs/Ops | Terminal SAW and seven-surface reconciliation complete | Preserve Commit B identity and accepted operational risks |
+| Backend/Strategy | Held | No promotion or strict-run claim |
+| Frontend/UI | Held | No readiness, score, or action surface |
+
+- Cross-stream rule: `DIAGNOSTIC_COMPLETE` plus sensitivity legs is not strict readiness, alpha, or tradability authority.
+- Stream freeze: no CCM/WRDS/provider access, historical-link construction, new data output, readiness flip, Strategy/UI, remotes, or publication.
+- Next action: hold by default; open only one separately authorized bounded scope.
+
+## Prior Addendum — M7F3-v7
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
 ## Active Addendum — M7F3-v7 (2026-07-12)
 
 - **Data:** M7F3-v7 self-financing diagnostic vertical active on c0x/m7f0-v4; strict curve BLOCKED; residual envelope only.

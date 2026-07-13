@@ -1,5 +1,18 @@
 # Bridge Contract - Current
 
+## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- `SYSTEM_DELTA`: A2.1 `b4d35e1` repaired the residual-evidence count and added the real publication-branch regression; Commit B `9f37745` banks only the evidence JSON and two manifests; three distinct reviewers independently PASS the fixed Commit B package.
+- `PM / Product Delta`: M7F4-v8 is `DIAGNOSTIC_COMPLETE` with 2,448 selected, 2,444 observed, four residual windows, two validated bridges, exact self-financing NAV/cost identities, and exact 16-state Shapley. Strict curve remains `BLOCKED`; research ceiling remains near 30.
+- `OPEN_DECISION`: None for terminal diagnostic reconciliation. Future transactionality, memory bounding, evidence portability, or historical-link work each requires a separate bounded decision.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion and choose at most one separately authorized next scope.
+- `DO_NOT_REDECIDE`: Do not flip readiness, treat sensitivity legs as a strict curve, claim PIT/as-of identity, describe neutral carry as a finite upper bound, or reopen provider/CCM/Strategy/UI scope.
+- `PHASE_STATUS`: M7F4-v8 terminal SAW PASS; strict curve `BLOCKED`; `m6b_data_contract_ready=false`.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained as the accounting-design predecessor and audit history.
+
 ## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
 
 - `SYSTEM_DELTA`: Hard-replaced M7F2-v6 active executable with M7F3-v7 self-financing portfolio truth on c0x/m7f0-v4. Drifted-prior equity turnover sequence; bridge parity; dead write-down; first-bad residual ~0.721%; exact 16-state Shapley. Commit A `bae1f656`; B evidence `b5c66bc`; C SAW+truth.

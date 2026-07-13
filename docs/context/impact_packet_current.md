@@ -1,5 +1,18 @@
 # Impact Packet - Current
 
+## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- Implementation/repair: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, and the active M7F4-v8 brief at A2.1 `b4d35e1`.
+- Commit B evidence: `docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json` plus daily-return and event-ledger manifests at `9f37745`; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`.
+- Commit C docs: three reviewer artifacts, terminal SAW, active brief, decision/formula/lesson records, and seven current-truth surfaces.
+- Touched interfaces: flagged Data/Research diagnostic and Docs/Ops truth only; Strategy/UI and strict readiness remain held.
+- Failing checks: none in compile/focused/reviewer checks. Strict curve intentionally `BLOCKED` by four residual windows.
+- Open risks: nontransactional multi-file publication, unbounded/no-checkpoint memory path, ignored-Parquet portability, and snapshot non-PIT link ceiling.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
 ## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
 
 - Changed code/tests: `scripts/pead_m7f3_v7_2019_crsp_vertical.py`, `tests/test_pead_m7f3_v7_2019_crsp_vertical.py`, `scripts/pead_m7f2_v6_2019_crsp_vertical.py` (CLI retired).

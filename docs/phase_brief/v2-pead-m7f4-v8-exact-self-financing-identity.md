@@ -12,7 +12,7 @@ Hierarchy Confirmation: Approved by inherited owner GO | Session: current-thread
 
 ## Purpose and current score
 
-Commit A `3671b849dc1f87b4462f980810d25bc3af53367c` is a genuine functional accounting milestone, but Slice 2 remains blocked pending A2. Current score is **68/100**: accounting 82, lineage 64, closure 40, research validity near **30/100** because the CUSIP8 link is a non-PIT snapshot. A2 is limited to checkout identity binding, exact selection enforcement, and true predecessor retirement before any new 2019 evidence run.
+M7F4-v8 is terminally reconciled as `DIAGNOSTIC_COMPLETE`. A2.1 `b4d35e1` repaired the residual-evidence count and added the real publication-branch regression; evidence-only Commit B `9f37745` records the clean rerun; three distinct Reviewer A/B/C passes close terminal ownership. Strict curve remains `BLOCKED`, and research validity remains near **30/100** because the CUSIP8 link is a non-PIT snapshot.
 
 ## Locked accounting identity
 
@@ -127,6 +127,6 @@ For day `t`, maintain explicit equity dollars, event-cash dollars, and global id
 - Slice 0: brief and functional accounting contract banked.
 - Slice 1 / Commit A: banked at `3671b84`; committed-checkout tests passed 38/38, but audit found identity splicing, unenforced selection identity, and retained v7 engine complexity.
 - Slice 1A / Commit A2: banked at `dd80c46`; committed checkout passed 44/44 and compile. The first Slice 2 attempt survived the high-memory scans but failed during residual-evidence assembly on an undefined stale count variable.
-- Slice 1A.1 / Commit A2.1: bounded repair replaces the stale count reference and adds a real residual-evidence publication regression. Focused suite passes 45/45 and compile; commit and fresh committed-checkout audit remain.
-- Slice 2: blocked until A2.1 is immutable and audit returns GO; then rerun unchanged 2019 with source-session continuity asserted from a new clean worktree.
-- Slice 3: blocked until Commit B evidence exists.
+- Slice 1A.1 / Commit A2.1: banked at `b4d35e1`; stale count reference replaced; real publication-branch regression added; committed-checkout compile and 45/45 tests PASS.
+- Slice 2 / Commit B: banked at `9f37745`; failed-run partials removed before the clean unchanged rerun; `DIAGNOSTIC_COMPLETE`; identity, selection, bridge, NAV/cost, file-hash, and Shapley checks PASS; strict curve remains `BLOCKED` by four residual windows.
+- Slice 3 / Commit C: independent Reviewer A/B/C PASS against exact Commit B; terminal SAW, decision/formula/lesson records, active brief, and seven current-truth surfaces reconciled.

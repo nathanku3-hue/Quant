@@ -1,5 +1,24 @@
 # Done Checklist - Current
 
+## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- [x] A2.1 repair banked at `b4d35e1`: verified selection count used by residual evidence; real publication branch regression added.
+- [x] Failed-run partial outputs removed before the fresh clean rerun.
+- [x] Compile and focused tests 45/45 PASS; clean rerun completed without OOM.
+- [x] Commit B `9f37745` contains only evidence JSON and two manifests.
+- [x] Selection lock: 2,448 unique events with both required hashes; 2,444 observed + 4 residual.
+- [x] Bridge 2/2 PASS; NAV/cost, carried-NAV, no-recapitalization, file-hash, and exact Shapley checks PASS.
+- [x] Independent Reviewer A/B/C PASS with distinct identities and exact Commit B pin.
+- [x] Decision/formula/lesson records, terminal SAW, active brief, and seven truth surfaces reconciled.
+- [x] `strict_curve_status=BLOCKED`; `m6b_data_contract_ready=false`; no alpha/tradable/PIT-as-of claim.
+- [ ] Strict primary curve, PIT/as-of link, generalized OOM recovery, and transactional publication — outside this close and blocked/unopened.
+
+Next action: hold promotion; choose exactly one separately authorized next decision.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
 ## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
 
 - [x] Owner GO with deltas recorded (daily sequence, first-bad residual, dead write-down, cash no double-count, Shapley-16, selection hash, v6 path removed, Commit C truth).

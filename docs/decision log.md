@@ -1,3 +1,10 @@
+## 2026-07-13 — M7F4-v8 terminal diagnostic close
+- Decision: accept A2.1 `b4d35e1`, evidence-only Commit B `9f37745`, and three distinct independent Reviewer A/B/C passes as terminal evidence for the fixed M7F4-v8 diagnostic package.
+- Decision: preserve `DIAGNOSTIC_COMPLETE` with strict curve `BLOCKED`; the four residual windows remain represented only by neutral-carry-to-cash and write-down sensitivity legs with exact Shapley attribution.
+- Decision: record nontransactional multi-file publication, unbounded/no-checkpoint memory, and ignored-Parquet portability as non-blocking operational risks; the successful clean rerun does not generalize beyond the fixed package.
+- Evidence: compile and implementer focused suite 45/45 PASS; Reviewer A exact-object suite 45/45 PASS; Reviewer B compile plus executable snapshot subset 44/44 PASS; Reviewer C mechanical identity/count/hash/bridge/NAV/Shapley PASS; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`.
+- Boundary: readiness remains false; link remains snapshot non-PIT; no strict curve, alpha/tradable, Strategy/UI, provider/CCM, remote, or publication authority.
+- Next action: hold promotion and open at most one separately authorized bounded scope.
 
 ## 2026-07-12 — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH close
 - Decision: Accept M7F3-v7 as active flagged diagnostic package (strict curve BLOCKED); supersede v6 as close authority; keep research validity ~30.

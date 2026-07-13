@@ -1,5 +1,17 @@
 # Post-Phase Alignment - Current
 
+## Active Addendum — M7F4-v8 terminal diagnostic close (2026-07-13)
+
+- **Data/Research:** A2.1 repair, clean rerun, Commit B `9f37745` evidence, and independent A/B/C review are complete; strict curve remains `BLOCKED` by four outcome-ambiguous windows.
+- **Docs/Ops:** Active brief, reviewer evidence, terminal SAW, decision/formula/lesson records, and seven truth surfaces are reconciled in Commit C.
+- **Strategy/UI:** Held; no promotion or readiness surface.
+- **Current bottleneck:** No blocker for diagnostic closure. Higher validity still requires a separately authorized PIT/as-of identity path; operational hardening remains separate.
+- **Next active stream:** None by default. Choose one bounded authorized scope before execution.
+
+## Prior Addendum — M7F3-v7 close
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
 ## Active Addendum — M7F3-v7 close (2026-07-12)
 
 - **Data stream:** DIAGNOSTIC_COMPLETE with self-financing truth; bottleneck remains residual 4 windows + snapshot non-PIT ceiling.

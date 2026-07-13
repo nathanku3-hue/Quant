@@ -1,5 +1,20 @@
 # Observability Pack - Current
 
+## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- `ObservabilityRating`: GREEN for fixed-package identity, tests, mechanical evidence, independent review, and truth reconciliation; AMBER for four residual windows and operational hardening; RED for strict readiness/alpha/tradability.
+- Identity sentinel: A2.1 `b4d35e1`; evidence-only Commit B `9f37745`; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`; distinct Reviewer A/B/C PASS.
+- Count sentinel: 2,448 selected = 2,444 observed + 3 nonnumeric + 1 unresolved delist; two bridge attempts PASS.
+- Accounting sentinel: fixed-point open cost, close/terminal equity-only costs, carried NAV, no recapitalization, direct cost identities, and exact 16-state Shapley conservation PASS.
+- Runtime sentinel: clean fixed rerun completed without OOM after manual failed-partial cleanup; no claim of transactional publication, bounded memory, checkpointing, or generalized recovery.
+- Portability sentinel: ignored Parquets are hash-bound but not embedded; explicit finite/duplicate counters remain optional hardening.
+- Claim sentinel: strict curve `BLOCKED`; snapshot non-PIT link; readiness false; no alpha/tradable/Strategy/UI authority.
+- Next-action sentinel: hold promotion and select exactly one separately authorized scope if work resumes.
+
+## Prior Addendum — M7F3-v7
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
 ## Active Addendum — M7F3-v7 (2026-07-12)
 
 - Drift cleared: v6 false 70–74 close / unproven A/B/C / residual metric 0.163% vs ~0.72% / identical leg turnover.

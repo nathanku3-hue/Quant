@@ -1,5 +1,18 @@
 # Feature Engineering Notes
 
+## 2026-07-13 M7F4-v8 Exact Self-Financing Identity Registry
+
+- RoundID: `ROUND-20260713-M7F4-V8-TERMINAL-COMMIT-C`; ScopeID: `M7F4_V8_REVIEWER_ABC_AND_TRUTH_RECONCILIATION`.
+- Implementation: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`; A2.1 `b4d35e1`; evidence-only Commit B `9f37745`.
+- Open-cost fixed point: `C_open,t = 0.00075 * sum_i(abs(w_target_equity,i,t * (NAV_open,t - C_open,t) - E_open,i,t))`; then `NAV_after_open_cost,t = NAV_open,t - C_open,t`.
+- Return identities: `daily_pre_cost_gross_t = NAV_after_ret,t / NAV_after_open_cost,t - 1`; `daily_net_t = NAV_end,t / NAV_open,t - 1`; `NAV_cost_drag_dollars,t = NAV_open,t * (1 + daily_pre_cost_gross_t) - NAV_end,t`.
+- Close/terminal costs: `C_close,t = 0.00075 * close_equity_trade_dollars,t`; `C_terminal,t = 0.00075 * terminal_equity_trade_dollars,t`. Event cash and global idle cash have zero terminal turnover.
+- Delist rule: `r_delist = (1 + RET) * (1 + DLRET) - 1` when both exist, else `DLRET` when RET is blank; the sleeve then becomes zero-return event cash.
+- Selection lock: `n_selected=2448`, event-set SHA-256 `caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d`, canonical-row SHA-256 `7f336eefaf7de6840a907a94361297111a2abc66702ad41b0aa0733016435749` before any output.
+- Residual attribution: exact four-player Shapley over all `2^4=16` states; each leg requires `sum(phi_i) = NAV_all_residuals - NAV_no_residuals` within tolerance. Observed errors are `0.0` and `1.734723475976807e-18`.
+- Current evidence: 2,444 observed, three nonnumeric residuals, one unresolved delist, two bridges PASS; strict curve remains `BLOCKED`; sensitivity legs are not finite bounds.
+- Boundary: source-max-date CUSIP8 identity is non-PIT; `m6b_data_contract_ready=false`; no alpha/tradable/Strategy/UI claim.
+
 ## 2026-07-12 M7F1-v5.2-final Registry
 
 - RoundID: `ROUND-20260712-M7F1-V5-2-FINAL`; ScopeID: `M7F1_V5_2_FINAL_2019_FORMATION_FIRST_VERTICAL`.

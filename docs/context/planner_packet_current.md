@@ -1,5 +1,38 @@
 # Planner Packet - Current
 
+## New Context Packet — M7F4-v8 Terminal Diagnostic Close (2026-07-13)
+
+## What Was Done
+
+- A2.1 `b4d35e1` repaired only the stale residual-evidence count and added a real publication-branch regression; compile and focused tests pass 45/45.
+- Failed-run partials were removed; the clean unchanged Slice 2 rerun completed without OOM.
+- Commit B `9f37745` banks the evidence JSON and two manifests only. Selection is locked at 2,448 unique events; 2,444 observed, three nonnumeric residuals, one unresolved delist, and two validated bridges.
+- NAV/cost, carried-NAV, no-recapitalization, file-hash, and exact 16-state Shapley checks pass. Three distinct independent Reviewer A/B/C passes are pinned to Commit B.
+- Commit C records the terminal SAW and reconciles the active brief, decision/formula/lesson records, and all seven truth surfaces.
+
+## What Is Locked
+
+- `DIAGNOSTIC_COMPLETE` is not a strict curve pass. The strict curve remains absent/`BLOCKED`; `m6b_data_contract_ready=false`.
+- The CUSIP8 link is source-max-date snapshot identity, not PIT/as-of. No alpha, tradable, Strategy/UI, CCM/provider, publication, or dispatch authority is created.
+- Neutral carry and write-down are named sensitivity legs, not justified finite bounds.
+- The clean rerun does not prove transactional multi-file publication, bounded memory, checkpointing, or portable ignored-Parquet evidence.
+
+## What Is Next
+
+Hold promotion. If work resumes, choose exactly one separately authorized scope: transactional cleanup, bounded/checkpointed execution, portable evidence counters, or historical/as-of data authority.
+
+## First Command
+
+```text
+git show --stat --oneline HEAD
+```
+
+## End Context Packet
+
+## Prior Context Packet — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
 ## New Context Packet — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH DIAGNOSTIC_COMPLETE (2026-07-12)
 
 ## What Was Done
