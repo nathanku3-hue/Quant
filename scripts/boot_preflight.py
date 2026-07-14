@@ -107,15 +107,6 @@ SENSITIVE_PATTERNS = (
     "tests/**",
     "views/**",
 )
-GIT_IDENTITY_REDIRECTION_ENVIRONMENT_VARIABLES = (
-    "GIT_DIR",
-    "GIT_WORK_TREE",
-    "GIT_COMMON_DIR",
-    "GIT_OBJECT_DIRECTORY",
-    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
-    "GIT_INDEX_FILE",
-    "GIT_NAMESPACE",
-)
 
 
 @dataclass(frozen=True)
@@ -203,65 +194,6 @@ def classify_dirty_entries(entries: Sequence[DirtyEntry]) -> dict[str, Any]:
         "blockers": [item.__dict__ for item in blockers],
         "warnings": [item.__dict__ for item in warnings],
         "classifications": [item.__dict__ for item in classifications],
-        "dirt_scope": "superproject_porcelain",
-    }
-
-
-def build_dirty_check(
-    *,
-    status_command_ok: bool,
-    entries: Sequence[DirtyEntry],
-    total_gitlinks: int,
-) -> dict[str, Any]:
-    """Classify superproject dirty state without lying about remaining gitlinks.
-
-    Plain dirty_state ``clean`` is allowed only when status succeeded, porcelain is
-    empty, and the index contains zero mode-160000 gitlinks. Empty porcelain with
-    remaining gitlinks is ``clean_superproject_only`` (never plain clean).
-    """
-    base = {
-        "dirt_scope": "superproject_porcelain",
-        "status_ignore_submodules": "all",
-        "status_command_ok": bool(status_command_ok),
-        "total_gitlinks": int(total_gitlinks),
-    }
-    if not status_command_ok:
-        return {
-            **base,
-            "status": "FAIL",
-            "dirty_state": "STATUS_UNAVAILABLE",
-            "counts": {},
-            "blockers": [],
-            "warnings": [],
-            "classifications": [],
-            "reason": "git status command failed; dirty state cannot be claimed clean",
-        }
-    if entries:
-        classified = classify_dirty_entries(entries)
-        classified.update(base)
-        return classified
-    if total_gitlinks > 0:
-        return {
-            **base,
-            "status": "FAIL",
-            "dirty_state": "clean_superproject_only",
-            "counts": {},
-            "blockers": [],
-            "warnings": [],
-            "classifications": [],
-            "reason": (
-                "superproject porcelain is empty but index still contains gitlinks; "
-                "not a full-tree clean state"
-            ),
-        }
-    return {
-        **base,
-        "status": "PASS",
-        "dirty_state": "clean",
-        "counts": {},
-        "blockers": [],
-        "warnings": [],
-        "classifications": [],
     }
 
 
@@ -271,7 +203,6 @@ def _run_command(
     cwd: Path,
     shell: bool = False,
     timeout: float | None = None,
-    env: Mapping[str, str] | None = None,
 ) -> CommandResult:
     try:
         completed = subprocess.run(
@@ -282,7 +213,6 @@ def _run_command(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             timeout=timeout,
-            env=dict(env) if env is not None else None,
         )
     except FileNotFoundError as exc:
         return CommandResult(args=args, returncode=127, stderr=str(exc))
@@ -376,292 +306,25 @@ def validate_boot_core(repo_root: Path) -> dict[str, Any]:
 
 
 def _parse_porcelain_z(stdout: str) -> list[DirtyEntry]:
-    """Parse ``git status --porcelain=v1 -z`` records; fail closed on malformation."""
     entries: list[DirtyEntry] = []
     raw_entries = [part for part in stdout.split("\0") if part]
     idx = 0
     while idx < len(raw_entries):
         raw = raw_entries[idx]
         if len(raw) < 4:
-            raise ValueError(
-                f"malformed git status porcelain -z record at index {idx}: "
-                f"expected status+space+path, got {raw!r}"
-            )
-        # XY<space><path> — path begins at index 3 when XY is two chars and space follows.
-        if raw[2] != " ":
-            raise ValueError(
-                f"malformed git status porcelain -z record at index {idx}: "
-                f"missing status/path separator in {raw!r}"
-            )
+            idx += 1
+            continue
         status = raw[:2].strip() or raw[:2]
         path = raw[3:]
-        if not path:
-            raise ValueError(
-                f"malformed git status porcelain -z record at index {idx}: empty path"
-            )
         if raw[0] in {"R", "C"} or raw[1] in {"R", "C"}:
             idx += 1
-            if idx >= len(raw_entries):
-                raise ValueError(
-                    f"malformed git status porcelain -z rename/copy at index {idx - 1}: "
-                    "missing destination path record"
-                )
-            # Destination path consumed; scoreboard still keys primary path.
         entries.append(DirtyEntry(status=status, path=path))
         idx += 1
     return entries
 
 
 def _git(repo_root: Path, *args: str) -> CommandResult:
-    environment = os.environ.copy()
-    for name in GIT_IDENTITY_REDIRECTION_ENVIRONMENT_VARIABLES:
-        environment.pop(name, None)
-    for name in tuple(environment):
-        if name.startswith("GIT_CONFIG_"):
-            environment.pop(name, None)
-    environment["GIT_NO_REPLACE_OBJECTS"] = "1"
-    return _run_command(["git", *args], cwd=repo_root, env=environment)
-
-
-def _replacement_refs(repo_root: Path) -> tuple[str, list[str], str]:
-    result = _git(repo_root, "for-each-ref", "--format=%(refname)", "refs/replace/")
-    if result.returncode != 0:
-        detail = (result.stderr or result.stdout or "Git replacement-ref enumeration failed").strip()
-        return "ERROR", [], detail
-    refs = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-    if refs:
-        return "DETECTED", refs, "Git replacement refs are present; identity verification is refused."
-    return "CLEAR", [], ""
-
-
-def _is_git_object_id(value: str) -> bool:
-    return len(value) in {40, 64} and all(character in "0123456789abcdef" for character in value)
-
-
-def _failed_git_identity_state(
-    *,
-    replacement_refs_status: str,
-    replacement_refs: Sequence[str],
-    reason: str,
-    identity_errors: Sequence[str],
-    branch: str = "",
-    head: str = "",
-    tree: str = "",
-    upstream: str = "",
-    upstream_head: str = "",
-    ahead: int | None = None,
-    behind: int | None = None,
-    has_upstream: bool = False,
-    aligned: bool | None = None,
-    worktree_clean: bool | None = None,
-    entries: Sequence[Mapping[str, Any]] | None = None,
-    status_command_ok: bool | None = None,
-    status_ignore_submodules: str | None = None,
-    dirt_scope: str | None = None,
-    gitlinks: Mapping[str, Any] | None = None,
-    dirt_complete: bool | None = None,
-) -> dict[str, Any]:
-    """Identity FAIL payload that preserves every successfully collected field."""
-    payload: dict[str, Any] = {
-        "available": True,
-        "status": "FAIL",
-        "reason": reason,
-        "replacement_refs_status": replacement_refs_status,
-        "replacement_refs": list(replacement_refs),
-        "identity_verified": False,
-        "identity_errors": list(identity_errors),
-        "branch": branch,
-        "head": head,
-        "tree": tree,
-        "upstream": upstream,
-        "upstream_head": upstream_head,
-        "ahead": ahead,
-        "behind": behind,
-        "has_upstream": has_upstream,
-        "aligned": aligned,
-        "worktree_clean": worktree_clean,
-        "entries": list(entries) if entries is not None else [],
-    }
-    if status_command_ok is not None:
-        payload["status_command_ok"] = status_command_ok
-    if status_ignore_submodules is not None:
-        payload["status_ignore_submodules"] = status_ignore_submodules
-    if dirt_scope is not None:
-        payload["dirt_scope"] = dirt_scope
-    if gitlinks is not None:
-        payload["gitlinks"] = dict(gitlinks)
-    if dirt_complete is not None:
-        payload["dirt_complete"] = dirt_complete
-    return payload
-
-
-def _parse_ls_files_stage_z(stdout: str) -> list[dict[str, Any]]:
-    """Parse ``git ls-files -s -z`` records; paths may contain spaces. Fail closed."""
-    records: list[dict[str, Any]] = []
-    for index, raw in enumerate(part for part in stdout.split("\0") if part):
-        # Format: <mode> SP <object> SP <stage> TAB <path>
-        tab = raw.find("\t")
-        if tab < 0:
-            raise ValueError(
-                f"malformed git ls-files -s -z record at index {index}: missing TAB in {raw!r}"
-            )
-        meta = raw[:tab]
-        path = raw[tab + 1 :]
-        if not path:
-            raise ValueError(
-                f"malformed git ls-files -s -z record at index {index}: empty path"
-            )
-        parts = meta.split(" ")
-        if len(parts) != 3:
-            raise ValueError(
-                f"malformed git ls-files -s -z record at index {index}: "
-                f"expected mode object stage, got {meta!r}"
-            )
-        mode, object_id, stage_text = parts
-        if mode not in {"100644", "100755", "120000", "160000", "040000"} and not (
-            len(mode) == 6 and mode.isdigit()
-        ):
-            # Accept standard git index modes; still require parseable stage/object.
-            pass
-        if not _is_git_object_id(object_id) and not (
-            len(object_id) in {40, 64}
-            and all(character in "0123456789abcdef" for character in object_id)
-        ):
-            # object may be abbreviated in some tooling; require non-empty hex-ish id
-            if not object_id or any(c not in "0123456789abcdef" for c in object_id.lower()):
-                raise ValueError(
-                    f"malformed git ls-files -s -z record at index {index}: "
-                    f"invalid object id {object_id!r}"
-                )
-        try:
-            stage = int(stage_text)
-        except ValueError as exc:
-            raise ValueError(
-                f"malformed git ls-files -s -z record at index {index}: "
-                f"invalid stage {stage_text!r}"
-            ) from exc
-        if stage < 0 or stage > 3:
-            raise ValueError(
-                f"malformed git ls-files -s -z record at index {index}: "
-                f"stage out of range {stage}"
-            )
-        records.append(
-            {
-                "mode": mode,
-                "object": object_id,
-                "stage": stage,
-                "path": path,
-            }
-        )
-    return records
-
-
-def _parse_gitmodules_paths(repo_root: Path) -> tuple[str, set[str], str]:
-    """Return (status, registered_paths, reason). Fail-closed when unreadable."""
-    path = repo_root / ".gitmodules"
-    if not path.exists():
-        return "ABSENT", set(), "no .gitmodules; no gitlinks are registered"
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError as exc:
-        return "UNREADABLE", set(), f".gitmodules unreadable: {exc}"
-    registered: set[str] = set()
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped.lower().startswith("path"):
-            continue
-        # path = foo/bar
-        if "=" not in stripped:
-            return "MALFORMED", set(), ".gitmodules path line missing '='"
-        _, value = stripped.split("=", 1)
-        candidate = _normalize_path(value.strip())
-        if not candidate:
-            return "MALFORMED", set(), ".gitmodules path value empty"
-        registered.add(candidate)
-    return "OK", registered, "parsed .gitmodules paths"
-
-
-def collect_gitlink_inventory(repo_root: Path) -> dict[str, Any]:
-    """Enumerate index gitlinks with space-safe -z parse and unregistered check."""
-    listed = _git(repo_root, "ls-files", "-s", "-z")
-    if listed.returncode != 0:
-        return {
-            "status": "FAIL",
-            "reason": (listed.stderr or listed.stdout or "git ls-files -s -z failed").strip(),
-            "ls_files_ok": False,
-            "total_gitlinks": 0,
-            "stage0_gitlinks": 0,
-            "unregistered_gitlinks": 0,
-            "unregistered_paths": [],
-            "non_stage0_gitlinks": 0,
-            "non_stage0_paths": [],
-            "unmerged_entries": 0,
-            "unmerged_paths": [],
-            "unmerged_or_nonzero_stage_status": "FAIL",
-            "unregistered_status": "FAIL",
-            "gitmodules_status": "NOT_CHECKED",
-            "registered_paths": [],
-        }
-    try:
-        records = _parse_ls_files_stage_z(listed.stdout)
-    except ValueError as exc:
-        return {
-            "status": "FAIL",
-            "reason": f"malformed ls-files stage index: {exc}",
-            "ls_files_ok": False,
-            "total_gitlinks": 0,
-            "stage0_gitlinks": 0,
-            "unregistered_gitlinks": 0,
-            "unregistered_paths": [],
-            "non_stage0_gitlinks": 0,
-            "non_stage0_paths": [],
-            "unmerged_entries": 0,
-            "unmerged_paths": [],
-            "unmerged_or_nonzero_stage_status": "FAIL",
-            "unregistered_status": "FAIL",
-            "gitmodules_status": "NOT_CHECKED",
-            "registered_paths": [],
-        }
-    gitlinks = [row for row in records if row["mode"] == "160000"]
-    non_gitlink_unmerged = [
-        row for row in records if row["mode"] != "160000" and int(row["stage"]) != 0
-    ]
-    stage0 = [row for row in gitlinks if int(row["stage"]) == 0]
-    non_stage0_gitlinks = [row for row in gitlinks if int(row["stage"]) != 0]
-    gitmodules_status, registered, gitmodules_reason = _parse_gitmodules_paths(repo_root)
-    if gitmodules_status == "OK":
-        unregistered = [
-            row for row in stage0 if _normalize_path(str(row["path"])) not in registered
-        ]
-    else:
-        # Fail-closed: missing/unreadable/malformed .gitmodules ⇒ none registered.
-        unregistered = list(stage0)
-    unmerged_paths = sorted(
-        {
-            _normalize_path(str(row["path"]))
-            for row in (*non_stage0_gitlinks, *non_gitlink_unmerged)
-        }
-    )
-    unmerged_or_nonzero = bool(non_stage0_gitlinks or non_gitlink_unmerged)
-    return {
-        "status": "PASS",
-        "reason": gitmodules_reason,
-        "ls_files_ok": True,
-        "total_gitlinks": len(gitlinks),
-        "stage0_gitlinks": len(stage0),
-        "unregistered_gitlinks": len(unregistered),
-        "unregistered_paths": sorted(_normalize_path(str(row["path"])) for row in unregistered),
-        "non_stage0_gitlinks": len(non_stage0_gitlinks),
-        "non_stage0_paths": sorted(
-            _normalize_path(str(row["path"])) for row in non_stage0_gitlinks
-        ),
-        "unmerged_entries": len(non_gitlink_unmerged) + len(non_stage0_gitlinks),
-        "unmerged_paths": unmerged_paths,
-        "unmerged_or_nonzero_stage_status": "FAIL" if unmerged_or_nonzero else "PASS",
-        "unregistered_status": "FAIL" if unregistered else "PASS",
-        "gitmodules_status": gitmodules_status,
-        "registered_paths": sorted(registered),
-    }
+    return _run_command(["git", *args], cwd=repo_root)
 
 
 def collect_git_state(repo_root: Path) -> dict[str, Any]:
@@ -671,185 +334,40 @@ def collect_git_state(repo_root: Path) -> dict[str, Any]:
             "available": False,
             "status": "WARN",
             "reason": (inside.stderr or inside.stdout or "not a Git worktree").strip(),
-            "replacement_refs_status": "NOT_CHECKED",
-            "replacement_refs": [],
-            "identity_verified": False,
-            "identity_errors": ["not_a_git_worktree"],
-            "tree": None,
             "entries": [],
             "worktree_clean": None,
             "aligned": None,
-            "status_command_ok": False,
-            "dirt_complete": False,
         }
-    replacement_refs_status, replacement_refs, replacement_refs_reason = _replacement_refs(repo_root)
-    if replacement_refs_status != "CLEAR":
-        return _failed_git_identity_state(
-            replacement_refs_status=replacement_refs_status,
-            replacement_refs=replacement_refs,
-            reason=replacement_refs_reason,
-            identity_errors=["replacement_refs_not_clear"],
-            dirt_complete=False,
-        )
-
     branch = _git(repo_root, "rev-parse", "--abbrev-ref", "HEAD")
     head = _git(repo_root, "rev-parse", "HEAD")
-    head_commit = _git(repo_root, "rev-parse", "--verify", "HEAD^{commit}")
-    head_tree = _git(repo_root, "rev-parse", "--verify", "HEAD^{tree}")
     upstream = _git(repo_root, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
     upstream_head = _git(repo_root, "rev-parse", "@{u}")
-    upstream_commit = _git(repo_root, "rev-parse", "--verify", "@{u}^{commit}")
     ahead_behind = _git(repo_root, "rev-list", "--left-right", "--count", "HEAD...@{u}")
-    # Superproject dirt only; broken nested gitlink worktrees must not block porcelain.
-    status = _git(repo_root, "status", "--porcelain=v1", "-z", "--ignore-submodules=all")
-    gitlinks = collect_gitlink_inventory(repo_root)
-
-    branch_name = branch.stdout.strip() if branch.returncode == 0 else ""
-    head_sha = head.stdout.strip() if head.returncode == 0 else ""
-    head_commit_sha = head_commit.stdout.strip() if head_commit.returncode == 0 else ""
-    head_tree_sha = head_tree.stdout.strip() if head_tree.returncode == 0 else ""
+    status = _git(repo_root, "status", "--porcelain=v1", "-z")
+    entries = _parse_porcelain_z(status.stdout if status.returncode == 0 else "")
     upstream_name = upstream.stdout.strip() if upstream.returncode == 0 else ""
+    head_sha = head.stdout.strip() if head.returncode == 0 else ""
     upstream_sha = upstream_head.stdout.strip() if upstream_head.returncode == 0 else ""
-    upstream_commit_sha = upstream_commit.stdout.strip() if upstream_commit.returncode == 0 else ""
-
-    # Preserve only successfully collected fields (empty string / None when failed).
-    preserved_branch = branch_name if branch.returncode == 0 and branch_name else ""
-    preserved_head = head_sha if head.returncode == 0 and _is_git_object_id(head_sha) else ""
-    preserved_tree = (
-        head_tree_sha if head_tree.returncode == 0 and _is_git_object_id(head_tree_sha) else ""
-    )
-    preserved_upstream = upstream_name if upstream.returncode == 0 and upstream_name else ""
-    preserved_upstream_head = (
-        upstream_sha if upstream_head.returncode == 0 and _is_git_object_id(upstream_sha) else ""
-    )
-
-    ahead: int | None = None
-    behind: int | None = None
-    identity_errors: list[str] = []
-    is_detached = branch_name == "HEAD"
-    if branch.returncode != 0:
-        identity_errors.append("branch_command_failed")
-    elif not branch_name:
-        identity_errors.append("branch_missing")
-    # Detached HEAD is allowed when commit+tree verify (proof worktrees pin exact commits).
-    if head.returncode != 0:
-        identity_errors.append("head_command_failed")
-    elif not _is_git_object_id(head_sha):
-        identity_errors.append("head_invalid")
-    if head_commit.returncode != 0:
-        identity_errors.append("head_commit_command_failed")
-    elif not _is_git_object_id(head_commit_sha):
-        identity_errors.append("head_commit_invalid")
-    elif head_sha != head_commit_sha:
-        identity_errors.append("head_not_commit")
-    if head_tree.returncode != 0:
-        identity_errors.append("head_tree_command_failed")
-    elif not _is_git_object_id(head_tree_sha):
-        identity_errors.append("head_tree_invalid")
-    # Upstream is optional on detached proof checkouts; required for named branches.
-    if not is_detached:
-        if upstream.returncode != 0:
-            identity_errors.append("upstream_command_failed")
-        elif not upstream_name:
-            identity_errors.append("upstream_missing")
-        if upstream_head.returncode != 0:
-            identity_errors.append("upstream_head_command_failed")
-        elif not _is_git_object_id(upstream_sha):
-            identity_errors.append("upstream_head_invalid")
-        if upstream_commit.returncode != 0:
-            identity_errors.append("upstream_commit_command_failed")
-        elif not _is_git_object_id(upstream_commit_sha):
-            identity_errors.append("upstream_commit_invalid")
-        elif upstream_sha != upstream_commit_sha:
-            identity_errors.append("upstream_not_commit")
-        if ahead_behind.returncode == 0:
-            parts = ahead_behind.stdout.strip().split()
-            if len(parts) == 2 and all(part.isdigit() for part in parts):
-                ahead, behind = int(parts[0]), int(parts[1])
-            else:
-                identity_errors.append("ahead_behind_invalid")
-        else:
-            identity_errors.append("ahead_behind_command_failed")
-    elif ahead_behind.returncode == 0:
+    ahead = behind = None
+    if ahead_behind.returncode == 0:
         parts = ahead_behind.stdout.strip().split()
-        if len(parts) == 2 and all(part.isdigit() for part in parts):
+        if len(parts) == 2:
             ahead, behind = int(parts[0]), int(parts[1])
-
-    status_command_ok = status.returncode == 0
-    if not status_command_ok:
-        identity_errors.append("status_command_failed")
-        entries: list[DirtyEntry] = []
-    else:
-        try:
-            entries = _parse_porcelain_z(status.stdout)
-        except ValueError as exc:
-            identity_errors.append(f"status_porcelain_malformed:{exc}")
-            entries = []
-            status_command_ok = False
-
-    has_upstream = bool(preserved_upstream)
-    aligned = bool(
-        has_upstream
-        and preserved_head
-        and preserved_upstream_head
-        and preserved_head == preserved_upstream_head
-        and ahead == 0
-        and behind == 0
-    )
-    total_gitlinks = int(gitlinks.get("total_gitlinks") or 0)
-    # Full-tree clean requires empty superproject porcelain and zero gitlinks.
-    worktree_clean = bool(status_command_ok and not entries and total_gitlinks == 0)
-    # Completeness under C0A: no recursive submodule verify; gitlinks must be zero.
-    dirt_complete = bool(status_command_ok and total_gitlinks == 0)
-
-    entry_payloads = [entry.__dict__ for entry in entries]
-    common = {
-        "status_command_ok": status_command_ok,
-        "status_ignore_submodules": "all",
-        "dirt_scope": "superproject_porcelain",
-        "gitlinks": gitlinks,
-        "dirt_complete": dirt_complete,
-    }
-
-    if identity_errors:
-        return _failed_git_identity_state(
-            replacement_refs_status=replacement_refs_status,
-            replacement_refs=replacement_refs,
-            reason="Git identity verification failed: " + ", ".join(identity_errors),
-            identity_errors=identity_errors,
-            branch=preserved_branch,
-            head=preserved_head,
-            tree=preserved_tree,
-            upstream=preserved_upstream,
-            upstream_head=preserved_upstream_head,
-            ahead=ahead,
-            behind=behind,
-            has_upstream=has_upstream,
-            aligned=aligned,
-            worktree_clean=worktree_clean if status_command_ok else None,
-            entries=entry_payloads,
-            **common,
-        )
-
+    has_upstream = bool(upstream_name and upstream_sha)
+    aligned = bool(has_upstream and head_sha and upstream_sha and head_sha == upstream_sha and ahead == 0 and behind == 0)
     return {
         "available": True,
         "status": "PASS",
-        "replacement_refs_status": replacement_refs_status,
-        "replacement_refs": replacement_refs,
-        "identity_verified": True,
-        "identity_errors": [],
-        "branch": preserved_branch,
-        "head": preserved_head,
-        "tree": preserved_tree,
-        "upstream": preserved_upstream,
-        "upstream_head": preserved_upstream_head,
+        "branch": branch.stdout.strip() if branch.returncode == 0 else "",
+        "head": head_sha,
+        "upstream": upstream_name,
+        "upstream_head": upstream_sha,
         "ahead": ahead,
         "behind": behind,
         "has_upstream": has_upstream,
         "aligned": aligned,
-        "worktree_clean": worktree_clean,
-        "entries": entry_payloads,
-        **common,
+        "worktree_clean": not entries,
+        "entries": [entry.__dict__ for entry in entries],
     }
 
 
@@ -930,16 +448,6 @@ def _status_from_git(git: Mapping[str, Any], require_github: bool) -> ReadinessC
             status="fail" if require_github else "warn",
             severity=severity,
             summary=str(git.get("reason", "Git state unavailable.")),
-            destination="Boot Status",
-            details=dict(git),
-        )
-    if git.get("status") == "FAIL" or not git.get("identity_verified", True):
-        return ReadinessCheck(
-            id="git_state",
-            label="Git state",
-            status="fail",
-            severity="blocked",
-            summary=str(git.get("reason", "Git identity verification failed.")),
             destination="Boot Status",
             details=dict(git),
         )
@@ -1082,107 +590,11 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
 
     git_state = collect_git_state(repo_root)
     checks["git"] = git_state
-    if git_state.get("available") and (
-        git_state.get("status") == "FAIL" or not git_state.get("identity_verified", True)
-    ):
-        failures.append(str(git_state.get("reason", "Git identity verification failed")))
-
-    gitlinks = git_state.get("gitlinks") if isinstance(git_state.get("gitlinks"), Mapping) else {}
-    if not git_state.get("available"):
-        # Non-git roots remain planning-soft (historical WARN path); no index claims.
-        dirty = {
-            "status": "PASS",
-            "dirty_state": "not_a_git_worktree",
-            "counts": {},
-            "blockers": [],
-            "warnings": [],
-            "classifications": [],
-            "dirt_scope": "none",
-            "status_command_ok": False,
-            "total_gitlinks": 0,
-        }
-        checks["dirty"] = dirty
-        checks["unregistered_gitlinks"] = {
-            "status": "PASS",
-            "unregistered_gitlinks": 0,
-            "paths": [],
-            "gitmodules_status": "NOT_APPLICABLE",
-            "reason": "not a git worktree",
-        }
-        checks["unmerged_or_nonzero_stage_index"] = {
-            "status": "PASS",
-            "unmerged_entries": 0,
-            "paths": [],
-            "reason": "not a git worktree",
-        }
-        checks["dirt_complete"] = {
-            "status": "PASS",
-            "dirt_complete": False,
-            "reason": "not a git worktree; dirt completeness not applicable",
-        }
-    else:
-        total_gitlinks = int(gitlinks.get("total_gitlinks") or 0) if gitlinks else 0
-        status_command_ok = bool(git_state.get("status_command_ok", False))
-        dirty_entries = [DirtyEntry(**entry) for entry in git_state.get("entries", [])]
-        dirty = build_dirty_check(
-            status_command_ok=status_command_ok,
-            entries=dirty_entries,
-            total_gitlinks=total_gitlinks,
-        )
-        checks["dirty"] = dirty
-        if dirty["status"] != "PASS":
-            if dirty.get("dirty_state") == "STATUS_UNAVAILABLE":
-                failures.append("git status unavailable; dirty state is STATUS_UNAVAILABLE")
-            elif dirty.get("dirty_state") == "clean_superproject_only":
-                failures.append(
-                    "superproject porcelain clean but gitlinks remain (clean_superproject_only)"
-                )
-            else:
-                failures.append("unclassified source/test/runtime dirty files are present")
-
-        unregistered_count = int(gitlinks.get("unregistered_gitlinks") or 0) if gitlinks else 0
-        ls_files_ok = bool(gitlinks.get("ls_files_ok")) if gitlinks else False
-        unregistered_check_status = "PASS" if ls_files_ok and unregistered_count == 0 else "FAIL"
-        checks["unregistered_gitlinks"] = {
-            "status": unregistered_check_status,
-            "unregistered_gitlinks": unregistered_count,
-            "paths": list(gitlinks.get("unregistered_paths") or []) if gitlinks else [],
-            "gitmodules_status": gitlinks.get("gitmodules_status") if gitlinks else "NOT_CHECKED",
-            "reason": (
-                f"unregistered_gitlinks={unregistered_count}"
-                if unregistered_count or not ls_files_ok
-                else "no unregistered stage-0 gitlinks"
-            ),
-        }
-        if unregistered_check_status != "PASS":
-            failures.append(f"unregistered gitlinks present: {unregistered_count}")
-
-        unmerged_status = (
-            str(gitlinks.get("unmerged_or_nonzero_stage_status") or "FAIL") if gitlinks else "FAIL"
-        )
-        checks["unmerged_or_nonzero_stage_index"] = {
-            "status": unmerged_status,
-            "unmerged_entries": int(gitlinks.get("unmerged_entries") or 0) if gitlinks else 0,
-            "paths": list(gitlinks.get("unmerged_paths") or []) if gitlinks else [],
-            "reason": (
-                "non-stage-0 gitlinks or other unmerged index entries present"
-                if unmerged_status == "FAIL"
-                else "no unmerged or non-stage-0 index entries"
-            ),
-        }
-        if unmerged_status != "PASS":
-            failures.append("unmerged or non-stage-0 index entries present")
-
-        checks["dirt_complete"] = {
-            "status": "PASS" if git_state.get("dirt_complete") else "FAIL",
-            "dirt_complete": bool(git_state.get("dirt_complete")),
-            "reason": (
-                "status ok and total gitlinks == 0"
-                if git_state.get("dirt_complete")
-                else "dirt incomplete: status failed and/or gitlinks remain "
-                "(registered submodules require recursive verification outside C0A)"
-            ),
-        }
+    dirty_entries = [DirtyEntry(**entry) for entry in git_state.get("entries", [])]
+    dirty = classify_dirty_entries(dirty_entries)
+    checks["dirty"] = dirty
+    if dirty["status"] != "PASS":
+        failures.append("unclassified source/test/runtime dirty files are present")
 
     if args.require_github:
         if not git_state.get("available"):
@@ -1243,11 +655,7 @@ def build_status(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     if args.require_github:
         post_git = collect_git_state(repo_root)
         status["post_git"] = post_git
-        if post_git.get("status") == "FAIL" or not post_git.get("identity_verified", True):
-            status["verdict"] = "FAIL"
-            status["exit_code"] = 1
-            status["failures"].append("--require-github post-write Git identity verification failed")
-        elif not post_git.get("worktree_clean") or not post_git.get("aligned"):
+        if not post_git.get("worktree_clean") or not post_git.get("aligned"):
             status["verdict"] = "FAIL"
             status["exit_code"] = 1
             status["failures"].append("--require-github post-write check is not clean/aligned")

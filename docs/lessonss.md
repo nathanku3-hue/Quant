@@ -1,6 +1,14 @@
 # lessonss.md
 
-Last updated: 2026-07-13
+Last updated: 2026-07-14
+
+## 2026-07-14 Round Entry (PEAD Strict-PIT Program Terminal Close)
+- Date: 2026-07-14
+- Mistake or miss: The original 2015–2019 dollar-neutral Q5−Q1 strict-PIT PEAD objective was not achieved. The shipped outcome is a bounded 2019 long-only future-informed diagnostic (M7F4-v8) with research validity ~30/100.
+- Root cause: Strict-PIT EPS data requires first-public/unrestated vintage with genuine effective-dated identifiers (CRSP/CCM PERMNO↔GVKEY date-ranged links). The available Compustat security master has only current-snapshot identifiers, and the CCM linktable has all-null PERMNO join keys. No data-owner approval for historical source acquisition was obtained.
+- Fix applied: Formally terminated the strict-PIT program. Merged M7F4-v8 to main as DIAGNOSTIC_ONLY at commit `150d322` with tag `pead-v8-diagnostic-terminal`. Closed all PEAD phase briefs. Prohibited strategy/UI promotion.
+- Guardrail for next time: Before starting a multi-phase strict-PIT research program, verify that the required historical data provenance (effective-dated identifiers, committed data-owner approval, non-null join keys) is obtainable. Do not proceed past M1 without proving the data authority path.
+- Evidence paths: merge commit `150d322`, tag `pead-v8-diagnostic-terminal` at `076f26b`, `docs/context/bridge_contract_current.md`.
 
 ## 2026-07-13 Round Entry (Clean Success Does Not Prove Transactional Recovery)
 - Date: 2026-07-13

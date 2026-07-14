@@ -1,5 +1,14 @@
 # M7F5-ID0 DATED_IDENTIFIER_AUTHORITY
 
+## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+
+- **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
+- **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.
+- **Original objective**: 2015–2019 dollar-neutral Q5−Q1 strict-PIT PEAD. **Not achieved.**
+- **Research validity**: ~30/100; delivery/closure: 88/100.
+- **Prohibited**: Strategy/UI promotion, readiness flag changes, provider access, curve/alpha claims, ranking/scoring, alerts, recommendations, broker/order paths.
+- **Reopen condition**: Only for one source-intake slice with genuine effective-dated identifiers + committed data-owner approval; mapping and curves remain closed until ID0 passes.
+
 Mode: `EXECUTION_PACKET`
 RoundID: `ROUND-20260714-M7F5-ID0-DATED-IDENTIFIER-AUTHORITY`
 ScopeID: `M7F5_ID0_DATED_IDENTIFIER_AUTHORITY_COMMIT_A`

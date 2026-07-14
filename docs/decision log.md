@@ -7297,3 +7297,16 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - Decision: hard-replace M7F1-v5.2 with M7F2-v6-final. Exclude pre-entry delists before breadth/Q5 and rerank; bridge only blank one-session gaps with adjacent prices + next RET; residual ambiguities emit strict BLOCK + neutral carry-to-cash + -100% write-down; map used_for_selection=true; SAW may PASS for diagnostic scope while strict_curve_status=BLOCKED.
 - Not decided: readiness flip, as-of link, alpha/tradable claims.
+
+## 2026-07-14 — M7F5-ID0 Dated-Identifier Provenance Block
+
+- Decision: Accept terminal Reviewer A/B/C PASS and terminal SAW `398732c` PASS for the M7F5-ID0 dated-identifier authority gate. Current Compustat security master remains blocked due to missing dated-identifier provenance.
+- The Decision (Hardcoded): `pead_m7f5_id0_dated_identifier_authority_gate.py` requires a committed data-owner approval JSON file with valid SHA-256 matches. Source status is set to `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`. Operational authorities for acquisition, provider access, mapping, portfolio, and strategy/UI promotion remain false.
+- Contract lock: `M7F5_ID0_PROVENANCE_BLOCKED = true`, `m6b_data_contract_ready = false`.
+
+## 2026-07-14 — V2 PEAD Strict-PIT Program Formal Closure
+
+- Decision: Formally close the PEAD strict-PIT research program. Ship the M7F4-v8 build as a bounded 2019 long-only future-informed diagnostic only. Reject further historical-source acquisition (no current authority or usable CCM keys). Merged c0x/m7f4-v8 into main at merge commit `150d322` and tagged `pead-v8-diagnostic-terminal` at `076f26b`.
+- The Decision (Hardcoded): Prohibit strategy and UI promotion of the PEAD program. Mark all PEAD phase briefs and checklists as `TERMINATED_DIAGNOSTIC_ONLY`. Retain existing codebases and validation JSONs for archival and diagnostic reference only.
+- Contract lock: `PEAD_PROGRAM_STATUS := TERMINATED_DIAGNOSTIC_ONLY`, `m6b_data_contract_ready = false`, `usable_for_alpha_inference = false`.
+
