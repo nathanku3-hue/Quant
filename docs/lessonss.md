@@ -1,6 +1,23 @@
 # lessonss.md
 
-Last updated: 2026-07-11
+Last updated: 2026-07-13
+
+## 2026-07-13 Round Entry (Clean Success Does Not Prove Transactional Recovery)
+- Date: 2026-07-13
+- Mistake or miss: The first Slice 2 attempt left four partial outputs after an OOM-adjacent failure, and the later clean rerun could be overread as proving generalized recovery.
+- Root cause: Individual writes are atomic, but the map, ledger, scenario legs, evidence, and manifests are not committed as one transaction; the full-panel plus dual-Shapley path also has no enforced memory cap or checkpoint.
+- Fix applied: Removed all failed-run partials, reran from a clean committed checkout, reconciled every available artifact hash and row count, and recorded the transactionality/memory limits in independent Reviewer B and terminal SAW evidence.
+- Guardrail for next time: Before any large rerun, require a clean-output preflight and post-run complete-package hash audit; never infer transactionality, bounded memory, or resumability from one successful rerun.
+- Evidence paths: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, `docs/saw_reports/reviewer_b_c0x_m7f4_v8_commit_b_20260713.md`, `docs/saw_reports/saw_c0x_m7f4_v8_terminal_commit_c_20260713.md`.
+
+## 2026-07-12 Round Entry (Self-Financing Truth Before Score Close)
+- Date: 2026-07-12
+- Mistake or miss: M7F2-v6 claimed diagnostic 70–74 close while residual exposure used event-count share (0.163% vs ~0.72% first-bad), turnover ignored drift/equity-cash transitions (identical leg costs), bridge lacked price/RET parity, and A/B/C identities were unproven while truth still said Commit C pending.
+- Root cause: Portfolio mechanics and governance closure were treated as hash/test PASS rather than self-financing path + independent review pins.
+- Fix applied: M7F3-v7 locked drifted-prior→equity trade→RET→close sequence; first-bad residual metric; dead write-down sleeves; equity-only turnover; 16-state Shapley; selection-set hash; v6 CLI retired; Commit B evidence-only; Commit C after distinct A/B/C.
+- Guardrail for next time: Never score a portfolio diagnostic close without (1) explicit daily trade sequence, (2) residual exposure defined as first-bad weight sum when that is the audit metric, (3) non-identical leg costs when residual paths differ, (4) distinct reviewer agent IDs, (5) seven-surface reconcile only after reviewers.
+- Evidence paths: `scripts/pead_m7f3_v7_2019_crsp_vertical.py`, `docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json`, `docs/saw_reports/saw_c0x_m7f3_v7_self_financing_20260712.md`.
+
 
 ## 2026-07-11 Round Entry (Payload Identity Must Use a Detached Envelope)
 - Date: 2026-07-11
@@ -1793,3 +1810,35 @@ Application pattern:
 - Fix applied: Ran a bounded docs-only truth reconciliation across all mandatory current-truth surfaces, preserved the payload and envelope bytes, regenerated/validated current context, reran governance and planning preflight, and published Thin SAW evidence.
 - Guardrail for next time: After any terminal evidence-only commit changes a milestone verdict, immediately compare every active current-truth surface against the new verdict before declaring closure; preflight PASS does not substitute for semantic truth reconciliation.
 - Evidence paths: `docs/saw_reports/saw_request_artifact_identity_terminal_review_v1_20260711.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/saw_reports/saw_request_artifact_identity_truth_reconciliation_v1_20260711.md`.
+
+## 2026-07-12 Round Entry (C0X→M7F0-v4)
+- Date: 2026-07-12
+- Mistake or miss: C0A closure claimed PASS with wrong envelope hashes; porcelain and ls-files parsers silently skipped malformed records; nested gitlinks poisoned dirt completeness.
+- Root cause: Closure theater over object-store truth; parsers optimized for lenience; proof used branch checkout that cannot attach twice.
+- Fix applied: Fork `aee7f4c`, fail-close both parsers, deindex+ignore 41 gitlinks, detached proof worktree planning PASS; M7F0-v4 mechanical vertical with v4 clock/overlap/live-name/cost locks.
+- Guardrail for next time: Prove exact commits detached; never source-wide nonnumeric gates on CRSP; formation after map/window filters; bind ignored parquet via tracked manifest.
+- Evidence paths: commits `17cb830`, `d4fcfcb`; `docs/context/e2e_evidence/pead_m7f0_v4_2019_crsp_vertical.json`; `docs/saw_reports/saw_c0x_m7f0_v4_20260712.md`.
+
+## 2026-07-12 Round Entry (M7F1-v5.2-final)
+- Date: 2026-07-12
+- Mistake or miss: Uncommitted M7F1-v5 claimed implementation identity on M7F0 tip, reused map, lacked prior-20 history for January, treated identity max_date as if selection, and left BLOCK without separate evidence vs review commits.
+- Root cause: Velocity over package discipline; prior-20 misframed as map repair; 2019-only panel load; Commit B conflated with terminal review.
+- Fix applied: Commit A code/tests only (`138c8b7`); source-wide spine + pre-2019 load; pre-Q5 prior-20 tradability roadmap deviation (finite RET, abs(PRC)>0, VOL>0); force map rebuild; invalidate stale curve; first/last mismatch diagnostic-only; Commit B evidence/truth; Commit C A/B/C+SAW pinned to B.
+- Guardrail for next time: Never bank evidence before code commit; never reuse map; never close evidence and terminal SAW in one commit; record formation tradability gates as explicit roadmap deviations.
+- Evidence paths: `138c8b7`; `docs/context/e2e_evidence/pead_m7f1_v5_2019_crsp_vertical.json`; residual BLOCK 7/2448.
+
+## 2026-07-12 M7F2-v6-final Outcome Envelope
+
+- Mistake or miss: M7F1-v5.2 claimed map unused for selection and closed with ADVISORY_PASS (validator-invalid); residual 7 invalids mixed pre-entry delist, bridgeable blanks, and genuine ambiguities.
+- Root cause: metadata honesty lag; residual policy deferred; SAW verdict enum not PASS/BLOCK.
+- Fix applied: M7F2-v6-final hard replace — pre-entry exclude before Q5, blank one-day bridge, strict BLOCK + neutral carry + write-down envelope, map used_for_selection=true; SAW may PASS diagnostic with strict_curve BLOCKED.
+- Guardrail for next time: never claim identity maps unused for selection; residual dispositions are structural rules not event-id lists; SAW verdict only PASS or BLOCK; neutral carry is not a finite upper bound.
+- Evidence: scripts/pead_m7f2_v6_2019_crsp_vertical.py; docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json; tests 19/19.
+
+## 2026-07-13 Round Entry (Residual Evidence Branch Must Be Executed Before Full Scan)
+- Date: 2026-07-13
+- Mistake or miss: The A2 focused suite passed 44/44, but the first full Slice 2 run failed after the expensive CRSP scans because the residual-evidence branch referenced undefined `selected_event_ids` instead of the verified selection contract.
+- Root cause: Tests covered the selection-lock helper and pre-write ordering, but no tiny end-to-end test executed the real `bad` residual branch through evidence and manifest publication.
+- Fix applied: Replaced the stale count reference with `selection_contract["n_selected_events"]`, added a deterministic real residual-evidence regression, removed all failed-run partial outputs, committed A2.1 at `b4d35e1`, reran from a fresh clean worktree, independently audited the published parquets and identities, and banked Commit B at `9f37745`.
+- Guardrail for next time: Every expensive data runner must have a small end-to-end regression for each terminal publication branch, including residual/BLOCK evidence, before a full-file scan is authorized; helper-only tests do not prove branch publication safety.
+- Evidence paths: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_daily_returns.parquet.manifest.json`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_event_ledger.parquet.manifest.json`.

@@ -1,5 +1,183 @@
 # Planner Packet - Current
 
+## New Context Packet — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+## What Was Done
+
+- Commit A `c5a9ab8` banked the M7F5-ID0 dated-identifier authority gate, requiring an exact semantics envelope and a reachable, unchanged committed `docs/authorization/*.json` data-owner approval blob.
+- Commit B `410d0ca` banked deterministic current-source BLOCK evidence; truth repair `a51f349` distinguishes runtime/check-out evidence SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903` from committed Git-blob evidence SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- Independent Reviewer A/B/C PASS and terminal SAW `398732c` PASS for the bounded BLOCK evidence gate.
+
+## What Is Locked
+
+- Current source status is `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`; reason `committed_git_blob_data_owner_approval_required`.
+- The 21,882-event pre-identity D1 universe and both canonical hashes remain locked; operational authorities for acquisition, provider access, mapping artifact generation, portfolio/curve execution, and readiness promotion are false.
+- M7F4-v8 remains diagnostic history; no strict PIT/as-of identity, alpha, tradability, Strategy/UI, provider, publication, or dispatch authority is created.
+
+## What Is Next
+
+Choose exactly one separately authorized owner decision: obtain a genuine effective-dated source plus committed data-owner approval, authorize historical identifier acquisition, or terminate PEAD strict-PIT work.
+
+## First Command
+
+```text
+git show --stat --oneline HEAD
+```
+
+## End Context Packet
+
+## Prior Context Packet — M7F4-v8 Terminal Diagnostic Close (2026-07-13)
+
+## What Was Done
+
+- A2.1 `b4d35e1` repaired only the stale residual-evidence count and added a real publication-branch regression; compile and focused tests pass 45/45.
+- Failed-run partials were removed; the clean unchanged Slice 2 rerun completed without OOM.
+- Commit B `9f37745` banks the evidence JSON and two manifests only. Selection is locked at 2,448 unique events; 2,444 observed, three nonnumeric residuals, one unresolved delist, and two validated bridges.
+- NAV/cost, carried-NAV, no-recapitalization, file-hash, and exact 16-state Shapley checks pass. Three distinct independent Reviewer A/B/C passes are pinned to Commit B.
+- Commit C records the terminal SAW and reconciles the active brief, decision/formula/lesson records, and all seven truth surfaces.
+
+## What Is Locked
+
+- `DIAGNOSTIC_COMPLETE` is not a strict curve pass. The strict curve remains absent/`BLOCKED`; `m6b_data_contract_ready=false`.
+- The CUSIP8 link is source-max-date snapshot identity, not PIT/as-of. No alpha, tradable, Strategy/UI, CCM/provider, publication, or dispatch authority is created.
+- Neutral carry and write-down are named sensitivity legs, not justified finite bounds.
+- The clean rerun does not prove transactional multi-file publication, bounded memory, checkpointing, or portable ignored-Parquet evidence.
+
+## What Is Next
+
+Hold promotion. If work resumes, choose exactly one separately authorized scope: transactional cleanup, bounded/checkpointed execution, portable evidence counters, or historical/as-of data authority.
+
+## First Command
+
+```text
+git show --stat --oneline HEAD
+```
+
+## End Context Packet
+
+## Prior Context Packet — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## New Context Packet — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH DIAGNOSTIC_COMPLETE (2026-07-12)
+
+## What Was Done
+
+- Commit A `bae1f65609b723cc6462d9bbd1967340a0cb3310` / tree `5d3a685e392b21551db25ccda26d5aeb043cd3b0`: m7f3-v7 self-financing engine + tests + brief; v6 CLI retired (exit 2).
+- Daily sequence locked: drifted prior → equity turnover trade → apply RET → close transitions; cash not double-counted; write_down dead zero weight.
+- Bridge price/RET parity tol 1e-4 changes **window status only**; selection set fixed 2448 (sha `caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d`).
+- Commit B `b5c66bc740926fc51294107a8951c2993400203a`: evidence only (no seven-surface reconcile).
+- Full run: DIAGNOSTIC_COMPLETE; strict_curve BLOCKED; ok 2444/2448; invalid 4; bridged 2; first-bad residual sum **0.007208 (~0.721%)**; Shapley 16-state both legs sum-to-gap err≈0; leg turnovers differ.
+- Distinct Reviewer A/B/C PASS; Commit C SAW + seven-surface reconcile.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; snapshot non-PIT; readiness false; research validity ~30; score path ~70–73 diagnostic.
+- Primary strict curve not promoted; no CCM/as-of link; no alpha/tradable/UI.
+- v6 historical evidence retained; v6 executable path inactive.
+
+## What Is Next
+
+Hold readiness/UI/strategy/historical-link/CCM. Optional polish: rename stderr `M7F2_BLOCKED` → `M7F3_BLOCKED`. Do not reopen residual selection policy without owner decision.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f3_v7_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+
+# Planner Packet - Current
+
+## New Context Packet — M7F2-v6-final Outcome Envelope DIAGNOSTIC_COMPLETE (2026-07-12)
+
+## What Was Done
+
+- Commit A `c7724adcaa855076be079c10224ea5cd2f0e60c0` / tree `158a0abe4c41215301fcad9abd83d485c230e778`: hard-replace v5.2 runner/tests/brief with m7f2-v6-final (no compatibility path).
+- Four semantic locks: pre-entry delist exclude before breadth/Q5 + rerank; blank one-day bridge with adjacent price+next RET proof; neutral carry-to-cash + write_down_100pct envelope (not a finite upper bound); map used_for_selection=true (identity).
+- Full 2019 rerun from Commit A: status=DIAGNOSTIC_COMPLETE, strict_curve_status=BLOCKED.
+- Counts: pre_entry_delist_excluded=12; selected=2448; ok=2444; invalid=4; bridged=2; residual reasons={'nonnumeric_selected_window': 3, 'unresolved_delist': 1}.
+- Residual combined approx event-slot share=0.0016339869281045752; envelope legs written for neutral_carry_to_cash and write_down_100pct.
+- Evidence SHA-256 `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a` bound to Commit A.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; non-PIT snapshot link; readiness false; research validity ~30.
+- Primary strict curve not promoted; sensitivity curves are diagnostic only.
+- Event-id allowlists forbidden in production policy (ids only in tests).
+- Do not restore pre-Q5 complete-60 / entry-day return filters.
+
+## What Is Next
+
+Terminal Commit C independent Reviewer A/B/C + SAW PASS allowed for completed diagnostic scope while strict_curve_status remains BLOCKED. Do not open readiness/UI/strategy/historical-link.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f2_v6_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+
+# Planner Packet - Current
+
+## New Context Packet — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+## What Was Done
+
+- Commit A `138c8b76028b2094793efb2d066c269bf7b805f6` / tree `2b7e216056cad76f87b3aaa3ed57ca1be0f23637`: M7F1-v5.2-final code+tests+brief only (clean worktree).
+- Four mandatory edits: prior-20 is explicit roadmap-deviation tradability gate (not map repair); source-wide spine + ≥20 pre-2019 sessions; VOL>0; first/last-date mismatch diagnostic-only; map always rebuilt; stale curve invalidate on BLOCK.
+- Full 2019 rerun from Commit A: durable **BLOCK** — 2448 selected / 2441 OK / 7 invalid (`nonnumeric=5`, `unresolved_delist=1`, `missing_session=1`). Curve not promoted. Prior-20: 15793 ok / 1050 fail.
+- Evidence SHA-256 `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292` bound to Commit A.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; non-PIT snapshot link; readiness false; research validity ~30.
+- Do not restore pre-Q5 complete-60 / entry-day return filters; do not use full-sample max_date for selection.
+- Residual specials/delist are a **delisting-data/policy** gate next — not historical-link yet.
+
+## What Is Next
+
+Owner open bounded delisting-data/policy gate for the 7 residual selected-window invalids only. Terminal Commit C SAW is ADVISORY_PASS (Reviewer A/B/C all PASS).
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f1_v5_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+## Prior Context Packet — C0X → M7F0-v4 (2026-07-12)
+
+## What Was Done
+
+- C0X on branch `c0x/m7f0-v4` from `aee7f4c`: fail-closed dual index/porcelain parsers; deindexed+ignored exactly 41 gitlinks; commit `17cb830`; detached proof worktree planning PASS via primary `.venv`.
+- M7F0-v4 2019 RDQ CRSP Q5 long-only mechanical vertical executed with v4 contract locks; evidence + tracked parquet manifest published.
+- Invalid C0A closure commits abandoned (not repaired).
+
+## What Is Locked
+
+- `link_model=current_snapshot_cusip8`; `as_of_link=false`; research-only; `m6b_data_contract_ready=false`.
+- No D2B/M6 portfolio reuse; no alpha/tradable; no WRDS login.
+
+## What Is Next
+
+Owner accept mechanical M7F0-v4 evidence under research-validity ceiling ~30, or authorize separate as-of link work. Do not run C0B as a phase.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4	ests	est_pead_m7f0_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+# Planner Packet - Current
+
 ## New Context Packet — Request Artifact Identity Truth Reconciliation V1
 
 ## What Was Done

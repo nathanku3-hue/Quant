@@ -1,0 +1,114 @@
+{
+    "envelope_id":  "PEAD_M7F4_V8_REVIEWED_PARQUET_CONTENT_ENVELOPE_20260713",
+    "round_id":  "ROUND-20260713-M7F4-V8-REPOSITORY-CLOSE",
+    "scope_id":  "M7F4_V8_REVIEWED_PARQUET_CONTENT_ENVELOPE",
+    "artifact_type":  "repo_relative_content_addressed_parquet_envelope",
+    "status":  "VERIFIED_DETACHED_BINDING",
+    "authority":  "byte-preservation and repository-closure evidence only; no rerun, research-validity promotion, strict-curve pass, readiness, provider access, Strategy/UI, publication, or M7F5 execution authority",
+    "binding_model":  {
+                          "type":  "decoded_sha256_content_addressing",
+                          "storage_encoding":  "base64_chunked_ascii",
+                          "chunk_order":  "lexicographic_part_number",
+                          "decoded_bytes_are_authoritative":  true,
+                          "rule":  "Concatenate each artifact\u0027s listed base64 parts in order, decode once, and require the decoded byte count and SHA-256 to match this envelope."
+                      },
+    "reviewed_repository_identity":  {
+                                         "canonical_remote":  "https://github.com/nathanku3-hue/Quant.git",
+                                         "repository_root":  "E:/Code/Quant",
+                                         "branch_to_anchor":  "c0x/m7f4-v8",
+                                         "branch_observed_before_repair":  "dd80c46b398ac16a6a39569d9e174ab2f77dddd2",
+                                         "reviewed_close_commit":  "824fadb05a749fe556c9f01a30cb531d71232538",
+                                         "reviewed_close_tree":  "37e6296c8e48c62026be15975ce044972b55b1e4",
+                                         "implementation_commit":  "b4d35e1d5eb3218b180c90938006d22df532fe8c",
+                                         "commit_b_evidence_commit":  "9f37745a114691e0fb67c681816536ca1f014bb3"
+                                     },
+    "artifacts":  [
+                      {
+                          "artifact_role":  "daily_returns_neutral_carry_to_cash",
+                          "format":  "Parquet",
+                          "original_repo_relative_path":  "data/processed/pead_m7f4_v8_2019_daily_returns_neutral_carry_to_cash.parquet",
+                          "object_directory":  "docs/context/e2e_evidence/artifact_envelopes/m7f4_v8/objects/sha256/86b1e21e9c458eadf97a1e81a651913627f6241e511c00d47050b780871ba1db",
+                          "decoded_sha256":  "86b1e21e9c458eadf97a1e81a651913627f6241e511c00d47050b780871ba1db",
+                          "decoded_byte_size":  85489,
+                          "part_count":  3,
+                          "parts":  [
+                                        "part-00000.b64",
+                                        "part-00001.b64",
+                                        "part-00002.b64"
+                                    ]
+                      },
+                      {
+                          "artifact_role":  "daily_returns_write_down_100pct",
+                          "format":  "Parquet",
+                          "original_repo_relative_path":  "data/processed/pead_m7f4_v8_2019_daily_returns_write_down_100pct.parquet",
+                          "object_directory":  "docs/context/e2e_evidence/artifact_envelopes/m7f4_v8/objects/sha256/6ba20ad17a2c3a3ca4f465b406396933d574467161342d1bf18a8463a2f67baa",
+                          "decoded_sha256":  "6ba20ad17a2c3a3ca4f465b406396933d574467161342d1bf18a8463a2f67baa",
+                          "decoded_byte_size":  85517,
+                          "part_count":  3,
+                          "parts":  [
+                                        "part-00000.b64",
+                                        "part-00001.b64",
+                                        "part-00002.b64"
+                                    ]
+                      },
+                      {
+                          "artifact_role":  "event_ledger",
+                          "format":  "Parquet",
+                          "original_repo_relative_path":  "data/processed/pead_m7f4_v8_2019_event_ledger.parquet",
+                          "object_directory":  "docs/context/e2e_evidence/artifact_envelopes/m7f4_v8/objects/sha256/d24ab0e6939be657bfeb12a7bcce10fecb097f493ef760a9d9d9d6918de877e3",
+                          "decoded_sha256":  "d24ab0e6939be657bfeb12a7bcce10fecb097f493ef760a9d9d9d6918de877e3",
+                          "decoded_byte_size":  155996,
+                          "part_count":  5,
+                          "parts":  [
+                                        "part-00000.b64",
+                                        "part-00001.b64",
+                                        "part-00002.b64",
+                                        "part-00003.b64",
+                                        "part-00004.b64"
+                                    ]
+                      },
+                      {
+                          "artifact_role":  "crsp_cusip8_permno_source_max_date_identity_map",
+                          "format":  "Parquet",
+                          "original_repo_relative_path":  "data/processed/pead_m7f4_v8_crsp_cusip8_permno_source_max_date.parquet",
+                          "object_directory":  "docs/context/e2e_evidence/artifact_envelopes/m7f4_v8/objects/sha256/d07b0dd991f7c3466a2fd943f2fae7208a8e1f110ada064bf1073a0c52b313a2",
+                          "decoded_sha256":  "d07b0dd991f7c3466a2fd943f2fae7208a8e1f110ada064bf1073a0c52b313a2",
+                          "decoded_byte_size":  390494,
+                          "part_count":  11,
+                          "parts":  [
+                                        "part-00000.b64",
+                                        "part-00001.b64",
+                                        "part-00002.b64",
+                                        "part-00003.b64",
+                                        "part-00004.b64",
+                                        "part-00005.b64",
+                                        "part-00006.b64",
+                                        "part-00007.b64",
+                                        "part-00008.b64",
+                                        "part-00009.b64",
+                                        "part-00010.b64"
+                                    ]
+                      }
+                  ],
+    "closure_state":  {
+                          "exact_source_hashes_verified":  true,
+                          "source_files_rerun":  false,
+                          "encoded_objects_written":  true,
+                          "decoded_object_hashes_verified":  true,
+                          "branch_fast_forwarded_to_reviewed_close_commit":  true,
+                          "envelope_committed":  "ESTABLISHED_BY_CONTAINING_GIT_COMMIT",
+                          "repository_close":  "PASS_WHEN_READ_FROM_CONTAINING_GIT_COMMIT"
+                      },
+    "forbidden_scope":  [
+                            "m7f4_rerun",
+                            "selection_change",
+                            "accounting_change",
+                            "residual_policy_change",
+                            "provider_or_wrds_access",
+                            "strict_curve_promotion",
+                            "readiness_promotion",
+                            "strategy_or_frontend_work",
+                            "parallel_compatibility_path"
+                        ],
+    "commit_binding_rule":  "The containing Git commit is the detached envelope commit. The envelope binds the earlier reviewed close commit/tree and the four decoded SHA-256 objects; it intentionally does not embed its own containing commit ID."
+}

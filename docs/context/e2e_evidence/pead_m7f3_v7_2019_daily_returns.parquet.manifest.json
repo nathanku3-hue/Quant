@@ -1,0 +1,39 @@
+{
+  "artifact": null,
+  "atomic_write": true,
+  "block_reason": "selected_window_invalid:nonnumeric_selected_window=3,unresolved_delist=1",
+  "curve_promoted": false,
+  "curve_status": "ABSENT",
+  "cusip_map": "E:/Code/Quant/data/processed/pead_m7f3_v7_crsp_cusip8_permno_source_max_date.parquet",
+  "cusip_map_sha256": "d07b0dd991f7c3466a2fd943f2fae7208a8e1f110ada064bf1073a0c52b313a2",
+  "event_ledger": "E:/Code/Quant/data/processed/pead_m7f3_v7_2019_event_ledger.parquet",
+  "event_ledger_sha256": "a8b37ed948f135fe115003beddd5109f5de7269e09b3134cb3b69f643de0fa59",
+  "evidence_json": "E:/Code/Quant_c0x_m7f0_v4/docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json",
+  "evidence_sha256": "49c594c8ac6e71d50dcc6f021e9e3ee5af29a4ca68717b72a90cbab11c00b488",
+  "generated_at_utc": "2026-07-12T11:33:32Z",
+  "implementation_commit": "bae1f65609b723cc6462d9bbd1967340a0cb3310",
+  "implementation_tree": "5d3a685e392b21551db25ccda26d5aeb043cd3b0",
+  "logical_identity_sha256": "3d64e0b3fa8ea830d0dc602e296159bce4e2cecfcda11b4ccf458bca815ab50a",
+  "outcome_envelope": {
+    "neutral_carry_to_cash": {
+      "parquet": "E:/Code/Quant/data/processed/pead_m7f3_v7_2019_daily_returns_neutral_carry_to_cash.parquet",
+      "sha256": "6d3c583522e2290ee56dc8dfdad0a3fbd7820188c65eb5df404cf073badb417f",
+      "status": "written"
+    },
+    "write_down_100pct": {
+      "parquet": "E:/Code/Quant/data/processed/pead_m7f3_v7_2019_daily_returns_write_down_100pct.parquet",
+      "sha256": "e3ce68d9a0d21457145e9e92f2dfd30166438d7c6bb786770814bc80e7c2e5f8",
+      "status": "written"
+    }
+  },
+  "rows": 0,
+  "sha256": null,
+  "stale_curve_invalidation": {
+    "invalidated": false,
+    "path": "E:/Code/Quant/data/processed/pead_m7f3_v7_2019_daily_returns.parquet",
+    "prior_sha256": null,
+    "reason": "no_file"
+  },
+  "status": "DIAGNOSTIC_COMPLETE",
+  "strict_curve_status": "BLOCKED"
+}

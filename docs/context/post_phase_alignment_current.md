@@ -1,3 +1,44 @@
+# Post-Phase Alignment - Current
+
+## Active Addendum — M7F5-ID0 terminal provenance block (2026-07-14)
+
+- **Data/Research:** Commit A `c5a9ab8`, Commit B `410d0ca`, truth repair `a51f349`, and terminal SAW `398732c` are complete; current source remains blocked by missing committed data-owner approval for dated identifier authority.
+- **Docs/Ops:** Active brief, BLOCK evidence, reviewer evidence, terminal SAW, and seven truth surfaces are reconciled to `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`.
+- **Strategy/UI:** Held; no mapping, curve rerun, promotion, readiness, or action surface.
+- **Current bottleneck:** No blocker for closing the M7F5-ID0 gate itself. Higher validity requires a separately authorized effective-dated source/acquisition/approval decision.
+- **Next active stream:** None by default. Choose one bounded owner decision before execution.
+
+## Prior Addendum — M7F4-v8 terminal diagnostic close (2026-07-13)
+
+- **Data/Research:** A2.1 repair, clean rerun, Commit B `9f37745` evidence, and independent A/B/C review are complete; strict curve remains `BLOCKED` by four outcome-ambiguous windows.
+- **Docs/Ops:** Active brief, reviewer evidence, terminal SAW, decision/formula/lesson records, and seven truth surfaces are reconciled in Commit C.
+- **Strategy/UI:** Held; no promotion or readiness surface.
+- **Current bottleneck:** No blocker for diagnostic closure. Higher validity still requires a separately authorized PIT/as-of identity path; operational hardening remains separate.
+- **Next active stream:** None by default. Choose one bounded authorized scope before execution.
+
+## Prior Addendum — M7F3-v7 close
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## Active Addendum — M7F3-v7 close (2026-07-12)
+
+- **Data stream:** DIAGNOSTIC_COMPLETE with self-financing truth; bottleneck remains residual 4 windows + snapshot non-PIT ceiling.
+- **Strategy/UI:** Held.
+- **Bottleneck:** Not mechanical turnover/attribution (closed in v7); residual outcome policy + link PIT for any higher research validity.
+- **Next:** Hold readiness; do not open CCM.
+
+
+# Post-Phase Alignment - Current
+
+## Active Addendum — M7F2-v6-final (2026-07-12)
+
+- What changed: Hard-replaced M7F1-v5.2 with M7F2-v6-final outcome envelope (pre-entry exclude, blank bridge, dual sensitivity legs, map selection honesty).
+- Stream status update: Data/Research diagnostic package written; Docs/Ops truth refresh in Commit B; Strategy/UI held.
+- Evidence: Commit A `c7724adcaa85`; evidence SHA `58f84cd64e31a41e…`; selected ok 2444; residual 4; bridged 2.
+- Current bottleneck: terminal independent Reviewer A/B/C + SAW validators for diagnostic PASS with strict curve BLOCKED.
+- Next active stream: Docs/Ops Commit C SAW; no readiness/strategy/UI work.
+
+
 # Post-Phase Alignment - Phase 65 G8.2
 
 ## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)

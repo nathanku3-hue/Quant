@@ -1,6 +1,88 @@
+# Done Checklist - Current
+
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- [x] Commit A `c5a9ab8` banked the standalone M7F5-ID0 authority gate, focused tests, and active brief.
+- [x] Commit B `410d0ca` banked deterministic current-source BLOCK evidence at `docs/context/e2e_evidence/pead_m7f5_id0_dated_identifier_authority_20260714.json`.
+- [x] Truth repair `a51f349` records runtime/check-out evidence SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903` and committed Git-blob evidence SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- [x] Independent Reviewer A/B/C PASS and terminal SAW `398732c` PASS for the bounded provenance BLOCK gate.
+- [x] Current result: `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED` with reason `committed_git_blob_data_owner_approval_required`; all operational authorities remain false.
+- [ ] Effective-dated source acquisition, committed data-owner approval, mapping generation, curve rerun, readiness promotion, Strategy/UI, and provider access — outside this close and blocked/unopened.
+
+Next action: hold promotion; choose exactly one separately authorized owner decision.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- [x] A2.1 repair banked at `b4d35e1`: verified selection count used by residual evidence; real publication branch regression added.
+- [x] Failed-run partial outputs removed before the fresh clean rerun.
+- [x] Compile and focused tests 45/45 PASS; clean rerun completed without OOM.
+- [x] Commit B `9f37745` contains only evidence JSON and two manifests.
+- [x] Selection lock: 2,448 unique events with both required hashes; 2,444 observed + 4 residual.
+- [x] Bridge 2/2 PASS; NAV/cost, carried-NAV, no-recapitalization, file-hash, and exact Shapley checks PASS.
+- [x] Independent Reviewer A/B/C PASS with distinct identities and exact Commit B pin.
+- [x] Decision/formula/lesson records, terminal SAW, active brief, and seven truth surfaces reconciled.
+- [x] `strict_curve_status=BLOCKED`; `m6b_data_contract_ready=false`; no alpha/tradable/PIT-as-of claim.
+- [ ] Strict primary curve, PIT/as-of link, generalized OOM recovery, and transactional publication — outside this close and blocked/unopened.
+
+Next action: hold promotion; choose exactly one separately authorized next decision.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- [x] Owner GO with deltas recorded (daily sequence, first-bad residual, dead write-down, cash no double-count, Shapley-16, selection hash, v6 path removed, Commit C truth).
+- [x] Commit A code/tests/brief + v6 CLI retire: `bae1f65609b723cc6462d9bbd1967340a0cb3310`.
+- [x] Focused tests 24/24 PASS.
+- [x] Full 2019 rerun DIAGNOSTIC_COMPLETE; selection 2448 hash `caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d`.
+- [x] first-bad residual sum 0.007208; Shapley 16-state sum-to-gap; legs differ in turnover/cost.
+- [x] Commit B evidence only: `b5c66bc740926fc51294107a8951c2993400203a` (no full truth in B).
+- [x] Distinct Reviewer A/B/C PASS.
+- [x] Commit C SAW + seven-surface reconcile.
+- [x] `m6b_data_contract_ready=false`; strict_curve BLOCKED; no CCM.
+- [ ] Strict primary curve PASS; readiness/UI/alpha/as-of link — blocked by design.
+
+## Prior Addendum — M7F2-v6-final (superseded as active close)
+
+- Historical v6 diagnostic retained; not valid 70–74 close (audit 61). Executable path retired.
+
+
+# Done Checklist - Current
+
+## Active Addendum — M7F2-v6-final (2026-07-12)
+
+- [x] Hard-rename/replace v5 runner/tests/brief with m7f2-v6-final (no compatibility path).
+- [x] Pre-entry delist exclude before breadth/Q5 + rerank (structural; no event-id policy).
+- [x] Bridge blank post-entry one-session gaps with adjacent price + next RET proof only.
+- [x] Emit strict BLOCK + neutral_carry_to_cash + write_down_100pct with per-event attribution.
+- [x] Map metadata: used_for_selection=true (identity); future_informed_identity_map=true.
+- [x] Unit tests PASS (19/19).
+- [x] Commit A code/tests/brief: `c7724adcaa855076be079c10224ea5cd2f0e60c0`.
+- [x] Full 2019 rerun from Commit A: DIAGNOSTIC_COMPLETE; strict_curve_status=BLOCKED.
+- [x] Evidence SHA-256 `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a`.
+- [x] All seven truth surfaces refreshed (this Commit B).
+- [x] Terminal independent Reviewer A/B/C + validated SAW C.
+- [ ] Curve PASS 68-72 primary; not claimed (strict BLOCKED by residual ambiguities).
+- Next action: Commit C A/B/C + SAW PASS (diagnostic scope) with strict_curve BLOCKED.
+
+
 # Done Checklist - Phase 65 G8.2 System-Scouted Candidate Card
 
-## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+## Active Addendum — M7F1-v5.2-final (2026-07-12)
+
+- [x] Four mandatory edits applied: prior-20 roadmap deviation; source-wide spine + pre-2019 load; VOL>0; first/last diagnostic-only; force map rebuild; stale curve invalidate.
+- [x] Clean Commit A code/tests/brief only: `138c8b76028b2094793efb2d066c269bf7b805f6`.
+- [x] Unit tests 17/17 PASS at Commit A.
+- [x] Full 2019 rerun from Commit A with forced map rebuild.
+- [x] Evidence bound to Commit A; curve not promoted; residual BLOCK 7/2448 recorded.
+- [x] Commit B evidence + truth surfaces: `8740f57763fafc838b07b9bedcf2a593a0787351`.
+- [x] Commit C full independent Reviewer A/B/C + SAW pinned to B (ADVISORY_PASS).
+- [ ] Residual delisting-data/policy gate authorized/executed.
+- [ ] Curve PASS 68–72; not achieved (durable residual BLOCK ~62).
+- Next action: owner open bounded delisting-data/policy gate for 7 residual invalids only.
+
+## Prior Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - [x] Original Reviewer A/B/C BLOCK findings accepted: dispatch identity at `e470137` failed because the four current 20260701 request artifacts were absent.
 - [x] False dispatch Markdown, JSON, and dependent PASS report quarantined as `INVALID_NOT_DISPATCHED`; no message is proven sent.

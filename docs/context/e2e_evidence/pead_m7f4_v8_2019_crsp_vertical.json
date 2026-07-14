@@ -1,0 +1,599 @@
+{
+  "artifact_name": "pead_m7f4_v8_2019_crsp_vertical",
+  "authority": "flagged research mechanical vertical only; not strict M6b readiness; not alpha; not tradable; not as-of/PIT CUSIP link",
+  "block_reason": "selected_window_invalid:nonnumeric_selected_window=3,unresolved_delist=1",
+  "bridge_parity_summary": {
+    "max_abs_err": 5.553157040871781e-07,
+    "n_attempts": 2,
+    "n_fail": 0,
+    "n_ok": 2,
+    "records": [
+      {
+        "event_id": "020010|2019-10-28|14645",
+        "gap_prc": null,
+        "gap_session": "2019-10-30",
+        "next_prc": 1.2,
+        "next_ret": 2.237993,
+        "parity_abs_err": 5.553157040871781e-07,
+        "parity_ok": true,
+        "prev_prc": 0.3706,
+        "tol": 0.0001
+      },
+      {
+        "event_id": "140044|2019-11-04|88626",
+        "gap_prc": null,
+        "gap_session": "2020-01-16",
+        "next_prc": 2.51,
+        "next_ret": -0.011811,
+        "parity_abs_err": 2.362204733381834e-08,
+        "parity_ok": true,
+        "prev_prc": 2.54,
+        "tol": 0.0001
+      }
+    ],
+    "tol": 0.0001
+  },
+  "claim_ceiling": {
+    "as_of_link": false,
+    "evidence_tier": "M6B_FLAGGED_BEST_AVAILABLE_RESEARCH",
+    "link_model": "cross_vintage_snapshot_cusip8_non_pit",
+    "m6b_data_contract_ready": false,
+    "not_alpha": true,
+    "not_tradable_claim": true,
+    "pit_link": false,
+    "research_use_only": true,
+    "research_validity_ceiling_note": "snapshot_link_ceiling_approx_30_of_100",
+    "usable_for_alpha_inference": false,
+    "usable_for_strategy_promotion": false
+  },
+  "contract": {
+    "bridge_rule": "blank_post_entry_one_session_gap_only_when_adjacent_price_ret_parity_within_tol",
+    "cohort": "RDQ calendar year 2019",
+    "cost_formula": "open_cost_dollars=0.00075*actual_post_cost_equity_trade_dollars_fixed_point; close_cost_dollars=0.00075*close_equity_trade_dollars; terminal_cost_dollars=0.00075*terminal_equity_trade_dollars; daily_pre_cost_gross=nav_after_ret/nav_after_open_cost-1; daily_net=nav_end/nav_open-1",
+    "cost_split": "open_actual_equity_trade_dollars_plus_close_equity_exits_plus_terminal_equity_only",
+    "day_plus_1": "first_crsp_session_strictly_after_rdq",
+    "day_plus_1_included_in_window": true,
+    "dedup": "one_event_per_formation_date_permno_highest_sue",
+    "delist_day_return": "(1+RET)*(1+DLRET)-1 or DLRET if RET blank; then cash slot r=0 remainder",
+    "filter_order": [
+      "unique_permno_map",
+      "assign_formation_entry_source_wide_spine_only_no_return_filter",
+      "dedup_one_event_per_formation_date_permno",
+      "pre_q5_prior20_observability_tradability_gate",
+      "exclude_pre_entry_delist_before_breadth_q5",
+      "formation_breadth_distinct_permno_ge_50",
+      "deterministic_q5_rerank",
+      "suppress_later_event_on_entry_overlap",
+      "resolve_selected_windows_bridge_blank_one_day",
+      "outcome_envelope_if_residual_ambiguous",
+      "equal_weight_active_slots_incl_cash"
+    ],
+    "formation_min_distinct_permnos": 50,
+    "global_idle_cash_policy": "explicit_global_idle_cash_preserves_nav_when_no_active_slots",
+    "holding_sessions": 60,
+    "locked_selection_contract": {
+      "locked_contract_verified": true,
+      "n_selected_events": 2448,
+      "n_unique_selected_event_ids": 2448,
+      "selected_canonical_rows_sha256": "7f336eefaf7de6840a907a94361297111a2abc66702ad41b0aa0733016435749",
+      "selected_event_set_sha256": "caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d"
+    },
+    "min_active_final_liquidation_exempt": true,
+    "min_active_slots": 10,
+    "nav_cost_policy": "fixed_point_open_trade_parity_then_scale_all_post_cost_nav",
+    "nonnumeric_scope": "selected_windows_only_block_run",
+    "one_way_cost": 0.00075,
+    "outcome_envelope_legs": [
+      "strict_block",
+      "neutral_carry_to_cash",
+      "write_down_100pct"
+    ],
+    "overlap": "suppress_later_event_entirely_when_entry_overlaps_earlier_60_session_claim",
+    "panel_load": {
+      "n_pre_cohort_sessions_available": 4797,
+      "n_pre_cohort_sessions_loaded": 20,
+      "panel_end": "2020-12-31",
+      "panel_start": "2018-11-30",
+      "spine_max": "2024-12-31",
+      "spine_min": "2000-01-03",
+      "spine_n_sessions": 6310
+    },
+    "posthoc_diagnostics_only": [
+      "panel_first_date",
+      "panel_last_date",
+      "first_last_date_mismatch_vs_rdq"
+    ],
+    "pre_entry_delist_rule": "exclude_before_breadth_q5_if_dlstcd_ge_200_on_any_session_strictly_before_entry",
+    "prior20_min_ok": 15,
+    "prior20_rule": "finite_RET_and_abs_PRC_gt_0_and_VOL_gt_0",
+    "prior20_sessions": 20,
+    "roadmap_deviation": "prior20_formation_tradability_restriction_not_map_repair: >=15/20 strictly pre-entry sessions require finite RET, abs(PRC)>0, VOL>0",
+    "selection_uses_entry_day_return": false,
+    "selection_uses_full_sample_max_date": false,
+    "selection_uses_future_window": false,
+    "session_spine": "source_wide_distinct_crsp_dates",
+    "weights": "equal_weight_active_slots_including_post_delist_cash"
+  },
+  "counts": {
+    "ambiguous_events": 729,
+    "d1_valid_2019_events": 21882,
+    "dedup_dropped_same_formation_permno": 0,
+    "events_after_breadth": 13214,
+    "formation_dates_ge_50": 88,
+    "formation_no_entry": 0,
+    "n_bridged_windows": 2,
+    "n_selected_event_set": 2448,
+    "n_selected_events": 2448,
+    "n_selected_invalid_windows": 4,
+    "n_selected_ok_windows": 2444,
+    "portfolio": null,
+    "posthoc_first_last_diagnostics": {
+      "invalid_with_no_panel_dates": 0,
+      "invalid_with_panel_coverage_ok": 4,
+      "invalid_with_panel_first_after_rdq": 0,
+      "invalid_with_panel_last_before_rdq": 0
+    },
+    "pre_entry_delist_excluded": 12,
+    "pre_entry_delist_kept": 15781,
+    "pre_q5_missing_permno_panel": 670,
+    "pre_q5_prior20_fail": 1050,
+    "pre_q5_prior20_insufficient_calendar": 0,
+    "pre_q5_prior20_lt_15": 380,
+    "pre_q5_prior20_ok": 15793,
+    "q5_events_after_overlap": 2448,
+    "q5_events_before_overlap": 2612,
+    "selected_canonical_rows_sha256": "7f336eefaf7de6840a907a94361297111a2abc66702ad41b0aa0733016435749",
+    "selected_event_set_sha256": "caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d",
+    "selected_invalid_reason_counts": {
+      "nonnumeric_selected_window": 3,
+      "unresolved_delist": 1
+    },
+    "selected_window_status_counts": {
+      "nonnumeric_selected_window": 3,
+      "ok": 2444,
+      "unresolved_delist": 1
+    },
+    "suppressed_entry_overlap": 164,
+    "unique_mapped_events": 16843,
+    "unique_permnos_after_breadth": 3953,
+    "unique_permnos_mapped": 4459,
+    "unique_permnos_q5": 1684,
+    "unique_permnos_selected": 1684,
+    "unmapped_events": 4310
+  },
+  "generated_at_utc": "2026-07-13T10:06:12Z",
+  "honest_selected_window_block": true,
+  "implementation_identity": {
+    "branch_ref": null,
+    "code_hash_authority": "git_blob",
+    "code_hash_fallback": null,
+    "code_normalized_worktree_matches_git_blob": true,
+    "code_path": "C:/Users/Lenovo/.devspace/worktrees/Quant_c0x_m7f4_v8-f9d9908f/scripts/pead_m7f4_v8_2019_crsp_vertical.py",
+    "code_rel_path": "scripts/pead_m7f4_v8_2019_crsp_vertical.py",
+    "code_sha256": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+    "code_sha256_git_blob": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+    "code_sha256_normalized_git_blob": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+    "code_sha256_normalized_worktree": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+    "code_sha256_worktree": "8bd4191a0ff8036fe685edc133f5b0f99e8f1c84bd0dc92e0ddb2ab55763c82e",
+    "commit": "b4d35e1d5eb3218b180c90938006d22df532fe8c",
+    "config": {
+      "attribution_method": "exact_16_state_shapley_four_residuals",
+      "bridge_price_ret_parity_abs_tol": 0.0001,
+      "bridge_rule": "blank_post_entry_one_session_gap_only_when_adjacent_price_ret_parity_within_tol",
+      "cohort_year": 2019,
+      "cost_split": "open_actual_equity_trade_dollars_plus_close_equity_exits_plus_terminal_equity_only",
+      "daily_sequence": "open_equity_cash_dollar_state->charge_open_equity_L1->scale_all_allocate_targets_from_reduced_NAV->apply_RET->charge_close_equity_exits->scale_all->terminal_equity_only_liquidation->daily_return_from_NAV_ratio",
+      "dedup": "one_event_per_formation_date_permno",
+      "global_idle_cash_policy": "explicit_global_idle_cash_preserves_nav_when_no_active_slots",
+      "holding_sessions": 60,
+      "implementation_version": "m7f4-v8",
+      "link_model": "cross_vintage_snapshot_cusip8_non_pit",
+      "map_always_rebuilt": true,
+      "map_selection_role": "identity_cusip8_to_permno_eligibility",
+      "map_used_for_selection": true,
+      "min_active_slots": 10,
+      "min_formation_names": 50,
+      "min_prior_ok": 15,
+      "nav_cost_policy": "fixed_point_open_trade_parity_then_scale_all_post_cost_nav",
+      "net_return": "nav_end/nav_open-1",
+      "one_way_cost": 0.00075,
+      "open_cost_fixed_point_max_iter": 128,
+      "open_cost_fixed_point_tol": 1e-14,
+      "outcome_envelope_legs": [
+        "strict_block",
+        "neutral_carry_to_cash",
+        "write_down_100pct"
+      ],
+      "overlap": "suppress_later_event_entirely_on_entry_overlap",
+      "pre_cost_gross_return": "nav_after_ret/nav_after_open_cost-1",
+      "pre_entry_delist_rule": "exclude_before_breadth_q5_if_dlstcd_ge_200_on_any_session_strictly_before_entry",
+      "prior20_requires_abs_prc_gt_0": true,
+      "prior20_requires_finite_ret": true,
+      "prior20_requires_vol_gt_0": true,
+      "prior_sessions": 20,
+      "residual_exposure_metric": "summed_first_bad_date_target_weight",
+      "roadmap_deviation": "prior20_formation_tradability_restriction_not_map_repair: >=15/20 strictly pre-entry sessions require finite RET, abs(PRC)>0, VOL>0",
+      "selection_uses_entry_day_return": false,
+      "selection_uses_full_sample_max_date": false,
+      "selection_uses_future_window": false,
+      "session_spine": "source_wide_distinct_crsp_dates",
+      "weights": "equal_weight_active_slots_including_post_delist_cash"
+    },
+    "config_sha256": "d74f0747cee04cf6109a58e862beaecb60fa888a57041634fe9af729cc0eb33e",
+    "detached": true,
+    "detached_proof_mode": true,
+    "git_common_dir": "E:\\Code\\Quant\\.git",
+    "git_dir": "E:\\Code\\Quant\\.git\\worktrees\\Quant_c0x_m7f4_v8-f9d9908f",
+    "logical_identity": {
+      "artifact_name": "pead_m7f4_v8_2019_crsp_vertical",
+      "code_sha256": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+      "commit": "b4d35e1d5eb3218b180c90938006d22df532fe8c",
+      "config_sha256": "d74f0747cee04cf6109a58e862beaecb60fa888a57041634fe9af729cc0eb33e",
+      "git_common_dir": "E:\\Code\\Quant\\.git",
+      "git_dir": "E:\\Code\\Quant\\.git\\worktrees\\Quant_c0x_m7f4_v8-f9d9908f",
+      "implementation_version": "m7f4-v8",
+      "repo_root": "C:\\Users\\Lenovo\\.devspace\\worktrees\\Quant_c0x_m7f4_v8-f9d9908f",
+      "round_id": "ROUND-20260712-M7F4-V8-EXACT-SELF-FINANCING-IDENTITY",
+      "scope_id": "M7F4_V8_EXACT_SELF_FINANCING_IDENTITY",
+      "tree": "471e456505c53d623756d5fe7db2d9af4ed08d0b"
+    },
+    "logical_identity_sha256": "5d61e48b04f94c524560e08797aedc4cd0393bf81f6c1859451110cac2ad3b4b",
+    "proof_authority": "explicit_detached_proof_mode",
+    "replacement_refs_rejected": true,
+    "repo_root": "C:\\Users\\Lenovo\\.devspace\\worktrees\\Quant_c0x_m7f4_v8-f9d9908f",
+    "tree": "471e456505c53d623756d5fe7db2d9af4ed08d0b"
+  },
+  "lineage": {
+    "crsp_path": "E:/Code/Quant/data/hkcj1itkyvfsmibz.csv",
+    "cusip_map_path": "C:/Users/Lenovo/.devspace/worktrees/Quant_c0x_m7f4_v8-f9d9908f/data/processed/pead_m7f4_v8_crsp_cusip8_permno_source_max_date.parquet",
+    "d1_path": "E:/Code/Quant/data/processed/pead_d1_sue_signal.parquet",
+    "daily_parquet_path": null,
+    "event_ledger_path": "C:/Users/Lenovo/.devspace/worktrees/Quant_c0x_m7f4_v8-f9d9908f/data/processed/pead_m7f4_v8_2019_event_ledger.parquet",
+    "hashes": {
+      "code_hash_authority": "git_blob",
+      "code_hash_fallback": null,
+      "code_normalized_worktree_matches_git_blob": true,
+      "code_sha256": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+      "code_sha256_git_blob": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+      "code_sha256_normalized_git_blob": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+      "code_sha256_normalized_worktree": "da7c0776098e77b126ca8cbace363acb215ea39a900a53b4837b9e7553559d13",
+      "code_sha256_worktree": "8bd4191a0ff8036fe685edc133f5b0f99e8f1c84bd0dc92e0ddb2ab55763c82e",
+      "config_sha256": "d74f0747cee04cf6109a58e862beaecb60fa888a57041634fe9af729cc0eb33e",
+      "crsp_sha256": "6dce514f45e0ede7205efc4bda83f79b9d4c269afe2777328dc5b8d2aae9608d",
+      "cusip_permno_map_sha256": "d07b0dd991f7c3466a2fd943f2fae7208a8e1f110ada064bf1073a0c52b313a2",
+      "d1_sha256": "81b2689b48943373f58586ddc382fb609dbce022cde93d4d502333cae5541855",
+      "daily_parquet_sha256": null,
+      "event_ledger_sha256": "d24ab0e6939be657bfeb12a7bcce10fecb097f493ef760a9d9d9d6918de877e3",
+      "logical_identity_sha256": "5d61e48b04f94c524560e08797aedc4cd0393bf81f6c1859451110cac2ad3b4b",
+      "neutral_carry_to_cash_sha256": "86b1e21e9c458eadf97a1e81a651913627f6241e511c00d47050b780871ba1db",
+      "security_master_sha256": "350d95da7bb030a6892965f3a9d7f54da21c7da2f60dc93b205a113da8df1ab4",
+      "write_down_100pct_sha256": "6ba20ad17a2c3a3ca4f465b406396933d574467161342d1bf18a8463a2f67baa"
+    },
+    "ledger_manifest_path": "C:/Users/Lenovo/.devspace/worktrees/Quant_c0x_m7f4_v8-f9d9908f/docs/context/e2e_evidence/pead_m7f4_v8_2019_event_ledger.parquet.manifest.json",
+    "manifest_path": "C:/Users/Lenovo/.devspace/worktrees/Quant_c0x_m7f4_v8-f9d9908f/docs/context/e2e_evidence/pead_m7f4_v8_2019_daily_returns.parquet.manifest.json",
+    "n_daily_rows": 0,
+    "n_ledger_rows": 3674,
+    "security_master_path": "E:/Code/Quant/data/processed/security_master_compustat.parquet"
+  },
+  "map_meta": {
+    "always_rebuilt": true,
+    "as_of_link": false,
+    "builder": "source_max_date_one_to_one_cusip8_permno",
+    "crsp_n_rows_scanned": 47321690,
+    "future_informed_identity_map": true,
+    "future_informed_note": "source_max_date is file-max (post-cohort); map chooses PERMNO identity, not a future-return selection filter",
+    "link_model": "cross_vintage_snapshot_cusip8_non_pit",
+    "n_unique_cusip8": 23672,
+    "n_unique_permno": 23672,
+    "pit_link": false,
+    "selection_role": "identity_cusip8_to_permno_eligibility",
+    "source_max_date": "2024-12-31",
+    "used_for_formation_completeness_filter": false,
+    "used_for_return_window_gate": false,
+    "used_for_selection": true
+  },
+  "outcome_envelope": {
+    "bridge_price_ret_parity_abs_tol": 0.0001,
+    "cost_split": "open_actual_equity_trade_dollars_plus_close_equity_exits_plus_terminal_equity_only",
+    "daily_sequence": "open_equity_cash_dollar_state->charge_open_equity_L1->scale_all_allocate_targets_from_reduced_NAV->apply_RET->charge_close_equity_exits->scale_all->terminal_equity_only_liquidation->daily_return_from_NAV_ratio",
+    "debug_non_authoritative_event_count_share": 0.0016339869281045752,
+    "debug_per_event_slot_share": [
+      {
+        "approx_event_slot_share_non_authoritative": 0.0004084967320261438,
+        "bridge_applied": false,
+        "entry": "2019-08-07",
+        "event_id": "020033|2019-08-06|14646",
+        "failure_detail": "dlstcd=233;dlret_raw='S';ret_raw='-0.002114';session=2019-10-21",
+        "first_bad_session": "2019-10-21",
+        "holding_sessions": 60,
+        "outcome_class": "outcome_ambiguous",
+        "permno": 14646,
+        "window_status": "unresolved_delist"
+      },
+      {
+        "approx_event_slot_share_non_authoritative": 0.0004084967320261438,
+        "bridge_applied": false,
+        "entry": "2019-11-07",
+        "event_id": "025539|2019-11-06|15793",
+        "failure_detail": "ret_raw='B';session=2020-01-17",
+        "first_bad_session": "2020-01-17",
+        "holding_sessions": 60,
+        "outcome_class": "outcome_ambiguous",
+        "permno": 15793,
+        "window_status": "nonnumeric_selected_window"
+      },
+      {
+        "approx_event_slot_share_non_authoritative": 0.0004084967320261438,
+        "bridge_applied": false,
+        "entry": "2019-05-15",
+        "event_id": "032192|2019-05-14|16913",
+        "failure_detail": "ret_raw='B';session=2019-07-22",
+        "first_bad_session": "2019-07-22",
+        "holding_sessions": 60,
+        "outcome_class": "outcome_ambiguous",
+        "permno": 16913,
+        "window_status": "nonnumeric_selected_window"
+      },
+      {
+        "approx_event_slot_share_non_authoritative": 0.0004084967320261438,
+        "bridge_applied": false,
+        "entry": "2019-07-24",
+        "event_id": "025509|2019-07-23|77763",
+        "failure_detail": "ret_raw='B';session=2019-09-27",
+        "first_bad_session": "2019-09-27",
+        "holding_sessions": 60,
+        "outcome_class": "outcome_ambiguous",
+        "permno": 77763,
+        "window_status": "nonnumeric_selected_window"
+      }
+    ],
+    "leg_artifacts": {
+      "neutral_carry_to_cash": {
+        "parquet": "C:/Users/Lenovo/.devspace/worktrees/Quant_c0x_m7f4_v8-f9d9908f/data/processed/pead_m7f4_v8_2019_daily_returns_neutral_carry_to_cash.parquet",
+        "portfolio": {
+          "cost_in_next_day_state": true,
+          "cost_split": "open_actual_equity_trade_dollars_plus_close_equity_exits_plus_terminal_equity_only",
+          "daily_sequence": "open_equity_cash_dollar_state->charge_open_equity_L1->scale_all_allocate_targets_from_reduced_NAV->apply_RET->charge_close_equity_exits->scale_all->terminal_equity_only_liquidation->daily_return_from_NAV_ratio",
+          "end": "2020-02-12",
+          "global_idle_cash_policy": "explicit_global_idle_cash_preserves_nav_when_no_active_slots",
+          "max_open_cost_fixed_point_abs_residual_dollars": 6.4035690812425106e-18,
+          "mean_active_slots": 550.1123595505618,
+          "mean_live_equity": 547.5131086142322,
+          "min_active_slots": 11,
+          "min_live_equity": 11,
+          "n_days": 267,
+          "nav_cost_policy": "fixed_point_open_trade_parity_then_scale_all_post_cost_nav",
+          "nav_state_matches_equity_path": true,
+          "no_recapitalization": true,
+          "start": "2019-01-23",
+          "terminal_equity_net": 1.194189536370541,
+          "total_close_cost_dollars": 3.393188493824182e-05,
+          "total_direct_cost_dollars": 0.02261082494351064,
+          "total_nav_cost_drag_dollars": 0.022667091124400685,
+          "total_net_return": 0.19418953637054104,
+          "total_open_cost_dollars": 0.02168057867050344,
+          "total_terminal_cost_dollars": 0.0008963143880689574,
+          "total_turnover_close_equity_exits": 0.039548303462786004,
+          "total_turnover_l1": 26.977577642668656,
+          "total_turnover_open_equity_l1": 25.93802933920587,
+          "total_turnover_terminal_equity": 1.0
+        },
+        "rows": 267,
+        "sha256": "86b1e21e9c458eadf97a1e81a651913627f6241e511c00d47050b780871ba1db",
+        "status": "written",
+        "total_direct_cost_dollars": 0.02261082494351064,
+        "total_nav_cost_drag_dollars": 0.022667091124400685,
+        "total_turnover_l1": 26.977577642668656
+      },
+      "write_down_100pct": {
+        "parquet": "C:/Users/Lenovo/.devspace/worktrees/Quant_c0x_m7f4_v8-f9d9908f/data/processed/pead_m7f4_v8_2019_daily_returns_write_down_100pct.parquet",
+        "portfolio": {
+          "cost_in_next_day_state": true,
+          "cost_split": "open_actual_equity_trade_dollars_plus_close_equity_exits_plus_terminal_equity_only",
+          "daily_sequence": "open_equity_cash_dollar_state->charge_open_equity_L1->scale_all_allocate_targets_from_reduced_NAV->apply_RET->charge_close_equity_exits->scale_all->terminal_equity_only_liquidation->daily_return_from_NAV_ratio",
+          "end": "2020-02-12",
+          "global_idle_cash_policy": "explicit_global_idle_cash_preserves_nav_when_no_active_slots",
+          "max_open_cost_fixed_point_abs_residual_dollars": 6.4035690812425106e-18,
+          "mean_active_slots": 549.9475655430712,
+          "mean_live_equity": 547.5280898876405,
+          "min_active_slots": 11,
+          "min_live_equity": 11,
+          "n_days": 267,
+          "nav_cost_policy": "fixed_point_open_trade_parity_then_scale_all_post_cost_nav",
+          "nav_state_matches_equity_path": true,
+          "no_recapitalization": true,
+          "start": "2019-01-23",
+          "terminal_equity_net": 1.1854762536435766,
+          "total_close_cost_dollars": 3.382934701995478e-05,
+          "total_direct_cost_dollars": 0.022550183823913397,
+          "total_nav_cost_drag_dollars": 0.022605876874469244,
+          "total_net_return": 0.18547625364357656,
+          "total_open_cost_dollars": 0.021626579955769918,
+          "total_terminal_cost_dollars": 0.0008897745211235252,
+          "total_turnover_close_equity_exits": 0.03955988341894324,
+          "total_turnover_l1": 26.988425856826115,
+          "total_turnover_open_equity_l1": 25.948865973407173,
+          "total_turnover_terminal_equity": 1.0
+        },
+        "rows": 267,
+        "sha256": "6ba20ad17a2c3a3ca4f465b406396933d574467161342d1bf18a8463a2f67baa",
+        "status": "written",
+        "total_direct_cost_dollars": 0.022550183823913397,
+        "total_nav_cost_drag_dollars": 0.022605876874469244,
+        "total_turnover_l1": 26.988425856826115
+      }
+    },
+    "legs": [
+      "strict_block",
+      "neutral_carry_to_cash",
+      "write_down_100pct"
+    ],
+    "n_residual_ambiguous": 4,
+    "nav_cost_policy": "fixed_point_open_trade_parity_then_scale_all_post_cost_nav",
+    "note": "neutral_carry_to_cash is a sensitivity scenario, not a justified finite upper bound on residual outcomes; residual primary metric is summed first-bad-date target weight; attribution is exact 16-state Shapley",
+    "residual_exposure_by_leg": {
+      "neutral_carry_to_cash": {
+        "metric": "summed_first_bad_date_target_weight",
+        "n_residual_events": 4,
+        "note": "sum of first-bad-date equal-weight target exposures; not weight-time share; not n_bad/n_selected",
+        "per_event": [
+          {
+            "event_id": "020033|2019-08-06|14646",
+            "first_bad_session": "2019-10-21",
+            "n_active_slots_that_day": 523,
+            "target_weight_first_bad": 0.0019120458891013384,
+            "window_status": "unresolved_delist"
+          },
+          {
+            "event_id": "025539|2019-11-06|15793",
+            "first_bad_session": "2020-01-17",
+            "n_active_slots_that_day": 628,
+            "target_weight_first_bad": 0.0015923566878980893,
+            "window_status": "nonnumeric_selected_window"
+          },
+          {
+            "event_id": "032192|2019-05-14|16913",
+            "first_bad_session": "2019-07-22",
+            "n_active_slots_that_day": 467,
+            "target_weight_first_bad": 0.0021413276231263384,
+            "window_status": "nonnumeric_selected_window"
+          },
+          {
+            "event_id": "025509|2019-07-23|77763",
+            "first_bad_session": "2019-09-27",
+            "n_active_slots_that_day": 640,
+            "target_weight_first_bad": 0.0015625,
+            "window_status": "nonnumeric_selected_window"
+          }
+        ],
+        "scenario": "neutral_carry_to_cash",
+        "summed_first_bad_date_target_weight": 0.007208230200125766
+      },
+      "write_down_100pct": {
+        "metric": "summed_first_bad_date_target_weight",
+        "n_residual_events": 4,
+        "note": "sum of first-bad-date equal-weight target exposures; not weight-time share; not n_bad/n_selected",
+        "per_event": [
+          {
+            "event_id": "020033|2019-08-06|14646",
+            "first_bad_session": "2019-10-21",
+            "n_active_slots_that_day": 523,
+            "target_weight_first_bad": 0.0019120458891013384,
+            "window_status": "unresolved_delist"
+          },
+          {
+            "event_id": "025539|2019-11-06|15793",
+            "first_bad_session": "2020-01-17",
+            "n_active_slots_that_day": 628,
+            "target_weight_first_bad": 0.0015923566878980893,
+            "window_status": "nonnumeric_selected_window"
+          },
+          {
+            "event_id": "032192|2019-05-14|16913",
+            "first_bad_session": "2019-07-22",
+            "n_active_slots_that_day": 467,
+            "target_weight_first_bad": 0.0021413276231263384,
+            "window_status": "nonnumeric_selected_window"
+          },
+          {
+            "event_id": "025509|2019-07-23|77763",
+            "first_bad_session": "2019-09-27",
+            "n_active_slots_that_day": 640,
+            "target_weight_first_bad": 0.0015625,
+            "window_status": "nonnumeric_selected_window"
+          }
+        ],
+        "scenario": "write_down_100pct",
+        "summed_first_bad_date_target_weight": 0.007208230200125766
+      }
+    },
+    "residual_exposure_metric": "summed_first_bad_date_target_weight",
+    "shapley_attribution_by_leg": {
+      "neutral_carry_to_cash": {
+        "contributions": [
+          {
+            "event_id": "020033|2019-08-06|14646",
+            "shapley_nav_contribution": 0.0017704804894226691,
+            "window_status": "unresolved_delist"
+          },
+          {
+            "event_id": "025539|2019-11-06|15793",
+            "shapley_nav_contribution": -0.0011688587993573158,
+            "window_status": "nonnumeric_selected_window"
+          },
+          {
+            "event_id": "032192|2019-05-14|16913",
+            "shapley_nav_contribution": -0.0006059597351089074,
+            "window_status": "nonnumeric_selected_window"
+          },
+          {
+            "event_id": "025509|2019-07-23|77763",
+            "shapley_nav_contribution": -0.0029989414465983653,
+            "window_status": "nonnumeric_selected_window"
+          }
+        ],
+        "method": "exact_16_state_shapley_four_residuals",
+        "n_residual": 4,
+        "n_states": 16,
+        "note": "exact Shapley; contributions sum to scenario terminal NAV gap vs ok-only",
+        "scenario": "neutral_carry_to_cash",
+        "scenario_nav_gap": -0.003003279491641919,
+        "sum_contributions": -0.003003279491641919,
+        "sum_equals_gap_abs_err": 0.0,
+        "v_empty_ok_only": 1.197192815862183,
+        "v_full_scenario": 1.194189536370541
+      },
+      "write_down_100pct": {
+        "contributions": [
+          {
+            "event_id": "020033|2019-08-06|14646",
+            "shapley_nav_contribution": -0.0004685190983319357,
+            "window_status": "unresolved_delist"
+          },
+          {
+            "event_id": "025539|2019-11-06|15793",
+            "shapley_nav_contribution": -0.0031731006273464364,
+            "window_status": "nonnumeric_selected_window"
+          },
+          {
+            "event_id": "032192|2019-05-14|16913",
+            "shapley_nav_contribution": -0.00318087903163126,
+            "window_status": "nonnumeric_selected_window"
+          },
+          {
+            "event_id": "025509|2019-07-23|77763",
+            "shapley_nav_contribution": -0.0048940634612967635,
+            "window_status": "nonnumeric_selected_window"
+          }
+        ],
+        "method": "exact_16_state_shapley_four_residuals",
+        "n_residual": 4,
+        "n_states": 16,
+        "note": "exact Shapley; contributions sum to scenario terminal NAV gap vs ok-only",
+        "scenario": "write_down_100pct",
+        "scenario_nav_gap": -0.011716562218606397,
+        "sum_contributions": -0.011716562218606395,
+        "sum_equals_gap_abs_err": 1.734723475976807e-18,
+        "v_empty_ok_only": 1.197192815862183,
+        "v_full_scenario": 1.1854762536435766
+      }
+    },
+    "summed_first_bad_date_target_weight": 0.007208230200125766,
+    "turnover_policy": "equity_l1_only_cash_not_double_counted",
+    "write_down_policy": "dead_zero_weight_no_recapitalization_after_minus_100pct"
+  },
+  "research_validity_ceiling_note": "snapshot_link_ceiling_approx_30_of_100",
+  "round_id": "ROUND-20260712-M7F4-V8-EXACT-SELF-FINANCING-IDENTITY",
+  "scope_id": "M7F4_V8_EXACT_SELF_FINANCING_IDENTITY",
+  "score_band_note": "diagnostic_package_target_70_74_with_strict_curve_BLOCKED;research_validity_ceiling_approx_30",
+  "selected_canonical_rows_sha256": "7f336eefaf7de6840a907a94361297111a2abc66702ad41b0aa0733016435749",
+  "selected_event_set_sha256": "caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d",
+  "stale_curve_invalidation": {
+    "invalidated": false,
+    "path": "C:/Users/Lenovo/.devspace/worktrees/Quant_c0x_m7f4_v8-f9d9908f/data/processed/pead_m7f4_v8_2019_daily_returns.parquet",
+    "prior_sha256": null,
+    "reason": "no_file"
+  },
+  "status": "DIAGNOSTIC_COMPLETE",
+  "strict_curve_status": "BLOCKED"
+}

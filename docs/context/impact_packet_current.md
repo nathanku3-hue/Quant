@@ -1,6 +1,64 @@
 # Impact Packet - Current
 
-## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- Implementation/repair: `scripts/pead_m7f5_id0_dated_identifier_authority.py`, `tests/test_pead_m7f5_id0_dated_identifier_authority.py`, and the active M7F5-ID0 brief at Commit A `c5a9ab8`.
+- Evidence: `docs/context/e2e_evidence/pead_m7f5_id0_dated_identifier_authority_20260714.json` at Commit B `410d0ca`; checkout/runtime SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903`; committed Git-blob SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- SAW/docs: truth repair `a51f349`, terminal SAW report `398732c`, and seven current-truth surfaces reconciled to the BLOCK state.
+- Touched interfaces: Data/Research authority gate and Docs/Ops truth only; Strategy/UI, provider access, mapping, curve rerun, and strict readiness remain held.
+- Failing checks: none in compile/focused/reviewer/SAW checks. Strict PIT identifier authority intentionally remains `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`.
+- Open risks: repository blob authority is not a cryptographic natural-person signature; genuine effective-dated source plus committed data-owner approval remains unavailable.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- Implementation/repair: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, and the active M7F4-v8 brief at A2.1 `b4d35e1`.
+- Commit B evidence: `docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json` plus daily-return and event-ledger manifests at `9f37745`; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`.
+- Commit C docs: three reviewer artifacts, terminal SAW, active brief, decision/formula/lesson records, and seven current-truth surfaces.
+- Touched interfaces: flagged Data/Research diagnostic and Docs/Ops truth only; Strategy/UI and strict readiness remain held.
+- Failing checks: none in compile/focused/reviewer checks. Strict curve intentionally `BLOCKED` by four residual windows.
+- Open risks: nontransactional multi-file publication, unbounded/no-checkpoint memory path, ignored-Parquet portability, and snapshot non-PIT link ceiling.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- Changed code/tests: `scripts/pead_m7f3_v7_2019_crsp_vertical.py`, `tests/test_pead_m7f3_v7_2019_crsp_vertical.py`, `scripts/pead_m7f2_v6_2019_crsp_vertical.py` (CLI retired).
+- Brief: `docs/phase_brief/v2-pead-m7f3-v7-self-financing-portfolio-truth.md`.
+- Evidence: `docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json` SHA-256 `49c594c8ac6e71d50dcc6f021e9e3ee5af29a4ca68717b72a90cbab11c00b488`.
+- Legs under `E:/Code/Quant/data/processed/pead_m7f3_v7_2019_daily_returns_*.parquet`.
+- Touched interfaces: Data/research diagnostic only; Strategy/UI frozen; readiness false.
+- Failing checks: none in focused suite (24/24). Strict curve intentionally BLOCKED.
+- Open risk: residual 4-event envelope; snapshot link ceiling ~30; low stderr label polish.
+
+## Prior Addendum — M7F2-v6-final (superseded as active package)
+
+- Retained as audit foil; not active product path.
+
+
+# Impact Packet - Current
+
+## Active Addendum — M7F2-v6-final (2026-07-12)
+
+- Changed code/tests/brief: scripts/pead_m7f2_v6_2019_crsp_vertical.py, tests/test_pead_m7f2_v6_2019_crsp_vertical.py, docs/phase_brief/v2-pead-m7f2-v6-2019-crsp-vertical.md (Commit A `c7724adcaa85`); removed v5.2 runner/tests/brief.
+- Evidence: docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json SHA `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a`; ledger/daily/envelope manifests; map/ledger under ignored data/processed/.
+- Touched interfaces: Data/Research flagged vertical only; Strategy/UI frozen; readiness false.
+- Failing checks: strict_curve_status=BLOCKED with 4 residual ambiguous selected windows (by design). Unit tests 19/19 PASS.
+- Open risk: residual ambiguities require envelope-only use; snapshot-link ceiling ~30; terminal SAW is Commit C.
+
+
+# Impact Packet - Current
+
+## Active Addendum — M7F1-v5.2-final (2026-07-12)
+
+- Changed code/tests: `scripts/pead_m7f1_v5_2019_crsp_vertical.py`, `tests/test_pead_m7f1_v5_2019_crsp_vertical.py`, `docs/phase_brief/v2-pead-m7f1-v5-2019-crsp-vertical.md` (Commit A `138c8b7`).
+- Evidence: `docs/context/e2e_evidence/pead_m7f1_v5_2019_crsp_vertical.json` SHA `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292`; ledger/daily manifests; map/ledger under ignored `data/processed/`.
+- Touched interfaces: Data/Research flagged vertical only; Strategy/UI frozen; readiness false.
+- Failing checks: durable residual selected-window BLOCK 7/2448 (5 nonnumeric, 1 unresolved delist, 1 missing session). Unit tests 17/17 PASS.
+- Open risk: residual requires delisting-data/policy gate; snapshot-link ceiling ~30; terminal A/B/C SAW is Commit C only.
+
+## Prior Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - Changed scope: mandatory current-truth surfaces, the active identity-repair phase status, decision/lesson records, generated current context, and one Thin SAW report only.
 - Touched interfaces: Docs/Ops governance truth only; no request payload, envelope, reviewer report, runtime, data, provider, validator, strategy, or UI interface.

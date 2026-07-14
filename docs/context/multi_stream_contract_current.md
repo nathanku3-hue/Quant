@@ -1,3 +1,63 @@
+# Multi-Stream Contract - Current
+
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data/Research | M7F5-ID0 A/B evidence and A/B/C+SAW PASS prove current source lacks committed provenance approval; strict PIT/as-of identifier authority `BLOCKED` | Obtain exact effective-dated source plus committed data-owner approval, authorize acquisition, or terminate |
+| Docs/Ops | Seven-surface truth reconciliation complete for terminal BLOCK state | Preserve A/B/Saw commit identities and dual evidence hashes |
+| Backend/Strategy | Held | No mapping, curve rerun, broker, or strategy action from BLOCK evidence |
+| Frontend/UI | Held | No readiness, score, alpha, or action surface |
+
+- Cross-stream rule: M7F5-ID0 BLOCK evidence is not source-access, mapping, strict curve, readiness, alpha, or tradability authority.
+- Stream freeze: no WRDS/provider access, historical-link construction, new data output, readiness flip, Strategy/UI, remotes, publication, or dispatch.
+- Next action: hold by default; open only one separately authorized owner decision.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data/Research | M7F4-v8 Commit B `9f37745` diagnostic package and independent review PASS; strict curve `BLOCKED` | Four residual windows and non-PIT link ceiling remain |
+| Docs/Ops | Terminal SAW and seven-surface reconciliation complete | Preserve Commit B identity and accepted operational risks |
+| Backend/Strategy | Held | No promotion or strict-run claim |
+| Frontend/UI | Held | No readiness, score, or action surface |
+
+- Cross-stream rule: `DIAGNOSTIC_COMPLETE` plus sensitivity legs is not strict readiness, alpha, or tradability authority.
+- Stream freeze: no CCM/WRDS/provider access, historical-link construction, new data output, readiness flip, Strategy/UI, remotes, or publication.
+- Next action: hold by default; open only one separately authorized bounded scope.
+
+## Prior Addendum — M7F3-v7
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## Active Addendum — M7F3-v7 (2026-07-12)
+
+- **Data:** M7F3-v7 self-financing diagnostic vertical active on c0x/m7f0-v4; strict curve BLOCKED; residual envelope only.
+- **Backend/Strategy:** No promotion; no engine_run_simulation claim upgrade.
+- **Frontend/UI:** Frozen.
+- **Docs/Ops:** Commit C truth surfaces + SAW PASS; research validity ~30.
+
+## Stream freeze
+
+No CCM, WRDS login, readiness flip, alpha UI, or multi-year expansion in this round.
+
+
+# Multi-Stream Contract - Quant Current
+
+## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | M7F2-v6-final diagnostic package complete; strict curve BLOCKED | Residual envelope diagnostics only; no readiness flip |
+| Research | Flagged mechanical vertical under snapshot CUSIP8 ceiling ~30 | Not alpha / not tradable |
+| Docs/Ops | Truth surfaces + evidence refreshed for Commit B | Terminal SAW C next |
+| Strategy | Held | No promotion |
+| Frontend/UI | Held | No readiness surface |
+
+- Cross-stream rule: DIAGNOSTIC_COMPLETE with strict_curve_status=BLOCKED is not readiness or alpha authority.
+- Next action: Commit C independent A/B/C + SAW; hold readiness/UI/strategy/historical-link.
+
+
 # Multi-Stream Contract - Quant Current
 
 ## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)

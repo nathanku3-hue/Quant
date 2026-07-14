@@ -1,5 +1,26 @@
+## 2026-07-13 — M7F4-v8 terminal diagnostic close
+- Decision: accept A2.1 `b4d35e1`, evidence-only Commit B `9f37745`, and three distinct independent Reviewer A/B/C passes as terminal evidence for the fixed M7F4-v8 diagnostic package.
+- Decision: preserve `DIAGNOSTIC_COMPLETE` with strict curve `BLOCKED`; the four residual windows remain represented only by neutral-carry-to-cash and write-down sensitivity legs with exact Shapley attribution.
+- Decision: record nontransactional multi-file publication, unbounded/no-checkpoint memory, and ignored-Parquet portability as non-blocking operational risks; the successful clean rerun does not generalize beyond the fixed package.
+- Evidence: compile and implementer focused suite 45/45 PASS; Reviewer A exact-object suite 45/45 PASS; Reviewer B compile plus executable snapshot subset 44/44 PASS; Reviewer C mechanical identity/count/hash/bridge/NAV/Shapley PASS; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`.
+- Boundary: readiness remains false; link remains snapshot non-PIT; no strict curve, alpha/tradable, Strategy/UI, provider/CCM, remote, or publication authority.
+- Next action: hold promotion and open at most one separately authorized bounded scope.
+
+## 2026-07-12 — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH close
+- Decision: Accept M7F3-v7 as active flagged diagnostic package (strict curve BLOCKED); supersede v6 as close authority; keep research validity ~30.
+- Commits: A `bae1f656` code; B `b5c66bc` evidence; C SAW+truth.
+- Forbidden held: CCM, readiness, alpha/tradable, UI, as-of link.
+
 Decision Log: Terminal Zero
-Author: Atomic Mesh | Last Updated: 2026-07-11 (request artifact identity repair v1)
+Author: Atomic Mesh | Last Updated: 2026-07-12 (M7F1-v5.2-final durable residual BLOCK)
+
+M7F1-v5.2-final Formation Prior-20 Tradability (2026-07-12)
+- Decision: approve M7F1-v5.2-final with four mandatory edits; prior-20 is an explicit roadmap-deviation formation tradability restriction (finite RET, abs(PRC)>0, VOL>0 ≥15/20 pre-entry), not a map repair.
+- Decision: build calendar from source-wide CRSP dates; load ≥20 sessions before 2019; force map rebuild; invalidate stale daily curve on BLOCK; first/last PERMNO dates are diagnostic-only.
+- Decision: three-commit protocol only — A code/tests, B evidence/truth, C full A/B/C+SAW pinned to B. Do not close evidence and terminal review together.
+- Evidence: Commit A `138c8b76028b2094793efb2d066c269bf7b805f6`; rerun BLOCK 2448 selected / 2441 OK / 7 invalid (5 nonnumeric, 1 unresolved delist, 1 missing session); evidence SHA `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292`; score band ~62 residual BLOCK; readiness false; link ceiling ~30.
+- Boundary: no readiness flip; no historical-link slice yet; residual path is delisting-data/policy only.
+- Next action: Commit C terminal Reviewer A/B/C + SAW pinned to B; then owner open delisting policy gate.
 
 V2 PEAD Request Artifact Identity Repair V1 (2026-07-11)
 - Decision: approve the bounded two-commit repair and keep dispatch denied. Commit 1 restores BLOCK truth, quarantines false dispatch evidence, clarifies detached binding, and banks the exact four current 20260701 request artifacts without byte changes.
@@ -7271,3 +7292,8 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
     - A/B/C/D factual gate statuses and `m6b_data_contract_ready=false` remain unchanged.
   - Single next decision/action:
     - hold/no-dispatch. A future Gate A/B/C dispatch action requires a separate explicit owner authorization.
+
+## 2026-07-12 — M7F2-v6-final outcome envelope
+
+- Decision: hard-replace M7F1-v5.2 with M7F2-v6-final. Exclude pre-entry delists before breadth/Q5 and rerank; bridge only blank one-session gaps with adjacent prices + next RET; residual ambiguities emit strict BLOCK + neutral carry-to-cash + -100% write-down; map used_for_selection=true; SAW may PASS for diagnostic scope while strict_curve_status=BLOCKED.
+- Not decided: readiness flip, as-of link, alpha/tradable claims.

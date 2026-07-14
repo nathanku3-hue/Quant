@@ -1,5 +1,53 @@
 # Observability Pack - Current
 
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- `ObservabilityRating`: GREEN for committed authority-gate implementation, 59/59 focused tests, deterministic BLOCK evidence, independent A/B/C PASS, and terminal SAW PASS; RED for strict PIT/as-of identifier authority, readiness, alpha, tradability, provider access, and Strategy/UI promotion.
+- Authority sentinel: Commit A `c5a9ab8` removes caller-controlled owner/repository authority; only exact, reachable, unchanged `docs/authorization/*.json` Git blobs in this checkout can approve.
+- Evidence sentinel: Commit B `410d0ca`; checkout/runtime SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903`; committed Git-blob SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- Blocker sentinel: `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`; reason `committed_git_blob_data_owner_approval_required`; source rows 75,913; no effective-date pair; `updated_at` is not authority.
+- D1 sentinel: 21,882 locked pre-identity events; event-set SHA `2922192aba299a7ab741e2ff1183f033291312614fbb4b3dce60f760fe7e06a5`; canonical-row SHA `3592137066ad74290e988ac06f4b6e29ccce64fc29ce8be4e864a3d0b7a882bd`.
+- Claim sentinel: strict PIT/as-of identity remains blocked; research validity remains near 30; no data acquisition, mapping, curve rerun, readiness, alpha, tradability, Strategy/UI, or provider authority.
+- Next-action sentinel: hold promotion and select exactly one separately authorized owner decision.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- `ObservabilityRating`: GREEN for fixed-package identity, tests, mechanical evidence, independent review, and truth reconciliation; AMBER for four residual windows and operational hardening; RED for strict readiness/alpha/tradability.
+- Identity sentinel: A2.1 `b4d35e1`; evidence-only Commit B `9f37745`; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`; distinct Reviewer A/B/C PASS.
+- Count sentinel: 2,448 selected = 2,444 observed + 3 nonnumeric + 1 unresolved delist; two bridge attempts PASS.
+- Accounting sentinel: fixed-point open cost, close/terminal equity-only costs, carried NAV, no recapitalization, direct cost identities, and exact 16-state Shapley conservation PASS.
+- Runtime sentinel: clean fixed rerun completed without OOM after manual failed-partial cleanup; no claim of transactional publication, bounded memory, checkpointing, or generalized recovery.
+- Portability sentinel: ignored Parquets are hash-bound but not embedded; explicit finite/duplicate counters remain optional hardening.
+- Claim sentinel: strict curve `BLOCKED`; snapshot non-PIT link; readiness false; no alpha/tradable/Strategy/UI authority.
+- Next-action sentinel: hold promotion and select exactly one separately authorized scope if work resumes.
+
+## Prior Addendum — M7F3-v7
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## Active Addendum — M7F3-v7 (2026-07-12)
+
+- Drift cleared: v6 false 70–74 close / unproven A/B/C / residual metric 0.163% vs ~0.72% / identical leg turnover.
+- Markers: selection hash locked; first-bad residual 0.721%; Shapley conserved; distinct A/B/C IDs recorded in SAW.
+- Budget: full 2019+Shapley ~15 min acceptable for diagnostic package.
+- Score: path ~70–73 diagnostic; research validity ~30; not readiness.
+
+
+# Observability Pack - Current
+
+## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+- ObservabilityRating: AMBER for residual strict-curve BLOCK; GREEN for diagnostic package completeness after Commit C if SAW validators PASS. RED for readiness/alpha.
+- Residual sentinel: invalid selected windows=4; reasons={'nonnumeric_selected_window': 3, 'unresolved_delist': 1}; bridged=2; pre_entry_excluded=12.
+- Envelope sentinel: legs neutral_carry_to_cash + write_down_100pct written; approx residual event-slot share=0.0016339869281045752; neutral carry is not a finite upper bound.
+- Map sentinel: used_for_selection=true; future_informed_identity_map=true; used_for_return_window_gate=false.
+- Identity sentinel: evidence bound to Commit A `c7724adcaa85`; evidence SHA `58f84cd64e31a41e…`.
+- Claim sentinel: m6b_data_contract_ready=false; not_alpha; not_tradable; research validity ceiling ~30.
+- Next-action sentinel: Commit C A/B/C + SAW PASS (diagnostic) with strict_curve_status=BLOCKED.
+
+
+# Observability Pack - Current
+
 ## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - `ObservabilityRating`: GREEN for request-artifact identity repair, reviewer independence, and truth reconciliation; RED for dispatch and strict M6b readiness. No Gate A or Gate B/C message is proven sent.

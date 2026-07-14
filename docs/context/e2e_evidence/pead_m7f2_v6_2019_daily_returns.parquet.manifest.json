@@ -1,0 +1,39 @@
+{
+  "artifact": null,
+  "atomic_write": true,
+  "block_reason": "selected_window_invalid:nonnumeric_selected_window=3,unresolved_delist=1",
+  "curve_promoted": false,
+  "curve_status": "ABSENT",
+  "cusip_map": "E:/Code/Quant/data/processed/pead_m7f2_v6_crsp_cusip8_permno_source_max_date.parquet",
+  "cusip_map_sha256": "d07b0dd991f7c3466a2fd943f2fae7208a8e1f110ada064bf1073a0c52b313a2",
+  "event_ledger": "E:/Code/Quant/data/processed/pead_m7f2_v6_2019_event_ledger.parquet",
+  "event_ledger_sha256": "a8b37ed948f135fe115003beddd5109f5de7269e09b3134cb3b69f643de0fa59",
+  "evidence_json": "E:/Code/Quant_c0x_m7f0_v4/docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json",
+  "evidence_sha256": "58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a",
+  "generated_at_utc": "2026-07-12T09:25:38Z",
+  "implementation_commit": "c7724adcaa855076be079c10224ea5cd2f0e60c0",
+  "implementation_tree": "158a0abe4c41215301fcad9abd83d485c230e778",
+  "logical_identity_sha256": "7aff9ec12b295ef7b6754d37e1e73c41c8ed094896d58bc048a84604ef8518c3",
+  "outcome_envelope": {
+    "neutral_carry_to_cash": {
+      "parquet": "E:/Code/Quant/data/processed/pead_m7f2_v6_2019_daily_returns_neutral_carry_to_cash.parquet",
+      "sha256": "04b312badc8695b365107cee20f8e551f68764a91a63212c33a5db899d0f49aa",
+      "status": "written"
+    },
+    "write_down_100pct": {
+      "parquet": "E:/Code/Quant/data/processed/pead_m7f2_v6_2019_daily_returns_write_down_100pct.parquet",
+      "sha256": "113a1c38fadecbc5fede2745e171156c18afe162aa0d9454310ed8aea3ae902b",
+      "status": "written"
+    }
+  },
+  "rows": 0,
+  "sha256": null,
+  "stale_curve_invalidation": {
+    "invalidated": false,
+    "path": "E:/Code/Quant/data/processed/pead_m7f2_v6_2019_daily_returns.parquet",
+    "prior_sha256": null,
+    "reason": "no_file"
+  },
+  "status": "DIAGNOSTIC_COMPLETE",
+  "strict_curve_status": "BLOCKED"
+}

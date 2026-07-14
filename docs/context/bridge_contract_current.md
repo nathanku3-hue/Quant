@@ -1,5 +1,79 @@
 # Bridge Contract - Current
 
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- `SYSTEM_DELTA`: M7F5-ID0 Commit A `c5a9ab8` requires exact source/envelope bytes plus a reachable, unchanged committed data-owner approval blob under `docs/authorization/`; Commit B `410d0ca` banks current-source BLOCK evidence; truth repair `a51f349` and terminal SAW `398732c` close A/B/C review.
+- `PM / Product Delta`: Current Compustat security master remains blocked for strict-PIT identifier authority with `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`; research validity remains near 30 and M7F4-v8 remains a diagnostic, not a strict curve.
+- `OPEN_DECISION`: Obtain a genuine effective-dated identifier source with committed data-owner approval, authorize historical identifier acquisition, or terminate PEAD strict-PIT work.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion; choose exactly one separately authorized owner decision.
+- `DO_NOT_REDECIDE`: Do not infer identifier-validity dates from current snapshots, caller-created JSON, generic date columns, `updated_at`, provider metadata, or non-committed approvals; do not run mapping/curve/readiness/Strategy/UI work from this BLOCK evidence.
+- `PHASE_STATUS`: M7F5-ID0 terminal SAW PASS for a provenance BLOCK; strict PIT/as-of identifier authority `BLOCKED`; `m6b_data_contract_ready=false`.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- `SYSTEM_DELTA`: A2.1 `b4d35e1` repaired the residual-evidence count and added the real publication-branch regression; Commit B `9f37745` banks only the evidence JSON and two manifests; three distinct reviewers independently PASS the fixed Commit B package.
+- `PM / Product Delta`: M7F4-v8 is `DIAGNOSTIC_COMPLETE` with 2,448 selected, 2,444 observed, four residual windows, two validated bridges, exact self-financing NAV/cost identities, and exact 16-state Shapley. Strict curve remains `BLOCKED`; research ceiling remains near 30.
+- `OPEN_DECISION`: None for terminal diagnostic reconciliation. Future transactionality, memory bounding, evidence portability, or historical-link work each requires a separate bounded decision.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion and choose at most one separately authorized next scope.
+- `DO_NOT_REDECIDE`: Do not flip readiness, treat sensitivity legs as a strict curve, claim PIT/as-of identity, describe neutral carry as a finite upper bound, or reopen provider/CCM/Strategy/UI scope.
+- `PHASE_STATUS`: M7F4-v8 terminal SAW PASS; strict curve `BLOCKED`; `m6b_data_contract_ready=false`.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained as the accounting-design predecessor and audit history.
+
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- `SYSTEM_DELTA`: Hard-replaced M7F2-v6 active executable with M7F3-v7 self-financing portfolio truth on c0x/m7f0-v4. Drifted-prior equity turnover sequence; bridge parity; dead write-down; first-bad residual ~0.721%; exact 16-state Shapley. Commit A `bae1f656`; B evidence `b5c66bc`; C SAW+truth.
+- `PM / Product Delta`: Diagnostic package complete with strict_curve BLOCKED. Score path ~70–73 diagnostic; research validity ~30. Residual exposure is first-bad sum not 4/2448. Selection 2448 unchanged.
+- `OPEN_DECISION`: None for package close. Hold readiness/UI/historical-link/CCM.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion; optional stderr label polish only.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not treat neutral carry as upper bound; do not open CCM; do not claim independent A/B/C without distinct agents (now proven).
+- `PHASE_STATUS`: M7F3-v7 DIAGNOSTIC_COMPLETE; terminal SAW PASS; strict curve BLOCKED.
+
+## Prior Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+- Superseded as active close package by M7F3-v7. Historical v6 evidence retained for audit; v6 executable retired.
+
+
+# Bridge Contract - Current
+
+## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+- `SYSTEM_DELTA`: Hard-replaced M7F1-v5.2 with M7F2-v6-final on c0x/m7f0-v4. Pre-entry delist exclude before breadth/Q5; blank one-day bridge; strict BLOCK + neutral carry-to-cash + -100% write-down envelope; map identity selection metadata corrected. Commit A `c7724adcaa85`.
+- `PM / Product Delta`: Diagnostic package complete (DIAGNOSTIC_COMPLETE) with strict_curve_status=BLOCKED. Selected ok 2444/2448; residual invalid 4; bridged 2; pre-entry excluded 12. Score target 70-74 diagnostic; research ceiling ~30; baseline 60 until SAW C closes.
+- `OPEN_DECISION`: Accept diagnostic package and close terminal SAW C, or re-scope residual policy. Do not promote readiness or primary curve PASS.
+- `RECOMMENDED_NEXT_STEP`: Commit C Reviewer A/B/C + validated SAW PASS (diagnostic) with strict_curve BLOCKED.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not claim as-of/PIT link; do not treat neutral carry as justified upper bound; no v5.2 compatibility path; no event-id production policy.
+- `PHASE_STATUS`: M7F2-v6-final evidence complete; terminal SAW pending Commit C.
+
+## Prior Addendum — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+- Superseded on package status by M7F2-v6-final. Historical residual BLOCK evidence remains for audit only.
+
+
+# Bridge Contract - Current
+
+## Active Addendum — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+- `SYSTEM_DELTA`: M7F1-v5.2-final on `c0x/m7f0-v4`: source-wide spine, pre-2019 prior-20 load, pre-Q5 prior-20 tradability gate (roadmap deviation, not map repair), force map rebuild, stale-curve invalidate, ledger failure details. Commit A `138c8b7`; evidence bound to that commit.
+- `PM / Product Delta`: Durable residual BLOCK (~62 band): 7/2448 selected windows invalid (5 special RET, 1 unresolved delist, 1 missing session). Prior-20 removed dead-identity bulk failures. Curve not promoted. Snapshot-link ceiling ~30 remains.
+- `OPEN_DECISION`: Accept durable residual BLOCK and open bounded delisting-data/policy gate for residual specials/`DLRET`/missing-session — or re-scope. Do **not** open historical-link yet.
+- `RECOMMENDED_NEXT_STEP`: Owner open bounded delisting-data/policy gate for 7 residual invalids only; keep readiness false.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not claim as-of/PIT link; do not restore pre-Q5 complete-60; do not treat uncommitted v5 diagnostic as package; do not open historical-link yet.
+- `PHASE_STATUS`: C0X PASS; M7F1-v5.2-final durable residual BLOCK; Commit C terminal SAW ADVISORY_PASS (A/B/C all PASS).
+
+## Prior Addendum — C0X → M7F0-v4 (2026-07-12)
+
+- `SYSTEM_DELTA`: C0X trust bootstrap + M7F0-v4 2019 CRSP Q5 long-only mechanical vertical on branch `c0x/m7f0-v4` (base `aee7f4c`). C0A closure theater abandoned.
+- `PM / Product Delta`: Mechanical flagged research curve evidence available under snapshot CUSIP8 ceiling; not strict M6b; not alpha.
+- `OPEN_DECISION`: Superseded by M7F1-v5.2-final residual path.
+- `RECOMMENDED_NEXT_STEP`: See active M7F1-v5.2-final addendum.
+- `DO_NOT_REDECIDE`: Do not repair invalid C0A envelopes; do not claim as-of link; do not flip `m6b_data_contract_ready`.
+- `PHASE_STATUS`: C0X PASS; M7F0-v4 superseded as selection contract by v5.2-final.
+
+# Bridge Contract - Current
+
 ## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 
 - `RoundID`: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-TRUTH-RECONCILIATION-V1`; `ScopeID`: `REQUEST_ARTIFACT_IDENTITY_TRUTH_RECONCILIATION_V1`.
