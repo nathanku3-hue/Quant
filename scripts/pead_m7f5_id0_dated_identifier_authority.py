@@ -11,7 +11,6 @@ import argparse
 import hashlib
 import json
 import os
-import re
 import sys
 import tempfile
 from pathlib import Path
@@ -94,34 +93,37 @@ def _path_text(path: Path) -> str:
     return path.resolve().as_posix()
 
 
-def _read_parquet(path: Path, *, label: str) -> pd.DataFrame:
-    if not path.is_file():
-        raise M7F5ID0InputError(f"{label}_not_found:{path}")
-    try:
-        return pd.read_parquet(path)
-    except Exception as exc:  # pragma: no cover - backend-specific detail
-        raise M7F5ID0InputError(f"{label}_unreadable:{path}:{exc}") from exc
-
-
 def _read_parquet_with_stable_sha256(
     path: Path, *, label: str
 ) -> tuple[pd.DataFrame, str]:
-    """Bind a parsed frame to one immutable byte snapshot."""
+    """Bind parsing and hashing to one private immutable byte snapshot."""
     if not path.is_file():
         raise M7F5ID0InputError(f"{label}_not_found:{path}")
+    digest = hashlib.sha256()
+    snapshot_path: Path | None = None
     try:
-        before = _sha256_file(path)
-        frame = _read_parquet(path, label=label)
-        after = _sha256_file(path)
+        with path.open("rb") as source, tempfile.NamedTemporaryFile(
+            suffix=".parquet", delete=False
+        ) as snapshot:
+            snapshot_path = Path(snapshot.name)
+            for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                digest.update(chunk)
+                snapshot.write(chunk)
+            snapshot.flush()
+            os.fsync(snapshot.fileno())
+        frame = pd.read_parquet(snapshot_path)
     except M7F5ID0InputError:
         raise
     except OSError as exc:
         raise M7F5ID0InputError(
             f"{label}_changed_or_unreadable_during_read:{path}:{exc}"
         ) from exc
-    if before != after:
-        raise M7F5ID0InputError(f"{label}_changed_during_read:{path}")
-    return frame, after
+    except Exception as exc:  # pragma: no cover - backend-specific detail
+        raise M7F5ID0InputError(f"{label}_unreadable:{path}:{exc}") from exc
+    finally:
+        if snapshot_path is not None:
+            snapshot_path.unlink(missing_ok=True)
+    return frame, digest.hexdigest()
 
 
 def _normalize_timestamp_series(series: pd.Series) -> pd.Series:
@@ -134,16 +136,13 @@ def _normalize_gvkey(series: pd.Series) -> pd.Series:
 
 
 def _normalize_identifier8(series: pd.Series, *, source_column: str) -> pd.Series:
-    cleaned = (
-        series.astype("string")
-        .str.replace(r"[^0-9A-Za-z]", "", regex=True)
-        .str.upper()
-    )
+    cleaned = series.astype("string").str.strip().str.upper()
     source_name = source_column.casefold()
     if source_name == "cusip":
-        valid_length = cleaned.str.len().isin([8, 9])
-        return cleaned.str.slice(0, 8).where(valid_length)
-    return cleaned.where(cleaned.str.len() == 8)
+        valid = cleaned.str.fullmatch(r"[0-9A-Z]{8,9}", na=False)
+        return cleaned.str.slice(0, 8).where(valid)
+    valid = cleaned.str.fullmatch(r"[0-9A-Z]{8}", na=False)
+    return cleaned.where(valid)
 
 
 def build_pre_identity_events(d1_frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
@@ -264,14 +263,20 @@ def _resolve_effective_pair(
     requested_start: str | None,
     requested_end: str | None,
 ) -> tuple[str, str] | None:
-    if bool(requested_start) != bool(requested_end):
+    explicitly_requested = requested_start is not None or requested_end is not None
+    if explicitly_requested and (
+        requested_start is None
+        or requested_end is None
+        or not requested_start.strip()
+        or not requested_end.strip()
+    ):
         raise M7F5ID0InputError(
-            "effective_start_and_end_columns_must_be_supplied_together"
+            "effective_start_and_end_columns_must_be_non_empty_and_supplied_together"
         )
     index = _casefold_columns(columns)
-    if requested_start and requested_end:
-        start = index.get(requested_start.casefold())
-        end = index.get(requested_end.casefold())
+    if explicitly_requested:
+        start = index.get(requested_start.strip().casefold())
+        end = index.get(requested_end.strip().casefold())
         return (start, end) if start and end else None
     for start_candidate, end_candidate in EFFECTIVE_DATE_COLUMN_PAIRS:
         start = index.get(start_candidate.casefold())
@@ -353,11 +358,18 @@ def inspect_identifier_source(
         effective_end_column,
     )
     if any(value is not None for value in requested) and not all(
-        value is not None for value in requested
+        value is not None and bool(value.strip()) for value in requested
     ):
         raise M7F5ID0InputError(
-            "identifier_start_and_end_columns_must_be_supplied_together"
+            "identifier_start_and_end_columns_must_be_non_empty_and_supplied_together"
         )
+    identifier_column = identifier_column.strip() if identifier_column else None
+    effective_start_column = (
+        effective_start_column.strip() if effective_start_column else None
+    )
+    effective_end_column = (
+        effective_end_column.strip() if effective_end_column else None
+    )
 
     detected_pair = _resolve_effective_pair(
         columns, requested_start=None, requested_end=None
@@ -699,6 +711,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     except M7F5ID0InputError as exc:
         print(f"M7F5_ID0_INPUT_ERROR:{exc}", file=sys.stderr)
         return 2
+    except OSError as exc:
+        print(f"M7F5_ID0_OUTPUT_ERROR:{exc}", file=sys.stderr)
+        return 3
 
 
 if __name__ == "__main__":

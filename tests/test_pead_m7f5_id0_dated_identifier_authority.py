@@ -164,7 +164,10 @@ def test_explicit_effective_columns_require_a_pair(tmp_path: Path) -> None:
     d1 = _d1(tmp_path / "d1.parquet")
     events, _ = id0.build_pre_identity_events(pd.read_parquet(d1))
     source = _source(tmp_path / "dated.parquet", [{"gvkey": "001004", "cusip": "11111111A", "valid_from": "2018-01-01"}])
-    with pytest.raises(id0.M7F5ID0InputError, match="must_be_supplied_together"):
+    with pytest.raises(
+        id0.M7F5ID0InputError,
+        match="must_be_non_empty_and_supplied_together",
+    ):
         id0.inspect_identifier_source(source, events, effective_start_column="valid_from")
 
 
@@ -217,13 +220,19 @@ def test_malformed_non_null_end_never_becomes_open_ended(
     assert evidence["dated_identifier_source"]["invalid_relevant_rows"] == 1
 
 
-def test_overlong_identifier_is_rejected_instead_of_truncated(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "malformed_identifier",
+    ["1234567890", "12345678!", "1234-5678A", "1234 5678A"],
+)
+def test_malformed_identifier_is_rejected_instead_of_rewritten(
+    tmp_path: Path, malformed_identifier: str
+) -> None:
     d1 = _d1(tmp_path / "d1.parquet")
     source = _source(
         tmp_path / "dated.parquet",
         [{
             "gvkey": "001004",
-            "cusip": "1234567890",
+            "cusip": malformed_identifier,
             "effective_start": "2018-01-01",
             "effective_end": None,
         }],
@@ -273,12 +282,54 @@ def test_non_finite_sue_is_ineligible_and_json_safe(tmp_path: Path) -> None:
     id0._serialize_evidence(contract)
 
 
-def test_read_hash_drift_fails_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_read_and_hash_use_same_private_snapshot_under_aba_replacement(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     d1 = _d1(tmp_path / "d1.parquet")
-    hashes = iter(["before", "after"])
-    monkeypatch.setattr(id0, "_sha256_file", lambda _path: next(hashes))
-    with pytest.raises(id0.M7F5ID0InputError, match="d1_changed_during_read"):
-        id0.inspect_d1_lock(d1)
+    original_frame = pd.read_parquet(d1)
+    original_bytes = d1.read_bytes()
+    replacement = _d1(tmp_path / "replacement.parquet")
+    replacement_frame = pd.read_parquet(replacement)
+    replacement_frame.loc[0, "gvkey"] = "999999"
+    replacement_frame.to_parquet(replacement, index=False)
+    replacement_bytes = replacement.read_bytes()
+    real_read_parquet = pd.read_parquet
+
+    def aba_read(snapshot_path: Path) -> pd.DataFrame:
+        d1.write_bytes(replacement_bytes)
+        parsed = real_read_parquet(snapshot_path)
+        d1.write_bytes(original_bytes)
+        return parsed
+
+    monkeypatch.setattr(pd, "read_parquet", aba_read)
+    parsed, reported_sha = id0._read_parquet_with_stable_sha256(d1, label="d1")
+    pd.testing.assert_frame_equal(parsed, original_frame)
+    assert reported_sha == id0._sha256_file(d1)
+
+
+@pytest.mark.parametrize("blank", ["", "   "])
+def test_blank_explicit_bindings_cannot_fall_back_to_detected_names(
+    tmp_path: Path, blank: str
+) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    events, _ = id0.build_pre_identity_events(pd.read_parquet(d1))
+    source = _source(
+        tmp_path / "dated.parquet",
+        [{
+            "gvkey": "001004",
+            "cusip": "11111111A",
+            "effective_start": "2018-01-01",
+            "effective_end": None,
+        }],
+    )
+    with pytest.raises(id0.M7F5ID0InputError, match="must_be_non_empty"):
+        id0.inspect_identifier_source(
+            source,
+            events,
+            identifier_column="cusip",
+            effective_start_column=blank,
+            effective_end_column=blank,
+        )
 
 
 @pytest.mark.parametrize("target", ["d1", "source"])
@@ -332,3 +383,25 @@ def test_atomic_write_cleans_partial_when_replace_fails(
         id0._atomic_write_text(output, "{}\n")
     assert not output.exists()
     assert not list(tmp_path.glob(f".{output.name}.*.tmp"))
+
+
+def test_output_write_failure_is_controlled(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    source = _source(
+        tmp_path / "source.parquet",
+        [{"gvkey": "001004", "cusip": "11111111A"}],
+    )
+    output_directory = tmp_path / "existing-directory"
+    output_directory.mkdir()
+    exit_code = id0.main([
+        "--d1", str(d1),
+        "--identifier-source", str(source),
+        "--output", str(output_directory),
+    ])
+    captured = capsys.readouterr()
+    assert exit_code == 3
+    assert captured.out == ""
+    assert captured.err.startswith("M7F5_ID0_OUTPUT_ERROR:")
+    assert "Traceback" not in captured.err
