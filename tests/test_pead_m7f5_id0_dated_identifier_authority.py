@@ -97,8 +97,8 @@ def test_complete_unique_dated_source_passes(tmp_path: Path) -> None:
     source = _source(
         tmp_path / "dated.parquet",
         [
-            {"gvkey": "001004", "cusip": "11111111A", "effective_start": "2018-01-01", "effective_end": "2019-05-31"},
-            {"gvkey": "001004", "cusip": "22222222B", "effective_start": "2019-06-01", "effective_end": None},
+            {"gvkey": "001004", "cusip": "11111111", "effective_start": "2018-01-01", "effective_end": "2019-05-31"},
+            {"gvkey": "001004", "cusip": "22222222", "effective_start": "2019-06-01", "effective_end": None},
         ],
     )
     evidence = _evaluate(d1, source)
@@ -113,7 +113,7 @@ def test_missing_interval_blocks_coverage(tmp_path: Path) -> None:
     d1 = _d1(tmp_path / "d1.parquet")
     source = _source(
         tmp_path / "dated.parquet",
-        [{"gvkey": "001004", "cusip": "11111111A", "effective_start": "2018-01-01", "effective_end": "2019-05-31"}],
+        [{"gvkey": "001004", "cusip": "11111111", "effective_start": "2018-01-01", "effective_end": "2019-05-31"}],
     )
     evidence = _evaluate(d1, source)
     assert evidence["status"] == id0.STATUS_BLOCKED_COVERAGE
@@ -125,8 +125,8 @@ def test_overlapping_rows_block_ambiguity(tmp_path: Path) -> None:
     source = _source(
         tmp_path / "dated.parquet",
         [
-            {"gvkey": "001004", "cusip": "11111111A", "effective_start": "2018-01-01", "effective_end": None},
-            {"gvkey": "001004", "cusip": "11111111A", "effective_start": "2019-01-01", "effective_end": None},
+            {"gvkey": "001004", "cusip": "11111111", "effective_start": "2018-01-01", "effective_end": None},
+            {"gvkey": "001004", "cusip": "11111111", "effective_start": "2019-01-01", "effective_end": None},
         ],
     )
     evidence = _evaluate(d1, source)
@@ -138,7 +138,7 @@ def test_invalid_interval_order_blocks_before_coverage(tmp_path: Path) -> None:
     d1 = _d1(tmp_path / "d1.parquet")
     source = _source(
         tmp_path / "dated.parquet",
-        [{"gvkey": "001004", "cusip": "11111111A", "effective_start": "2020-01-01", "effective_end": "2019-01-01"}],
+        [{"gvkey": "001004", "cusip": "11111111", "effective_start": "2020-01-01", "effective_end": "2019-01-01"}],
     )
     evidence = _evaluate(d1, source)
     assert evidence["status"] == id0.STATUS_BLOCKED_INTERVALS
@@ -187,7 +187,7 @@ def test_detected_date_names_are_not_semantic_authority(tmp_path: Path) -> None:
         tmp_path / "relationship.parquet",
         [{
             "gvkey": "001004",
-            "cusip": "11111111A",
+            "cusip": "11111111",
             "start_date": "2018-01-01",
             "end_date": None,
         }],
@@ -210,7 +210,7 @@ def test_malformed_non_null_end_never_becomes_open_ended(
         tmp_path / "dated.parquet",
         [{
             "gvkey": "001004",
-            "cusip": "11111111A",
+            "cusip": "11111111",
             "effective_start": "2018-01-01",
             "effective_end": malformed_end,
         }],
@@ -222,7 +222,14 @@ def test_malformed_non_null_end_never_becomes_open_ended(
 
 @pytest.mark.parametrize(
     "malformed_identifier",
-    ["1234567890", "12345678!", "1234-5678A", "1234 5678A"],
+    [
+        "1234567890",
+        "12345678!",
+        "1234-5678A",
+        "1234 5678A",
+        "037833101",
+        "03783310A",
+    ],
 )
 def test_malformed_identifier_is_rejected_instead_of_rewritten(
     tmp_path: Path, malformed_identifier: str
@@ -241,6 +248,27 @@ def test_malformed_identifier_is_rejected_instead_of_rewritten(
     assert evidence["status"] == id0.STATUS_BLOCKED_INTERVALS
 
 
+@pytest.mark.parametrize(
+    ("identifier", "expected"),
+    [
+        ("03783310", "03783310"),
+        ("037833100", "03783310"),
+        ("037833101", None),
+        ("03783310A", None),
+    ],
+)
+def test_cusip9_requires_numeric_computed_check_digit(
+    identifier: str, expected: str | None
+) -> None:
+    normalized = id0._normalize_identifier8(
+        pd.Series([identifier]), source_column="cusip"
+    ).iloc[0]
+    if expected is None:
+        assert pd.isna(normalized)
+    else:
+        assert normalized == expected
+
+
 def test_mixed_missing_and_overlap_preserves_both_blockers(tmp_path: Path) -> None:
     d1 = _d1(tmp_path / "d1.parquet")
     source = _source(
@@ -248,13 +276,13 @@ def test_mixed_missing_and_overlap_preserves_both_blockers(tmp_path: Path) -> No
         [
             {
                 "gvkey": "001004",
-                "cusip": "11111111A",
+                "cusip": "11111111",
                 "effective_start": "2018-01-01",
                 "effective_end": "2019-05-31",
             },
             {
                 "gvkey": "001004",
-                "cusip": "11111111A",
+                "cusip": "11111111",
                 "effective_start": "2019-01-01",
                 "effective_end": "2019-05-31",
             },

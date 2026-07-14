@@ -135,12 +135,28 @@ def _normalize_gvkey(series: pd.Series) -> pd.Series:
     return series.astype("string").str.strip()
 
 
+def _cusip_check_digit(cusip8: pd.Series) -> pd.Series:
+    values_by_character = {
+        **{str(value): value for value in range(10)},
+        **{chr(ord("A") + value): 10 + value for value in range(26)},
+    }
+    total = pd.Series(0, index=cusip8.index, dtype="Int64")
+    for position in range(8):
+        value = cusip8.str[position].map(values_by_character).astype("Int64")
+        weighted = value * (2 if position % 2 else 1)
+        total = total + weighted.floordiv(10) + weighted.mod(10)
+    return ((10 - total.mod(10)).mod(10)).astype("string")
+
+
 def _normalize_identifier8(series: pd.Series, *, source_column: str) -> pd.Series:
     cleaned = series.astype("string").str.strip().str.upper()
     source_name = source_column.casefold()
     if source_name == "cusip":
-        valid = cleaned.str.fullmatch(r"[0-9A-Z]{8,9}", na=False)
-        return cleaned.str.slice(0, 8).where(valid)
+        identifier8 = cleaned.str.slice(0, 8)
+        valid8 = cleaned.str.fullmatch(r"[0-9A-Z]{8}", na=False)
+        valid9_shape = cleaned.str.fullmatch(r"[0-9A-Z]{8}[0-9]", na=False)
+        valid9_checksum = cleaned.str[8].eq(_cusip_check_digit(identifier8))
+        return identifier8.where(valid8 | (valid9_shape & valid9_checksum))
     valid = cleaned.str.fullmatch(r"[0-9A-Z]{8}", na=False)
     return cleaned.where(valid)
 
