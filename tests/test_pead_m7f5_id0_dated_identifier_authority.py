@@ -1,6 +1,7 @@
 """Focused tests for M7F5-ID0 dated-identifier authority."""
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -36,10 +37,25 @@ def _lock(path: Path) -> dict[str, object]:
     }
 
 
-def _evaluate(d1: Path, source: Path) -> dict[str, object]:
+def _evaluate(
+    d1: Path,
+    source: Path,
+    *,
+    bind_columns: bool = True,
+) -> dict[str, object]:
+    column_args = (
+        {
+            "identifier_column": "cusip",
+            "effective_start_column": "effective_start",
+            "effective_end_column": "effective_end",
+        }
+        if bind_columns
+        else {}
+    )
     return id0.evaluate_authority(
         d1_path=d1,
         identifier_source_path=source,
+        **column_args,
         **_lock(d1),
     )
 
@@ -67,7 +83,7 @@ def test_snapshot_only_master_returns_required_blocker(tmp_path: Path) -> None:
         tmp_path / "master.parquet",
         [{"gvkey": "001004", "cusip": "12345678A", "updated_at": "2026-03-07T11:03:59Z"}],
     )
-    evidence = _evaluate(d1, source)
+    evidence = _evaluate(d1, source, bind_columns=False)
     report = evidence["dated_identifier_source"]
     assert evidence["status"] == "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_SOURCE_ABSENT"
     assert report["effective_date_columns"] is None
@@ -159,4 +175,160 @@ def test_atomic_evidence_write_is_deterministic(tmp_path: Path) -> None:
     first = output.read_bytes()
     id0._atomic_write_text(output, payload)
     assert output.read_bytes() == first
+    assert not list(tmp_path.glob(f".{output.name}.*.tmp"))
+
+
+def test_detected_date_names_are_not_semantic_authority(tmp_path: Path) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    source = _source(
+        tmp_path / "relationship.parquet",
+        [{
+            "gvkey": "001004",
+            "cusip": "11111111A",
+            "start_date": "2018-01-01",
+            "end_date": None,
+        }],
+    )
+    evidence = _evaluate(d1, source, bind_columns=False)
+    report = evidence["dated_identifier_source"]
+    assert evidence["status"] == id0.STATUS_BLOCKED_SCHEMA
+    assert report["reason_codes"] == [
+        "identifier_validity_columns_must_be_explicitly_bound"
+    ]
+    assert report["strict_pit_identifier_authority"] is False
+
+
+@pytest.mark.parametrize("malformed_end", ["", "   ", "not-a-date"])
+def test_malformed_non_null_end_never_becomes_open_ended(
+    tmp_path: Path, malformed_end: str
+) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    source = _source(
+        tmp_path / "dated.parquet",
+        [{
+            "gvkey": "001004",
+            "cusip": "11111111A",
+            "effective_start": "2018-01-01",
+            "effective_end": malformed_end,
+        }],
+    )
+    evidence = _evaluate(d1, source)
+    assert evidence["status"] == id0.STATUS_BLOCKED_INTERVALS
+    assert evidence["dated_identifier_source"]["invalid_relevant_rows"] == 1
+
+
+def test_overlong_identifier_is_rejected_instead_of_truncated(tmp_path: Path) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    source = _source(
+        tmp_path / "dated.parquet",
+        [{
+            "gvkey": "001004",
+            "cusip": "1234567890",
+            "effective_start": "2018-01-01",
+            "effective_end": None,
+        }],
+    )
+    evidence = _evaluate(d1, source)
+    assert evidence["status"] == id0.STATUS_BLOCKED_INTERVALS
+
+
+def test_mixed_missing_and_overlap_preserves_both_blockers(tmp_path: Path) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    source = _source(
+        tmp_path / "dated.parquet",
+        [
+            {
+                "gvkey": "001004",
+                "cusip": "11111111A",
+                "effective_start": "2018-01-01",
+                "effective_end": "2019-05-31",
+            },
+            {
+                "gvkey": "001004",
+                "cusip": "11111111A",
+                "effective_start": "2019-01-01",
+                "effective_end": "2019-05-31",
+            },
+        ],
+    )
+    evidence = _evaluate(d1, source)
+    reasons = evidence["dated_identifier_source"]["reason_codes"]
+    assert evidence["status"] == id0.STATUS_BLOCKED_AMBIGUITY
+    assert "one_or_more_events_have_no_effective_identifier" in reasons
+    assert "one_or_more_events_have_multiple_active_identifier_rows" in reasons
+
+
+def test_non_finite_sue_is_ineligible_and_json_safe(tmp_path: Path) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    frame = pd.read_parquet(d1)
+    frame.loc[len(frame)] = {
+        "gvkey": "009999",
+        "rdq": "2019-08-01",
+        "sue_price_scaled_clipped": float("inf"),
+        "valid_sue": True,
+    }
+    events, contract = id0.build_pre_identity_events(frame)
+    assert "009999|2019-08-01" not in set(events["event_id"])
+    assert contract["unique_pre_identity_events"] == 2
+    id0._serialize_evidence(contract)
+
+
+def test_read_hash_drift_fails_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    hashes = iter(["before", "after"])
+    monkeypatch.setattr(id0, "_sha256_file", lambda _path: next(hashes))
+    with pytest.raises(id0.M7F5ID0InputError, match="d1_changed_during_read"):
+        id0.inspect_d1_lock(d1)
+
+
+@pytest.mark.parametrize("target", ["d1", "source"])
+def test_output_cannot_alias_an_input(tmp_path: Path, target: str) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    source = _source(
+        tmp_path / "source.parquet",
+        [{"gvkey": "001004", "cusip": "11111111A"}],
+    )
+    output = d1 if target == "d1" else source
+    before = output.read_bytes()
+    exit_code = id0.main([
+        "--d1", str(d1),
+        "--identifier-source", str(source),
+        "--output", str(output),
+    ])
+    assert exit_code == 2
+    assert output.read_bytes() == before
+
+
+def test_output_hardlink_alias_is_rejected(tmp_path: Path) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    source = _source(
+        tmp_path / "source.parquet",
+        [{"gvkey": "001004", "cusip": "11111111A"}],
+    )
+    alias = tmp_path / "d1-alias.parquet"
+    try:
+        os.link(d1, alias)
+    except OSError as exc:
+        pytest.skip(f"hardlinks unavailable: {exc}")
+    before = d1.read_bytes()
+    assert id0.main([
+        "--d1", str(d1),
+        "--identifier-source", str(source),
+        "--output", str(alias),
+    ]) == 2
+    assert d1.read_bytes() == before
+
+
+def test_atomic_write_cleans_partial_when_replace_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output = tmp_path / "evidence.json"
+
+    def fail_replace(_self: Path, _target: Path) -> None:
+        raise OSError("replace failed")
+
+    monkeypatch.setattr(Path, "replace", fail_replace)
+    with pytest.raises(OSError, match="replace failed"):
+        id0._atomic_write_text(output, "{}\n")
+    assert not output.exists()
     assert not list(tmp_path.glob(f".{output.name}.*.tmp"))

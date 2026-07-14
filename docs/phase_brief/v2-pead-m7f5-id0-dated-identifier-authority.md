@@ -11,7 +11,7 @@ Hierarchy Confirmation: Approved by owner after G0 independent audit PASS | Sess
 
 ## Recommended next action
 
-Bank Commit A only: a standalone validator, focused tests, and this brief. Run it against the locked D1 artifact and the current Compustat security master. The required current result is `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_SOURCE_ABSENT`. Do not acquire historical identifiers or reopen portfolio mechanics in this round.
+Repair Commit A only in the standalone validator, focused tests, and this brief, then rerun independent Reviewer A/B/C against the immutable repair commit. The required current-source result remains `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_SOURCE_ABSENT`. Do not acquire historical identifiers or reopen portfolio mechanics in this round.
 
 ## Purpose
 
@@ -41,11 +41,13 @@ Any mismatch returns `BLOCKED_D1_PRE_IDENTITY_LOCK_MISMATCH` and skips identifie
 The source must provide:
 
 - `gvkey`;
-- a normalized eight-character security identifier from an explicitly named or canonical identifier column;
-- a genuine effective-start column;
-- a genuine effective-end column, nullable only for an open-ended interval.
+- a normalized eight-character security identifier from an explicitly bound identifier column;
+- a genuine effective-start column explicitly bound to identifier validity;
+- a genuine effective-end column explicitly bound to identifier validity, nullable only for an open-ended interval.
 
-`updated_at`, file modification time, extraction time, or source maximum date are load/snapshot metadata and are never effective-date authority.
+The identifier, effective-start, and effective-end columns must be supplied together through the CLI/API. Column names alone—including generic relationship pairs such as `start_date/end_date`, `linkdt/linkenddt`, and `namedt/nameendt`—never establish identifier-validity semantics. A `cusip` value may contain exactly 8 characters or a 9th check digit; `cusip8` and `ncusip` must contain exactly 8. Other lengths fail closed instead of being truncated.
+
+`updated_at`, file modification time, extraction time, or source maximum date are load/snapshot metadata and are never effective-date authority. A null effective end is open-ended; blank, whitespace, or unparsable non-null values are invalid intervals.
 
 For every locked event, exactly one active source row and one identifier must satisfy:
 
@@ -55,7 +57,7 @@ Missing coverage, invalid intervals, overlapping active rows, or multiple active
 
 ### Slice A2 — deterministic evidence interface
 
-The CLI prints deterministic, sorted JSON and may atomically write the same evidence to an explicit output path. Blocked research states exit successfully as evaluated evidence; malformed or unreadable inputs exit `2` without partial output.
+The CLI prints deterministic, sorted JSON and may atomically write the same evidence to an explicit output path. The output must not resolve to, link to, or otherwise alias either input. Each Parquet is hashed before and after its read so evidence cannot bind parsed rows to different bytes. Blocked research states exit successfully as evaluated evidence; malformed or unreadable inputs exit `2` without partial output.
 
 The evidence must declare all of the following false:
 
@@ -70,15 +72,19 @@ The evidence must declare all of the following false:
 Tests must cover:
 
 - exact locked constants;
-- pre-identity filtering and shuffle-stable hashes;
+- pre-identity filtering, non-finite SUE exclusion, and shuffle-stable hashes;
 - current snapshot-only master blocker;
 - complete unique dated-source PASS;
 - missing event coverage;
 - overlapping intervals;
 - invalid interval order;
 - D1 lock failure before source evaluation;
-- explicit effective-column pairing;
-- deterministic atomic evidence output.
+- explicit three-column semantic binding and generic relationship-date rejection;
+- malformed non-null ends and malformed/overlong identifiers;
+- mixed missing-plus-overlap blocker preservation;
+- read/hash drift rejection;
+- direct-path and hardlink output/input alias rejection;
+- deterministic atomic evidence output and partial cleanup after replace failure.
 
 ## Current-source expected result
 
@@ -87,6 +93,12 @@ Tests must cover:
 `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_SOURCE_ABSENT`
 
 This blocker is evidence that the required authority is absent, not a request to infer dates from the snapshot.
+
+Executable clean-checkout command (using the canonical data checkout explicitly):
+
+`E:\Code\Quant\.venv\Scripts\python.exe E:\Code\Quant_c0x_m7f4_v8\scripts\pead_m7f5_id0_dated_identifier_authority.py --d1 E:\Code\Quant\data\processed\pead_d1_sue_signal.parquet --identifier-source E:\Code\Quant\data\processed\security_master_compustat.parquet`
+
+A candidate dated source may be evaluated only by additionally supplying all three of `--identifier-column`, `--effective-start-column`, and `--effective-end-column` with provenance-backed semantics.
 
 ## P0 / P1 risks
 
@@ -115,8 +127,9 @@ No evidence JSON, current-truth reconciliation, acquisition request, source data
 - The script imports no M7F4/v8 or portfolio module.
 - D1 real bytes reproduce the exact locked count and both canonical hashes.
 - The current Compustat master returns the exact required blocker.
-- A valid synthetic dated source passes only with complete one-row-per-event coverage.
-- Missing, invalid, overlapping, and ambiguous interval cases fail closed.
+- A valid synthetic dated source passes only with explicitly bound semantics and complete one-row-per-event coverage.
+- Missing, malformed, invalid, overlapping, and ambiguous interval cases fail closed without losing simultaneous blocker reasons.
+- Output/input aliases and read/hash drift fail before evidence can overwrite or misdescribe input bytes.
 - Compile and focused tests pass.
 - Two real CLI runs produce byte-identical evidence.
 - Git status contains only the three expected Commit A paths.
@@ -139,9 +152,12 @@ Commit A is additive. Rollback removes only the three expected paths. It does no
 ## Live loop
 
 - G0 independent audit of `ea0da956` — PASS.
-- Slice A0/A1/A2 implementation — active in Commit A worktree.
-- Focused validation and real current-source evidence — pending.
-- Independent Reviewer A/B/C and terminal truth reconciliation — not part of Commit A and not yet authorized as closure.
+- Commit A `466a485a3f1b91c697073d1ccec3fee386d13539` — created; initial Reviewer A/B/C verdict blocked on fail-closed defects.
+- Validator/test/brief repair — active, restricted to the three Commit A paths.
+- Compile and 22/22 focused tests — PASS.
+- Two real current-source runs — byte-identical and returned the required absence blocker with the locked 21,882-event universe and both canonical hashes.
+- Independent Reviewer A/B/C repair audit — pending against the immutable repair commit.
+- Acquisition, mapping, curves, readiness, Strategy/UI, and current-truth reconciliation remain closed.
 
 ## Decision after evidence
 

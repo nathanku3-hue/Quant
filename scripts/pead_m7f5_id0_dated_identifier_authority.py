@@ -103,6 +103,27 @@ def _read_parquet(path: Path, *, label: str) -> pd.DataFrame:
         raise M7F5ID0InputError(f"{label}_unreadable:{path}:{exc}") from exc
 
 
+def _read_parquet_with_stable_sha256(
+    path: Path, *, label: str
+) -> tuple[pd.DataFrame, str]:
+    """Bind a parsed frame to one immutable byte snapshot."""
+    if not path.is_file():
+        raise M7F5ID0InputError(f"{label}_not_found:{path}")
+    try:
+        before = _sha256_file(path)
+        frame = _read_parquet(path, label=label)
+        after = _sha256_file(path)
+    except M7F5ID0InputError:
+        raise
+    except OSError as exc:
+        raise M7F5ID0InputError(
+            f"{label}_changed_or_unreadable_during_read:{path}:{exc}"
+        ) from exc
+    if before != after:
+        raise M7F5ID0InputError(f"{label}_changed_during_read:{path}")
+    return frame, after
+
+
 def _normalize_timestamp_series(series: pd.Series) -> pd.Series:
     parsed = pd.to_datetime(series, errors="coerce", utc=True)
     return parsed.dt.tz_convert(None).dt.normalize()
@@ -112,13 +133,16 @@ def _normalize_gvkey(series: pd.Series) -> pd.Series:
     return series.astype("string").str.strip()
 
 
-def _normalize_identifier8(series: pd.Series) -> pd.Series:
+def _normalize_identifier8(series: pd.Series, *, source_column: str) -> pd.Series:
     cleaned = (
         series.astype("string")
         .str.replace(r"[^0-9A-Za-z]", "", regex=True)
         .str.upper()
-        .str.slice(0, 8)
     )
+    source_name = source_column.casefold()
+    if source_name == "cusip":
+        valid_length = cleaned.str.len().isin([8, 9])
+        return cleaned.str.slice(0, 8).where(valid_length)
     return cleaned.where(cleaned.str.len() == 8)
 
 
@@ -140,7 +164,8 @@ def build_pre_identity_events(d1_frame: pd.DataFrame) -> tuple[pd.DataFrame, dic
         & frame["gvkey"].ne("")
         & frame["rdq"].notna()
         & frame["rdq"].dt.year.eq(COHORT_YEAR)
-        & frame["sue"].notna(),
+        & frame["sue"].notna()
+        & frame["sue"].abs().lt(float("inf")),
         ["gvkey", "rdq", "sue"],
     ].copy()
 
@@ -188,9 +213,10 @@ def inspect_d1_lock(
     expected_event_set_sha256: str = LOCKED_PRE_IDENTITY_EVENT_SET_SHA256,
     expected_canonical_rows_sha256: str = LOCKED_PRE_IDENTITY_CANONICAL_ROWS_SHA256,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
-    d1_frame = _read_parquet(d1_path, label="d1")
+    d1_frame, actual_sha256 = _read_parquet_with_stable_sha256(
+        d1_path, label="d1"
+    )
     events, contract = build_pre_identity_events(d1_frame)
-    actual_sha256 = _sha256_file(d1_path)
     mismatches: list[str] = []
     if actual_sha256 != expected_sha256:
         mismatches.append("d1_sha256")
@@ -316,17 +342,40 @@ def inspect_identifier_source(
             },
         }
 
-    frame = _read_parquet(source_path, label="identifier_source")
+    frame, source_sha256 = _read_parquet_with_stable_sha256(
+        source_path, label="identifier_source"
+    )
     columns = [str(column) for column in frame.columns]
-    source_sha256 = _sha256_file(source_path)
     updated_at_profile = _profile_updated_at(frame)
-    pair = _resolve_effective_pair(
-        columns,
-        requested_start=effective_start_column,
-        requested_end=effective_end_column,
+    requested = (
+        identifier_column,
+        effective_start_column,
+        effective_end_column,
+    )
+    if any(value is not None for value in requested) and not all(
+        value is not None for value in requested
+    ):
+        raise M7F5ID0InputError(
+            "identifier_start_and_end_columns_must_be_supplied_together"
+        )
+
+    detected_pair = _resolve_effective_pair(
+        columns, requested_start=None, requested_end=None
+    )
+    explicitly_bound = all(value is not None for value in requested)
+    pair = (
+        _resolve_effective_pair(
+            columns,
+            requested_start=effective_start_column,
+            requested_end=effective_end_column,
+        )
+        if explicitly_bound
+        else None
     )
     identifier = _resolve_named_column(
-        columns, identifier_column, IDENTIFIER_COLUMN_CANDIDATES
+        columns,
+        identifier_column if explicitly_bound else None,
+        () if explicitly_bound else IDENTIFIER_COLUMN_CANDIDATES,
     )
     gvkey_column = _resolve_named_column(columns, "gvkey", ())
 
@@ -340,10 +389,25 @@ def inspect_identifier_source(
         "effective_date_columns": (
             {"start": pair[0], "end": pair[1]} if pair is not None else None
         ),
+        "detected_unbound_effective_date_columns": (
+            {"start": detected_pair[0], "end": detected_pair[1]}
+            if detected_pair is not None and not explicitly_bound
+            else None
+        ),
+        "effective_date_semantics_explicitly_bound": explicitly_bound,
         "updated_at_profile": updated_at_profile,
     }
 
-    if pair is None:
+    if not explicitly_bound:
+        if detected_pair is not None:
+            return {
+                **source_report,
+                "status": STATUS_BLOCKED_SCHEMA,
+                "reason_codes": [
+                    "identifier_validity_columns_must_be_explicitly_bound"
+                ],
+                "coverage": None,
+            }
         return {
             **source_report,
             "status": STATUS_BLOCKED_SOURCE_ABSENT,
@@ -353,12 +417,14 @@ def inspect_identifier_source(
             ],
             "coverage": None,
         }
-    if gvkey_column is None or identifier is None:
+    if pair is None or gvkey_column is None or identifier is None:
         reasons = []
+        if pair is None:
+            reasons.append("requested_effective_date_column_missing")
         if gvkey_column is None:
             reasons.append("gvkey_column_missing")
         if identifier is None:
-            reasons.append("identifier_column_missing")
+            reasons.append("requested_identifier_column_missing")
         return {
             **source_report,
             "status": STATUS_BLOCKED_SCHEMA,
@@ -370,9 +436,12 @@ def inspect_identifier_source(
     normalized = pd.DataFrame(
         {
             "gvkey": _normalize_gvkey(frame[gvkey_column]),
-            "identifier8": _normalize_identifier8(frame[identifier]),
+            "identifier8": _normalize_identifier8(
+                frame[identifier], source_column=identifier
+            ),
             "effective_start": _normalize_timestamp_series(frame[start_column]),
             "effective_end": _normalize_timestamp_series(frame[end_column]),
+            "effective_end_raw_null": frame[end_column].isna(),
         }
     )
     relevant_gvkeys = set(events["gvkey"].astype(str))
@@ -382,6 +451,10 @@ def inspect_identifier_source(
         | relevant["gvkey"].eq("")
         | relevant["identifier8"].isna()
         | relevant["effective_start"].isna()
+        | (
+            relevant["effective_end"].isna()
+            & ~relevant["effective_end_raw_null"]
+        )
         | (
             relevant["effective_end"].notna()
             & relevant["effective_end"].lt(relevant["effective_start"])
@@ -452,15 +525,18 @@ def inspect_identifier_source(
         "canonical_event_identifier_mapping_sha256": _canonical_mapping_sha256(mapping),
     }
 
+    reasons = []
     if missing_events:
-        status = STATUS_BLOCKED_COVERAGE
-        reasons = ["one_or_more_events_have_no_effective_identifier"]
-    elif overlapping_events or ambiguous_events:
+        reasons.append("one_or_more_events_have_no_effective_identifier")
+    if overlapping_events or ambiguous_events:
+        reasons.append("one_or_more_events_have_multiple_active_identifier_rows")
+
+    if overlapping_events or ambiguous_events:
         status = STATUS_BLOCKED_AMBIGUITY
-        reasons = ["one_or_more_events_have_multiple_active_identifier_rows"]
+    elif missing_events:
+        status = STATUS_BLOCKED_COVERAGE
     else:
         status = STATUS_PASS
-        reasons = []
 
     return {
         **source_report,
@@ -568,6 +644,25 @@ def _atomic_write_text(path: Path, text: str) -> None:
         raise
 
 
+def _paths_alias(first: Path, second: Path) -> bool:
+    if first.resolve(strict=False) == second.resolve(strict=False):
+        return True
+    if first.exists() and second.exists():
+        try:
+            return os.path.samefile(first, second)
+        except OSError:
+            return False
+    return False
+
+
+def _validate_output_path(output: Path | None, inputs: Sequence[Path]) -> None:
+    if output is None:
+        return
+    for input_path in inputs:
+        if _paths_alias(output, input_path):
+            raise M7F5ID0InputError(f"output_path_aliases_input:{input_path}")
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Validate dated Compustat identifier authority for locked 2019 D1 events."
@@ -586,6 +681,9 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     try:
+        _validate_output_path(
+            args.output, (args.d1, args.identifier_source)
+        )
         evidence = evaluate_authority(
             d1_path=args.d1,
             identifier_source_path=args.identifier_source,
