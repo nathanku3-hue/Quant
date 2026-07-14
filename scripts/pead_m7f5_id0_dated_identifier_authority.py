@@ -152,9 +152,14 @@ def _lexical_identifier_mask(series: pd.Series) -> pd.Series:
     if isinstance(series.dtype, pd.CategoricalDtype):
         return pd.Series(False, index=series.index, dtype=bool)
     if pd.api.types.is_object_dtype(series.dtype):
-        return series.map(
-            lambda value: bool(pd.isna(value)) or isinstance(value, str)
-        ).astype(bool)
+        def is_lexical_or_missing(value: Any) -> bool:
+            if isinstance(value, str):
+                return True
+            if not pd.api.types.is_scalar(value):
+                return False
+            return bool(pd.isna(value))
+
+        return series.map(is_lexical_or_missing).astype(bool)
     if pd.api.types.is_string_dtype(series.dtype):
         return pd.Series(True, index=series.index, dtype=bool)
     return pd.Series(False, index=series.index, dtype=bool)
@@ -162,7 +167,9 @@ def _lexical_identifier_mask(series: pd.Series) -> pd.Series:
 
 def _normalize_identifier8(series: pd.Series, *, source_column: str) -> pd.Series:
     lexical = _lexical_identifier_mask(series)
-    cleaned = series.where(lexical).astype("string").str.strip().str.upper()
+    trimmed = series.where(lexical).astype("string").str.strip()
+    ascii_shape = trimmed.str.fullmatch(r"[0-9A-Za-z]{8,9}", na=False)
+    cleaned = trimmed.where(ascii_shape).str.upper()
     source_name = source_column.casefold()
     if source_name == "cusip":
         identifier8 = cleaned.str.slice(0, 8)

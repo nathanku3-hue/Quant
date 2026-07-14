@@ -45,7 +45,7 @@ The source must provide:
 - a genuine effective-start column explicitly bound to identifier validity;
 - a genuine effective-end column explicitly bound to identifier validity, nullable only for an open-ended interval.
 
-The identifier, effective-start, and effective-end columns must be supplied together through the CLI/API and each binding name must be non-empty after trimming. Column names alone—including generic relationship pairs such as `start_date/end_date`, `linkdt/linkenddt`, and `namedt/nameendt`—never establish identifier-validity semantics. Identifier values must retain lexical string provenance; numeric and categorical source dtypes are not string-coerced because leading zeros may already be lost. A `cusip` value must be exactly 8 ASCII alphanumeric characters or 9 with a numeric ninth character that matches the computed CUSIP check digit; `cusip8` and `ncusip` must be exactly 8 ASCII alphanumeric characters. Unsupported punctuation, embedded spaces, invalid or nonnumeric check digits, and other lengths fail closed instead of being removed or truncated.
+The identifier, effective-start, and effective-end columns must be supplied together through the CLI/API and each binding name must be non-empty after trimming. Column names alone—including generic relationship pairs such as `start_date/end_date`, `linkdt/linkenddt`, and `namedt/nameendt`—never establish identifier-validity semantics. Identifier values must retain lexical scalar-string provenance; numeric, categorical, nested, and list-valued inputs are not string-coerced because leading zeros or singular identity may already be lost. Original trimmed values must match the ASCII shape before case normalization, so Unicode case folding cannot create authority. A `cusip` value must be exactly 8 ASCII alphanumeric characters or 9 with a numeric ninth character that matches the computed CUSIP check digit; `cusip8` and `ncusip` must be exactly 8 ASCII alphanumeric characters. Unsupported punctuation, embedded spaces, invalid or nonnumeric check digits, and other lengths fail closed instead of being removed or truncated.
 
 `updated_at`, file modification time, extraction time, or source maximum date are load/snapshot metadata and are never effective-date authority. A null effective end is open-ended; blank, whitespace, or unparsable non-null values are invalid intervals.
 
@@ -80,7 +80,7 @@ Tests must cover:
 - invalid interval order;
 - D1 lock failure before source evaluation;
 - explicit three-column semantic binding and generic relationship-date rejection;
-- malformed non-null ends, blank bindings, non-string identifier dtypes, malformed/overlong/punctuated identifiers, and invalid CUSIP9 check digits;
+- malformed non-null ends, blank bindings, non-string/non-scalar identifier values, Unicode case-expansion attempts, malformed/overlong/punctuated identifiers, and invalid CUSIP9 check digits;
 - mixed missing-plus-overlap blocker preservation;
 - immutable-snapshot read/hash binding, including A→B→A replacement;
 - direct-path and hardlink output/input alias rejection;
@@ -156,10 +156,11 @@ Commit A is additive. Rollback removes only the three expected paths. It does no
 - Repair commit `e4122330a794bad7bd27b849ebbec482e7d43952` — compile, 22/22 tests, and two byte-identical real runs PASS; Reviewer B PASS, Reviewer A/C BLOCK on adversarial identifier, blank-binding, and A→B→A findings.
 - Repair commit `d7f38973af9e3c8df9320b6a758e86a4a38ae66b` — compile, 28/28 tests, and two byte-identical real runs PASS; Reviewer B/C PASS, Reviewer A BLOCK on missing CUSIP9 checksum validation.
 - Checksum repair commit `93822b57e7be94a78a176505484dd852e0f45cb1` — compile, 34/34 tests, and two byte-identical real runs PASS; Reviewer A/B PASS, Reviewer C BLOCK on numeric identifier string coercion.
-- Lexical-provenance validator/test/brief repair — complete, restricted to the same three paths.
-- Compile and 36/36 focused tests — PASS.
+- Lexical repair commit `0e6d708da227bb49cabf2d8015ebad6e6d130736` — compile, 36/36 tests, and two byte-identical real runs PASS; Reviewer A/B/C BLOCK on Unicode case expansion and list-valued identifier crash paths.
+- Scalar-safe ASCII-order validator/test/brief repair — complete, restricted to the same three paths.
+- Compile and 40/40 focused tests — PASS.
 - Two real current-source runs — byte-identical and returned the required absence blocker with the locked 21,882-event universe and both canonical hashes.
-- Terminal Reviewer A/B/C rerun — pending against the immutable lexical-provenance repair commit.
+- Terminal Reviewer A/B/C rerun — pending against the immutable scalar-safe repair commit.
 - Acquisition, mapping, curves, readiness, Strategy/UI, and current-truth reconciliation remain closed.
 
 ## Decision after evidence

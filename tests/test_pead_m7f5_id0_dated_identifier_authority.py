@@ -229,6 +229,9 @@ def test_malformed_non_null_end_never_becomes_open_ended(
         "1234 5678A",
         "037833101",
         "03783310A",
+        "1234567ſ",
+        "1234567ı",
+        "123456ß",
     ],
 )
 def test_malformed_identifier_is_rejected_instead_of_rewritten(
@@ -292,6 +295,46 @@ def test_categorical_identifier_dtype_is_not_implicitly_lexical() -> None:
         source_column="cusip",
     )
     assert normalized.isna().all()
+
+
+def test_list_typed_identifier_blocks_without_crashing_cli(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    events, contract = id0.build_pre_identity_events(pd.read_parquet(d1))
+    source = _source(
+        tmp_path / "list-identifier.parquet",
+        [{
+            "gvkey": "001004",
+            "cusip": ["037833100", "594918104"],
+            "effective_start": "2018-01-01",
+            "effective_end": None,
+        }],
+    )
+    d1_report = {
+        "verified": True,
+        "mismatches": [],
+        **contract,
+    }
+    monkeypatch.setattr(
+        id0,
+        "inspect_d1_lock",
+        lambda *_args, **_kwargs: (events, d1_report),
+    )
+    exit_code = id0.main([
+        "--d1", str(d1),
+        "--identifier-source", str(source),
+        "--identifier-column", "cusip",
+        "--effective-start-column", "effective_start",
+        "--effective-end-column", "effective_end",
+    ])
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert captured.err == ""
+    assert id0.STATUS_BLOCKED_INTERVALS in captured.out
+    assert "Traceback" not in captured.out
 
 
 def test_mixed_missing_and_overlap_preserves_both_blockers(tmp_path: Path) -> None:
