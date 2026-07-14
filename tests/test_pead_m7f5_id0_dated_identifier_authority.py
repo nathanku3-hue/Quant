@@ -269,6 +269,31 @@ def test_cusip9_requires_numeric_computed_check_digit(
         assert normalized == expected
 
 
+def test_numeric_identifier_dtype_cannot_gain_lexical_authority(tmp_path: Path) -> None:
+    d1 = _d1(tmp_path / "d1.parquet")
+    source = _source(
+        tmp_path / "numeric-identifier.parquet",
+        [{
+            "gvkey": "001004",
+            "cusip": 12345678,
+            "effective_start": "2018-01-01",
+            "effective_end": None,
+        }],
+    )
+    evidence = _evaluate(d1, source)
+    assert evidence["status"] == id0.STATUS_BLOCKED_INTERVALS
+    assert evidence["strict_pit_identifier_authority"] is False
+    assert evidence["dated_identifier_source"]["invalid_relevant_rows"] == 1
+
+
+def test_categorical_identifier_dtype_is_not_implicitly_lexical() -> None:
+    normalized = id0._normalize_identifier8(
+        pd.Series(pd.Categorical(["037833100"])),
+        source_column="cusip",
+    )
+    assert normalized.isna().all()
+
+
 def test_mixed_missing_and_overlap_preserves_both_blockers(tmp_path: Path) -> None:
     d1 = _d1(tmp_path / "d1.parquet")
     source = _source(

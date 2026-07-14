@@ -148,8 +148,21 @@ def _cusip_check_digit(cusip8: pd.Series) -> pd.Series:
     return ((10 - total.mod(10)).mod(10)).astype("string")
 
 
+def _lexical_identifier_mask(series: pd.Series) -> pd.Series:
+    if isinstance(series.dtype, pd.CategoricalDtype):
+        return pd.Series(False, index=series.index, dtype=bool)
+    if pd.api.types.is_object_dtype(series.dtype):
+        return series.map(
+            lambda value: bool(pd.isna(value)) or isinstance(value, str)
+        ).astype(bool)
+    if pd.api.types.is_string_dtype(series.dtype):
+        return pd.Series(True, index=series.index, dtype=bool)
+    return pd.Series(False, index=series.index, dtype=bool)
+
+
 def _normalize_identifier8(series: pd.Series, *, source_column: str) -> pd.Series:
-    cleaned = series.astype("string").str.strip().str.upper()
+    lexical = _lexical_identifier_mask(series)
+    cleaned = series.where(lexical).astype("string").str.strip().str.upper()
     source_name = source_column.casefold()
     if source_name == "cusip":
         identifier8 = cleaned.str.slice(0, 8)
