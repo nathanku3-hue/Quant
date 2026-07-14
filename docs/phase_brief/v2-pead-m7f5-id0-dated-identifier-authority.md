@@ -174,8 +174,9 @@ Commit A is additive. Rollback removes only the three expected paths. It does no
 - Two real current-source runs — byte-identical, schema `pead_m7f5_id0_dated_identifier_authority_v2`, runtime/check-out evidence SHA-256 `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903`, committed Git-blob evidence SHA-256 `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`, and returned `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED` with reason `committed_git_blob_data_owner_approval_required`, the locked 21,882-event universe, and both canonical hashes.
 - Commit A banking — PASS at `c5a9ab8377d3a455b003a5166e9b1f93e8dc686e`.
 - Deterministic evidence Commit B banking — PASS at `410d0caf327646de2447e049ae0d1d66482e7c8a`; evidence path `docs/context/e2e_evidence/pead_m7f5_id0_dated_identifier_authority_20260714.json`.
-- Terminal Reviewer A/B/C+SAW rerun — in progress after A/B banking; no truth closure before PASS.
-- Acquisition, mapping, curves, readiness, Strategy/UI, and current-truth reconciliation remain closed.
+- Terminal Reviewer A/B/C+SAW rerun — PASS; Reviewer A/B/C passed independently, and terminal SAW report `398732c` validated `ChecksPassed=10`, `ChecksFailed=0`.
+- Seven current-truth surfaces — reconciled to the terminal provenance BLOCK state; M7F4-v8 remains diagnostic history, and strict PIT/as-of identifier authority remains `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`.
+- Acquisition, mapping, curves, readiness, Strategy/UI, provider access, remotes, publication, and dispatch remain closed.
 
 ## Decision after evidence
 

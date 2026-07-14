@@ -1,6 +1,15 @@
 # Bridge Contract - Current
 
-## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- `SYSTEM_DELTA`: M7F5-ID0 Commit A `c5a9ab8` requires exact source/envelope bytes plus a reachable, unchanged committed data-owner approval blob under `docs/authorization/`; Commit B `410d0ca` banks current-source BLOCK evidence; truth repair `a51f349` and terminal SAW `398732c` close A/B/C review.
+- `PM / Product Delta`: Current Compustat security master remains blocked for strict-PIT identifier authority with `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`; research validity remains near 30 and M7F4-v8 remains a diagnostic, not a strict curve.
+- `OPEN_DECISION`: Obtain a genuine effective-dated identifier source with committed data-owner approval, authorize historical identifier acquisition, or terminate PEAD strict-PIT work.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion; choose exactly one separately authorized owner decision.
+- `DO_NOT_REDECIDE`: Do not infer identifier-validity dates from current snapshots, caller-created JSON, generic date columns, `updated_at`, provider metadata, or non-committed approvals; do not run mapping/curve/readiness/Strategy/UI work from this BLOCK evidence.
+- `PHASE_STATUS`: M7F5-ID0 terminal SAW PASS for a provenance BLOCK; strict PIT/as-of identifier authority `BLOCKED`; `m6b_data_contract_ready=false`.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
 
 - `SYSTEM_DELTA`: A2.1 `b4d35e1` repaired the residual-evidence count and added the real publication-branch regression; Commit B `9f37745` banks only the evidence JSON and two manifests; three distinct reviewers independently PASS the fixed Commit B package.
 - `PM / Product Delta`: M7F4-v8 is `DIAGNOSTIC_COMPLETE` with 2,448 selected, 2,444 observed, four residual windows, two validated bridges, exact self-financing NAV/cost identities, and exact 16-state Shapley. Strict curve remains `BLOCKED`; research ceiling remains near 30.

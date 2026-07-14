@@ -1,6 +1,16 @@
 # Observability Pack - Current
 
-## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- `ObservabilityRating`: GREEN for committed authority-gate implementation, 59/59 focused tests, deterministic BLOCK evidence, independent A/B/C PASS, and terminal SAW PASS; RED for strict PIT/as-of identifier authority, readiness, alpha, tradability, provider access, and Strategy/UI promotion.
+- Authority sentinel: Commit A `c5a9ab8` removes caller-controlled owner/repository authority; only exact, reachable, unchanged `docs/authorization/*.json` Git blobs in this checkout can approve.
+- Evidence sentinel: Commit B `410d0ca`; checkout/runtime SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903`; committed Git-blob SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- Blocker sentinel: `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`; reason `committed_git_blob_data_owner_approval_required`; source rows 75,913; no effective-date pair; `updated_at` is not authority.
+- D1 sentinel: 21,882 locked pre-identity events; event-set SHA `2922192aba299a7ab741e2ff1183f033291312614fbb4b3dce60f760fe7e06a5`; canonical-row SHA `3592137066ad74290e988ac06f4b6e29ccce64fc29ce8be4e864a3d0b7a882bd`.
+- Claim sentinel: strict PIT/as-of identity remains blocked; research validity remains near 30; no data acquisition, mapping, curve rerun, readiness, alpha, tradability, Strategy/UI, or provider authority.
+- Next-action sentinel: hold promotion and select exactly one separately authorized owner decision.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
 
 - `ObservabilityRating`: GREEN for fixed-package identity, tests, mechanical evidence, independent review, and truth reconciliation; AMBER for four residual windows and operational hardening; RED for strict readiness/alpha/tradability.
 - Identity sentinel: A2.1 `b4d35e1`; evidence-only Commit B `9f37745`; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`; distinct Reviewer A/B/C PASS.

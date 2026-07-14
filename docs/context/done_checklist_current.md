@@ -1,6 +1,17 @@
 # Done Checklist - Current
 
-## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- [x] Commit A `c5a9ab8` banked the standalone M7F5-ID0 authority gate, focused tests, and active brief.
+- [x] Commit B `410d0ca` banked deterministic current-source BLOCK evidence at `docs/context/e2e_evidence/pead_m7f5_id0_dated_identifier_authority_20260714.json`.
+- [x] Truth repair `a51f349` records runtime/check-out evidence SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903` and committed Git-blob evidence SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- [x] Independent Reviewer A/B/C PASS and terminal SAW `398732c` PASS for the bounded provenance BLOCK gate.
+- [x] Current result: `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED` with reason `committed_git_blob_data_owner_approval_required`; all operational authorities remain false.
+- [ ] Effective-dated source acquisition, committed data-owner approval, mapping generation, curve rerun, readiness promotion, Strategy/UI, and provider access — outside this close and blocked/unopened.
+
+Next action: hold promotion; choose exactly one separately authorized owner decision.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
 
 - [x] A2.1 repair banked at `b4d35e1`: verified selection count used by residual evidence; real publication branch regression added.
 - [x] Failed-run partial outputs removed before the fresh clean rerun.

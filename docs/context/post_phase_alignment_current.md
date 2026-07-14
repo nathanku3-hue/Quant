@@ -1,6 +1,14 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — M7F4-v8 terminal diagnostic close (2026-07-13)
+## Active Addendum — M7F5-ID0 terminal provenance block (2026-07-14)
+
+- **Data/Research:** Commit A `c5a9ab8`, Commit B `410d0ca`, truth repair `a51f349`, and terminal SAW `398732c` are complete; current source remains blocked by missing committed data-owner approval for dated identifier authority.
+- **Docs/Ops:** Active brief, BLOCK evidence, reviewer evidence, terminal SAW, and seven truth surfaces are reconciled to `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`.
+- **Strategy/UI:** Held; no mapping, curve rerun, promotion, readiness, or action surface.
+- **Current bottleneck:** No blocker for closing the M7F5-ID0 gate itself. Higher validity requires a separately authorized effective-dated source/acquisition/approval decision.
+- **Next active stream:** None by default. Choose one bounded owner decision before execution.
+
+## Prior Addendum — M7F4-v8 terminal diagnostic close (2026-07-13)
 
 - **Data/Research:** A2.1 repair, clean rerun, Commit B `9f37745` evidence, and independent A/B/C review are complete; strict curve remains `BLOCKED` by four outcome-ambiguous windows.
 - **Docs/Ops:** Active brief, reviewer evidence, terminal SAW, decision/formula/lesson records, and seven truth surfaces are reconciled in Commit C.

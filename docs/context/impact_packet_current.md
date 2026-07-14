@@ -1,6 +1,15 @@
 # Impact Packet - Current
 
-## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- Implementation/repair: `scripts/pead_m7f5_id0_dated_identifier_authority.py`, `tests/test_pead_m7f5_id0_dated_identifier_authority.py`, and the active M7F5-ID0 brief at Commit A `c5a9ab8`.
+- Evidence: `docs/context/e2e_evidence/pead_m7f5_id0_dated_identifier_authority_20260714.json` at Commit B `410d0ca`; checkout/runtime SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903`; committed Git-blob SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- SAW/docs: truth repair `a51f349`, terminal SAW report `398732c`, and seven current-truth surfaces reconciled to the BLOCK state.
+- Touched interfaces: Data/Research authority gate and Docs/Ops truth only; Strategy/UI, provider access, mapping, curve rerun, and strict readiness remain held.
+- Failing checks: none in compile/focused/reviewer/SAW checks. Strict PIT identifier authority intentionally remains `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`.
+- Open risks: repository blob authority is not a cryptographic natural-person signature; genuine effective-dated source plus committed data-owner approval remains unavailable.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
 
 - Implementation/repair: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, and the active M7F4-v8 brief at A2.1 `b4d35e1`.
 - Commit B evidence: `docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json` plus daily-return and event-ledger manifests at `9f37745`; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`.

@@ -1,6 +1,19 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data/Research | M7F5-ID0 A/B evidence and A/B/C+SAW PASS prove current source lacks committed provenance approval; strict PIT/as-of identifier authority `BLOCKED` | Obtain exact effective-dated source plus committed data-owner approval, authorize acquisition, or terminate |
+| Docs/Ops | Seven-surface truth reconciliation complete for terminal BLOCK state | Preserve A/B/Saw commit identities and dual evidence hashes |
+| Backend/Strategy | Held | No mapping, curve rerun, broker, or strategy action from BLOCK evidence |
+| Frontend/UI | Held | No readiness, score, alpha, or action surface |
+
+- Cross-stream rule: M7F5-ID0 BLOCK evidence is not source-access, mapping, strict curve, readiness, alpha, or tradability authority.
+- Stream freeze: no WRDS/provider access, historical-link construction, new data output, readiness flip, Strategy/UI, remotes, publication, or dispatch.
+- Next action: hold by default; open only one separately authorized owner decision.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
 
 | Stream | Current status | Handoff / boundary |
 |---|---|---|
