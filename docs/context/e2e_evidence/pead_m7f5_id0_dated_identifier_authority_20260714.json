@@ -1,0 +1,86 @@
+{
+  "d1_pre_identity_lock": {
+    "cohort_year": 2019,
+    "duplicate_eligible_rows": 0,
+    "expected_pre_identity_canonical_rows_sha256": "3592137066ad74290e988ac06f4b6e29ccce64fc29ce8be4e864a3d0b7a882bd",
+    "expected_pre_identity_event_set_sha256": "2922192aba299a7ab741e2ff1183f033291312614fbb4b3dce60f760fe7e06a5",
+    "expected_sha256": "81b2689b48943373f58586ddc382fb609dbce022cde93d4d502333cae5541855",
+    "expected_unique_pre_identity_events": 21882,
+    "mismatches": [],
+    "path": "E:/Code/Quant/data/processed/pead_d1_sue_signal.parquet",
+    "pre_identity_canonical_rows_sha256": "3592137066ad74290e988ac06f4b6e29ccce64fc29ce8be4e864a3d0b7a882bd",
+    "pre_identity_event_set_sha256": "2922192aba299a7ab741e2ff1183f033291312614fbb4b3dce60f760fe7e06a5",
+    "raw_eligible_rows": 21882,
+    "sha256": "81b2689b48943373f58586ddc382fb609dbce022cde93d4d502333cae5541855",
+    "unique_pre_identity_events": 21882,
+    "verified": true
+  },
+  "dated_identifier_source": {
+    "authority_approval": null,
+    "columns": [
+      "cik",
+      "company_name",
+      "country",
+      "cusip",
+      "exchange",
+      "gvkey",
+      "iid",
+      "sic",
+      "source",
+      "ticker",
+      "updated_at"
+    ],
+    "coverage": null,
+    "detected_unbound_effective_date_columns": null,
+    "effective_date_columns": null,
+    "effective_date_semantics_explicitly_bound": false,
+    "exists": true,
+    "gvkey_column": null,
+    "identifier_column": null,
+    "identifier_type": null,
+    "path": "E:/Code/Quant/data/processed/security_master_compustat.parquet",
+    "provenance_envelope": null,
+    "reason_codes": [
+      "committed_git_blob_data_owner_approval_required"
+    ],
+    "row_count": 75913,
+    "sha256": "350d95da7bb030a6892965f3a9d7f54da21c7da2f60dc93b205a113da8df1ab4",
+    "status": "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED",
+    "strict_pit_identifier_authority": false,
+    "updated_at_profile": {
+      "authoritative_effective_date": false,
+      "column": "updated_at",
+      "unique_non_null_values": 1,
+      "values": [
+        "2026-03-07T11:03:59.418949Z"
+      ]
+    }
+  },
+  "forbidden_scope": [
+    "v8_or_portfolio_imports",
+    "provider_or_wrds_access",
+    "historical_identifier_acquisition",
+    "identifier_mapping_artifact_output",
+    "curve_or_return_rerun",
+    "strategy_or_ui_work",
+    "readiness_alpha_or_tradability_promotion",
+    "remote_push_merge_or_publication"
+  ],
+  "mode": "EXECUTION_PACKET",
+  "next_decision": "OBTAIN_COMMITTED_DATA_OWNER_APPROVAL_OR_HOLD",
+  "operational_authority": {
+    "historical_identifier_acquisition_authorized": false,
+    "mapping_artifact_generation_authorized": false,
+    "portfolio_or_curve_execution_authorized": false,
+    "provider_access_authorized": false,
+    "readiness_promotion_authorized": false
+  },
+  "reason_codes": [
+    "committed_git_blob_data_owner_approval_required"
+  ],
+  "round_id": "ROUND-20260714-M7F5-ID0-DATED-IDENTIFIER-AUTHORITY",
+  "schema_version": "pead_m7f5_id0_dated_identifier_authority_v2",
+  "scope_id": "M7F5_ID0_DATED_IDENTIFIER_AUTHORITY_COMMIT_A",
+  "status": "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED",
+  "strict_pit_identifier_authority": false
+}
