@@ -1,9 +1,11 @@
 """Standalone dated-identifier authority gate for PEAD M7F5-ID0.
 
 This module locks the complete pre-identity 2019 D1 event universe and inspects
-one candidate Compustat identifier source for genuine effective-date intervals.
-It does not import any M7F4/portfolio code, fetch data, create a mapping artifact,
-or run a research curve.
+one candidate Compustat identifier source only when an exact-byte semantics
+envelope and a repository-authoritative committed approval blob bind its bytes,
+owner, scope, and identifier-validity semantics. It does not import any
+M7F4/portfolio code, fetch data, create a mapping artifact, or run a research
+curve.
 """
 from __future__ import annotations
 
@@ -11,9 +13,11 @@ import argparse
 import hashlib
 import json
 import os
+import re
+import subprocess
 import sys
 import tempfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Mapping, Sequence
 
 import pandas as pd
@@ -24,10 +28,21 @@ DEFAULT_D1_PATH = ROOT / "data" / "processed" / "pead_d1_sue_signal.parquet"
 DEFAULT_IDENTIFIER_SOURCE_PATH = (
     ROOT / "data" / "processed" / "security_master_compustat.parquet"
 )
+APPROVAL_REPOSITORY_ROOT = ROOT
 
 ROUND_ID = "ROUND-20260714-M7F5-ID0-DATED-IDENTIFIER-AUTHORITY"
 SCOPE_ID = "M7F5_ID0_DATED_IDENTIFIER_AUTHORITY_COMMIT_A"
-SCHEMA_VERSION = "pead_m7f5_id0_dated_identifier_authority_v1"
+SCHEMA_VERSION = "pead_m7f5_id0_dated_identifier_authority_v2"
+PROVENANCE_SCHEMA_VERSION = "pead_m7f5_id0_source_semantics_v2"
+PROVENANCE_DECLARATION_TYPE = "SOURCE_IDENTIFIER_VALIDITY_SEMANTICS"
+APPROVAL_SCHEMA_VERSION = "pead_m7f5_id0_git_blob_approval_v1"
+APPROVAL_AUTHORITY_TYPE = "DATA_OWNER_IDENTIFIER_VALIDITY_APPROVAL"
+APPROVAL_SCOPE = "M7F5_ID0_DATED_IDENTIFIER_AUTHORITY"
+APPROVAL_DECISION = "APPROVED"
+APPROVAL_DATA_OWNER_ROLE = "DATA_OWNER"
+APPROVAL_PATH_PREFIX = "docs/authorization/"
+PROVENANCE_INTERVAL_MEANING = "IDENTIFIER_VALIDITY"
+SUPPORTED_IDENTIFIER_TYPES = frozenset({"CUSIP", "CUSIP8", "NCUSIP"})
 COHORT_YEAR = 2019
 
 LOCKED_D1_SHA256 = (
@@ -45,17 +60,15 @@ STATUS_BLOCKED_D1_LOCK = "BLOCKED_D1_PRE_IDENTITY_LOCK_MISMATCH"
 STATUS_BLOCKED_SOURCE_ABSENT = (
     "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_SOURCE_ABSENT"
 )
+STATUS_BLOCKED_PROVENANCE = (
+    "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED"
+)
 STATUS_BLOCKED_SCHEMA = "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_SCHEMA_INVALID"
 STATUS_BLOCKED_INTERVALS = "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_INTERVAL_INVALID"
 STATUS_BLOCKED_COVERAGE = "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_EVENT_COVERAGE_INCOMPLETE"
 STATUS_BLOCKED_AMBIGUITY = "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_EVENT_IDENTITY_AMBIGUOUS"
 STATUS_PASS = "PASS_DATED_COMPUSTAT_IDENTIFIER_SOURCE_CONTRACT"
 
-IDENTIFIER_COLUMN_CANDIDATES: tuple[str, ...] = (
-    "cusip8",
-    "cusip",
-    "ncusip",
-)
 EFFECTIVE_DATE_COLUMN_PAIRS: tuple[tuple[str, str], ...] = (
     ("effective_start", "effective_end"),
     ("effective_from", "effective_to"),
@@ -69,6 +82,417 @@ EFFECTIVE_DATE_COLUMN_PAIRS: tuple[tuple[str, str], ...] = (
 
 class M7F5ID0InputError(ValueError):
     """Invalid invocation or unreadable input."""
+
+
+def _duplicate_key_hook(label: str):
+    def reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        parsed: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in parsed:
+                raise M7F5ID0InputError(f"{label}_duplicate_key:{key}")
+            parsed[key] = value
+        return parsed
+
+    return reject_duplicates
+
+
+def _load_json_payload(payload: bytes, *, label: str) -> dict[str, Any]:
+    try:
+        decoded = payload.decode("utf-8")
+        parsed = json.loads(decoded, object_pairs_hook=_duplicate_key_hook(label))
+    except M7F5ID0InputError:
+        raise
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise M7F5ID0InputError(f"{label}_invalid_json:{exc}") from exc
+    if not isinstance(parsed, dict):
+        raise M7F5ID0InputError(f"{label}_root_must_be_object")
+    return parsed
+
+
+def _read_json_file(path: Path, *, label: str) -> tuple[dict[str, Any], str]:
+    """Read, hash, and parse the same exact JSON bytes."""
+    if not path.is_file():
+        raise M7F5ID0InputError(f"{label}_not_found:{path}")
+    try:
+        payload = path.read_bytes()
+    except OSError as exc:
+        raise M7F5ID0InputError(f"{label}_unreadable:{path}:{exc}") from exc
+    return _load_json_payload(payload, label=label), hashlib.sha256(payload).hexdigest()
+
+
+def _require_mapping(value: Any, *, field: str, label: str) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise M7F5ID0InputError(f"{label}_field_must_be_object:{field}")
+    return value
+
+
+def _require_non_empty_string(value: Any, *, field: str, label: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise M7F5ID0InputError(
+            f"{label}_field_must_be_non_empty_string:{field}"
+        )
+    return value.strip()
+
+
+def _require_exact_keys(
+    value: Mapping[str, Any], *, expected: set[str], field: str, label: str
+) -> None:
+    actual = set(value)
+    missing = sorted(expected - actual)
+    unexpected = sorted(actual - expected)
+    if missing:
+        raise M7F5ID0InputError(
+            f"{label}_required_keys_missing:{field}:{','.join(missing)}"
+        )
+    if unexpected:
+        raise M7F5ID0InputError(
+            f"{label}_unexpected_keys:{field}:{','.join(unexpected)}"
+        )
+
+
+def _require_sha256(value: Any, *, field: str, label: str) -> str:
+    normalized = _require_non_empty_string(value, field=field, label=label)
+    if not re.fullmatch(r"[0-9a-f]{64}", normalized):
+        raise M7F5ID0InputError(f"{label}_field_must_be_lowercase_hex64:{field}")
+    return normalized
+
+
+def _normalize_binding(
+    raw: Mapping[str, Any], *, label: str, field_prefix: str = "binding"
+) -> dict[str, Any]:
+    _require_exact_keys(
+        raw,
+        expected={
+            "gvkey_column",
+            "identifier_column",
+            "identifier_type",
+            "effective_start_column",
+            "effective_end_column",
+            "effective_interval_semantics",
+        },
+        field=field_prefix,
+        label=label,
+    )
+    semantics = _require_mapping(
+        raw.get("effective_interval_semantics"),
+        field=f"{field_prefix}.effective_interval_semantics",
+        label=label,
+    )
+    _require_exact_keys(
+        semantics,
+        expected={
+            "meaning",
+            "start_inclusive",
+            "end_inclusive",
+            "null_end_means_open_ended",
+        },
+        field=f"{field_prefix}.effective_interval_semantics",
+        label=label,
+    )
+    normalized = {
+        "gvkey_column": _require_non_empty_string(
+            raw.get("gvkey_column"), field=f"{field_prefix}.gvkey_column", label=label
+        ),
+        "identifier_column": _require_non_empty_string(
+            raw.get("identifier_column"),
+            field=f"{field_prefix}.identifier_column",
+            label=label,
+        ),
+        "identifier_type": _require_non_empty_string(
+            raw.get("identifier_type"),
+            field=f"{field_prefix}.identifier_type",
+            label=label,
+        ).upper(),
+        "effective_start_column": _require_non_empty_string(
+            raw.get("effective_start_column"),
+            field=f"{field_prefix}.effective_start_column",
+            label=label,
+        ),
+        "effective_end_column": _require_non_empty_string(
+            raw.get("effective_end_column"),
+            field=f"{field_prefix}.effective_end_column",
+            label=label,
+        ),
+        "interval_meaning": _require_non_empty_string(
+            semantics.get("meaning"),
+            field=f"{field_prefix}.effective_interval_semantics.meaning",
+            label=label,
+        ),
+        "start_inclusive": semantics.get("start_inclusive"),
+        "end_inclusive": semantics.get("end_inclusive"),
+        "null_end_means_open_ended": semantics.get("null_end_means_open_ended"),
+    }
+    for boolean_field in (
+        "start_inclusive",
+        "end_inclusive",
+        "null_end_means_open_ended",
+    ):
+        if not isinstance(normalized[boolean_field], bool):
+            raise M7F5ID0InputError(
+                f"{label}_field_must_be_boolean:{field_prefix}.{boolean_field}"
+            )
+    return normalized
+
+
+def _parse_provenance_envelope(path: Path) -> tuple[dict[str, Any], str]:
+    label = "provenance_envelope"
+    raw, envelope_sha256 = _read_json_file(path, label=label)
+    _require_exact_keys(
+        raw,
+        expected={
+            "schema_version",
+            "declaration_type",
+            "dataset",
+            "source_sha256",
+            "binding",
+        },
+        field="root",
+        label=label,
+    )
+    dataset = _require_mapping(raw.get("dataset"), field="dataset", label=label)
+    _require_exact_keys(
+        dataset,
+        expected={"name", "version"},
+        field="dataset",
+        label=label,
+    )
+    binding = _require_mapping(raw.get("binding"), field="binding", label=label)
+    normalized = {
+        "schema_version": _require_non_empty_string(
+            raw.get("schema_version"), field="schema_version", label=label
+        ),
+        "declaration_type": _require_non_empty_string(
+            raw.get("declaration_type"), field="declaration_type", label=label
+        ),
+        "dataset_name": _require_non_empty_string(
+            dataset.get("name"), field="dataset.name", label=label
+        ),
+        "dataset_version": _require_non_empty_string(
+            dataset.get("version"), field="dataset.version", label=label
+        ),
+        "source_sha256": _require_sha256(
+            raw.get("source_sha256"), field="source_sha256", label=label
+        ),
+        **_normalize_binding(binding, label=label),
+    }
+    return normalized, envelope_sha256
+
+
+def _parse_approval_payload(payload: bytes) -> dict[str, Any]:
+    label = "authority_approval"
+    raw = _load_json_payload(payload, label=label)
+    _require_exact_keys(
+        raw,
+        expected={
+            "schema_version",
+            "authority_type",
+            "approval_scope",
+            "decision",
+            "owner",
+            "approval_ref",
+            "provenance_envelope_sha256",
+            "source_sha256",
+            "dataset",
+            "binding",
+        },
+        field="root",
+        label=label,
+    )
+    owner = _require_mapping(raw.get("owner"), field="owner", label=label)
+    dataset = _require_mapping(raw.get("dataset"), field="dataset", label=label)
+    binding = _require_mapping(raw.get("binding"), field="binding", label=label)
+    _require_exact_keys(
+        owner, expected={"identity", "role"}, field="owner", label=label
+    )
+    _require_exact_keys(
+        dataset, expected={"name", "version"}, field="dataset", label=label
+    )
+    return {
+        "schema_version": _require_non_empty_string(
+            raw.get("schema_version"), field="schema_version", label=label
+        ),
+        "authority_type": _require_non_empty_string(
+            raw.get("authority_type"), field="authority_type", label=label
+        ),
+        "approval_scope": _require_non_empty_string(
+            raw.get("approval_scope"), field="approval_scope", label=label
+        ),
+        "decision": _require_non_empty_string(
+            raw.get("decision"), field="decision", label=label
+        ),
+        "owner_identity": _require_non_empty_string(
+            owner.get("identity"), field="owner.identity", label=label
+        ),
+        "owner_role": _require_non_empty_string(
+            owner.get("role"), field="owner.role", label=label
+        ),
+        "approval_ref": _require_non_empty_string(
+            raw.get("approval_ref"), field="approval_ref", label=label
+        ),
+        "provenance_envelope_sha256": _require_sha256(
+            raw.get("provenance_envelope_sha256"),
+            field="provenance_envelope_sha256",
+            label=label,
+        ),
+        "source_sha256": _require_sha256(
+            raw.get("source_sha256"), field="source_sha256", label=label
+        ),
+        "dataset_name": _require_non_empty_string(
+            dataset.get("name"), field="dataset.name", label=label
+        ),
+        "dataset_version": _require_non_empty_string(
+            dataset.get("version"), field="dataset.version", label=label
+        ),
+        **_normalize_binding(binding, label=label),
+    }
+
+
+def _git_environment() -> dict[str, str]:
+    env = {
+        key: value
+        for key, value in os.environ.items()
+        if not key.upper().startswith("GIT_")
+    }
+    env.update(
+        {
+            "GIT_NO_REPLACE_OBJECTS": "1",
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_TERMINAL_PROMPT": "0",
+        }
+    )
+    return env
+
+
+def _run_git(
+    repository_root: Path,
+    arguments: Sequence[str],
+    *,
+    allowed_returncodes: set[int] | None = None,
+) -> subprocess.CompletedProcess[bytes]:
+    allowed = allowed_returncodes or {0}
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(repository_root), *arguments],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=_git_environment(),
+        )
+    except OSError as exc:
+        raise M7F5ID0InputError(f"authority_git_unavailable:{exc}") from exc
+    if completed.returncode not in allowed:
+        detail = completed.stderr.decode("utf-8", errors="replace").strip()
+        raise M7F5ID0InputError(
+            f"authority_git_command_failed:{arguments[0]}:{completed.returncode}:{detail}"
+        )
+    return completed
+
+
+def _normalize_approval_commit(value: str) -> str:
+    normalized = value.strip()
+    if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", normalized):
+        raise M7F5ID0InputError("approval_commit_must_be_full_lowercase_object_id")
+    return normalized
+
+
+def _normalize_approval_path(value: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise M7F5ID0InputError("approval_path_must_be_non_empty")
+    candidate = value.strip()
+    if "\\" in candidate or "\x00" in candidate:
+        raise M7F5ID0InputError("approval_path_must_be_canonical_posix")
+    path = PurePosixPath(candidate)
+    if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
+        raise M7F5ID0InputError("approval_path_must_be_canonical_relative")
+    normalized = path.as_posix()
+    if normalized != candidate:
+        raise M7F5ID0InputError("approval_path_must_be_canonical_relative")
+    if not normalized.startswith(APPROVAL_PATH_PREFIX) or not normalized.endswith(".json"):
+        raise M7F5ID0InputError(
+            "approval_path_must_be_json_under_docs_authorization"
+        )
+    return normalized
+
+
+def _parse_ls_tree_blob(payload: bytes, *, expected_path: str, label: str) -> tuple[str, str]:
+    entries = [entry for entry in payload.split(b"\x00") if entry]
+    if len(entries) != 1 or b"\t" not in entries[0]:
+        raise M7F5ID0InputError(f"{label}_blob_not_found:{expected_path}")
+    header, raw_path = entries[0].split(b"\t", 1)
+    try:
+        mode, object_type, object_id = header.decode("ascii").split()
+        actual_path = raw_path.decode("utf-8")
+    except (UnicodeDecodeError, ValueError) as exc:
+        raise M7F5ID0InputError(f"{label}_tree_entry_invalid") from exc
+    if actual_path != expected_path or mode != "100644" or object_type != "blob":
+        raise M7F5ID0InputError(f"{label}_must_be_regular_json_blob:{expected_path}")
+    return object_id.lower(), mode
+
+
+def _same_resolved_path(first: Path, second: Path) -> bool:
+    return os.path.normcase(str(first.resolve())) == os.path.normcase(str(second.resolve()))
+
+
+def _read_git_blob_approval(
+    repository_root: Path, *, approval_commit: str, approval_path: str
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Read authority only from an immutable, current, reachable Git blob."""
+    root = repository_root.resolve()
+    commit = _normalize_approval_commit(approval_commit)
+    path = _normalize_approval_path(approval_path)
+
+    top_level = _run_git(root, ["rev-parse", "--show-toplevel"]).stdout.decode(
+        "utf-8", errors="strict"
+    ).strip()
+    if not _same_resolved_path(Path(top_level), root):
+        raise M7F5ID0InputError("approval_repository_root_mismatch")
+
+    resolved_commit = _run_git(
+        root, ["rev-parse", "--verify", f"{commit}^{{commit}}"]
+    ).stdout.decode("ascii").strip().lower()
+    if resolved_commit != commit:
+        raise M7F5ID0InputError("approval_commit_does_not_resolve_exactly")
+    head_commit = _run_git(
+        root, ["rev-parse", "--verify", "HEAD^{commit}"]
+    ).stdout.decode("ascii").strip().lower()
+    ancestry = _run_git(
+        root,
+        ["merge-base", "--is-ancestor", commit, head_commit],
+        allowed_returncodes={0, 1},
+    )
+    if ancestry.returncode != 0:
+        raise M7F5ID0InputError("approval_commit_not_reachable_from_head")
+
+    committed_tree = _run_git(
+        root, ["ls-tree", "-z", commit, "--", path]
+    ).stdout
+    blob_oid, mode = _parse_ls_tree_blob(
+        committed_tree, expected_path=path, label="approval_commit"
+    )
+    head_tree = _run_git(
+        root, ["ls-tree", "-z", head_commit, "--", path]
+    ).stdout
+    head_blob_oid, _ = _parse_ls_tree_blob(
+        head_tree, expected_path=path, label="approval_head"
+    )
+    if head_blob_oid != blob_oid:
+        raise M7F5ID0InputError("approval_blob_changed_or_revoked_at_head")
+
+    payload = _run_git(root, ["cat-file", "blob", blob_oid]).stdout
+    approval = _parse_approval_payload(payload)
+    report = {
+        "repository_root": root.as_posix(),
+        "commit": commit,
+        "head_commit": head_commit,
+        "path": path,
+        "blob_oid": blob_oid,
+        "blob_mode": mode,
+        "blob_sha256": hashlib.sha256(payload).hexdigest(),
+        "reachable_from_head": True,
+        "present_unchanged_at_head": True,
+    }
+    return approval, report
 
 
 def _sha256_file(path: Path) -> str:
@@ -165,20 +589,22 @@ def _lexical_identifier_mask(series: pd.Series) -> pd.Series:
     return pd.Series(False, index=series.index, dtype=bool)
 
 
-def _normalize_identifier8(series: pd.Series, *, source_column: str) -> pd.Series:
+def _normalize_identifier8(series: pd.Series, *, identifier_type: str) -> pd.Series:
     lexical = _lexical_identifier_mask(series)
     trimmed = series.where(lexical).astype("string").str.strip()
     ascii_shape = trimmed.str.fullmatch(r"[0-9A-Za-z]{8,9}", na=False)
     cleaned = trimmed.where(ascii_shape).str.upper()
-    source_name = source_column.casefold()
-    if source_name == "cusip":
+    normalized_type = identifier_type.upper()
+    if normalized_type == "CUSIP":
         identifier8 = cleaned.str.slice(0, 8)
         valid8 = cleaned.str.fullmatch(r"[0-9A-Z]{8}", na=False)
         valid9_shape = cleaned.str.fullmatch(r"[0-9A-Z]{8}[0-9]", na=False)
         valid9_checksum = cleaned.str[8].eq(_cusip_check_digit(identifier8))
         return identifier8.where(valid8 | (valid9_shape & valid9_checksum))
-    valid = cleaned.str.fullmatch(r"[0-9A-Z]{8}", na=False)
-    return cleaned.where(valid)
+    if normalized_type in {"CUSIP8", "NCUSIP"}:
+        valid = cleaned.str.fullmatch(r"[0-9A-Z]{8}", na=False)
+        return cleaned.where(valid)
+    return pd.Series(pd.NA, index=series.index, dtype="string")
 
 
 def build_pre_identity_events(d1_frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
@@ -293,27 +719,9 @@ def _resolve_named_column(
     return None
 
 
-def _resolve_effective_pair(
-    columns: Sequence[str],
-    *,
-    requested_start: str | None,
-    requested_end: str | None,
-) -> tuple[str, str] | None:
-    explicitly_requested = requested_start is not None or requested_end is not None
-    if explicitly_requested and (
-        requested_start is None
-        or requested_end is None
-        or not requested_start.strip()
-        or not requested_end.strip()
-    ):
-        raise M7F5ID0InputError(
-            "effective_start_and_end_columns_must_be_non_empty_and_supplied_together"
-        )
+def _detect_effective_pair(columns: Sequence[str]) -> tuple[str, str] | None:
+    """Detect familiar date pairs for diagnostics only; never authorize them."""
     index = _casefold_columns(columns)
-    if explicitly_requested:
-        start = index.get(requested_start.strip().casefold())
-        end = index.get(requested_end.strip().casefold())
-        return (start, end) if start and end else None
     for start_candidate, end_candidate in EFFECTIVE_DATE_COLUMN_PAIRS:
         start = index.get(start_candidate.casefold())
         end = index.get(end_candidate.casefold())
@@ -354,13 +762,77 @@ def _canonical_mapping_sha256(frame: pd.DataFrame) -> str | None:
     )
 
 
+AUTHORITY_BINDING_FIELDS = (
+    "gvkey_column",
+    "identifier_column",
+    "identifier_type",
+    "effective_start_column",
+    "effective_end_column",
+    "interval_meaning",
+    "start_inclusive",
+    "end_inclusive",
+    "null_end_means_open_ended",
+)
+
+
+def _authority_reason_codes(
+    provenance: Mapping[str, Any],
+    approval: Mapping[str, Any],
+    *,
+    source_sha256: str,
+    envelope_sha256: str,
+) -> list[str]:
+    reasons: list[str] = []
+    if provenance["schema_version"] != PROVENANCE_SCHEMA_VERSION:
+        reasons.append("unsupported_provenance_schema_version")
+    if provenance["declaration_type"] != PROVENANCE_DECLARATION_TYPE:
+        reasons.append("unsupported_provenance_declaration_type")
+    if provenance["source_sha256"] != source_sha256:
+        reasons.append("provenance_source_sha256_mismatch")
+    if provenance["identifier_type"] not in SUPPORTED_IDENTIFIER_TYPES:
+        reasons.append("unsupported_provenance_identifier_type")
+    if provenance["interval_meaning"] != PROVENANCE_INTERVAL_MEANING:
+        reasons.append("effective_interval_semantics_are_not_identifier_validity")
+    if provenance["start_inclusive"] is not True:
+        reasons.append("effective_start_must_be_inclusive")
+    if provenance["end_inclusive"] is not True:
+        reasons.append("effective_end_must_be_inclusive")
+    if provenance["null_end_means_open_ended"] is not True:
+        reasons.append("null_effective_end_must_mean_open_ended")
+
+    if approval["schema_version"] != APPROVAL_SCHEMA_VERSION:
+        reasons.append("unsupported_approval_schema_version")
+    if approval["authority_type"] != APPROVAL_AUTHORITY_TYPE:
+        reasons.append("unsupported_approval_authority_type")
+    if approval["approval_scope"] != APPROVAL_SCOPE:
+        reasons.append("approval_scope_mismatch")
+    if approval["decision"] != APPROVAL_DECISION:
+        reasons.append("approval_decision_is_not_approved")
+    if approval["owner_role"] != APPROVAL_DATA_OWNER_ROLE:
+        reasons.append("approval_owner_role_is_not_data_owner")
+    if approval["provenance_envelope_sha256"] != envelope_sha256:
+        reasons.append("approval_provenance_envelope_sha256_mismatch")
+    if approval["source_sha256"] != source_sha256:
+        reasons.append("approval_source_sha256_mismatch")
+    if approval["source_sha256"] != provenance["source_sha256"]:
+        reasons.append("approval_and_provenance_source_sha256_mismatch")
+    if approval["dataset_name"] != provenance["dataset_name"]:
+        reasons.append("approval_dataset_name_mismatch")
+    if approval["dataset_version"] != provenance["dataset_version"]:
+        reasons.append("approval_dataset_version_mismatch")
+    for field in AUTHORITY_BINDING_FIELDS:
+        if approval[field] != provenance[field]:
+            reasons.append(f"approval_binding_mismatch:{field}")
+    return reasons
+
+
 def inspect_identifier_source(
     source_path: Path,
     events: pd.DataFrame,
     *,
-    identifier_column: str | None = None,
-    effective_start_column: str | None = None,
-    effective_end_column: str | None = None,
+    provenance_envelope_path: Path | None = None,
+    approval_commit: str | None = None,
+    approval_path: str | None = None,
 ) -> dict[str, Any]:
     base: dict[str, Any] = {
         "path": _path_text(source_path),
@@ -376,6 +848,8 @@ def inspect_identifier_source(
             "row_count": 0,
             "columns": [],
             "effective_date_columns": None,
+            "provenance_envelope": None,
+            "authority_approval": None,
             "updated_at_profile": {
                 "column": None,
                 "unique_non_null_values": 0,
@@ -388,104 +862,184 @@ def inspect_identifier_source(
     )
     columns = [str(column) for column in frame.columns]
     updated_at_profile = _profile_updated_at(frame)
-    requested = (
-        identifier_column,
-        effective_start_column,
-        effective_end_column,
-    )
-    if any(value is not None for value in requested) and not all(
-        value is not None and bool(value.strip()) for value in requested
-    ):
-        raise M7F5ID0InputError(
-            "identifier_start_and_end_columns_must_be_non_empty_and_supplied_together"
-        )
-    identifier_column = identifier_column.strip() if identifier_column else None
-    effective_start_column = (
-        effective_start_column.strip() if effective_start_column else None
-    )
-    effective_end_column = (
-        effective_end_column.strip() if effective_end_column else None
-    )
-
-    detected_pair = _resolve_effective_pair(
-        columns, requested_start=None, requested_end=None
-    )
-    explicitly_bound = all(value is not None for value in requested)
-    pair = (
-        _resolve_effective_pair(
-            columns,
-            requested_start=effective_start_column,
-            requested_end=effective_end_column,
-        )
-        if explicitly_bound
-        else None
-    )
-    identifier = _resolve_named_column(
-        columns,
-        identifier_column if explicitly_bound else None,
-        () if explicitly_bound else IDENTIFIER_COLUMN_CANDIDATES,
-    )
-    gvkey_column = _resolve_named_column(columns, "gvkey", ())
-
+    detected_pair = _detect_effective_pair(columns)
     source_report: dict[str, Any] = {
         **base,
         "sha256": source_sha256,
         "row_count": int(len(frame)),
         "columns": sorted(columns),
-        "identifier_column": identifier,
-        "gvkey_column": gvkey_column,
-        "effective_date_columns": (
-            {"start": pair[0], "end": pair[1]} if pair is not None else None
-        ),
+        "identifier_column": None,
+        "identifier_type": None,
+        "gvkey_column": None,
+        "effective_date_columns": None,
         "detected_unbound_effective_date_columns": (
             {"start": detected_pair[0], "end": detected_pair[1]}
-            if detected_pair is not None and not explicitly_bound
+            if detected_pair is not None
             else None
         ),
-        "effective_date_semantics_explicitly_bound": explicitly_bound,
+        "effective_date_semantics_explicitly_bound": False,
+        "provenance_envelope": None,
+        "authority_approval": None,
         "updated_at_profile": updated_at_profile,
     }
 
-    if not explicitly_bound:
-        if detected_pair is not None:
-            return {
-                **source_report,
-                "status": STATUS_BLOCKED_SCHEMA,
-                "reason_codes": [
-                    "identifier_validity_columns_must_be_explicitly_bound"
-                ],
-                "coverage": None,
-            }
+    authority_values = (
+        provenance_envelope_path,
+        approval_commit,
+        approval_path,
+    )
+    if not any(value is not None for value in authority_values):
         return {
             **source_report,
-            "status": STATUS_BLOCKED_SOURCE_ABSENT,
-            "reason_codes": [
-                "effective_date_intervals_absent",
-                "updated_at_is_load_timestamp_not_effective_date",
-            ],
+            "status": STATUS_BLOCKED_PROVENANCE,
+            "reason_codes": ["committed_git_blob_data_owner_approval_required"],
             "coverage": None,
         }
-    if pair is None or gvkey_column is None or identifier is None:
-        reasons = []
-        if pair is None:
-            reasons.append("requested_effective_date_column_missing")
-        if gvkey_column is None:
-            reasons.append("gvkey_column_missing")
-        if identifier is None:
-            reasons.append("requested_identifier_column_missing")
+    if not all(value is not None for value in authority_values):
+        raise M7F5ID0InputError(
+            "provenance_envelope_approval_commit_and_path_required_together"
+        )
+
+    assert provenance_envelope_path is not None
+    assert approval_commit is not None
+    assert approval_path is not None
+    provenance, envelope_sha256 = _parse_provenance_envelope(
+        provenance_envelope_path
+    )
+    approval, approval_git_report = _read_git_blob_approval(
+        APPROVAL_REPOSITORY_ROOT,
+        approval_commit=approval_commit,
+        approval_path=approval_path,
+    )
+    provenance_report = {
+        "path": _path_text(provenance_envelope_path),
+        "sha256": envelope_sha256,
+        "schema_version": provenance["schema_version"],
+        "declaration_type": provenance["declaration_type"],
+        "dataset": {
+            "name": provenance["dataset_name"],
+            "version": provenance["dataset_version"],
+        },
+        "source_sha256": provenance["source_sha256"],
+        "binding": {
+            "gvkey_column": provenance["gvkey_column"],
+            "identifier_column": provenance["identifier_column"],
+            "identifier_type": provenance["identifier_type"],
+            "effective_start_column": provenance["effective_start_column"],
+            "effective_end_column": provenance["effective_end_column"],
+            "effective_interval_semantics": {
+                "meaning": provenance["interval_meaning"],
+                "start_inclusive": provenance["start_inclusive"],
+                "end_inclusive": provenance["end_inclusive"],
+                "null_end_means_open_ended": provenance[
+                    "null_end_means_open_ended"
+                ],
+            },
+        },
+        "verified": False,
+    }
+    approval_report = {
+        **approval_git_report,
+        "schema_version": approval["schema_version"],
+        "authority_type": approval["authority_type"],
+        "approval_scope": approval["approval_scope"],
+        "decision": approval["decision"],
+        "owner": {
+            "identity": approval["owner_identity"],
+            "role": approval["owner_role"],
+        },
+        "approval_ref": approval["approval_ref"],
+        "provenance_envelope_sha256": approval[
+            "provenance_envelope_sha256"
+        ],
+        "source_sha256": approval["source_sha256"],
+        "dataset": {
+            "name": approval["dataset_name"],
+            "version": approval["dataset_version"],
+        },
+        "binding": {
+            "gvkey_column": approval["gvkey_column"],
+            "identifier_column": approval["identifier_column"],
+            "identifier_type": approval["identifier_type"],
+            "effective_start_column": approval["effective_start_column"],
+            "effective_end_column": approval["effective_end_column"],
+            "effective_interval_semantics": {
+                "meaning": approval["interval_meaning"],
+                "start_inclusive": approval["start_inclusive"],
+                "end_inclusive": approval["end_inclusive"],
+                "null_end_means_open_ended": approval[
+                    "null_end_means_open_ended"
+                ],
+            },
+        },
+        "verified": False,
+    }
+    authority_reasons = _authority_reason_codes(
+        provenance,
+        approval,
+        source_sha256=source_sha256,
+        envelope_sha256=envelope_sha256,
+    )
+    if authority_reasons:
         return {
             **source_report,
-            "status": STATUS_BLOCKED_SCHEMA,
-            "reason_codes": reasons,
+            "provenance_envelope": provenance_report,
+            "authority_approval": approval_report,
+            "status": STATUS_BLOCKED_PROVENANCE,
+            "reason_codes": authority_reasons,
             "coverage": None,
         }
 
-    start_column, end_column = pair
+    identifier = _resolve_named_column(
+        columns, provenance["identifier_column"], ()
+    )
+    gvkey_column = _resolve_named_column(columns, provenance["gvkey_column"], ())
+    start_column = _resolve_named_column(
+        columns, provenance["effective_start_column"], ()
+    )
+    end_column = _resolve_named_column(
+        columns, provenance["effective_end_column"], ()
+    )
+    source_report = {
+        **source_report,
+        "identifier_column": identifier,
+        "identifier_type": provenance["identifier_type"],
+        "gvkey_column": gvkey_column,
+        "effective_date_columns": (
+            {"start": start_column, "end": end_column}
+            if start_column is not None and end_column is not None
+            else None
+        ),
+        "effective_date_semantics_explicitly_bound": True,
+        "provenance_envelope": {**provenance_report, "verified": True},
+        "authority_approval": {**approval_report, "verified": True},
+    }
+    missing_bound_columns: list[str] = []
+    if gvkey_column is None:
+        missing_bound_columns.append("provenance_bound_gvkey_column_missing")
+    if identifier is None:
+        missing_bound_columns.append("provenance_bound_identifier_column_missing")
+    if start_column is None:
+        missing_bound_columns.append("provenance_bound_effective_start_column_missing")
+    if end_column is None:
+        missing_bound_columns.append("provenance_bound_effective_end_column_missing")
+    if missing_bound_columns:
+        return {
+            **source_report,
+            "status": STATUS_BLOCKED_SCHEMA,
+            "reason_codes": missing_bound_columns,
+            "coverage": None,
+        }
+
+    assert gvkey_column is not None
+    assert identifier is not None
+    assert start_column is not None
+    assert end_column is not None
     normalized = pd.DataFrame(
         {
             "gvkey": _normalize_gvkey(frame[gvkey_column]),
             "identifier8": _normalize_identifier8(
-                frame[identifier], source_column=identifier
+                frame[identifier], identifier_type=provenance["identifier_type"]
             ),
             "effective_start": _normalize_timestamp_series(frame[start_column]),
             "effective_end": _normalize_timestamp_series(frame[end_column]),
@@ -601,14 +1155,28 @@ def evaluate_authority(
     *,
     d1_path: Path,
     identifier_source_path: Path,
-    identifier_column: str | None = None,
-    effective_start_column: str | None = None,
-    effective_end_column: str | None = None,
+    provenance_envelope_path: Path | None = None,
+    approval_commit: str | None = None,
+    approval_path: str | None = None,
     expected_d1_sha256: str = LOCKED_D1_SHA256,
     expected_event_count: int = LOCKED_PRE_IDENTITY_EVENT_COUNT,
     expected_event_set_sha256: str = LOCKED_PRE_IDENTITY_EVENT_SET_SHA256,
     expected_canonical_rows_sha256: str = LOCKED_PRE_IDENTITY_CANONICAL_ROWS_SHA256,
 ) -> dict[str, Any]:
+    authority_values = (provenance_envelope_path, approval_commit, approval_path)
+    if provenance_envelope_path is not None:
+        for input_path in (d1_path, identifier_source_path):
+            if _paths_alias(provenance_envelope_path, input_path):
+                raise M7F5ID0InputError(
+                    f"provenance_envelope_must_be_detached_from_input:{input_path}"
+                )
+    if any(value is not None for value in authority_values) and not all(
+        value is not None for value in authority_values
+    ):
+        raise M7F5ID0InputError(
+            "provenance_envelope_approval_commit_and_path_required_together"
+        )
+
     events, d1_report = inspect_d1_lock(
         d1_path,
         expected_sha256=expected_d1_sha256,
@@ -629,9 +1197,9 @@ def evaluate_authority(
         source_report = inspect_identifier_source(
             identifier_source_path,
             events,
-            identifier_column=identifier_column,
-            effective_start_column=effective_start_column,
-            effective_end_column=effective_end_column,
+            provenance_envelope_path=provenance_envelope_path,
+            approval_commit=approval_commit,
+            approval_path=approval_path,
         )
         status = str(source_report["status"])
         reason_codes = list(source_report.get("reason_codes", []))
@@ -654,9 +1222,13 @@ def evaluate_authority(
             "readiness_promotion_authorized": False,
         },
         "next_decision": (
-            "AUTHORIZE_HISTORICAL_IDENTIFIER_ACQUISITION_OR_TERMINATE_PEAD_STRICT_PIT"
-            if status == STATUS_BLOCKED_SOURCE_ABSENT
-            else "HOLD_UNTIL_SEPARATELY_AUTHORIZED_NEXT_SCOPE"
+            "OBTAIN_COMMITTED_DATA_OWNER_APPROVAL_OR_HOLD"
+            if status == STATUS_BLOCKED_PROVENANCE
+            else (
+                "AUTHORIZE_HISTORICAL_IDENTIFIER_ACQUISITION_OR_TERMINATE_PEAD_STRICT_PIT"
+                if status == STATUS_BLOCKED_SOURCE_ABSENT
+                else "HOLD_UNTIL_SEPARATELY_AUTHORIZED_NEXT_SCOPE"
+            )
         ),
         "forbidden_scope": [
             "v8_or_portfolio_imports",
@@ -719,9 +1291,19 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--identifier-source", type=Path, default=DEFAULT_IDENTIFIER_SOURCE_PATH
     )
-    parser.add_argument("--identifier-column")
-    parser.add_argument("--effective-start-column")
-    parser.add_argument("--effective-end-column")
+    parser.add_argument(
+        "--provenance-envelope",
+        type=Path,
+        help="Detached source-semantics JSON bound to the exact source bytes.",
+    )
+    parser.add_argument(
+        "--approval-commit",
+        help="Full commit ID containing the repository-authoritative approval blob.",
+    )
+    parser.add_argument(
+        "--approval-path",
+        help="Canonical docs/authorization/*.json path at the approval commit.",
+    )
     parser.add_argument("--output", type=Path)
     return parser
 
@@ -729,15 +1311,16 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     try:
-        _validate_output_path(
-            args.output, (args.d1, args.identifier_source)
-        )
+        input_paths = [args.d1, args.identifier_source]
+        if args.provenance_envelope is not None:
+            input_paths.append(args.provenance_envelope)
+        _validate_output_path(args.output, input_paths)
         evidence = evaluate_authority(
             d1_path=args.d1,
             identifier_source_path=args.identifier_source,
-            identifier_column=args.identifier_column,
-            effective_start_column=args.effective_start_column,
-            effective_end_column=args.effective_end_column,
+            provenance_envelope_path=args.provenance_envelope,
+            approval_commit=args.approval_commit,
+            approval_path=args.approval_path,
         )
         payload = _serialize_evidence(evidence)
         if args.output is not None:
