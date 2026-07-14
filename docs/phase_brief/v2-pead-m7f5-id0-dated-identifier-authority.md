@@ -171,9 +171,10 @@ Commit A is additive. Rollback removes only the three expected paths. It does no
 - Detached-provenance candidate — superseded because caller-created owner and approval strings could self-authorize synthetic bytes despite 47/47 tests.
 - Repository-authoritative approval hard replacement — complete in the same three Commit A paths: the envelope is semantics-only; authority is an exact, reachable, unchanged Git blob under `docs/authorization/` in this checkout only, binding owner, scope, envelope hash, source hash, and full identifier-validity semantics. No CLI or Python evaluation parameter can redirect the authority repository.
 - Compile and 59/59 focused tests — PASS, including caller-attestation rejection, approval binding mismatches, duplicate committed keys, unreachable commits, revocation, path confinement, and ambient Git redirection isolation.
-- Two real current-source runs — byte-identical, schema `pead_m7f5_id0_dated_identifier_authority_v2`, SHA-256 `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903`, and returned `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED` with reason `committed_git_blob_data_owner_approval_required`, the locked 21,882-event universe, and both canonical hashes.
-- Commit A banking and deterministic evidence Commit B — pending because this execution surface can edit and validate the checkout but cannot stage or create local Git commits.
-- Terminal Reviewer A/B/C+SAW rerun — not started; this round stops at that boundary as requested.
+- Two real current-source runs — byte-identical, schema `pead_m7f5_id0_dated_identifier_authority_v2`, runtime/check-out evidence SHA-256 `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903`, committed Git-blob evidence SHA-256 `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`, and returned `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED` with reason `committed_git_blob_data_owner_approval_required`, the locked 21,882-event universe, and both canonical hashes.
+- Commit A banking — PASS at `c5a9ab8377d3a455b003a5166e9b1f93e8dc686e`.
+- Deterministic evidence Commit B banking — PASS at `410d0caf327646de2447e049ae0d1d66482e7c8a`; evidence path `docs/context/e2e_evidence/pead_m7f5_id0_dated_identifier_authority_20260714.json`.
+- Terminal Reviewer A/B/C+SAW rerun — in progress after A/B banking; no truth closure before PASS.
 - Acquisition, mapping, curves, readiness, Strategy/UI, and current-truth reconciliation remain closed.
 
 ## Decision after evidence
