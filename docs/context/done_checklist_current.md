@@ -1,6 +1,21 @@
 # Done Checklist - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+- [x] Reviewed contract transferred byte-for-byte; SHA-256 `085a4bcf672069320e69a40c010bbc6ad7bd5c63a844214cb140cb6292de8a02`.
+- [x] Reviewed phase brief transferred byte-for-byte; SHA-256 `9b356b39a91190cd3c3f4aa74a7e85ea014323aff1827959c2ba77ceb522f5c6`.
+- [x] Sole normative `GV_FS0_PROTOCOL_V1` source mechanically enforced.
+- [x] Canonical encoder, raw-token validation, 12 schemas, registries, ranks, slots, transition ownership, ordering identities, supervision, golden vectors, manifest, and CI guard implemented.
+- [x] Terminal protocol validator PASS; first-freeze immutability validator PASS; focused tests 54/54 PASS.
+- [x] Bounded Phase 1 package committed and tracked as audit candidate `94c3ea4`.
+- [ ] Distinct Reviewer A/B/C clean audit complete.
+- [ ] Terminal SAW PASS against the committed object; current SAW is BLOCK only for reviewer independence and audit.
+- [x] Post-governance-evidence commit worktree cleanliness verified.
+- [ ] Reducer and product work — intentionally blocked until all four remaining gates pass.
+
+Next action: audit commit `94c3ea4` and its governance evidence without semantic expansion, run distinct Reviewer A/B/C plus terminal SAW, and keep reducer authorization false until they pass.
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

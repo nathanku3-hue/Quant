@@ -1,6 +1,36 @@
 # Planner Packet - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+- **Status:** `COMMITTED_AUDIT_CANDIDATE_PENDING_INDEPENDENT_REVIEW`; implementation commit `94c3ea4` is based on clean Phase 0 commit `6a8bb6c9410bc91940d53ca727b561aa86776ec7`.
+- **Authority:** reviewed contract SHA-256 `085a4bcf672069320e69a40c010bbc6ad7bd5c63a844214cb140cb6292de8a02` and phase brief SHA-256 `9b356b39a91190cd3c3f4aa74a7e85ea014323aff1827959c2ba77ceb522f5c6` are byte-exact in the clean boundary; the contract is the sole `GV_FS0_PROTOCOL_V1` normative source.
+- **Implemented slice:** canonical encoder/raw-token proof, 12 Draft 2020-12 schemas, two registries, event ranks, generated slots, transition ownership, ordering/identity predicates, verifier supervision, publication-state predicates, golden vectors, freeze manifest, immutability checker, and Windows/Linux CI workflow.
+- **Evidence:** `python validation/gv_fs0_protocol_freeze.py` PASS; `python validation/gv_fs0_v1_immutability.py` PASS; focused Phase 1 pytest **54/54 PASS**.
+- **Exit blockers:** distinct Reviewer A/B/C, remote Windows/Linux CI, clean audit, and terminal SAW PASS remain pending. The current local SAW is BLOCK only for reviewer independence and audit.
+- **Next action:** audit commit `94c3ea4` and its governance evidence without semantic expansion, then run terminal SAW. Reducer, fixture generation, snapshots, certification execution, certified components, bundle publication, and Streamlit remain blocked.
+
+## New Context Packet — GV-FS0 Phase 1 Protocol Freeze
+
+## What Was Done
+- Transferred the reviewed GV-FS0 contract and phase brief byte-for-byte into the isolated Phase 0 worktree.
+- Implemented the bounded V1 protocol proof: canonical/raw-token encoders, 12 schemas, registries, immutable tables, ordering/identity and supervision predicates, golden vectors, freeze manifest, CI guard, and 54 passing focused tests.
+
+## What Is Locked
+- Phase 1 is not closed: audit-candidate commit `94c3ea4` exists, but distinct Reviewer A/B/C, remote Windows/Linux CI, clean audit, and terminal SAW PASS remain pending.
+- Reducer, fixture event generation, snapshots, certification execution, certified components, permanent bundle publication, Streamlit, provider access, and real-data work remain blocked.
+
+## What Is Next
+- Audit commit `94c3ea4` and its governance evidence without semantic expansion.
+- Run distinct Reviewer A/B/C, both CI matrix jobs, clean audit, and terminal SAW against the unchanged object.
+
+## First Command
+```text
+/mnt/e/code/quant/.venv/Scripts/python.exe -m pytest tests/test_gv_fs0_protocol_*.py -q
+```
+
+## End Context Packet
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

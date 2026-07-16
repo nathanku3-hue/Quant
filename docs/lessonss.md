@@ -1,6 +1,15 @@
 # lessonss.md
 
-Last updated: 2026-07-14
+Last updated: 2026-07-17
+
+## 2026-07-17 Round Entry (Freeze Bytes Before Building Economics)
+- Date: 2026-07-17
+- Mistake or miss: Earlier truth surfaces could be read as authorizing reducer work before one reviewed V1 protocol source, exact generated artifacts, and same-version immutability were mechanically established.
+- Root cause: Normative prose, generated JSON, canonical byte rules, and execution sequencing were separate surfaces, allowing transport and interpretation drift.
+- Fix applied: transferred the reviewed contract and phase brief byte-for-byte into an isolated Phase 0 worktree; generated schemas/registries/tables/vectors from one definition surface; added an independent reference encoder, exact freeze hashes, 54 adversarial tests, and a Windows/Linux immutability workflow.
+- Guardrail for next time: freeze identity, bytes, and failure semantics before implementing state transitions. When canonical text includes transport-sensitive Unicode, store recoverable UTF-8 hex and test the reconstructed bytes rather than weakening the canonical rules.
+- Evidence paths: `gv_fs0/protocol/**`, `schemas/gv_fs0/v1/**`, `docs/context/e2e_evidence/gv_fs0_protocol_v1/**`, `tests/test_gv_fs0_protocol_*.py`, and `.github/workflows/gv-fs0-protocol-v1.yml`.
+- Remaining gate: audit-candidate commit `94c3ea4` exists, but no terminal PASS is allowed without distinct Reviewer A/B/C, green remote Windows/Linux CI, clean audit, and terminal SAW PASS.
 
 ## 2026-07-14 Round Entry (PEAD Strict-PIT Program Terminal Close)
 - Date: 2026-07-14

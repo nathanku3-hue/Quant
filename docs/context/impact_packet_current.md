@@ -1,6 +1,14 @@
 # Impact Packet - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+- **Changed:** added the reviewed protocol authority, protocol-only Python package, 12-schema bundle, immutable registries/tables/vectors, freeze manifest, terminal validators, 54 focused tests, and a bounded cross-platform CI workflow.
+- **Interfaces touched:** Docs/Ops protocol authority and backend protocol primitives only. No `PortfolioBook`, reducer transition, fixture-event generation, snapshot, certification execution, certified component, permanent publication, or Streamlit interface was added.
+- **Current proof:** exact authority bytes PASS; generated-artifact equality PASS; schema/registry/table validation PASS; canonical/adversarial/supervision/immutability suite 54/54 PASS.
+- **Open risk:** audit-candidate commit `94c3ea4` has no distinct Reviewer A/B/C evidence and its Windows/Linux CI has not run remotely. The Phase 1 clean-audit gate remains closed.
+- **Rollback:** revert the audit-candidate and governance-evidence commits; Phase 0 commit `6a8bb6c9410bc91940d53ca727b561aa86776ec7` remains the clean pre-Phase-1 boundary.
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

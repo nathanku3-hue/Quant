@@ -1,5 +1,15 @@
 # Feature Engineering Notes
 
+## 2026-07-17 GV-FS0 Protocol V1 Freeze Evidence
+
+- Authority base: isolated worktree at `6a8bb6c9410bc91940d53ca727b561aa86776ec7`.
+- Reviewed bytes: contract `085a4bcf672069320e69a40c010bbc6ad7bd5c63a844214cb140cb6292de8a02`; phase brief `9b356b39a91190cd3c3f4aa74a7e85ea014323aff1827959c2ba77ceb522f5c6`.
+- Definition formula: `checked_in_machine_artifact_bytes == canonical_document_bytes(single_python_definition_surface)`.
+- Freeze formula: `phase1_exit := tracked_authority AND sole_normative_source AND schemas_registries_valid AND golden_bytes_hashes_pass AND supervision_tests_pass AND immutable_hashes_recorded AND CI_guard_pass AND independent_A_B_C_pass AND terminal_SAW_pass AND post_commit_worktree_clean`.
+- Current result: local implementation proof PASS with 54/54 focused tests and `tracked_authority=true` at audit-candidate commit `94c3ea4`; independent review, remote CI, clean audit, and terminal SAW PASS remain false. Post-governance-evidence worktree cleanliness is verified operationally after commit.
+- Hard boundary: protocol-level ordering/publication modules are pure predicates with no reducer, economic transition, verifier execution, filesystem publication, or UI ownership.
+
+
 ## 2026-07-11 Request Artifact Identity Repair V1 Registry
 
 - RoundID: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-REPAIR-V1`; ScopeID: `REQUEST_ARTIFACT_IDENTITY_REPAIR_V1`.

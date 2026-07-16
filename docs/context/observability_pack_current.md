@@ -1,6 +1,16 @@
 # Observability Pack - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+- `ObservabilityRating`: GREEN for local protocol generation, focused proof, and commit identity; AMBER for independent review and remote CI; RED for reducer/product authorization until clean audit.
+- Authority sentinel: contract `085a4bcf...8a02`, phase brief `9b356b39...f5c6`, sole normative protocol source PASS.
+- Artifact sentinel: 12 schema hashes plus exact hashes for both registries, ranks, slots, transition ownership, canonical vectors, and schema bundle are recorded in `gv_fs0_freeze_manifest_v1.json`.
+- Test sentinel: terminal protocol validator PASS; first-freeze immutability validator PASS; focused pytest 54/54 PASS under the repository environment.
+- CI sentinel: Windows/Linux Python 3.12 matrix validates artifacts, same-version immutability, and only the bounded Phase 1 suite.
+- Audit sentinel: audit-candidate commit `94c3ea4` exists and local evidence is green; distinct Reviewer A/B/C, remote CI, clean audit, and terminal SAW PASS are absent; Phase 1 exit remains BLOCKED.
+- Scope sentinel: no reducer, fixture event generation, snapshots, certification execution, certified components, permanent bundle publication, or Streamlit integration.
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

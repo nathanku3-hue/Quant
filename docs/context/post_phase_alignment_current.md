@@ -1,6 +1,15 @@
 # Post-Phase Alignment - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+- **Docs/Ops:** reviewed authority is consolidated and exact; generated immutable evidence and the CI guard exist.
+- **Backend protocol:** canonical, schema, ordering, supervision, registry, and publication-state predicates pass 54/54 focused tests.
+- **Backend accounting:** held. No reducer, balance mutation, fixture-event expansion, snapshot generation, or certification execution is authorized.
+- **Frontend/UI:** held. No Streamlit or certified presentation integration is authorized.
+- **Current bottleneck:** distinct Reviewer A/B/C, remote Windows/Linux CI, clean audit of commit `94c3ea4`, and terminal SAW PASS.
+- **Next active stream:** clean audit only. Reducer becomes eligible only after the complete Phase 1 exit gate passes.
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

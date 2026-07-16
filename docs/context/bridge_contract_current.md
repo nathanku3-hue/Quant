@@ -1,6 +1,15 @@
 # Bridge Contract - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+- `SYSTEM_DELTA`: the reviewed V1 contract and phase brief are byte-exact in audit-candidate commit `94c3ea4`; generated protocol artifacts and pure protocol predicates are implemented with 54/54 focused tests passing.
+- `PM / Product Delta`: no product output exists. Phase 1 creates a deterministic protocol substrate only; shipped-product score and certification claims do not change.
+- `OPEN_DECISION`: none on protocol semantics. Operational closure still requires distinct Reviewer A/B/C, green Windows/Linux CI, terminal SAW PASS, and a clean audit of commit `94c3ea4` plus its governance evidence.
+- `RECOMMENDED_NEXT_STEP`: audit the exact committed protocol package; do not broaden scope during review.
+- `DO_NOT_REDECIDE`: no reducer, balance transition, fixture generation, snapshot, OPEN/NO_POSITION certification execution, certified component, bundle publication, or Streamlit work before a clean audit.
+- `PHASE_STATUS`: `COMMITTED_AUDIT_CANDIDATE_PENDING_INDEPENDENT_REVIEW`; Phase 1 exit gate remains BLOCKED.
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

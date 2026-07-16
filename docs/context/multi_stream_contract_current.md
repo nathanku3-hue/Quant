@@ -1,6 +1,20 @@
 # Multi-Stream Contract - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | Reviewed V1 authority and manifest committed in audit candidate `94c3ea4`; CI guard implemented | Independent A/B/C, remote CI, clean audit, then terminal SAW PASS |
+| Backend protocol | Canonical/schema/identity/supervision predicates implemented; 54/54 focused tests PASS | Freeze semantics during audit |
+| Backend accounting | BLOCKED | No reducer, transitions, fixture events, snapshots, or certification execution |
+| Frontend/UI | BLOCKED | No certified component, bundle, or Streamlit integration |
+| Data/Research | Unchanged and held | No provider, real-data, or candidate-admission work |
+
+- Cross-stream rule: protocol proof is not economic reduction, certification, publication, or product authority.
+- Stream freeze: only clean audit and evidence reconciliation may follow the committed audit candidate.
+- Next action: complete independent review, remote CI, clean audit, and terminal SAW against the unchanged candidate; do not begin reducer work.
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.
