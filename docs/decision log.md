@@ -1,3 +1,19 @@
+## 2026-07-17 — GV-FS0 Protocol V1 audit candidate
+- Decision: transfer the reviewed GV-FS0 contract and phase brief byte-for-byte into the clean Phase 0 boundary and implement only the authorized protocol-proof surface.
+- Decision: accept the generated 12-schema bundle, certification-failure registry, operational-error registry, event-rank table, generated-slot table, transition-ownership table, canonical vectors, freeze manifest, canonical/order/supervision/publication primitives, focused tests, and read-only CI guard as the audit candidate.
+- Evidence: authority SHA-256 values remain `085a4bcf672069320e69a40c010bbc6ad7bd5c63a844214cb140cb6292de8a02` and `9b356b39a91190cd3c3f4aa74a7e85ea014323aff1827959c2ba77ceb522f5c6`; terminal freeze and immutability validators PASS; focused Phase 1 suite PASS 54/54 under pinned Python 3.12 / pytest 9.0.2 / jsonschema 4.26.0.
+- Boundary: reducer, balance transitions, FS0 event generation, snapshots, certification execution, certified components, permanent publication, Streamlit integration, provider access, and real data remain blocked.
+- Open gate: terminal distinct-agent Reviewer A/B/C ownership is unavailable in this session and the protocol-freeze commit has not received the required clean audit; SAW remains BLOCK and reducer authorization remains false.
+- Next action: bank the unchanged audit-candidate commit, obtain distinct-agent terminal review plus clean audit, and only then consider reducer authorization.
+
+## 2026-07-17 — GV-FS0 Phase 1 protocol-freeze implementation
+- Decision: preserve the reviewed contract and phase brief byte-for-byte, with `docs/architecture/gv_fs0_certification_and_data_authority_contract.md` as the sole normative `GV_FS0_PROTOCOL_V1` source.
+- Decision: implement one protocol-only slice: canonical/raw-token encoders, 12 schemas, separated registries, ranks/slots/transition ownership, pure ordering and verifier-supervision predicates, transport-safe golden vectors, freeze manifest, tests, and same-version CI guard.
+- Decision: represent golden canonical text and documents as UTF-8 hex inside the evidence artifact because literal U+2028/U+2029 are transport-sensitive; tests reconstruct and verify the exact bytes, full preimage, length, and digest.
+- Decision: keep publication code limited to pure compare/recovery/lock-release predicates with no filesystem I/O; this is protocol proof, not permanent bundle publication.
+- Evidence: reviewed authority hashes match; terminal protocol and first-freeze immutability validators PASS; focused Phase 1 suite 54/54 PASS.
+- Boundary: package remains uncommitted and unaudited. Reducer, fixture events, snapshots, certification execution, certified components, bundle publication, and Streamlit remain blocked until commit identity, distinct Reviewer A/B/C, terminal SAW, and post-commit cleanliness pass.
+
 ## 2026-07-13 — M7F4-v8 terminal diagnostic close
 - Decision: accept A2.1 `b4d35e1`, evidence-only Commit B `9f37745`, and three distinct independent Reviewer A/B/C passes as terminal evidence for the fixed M7F4-v8 diagnostic package.
 - Decision: preserve `DIAGNOSTIC_COMPLETE` with strict curve `BLOCKED`; the four residual windows remain represented only by neutral-carry-to-cash and write-down sensitivity legs with exact Shapley attribution.
