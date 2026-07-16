@@ -143,7 +143,7 @@ def _expected_artifact_files() -> set[Path]:
 
 
 def _actual_artifact_files() -> set[Path]:
-    return {path for path in ARTIFACT_ROOT.rglob("*.json") if path != MANIFEST}
+    return {path for path in ARTIFACT_ROOT.rglob("*") if path.is_file() and path != MANIFEST}
 
 
 def _check_lf_attributes() -> list[str]:

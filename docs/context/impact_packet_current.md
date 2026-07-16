@@ -4,7 +4,7 @@
 
 - **Changed interfaces**: normative contract, 18 machine-readable artifacts, canonical/parser primitives, isolated reconstruction boundary, independent reference encoder, freeze verifier/manifest, protocol tests, and CI workflow.
 - **Primary paths**: `docs/architecture/gv_fs0_certification_and_data_authority_contract.md`, `contracts/gv_fs0/v1/**`, `core/gv_fs0_canonical.py`, `validation/gv_fs0_*.py`, `scripts/*gv_fs0_protocol*`, `tests/test_gv_fs0_*.py`, and `.github/workflows/gv-fs0-protocol-freeze.yml`.
-- **Validation**: 132 focused tests PASS; generator/reference/bootstrap guards PASS on Windows and Linux Python; parity records byte-identical; workflow YAML and `git diff --check` PASS.
+- **Validation**: 135 focused tests PASS, including local schema-reference resolution and intent-cardinality proofs; generator/reference/bootstrap guards PASS on Windows and Linux Python; parity records byte-identical; workflow YAML and `git diff --check` PASS.
 - **Open checks**: committed-base enforced guard, non-merged mutation probe, hosted CI, immutable candidate audit, and full Reviewer A/B/C SAW.
 - **Forbidden impact**: no reducer, balance mutation, event execution, snapshot generation, certification execution, certified result, permanent bundle, UI, provider, real-data, or FS1 path changed.
 

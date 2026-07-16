@@ -3,7 +3,7 @@
 ## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
 
 - `SYSTEM_DELTA`: The approved GV-FS0 precision patch is encoded in the consolidated contract and 18 deterministic machine artifacts. Canonical bytes, raw tokens, domain hashes, registries/tables, manifest representations, bootstrap/enforced guards, independent vectors, and isolated reconstruction boundaries are implemented.
-- `PM / Product Delta`: Protocol proof is locally green with 132 focused tests and Windows/Linux byte parity. No certified portfolio slice or user-facing product exists yet.
+- `PM / Product Delta`: Protocol proof is locally green with 135 focused tests, local schema-bundle resolution, exact intent cardinality, and Windows/Linux byte parity. No certified portfolio slice or user-facing product exists yet.
 - `OPEN_DECISION`: None for implementation scope. The remaining action is evidence closure: immutable candidate commit, enforced mutation proof, hosted CI, and independent audit/SAW.
 - `RECOMMENDED_NEXT_STEP`: Bank the protocol candidate, run enforced mode against that exact commit, retain the non-merged mutation branch evidence, then audit the immutable candidate.
 - `DO_NOT_REDECIDE`: Do not reopen the four precision decisions; do not treat local protocol proof as reducer authorization; do not implement PortfolioBook, execution, snapshots, certification, bundles, Streamlit, provider, real-data, or FS1 work.

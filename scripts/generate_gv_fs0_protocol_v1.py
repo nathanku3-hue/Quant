@@ -30,6 +30,7 @@ CONTRACT = ROOT / "docs/architecture/gv_fs0_certification_and_data_authority_con
 ARTIFACT_ROOT = ROOT / "contracts/gv_fs0/v1"
 PROTOCOL_ID = "GV_FS0_PROTOCOL_V1"
 DRAFT = "https://json-schema.org/draft/2020-12/schema"
+SCHEMA_BASE = "https://terminal-zero.invalid/contracts/gv_fs0/v1/schemas/"
 HASH_PATTERN = "^[0-9a-f]{64}$"
 DECIMAL_PATTERN = "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
 DATE_PATTERN = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
@@ -51,7 +52,7 @@ def _object(properties: dict[str, Any], required: list[str], **extra: Any) -> di
 def _schema(name: str, body: dict[str, Any]) -> dict[str, Any]:
     return {
         "$schema": DRAFT,
-        "$id": f"urn:terminal-zero:gv-fs0:{name}",
+        "$id": f"{SCHEMA_BASE}{name}.schema.json",
         "title": name,
         **body,
     }
@@ -119,20 +120,59 @@ def _source_intent_schema() -> dict[str, Any]:
             common,
             allOf=[
                 {
-                    "if": {"properties": {"intent_type": {"const": "EXECUTION_INTENT"}}},
-                    "then": {"properties": {"quantity": _uint(), "execution_price": _string(pattern=DECIMAL_PATTERN)}},
+                    "if": {"properties": {"intent_type": {"const": "EXECUTION_INTENT"}}, "required": ["intent_type"]},
+                    "then": {"properties": {
+                        "quantity": _uint(),
+                        "execution_price": _string(pattern=DECIMAL_PATTERN),
+                        "fee": {"type": "null"},
+                        "dividend_amount_per_share": {"type": "null"},
+                        "referenced_entitlement_source_intent_id": {"type": "null"},
+                        "valuation_timestamp": {"type": "null"},
+                    }},
                 },
                 {
-                    "if": {"properties": {"intent_type": {"const": "EXPLICIT_FEE"}}},
-                    "then": {"properties": {"fee": _string(pattern=DECIMAL_PATTERN)}},
+                    "if": {"properties": {"intent_type": {"const": "EXPLICIT_FEE"}}, "required": ["intent_type"]},
+                    "then": {"properties": {
+                        "quantity": {"type": "null"},
+                        "execution_price": {"type": "null"},
+                        "fee": _string(pattern=DECIMAL_PATTERN),
+                        "dividend_amount_per_share": {"type": "null"},
+                        "referenced_entitlement_source_intent_id": {"type": "null"},
+                        "valuation_timestamp": {"type": "null"},
+                    }},
                 },
                 {
-                    "if": {"properties": {"intent_type": {"const": "DIVIDEND_DECLARATION"}}},
-                    "then": {"properties": {"dividend_amount_per_share": _string(pattern=DECIMAL_PATTERN)}},
+                    "if": {"properties": {"intent_type": {"const": "DIVIDEND_DECLARATION"}}, "required": ["intent_type"]},
+                    "then": {"properties": {
+                        "quantity": {"type": "null"},
+                        "execution_price": {"type": "null"},
+                        "fee": {"type": "null"},
+                        "dividend_amount_per_share": _string(pattern=DECIMAL_PATTERN),
+                        "referenced_entitlement_source_intent_id": {"type": "null"},
+                        "valuation_timestamp": {"type": "null"},
+                    }},
                 },
                 {
-                    "if": {"properties": {"intent_type": {"const": "VALUATION_INSTRUCTION"}}},
-                    "then": {"properties": {"valuation_timestamp": _string(pattern=TIMESTAMP_PATTERN)}},
+                    "if": {"properties": {"intent_type": {"const": "DIVIDEND_PAYMENT_INSTRUCTION"}}, "required": ["intent_type"]},
+                    "then": {"properties": {
+                        "quantity": {"type": "null"},
+                        "execution_price": {"type": "null"},
+                        "fee": {"type": "null"},
+                        "dividend_amount_per_share": {"type": "null"},
+                        "referenced_entitlement_source_intent_id": _string(pattern=SOURCE_INTENT_PATTERN),
+                        "valuation_timestamp": {"type": "null"},
+                    }},
+                },
+                {
+                    "if": {"properties": {"intent_type": {"const": "VALUATION_INSTRUCTION"}}, "required": ["intent_type"]},
+                    "then": {"properties": {
+                        "quantity": {"type": "null"},
+                        "execution_price": {"type": "null"},
+                        "fee": {"type": "null"},
+                        "dividend_amount_per_share": {"type": "null"},
+                        "referenced_entitlement_source_intent_id": {"type": "null"},
+                        "valuation_timestamp": _string(pattern=TIMESTAMP_PATTERN),
+                    }},
                 },
             ],
         ),
@@ -284,6 +324,51 @@ def _schemas() -> dict[str, dict[str, Any]]:
                 "source_intents": {"type": "array", "items": {"$ref": "gv_fs0_source_intent_v1.schema.json"}},
             },
             ["schema_version", "protocol", "decision", "source_prices", "source_intents"],
+            allOf=[
+                {
+                    "if": {
+                        "properties": {
+                            "decision": {
+                                "properties": {"action": {"const": "NO_POSITION"}},
+                                "required": ["action"],
+                            }
+                        },
+                        "required": ["decision"],
+                    },
+                    "then": {
+                        "properties": {
+                            "source_intents": {
+                                "items": {
+                                    "allOf": [
+                                        {"$ref": "gv_fs0_source_intent_v1.schema.json"},
+                                        {"properties": {"intent_type": {"const": "VALUATION_INSTRUCTION"}}},
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "decision": {
+                                "properties": {"action": {"const": "OPEN"}},
+                                "required": ["action"],
+                            }
+                        },
+                        "required": ["decision"],
+                    },
+                    "then": {
+                        "allOf": [
+                            {"properties": {"source_intents": {"contains": {"properties": {"intent_type": {"const": "EXECUTION_INTENT"}}, "required": ["intent_type"]}, "minContains": 1, "maxContains": 1}}},
+                            {"properties": {"source_intents": {"contains": {"properties": {"intent_type": {"const": "EXPLICIT_FEE"}}, "required": ["intent_type"]}, "minContains": 1, "maxContains": 1}}},
+                            {"properties": {"source_intents": {"contains": {"properties": {"intent_type": {"const": "DIVIDEND_DECLARATION"}}, "required": ["intent_type"]}, "minContains": 1, "maxContains": 1}}},
+                            {"properties": {"source_intents": {"contains": {"properties": {"intent_type": {"const": "DIVIDEND_PAYMENT_INSTRUCTION"}}, "required": ["intent_type"]}, "minContains": 1, "maxContains": 1}}},
+                            {"properties": {"source_intents": {"contains": {"properties": {"intent_type": {"const": "VALUATION_INSTRUCTION"}}, "required": ["intent_type"]}, "minContains": 1}}},
+                        ]
+                    },
+                },
+            ],
         ),
     )
     economic_payload = _object(
@@ -609,6 +694,7 @@ def contract_literal_check() -> list[str]:
     contract = CONTRACT.read_text(encoding="utf-8")
     required = [
         PROTOCOL_ID,
+        SCHEMA_BASE,
         "DUPLICATE_ORIGIN_ORDER_KEY",
         "max_session_lag",
         "BOOTSTRAP",
@@ -631,8 +717,8 @@ def check_checked_in() -> list[str]:
     expected = rendered_artifacts()
     actual_paths = {
         path.relative_to(ARTIFACT_ROOT).as_posix()
-        for path in ARTIFACT_ROOT.rglob("*.json")
-        if path.name != "gv_fs0_freeze_manifest_v1.json"
+        for path in ARTIFACT_ROOT.rglob("*")
+        if path.is_file() and path.name != "gv_fs0_freeze_manifest_v1.json"
     } if ARTIFACT_ROOT.exists() else set()
     expected_paths = set(expected)
     for extra in sorted(actual_paths - expected_paths):

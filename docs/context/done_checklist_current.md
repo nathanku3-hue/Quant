@@ -7,7 +7,7 @@
 - [x] Canonical encoder, raw-token parser, independent reference encoder, vectors, registries, tables, and manifest pass.
 - [x] Manifest records lowercase SHA-256, declared Git object format, Git blob OIDs, byte lengths, and exactly one terminal LF.
 - [x] Bootstrap mode rejects schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest mutations.
-- [x] 132 focused GV-FS0 tests pass, including isolated reconstruction and publication boundary tests.
+- [x] 135 focused GV-FS0 tests pass, including isolated reconstruction, local schema-reference resolution, intent cardinality, and publication boundary tests.
 - [x] Native Windows and Linux Python parity records are byte-identical locally.
 - [x] Windows/Linux CI workflow implements bootstrap/enforced selection and downstream byte comparison.
 - [ ] Immutable candidate commit created and locally audited.

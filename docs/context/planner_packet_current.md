@@ -4,7 +4,7 @@
 
 - **Current state**: protocol-only candidate is locally green; reducer and product authorization remain blocked.
 - **Completed**: approved precision amendments; 12 schemas plus six normative tables/registries/vectors; exact canonical encoder and raw-token parser; isolated reconstruction byte/hash boundary; independent CI encoder; freeze manifest; bootstrap/enforced guard machinery; Windows/Linux workflow.
-- **Evidence**: 132 focused GV-FS0 tests PASS; deterministic generation PASS; independent vectors PASS; bootstrap mutation guards PASS; native Windows/Linux parity records byte-identical.
+- **Evidence**: 135 focused GV-FS0 tests PASS, including local schema-reference resolution and OPEN/NO_POSITION intent cardinality; deterministic generation PASS; independent vectors PASS; bootstrap mutation guards PASS; native Windows/Linux parity records byte-identical.
 - **Pending gate**: commit the immutable candidate, run enforced mode against that commit, retain a non-merged mutation-probe branch, obtain hosted Windows/Linux CI evidence, and complete independent audit/SAW.
 - **Recommended next step**: create the candidate commit, prove enforced rejection relative to it, then audit only that immutable commit.
 - **Do not begin**: PortfolioBook reduction, FS0 event execution, snapshots, certification execution, certified results, permanent bundle publication, Streamlit, providers, real data, or GV-FS1.

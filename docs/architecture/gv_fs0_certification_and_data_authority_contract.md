@@ -124,6 +124,16 @@ All JSON Schemas use JSON Schema Draft 2020-12:
 
 All object schemas set `additionalProperties` to `false`. Duplicate JSON object keys are prohibited before schema validation. Correctness must not depend on implementation-specific `format` validation; timestamps, dates, decimals, integers, hashes, IDs, and other constrained fields use explicit patterns plus repository-owned semantic validation.
 
+Every V1 schema uses the stable local-bundle identifier base:
+
+```text
+https://terminal-zero.invalid/contracts/gv_fs0/v1/schemas/
+```
+
+The reserved `.invalid` host is an identifier namespace only. Validators must resolve every relative V1 `$ref` from the committed local schema bundle and must not perform network retrieval. An unresolvable reference or attempted network dependency fails the freeze.
+
+Source-intent schemas enforce exact type-specific nullability. For NO_POSITION verifier input, every source intent must be `VALUATION_INSTRUCTION`; zero `EXECUTION_INTENT` records are mandatory. For OPEN verifier input, exactly one execution, exactly one explicit fee, exactly one dividend declaration, exactly one dividend payment instruction, and at least one valuation instruction are mandatory.
+
 Field counts are consequences of the schemas. A prose field count is never an independent governing contract.
 
 ## 3. Canonical JSON Document Protocol
