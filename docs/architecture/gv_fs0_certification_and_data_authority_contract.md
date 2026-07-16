@@ -676,7 +676,7 @@ OPEN includes one execution intent, one explicit fee intent, one dividend declar
 
 NO_POSITION contains zero `EXECUTION_INTENT` records. Zero execution intents are valid and normative for NO_POSITION. It contains no fee, position movement, entitlement, or payment instruction and contains explicit valuation instructions preserving all-cash economics.
 
-For every valuation instruction, V1 price freshness requires exactly one positive price for the same security and session, with `price_timestamp <= valuation_timestamp`. The frozen predicate is `max_session_lag = 0`. Cross-session carry-forward is prohibited in FS0.
+For every valuation instruction, V1 price freshness requires exactly one positive price for the same security and session, with `price_timestamp <= valuation_timestamp`. The frozen predicate is `max_session_lag = 1`. Cross-session carry-forward is prohibited in FS0.
 
 ### 6.3 Source identities
 
