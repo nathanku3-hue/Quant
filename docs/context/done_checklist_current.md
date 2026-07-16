@@ -1,6 +1,24 @@
 # Done Checklist - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
+
+- [x] Four approved precision decisions and four execution amendments are explicit in the normative contract.
+- [x] Exactly 12 schemas and six other normative V1 artifacts regenerate deterministically.
+- [x] Canonical encoder, raw-token parser, independent reference encoder, vectors, registries, tables, and manifest pass.
+- [x] Manifest records lowercase SHA-256, declared Git object format, Git blob OIDs, byte lengths, and exactly one terminal LF.
+- [x] Bootstrap mode rejects schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest mutations.
+- [x] 132 focused GV-FS0 tests pass, including isolated reconstruction and publication boundary tests.
+- [x] Native Windows and Linux Python parity records are byte-identical locally.
+- [x] Windows/Linux CI workflow implements bootstrap/enforced selection and downstream byte comparison.
+- [ ] Immutable candidate commit created and locally audited.
+- [ ] Enforced mode passes unchanged and rejects all required mutations relative to the committed candidate on a non-merged branch.
+- [ ] Hosted Windows/Linux CI passes.
+- [ ] Independent Reviewer A/B/C and terminal SAW approve the exact candidate.
+- [ ] Reducer authorization predicate satisfied; currently false.
+
+Next action: commit the immutable candidate, execute the enforced mutation probe, and audit that exact commit. Economic implementation remains blocked.
+
+## Prior Program State — PEAD Strict-PIT Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

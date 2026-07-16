@@ -1850,3 +1850,11 @@ Application pattern:
 - Fix applied: Replaced the stale count reference with `selection_contract["n_selected_events"]`, added a deterministic real residual-evidence regression, removed all failed-run partial outputs, committed A2.1 at `b4d35e1`, reran from a fresh clean worktree, independently audited the published parquets and identities, and banked Commit B at `9f37745`.
 - Guardrail for next time: Every expensive data runner must have a small end-to-end regression for each terminal publication branch, including residual/BLOCK evidence, before a full-file scan is authorized; helper-only tests do not prove branch publication safety.
 - Evidence paths: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_daily_returns.parquet.manifest.json`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_event_ledger.parquet.manifest.json`.
+
+## 2026-07-17 Round Entry (Protocol Byte Proof Must Avoid Ambient Package and Git Assumptions)
+- Date: 2026-07-17
+- Mistake or miss: The first cross-platform proof imported the independent encoder through the repository `validation` package, which pulled in pandas, and assumed Linux Git could resolve a Windows-managed worktree pointer.
+- Root cause: Protocol tools were logically stdlib-only but their import path and local worktree identity still depended on ambient repository packaging and platform-specific Git metadata.
+- Fix applied: Loaded the independent encoder directly from its validation directory, kept the verifier and reference implementation free of repository package imports, added an explicit `GV_FS0_GIT_OBJECT_FORMAT` override only for filesystem-copy parity checks, and retained normal CI derivation from `git rev-parse --show-object-format`.
+- Guardrail for next time: A byte-parity tool must be runnable from a minimal Python installation without importing application packages; distinguish canonical-byte parity from local worktree Git discoverability and make any non-Git object-format input explicit and validated.
+- Evidence paths: `validation/gv_fs0_ci_reference_encoder.py`, `scripts/verify_gv_fs0_protocol_freeze.py`, `.github/workflows/gv-fs0-protocol-freeze.yml`, `tests/test_gv_fs0_freeze_immutability_v1.py`.

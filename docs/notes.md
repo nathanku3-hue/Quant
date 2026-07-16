@@ -6414,3 +6414,15 @@ Focused tests: `tests/test_pead_m6_pit_walk_forward_equity_curve.py`.
 - Lifecycle boundary: `PREPARED_NOT_SENT`; no message is proven sent and dispatch remains denied.
 - Authority boundary: identity closure does not authorize remotes, source/provider access, factual validation, readiness promotion, Gate D, publication, strategy/UI work, or data output.
 - Formula impact: none; no quantitative formula, estimator, or runtime path changed.
+
+# GV-FS0 Protocol V1 Canonical and Identity Formula Registry (2026-07-17)
+
+Implementation paths: `core/gv_fs0_canonical.py`, `validation/gv_fs0_reconstruction.py`, `validation/gv_fs0_ci_reference_encoder.py`, `scripts/generate_gv_fs0_protocol_v1.py`, and `scripts/verify_gv_fs0_protocol_freeze.py`.
+
+- Canonical document bytes: `canonical_json_text.encode("utf-8") + b"\n"`, with sorted Unicode scalar keys, exact string escapes, no extra whitespace, and exactly one terminal LF.
+- Domain hash: `SHA256(domain_prefix.encode("utf-8") + b"\n" + canonical_json_document_bytes)`, emitted as lowercase 64-character hexadecimal.
+- Price freshness: one unique positive price for the same security/session, `price_timestamp <= valuation_timestamp`, and `max_session_lag = 0`.
+- Origin order key: `(source_sequence, source_intent_id, generated_event_slot)` within `(effective_timestamp_utc, session, event_type_rank)`; duplicate keys block with `DUPLICATE_ORIGIN_ORDER_KEY`.
+- Manifest Git blob identity: `HASH("blob " + ascii(byte_length) + NUL + exact_file_bytes)` using the manifest-declared repository object format `sha1` or `sha256`.
+- Terminal newline count: number of consecutive LF bytes at end of file; every frozen surface requires exactly `1`.
+- Scope boundary: these formulas certify protocol bytes and identities only; they do not authorize economic reduction, certification execution, publication, or UI behavior.

@@ -7310,3 +7310,11 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - The Decision (Hardcoded): Prohibit strategy and UI promotion of the PEAD program. Mark all PEAD phase briefs and checklists as `TERMINATED_DIAGNOSTIC_ONLY`. Retain existing codebases and validation JSONs for archival and diagnostic reference only.
 - Contract lock: `PEAD_PROGRAM_STATUS := TERMINATED_DIAGNOSTIC_ONLY`, `m6b_data_contract_ready = false`, `usable_for_alpha_inference = false`.
 
+## 2026-07-17 — GV-FS0 Protocol V1 Freeze Candidate
+
+- Decision: Implement only the protocol-freeze boundary authorized by the 2026-07-17 approval verdict. Close the four precision gaps before artifact generation and preserve the reducer/product NO-GO.
+- The Decision (Hardcoded): `max_session_lag = 0`; duplicate origin keys bind `DUPLICATE_ORIGIN_ORDER_KEY` to `timestamp_causality_valid=FALSE`; NO_POSITION permits exactly zero execution intents; post-replace failure carries no rollback or prior-preservation claim; frozen V1 corrections require a new protocol version.
+- Authority relationship: the consolidated contract defines semantics, the 18 generated artifacts are the machine-readable normative expression, and the generator is derivation machinery only. Any contract/artifact/vector/generator disagreement blocks.
+- Freeze evidence: bootstrap and enforced guard modes; LF-only frozen surfaces; lowercase hexadecimal vectors and SHA-256; explicit Git object format and Git blob OIDs; exact mutation probes; Windows/Linux parity workflow.
+- Current gate: local protocol proof PASS, but reducer authorization remains false until the immutable candidate commit, base-relative mutation proof, hosted CI, and independent audit/SAW all pass.
+

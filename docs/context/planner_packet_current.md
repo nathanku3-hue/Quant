@@ -1,6 +1,15 @@
 # Planner Packet - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
+
+- **Current state**: protocol-only candidate is locally green; reducer and product authorization remain blocked.
+- **Completed**: approved precision amendments; 12 schemas plus six normative tables/registries/vectors; exact canonical encoder and raw-token parser; isolated reconstruction byte/hash boundary; independent CI encoder; freeze manifest; bootstrap/enforced guard machinery; Windows/Linux workflow.
+- **Evidence**: 132 focused GV-FS0 tests PASS; deterministic generation PASS; independent vectors PASS; bootstrap mutation guards PASS; native Windows/Linux parity records byte-identical.
+- **Pending gate**: commit the immutable candidate, run enforced mode against that commit, retain a non-merged mutation-probe branch, obtain hosted Windows/Linux CI evidence, and complete independent audit/SAW.
+- **Recommended next step**: create the candidate commit, prove enforced rejection relative to it, then audit only that immutable commit.
+- **Do not begin**: PortfolioBook reduction, FS0 event execution, snapshots, certification execution, certified results, permanent bundle publication, Streamlit, providers, real data, or GV-FS1.
+
+## Prior Program State — PEAD Strict-PIT Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

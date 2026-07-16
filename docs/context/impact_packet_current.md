@@ -1,6 +1,14 @@
 # Impact Packet - Current
 
-## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
+
+- **Changed interfaces**: normative contract, 18 machine-readable artifacts, canonical/parser primitives, isolated reconstruction boundary, independent reference encoder, freeze verifier/manifest, protocol tests, and CI workflow.
+- **Primary paths**: `docs/architecture/gv_fs0_certification_and_data_authority_contract.md`, `contracts/gv_fs0/v1/**`, `core/gv_fs0_canonical.py`, `validation/gv_fs0_*.py`, `scripts/*gv_fs0_protocol*`, `tests/test_gv_fs0_*.py`, and `.github/workflows/gv-fs0-protocol-freeze.yml`.
+- **Validation**: 132 focused tests PASS; generator/reference/bootstrap guards PASS on Windows and Linux Python; parity records byte-identical; workflow YAML and `git diff --check` PASS.
+- **Open checks**: committed-base enforced guard, non-merged mutation probe, hosted CI, immutable candidate audit, and full Reviewer A/B/C SAW.
+- **Forbidden impact**: no reducer, balance mutation, event execution, snapshot generation, certification execution, certified result, permanent bundle, UI, provider, real-data, or FS1 path changed.
+
+## Prior Program State — PEAD Strict-PIT Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
 - **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.

@@ -1,0 +1,132 @@
+name: GV-FS0 Protocol Freeze
+
+on:
+  pull_request:
+    paths:
+      - ".gitattributes"
+      - "contracts/gv_fs0/v1/**"
+      - "core/gv_fs0_canonical.py"
+      - "docs/architecture/gv_fs0_certification_and_data_authority_contract.md"
+      - "docs/phase_brief/phase-E0-brief.md"
+      - "scripts/generate_gv_fs0_protocol_v1.py"
+      - "scripts/verify_gv_fs0_protocol_freeze.py"
+      - "validation/gv_fs0_*.py"
+      - "tests/test_gv_fs0_*.py"
+      - ".github/workflows/gv-fs0-protocol-freeze.yml"
+  push:
+    paths:
+      - ".gitattributes"
+      - "contracts/gv_fs0/v1/**"
+      - "core/gv_fs0_canonical.py"
+      - "docs/architecture/gv_fs0_certification_and_data_authority_contract.md"
+      - "docs/phase_brief/phase-E0-brief.md"
+      - "scripts/generate_gv_fs0_protocol_v1.py"
+      - "scripts/verify_gv_fs0_protocol_freeze.py"
+      - "validation/gv_fs0_*.py"
+      - "tests/test_gv_fs0_*.py"
+      - ".github/workflows/gv-fs0-protocol-freeze.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  protocol-proof:
+    name: Protocol proof (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install protocol test dependencies
+        run: python -m pip install --disable-pip-version-check pytest jsonschema
+
+      - name: Select bootstrap or enforced guard
+        id: guard
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          base_ref=""
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            base_ref="$PR_BASE_SHA"
+          elif [[ "$EVENT_NAME" == "push" && -n "$PUSH_BEFORE_SHA" && "$PUSH_BEFORE_SHA" != "0000000000000000000000000000000000000000" ]]; then
+            base_ref="$PUSH_BEFORE_SHA"
+          fi
+          mode="bootstrap"
+          if [[ -n "$base_ref" ]] && git cat-file -e "$base_ref:contracts/gv_fs0/v1/gv_fs0_freeze_manifest_v1.json" 2>/dev/null; then
+            mode="enforced"
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "base_ref=${base_ref:-origin/main}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify deterministic artifacts
+        run: python scripts/generate_gv_fs0_protocol_v1.py --check
+
+      - name: Verify independent canonical vectors
+        run: python validation/gv_fs0_ci_reference_encoder.py
+
+      - name: Verify freeze guard
+        shell: bash
+        run: >-
+          python scripts/verify_gv_fs0_protocol_freeze.py
+          --mode "${{ steps.guard.outputs.mode }}"
+          --base-ref "${{ steps.guard.outputs.base_ref }}"
+
+      - name: Run protocol proof suite
+        run: python -m pytest -q tests/test_gv_fs0_*.py
+
+      - name: Emit parity record
+        shell: bash
+        run: >-
+          python scripts/verify_gv_fs0_protocol_freeze.py
+          --mode "${{ steps.guard.outputs.mode }}"
+          --base-ref "${{ steps.guard.outputs.base_ref }}"
+          --print-parity-json > "gv-fs0-parity-${{ runner.os }}.json"
+
+      - name: Upload parity record
+        uses: actions/upload-artifact@v4
+        with:
+          name: gv-fs0-parity-${{ runner.os }}
+          path: gv-fs0-parity-${{ runner.os }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  byte-parity:
+    name: Windows/Linux byte parity
+    runs-on: ubuntu-latest
+    needs: protocol-proof
+
+    steps:
+      - name: Download parity records
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gv-fs0-parity-*
+          merge-multiple: true
+
+      - name: Compare exact parity records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          linux = Path("gv-fs0-parity-Linux.json").read_bytes()
+          windows = Path("gv-fs0-parity-Windows.json").read_bytes()
+          if linux != windows:
+              raise SystemExit("GV-FS0 Windows/Linux canonical bytes differ")
+          print("GV-FS0 Windows/Linux byte parity: PASS")
+          PY
