@@ -87,6 +87,16 @@ def test_gitattributes_prevents_autocrlf_from_changing_frozen_bytes() -> None:
     assert "contracts/gv_fs0/v1/**/*.json text eol=lf" in attributes
 
 
+def test_hosted_ci_is_cross_platform_and_anchors_enforcement_to_accepted_base() -> None:
+    workflow = (ROOT / ".github/workflows/gv-fs0-protocol-freeze.yml").read_text(encoding="utf-8")
+    assert "glob.glob('tests/test_gv_fs0_*.py')" in workflow
+    assert "python -m pytest -q tests/test_gv_fs0_*.py" not in workflow
+    assert 'base_ref="origin/$DEFAULT_BRANCH"' in workflow
+    assert '"$GITHUB_REF_NAME" == "$DEFAULT_BRANCH"' in workflow
+    assert 'base_ref="$PR_BASE_SHA"' in workflow
+    assert 'base_ref="$PUSH_BEFORE_SHA"' in workflow
+
+
 def test_generator_is_declared_non_authoritative_and_disagreement_fails() -> None:
     contract = (ROOT / "docs/architecture/gv_fs0_certification_and_data_authority_contract.md").read_text(encoding="utf-8")
     assert "The generator is only a deterministic derivation mechanism" in contract

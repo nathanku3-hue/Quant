@@ -58,13 +58,15 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PUSH_BEFORE_SHA: ${{ github.event.before }}
         run: |
-          base_ref=""
+          base_ref="origin/$DEFAULT_BRANCH"
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
             base_ref="$PR_BASE_SHA"
-          elif [[ "$EVENT_NAME" == "push" && -n "$PUSH_BEFORE_SHA" && "$PUSH_BEFORE_SHA" != "0000000000000000000000000000000000000000" ]]; then
+          elif [[ "$EVENT_NAME" == "push" && "$GITHUB_REF_NAME" == "$DEFAULT_BRANCH" && -n "$PUSH_BEFORE_SHA" && "$PUSH_BEFORE_SHA" != "0000000000000000000000000000000000000000" ]]; then
             base_ref="$PUSH_BEFORE_SHA"
           fi
           mode="bootstrap"
@@ -88,7 +90,9 @@ jobs:
           --base-ref "${{ steps.guard.outputs.base_ref }}"
 
       - name: Run protocol proof suite
-        run: python -m pytest -q tests/test_gv_fs0_*.py
+        run: >-
+          python -c "import glob, pytest, sys;
+          sys.exit(pytest.main(['-q', *glob.glob('tests/test_gv_fs0_*.py')]))"
 
       - name: Emit parity record
         shell: bash
