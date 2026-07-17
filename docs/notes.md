@@ -6434,4 +6434,4 @@ Additional implementation paths: `.github/workflows/gv-fs0-protocol-freeze.yml`,
 - Hosted branch base selection: feature-branch push and PR bootstrap/enforced decisions must use the default branch or PR base, while only default-branch pushes may use the previous pushed SHA as the accepted base candidate.
 - Windows protocol test expansion: hosted pytest file globs are expanded inside Python with `glob.glob("tests/test_gv_fs0_*.py")`, so Windows and Linux run the same focused protocol suite.
 - Mutation acceptance formula: `freeze_candidate_accepted = deterministic_generation_pass AND independent_vectors_pass AND enforced_self_check_pass AND all_required_mutations_rejected AND restored_tree_equals_candidate_tree AND hosted_windows_linux_ci_pass`.
-- Current value: all local terms are true; `hosted_windows_linux_ci_pass` is pending.
+- Current value: true as of hosted run `29567754495`.

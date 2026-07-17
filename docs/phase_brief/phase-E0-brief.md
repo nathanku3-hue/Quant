@@ -1,7 +1,7 @@
 # Phase Brief: GV-FS0 — One Decision, One Book, One Screen
 
 Mode: `EXECUTION_PACKET`
-Status: `PHASE_1_PROTOCOL_LOCAL_AUDIT_PASS; HOSTED_CI_PENDING; REDUCER_BLOCKED`
+Status: `PHASE_1_PROTOCOL_FREEZE_PASS; REDUCER_BLOCKED`
 Date: 2026-07-17
 RoundID: `ROUND-20260717-GV-FS0-PROTOCOL-FREEZE-PHASE1`
 ScopeID: `GV_FS0_PROTOCOL_V1_FREEZE_PROOF`
@@ -22,7 +22,7 @@ DecisionEnvelope
 
 The authority cutover and P0-P4 design review are complete. The consolidated V1 protocol now incorporates the approved canonical byte rules, acyclic identities, event ordering and transition ownership, two verifier attempts, unique hash-addressed verifier-result retention, deterministic supervision boundaries, registry separation, certification semantics, blocked-artifact boundary, and fail-safe publication model.
 
-The freeze is locally repaired and audited but not yet terminal. Before reducer work begins, hosted Windows/Linux CI must pass for the published candidate branch and terminal SAW must be reconciled from BLOCK to PASS.
+The protocol freeze is terminal PASS for the V1 evidence boundary. Reducer/product work remains blocked until separately authorized.
 
 The reviewed source bytes were transferred into the clean managed worktree and verified before amendment:
 
@@ -35,14 +35,15 @@ git_object_format = sha1
 
 Current shipped-product score remains **39/100** because no user-visible certified portfolio slice exists yet.
 
-## Pre-Hosted Freeze Audit Update
+## Terminal Freeze Audit Update
 
 - Candidate baseline: `346d362bb19287a971693819546ad029d5be2d2a`.
-- Hosted-CI repair: `d15b74e30c946b9125e2fe7edb6d265ccf8896b3`; frozen protocol, manifest, and vector bytes unchanged from the baseline.
+- Hosted-CI repairs: `d15b74e30c946b9125e2fe7edb6d265ccf8896b3` and `d5d03ec6e0b0a2bcafd6c0eac34caa23703d03ed`; frozen protocol, manifest, and vector bytes unchanged from the baseline.
 - Mutation probe branch: `9954e32b58ababb49aa263fd210caa5dd20bc9b7`; all six mutation/revert pairs retained and restored to the candidate tree.
 - Local proof: 136 GV-FS0 tests PASS, deterministic generation PASS, independent vectors PASS, enforced verifier PASS, and schema/registry/contract/vector/CRLF/dishonest-manifest probes reject as expected.
 - Review proof: independent Reviewer A/B/C PASS for exact repaired candidate.
-- Remaining gate: hosted Windows/Linux CI. Reducer, product, provider, real-data, and FS1 scope remain blocked.
+- Hosted proof: GitHub Actions run `29567754495` PASS for Ubuntu, Windows, and byte parity.
+- Remaining gate: none for protocol freeze closure. Reducer, product, provider, real-data, and FS1 scope remain blocked.
 
 ## Frozen Research Boundary
 

@@ -1,13 +1,13 @@
 # Bridge Contract - Current
 
-## Active Addendum — GV-FS0 Protocol V1 Pre-Hosted Freeze Audit (2026-07-17)
+## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
-- `SYSTEM_DELTA`: GV-FS0 protocol artifacts and guards are fixed at candidate `346d362`, with hosted-CI portability repair `d15b74e`; frozen protocol, manifest, and vector bytes remain unchanged by the repair.
-- `PM / Product Delta`: Local protocol proof is green at 136 tests plus generator/vector/enforced checks and all six mutation rejections. No certified portfolio slice or user-facing product exists yet.
-- `OPEN_DECISION`: None for local implementation. The remaining gate is hosted Windows/Linux CI evidence for the published candidate branch.
-- `RECOMMENDED_NEXT_STEP`: Push candidate and non-merged probe branches, run hosted CI, then update SAW/truth to terminal PASS only if hosted CI passes.
-- `DO_NOT_REDECIDE`: Do not reopen precision decisions; do not treat pre-hosted local proof as reducer execution; do not implement PortfolioBook, execution, snapshots, certification, bundles, Streamlit, provider, real-data, or FS1 work.
-- `PHASE_STATUS`: Protocol freeze local audit PASS; terminal SAW is BLOCK pending hosted CI; economic implementation remains NO-GO.
+- `SYSTEM_DELTA`: GV-FS0 protocol artifacts and guards are fixed through candidate branch `d5d03ec`; frozen protocol, manifest, and vector bytes remain unchanged by hosted-CI repairs.
+- `PM / Product Delta`: Protocol freeze evidence is terminal PASS: local checks, mutation probes, A/B/C review, and hosted Windows/Linux byte parity all pass. No certified portfolio slice or user-facing product exists yet.
+- `OPEN_DECISION`: None for protocol freeze closure. Reducer/product work requires a separate owner decision.
+- `RECOMMENDED_NEXT_STEP`: Hold protocol evidence; open the reducer/product round only by separate authorization.
+- `DO_NOT_REDECIDE`: Do not reopen precision decisions; do not treat protocol evidence as already executed reducer output; do not implement PortfolioBook, execution, snapshots, certification, bundles, Streamlit, provider, real-data, or FS1 work in this closeout.
+- `PHASE_STATUS`: Protocol freeze terminal SAW PASS; economic implementation remains NO-GO until separately authorized.
 
 ## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
 

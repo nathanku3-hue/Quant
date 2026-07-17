@@ -1,13 +1,14 @@
 # Observability Pack - Current
 
-## Active Addendum — GV-FS0 Protocol V1 Pre-Hosted Freeze Audit (2026-07-17)
+## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
-- `ObservabilityRating`: GREEN for local deterministic generation, vectors, enforced verifier, six mutation rejections, clean restored probe tree, and A/B/C review; AMBER until hosted Windows/Linux CI passes; RED for reducer/product execution authority in this round.
-- Candidate sentinel: original protocol candidate `346d362`; repaired hosted-CI candidate `d15b74e`; frozen protocol/manifest/vector bytes unchanged by repair.
+- `ObservabilityRating`: GREEN for deterministic generation, vectors, enforced verifier, six mutation rejections, clean restored probe tree, A/B/C review, hosted Windows/Linux protocol proof, and byte parity; RED for reducer/product execution authority in this round.
+- Candidate sentinel: original protocol candidate `346d362`; repaired hosted-CI candidate `d5d03ec`; frozen protocol/manifest/vector bytes unchanged by repair.
 - Probe sentinel: non-merged branch tip `9954e32` retains mutation/revert pairs for schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest probes.
 - CI sentinel: Windows pytest glob is expanded by Python, and feature-branch push guard bases on default branch rather than `github.event.before`.
 - Claim sentinel: local protocol proof is not a certified portfolio, not alpha, not tradable, not provider authority, and not FS1.
-- Next-action sentinel: publish branches and wait for hosted CI before terminal PASS.
+- Hosted sentinel: GitHub Actions run `29567754495` PASS.
+- Next-action sentinel: hold until separate reducer/product authorization.
 
 ## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 

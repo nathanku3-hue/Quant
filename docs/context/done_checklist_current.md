@@ -1,18 +1,18 @@
 # Done Checklist - Current
 
-## Active Addendum — GV-FS0 Protocol V1 Pre-Hosted Freeze Audit (2026-07-17)
+## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
 - [x] Immutable candidate `346d362` created and locally audited.
-- [x] Hosted-CI portability repair `d15b74e` preserves frozen protocol, manifest, and vector bytes.
+- [x] Hosted-CI portability repairs through `d5d03ec` preserve frozen protocol, manifest, and vector bytes.
 - [x] 136 focused GV-FS0 tests pass, including the Windows glob and push-base guard regressions.
 - [x] Deterministic generator, independent vectors, and enforced verifier pass against the repaired candidate.
 - [x] Non-merged mutation probe branch tip `9954e32` restores cleanly and retains schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest rejection pairs.
 - [x] Independent Reviewer A/B/C terminal review PASS for exact repaired candidate.
-- [ ] Hosted Windows/Linux CI passes on the published candidate branch.
-- [ ] Terminal SAW reconciled from BLOCK to PASS after hosted CI evidence.
+- [x] Hosted Windows/Linux CI passes on run `29567754495`.
+- [x] Terminal SAW reconciled from BLOCK to PASS after hosted CI evidence.
 - [ ] Reducer authorization predicate acted on; currently false for this round.
 
-Next action: push candidate and probe branches, run hosted CI, then reconcile terminal SAW. Economic implementation remains blocked.
+Next action: hold until separate owner authorization opens reducer/product work. Economic implementation remains blocked in this round.
 
 ## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
 

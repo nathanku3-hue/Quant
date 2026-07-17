@@ -14,6 +14,13 @@
 - Current gate: terminal SAW remains BLOCK until hosted Windows/Linux CI passes after branch publication.
 - Boundary: no reducer, PortfolioBook, certification execution, permanent bundle, UI, provider, real-data, PEAD reopen, or FS1 work is authorized by this pre-hosted audit.
 
+## 2026-07-17 — GV-FS0 Protocol V1 Terminal Freeze Audit
+
+- Decision: close the GV-FS0 protocol-freeze evidence boundary as PASS at candidate branch `d5d03ec`; keep the mutation-probe branch non-merged at `9954e32`.
+- Evidence: hosted run `29567754495` PASS for Ubuntu protocol proof, Windows protocol proof, and Windows/Linux byte parity; local generator, vectors, verifier, focused tests, six mutation probes, and A/B/C review already PASS.
+- Boundary: terminal protocol evidence does not authorize reducer execution, PortfolioBook, certification execution, permanent bundle, UI, provider, real-data, PEAD reopen, or FS1 work.
+- Next action: require separate owner authorization before reducer/product implementation.
+
 ## 2026-07-12 — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH close
 - Decision: Accept M7F3-v7 as active flagged diagnostic package (strict curve BLOCKED); supersede v6 as close authority; keep research validity ~30.
 - Commits: A `bae1f656` code; B `b5c66bc` evidence; C SAW+truth.

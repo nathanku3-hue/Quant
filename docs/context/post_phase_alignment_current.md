@@ -1,13 +1,13 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-FS0 Protocol V1 Pre-Hosted Freeze Audit (2026-07-17)
+## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
-- **Docs/Ops:** Protocol candidate, CI portability repair, final mutation probe evidence, and A/B/C review are complete locally; terminal evidence is intentionally BLOCK pending hosted CI.
+- **Docs/Ops:** Protocol candidate, CI portability repair, final mutation probe evidence, A/B/C review, hosted Windows/Linux CI, byte parity, and terminal SAW are complete.
 - **Backend/Strategy:** Held; reducer and PortfolioBook work remain unopened in this round.
 - **Frontend/UI:** Held; no product surface or certification display exists.
 - **Data/Research:** Held; no provider, real-data, admission, or PEAD scope changed.
-- **Current bottleneck:** hosted Windows/Linux CI byte-parity evidence for the published candidate branch.
-- **Next active stream:** Docs/Ops CI monitoring and SAW reconciliation only.
+- **Current bottleneck:** none for protocol freeze closure.
+- **Next active stream:** none by default; reducer/product requires separate authorization.
 
 ## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
