@@ -1,7 +1,7 @@
 {
   "manifest_id": "MU_SUPERCYCLE_CANDIDATE_CARD_V0_MANIFEST",
   "artifact_uri": "data/candidate_cards/MU_supercycle_candidate_card_v0.json",
-  "artifact_sha256": "f87e7908854791c327b3a04eb46b873fb995283a4b8015c1bca7bd7066f53f2d",
+  "artifact_sha256": "368c4fb3f7afc4673f2bbffd3a39a977159a779e8929e0a327db461d1ee05abd",
   "created_at": "2026-05-10T00:00:00+08:00",
   "scope": "PH65_G8_CANDIDATE_CARD_ONLY",
   "candidate_id": "MU_SUPERCYCLE_CANDIDATE_CARD_V0",

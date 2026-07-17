@@ -1,0 +1,243 @@
+{
+  "artifact_id": "V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701",
+  "round_id": "ROUND-20260701-V2-PEAD-M6B-STRICT-DATA-PHASE0-SUCCESSOR",
+  "scope_id": "V2_PEAD_M6B_STRICT_DATA_PHASE0_DOCS_ONLY",
+  "status": "PROPOSED_FOR_DATA_OWNER_APPROVAL",
+  "artifact_type": "gate_a_semantic_definition_and_session_mapping_contract_request",
+  "authority": "definition and request-contract artifact only; not source-access authorization, entitlement proof, provider access, archive inspection authority, factual gate validation, or strict readiness authority",
+  "lineage": {
+    "supersedes": "docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260630.json",
+    "prior_artifact_sha256": "78487de768b1f399e8b9ea4837858b50e46f79b71959c45757603d2f86257374",
+    "supersession_reason": "add authorized market-calendar source-of-record, conditional timing-artifact dependency, executable eligible-trading-session mapping, replayable session schema, and source-capability attestation",
+    "historical_artifact_mutated": false
+  },
+  "purpose": "Lock strict Gate A first-public/unrestated EPS selection, timing capability, calendar provenance, and replayable daily decision-session mapping before any export or local-byte inspection.",
+  "definition": {
+    "eps_basis": {
+      "required": "company_reported_GAAP_diluted_EPS_as_explicitly_labeled_by_the_licensed_source_dictionary",
+      "prohibited": [
+        "adjusted_or_non_GAAP_EPS",
+        "analyst_estimate",
+        "provider_derived_EPS",
+        "retrospectively_backfilled_current_snapshot_EPS"
+      ],
+      "field_mnemonics": "must be confirmed from the licensed data dictionary; no mnemonic is assumed in this request"
+    },
+    "event_basis": {
+      "required": "first_public_company_earnings_release_for_the_fiscal_quarter",
+      "fallback": "none; absence of an eligible first-public release is a fail-closed missing result",
+      "original_10Q_role": "corroboration only unless a later separately approved contract changes the event basis"
+    },
+    "fiscal_period_identity": {
+      "required_fields": [
+        "issuer_identifier",
+        "fiscal_period_end",
+        "fiscal_year",
+        "fiscal_quarter"
+      ],
+      "currency_rule": "currency must be explicit and consistent within each selected issuer-quarter record; unresolved currency differences fail closed",
+      "share_adjustment_rule": "the selected record must carry sufficient source metadata to identify the reported per-share basis and any source adjustment treatment; undocumented retrospective adjustment fails closed"
+    },
+    "source_roles": [
+      {
+        "source_family": "Compustat Preliminary History",
+        "role": "primary candidate layer for the first-public earnings-release event",
+        "rule": "may supply the selected value only if all event, status, timing, calendar, and source-dictionary requirements are met"
+      },
+      {
+        "source_family": "Compustat Snapshot",
+        "role": "lineage and overwritten-value verification",
+        "rule": "may not silently replace the primary selected first-public value"
+      },
+      {
+        "source_family": "Compustat Point-in-Time",
+        "role": "revision, effective, thru, and delivery lineage verification",
+        "rule": "may not silently replace the primary selected first-public value"
+      },
+      {
+        "source_family": "Compustat Unrestated Quarterly",
+        "role": "original 10-Q corroboration",
+        "rule": "is not an automatic fallback for a missing first-public earnings release"
+      }
+    ],
+    "selection_rule": {
+      "priority_order": [
+        "eligible_Preliminary_History_first_public_release",
+        "otherwise_fail_closed"
+      ],
+      "tie_break": "exact duplicate records with identical issuer-quarter, value, currency, status, and timestamp lineage may be deduplicated deterministically by source record identity; conflicting duplicate candidates fail closed",
+      "later_restatement_rule": "later restated or amended records must be retained only as exclusion/lineage evidence and must never replace the selected first-public value"
+    },
+    "coverage_rule": {
+      "denominator": "every issuer-quarter in the approved M6b Gate A universe after deterministic fiscal-period and identifier eligibility rules",
+      "numerator": "denominator records with one uniquely selected eligible first-public non-restated EPS record and complete timing, calendar, and source lineage",
+      "missingness": "every denominator record absent from the numerator requires a stable fail-closed missing reason"
+    }
+  },
+  "source_capability_attestation": {
+    "provision_timing": "data_owner_provides_as_part_of_approving_the_Gate_A_export_source_access_request_before_human_export_or_agent_inspection",
+    "must_identify": [
+      "exact_licensed_source_fields",
+      "licensed_dictionary_definitions",
+      "first_public_record_identity",
+      "original_restated_revision_or_source_update_status",
+      "minute_or_finer_release_timestamp_capability",
+      "unambiguous_source_timezone_as_IANA_zone_or_explicit_UTC_offset",
+      "issuer_quarter_identity",
+      "date_ranged_issuer_security_mapping"
+    ],
+    "insufficient_pit_timing_rule": "if the selected PIT-family record lacks a complete eligible release timestamp with unambiguous timezone semantics, the approval response must name a separately authorized immutable linkable timing artifact; otherwise Gate A remains blocked"
+  },
+  "timing_artifact_contract": {
+    "timing_artifact_required_rule": "true iff the selected EPS source record lacks a complete eligible release timestamp with unambiguous timezone semantics",
+    "complete_eligible_timestamp_requires": [
+      "minute_or_finer_precision",
+      "unambiguous_IANA_zone_or_explicit_UTC_offset",
+      "deterministic_conversion_to_UTC",
+      "deterministic_conversion_to_exchange_local_time",
+      "deterministic_association_with_the_selected_issuer_quarter_or_source_record"
+    ],
+    "when_not_required": {
+      "timing_artifact_path": null,
+      "timing_artifact_sha256": null,
+      "timing_join_key": null,
+      "timing_join_cardinality": "not_required"
+    },
+    "when_required": {
+      "required_fields": [
+        "timing_artifact_source_identity",
+        "licensed_dictionary",
+        "local_artifact_path",
+        "source_as_of_and_export_provenance",
+        "sha256",
+        "timing_join_key"
+      ],
+      "timing_join_cardinality": "one_to_one",
+      "failure_rule": "zero-match, many-match, ambiguous, unmatched selected source record, or timing coverage gap fails closed"
+    }
+  },
+  "calendar_source_of_record": {
+    "required_with_Gate_A_source_access_approval": true,
+    "required_fields": [
+      "calendar_artifact_id",
+      "calendar_source_identity",
+      "license_or_owner_attestation",
+      "calendar_exchange_timezone",
+      "export_or_version_provenance",
+      "local_or_approved_versioned_repository_path",
+      "sha256",
+      "coverage_start",
+      "coverage_end",
+      "is_trading_session",
+      "scheduled_close_local",
+      "holiday_schedule",
+      "early_close_schedule"
+    ],
+    "prohibited_sources": [
+      "generic_weekday_logic",
+      "undocumented_derived_cache",
+      "unpinned_library_version",
+      "undocumented_exchange_calendar_service",
+      "dynamic_network_lookup"
+    ],
+    "eligible_trading_session_definition": "calendar date where is_trading_session is true and scheduled_close_local is non-null; includes normal and officially early-close dates",
+    "reviewer_c_rule": "Reviewer C must reproduce every session mapping from the exact calendar artifact and SHA-256"
+  },
+  "daily_decision_session_rule": {
+    "rule_id": "first_eligible_trading_session_strictly_later_than_release_local_exchange_date",
+    "definition": "decision_session is the first eligible_trading_session date strictly later than release_local_exchange_date",
+    "same_session_entry": "forbidden",
+    "close_classification_effect": "provenance_only; does not alter decision_session"
+  },
+  "session_mapping_record_schema": {
+    "schema_version": "1.2",
+    "required_fields": [
+      "gate_a_contract_path",
+      "gate_a_contract_sha256",
+      "source_record_identity",
+      "source_artifact_path",
+      "source_artifact_sha256",
+      "raw_release_timestamp",
+      "raw_release_timezone",
+      "timestamp_precision",
+      "normalized_release_timestamp_utc",
+      "normalized_release_timestamp_exchange_local",
+      "release_local_exchange_date",
+      "timing_artifact_required",
+      "timing_artifact_path",
+      "timing_artifact_sha256",
+      "timing_join_key",
+      "timing_join_cardinality",
+      "calendar_artifact_id",
+      "calendar_source_identity",
+      "calendar_exchange_timezone",
+      "calendar_artifact_path",
+      "calendar_artifact_sha256",
+      "calendar_coverage_start",
+      "calendar_coverage_end",
+      "is_trading_session",
+      "scheduled_close_local",
+      "event_date_session_classification",
+      "release_close_classification",
+      "decision_session_rule",
+      "decision_session",
+      "mapping_reason",
+      "stable_fail_closed_missing_reason",
+      "reviewer_c_replay_status"
+    ],
+    "field_values": {
+      "timestamp_precision": ["minute", "second", "millisecond"],
+      "timing_join_cardinality": ["one_to_one", "not_required", "zero_or_many"],
+      "event_date_session_classification": ["normal_session", "early_close_session", "holiday", "weekend", "non_session", "unclassifiable"],
+      "release_close_classification": ["before_close", "at_close", "after_close", "non_session", "unclassifiable"],
+      "reviewer_c_replay_status": ["pending", "pass", "block"]
+    },
+    "consistency_rules": [
+      "is_trading_session=true requires event_date_session_classification in {normal_session, early_close_session}",
+      "is_trading_session=true requires scheduled_close_local non-null and the timestamp includes release_local_exchange_date and calendar_exchange_timezone or an explicit offset",
+      "is_trading_session=false requires event_date_session_classification in {holiday, weekend, non_session} and scheduled_close_local=null",
+      "is_trading_session=null requires event_date_session_classification=unclassifiable, scheduled_close_local=null, decision_session=null, and stable_fail_closed_missing_reason non-null",
+      "normal_session or early_close_session requires release_close_classification in {before_close, at_close, after_close}",
+      "holiday, weekend, or non_session requires release_close_classification=non_session",
+      "unclassifiable requires release_close_classification=unclassifiable",
+      "timing_artifact_required=false requires timing_artifact_path=null, timing_artifact_sha256=null, timing_join_key=null, and timing_join_cardinality=not_required",
+      "timing_artifact_required=true requires non-null timing_artifact_path, timing_artifact_sha256, timing_join_key, and timing_join_cardinality=one_to_one",
+      "missing, ambiguous, or non-convertible timestamp timezone requires decision_session=null and stable_fail_closed_missing_reason non-null"
+    ],
+    "replay_rule": "Reviewer C must reproduce every session-mapping field solely from authorized raw bytes, the locked contract, and the exact calendar artifact; hidden notebooks, package defaults, generic weekday logic, and external calendar services are prohibited"
+  },
+  "hard_stops": [
+    "no_named_licensed_dictionary",
+    "no_first_public_classification",
+    "no_revision_or_status_lineage",
+    "no_effective_thru_delivery_or_equivalent_time_lineage",
+    "no_source_capability_attestation_at_approval",
+    "no_complete_eligible_timestamp_and_no_authorized_timing_artifact",
+    "no_authorized_calendar_artifact",
+    "calendar_not_covering_event_date_or_decision_mapping",
+    "no_date_ranged_identifier_mapping",
+    "conflicting_candidate_values",
+    "coverage_definition_missing"
+  ],
+  "required_references_after_approval": [
+    "Gate A source-access authorization",
+    "human export manifest",
+    "authorized calendar artifact manifest",
+    "staging-only strict Gate A provenance input",
+    "Reviewer C raw-byte and calendar replay packet"
+  ],
+  "forbidden_scope": [
+    "read_secret_txt",
+    "credential_use",
+    "provider_login",
+    "API_call",
+    "network_request",
+    "download",
+    "source_extraction",
+    "artifact_inspection_before_source_authorization",
+    "data_generation",
+    "validator_or_test_redesign",
+    "canonical_readiness_promotion"
+  ],
+  "approval_effect": "only enables a separate source-access authorization request; it does not itself authorize export, archive inspection, provider access, factual validation, or readiness promotion"
+}

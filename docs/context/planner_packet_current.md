@@ -1,5 +1,408 @@
 # Planner Packet - Current
 
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+- **Status:** `COMMITTED_AUDIT_CANDIDATE_PENDING_INDEPENDENT_REVIEW`; implementation commit `94c3ea4` is based on clean Phase 0 commit `6a8bb6c9410bc91940d53ca727b561aa86776ec7`.
+- **Authority:** reviewed contract SHA-256 `085a4bcf672069320e69a40c010bbc6ad7bd5c63a844214cb140cb6292de8a02` and phase brief SHA-256 `9b356b39a91190cd3c3f4aa74a7e85ea014323aff1827959c2ba77ceb522f5c6` are byte-exact in the clean boundary; the contract is the sole `GV_FS0_PROTOCOL_V1` normative source.
+- **Implemented slice:** canonical encoder/raw-token proof, 12 Draft 2020-12 schemas, two registries, event ranks, generated slots, transition ownership, ordering/identity predicates, verifier supervision, publication-state predicates, golden vectors, freeze manifest, immutability checker, and Windows/Linux CI workflow.
+- **Evidence:** `python validation/gv_fs0_protocol_freeze.py` PASS; `python validation/gv_fs0_v1_immutability.py` PASS; focused Phase 1 pytest **54/54 PASS**.
+- **Exit blockers:** distinct Reviewer A/B/C, remote Windows/Linux CI, clean audit, and terminal SAW PASS remain pending. The current local SAW is BLOCK only for reviewer independence and audit.
+- **Next action:** audit commit `94c3ea4` and its governance evidence without semantic expansion, then run terminal SAW. Reducer, fixture generation, snapshots, certification execution, certified components, bundle publication, and Streamlit remain blocked.
+
+## New Context Packet — GV-FS0 Phase 1 Protocol Freeze
+
+## What Was Done
+- Transferred the reviewed GV-FS0 contract and phase brief byte-for-byte into the isolated Phase 0 worktree.
+- Implemented the bounded V1 protocol proof: canonical/raw-token encoders, 12 schemas, registries, immutable tables, ordering/identity and supervision predicates, golden vectors, freeze manifest, CI guard, and 54 passing focused tests.
+
+## What Is Locked
+- Phase 1 is not closed: audit-candidate commit `94c3ea4` exists, but distinct Reviewer A/B/C, remote Windows/Linux CI, clean audit, and terminal SAW PASS remain pending.
+- Reducer, fixture event generation, snapshots, certification execution, certified components, permanent bundle publication, Streamlit, provider access, and real-data work remain blocked.
+
+## What Is Next
+- Audit commit `94c3ea4` and its governance evidence without semantic expansion.
+- Run distinct Reviewer A/B/C, both CI matrix jobs, clean audit, and terminal SAW against the unchanged object.
+
+## First Command
+```text
+/mnt/e/code/quant/.venv/Scripts/python.exe -m pytest tests/test_gv_fs0_protocol_*.py -q
+```
+
+## End Context Packet
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+
+- **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
+- **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.
+- **Original objective**: 2015–2019 dollar-neutral Q5−Q1 strict-PIT PEAD. **Not achieved.**
+- **Research validity**: ~30/100; delivery/closure: 88/100.
+- **Prohibited**: Strategy/UI promotion, readiness flag changes, provider access, curve/alpha claims, ranking/scoring, alerts, recommendations, broker/order paths.
+- **Reopen condition**: Only for one source-intake slice with genuine effective-dated identifiers + committed data-owner approval; mapping and curves remain closed until ID0 passes.
+
+## New Context Packet — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+## What Was Done
+
+- Commit A `c5a9ab8` banked the M7F5-ID0 dated-identifier authority gate, requiring an exact semantics envelope and a reachable, unchanged committed `docs/authorization/*.json` data-owner approval blob.
+- Commit B `410d0ca` banked deterministic current-source BLOCK evidence; truth repair `a51f349` distinguishes runtime/check-out evidence SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903` from committed Git-blob evidence SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- Independent Reviewer A/B/C PASS and terminal SAW `398732c` PASS for the bounded BLOCK evidence gate.
+
+## What Is Locked
+
+- Current source status is `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`; reason `committed_git_blob_data_owner_approval_required`.
+- The 21,882-event pre-identity D1 universe and both canonical hashes remain locked; operational authorities for acquisition, provider access, mapping artifact generation, portfolio/curve execution, and readiness promotion are false.
+- M7F4-v8 remains diagnostic history; no strict PIT/as-of identity, alpha, tradability, Strategy/UI, provider, publication, or dispatch authority is created.
+
+## What Is Next
+
+Choose exactly one separately authorized owner decision: obtain a genuine effective-dated source plus committed data-owner approval, authorize historical identifier acquisition, or terminate PEAD strict-PIT work.
+
+## First Command
+
+```text
+git show --stat --oneline HEAD
+```
+
+## End Context Packet
+
+## Prior Context Packet — M7F4-v8 Terminal Diagnostic Close (2026-07-13)
+
+## What Was Done
+
+- A2.1 `b4d35e1` repaired only the stale residual-evidence count and added a real publication-branch regression; compile and focused tests pass 45/45.
+- Failed-run partials were removed; the clean unchanged Slice 2 rerun completed without OOM.
+- Commit B `9f37745` banks the evidence JSON and two manifests only. Selection is locked at 2,448 unique events; 2,444 observed, three nonnumeric residuals, one unresolved delist, and two validated bridges.
+- NAV/cost, carried-NAV, no-recapitalization, file-hash, and exact 16-state Shapley checks pass. Three distinct independent Reviewer A/B/C passes are pinned to Commit B.
+- Commit C records the terminal SAW and reconciles the active brief, decision/formula/lesson records, and all seven truth surfaces.
+
+## What Is Locked
+
+- `DIAGNOSTIC_COMPLETE` is not a strict curve pass. The strict curve remains absent/`BLOCKED`; `m6b_data_contract_ready=false`.
+- The CUSIP8 link is source-max-date snapshot identity, not PIT/as-of. No alpha, tradable, Strategy/UI, CCM/provider, publication, or dispatch authority is created.
+- Neutral carry and write-down are named sensitivity legs, not justified finite bounds.
+- The clean rerun does not prove transactional multi-file publication, bounded memory, checkpointing, or portable ignored-Parquet evidence.
+
+## What Is Next
+
+Hold promotion. If work resumes, choose exactly one separately authorized scope: transactional cleanup, bounded/checkpointed execution, portable evidence counters, or historical/as-of data authority.
+
+## First Command
+
+```text
+git show --stat --oneline HEAD
+```
+
+## End Context Packet
+
+## Prior Context Packet — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## New Context Packet — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH DIAGNOSTIC_COMPLETE (2026-07-12)
+
+## What Was Done
+
+- Commit A `bae1f65609b723cc6462d9bbd1967340a0cb3310` / tree `5d3a685e392b21551db25ccda26d5aeb043cd3b0`: m7f3-v7 self-financing engine + tests + brief; v6 CLI retired (exit 2).
+- Daily sequence locked: drifted prior → equity turnover trade → apply RET → close transitions; cash not double-counted; write_down dead zero weight.
+- Bridge price/RET parity tol 1e-4 changes **window status only**; selection set fixed 2448 (sha `caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d`).
+- Commit B `b5c66bc740926fc51294107a8951c2993400203a`: evidence only (no seven-surface reconcile).
+- Full run: DIAGNOSTIC_COMPLETE; strict_curve BLOCKED; ok 2444/2448; invalid 4; bridged 2; first-bad residual sum **0.007208 (~0.721%)**; Shapley 16-state both legs sum-to-gap err≈0; leg turnovers differ.
+- Distinct Reviewer A/B/C PASS; Commit C SAW + seven-surface reconcile.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; snapshot non-PIT; readiness false; research validity ~30; score path ~70–73 diagnostic.
+- Primary strict curve not promoted; no CCM/as-of link; no alpha/tradable/UI.
+- v6 historical evidence retained; v6 executable path inactive.
+
+## What Is Next
+
+Hold readiness/UI/strategy/historical-link/CCM. Optional polish: rename stderr `M7F2_BLOCKED` → `M7F3_BLOCKED`. Do not reopen residual selection policy without owner decision.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f3_v7_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+
+# Planner Packet - Current
+
+## New Context Packet — M7F2-v6-final Outcome Envelope DIAGNOSTIC_COMPLETE (2026-07-12)
+
+## What Was Done
+
+- Commit A `c7724adcaa855076be079c10224ea5cd2f0e60c0` / tree `158a0abe4c41215301fcad9abd83d485c230e778`: hard-replace v5.2 runner/tests/brief with m7f2-v6-final (no compatibility path).
+- Four semantic locks: pre-entry delist exclude before breadth/Q5 + rerank; blank one-day bridge with adjacent price+next RET proof; neutral carry-to-cash + write_down_100pct envelope (not a finite upper bound); map used_for_selection=true (identity).
+- Full 2019 rerun from Commit A: status=DIAGNOSTIC_COMPLETE, strict_curve_status=BLOCKED.
+- Counts: pre_entry_delist_excluded=12; selected=2448; ok=2444; invalid=4; bridged=2; residual reasons={'nonnumeric_selected_window': 3, 'unresolved_delist': 1}.
+- Residual combined approx event-slot share=0.0016339869281045752; envelope legs written for neutral_carry_to_cash and write_down_100pct.
+- Evidence SHA-256 `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a` bound to Commit A.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; non-PIT snapshot link; readiness false; research validity ~30.
+- Primary strict curve not promoted; sensitivity curves are diagnostic only.
+- Event-id allowlists forbidden in production policy (ids only in tests).
+- Do not restore pre-Q5 complete-60 / entry-day return filters.
+
+## What Is Next
+
+Terminal Commit C independent Reviewer A/B/C + SAW PASS allowed for completed diagnostic scope while strict_curve_status remains BLOCKED. Do not open readiness/UI/strategy/historical-link.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f2_v6_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+
+# Planner Packet - Current
+
+## New Context Packet — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+## What Was Done
+
+- Commit A `138c8b76028b2094793efb2d066c269bf7b805f6` / tree `2b7e216056cad76f87b3aaa3ed57ca1be0f23637`: M7F1-v5.2-final code+tests+brief only (clean worktree).
+- Four mandatory edits: prior-20 is explicit roadmap-deviation tradability gate (not map repair); source-wide spine + ≥20 pre-2019 sessions; VOL>0; first/last-date mismatch diagnostic-only; map always rebuilt; stale curve invalidate on BLOCK.
+- Full 2019 rerun from Commit A: durable **BLOCK** — 2448 selected / 2441 OK / 7 invalid (`nonnumeric=5`, `unresolved_delist=1`, `missing_session=1`). Curve not promoted. Prior-20: 15793 ok / 1050 fail.
+- Evidence SHA-256 `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292` bound to Commit A.
+
+## What Is Locked
+
+- Claim ceiling: flagged research; non-PIT snapshot link; readiness false; research validity ~30.
+- Do not restore pre-Q5 complete-60 / entry-day return filters; do not use full-sample max_date for selection.
+- Residual specials/delist are a **delisting-data/policy** gate next — not historical-link yet.
+
+## What Is Next
+
+Owner open bounded delisting-data/policy gate for the 7 residual selected-window invalids only. Terminal Commit C SAW is ADVISORY_PASS (Reviewer A/B/C all PASS).
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4\tests\test_pead_m7f1_v5_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+## Prior Context Packet — C0X → M7F0-v4 (2026-07-12)
+
+## What Was Done
+
+- C0X on branch `c0x/m7f0-v4` from `aee7f4c`: fail-closed dual index/porcelain parsers; deindexed+ignored exactly 41 gitlinks; commit `17cb830`; detached proof worktree planning PASS via primary `.venv`.
+- M7F0-v4 2019 RDQ CRSP Q5 long-only mechanical vertical executed with v4 contract locks; evidence + tracked parquet manifest published.
+- Invalid C0A closure commits abandoned (not repaired).
+
+## What Is Locked
+
+- `link_model=current_snapshot_cusip8`; `as_of_link=false`; research-only; `m6b_data_contract_ready=false`.
+- No D2B/M6 portfolio reuse; no alpha/tradable; no WRDS login.
+
+## What Is Next
+
+Owner accept mechanical M7F0-v4 evidence under research-validity ceiling ~30, or authorize separate as-of link work. Do not run C0B as a phase.
+
+## First Command
+
+```text
+E:\Code\Quant\.venv\Scripts\python.exe -m pytest E:\Code\Quant_c0x_m7f0_v4	ests	est_pead_m7f0_2019_crsp_vertical.py -q
+```
+
+## End Context Packet
+
+# Planner Packet - Current
+
+## New Context Packet — Request Artifact Identity Truth Reconciliation V1
+
+## What Was Done
+
+- Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` banks the exact four current 20260701 request artifacts, and commit `c642a94944831adbd7ecc06fb16259c87fcdd213` adds the detached identity envelope with lifecycle `PREPARED_NOT_SENT`.
+- Terminal review commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` records three distinct read-only Reviewer A/B/C PASS reports and a terminal SAW PASS against the unchanged payload commit and envelope.
+- Mandatory current-truth surfaces are reconciled from the superseded ownership BLOCK to terminal identity-closure PASS. This changes governance truth only; request payload bytes, envelope bytes, request semantics, and factual gate/readiness evidence remain unchanged.
+
+## What Is Locked
+
+- Dispatch remains denied and no Gate A or Gate B/C message is proven sent. The envelope remains identity evidence only and grants no authority transfer.
+- Reject legacy, divergent, reconstructed, redirected, cherry-picked, self-referential, ambiguously hashed, or otherwise unbound artifacts, including `51b1471ff93741fd339d506399413c928479db5a`.
+- No remotes, dispatch, source/provider access, factual validation, readiness promotion, Gate D, publication, strategy/UI work, or data output. A/B/C/D factual statuses and `m6b_data_contract_ready=false` are unchanged.
+
+## What Is Next
+
+Hold the verified request artifacts at `PREPARED_NOT_SENT`. Do not rerun implementation or reviewers. Gate A/B/C dispatch requires a separate explicit owner decision and remains denied until that decision is made.
+
+## First Command
+
+```text
+git show --stat --oneline HEAD
+```
+
+## End Context Packet
+
+## Prior Context Packet — Checkout Hygiene / Governance Recovery PASS
+
+## What Was Done
+
+- Closed hard unclassified dirty blocker by banking Path A source/test pair; fixed GOV-002/GOV-008; restored locked PEAD evidence LF; planning preflight green at commit `e470137`.
+
+## What Is Locked
+
+- Hygiene green did not establish request-artifact identity and is not dispatch, source-access, or readiness authority.
+
+## What Is Next
+
+Superseded by the active request-artifact identity repair packet above.
+
+## First Command
+
+```text
+.venv/Scripts/python.exe scripts/boot_preflight.py --repo-root . --mode planning --no-tests
+```
+
+## End Context Packet
+
+## Prior Context Packet — P0 Trust-Substrate Repair Active
+
+## What Was Done
+
+- Hardened the boot Git gateway against ambient redirection, replacement-object ancestry, and non-commit identities; hardened strict Path A JSON parsing against duplicate-member ambiguity. Focused adversarial tests and fresh A/B/C review pass.
+
+## What Is Locked
+
+- P2 publication, Gate A/B/C dispatch, remote actions, Gate D, Strategy/UI, source access, data output, and readiness promotion are frozen until separately reopened after hygiene green.
+- P0 identity repair is banked; hygiene/governance was the subsequent blocker and is now cleared for planning preflight.
+
+## What Is Next
+
+See active hygiene recovery packet above.
+
+## First Command
+
+```text
+.venv/Scripts/python.exe scripts/boot_preflight.py --repo-root . --mode planning --no-tests
+```
+
+## End Context Packet
+
+## New Context Packet - V2 PEAD M6b Slice 0 Active-Contract Deconfliction
+
+## What Was Done
+
+- Corrected only the active M6b phase brief: first-public/unrestated EPS is now the sole strict Gate A pass route; restated EPS remains non-strict diagnostic evidence.
+- Added concrete repository remote/root, commit, tree, artifact path, and artifact-hash verification fields to the canonical Ship-Fast approval/request template.
+- Verified that the denied R0.1 commit and root plan do not resolve in Quant; no R0.1 work was imported or recreated.
+
+## What Is Locked
+
+- `release_date_aligned_but_restated` cannot satisfy strict Gate A, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- Historical addenda are preserved. No data, provider, source-byte, ETL, curve, readiness, or R0.1 work occurred.
+- Gate A/B/C/D factual statuses and strict readiness remain unchanged.
+
+## What Is Next
+
+Next action: dispatch only the existing Gate A and Gate B/C data-owner source-access requests.
+
+## First Command
+
+```text
+Review docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.md and send only its approved data-owner request content.
+```
+
+## End Context Packet
+
+## New Context Packet - V2 PEAD Strict M6b Phase 0 Successor Requests
+
+## What Was Done
+
+- Created 20260701 successor Gate A definition/session-mapping contract and strict source-access request bundle without altering 20260630 historical request artifacts.
+- Bound the active successor request only to Gate A contract SHA-256 `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063`.
+- Added data-owner capability attestation at approval, conditional timing-artifact rules, immutable calendar provenance, and Reviewer C replayable session mapping.
+
+## What Is Locked
+
+- A=`BLOCKED_STRICT_PIT_ARTIFACT_MISSING`; B=`CANDIDATE_LOCAL_INPUT_PRESENT__AUTHORIZATION_AND_FACTUAL_VERIFICATION_PENDING`; C=`BLOCKED_ATTRIBUTE_SCOPE_UNVERIFIED`; D=`DEFERRED_SOURCE_INDEPENDENT_INTEGRATION_GAP`.
+- No source artifact, provider, credential, raw-data inspection, Gate validation, or readiness work occurred.
+- Canonical current evidence and strict readiness remain unchanged.
+
+## What Is Next
+
+Next action: close the request-only Thin SAW, then submit separate Gate A and Gate B/C data-owner source-access requests.
+
+## First Command
+
+```text
+Review docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.md and send only its approved data-owner request content.
+```
+
+## End Context Packet
+
+## New Context Packet - V2 PEAD Strict M6b Path A Gate Infrastructure
+
+## What Was Done
+
+- Repaired and locally validated the bounded evidence-only Gate A-D validator: payloads cannot self-authorize, malformed authorization and synthetic-test-plus-authorization are CLI input errors, and no current gate can pass without detached authorization plus all four verified source-byte hashes.
+- Passed 68 focused tests, 12 existing M6a tests, compile, deterministic atomic current-evidence CLI, explicit-`--output` argparse rejection, synthetic canonical-output rejection, payload-only restated-approval rejection, malformed-evidence/authorization no-output checks, authorization mismatch, source tamper, isolation checks, and canonical context build/validation.
+- Published fail-closed evidence at `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json`, SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+
+## What Is Locked
+
+- A/B/C/D are `BLOCKED`; `m6b_data_contract_ready=false`; current restated EPS has `strict_vintage_pit=false`; its exception is `NOT_AUTHORIZED`.
+- Inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception cannot satisfy strict Gate A.
+- M6a is sparse engine/framework evidence only. Data Path A is active; Frontend/UI and Strategy promotion are held.
+- B stays an isolated illustrative diagnostic and is never a strict-data fallback.
+- Terminal A/B/C review remains infrastructure-only and cannot promote readiness.
+
+## What Is Next
+
+Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
+## First Command
+
+```text
+.venv/Scripts/python.exe -m pytest tests/test_pead_m6b_strict_path_a_data_gate.py -q --basetemp=tmp/pytest/strict_path_a_repair
+```
+
+## Next Todos
+
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
+## End Context Packet
+
+## New Context Packet - V2 PEAD Strict M6b Path A Gates Opened
+
+## What Was Done
+
+- Refreshed stale cross-stream docs (`multi_stream_contract_current.md`, `post_phase_alignment_current.md`) to the June 25 M6 truth.
+- Opened strict M6b Path A data gates in `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md` for first-public EPS vintage, delisting-adjusted tradable returns, as-of liquidity/tradability screen, and short borrow assumptions.
+- Established fail-closed acceptance criteria for strict M6b data readiness (`m6b_data_contract_ready = false`).
+
+## What Is Locked
+
+- Fastest valid reboot is strict M6b Data Path A, not Strategy or Frontend. Data is done for diagnostic/M6a-engine use but not "done done" for a tradable research run.
+- Best-Available Option 1 B artifacts remain illustrative-only / not_alpha / not_tradable_claim and cannot be wired into strict M6b.
+- No provider ingestion, strict M6b adapter, M6a readiness-flag promotion, UI, ranking/scoring, alert, recommendation, live/paper, or broker/order path was opened.
+
+## What Is Next
+
+**Single next action: execute the strict M6b Path A data prep for Gates 1-4 (first-public EPS or explicit flagged exception, delisting-adjusted tradable returns, as-of liquidity/tradability screen, borrow assumptions).**
+
+## First Command
+
+```text
+.venv\Scripts\python.exe -m pytest tests\test_pead_m6_pit_walk_forward_equity_curve.py -q
+```
+
+## Next Todos
+
+- [ ] Execute strict M6b Path A data prep for Gate 1 (EPS Vintage).
+- [ ] Execute strict M6b Path A data prep for Gate 2 (Delisting Returns).
+- [ ] Execute strict M6b Path A data prep for Gate 3 (Liquidity Screen).
+- [ ] Execute strict M6b Path A data prep for Gate 4 (Borrow Assumptions).
+
 ## New Context Packet - V2 PEAD M6b Best-Available Option 1 Repair PASS
 
 ## What Was Done

@@ -1,6 +1,90 @@
 # lessonss.md
 
-Last updated: 2026-06-25
+Last updated: 2026-07-17
+
+## 2026-07-17 Round Entry (Freeze Bytes Before Building Economics)
+- Date: 2026-07-17
+- Mistake or miss: Earlier truth surfaces could be read as authorizing reducer work before one reviewed V1 protocol source, exact generated artifacts, and same-version immutability were mechanically established.
+- Root cause: Normative prose, generated JSON, canonical byte rules, and execution sequencing were separate surfaces, allowing transport and interpretation drift.
+- Fix applied: transferred the reviewed contract and phase brief byte-for-byte into an isolated Phase 0 worktree; generated schemas/registries/tables/vectors from one definition surface; added an independent reference encoder, exact freeze hashes, 54 adversarial tests, and a Windows/Linux immutability workflow.
+- Guardrail for next time: freeze identity, bytes, and failure semantics before implementing state transitions. When canonical text includes transport-sensitive Unicode, store recoverable UTF-8 hex and test the reconstructed bytes rather than weakening the canonical rules.
+- Evidence paths: `gv_fs0/protocol/**`, `schemas/gv_fs0/v1/**`, `docs/context/e2e_evidence/gv_fs0_protocol_v1/**`, `tests/test_gv_fs0_protocol_*.py`, and `.github/workflows/gv-fs0-protocol-v1.yml`.
+- Remaining gate: audit-candidate commit `94c3ea4` exists, but no terminal PASS is allowed without distinct Reviewer A/B/C, green remote Windows/Linux CI, clean audit, and terminal SAW PASS.
+
+## 2026-07-14 Round Entry (PEAD Strict-PIT Program Terminal Close)
+- Date: 2026-07-14
+- Mistake or miss: The original 2015–2019 dollar-neutral Q5−Q1 strict-PIT PEAD objective was not achieved. The shipped outcome is a bounded 2019 long-only future-informed diagnostic (M7F4-v8) with research validity ~30/100.
+- Root cause: Strict-PIT EPS data requires first-public/unrestated vintage with genuine effective-dated identifiers (CRSP/CCM PERMNO↔GVKEY date-ranged links). The available Compustat security master has only current-snapshot identifiers, and the CCM linktable has all-null PERMNO join keys. No data-owner approval for historical source acquisition was obtained.
+- Fix applied: Formally terminated the strict-PIT program. Merged M7F4-v8 to main as DIAGNOSTIC_ONLY at commit `150d322` with tag `pead-v8-diagnostic-terminal`. Closed all PEAD phase briefs. Prohibited strategy/UI promotion.
+- Guardrail for next time: Before starting a multi-phase strict-PIT research program, verify that the required historical data provenance (effective-dated identifiers, committed data-owner approval, non-null join keys) is obtainable. Do not proceed past M1 without proving the data authority path.
+- Evidence paths: merge commit `150d322`, tag `pead-v8-diagnostic-terminal` at `076f26b`, `docs/context/bridge_contract_current.md`.
+
+## 2026-07-13 Round Entry (Clean Success Does Not Prove Transactional Recovery)
+- Date: 2026-07-13
+- Mistake or miss: The first Slice 2 attempt left four partial outputs after an OOM-adjacent failure, and the later clean rerun could be overread as proving generalized recovery.
+- Root cause: Individual writes are atomic, but the map, ledger, scenario legs, evidence, and manifests are not committed as one transaction; the full-panel plus dual-Shapley path also has no enforced memory cap or checkpoint.
+- Fix applied: Removed all failed-run partials, reran from a clean committed checkout, reconciled every available artifact hash and row count, and recorded the transactionality/memory limits in independent Reviewer B and terminal SAW evidence.
+- Guardrail for next time: Before any large rerun, require a clean-output preflight and post-run complete-package hash audit; never infer transactionality, bounded memory, or resumability from one successful rerun.
+- Evidence paths: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, `docs/saw_reports/reviewer_b_c0x_m7f4_v8_commit_b_20260713.md`, `docs/saw_reports/saw_c0x_m7f4_v8_terminal_commit_c_20260713.md`.
+
+## 2026-07-12 Round Entry (Self-Financing Truth Before Score Close)
+- Date: 2026-07-12
+- Mistake or miss: M7F2-v6 claimed diagnostic 70–74 close while residual exposure used event-count share (0.163% vs ~0.72% first-bad), turnover ignored drift/equity-cash transitions (identical leg costs), bridge lacked price/RET parity, and A/B/C identities were unproven while truth still said Commit C pending.
+- Root cause: Portfolio mechanics and governance closure were treated as hash/test PASS rather than self-financing path + independent review pins.
+- Fix applied: M7F3-v7 locked drifted-prior→equity trade→RET→close sequence; first-bad residual metric; dead write-down sleeves; equity-only turnover; 16-state Shapley; selection-set hash; v6 CLI retired; Commit B evidence-only; Commit C after distinct A/B/C.
+- Guardrail for next time: Never score a portfolio diagnostic close without (1) explicit daily trade sequence, (2) residual exposure defined as first-bad weight sum when that is the audit metric, (3) non-identical leg costs when residual paths differ, (4) distinct reviewer agent IDs, (5) seven-surface reconcile only after reviewers.
+- Evidence paths: `scripts/pead_m7f3_v7_2019_crsp_vertical.py`, `docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json`, `docs/saw_reports/saw_c0x_m7f3_v7_self_financing_20260712.md`.
+
+
+## 2026-07-11 Round Entry (Payload Identity Must Use a Detached Envelope)
+- Date: 2026-07-11
+- Mistake or miss: Dispatch and reviewer PASS were claimed against commit `e470137` even though the four current 20260701 request artifacts were untracked and absent from that commit; the dispatch Markdown also labeled the JSON hash as its own.
+- Root cause: Artifact identity was treated as narrative metadata inside or beside the payload instead of an exact object-store binding. Embedding a payload's final commit/tree in that payload is self-referential, and one ambiguous packet hash cannot identify separate Markdown and JSON bytes.
+- Fix applied: Restored truth to BLOCK, quarantined the false dispatch outputs and dependent PASS report, banked the exact four request payloads unchanged in Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e`, and created a tracked detached envelope binding its remote/root/commit/tree plus distinct path/hash pairs with `PREPARED_NOT_SENT`. Both preflights and A/B/C technical checks pass; terminal SAW remains BLOCK because distinct-agent ownership is unavailable.
+- Guardrail for next time: Bank payload bytes first, then bind them from a detached envelope. Reject legacy, divergent, reconstructed, redirected, cherry-picked, self-referential, ambiguously hashed, or otherwise unbound artifacts. `PREPARED_NOT_SENT` is never dispatch proof.
+- Evidence paths: `docs/phase_brief/v2-pead-m6b-request-artifact-identity-repair-v1.md`, `docs/quarantine/request_artifact_identity_repair_v1/QUARANTINE_MANIFEST.md`, the four 20260701 request artifacts, and the tracked identity envelope created in Commit 2.
+
+## 2026-07-11 Round Entry (Planning Preflight Hard Dirty Is Path-Classified, Not Every Dirty File)
+- Date: 2026-07-11
+- Mistake or miss: Early planning treated boot-core dirty files as the hard dirty blocker; the real hard fail was the untracked Path A source/test pair. Separately, GOV-002 failed PEAD *denial* copy that contained the token `recommendation`, and GOV-008 failed on stale candidate-card manifest hashes. Locked PEAD evidence JSON had CRLF bytes under assume-unchanged, breaking SHA verification without showing as ordinary git dirty.
+- Root cause: Dirty classification is code-path severity, not “any modified file.” UI scanners match substrings regardless of negation. Manifest hashes drift silently if card bytes change without rebinding. Windows line-ending + assume-unchanged can desync content hashes from Git’s dirty view.
+- Fix applied: Banked Path A pair; reworded PEAD denial UI without forbidden tokens; moved M1B schema claim-boundary names to non-UI core; rebound MSFT/MU manifests to current card SHA-256; restored locked evidence LF blobs from HEAD; acceptance governance+planning preflight PASS at commit `e470137`.
+- Guardrail for next time: When preflight fails dirty, list `severity=fail` paths only before planning work. Rebind manifests mechanically when cards change. Never put product-action tokens in UI-scanned string literals even in denials—use allowed wording or non-UI schema modules. Clear assume-unchanged and restore LF when evidence SHA verification drifts without porcelain dirt.
+- Evidence paths: `core/pead_evidence_claim_boundary.py`, `views/pead_validation_evidence.py`, `data/candidate_cards/*manifest.json`, Path A script/tests, `scripts/governance_preflight.py` PASS, `scripts/boot_preflight.py --mode planning --no-tests` PASS, commit `e470137`.
+
+## 2026-07-11 Round Entry (Authority Identity Requires an Unambiguous Parser and Object Store)
+- Date: 2026-07-11
+- Mistake or miss: Approval/evidence JSON accepted duplicate members under Python's last-key-wins default, while Git ancestry checks could be affected by replacement refs and did not reject their presence.
+- Root cause: Repository identity and JSON syntax were treated as ordinary input details rather than authority preconditions.
+- Fix applied: Sanitized Git identity subprocesses, disabled replacement objects, rejected loose/packed replacement refs, required raw HEAD/upstream commit objects plus a verified HEAD tree, and added all-depth duplicate-key rejection to strict evidence and authorization JSON parsing before output creation. Fresh A/B/C review passed after the repair.
+- Guardrail for next time: An authority packet is valid only when Git redirection is sanitized, raw commit/tree identity and replacement state are verified, and every JSON object member is unique; unavailable/non-commit identity, any replacement ref, or any duplicate key blocks the packet with no compatibility bypass.
+- Evidence paths: `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, `scripts/pead_m6b_strict_path_a_data_gate.py`, `tests/test_pead_m6b_strict_path_a_data_gate.py`, focused P0 test output, final Reviewer A/B/C evidence, and this round's SAW report.
+
+## 2026-07-02 Round Entry (Repository Identity Must Be a Packet Gate, Not a Narrative Rule)
+- Date: 2026-07-02
+- Mistake or miss: An R0.1 approval/denial packet was evaluated against Quant even though its claimed commit and root plan did not resolve here; the active M6b phase brief also retained stale language implying a restated-EPS exception could satisfy strict Gate A.
+- Root cause: Repository identity was described as an operational principle rather than required fields and verification evidence in the canonical approval/request template; active and historical wording were not separated tightly enough.
+- Fix applied: Added a repository remote/root, commit, tree, artifact path, and artifact hash gate to `docs/templates/ship_fast_decision_gate.md`; corrected only the active M6b phase brief so first-public/unrestated EPS is the sole strict Gate A pass route.
+- Guardrail for next time: Deny any approval/request packet whose declared repository, commit, tree, artifact path, or artifact hash cannot resolve exactly; never repair a missing external governance chain by importing it into the wrong repository. Preserve historical addenda while correcting active truth.
+- Evidence paths: `docs/templates/ship_fast_decision_gate.md`, `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md`, current truth surfaces, and this round's Thin SAW report.
+
+## 2026-06-30 Round Entry (Windows Sandbox Failure Requires an Explicit WSL Repo Guard)
+- Date: 2026-06-30
+- Mistake or miss: Reinstalling Codex did not repair the Windows sandbox helper, and a malformed WindowsApps-based working directory could have redirected validation away from the intended repository.
+- Root cause: The Windows sandbox setup executable had a missing-module failure, while the WSL handoff inherited an invalid composite cwd instead of the mounted E: workspace.
+- Fix applied: Bound every command to `/mnt/e/Code/Quant`, confirmed the working path before validation, used the repo `.venv` through WSL interop, and preserved the canonical brief and unrelated dirty files.
+- Guardrail for next time: On WSL recovery, hard-stop unless `pwd` is exactly `/mnt/e/Code/Quant`; never accept a cwd containing `WindowsApps` or a composite `resources/E:/...` path.
+- Evidence paths: `scripts/pead_m6b_strict_path_a_data_gate.py`, `tests/test_pead_m6b_strict_path_a_data_gate.py`, `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json`, focused pytest/compile/CLI output from this round.
+
+## 2026-06-30 Round Entry (Evidence Content Must Never Carry Its Own Authority)
+- Date: 2026-06-30
+- Mistake or miss: The current-evidence payload could set its own authorization boolean, malformed authorization was silently downgraded to `NOT_AUTHORIZED`, and structurally passing gates could report `PASS` without detached authority or complete source-byte verification.
+- Root cause: Authorization schema validity, authorization outcome, evidence content, byte provenance, and gate status were evaluated as separable local checks instead of global current-evidence prerequisites.
+- Fix applied: Made malformed authorization JSON/schema and synthetic-test-plus-authorization CLI input errors; retained fail-closed JSON for structurally valid unapproved/mismatched current-evidence authorization; and required detached authorization plus all four verified source hashes before any current gate can pass.
+- Guardrail for next time: Never emit a current gate `PASS` unless detached authority and the complete source-byte set are verified; never convert malformed control artifacts into ordinary authorization denials or accept authorization flags in synthetic validation.
+- Observed state: A/B/C/D are `BLOCKED`; the restated-EPS exception is `NOT_AUTHORIZED`; `strict_vintage_pit=false`; `m6b_data_contract_ready=false`. Inherited exception wording is superseded on current truth surfaces and cannot satisfy strict Gate A.
+- Evidence: strict-gate tests PASS 68/68; M6a tests PASS 12/12; malformed and synthetic-test authorization combinations exit 2 without output; mismatched current-evidence authorization exits 0 with A-D blocked; canonical context build/validation passes; readiness JSON SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
 
 ## 2026-06-25 Round Entry (Bounded B Runs Need Eligibility and Commit Atomicity Together)
 - Date: 2026-06-25
@@ -1727,3 +1811,51 @@ Application pattern:
 - Fix applied: Added a global `return_idx:int32` calendar with explicit `entry_idx/exit_idx` interval bounds, numeric-only DuckDB relations with object-dtype rejection, one-worker compensated aggregation, canonical daily SHA-256 hashing, and shuffled-input parity coverage.
 - Guardrail for next time: A sparse portfolio engine is not complete until calendar membership, relational dtypes, entry/overlap/exit liquidation turnover, and reproducible final output are each independently tested under the full-universe smoke bound.
 - Evidence paths: `scripts/pead_m6_pit_walk_forward_equity_curve.py`, `tests/test_pead_m6_pit_walk_forward_equity_curve.py`, `docs/phase_brief/v2-pead-m6-pit-walk-forward-equity-curve.md`.
+
+## 2026-07-01 Round Entry (Session Mapping Needs Immutable Calendar and Linkage Evidence)
+- Date: 2026-07-01
+- Mistake or miss: Earlier strict Gate A request preparation treated timezone normalization and generic session wording as sufficient, without binding immutable calendar provenance, eligible early-close sessions, conditional timing linkage, and mechanically replayable close classification.
+- Root cause: Event-time semantics were described as an implementation detail rather than as first-class evidence dependencies that a reviewer must reproduce from locked bytes.
+- Fix applied: Created versioned successor Gate A contract and request artifacts that bind an authorized calendar source of record, define eligible trading sessions, require an executable no-same-session mapping rule, make a timing artifact conditional on selected-source capability, and require one-to-one linkage when separate timing is used.
+- Guardrail for next time: Any strict timing-PIT claim must preserve predecessor hashes, bind the source/timing/calendar artifacts by SHA-256, define session mapping mechanically, and fail closed for ambiguous timestamps, non-one-to-one timing joins, or calendar gaps.
+- Evidence paths: `docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.json`, `docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.json`, `docs/saw_reports/saw_v2_pead_m6b_strict_data_authorization_request_20260701.md`.
+
+## 2026-07-11 Round Entry (Terminal Evidence Must Be Reconciled Into Current Truth)
+- Date: 2026-07-11
+- Mistake or miss: Terminal reviewer-independence PASS was committed, but planner, bridge, done, and related current-truth surfaces still reported the superseded ownership BLOCK.
+- Root cause: The review-only reconciliation intentionally committed only reviewer reports and terminal SAW evidence, while semantic drift detection was outside governance and planning preflight coverage.
+- Fix applied: Ran a bounded docs-only truth reconciliation across all mandatory current-truth surfaces, preserved the payload and envelope bytes, regenerated/validated current context, reran governance and planning preflight, and published Thin SAW evidence.
+- Guardrail for next time: After any terminal evidence-only commit changes a milestone verdict, immediately compare every active current-truth surface against the new verdict before declaring closure; preflight PASS does not substitute for semantic truth reconciliation.
+- Evidence paths: `docs/saw_reports/saw_request_artifact_identity_terminal_review_v1_20260711.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/done_checklist_current.md`, `docs/saw_reports/saw_request_artifact_identity_truth_reconciliation_v1_20260711.md`.
+
+## 2026-07-12 Round Entry (C0X→M7F0-v4)
+- Date: 2026-07-12
+- Mistake or miss: C0A closure claimed PASS with wrong envelope hashes; porcelain and ls-files parsers silently skipped malformed records; nested gitlinks poisoned dirt completeness.
+- Root cause: Closure theater over object-store truth; parsers optimized for lenience; proof used branch checkout that cannot attach twice.
+- Fix applied: Fork `aee7f4c`, fail-close both parsers, deindex+ignore 41 gitlinks, detached proof worktree planning PASS; M7F0-v4 mechanical vertical with v4 clock/overlap/live-name/cost locks.
+- Guardrail for next time: Prove exact commits detached; never source-wide nonnumeric gates on CRSP; formation after map/window filters; bind ignored parquet via tracked manifest.
+- Evidence paths: commits `17cb830`, `d4fcfcb`; `docs/context/e2e_evidence/pead_m7f0_v4_2019_crsp_vertical.json`; `docs/saw_reports/saw_c0x_m7f0_v4_20260712.md`.
+
+## 2026-07-12 Round Entry (M7F1-v5.2-final)
+- Date: 2026-07-12
+- Mistake or miss: Uncommitted M7F1-v5 claimed implementation identity on M7F0 tip, reused map, lacked prior-20 history for January, treated identity max_date as if selection, and left BLOCK without separate evidence vs review commits.
+- Root cause: Velocity over package discipline; prior-20 misframed as map repair; 2019-only panel load; Commit B conflated with terminal review.
+- Fix applied: Commit A code/tests only (`138c8b7`); source-wide spine + pre-2019 load; pre-Q5 prior-20 tradability roadmap deviation (finite RET, abs(PRC)>0, VOL>0); force map rebuild; invalidate stale curve; first/last mismatch diagnostic-only; Commit B evidence/truth; Commit C A/B/C+SAW pinned to B.
+- Guardrail for next time: Never bank evidence before code commit; never reuse map; never close evidence and terminal SAW in one commit; record formation tradability gates as explicit roadmap deviations.
+- Evidence paths: `138c8b7`; `docs/context/e2e_evidence/pead_m7f1_v5_2019_crsp_vertical.json`; residual BLOCK 7/2448.
+
+## 2026-07-12 M7F2-v6-final Outcome Envelope
+
+- Mistake or miss: M7F1-v5.2 claimed map unused for selection and closed with ADVISORY_PASS (validator-invalid); residual 7 invalids mixed pre-entry delist, bridgeable blanks, and genuine ambiguities.
+- Root cause: metadata honesty lag; residual policy deferred; SAW verdict enum not PASS/BLOCK.
+- Fix applied: M7F2-v6-final hard replace — pre-entry exclude before Q5, blank one-day bridge, strict BLOCK + neutral carry + write-down envelope, map used_for_selection=true; SAW may PASS diagnostic with strict_curve BLOCKED.
+- Guardrail for next time: never claim identity maps unused for selection; residual dispositions are structural rules not event-id lists; SAW verdict only PASS or BLOCK; neutral carry is not a finite upper bound.
+- Evidence: scripts/pead_m7f2_v6_2019_crsp_vertical.py; docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json; tests 19/19.
+
+## 2026-07-13 Round Entry (Residual Evidence Branch Must Be Executed Before Full Scan)
+- Date: 2026-07-13
+- Mistake or miss: The A2 focused suite passed 44/44, but the first full Slice 2 run failed after the expensive CRSP scans because the residual-evidence branch referenced undefined `selected_event_ids` instead of the verified selection contract.
+- Root cause: Tests covered the selection-lock helper and pre-write ordering, but no tiny end-to-end test executed the real `bad` residual branch through evidence and manifest publication.
+- Fix applied: Replaced the stale count reference with `selection_contract["n_selected_events"]`, added a deterministic real residual-evidence regression, removed all failed-run partial outputs, committed A2.1 at `b4d35e1`, reran from a fresh clean worktree, independently audited the published parquets and identities, and banked Commit B at `9f37745`.
+- Guardrail for next time: Every expensive data runner must have a small end-to-end regression for each terminal publication branch, including residual/BLOCK evidence, before a full-file scan is authorized; helper-only tests do not prove branch publication safety.
+- Evidence paths: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_daily_returns.parquet.manifest.json`, `docs/context/e2e_evidence/pead_m7f4_v8_2019_event_ledger.parquet.manifest.json`.

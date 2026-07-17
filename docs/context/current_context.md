@@ -1,17 +1,14 @@
 ## What Was Done
-- Completed the sparse-engine core: DuckDB direct aggregation, global trading-calendar `return_idx:int32`, `entry_idx/exit_idx` interval bounds, numeric-only projected relations, object-dtype rejection, single-thread compensated aggregation, and canonical daily SHA-256 output hashing.
-- Turnover continues to preserve entry, overlap, exit, and final trade-to-zero parity; no wide matrix, chunking, physical repartitioning, Numba, or multiprocessing was added.
-- Focused M6 PASS 12/12; M5a+M6 PASS 16/16; broader PEAD PASS 109/109; 11,798,280-position-day smoke is within the configured bound.
+- Transferred the reviewed GV-FS0 contract and phase brief byte-for-byte into the isolated Phase 0 worktree.
+- Implemented the bounded V1 protocol proof: canonical/raw-token encoders, 12 schemas, registries, immutable tables, ordering/identity and supervision predicates, golden vectors, freeze manifest, CI guard, and 54 passing focused tests.
 
 ## What Is Locked
-- Engine completion does not satisfy M6b data readiness. Strict EPS vintage, delisting-adjusted tradable returns, and full as-of tradability/liquidity remain absent and fail closed.
-- No provider/data/UI/alpha/ranking/action/real-curve scope was opened.
+- Phase 1 is not closed: audit-candidate commit `94c3ea4` exists, but distinct Reviewer A/B/C, remote Windows/Linux CI, clean audit, and terminal SAW PASS remain pending.
+- Reducer, fixture event generation, snapshots, certification execution, certified components, permanent bundle publication, Streamlit, provider access, and real-data work remain blocked.
 
 ## What Is Next
-- **Single next action: obtain independent Reviewer A/B/C terminal review for the completed M6a.1 core; only then start M6b data-prep for its independent data gates.**
-- `V2-PEAD-M6A-SCALE-SPARSE-PORTFOLIO-ENGINE`: core implementation complete locally; independent SAW review pending.
-- `V2-PEAD-M6B-DATA-PREP`: blocked by independent strict data decisions.
-- `V2-PEAD-REAL-RUN-EQUITY-CURVE`: blocked until M6b closes its data contract.
+- Audit commit `94c3ea4` and its governance evidence without semantic expansion.
+- Run distinct Reviewer A/B/C, both CI matrix jobs, clean audit, and terminal SAW against the unchanged object.
 
 ## First Command
-`.venv\\Scripts\\python.exe -m pytest tests\\test_pead_m6_pit_walk_forward_equity_curve.py -q`
+`/mnt/e/code/quant/.venv/Scripts/python.exe -m pytest tests/test_gv_fs0_protocol_*.py -q`

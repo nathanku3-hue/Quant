@@ -1,5 +1,179 @@
 # Bridge Contract - Current
 
+## Active Addendum — GV-FS0 Phase 1 Protocol Freeze (2026-07-17)
+
+- `SYSTEM_DELTA`: the reviewed V1 contract and phase brief are byte-exact in audit-candidate commit `94c3ea4`; generated protocol artifacts and pure protocol predicates are implemented with 54/54 focused tests passing.
+- `PM / Product Delta`: no product output exists. Phase 1 creates a deterministic protocol substrate only; shipped-product score and certification claims do not change.
+- `OPEN_DECISION`: none on protocol semantics. Operational closure still requires distinct Reviewer A/B/C, green Windows/Linux CI, terminal SAW PASS, and a clean audit of commit `94c3ea4` plus its governance evidence.
+- `RECOMMENDED_NEXT_STEP`: audit the exact committed protocol package; do not broaden scope during review.
+- `DO_NOT_REDECIDE`: no reducer, balance transition, fixture generation, snapshot, OPEN/NO_POSITION certification execution, certified component, bundle publication, or Streamlit work before a clean audit.
+- `PHASE_STATUS`: `COMMITTED_AUDIT_CANDIDATE_PENDING_INDEPENDENT_REVIEW`; Phase 1 exit gate remains BLOCKED.
+
+## Historical Context — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+
+- **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
+- **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.
+- **Original objective**: 2015–2019 dollar-neutral Q5−Q1 strict-PIT PEAD. **Not achieved.**
+- **Research validity**: ~30/100; delivery/closure: 88/100.
+- **Prohibited**: Strategy/UI promotion, readiness flag changes, provider access, curve/alpha claims, ranking/scoring, alerts, recommendations, broker/order paths.
+- **Reopen condition**: Only for one source-intake slice with genuine effective-dated identifiers + committed data-owner approval; mapping and curves remain closed until ID0 passes.
+
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- `SYSTEM_DELTA`: M7F5-ID0 Commit A `c5a9ab8` requires exact source/envelope bytes plus a reachable, unchanged committed data-owner approval blob under `docs/authorization/`; Commit B `410d0ca` banks current-source BLOCK evidence; truth repair `a51f349` and terminal SAW `398732c` close A/B/C review.
+- `PM / Product Delta`: Current Compustat security master remains blocked for strict-PIT identifier authority with `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`; research validity remains near 30 and M7F4-v8 remains a diagnostic, not a strict curve.
+- `OPEN_DECISION`: Obtain a genuine effective-dated identifier source with committed data-owner approval, authorize historical identifier acquisition, or terminate PEAD strict-PIT work.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion; choose exactly one separately authorized owner decision.
+- `DO_NOT_REDECIDE`: Do not infer identifier-validity dates from current snapshots, caller-created JSON, generic date columns, `updated_at`, provider metadata, or non-committed approvals; do not run mapping/curve/readiness/Strategy/UI work from this BLOCK evidence.
+- `PHASE_STATUS`: M7F5-ID0 terminal SAW PASS for a provenance BLOCK; strict PIT/as-of identifier authority `BLOCKED`; `m6b_data_contract_ready=false`.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- `SYSTEM_DELTA`: A2.1 `b4d35e1` repaired the residual-evidence count and added the real publication-branch regression; Commit B `9f37745` banks only the evidence JSON and two manifests; three distinct reviewers independently PASS the fixed Commit B package.
+- `PM / Product Delta`: M7F4-v8 is `DIAGNOSTIC_COMPLETE` with 2,448 selected, 2,444 observed, four residual windows, two validated bridges, exact self-financing NAV/cost identities, and exact 16-state Shapley. Strict curve remains `BLOCKED`; research ceiling remains near 30.
+- `OPEN_DECISION`: None for terminal diagnostic reconciliation. Future transactionality, memory bounding, evidence portability, or historical-link work each requires a separate bounded decision.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion and choose at most one separately authorized next scope.
+- `DO_NOT_REDECIDE`: Do not flip readiness, treat sensitivity legs as a strict curve, claim PIT/as-of identity, describe neutral carry as a finite upper bound, or reopen provider/CCM/Strategy/UI scope.
+- `PHASE_STATUS`: M7F4-v8 terminal SAW PASS; strict curve `BLOCKED`; `m6b_data_contract_ready=false`.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained as the accounting-design predecessor and audit history.
+
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- `SYSTEM_DELTA`: Hard-replaced M7F2-v6 active executable with M7F3-v7 self-financing portfolio truth on c0x/m7f0-v4. Drifted-prior equity turnover sequence; bridge parity; dead write-down; first-bad residual ~0.721%; exact 16-state Shapley. Commit A `bae1f656`; B evidence `b5c66bc`; C SAW+truth.
+- `PM / Product Delta`: Diagnostic package complete with strict_curve BLOCKED. Score path ~70–73 diagnostic; research validity ~30. Residual exposure is first-bad sum not 4/2448. Selection 2448 unchanged.
+- `OPEN_DECISION`: None for package close. Hold readiness/UI/historical-link/CCM.
+- `RECOMMENDED_NEXT_STEP`: Hold promotion; optional stderr label polish only.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not treat neutral carry as upper bound; do not open CCM; do not claim independent A/B/C without distinct agents (now proven).
+- `PHASE_STATUS`: M7F3-v7 DIAGNOSTIC_COMPLETE; terminal SAW PASS; strict curve BLOCKED.
+
+## Prior Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+- Superseded as active close package by M7F3-v7. Historical v6 evidence retained for audit; v6 executable retired.
+
+
+# Bridge Contract - Current
+
+## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+- `SYSTEM_DELTA`: Hard-replaced M7F1-v5.2 with M7F2-v6-final on c0x/m7f0-v4. Pre-entry delist exclude before breadth/Q5; blank one-day bridge; strict BLOCK + neutral carry-to-cash + -100% write-down envelope; map identity selection metadata corrected. Commit A `c7724adcaa85`.
+- `PM / Product Delta`: Diagnostic package complete (DIAGNOSTIC_COMPLETE) with strict_curve_status=BLOCKED. Selected ok 2444/2448; residual invalid 4; bridged 2; pre-entry excluded 12. Score target 70-74 diagnostic; research ceiling ~30; baseline 60 until SAW C closes.
+- `OPEN_DECISION`: Accept diagnostic package and close terminal SAW C, or re-scope residual policy. Do not promote readiness or primary curve PASS.
+- `RECOMMENDED_NEXT_STEP`: Commit C Reviewer A/B/C + validated SAW PASS (diagnostic) with strict_curve BLOCKED.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not claim as-of/PIT link; do not treat neutral carry as justified upper bound; no v5.2 compatibility path; no event-id production policy.
+- `PHASE_STATUS`: M7F2-v6-final evidence complete; terminal SAW pending Commit C.
+
+## Prior Addendum — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+- Superseded on package status by M7F2-v6-final. Historical residual BLOCK evidence remains for audit only.
+
+
+# Bridge Contract - Current
+
+## Active Addendum — M7F1-v5.2-final Durable Residual BLOCK (2026-07-12)
+
+- `SYSTEM_DELTA`: M7F1-v5.2-final on `c0x/m7f0-v4`: source-wide spine, pre-2019 prior-20 load, pre-Q5 prior-20 tradability gate (roadmap deviation, not map repair), force map rebuild, stale-curve invalidate, ledger failure details. Commit A `138c8b7`; evidence bound to that commit.
+- `PM / Product Delta`: Durable residual BLOCK (~62 band): 7/2448 selected windows invalid (5 special RET, 1 unresolved delist, 1 missing session). Prior-20 removed dead-identity bulk failures. Curve not promoted. Snapshot-link ceiling ~30 remains.
+- `OPEN_DECISION`: Accept durable residual BLOCK and open bounded delisting-data/policy gate for residual specials/`DLRET`/missing-session — or re-scope. Do **not** open historical-link yet.
+- `RECOMMENDED_NEXT_STEP`: Owner open bounded delisting-data/policy gate for 7 residual invalids only; keep readiness false.
+- `DO_NOT_REDECIDE`: Do not flip readiness; do not claim as-of/PIT link; do not restore pre-Q5 complete-60; do not treat uncommitted v5 diagnostic as package; do not open historical-link yet.
+- `PHASE_STATUS`: C0X PASS; M7F1-v5.2-final durable residual BLOCK; Commit C terminal SAW ADVISORY_PASS (A/B/C all PASS).
+
+## Prior Addendum — C0X → M7F0-v4 (2026-07-12)
+
+- `SYSTEM_DELTA`: C0X trust bootstrap + M7F0-v4 2019 CRSP Q5 long-only mechanical vertical on branch `c0x/m7f0-v4` (base `aee7f4c`). C0A closure theater abandoned.
+- `PM / Product Delta`: Mechanical flagged research curve evidence available under snapshot CUSIP8 ceiling; not strict M6b; not alpha.
+- `OPEN_DECISION`: Superseded by M7F1-v5.2-final residual path.
+- `RECOMMENDED_NEXT_STEP`: See active M7F1-v5.2-final addendum.
+- `DO_NOT_REDECIDE`: Do not repair invalid C0A envelopes; do not claim as-of link; do not flip `m6b_data_contract_ready`.
+- `PHASE_STATUS`: C0X PASS; M7F0-v4 superseded as selection contract by v5.2-final.
+
+# Bridge Contract - Current
+
+## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+
+- `RoundID`: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-TRUTH-RECONCILIATION-V1`; `ScopeID`: `REQUEST_ARTIFACT_IDENTITY_TRUTH_RECONCILIATION_V1`.
+- `SYSTEM_DELTA`: Reconciled mandatory current truth to the valid terminal reviewer-independence PASS at commit `e50219051df8bc8fc1f21312325f01cea4a8e18d`. The former dispatch Markdown, JSON, and dependent PASS report remain quarantined as `INVALID_NOT_DISPATCHED`; no Gate A or Gate B/C message is proven sent.
+- `PM / Product Delta`: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` still banks the exact four request payloads, and commit `c642a94944831adbd7ecc06fb16259c87fcdd213` still holds the detached envelope with lifecycle `PREPARED_NOT_SENT`. No payload or envelope bytes changed.
+- `EVIDENCE_DELTA`: Three distinct read-only Reviewer A/B/C agents, each pinned to `c642a94944831adbd7ecc06fb16259c87fcdd213`, independently passed semantics, raw Git/blob identity, and hash/lifecycle/forbidden-scope checks against payload commit `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e`; terminal SAW is PASS. Truth reconciliation context validation, governance preflight, planning boot preflight, and fixed-artifact byte checks also PASS.
+- `OPEN_DECISION`: None for request-artifact identity closure. Gate A/B/C dispatch is a separate explicit owner decision and remains denied by default.
+- `RECOMMENDED_NEXT_STEP`: Hold the verified artifacts at `PREPARED_NOT_SENT`; do not rerun implementation or reviewers and do not dispatch without a separate owner authorization.
+- `DO_NOT_REDECIDE`: Do not redirect to or cherry-pick divergent `51b1471ff93741fd339d506399413c928479db5a`; reject legacy, reconstructed, or unbound artifacts. No remotes, dispatch, source/provider access, factual validation, readiness promotion, Gate D, publication, or data output.
+- `PHASE_STATUS`: PASS for request-artifact identity repair and terminal reviewer independence. Dispatch remains denied; A/B/C/D factual statuses and `m6b_data_contract_ready=false` remain unchanged.
+
+## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
+
+- `RoundID`: `ROUND-20260711-CHECKOUT-HYGIENE-GOV-RECOVERY`; `ScopeID`: `CHECKOUT_HYGIENE_GOV_RECOVERY_V1`.
+- `SYSTEM_DELTA`: Path A banked; GOV-002/GOV-008 fixed; locked PEAD evidence LF restored; planning preflight green at `e470137`.
+- `PM / Product Delta`: Hygiene green did not establish exact request-artifact identity and therefore did not enable dispatch.
+- `OPEN_DECISION`: Superseded by the active request-artifact identity repair.
+- `RECOMMENDED_NEXT_STEP`: See the active identity-repair addendum.
+- `DO_NOT_REDECIDE`: Do not treat hygiene green as BootReady or source-access authority.
+- `PHASE_STATUS`: Hygiene/governance recovery PASS for planning mode.
+
+## Prior Addendum — P0 Trust-Substrate Repair (2026-07-11)
+
+- `RoundID`: `ROUND-20260711-V2-PEAD-P0-TRUST-SUBSTRATE-REPAIR`; `ScopeID`: `V2_PEAD_P0_TRUST_SUBSTRATE_REPAIR`.
+- `SYSTEM_DELTA`: Boot identity now removes ambient Git redirection/configuration, disables replacement objects, requires raw HEAD/upstream commits plus a verified HEAD tree, and rejects loose/packed `refs/replace/*`; the strict Path A loader rejects duplicate JSON object keys at every depth before evidence or authorization evaluation and before any output write.
+- `PM / Product Delta`: P0 repair and fresh independent A/B/C review pass. Subsequent hygiene/governance blockers are addressed in the active recovery addendum.
+- `EVIDENCE_DELTA`: Focused adversarial tests and fresh A/B/C pass for Git environment isolation, loose/packed replacement refs, forged displayed ancestry, unborn/broken/tag-shaped identity, duplicate authority/evidence keys, and no-output/no-temp duplicate-input failures.
+- `OPEN_DECISION`: Superseded on next-step status by hygiene recovery; still valid for P0 identity guardrails.
+- `RECOMMENDED_NEXT_STEP`: See active hygiene recovery addendum.
+- `DO_NOT_REDECIDE`: Do not weaken Git identity or duplicate-key fail-closed rules.
+- `PHASE_STATUS`: P0 code repair banked; planning preflight green after hygiene recovery.
+
+## Authoritative Addendum - V2 PEAD M6b Slice 0 Active-Contract Deconfliction (2026-07-02)
+
+- `RoundID`: `ROUND-20260702-V2-PEAD-M6B-SLICE0-CONTRACT-DECONFLICTION`.
+- `ScopeID`: `V2_PEAD_M6B_SLICE0_ACTIVE_CONTRACT_DECONFLICTION_DOCS_ONLY`.
+- `SYSTEM_DELTA`: Updated only the active M6b phase brief so first-public/unrestated EPS is the sole strict Gate A PASS route; restated EPS remains a non-strict diagnostic label and cannot promote strict readiness.
+- `PM / Product Delta`: The canonical Ship-Fast Decision Gate template now requires repository remote/root, commit, tree, artifact path, and artifact hash verification for every approval/request packet; identity mismatch requires denial and rerouting, not synthetic provenance.
+- `EVIDENCE_DELTA`: Local Quant verification found that the claimed R0.1 commit `cc96053513f445f143632103c478367bbf674e12` does not resolve in this repository and `R0.1-preflight-plan.md` is absent at the root. No R0.1 authority transferred into Quant.
+- `OPEN_DECISION`: Dispatch the already prepared Gate A and Gate B/C data-owner source-access requests.
+- `RECOMMENDED_NEXT_STEP`: Request-dispatch sequencing only; await separate data-owner responses before any source artifact, provider, factual validation, or implementation work.
+- `DO_NOT_REDECIDE`: Do not change historical addenda, treat a restated-EPS exception as strict evidence, reconstruct R0.1 in Quant, or begin data/provider/ETL/curve/readiness work.
+- `PHASE_STATUS`: Slice 0 is docs-only; canonical current evidence and strict readiness remain unchanged.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+- `RoundID`: `ROUND-20260701-V2-PEAD-M6B-STRICT-DATA-PHASE0-SUCCESSOR`.
+- `ScopeID`: `V2_PEAD_M6B_STRICT_DATA_PHASE0_DOCS_ONLY`.
+- `SYSTEM_DELTA`: Created versioned 20260701 successor Gate A contract and source-access request artifacts; preserved all 20260630 predecessors and their historical hashes.
+- `PM / Product Delta`: Gate A request now requires data-owner capability attestation at approval, conditional one-to-one timing linkage when the PIT record lacks eligible timing, and an authorized immutable calendar source of record with replayable session mapping.
+- `EVIDENCE_DELTA`: Successor contract SHA-256 `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063`; successor request SHA-256 `913196ba279dd49442ce6b3bbde54d185c188a2d26e21cf462d853bbe295505b`.
+- `OPEN_DECISION`: Data owner must approve or decline separate Gate A and Gate B/C source-access requests; Gate D remains deferred pending a source-independent consumer-interface audit.
+- `RECOMMENDED_NEXT_STEP`: Submit the successor Gate A and Gate B/C requests only after the request-only Thin SAW closeout passes.
+- `DO_NOT_REDECIDE`: Do not inspect local raw artifacts, use credentials or providers, run Gate validation, generate data outputs, or infer readiness from these request artifacts.
+- `PHASE_STATUS`: Canonical current evidence and strict readiness remain unchanged.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+- `RoundID`: `ROUND-20260629-V2-PEAD-M6B-STRICT-PATH-A-INFRA`.
+- `ScopeID`: `V2_PEAD_M6B_STRICT_PATH_A_DATA_GATE_INFRA`.
+- `SYSTEM_DELTA`: Repaired the evidence-only, atomic JSON validator so malformed authorization JSON/schema and synthetic-test-plus-authorization are CLI input errors and current gate PASS requires detached exact-file authorization plus all four verified local source-byte hashes.
+- `PM / Product Delta`: Data Path A is active, but strict M6b remains fail-closed. M6a is sparse engine/framework evidence only; Strategy promotion and Frontend/UI remain held.
+- `QUALITY_DELTA`: Strict-gate tests PASS 68/68; existing M6a tests PASS 12/12; compile, two-run determinism, explicit-`--output` argparse rejection, synthetic canonical-output rejection before atomic write, payload-only restated-approval rejection, malformed-evidence/authorization no-output errors, authorization mismatch, source-byte tamper, atomic-cleanup, static-isolation, output-isolation, and canonical context build/validation checks PASS.
+- `EVIDENCE_DELTA`: `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json` SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`; A/B/C/D=`BLOCKED`; source bytes unverified; `strict_vintage_pit=false`; restated-EPS exception=`NOT_AUTHORIZED`; `m6b_data_contract_ready=false`.
+- `OPEN_DECISION`: No exception is authorized. Inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces and cannot satisfy strict Gate A.
+- `RECOMMENDED_NEXT_STEP`: Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+- `DO_NOT_REDECIDE`: Do not use synthetic fixtures, tests, validator existence, reviewer approval, or illustrative B as readiness evidence; do not open UI or Strategy promotion.
+- `PHASE_STATUS`: Infrastructure locally validated; strict M6b data contract remains BLOCKED pending authoritative gate evidence and terminal infrastructure review.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gates Opened (2026-06-29)
+
+- `RoundID`: `ROUND-20260629-V2-PEAD-M6B-STRICT-DATA-PATH-A`.
+- `ScopeID`: `V2_PEAD_M6B_STRICT_DATA_PATH_A_GATES`.
+- `SYSTEM_DELTA`: Opened strict M6b Path A data gates in `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md` for first-public EPS vintage, delisting-adjusted tradable returns, as-of liquidity/tradability screen, and short borrow assumptions. Refreshed stale cross-stream docs to June 25 M6 truth.
+- `PM / Product Delta`: Fastest valid reboot is strict M6b Data Path A, not Strategy or Frontend. Data is done for diagnostic/M6a-engine use but not "done done" for a tradable research run.
+- `QUALITY_DELTA`: Strict M6b data readiness remains fail-closed (`m6b_data_contract_ready = false`) until all four strict data gates pass or receive explicit flagged exceptions.
+- `EVIDENCE_DELTA`: Stale cross-stream docs (`multi_stream_contract_current.md`, `post_phase_alignment_current.md`) refreshed to June 25 M6 truth. Strict M6b Path A brief established.
+- `OPEN_DECISION`: Execute strict M6b Path A data prep for Gates 1-4.
+- `RECOMMENDED_NEXT_STEP`: Start strict M6b Path A data prep for first-public EPS, delisting-adjusted tradable returns, as-of liquidity/tradability screen, and borrow assumptions.
+- `DO_NOT_REDECIDE`: Do not wire best-available B into strict M6b, do not modify strict readiness flags, and do not build alpha-named frontend or strategy code before strict data gates pass.
+- `PHASE_STATUS`: Strict M6b Path A data gates opened; real M6 curve remains blocked fail-closed pending strict data.
+
 ## Authoritative Addendum - V2 PEAD M6b Option 1 Repair PASS (2026-06-25)
 
 - `RoundID`: `ROUND-20260625-V2-PEAD-M6B-BESTAVAIL-OPTION1-REPAIR`.

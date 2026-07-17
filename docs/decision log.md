@@ -1,5 +1,80 @@
+## 2026-07-17 — GV-FS0 Protocol V1 audit candidate
+- Decision: transfer the reviewed GV-FS0 contract and phase brief byte-for-byte into the clean Phase 0 boundary and implement only the authorized protocol-proof surface.
+- Decision: accept the generated 12-schema bundle, certification-failure registry, operational-error registry, event-rank table, generated-slot table, transition-ownership table, canonical vectors, freeze manifest, canonical/order/supervision/publication primitives, focused tests, and read-only CI guard as the audit candidate.
+- Evidence: authority SHA-256 values remain `085a4bcf672069320e69a40c010bbc6ad7bd5c63a844214cb140cb6292de8a02` and `9b356b39a91190cd3c3f4aa74a7e85ea014323aff1827959c2ba77ceb522f5c6`; terminal freeze and immutability validators PASS; focused Phase 1 suite PASS 54/54 under pinned Python 3.12 / pytest 9.0.2 / jsonschema 4.26.0.
+- Boundary: reducer, balance transitions, FS0 event generation, snapshots, certification execution, certified components, permanent publication, Streamlit integration, provider access, and real data remain blocked.
+- Open gate: terminal distinct-agent Reviewer A/B/C ownership is unavailable in this session and the protocol-freeze commit has not received the required clean audit; SAW remains BLOCK and reducer authorization remains false.
+- Next action: bank the unchanged audit-candidate commit, obtain distinct-agent terminal review plus clean audit, and only then consider reducer authorization.
+
+## 2026-07-17 — GV-FS0 Phase 1 protocol-freeze implementation
+- Decision: preserve the reviewed contract and phase brief byte-for-byte, with `docs/architecture/gv_fs0_certification_and_data_authority_contract.md` as the sole normative `GV_FS0_PROTOCOL_V1` source.
+- Decision: implement one protocol-only slice: canonical/raw-token encoders, 12 schemas, separated registries, ranks/slots/transition ownership, pure ordering and verifier-supervision predicates, transport-safe golden vectors, freeze manifest, tests, and same-version CI guard.
+- Decision: represent golden canonical text and documents as UTF-8 hex inside the evidence artifact because literal U+2028/U+2029 are transport-sensitive; tests reconstruct and verify the exact bytes, full preimage, length, and digest.
+- Decision: keep publication code limited to pure compare/recovery/lock-release predicates with no filesystem I/O; this is protocol proof, not permanent bundle publication.
+- Evidence: reviewed authority hashes match; terminal protocol and first-freeze immutability validators PASS; focused Phase 1 suite 54/54 PASS.
+- Boundary: package remains uncommitted and unaudited. Reducer, fixture events, snapshots, certification execution, certified components, bundle publication, and Streamlit remain blocked until commit identity, distinct Reviewer A/B/C, terminal SAW, and post-commit cleanliness pass.
+
+## 2026-07-13 — M7F4-v8 terminal diagnostic close
+- Decision: accept A2.1 `b4d35e1`, evidence-only Commit B `9f37745`, and three distinct independent Reviewer A/B/C passes as terminal evidence for the fixed M7F4-v8 diagnostic package.
+- Decision: preserve `DIAGNOSTIC_COMPLETE` with strict curve `BLOCKED`; the four residual windows remain represented only by neutral-carry-to-cash and write-down sensitivity legs with exact Shapley attribution.
+- Decision: record nontransactional multi-file publication, unbounded/no-checkpoint memory, and ignored-Parquet portability as non-blocking operational risks; the successful clean rerun does not generalize beyond the fixed package.
+- Evidence: compile and implementer focused suite 45/45 PASS; Reviewer A exact-object suite 45/45 PASS; Reviewer B compile plus executable snapshot subset 44/44 PASS; Reviewer C mechanical identity/count/hash/bridge/NAV/Shapley PASS; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`.
+- Boundary: readiness remains false; link remains snapshot non-PIT; no strict curve, alpha/tradable, Strategy/UI, provider/CCM, remote, or publication authority.
+- Next action: hold promotion and open at most one separately authorized bounded scope.
+
+## 2026-07-12 — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH close
+- Decision: Accept M7F3-v7 as active flagged diagnostic package (strict curve BLOCKED); supersede v6 as close authority; keep research validity ~30.
+- Commits: A `bae1f656` code; B `b5c66bc` evidence; C SAW+truth.
+- Forbidden held: CCM, readiness, alpha/tradable, UI, as-of link.
+
 Decision Log: Terminal Zero
-Author: Atomic Mesh | Last Updated: 2026-03-01 (Stream 1 fail-loud bootstrap + Stream 4 strict container draft)
+Author: Atomic Mesh | Last Updated: 2026-07-12 (M7F1-v5.2-final durable residual BLOCK)
+
+M7F1-v5.2-final Formation Prior-20 Tradability (2026-07-12)
+- Decision: approve M7F1-v5.2-final with four mandatory edits; prior-20 is an explicit roadmap-deviation formation tradability restriction (finite RET, abs(PRC)>0, VOL>0 ≥15/20 pre-entry), not a map repair.
+- Decision: build calendar from source-wide CRSP dates; load ≥20 sessions before 2019; force map rebuild; invalidate stale daily curve on BLOCK; first/last PERMNO dates are diagnostic-only.
+- Decision: three-commit protocol only — A code/tests, B evidence/truth, C full A/B/C+SAW pinned to B. Do not close evidence and terminal review together.
+- Evidence: Commit A `138c8b76028b2094793efb2d066c269bf7b805f6`; rerun BLOCK 2448 selected / 2441 OK / 7 invalid (5 nonnumeric, 1 unresolved delist, 1 missing session); evidence SHA `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292`; score band ~62 residual BLOCK; readiness false; link ceiling ~30.
+- Boundary: no readiness flip; no historical-link slice yet; residual path is delisting-data/policy only.
+- Next action: Commit C terminal Reviewer A/B/C + SAW pinned to B; then owner open delisting policy gate.
+
+V2 PEAD Request Artifact Identity Repair V1 (2026-07-11)
+- Decision: approve the bounded two-commit repair and keep dispatch denied. Commit 1 restores BLOCK truth, quarantines false dispatch evidence, clarifies detached binding, and banks the exact four current 20260701 request artifacts without byte changes.
+- Decision: Commit 2 must create a separate tracked identity envelope binding Commit 1's canonical remote, repository root, commit, tree, four artifact paths, and four distinct SHA-256 values. The envelope lifecycle is `PREPARED_NOT_SENT` and grants no downstream authority.
+- Decision: reject legacy, divergent, reconstructed, redirected, cherry-picked, self-referential, ambiguously hashed, or otherwise unbound artifacts. Do not use `51b1471ff93741fd339d506399413c928479db5a` as a substitute.
+- Evidence: `e470137d64eb44829e8977c1aaf60bdcc64117d5` lacked all four current artifacts. Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` banks their exact bytes; the tracked detached envelope binds four distinct path/hash pairs with `PREPARED_NOT_SENT`. Governance PASS 0 findings, planning boot PASS, and fresh A/B/C technical checks PASS.
+- Boundary: no remotes, dispatch, source/provider access, factual validation, readiness, Gate D, publication, strategy/UI work, or data output. Distinct-agent ownership is unavailable, so terminal SAW remains BLOCK.
+- Next action: reserve distinct implementer/Reviewer A/B/C agents and rerun terminal ownership review against the unchanged envelope; do not dispatch.
+
+V2 PEAD P0 Trust-Substrate Repair (2026-07-11)
+- Decision: repair Git identity and JSON authority ambiguity together as one P0 trust boundary; replacement refs or duplicate JSON object members deny authority before any artifact, approval, request, or output is trusted.
+- Decision: all `boot_preflight` Git subprocesses remove ambient Git redirection/configuration, set `GIT_NO_REPLACE_OBJECTS=1`, enumerate `refs/replace/*` through Git (including packed refs), and require raw HEAD/upstream commits plus a verified HEAD tree before identity can pass.
+- Decision: strict Path A evidence and authorization JSON use a duplicate-key-rejecting loader at all nesting levels; legacy ambiguous JSON is invalid and receives no compatibility path.
+- Evidence: focused adversarial tests and fresh independent Reviewer A/B/C pass for environment isolation, loose/packed replacement refs, forged displayed ancestry, unborn/broken/tag-shaped identities, top-level/nested duplicate keys, and no output/temp file after duplicate JSON input.
+- Boundary: source-owner requests, P2 publication, remote actions, Gate D, source/provider work, Strategy/UI, data output, and readiness promotion are frozen.
+- Current blocker: the checkout verifies Git identity with replacement refs clear, but it is dirty/unclassified and broader governance preflight fails. Reconcile those independent checkout blockers before any authority transfer.
+
+V2 PEAD M6b Slice 0 Active-Contract Deconfliction (2026-07-02)
+- Decision: first-public/unrestated EPS is the sole strict Gate A pass route. Restated EPS remains non-strict diagnostic evidence and cannot satisfy strict readiness.
+- Decision: `docs/templates/ship_fast_decision_gate.md` now requires repository identity and artifact verification for approval/request packets.
+- Evidence: the denied external R0.1 reference does not resolve in Quant, and the asserted root plan is absent.
+- Boundary: Slice 0 is active-document and template work only; no runtime or data work.
+- Next action: dispatch only the existing Gate A and Gate B/C source-access requests.
+
+V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+- Decision:
+    - accept the repaired bounded evidence-only validator, focused tests, and atomic readiness JSON for terminal infrastructure review.
+    - evidence payload content cannot self-authorize; current authorization must be a distinct well-formed artifact bound to the exact evidence-file SHA-256 and correct round/scope/mode/action, and current gate PASS requires all four local source-byte hashes to verify.
+    - malformed authorization JSON/schema and synthetic-test-plus-authorization are CLI input errors with no output artifact; structurally valid but unapproved or mismatched current-evidence authorization remains `NOT_AUTHORIZED` and forces A/B/C/D `BLOCKED`.
+    - keep A/B/C/D `BLOCKED`, `m6b_data_contract_ready=false`, and all product/strategy promotion held until authoritative gate evidence passes.
+    - restated-EPS exception=`NOT_AUTHORIZED`; current release-date-aligned/restated EPS retains `strict_vintage_pit=false`. Inherited exception wording is superseded on current truth surfaces and cannot satisfy strict Gate A.
+- Evidence:
+    - strict-gate tests PASS 68/68; M6a tests PASS 12/12; compile, two-run deterministic CLI, missing explicit `--output`, synthetic canonical-output rejection before atomic write, payload-only restated-approval rejection, malformed-evidence and malformed-authorization JSON/schema CLI errors with no output, authorization mismatch, source-byte tamper, atomic-cleanup, static-isolation, output-isolation, and canonical context build/validation checks PASS.
+    - `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json` SHA-256 is `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Boundary:
+    - terminal Reviewer A/B/C validates infrastructure only; synthetic fixtures, tests, validator existence, reviewer approval, and illustrative B cannot promote strict readiness.
+    - no provider read, source extraction, B import, locked-artifact mutation, UI, strategy, real return, curve, CAGR, alpha, or tradability output is authorized.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
 
 V2 PEAD M6b Best-Available Option 1 Repair (2026-06-25)
 - Decision:
@@ -7219,3 +7294,35 @@ V2 PEAD M6a.1 Core Guard Completion (2026-06-25)
     - `V2_PEAD_M6A_CORE := READY iff (calendar_interval_index = 1) and (numeric_projection_guard = 1) and (object_duckdb_relation = 0) and (turnover_entry_overlap_exit_final_parity = 1) and (shuffled_input_output_hash_parity = 1) and (full_universe_smoke_under_cap = 1)`.
   - Single next decision/action:
     - obtain independent Reviewer A/B/C terminal review; do not begin M6b or real-run wiring before that review and its separate data gates.
+
+Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+
+  - Decision record:
+    - accept terminal reviewer-independence PASS at commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` as the authoritative closure of the ownership blocker.
+    - reconcile only mandatory current-truth surfaces and closure records; do not rerun implementation or reviewers.
+    - preserve payload commit `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e`, envelope commit `c642a94944831adbd7ecc06fb16259c87fcdd213`, all four request payload bytes, and the envelope bytes unchanged.
+    - keep lifecycle `PREPARED_NOT_SENT`; terminal identity PASS does not authorize dispatch or downstream work.
+  - Contract lock:
+    - `REQUEST_ARTIFACT_IDENTITY_CLOSED = true` only for artifact identity and reviewer independence.
+    - `REQUEST_DISPATCH_AUTHORIZED = false` until a separate explicit owner decision.
+    - A/B/C/D factual gate statuses and `m6b_data_contract_ready=false` remain unchanged.
+  - Single next decision/action:
+    - hold/no-dispatch. A future Gate A/B/C dispatch action requires a separate explicit owner authorization.
+
+## 2026-07-12 — M7F2-v6-final outcome envelope
+
+- Decision: hard-replace M7F1-v5.2 with M7F2-v6-final. Exclude pre-entry delists before breadth/Q5 and rerank; bridge only blank one-session gaps with adjacent prices + next RET; residual ambiguities emit strict BLOCK + neutral carry-to-cash + -100% write-down; map used_for_selection=true; SAW may PASS for diagnostic scope while strict_curve_status=BLOCKED.
+- Not decided: readiness flip, as-of link, alpha/tradable claims.
+
+## 2026-07-14 — M7F5-ID0 Dated-Identifier Provenance Block
+
+- Decision: Accept terminal Reviewer A/B/C PASS and terminal SAW `398732c` PASS for the M7F5-ID0 dated-identifier authority gate. Current Compustat security master remains blocked due to missing dated-identifier provenance.
+- The Decision (Hardcoded): `pead_m7f5_id0_dated_identifier_authority_gate.py` requires a committed data-owner approval JSON file with valid SHA-256 matches. Source status is set to `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`. Operational authorities for acquisition, provider access, mapping, portfolio, and strategy/UI promotion remain false.
+- Contract lock: `M7F5_ID0_PROVENANCE_BLOCKED = true`, `m6b_data_contract_ready = false`.
+
+## 2026-07-14 — V2 PEAD Strict-PIT Program Formal Closure
+
+- Decision: Formally close the PEAD strict-PIT research program. Ship the M7F4-v8 build as a bounded 2019 long-only future-informed diagnostic only. Reject further historical-source acquisition (no current authority or usable CCM keys). Merged c0x/m7f4-v8 into main at merge commit `150d322` and tagged `pead-v8-diagnostic-terminal` at `076f26b`.
+- The Decision (Hardcoded): Prohibit strategy and UI promotion of the PEAD program. Mark all PEAD phase briefs and checklists as `TERMINATED_DIAGNOSTIC_ONLY`. Retain existing codebases and validation JSONs for archival and diagnostic reference only.
+- Contract lock: `PEAD_PROGRAM_STATUS := TERMINATED_DIAGNOSTIC_ONLY`, `m6b_data_contract_ready = false`, `usable_for_alpha_inference = false`.
+

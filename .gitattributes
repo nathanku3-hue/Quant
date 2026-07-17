@@ -1,0 +1,5 @@
+data/fixtures/v2_proxy/synthetic_weights.csv text eol=lf
+data/fixtures/v2_proxy/synthetic_prices.csv text eol=lf
+data/fixtures/v2_proxy/expected_ledger.csv text eol=lf
+data/fixtures/v2_proxy/expected_positions.csv text eol=lf
+data/fixtures/v2_proxy/expected_result.json text eol=lf
