@@ -44,7 +44,8 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
-          git -c http.extraheader="AUTHORIZATION: bearer ${GH_TOKEN}" fetch --no-recurse-submodules --prune --no-tags origin \
+          auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GH_TOKEN}" | base64 | tr -d '\r\n')"
+          git -c http.extraheader="${auth_header}" fetch --no-recurse-submodules --prune --no-tags origin \
             "+refs/heads/*:refs/remotes/origin/*" \
             "+${GITHUB_SHA}:refs/remotes/pull/${{ github.event.pull_request.number || 0 }}/merge"
           git checkout --force "${GITHUB_SHA}"
