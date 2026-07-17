@@ -4,7 +4,7 @@
 
 - **Current state**: repaired candidate `d5d03ec` has terminal protocol-freeze evidence PASS; reducer/product work remains a separate unopened round.
 - **Completed**: final candidate `346d362`, CI repairs through `d5d03ec`, deterministic generation, independent vectors, enforced verifier, six mutation probes on restored non-merge branch tip `9954e32`, A/B/C terminal review PASS, and hosted Windows/Linux byte parity PASS.
-- **Evidence**: 136 focused GV-FS0 tests PASS locally; generator PASS; independent vectors PASS; enforced self-check PASS; schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest mutations all rejected; hosted run `29567754495` PASS.
+- **Evidence**: 136 focused GV-FS0 tests PASS locally; generator PASS; independent vectors PASS; enforced self-check PASS; schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest mutations all rejected; hosted run `29567754495` PASS and final confirmation run `29568087448` PASS at `14cad98`.
 - **Pending gate**: none for protocol freeze evidence closure.
 - **Recommended next step**: hold until a separate owner decision authorizes reducer/product work.
 - **Do not begin**: PortfolioBook reduction, FS0 event execution, snapshots, certification execution, certified results, permanent bundle publication, Streamlit, providers, real data, or GV-FS1.

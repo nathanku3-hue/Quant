@@ -23,11 +23,11 @@ Scope: stream=Docs/Ops protocol freeze; stage=Final Verification; owner=Codex; r
 | EVD-02 | `.venv/Scripts/python.exe -m pytest -q tests/test_gv_fs0_*.py` plus generator/vector/enforced checks | PASS | 136 focused tests and protocol checks pass locally | 2026-07-17T08:41:56Z | ROUND-20260717-GV-FS0-FREEZE-CLOSE |
 | EVD-03 | `.venv/Scripts/python.exe -m pytest -q tests/test_gv_fs0_freeze_immutability_v1.py` | PASS | Static workflow regression covers repaired hosted semantics | 2026-07-17T08:41:56Z | ROUND-20260717-GV-FS0-FREEZE-CLOSE |
 | EVD-04 | Reviewer A/B/C exact repair review | PASS | Prior two High findings fixed; no remaining local Critical/High | 2026-07-17T08:41:56Z | ROUND-20260717-GV-FS0-FREEZE-CLOSE |
-| EVD-05 | Hosted GitHub Actions Windows/Linux byte parity | PASS | Run `29567754495` passed Ubuntu, Windows, and byte parity | 2026-07-17T08:51:04Z | ROUND-20260717-GV-FS0-FREEZE-CLOSE |
+| EVD-05 | Hosted GitHub Actions Windows/Linux byte parity | PASS | Run `29567754495` passed Ubuntu, Windows, and byte parity; final confirmation run `29568087448` passed at `14cad98` | 2026-07-17T08:56:04Z | ROUND-20260717-GV-FS0-FREEZE-CLOSE |
 
 TaskEvidenceMap: TSK-01:EVD-01,TSK-02:EVD-02,TSK-03:EVD-03,TSK-04:EVD-04,TSK-05:EVD-05
 
-EvidenceRows: EVD-01|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:41:56Z;EVD-02|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:41:56Z;EVD-03|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:41:56Z;EVD-04|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:41:56Z;EVD-05|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:51:04Z
+EvidenceRows: EVD-01|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:41:56Z;EVD-02|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:41:56Z;EVD-03|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:41:56Z;EVD-04|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:41:56Z;EVD-05|ROUND-20260717-GV-FS0-FREEZE-CLOSE|2026-07-17T08:56:04Z
 
 EvidenceValidation: PASS
 

@@ -7,7 +7,7 @@
 - Probe sentinel: non-merged branch tip `9954e32` retains mutation/revert pairs for schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest probes.
 - CI sentinel: Windows pytest glob is expanded by Python, and feature-branch push guard bases on default branch rather than `github.event.before`.
 - Claim sentinel: local protocol proof is not a certified portfolio, not alpha, not tradable, not provider authority, and not FS1.
-- Hosted sentinel: GitHub Actions run `29567754495` PASS.
+- Hosted sentinel: GitHub Actions run `29567754495` PASS; final confirmation run `29568087448` PASS at `14cad98`.
 - Next-action sentinel: hold until separate reducer/product authorization.
 
 ## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)

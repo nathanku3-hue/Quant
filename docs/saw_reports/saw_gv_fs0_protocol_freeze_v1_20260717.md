@@ -29,7 +29,7 @@ Acceptance checks:
 |---|---|---|---|---|
 | High | Windows hosted CI would not expand pytest glob | Use Python `glob.glob` inside workflow command | Codex | Fixed |
 | High | Feature-branch push could enforce against provisional `github.event.before` manifest | Use default branch for feature pushes; previous SHA only for default-branch pushes | Codex | Fixed |
-| Medium | Hosted Windows/Linux byte-parity evidence was pending | Run `29567754495` passed Ubuntu, Windows, and byte parity | Codex | Fixed |
+| Medium | Hosted Windows/Linux byte-parity evidence was pending | Run `29567754495` passed Ubuntu, Windows, and byte parity; final confirmation run `29568087448` passed at `14cad98` | Codex | Fixed |
 
 ## Scope Split Summary
 
