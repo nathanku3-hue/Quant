@@ -36,11 +36,19 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     steps:
-      - name: Checkout without write credentials
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-        with:
-          persist-credentials: false
-          fetch-depth: 0
+      - name: Checkout without submodule recursion
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+          git -c http.extraheader="AUTHORIZATION: bearer ${GH_TOKEN}" fetch --no-recurse-submodules --prune --no-tags origin \
+            "+refs/heads/*:refs/remotes/origin/*" \
+            "+${GITHUB_SHA}:refs/remotes/pull/${{ github.event.pull_request.number || 0 }}/merge"
+          git checkout --force "${GITHUB_SHA}"
+          git config --local gc.auto 0
 
       - name: Set up Python 3.12
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
