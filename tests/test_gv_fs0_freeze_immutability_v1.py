@@ -90,6 +90,7 @@ def test_gitattributes_prevents_autocrlf_from_changing_frozen_bytes() -> None:
 def test_hosted_ci_is_cross_platform_and_anchors_enforcement_to_accepted_base() -> None:
     workflow = (ROOT / ".github/workflows/gv-fs0-protocol-freeze.yml").read_text(encoding="utf-8")
     assert "glob.glob('tests/test_gv_fs0_*.py')" in workflow
+    assert "pandas==2.2.3" in workflow
     assert "python -m pytest -q tests/test_gv_fs0_*.py" not in workflow
     assert 'base_ref="origin/$DEFAULT_BRANCH"' in workflow
     assert '"$GITHUB_REF_NAME" == "$DEFAULT_BRANCH"' in workflow

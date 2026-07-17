@@ -51,7 +51,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install protocol test dependencies
-        run: python -m pip install --disable-pip-version-check pytest jsonschema
+        run: python -m pip install --disable-pip-version-check pytest jsonschema pandas==2.2.3
 
       - name: Select bootstrap or enforced guard
         id: guard
