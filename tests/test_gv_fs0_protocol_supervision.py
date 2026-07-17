@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from itertools import permutations
+import os
 from pathlib import Path
 
 import pytest
@@ -75,7 +76,7 @@ def test_exact_supervision_constants() -> None:
 
 def test_exact_isolated_invocation_requires_absolute_paths(tmp_path: Path) -> None:
     command = build_verifier_command(
-        Path("C:/Python/python.exe") if Path().anchor == "" else tmp_path / "python.exe",
+        Path("C:/Python/python.exe") if os.name == "nt" else tmp_path / "python.exe",
         tmp_path / "verifier.py",
         tmp_path / "input.json",
     )
