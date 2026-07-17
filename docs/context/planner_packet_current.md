@@ -1,5 +1,14 @@
 # Planner Packet - Current
 
+## Active Addendum — GV-FS0 Protocol V1 Pre-Hosted Freeze Audit (2026-07-17)
+
+- **Current state**: repaired candidate `d15b74e` is locally audited; protocol freeze remains blocked only on hosted Windows/Linux CI evidence.
+- **Completed**: final candidate `346d362` plus CI repair `d15b74e`; deterministic generation; independent vectors; enforced verifier; six mutation probes on restored non-merge branch tip `9954e32`; A/B/C terminal review PASS.
+- **Evidence**: 136 focused GV-FS0 tests PASS; generator PASS; independent vectors PASS; enforced self-check PASS; schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest mutations all rejected; frozen protocol/manifest/vector hashes unchanged from `346d362`.
+- **Pending gate**: push candidate and probe branches, run hosted Windows/Linux byte-parity CI, then reconcile terminal SAW from BLOCK to PASS if hosted CI passes.
+- **Recommended next step**: publish branches and monitor hosted CI; do not start reducer/product work in this round.
+- **Do not begin**: PortfolioBook reduction, FS0 event execution, snapshots, certification execution, certified results, permanent bundle publication, Streamlit, providers, real data, or GV-FS1.
+
 ## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
 
 - **Current state**: protocol-only candidate is locally green; reducer and product authorization remain blocked.

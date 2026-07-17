@@ -6,6 +6,14 @@
 - Boundary: readiness remains false; link remains snapshot non-PIT; no strict curve, alpha/tradable, Strategy/UI, provider/CCM, remote, or publication authority.
 - Next action: hold promotion and open at most one separately authorized bounded scope.
 
+## 2026-07-17 — GV-FS0 Protocol V1 Pre-Hosted Freeze Audit
+
+- Decision: accept repaired candidate `d15b74e` as the local freeze candidate for hosted CI; it preserves the frozen protocol bytes from `346d362` and only fixes hosted workflow portability.
+- Decision: retain non-merged probe branch `codex/gv-fs0-protocol-freeze-v1-mutation-probe-final` at `9954e32` as mutation evidence; do not merge the probe branch into product history.
+- Evidence: 136 focused tests PASS; deterministic generation, independent vectors, enforced self-check, all six mutation probes, final clean restore, and Reviewer A/B/C terminal review PASS locally.
+- Current gate: terminal SAW remains BLOCK until hosted Windows/Linux CI passes after branch publication.
+- Boundary: no reducer, PortfolioBook, certification execution, permanent bundle, UI, provider, real-data, PEAD reopen, or FS1 work is authorized by this pre-hosted audit.
+
 ## 2026-07-12 — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH close
 - Decision: Accept M7F3-v7 as active flagged diagnostic package (strict curve BLOCKED); supersede v6 as close authority; keep research validity ~30.
 - Commits: A `bae1f656` code; B `b5c66bc` evidence; C SAW+truth.

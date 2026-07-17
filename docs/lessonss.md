@@ -1858,3 +1858,11 @@ Application pattern:
 - Fix applied: Loaded the independent encoder directly from its validation directory, kept the verifier and reference implementation free of repository package imports, added an explicit `GV_FS0_GIT_OBJECT_FORMAT` override only for filesystem-copy parity checks, and retained normal CI derivation from `git rev-parse --show-object-format`.
 - Guardrail for next time: A byte-parity tool must be runnable from a minimal Python installation without importing application packages; distinguish canonical-byte parity from local worktree Git discoverability and make any non-Git object-format input explicit and validated.
 - Evidence paths: `validation/gv_fs0_ci_reference_encoder.py`, `scripts/verify_gv_fs0_protocol_freeze.py`, `.github/workflows/gv-fs0-protocol-freeze.yml`, `tests/test_gv_fs0_freeze_immutability_v1.py`.
+
+## 2026-07-17 Round Entry (Hosted CI Semantics Need Native Regression Coverage)
+- Date: 2026-07-17
+- Mistake or miss: The first repaired candidate passed local protocol checks but still had hosted-CI risks: Windows shell glob expansion and feature-branch push base selection were not modeled closely enough.
+- Root cause: Local parity focused on protocol bytes while workflow semantics were reviewed as YAML intent instead of executable branch/event behavior.
+- Fix applied: Expanded protocol pytest globs inside Python, changed feature-branch push guard selection to the default branch, limited previous-SHA enforcement to default-branch pushes, and added static regression coverage for those workflow contracts.
+- Guardrail for next time: Any cross-platform freeze workflow must test Windows command expansion and each GitHub event/base-selection branch before terminal audit.
+- Evidence paths: `.github/workflows/gv-fs0-protocol-freeze.yml`, `tests/test_gv_fs0_freeze_immutability_v1.py`, `docs/saw_reports/saw_gv_fs0_protocol_freeze_v1_20260717.md`.

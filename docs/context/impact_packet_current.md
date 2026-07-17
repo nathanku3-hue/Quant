@@ -1,5 +1,13 @@
 # Impact Packet - Current
 
+## Active Addendum — GV-FS0 Protocol V1 Pre-Hosted Freeze Audit (2026-07-17)
+
+- **Changed interfaces**: CI branch/base selection portability and Windows pytest glob execution were repaired after the immutable protocol candidate; frozen protocol semantics and machine artifacts are unchanged.
+- **Primary paths**: `.github/workflows/gv-fs0-protocol-freeze.yml`, `tests/test_gv_fs0_freeze_immutability_v1.py`, `docs/phase_brief/phase-E0-brief.md`, `docs/context/*_current.md`, `docs/decision log.md`, `docs/notes.md`, `docs/lessonss.md`, and `docs/saw_reports/saw_gv_fs0_protocol_freeze_v1_20260717.md`.
+- **Validation**: 136 focused tests PASS; generator PASS; independent vectors PASS; enforced verifier PASS; all six final mutation probes reject; final probe branch restores cleanly to tree `a60bc645f670bcc1007afaf9774e72648cb093b2`.
+- **Open checks**: hosted Windows/Linux CI and terminal SAW reconciliation after hosted evidence.
+- **Forbidden impact**: no reducer, balance mutation, event execution, snapshot generation, certification execution, certified result, permanent bundle, UI, provider, real-data, or FS1 path changed.
+
 ## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
 
 - **Changed interfaces**: normative contract, 18 machine-readable artifacts, canonical/parser primitives, isolated reconstruction boundary, independent reference encoder, freeze verifier/manifest, protocol tests, and CI workflow.

@@ -1,5 +1,18 @@
 # Multi-Stream Contract - Current
 
+## Active Addendum — GV-FS0 Protocol V1 Pre-Hosted Freeze Audit (2026-07-17)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | Candidate `d15b74e` and probe `9954e32` are locally audited; SAW is BLOCK only on hosted CI | Push branches, run hosted Windows/Linux CI, reconcile terminal SAW |
+| Backend/Strategy | Held | No PortfolioBook, balance mutation, reducer, certification execution, or bundle publication in this round |
+| Frontend/UI | Held | No Streamlit or certified-result surface |
+| Data/Research | Held | No provider, real-data, admission, PEAD reopen, or FS1 scope |
+
+- Cross-stream rule: protocol freeze evidence can unlock a later reducer decision only after hosted CI and terminal SAW PASS; it does not itself execute economic logic.
+- Stream freeze: do not widen beyond protocol CI/evidence publication.
+- Next action: hosted CI only.
+
 ## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
 
 - **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
