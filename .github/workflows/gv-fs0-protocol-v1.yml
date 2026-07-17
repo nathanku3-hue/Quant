@@ -48,6 +48,7 @@ jobs:
           git -c http.extraheader="${auth_header}" fetch --no-recurse-submodules --prune --no-tags origin \
             "+refs/heads/*:refs/remotes/origin/*" \
             "+${GITHUB_SHA}:refs/remotes/pull/${{ github.event.pull_request.number || 0 }}/merge"
+          git config --local core.autocrlf false
           git checkout --force "${GITHUB_SHA}"
           git config --local gc.auto 0
 
@@ -58,7 +59,7 @@ jobs:
           cache: pip
 
       - name: Install protocol-test dependencies
-        run: python -m pip install --disable-pip-version-check pytest==9.0.2 jsonschema==4.26.0
+        run: python -m pip install --disable-pip-version-check pytest==9.0.2 jsonschema==4.26.0 pandas==2.2.3
 
       - name: Validate generated artifacts and freeze hashes
         run: python validation/gv_fs0_protocol_freeze.py
