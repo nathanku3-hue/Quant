@@ -1,16 +1,20 @@
 # Planner Packet - Current
 
-## Active Addendum — GV-E0A-OPERABLE Direction Hard Recut (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Terminal Transport PASS (2026-07-19)
 
-- **PRODUCT_PIVOT**: AUTHORIZED — UOE discretionary cockpit → GodView certified portfolio OS (paper).
-- **F1C_SHIP**: `CLOSED_SUBSTRATE` on product tip lineage `490a234` (dual-fixture certified demo + product CI). Not operator single-decision endpoint. Not reopenable as active gate.
-- **ACTIVE_GATE (sole)**: **GV-E0A-OPERABLE**.
-- **Score**: `SHIPPED_PRODUCT_SCORE = 39/100` (owner claim ceiling; metric confidence low; no alpha). Do not uplift to 40+ without rubric.
-- **FUNCTIONAL_STAGE**: `CERTIFIED_SINGLE_DECISION_OPERABLE` (evidence: E0 custody + current decision publish + default `render_gv_fs0_current_decision` + product suite green). Score remains 39/100.
-- **Vertical**: frozen MU G_supply (4 exact hashes) → HOLD_FOR_EVIDENCE / NO_POSITION → one DecisionEnvelope → book/cert → atomic current publication → one visible decision → Streamlit smoke.
-- **E0A code status**: not claimed complete in this docs round; direction locked A/A/A/A.
-- **Recommended next step**: implement GV-E0A-OPERABLE only (`docs/phase_brief/gv-e0a-operable-brief.md`).
-- **Do not begin**: F1C reopen, providers, real prices, FS1 batch, PEAD, alpha claims, broker, dual-authority UI, historical suite repair, main-as-product-tip claims if tip is branch-based.
+- **PRODUCT_PIVOT**: AUTHORIZED — GodView certified portfolio OS (paper).
+- **F1C_SHIP**: `CLOSED_SUBSTRATE`.
+- **E0A terminal pin**: `446ac6d` (C `45f9f96` + C2 filelock).
+- **Hosted**: GV-FS0 Product run `29655802878` Ubuntu + Windows + Win/Linux parity **PASS**.
+- **Review**: distinct Reviewer A/B/C **PASS**; terminal SAW **PASS**.
+- **Score**: `SHIPPED_PRODUCT_SCORE = 39/100` (owner ceiling; no alpha).
+- **FUNCTIONAL_STAGE**: `CERTIFIED_SINGLE_DECISION_OPERABLE`.
+- **Recommended next step**: hold tip; owner merge-to-main decision only.
+- **Do not begin**: FS1, providers, real prices, PEAD, alpha, broker, dual-authority UI.
+
+## Prior Addendum — GV-E0A-OPERABLE Direction Hard Recut (2026-07-19) [superseded on terminal status]
+
+- Direction A/A/A/A locked; implementation completed and terminal-closed at `446ac6d`.
 
 ## Prior Addendum — GV-FS0 F1C-SHIP Terminal Closeout T (2026-07-19) [CLOSED_SUBSTRATE]
 

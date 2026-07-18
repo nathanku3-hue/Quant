@@ -1,13 +1,17 @@
 # Bridge Contract - Current
 
-## Active Addendum — GV-E0A-OPERABLE Direction Hard Recut (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Terminal Transport (2026-07-19)
 
-- SYSTEM_DELTA: Active canon hard-recut. F1C-SHIP demoted to closed substrate. Sole active gate is **GV-E0A-OPERABLE**. Score semantics split: 39/100 owner ceiling vs functional stage `CERTIFIED_SINGLE_DECISION_OPERABLE` (stage only; no score uplift). UOE primary framing revoked as active product authority.
-- PM / Product Delta: Product is GodView certified portfolio OS (paper). Dual-fixture demo is not the operator endpoint. Next is one operable HOLD_FOR_EVIDENCE/NO_POSITION decision path from frozen E0 custody — not FS1, not F1C reopen.
-- OPEN_DECISION: none for direction (locked A/A/A/A). Implementation evidence for operable stage promotion remains open until code/smoke exist.
-- RECOMMENDED_NEXT_STEP: execute GV-E0A-OPERABLE vertical only (`docs/phase_brief/gv-e0a-operable-brief.md`).
-- DO_NOT_REDECIDE: product pivot authorized; F1C closed substrate; score 39 ceiling; forbidden providers/real prices/FS1/PEAD/alpha/broker/dual-authority UI/historical suite repair; do not stack multi-active gates.
-- PHASE_STATUS: F1C-SHIP CLOSED_SUBSTRATE at tip lineage 490a234; ACTIVE_GATE=GV-E0A-OPERABLE implemented on branch codex/gv-e0a-operable; FUNCTIONAL_STAGE=CERTIFIED_SINGLE_DECISION_OPERABLE; score 39/100.
+- SYSTEM_DELTA: E0A operable vertical banked and hosted-proven on product tip `446ac6d` (C/C2).
+- PM / Product Delta: one current certified decision is default authority; F1C dual bundle remains substrate; score 39/100; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
+- OPEN_DECISION: optional owner merge-to-main only; no FS1.
+- RECOMMENDED_NEXT_STEP: hold tip after terminal SAW; do not open FS1/providers/PEAD/broker/alpha.
+- DO_NOT_REDECIDE: dual-fixture default UI; score uplift without rubric; FS1-as-next.
+- PHASE_STATUS: `GV_E0A_OPERABLE_TERMINAL_PASS; HOSTED_29655802878; REVIEW_ABC_PASS; SCORE_39`.
+
+## Prior Addendum — GV-E0A-OPERABLE Direction Hard Recut (2026-07-19) [superseded on terminal status]
+
+- Direction locked A/A/A/A; implementation + hosted proof closed at `446ac6d`.
 
 ## Prior Addendum — GV-FS0 F1C-SHIP Terminal Bridge (2026-07-19) [CLOSED_SUBSTRATE]
 
