@@ -7333,3 +7333,11 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Freeze evidence: bootstrap and enforced guard modes; LF-only frozen surfaces; lowercase hexadecimal vectors and SHA-256; explicit Git object format and Git blob OIDs; exact mutation probes; Windows/Linux parity workflow.
 - Current gate: local protocol proof PASS, but reducer authorization remains false until the immutable candidate commit, base-relative mutation proof, hosted CI, and independent audit/SAW all pass.
 
+## 2026-07-18 — GV-FS0 F1A Certified OPEN Vertical
+
+- Decision: implement only the bounded OPEN functional slice after P0.5 and V1.1 verifier-I/O compatibility were banked.
+- The Decision (Hardcoded): one synthetic `MANUAL_OWNER_PAPER / OPEN` decision owns one canonical book; frozen ranks/slots/ownership generate the event trail; five immutable snapshots own paper economics; exactly two process-isolated verifier attempts must match; all ten checks must be TRUE before an in-memory certified result is injected into the final read-only adapter.
+- Exact economics: initial cash `1000`; 10 shares at `10`; explicit fee `1`; residual cash `899`; dividend receivable/payment `5`; terminal cash `904`; terminal market value `140`; terminal NAV `1044`; cumulative contribution `44`.
+- Boundary: no permanent bundle, publication lock, default dashboard route, provider, real data, legacy replay authority, NO_POSITION implementation, or FS1 work in F1A.
+- Evidence state: focused product and protocol suites, deterministic two-run bytes, generator/freeze checks, compile, adapter smoke, and diff hygiene pass locally. Banked-commit identity and independent Reviewer A/B/C remain the next closure actions.
+

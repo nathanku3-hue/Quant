@@ -6435,3 +6435,19 @@ Additional implementation paths: `.github/workflows/gv-fs0-protocol-freeze.yml`,
 - Windows protocol test expansion: hosted pytest file globs are expanded inside Python with `glob.glob("tests/test_gv_fs0_*.py")`, so Windows and Linux run the same focused protocol suite.
 - Mutation acceptance formula: `freeze_candidate_accepted = deterministic_generation_pass AND independent_vectors_pass AND enforced_self_check_pass AND all_required_mutations_rejected AND restored_tree_equals_candidate_tree AND hosted_windows_linux_ci_pass`.
 - Current value: true as of hosted run `29567754495`.
+
+# GV-FS0 F1A OPEN Portfolio Economics and Certification (2026-07-18)
+
+Implementation paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, and `views/gv_fs0_portfolio_adapter.py`.
+Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
+
+- Execution cash delta: `-(shares * execution_price) = -(10 * 10) = -100`.
+- Explicit fee cash delta: `-fee = -1`; post-entry residual cash is `1000 - 100 - 1 = 899`.
+- Dividend receivable: `entitled_shares * amount_per_share = 10 * 0.5 = 5` on the ex-date.
+- Dividend payment: atomically decreases receivables by `5` and increases cash by `5`, producing cash `904` and receivables `0`.
+- Market value: `shares * session_close`; terminal value is `10 * 14 = 140`.
+- NAV: `cash + market_value + receivables`; terminal NAV is `904 + 140 + 0 = 1044`.
+- Session contribution: `current_NAV - previous_NAV`; canonical series is `0, 9, 15, 10, 10`.
+- Cumulative contribution: `current_NAV - initial_cash`; terminal contribution is `44`.
+- Certification: exactly two isolated verifier attempts must both reproduce the primary economic payload and hash; all ten tri-state checks must be TRUE before status may be CERTIFIED.
+- F1A boundary: certified OPEN remains in memory and is injected into the final read-only adapter. No permanent two-component bundle or default dashboard route is authorized.

@@ -1,7 +1,7 @@
 # Phase Brief: GV-FS0-F1 — Product Slice (Corrected)
 
 Mode: `EXECUTION_PACKET`
-Status: `P0_5_BANKED; V1_1_VERIFIER_IO_COMPAT_BANKED; F1A_UNBLOCKED`
+Status: `P0_5_BANKED; V1_1_VERIFIER_IO_COMPAT_BANKED; F1A_IMPLEMENTED_LOCAL; BANK_AND_INDEPENDENT_REVIEW_PENDING`
 Date: 2026-07-18
 RoundID: `ROUND-20260718-GV-FS0-F1-PRODUCT-SLICE`
 ScopeID: `GV_FS0_F1_REPAIR_AND_SHIP_CURRENT_SLICE`
@@ -21,7 +21,7 @@ Hierarchy: L1 Terminal Zero; L2 active Backend product accounting + Frontend rea
 STRATEGY = REPAIR_AND_SHIP_CURRENT_SLICE
 PROTOCOL_REDESIGN = FORBIDDEN
 CURRENT_CHECKOUT_GIT_REPAIR = FORBIDDEN
-F1A = UNBLOCKED after V1.1 verifier I/O compatibility
+F1A = IMPLEMENTED_LOCAL; focused product/protocol evidence PASS; bank and independent review pending
 SHIPPED_PRODUCT_SCORE = 39/100 (unchanged until certified visible screen on final adapter)
 ```
 
@@ -242,9 +242,24 @@ F1A before atomic P0.5 green
 - [x] Final-adapter injection plan (no throwaway temp route)
 - [x] Atomic commit banked on `codex/gv-fs0-f1-product`
 
-### F1A+
+### F1A — local implementation evidence
 
-See gate sections above; start only after P0.5 commit is banked and product tests green.
+- [x] Immutable OPEN source fixture and `DecisionEnvelope` with deterministic fixture/decision/book identity
+- [x] Append-only canonical event trail using frozen ranks, slots, and transition ownership
+- [x] Five exact snapshots: NAV `1000 → 1009 → 1024 → 1034 → 1044`
+- [x] Execution fee leaves cash `899`; ex-date receivable is `5`; pay-date cash is `904`; terminal receivable is `0`
+- [x] Verifier input contains only original protocol/decision/price/intent projections
+- [x] Exactly two isolated verifier attempts; byte-identical results retain one hash-addressed verifier result
+- [x] All ten certification checks TRUE; certification status CERTIFIED
+- [x] Certification-reference event, certified OPEN result, and presentation projection validate against frozen schemas
+- [x] Final read-only adapter renders injected presentation/snapshot/certification and imports no accounting/certification module
+- [x] Disagreeing verifier attempts fail closed before certification
+- [x] No permanent bundle path created or modified
+- [x] Product suite, protocol suite, generator check, freeze bootstrap, compile, render smoke, and diff hygiene PASS
+- [ ] Bank F1A implementation commit on `codex/gv-fs0-f1-product`
+- [ ] Independent Reviewer A/B/C evidence and SAW closure for the exact banked commit
+
+F1B, F1C, and F1D remain unopened.
 
 ## First Commands
 
@@ -258,4 +273,4 @@ python -c "import glob,pytest,sys; sys.exit(pytest.main(['-q',*glob.glob('tests/
 
 ## Next Action
 
-GO F1A: final adapter + injected OPEN + schema-valid V1 verifier input into the V1.1 reconstruction engine.
+Bank the bounded F1A code/tests/docs, run independent Reviewer A/B/C against that exact commit, then execute F1B by sending NO_POSITION through the same book/certification/adapter path. Do not open publication or default-dashboard routing.

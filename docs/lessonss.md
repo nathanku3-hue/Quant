@@ -1866,3 +1866,11 @@ Application pattern:
 - Fix applied: Expanded protocol pytest globs inside Python, changed feature-branch push guard selection to the default branch, limited previous-SHA enforcement to default-branch pushes, and added static regression coverage for those workflow contracts.
 - Guardrail for next time: Any cross-platform freeze workflow must test Windows command expansion and each GitHub event/base-selection branch before terminal audit.
 - Evidence paths: `.github/workflows/gv-fs0-protocol-freeze.yml`, `tests/test_gv_fs0_freeze_immutability_v1.py`, `docs/saw_reports/saw_gv_fs0_protocol_freeze_v1_20260717.md`.
+
+## 2026-07-18 Round Entry (Ship the First Economic Path Before Publication Machinery)
+- Date: 2026-07-18
+- Mistake or miss: Earlier planning grouped book, certification, UI, and publication horizontally, which would have delayed executable economic feedback and made verifier disagreement harder to localize.
+- Root cause: File-layer sequencing was treated as delivery sequencing instead of following one decision through every authority boundary.
+- Fix applied: Implemented OPEN vertically from source fixture and `DecisionEnvelope` through canonical events, exact snapshots, two isolated verifier attempts, ten-check certification, certification-reference event, certified result, and injection into the final read-only adapter. Permanent bundle publication remains unopened.
+- Guardrail for next time: For each portfolio gate, execute one complete decision path first and require exact canonical bytes plus a deliberate disagreement test before adding a second decision or any permanent publication mechanism.
+- Evidence paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, `views/gv_fs0_portfolio_adapter.py`, `tests/gv_fs0_product/test_open_vertical.py`, `docs/phase_brief/gv-fs0-f1-product-slice-brief.md`.
