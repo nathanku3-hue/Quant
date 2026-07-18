@@ -90,16 +90,16 @@ def test_dash_2_ytd_chart_function_exists() -> None:
     assert "def _render_portfolio_ytd_chart(" in source
 
 
-def test_dash_2_ytd_chart_wired_into_portfolio_page() -> None:
-    """Performance renders from page-level replay orchestration."""
+def test_dash_2_legacy_ytd_chart_is_not_default_portfolio_authority() -> None:
+    """Historical YTD machinery may remain, but the default page never invokes it."""
     source = DASHBOARD.read_text(encoding="utf-8")
     start = source.index("def _render_portfolio_allocation_page()")
-    # Find the next function definition after this one
     next_def = source.index("\ndef ", start + 1)
     section_source = source[start:next_def]
 
-    assert "_ensure_daily_portfolio_replay_context(" in section_source
-    assert "_render_portfolio_ytd_chart(daily_replay_context" in section_source
+    assert "render_gv_fs0_certified_bundle(st)" in section_source
+    assert "_ensure_daily_portfolio_replay_context(" not in section_source
+    assert "_render_portfolio_ytd_chart(" not in section_source
 
 
 def test_dash_2_ytd_chart_renders_spy_and_qqq_benchmarks() -> None:
@@ -144,29 +144,29 @@ def test_dash_2_benchmarks_have_local_tri_fallback() -> None:
 # ── Optimizer Ordering and Return Logic ───────────────────────────────────
 
 
-def test_dash_2_optimizer_renders_before_ytd_chart() -> None:
-    """Optimizer controls render before replay-sourced allocation and performance."""
+def test_dash_2_optimizer_is_not_default_certified_portfolio_authority() -> None:
+    """Optimizer controls remain non-certifying and absent from the default route."""
     source = DASHBOARD.read_text(encoding="utf-8")
     start = source.index("def _render_portfolio_allocation_page()")
     next_def = source.index("\ndef ", start + 1)
     section_source = source[start:next_def]
 
-    assert "_render_portfolio_builder_section()" in section_source
-    assert "_render_portfolio_ytd_chart(daily_replay_context" in section_source
-    assert section_source.index("_render_portfolio_builder_section()") < section_source.index("_render_portfolio_ytd_chart(daily_replay_context")
+    assert "render_gv_fs0_certified_bundle(st)" in section_source
+    assert "_render_portfolio_builder_section()" not in section_source
+    assert "render_optimizer_view" not in section_source
     assert "st.expander(" not in section_source
 
 
-def test_dash_2_portfolio_page_separates_optimizer_and_replay_copy() -> None:
-    """Portfolio page copy distinguishes optimizer output from replay output."""
+def test_dash_2_portfolio_page_declares_certified_bundle_authority() -> None:
+    """Default copy names the permanent bundle and demotes legacy research output."""
     source = DASHBOARD.read_text(encoding="utf-8")
     start = source.index("def _render_portfolio_allocation_page()")
     next_def = source.index("\ndef ", start + 1)
     fn_source = source[start:next_def]
 
-    assert "Optimizer controls select the method and universe." in fn_source
-    assert "one daily replay source" in fn_source
-    assert "Strategy Replay" in source
+    assert "Permanent GV-FS0 certified bundle" in fn_source
+    assert "non-certifying research surfaces" in fn_source
+    assert "Optimizer controls select the method and universe." not in fn_source
 
 
 def test_dash_2_optimizer_uses_explicit_universe_builder() -> None:
@@ -2250,17 +2250,18 @@ def test_replay_timeline_stacked_chart_traces_are_allocation_areas(monkeypatch: 
     assert fig.layout.yaxis.range == (0, 1)
 
 
-def test_dash_2_portfolio_render_path_builds_one_daily_replay_context() -> None:
-    """Portfolio page builds one daily context and passes it to all replay-facing surfaces."""
+def test_dash_2_portfolio_render_path_has_one_certified_source() -> None:
+    """Default portfolio rendering has one permanent certified bundle source."""
     source = DASHBOARD.read_text(encoding="utf-8")
     start = source.index("def _render_portfolio_allocation_page()")
     next_def = source.index("\ndef ", start + 1)
     fn_source = source[start:next_def]
 
-    assert fn_source.count("_ensure_daily_portfolio_replay_context(") == 1
-    assert "_render_replay_allocation_snapshot(daily_replay_context)" in fn_source
-    assert "_render_portfolio_ytd_chart(daily_replay_context" in fn_source
-    assert "_render_strategy_replay_section(daily_replay_context)" in fn_source
+    assert fn_source.count("render_gv_fs0_certified_bundle(st)") == 1
+    assert "_ensure_daily_portfolio_replay_context(" not in fn_source
+    assert "_render_replay_allocation_snapshot(" not in fn_source
+    assert "_render_portfolio_ytd_chart(" not in fn_source
+    assert "_render_strategy_replay_section(" not in fn_source
 
 
 def test_dash_2_portfolio_render_path_has_no_direct_second_source_reads() -> None:

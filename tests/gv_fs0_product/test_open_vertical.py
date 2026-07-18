@@ -398,12 +398,11 @@ def test_adapter_rejects_uncertified_or_mismatched_injection() -> None:
         )
 
 
-def test_f1a_never_publishes_permanent_bundle() -> None:
+def test_f1a_builder_never_mutates_permanent_bundle() -> None:
     before = PERMANENT_BUNDLE.read_bytes() if PERMANENT_BUNDLE.exists() else None
     build_open_certified_result()
     after = PERMANENT_BUNDLE.read_bytes() if PERMANENT_BUNDLE.exists() else None
     assert after == before
-    assert before is None
 
 
 def _imports(path: Path) -> set[str]:
@@ -419,8 +418,10 @@ def _imports(path: Path) -> set[str]:
 
 def test_static_product_boundaries() -> None:
     adapter_imports = _imports(ROOT / "views" / "gv_fs0_portfolio_adapter.py")
-    assert not any(name.startswith("core.") for name in adapter_imports)
+    adapter_core_imports = {name for name in adapter_imports if name.startswith("core.")}
+    assert adapter_core_imports == {"core.gv_fs0_bundle"}
     assert not any(name.startswith("validation.") for name in adapter_imports)
+    assert not any(name.startswith("strategies.") for name in adapter_imports)
 
     book_imports = _imports(ROOT / "core" / "gv_fs0_book.py")
     assert not any(name.startswith("views.") for name in book_imports)

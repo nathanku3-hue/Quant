@@ -206,17 +206,15 @@ def test_lifecycle_renderer_exists_in_dashboard() -> None:
     assert "def _render_strategy_replay_section(" in source
 
 
-def test_lifecycle_renderer_wired_into_portfolio_page() -> None:
+def test_lifecycle_renderer_is_not_default_certified_portfolio_authority() -> None:
     source = DASHBOARD.read_text(encoding="utf-8")
     start = source.index("def _render_portfolio_allocation_page()")
     next_def = source.index("\ndef ", start + 1)
     page_source = source[start:next_def]
 
-    assert "_render_strategy_replay_section(daily_replay_context)" in page_source
-    # Shadow Portfolio removed from live page — must not appear in page flow
-    builder_pos = page_source.index("_render_portfolio_builder_section()")
-    lifecycle_pos = page_source.index("_render_strategy_replay_section(daily_replay_context)")
-    assert builder_pos < lifecycle_pos
+    assert "render_gv_fs0_certified_bundle(st)" in page_source
+    assert "_render_strategy_replay_section(" not in page_source
+    assert "_render_portfolio_builder_section(" not in page_source
     assert "_render_shadow_portfolio_section()" not in page_source
 
 

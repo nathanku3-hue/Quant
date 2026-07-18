@@ -47,6 +47,7 @@ from views.page_registry import DISCOVERY_PAGE_TITLE
 from views.page_registry import PORTFOLIO_PAGE_TITLE
 from views.page_registry import STRATEGY_PAGE_TITLE
 from views.discovery_view import render_discovery_page
+from views.gv_fs0_portfolio_adapter import render_gv_fs0_certified_bundle
 from views.pead_validation_evidence import render_pead_validation_evidence
 from views.strategy_view import render_strategy_page
 from strategies.portfolio_universe import (
@@ -3687,10 +3688,9 @@ def _store_strategy_replay_context(context: DashboardReplayContext) -> None:
     if context.status != "ready":
         _clear_strategy_replay_session_cache()
         return
-    try:
-        _write_replay_context_diagnostic_artifact(context)
-    except Exception:
-        pass
+    # Legacy replay diagnostics are never auto-published during dashboard startup.
+    # The certified default portfolio route must be read-only and must not mutate
+    # unrelated evidence merely because Streamlit evaluates the module.
     latest = context.latest_snapshot
     if isinstance(latest, pd.DataFrame) and not latest.empty:
         positive = latest[pd.to_numeric(latest.get("target_weight"), errors="coerce").fillna(0.0) > 0].copy()
@@ -4736,21 +4736,13 @@ def _render_placeholder_page(title: str) -> None:
 
 
 def _render_portfolio_allocation_page() -> None:
+    """Render the sole default certified portfolio authority."""
+
     st.header(PORTFOLIO_PAGE_TITLE)
-    st.caption("Optimizer controls select the method and universe. Allocation, performance, timeline, events, and decisions are rendered from one daily replay source.")
-    _render_portfolio_builder_section()
-    st.divider()
-    horizon, horizon_start = _render_portfolio_horizon_control()
-    daily_replay_context = _ensure_daily_portfolio_replay_context(horizon_start=horizon_start)
-    _render_replay_allocation_snapshot(daily_replay_context)
-    st.divider()
-    _render_portfolio_ytd_chart(daily_replay_context, horizon=horizon, ytd_start=horizon_start)
-    st.divider()
-    _render_strategy_replay_section(daily_replay_context)
-    st.divider()
-    _render_data_health_section()
-    st.divider()
-    _render_drift_monitor_section()
+    st.caption(
+        "Permanent GV-FS0 certified bundle. Legacy replay and optimizer outputs are non-certifying research surfaces."
+    )
+    render_gv_fs0_certified_bundle(st)
 
 
 def _render_discovery_page() -> None:

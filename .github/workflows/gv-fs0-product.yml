@@ -1,0 +1,129 @@
+name: GV-FS0 Product
+
+on:
+  pull_request:
+    paths:
+      - "core/gv_fs0_book.py"
+      - "core/gv_fs0_bundle.py"
+      - "core/gv_fs0_certify.py"
+      - "core/gv_fs0_publish.py"
+      - "data/gv_fs0/gv_fs0_certified_bundle.json"
+      - "views/gv_fs0_portfolio_adapter.py"
+      - "views/page_registry.py"
+      - "dashboard.py"
+      - "tests/gv_fs0_product/**"
+      - "tests/test_gv_fs0_*.py"
+      - ".github/workflows/gv-fs0-product.yml"
+  push:
+    paths:
+      - "core/gv_fs0_book.py"
+      - "core/gv_fs0_bundle.py"
+      - "core/gv_fs0_certify.py"
+      - "core/gv_fs0_publish.py"
+      - "data/gv_fs0/gv_fs0_certified_bundle.json"
+      - "views/gv_fs0_portfolio_adapter.py"
+      - "views/page_registry.py"
+      - "dashboard.py"
+      - "tests/gv_fs0_product/**"
+      - "tests/test_gv_fs0_*.py"
+      - ".github/workflows/gv-fs0-product.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  product-proof:
+    name: Product proof (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install product test dependencies
+        run: python -m pip install --disable-pip-version-check pytest jsonschema pandas==2.2.3
+
+      - name: Run product and frozen protocol regression
+        shell: bash
+        run: >-
+          python -c "import glob, pytest, sys;
+          sys.exit(pytest.main(['-q', 'tests/gv_fs0_product', *glob.glob('tests/test_gv_fs0_*.py')]))"
+
+      - name: Build canonical bundle twice and emit parity artifact
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          from core.gv_fs0_bundle import certified_bundle_bytes
+          from core.gv_fs0_canonical import sha256_bytes
+          from core.gv_fs0_publish import build_default_certified_bundle
+
+          first = certified_bundle_bytes(build_default_certified_bundle())
+          second = certified_bundle_bytes(build_default_certified_bundle())
+          if first != second:
+              raise SystemExit("GV-FS0 bundle is not byte deterministic")
+          tracked = Path("data/gv_fs0/gv_fs0_certified_bundle.json").read_bytes()
+          if tracked != first:
+              raise SystemExit("tracked permanent bundle differs from current canonical build")
+          bundle = build_default_certified_bundle()
+          record = {
+              "bundle_hash": bundle["bundle_hash"],
+              "bundle_id": bundle["bundle_id"],
+              "byte_length": len(first),
+              "file_sha256": sha256_bytes(first),
+          }
+          Path("gv-fs0-product-parity.json").write_text(
+              json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+              newline="\n",
+          )
+          PY
+
+      - name: Upload product parity record
+        uses: actions/upload-artifact@v4
+        with:
+          name: gv-fs0-product-parity-${{ runner.os }}
+          path: gv-fs0-product-parity.json
+          if-no-files-found: error
+          retention-days: 30
+
+  byte-parity:
+    name: Product Windows/Linux byte parity
+    runs-on: ubuntu-latest
+    needs: product-proof
+
+    steps:
+      - name: Download product parity records
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gv-fs0-product-parity-*
+          merge-multiple: false
+
+      - name: Compare exact parity records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          records = sorted(Path(".").glob("gv-fs0-product-parity-*/gv-fs0-product-parity.json"))
+          if len(records) != 2:
+              raise SystemExit(f"expected two parity records, found {len(records)}")
+          payloads = [path.read_bytes() for path in records]
+          if payloads[0] != payloads[1]:
+              raise SystemExit("GV-FS0 product Windows/Linux parity differs")
+          print(payloads[0].decode("utf-8").strip())
+          PY

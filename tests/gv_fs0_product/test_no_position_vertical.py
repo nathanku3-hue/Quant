@@ -227,9 +227,8 @@ def test_final_adapter_renders_injected_no_position_through_same_path() -> None:
     assert [name for name, _ in renderer.calls] == ["subheader", "table", "caption"]
 
 
-def test_f1b_never_publishes_permanent_bundle() -> None:
+def test_f1b_builder_never_mutates_permanent_bundle() -> None:
     before = PERMANENT_BUNDLE.read_bytes() if PERMANENT_BUNDLE.exists() else None
     build_no_position_certified_result()
     after = PERMANENT_BUNDLE.read_bytes() if PERMANENT_BUNDLE.exists() else None
     assert after == before
-    assert before is None

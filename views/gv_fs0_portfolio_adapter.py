@@ -1,9 +1,9 @@
-"""Read-only GV-FS0 portfolio presentation adapter.
+"""Read-only GV-FS0 certified portfolio adapter.
 
-F1A/F1B inject already validated OPEN or NO_POSITION presentation, terminal
-snapshot, and certification artifacts through the same display path. The
-adapter owns no accounting, verifier execution, certification aggregation,
-freshness logic, or bundle publication.
+Injected component rendering remains the test seam. The default product path
+loads one permanent, canonical, schema-valid two-role bundle and injects each
+component through the same display function. The adapter owns no accounting,
+verifier execution, certification aggregation, or publication.
 """
 
 from __future__ import annotations
@@ -11,7 +11,13 @@ from __future__ import annotations
 from collections.abc import Mapping
 import hashlib
 import json
+from pathlib import Path
 from typing import Any, Protocol
+
+from core.gv_fs0_bundle import GvFs0BundleError, read_certified_bundle
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_BUNDLE_PATH = ROOT / "data" / "gv_fs0" / "gv_fs0_certified_bundle.json"
 
 
 class PortfolioRenderer(Protocol):
@@ -121,8 +127,43 @@ def render_gv_fs0_portfolio(
     return model
 
 
+def load_default_certified_bundle(
+    bundle_path: Path = DEFAULT_BUNDLE_PATH,
+) -> dict[str, Any]:
+    """Load permanent product truth; missing or invalid bytes fail closed."""
+
+    try:
+        return read_certified_bundle(Path(bundle_path))
+    except GvFs0BundleError as exc:
+        raise GvFs0PresentationError(f"CERTIFIED_BUNDLE_INVALID:{exc}") from exc
+
+
+def render_gv_fs0_certified_bundle(
+    renderer: PortfolioRenderer,
+    *,
+    bundle_path: Path = DEFAULT_BUNDLE_PATH,
+) -> list[dict[str, Any]]:
+    """Render OPEN then NO_POSITION from the permanent validated bundle."""
+
+    bundle = load_default_certified_bundle(bundle_path)
+    models: list[dict[str, Any]] = []
+    for component in bundle["components"]:
+        models.append(
+            render_gv_fs0_portfolio(
+                renderer,
+                presentation=component["presentation"],
+                terminal_snapshot=component["snapshots"][-1],
+                certification=component["certification"],
+            )
+        )
+    return models
+
+
 __all__ = [
+    "DEFAULT_BUNDLE_PATH",
     "GvFs0PresentationError",
     "build_portfolio_view_model",
+    "load_default_certified_bundle",
+    "render_gv_fs0_certified_bundle",
     "render_gv_fs0_portfolio",
 ]

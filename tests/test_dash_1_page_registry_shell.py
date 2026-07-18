@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 import pandas as pd
 from streamlit.testing.v1 import AppTest
 
+from core.gv_fs0_publish import DEFAULT_LOCK, DEFAULT_TARGET, publish_default_certified_bundle
 from views.page_registry import (
     APPROVED_PAGE_TITLES,
     DISCOVERY_PAGE_TITLE,
@@ -114,49 +116,66 @@ def test_dash_1_portfolio_route_has_explicit_default_path() -> None:
     assert 'default=True' in source
     assert "url_path=PORTFOLIO_PAGE_ROUTE" in source
     assert "renderers[PORTFOLIO_PAGE_TITLE]" in source
-    assert PORTFOLIO_PAGE_ROUTE == "portfolio-and-allocation"
+    assert PORTFOLIO_PAGE_TITLE == "Certified Portfolio"
+    assert PORTFOLIO_PAGE_ROUTE == "portfolio"
 
 
-def test_dash_1_portfolio_allocation_route_renders_without_overlay() -> None:
-    app = AppTest.from_file("dashboard.py")
-    app.query_params["page"] = PORTFOLIO_PAGE_ROUTE
-    app = app.run(timeout=90)
+def test_dash_1_default_portfolio_route_renders_certified_bundle() -> None:
+    prior_target = DEFAULT_TARGET.read_bytes() if DEFAULT_TARGET.exists() else None
+    prior_lock = DEFAULT_LOCK.read_bytes() if DEFAULT_LOCK.exists() else None
+    try:
+        if DEFAULT_LOCK.exists():
+            DEFAULT_LOCK.unlink()
+        publish_default_certified_bundle()
+        app = AppTest.from_file("dashboard.py")
+        app.query_params["page"] = PORTFOLIO_PAGE_ROUTE
+        app = app.run(timeout=90)
 
-    assert not app.exception
-    assert any(header.value == PORTFOLIO_PAGE_TITLE for header in app.header)
-    dataframe_values = _app_dataframe_values(app)
-    has_replay_snapshot = any(
-        {"Ticker", "Replay Weight", "Context Role"}.issubset(frame.columns)
-        for frame in dataframe_values
-    )
-    has_current_snapshot = any(
-        {"Ticker", "Current Weight", "Context Role"}.issubset(frame.columns)
-        for frame in dataframe_values
-    )
-    status_text = _app_status_text(app)
-    has_fail_closed_replay_state = all(
-        message in status_text
-        for message in (
-            "Daily replay allocation snapshot unavailable for this method/window.",
-            "Daily replay performance unavailable for this method/window.",
-            "Replay selection unavailable. Use the optimizer controls above to select a valid replay universe.",
-        )
-    )
-    assert (has_replay_snapshot and has_current_snapshot) or has_fail_closed_replay_state
+        assert not app.exception
+        assert any(header.value == PORTFOLIO_PAGE_TITLE for header in app.header)
+        assert [element.value for element in app.subheader] == [
+            "GV-FS0 Certified Paper Portfolio — OPEN",
+            "GV-FS0 Certified Paper Portfolio — NO_POSITION",
+        ]
+        assert len(app.table) == 2
+        caption_text = "\n".join(element.value for element in app.caption)
+        assert caption_text.count("CERTIFIED") >= 2
+        assert "Replay selection unavailable" not in _app_status_text(app)
+    finally:
+        if prior_target is None:
+            DEFAULT_TARGET.unlink(missing_ok=True)
+        else:
+            DEFAULT_TARGET.write_bytes(prior_target)
+        if prior_lock is None:
+            DEFAULT_LOCK.unlink(missing_ok=True)
+        else:
+            DEFAULT_LOCK.write_bytes(prior_lock)
 
 
-def test_dash_1_legacy_sections_remain_reachable_inside_new_pages() -> None:
+def test_dash_1_legacy_portfolio_sections_are_not_default_authority() -> None:
     source = DASHBOARD.read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    function = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_render_portfolio_allocation_page"
+    )
+    body = ast.unparse(function)
 
-    assert "_render_data_health_section()" in source
-    assert "_render_drift_monitor_section()" in source
+    assert "render_gv_fs0_certified_bundle(st)" in body
+    for forbidden in (
+        "_render_portfolio_builder_section",
+        "_ensure_daily_portfolio_replay_context",
+        "_render_replay_allocation_snapshot",
+        "_render_portfolio_ytd_chart",
+        "_render_strategy_replay_section",
+        "_render_data_health_section",
+        "_render_drift_monitor_section",
+    ):
+        assert forbidden not in body
     assert "_render_backtest_lab_section()" in source
     assert "_render_modular_strategies_section()" in source
-    assert "_render_portfolio_builder_section()" in source
-    # Shadow Portfolio removed from live page — function no longer exists
-    assert "_render_shadow_portfolio_section()" not in source
-    assert "_render_opportunities_page()" in source or "_render_opportunities_page," in source
-    assert "_render_daily_scan_section()" in source or "_render_daily_scan_section," in source
 
 
 def test_dash_1_forbidden_runtime_scope_is_not_added() -> None:
