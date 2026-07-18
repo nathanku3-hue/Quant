@@ -67,7 +67,12 @@ jobs:
           python-version: "3.12"
 
       - name: Install product test dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements.txt
+        # filelock is imported by dashboard.py; pin explicitly so AppTests do not
+        # depend on transitive resolution drift across hosted runners.
+        run: >-
+          python -m pip install --disable-pip-version-check
+          -r requirements.txt
+          filelock
 
       - name: Run product suite, frozen protocol, and E0A dashboard AppTests
         shell: bash
