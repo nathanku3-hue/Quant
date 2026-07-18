@@ -32,7 +32,8 @@
     "This envelope binds payload commit N only; it does not bind its own commit/tree.",
     "Both Markdown and JSON artifact identities are non-null and separately hashed.",
     "Thin-SAW is mandatory exactly-one at F; G binds Thin-SAW hash; final_tip=G with C,F,G in ancestry.",
-    "Freeze execution remains forbidden until a separate EXECUTION_PACKET cites dual-artifact N identities and this envelope lineage."
+    "Freeze execution remains forbidden until a separate EXECUTION_PACKET cites dual-artifact N identities and this envelope lineage.",
+    "upstream_commit_sha pins published branch tip after envelope commit (resolvable via ls-remote)."
   ],
   "payload_commit_sha": "c0888f86b794a731fe68abfc4051104e096e1a90",
   "payload_tree_sha": "19d56b2edba3266e889ffcdf5f770e22a0dfbcdf",
@@ -41,6 +42,6 @@
   "supersedes_payload_commit_r34": "3d3efd755f0e7ee47b9fea76b0ae320141f07848",
   "thin_saw_required_exactly_one": true,
   "upstream_branch": "docs/gv-fs0-pf1l-r3-3-approval",
-  "upstream_commit_sha": "c0888f86b794a731fe68abfc4051104e096e1a90",
+  "upstream_commit_sha": "370ec06b52575a7c5eca6be5853ff6cf7982bd50",
   "upstream_ref": "refs/heads/docs/gv-fs0-pf1l-r3-3-approval"
 }
