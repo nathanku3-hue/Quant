@@ -1,6 +1,36 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Coordination (2026-07-18)
+## Active Addendum — GV-FS0 F1C-SHIP Terminal Multi-Stream (2026-07-19)
+
+| Stream | Status | Note |
+|---|---|---|
+| Backend/Strategy | F1A/F1B preserved; F1C-SHIP closed | Bundle + publication recovery banked |
+| Frontend/UI | Default Certified Portfolio | Permanent-byte adapter only |
+| Data admission | Held | No provider/real admission |
+| Docs/Ops | Terminal SAW PASS | Two-SHA C/C2 + T |
+| Product CI | PASS 29651784244 | Ubuntu/Windows/parity |
+
+- Cross-stream rule: obsolete sequential F1C/F1D split is not an active gate.
+- Next action: hold; no multi-stream expansion.
+
+
+# Multi-Stream Contract - Current
+
+## Active Addendum — GV-FS0 F1C-SHIP Local Coordination (2026-07-18)
+
+| Stream | Current state | Remaining handoff |
+|---|---|---|
+| Backend/Product | Bundle codec + publisher/recovery locally PASS | Materialize tracked exact bundle and bank immutable candidate |
+| Frontend/UI | Certified default route + headless both-role proof PASS | Re-run from tracked artifact on immutable commit |
+| CI/Ops | Product parity workflow authored; zero-regression local PASS | Hosted Ubuntu/Windows run and branch push |
+| Review/Docs | Evidence and live truth reconciled to BLOCK | Distinct exact-commit A/B/C and terminal SAW |
+| Data/Research | Held | No provider, real data, PEAD, benchmark, policy, or FS1 authority |
+
+- Cross-stream rule: no stream can close independently; F1C-SHIP closes only when artifact, screen, hosted parity, review, and push bind one commit.
+- No compatibility fallback to replay/optimizer truth is allowed.
+- Next action: finish custody/evidence only.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Coordination (2026-07-18)
 
 | Stream | Current status | Handoff / boundary |
 |---|---|---|

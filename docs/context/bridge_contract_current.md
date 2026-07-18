@@ -1,6 +1,27 @@
 # Bridge Contract - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Bridge (2026-07-18)
+## Active Addendum — GV-FS0 F1C-SHIP Terminal Bridge (2026-07-19)
+
+- SYSTEM_DELTA: F1C-SHIP closes permanent two-role certified bundle publication, default certified route, product CI, and independent A/B/C on product branch via two-SHA transport C/C2 + closeout T.
+- PM / Product Delta: first user-visible certified authority loop is closed on codex/gv-fs0-f1-product. Official score remains 39/100.
+- OPEN_DECISION: none for F1C-SHIP closeout. Providers/PEAD/FS1/main merge remain separate.
+- RECOMMENDED_NEXT_STEP: hold product-branch tip after T; open nothing else without separate owner authorization.
+- DO_NOT_REDECIDE: preserve frozen protocol and F1A/F1B economics; do not reopen obsolete F1C/F1D sequential split as active gates.
+- PHASE_STATUS: F1A PASS; F1B PASS; F1C-SHIP PASS on product branch; score 39/100.
+
+
+# Bridge Contract - Current
+
+## Active Addendum — GV-FS0 F1C-SHIP Local Bridge (2026-07-18)
+
+- `SYSTEM_DELTA`: a complete local F1C-SHIP path now builds, validates, publishes, loads, and headlessly renders the exact two-role certified bundle; default legacy portfolio authority is removed.
+- `PM / Product Delta`: the first user-visible certified screen works locally, but the permanent tracked artifact and shipment custody chain do not exist; score remains 39/100.
+- `OPEN_DECISION`: none. Owner GO was exercised; remaining work is closure evidence, not scope selection.
+- `RECOMMENDED_NEXT_STEP`: materialize exact permanent bytes, pass 202/202, bank candidate, obtain hosted Windows/Linux parity plus exact-commit A/B/C, then push.
+- `DO_NOT_REDECIDE`: preserve frozen protocol and F1A/F1B identities; do not restore default replay/optimizer authority or open adjacent endgame work.
+- `PHASE_STATUS`: F1A PASS; F1B PASS; F1C-SHIP local implementation BLOCKED before shipment.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Bridge (2026-07-18)
 
 - `SYSTEM_DELTA`: F1B adds a separate NO_POSITION fixture/decision and routes it through the same book, five snapshots, two verifier attempts, certification, result, presentation, and adapter path as F1A.
 - `PM / Product Delta`: the second synthetic certified component is banked and independently closed; no permanent bundle or default product screen exists yet, so shipped-product score remains 39/100.

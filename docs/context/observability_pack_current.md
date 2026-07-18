@@ -1,6 +1,27 @@
 # Observability Pack - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Observability (2026-07-18)
+## Active Addendum — GV-FS0 F1C-SHIP Terminal Observability (2026-07-19)
+
+- ObservabilityRating: GREEN for exact bundle identity, hosted Win/Linux parity, distinct A/B/C, terminal SAW; AMBER for inherited process-tree hardening and path-filter hygiene; RED/held for providers/PEAD/FS1/alpha.
+- Drift sentinel: permanent file must remain 55774 / 9dda224…; default route must not reintroduce legacy portfolio authority.
+- Boundary sentinel: score remains 39/100; no silent readiness/alpha promotion.
+- Next-action sentinel: hold product-branch tip after T.
+
+
+# Observability Pack - Current
+
+## Active Addendum — GV-FS0 F1C-SHIP Local Observability (2026-07-18)
+
+- `ObservabilityRating`: GREEN for deterministic bundle identity, publication recovery matrix, certified default route, headless proof, and zero-new-failure local delta; RED for absent permanent artifact, immutable commit, hosted parity, exact-commit review, and push.
+- Identity sentinel: bundle hash `527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c`; file SHA-256 `a9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5`.
+- Artifact sentinel: required permanent path must exist and equal 55,774 canonical bytes; currently absent.
+- Default-authority sentinel: default function must contain one `render_gv_fs0_certified_bundle(st)` and zero replay/optimizer/lifecycle/YTD calls.
+- Recovery sentinel: no lock age/PID deletion; post-replace failure must retain `RECOVERY_REQUIRED`.
+- Test sentinel: 201/202 focused PASS; full-suite candidate failure set must remain a subset of exact `c37db09` baseline.
+- Custody sentinel: no shipment claim before exact commit + hosted Ubuntu/Windows parity + distinct A/B/C + push.
+- Boundary sentinel: no adjacent scope.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Observability (2026-07-18)
 
 - `ObservabilityRating`: GREEN for F1B exact economics, zero-intent boundary, two-attempt certification, deterministic identities, OPEN regression, exact commit custody, distinct A/B/C, and 189-test combined evidence; AMBER for inherited descendant process-tree hardening; RED/held for later gates and real authority.
 - Drift sentinel: any non-valuation source intent, non-null requested quantity, non-flat snapshot, action mismatch, or adapter-owned truth must fail F1B.

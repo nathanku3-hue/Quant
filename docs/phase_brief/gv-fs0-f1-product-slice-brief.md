@@ -1,30 +1,49 @@
 # Phase Brief: GV-FS0-F1 — Product Slice (Corrected)
 
-Mode: `EXECUTION_PACKET`
-Status: `P0_5_BANKED; V1_1_VERIFIER_IO_COMPAT_BANKED; F1A_BANKED_AND_CLOSED; F1B_BANKED_AND_CLOSED; F1C_F1D_UNOPENED`
-Date: 2026-07-18
-RoundID: `ROUND-20260718-GV-FS0-F1-PRODUCT-SLICE`
-ScopeID: `GV_FS0_F1_REPAIR_AND_SHIP_CURRENT_SLICE`
+## Active Addendum — F1C-SHIP Terminal Closeout T (2026-07-19)
+
+- **Authority**: owner GO SHIP F1C with mandatory two-SHA sequence repair.
+- **Transport C**: 48ad053dc21d7dda3c8280dcbd3c332584cc184a (runtime, permanent bundle, tests, workflow, default cutover).
+- **Transport C2**: 91b9bf1459439443298886ad6acc4a6181154431 (.gitattributes LF pin for Windows hosted parity).
+- **Hosted product CI**: run 29651784244 PASS — Ubuntu, Windows, Windows/Linux byte parity.
+- **Independent review**: distinct Reviewer A/B/C PASS on C and re-pin PASS on C2.
+- **Canonical bundle**: BUNDLE_527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c; 55,774 bytes; file SHA-256 9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5.
+- **Product meaning**: permanent two-role certified bundle is tracked; default Certified Portfolio route loads only permanent validated bytes; product CI is banked.
+- **Score**: official shipped-product score remains **39/100** (owner ceiling; no alpha/readiness promotion).
+- **Obsolete gate language**: standalone sequential F1C then F1D is revoked as an active gate. F1C-SHIP is the single product shipment that unifies permanent publication, default certified route, product CI, and independent closeout.
+- **Boundary**: no provider, real data, PEAD, broker/live capital, protocol redesign, historical suite repair, or main merge.
+- **Next action**: hold product-branch tip after T; open nothing else without a separate owner decision.
+
+## Prior Addendum — F1C-SHIP Local Candidate (2026-07-18) [superseded on shipment status]
+
+- Local implementer candidate recorded 201/202 and absent permanent artifact; superseded by materialization, C/C2 transport, hosted PASS, A/B/C PASS, and terminal T.
+
+Mode: CLOSURE_REPORT
+Status: P0_5_BANKED; F1A_CLOSED; F1B_CLOSED; F1C_SHIP_CLOSED_ON_PRODUCT_BRANCH; SCORE_39_RETAINED
+Date: 2026-07-19
+RoundID: ROUND-20260719-GV-FS0-F1C-SHIP-TERMINAL
+ScopeID: GV_FS0_F1C_SHIP_TWO_SHA_CLOSEOUT
 Authority:
-- `docs/architecture/godview_endgame_vision.md`
-- `docs/architecture/godview_portfolio_first_operating_model.md`
-- `docs/architecture/godview_portfolio_p0_owner_freeze.md`
-- `docs/architecture/top_level_roadmap.md` (GV-FS0-First; replaces obsolete UOE roadmap)
-- frozen protocol: `docs/architecture/gv_fs0_certification_and_data_authority_contract.md` (terminal freeze at `c007895`)
-- V1.1 verifier I/O: `docs/architecture/gv_fs0_protocol_v1_1_verifier_io.md` (engine compatibility only; frozen V1 schemas byte-immutable)
-- terminal freeze evidence: `docs/phase_brief/phase-E0-brief.md` (historical/terminal; do not rewrite)
-Hierarchy: L1 Terminal Zero; L2 active Backend product accounting + Frontend read-only presentation; L2 held Data admission / Research / PEAD / FS1; L3 flow P0 custody → **atomic P0.5 bank** → F1A OPEN vertical → F1B NO_POSITION → F1C permanent bundle → F1D both on default screen + product CI + full suite + A/B/C.
+- docs/architecture/godview_endgame_vision.md
+- docs/architecture/godview_portfolio_first_operating_model.md
+- docs/architecture/godview_portfolio_p0_owner_freeze.md
+- docs/architecture/top_level_roadmap.md (GV-FS0-First; replaces obsolete UOE roadmap)
+- frozen protocol: docs/architecture/gv_fs0_certification_and_data_authority_contract.md (terminal freeze at c007895)
+- V1.1 verifier I/O: docs/architecture/gv_fs0_protocol_v1_1_verifier_io.md (engine compatibility only; frozen V1 schemas byte-immutable)
+- terminal freeze evidence: docs/phase_brief/phase-E0-brief.md (historical/terminal; do not rewrite)
+Hierarchy: L1 Terminal Zero; L2 active Backend product accounting + Frontend read-only presentation; L2 held Data admission / Research / PEAD / FS1; L3 flow P0 custody → atomic P0.5 bank → F1A OPEN → F1B NO_POSITION → **F1C-SHIP** (permanent two-role bundle + default certified route + product CI + independent closeout). The historical F1C/F1D sequential labels below are retained only as archival description of earlier planning slices.
 
 ## Decision
 
-```text
+`	ext
 STRATEGY = REPAIR_AND_SHIP_CURRENT_SLICE
 PROTOCOL_REDESIGN = FORBIDDEN
 CURRENT_CHECKOUT_GIT_REPAIR = FORBIDDEN
 F1A = BANKED_AND_CLOSED at e156c66
 F1B = BANKED_AND_CLOSED at 4359f35; distinct Reviewer A/B/C and terminal SAW PASS
-SHIPPED_PRODUCT_SCORE = 39/100 (unchanged; F1C/F1D publication and default routing remain closed)
-```
+F1C_SHIP = CLOSED on product branch at closeout T after transport C/C2
+SHIPPED_PRODUCT_SCORE = 39/100 (owner ceiling retained; no alpha claim)
+`
 
 Audit verdict absorbed: `APPROVE_WITH_MANDATORY_REPAIR`, plus bankability repairs for P0.5 atomicity.
 
@@ -43,8 +62,7 @@ DecisionEnvelope
 → certification-reference event
 → certified decision result
 → final read-only Streamlit adapter (injected OPEN first; later both components)
-→ permanent two-component certified bundle (F1C)
-→ default screen reads permanent bundle (F1D)
+→ permanent two-component certified bundle + default certified route + product CI (F1C-SHIP)
 ```
 
 No allocation authority, providers, real data, MU/E0 research, benchmarks, optimizers, or GV-FS1.
@@ -75,7 +93,7 @@ PRODUCT_ROOT/
   views/gv_fs0_portfolio_adapter.py      # ONE final adapter (F1A+); injection-first
   .github/workflows/
     gv-fs0-protocol-freeze.yml           # leave protocol-only
-    gv-fs0-product.yml                   # NEW at F1D (or earlier CI bank if needed)
+    gv-fs0-product.yml                   # banked in F1C-SHIP product CI
 ```
 
 ## Atomic P0.5 bank (single reviewable commit)
@@ -118,8 +136,8 @@ P0   Clean execution custody at exact c007895
 P0.5 Atomic bank: three canons + revised roadmap + integrity + authority-chain + brief
 F1A  OPEN vertical end-to-end into ONE final adapter via injected OPEN presentation/snapshot/cert
 F1B  NO_POSITION through the identical implementation path (inject second component)
-F1C  Permanent two-component bundle publication with full recovery semantics
-F1D  Default screen reads permanent bundle; product CI; full suite; A/B/C + truth
+F1C-SHIP  Permanent two-component bundle + default certified route + product CI + independent closeout (active closed gate)
+F1C/F1D sequential labels  SUPERSEDED historical planning only
 ```
 
 ### F1A detail — OPEN only (starts only after P0.5 green)
@@ -209,7 +227,7 @@ Machine checks (P0.5 authority-chain + integrity):
 | Protocol freeze | `tests/test_gv_fs0_*.py` | `gv-fs0-protocol-freeze.yml` |
 | Product | `tests/gv_fs0_product/**` | `gv-fs0-product.yml` (add by F1D; protocol as regression) |
 
-## F1D A/B/C criteria
+## F1C-SHIP A/B/C criteria (was labeled F1D; sequential split revoked)
 
 | Reviewer | Domain | Must verify |
 |---|---|---|
@@ -279,7 +297,7 @@ F1A before atomic P0.5 green
 - [x] Distinct Reviewer A/B/C PASS against that exact commit; terminal SAW PASS
 - [x] Refresh and validate generated `current_context`
 
-F1C and F1D remain unopened.
+Historical note: F1C and F1D sequential unopened language is obsolete; F1C-SHIP is closed on the product branch.
 
 ## First Commands
 
@@ -293,4 +311,4 @@ python -c "import glob,pytest,sys; sys.exit(pytest.main(['-q',*glob.glob('tests/
 
 ## Next Action
 
-Stop before F1C. Preserve F1B commit/reviewer evidence and require a separate owner-authorized round before permanent publication or F1D routing.
+Next action: hold product-branch tip after F1C-SHIP closeout T. Do not open providers, PEAD, FS1, or main merge without a separate owner decision.

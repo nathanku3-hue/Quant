@@ -1,6 +1,26 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Alignment (2026-07-18)
+## Active Addendum — GV-FS0 F1C-SHIP Terminal Alignment (2026-07-19)
+
+- **What changed**: F1C-SHIP closed on product branch — permanent certified bundle + default certified route + product CI + independent closeout.
+- **Streams**: Backend/Frontend product path closed for this slice; Data admission/Research/PEAD/FS1 held.
+- **Current bottleneck**: none for F1C-SHIP. Later owner decision required for any adjacent scope.
+- **Next active stream**: none by default.
+
+
+# Post-Phase Alignment - Current
+
+## Active Addendum — GV-FS0 F1C-SHIP Local Alignment (2026-07-18)
+
+- **Backend/Product:** deterministic complete bundle and section-15 publisher/recovery path locally PASS.
+- **Frontend/UI:** default portfolio authority hard-cut to permanent certified bundle; both roles render headlessly; legacy replay remains non-certifying history only.
+- **CI/Ops:** zero-new-failure local comparison PASS; hosted product parity and push remain absent.
+- **Docs/Review:** local evidence and truth reconciled; immutable candidate and independent A/B/C remain unavailable.
+- **Data/Research:** unchanged and held.
+- **Current bottleneck:** artifact and Git/hosted/reviewer custody, not product design.
+- **Next active stream:** closure of F1C-SHIP only.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Alignment (2026-07-18)
 
 - **Backend/Strategy:** NO_POSITION shares the F1A book, reducer, verifier, certification, and result path; exact flat economics and fail-closed intent boundaries pass locally.
 - **Frontend/UI:** the final injected adapter renders both validated actions; default routing remains closed.

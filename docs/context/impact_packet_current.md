@@ -1,6 +1,28 @@
 # Impact Packet - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Impact (2026-07-18)
+## Active Addendum — GV-FS0 F1C-SHIP Terminal Impact (2026-07-19)
+
+- **Runtime impact**: core/gv_fs0_bundle.py, core/gv_fs0_publish.py, permanent bundle, adapter permanent-load path, default Certified Portfolio cutover, product workflow.
+- **Transport commits**: C 48ad053, C2 91b9bf1; closeout T docs/review/truth only.
+- **Hosted impact**: product CI 29651784244 PASS Ubuntu/Windows/parity.
+- **Untouched**: frozen contracts/verifier, providers, PEAD, FS1, main merge, historical suite repair.
+- **Score**: 39/100 retained.
+- **Open residual**: path-filter hygiene for .gitattributes; process-tree hardening Medium inherited.
+
+
+# Impact Packet - Current
+
+## Active Addendum — GV-FS0 F1C-SHIP Local Impact (2026-07-18)
+
+- **Runtime**: new pure bundle validator and publication controller; adapter loads permanent validated bytes; default dashboard route hard-replaced by certified bundle rendering.
+- **Tests**: new bundle/publication/recovery/default-authority suite; obsolete default replay/YTD/lifecycle assertions replaced without compatibility fallback.
+- **CI**: new Windows/Linux product parity workflow; not hosted-run yet.
+- **Artifact**: exact canonical bundle identity established, but `data/gv_fs0/gv_fs0_certified_bundle.json` remains absent.
+- **Regression**: 201/202 focused checks pass; candidate full-suite has zero new failures and one fewer inherited dashboard failure.
+- **Custody**: local detached worktree only; no commit, review pin, or push.
+- **Untouched**: frozen protocol, providers, real data, PEAD, benchmark/policy, broker/live capital, main, and GV-FS1.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Impact (2026-07-18)
 
 - **Base authority**: F1A terminal close `e156c66` on `codex/gv-fs0-f1-product`.
 - **Changed runtime**: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, and `views/gv_fs0_portfolio_adapter.py` now pass a separate NO_POSITION component through the same shared path while preserving OPEN regression.

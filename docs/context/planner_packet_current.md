@@ -1,6 +1,30 @@
 # Planner Packet - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Close (2026-07-18)
+## Active Addendum — GV-FS0 F1C-SHIP Terminal Closeout T (2026-07-19)
+
+- **Transport C**: 48ad053dc21d7dda3c8280dcbd3c332584cc184a — runtime/bundle/tests/workflow/default cutover (transport only).
+- **Transport C2**: 91b9bf1459439443298886ad6acc4a6181154431 — LF pin for Windows hosted parity.
+- **Hosted**: product CI run 29651784244 PASS (Ubuntu, Windows, byte parity).
+- **Review**: distinct A/B/C PASS on C; re-pin PASS on C2; terminal SAW PASS.
+- **Product**: permanent two-role certified bundle tracked; default Certified Portfolio reads only permanent bytes.
+- **Score**: 39/100 retained by owner ceiling.
+- **Recommended next step**: hold product-branch tip; do not open providers, PEAD, FS1, historical suite repair, or main merge.
+- **Do not begin**: protocol redesign, provider/real data, PEAD reopen, broker/live capital, GV-FS1, main merge.
+
+
+# Planner Packet - Current
+
+## Active Addendum — GV-FS0 F1C-SHIP Local Candidate (2026-07-18)
+
+- **Base**: exact clean `c37db09`; F1A/F1B identities preserved.
+- **Current state**: complete F1C-SHIP code path exists locally—two-role bundle, atomic publication/recovery, certified default route, headless proof, and product CI workflow.
+- **Evidence**: bundle `527c86b9...6282c`, 55,774 bytes, file SHA-256 `a9dda224...b96e5`; 201/202 focused checks pass; full-suite zero-new-failure delta PASS.
+- **Blockers**: tracked permanent bundle absent; candidate uncommitted; hosted parity, exact-commit A/B/C, and push not performed.
+- **Score**: 39/100 unchanged; local implementation is not shipped product.
+- **Recommended next step**: materialize exact permanent bytes, pass 202/202, bank immutable candidate, run hosted parity and A/B/C, then push only the product branch.
+- **Do not begin**: providers, real data, PEAD, benchmark/policy expansion, broker/live capital, protocol changes, main merge, or GV-FS1.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Close (2026-07-18)
 
 - **Current state**: F1B NO_POSITION is banked at `4359f35` on `codex/gv-fs0-f1-product` from exact F1A authority `e156c66` and independently closed.
 - **Evidence**: product 52/52, frozen protocol 137/137, combined 189/189 PASS; exact flat five-session economics, two attempts, all ten checks TRUE, deterministic bytes, and shared adapter injection PASS.

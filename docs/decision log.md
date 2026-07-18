@@ -1,3 +1,18 @@
+## 2026-07-19 — GV-FS0 F1C-SHIP Terminal Closeout
+
+- Decision: accept two-SHA shipment closeout on codex/gv-fs0-f1-product after hosted parity and exact-commit A/B/C.
+- Evidence: C 48ad053dc21d7dda3c8280dcbd3c332584cc184a, C2 91b9bf1459439443298886ad6acc4a6181154431, CI 29651784244, bundle 9dda224… / 55774.
+- Score: remain 39/100. No alpha/provider/FS1/main-merge authority.
+- Boundary: obsolete F1C/F1D sequential split is not active.
+
+## 2026-07-18 — GV-FS0 F1C-SHIP Local Implementation
+
+- Decision: execute the owner-authorized single F1C-SHIP vertical from exact base `c37db09`; revoke standalone F1C/F1D completion and all default replay/optimizer compatibility authority.
+- Delivered locally: complete deterministic bundle, section-15 atomic publication/recovery, permanent-bundle adapter load, certified default route, headless both-role proof, product parity workflow, and zero-new-failure full-suite comparison.
+- Identity: bundle `527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c`; 55,774 bytes; file SHA-256 `a9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5`.
+- Verdict: BLOCK shipment. Required tracked bundle is absent; focused boundary is 201/202; no immutable commit, hosted parity, exact-commit Reviewer A/B/C, or push exists.
+- Score: 39/100 unchanged. No provider, real data, PEAD, benchmark/policy, broker, protocol, main merge, or GV-FS1 authority.
+
 ## 2026-07-18 — GV-FS0 F1B NO_POSITION Terminal Close
 
 - Decision: accept exact implementation commit `4359f35` on `codex/gv-fs0-f1-product` and distinct Reviewer A/B/C PASS as terminal closure of F1B only.

@@ -1,4 +1,21 @@
+## 2026-07-19 GV-FS0 F1C-SHIP Terminal
+
+- Permanent two-role certified bundle tracked; default Certified Portfolio loads permanent bytes only.
+- Transport C 48ad053, C2 91b9bf1; hosted product CI 29651784244 PASS; A/B/C PASS; terminal SAW PASS.
+- Official score remains 39/100. Obsolete sequential F1C/F1D active-gate language removed.
+- Boundary: no provider/PEAD/FS1/main merge.
+
 # Feature Engineering Notes
+
+## 2026-07-18 GV-FS0 F1C-SHIP Formula Registry
+
+- Bundle preimage: `bundle_preimage := {schema_version, protocol_id, currency, components=[OPEN_complete_result, NO_POSITION_complete_result]}`.
+- Bundle identity: `bundle_hash := SHA256("GV-FS0:CERTIFIED_BUNDLE:V1\n" || canonical_document(bundle_preimage))`; `bundle_id := "BUNDLE_" || bundle_hash`.
+- Candidate identity: bundle hash `527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c`; file SHA-256 `a9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5`; byte length `55774`.
+- Publication compare: `current_bytes == candidate_bytes => IDEMPOTENT`; else `current_hash != observed_prebuild_hash => PUBLICATION_TARGET_CHANGED`; else atomic replacement may proceed.
+- Post-replace safety: any exact-byte/hash/schema reread failure yields `PUBLICATION_POST_REPLACE_VERIFICATION_FAILED` and converts the lock to durable `RECOVERY_REQUIRED`; recovery-record failure yields `PUBLICATION_RECOVERY_RECORD_FAILED` and retains the lock.
+- Regression rule: `candidate_failure_nodeids ⊆ baseline_c37db09_failure_nodeids`; candidate count is 105 vs baseline 106, therefore zero new failures.
+- Implementation paths: `core/gv_fs0_bundle.py`, `core/gv_fs0_publish.py`, `views/gv_fs0_portfolio_adapter.py`, and `dashboard.py`.
 
 ## 2026-07-18 GV-FS0 F1B NO_POSITION Formula Registry
 

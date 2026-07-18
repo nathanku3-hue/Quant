@@ -1,6 +1,21 @@
+## 2026-07-19
+- Mistake or miss: ordering commit→hosted→review→push is causally impossible; Windows CRLF also broke 55774 identity.
+- Root cause: hosted CI needs pushed workflow/commit; reviews need immutable SHA; Git autocrlf on Windows without attributes.
+- Fix applied: two-SHA pattern (C transport → hosted+A/B/C → T closeout); .gitattributes 	ext eol=lf for permanent bundle; workflow_dispatch on C2.
+- Guardrail: never claim shipment before push+hosted+A/B/C; pin exact-byte product artifacts with ol=lf; path-filters must include identity pins or use dispatch.
+- Evidence: 48ad053dc21d7dda3c8280dcbd3c332584cc184a / 91b9bf1459439443298886ad6acc4a6181154431 / CI 29651784244 / terminal SAW.
+
 # lessonss.md
 
 Last updated: 2026-07-18
+
+## 2026-07-18 Round Entry (A Visible Route Is Not Shipped Without Artifact Custody)
+- Date: 2026-07-18
+- Mistake or miss: component certification and even a locally passing default screen could be overread as shipment while the permanent tracked bundle, immutable commit, hosted parity, independent review, and push were absent.
+- Root cause: runtime construction, repository artifact custody, hosted reproducibility, review identity, and remote delivery are separate authorities.
+- Fix applied: implemented one F1C-SHIP vertical, kept the tracked-artifact assertion red, compared the entire suite to exact `c37db09`, and reconciled truth to BLOCK rather than inflating the 39/100 score.
+- Guardrail for next time: never move a shipped-product score from local runtime proof; require one exact artifact/commit/hosted-review/push chain and reject intermediate publication-only or compatibility milestones.
+- Evidence paths: `docs/context/e2e_evidence/gv_fs0_f1c_ship_local_validation_20260718.md`, `core/gv_fs0_bundle.py`, `core/gv_fs0_publish.py`, and `tests/gv_fs0_product/test_bundle_publication_and_default.py`.
 
 ## 2026-07-18 Round Entry (Bank Before Review and Preserve Dirty Sibling Custody)
 - Date: 2026-07-18

@@ -1,6 +1,41 @@
 # Done Checklist - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Done State (2026-07-18)
+## Active Addendum — GV-FS0 F1C-SHIP Terminal Checklist (2026-07-19)
+
+- [x] Exact permanent bundle materialized and tracked (55774 / 9dda224…).
+- [x] Focused product+protocol 202/202.
+- [x] Candidate C banked and pushed as transport (48ad053).
+- [x] C2 LF pin banked and pushed (91b9bf1).
+- [x] Hosted Ubuntu/Windows product proof + byte parity PASS (29651784244).
+- [x] Distinct Reviewer A/B/C PASS on C and re-pin C2.
+- [x] Terminal SAW PASS; obsolete F1C/F1D sequential active-gate language removed.
+- [x] Official score remains 39/100.
+- [ ] Provider/real data/PEAD/FS1/main merge — held; not authorized.
+
+Next action: hold product-branch tip; choose any later scope only by separate owner decision.
+
+
+# Done Checklist - Current
+
+## Active Addendum — GV-FS0 F1C-SHIP Local Done State (2026-07-18)
+
+- [x] Exact base `c37db09`; F1A/F1B identities unchanged.
+- [x] Deterministic complete OPEN + NO_POSITION bundle identity.
+- [x] Atomic publication and recovery matrix implemented with four frozen codes only.
+- [x] Default `Certified Portfolio` route reads permanent validated bundle only; no replay fallback.
+- [x] Headless two-role rendering PASS and dashboard startup read-only.
+- [x] Windows/Linux product parity workflow added.
+- [x] Full-suite zero-new-failure comparison PASS.
+- [ ] Permanent canonical bundle tracked at required path.
+- [ ] Focused boundary 202/202 PASS; currently 201/202.
+- [ ] Immutable implementation commit.
+- [ ] Hosted Windows/Linux parity PASS.
+- [ ] Distinct exact-commit Reviewer A/B/C and terminal SAW PASS.
+- [ ] Product branch pushed.
+
+Next action: complete the six unchecked custody/evidence items without opening adjacent scope.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Done State (2026-07-18)
 
 - [x] F1A banked and independently closed at `e156c66`.
 - [x] Separate NO_POSITION fixture/decision; quantity null; zero non-valuation source intents.

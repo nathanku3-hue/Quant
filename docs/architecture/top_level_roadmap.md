@@ -21,7 +21,26 @@ LIVE_TRADING_MONITORING = OUT_OF_SCOPE
 
 The only active implementation gate is **GV-FS0: one certified synthetic `OPEN` and one certified synthetic `NO_POSITION` through one new canonical book and one visible screen**.
 
-Current shipped-product score remains **39/100**. This documentation cutover changes no code, runtime evidence, provider status, data output, or financial-alpha evidence.
+Current shipped-product score remains **39/100**. F1C-SHIP is closed on product branch codex/gv-fs0-f1-product (permanent certified bundle + default certified route + product CI); no alpha claim. until one permanent tracked two-role bundle is the default visible portfolio authority on a pushed, hosted-parity, independently reviewed commit.
+
+## Active Shipment Gate — F1C-SHIP
+
+F1A `OPEN` and F1B `NO_POSITION` are terminal PASS at closeout `c37db09`. The former standalone F1C publication and F1D routing split is revoked. The only active gate is one atomic shipment vertical:
+
+```text
+complete deterministic bundle
+→ section-15 publication and recovery
+→ default Certified Portfolio route
+→ headless both-role proof
+→ hosted Windows/Linux byte parity
+→ zero new full-suite failures vs exact c37db09
+→ exact-commit Reviewer A/B/C
+→ product-branch push
+```
+
+Publication alone, an injected-unit-fixture screen, local-only parity, or an unpushed commit cannot close this gate. Backward compatibility with default replay/optimizer/lifecycle authority is prohibited. Inherited unrelated suite failures are fingerprinted, not repaired inside F1C-SHIP.
+
+Local implementation exists but remains blocked before shipment because the tracked permanent artifact, immutable commit, hosted evidence, exact-commit review, and push are absent.
 
 - Revised-plan quality: **9.2/10**.
 - Revoked six-stream execution plan: **5.8/10**.
