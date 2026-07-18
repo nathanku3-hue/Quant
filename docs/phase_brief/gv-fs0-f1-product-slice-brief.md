@@ -1,7 +1,7 @@
 # Phase Brief: GV-FS0-F1 — Product Slice (Corrected)
 
 Mode: `EXECUTION_PACKET`
-Status: `P0_5_ATOMIC_BANKED; F1A_AUTHORIZED_AFTER_GREEN_PRODUCT_SUITE`
+Status: `P0_5_BANKED; V1_1_VERIFIER_IO_COMPAT_BANKED; F1A_UNBLOCKED`
 Date: 2026-07-18
 RoundID: `ROUND-20260718-GV-FS0-F1-PRODUCT-SLICE`
 ScopeID: `GV_FS0_F1_REPAIR_AND_SHIP_CURRENT_SLICE`
@@ -11,6 +11,7 @@ Authority:
 - `docs/architecture/godview_portfolio_p0_owner_freeze.md`
 - `docs/architecture/top_level_roadmap.md` (GV-FS0-First; replaces obsolete UOE roadmap)
 - frozen protocol: `docs/architecture/gv_fs0_certification_and_data_authority_contract.md` (terminal freeze at `c007895`)
+- V1.1 verifier I/O: `docs/architecture/gv_fs0_protocol_v1_1_verifier_io.md` (engine compatibility only; frozen V1 schemas byte-immutable)
 - terminal freeze evidence: `docs/phase_brief/phase-E0-brief.md` (historical/terminal; do not rewrite)
 Hierarchy: L1 Terminal Zero; L2 active Backend product accounting + Frontend read-only presentation; L2 held Data admission / Research / PEAD / FS1; L3 flow P0 custody → **atomic P0.5 bank** → F1A OPEN vertical → F1B NO_POSITION → F1C permanent bundle → F1D both on default screen + product CI + full suite + A/B/C.
 
@@ -20,11 +21,13 @@ Hierarchy: L1 Terminal Zero; L2 active Backend product accounting + Frontend rea
 STRATEGY = REPAIR_AND_SHIP_CURRENT_SLICE
 PROTOCOL_REDESIGN = FORBIDDEN
 CURRENT_CHECKOUT_GIT_REPAIR = FORBIDDEN
-F1A = BLOCKED until atomic P0.5 commit is banked and green
+F1A = UNBLOCKED after V1.1 verifier I/O compatibility
 SHIPPED_PRODUCT_SCORE = 39/100 (unchanged until certified visible screen on final adapter)
 ```
 
 Audit verdict absorbed: `APPROVE_WITH_MANDATORY_REPAIR`, plus bankability repairs for P0.5 atomicity.
+
+**V1.1 blocker closed:** schema-valid `gv_fs0_verifier_input_v1` is accepted by `validation/gv_fs0_reconstruction.py`. Legacy `prices`/`events` inputs fail closed. Frozen V1 schemas under `contracts/gv_fs0/v1/` were already correct and remain byte-immutable (no freeze regen required).
 
 ## Endgame Intent
 
@@ -132,7 +135,7 @@ F1D  Default screen reads permanent bundle; product CI; full suite; A/B/C + trut
    + protocol bindings
    ```
    Never: primary generated events, book ledger, snapshots, certifications, components, or bundle data.
-5. Two supervised independent verifier attempts (`sys.executable -I` on **unchanged** `validation/gv_fs0_reconstruction.py`).
+5. Two supervised independent verifier attempts (`sys.executable -I` on V1.1-compatible `validation/gv_fs0_reconstruction.py` with schema-valid `gv_fs0_verifier_input_v1` only).
 6. Immutable `Fs0Certification`; CERTIFIED only if all ten checks TRUE.
 7. Certification-reference event + certified decision result + presentation projection.
 8. **Final adapter only:** `views/gv_fs0_portfolio_adapter.py` renders §16 fields from **injected** validated presentation/snapshot/certification objects (OPEN). No disposable temp route, no env-flag throwaway page, no second adapter to delete later. Permanent bundle is still forbidden until F1C (contract §14.2: no partial final bundle file).
@@ -255,4 +258,4 @@ python -c "import glob,pytest,sys; sys.exit(pytest.main(['-q',*glob.glob('tests/
 
 ## Next Action
 
-Bank atomic P0.5 commit. Then GO F1A immediately: final adapter + injected OPEN + frozen verifier untouched.
+GO F1A: final adapter + injected OPEN + schema-valid V1 verifier input into the V1.1 reconstruction engine.

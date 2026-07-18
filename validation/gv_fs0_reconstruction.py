@@ -4,10 +4,10 @@ Production-style invocation is exactly::
 
     <absolute sys.executable> -I -X utf8 <absolute script> --input <absolute file>
 
-This file preserves the reviewed synthetic OPEN/NO_POSITION reconstruction
-behaviour. Phase 1 changes are restricted to the V1 input parser, canonical
-stdout/stderr bytes, and domain-separated hashing boundary. It imports no
-repository module and writes no repository artifact.
+Protocol V1.1 verifier I/O compatibility: this engine accepts only schema-valid
+``gv_fs0_verifier_input_v1`` documents (source_prices + source_intents). Legacy
+``prices``/``events`` inputs are rejected. It imports no repository module and
+writes no repository artifact.
 """
 
 from __future__ import annotations
@@ -23,11 +23,12 @@ import sys
 import unicodedata
 from typing import Any, Iterable
 
-INPUT_SCHEMA_VERSION = "GV_FS0_RECON_INPUT_V1"
+INPUT_SCHEMA_VERSION = "gv_fs0_verifier_input_v1"
 ECONOMIC_SCHEMA_VERSION = "GV_FS0_ECONOMIC_PAYLOAD_V1"
-RESULT_SCHEMA_VERSION = "GV_FS0_RECONSTRUCTION_RESULT_V1"
+RESULT_SCHEMA_VERSION = "GV_FS0_RECONSTRUCTION_RESULT_V1_1"
 ERROR_SCHEMA_VERSION = "GV_FS0_RECONSTRUCTION_ERROR_V1"
-RECONSTRUCTION_ENGINE = "GV_FS0_STDLIB_ISOLATED_V1"
+RECONSTRUCTION_ENGINE = "GV_FS0_STDLIB_ISOLATED_V1_1"
+PROTOCOL_COMPAT_VERSION = "GV_FS0_PROTOCOL_V1_1_VERIFIER_IO"
 
 VERIFIER_INPUT_DOMAIN = "GV-FS0:VERIFIER_INPUT:V1"
 ECONOMIC_PAYLOAD_DOMAIN = "GV-FS0:ECONOMIC_PAYLOAD:V1"
@@ -37,6 +38,36 @@ MAX_INTEGER = 9_007_199_254_740_991
 INTEGER_TOKEN = re.compile(r"^(0|[1-9][0-9]*)$")
 DECIMAL_TOKEN = re.compile(r"^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$")
 EVENT_RANK = {"EXECUTION": 0, "DIVIDEND_EX": 1, "DIVIDEND_PAY": 2}
+ROOT_KEYS = {"schema_version", "protocol", "decision", "source_prices", "source_intents"}
+LEGACY_ROOT_KEYS = {"prices", "events"}
+PROTOCOL_KEYS = {"protocol_id", "fixture_id", "fixture_hash", "currency", "initial_cash"}
+DECISION_KEYS = {
+    "decision_id",
+    "decision_hash",
+    "authority",
+    "action",
+    "decision_timestamp",
+    "effective_timestamp",
+    "security_id",
+    "requested_sizing",
+    "rationale_reference",
+}
+PRICE_KEYS = {"security_id", "session", "price_timestamp", "close_price", "source_sequence"}
+INTENT_KEYS = {
+    "schema_version",
+    "source_intent_id",
+    "source_sequence",
+    "intent_type",
+    "effective_timestamp",
+    "session",
+    "security_id",
+    "quantity",
+    "execution_price",
+    "fee",
+    "dividend_amount_per_share",
+    "referenced_entitlement_source_intent_id",
+    "valuation_timestamp",
+}
 
 
 class ReconstructionError(ValueError):
@@ -316,155 +347,289 @@ def _timestamp(value: Any, context: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def _validate(payload: dict[str, Any]) -> dict[str, Any]:
-    root = _expect_keys(payload, {"schema_version", "protocol", "decision", "prices", "events"}, "root")
-    if root["schema_version"] != INPUT_SCHEMA_VERSION:
-        raise ReconstructionError("INPUT_SCHEMA_VERSION_UNSUPPORTED")
+def _nullable_text(value: Any, context: str) -> str | None:
+    if value is None:
+        return None
+    return _text(value, context)
 
-    protocol = _expect_keys(root["protocol"], {"protocol_id", "fixture_id", "currency", "initial_cash"}, "protocol")
-    protocol_id = _reference(protocol["protocol_id"], "protocol.protocol_id")
-    fixture_id = _reference(protocol["fixture_id"], "protocol.fixture_id")
-    currency = _text(protocol["currency"], "protocol.currency")
-    if currency != "USD":
-        raise ReconstructionError("FS0_CURRENCY_UNSUPPORTED", currency)
-    initial_cash = _decimal(protocol["initial_cash"], "protocol.initial_cash", positive=True)
 
-    decision = _expect_keys(
-        root["decision"],
-        {"decision_id", "authority", "action", "security_id", "decision_timestamp", "rationale_reference"},
-        "decision",
-    )
-    authority = _text(decision["authority"], "decision.authority")
-    action = _text(decision["action"], "decision.action")
-    if authority != "MANUAL_OWNER_PAPER":
-        raise ReconstructionError("DECISION_AUTHORITY_UNSUPPORTED", authority)
-    if action not in {"OPEN", "NO_POSITION"}:
-        raise ReconstructionError("DECISION_ACTION_UNSUPPORTED", action)
-    validated_decision = {
-        "decision_id": _reference(decision["decision_id"], "decision.decision_id"),
-        "authority": authority,
-        "action": action,
-        "security_id": _reference(decision["security_id"], "decision.security_id"),
-        "decision_timestamp": _timestamp(decision["decision_timestamp"], "decision.decision_timestamp"),
-        "rationale_reference": _reference(decision["rationale_reference"], "decision.rationale_reference"),
-    }
+def _nullable_decimal(value: Any, context: str, *, positive: bool = False) -> Decimal | None:
+    if value is None:
+        return None
+    return _decimal(value, context, positive=positive)
 
-    raw_prices = root["prices"]
-    if not isinstance(raw_prices, list) or not 5 <= len(raw_prices) <= 10:
-        raise ReconstructionError("FS0_PRICE_SESSION_COUNT_INVALID")
-    prices: list[dict[str, Any]] = []
-    prior: date | None = None
-    for index, raw_price in enumerate(raw_prices):
-        row = _expect_keys(raw_price, {"session", "security_id", "close"}, f"prices[{index}]")
-        session = _session(row["session"], f"prices[{index}].session")
-        if prior is not None and session <= prior:
-            raise ReconstructionError("PRICE_SESSIONS_NOT_STRICTLY_ORDERED", str(index))
-        prior = session
-        security_id = _reference(row["security_id"], f"prices[{index}].security_id")
-        if security_id != validated_decision["security_id"]:
-            raise ReconstructionError("PRICE_SECURITY_MISMATCH", str(index))
-        prices.append(
-            {
-                "session": session,
-                "session_text": session.isoformat(),
-                "security_id": security_id,
-                "close": _decimal(row["close"], f"prices[{index}].close", positive=True),
-            }
-        )
 
-    price_sessions = {row["session"] for row in prices}
-    raw_events = root["events"]
-    if not isinstance(raw_events, list):
-        raise ReconstructionError("EVENTS_LIST_REQUIRED")
-    events: list[dict[str, Any]] = []
+def _nullable_int(value: Any, context: str) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ReconstructionError("NONNEGATIVE_INTEGER_REQUIRED", context)
+    return value
+
+
+def _map_intents_to_events(
+    intents: list[dict[str, Any]],
+    *,
+    action: str,
+    security_id: str,
+    price_sessions: set[date],
+) -> list[dict[str, Any]]:
+    """Map original source intents to independent economic events (never primary ledger)."""
+    by_type: dict[str, list[dict[str, Any]]] = {}
     by_id: dict[str, dict[str, Any]] = {}
-    for index, raw_event in enumerate(raw_events):
-        if not isinstance(raw_event, dict):
-            raise ReconstructionError("SCHEMA_OBJECT_REQUIRED", f"events[{index}]")
-        event_id = _reference(raw_event.get("event_id"), f"events[{index}].event_id")
-        event_type = _text(raw_event.get("event_type"), f"events[{index}].event_type")
-        if event_type not in EVENT_RANK:
-            raise ReconstructionError("UNSUPPORTED_EVENT_TYPE", event_type)
-        if event_id in by_id:
-            if raw_event != by_id[event_id]:
-                raise ReconstructionError("CONFLICTING_DUPLICATE_EVENT", event_id)
+    for intent in intents:
+        intent_id = intent["source_intent_id"]
+        if intent_id in by_id:
+            if intent != by_id[intent_id]:
+                raise ReconstructionError("CONFLICTING_DUPLICATE_EVENT", intent_id)
             continue
-        by_id[event_id] = raw_event
-        if event_type == "EXECUTION":
-            event = _expect_keys(raw_event, {"event_id", "event_type", "session", "security_id", "shares", "price", "fee"}, f"events[{index}]")
-            validated = {
-                "event_id": event_id,
-                "event_type": event_type,
-                "session": _session(event["session"], f"events[{index}].session"),
-                "security_id": _reference(event["security_id"], f"events[{index}].security_id"),
-                "shares": _shares(event["shares"], f"events[{index}].shares"),
-                "price": _decimal(event["price"], f"events[{index}].price", positive=True),
-                "fee": _decimal(event["fee"], f"events[{index}].fee"),
-            }
-        elif event_type == "DIVIDEND_EX":
-            event = _expect_keys(raw_event, {"event_id", "event_type", "session", "security_id", "amount_per_share", "pay_session"}, f"events[{index}]")
-            validated = {
-                "event_id": event_id,
-                "event_type": event_type,
-                "session": _session(event["session"], f"events[{index}].session"),
-                "security_id": _reference(event["security_id"], f"events[{index}].security_id"),
-                "amount_per_share": _decimal(event["amount_per_share"], f"events[{index}].amount_per_share", positive=True),
-                "pay_session": _session(event["pay_session"], f"events[{index}].pay_session"),
-            }
-        else:
-            event = _expect_keys(raw_event, {"event_id", "event_type", "session", "security_id", "entitlement_event_id"}, f"events[{index}]")
-            validated = {
-                "event_id": event_id,
-                "event_type": event_type,
-                "session": _session(event["session"], f"events[{index}].session"),
-                "security_id": _reference(event["security_id"], f"events[{index}].security_id"),
-                "entitlement_event_id": _reference(event["entitlement_event_id"], f"events[{index}].entitlement_event_id"),
-            }
-        if validated["security_id"] != validated_decision["security_id"]:
-            raise ReconstructionError("EVENT_SECURITY_MISMATCH", event_id)
-        if validated["session"] not in price_sessions:
-            raise ReconstructionError("EVENT_SESSION_WITHOUT_PRICE", event_id)
-        events.append(validated)
+        by_id[intent_id] = intent
+        by_type.setdefault(intent["intent_type"], []).append(intent)
 
+    if action == "NO_POSITION":
+        if any(intent_type != "VALUATION_INSTRUCTION" for intent_type in by_type):
+            raise ReconstructionError("NO_POSITION_NON_VALUATION_INTENT_PROHIBITED")
+        if "EXECUTION_INTENT" in by_type:
+            raise ReconstructionError("NO_POSITION_EVENTS_PROHIBITED")
+        return []
+
+    executions = by_type.get("EXECUTION_INTENT", [])
+    fees = by_type.get("EXPLICIT_FEE", [])
+    declarations = by_type.get("DIVIDEND_DECLARATION", [])
+    payments = by_type.get("DIVIDEND_PAYMENT_INSTRUCTION", [])
+    valuations = by_type.get("VALUATION_INSTRUCTION", [])
+    if len(executions) != 1:
+        raise ReconstructionError("OPEN_REQUIRES_ONE_EXECUTION")
+    if len(fees) != 1:
+        raise ReconstructionError("OPEN_REQUIRES_ONE_EXPLICIT_FEE")
+    if len(declarations) != 1 or len(payments) != 1:
+        raise ReconstructionError("OPEN_REQUIRES_ONE_DIVIDEND_EX_AND_PAY")
+    if not valuations:
+        raise ReconstructionError("OPEN_REQUIRES_VALUATION_INSTRUCTION")
+
+    execution = executions[0]
+    fee = fees[0]
+    declaration = declarations[0]
+    payment = payments[0]
+    if execution["security_id"] != security_id or fee["security_id"] != security_id:
+        raise ReconstructionError("EVENT_SECURITY_MISMATCH", execution["source_intent_id"])
+    if declaration["security_id"] != security_id or payment["security_id"] != security_id:
+        raise ReconstructionError("EVENT_SECURITY_MISMATCH", declaration["source_intent_id"])
+    if execution["quantity"] is None or execution["execution_price"] is None:
+        raise ReconstructionError("EXECUTION_FIELDS_REQUIRED", execution["source_intent_id"])
+    if fee["fee"] is None:
+        raise ReconstructionError("FEE_FIELD_REQUIRED", fee["source_intent_id"])
+    if declaration["dividend_amount_per_share"] is None:
+        raise ReconstructionError("DIVIDEND_AMOUNT_REQUIRED", declaration["source_intent_id"])
+    if payment["referenced_entitlement_source_intent_id"] != declaration["source_intent_id"]:
+        raise ReconstructionError("DIVIDEND_ENTITLEMENT_REFERENCE_MISMATCH")
+    if execution["session"] != fee["session"]:
+        raise ReconstructionError("FEE_SESSION_MISMATCH", fee["source_intent_id"])
+    if execution["session"] not in price_sessions or declaration["session"] not in price_sessions:
+        raise ReconstructionError("EVENT_SESSION_WITHOUT_PRICE", execution["source_intent_id"])
+    if payment["session"] not in price_sessions:
+        raise ReconstructionError("EVENT_SESSION_WITHOUT_PRICE", payment["source_intent_id"])
+    if execution["session"] >= declaration["session"]:
+        raise ReconstructionError("EXECUTION_NOT_BEFORE_DIVIDEND_EX")
+    if declaration["session"] >= payment["session"]:
+        raise ReconstructionError("DIVIDEND_PAY_NOT_AFTER_EX")
+
+    events = [
+        {
+            "event_id": execution["source_intent_id"],
+            "event_type": "EXECUTION",
+            "session": execution["session"],
+            "security_id": security_id,
+            "shares": _shares(execution["quantity"], "execution.quantity"),
+            "price": execution["execution_price"],
+            "fee": fee["fee"],
+        },
+        {
+            "event_id": declaration["source_intent_id"],
+            "event_type": "DIVIDEND_EX",
+            "session": declaration["session"],
+            "security_id": security_id,
+            "amount_per_share": declaration["dividend_amount_per_share"],
+            "pay_session": payment["session"],
+        },
+        {
+            "event_id": payment["source_intent_id"],
+            "event_type": "DIVIDEND_PAY",
+            "session": payment["session"],
+            "security_id": security_id,
+            "entitlement_event_id": declaration["source_intent_id"],
+        },
+    ]
     prior_key: tuple[date, int] | None = None
     for event in events:
         key = (event["session"], EVENT_RANK[event["event_type"]])
         if prior_key is not None and key < prior_key:
             raise ReconstructionError("EVENTS_OUT_OF_ORDER", event["event_id"])
         prior_key = key
+    return events
 
-    execution = [event for event in events if event["event_type"] == "EXECUTION"]
-    declarations = [event for event in events if event["event_type"] == "DIVIDEND_EX"]
-    payments = [event for event in events if event["event_type"] == "DIVIDEND_PAY"]
-    if action == "NO_POSITION":
-        if events:
-            raise ReconstructionError("NO_POSITION_EVENTS_PROHIBITED")
-    else:
-        if len(execution) != 1:
-            raise ReconstructionError("OPEN_REQUIRES_ONE_EXECUTION")
-        if len(declarations) != 1 or len(payments) != 1:
-            raise ReconstructionError("OPEN_REQUIRES_ONE_DIVIDEND_EX_AND_PAY")
-        declaration = declarations[0]
-        payment = payments[0]
-        if execution[0]["session"] >= declaration["session"]:
-            raise ReconstructionError("EXECUTION_NOT_BEFORE_DIVIDEND_EX")
-        if declaration["session"] >= declaration["pay_session"]:
-            raise ReconstructionError("DIVIDEND_PAY_NOT_AFTER_EX")
-        if payment["session"] != declaration["pay_session"]:
-            raise ReconstructionError("DIVIDEND_PAY_SESSION_MISMATCH")
-        if payment["entitlement_event_id"] != declaration["event_id"]:
-            raise ReconstructionError("DIVIDEND_ENTITLEMENT_REFERENCE_MISMATCH")
+
+def _validate(payload: dict[str, Any]) -> dict[str, Any]:
+    if any(key in payload for key in LEGACY_ROOT_KEYS):
+        raise ReconstructionError(
+            "LEGACY_VERIFIER_INPUT_PROHIBITED",
+            "Protocol V1.1 rejects legacy prices/events; use source_prices/source_intents",
+        )
+    root = _expect_keys(payload, ROOT_KEYS, "root")
+    if root["schema_version"] != INPUT_SCHEMA_VERSION:
+        raise ReconstructionError("INPUT_SCHEMA_VERSION_UNSUPPORTED")
+
+    protocol = _expect_keys(root["protocol"], PROTOCOL_KEYS, "protocol")
+    protocol_id = _reference(protocol["protocol_id"], "protocol.protocol_id")
+    if protocol_id != "GV_FS0_PROTOCOL_V1":
+        raise ReconstructionError("PROTOCOL_ID_UNSUPPORTED", protocol_id)
+    fixture_id = _reference(protocol["fixture_id"], "protocol.fixture_id")
+    fixture_hash = _text(protocol["fixture_hash"], "protocol.fixture_hash")
+    if not re.fullmatch(r"[0-9a-f]{64}", fixture_hash):
+        raise ReconstructionError("FIXTURE_HASH_INVALID", fixture_hash)
+    currency = _text(protocol["currency"], "protocol.currency")
+    if currency != "USD":
+        raise ReconstructionError("FS0_CURRENCY_UNSUPPORTED", currency)
+    initial_cash = _decimal(protocol["initial_cash"], "protocol.initial_cash", positive=True)
+
+    decision = _expect_keys(root["decision"], DECISION_KEYS, "decision")
+    authority = _text(decision["authority"], "decision.authority")
+    action = _text(decision["action"], "decision.action")
+    if authority != "MANUAL_OWNER_PAPER":
+        raise ReconstructionError("DECISION_AUTHORITY_UNSUPPORTED", authority)
+    if action not in {"OPEN", "NO_POSITION"}:
+        raise ReconstructionError("DECISION_ACTION_UNSUPPORTED", action)
+    decision_hash = _text(decision["decision_hash"], "decision.decision_hash")
+    if not re.fullmatch(r"[0-9a-f]{64}", decision_hash):
+        raise ReconstructionError("DECISION_HASH_INVALID", decision_hash)
+    sizing = _expect_keys(decision["requested_sizing"], {"quantity"}, "decision.requested_sizing")
+    _nullable_int(sizing["quantity"], "decision.requested_sizing.quantity")
+    validated_decision = {
+        "decision_id": _reference(decision["decision_id"], "decision.decision_id"),
+        "decision_hash": decision_hash,
+        "authority": authority,
+        "action": action,
+        "security_id": _reference(decision["security_id"], "decision.security_id"),
+        "decision_timestamp": _timestamp(decision["decision_timestamp"], "decision.decision_timestamp"),
+        "effective_timestamp": _timestamp(decision["effective_timestamp"], "decision.effective_timestamp"),
+        "rationale_reference": _reference(decision["rationale_reference"], "decision.rationale_reference"),
+    }
+
+    raw_prices = root["source_prices"]
+    if not isinstance(raw_prices, list) or not 5 <= len(raw_prices) <= 10:
+        raise ReconstructionError("FS0_PRICE_SESSION_COUNT_INVALID")
+    ordered_prices = sorted(
+        enumerate(raw_prices),
+        key=lambda item: (
+            item[1].get("source_sequence") if isinstance(item[1], dict) else -1,
+            item[0],
+        ),
+    )
+    prices: list[dict[str, Any]] = []
+    prior: date | None = None
+    seen_sequences: set[int] = set()
+    for index, raw_price in ordered_prices:
+        row = _expect_keys(raw_price, PRICE_KEYS, f"source_prices[{index}]")
+        sequence = row["source_sequence"]
+        if isinstance(sequence, bool) or not isinstance(sequence, int) or sequence < 0:
+            raise ReconstructionError("SOURCE_SEQUENCE_INVALID", f"source_prices[{index}]")
+        if sequence in seen_sequences:
+            raise ReconstructionError("DUPLICATE_SOURCE_SEQUENCE", str(sequence))
+        seen_sequences.add(sequence)
+        session = _session(row["session"], f"source_prices[{index}].session")
+        if prior is not None and session <= prior:
+            raise ReconstructionError("PRICE_SESSIONS_NOT_STRICTLY_ORDERED", str(index))
+        prior = session
+        security_id = _reference(row["security_id"], f"source_prices[{index}].security_id")
+        if security_id != validated_decision["security_id"]:
+            raise ReconstructionError("PRICE_SECURITY_MISMATCH", str(index))
+        price_timestamp = _timestamp(row["price_timestamp"], f"source_prices[{index}].price_timestamp")
+        if price_timestamp.date() != session:
+            raise ReconstructionError("PRICE_TIMESTAMP_SESSION_MISMATCH", str(index))
+        prices.append(
+            {
+                "session": session,
+                "session_text": session.isoformat(),
+                "security_id": security_id,
+                "close": _decimal(row["close_price"], f"source_prices[{index}].close_price", positive=True),
+            }
+        )
+
+    price_sessions = {row["session"] for row in prices}
+    raw_intents = root["source_intents"]
+    if not isinstance(raw_intents, list):
+        raise ReconstructionError("SOURCE_INTENTS_LIST_REQUIRED")
+    intents: list[dict[str, Any]] = []
+    for index, raw_intent in enumerate(raw_intents):
+        row = _expect_keys(raw_intent, INTENT_KEYS, f"source_intents[{index}]")
+        if row["schema_version"] != "gv_fs0_source_intent_v1":
+            raise ReconstructionError("SOURCE_INTENT_SCHEMA_UNSUPPORTED", f"source_intents[{index}]")
+        intent_type = _text(row["intent_type"], f"source_intents[{index}].intent_type")
+        if intent_type not in {
+            "EXECUTION_INTENT",
+            "EXPLICIT_FEE",
+            "DIVIDEND_DECLARATION",
+            "DIVIDEND_PAYMENT_INSTRUCTION",
+            "VALUATION_INSTRUCTION",
+        }:
+            raise ReconstructionError("UNSUPPORTED_INTENT_TYPE", intent_type)
+        sequence = row["source_sequence"]
+        if isinstance(sequence, bool) or not isinstance(sequence, int) or sequence < 0:
+            raise ReconstructionError("SOURCE_SEQUENCE_INVALID", f"source_intents[{index}]")
+        session = _session(row["session"], f"source_intents[{index}].session")
+        security = _reference(row["security_id"], f"source_intents[{index}].security_id")
+        intents.append(
+            {
+                "source_intent_id": _reference(row["source_intent_id"], f"source_intents[{index}].source_intent_id"),
+                "source_sequence": sequence,
+                "intent_type": intent_type,
+                "effective_timestamp": _timestamp(
+                    row["effective_timestamp"], f"source_intents[{index}].effective_timestamp"
+                ),
+                "session": session,
+                "security_id": security,
+                "quantity": _nullable_int(row["quantity"], f"source_intents[{index}].quantity"),
+                "execution_price": _nullable_decimal(
+                    row["execution_price"], f"source_intents[{index}].execution_price", positive=True
+                ),
+                "fee": _nullable_decimal(row["fee"], f"source_intents[{index}].fee"),
+                "dividend_amount_per_share": _nullable_decimal(
+                    row["dividend_amount_per_share"],
+                    f"source_intents[{index}].dividend_amount_per_share",
+                    positive=True,
+                ),
+                "referenced_entitlement_source_intent_id": _nullable_text(
+                    row["referenced_entitlement_source_intent_id"],
+                    f"source_intents[{index}].referenced_entitlement_source_intent_id",
+                ),
+                "valuation_timestamp": (
+                    None
+                    if row["valuation_timestamp"] is None
+                    else _timestamp(row["valuation_timestamp"], f"source_intents[{index}].valuation_timestamp")
+                ),
+            }
+        )
+
+    events = _map_intents_to_events(
+        intents,
+        action=action,
+        security_id=validated_decision["security_id"],
+        price_sessions=price_sessions,
+    )
 
     first_session = prices[0]["session"]
     if validated_decision["decision_timestamp"].date() > first_session:
         raise ReconstructionError("DECISION_AFTER_FIRST_SESSION")
-    if action == "OPEN" and validated_decision["decision_timestamp"].date() >= execution[0]["session"]:
-        raise ReconstructionError("DECISION_NOT_BEFORE_EXECUTION_SESSION")
+    if action == "OPEN":
+        execution = next(event for event in events if event["event_type"] == "EXECUTION")
+        if validated_decision["decision_timestamp"].date() >= execution["session"]:
+            raise ReconstructionError("DECISION_NOT_BEFORE_EXECUTION_SESSION")
 
     return {
         "protocol": {
             "protocol_id": protocol_id,
             "fixture_id": fixture_id,
+            "fixture_hash": fixture_hash,
             "currency": currency,
             "initial_cash": initial_cash,
         },
@@ -560,11 +725,13 @@ def _result(payload: dict[str, Any], input_hash: str) -> dict[str, Any]:
         "input_hash": input_hash,
         "isolation": {
             "artifact_output": "STDOUT_ONLY",
-            "input_contract": "ORIGINAL_CANONICAL_JSON_ONLY",
+            "input_contract": "GV_FS0_VERIFIER_INPUT_V1_ONLY",
+            "legacy_prices_events": "PROHIBITED",
             "primary_intermediate_artifacts": "PROHIBITED",
             "python_isolated_mode": True,
             "repository_imports": "PROHIBITED",
         },
+        "protocol_compat_version": PROTOCOL_COMPAT_VERSION,
         "reconstruction_engine": RECONSTRUCTION_ENGINE,
         "schema_version": RESULT_SCHEMA_VERSION,
     }

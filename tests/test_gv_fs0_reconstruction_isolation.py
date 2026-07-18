@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import ast
 import copy
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -21,59 +20,124 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = (ROOT / "validation/gv_fs0_reconstruction.py").resolve()
 
 
+def _intent(
+    intent_type: str,
+    sequence: int,
+    *,
+    session: str,
+    security_id: str = "SEC_1",
+    quantity: int | None = None,
+    execution_price: str | None = None,
+    fee: str | None = None,
+    dividend_amount_per_share: str | None = None,
+    referenced_entitlement_source_intent_id: str | None = None,
+    valuation_timestamp: str | None = None,
+    effective_timestamp: str | None = None,
+) -> dict:
+    stamp = effective_timestamp or f"{session}T14:30:00.000000Z"
+    return {
+        "schema_version": "gv_fs0_source_intent_v1",
+        "source_intent_id": f"{intent_type}:{sequence}",
+        "source_sequence": sequence,
+        "intent_type": intent_type,
+        "effective_timestamp": stamp,
+        "session": session,
+        "security_id": security_id,
+        "quantity": quantity,
+        "execution_price": execution_price,
+        "fee": fee,
+        "dividend_amount_per_share": dividend_amount_per_share,
+        "referenced_entitlement_source_intent_id": referenced_entitlement_source_intent_id,
+        "valuation_timestamp": valuation_timestamp,
+    }
+
+
+def _prices() -> list[dict]:
+    rows = [
+        ("2026-07-13", "10", 0),
+        ("2026-07-14", "11", 1),
+        ("2026-07-15", "12", 2),
+        ("2026-07-16", "13", 3),
+        ("2026-07-17", "14", 4),
+    ]
+    return [
+        {
+            "security_id": "SEC_1",
+            "session": session,
+            "price_timestamp": f"{session}T20:00:00.000000Z",
+            "close_price": close,
+            "source_sequence": sequence,
+        }
+        for session, close, sequence in rows
+    ]
+
+
 def _payload(action: str = "OPEN") -> dict:
-    events = []
     if action == "OPEN":
-        events = [
-            {
-                "event_id": "EXECUTION:1",
-                "event_type": "EXECUTION",
-                "fee": "1",
-                "price": "10",
-                "security_id": "SEC_1",
-                "session": "2026-07-14",
-                "shares": 10,
-            },
-            {
-                "amount_per_share": "0.5",
-                "event_id": "DIVIDEND:EX_1",
-                "event_type": "DIVIDEND_EX",
-                "pay_session": "2026-07-16",
-                "security_id": "SEC_1",
-                "session": "2026-07-15",
-            },
-            {
-                "entitlement_event_id": "DIVIDEND:EX_1",
-                "event_id": "DIVIDEND:PAY_1",
-                "event_type": "DIVIDEND_PAY",
-                "security_id": "SEC_1",
-                "session": "2026-07-16",
-            },
+        intents = [
+            _intent(
+                "EXECUTION_INTENT",
+                0,
+                session="2026-07-14",
+                quantity=10,
+                execution_price="10",
+            ),
+            _intent("EXPLICIT_FEE", 1, session="2026-07-14", fee="1"),
+            _intent(
+                "DIVIDEND_DECLARATION",
+                2,
+                session="2026-07-15",
+                dividend_amount_per_share="0.5",
+            ),
+            _intent(
+                "DIVIDEND_PAYMENT_INSTRUCTION",
+                3,
+                session="2026-07-16",
+                referenced_entitlement_source_intent_id="DIVIDEND_DECLARATION:2",
+            ),
+            _intent(
+                "VALUATION_INSTRUCTION",
+                4,
+                session="2026-07-17",
+                valuation_timestamp="2026-07-17T20:00:00.000000Z",
+                effective_timestamp="2026-07-17T20:00:00.000000Z",
+            ),
+        ]
+    else:
+        intents = [
+            _intent(
+                "VALUATION_INSTRUCTION",
+                sequence,
+                session=session,
+                valuation_timestamp=f"{session}T20:00:00.000000Z",
+                effective_timestamp=f"{session}T20:00:00.000000Z",
+            )
+            for sequence, session in enumerate(
+                ["2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17"]
+            )
         ]
     return {
-        "decision": {
-            "action": action,
-            "authority": "MANUAL_OWNER_PAPER",
-            "decision_id": f"DECISION_{action}",
-            "decision_timestamp": "2026-07-12T00:00:00.000000Z",
-            "rationale_reference": f"RATIONALE:{action}",
-            "security_id": "SEC_1",
-        },
-        "events": events,
-        "prices": [
-            {"close": "10", "security_id": "SEC_1", "session": "2026-07-13"},
-            {"close": "11", "security_id": "SEC_1", "session": "2026-07-14"},
-            {"close": "12", "security_id": "SEC_1", "session": "2026-07-15"},
-            {"close": "13", "security_id": "SEC_1", "session": "2026-07-16"},
-            {"close": "14", "security_id": "SEC_1", "session": "2026-07-17"},
-        ],
+        "schema_version": "gv_fs0_verifier_input_v1",
         "protocol": {
-            "currency": "USD",
-            "fixture_id": f"FIXTURE_{action}",
-            "initial_cash": "1000",
             "protocol_id": "GV_FS0_PROTOCOL_V1",
+            "fixture_id": f"FIXTURE_{action}",
+            "fixture_hash": "a" * 64,
+            "currency": "USD",
+            "initial_cash": "1000",
         },
-        "schema_version": "GV_FS0_RECON_INPUT_V1",
+        "decision": {
+            "decision_id": f"DECISION_{action}",
+            "decision_hash": "b" * 64,
+            "authority": "MANUAL_OWNER_PAPER",
+            "action": action,
+            "decision_timestamp": "2026-07-12T00:00:00.000000Z",
+            "effective_timestamp": "2026-07-12T00:00:00.000000Z",
+            "security_id": "SEC_1",
+            "requested_sizing": {"quantity": 10 if action == "OPEN" else None},
+            "rationale_reference": f"RATIONALE:{action}",
+        },
+        "source_prices": _prices(),
+        "source_intents": intents,
     }
 
 
@@ -115,6 +179,8 @@ def test_open_reconstruction_preserves_reviewed_synthetic_economics(tmp_path: Pa
     assert economic["sessions"][2]["receivables"] == "5"
     assert economic["sessions"][3]["cash"] == "904"
     assert economic["final_state"]["nav"] == "1044"
+    assert output["protocol_compat_version"] == "GV_FS0_PROTOCOL_V1_1_VERIFIER_IO"
+    assert output["reconstruction_engine"] == "GV_FS0_STDLIB_ISOLATED_V1_1"
 
 
 def test_no_position_preserves_all_cash_with_zero_events(tmp_path: Path) -> None:
@@ -145,21 +211,45 @@ def test_two_runs_produce_identical_stdout_bytes(tmp_path: Path) -> None:
     assert first.stdout == second.stdout
 
 
-def test_exact_duplicate_events_are_idempotent(tmp_path: Path) -> None:
+def test_exact_duplicate_intents_are_idempotent(tmp_path: Path) -> None:
     payload = _payload()
-    payload["events"].insert(1, copy.deepcopy(payload["events"][0]))
+    payload["source_intents"].insert(1, copy.deepcopy(payload["source_intents"][0]))
     duplicate = _success(_run(tmp_path, payload))
     baseline = _success(_run(tmp_path, _payload()))
     assert duplicate["economic_payload"] == baseline["economic_payload"]
 
 
-def test_conflicting_duplicate_event_blocks(tmp_path: Path) -> None:
+def test_conflicting_duplicate_intent_blocks(tmp_path: Path) -> None:
     payload = _payload()
-    conflict = copy.deepcopy(payload["events"][0])
-    conflict["shares"] = 11
-    payload["events"].insert(1, conflict)
+    conflict = copy.deepcopy(payload["source_intents"][0])
+    conflict["quantity"] = 11
+    payload["source_intents"].insert(1, conflict)
     failure = _failure(_run(tmp_path, payload))
     assert failure["failure_reasons"] == ["CONFLICTING_DUPLICATE_EVENT"]
+
+
+def test_legacy_prices_events_input_is_rejected(tmp_path: Path) -> None:
+    payload = {
+        "schema_version": "GV_FS0_RECON_INPUT_V1",
+        "protocol": {
+            "protocol_id": "GV_FS0_PROTOCOL_V1",
+            "fixture_id": "FIXTURE_OPEN",
+            "currency": "USD",
+            "initial_cash": "1000",
+        },
+        "decision": {
+            "decision_id": "DECISION_OPEN",
+            "authority": "MANUAL_OWNER_PAPER",
+            "action": "OPEN",
+            "security_id": "SEC_1",
+            "decision_timestamp": "2026-07-12T00:00:00.000000Z",
+            "rationale_reference": "RATIONALE:OPEN",
+        },
+        "prices": [{"close": "10", "security_id": "SEC_1", "session": "2026-07-13"}],
+        "events": [],
+    }
+    failure = _failure(_run(tmp_path, payload))
+    assert failure["failure_reasons"] == ["LEGACY_VERIFIER_INPUT_PROHIBITED"]
 
 
 def test_noncanonical_input_whitespace_blocks(tmp_path: Path) -> None:
@@ -194,7 +284,7 @@ def test_unknown_input_field_blocks_fail_closed(tmp_path: Path) -> None:
 
 def test_negative_cash_blocks(tmp_path: Path) -> None:
     payload = _payload()
-    payload["events"][0]["shares"] = 1000
+    payload["source_intents"][0]["quantity"] = 1000
     failure = _failure(_run(tmp_path, payload))
     assert failure["failure_reasons"] == ["NEGATIVE_CASH_BLOCKED"]
 
@@ -222,6 +312,7 @@ def test_isolated_process_ignores_hostile_pythonpath(tmp_path: Path) -> None:
     env["PYTHONPATH"] = str(hostile)
     output = _success(_run(tmp_path, _payload(), env=env))
     assert output["isolation"]["python_isolated_mode"] is True
+    assert output["isolation"]["legacy_prices_events"] == "PROHIBITED"
 
 
 def test_ast_is_standard_library_only_and_has_no_import_escape_hatches() -> None:
