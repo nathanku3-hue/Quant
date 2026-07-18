@@ -1,9 +1,16 @@
-## 2026-07-18 — GV-FS0 F1B NO_POSITION Local Implementation
+## 2026-07-18 — GV-FS0 F1B NO_POSITION Terminal Close
+
+- Decision: accept exact implementation commit `4359f35` on `codex/gv-fs0-f1-product` and distinct Reviewer A/B/C PASS as terminal closure of F1B only.
+- Evidence: product 52/52, frozen protocol 137/137, combined 189/189; exact OPEN regression; five flat NO_POSITION sessions; two isolated attempts; canonical SHA-256 `06575d9bbed68acf53caf776bab35f95491b069981189709cd0f23f2559243b9`; fresh generated context validation PASS.
+- Open risk: descendant process-tree termination hardening remains inherited Medium and outside F1B; the frozen verifier has no descendant-spawn path.
+- Boundary: stop before F1C. No permanent bundle, default routing, hosted product CI/full-suite closeout, provider, real data, broker/live capital, or FS1 authority.
+
+## 2026-07-18 — GV-FS0 F1B NO_POSITION Local Implementation (superseded on closure status)
 
 - Decision: implement F1B only from terminal F1A authority `e156c66`, using one shared fixture/decision/book/reducer/verifier/certification/result/adapter path rather than a parallel NO_POSITION architecture.
 - Decision: make zero non-valuation source intents and null requested quantity machine-enforced preconditions for NO_POSITION.
 - Evidence: five flat sessions at cash/NAV `1000`; exactly two verifier attempts; all ten checks TRUE; product 52/52, protocol 137/137, combined 189/189 PASS; canonical result SHA-256 `06575d9bbed68acf53caf776bab35f95491b069981189709cd0f23f2559243b9`.
-- Closure: local implementation PASS, terminal SAW BLOCK because exact F1B commit custody and distinct Reviewer A/B/C are absent in this run.
+- Closure: this pre-bank BLOCK is superseded by the terminal close above; retained as local execution history.
 - Boundary: no F1C permanent publication, F1D default routing/hosted parity/full-suite repair, providers, real data, PEAD, broker/live capital, or FS1.
 
 ## 2026-07-18 — GV-FS0 F1A Terminal Close

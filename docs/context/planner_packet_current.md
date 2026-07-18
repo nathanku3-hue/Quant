@@ -1,11 +1,11 @@
 # Planner Packet - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Implemented Locally (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Close (2026-07-18)
 
-- **Current state**: F1A is banked and independently closed at `e156c66`; F1B NO_POSITION is implemented in a clean managed worktree based exactly there.
+- **Current state**: F1B NO_POSITION is banked at `4359f35` on `codex/gv-fs0-f1-product` from exact F1A authority `e156c66` and independently closed.
 - **Evidence**: product 52/52, frozen protocol 137/137, combined 189/189 PASS; exact flat five-session economics, two attempts, all ten checks TRUE, deterministic bytes, and shared adapter injection PASS.
-- **Closure blocker**: F1B has no exact banked commit and no distinct Reviewer A/B/C review in this run; terminal SAW is BLOCK.
-- **Recommended next step**: bank F1B only on `codex/gv-fs0-f1-product`, run distinct A/B/C against that commit, reconcile any in-scope Critical/High finding, then stop.
+- **Closure evidence**: distinct Reviewer A/B/C PASS on exact commit `4359f35`; generated current context is fresh and validates; terminal SAW is PASS.
+- **Recommended next step**: stop before F1C. Permanent two-component publication requires a separate owner-authorized round.
 - **Do not begin**: F1C permanent publication, F1D default routing/hosted parity/full-suite closeout, providers, real data, PEAD, broker/live capital, or GV-FS1.
 
 ## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)

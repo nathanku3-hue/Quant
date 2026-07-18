@@ -1,6 +1,6 @@
 # Done Checklist - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Local Done State (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Done State (2026-07-18)
 
 - [x] F1A banked and independently closed at `e156c66`.
 - [x] Separate NO_POSITION fixture/decision; quantity null; zero non-valuation source intents.
@@ -9,11 +9,12 @@
 - [x] Two isolated attempts; all ten certification checks TRUE; deterministic canonical bytes.
 - [x] Product 52/52, protocol 137/137, combined 189/189 PASS.
 - [x] No F1C/F1D publication/default-route/provider/data/FS1 action.
-- [ ] Exact F1B commit banked on named product branch.
-- [ ] Distinct Reviewer A/B/C PASS against exact F1B commit.
-- [ ] F1C/F1D remain closed.
+- [x] Exact F1B commit `4359f35` banked on `codex/gv-fs0-f1-product`.
+- [x] Distinct Reviewer A/B/C PASS against exact F1B commit; terminal SAW PASS.
+- [x] Generated `current_context` refreshed and validated.
+- [x] F1C/F1D remain closed.
 
-Next action: bank F1B only and run distinct A/B/C; stop before F1C.
+Next action: stop before F1C; require separate owner authorization before permanent publication.
 
 ## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
 

@@ -1,17 +1,17 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Local Coordination (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Coordination (2026-07-18)
 
 | Stream | Current status | Handoff / boundary |
 |---|---|---|
-| Backend/Strategy | F1A PASS; F1B NO_POSITION local implementation PASS | Bank exact F1B commit; no F1C publication |
-| Frontend/UI | Same injected adapter renders OPEN and NO_POSITION locally | No default bundle loading until F1D |
+| Backend/Strategy | F1A PASS; F1B PASS at `4359f35` | Preserve exact component identities; no F1C publication |
+| Frontend/UI | Same injected adapter renders OPEN and NO_POSITION | No default bundle loading until F1D |
 | Data/Research | Held | No provider, real data, PEAD, ranking, or FS1 authority |
-| Docs/Ops | Evidence/truth reconciled; SAW BLOCK | Distinct Reviewer A/B/C required on exact commit |
+| Docs/Ops | Distinct A/B/C, fresh context, and terminal SAW PASS | Stop before F1C |
 
 - Cross-stream rule: F1B is an in-memory second certified component, not bundle publication or product shipment authority.
 - Regression evidence: product 52/52, protocol 137/137, combined 189/189 PASS.
-- Next action: bank F1B only, run distinct A/B/C, and stop before F1C.
+- Next action: hold. F1C requires a separate owner-authorized round.
 
 ## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
 

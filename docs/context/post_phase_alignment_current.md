@@ -1,13 +1,13 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Local Alignment (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Alignment (2026-07-18)
 
 - **Backend/Strategy:** NO_POSITION shares the F1A book, reducer, verifier, certification, and result path; exact flat economics and fail-closed intent boundaries pass locally.
 - **Frontend/UI:** the final injected adapter renders both validated actions; default routing remains closed.
 - **Data/Research:** unchanged and held; no provider or real-data authority.
-- **Docs/Ops:** F1B plan, evidence, audit disposition, and SAW BLOCK recorded.
-- **Current bottleneck:** immutable commit custody and distinct Reviewer A/B/C, not product mechanics.
-- **Next active stream:** bank/review F1B only; F1C/F1D remain unopened.
+- **Docs/Ops:** exact commit `4359f35`, fresh generated context, distinct A/B/C evidence, and terminal SAW PASS are recorded.
+- **Current bottleneck:** none for F1B closure; the inherited Medium process-tree hardening risk remains outside this slice.
+- **Next active stream:** none by default. F1C/F1D remain unopened pending separate owner authorization.
 
 ## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
 

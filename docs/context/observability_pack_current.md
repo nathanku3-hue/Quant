@@ -1,13 +1,13 @@
 # Observability Pack - Current
 
-## Active Addendum — GV-FS0 F1B NO_POSITION Local Observability (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Terminal Observability (2026-07-18)
 
-- `ObservabilityRating`: GREEN for F1B exact economics, zero-intent boundary, two-attempt certification, deterministic identities, OPEN regression, and 189-test combined evidence; AMBER for unbanked custody and unavailable independent reviewers; RED/held for later gates and real authority.
+- `ObservabilityRating`: GREEN for F1B exact economics, zero-intent boundary, two-attempt certification, deterministic identities, OPEN regression, exact commit custody, distinct A/B/C, and 189-test combined evidence; AMBER for inherited descendant process-tree hardening; RED/held for later gates and real authority.
 - Drift sentinel: any non-valuation source intent, non-null requested quantity, non-flat snapshot, action mismatch, or adapter-owned truth must fail F1B.
-- Custody sentinel: local detached bytes are not terminal evidence; exact commit identity is required before review closure.
-- Review sentinel: implementer self-checks cannot substitute for distinct Reviewer A/B/C.
+- Custody sentinel: reviewed implementation is exact commit `4359f35` on `codex/gv-fs0-f1-product`.
+- Review sentinel: distinct Reviewer A/B/C PASS with no in-scope Critical/High findings.
 - Boundary sentinel: no F1C/F1D publication/default routing, full-suite repair, provider, real data, PEAD, broker/live capital, or FS1 authority.
-- Next-action sentinel: bank F1B only, run distinct A/B/C, stop before F1C.
+- Next-action sentinel: stop before F1C; require a separate owner-authorized publication round.
 
 ## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
 

@@ -2,6 +2,14 @@
 
 Last updated: 2026-07-18
 
+## 2026-07-18 Round Entry (Bank Before Review and Preserve Dirty Sibling Custody)
+- Date: 2026-07-18
+- Mistake or miss: F1B was locally green in a detached worktree while the named branch was registered to a separate dirty worktree, so ordinary branch switching would have risked disturbing unrelated user changes or reviewing mutable bytes.
+- Root cause: implementation custody, branch-ref custody, and dirty sibling worktree custody were separate facts that the local validation run could not reconcile.
+- Fix applied: committed the exact detached F1B bytes, atomically fast-forwarded only the named branch ref from `e156c66` to `4359f35`, left the dirty sibling files untouched, refreshed generated context, and ran distinct read-only Reviewer A/B/C against the immutable commit.
+- Guardrail for next time: when a target branch is checked out in a dirty sibling worktree, never force checkout or overwrite it; commit in the clean detached worktree, prove a fast-forward ref update, and pin every reviewer to the resulting commit.
+- Evidence paths: `docs/context/e2e_evidence/gv_fs0_f1b_local_validation_20260718.md`, `docs/saw_reports/reviewer_{a,b,c}_gv_fs0_f1b_20260718.md`, `docs/saw_reports/saw_gv_fs0_f1b_terminal_close_20260718.md`, and commit `4359f35`.
+
 ## 2026-07-18 Round Entry (Verify Latest Git Authority Before Acting on Stale Local Reports)
 - Date: 2026-07-18
 - Mistake or miss: the supplied context contained both a pre-bank F1A local BLOCK report and a later claim that F1A was banked and independently closed, while the primary checkout itself had broken worktree metadata.

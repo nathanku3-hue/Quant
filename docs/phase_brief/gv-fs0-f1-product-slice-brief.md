@@ -1,7 +1,7 @@
 # Phase Brief: GV-FS0-F1 — Product Slice (Corrected)
 
 Mode: `EXECUTION_PACKET`
-Status: `P0_5_BANKED; V1_1_VERIFIER_IO_COMPAT_BANKED; F1A_BANKED_AND_CLOSED; F1B_IMPLEMENTED_LOCAL; BANK_AND_INDEPENDENT_REVIEW_PENDING`
+Status: `P0_5_BANKED; V1_1_VERIFIER_IO_COMPAT_BANKED; F1A_BANKED_AND_CLOSED; F1B_BANKED_AND_CLOSED; F1C_F1D_UNOPENED`
 Date: 2026-07-18
 RoundID: `ROUND-20260718-GV-FS0-F1-PRODUCT-SLICE`
 ScopeID: `GV_FS0_F1_REPAIR_AND_SHIP_CURRENT_SLICE`
@@ -22,7 +22,7 @@ STRATEGY = REPAIR_AND_SHIP_CURRENT_SLICE
 PROTOCOL_REDESIGN = FORBIDDEN
 CURRENT_CHECKOUT_GIT_REPAIR = FORBIDDEN
 F1A = BANKED_AND_CLOSED at e156c66
-F1B = IMPLEMENTED_LOCAL; focused product/protocol evidence PASS; bank and distinct independent review pending
+F1B = BANKED_AND_CLOSED at 4359f35; distinct Reviewer A/B/C and terminal SAW PASS
 SHIPPED_PRODUCT_SCORE = 39/100 (unchanged; F1C/F1D publication and default routing remain closed)
 ```
 
@@ -275,8 +275,9 @@ F1A before atomic P0.5 green
 - [x] Primary and verifier-side non-valuation intent mutations fail closed
 - [x] No permanent bundle path created or modified; no default route, provider, real data, or FS1 work
 - [x] Product 52/52, protocol 137/137, combined 189/189 PASS
-- [ ] Bank exact F1B implementation commit on `codex/gv-fs0-f1-product`
-- [ ] Distinct Reviewer A/B/C PASS against that exact commit
+- [x] Bank exact F1B implementation commit `4359f35` on `codex/gv-fs0-f1-product`
+- [x] Distinct Reviewer A/B/C PASS against that exact commit; terminal SAW PASS
+- [x] Refresh and validate generated `current_context`
 
 F1C and F1D remain unopened.
 
@@ -292,4 +293,4 @@ python -c "import glob,pytest,sys; sys.exit(pytest.main(['-q',*glob.glob('tests/
 
 ## Next Action
 
-Bank the bounded F1B implementation, then run distinct Reviewer A/B/C against the exact commit. Do not open F1C publication or F1D default-dashboard routing.
+Stop before F1C. Preserve F1B commit/reviewer evidence and require a separate owner-authorized round before permanent publication or F1D routing.
