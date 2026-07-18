@@ -1,18 +1,22 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-E0A-OPERABLE Multi-Stream (2026-07-19)
+## Active Addendum — GV-E0A Main Cutover Multi-Stream (2026-07-19)
 
 | Stream | Status | Note |
 |---|---|---|
-| Backend/Strategy | **Active for E0A** | HOLD_FOR_EVIDENCE / NO_POSITION → DecisionEnvelope → book/cert → atomic current publication; F1C substrate preserved |
-| Frontend/UI | **Active for E0A** | One visible current decision + Streamlit smoke; no dual-authority compatibility UI |
+| Backend/Strategy | **Closed for E0A product** | Terminal operable vertical banked; no product change in cutover |
+| Frontend/UI | **Closed for E0A product** | One current certified decision default; smoke after main FF |
 | Data admission | Held | No provider/real prices/admission |
-| Docs/Ops | Active canon recut | Roadmap/PRD/README/truth/E0A brief; score 39 + stage semantics |
-| Product CI (F1C) | PASS substrate | 29651784244; not E0A completion proof |
+| Docs/Ops | **Active cutover** | Truth repair + context bootstrap + main FF coordination |
+| Product CI | PASS substrate | E0A hosted `29655802878`; F1C `29651784244` |
 | PEAD / FS1 / broker | Held | Forbidden as next |
 
-- Cross-stream rule: **one active gate only — GV-E0A-OPERABLE**. F1C dual-fixture demo is substrate, not a second active gate.
-- Next action: implement E0A vertical; no FS1 expansion; no F1C reopen.
+- Cross-stream rule: **one active integration gate — GV-E0A-MAIN-CUTOVER-PREFLIGHT**. Product gate E0A is terminal; F1C is substrate only.
+- Next action after integrated-main smoke: open **GV-E0B Decision-Value** planning across Backend/Docs only; no FS1 expansion; no F1C reopen; no PEAD.
+
+## Prior Addendum — GV-E0A-OPERABLE Multi-Stream (2026-07-19) [superseded — E0A implemented]
+
+- Backend/Frontend were active for E0A implementation; that product work is terminal. Cutover multi-stream above is authoritative.
 
 ## Prior Addendum — GV-FS0 F1C-SHIP Terminal Multi-Stream (2026-07-19) [CLOSED_SUBSTRATE]
 

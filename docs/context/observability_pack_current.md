@@ -1,14 +1,18 @@
 # Observability Pack - Current
 
-## Active Addendum — GV-E0A-OPERABLE Direction Observability (2026-07-19)
+## Active Addendum — GV-E0A Main Cutover Observability (2026-07-19)
 
-- ObservabilityRating: GREEN for F1C substrate identity and direction hard-recut coherence; AMBER until E0A operable evidence (envelope→book→cert→publish→visible→smoke) exists; RED/held for providers/PEAD/FS1/alpha/broker.
-- Active-gate sentinel: exactly one active gate string **GV-E0A-OPERABLE**; multi-active F1C/FS0/FS1 language is drift.
-- Score/stage sentinel: score **39/100** owner ceiling; stage **CERTIFIED_SINGLE_DECISION_OPERABLE** (stage-only promotion; no score uplift).
-- E0 custody sentinel: four godview_e0 files must match locked SHA-256 hashes.
-- UI overclaim sentinel: dual-fixture Certified Portfolio demo ≠ single-decision operable product.
+- ObservabilityRating: GREEN for E0A terminal product evidence (hosted `29655802878`, A/B/C, SAW, stage operable); AMBER until integrated `main` generates E0A context and smokes one certified decision; RED/held for providers/PEAD/FS1/alpha/broker.
+- Bootstrap sentinel: generated `current_context` must not resolve to historical PEAD while E0A is terminal; first machine `New Context Packet` must be E0A cutover/terminal.
+- Active-gate sentinel: cutover preflight is the only integration gate; product E0A is terminal; multi-active F1C/FS1 language is drift.
+- Score/stage sentinel: score **39/100** owner ceiling; stage **CERTIFIED_SINGLE_DECISION_OPERABLE** (no score uplift).
+- Endgame sentinel: after smoke, next is E0B decision-value delta — not indefinite hold and not broad FS1.
 - Boundary sentinel: no providers, real prices, FS1 batch, PEAD, alpha, broker, dual-authority UI, historical suite repair.
-- Next-action sentinel: implement E0A vertical only.
+- Next-action sentinel: FF main → smoke one certified decision → open E0B planning.
+
+## Prior Addendum — GV-E0A-OPERABLE Direction Observability (2026-07-19) [superseded]
+
+- Pre-terminal AMBER-until-E0A-evidence stance is historical only.
 
 ## Prior Addendum — GV-FS0 F1C-SHIP Terminal Observability (2026-07-19) [CLOSED_SUBSTRATE]
 

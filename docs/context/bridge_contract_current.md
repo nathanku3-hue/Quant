@@ -1,11 +1,20 @@
 # Bridge Contract - Current
 
-## Active Addendum — GV-E0A-OPERABLE Terminal Transport (2026-07-19)
+## Active Addendum — GV-E0A Main Cutover Preflight (2026-07-19)
+
+- SYSTEM_DELTA: E0A remains terminal on product tip lineage (`45f9f96`/`446ac6d`); cutover preflight repairs generated context bootstrap so active truth is E0A, not PEAD, before fast-forward into `main`.
+- PM / Product Delta: one current certified decision stays default authority; score 39/100; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`; F1C dual bundle remains substrate only.
+- OPEN_DECISION: none for product scope. Integration path is truth-repair → FF main → smoke → E0B Decision-Value planning.
+- RECOMMENDED_NEXT_STEP: complete cutover smoke on integrated main, then open GV-E0B (baseline vs GodView decision delta under sealed E0 evidence). Not FS1. Not indefinite hold.
+- DO_NOT_REDECIDE: dual-fixture default UI; score uplift without rubric; FS1-as-next; merge unrepaired PEAD-resolving tip as-is.
+- PHASE_STATUS: `GV_E0A_OPERABLE_TERMINAL_PASS; CUTOVER_PREFLIGHT; HOSTED_29655802878; REVIEW_ABC_PASS; SCORE_39`.
+
+## Prior Addendum — GV-E0A-OPERABLE Terminal Transport (2026-07-19) [superseded next-step only]
 
 - SYSTEM_DELTA: E0A operable vertical banked and hosted-proven on product tip `446ac6d` (C/C2).
 - PM / Product Delta: one current certified decision is default authority; F1C dual bundle remains substrate; score 39/100; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
-- OPEN_DECISION: optional owner merge-to-main only; no FS1.
-- RECOMMENDED_NEXT_STEP: hold tip after terminal SAW; do not open FS1/providers/PEAD/broker/alpha.
+- OPEN_DECISION: owner merge-to-main only after truth repair (now active above).
+- RECOMMENDED_NEXT_STEP (superseded): hold tip after terminal SAW → replaced by cutover then E0B.
 - DO_NOT_REDECIDE: dual-fixture default UI; score uplift without rubric; FS1-as-next.
 - PHASE_STATUS: `GV_E0A_OPERABLE_TERMINAL_PASS; HOSTED_29655802878; REVIEW_ABC_PASS; SCORE_39`.
 

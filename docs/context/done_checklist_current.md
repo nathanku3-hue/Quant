@@ -23,8 +23,18 @@
 - [x] Streamlit AppTest smoke for one current decision.
 - [x] Stage `CERTIFIED_SINGLE_DECISION_OPERABLE` with product-suite evidence.
 - [x] Score remains 39/100.
+- [x] Hosted product CI `29655802878` PASS; Reviewer A/B/C PASS; terminal SAW PASS at pin `446ac6d`.
 
-Next action: owner review/merge of `codex/gv-e0a-operable`; do not open FS1, providers, PEAD, alpha, or broker.
+### Main cutover preflight (GV-E0A-MAIN-CUTOVER-PREFLIGHT)
+
+- [x] Machine-shaped E0A terminal context packet is the first bootstrap-selectable packet.
+- [x] Stale Impact/Multi-stream/Alignment/Observability/Done/Bridge surfaces reconciled to terminal + cutover→E0B.
+- [x] Regression ensures context bootstrap prefers E0A terminal packet over later PEAD packets.
+- [ ] Fast-forward `main` to repaired product tip.
+- [ ] Smoke single certified decision from integrated main.
+- [ ] Open GV-E0B Decision-Value planning after smoke (not FS1; not indefinite hold).
+
+Next action: FF main after truth-repair bank; smoke one certified decision; then E0B planning only. Do not open FS1, providers, PEAD, alpha, or broker.
 
 ## Prior Addendum — GV-FS0 F1C-SHIP Terminal Checklist (2026-07-19) [CLOSED_SUBSTRATE]
 

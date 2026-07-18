@@ -1,15 +1,16 @@
 ## What Was Done
-- Commit A `c5a9ab8` banked the M7F5-ID0 dated-identifier authority gate, requiring an exact semantics envelope and a reachable, unchanged committed `docs/authorization/*.json` data-owner approval blob.
-- Commit B `410d0ca` banked deterministic current-source BLOCK evidence; truth repair `a51f349` distinguishes runtime/check-out evidence SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903` from committed Git-blob evidence SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
-- Independent Reviewer A/B/C PASS and terminal SAW `398732c` PASS for the bounded BLOCK evidence gate.
+- E0A operable vertical is terminal on product branch `codex/gv-e0a-operable`: transport C `45f9f96` + C2 pin `446ac6d`; hosted product CI `29655802878` PASS; distinct Reviewer A/B/C PASS; terminal SAW PASS.
+- F1C-SHIP remains closed substrate only; default portfolio authority is one current certified decision at stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
+- Bounded main-cutover preflight repairs planner bootstrap so generated `current_context` selects this E0A terminal packet instead of historical PEAD "New Context Packet" blocks.
 
 ## What Is Locked
-- Current source status is `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`; reason `committed_git_blob_data_owner_approval_required`.
-- The 21,882-event pre-identity D1 universe and both canonical hashes remain locked; operational authorities for acquisition, provider access, mapping artifact generation, portfolio/curve execution, and readiness promotion are false.
-- M7F4-v8 remains diagnostic history; no strict PIT/as-of identity, alpha, tradability, Strategy/UI, provider, publication, or dispatch authority is created.
+- Score remains `SHIPPED_PRODUCT_SCORE = 39/100` (owner ceiling; no alpha uplift). Stage remains `CERTIFIED_SINGLE_DECISION_OPERABLE`.
+- FS1, providers, real prices, PEAD reopen, alpha claims, broker paths, compatibility dual-authority UI, and historical-suite repair remain closed.
+- Do not merge unrepaired tip `2357780` as-is while active generated context still resolves to PEAD. PEAD program stays `TERMINATED_DIAGNOSTIC_ONLY` history only.
+- Certification machinery is substrate, not the product endgame; indefinite hold after merge is forbidden.
 
 ## What Is Next
-- Choose exactly one separately authorized owner decision: obtain a genuine effective-dated source plus committed data-owner approval, authorize historical identifier acquisition, or terminate PEAD strict-PIT work.
+- Fast-forward `main` to the repaired product tip, smoke the single certified decision from integrated main, then open GV-E0B Decision-Value Slice planning only (sealed evidence → cheap baseline vs GodView delta → existing cert/publish path). Not FS1.
 
 ## First Command
 `git show --stat --oneline HEAD`

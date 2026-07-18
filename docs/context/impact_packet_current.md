@@ -1,20 +1,23 @@
 # Impact Packet - Current
 
-## Active Addendum — GV-E0A-OPERABLE Docs Hard Recut Impact (2026-07-19)
+## Active Addendum — GV-E0A Main Cutover Truth-Repair Impact (2026-07-19)
 
+- **Product evidence (already terminal)**: E0A transport C `45f9f96` + C2 `446ac6d`; hosted product CI `29655802878` PASS; Reviewer A/B/C PASS; terminal SAW PASS on `codex/gv-e0a-operable`.
+- **Cutover defect**: generated `current_context` still resolved to historical PEAD because bootstrap selected the first historical `## New Context Packet` in planner truth.
 - **Docs/Ops owned changes (this round)**:
-  - `docs/architecture/top_level_roadmap.md` — sole active gate E0A; score vs stage split
-  - `README.md`, `PRD.md`, `PRODUCT_SPEC.md` (active header) — GodView portfolio OS framing
-  - `docs/phase_brief/gv-e0a-operable-brief.md` (new EXECUTION_PACKET)
-  - `docs/phase_brief/gv-fs0-f1-product-slice-brief.md` — F1C closed substrate; next E0A
-  - truth surfaces: planner/bridge/done/impact/alignment/multi-stream/observability
-  - `docs/decision log.md`, `docs/lessonss.md`, `docs/notes.md`
-- **Runtime code**: not claimed changed by this Docs/Ops hard-recut (parallel code agent owns E0A implementation).
-- **Substrate (unchanged by this recut)**: F1C permanent bundle + default route + product CI on tip lineage `490a234`.
-- **Touched interfaces (docs authority only)**: active gate, score semantics, functional stage, product framing.
-- **Failing checks**: none claimed for docs recut; E0A operable acceptance checks open until code evidence.
-- **Untouched / forbidden**: providers, real prices, FS1 batch, PEAD, alpha claims, broker, dual-authority UI, historical suite repair.
-- **Score**: 39/100 retained; stage `CERTIFIED_SINGLE_DECISION_OPERABLE` (stage-only).
+  - machine-shaped E0A terminal packet at top of `planner_packet_current.md`
+  - reconcile bridge/done/impact/multi-stream/alignment/observability to terminal + cutover→E0B next
+  - regenerate `current_context.md` / `current_context.json`
+  - regression in `tests/test_build_context_packet.py` that E0A packet wins over later PEAD packet
+- **Runtime product code**: unchanged by this truth-repair cutover.
+- **Touched interfaces**: Docs/Ops bootstrap truth only; no provider/FS1/PEAD/broker/alpha interface.
+- **Failing checks before repair**: active context PEAD (P0). After repair: none in focused context suite.
+- **Next after integrated main smoke**: GV-E0B Decision-Value Slice planning (not FS1; not indefinite hold).
+- **Score**: 39/100 retained; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
+
+## Prior Addendum — GV-E0A-OPERABLE Docs Hard Recut Impact (2026-07-19) [superseded on terminal/cutover]
+
+- Historical docs hard-recut impact retained below for audit; E0A code acceptance is closed and cutover is the active integration impact.
 
 ## Prior Addendum — GV-FS0 F1C-SHIP Terminal Impact (2026-07-19) [CLOSED_SUBSTRATE]
 

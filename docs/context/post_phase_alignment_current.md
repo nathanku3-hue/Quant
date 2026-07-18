@@ -1,11 +1,15 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-E0A-OPERABLE Direction Alignment (2026-07-19)
+## Active Addendum — GV-E0A Main Cutover Alignment (2026-07-19)
 
-- **What changed**: Active canon hard-recut + E0A operable vertical. Sole active gate **GV-E0A-OPERABLE**. F1C-SHIP demoted to closed dual-fixture substrate. Product framing = GodView certified portfolio OS (paper). Score 39 ceiling; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
-- **Streams**: Docs/Ops canon recut active; Backend/Frontend own E0A operable implementation (not claimed complete here); Data admission/PEAD/FS1/broker held.
-- **Current bottleneck**: operable single-decision vertical not yet evidenced as complete; dual-fixture UI must not be overclaimed as operator product.
-- **Next active stream**: Backend + Frontend for GV-E0A-OPERABLE only (Docs/Ops tracks evidence).
+- **What changed**: E0A product vertical is terminal on the product branch. Cutover preflight repairs stale active context (PEAD bootstrap) and reconciles truth surfaces so `main` can fast-forward honestly.
+- **Streams**: Docs/Ops owns cutover truth; Backend/Frontend product paths closed for E0A; Data/PEAD/FS1/broker held.
+- **Current bottleneck**: main lag + repaired-context custody (not missing product design). After smoke, bottleneck becomes missing **decision-value proof** (E0B), not more certification machinery.
+- **Next active stream**: Docs/Ops complete FF+smoke; then Backend/Docs plan **GV-E0B Decision-Value** only.
+
+## Prior Addendum — GV-E0A-OPERABLE Direction Alignment (2026-07-19) [superseded on terminal/cutover]
+
+- Direction recut and E0A implementation intent retained as history; operable vertical is now evidenced complete on product tip.
 
 ## Prior Addendum — GV-FS0 F1C-SHIP Terminal Alignment (2026-07-19) [CLOSED_SUBSTRATE]
 

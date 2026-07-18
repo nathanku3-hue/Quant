@@ -1,4 +1,11 @@
 ## 2026-07-19
+- Mistake or miss: terminal E0A truth surfaces still left historical PEAD `## New Context Packet` as the first bootstrap-selectable block, so validated `current_context` imported terminated PEAD direction into cutover planning.
+- Root cause: context builder selects the first machine-shaped New Context Packet; Active Addendum prose is not parseable as bootstrap sections.
+- Fix applied: lead planner with machine-shaped E0A terminal packet; reconcile cutover surfaces; regenerate context; add regression that E0A wins over later PEAD packet; Option A cutover then E0B (not indefinite hold, not FS1).
+- Guardrail for next time: every terminal product close must bank a leading machine context packet before merge-to-main; never treat indefinite hold after certification as the endgame next step.
+- Evidence paths: `docs/context/planner_packet_current.md`, `tests/test_build_context_packet.py`, `docs/context/current_context.md`.
+
+## 2026-07-19
 - Mistake or miss: multi-active-gate drift (F1C closed + still active + still blocked + implement next stacked simultaneously); dual-fixture Certified Portfolio UI overclaimed as operator product endpoint; score conflated with functional maturity (pressure to uplift 39 without rubric).
 - Root cause: addendum-stacking left contradictory `Active` sections live; demo evidence was treated as shipment/operability; single numeric score used for both claim ceiling and stage maturity.
 - Fix applied: hard-recut active canon to one gate GV-E0A-OPERABLE; demote F1C to CLOSED_SUBSTRATE; implement operable vertical (custody→HOLD_FOR_EVIDENCE→NO_POSITION→cert→current publish→one UI); split SHIPPED_PRODUCT_SCORE 39/100 from FUNCTIONAL_STAGE CERTIFIED_SINGLE_DECISION_OPERABLE (stage-only).
