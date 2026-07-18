@@ -1,0 +1,352 @@
+protocol:
+  protocol_id: GODVIEW-E0-P0-V1
+  protocol_version: 1
+  status: FROZEN
+  frozen_scope: synthetic_e0_then_first_mu_evidence_bearing_run
+  subject: MU
+  primary_module: G_supply
+  authority_date: '2026-07-15'
+  authority_sources:
+    - docs/architecture/godview_endgame_vision.md
+    - docs/architecture/top_level_roadmap.md
+    - docs/architecture/godview_e0_mu_cockpit_spec.md
+  implementation_authority:
+    synthetic_dev_after_hash_freeze: true
+    mu_evidence_bearing_before_hash_freeze: false
+    provider_or_network_access: false
+    data_acquisition: false
+    dashboard_first_work: false
+    portfolio_or_execution: false
+
+decision:
+  primary_question: >-
+    Does admissible point-in-time physical evidence support a materially slower
+    memory-supply-relief path than the set of operating and valuation scenarios
+    consistent with MU's decision-time price, and do MU's business and
+    shareholder economics preserve enough of that separation to justify
+    advancing the proposition to full research?
+  action_set:
+    - ADVANCE_TO_FULL_RESEARCH
+    - HOLD_FOR_EVIDENCE
+    - REJECT_THESIS
+  research_horizon_quarters:
+    minimum: 4
+    maximum: 8
+  decision_timestamp_rule: >-
+    Each evidence-bearing run fixes one UTC decision timestamp before source
+    acceptance, model evaluation, baseline sealing, or market-price selection.
+  information_cutoff_rule: known_at_must_be_less_than_or_equal_to_decision_timestamp
+  revisit_trigger_rule: >-
+    A new run requires a new admissible evidence release, a registered falsifier
+    observation, or a material protocol amendment. Passage of time alone does
+    not authorize reinterpretation of the prior run.
+  forbidden_decision_outputs:
+    - BUY
+    - SELL
+    - POSITION_SIZE
+    - PORTFOLIO_WEIGHT
+    - AUTOMATIC_PROMOTION
+
+claim_boundary:
+  claim_ids:
+    C1_PHYSICAL_RELIEF_SLOWER: >-
+      Admissible physical evidence supports a slower qualified sellable-supply
+      relief path than the registered comparison over the registered horizon.
+    C2_MU_BUSINESS_CAPTURE: >-
+      MU business economics preserve a material portion of the registered
+      industry supply effect through volume, mix, realized price, cost, margin,
+      or operating cash generation.
+    C3_SHAREHOLDER_CAPTURE: >-
+      Shareholder cash-flow economics preserve a material portion of business
+      capture after capex, working capital, taxes, financing, dilution,
+      repurchases, issuance, dividends, and net-debt effects.
+    C4_PRICE_ENVELOPE_MATERIALLY_SEPARATED: >-
+      The adequate, certified, challenge-tested price-consistent feasible set
+      remains materially separated after the registered physical and capture
+      constraints are imposed.
+  candidate_outputs:
+    - NONE
+    - PRICE_INCONSISTENCY_CANDIDATE
+  mandatory_candidate_qualifier: >-
+    Conditional on the registered evidence bundle, model family, parameter
+    bounds, proof rule, and decision timestamp.
+  forbidden_claims:
+    - established_market_mispricing
+    - financial_alpha
+    - investability
+    - tradability
+    - trade_recommendation
+    - portfolio_readiness
+    - calibrated_probability
+    - general_decision_quality_improvement
+    - research_latency_improvement
+
+state_model:
+  run_state:
+    - VALID
+    - BLOCKED
+  block_reason:
+    - INVALID_SCHEMA
+    - INVALID_POINT_IN_TIME
+    - MISSING_INDISPENSABLE_EVIDENCE
+    - STALE_INDISPENSABLE_EVIDENCE
+    - CONTRADICTORY_INDISPENSABLE_EVIDENCE
+    - INACCESSIBLE_OR_UNLICENSED_EVIDENCE
+    - NONDETERMINISTIC_EXECUTION
+    - INVALID_BASELINE_SEAL
+  model_state:
+    - ADEQUACY_GATE_PASSED
+    - NON_IDENTIFIABLE
+    - BOUNDS_UNJUSTIFIED
+    - MODEL_INADEQUATE
+    - INFEASIBILITY_UNCERTIFIED
+    - NOT_EVALUATED
+  claim_result:
+    - SUPPORTED
+    - FALSIFIED
+    - UNKNOWN
+    - NOT_EVALUATED
+  invariants:
+    - BLOCKED_implies_model_NOT_EVALUATED_all_claims_NOT_EVALUATED_candidate_NONE
+    - candidate_requires_VALID_ADEQUACY_GATE_PASSED_and_all_four_claims_SUPPORTED
+    - nonadequate_model_state_implies_candidate_NONE
+    - missing_evidence_never_becomes_FALSIFIED
+    - economically_immaterial_certified_separation_sets_C4_FALSIFIED
+    - candidate_does_not_force_human_ADVANCE
+    - absence_of_candidate_does_not_force_human_REJECT
+
+market_anchor:
+  price_convention: official_primary_market_close
+  after_hours_rule: >-
+    Evidence published after the official close is excluded from a same-day
+    close anchor and requires the next eligible primary-market close unless a
+    new protocol version registers another convention.
+  security_identity_rule: exact_issuer_security_and_primary_listing_binding
+  diluted_share_basis: latest_admissible_point_in_time_diluted_share_basis
+  net_debt_cash_basis: latest_admissible_point_in_time_balance_sheet_basis
+  currency: USD
+  unit_rule: all_valuation_outputs_reconcile_to_USD_per_diluted_share
+  maximum_accounting_lag_days: 120
+  market_and_evidence_information_state_rule: >-
+    The price anchor, share basis, capital structure, and accepted evidence must
+    be mechanically reproducible under the same decision-time information set.
+
+model_family:
+  primary_representation: finite_bounded_scenario_lattice
+  proof_method: complete_deterministic_enumeration
+  probability_weights_allowed: false
+  expected_combination_rule: >-
+    The run manifest records every parameter axis, ordered value set, expected
+    Cartesian-product count, evaluated count, rejected-input count, and final
+    feasible count. Candidate evaluation requires complete count equality.
+  local_solver_status_is_proof: false
+  solver_path_status: deferred_separate_protocol_amendment
+  control_model_rule: >-
+    Before the physical-supply constraint is imposed, at least one scenario in
+    the broad registered control model must reproduce the decision-time price
+    within the registered price tolerance.
+  primary_model_rule: >-
+    Apply the registered physical-supply, business-capture, and
+    shareholder-capture constraints without changing other model semantics.
+  challenge_model_rule: >-
+    Use the same valuation identity with conservative broader domains and the
+    registered alternative demand, competitor-response, cycle-normalization,
+    and terminal assumptions. The challenge model is frozen before an
+    evidence-bearing primary result is observed.
+  ablation_rule: >-
+    Remove only the registered physical-supply constraint while keeping the
+    evidence, bounds, capture bridge, valuation identity, and decision-time
+    anchor fixed. Candidate separation must disappear or fall below materiality.
+
+bounds_and_materiality:
+  bound_derivation_classes:
+    - DIRECT_OBSERVED_RANGE
+    - POINT_IN_TIME_GUIDANCE_RANGE
+    - AUDITABLE_CALCULATION_RANGE
+    - REGISTERED_CONSERVATIVE_POLICY_RANGE
+  unsupported_bound_behavior: BOUNDS_UNJUSTIFIED
+  conservative_expansion_fraction: 0.20
+  expansion_rule: >-
+    Expand each material numeric domain outward by 20 percent of its registered
+    width, respecting physical and accounting hard limits. One-sided domains
+    expand only in the conservative direction that makes overlap more likely.
+  price_fit_tolerance_fraction: 0.01
+  numerical_separation_tolerance_fraction: 0.005
+  economic_materiality_metric: minimum_robust_price_equivalent_separation_fraction
+  economic_materiality_threshold_fraction: 0.15
+  materiality_interpretation: >-
+    The threshold is a conservative research-triage policy for deciding whether
+    full research is justified. It is not an expected-return or alpha estimate.
+  boundary_behavior: greater_than_or_equal_to_threshold_is_material
+
+supply_demand_identification:
+  minimum_mechanism_count: 1
+  admissible_mechanisms:
+    - direct_physical_supply_observation
+    - supply_specific_timing_restriction
+    - cross_segment_implication
+    - cross_producer_implication
+    - registered_supply_specific_falsifier
+  unresolved_equivalence_behavior: NON_IDENTIFIABLE
+  demand_cannot_be_used_as_supply_proxy: true
+
+candidate_predicate:
+  ordered_requirements:
+    - deterministic_valid_run
+    - indispensable_evidence_authority_pass
+    - supply_demand_identification_pass
+    - dimensional_segment_stock_flow_accounting_reconciliation_pass
+    - control_model_price_accommodation_pass
+    - C1_SUPPORTED
+    - C2_SUPPORTED
+    - C3_SUPPORTED
+    - complete_enumeration_or_registered_global_proof_pass
+    - physical_constraint_ablation_pass
+    - conservative_bound_expansion_pass
+    - frozen_challenge_model_pass
+    - no_forced_falsifier_triggered
+    - economic_materiality_pass
+    - prior_evidence_bearing_run_disclosure_complete
+    - C4_SUPPORTED
+  empty_intersection_alone_is_sufficient: false
+
+baseline:
+  primary_endpoint: >-
+    Whether GodView produces a higher-quality research-triage decision than the
+    cheap human baseline under an identical, fixed human-analysis time budget.
+  same_evidence_bundle: true
+  same_decision_timestamp: true
+  same_information_cutoff: true
+  same_action_set: true
+  same_research_horizon: true
+  same_instructions: true
+  same_human_analysis_time: true
+  human_analysis_time_minutes_per_arm: 60
+  outside_research_allowed: false
+  post_cutoff_information_allowed: false
+  baseline_sealed_before_packet: true
+  canonicalization: UTF8_canonical_JSON_sorted_keys_no_insignificant_whitespace
+  hash_algorithm: SHA256
+  machine_runtime_counted_as_human_time: false
+  rubric:
+    score_values: [0, 1, 2]
+    weights: equal
+    items:
+      - selected_action_defensibility
+      - indispensable_missing_evidence_identification
+      - falsifier_and_contradiction_recognition
+      - supply_demand_business_shareholder_valuation_claim_separation
+      - avoidance_of_claims_beyond_evidence
+      - rationale_traceability
+    arm_identity_blinding: where_practical
+    tie_rule: preserve_item_tie_and_total_tie
+    adjudication_rule: >-
+      Score against the frozen rubric and sealed evidence only. Any adjudication
+      change must preserve the original scores, reason, reviewer identity, and
+      timestamp.
+  e0_reporting:
+    - raw_item_differences
+    - total_score_difference
+    - action_change
+    - rationale_change
+  prohibited_e0_interpretation:
+    - general_decision_quality_improvement
+    - causal_superiority
+    - research_efficiency_improvement
+  deferred_latency_endpoint: >-
+    Human time required to reach an equivalent frozen decision-quality standard
+    under a separate repeated prospective protocol.
+
+run_search_and_amendment:
+  run_classes:
+    - SYNTHETIC_DEV_RUN
+    - EVIDENCE_BEARING_RUN
+  synthetic_dev_rule: >-
+    May use generated fixtures only and may not read MU, market-price, industry,
+    accounting, or decision-time artifacts.
+  evidence_bearing_rule: >-
+    Any run reading any real MU, market-price, industry, accounting, or
+    decision-time artifact is evidence-bearing, including partial, exploratory,
+    failed, null, timed-out, or unviewed runs.
+  retention_rule: retain_every_evidence_bearing_run_and_result
+  ledger_format: append_only_canonical_JSONL
+  required_run_identity_fields:
+    - run_id
+    - run_class
+    - protocol_id
+    - protocol_parent_id
+    - model_family_id
+    - code_commit_or_content_identity
+    - config_sha256
+    - evidence_bundle_sha256
+    - baseline_seal_sha256
+    - enumerator_or_solver_identity
+    - started_at
+    - result_sha256
+    - amendment_reason
+    - prior_evidence_bearing_run_count
+  material_changes_require_new_protocol_version:
+    - evidence_inclusion_or_exclusion
+    - equations
+    - transformations
+    - claim_dependencies
+    - bounds
+    - tolerances
+    - proof_method
+    - branch_order
+    - challenge_model
+    - materiality_rule
+    - falsifiers
+    - baseline_endpoint_or_budget
+  nonmaterial_repair_whitelist:
+    - comments
+    - formatting
+    - logging
+    - deterministic_rendering
+    - parser_defect_with_prelocked_synthetic_golden_expected_output
+  candidate_carry_forward_after_material_amendment: false
+
+llm_boundary:
+  allowed:
+    - format_already_approved_structured_fields
+  forbidden:
+    - create_facts
+    - select_or_change_sources
+    - resolve_contradictions
+    - infer_missing_causal_links
+    - select_bounds
+    - assign_confidence
+    - create_probability_weights
+    - change_claim_results
+    - promote_thesis
+    - add_uncited_factual_assertions
+
+success_and_stop:
+  synthetic_e0_success:
+    - every_registered_terminal_branch_has_end_to_end_golden_case
+    - same_inputs_produce_byte_identical_canonical_outputs
+    - blocked_runs_stop_before_model_evaluation
+    - model_self_rejection_states_are_first_class_outputs
+    - candidate_branch_requires_all_registered_gates
+    - baseline_sealing_and_equal_budget_are_enforced
+  first_mu_run_success: >-
+    The first immutable MU evidence-bearing run completes the full chain and
+    reaches an honest reproducible terminal state without exceeding E0 claim
+    authority. Candidate emission is not required for success.
+  stop_conditions:
+    - indispensable_evidence_authority_unavailable
+    - supply_demand_non_identifiable
+    - control_model_cannot_fit_price
+    - stock_flow_or_accounting_reconciliation_fails
+    - complete_or_global_separation_proof_unavailable
+    - conservative_bound_expansion_restores_overlap
+    - challenge_model_eliminates_result
+    - business_or_shareholder_capture_fails
+    - robust_separation_is_economically_immaterial
+    - cheap_baseline_cannot_be_run_fairly
+    - evidence_bearing_search_history_is_incomplete
+    - forbidden_infrastructure_required_before_contract_proof
+
+next_authorized_action:
+  after_hash_freeze: implement_E0_1_synthetic_evidence_authority_kernel
+  before_hash_freeze: docs_validation_only

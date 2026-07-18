@@ -1,18 +1,27 @@
 # Bridge Contract - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Terminal Bridge (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Direction Hard Recut (2026-07-19)
+
+- SYSTEM_DELTA: Active canon hard-recut. F1C-SHIP demoted to closed substrate. Sole active gate is **GV-E0A-OPERABLE**. Score semantics split: 39/100 owner ceiling vs functional stage `CERTIFIED_SINGLE_DECISION_OPERABLE` (stage only; no score uplift). UOE primary framing revoked as active product authority.
+- PM / Product Delta: Product is GodView certified portfolio OS (paper). Dual-fixture demo is not the operator endpoint. Next is one operable HOLD_FOR_EVIDENCE/NO_POSITION decision path from frozen E0 custody — not FS1, not F1C reopen.
+- OPEN_DECISION: none for direction (locked A/A/A/A). Implementation evidence for operable stage promotion remains open until code/smoke exist.
+- RECOMMENDED_NEXT_STEP: execute GV-E0A-OPERABLE vertical only (`docs/phase_brief/gv-e0a-operable-brief.md`).
+- DO_NOT_REDECIDE: product pivot authorized; F1C closed substrate; score 39 ceiling; forbidden providers/real prices/FS1/PEAD/alpha/broker/dual-authority UI/historical suite repair; do not stack multi-active gates.
+- PHASE_STATUS: F1C-SHIP CLOSED_SUBSTRATE at tip lineage 490a234; ACTIVE_GATE=GV-E0A-OPERABLE implemented on branch codex/gv-e0a-operable; FUNCTIONAL_STAGE=CERTIFIED_SINGLE_DECISION_OPERABLE; score 39/100.
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Bridge (2026-07-19) [CLOSED_SUBSTRATE]
 
 - SYSTEM_DELTA: F1C-SHIP closes permanent two-role certified bundle publication, default certified route, product CI, and independent A/B/C on product branch via two-SHA transport C/C2 + closeout T.
-- PM / Product Delta: first user-visible certified authority loop is closed on codex/gv-fs0-f1-product. Official score remains 39/100.
-- OPEN_DECISION: none for F1C-SHIP closeout. Providers/PEAD/FS1/main merge remain separate.
-- RECOMMENDED_NEXT_STEP: hold product-branch tip after T; open nothing else without separate owner authorization.
+- PM / Product Delta: first user-visible certified dual-fixture loop closed on product lineage. Official score remains 39/100. Stage label: static branch demo (relabeled in E0A hard-recut).
+- OPEN_DECISION: none for F1C-SHIP closeout.
+- RECOMMENDED_NEXT_STEP (superseded): hold tip → replaced by GV-E0A-OPERABLE.
 - DO_NOT_REDECIDE: preserve frozen protocol and F1A/F1B economics; do not reopen obsolete F1C/F1D sequential split as active gates.
-- PHASE_STATUS: F1A PASS; F1B PASS; F1C-SHIP PASS on product branch; score 39/100.
+- PHASE_STATUS: F1A PASS; F1B PASS; F1C-SHIP PASS on product branch; score 39/100; next gate moved to E0A.
 
 
 # Bridge Contract - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Local Bridge (2026-07-18)
+## Prior Addendum — GV-FS0 F1C-SHIP Local Bridge (2026-07-18) [superseded]
 
 - `SYSTEM_DELTA`: a complete local F1C-SHIP path now builds, validates, publishes, loads, and headlessly renders the exact two-role certified bundle; default legacy portfolio authority is removed.
 - `PM / Product Delta`: the first user-visible certified screen works locally, but the permanent tracked artifact and shipment custody chain do not exist; score remains 39/100.
@@ -39,7 +48,7 @@
 - `DO_NOT_REDECIDE`: preserve the frozen protocol and F1A economics; do not open F1C/F1D, publication, default routing, providers, real data, PEAD, or FS1.
 - `PHASE_STATUS`: F1A PASS; F1B next; later gates unopened.
 
-## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
 
 - `SYSTEM_DELTA`: GV-FS0 protocol artifacts and guards are fixed through candidate branch `d5d03ec`; frozen protocol, manifest, and vector bytes remain unchanged by hosted-CI repairs.
 - `PM / Product Delta`: Protocol freeze evidence is terminal PASS: local checks, mutation probes, A/B/C review, and hosted Windows/Linux byte parity all pass. No certified portfolio slice or user-facing product exists yet.
@@ -48,7 +57,7 @@
 - `DO_NOT_REDECIDE`: Do not reopen precision decisions; do not treat protocol evidence as already executed reducer output; do not implement PortfolioBook, execution, snapshots, certification, bundles, Streamlit, provider, real-data, or FS1 work in this closeout.
 - `PHASE_STATUS`: Protocol freeze terminal SAW PASS; economic implementation remains NO-GO until separately authorized.
 
-## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17) [history]
 
 - `SYSTEM_DELTA`: The approved GV-FS0 precision patch is encoded in the consolidated contract and 18 deterministic machine artifacts. Canonical bytes, raw tokens, domain hashes, registries/tables, manifest representations, bootstrap/enforced guards, independent vectors, and isolated reconstruction boundaries are implemented.
 - `PM / Product Delta`: Protocol proof is locally green with 135 focused tests, local schema-bundle resolution, exact intent cardinality, and Windows/Linux byte parity. No certified portfolio slice or user-facing product exists yet.

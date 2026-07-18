@@ -97,7 +97,8 @@ def test_dash_2_legacy_ytd_chart_is_not_default_portfolio_authority() -> None:
     next_def = source.index("\ndef ", start + 1)
     section_source = source[start:next_def]
 
-    assert "render_gv_fs0_certified_bundle(st)" in section_source
+    assert "render_gv_fs0_current_decision(st)" in section_source
+    assert "render_gv_fs0_certified_bundle(st)" not in section_source
     assert "_ensure_daily_portfolio_replay_context(" not in section_source
     assert "_render_portfolio_ytd_chart(" not in section_source
 
@@ -151,20 +152,22 @@ def test_dash_2_optimizer_is_not_default_certified_portfolio_authority() -> None
     next_def = source.index("\ndef ", start + 1)
     section_source = source[start:next_def]
 
-    assert "render_gv_fs0_certified_bundle(st)" in section_source
+    assert "render_gv_fs0_current_decision(st)" in section_source
+    assert "render_gv_fs0_certified_bundle(st)" not in section_source
     assert "_render_portfolio_builder_section()" not in section_source
     assert "render_optimizer_view" not in section_source
     assert "st.expander(" not in section_source
 
 
-def test_dash_2_portfolio_page_declares_certified_bundle_authority() -> None:
-    """Default copy names the permanent bundle and demotes legacy research output."""
+def test_dash_2_portfolio_page_declares_current_decision_authority() -> None:
+    """Default copy names one active current decision and demotes legacy research output."""
     source = DASHBOARD.read_text(encoding="utf-8")
     start = source.index("def _render_portfolio_allocation_page()")
     next_def = source.index("\ndef ", start + 1)
     fn_source = source[start:next_def]
 
-    assert "Permanent GV-FS0 certified bundle" in fn_source
+    assert "One active certified decision" in fn_source
+    assert "HOLD_FOR_EVIDENCE" in fn_source
     assert "non-certifying research surfaces" in fn_source
     assert "Optimizer controls select the method and universe." not in fn_source
 
@@ -2251,13 +2254,14 @@ def test_replay_timeline_stacked_chart_traces_are_allocation_areas(monkeypatch: 
 
 
 def test_dash_2_portfolio_render_path_has_one_certified_source() -> None:
-    """Default portfolio rendering has one permanent certified bundle source."""
+    """Default portfolio rendering has one current certified decision source."""
     source = DASHBOARD.read_text(encoding="utf-8")
     start = source.index("def _render_portfolio_allocation_page()")
     next_def = source.index("\ndef ", start + 1)
     fn_source = source[start:next_def]
 
-    assert fn_source.count("render_gv_fs0_certified_bundle(st)") == 1
+    assert fn_source.count("render_gv_fs0_current_decision(st)") == 1
+    assert "render_gv_fs0_certified_bundle(st)" not in fn_source
     assert "_ensure_daily_portfolio_replay_context(" not in fn_source
     assert "_render_replay_allocation_snapshot(" not in fn_source
     assert "_render_portfolio_ytd_chart(" not in fn_source

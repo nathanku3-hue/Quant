@@ -1,4 +1,24 @@
-# Product Specification: Unified Opportunity Engine
+# Product Specification: Terminal Zero / GodView Certified Portfolio OS
+
+## Active Product Header (2026-07-19) — HARD RECUT
+
+```text
+PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
+F1C_SHIP = CLOSED_SUBSTRATE (product tip lineage 490a234)
+ACTIVE_GATE = GV-E0A-OPERABLE
+SHIPPED_PRODUCT_SCORE = 39/100 (owner claim ceiling; no alpha)
+FUNCTIONAL_STAGE = CERTIFIED_STATIC_BRANCH_DEMO
+FORBIDDEN = providers, real prices, FS1 batch, PEAD, alpha claims, broker,
+            compatibility dual-authority UI, historical-suite repair
+```
+
+Active authority: `docs/architecture/top_level_roadmap.md`, `PRD.md` Active Build Authority block, `docs/phase_brief/gv-e0a-operable-brief.md`.
+
+**UOE-as-primary and PEAD-as-active-build sections below are historical / superseded as active product authority.** Keep them for audit continuity; do not use them to reopen concurrent UOE or PEAD gates.
+
+---
+
+## History — V2 PEAD Contracts (not active product gate)
 
 ## V2 PEAD Alpha Interpretation Gate Contract (2026-06-24)
 

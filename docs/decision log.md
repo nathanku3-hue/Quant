@@ -1,3 +1,11 @@
+## 2026-07-19 — ROUND-20260719-E0A-OPERABLE-DIRECTION (A/A/A/A)
+
+- Decision: lock product pivot UOE discretionary cockpit → GodView certified portfolio OS (paper); demote F1C-SHIP to CLOSED_SUBSTRATE; set sole active gate **GV-E0A-OPERABLE**.
+- Decision: keep SHIPPED_PRODUCT_SCORE = 39/100 as owner claim ceiling (no numerical uplift without rubric); introduce separate FUNCTIONAL_STAGE measure starting at CERTIFIED_STATIC_BRANCH_DEMO.
+- Decision: next vertical is frozen E0 custody → HOLD_FOR_EVIDENCE/NO_POSITION → one DecisionEnvelope → book/cert → atomic current publication → one visible decision → Streamlit smoke — not broad FS1 and not F1C reopen.
+- Forbidden: providers, real prices, FS1 batch, PEAD, alpha claims, broker, compatibility dual-authority UI, historical-suite repair.
+- Evidence: docs hard-recut on branch codex/gv-e0a-operable from product tip lineage 490a234; E0 four-file hashes verified; E0A code not claimed complete by Docs/Ops.
+- Boundary: main may lag product tip; do not claim main is product tip without evidence.
 ## 2026-07-19 — GV-FS0 F1C-SHIP Terminal Closeout
 
 - Decision: accept two-SHA shipment closeout on codex/gv-fs0-f1-product after hosted parity and exact-commit A/B/C.
@@ -7385,3 +7393,4 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Exact economics: initial cash `1000`; 10 shares at `10`; explicit fee `1`; residual cash `899`; dividend receivable/payment `5`; terminal cash `904`; terminal market value `140`; terminal NAV `1044`; cumulative contribution `44`.
 - Boundary: no permanent bundle, publication lock, default dashboard route, provider, real data, legacy replay authority, NO_POSITION implementation, or FS1 work in F1A.
 - Evidence state: focused product and protocol suites, deterministic two-run bytes, generator/freeze checks, compile, adapter smoke, and diff hygiene pass locally. Banked-commit identity and independent Reviewer A/B/C remain the next closure actions.
+

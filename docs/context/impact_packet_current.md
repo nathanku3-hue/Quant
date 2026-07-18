@@ -1,6 +1,22 @@
 # Impact Packet - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Terminal Impact (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Docs Hard Recut Impact (2026-07-19)
+
+- **Docs/Ops owned changes (this round)**:
+  - `docs/architecture/top_level_roadmap.md` — sole active gate E0A; score vs stage split
+  - `README.md`, `PRD.md`, `PRODUCT_SPEC.md` (active header) — GodView portfolio OS framing
+  - `docs/phase_brief/gv-e0a-operable-brief.md` (new EXECUTION_PACKET)
+  - `docs/phase_brief/gv-fs0-f1-product-slice-brief.md` — F1C closed substrate; next E0A
+  - truth surfaces: planner/bridge/done/impact/alignment/multi-stream/observability
+  - `docs/decision log.md`, `docs/lessonss.md`, `docs/notes.md`
+- **Runtime code**: not claimed changed by this Docs/Ops hard-recut (parallel code agent owns E0A implementation).
+- **Substrate (unchanged by this recut)**: F1C permanent bundle + default route + product CI on tip lineage `490a234`.
+- **Touched interfaces (docs authority only)**: active gate, score semantics, functional stage, product framing.
+- **Failing checks**: none claimed for docs recut; E0A operable acceptance checks open until code evidence.
+- **Untouched / forbidden**: providers, real prices, FS1 batch, PEAD, alpha claims, broker, dual-authority UI, historical suite repair.
+- **Score**: 39/100 retained; stage `CERTIFIED_SINGLE_DECISION_OPERABLE` (stage-only).
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Impact (2026-07-19) [CLOSED_SUBSTRATE]
 
 - **Runtime impact**: core/gv_fs0_bundle.py, core/gv_fs0_publish.py, permanent bundle, adapter permanent-load path, default Certified Portfolio cutover, product workflow.
 - **Transport commits**: C 48ad053, C2 91b9bf1; closeout T docs/review/truth only.
@@ -12,7 +28,7 @@
 
 # Impact Packet - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Local Impact (2026-07-18)
+## Prior Addendum — GV-FS0 F1C-SHIP Local Impact (2026-07-18) [superseded]
 
 - **Runtime**: new pure bundle validator and publication controller; adapter loads permanent validated bytes; default dashboard route hard-replaced by certified bundle rendering.
 - **Tests**: new bundle/publication/recovery/default-authority suite; obsolete default replay/YTD/lifecycle assertions replaced without compatibility fallback.
@@ -42,7 +58,7 @@
 - **Open risk**: process-tree termination hardening remains Medium and non-blocking because the frozen verifier has no descendant-spawn path.
 - **Untouched**: F1B NO_POSITION, permanent bundle/publication, default routing, providers, real data, and FS1.
 
-## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
 
 - **Changed interfaces**: CI branch/base selection portability and Windows pytest glob execution were repaired after the immutable protocol candidate; frozen protocol semantics and machine artifacts are unchanged.
 - **Primary paths**: `.github/workflows/gv-fs0-protocol-freeze.yml`, `tests/test_gv_fs0_freeze_immutability_v1.py`, `docs/phase_brief/phase-E0-brief.md`, `docs/context/*_current.md`, `docs/decision log.md`, `docs/notes.md`, `docs/lessonss.md`, and `docs/saw_reports/saw_gv_fs0_protocol_freeze_v1_20260717.md`.
@@ -50,7 +66,7 @@
 - **Open checks**: none for protocol freeze closure.
 - **Forbidden impact**: no reducer, balance mutation, event execution, snapshot generation, certification execution, certified result, permanent bundle, UI, provider, real-data, or FS1 path changed.
 
-## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17) [history]
 
 - **Changed interfaces**: normative contract, 18 machine-readable artifacts, canonical/parser primitives, isolated reconstruction boundary, independent reference encoder, freeze verifier/manifest, protocol tests, and CI workflow.
 - **Primary paths**: `docs/architecture/gv_fs0_certification_and_data_authority_contract.md`, `contracts/gv_fs0/v1/**`, `core/gv_fs0_canonical.py`, `validation/gv_fs0_*.py`, `scripts/*gv_fs0_protocol*`, `tests/test_gv_fs0_*.py`, and `.github/workflows/gv-fs0-protocol-freeze.yml`.

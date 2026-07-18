@@ -212,7 +212,8 @@ def test_lifecycle_renderer_is_not_default_certified_portfolio_authority() -> No
     next_def = source.index("\ndef ", start + 1)
     page_source = source[start:next_def]
 
-    assert "render_gv_fs0_certified_bundle(st)" in page_source
+    assert "render_gv_fs0_current_decision(st)" in page_source
+    assert "render_gv_fs0_certified_bundle(st)" not in page_source
     assert "_render_strategy_replay_section(" not in page_source
     assert "_render_portfolio_builder_section(" not in page_source
     assert "_render_shadow_portfolio_section()" not in page_source

@@ -6,7 +6,11 @@ from pathlib import Path
 import pandas as pd
 from streamlit.testing.v1 import AppTest
 
-from core.gv_fs0_publish import DEFAULT_LOCK, DEFAULT_TARGET, publish_default_certified_bundle
+from core.gv_e0a_operable import publish_e0a_current_decision
+from core.gv_fs0_publish import (
+    DEFAULT_CURRENT_DECISION_LOCK,
+    DEFAULT_CURRENT_DECISION_TARGET,
+)
 from views.page_registry import (
     APPROVED_PAGE_TITLES,
     DISCOVERY_PAGE_TITLE,
@@ -120,13 +124,21 @@ def test_dash_1_portfolio_route_has_explicit_default_path() -> None:
     assert PORTFOLIO_PAGE_ROUTE == "portfolio"
 
 
-def test_dash_1_default_portfolio_route_renders_certified_bundle() -> None:
-    prior_target = DEFAULT_TARGET.read_bytes() if DEFAULT_TARGET.exists() else None
-    prior_lock = DEFAULT_LOCK.read_bytes() if DEFAULT_LOCK.exists() else None
+def test_dash_1_default_portfolio_route_renders_current_decision() -> None:
+    prior_target = (
+        DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
+        if DEFAULT_CURRENT_DECISION_TARGET.exists()
+        else None
+    )
+    prior_lock = (
+        DEFAULT_CURRENT_DECISION_LOCK.read_bytes()
+        if DEFAULT_CURRENT_DECISION_LOCK.exists()
+        else None
+    )
     try:
-        if DEFAULT_LOCK.exists():
-            DEFAULT_LOCK.unlink()
-        publish_default_certified_bundle()
+        if DEFAULT_CURRENT_DECISION_LOCK.exists():
+            DEFAULT_CURRENT_DECISION_LOCK.unlink()
+        publish_e0a_current_decision()
         app = AppTest.from_file("dashboard.py")
         app.query_params["page"] = PORTFOLIO_PAGE_ROUTE
         app = app.run(timeout=90)
@@ -134,22 +146,21 @@ def test_dash_1_default_portfolio_route_renders_certified_bundle() -> None:
         assert not app.exception
         assert any(header.value == PORTFOLIO_PAGE_TITLE for header in app.header)
         assert [element.value for element in app.subheader] == [
-            "GV-FS0 Certified Paper Portfolio — OPEN",
             "GV-FS0 Certified Paper Portfolio — NO_POSITION",
         ]
-        assert len(app.table) == 2
+        assert len(app.table) == 1
         caption_text = "\n".join(element.value for element in app.caption)
-        assert caption_text.count("CERTIFIED") >= 2
+        assert caption_text.count("CERTIFIED") >= 1
         assert "Replay selection unavailable" not in _app_status_text(app)
     finally:
         if prior_target is None:
-            DEFAULT_TARGET.unlink(missing_ok=True)
+            DEFAULT_CURRENT_DECISION_TARGET.unlink(missing_ok=True)
         else:
-            DEFAULT_TARGET.write_bytes(prior_target)
+            DEFAULT_CURRENT_DECISION_TARGET.write_bytes(prior_target)
         if prior_lock is None:
-            DEFAULT_LOCK.unlink(missing_ok=True)
+            DEFAULT_CURRENT_DECISION_LOCK.unlink(missing_ok=True)
         else:
-            DEFAULT_LOCK.write_bytes(prior_lock)
+            DEFAULT_CURRENT_DECISION_LOCK.write_bytes(prior_lock)
 
 
 def test_dash_1_legacy_portfolio_sections_are_not_default_authority() -> None:
@@ -163,7 +174,8 @@ def test_dash_1_legacy_portfolio_sections_are_not_default_authority() -> None:
     )
     body = ast.unparse(function)
 
-    assert "render_gv_fs0_certified_bundle(st)" in body
+    assert "render_gv_fs0_current_decision(st)" in body
+    assert "render_gv_fs0_certified_bundle(st)" not in body
     for forbidden in (
         "_render_portfolio_builder_section",
         "_ensure_daily_portfolio_replay_context",

@@ -419,9 +419,16 @@ def _imports(path: Path) -> set[str]:
 def test_static_product_boundaries() -> None:
     adapter_imports = _imports(ROOT / "views" / "gv_fs0_portfolio_adapter.py")
     adapter_core_imports = {name for name in adapter_imports if name.startswith("core.")}
-    assert adapter_core_imports == {"core.gv_fs0_bundle"}
+    # Read-only presentation: F1C bundle loader + shared current-decision canonical parser.
+    assert adapter_core_imports == {
+        "core.gv_fs0_bundle",
+        "core.gv_fs0_current_decision",
+    }
     assert not any(name.startswith("validation.") for name in adapter_imports)
     assert not any(name.startswith("strategies.") for name in adapter_imports)
+    assert "core.gv_fs0_publish" not in adapter_core_imports
+    assert "core.gv_fs0_book" not in adapter_core_imports
+    assert "core.gv_fs0_certify" not in adapter_core_imports
 
     book_imports = _imports(ROOT / "core" / "gv_fs0_book.py")
     assert not any(name.startswith("views.") for name in book_imports)

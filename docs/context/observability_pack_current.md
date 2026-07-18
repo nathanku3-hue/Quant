@@ -1,21 +1,31 @@
 # Observability Pack - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Terminal Observability (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Direction Observability (2026-07-19)
+
+- ObservabilityRating: GREEN for F1C substrate identity and direction hard-recut coherence; AMBER until E0A operable evidence (envelope→book→cert→publish→visible→smoke) exists; RED/held for providers/PEAD/FS1/alpha/broker.
+- Active-gate sentinel: exactly one active gate string **GV-E0A-OPERABLE**; multi-active F1C/FS0/FS1 language is drift.
+- Score/stage sentinel: score **39/100** owner ceiling; stage **CERTIFIED_SINGLE_DECISION_OPERABLE** (stage-only promotion; no score uplift).
+- E0 custody sentinel: four godview_e0 files must match locked SHA-256 hashes.
+- UI overclaim sentinel: dual-fixture Certified Portfolio demo ≠ single-decision operable product.
+- Boundary sentinel: no providers, real prices, FS1 batch, PEAD, alpha, broker, dual-authority UI, historical suite repair.
+- Next-action sentinel: implement E0A vertical only.
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Observability (2026-07-19) [CLOSED_SUBSTRATE]
 
 - ObservabilityRating: GREEN for exact bundle identity, hosted Win/Linux parity, distinct A/B/C, terminal SAW; AMBER for inherited process-tree hardening and path-filter hygiene; RED/held for providers/PEAD/FS1/alpha.
-- Drift sentinel: permanent file must remain 55774 / 9dda224…; default route must not reintroduce legacy portfolio authority.
+- Drift sentinel: permanent file must remain 55774 / a9dda224…; default route must not reintroduce legacy portfolio authority.
 - Boundary sentinel: score remains 39/100; no silent readiness/alpha promotion.
-- Next-action sentinel: hold product-branch tip after T.
+- Next-action sentinel (superseded): hold tip → E0A.
 
 
 # Observability Pack - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Local Observability (2026-07-18)
+## Prior Addendum — GV-FS0 F1C-SHIP Local Observability (2026-07-18) [superseded]
 
 - `ObservabilityRating`: GREEN for deterministic bundle identity, publication recovery matrix, certified default route, headless proof, and zero-new-failure local delta; RED for absent permanent artifact, immutable commit, hosted parity, exact-commit review, and push.
 - Identity sentinel: bundle hash `527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c`; file SHA-256 `a9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5`.
 - Artifact sentinel: required permanent path must exist and equal 55,774 canonical bytes; currently absent.
-- Default-authority sentinel: default function must contain one `render_gv_fs0_certified_bundle(st)` and zero replay/optimizer/lifecycle/YTD calls.
+- Default-authority sentinel: default function must contain one `render_gv_fs0_current_decision(st)`, zero `render_gv_fs0_certified_bundle(st)`, and zero replay/optimizer/lifecycle/YTD calls.
 - Recovery sentinel: no lock age/PID deletion; post-replace failure must retain `RECOVERY_REQUIRED`.
 - Test sentinel: 201/202 focused PASS; full-suite candidate failure set must remain a subset of exact `c37db09` baseline.
 - Custody sentinel: no shipment claim before exact commit + hosted Ubuntu/Windows parity + distinct A/B/C + push.
@@ -40,7 +50,7 @@
 - Boundary sentinel: no F1C/F1D, publication, default routing, provider, real data, PEAD, or FS1 authority.
 - Next-action sentinel: F1B only.
 
-## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
 
 - `ObservabilityRating`: GREEN for deterministic generation, vectors, enforced verifier, six mutation rejections, clean restored probe tree, A/B/C review, hosted Windows/Linux protocol proof, and byte parity; RED for reducer/product execution authority in this round.
 - Candidate sentinel: original protocol candidate `346d362`; repaired hosted-CI candidate `d5d03ec`; frozen protocol/manifest/vector bytes unchanged by repair.

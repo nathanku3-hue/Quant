@@ -1,55 +1,66 @@
-# Top-Level Roadmap: GodView GV-FS0-First Build
+# Top-Level Roadmap: GodView Certified Portfolio OS
 
-Status: Active Architecture Canon — GV-FS0 First
-Date: 2026-07-16
-Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, and `gv_fs0_certification_and_data_authority_contract.md`
+Status: Active Architecture Canon — GV-E0A-OPERABLE sole active gate
+Date: 2026-07-19
+Product tip lineage: `490a234` (F1C-SHIP closed substrate on product branch lineage)
+Active working branch (this recut): `codex/gv-e0a-operable`
+Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, and `docs/phase_brief/gv-e0a-operable-brief.md`
 
-## Executive Decision
+## Executive Decision (Active Canon)
 
 ```text
-ROADMAP_REVISION = APPROVED
-EXECUTION_MODEL = GV_FS0_FIRST
+PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
+F1C_SHIP = CLOSED_SUBSTRATE (deterministic certification + permanent dual-fixture evidence; not operator-usable product endpoint)
+ACTIVE_GATE = GV-E0A-OPERABLE
+SHIPPED_PRODUCT_SCORE = 39/100 (owner claim ceiling; metric confidence low; no alpha)
+FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
+  (stage-only; score stays 39/100; no alpha)
 SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED
 BACKWARD_COMPATIBILITY_LAYER = PROHIBITED
-SYNTHETIC_FS0 = AUTHORIZED
 REAL_PROVIDER_READ = BLOCKED_PENDING_DATA_ACCESS_AUTHORIZATION
 REAL_CANDIDATE = BLOCKED_PENDING_FULL_ADMISSION
 YFINANCE_AUTHORITY = PROHIBITED
 WRDS_PEAD_REOPEN = PROHIBITED
 LIVE_TRADING_MONITORING = OUT_OF_SCOPE
+FS1_BATCH = NOT_NEXT
 ```
 
-The only active implementation gate is **GV-FS0: one certified synthetic `OPEN` and one certified synthetic `NO_POSITION` through one new canonical book and one visible screen**.
+**One active gate only:** **GV-E0A-OPERABLE** — a combined research→decision→book→cert→publish→visible vertical on frozen MU `G_supply` custody. F1C-SHIP is closed substrate, not an active shipment gate. Broad FS1 is a future stage, not next action.
 
-Current shipped-product score remains **39/100**. F1C-SHIP is closed on product branch codex/gv-fs0-f1-product (permanent certified bundle + default certified route + product CI); no alpha claim. until one permanent tracked two-role bundle is the default visible portfolio authority on a pushed, hosted-parity, independently reviewed commit.
+### Score semantics (do not conflate)
 
-## Active Shipment Gate — F1C-SHIP
+| Measure | Value | Meaning |
+|---|---|---|
+| `SHIPPED_PRODUCT_SCORE` | **39/100** | Owner claim ceiling. Does **not** auto-uplift for demos, dual-fixture screens, or local green paths. No alpha. Metric confidence low. |
+| `FUNCTIONAL_STAGE` | **`CERTIFIED_SINGLE_DECISION_OPERABLE`** | E0 custody + `HOLD_FOR_EVIDENCE`→paper `NO_POSITION` + certify + atomic current publish + one default Streamlit decision on branch `codex/gv-e0a-operable`. Prior stage was dual-fixture static demo on `490a234`. |
+| Score rule | no auto-uplift | Stage promotion does **not** raise `SHIPPED_PRODUCT_SCORE`. Score stays 39/100 unless a separate rubric-based owner claim is authorized. |
 
-F1A `OPEN` and F1B `NO_POSITION` are terminal PASS at closeout `c37db09`. The former standalone F1C publication and F1D routing split is revoked. The only active gate is one atomic shipment vertical:
+### Active gate — GV-E0A-OPERABLE
 
 ```text
-complete deterministic bundle
-→ section-15 publication and recovery
-→ default Certified Portfolio route
-→ headless both-role proof
-→ hosted Windows/Linux byte parity
-→ zero new full-suite failures vs exact c37db09
-→ exact-commit Reviewer A/B/C
-→ product-branch push
+frozen MU G_supply evidence (4 files exact hashes)
+→ explicit HOLD_FOR_EVIDENCE research decision / portfolio NO_POSITION
+→ one active DecisionEnvelope
+→ PortfolioBook + independent certification
+→ atomic publication of current decision
+→ one visible current decision
+→ real Streamlit smoke
 ```
 
-Publication alone, an injected-unit-fixture screen, local-only parity, or an unpushed commit cannot close this gate. Backward compatibility with default replay/optimizer/lifecycle authority is prohibited. Inherited unrelated suite failures are fingerprinted, not repaired inside F1C-SHIP.
+**Forbidden for this gate:** providers, real prices, FS1 batch, PEAD reopen, alpha claims, broker paths, compatibility dual-authority UI, historical-suite repair.
 
-Local implementation exists but remains blocked before shipment because the tracked permanent artifact, immutable commit, hosted evidence, exact-commit review, and push are absent.
+### Closed substrate (history — not active gates)
 
-- Revised-plan quality: **9.2/10**.
-- Revoked six-stream execution plan: **5.8/10**.
+- **F1A OPEN / F1B NO_POSITION / F1C-SHIP**: closed on product tip lineage `490a234` (transport C/C2 + closeout T). Permanent two-role certified bundle + default Certified Portfolio route + product CI. Demoted to substrate; do not reopen as active shipment language.
+- **GV-FS0 protocol V1 freeze**: closed earlier; frozen contracts remain byte-immutable authority for certification bytes.
+- **PEAD strict-PIT**: `TERMINATED_DIAGNOSTIC_ONLY` — not active product work.
+- **UOE / six-stream concurrent execution**: revoked as active product framing; retained only as historical product lineage.
 
-## Why the Prior Order Was Rejected
+### Why multi-gate language is revoked
 
-The prior roadmap made six endgame work packages concurrently active. That was architecturally complete but operationally unsound for a local-first, single-operator system. It also retained `strategies/strategy_replay.py` as official GodView portfolio truth and placed policy controls, 252 sessions, 20+ corporate-action cases, and full P0 contracts inside the first integration gate.
+Prior truth surfaces stacked “F1C closed / still active / still blocked / implement next” and left FS0 dual-demo language as if still the shipment gate. That multi-active-gate drift is revoked. **Only GV-E0A-OPERABLE is active.**
 
-Those claims are revoked. Streams A–F remain useful endgame work packages, but they are not concurrently active implementation streams.
+Six concurrent endgame streams (A–F) remain deferred work packages, not concurrent implementation streams.
 
 ## Active Canonical Chain
 
@@ -63,9 +74,62 @@ DecisionEnvelope
 
 `Fs0Certification` is a first-class immutable result. It is not UI logic, a test comment, or a discretionary reviewer conclusion.
 
-## GV-FS0 — One Decision, One Book, One Screen
+## GV-E0A-OPERABLE — Sole Active Gate (Research → One Operable Decision)
 
-### Scope
+### Objective
+
+Connect frozen MU `G_supply` research custody to one operator-visible **current** certified decision, without reopening FS0 dual-demo shipment language and without starting broad FS1.
+
+### Vertical (must ship as one)
+
+```text
+frozen MU G_supply evidence (4 files exact hashes)
+→ explicit HOLD_FOR_EVIDENCE research decision / portfolio NO_POSITION
+→ one active DecisionEnvelope
+→ PortfolioBook + independent certification
+→ atomic publication of current decision
+→ one visible current decision
+→ real Streamlit smoke
+```
+
+### Frozen E0 research artifacts (byte-identical; sole research-promotion custody)
+
+```text
+docs/architecture/godview_e0/e0_preregistration.yaml
+  sha256 0a6dc18a44d7532610a73f90b92477fc7bd36644c1a052d81a48162097176618
+docs/architecture/godview_e0/evidence_authority_matrix.csv
+  sha256 3306adbed26d27732a0a53d3819a09044e418e183ecc58ebebf82c6f9fe0dcb0
+docs/architecture/godview_e0/e0_model_spec.md
+  sha256 28a0ea062777d9364008480266ce933bd6a34348ce0defcac7185398068a38f0
+docs/architecture/godview_e0/e0_acceptance_tests.md
+  sha256 9d9a7f195bd8db2caea82859d6a73d951c862f229fc9d72e5302c58ba7b8d55c
+```
+
+Any hash drift blocks E0A. E0A does not rewrite research claim authority; it consumes sealed custody for one paper `HOLD_FOR_EVIDENCE` / portfolio `NO_POSITION` path.
+
+### Acceptance (gate-level)
+
+- One active current DecisionEnvelope exists (not dual static fixture-only UI).
+- Portfolio path is `NO_POSITION` (or explicit paper hold) bound to that envelope.
+- Independent certification PASS for the operable path.
+- Atomic publication of **current** decision (not dual-fixture F1C bundle as the operator endpoint).
+- One visible current decision on the product surface.
+- Real Streamlit smoke (not headless-only proof as sole evidence).
+- Score remains 39/100; stage may move to `CERTIFIED_SINGLE_DECISION_OPERABLE` **only** when the above evidence exists on branch.
+
+### Forbidden
+
+providers · real prices · FS1 batch · PEAD · alpha claims · broker · compatibility dual-authority UI · historical-suite repair · reopening F1C-SHIP as active gate · broad six-stream concurrency
+
+---
+
+## History / Substrate — GV-FS0 Dual-Fixture Demo (CLOSED)
+
+> **Status:** `CLOSED_SUBSTRATE`. Not the active gate. Retained for architecture and certification byte authority.
+
+F1A synthetic `OPEN`, F1B synthetic `NO_POSITION`, and F1C-SHIP permanent dual-role bundle shipment closed on product tip lineage `490a234`. That path proves deterministic certification and a permanent dual-fixture Certified Portfolio demo. It is **not** an operator single-decision product endpoint.
+
+### Historical scope (FS0 dual-demo)
 
 Two synthetic decision envelopes:
 
@@ -74,22 +138,9 @@ MANUAL_OWNER_PAPER / OPEN
 MANUAL_OWNER_PAPER / NO_POSITION
 ```
 
-One small deterministic fixture:
+One small deterministic fixture (one security; 5–10 sessions; cash; one execution; fee; dividend; no provider/benchmark/optimizer/inference).
 
-- one security;
-- 5–10 valid sessions;
-- initial cash;
-- one execution;
-- one explicit fee or cost;
-- one dividend ex-date;
-- one dividend pay date;
-- no provider input;
-- no benchmark requirement;
-- no optimizer;
-- no corporate-action matrix beyond the dividend;
-- no inference.
-
-### Required outputs
+### Historical required outputs
 
 ```text
 DecisionEnvelope
@@ -101,7 +152,7 @@ independent reconstruction result
 Streamlit rendering
 ```
 
-### DecisionEnvelope
+### DecisionEnvelope (retained contract)
 
 The envelope binds at minimum:
 
@@ -116,41 +167,13 @@ The envelope binds at minimum:
 
 Unknown authority, missing timestamps, ambiguous identity, or unsupported action blocks before book mutation.
 
-### PortfolioBook
+### PortfolioBook (retained contract)
 
-`PortfolioBook` is the only active official GodView economic book for FS0. It owns:
+`PortfolioBook` is the official GodView economic book for certified paper paths. It owns append-only decision/economic events, executions and costs, cash, whole-share holdings, dividend receivables, paid income, session valuation, NAV/contribution, and deterministic canonical serialization. No compatibility conversion from legacy lifecycle or target-weight replay.
 
-- append-only decision and economic events;
-- executions and explicit costs;
-- cash;
-- whole-share holdings;
-- dividend receivables;
-- paid income;
-- session valuation;
-- NAV and contribution;
-- deterministic canonical serialization.
+### Fs0PortfolioSnapshot / Fs0Certification (retained contract)
 
-No compatibility conversion from the legacy lifecycle or target-weight replay is permitted.
-
-### Fs0PortfolioSnapshot
-
-The snapshot is an immutable projection of the certified book at one session. It reports at minimum:
-
-- authority and action;
-- rationale reference;
-- security and shares;
-- cash;
-- receivables;
-- market value;
-- NAV;
-- session and cumulative contribution;
-- source event range;
-- canonical book hash;
-- certification identity and status.
-
-### Fs0Certification
-
-The certification reports independently:
+Snapshot is an immutable projection at one session. Certification independently reports:
 
 ```text
 decision_authority_valid
@@ -169,22 +192,10 @@ failure_reasons
 
 Any false or unknown mandatory result produces `BLOCKED`.
 
-### Acceptance
+### Historical FS0 acceptance (substrate evidence — closed)
 
-- `OPEN` creates an exact whole-share position, exact cost, and residual cash.
-- `NO_POSITION` records the decision while preserving all-cash economics.
-- Prior effective holdings earn each interval's result.
-- Dividend entitlement is created on ex-date and paid exactly once on pay date.
-- `NAV = cash + market_value + receivables` every session.
-- No missing return, stale price, or unsupported event is silently converted to zero.
-- Negative cash, negative shares, implicit leverage, and out-of-order events block.
-- Duplicate events are idempotent.
-- Independent reconstruction starts from the original decision, price, event, and protocol inputs and shares no accounting implementation.
-- Primary and independent quantities, cash, receivables, and NAV match exactly for FS0.
-- Two runs generate the same canonical hash.
-- Windows and Linux CI generate the same canonical payload hash.
-- The default portfolio page displays authority, action, rationale reference, shares, cash, receivables, NAV, contribution, hash, and certification.
-- Existing focused replay and dashboard tests remain green, but their outputs do not certify FS0.
+- `OPEN` / `NO_POSITION` economics, dividend, NAV identity, reconstruction, dual-platform hash, and dual-fixture default page as closed on product lineage.
+- Existing focused replay/dashboard tests may remain green without certifying FS0 or E0A.
 
 ## Data Authorization and Admission
 
@@ -270,9 +281,9 @@ Legacy code may remain physically present and serve unrelated historical screens
 
 This is a hard authority cutover without making deletion a prerequisite.
 
-## GV-FS1 — Policy and Benchmark Paths
+## GV-FS1 — Policy and Benchmark Paths (Future — NOT next action)
 
-After GV-FS0 passes, add:
+After **GV-E0A-OPERABLE** closes (and only then), add:
 
 ```text
 C0
@@ -315,22 +326,14 @@ Require all of:
 
 The thresholds in `godview_portfolio_p0_owner_freeze.md` remain unchanged. No threshold may be relaxed to accommodate available data.
 
-## GV-E0 — Research-to-Decision Slice
+## GV-E0 / GV-E0A — Research-to-Decision
 
-Connect the MU `G_supply` falsification packet to the same:
+- **Historical label `GV-E0`**: research packet freeze (four artifacts) — custody closed; hashes locked above.
+- **Active label `GV-E0A-OPERABLE`**: sole active gate — see Active gate section. Combined vertical from frozen custody to one visible current decision. Do not treat broad “E0 research expansion” or FS1 as next.
 
-```text
-DecisionEnvelope
-→ PortfolioBook
-→ Fs0PortfolioSnapshot
-→ Fs0Certification
-```
+## GV-P1 — Prospective Policy Evaluation (Future)
 
-This is where GodView begins testing whether it improves research decisions rather than only accounting correctly. The four frozen E0 research artifacts remain byte-identical and retain sole research-promotion authority.
-
-## GV-P1 — Prospective Policy Evaluation
-
-Only after the preceding gates:
+Only after the preceding gates (E0A then FS1+ as staged):
 
 - return-aware challengers;
 - optimizer challengers;
@@ -366,4 +369,11 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-Implement **GV-FS0 only**: one synthetic `OPEN`, one synthetic `NO_POSITION`, one new canonical `PortfolioBook`, one immutable `Fs0Certification`, one independent reconstruction, one cross-platform canonical hash, and one read-only Streamlit screen.
+Implement **GV-E0A-OPERABLE only**:
+
+```text
+frozen E0 custody → HOLD_FOR_EVIDENCE / NO_POSITION → one DecisionEnvelope
+→ book/cert → atomic current publication → one visible decision → Streamlit smoke
+```
+
+Do **not** reopen F1C-SHIP as an active gate. Do **not** start FS1, providers, PEAD, alpha claims, broker paths, dual-authority UI, or historical-suite repair. Keep `SHIPPED_PRODUCT_SCORE = 39/100`. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE` is stage-only and does not authorize alpha or score uplift.

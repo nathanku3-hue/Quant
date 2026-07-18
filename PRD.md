@@ -1,4 +1,36 @@
-# Product Requirements Document: Unified Opportunity Engine
+# Product Requirements Document: Terminal Zero / GodView Certified Portfolio OS
+
+## Active Build Authority (2026-07-19) — HARD RECUT
+
+```text
+PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
+F1C_SHIP = CLOSED_SUBSTRATE on product tip lineage 490a234
+  (deterministic certification + permanent dual-fixture evidence;
+   not operator-usable single-decision product endpoint)
+ACTIVE_GATE = GV-E0A-OPERABLE
+SHIPPED_PRODUCT_SCORE = 39/100 (owner claim ceiling; metric confidence low; no alpha)
+FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
+  (CERTIFIED_SINGLE_DECISION_OPERABLE only with operable evidence on branch)
+NEXT = frozen E0 custody → HOLD_FOR_EVIDENCE/NO_POSITION → one DecisionEnvelope
+       → book/cert → atomic current publication → one visible decision → Streamlit smoke
+FORBIDDEN = providers, real prices, FS1 batch, PEAD, alpha claims, broker,
+            compatibility dual-authority UI, historical-suite repair
+```
+
+- **Authority docs**: `docs/architecture/top_level_roadmap.md`, `docs/phase_brief/gv-e0a-operable-brief.md`, `docs/architecture/gv_fs0_certification_and_data_authority_contract.md`.
+- **F1C-SHIP**: closed substrate (transport C/C2 + closeout T). Do not reopen as active shipment gate.
+- **FS1**: future stage after E0A; **not** next action.
+- **UOE / six-stream concurrent authority**: superseded as active product framing; retained below as history only.
+- **PEAD notices** below are historical research program residue; PEAD strict-PIT is `TERMINATED_DIAGNOSTIC_ONLY` and is not active build authority.
+- **Score rule**: do not numerically uplift past 39/100 without a separate rubric-based owner claim. Dual-fixture demo existence is already reflected in stage `CERTIFIED_STATIC_BRANCH_DEMO`, not in score inflation.
+
+Mode for this block: active build authority supersession. Implementation of E0A code is a separate Backend/Frontend round; this block does not claim E0A operable code complete.
+
+---
+
+## History — V2 PEAD Notices (not active product gate)
+
+The following PEAD notices are retained as research/audit history. They do **not** authorize PEAD reopen, provider access, alpha claims, or dashboard promotion.
 
 ## V2 PEAD Alpha Interpretation Gate Notice (2026-06-24)
 
@@ -93,12 +125,13 @@
 - Reviewer A/B/C rerun has passed for the strategy skeleton, so it is handoff-ready for corrected D1/D2 inputs only.
 - This authorizes strategy schema/statistics development only. Data builders, Parquet/manifest artifacts, provider access, real alpha interpretation, promotion, UI, alerts, and broker paths remain outside this round.
 
-Status: Canonical product PRD for Phase 65 Portfolio Universe Construction Fix
-Date: 2026-05-10
+Status: Canonical product PRD — GodView certified portfolio OS pivot (authorized)
+Date: 2026-07-19 (active authority hard-recut); historical body dates retained
 Owner: PM / Architecture Office
-Scope: docs and architecture only
+Active gate: GV-E0A-OPERABLE (see Active Build Authority block at top)
+Historical note: older “Phase 65 / UOE / six-stream” body text below is history unless explicitly re-authorized.
 
-## Current Phase 65 Notices
+## History — Phase 65 / UOE Notices (superseded as active authority)
 
 V2-D0.4C Local Read-Only Permission Probe Approval (2026-06-03):
 

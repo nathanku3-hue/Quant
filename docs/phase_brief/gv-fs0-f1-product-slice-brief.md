@@ -1,28 +1,37 @@
 # Phase Brief: GV-FS0-F1 — Product Slice (Corrected)
 
-## Active Addendum — F1C-SHIP Terminal Closeout T (2026-07-19)
+## Active Addendum — Post-F1C Direction Hard Recut (2026-07-19)
+
+- **F1C-SHIP status**: `CLOSED_SUBSTRATE` on product tip lineage `490a234`. Deterministic certification + permanent dual-fixture evidence are banked. F1C is **not** an operator-usable single-decision product endpoint and is **not** reopenable as the active shipment gate.
+- **Sole active gate**: **GV-E0A-OPERABLE** (see `docs/phase_brief/gv-e0a-operable-brief.md` and roadmap hard-recut). Not another F1C reopen. Not broad FS1.
+- **Score**: `SHIPPED_PRODUCT_SCORE = 39/100` (owner claim ceiling; no alpha).
+- **Functional stage**: `CERTIFIED_STATIC_BRANCH_DEMO` until operable single-decision evidence exists; then evidence may support `CERTIFIED_SINGLE_DECISION_OPERABLE` without automatic score uplift.
+- **Forbidden**: providers, real prices, FS1 batch, PEAD, alpha claims, broker, compatibility dual-authority UI, historical-suite repair.
+- **Next action**: execute E0A operable vertical only; do not re-open F1C/F1D sequential language as active.
+
+## Prior Addendum — F1C-SHIP Terminal Closeout T (2026-07-19) [CLOSED_SUBSTRATE]
 
 - **Authority**: owner GO SHIP F1C with mandatory two-SHA sequence repair.
 - **Transport C**: 48ad053dc21d7dda3c8280dcbd3c332584cc184a (runtime, permanent bundle, tests, workflow, default cutover).
 - **Transport C2**: 91b9bf1459439443298886ad6acc4a6181154431 (.gitattributes LF pin for Windows hosted parity).
 - **Hosted product CI**: run 29651784244 PASS — Ubuntu, Windows, Windows/Linux byte parity.
 - **Independent review**: distinct Reviewer A/B/C PASS on C and re-pin PASS on C2.
-- **Canonical bundle**: BUNDLE_527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c; 55,774 bytes; file SHA-256 9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5.
+- **Canonical bundle**: BUNDLE_527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c; 55,774 bytes; file SHA-256 a9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5.
 - **Product meaning**: permanent two-role certified bundle is tracked; default Certified Portfolio route loads only permanent validated bytes; product CI is banked.
 - **Score**: official shipped-product score remains **39/100** (owner ceiling; no alpha/readiness promotion).
-- **Obsolete gate language**: standalone sequential F1C then F1D is revoked as an active gate. F1C-SHIP is the single product shipment that unifies permanent publication, default certified route, product CI, and independent closeout.
+- **Gate language**: standalone sequential F1C then F1D is revoked. F1C-SHIP closed as substrate; active gate moved to **GV-E0A-OPERABLE** by direction hard-recut A/A/A/A.
 - **Boundary**: no provider, real data, PEAD, broker/live capital, protocol redesign, historical suite repair, or main merge.
-- **Next action**: hold product-branch tip after T; open nothing else without a separate owner decision.
+- **Next action (superseded)**: hold tip language superseded by E0A-OPERABLE active gate.
 
 ## Prior Addendum — F1C-SHIP Local Candidate (2026-07-18) [superseded on shipment status]
 
 - Local implementer candidate recorded 201/202 and absent permanent artifact; superseded by materialization, C/C2 transport, hosted PASS, A/B/C PASS, and terminal T.
 
-Mode: CLOSURE_REPORT
-Status: P0_5_BANKED; F1A_CLOSED; F1B_CLOSED; F1C_SHIP_CLOSED_ON_PRODUCT_BRANCH; SCORE_39_RETAINED
+Mode: CLOSURE_REPORT (F1C substrate); active product gate moved to GV-E0A-OPERABLE
+Status: P0_5_BANKED; F1A_CLOSED; F1B_CLOSED; F1C_SHIP_CLOSED_SUBSTRATE; ACTIVE_GATE=GV_E0A_OPERABLE; SCORE_39_RETAINED; STAGE=CERTIFIED_STATIC_BRANCH_DEMO
 Date: 2026-07-19
-RoundID: ROUND-20260719-GV-FS0-F1C-SHIP-TERMINAL
-ScopeID: GV_FS0_F1C_SHIP_TWO_SHA_CLOSEOUT
+RoundID: ROUND-20260719-GV-FS0-F1C-SHIP-TERMINAL (substrate); direction ROUND-20260719-E0A-OPERABLE-DIRECTION
+ScopeID: GV_FS0_F1C_SHIP_TWO_SHA_CLOSEOUT (closed); next GV_E0A_OPERABLE_VERTICAL
 Authority:
 - docs/architecture/godview_endgame_vision.md
 - docs/architecture/godview_portfolio_first_operating_model.md
@@ -31,7 +40,7 @@ Authority:
 - frozen protocol: docs/architecture/gv_fs0_certification_and_data_authority_contract.md (terminal freeze at c007895)
 - V1.1 verifier I/O: docs/architecture/gv_fs0_protocol_v1_1_verifier_io.md (engine compatibility only; frozen V1 schemas byte-immutable)
 - terminal freeze evidence: docs/phase_brief/phase-E0-brief.md (historical/terminal; do not rewrite)
-Hierarchy: L1 Terminal Zero; L2 active Backend product accounting + Frontend read-only presentation; L2 held Data admission / Research / PEAD / FS1; L3 flow P0 custody → atomic P0.5 bank → F1A OPEN → F1B NO_POSITION → **F1C-SHIP** (permanent two-role bundle + default certified route + product CI + independent closeout). The historical F1C/F1D sequential labels below are retained only as archival description of earlier planning slices.
+Hierarchy: L1 Terminal Zero; L2 active Backend/Frontend for **GV-E0A-OPERABLE**; L2 substrate F1C dual-fixture demo closed; L2 held Data admission / Research / PEAD / FS1; L3 historical flow P0 custody → P0.5 bank → F1A OPEN → F1B NO_POSITION → F1C-SHIP (CLOSED_SUBSTRATE). Active next is E0A operable single-decision vertical, not F1C reopen.
 
 ## Decision
 

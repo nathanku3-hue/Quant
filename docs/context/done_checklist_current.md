@@ -1,8 +1,34 @@
 # Done Checklist - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Terminal Checklist (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Direction + Gate Checklist (2026-07-19)
 
-- [x] Exact permanent bundle materialized and tracked (55774 / 9dda224…).
+### Direction hard-recut (Docs/Ops)
+
+- [x] Active canon hard-recut: sole gate **GV-E0A-OPERABLE**.
+- [x] F1C-SHIP marked CLOSED_SUBSTRATE; not active shipment language.
+- [x] Score 39/100 retained as owner claim ceiling (no numerical uplift).
+- [x] Functional stage explicit: `CERTIFIED_SINGLE_DECISION_OPERABLE` (stage-only; score remains 39).
+- [x] README/PRD/PRODUCT_SPEC active framing → GodView certified portfolio OS; UOE demoted to history.
+- [x] E0A EXECUTION_PACKET brief created.
+- [x] Forbidden scope restated: providers, real prices, FS1 batch, PEAD, alpha, broker, dual-authority UI, historical suite repair.
+
+### E0A operable vertical (implemented on `codex/gv-e0a-operable`)
+
+- [x] Frozen E0 four-file exact hashes verified in operable path.
+- [x] Explicit HOLD_FOR_EVIDENCE research decision.
+- [x] Portfolio NO_POSITION via one DecisionEnvelope.
+- [x] PortfolioBook + independent certification for that decision.
+- [x] Atomic publication of current decision.
+- [x] One visible current decision (default portfolio route).
+- [x] Streamlit AppTest smoke for one current decision.
+- [x] Stage `CERTIFIED_SINGLE_DECISION_OPERABLE` with product-suite evidence.
+- [x] Score remains 39/100.
+
+Next action: owner review/merge of `codex/gv-e0a-operable`; do not open FS1, providers, PEAD, alpha, or broker.
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Checklist (2026-07-19) [CLOSED_SUBSTRATE]
+
+- [x] Exact permanent bundle materialized and tracked (55774 / a9dda224…).
 - [x] Focused product+protocol 202/202.
 - [x] Candidate C banked and pushed as transport (48ad053).
 - [x] C2 LF pin banked and pushed (91b9bf1).
@@ -10,14 +36,13 @@
 - [x] Distinct Reviewer A/B/C PASS on C and re-pin C2.
 - [x] Terminal SAW PASS; obsolete F1C/F1D sequential active-gate language removed.
 - [x] Official score remains 39/100.
+- [x] F1C closed as substrate (direction recut).
 - [ ] Provider/real data/PEAD/FS1/main merge — held; not authorized.
-
-Next action: hold product-branch tip; choose any later scope only by separate owner decision.
 
 
 # Done Checklist - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Local Done State (2026-07-18)
+## Prior Addendum — GV-FS0 F1C-SHIP Local Done State (2026-07-18) [superseded]
 
 - [x] Exact base `c37db09`; F1A/F1B identities unchanged.
 - [x] Deterministic complete OPEN + NO_POSITION bundle identity.
@@ -65,7 +90,7 @@ Next action: stop before F1C; require separate owner authorization before perman
 
 Next action: open F1B only.
 
-## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
 
 - [x] Immutable candidate `346d362` created and locally audited.
 - [x] Hosted-CI portability repairs through `d5d03ec` preserve frozen protocol, manifest, and vector bytes.
@@ -79,7 +104,7 @@ Next action: open F1B only.
 
 Next action: hold until separate owner authorization opens reducer/product work. Economic implementation remains blocked in this round.
 
-## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17) [history]
 
 - [x] Four approved precision decisions and four execution amendments are explicit in the normative contract.
 - [x] Exactly 12 schemas and six other normative V1 artifacts regenerate deterministically.

@@ -744,6 +744,15 @@ def _build_certified_result(
     return result
 
 
+def build_certified_result_from_book(
+    build: OpenBookBuild,
+    verifier_runner: VerifierRunner = run_isolated_verifier,
+) -> dict[str, Any]:
+    """Build one certified result from an arbitrary primary book build."""
+
+    return _build_certified_result(build, verifier_runner)
+
+
 def build_open_certified_result(
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> dict[str, Any]:
@@ -762,6 +771,7 @@ def build_no_position_certified_result(
 
 __all__ = [
     "GvFs0CertificationError",
+    "build_certified_result_from_book",
     "build_no_position_certified_result",
     "build_open_certified_result",
     "run_isolated_verifier",

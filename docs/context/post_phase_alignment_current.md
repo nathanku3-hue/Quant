@@ -1,16 +1,23 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Terminal Alignment (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Direction Alignment (2026-07-19)
+
+- **What changed**: Active canon hard-recut + E0A operable vertical. Sole active gate **GV-E0A-OPERABLE**. F1C-SHIP demoted to closed dual-fixture substrate. Product framing = GodView certified portfolio OS (paper). Score 39 ceiling; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
+- **Streams**: Docs/Ops canon recut active; Backend/Frontend own E0A operable implementation (not claimed complete here); Data admission/PEAD/FS1/broker held.
+- **Current bottleneck**: operable single-decision vertical not yet evidenced as complete; dual-fixture UI must not be overclaimed as operator product.
+- **Next active stream**: Backend + Frontend for GV-E0A-OPERABLE only (Docs/Ops tracks evidence).
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Alignment (2026-07-19) [CLOSED_SUBSTRATE]
 
 - **What changed**: F1C-SHIP closed on product branch — permanent certified bundle + default certified route + product CI + independent closeout.
-- **Streams**: Backend/Frontend product path closed for this slice; Data admission/Research/PEAD/FS1 held.
-- **Current bottleneck**: none for F1C-SHIP. Later owner decision required for any adjacent scope.
-- **Next active stream**: none by default.
+- **Streams**: Backend/Frontend product path closed for F1C slice; Data admission/Research/PEAD/FS1 held.
+- **Current bottleneck**: none for F1C-SHIP; next gate is E0A (direction recut).
+- **Next active stream (superseded)**: none by default → E0A.
 
 
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Local Alignment (2026-07-18)
+## Prior Addendum — GV-FS0 F1C-SHIP Local Alignment (2026-07-18) [superseded]
 
 - **Backend/Product:** deterministic complete bundle and section-15 publisher/recovery path locally PASS.
 - **Frontend/UI:** default portfolio authority hard-cut to permanent certified bundle; both roles render headlessly; legacy replay remains non-certifying history only.
@@ -38,7 +45,7 @@
 - **Current bottleneck:** none for F1A. Process-tree termination is later operational hardening, not an F1A blocker.
 - **Next active stream:** F1B NO_POSITION only.
 
-## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
 
 - **Docs/Ops:** Protocol candidate, CI portability repair, final mutation probe evidence, A/B/C review, hosted Windows/Linux CI, byte parity, and terminal SAW are complete.
 - **Backend/Strategy:** Held; reducer and PortfolioBook work remain unopened in this round.

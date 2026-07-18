@@ -1,8 +1,9 @@
-"""Read-only GV-FS0 certified portfolio adapter.
+"""Read-only GV-FS0 / E0A portfolio adapter.
 
 Injected component rendering remains the test seam. The default product path
-loads one permanent, canonical, schema-valid two-role bundle and injects each
-component through the same display function. The adapter owns no accounting,
+loads one published current certified decision and renders a single component.
+The F1C permanent two-role bundle loader remains available for evidence tests
+only and is not the default product export path. The adapter owns no accounting,
 verifier execution, certification aggregation, or publication.
 """
 
@@ -14,7 +15,15 @@ import json
 from pathlib import Path
 from typing import Any, Protocol
 
-from core.gv_fs0_bundle import GvFs0BundleError, read_certified_bundle
+from core.gv_fs0_bundle import (
+    GvFs0BundleError,
+    read_certified_bundle,
+)
+from core.gv_fs0_current_decision import (
+    DEFAULT_CURRENT_DECISION_PATH,
+    GvFs0CurrentDecisionError,
+    parse_current_decision_bytes,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BUNDLE_PATH = ROOT / "data" / "gv_fs0" / "gv_fs0_certified_bundle.json"
@@ -130,7 +139,7 @@ def render_gv_fs0_portfolio(
 def load_default_certified_bundle(
     bundle_path: Path = DEFAULT_BUNDLE_PATH,
 ) -> dict[str, Any]:
-    """Load permanent product truth; missing or invalid bytes fail closed."""
+    """Load permanent F1C evidence bundle; missing or invalid bytes fail closed."""
 
     try:
         return read_certified_bundle(Path(bundle_path))
@@ -143,7 +152,7 @@ def render_gv_fs0_certified_bundle(
     *,
     bundle_path: Path = DEFAULT_BUNDLE_PATH,
 ) -> list[dict[str, Any]]:
-    """Render OPEN then NO_POSITION from the permanent validated bundle."""
+    """Evidence-only: render OPEN then NO_POSITION from the permanent bundle."""
 
     bundle = load_default_certified_bundle(bundle_path)
     models: list[dict[str, Any]] = []
@@ -159,11 +168,53 @@ def render_gv_fs0_certified_bundle(
     return models
 
 
+def load_current_certified_decision(
+    decision_path: Path | None = None,
+) -> dict[str, Any]:
+    """Load one current decision via the same canonical parser as publication.
+
+    Object-only / non-canonical bytes that pass loose JSON schema checks but fail
+    publisher identity are rejected here as well. Path is resolved at call time
+    so tests can retarget the default product authority without reimport.
+    """
+
+    path = Path(
+        decision_path if decision_path is not None else DEFAULT_CURRENT_DECISION_PATH
+    )
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise GvFs0PresentationError("CURRENT_DECISION_UNAVAILABLE") from exc
+    try:
+        return parse_current_decision_bytes(raw)
+    except GvFs0CurrentDecisionError as exc:
+        raise GvFs0PresentationError(f"CURRENT_DECISION_INVALID:{exc}") from exc
+
+
+def render_gv_fs0_current_decision(
+    renderer: PortfolioRenderer,
+    *,
+    decision_path: Path | None = None,
+) -> dict[str, Any]:
+    """Default product path: render exactly one current certified decision."""
+
+    component = load_current_certified_decision(decision_path)
+    return render_gv_fs0_portfolio(
+        renderer,
+        presentation=component["presentation"],
+        terminal_snapshot=component["snapshots"][-1],
+        certification=component["certification"],
+    )
+
+
 __all__ = [
     "DEFAULT_BUNDLE_PATH",
+    "DEFAULT_CURRENT_DECISION_PATH",
     "GvFs0PresentationError",
     "build_portfolio_view_model",
+    "load_current_certified_decision",
     "load_default_certified_bundle",
     "render_gv_fs0_certified_bundle",
+    "render_gv_fs0_current_decision",
     "render_gv_fs0_portfolio",
 ]

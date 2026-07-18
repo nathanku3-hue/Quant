@@ -47,7 +47,10 @@ from views.page_registry import DISCOVERY_PAGE_TITLE
 from views.page_registry import PORTFOLIO_PAGE_TITLE
 from views.page_registry import STRATEGY_PAGE_TITLE
 from views.discovery_view import render_discovery_page
-from views.gv_fs0_portfolio_adapter import render_gv_fs0_certified_bundle
+from views.gv_fs0_portfolio_adapter import (
+    GvFs0PresentationError,
+    render_gv_fs0_current_decision,
+)
 from views.pead_validation_evidence import render_pead_validation_evidence
 from views.strategy_view import render_strategy_page
 from strategies.portfolio_universe import (
@@ -4736,13 +4739,21 @@ def _render_placeholder_page(title: str) -> None:
 
 
 def _render_portfolio_allocation_page() -> None:
-    """Render the sole default certified portfolio authority."""
+    """Render the sole default certified portfolio authority (one active decision)."""
 
     st.header(PORTFOLIO_PAGE_TITLE)
     st.caption(
-        "Permanent GV-FS0 certified bundle. Legacy replay and optimizer outputs are non-certifying research surfaces."
+        "E0A operable · research HOLD_FOR_EVIDENCE → paper NO_POSITION. "
+        "One active certified decision. Legacy replay and optimizer outputs are "
+        "non-certifying research surfaces. F1C dual-role bundle remains evidence-only."
     )
-    render_gv_fs0_certified_bundle(st)
+    try:
+        render_gv_fs0_current_decision(st)
+    except GvFs0PresentationError as exc:
+        # Fail closed: explicit unavailable authority. Never fall back to F1C dual
+        # bundle, replay, optimizer, or any non-certifying surface.
+        st.error("Certified decision unavailable")
+        st.caption(f"Authority refused: {exc}")
 
 
 def _render_discovery_page() -> None:

@@ -2,3 +2,5 @@ docs/architecture/gv_fs0_certification_and_data_authority_contract.md text eol=l
 contracts/gv_fs0/v1/**/*.json text eol=lf
 contracts/gv_fs0/v1/**/*.bin -text
 data/gv_fs0/gv_fs0_certified_bundle.json text eol=lf
+data/gv_fs0/gv_fs0_current_decision.json text eol=lf
+docs/architecture/godview_e0/** text eol=lf

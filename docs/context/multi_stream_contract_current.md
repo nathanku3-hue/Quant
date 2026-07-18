@@ -1,6 +1,20 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Terminal Multi-Stream (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Multi-Stream (2026-07-19)
+
+| Stream | Status | Note |
+|---|---|---|
+| Backend/Strategy | **Active for E0A** | HOLD_FOR_EVIDENCE / NO_POSITION → DecisionEnvelope → book/cert → atomic current publication; F1C substrate preserved |
+| Frontend/UI | **Active for E0A** | One visible current decision + Streamlit smoke; no dual-authority compatibility UI |
+| Data admission | Held | No provider/real prices/admission |
+| Docs/Ops | Active canon recut | Roadmap/PRD/README/truth/E0A brief; score 39 + stage semantics |
+| Product CI (F1C) | PASS substrate | 29651784244; not E0A completion proof |
+| PEAD / FS1 / broker | Held | Forbidden as next |
+
+- Cross-stream rule: **one active gate only — GV-E0A-OPERABLE**. F1C dual-fixture demo is substrate, not a second active gate.
+- Next action: implement E0A vertical; no FS1 expansion; no F1C reopen.
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Multi-Stream (2026-07-19) [CLOSED_SUBSTRATE]
 
 | Stream | Status | Note |
 |---|---|---|
@@ -11,12 +25,12 @@
 | Product CI | PASS 29651784244 | Ubuntu/Windows/parity |
 
 - Cross-stream rule: obsolete sequential F1C/F1D split is not an active gate.
-- Next action: hold; no multi-stream expansion.
+- Next action (superseded): hold → E0A.
 
 
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Local Coordination (2026-07-18)
+## Prior Addendum — GV-FS0 F1C-SHIP Local Coordination (2026-07-18) [superseded]
 
 | Stream | Current state | Remaining handoff |
 |---|---|---|
@@ -56,7 +70,7 @@
 - Stream freeze: F1C/F1D, publication, default routing, provider/data, and FS1 remain unopened.
 - Next action: F1B only.
 
-## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
 
 | Stream | Current status | Handoff / boundary |
 |---|---|---|

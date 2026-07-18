@@ -1,6 +1,18 @@
 # Planner Packet - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Terminal Closeout T (2026-07-19)
+## Active Addendum — GV-E0A-OPERABLE Direction Hard Recut (2026-07-19)
+
+- **PRODUCT_PIVOT**: AUTHORIZED — UOE discretionary cockpit → GodView certified portfolio OS (paper).
+- **F1C_SHIP**: `CLOSED_SUBSTRATE` on product tip lineage `490a234` (dual-fixture certified demo + product CI). Not operator single-decision endpoint. Not reopenable as active gate.
+- **ACTIVE_GATE (sole)**: **GV-E0A-OPERABLE**.
+- **Score**: `SHIPPED_PRODUCT_SCORE = 39/100` (owner claim ceiling; metric confidence low; no alpha). Do not uplift to 40+ without rubric.
+- **FUNCTIONAL_STAGE**: `CERTIFIED_SINGLE_DECISION_OPERABLE` (evidence: E0 custody + current decision publish + default `render_gv_fs0_current_decision` + product suite green). Score remains 39/100.
+- **Vertical**: frozen MU G_supply (4 exact hashes) → HOLD_FOR_EVIDENCE / NO_POSITION → one DecisionEnvelope → book/cert → atomic current publication → one visible decision → Streamlit smoke.
+- **E0A code status**: not claimed complete in this docs round; direction locked A/A/A/A.
+- **Recommended next step**: implement GV-E0A-OPERABLE only (`docs/phase_brief/gv-e0a-operable-brief.md`).
+- **Do not begin**: F1C reopen, providers, real prices, FS1 batch, PEAD, alpha claims, broker, dual-authority UI, historical suite repair, main-as-product-tip claims if tip is branch-based.
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Closeout T (2026-07-19) [CLOSED_SUBSTRATE]
 
 - **Transport C**: 48ad053dc21d7dda3c8280dcbd3c332584cc184a — runtime/bundle/tests/workflow/default cutover (transport only).
 - **Transport C2**: 91b9bf1459439443298886ad6acc4a6181154431 — LF pin for Windows hosted parity.
@@ -8,13 +20,13 @@
 - **Review**: distinct A/B/C PASS on C; re-pin PASS on C2; terminal SAW PASS.
 - **Product**: permanent two-role certified bundle tracked; default Certified Portfolio reads only permanent bytes.
 - **Score**: 39/100 retained by owner ceiling.
-- **Recommended next step**: hold product-branch tip; do not open providers, PEAD, FS1, historical suite repair, or main merge.
-- **Do not begin**: protocol redesign, provider/real data, PEAD reopen, broker/live capital, GV-FS1, main merge.
+- **Superseded next step**: hold tip → replaced by **GV-E0A-OPERABLE** as sole active gate.
+- **Do not begin** (still held): protocol redesign, provider/real data, PEAD reopen, broker/live capital, GV-FS1 as next, main merge without separate authority.
 
 
 # Planner Packet - Current
 
-## Active Addendum — GV-FS0 F1C-SHIP Local Candidate (2026-07-18)
+## Prior Addendum — GV-FS0 F1C-SHIP Local Candidate (2026-07-18) [superseded]
 
 - **Base**: exact clean `c37db09`; F1A/F1B identities preserved.
 - **Current state**: complete F1C-SHIP code path exists locally—two-role bundle, atomic publication/recovery, certified default route, headless proof, and product CI workflow.
@@ -41,7 +53,7 @@
 - **Recommended next step**: open F1B only, sending NO_POSITION through the identical book/certification/adapter path.
 - **Do not begin**: F1C/F1D, permanent bundle publication, default dashboard routing, providers, real data, PEAD reopen, or GV-FS1.
 
-## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
 
 - **Current state**: repaired candidate `d5d03ec` has terminal protocol-freeze evidence PASS; reducer/product work remains a separate unopened round.
 - **Completed**: final candidate `346d362`, CI repairs through `d5d03ec`, deterministic generation, independent vectors, enforced verifier, six mutation probes on restored non-merge branch tip `9954e32`, A/B/C terminal review PASS, and hosted Windows/Linux byte parity PASS.
@@ -50,7 +62,7 @@
 - **Recommended next step**: hold until a separate owner decision authorizes reducer/product work.
 - **Do not begin**: PortfolioBook reduction, FS0 event execution, snapshots, certification execution, certified results, permanent bundle publication, Streamlit, providers, real data, or GV-FS1.
 
-## Active Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17)
+## Prior Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17) [history]
 
 - **Current state**: protocol-only candidate is locally green; reducer and product authorization remain blocked.
 - **Completed**: approved precision amendments; 12 schemas plus six normative tables/registries/vectors; exact canonical encoder and raw-token parser; isolated reconstruction byte/hash boundary; independent CI encoder; freeze manifest; bootstrap/enforced guard machinery; Windows/Linux workflow.

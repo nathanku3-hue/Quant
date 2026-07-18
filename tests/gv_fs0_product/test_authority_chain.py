@@ -113,7 +113,11 @@ def test_roadmap_declares_gv_fs0_authority_chain() -> None:
     text = _read(ROADMAP_REL)
     for token in AUTHORITY_CHAIN:
         assert token in text, f"roadmap missing authority-chain token {token!r}"
-    assert "EXECUTION_MODEL = GV_FS0_FIRST" in text
+    # Active gate is E0A operable; F1C dual-bundle remains closed substrate.
+    assert (
+        "ACTIVE_GATE = GV-E0A-OPERABLE" in text
+        or "EXECUTION_MODEL = GV_FS0_FIRST" in text
+    )
     assert "SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED" in text
 
 

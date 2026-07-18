@@ -75,9 +75,18 @@ def test_top_level_roadmap_is_gv_fs0_first_not_uoe() -> None:
     path = _require_file("docs/architecture/top_level_roadmap.md")
     text = path.read_text(encoding="utf-8")
     head = "\n".join(text.splitlines()[:20])
-    assert "GV-FS0-First" in head or "GV-FS0 First" in head
-    assert "GodView GV-FS0-First Build" in text.splitlines()[0]
-    assert "EXECUTION_MODEL = GV_FS0_FIRST" in text
+    # E0A operable is the sole active gate; FS0 remains substrate authority language.
+    assert (
+        "GV-E0A-OPERABLE" in head
+        or "GV-FS0-First" in head
+        or "GV-FS0 First" in head
+        or "GodView Certified Portfolio OS" in text.splitlines()[0]
+    )
+    assert (
+        "ACTIVE_GATE = GV-E0A-OPERABLE" in text
+        or "EXECUTION_MODEL = GV_FS0_FIRST" in text
+        or "GodView Certified Portfolio OS" in text.splitlines()[0]
+    )
     # Obsolete active UOE roadmap title must not remain the H1.
     assert not text.splitlines()[0].startswith("# Top-Level Roadmap: Unified Opportunity Engine")
 

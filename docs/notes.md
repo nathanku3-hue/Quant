@@ -1,3 +1,31 @@
+## 2026-07-19 Score Semantics + Functional Stage Definition
+
+### SHIPPED_PRODUCT_SCORE
+- Current value: **39/100**.
+- Meaning: **owner claim ceiling** for shipped product claims. Metric confidence is low. **No alpha**.
+- Non-uplift rule: do **not** numerically move to 40+ because dual-fixture demo, local green paths, CI parity, or docs recuts exist. Uplift requires separate rubric-based owner claim authorization.
+- Rationale repair: obsolete language such as `no visible certified slice` is superseded. A certified dual-fixture static branch demo **does** exist on product tip lineage `490a234`; that fact is expressed via **FUNCTIONAL_STAGE**, not score inflation.
+
+### FUNCTIONAL_STAGE (separate from score)
+| Stage | Meaning | Promote when |
+|---|---|---|
+| `CERTIFIED_STATIC_BRANCH_DEMO` | Permanent dual-fixture certified bundle + default Certified Portfolio route exist on product lineage; deterministic certification substrate closed | Default current stage post-F1C |
+| `CERTIFIED_SINGLE_DECISION_OPERABLE` | One operator-visible **current** decision path: frozen E0 custody → HOLD_FOR_EVIDENCE/NO_POSITION → DecisionEnvelope → book/cert → atomic current publication → visible decision → Streamlit smoke | Only with branch evidence for full E0A vertical |
+
+Stage promotion does **not** auto-change SHIPPED_PRODUCT_SCORE.
+
+### ACTIVE_GATE
+- Sole active gate: **GV-E0A-OPERABLE**.
+- F1C-SHIP: CLOSED_SUBSTRATE (not active).
+- FS1+: future stages only; not next action.
+
+### Formula / identity notes
+- E0 custody hashes (must remain exact):
+  - e0_preregistration.yaml `0a6dc18a44d7532610a73f90b92477fc7bd36644c1a052d81a48162097176618`
+  - evidence_authority_matrix.csv `3306adbed26d27732a0a53d3819a09044e418e183ecc58ebebf82c6f9fe0dcb0`
+  - e0_model_spec.md `28a0ea062777d9364008480266ce933bd6a34348ce0defcac7185398068a38f0`
+  - e0_acceptance_tests.md `9d9a7f195bd8db2caea82859d6a73d951c862f229fc9d72e5302c58ba7b8d55c`
+- Implementation paths for E0A code: owned by parallel code agent; not registered complete in this docs round.
 ## 2026-07-19 GV-FS0 F1C-SHIP Terminal
 
 - Permanent two-role certified bundle tracked; default Certified Portfolio loads permanent bytes only.
@@ -6486,3 +6514,4 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Cumulative contribution: `current_NAV - initial_cash`; terminal contribution is `44`.
 - Certification: exactly two isolated verifier attempts must both reproduce the primary economic payload and hash; all ten tri-state checks must be TRUE before status may be CERTIFIED.
 - F1A boundary: certified OPEN remains in memory and is injected into the final read-only adapter. No permanent two-component bundle or default dashboard route is authorized.
+

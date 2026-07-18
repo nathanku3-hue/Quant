@@ -284,7 +284,7 @@ def test_default_render_fails_closed_without_valid_bundle(tmp_path: Path) -> Non
         render_gv_fs0_certified_bundle(renderer, bundle_path=invalid)
 
 
-def test_default_dashboard_authority_is_certified_bundle_only() -> None:
+def test_default_dashboard_authority_is_current_decision_only() -> None:
     dashboard_path = ROOT / "dashboard.py"
     tree = ast.parse(dashboard_path.read_text(encoding="utf-8"), filename=str(dashboard_path))
     function = next(
@@ -294,7 +294,8 @@ def test_default_dashboard_authority_is_certified_bundle_only() -> None:
         and node.name == "_render_portfolio_allocation_page"
     )
     body = ast.unparse(function)
-    assert "render_gv_fs0_certified_bundle(st)" in body
+    assert "render_gv_fs0_current_decision(st)" in body
+    assert "render_gv_fs0_certified_bundle(st)" not in body
     for forbidden in (
         "_render_portfolio_builder_section",
         "_ensure_daily_portfolio_replay_context",
@@ -316,12 +317,14 @@ def test_default_dashboard_authority_is_certified_bundle_only() -> None:
         elif isinstance(node, ast.Import):
             imports.update(alias.name for alias in node.names)
     assert "core.gv_fs0_bundle" in imports
+    assert "core.gv_fs0_current_decision" in imports  # shared canonical reader only
     assert not any(
         name in imports
         for name in (
             "core.gv_fs0_book",
             "core.gv_fs0_certify",
             "core.gv_fs0_publish",
+            "core.gv_e0a_operable",
             "strategies.strategy_replay",
         )
     )

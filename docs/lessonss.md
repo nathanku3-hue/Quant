@@ -1,4 +1,10 @@
 ## 2026-07-19
+- Mistake or miss: multi-active-gate drift (F1C closed + still active + still blocked + implement next stacked simultaneously); dual-fixture Certified Portfolio UI overclaimed as operator product endpoint; score conflated with functional maturity (pressure to uplift 39 without rubric).
+- Root cause: addendum-stacking left contradictory `Active` sections live; demo evidence was treated as shipment/operability; single numeric score used for both claim ceiling and stage maturity.
+- Fix applied: hard-recut active canon to one gate GV-E0A-OPERABLE; demote F1C to CLOSED_SUBSTRATE; implement operable vertical (custody→HOLD_FOR_EVIDENCE→NO_POSITION→cert→current publish→one UI); split SHIPPED_PRODUCT_SCORE 39/100 from FUNCTIONAL_STAGE CERTIFIED_SINGLE_DECISION_OPERABLE (stage-only).
+- Guardrail for next time: never leave two `Active` next gates; never promote score from stage alone; default UI shows one current decision only; operator publish is CLI not presentation-layer mutation.
+- Evidence paths: core/gv_e0a_operable.py, views/gv_fs0_portfolio_adapter.py, scripts/publish_gv_e0a_current.py, docs/architecture/top_level_roadmap.md, tests/gv_fs0_product/test_e0a_operable.py.
+## 2026-07-19
 - Mistake or miss: ordering commit→hosted→review→push is causally impossible; Windows CRLF also broke 55774 identity.
 - Root cause: hosted CI needs pushed workflow/commit; reviews need immutable SHA; Git autocrlf on Windows without attributes.
 - Fix applied: two-SHA pattern (C transport → hosted+A/B/C → T closeout); .gitattributes 	ext eol=lf for permanent bundle; workflow_dispatch on C2.
@@ -1921,3 +1927,4 @@ Application pattern:
 - Fix applied: Implemented OPEN vertically from source fixture and `DecisionEnvelope` through canonical events, exact snapshots, two isolated verifier attempts, ten-check certification, certification-reference event, certified result, and injection into the final read-only adapter. Permanent bundle publication remains unopened.
 - Guardrail for next time: For each portfolio gate, execute one complete decision path first and require exact canonical bytes plus a deliberate disagreement test before adding a second decision or any permanent publication mechanism.
 - Evidence paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, `views/gv_fs0_portfolio_adapter.py`, `tests/gv_fs0_product/test_open_vertical.py`, `docs/phase_brief/gv-fs0-f1-product-slice-brief.md`.
+
