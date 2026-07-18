@@ -1,5 +1,14 @@
 # Feature Engineering Notes
 
+## 2026-07-18 GV-FS0 F1A Review Reconciliation Formula Registry
+
+- Raw verifier binding: `raw_verifier_valid := economic_payload == expected_projection(primary_snapshots, decision, fixture, fees) AND canonical_payload_hash == H("GV-FS0:ECONOMIC_PAYLOAD:V1", expected_projection)`. Every semantic field, every session, final state, total cost, and the raw canonical hash must match before a formal verifier result exists.
+- Presentation binding: `presentation_valid := rows == projection(terminal_snapshot, certification) AND presentation_hash == H("GV-FS0:PRESENTATION:V1", {rows})`.
+- Duplicate handling: byte-identical identity preimages with the same event ID collapse; the same event ID with a different preimage blocks as `CONFLICTING_EVENT_ID`; different event IDs with the same economic-effect key block as `DUPLICATE_SEMANTIC_EVENT`.
+- Attempt rule: both ordinals execute even when a runner raises an infrastructure exception; any failure blocks certification.
+- Source authority tokens: `DECISION:<decision_hash>` and `CERTIFICATION:<certification_id>`.
+- Implementation paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, and `views/gv_fs0_portfolio_adapter.py`.
+
 ## 2026-07-11 Request Artifact Identity Repair V1 Registry
 
 - RoundID: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-REPAIR-V1`; ScopeID: `REQUEST_ARTIFACT_IDENTITY_REPAIR_V1`.

@@ -164,7 +164,7 @@ def _supervise_process(
         ]
         first_overflow = min(overflow_times) if overflow_times else None
         running = process.poll() is None
-        if running and now >= deadline_at:
+        if now >= deadline_at and (running or not (stdout_capture.eof and stderr_capture.eof)):
             hard_boundary = (
                 "VERIFIER_OUTPUT_LIMIT_EXCEEDED"
                 if first_overflow is not None and first_overflow < deadline_at
@@ -195,12 +195,12 @@ def _supervise_process(
 
     for reader in readers:
         reader.join(timeout=shutdown_seconds)
+    if hard_boundary is not None:
+        raise GvFs0CertificationError(hard_boundary)
     if any(reader.is_alive() for reader in readers):
         raise GvFs0CertificationError("VERIFIER_SUPERVISION_INCOMPLETE")
     if not stdout_capture.eof or not stderr_capture.eof:
         raise GvFs0CertificationError("VERIFIER_SUPERVISION_INCOMPLETE")
-    if hard_boundary is not None:
-        raise GvFs0CertificationError(hard_boundary)
     return (
         int(process.returncode),
         bytes(stdout_capture.retained),
@@ -294,13 +294,49 @@ def _formal_verifier_result(
     build: OpenBookBuild, raw_result: Mapping[str, Any]
 ) -> dict[str, Any]:
     economic = raw_result["economic_payload"]
-    if economic.get("action") != build.decision.action:
-        raise GvFs0CertificationError("VERIFIER_RESULT_BINDING_INVALID")
-    if economic.get("decision_id") != build.decision.decision_id:
-        raise GvFs0CertificationError("VERIFIER_RESULT_BINDING_INVALID")
-    if economic.get("fixture_id") != build.decision.fixture_id:
-        raise GvFs0CertificationError("VERIFIER_RESULT_BINDING_INVALID")
-    if economic.get("protocol_id") != PROTOCOL_ID:
+    expected_sessions = [
+        {
+            "cash": snapshot["cash"],
+            "contribution": snapshot["session_contribution"],
+            "market_value": snapshot["market_value"],
+            "nav": snapshot["nav"],
+            "receivables": snapshot["receivables"],
+            "session": snapshot["session"],
+            "shares": snapshot["shares"],
+        }
+        for snapshot in build.book.snapshots
+    ]
+    terminal = expected_sessions[-1]
+    expected_economic = {
+        "action": build.decision.action,
+        "authority": build.decision.authority_tier,
+        "currency": build.source_fixture["currency"],
+        "decision_id": build.decision.decision_id,
+        "final_state": dict(terminal),
+        "fixture_id": build.decision.fixture_id,
+        "protocol_id": PROTOCOL_ID,
+        "rationale_reference": build.decision.rationale_ref,
+        "schema_version": "GV_FS0_ECONOMIC_PAYLOAD_V1",
+        "security_id": build.decision.security_id,
+        "sessions": expected_sessions,
+        "total_costs": str(
+            sum(
+                (
+                    Decimal(event["payload"]["fee"])
+                    for event in build.book.events
+                    if event["event_type"] == "FEE_OR_COST"
+                ),
+                Decimal("0"),
+            )
+        ),
+    }
+    expected_raw_hash = domain_hash(
+        "GV-FS0:ECONOMIC_PAYLOAD:V1", expected_economic
+    )
+    if (
+        economic != expected_economic
+        or raw_result.get("canonical_payload_hash") != expected_raw_hash
+    ):
         raise GvFs0CertificationError("VERIFIER_RESULT_BINDING_INVALID")
     reconstructed_payload = verifier_rows_to_economic_payload(build, economic["sessions"])
     formal = {
@@ -498,7 +534,7 @@ def _certification_reference_event(
     source_sequence = max(
         intent["source_sequence"] for intent in build.source_fixture["source_intents"]
     ) + 1
-    source_intent_id = "CERTIFICATION:OPEN"
+    source_intent_id = f"CERTIFICATION:{certification_id}"
     preimage = {
         "schema_version": "gv_fs0_portfolio_event_v1",
         "book_id": build.book.book_id,
@@ -592,11 +628,16 @@ def build_open_certified_result(
             raw_results.append(verifier_runner(build.verifier_input))
         except GvFs0CertificationError as exc:
             attempt_failures.append(str(exc))
+        except Exception:
+            attempt_failures.append("VERIFIER_PROCESS_FAILED")
     if attempt_failures:
         raise GvFs0CertificationError(
             "CERTIFICATION_BLOCKED:" + ",".join(attempt_failures)
         )
-    formal_results = [_formal_verifier_result(build, raw) for raw in raw_results]
+    try:
+        formal_results = [_formal_verifier_result(build, raw) for raw in raw_results]
+    except GvFs0CertificationError as exc:
+        raise GvFs0CertificationError(f"CERTIFICATION_BLOCKED:{exc}") from exc
     formal_hashes = [
         domain_hash("GV-FS0:VERIFIER_RESULT:V1", result) for result in formal_results
     ]

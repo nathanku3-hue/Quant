@@ -1,3 +1,11 @@
+## 2026-07-18 — GV-FS0 F1A Initial Review Reconciliation
+
+- Decision: retain the exact synthetic OPEN economics while repairing every in-scope High finding from distinct Reviewer A/B/C against banked commit `699e664`.
+- Decision: require frozen source-authority tokens, exact raw verifier semantic/hash binding before formalization, two attempts across unexpected infrastructure exceptions, exact presentation projection/hash binding, and the machine-readable legacy replay revocation marker.
+- Decision: also close the Medium duplicate/idempotence, inherited-pipe deadline, and combined-suite module-reload findings in the same bounded repair because they affect the same F1A protocol and regression boundary.
+- Evidence: combined product/protocol tests, generator check, freeze bootstrap, compile, and focused adversarial probes pass locally after repair; terminal independent rerun remains required against the repair commit.
+- Boundary: no F1B, F1C, F1D, permanent bundle, provider, real data, dashboard routing, or FS1 work.
+
 ## 2026-07-13 — M7F4-v8 terminal diagnostic close
 - Decision: accept A2.1 `b4d35e1`, evidence-only Commit B `9f37745`, and three distinct independent Reviewer A/B/C passes as terminal evidence for the fixed M7F4-v8 diagnostic package.
 - Decision: preserve `DIAGNOSTIC_COMPLETE` with strict curve `BLOCKED`; the four residual windows remain represented only by neutral-carry-to-cash and write-down sensitivity legs with exact Shapley attribution.
@@ -7340,4 +7348,3 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Exact economics: initial cash `1000`; 10 shares at `10`; explicit fee `1`; residual cash `899`; dividend receivable/payment `5`; terminal cash `904`; terminal market value `140`; terminal NAV `1044`; cumulative contribution `44`.
 - Boundary: no permanent bundle, publication lock, default dashboard route, provider, real data, legacy replay authority, NO_POSITION implementation, or FS1 work in F1A.
 - Evidence state: focused product and protocol suites, deterministic two-run bytes, generator/freeze checks, compile, adapter smoke, and diff hygiene pass locally. Banked-commit identity and independent Reviewer A/B/C remain the next closure actions.
-

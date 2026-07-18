@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__authority__ = "REVOKED_BY_GV_FS0_20260716"
+
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone

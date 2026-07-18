@@ -1,6 +1,14 @@
 # lessonss.md
 
-Last updated: 2026-07-14
+Last updated: 2026-07-18
+
+## 2026-07-18 Round Entry (Schema PASS Does Not Prove Cross-Artifact Binding)
+- Date: 2026-07-18
+- Mistake or miss: F1A reached correct NAV 1044 and schema-valid CERTIFIED output while identity-bearing source tokens were nonconforming, raw verifier semantic fields were discarded during formalization, presentation rows were not bound to injected truth, and unexpected infrastructure errors could skip the second attempt.
+- Root cause: happy-path schema validity and numeric equality were treated as sufficient without adversarially checking every authority token and every boundary between raw verifier output, formal result, certification, and presentation.
+- Fix applied: enforced frozen source tokens, full raw economic/hash equality, exact two-attempt normalization, presentation projection/hash equality, legacy replay revocation, duplicate semantics, inherited-pipe deadline, and combined-suite module identity.
+- Guardrail for next time: before claiming certification, mutate each independently supplied field and each identity-bearing token; require every mutation to fail closed while the exact required attempt count still executes.
+- Evidence paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, `views/gv_fs0_portfolio_adapter.py`, `tests/gv_fs0_product/test_open_vertical.py`, and `docs/saw_reports/se_gv_fs0_f1a_reconciliation_20260718.md`.
 
 ## 2026-07-14 Round Entry (PEAD Strict-PIT Program Terminal Close)
 - Date: 2026-07-14

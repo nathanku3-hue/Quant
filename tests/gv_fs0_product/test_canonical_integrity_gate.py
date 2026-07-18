@@ -132,8 +132,8 @@ def test_runtime_load_frozen_tables_and_registries() -> None:
 
 def test_external_import_canonical_reimport_is_stable() -> None:
     """Validate external import path remains resolvable under product suite."""
-    reloaded = importlib.reload(importlib.import_module("core.gv_fs0_canonical"))
-    assert reloaded.prepare_identity_string("OPEN") == "OPEN"
+    imported = importlib.import_module("core.gv_fs0_canonical")
+    assert imported.prepare_identity_string("OPEN") == "OPEN"
 
 
 def test_frozen_verifier_exists_and_refuses_in_process_import() -> None:

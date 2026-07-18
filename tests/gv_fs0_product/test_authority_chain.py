@@ -175,6 +175,8 @@ def test_frozen_verifier_remains_process_only_script() -> None:
 def test_legacy_strategy_replay_is_not_fs0_product_entry() -> None:
     """Legacy replay may exist, but product modules must not import it."""
     assert (REPO_ROOT / LEGACY_REPLAY_REL).is_file()
+    legacy_text = _read(LEGACY_REPLAY_REL)
+    assert '__authority__ = "REVOKED_BY_GV_FS0_20260716"' in legacy_text
     for path in _product_module_paths():
         imported = _imported_modules(path)
         for name in imported:

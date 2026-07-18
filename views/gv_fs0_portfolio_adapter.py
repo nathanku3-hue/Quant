@@ -8,6 +8,8 @@ certification aggregation, freshness logic, or bundle publication.
 from __future__ import annotations
 
 from collections.abc import Mapping
+import hashlib
+import json
 from typing import Any, Protocol
 
 
@@ -21,6 +23,35 @@ class PortfolioRenderer(Protocol):
 
 class GvFs0PresentationError(ValueError):
     """Raised when injected certified presentation artifacts do not bind."""
+
+
+def _expected_rows(
+    terminal_snapshot: Mapping[str, Any], certification: Mapping[str, Any]
+) -> list[dict[str, str]]:
+    return [
+        {"label": "Authority", "value": terminal_snapshot["authority_tier"]},
+        {"label": "Action", "value": terminal_snapshot["action"]},
+        {"label": "Rationale", "value": terminal_snapshot["rationale_ref"]},
+        {"label": "Shares", "value": str(terminal_snapshot["shares"])},
+        {"label": "Cash", "value": terminal_snapshot["cash"]},
+        {"label": "Receivables", "value": terminal_snapshot["receivables"]},
+        {"label": "NAV", "value": terminal_snapshot["nav"]},
+        {"label": "SessionContribution", "value": terminal_snapshot["session_contribution"]},
+        {"label": "CumulativeContribution", "value": terminal_snapshot["cumulative_contribution"]},
+        {"label": "BookId", "value": terminal_snapshot["book_id"]},
+        {"label": "DecisionHash", "value": certification["decision_hash"]},
+        {"label": "SnapshotId", "value": terminal_snapshot["snapshot_id"]},
+        {"label": "CertificationId", "value": certification["certification_id"]},
+        {"label": "CertificationStatus", "value": certification["certification_status"]},
+    ]
+
+
+def _presentation_hash(rows: list[dict[str, str]]) -> str:
+    payload = json.dumps(
+        {"rows": rows}, ensure_ascii=False, separators=(",", ":"), sort_keys=True
+    ).encode("utf-8")
+    preimage = b"GV-FS0:PRESENTATION:V1\n" + payload + b"\n"
+    return hashlib.sha256(preimage).hexdigest()
 
 
 def build_portfolio_view_model(
@@ -49,6 +80,11 @@ def build_portfolio_view_model(
         if not isinstance(label, str) or not isinstance(value, str):
             raise GvFs0PresentationError("PRESENTATION_ROW_TEXT_REQUIRED")
         normalized_rows.append({"label": label, "value": value})
+    expected_rows = _expected_rows(terminal_snapshot, certification)
+    if normalized_rows != expected_rows:
+        raise GvFs0PresentationError("PRESENTATION_BINDING_INVALID")
+    if presentation.get("presentation_hash") != _presentation_hash(expected_rows):
+        raise GvFs0PresentationError("PRESENTATION_HASH_INVALID")
     return {
         "title": "GV-FS0 Certified Paper Portfolio — OPEN",
         "status": certification["certification_status"],

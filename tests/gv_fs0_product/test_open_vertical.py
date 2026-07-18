@@ -4,11 +4,17 @@ import ast
 import copy
 from pathlib import Path
 import sys
+import time
 from typing import Any
 
 import pytest
 
-from core.gv_fs0_book import build_open_book, validate_schema
+from core.gv_fs0_book import (
+    GvFs0BookError,
+    _deduplicate_completed_events,
+    build_open_book,
+    validate_schema,
+)
 from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
 from core.gv_fs0_certify import (
     GvFs0CertificationError,
@@ -216,6 +222,27 @@ def test_supervision_stops_at_deadline(tmp_path: Path) -> None:
         )
 
 
+def test_supervision_deadline_bounds_inherited_pipe_descendant(tmp_path: Path) -> None:
+    script = tmp_path / "descendant.py"
+    script.write_text(
+        "import subprocess, sys\n"
+        "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(2)'])\n",
+        encoding="utf-8",
+    )
+    started = time.monotonic()
+    with pytest.raises(GvFs0CertificationError, match="VERIFIER_TIMEOUT"):
+        _supervise_process(
+            [str(Path(sys.executable).resolve()), "-I", "-X", "utf8", str(script)],
+            cwd=str(tmp_path),
+            env=_subprocess_environment(str(tmp_path)),
+            deadline_seconds=0.05,
+            shutdown_seconds=0.1,
+            stdout_limit=64,
+            stderr_limit=64,
+        )
+    assert time.monotonic() - started < 1.0
+
+
 def test_infrastructure_failure_still_executes_exactly_two_attempts() -> None:
     calls = 0
 
@@ -223,6 +250,19 @@ def test_infrastructure_failure_still_executes_exactly_two_attempts() -> None:
         nonlocal calls
         calls += 1
         raise GvFs0CertificationError("VERIFIER_TIMEOUT")
+
+    with pytest.raises(GvFs0CertificationError, match="CERTIFICATION_BLOCKED"):
+        build_open_certified_result(failing_runner)
+    assert calls == 2
+
+
+def test_raw_oserror_still_executes_exactly_two_attempts() -> None:
+    calls = 0
+
+    def failing_runner(_verifier_input: dict[str, Any]) -> dict[str, Any]:
+        nonlocal calls
+        calls += 1
+        raise OSError("disk/temp failure")
 
     with pytest.raises(GvFs0CertificationError, match="CERTIFICATION_BLOCKED"):
         build_open_certified_result(failing_runner)
@@ -255,6 +295,52 @@ def test_disagreeing_verifier_attempt_blocks_certification() -> None:
     with pytest.raises(GvFs0CertificationError, match="CERTIFICATION_BLOCKED"):
         build_open_certified_result(disagreeing_runner)
     assert calls == 2
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value"),
+    [
+        ("authority", "SYSTEM"),
+        ("currency", "EUR"),
+        ("security_id", "SEC_WRONG"),
+        ("rationale_reference", "RATIONALE:WRONG"),
+        ("total_costs", "0"),
+    ],
+)
+def test_verifier_semantic_tampering_blocks_certification(
+    field: str, bad_value: str
+) -> None:
+    def tampered_runner(verifier_input: dict[str, Any]) -> dict[str, Any]:
+        changed = copy.deepcopy(run_isolated_verifier(verifier_input))
+        changed["economic_payload"][field] = bad_value
+        changed["canonical_payload_hash"] = domain_hash(
+            "GV-FS0:ECONOMIC_PAYLOAD:V1", changed["economic_payload"]
+        )
+        without_hash = {
+            key: value for key, value in changed.items() if key != "verifier_result_hash"
+        }
+        changed["verifier_result_hash"] = domain_hash(
+            "GV-FS0:VERIFIER_RESULT:V1", without_hash
+        )
+        return changed
+
+    with pytest.raises(GvFs0CertificationError, match="CERTIFICATION_BLOCKED"):
+        build_open_certified_result(tampered_runner)
+
+
+def test_event_duplicate_rules_collapse_or_block() -> None:
+    event = copy.deepcopy(build_open_book().book.events[0])
+    assert _deduplicate_completed_events([event, copy.deepcopy(event)]) == [event]
+
+    conflicting = copy.deepcopy(event)
+    conflicting["payload"]["quantity"] = 99
+    with pytest.raises(GvFs0BookError, match="CONFLICTING_EVENT_ID"):
+        _deduplicate_completed_events([event, conflicting])
+
+    semantic_duplicate = copy.deepcopy(event)
+    semantic_duplicate["event_id"] = "EVT_" + "0" * 64
+    with pytest.raises(GvFs0BookError, match="DUPLICATE_SEMANTIC_EVENT"):
+        _deduplicate_completed_events([event, semantic_duplicate])
 
 
 def test_final_adapter_renders_injected_open_without_owning_truth() -> None:
@@ -292,6 +378,22 @@ def test_adapter_rejects_uncertified_or_mismatched_injection() -> None:
         build_portfolio_view_model(
             presentation=result["presentation"],
             terminal_snapshot=wrong_snapshot,
+            certification=result["certification"],
+        )
+    tampered = copy.deepcopy(result["presentation"])
+    tampered["rows"][6]["value"] = "999999"
+    with pytest.raises(GvFs0PresentationError, match="PRESENTATION_BINDING_INVALID"):
+        build_portfolio_view_model(
+            presentation=tampered,
+            terminal_snapshot=result["snapshots"][-1],
+            certification=result["certification"],
+        )
+    wrong_hash = copy.deepcopy(result["presentation"])
+    wrong_hash["presentation_hash"] = "0" * 64
+    with pytest.raises(GvFs0PresentationError, match="PRESENTATION_HASH_INVALID"):
+        build_portfolio_view_model(
+            presentation=wrong_hash,
+            terminal_snapshot=result["snapshots"][-1],
             certification=result["certification"],
         )
 

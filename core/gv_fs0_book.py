@@ -17,7 +17,7 @@ from typing import Any, Iterable, Mapping, Sequence
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
-from core.gv_fs0_canonical import canonical_decimal, domain_hash
+from core.gv_fs0_canonical import canonical_decimal, canonical_document_bytes, domain_hash
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_ROOT = ROOT / "contracts" / "gv_fs0" / "v1"
@@ -375,8 +375,11 @@ def _event_identity_preimage(candidate: Mapping[str, Any], intra_rank_sequence: 
 
 
 def _assign_intra_rank(candidates: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
-    groups: dict[tuple[str, str, int], list[dict[str, Any]]] = {}
+    unique_candidates: dict[bytes, dict[str, Any]] = {}
     for candidate in candidates:
+        unique_candidates.setdefault(canonical_document_bytes(candidate), candidate)
+    groups: dict[tuple[str, str, int], list[dict[str, Any]]] = {}
+    for candidate in unique_candidates.values():
         key = (
             candidate["effective_timestamp"],
             candidate["session"],
@@ -403,6 +406,44 @@ def _assign_intra_rank(candidates: Sequence[dict[str, Any]]) -> list[dict[str, A
     return completed
 
 
+def _economic_effect_key(event: Mapping[str, Any]) -> bytes:
+    payload = event["payload"]
+    return canonical_document_bytes(
+        {
+            "book_id": event["book_id"],
+            "event_type": event["event_type"],
+            "effective_timestamp": event["effective_timestamp"],
+            "session": event["session"],
+            "security_id": event["security_id"],
+            **{key: payload[key] for key in _PAYLOAD_KEYS},
+        }
+    )
+
+
+def _deduplicate_completed_events(
+    events: Sequence[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    retained_by_id: dict[str, tuple[bytes, dict[str, Any]]] = {}
+    economic_effect_ids: dict[bytes, str] = {}
+    for event in events:
+        identity = canonical_document_bytes(
+            _event_identity_preimage(event, event["intra_rank_sequence"])
+        )
+        event_id = event["event_id"]
+        existing = retained_by_id.get(event_id)
+        if existing is not None:
+            if existing[0] != identity:
+                raise GvFs0BookError("CONFLICTING_EVENT_ID")
+            continue
+        effect_key = _economic_effect_key(event)
+        prior_id = economic_effect_ids.get(effect_key)
+        if prior_id is not None and prior_id != event_id:
+            raise GvFs0BookError("DUPLICATE_SEMANTIC_EVENT")
+        retained_by_id[event_id] = (identity, event)
+        economic_effect_ids[effect_key] = event_id
+    return [entry[1] for entry in retained_by_id.values()]
+
+
 def _build_economic_events(
     fixture: Mapping[str, Any], decision: DecisionEnvelope, book_id: str
 ) -> tuple[dict[str, Any], ...]:
@@ -413,7 +454,7 @@ def _build_economic_events(
             decision=decision,
             source_type="DECISION_ENVELOPE",
             source_sequence=0,
-            source_intent_id=f"DECISION_ENVELOPE:{decision.decision_id}",
+            source_intent_id=f"DECISION:{decision.decision_hash}",
             event_type="DECISION_ACCEPTED",
             effective_timestamp=decision.effective_timestamp,
             session=fixture["sessions"][0],
@@ -530,6 +571,7 @@ def _build_economic_events(
         event_id = "EVT_" + domain_hash("GV-FS0:PORTFOLIO_EVENT_ID:V1", preimage)
         completed.append({**row, "event_id": event_id})
 
+    completed = _deduplicate_completed_events(completed)
     completed.sort(
         key=lambda row: (
             row["effective_timestamp"],

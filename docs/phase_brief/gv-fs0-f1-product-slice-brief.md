@@ -256,8 +256,10 @@ F1A before atomic P0.5 green
 - [x] Disagreeing verifier attempts fail closed before certification
 - [x] No permanent bundle path created or modified
 - [x] Product suite, protocol suite, generator check, freeze bootstrap, compile, render smoke, and diff hygiene PASS
-- [ ] Bank F1A implementation commit on `codex/gv-fs0-f1-product`
+- [x] Bank F1A implementation commit `699e664` on `codex/gv-fs0-f1-product`
 - [ ] Independent Reviewer A/B/C evidence and SAW closure for the exact banked commit
+- [x] Reconcile initial A/B/C BLOCK findings: authority tokens, complete verifier economics, two-attempt infrastructure failures, presentation binding, legacy revocation, duplicate rules, descendant-pipe deadline, and combined-suite module identity
+- [ ] Bank the reconciliation commit and rerun distinct Reviewer A/B/C against that exact commit
 
 F1B, F1C, and F1D remain unopened.
 
