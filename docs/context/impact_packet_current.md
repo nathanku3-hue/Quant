@@ -1,6 +1,15 @@
 # Impact Packet - Current
 
-## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Local Impact (2026-07-18)
+
+- **Base authority**: F1A terminal close `e156c66` on `codex/gv-fs0-f1-product`.
+- **Changed runtime**: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, and `views/gv_fs0_portfolio_adapter.py` now pass a separate NO_POSITION component through the same shared path while preserving OPEN regression.
+- **Changed tests**: new `tests/gv_fs0_product/test_no_position_vertical.py`; product 52/52, protocol 137/137, combined 189/189 PASS.
+- **Economic delta**: five sessions remain shares `0`, cash/NAV `1000`, receivables/market value/contribution `0`; zero non-valuation source intents are enforced primary-side and verifier-side.
+- **Untouched**: frozen contracts/verifier, permanent bundle/publication recovery, default route, hosted parity, complete-suite repair, providers, real data, PEAD, broker/live capital, and FS1.
+- **Closure state**: implementation is local and detached; exact commit and distinct Reviewer A/B/C remain missing, so SAW is BLOCK.
+
+## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
 
 - **Banked commits**: `699e664` initial F1A; `066bdda` review reconciliation and terminal review target.
 - **Backend impact**: new primary OPEN book/events/snapshots and certification controller with exact raw-verifier semantic/hash binding, two-attempt supervision, retained-result dedupe, and frozen authority/duplicate rules.

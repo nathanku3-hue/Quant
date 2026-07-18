@@ -1,6 +1,15 @@
 # Bridge Contract - Current
 
-## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Local Bridge (2026-07-18)
+
+- `SYSTEM_DELTA`: F1B adds a separate NO_POSITION fixture/decision and routes it through the same book, five snapshots, two verifier attempts, certification, result, presentation, and adapter path as F1A.
+- `PM / Product Delta`: the second synthetic certified component works locally; no permanent bundle or default product screen exists yet, so shipped-product score remains 39/100.
+- `OPEN_DECISION`: none for implementation scope; closure evidence still requires repository custody and independent review.
+- `RECOMMENDED_NEXT_STEP`: bank F1B only, then run distinct Reviewer A/B/C against the exact commit.
+- `DO_NOT_REDECIDE`: preserve F1A and the frozen protocol; do not open F1C/F1D, publication, default routing, providers, real data, PEAD, broker/live capital, or FS1.
+- `PHASE_STATUS`: F1A PASS; F1B local implementation PASS / terminal closure BLOCK; later gates unopened.
+
+## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
 
 - `SYSTEM_DELTA`: commit `066bdda` closes F1A OPEN with conforming event authority, exact raw-verifier economics/hash binding, two attempts, certification, result identity, and injected presentation binding.
 - `PM / Product Delta`: one synthetic OPEN component is now CERTIFIED and independently closed; terminal NAV is `1044`. This is not a permanent two-component product bundle.

@@ -2,6 +2,22 @@
 
 Last updated: 2026-07-18
 
+## 2026-07-18 Round Entry (Verify Latest Git Authority Before Acting on Stale Local Reports)
+- Date: 2026-07-18
+- Mistake or miss: the supplied context contained both a pre-bank F1A local BLOCK report and a later claim that F1A was banked and independently closed, while the primary checkout itself had broken worktree metadata.
+- Root cause: narrative status can lag object-store truth, and a broken checkout can make ordinary Git commands falsely suggest custody is unavailable.
+- Fix applied: resolved `e156c66` directly from the repository object store, verified branch containment and terminal closure, created a clean managed worktree from a healthy sibling repository worktree, and opened only F1B.
+- Guardrail for next time: when status artifacts conflict, verify the newest claimed commit, tree, branch containment, and active truth before planning; never repair a dirty/broken primary checkout when an exact clean worktree can isolate the authorized slice.
+- Evidence paths: `docs/context/e2e_evidence/gv_fs0_f1b_local_validation_20260718.md`, `docs/phase_brief/gv-fs0-f1-product-slice-brief.md`, and Git inspection evidence for `e156c66`.
+
+## 2026-07-18 Round Entry (Identical Path Means Shared Functions Plus Action-Specific Preconditions)
+- Date: 2026-07-18
+- Mistake or miss: F1A runtime and certification code encoded OPEN assumptions directly, so adding NO_POSITION by copying code would have created parallel truth paths and silent drift risk.
+- Root cause: the first functional slice optimized for one role rather than separating shared mechanics from role-specific source/decision preconditions.
+- Fix applied: generalized fixture/decision construction and certification orchestration while keeping one event builder, reducer, snapshot, verifier, certification, result, and adapter path; NO_POSITION now rejects any non-valuation intent and any non-null quantity.
+- Guardrail for next time: extend a certified state machine by sharing mechanics and making role differences explicit at input gates; never duplicate accounting, certification, or presentation paths for a second role.
+- Evidence paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, `views/gv_fs0_portfolio_adapter.py`, and `tests/gv_fs0_product/test_no_position_vertical.py`.
+
 ## 2026-07-18 Round Entry (Schema PASS Does Not Prove Cross-Artifact Binding)
 - Date: 2026-07-18
 - Mistake or miss: F1A reached correct NAV 1044 and schema-valid CERTIFIED output while identity-bearing source tokens were nonconforming, raw verifier semantic fields were discarded during formalization, presentation rows were not bound to injected truth, and unexpected infrastructure errors could skip the second attempt.

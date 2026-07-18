@@ -1,6 +1,15 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Local Alignment (2026-07-18)
+
+- **Backend/Strategy:** NO_POSITION shares the F1A book, reducer, verifier, certification, and result path; exact flat economics and fail-closed intent boundaries pass locally.
+- **Frontend/UI:** the final injected adapter renders both validated actions; default routing remains closed.
+- **Data/Research:** unchanged and held; no provider or real-data authority.
+- **Docs/Ops:** F1B plan, evidence, audit disposition, and SAW BLOCK recorded.
+- **Current bottleneck:** immutable commit custody and distinct Reviewer A/B/C, not product mechanics.
+- **Next active stream:** bank/review F1B only; F1C/F1D remain unopened.
+
+## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
 
 - **Backend/Strategy:** exact synthetic OPEN economics and certification closed at `066bdda`; legacy replay authority revoked.
 - **Frontend/UI:** final read-only adapter injection is bound to certified snapshot/presentation content; no default bundle route.

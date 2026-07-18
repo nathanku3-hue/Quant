@@ -1,6 +1,21 @@
 # Done Checklist - Current
 
-## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+## Active Addendum — GV-FS0 F1B NO_POSITION Local Done State (2026-07-18)
+
+- [x] F1A banked and independently closed at `e156c66`.
+- [x] Separate NO_POSITION fixture/decision; quantity null; zero non-valuation source intents.
+- [x] Shared book/reducer/snapshot/verifier/certification/result/adapter path.
+- [x] Five flat sessions at shares `0`, cash/NAV `1000`, all contributions `0`.
+- [x] Two isolated attempts; all ten certification checks TRUE; deterministic canonical bytes.
+- [x] Product 52/52, protocol 137/137, combined 189/189 PASS.
+- [x] No F1C/F1D publication/default-route/provider/data/FS1 action.
+- [ ] Exact F1B commit banked on named product branch.
+- [ ] Distinct Reviewer A/B/C PASS against exact F1B commit.
+- [ ] F1C/F1D remain closed.
+
+Next action: bank F1B only and run distinct A/B/C; stop before F1C.
+
+## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
 
 - [x] F1A implementation banked at `699e664` and review repair banked at `066bdda`.
 - [x] Exact OPEN economics: NAV `1000 → 1009 → 1024 → 1034 → 1044`, cash `899 → 904`, receivable `5 → 0`.

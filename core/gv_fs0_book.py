@@ -1,9 +1,10 @@
-"""GV-FS0 F1A canonical OPEN decision, book, events, and snapshots.
+"""GV-FS0 canonical synthetic decision, book, events, and snapshots.
 
 This module owns primary paper-economic truth for the bounded synthetic OPEN
-fixture. It consumes the frozen V1 schemas/tables and the frozen canonical
-encoder. It performs no verification subprocess work, certification,
-publication, provider access, or UI rendering.
+and NO_POSITION fixtures. Both roles consume the same frozen V1 schemas/tables,
+canonical encoder, event builder, reducer, and snapshot path. It performs no
+verification subprocess work, certification, publication, provider access, or
+UI rendering.
 """
 
 from __future__ import annotations
@@ -12,7 +13,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 import json
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
@@ -189,7 +190,7 @@ def _source_intent(
     }
 
 
-def build_open_source_fixture() -> dict[str, Any]:
+def _build_source_fixture(*, fixture_id: str, include_open_intents: bool) -> dict[str, Any]:
     sessions = ["2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17"]
     closes = ["10", "11", "12", "13", "14"]
     prices = [
@@ -202,32 +203,37 @@ def build_open_source_fixture() -> dict[str, Any]:
         }
         for index, (session, close) in enumerate(zip(sessions, closes, strict=True))
     ]
-    intents = [
-        _source_intent(
-            "EXECUTION_INTENT",
-            0,
-            session="2026-07-14",
-            quantity=10,
-            execution_price="10",
-        ),
-        _source_intent("EXPLICIT_FEE", 1, session="2026-07-14", fee="1"),
-        _source_intent(
-            "DIVIDEND_DECLARATION",
-            2,
-            session="2026-07-15",
-            dividend_amount_per_share="0.5",
-        ),
-        _source_intent(
-            "DIVIDEND_PAYMENT_INSTRUCTION",
-            3,
-            session="2026-07-16",
-            referenced_entitlement_source_intent_id="DIVIDEND_DECLARATION:2",
-        ),
-    ]
+    intents: list[dict[str, Any]] = []
+    if include_open_intents:
+        intents.extend(
+            [
+                _source_intent(
+                    "EXECUTION_INTENT",
+                    0,
+                    session="2026-07-14",
+                    quantity=10,
+                    execution_price="10",
+                ),
+                _source_intent("EXPLICIT_FEE", 1, session="2026-07-14", fee="1"),
+                _source_intent(
+                    "DIVIDEND_DECLARATION",
+                    2,
+                    session="2026-07-15",
+                    dividend_amount_per_share="0.5",
+                ),
+                _source_intent(
+                    "DIVIDEND_PAYMENT_INSTRUCTION",
+                    3,
+                    session="2026-07-16",
+                    referenced_entitlement_source_intent_id="DIVIDEND_DECLARATION:2",
+                ),
+            ]
+        )
+    valuation_sequence = len(intents)
     intents.extend(
         _source_intent(
             "VALUATION_INSTRUCTION",
-            sequence=4 + index,
+            sequence=valuation_sequence + index,
             session=session,
             valuation_timestamp=f"{session}T20:00:00.000000Z",
             effective_timestamp=f"{session}T20:00:00.000000Z",
@@ -237,7 +243,7 @@ def build_open_source_fixture() -> dict[str, Any]:
     fixture = {
         "schema_version": "gv_fs0_source_fixture_v1",
         "protocol_id": PROTOCOL_ID,
-        "fixture_id": "FIXTURE_OPEN_1",
+        "fixture_id": fixture_id,
         "currency": "USD",
         "security_id": "SEC_1",
         "initial_cash": "1000",
@@ -249,18 +255,36 @@ def build_open_source_fixture() -> dict[str, Any]:
     return fixture
 
 
-def build_open_decision(fixture_hash: str, fixture_id: str) -> DecisionEnvelope:
+def build_open_source_fixture() -> dict[str, Any]:
+    return _build_source_fixture(fixture_id="FIXTURE_OPEN_1", include_open_intents=True)
+
+
+def build_no_position_source_fixture() -> dict[str, Any]:
+    return _build_source_fixture(
+        fixture_id="FIXTURE_NO_POSITION_1", include_open_intents=False
+    )
+
+
+def _build_decision(
+    *,
+    fixture_hash: str,
+    fixture_id: str,
+    decision_id: str,
+    action: str,
+    requested_quantity: int | None,
+    rationale_ref: str,
+) -> DecisionEnvelope:
     base = {
         "schema_version": "gv_fs0_decision_envelope_v1",
-        "decision_id": "DECISION_OPEN_1",
+        "decision_id": decision_id,
         "fixture_hash": fixture_hash,
         "authority_tier": "MANUAL_OWNER_PAPER",
-        "action": "OPEN",
+        "action": action,
         "decision_timestamp": "2026-07-12T00:00:00.000000Z",
         "effective_timestamp": "2026-07-13T00:00:00.000000Z",
         "security_id": "SEC_1",
-        "requested_quantity_or_sizing_input": {"quantity": 10},
-        "rationale_ref": "RATIONALE:OPEN_1",
+        "requested_quantity_or_sizing_input": {"quantity": requested_quantity},
+        "rationale_ref": rationale_ref,
         "protocol_id": PROTOCOL_ID,
         "fixture_id": fixture_id,
         "operator_id": "OWNER_1",
@@ -277,7 +301,7 @@ def build_open_decision(fixture_hash: str, fixture_id: str) -> DecisionEnvelope:
         decision_timestamp=base["decision_timestamp"],
         effective_timestamp=base["effective_timestamp"],
         security_id=base["security_id"],
-        requested_quantity=10,
+        requested_quantity=requested_quantity,
         rationale_ref=base["rationale_ref"],
         protocol_id=PROTOCOL_ID,
         fixture_id=fixture_id,
@@ -286,6 +310,28 @@ def build_open_decision(fixture_hash: str, fixture_id: str) -> DecisionEnvelope:
     )
     validate_schema(decision.to_dict(), "gv_fs0_decision_envelope_v1.schema.json")
     return decision
+
+
+def build_open_decision(fixture_hash: str, fixture_id: str) -> DecisionEnvelope:
+    return _build_decision(
+        fixture_hash=fixture_hash,
+        fixture_id=fixture_id,
+        decision_id="DECISION_OPEN_1",
+        action="OPEN",
+        requested_quantity=10,
+        rationale_ref="RATIONALE:OPEN_1",
+    )
+
+
+def build_no_position_decision(fixture_hash: str, fixture_id: str) -> DecisionEnvelope:
+    return _build_decision(
+        fixture_hash=fixture_hash,
+        fixture_id=fixture_id,
+        decision_id="DECISION_NO_POSITION_1",
+        action="NO_POSITION",
+        requested_quantity=None,
+        rationale_ref="RATIONALE:NO_POSITION_1",
+    )
 
 
 def _book_id(decision: DecisionEnvelope) -> str:
@@ -447,6 +493,15 @@ def _deduplicate_completed_events(
 def _build_economic_events(
     fixture: Mapping[str, Any], decision: DecisionEnvelope, book_id: str
 ) -> tuple[dict[str, Any], ...]:
+    source_intent_types = [intent["intent_type"] for intent in fixture["source_intents"]]
+    if decision.action == "NO_POSITION":
+        if decision.requested_quantity is not None:
+            raise GvFs0BookError("NO_POSITION_QUANTITY_PROHIBITED")
+        if any(intent_type != "VALUATION_INSTRUCTION" for intent_type in source_intent_types):
+            raise GvFs0BookError("NO_POSITION_NON_VALUATION_INTENT_PROHIBITED")
+    elif decision.action != "OPEN":
+        raise GvFs0BookError(f"UNSUPPORTED_DECISION_ACTION:{decision.action}")
+
     price_by_session = {row["session"]: row for row in fixture["source_prices"]}
     candidates: list[dict[str, Any]] = [
         _candidate(
@@ -462,7 +517,6 @@ def _build_economic_events(
         )
     ]
     entitlement_candidate: dict[str, Any] | None = None
-    payment_candidate: dict[str, Any] | None = None
     for intent in fixture["source_intents"]:
         intent_type = intent["intent_type"]
         common = dict(
@@ -530,12 +584,13 @@ def _build_economic_events(
             )
             candidates.append(entitlement_candidate)
         elif intent_type == "DIVIDEND_PAYMENT_INSTRUCTION":
-            payment_candidate = _candidate(
-                **common,
-                event_type="DIVIDEND_PAYMENT",
-                payload=_empty_payload(),
+            candidates.append(
+                _candidate(
+                    **common,
+                    event_type="DIVIDEND_PAYMENT",
+                    payload=_empty_payload(),
+                )
             )
-            candidates.append(payment_candidate)
         elif intent_type == "VALUATION_INSTRUCTION":
             price = price_by_session[intent["session"]]
             valuation_common = {
@@ -553,17 +608,29 @@ def _build_economic_events(
             raise GvFs0BookError(f"UNSUPPORTED_SOURCE_INTENT:{intent_type}")
 
     with_intra = _assign_intra_rank(candidates)
-    entitlement_row = next(
+    entitlement_rows = [
         row for row in with_intra if row["event_type"] == "DIVIDEND_ENTITLEMENT"
-    )
-    entitlement_id = "EVT_" + domain_hash(
-        "GV-FS0:PORTFOLIO_EVENT_ID:V1",
-        _event_identity_preimage(entitlement_row, entitlement_row["intra_rank_sequence"]),
+    ]
+    if len(entitlement_rows) > 1:
+        raise GvFs0BookError("MULTIPLE_DIVIDEND_ENTITLEMENTS_PROHIBITED")
+    entitlement_row = entitlement_rows[0] if entitlement_rows else None
+    entitlement_id = (
+        "EVT_"
+        + domain_hash(
+            "GV-FS0:PORTFOLIO_EVENT_ID:V1",
+            _event_identity_preimage(
+                entitlement_row, entitlement_row["intra_rank_sequence"]
+            ),
+        )
+        if entitlement_row is not None
+        else None
     )
     completed: list[dict[str, Any]] = []
     for row in with_intra:
         payload = dict(row["payload"])
         if row["event_type"] == "DIVIDEND_PAYMENT":
+            if entitlement_row is None or entitlement_id is None:
+                raise GvFs0BookError("DIVIDEND_ENTITLEMENT_MISSING")
             payload["payment_amount"] = entitlement_row["payload"]["receivable_amount"]
             payload["referenced_entitlement_id"] = entitlement_id
             row = {**row, "payload": payload}
@@ -747,10 +814,13 @@ def economic_payload(
     }
 
 
-def build_open_book() -> OpenBookBuild:
-    fixture = build_open_source_fixture()
+def _build_book(
+    *,
+    fixture: dict[str, Any],
+    decision_builder: Callable[[str, str], DecisionEnvelope],
+) -> OpenBookBuild:
     fixture_hash = domain_hash("GV-FS0:FIXTURE:V1", fixture)
-    decision = build_open_decision(fixture_hash, fixture["fixture_id"])
+    decision = decision_builder(fixture_hash, fixture["fixture_id"])
     verifier_input = build_verifier_input(fixture, decision)
     book_id = _book_id(decision)
     events = _build_economic_events(fixture, decision, book_id)
@@ -775,6 +845,19 @@ def build_open_book() -> OpenBookBuild:
         decision=decision,
         verifier_input=verifier_input,
         book=book,
+    )
+
+
+def build_open_book() -> OpenBookBuild:
+    return _build_book(
+        fixture=build_open_source_fixture(), decision_builder=build_open_decision
+    )
+
+
+def build_no_position_book() -> OpenBookBuild:
+    return _build_book(
+        fixture=build_no_position_source_fixture(),
+        decision_builder=build_no_position_decision,
     )
 
 
@@ -803,6 +886,7 @@ __all__ = [
     "PortfolioBook",
     "PROTOCOL_ID",
     "PROTOCOL_VERSION",
+    "build_no_position_book",
     "build_open_book",
     "validate_schema",
     "verifier_rows_to_economic_payload",

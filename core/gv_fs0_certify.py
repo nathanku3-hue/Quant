@@ -1,9 +1,10 @@
-"""GV-FS0 F1A verifier supervision, certification, and certified OPEN result.
+"""GV-FS0 verifier supervision and synthetic component certification.
 
 The controller invokes the process-only V1.1 reconstruction engine exactly two
 times from original verifier input, wraps each successful reconstruction into
 the frozen V1 verifier-result schema, compares it with the primary book, and
-emits an in-memory certified OPEN result. It never publishes a bundle.
+emits an in-memory certified OPEN or NO_POSITION result. It never publishes a
+bundle.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from core.gv_fs0_book import (
     OpenBookBuild,
     PROTOCOL_ID,
     PROTOCOL_VERSION,
+    build_no_position_book,
     build_open_book,
     validate_schema,
     verifier_rows_to_economic_payload,
@@ -455,6 +457,26 @@ def _primary_invariants_valid(build: OpenBookBuild) -> dict[str, bool]:
     }
 
 
+def _decision_semantics_valid(build: OpenBookBuild) -> bool:
+    if build.decision.authority_tier != "MANUAL_OWNER_PAPER":
+        return False
+    if build.decision.action == "OPEN":
+        return build.decision.requested_quantity == 10
+    if build.decision.action == "NO_POSITION":
+        return (
+            build.decision.requested_quantity is None
+            and all(
+                intent["intent_type"] == "VALUATION_INSTRUCTION"
+                for intent in build.source_fixture["source_intents"]
+            )
+            and all(
+                event["event_type"] in {"DECISION_ACCEPTED", "SESSION_VALUATION"}
+                for event in build.book.events
+            )
+        )
+    return False
+
+
 def _certification_checks(
     build: OpenBookBuild,
     formal_results: Sequence[Mapping[str, Any]],
@@ -476,11 +498,7 @@ def _certification_checks(
         value == primary_hash for value in reconstructed_hashes
     )
     checks = {
-        "decision_authority_valid": (
-            build.decision.authority_tier == "MANUAL_OWNER_PAPER"
-            and build.decision.action == "OPEN"
-            and build.decision.requested_quantity == 10
-        ),
+        "decision_authority_valid": _decision_semantics_valid(build),
         "timestamp_causality_valid": (
             build.decision.decision_timestamp < build.decision.effective_timestamp
             and all(
@@ -615,12 +633,11 @@ def _presentation(
     }
 
 
-def build_open_certified_result(
-    verifier_runner: VerifierRunner = run_isolated_verifier,
+def _build_certified_result(
+    build: OpenBookBuild,
+    verifier_runner: VerifierRunner,
 ) -> dict[str, Any]:
-    """Build the complete in-memory certified OPEN component for F1A."""
-
-    build = build_open_book()
+    """Build one in-memory certified synthetic component through the shared path."""
     raw_results: list[dict[str, Any]] = []
     attempt_failures: list[str] = []
     for _ordinal in (1, 2):
@@ -704,7 +721,7 @@ def build_open_certified_result(
     all_events = [*build.book.events, reference_event]
     authoritative = {
         "schema_version": "gv_fs0_certified_decision_result_v1",
-        "role": "OPEN",
+        "role": build.decision.action,
         "decision": build.decision.to_dict(),
         "book_id": build.book.book_id,
         "events": all_events,
@@ -727,8 +744,25 @@ def build_open_certified_result(
     return result
 
 
+def build_open_certified_result(
+    verifier_runner: VerifierRunner = run_isolated_verifier,
+) -> dict[str, Any]:
+    """Build the complete in-memory certified OPEN component for F1A."""
+
+    return _build_certified_result(build_open_book(), verifier_runner)
+
+
+def build_no_position_certified_result(
+    verifier_runner: VerifierRunner = run_isolated_verifier,
+) -> dict[str, Any]:
+    """Build the complete in-memory certified NO_POSITION component for F1B."""
+
+    return _build_certified_result(build_no_position_book(), verifier_runner)
+
+
 __all__ = [
     "GvFs0CertificationError",
+    "build_no_position_certified_result",
     "build_open_certified_result",
     "run_isolated_verifier",
 ]

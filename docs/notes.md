@@ -1,5 +1,14 @@
 # Feature Engineering Notes
 
+## 2026-07-18 GV-FS0 F1B NO_POSITION Formula Registry
+
+- Normative source-intent rule: `NO_POSITION => requested_quantity = null AND every source_intent.intent_type = VALUATION_INSTRUCTION`.
+- Primary state for every session `t`: `shares_t = 0`; `cash_t = initial_cash = 1000`; `receivables_t = 0`; `market_value_t = shares_t × close_t = 0`; `NAV_t = cash_t + market_value_t + receivables_t = 1000`.
+- Contribution formulas: `session_contribution_t = NAV_t - NAV_(t-1) = 0`; `cumulative_contribution_t = NAV_t - initial_cash = 0`.
+- Certification rule: the same two isolated verifier attempts must reproduce the same canonical primary economic payload and hash; every frozen check must be `TRUE` before status `CERTIFIED`.
+- Implementation paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, `views/gv_fs0_portfolio_adapter.py`; tests in `tests/gv_fs0_product/test_no_position_vertical.py`.
+- Boundary: F1B remains in memory only; no bundle publication or default routing until F1C/F1D.
+
 ## 2026-07-18 GV-FS0 F1A Review Reconciliation Formula Registry
 
 - Raw verifier binding: `raw_verifier_valid := economic_payload == expected_projection(primary_snapshots, decision, fixture, fees) AND canonical_payload_hash == H("GV-FS0:ECONOMIC_PAYLOAD:V1", expected_projection)`. Every semantic field, every session, final state, total cost, and the raw canonical hash must match before a formal verifier result exists.

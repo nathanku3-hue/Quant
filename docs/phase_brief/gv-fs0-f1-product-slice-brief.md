@@ -1,7 +1,7 @@
 # Phase Brief: GV-FS0-F1 — Product Slice (Corrected)
 
 Mode: `EXECUTION_PACKET`
-Status: `P0_5_BANKED; V1_1_VERIFIER_IO_COMPAT_BANKED; F1A_IMPLEMENTED_LOCAL; BANK_AND_INDEPENDENT_REVIEW_PENDING`
+Status: `P0_5_BANKED; V1_1_VERIFIER_IO_COMPAT_BANKED; F1A_BANKED_AND_CLOSED; F1B_IMPLEMENTED_LOCAL; BANK_AND_INDEPENDENT_REVIEW_PENDING`
 Date: 2026-07-18
 RoundID: `ROUND-20260718-GV-FS0-F1-PRODUCT-SLICE`
 ScopeID: `GV_FS0_F1_REPAIR_AND_SHIP_CURRENT_SLICE`
@@ -21,8 +21,9 @@ Hierarchy: L1 Terminal Zero; L2 active Backend product accounting + Frontend rea
 STRATEGY = REPAIR_AND_SHIP_CURRENT_SLICE
 PROTOCOL_REDESIGN = FORBIDDEN
 CURRENT_CHECKOUT_GIT_REPAIR = FORBIDDEN
-F1A = IMPLEMENTED_LOCAL; focused product/protocol evidence PASS; bank and independent review pending
-SHIPPED_PRODUCT_SCORE = 39/100 (unchanged until certified visible screen on final adapter)
+F1A = BANKED_AND_CLOSED at e156c66
+F1B = IMPLEMENTED_LOCAL; focused product/protocol evidence PASS; bank and distinct independent review pending
+SHIPPED_PRODUCT_SCORE = 39/100 (unchanged; F1C/F1D publication and default routing remain closed)
 ```
 
 Audit verdict absorbed: `APPROVE_WITH_MANDATORY_REPAIR`, plus bankability repairs for P0.5 atomicity.
@@ -261,7 +262,23 @@ F1A before atomic P0.5 green
 - [x] Reconcile initial A/B/C BLOCK findings: authority tokens, complete verifier economics, two-attempt infrastructure failures, presentation binding, legacy revocation, duplicate rules, descendant-pipe deadline, and combined-suite module identity
 - [x] Bank reconciliation commit `066bdda` and rerun distinct Reviewer A/B/C against that exact commit
 
-F1B, F1C, and F1D remain unopened.
+### F1B — local implementation evidence
+
+- [x] Separate immutable NO_POSITION fixture and decision with `requested_quantity=None`
+- [x] Zero execution, fee, dividend, or other non-valuation source intents
+- [x] Shared primary path emits one decision event plus five valuation events; no economic movement events
+- [x] Five exact flat snapshots: shares `0`, cash/NAV `1000`, receivables/market value/contribution `0`
+- [x] Verifier input contains only original protocol/decision/price/valuation-intent projections
+- [x] Exactly two isolated verifier attempts; one retained hash-addressed result
+- [x] All ten certification checks TRUE; role and certification status are `NO_POSITION` / `CERTIFIED`
+- [x] Existing final adapter renders injected NO_POSITION through the same function and validates presentation binding
+- [x] Primary and verifier-side non-valuation intent mutations fail closed
+- [x] No permanent bundle path created or modified; no default route, provider, real data, or FS1 work
+- [x] Product 52/52, protocol 137/137, combined 189/189 PASS
+- [ ] Bank exact F1B implementation commit on `codex/gv-fs0-f1-product`
+- [ ] Distinct Reviewer A/B/C PASS against that exact commit
+
+F1C and F1D remain unopened.
 
 ## First Commands
 
@@ -275,4 +292,4 @@ python -c "import glob,pytest,sys; sys.exit(pytest.main(['-q',*glob.glob('tests/
 
 ## Next Action
 
-Open F1B only: send NO_POSITION through the same book/certification/adapter path. Do not open publication or default-dashboard routing.
+Bank the bounded F1B implementation, then run distinct Reviewer A/B/C against the exact commit. Do not open F1C publication or F1D default-dashboard routing.

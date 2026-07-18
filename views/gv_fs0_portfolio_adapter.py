@@ -1,8 +1,9 @@
 """Read-only GV-FS0 portfolio presentation adapter.
 
-F1A injects an already validated OPEN presentation, terminal snapshot, and
-certification. The adapter owns no accounting, verifier execution,
-certification aggregation, freshness logic, or bundle publication.
+F1A/F1B inject already validated OPEN or NO_POSITION presentation, terminal
+snapshot, and certification artifacts through the same display path. The
+adapter owns no accounting, verifier execution, certification aggregation,
+freshness logic, or bundle publication.
 """
 
 from __future__ import annotations
@@ -64,6 +65,9 @@ def build_portfolio_view_model(
 
     if certification.get("certification_status") != "CERTIFIED":
         raise GvFs0PresentationError("CERTIFIED_INPUT_REQUIRED")
+    action = terminal_snapshot.get("action")
+    if action not in {"OPEN", "NO_POSITION"}:
+        raise GvFs0PresentationError("PRESENTATION_ACTION_INVALID")
     if certification.get("terminal_snapshot_id") != terminal_snapshot.get("snapshot_id"):
         raise GvFs0PresentationError("TERMINAL_SNAPSHOT_BINDING_INVALID")
     if certification.get("book_id") != terminal_snapshot.get("book_id"):
@@ -86,7 +90,7 @@ def build_portfolio_view_model(
     if presentation.get("presentation_hash") != _presentation_hash(expected_rows):
         raise GvFs0PresentationError("PRESENTATION_HASH_INVALID")
     return {
-        "title": "GV-FS0 Certified Paper Portfolio — OPEN",
+        "title": f"GV-FS0 Certified Paper Portfolio — {action}",
         "status": certification["certification_status"],
         "rows": normalized_rows,
         "presentation_hash": presentation.get("presentation_hash"),
