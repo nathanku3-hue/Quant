@@ -1,0 +1,68 @@
+{
+  "ancestry_required_in_final_tip": [
+    "C",
+    "F",
+    "G"
+  ],
+  "authority_class": "APPROVAL_GATE_PROCEDURE_ONLY",
+  "c_marker_applies_to": "markdown_and_text_truth_surfaces_only",
+  "c_marker_regex": "^GV_FS0_PF1L_CANDIDATE_COMMIT_C=[0-9a-f]{40}$",
+  "c_transplant_allowlist_count": 37,
+  "closure_binding_path": "docs/context/e2e_evidence/gv_fs0_pf1l_closure_binding_v1.json",
+  "closure_commit_f_omitted": true,
+  "current_context_json_c_field": "candidate_commit_c",
+  "current_context_json_path": "docs/context/current_context.json",
+  "execution_requires": "separate EXECUTION_PACKET citing dual-artifact N identities and envelope N+1",
+  "final_tip": "G",
+  "gate_id": "GV-FS0-PF1L-R3.5",
+  "gate_version": 5,
+  "identity_algorithm": "per-file SHA-256 of exact UTF-8 bytes; no in-payload self-hash; no substitution",
+  "json_artifact_path": "docs/authorization/GV_FS0_PF1L_R3_5_APPROVAL_GATE.json",
+  "lifecycle_after_publish": "BOUND_UPSTREAM_NOT_EXECUTION",
+  "markdown_artifact_path": "docs/authorization/GV_FS0_PF1L_R3_5_APPROVAL_GATE.md",
+  "mode": "APPROVAL_GATE",
+  "phase0_fixture_sha256": {
+    "data/fixtures/v2_proxy/expected_ledger.csv": "3d69bdf1fb6a8ce98400d0a5eff3255662fe42b3e573f08f4b6b0b1c9b2707fc",
+    "data/fixtures/v2_proxy/expected_positions.csv": "32dd6dfba16826051be6adbfe38530f58429a6b7969ca9a6ce6e756dae969d8a",
+    "data/fixtures/v2_proxy/expected_result.json": "4029a68df991b5a73eb7a6401e4562fa32f6dcd91f346fcb3151aa98804281eb",
+    "data/fixtures/v2_proxy/synthetic_prices.csv": "732e1898866f2dd777b64650d70c154dc6b6f72cbd23785dee8a865e9bd360a7",
+    "data/fixtures/v2_proxy/synthetic_weights.csv": "3804eeff6664ada5c03bace1beaeb136a96e5d85f11ba5faeeafb84da9db3760"
+  },
+  "pins": {
+    "forbidden_sha": "c007895606c04d9b6de19be80273534ca6437572",
+    "gitattributes_bytes": 624,
+    "gitattributes_sha256": "7edc9193207199b7882e1b687dd5ca9619d0d4c39cb15e7c1b3e272ac28b3377",
+    "required_ancestor": "6a8bb6c9410bc91940d53ca727b561aa86776ec7",
+    "transplant_tip": "d5d03ec6e0b0a2bcafd6c0eac34caa23703d03ed"
+  },
+  "scores": {
+    "freeze_authority": 65,
+    "product": 39,
+    "protocol_capability": 92
+  },
+  "se_report": {
+    "at_most_one": true,
+    "glob": "docs/saw_reports/se_gv_fs0_pf1l_r3_closure_*.md",
+    "required": false
+  },
+  "supersedes": {
+    "r3_3_payload_commit": "1a38af75daf0047df825af270b84546e481c4af8",
+    "r3_4_payload_commit": "3d3efd755f0e7ee47b9fea76b0ae320141f07848",
+    "r3_4_raw_sha256": "69c3601c1ccdd1aeab1a8fe63ef1fa257f4ea7775f52d2abeb30316f254ba3b0"
+  },
+  "thin_saw": {
+    "exactly_one": true,
+    "fail_closed_on_zero_or_many": true,
+    "glob": "docs/saw_reports/saw_gv_fs0_pf1l_r3_closure_*.md",
+    "hash_bound_in": "G",
+    "required": true
+  },
+  "v2_matrix": [
+    "tests/test_v2_fast_proxy_synthetic.py",
+    "tests/test_v2_fast_proxy_invariants.py",
+    "tests/test_v2_canonical_replay_fixture.py",
+    "tests/test_v2_proxy_registered_candidate_flow.py",
+    "tests/test_v2_proxy_boundary.py"
+  ],
+  "v2_matrix_expected_count": 79
+}
