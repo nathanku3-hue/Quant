@@ -1,0 +1,46 @@
+{
+  "authority_class": "APPROVAL_GATE_PROCEDURE_ONLY",
+  "canonical_repository_remote": "https://github.com/nathanku3-hue/Quant.git",
+  "envelope_id": "gv_fs0_pf1l_r3_5_approval_gate_identity_envelope_v1",
+  "envelope_version": 1,
+  "final_tip_rule": "G",
+  "gate_id": "GV-FS0-PF1L-R3.5",
+  "git_identity_verification": {
+    "GIT_NO_REPLACE_OBJECTS": "1",
+    "cleared_redirects": [
+      "GIT_DIR",
+      "GIT_WORK_TREE",
+      "GIT_COMMON_DIR",
+      "GIT_OBJECT_DIRECTORY",
+      "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+      "GIT_INDEX_FILE",
+      "GIT_NAMESPACE",
+      "GIT_CONFIG_*"
+    ],
+    "replacement_refs_required": "CLEAR",
+    "shallow_repository_allowed": false
+  },
+  "identity_algorithm": "per-file SHA-256 of exact UTF-8 bytes; dual Markdown+JSON; no in-payload self-hash",
+  "json_artifact_byte_length": 3033,
+  "json_artifact_path": "docs/authorization/GV_FS0_PF1L_R3_5_APPROVAL_GATE.json",
+  "json_artifact_sha256": "a408bd11f6c69beb620b02f51744b879e10ee860930d4d7f6557e1d6cef720b8",
+  "lifecycle_status": "BOUND_UPSTREAM_NOT_EXECUTION",
+  "markdown_artifact_byte_length": 21824,
+  "markdown_artifact_path": "docs/authorization/GV_FS0_PF1L_R3_5_APPROVAL_GATE.md",
+  "markdown_artifact_sha256": "7e97e73b0d3a1199aec69b6cb43e25b33767110d64ae77da2a1754d99b3c765b",
+  "notes": [
+    "This envelope binds payload commit N only; it does not bind its own commit/tree.",
+    "Both Markdown and JSON artifact identities are non-null and separately hashed.",
+    "Thin-SAW is mandatory exactly-one at F; G binds Thin-SAW hash; final_tip=G with C,F,G in ancestry.",
+    "Freeze execution remains forbidden until a separate EXECUTION_PACKET cites dual-artifact N identities and this envelope lineage."
+  ],
+  "payload_commit_sha": "c0888f86b794a731fe68abfc4051104e096e1a90",
+  "payload_tree_sha": "19d56b2edba3266e889ffcdf5f770e22a0dfbcdf",
+  "repository_root": "C:/Users/Lenovo/.devspace/worktrees/Quant-pf1l-r33-bank",
+  "supersedes_payload_commit_r33": "1a38af75daf0047df825af270b84546e481c4af8",
+  "supersedes_payload_commit_r34": "3d3efd755f0e7ee47b9fea76b0ae320141f07848",
+  "thin_saw_required_exactly_one": true,
+  "upstream_branch": "docs/gv-fs0-pf1l-r3-3-approval",
+  "upstream_commit_sha": "c0888f86b794a731fe68abfc4051104e096e1a90",
+  "upstream_ref": "refs/heads/docs/gv-fs0-pf1l-r3-3-approval"
+}
