@@ -257,9 +257,9 @@ F1A before atomic P0.5 green
 - [x] No permanent bundle path created or modified
 - [x] Product suite, protocol suite, generator check, freeze bootstrap, compile, render smoke, and diff hygiene PASS
 - [x] Bank F1A implementation commit `699e664` on `codex/gv-fs0-f1-product`
-- [ ] Independent Reviewer A/B/C evidence and SAW closure for the exact banked commit
+- [x] Independent Reviewer A/B/C evidence and SAW closure for exact repair commit `066bdda`
 - [x] Reconcile initial A/B/C BLOCK findings: authority tokens, complete verifier economics, two-attempt infrastructure failures, presentation binding, legacy revocation, duplicate rules, descendant-pipe deadline, and combined-suite module identity
-- [ ] Bank the reconciliation commit and rerun distinct Reviewer A/B/C against that exact commit
+- [x] Bank reconciliation commit `066bdda` and rerun distinct Reviewer A/B/C against that exact commit
 
 F1B, F1C, and F1D remain unopened.
 
@@ -275,4 +275,4 @@ python -c "import glob,pytest,sys; sys.exit(pytest.main(['-q',*glob.glob('tests/
 
 ## Next Action
 
-Bank the bounded F1A code/tests/docs, run independent Reviewer A/B/C against that exact commit, then execute F1B by sending NO_POSITION through the same book/certification/adapter path. Do not open publication or default-dashboard routing.
+Open F1B only: send NO_POSITION through the same book/certification/adapter path. Do not open publication or default-dashboard routing.

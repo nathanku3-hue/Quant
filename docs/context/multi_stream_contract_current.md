@@ -1,5 +1,18 @@
 # Multi-Stream Contract - Current
 
+## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Backend/Strategy | F1A OPEN book/certification PASS at `066bdda` | F1B may reuse identical path for NO_POSITION only |
+| Frontend/UI | Final injected adapter PASS for certified OPEN | Add NO_POSITION injection only in F1B; no default bundle loading |
+| Docs/Ops | Distinct A/B/C and terminal SAW PASS; truth reconciled | Preserve F1A identities and Medium process-tree hardening risk |
+| Data/Research | Held | No provider, real-data, PEAD, admission, or FS1 scope |
+
+- Cross-stream rule: F1A certification is one synthetic component, not permanent bundle publication authority.
+- Stream freeze: F1C/F1D, publication, default routing, provider/data, and FS1 remain unopened.
+- Next action: F1B only.
+
 ## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
 | Stream | Current status | Handoff / boundary |

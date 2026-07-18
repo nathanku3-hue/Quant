@@ -1,5 +1,14 @@
 # Planner Packet - Current
 
+## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+- **Current state**: F1A synthetic OPEN is banked and independently closed at repair commit `066bdda` on `codex/gv-fs0-f1-product`.
+- **Delivered**: exact PortfolioBook/snapshots, two isolated verifier attempts, one retained result, all ten checks TRUE, CERTIFIED result, and final injected read-only adapter; terminal NAV is `1044`.
+- **Evidence**: distinct Reviewer A/B/C PASS on exact commit; product 43/43, protocol 137/137, combined 180/180, generator, freeze bootstrap, and compile PASS.
+- **Open risk**: descendant processes are deadline-bounded but not killed as a tree; frozen verifier has no spawn path. Carry as later operational hardening.
+- **Recommended next step**: open F1B only, sending NO_POSITION through the identical book/certification/adapter path.
+- **Do not begin**: F1C/F1D, permanent bundle publication, default dashboard routing, providers, real data, PEAD reopen, or GV-FS1.
+
 ## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
 - **Current state**: repaired candidate `d5d03ec` has terminal protocol-freeze evidence PASS; reducer/product work remains a separate unopened round.

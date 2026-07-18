@@ -1,5 +1,15 @@
 # Observability Pack - Current
 
+## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+- `ObservabilityRating`: GREEN for exact OPEN economics, verifier binding, certification, adapter binding, deterministic identities, and independent review; AMBER for descendant process-tree termination hardening; RED/held for later gates and real authority.
+- Identity sentinel: implementation `699e664`; repaired/reviewed commit `066bdda`.
+- Economic sentinel: terminal NAV `1044`, cash `904`, receivables `0`, contribution `10`; two attempts, one retained result, ten TRUE checks.
+- Test sentinel: product 43/43, protocol 137/137, combined 180/180; generator/freeze/compile PASS.
+- Reviewer sentinel: distinct A/B/C PASS on exact repaired commit with no in-scope Critical/High remaining.
+- Boundary sentinel: no F1C/F1D, publication, default routing, provider, real data, PEAD, or FS1 authority.
+- Next-action sentinel: F1B only.
+
 ## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
 - `ObservabilityRating`: GREEN for deterministic generation, vectors, enforced verifier, six mutation rejections, clean restored probe tree, A/B/C review, hosted Windows/Linux protocol proof, and byte parity; RED for reducer/product execution authority in this round.

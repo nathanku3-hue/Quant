@@ -1,5 +1,15 @@
 # Impact Packet - Current
 
+## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+- **Banked commits**: `699e664` initial F1A; `066bdda` review reconciliation and terminal review target.
+- **Backend impact**: new primary OPEN book/events/snapshots and certification controller with exact raw-verifier semantic/hash binding, two-attempt supervision, retained-result dedupe, and frozen authority/duplicate rules.
+- **Frontend impact**: final adapter accepts injected artifacts only and rejects presentation row/hash drift against the terminal snapshot and certification.
+- **Legacy impact**: `strategies/strategy_replay.py` is machine-marked `REVOKED_BY_GV_FS0_20260716`; product authority tests enforce no FS0 certification use.
+- **Validation**: exact commit Reviewer A/B/C PASS; product 43/43, protocol 137/137, combined 180/180, generator/freeze/compile PASS.
+- **Open risk**: process-tree termination hardening remains Medium and non-blocking because the frozen verifier has no descendant-spawn path.
+- **Untouched**: F1B NO_POSITION, permanent bundle/publication, default routing, providers, real data, and FS1.
+
 ## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
 - **Changed interfaces**: CI branch/base selection portability and Windows pytest glob execution were repaired after the immutable protocol candidate; frozen protocol semantics and machine artifacts are unchanged.

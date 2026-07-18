@@ -1,5 +1,14 @@
 # Post-Phase Alignment - Current
 
+## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+- **Backend/Strategy:** exact synthetic OPEN economics and certification closed at `066bdda`; legacy replay authority revoked.
+- **Frontend/UI:** final read-only adapter injection is bound to certified snapshot/presentation content; no default bundle route.
+- **Docs/Ops:** product/protocol/combined checks and distinct A/B/C terminal SAW PASS; seven truth surfaces reconciled.
+- **Data/Research:** held; no provider or real-data change.
+- **Current bottleneck:** none for F1A. Process-tree termination is later operational hardening, not an F1A blocker.
+- **Next active stream:** F1B NO_POSITION only.
+
 ## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
 - **Docs/Ops:** Protocol candidate, CI portability repair, final mutation probe evidence, A/B/C review, hosted Windows/Linux CI, byte parity, and terminal SAW are complete.

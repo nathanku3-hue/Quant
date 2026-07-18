@@ -1,5 +1,14 @@
 # Bridge Contract - Current
 
+## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+- `SYSTEM_DELTA`: commit `066bdda` closes F1A OPEN with conforming event authority, exact raw-verifier economics/hash binding, two attempts, certification, result identity, and injected presentation binding.
+- `PM / Product Delta`: one synthetic OPEN component is now CERTIFIED and independently closed; terminal NAV is `1044`. This is not a permanent two-component product bundle.
+- `OPEN_DECISION`: none for F1A closure.
+- `RECOMMENDED_NEXT_STEP`: open F1B only and pass NO_POSITION through the identical implementation path.
+- `DO_NOT_REDECIDE`: preserve the frozen protocol and F1A economics; do not open F1C/F1D, publication, default routing, providers, real data, PEAD, or FS1.
+- `PHASE_STATUS`: F1A PASS; F1B next; later gates unopened.
+
 ## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
 - `SYSTEM_DELTA`: GV-FS0 protocol artifacts and guards are fixed through candidate branch `d5d03ec`; frozen protocol, manifest, and vector bytes remain unchanged by hosted-CI repairs.

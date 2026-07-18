@@ -1,3 +1,10 @@
+## 2026-07-18 — GV-FS0 F1A Terminal Close
+
+- Decision: accept implementation commit `699e664`, repair commit `066bdda`, and distinct terminal Reviewer A/B/C PASS as closure of F1A synthetic OPEN only.
+- Evidence: exact NAV `1044`, cash `904`, receivables `0`, two verifier attempts, one retained result, all ten certification checks TRUE; product 43/43, protocol 137/137, combined 180/180, generator/freeze/compile PASS.
+- Open risk: descendant-held pipes are deadline-bounded but the supervisor does not terminate a malicious descendant process tree; the frozen verifier has no descendant-spawn path, so this is non-blocking operational hardening.
+- Boundary: F1B is the only next scope. F1C/F1D, permanent publication, providers, real data, default routing, and FS1 remain unopened.
+
 ## 2026-07-18 — GV-FS0 F1A Initial Review Reconciliation
 
 - Decision: retain the exact synthetic OPEN economics while repairing every in-scope High finding from distinct Reviewer A/B/C against banked commit `699e664`.

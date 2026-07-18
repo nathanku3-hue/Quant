@@ -1,5 +1,19 @@
 # Done Checklist - Current
 
+## Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+- [x] F1A implementation banked at `699e664` and review repair banked at `066bdda`.
+- [x] Exact OPEN economics: NAV `1000 → 1009 → 1024 → 1034 → 1044`, cash `899 → 904`, receivable `5 → 0`.
+- [x] Exactly two isolated verifier attempts and one retained result; all ten checks TRUE; CERTIFIED.
+- [x] Frozen decision/certification authority tokens and legacy replay revocation enforced.
+- [x] Raw verifier semantics/hash, duplicate rules, and presentation projection/hash fail closed under adversarial tests.
+- [x] Product 43/43, protocol 137/137, combined 180/180, generator/freeze/compile PASS.
+- [x] Distinct Reviewer A/B/C PASS on exact commit `066bdda`; terminal SAW PASS.
+- [ ] F1B NO_POSITION — next and unopened.
+- [ ] F1C/F1D, permanent publication, default routing, providers, real data, and FS1 — held.
+
+Next action: open F1B only.
+
 ## Active Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17)
 
 - [x] Immutable candidate `346d362` created and locally audited.
