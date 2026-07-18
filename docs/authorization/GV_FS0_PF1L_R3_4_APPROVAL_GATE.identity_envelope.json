@@ -1,0 +1,41 @@
+{
+  "authority_class": "APPROVAL_GATE_PROCEDURE_ONLY",
+  "canonical_repository_remote": "https://github.com/nathanku3-hue/Quant.git",
+  "envelope_id": "gv_fs0_pf1l_r3_4_approval_gate_identity_envelope_v1",
+  "envelope_version": 1,
+  "gate_id": "GV-FS0-PF1L-R3.4",
+  "git_identity_verification": {
+    "GIT_NO_REPLACE_OBJECTS": "1",
+    "cleared_redirects": [
+      "GIT_DIR",
+      "GIT_WORK_TREE",
+      "GIT_COMMON_DIR",
+      "GIT_OBJECT_DIRECTORY",
+      "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+      "GIT_INDEX_FILE",
+      "GIT_NAMESPACE",
+      "GIT_CONFIG_*"
+    ],
+    "replacement_refs_required": "CLEAR",
+    "shallow_repository_allowed": false
+  },
+  "identity_algorithm": "SHA-256(exact UTF-8 file bytes); no in-payload self-hash; no substitution",
+  "json_artifact_path": null,
+  "json_artifact_sha256": null,
+  "lifecycle_status": "PREPARED_NOT_SENT",
+  "markdown_artifact_byte_length": 18860,
+  "markdown_artifact_path": "docs/authorization/GV_FS0_PF1L_R3_4_APPROVAL_GATE.md",
+  "markdown_artifact_sha256": "69c3601c1ccdd1aeab1a8fe63ef1fa257f4ea7775f52d2abeb30316f254ba3b0",
+  "notes": [
+    "This envelope binds payload commit N only; it does not bind its own commit/tree.",
+    "R3.4 removes form-feed corruption present in R3.3 payload b5664dd86213b20dd14d53f5989b39f02725a5d46455d1d89fc548331f8cd82d.",
+    "Standalone C-marker applies to Markdown/text only; current_context.json uses structured top-level candidate_commit_c with duplicate-key rejection.",
+    "Freeze execution remains forbidden until a separate EXECUTION_PACKET cites this payload SHA-256 and envelope.",
+    "closure_commit_f is omitted; F is bound later by detached envelope G after F exists."
+  ],
+  "payload_commit_sha": "3d3efd755f0e7ee47b9fea76b0ae320141f07848",
+  "payload_tree_sha": "dfa135eb9f1d671ece1f54ef757e3128c9a37951",
+  "repository_root": "C:/Users/Lenovo/.devspace/worktrees/Quant-pf1l-r33-bank",
+  "supersedes_gate_id": "GV-FS0-PF1L-R3.3",
+  "supersedes_payload_commit": "1a38af75daf0047df825af270b84546e481c4af8"
+}
