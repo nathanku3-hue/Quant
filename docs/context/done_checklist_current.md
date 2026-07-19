@@ -1,4 +1,320 @@
+# Done Checklist - Current
+
+## Active Addendum — GV-E0A-OPERABLE Direction + Gate Checklist (2026-07-19)
+
+### Direction hard-recut (Docs/Ops)
+
+- [x] Active canon hard-recut: sole gate **GV-E0A-OPERABLE**.
+- [x] F1C-SHIP marked CLOSED_SUBSTRATE; not active shipment language.
+- [x] Score 39/100 retained as owner claim ceiling (no numerical uplift).
+- [x] Functional stage explicit: `CERTIFIED_SINGLE_DECISION_OPERABLE` (stage-only; score remains 39).
+- [x] README/PRD/PRODUCT_SPEC active framing → GodView certified portfolio OS; UOE demoted to history.
+- [x] E0A EXECUTION_PACKET brief created.
+- [x] Forbidden scope restated: providers, real prices, FS1 batch, PEAD, alpha, broker, dual-authority UI, historical suite repair.
+
+### E0A operable vertical (implemented on `codex/gv-e0a-operable`)
+
+- [x] Frozen E0 four-file exact hashes verified in operable path.
+- [x] Explicit HOLD_FOR_EVIDENCE research decision.
+- [x] Portfolio NO_POSITION via one DecisionEnvelope.
+- [x] PortfolioBook + independent certification for that decision.
+- [x] Atomic publication of current decision.
+- [x] One visible current decision (default portfolio route).
+- [x] Streamlit AppTest smoke for one current decision.
+- [x] Stage `CERTIFIED_SINGLE_DECISION_OPERABLE` with product-suite evidence.
+- [x] Score remains 39/100.
+- [x] Hosted product CI `29655802878` PASS; Reviewer A/B/C PASS; terminal SAW PASS at pin `446ac6d`.
+
+### Main cutover preflight (GV-E0A-MAIN-CUTOVER-PREFLIGHT)
+
+- [x] Machine-shaped E0A terminal context packet is the first bootstrap-selectable packet.
+- [x] Stale Impact/Multi-stream/Alignment/Observability/Done/Bridge surfaces reconciled to terminal + cutover→E0B.
+- [x] Regression ensures context bootstrap prefers E0A terminal packet over later PEAD packets.
+- [ ] Fast-forward `main` to repaired product tip.
+- [ ] Smoke single certified decision from integrated main.
+- [ ] Open GV-E0B Decision-Value planning after smoke (not FS1; not indefinite hold).
+
+Next action: FF main after truth-repair bank; smoke one certified decision; then E0B planning only. Do not open FS1, providers, PEAD, alpha, or broker.
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Checklist (2026-07-19) [CLOSED_SUBSTRATE]
+
+- [x] Exact permanent bundle materialized and tracked (55774 / a9dda224…).
+- [x] Focused product+protocol 202/202.
+- [x] Candidate C banked and pushed as transport (48ad053).
+- [x] C2 LF pin banked and pushed (91b9bf1).
+- [x] Hosted Ubuntu/Windows product proof + byte parity PASS (29651784244).
+- [x] Distinct Reviewer A/B/C PASS on C and re-pin C2.
+- [x] Terminal SAW PASS; obsolete F1C/F1D sequential active-gate language removed.
+- [x] Official score remains 39/100.
+- [x] F1C closed as substrate (direction recut).
+- [ ] Provider/real data/PEAD/FS1/main merge — held; not authorized.
+
+
+# Done Checklist - Current
+
+## Prior Addendum — GV-FS0 F1C-SHIP Local Done State (2026-07-18) [superseded]
+
+- [x] Exact base `c37db09`; F1A/F1B identities unchanged.
+- [x] Deterministic complete OPEN + NO_POSITION bundle identity.
+- [x] Atomic publication and recovery matrix implemented with four frozen codes only.
+- [x] Default `Certified Portfolio` route reads permanent validated bundle only; no replay fallback.
+- [x] Headless two-role rendering PASS and dashboard startup read-only.
+- [x] Windows/Linux product parity workflow added.
+- [x] Full-suite zero-new-failure comparison PASS.
+- [ ] Permanent canonical bundle tracked at required path.
+- [ ] Focused boundary 202/202 PASS; currently 201/202.
+- [ ] Immutable implementation commit.
+- [ ] Hosted Windows/Linux parity PASS.
+- [ ] Distinct exact-commit Reviewer A/B/C and terminal SAW PASS.
+- [ ] Product branch pushed.
+
+Next action: complete the six unchecked custody/evidence items without opening adjacent scope.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Done State (2026-07-18)
+
+- [x] F1A banked and independently closed at `e156c66`.
+- [x] Separate NO_POSITION fixture/decision; quantity null; zero non-valuation source intents.
+- [x] Shared book/reducer/snapshot/verifier/certification/result/adapter path.
+- [x] Five flat sessions at shares `0`, cash/NAV `1000`, all contributions `0`.
+- [x] Two isolated attempts; all ten certification checks TRUE; deterministic canonical bytes.
+- [x] Product 52/52, protocol 137/137, combined 189/189 PASS.
+- [x] No F1C/F1D publication/default-route/provider/data/FS1 action.
+- [x] Exact F1B commit `4359f35` banked on `codex/gv-fs0-f1-product`.
+- [x] Distinct Reviewer A/B/C PASS against exact F1B commit; terminal SAW PASS.
+- [x] Generated `current_context` refreshed and validated.
+- [x] F1C/F1D remain closed.
+
+Next action: stop before F1C; require separate owner authorization before permanent publication.
+
+## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+- [x] F1A implementation banked at `699e664` and review repair banked at `066bdda`.
+- [x] Exact OPEN economics: NAV `1000 → 1009 → 1024 → 1034 → 1044`, cash `899 → 904`, receivable `5 → 0`.
+- [x] Exactly two isolated verifier attempts and one retained result; all ten checks TRUE; CERTIFIED.
+- [x] Frozen decision/certification authority tokens and legacy replay revocation enforced.
+- [x] Raw verifier semantics/hash, duplicate rules, and presentation projection/hash fail closed under adversarial tests.
+- [x] Product 43/43, protocol 137/137, combined 180/180, generator/freeze/compile PASS.
+- [x] Distinct Reviewer A/B/C PASS on exact commit `066bdda`; terminal SAW PASS.
+- [ ] F1B NO_POSITION — next and unopened.
+- [ ] F1C/F1D, permanent publication, default routing, providers, real data, and FS1 — held.
+
+Next action: open F1B only.
+
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
+
+- [x] Immutable candidate `346d362` created and locally audited.
+- [x] Hosted-CI portability repairs through `d5d03ec` preserve frozen protocol, manifest, and vector bytes.
+- [x] 136 focused GV-FS0 tests pass, including the Windows glob and push-base guard regressions.
+- [x] Deterministic generator, independent vectors, and enforced verifier pass against the repaired candidate.
+- [x] Non-merged mutation probe branch tip `9954e32` restores cleanly and retains schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest rejection pairs.
+- [x] Independent Reviewer A/B/C terminal review PASS for exact repaired candidate.
+- [x] Hosted Windows/Linux CI passes on run `29567754495`.
+- [x] Terminal SAW reconciled from BLOCK to PASS after hosted CI evidence.
+- [ ] Reducer authorization predicate acted on; currently false for this round.
+
+Next action: hold until separate owner authorization opens reducer/product work. Economic implementation remains blocked in this round.
+
+## Prior Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17) [history]
+
+- [x] Four approved precision decisions and four execution amendments are explicit in the normative contract.
+- [x] Exactly 12 schemas and six other normative V1 artifacts regenerate deterministically.
+- [x] Canonical encoder, raw-token parser, independent reference encoder, vectors, registries, tables, and manifest pass.
+- [x] Manifest records lowercase SHA-256, declared Git object format, Git blob OIDs, byte lengths, and exactly one terminal LF.
+- [x] Bootstrap mode rejects schema, registry, contract, vector, CRLF, and dishonest artifact-plus-manifest mutations.
+- [x] 135 focused GV-FS0 tests pass, including isolated reconstruction, local schema-reference resolution, intent cardinality, and publication boundary tests.
+- [x] Native Windows and Linux Python parity records are byte-identical locally.
+- [x] Windows/Linux CI workflow implements bootstrap/enforced selection and downstream byte comparison.
+- [ ] Immutable candidate commit created and locally audited.
+- [ ] Enforced mode passes unchanged and rejects all required mutations relative to the committed candidate on a non-merged branch.
+- [ ] Hosted Windows/Linux CI passes.
+- [ ] Independent Reviewer A/B/C and terminal SAW approve the exact candidate.
+- [ ] Reducer authorization predicate satisfied; currently false.
+
+Next action: commit the immutable candidate, execute the enforced mutation probe, and audit that exact commit. Economic implementation remains blocked.
+
+## Prior Program State — PEAD Strict-PIT Formally Closed (2026-07-14)
+
+- **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
+- **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.
+- **Original objective**: 2015–2019 dollar-neutral Q5−Q1 strict-PIT PEAD. **Not achieved.**
+- **Research validity**: ~30/100; delivery/closure: 88/100.
+- **Prohibited**: Strategy/UI promotion, readiness flag changes, provider access, curve/alpha claims, ranking/scoring, alerts, recommendations, broker/order paths.
+- **Reopen condition**: Only for one source-intake slice with genuine effective-dated identifiers + committed data-owner approval; mapping and curves remain closed until ID0 passes.
+
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- [x] Commit A `c5a9ab8` banked the standalone M7F5-ID0 authority gate, focused tests, and active brief.
+- [x] Commit B `410d0ca` banked deterministic current-source BLOCK evidence at `docs/context/e2e_evidence/pead_m7f5_id0_dated_identifier_authority_20260714.json`.
+- [x] Truth repair `a51f349` records runtime/check-out evidence SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903` and committed Git-blob evidence SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- [x] Independent Reviewer A/B/C PASS and terminal SAW `398732c` PASS for the bounded provenance BLOCK gate.
+- [x] Current result: `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED` with reason `committed_git_blob_data_owner_approval_required`; all operational authorities remain false.
+- [ ] Effective-dated source acquisition, committed data-owner approval, mapping generation, curve rerun, readiness promotion, Strategy/UI, and provider access — outside this close and blocked/unopened.
+
+Next action: hold promotion; choose exactly one separately authorized owner decision.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- [x] A2.1 repair banked at `b4d35e1`: verified selection count used by residual evidence; real publication branch regression added.
+- [x] Failed-run partial outputs removed before the fresh clean rerun.
+- [x] Compile and focused tests 45/45 PASS; clean rerun completed without OOM.
+- [x] Commit B `9f37745` contains only evidence JSON and two manifests.
+- [x] Selection lock: 2,448 unique events with both required hashes; 2,444 observed + 4 residual.
+- [x] Bridge 2/2 PASS; NAV/cost, carried-NAV, no-recapitalization, file-hash, and exact Shapley checks PASS.
+- [x] Independent Reviewer A/B/C PASS with distinct identities and exact Commit B pin.
+- [x] Decision/formula/lesson records, terminal SAW, active brief, and seven truth surfaces reconciled.
+- [x] `strict_curve_status=BLOCKED`; `m6b_data_contract_ready=false`; no alpha/tradable/PIT-as-of claim.
+- [ ] Strict primary curve, PIT/as-of link, generalized OOM recovery, and transactional publication — outside this close and blocked/unopened.
+
+Next action: hold promotion; choose exactly one separately authorized next decision.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- [x] Owner GO with deltas recorded (daily sequence, first-bad residual, dead write-down, cash no double-count, Shapley-16, selection hash, v6 path removed, Commit C truth).
+- [x] Commit A code/tests/brief + v6 CLI retire: `bae1f65609b723cc6462d9bbd1967340a0cb3310`.
+- [x] Focused tests 24/24 PASS.
+- [x] Full 2019 rerun DIAGNOSTIC_COMPLETE; selection 2448 hash `caeccc642e5d052b211cc5ecfc335bf4f63d0fd7d63018a6b40c5d6965ad2e6d`.
+- [x] first-bad residual sum 0.007208; Shapley 16-state sum-to-gap; legs differ in turnover/cost.
+- [x] Commit B evidence only: `b5c66bc740926fc51294107a8951c2993400203a` (no full truth in B).
+- [x] Distinct Reviewer A/B/C PASS.
+- [x] Commit C SAW + seven-surface reconcile.
+- [x] `m6b_data_contract_ready=false`; strict_curve BLOCKED; no CCM.
+- [ ] Strict primary curve PASS; readiness/UI/alpha/as-of link — blocked by design.
+
+## Prior Addendum — M7F2-v6-final (superseded as active close)
+
+- Historical v6 diagnostic retained; not valid 70–74 close (audit 61). Executable path retired.
+
+
+# Done Checklist - Current
+
+## Active Addendum — M7F2-v6-final (2026-07-12)
+
+- [x] Hard-rename/replace v5 runner/tests/brief with m7f2-v6-final (no compatibility path).
+- [x] Pre-entry delist exclude before breadth/Q5 + rerank (structural; no event-id policy).
+- [x] Bridge blank post-entry one-session gaps with adjacent price + next RET proof only.
+- [x] Emit strict BLOCK + neutral_carry_to_cash + write_down_100pct with per-event attribution.
+- [x] Map metadata: used_for_selection=true (identity); future_informed_identity_map=true.
+- [x] Unit tests PASS (19/19).
+- [x] Commit A code/tests/brief: `c7724adcaa855076be079c10224ea5cd2f0e60c0`.
+- [x] Full 2019 rerun from Commit A: DIAGNOSTIC_COMPLETE; strict_curve_status=BLOCKED.
+- [x] Evidence SHA-256 `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a`.
+- [x] All seven truth surfaces refreshed (this Commit B).
+- [x] Terminal independent Reviewer A/B/C + validated SAW C.
+- [ ] Curve PASS 68-72 primary; not claimed (strict BLOCKED by residual ambiguities).
+- Next action: Commit C A/B/C + SAW PASS (diagnostic scope) with strict_curve BLOCKED.
+
+
 # Done Checklist - Phase 65 G8.2 System-Scouted Candidate Card
+
+## Active Addendum — M7F1-v5.2-final (2026-07-12)
+
+- [x] Four mandatory edits applied: prior-20 roadmap deviation; source-wide spine + pre-2019 load; VOL>0; first/last diagnostic-only; force map rebuild; stale curve invalidate.
+- [x] Clean Commit A code/tests/brief only: `138c8b76028b2094793efb2d066c269bf7b805f6`.
+- [x] Unit tests 17/17 PASS at Commit A.
+- [x] Full 2019 rerun from Commit A with forced map rebuild.
+- [x] Evidence bound to Commit A; curve not promoted; residual BLOCK 7/2448 recorded.
+- [x] Commit B evidence + truth surfaces: `8740f57763fafc838b07b9bedcf2a593a0787351`.
+- [x] Commit C full independent Reviewer A/B/C + SAW pinned to B (ADVISORY_PASS).
+- [ ] Residual delisting-data/policy gate authorized/executed.
+- [ ] Curve PASS 68–72; not achieved (durable residual BLOCK ~62).
+- Next action: owner open bounded delisting-data/policy gate for 7 residual invalids only.
+
+## Prior Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+
+- [x] Original Reviewer A/B/C BLOCK findings accepted: dispatch identity at `e470137` failed because the four current 20260701 request artifacts were absent.
+- [x] False dispatch Markdown, JSON, and dependent PASS report quarantined as `INVALID_NOT_DISPATCHED`; no message is proven sent.
+- [x] Dispatch Markdown and JSON hashes remain separately labeled: Markdown `ed2db3015413bc71edea919d5c15800514e74b5918253af3d86788614baf872d`; JSON `5975304aee17b6b46a481f690b3be7ac76ee37d5000e9e1e58fcbed1b88b8a30`.
+- [x] Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` banks the exact four current request artifacts without semantic or byte changes.
+- [x] Commit `c642a94944831adbd7ecc06fb16259c87fcdd213` contains the detached identity envelope with four distinct path/hash pairs and lifecycle `PREPARED_NOT_SENT`.
+- [x] Three distinct read-only Reviewer A/B/C agents reviewed the fixed commits in separate pinned worktrees and returned PASS.
+- [x] Terminal reviewer-independence SAW at commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` is PASS.
+- [x] Mandatory current-truth surfaces no longer report the superseded ownership BLOCK.
+- [x] Legacy, divergent, reconstructed, redirected, cherry-picked, and otherwise unbound artifacts remain rejected.
+- [x] Factual A/B/C/D statuses and `m6b_data_contract_ready=false` remain unchanged.
+- [x] No remotes, dispatch, source inspection, provider use, factual validation, readiness promotion, Gate D, publication, or data output.
+- [x] Request-artifact identity repair and terminal reviewer independence are closed PASS.
+- [x] Context validation PASS; governance preflight PASS with 0 findings; planning boot preflight PASS; fixed-artifact byte checks PASS.
+- [x] Thin SAW PASS published for the bounded truth-reconciliation slice.
+- [ ] Gate A/B/C dispatch is authorized; a separate explicit owner decision is still absent.
+- Next action: hold the unchanged envelope at `PREPARED_NOT_SENT`; do not rerun implementation or reviewers and do not dispatch.
+
+## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
+
+- [x] Hard dirty blocker identified as untracked Path A pair only (boot-core dirty remains advisory).
+- [x] Path A source/test banked; GOV-002/GOV-008 fixed; evidence LF restored.
+- [x] Governance PASS; planning boot preflight PASS; commit `e470137`.
+- [x] Hygiene recovery completed, but exact request-artifact identity was not established and dispatch remained invalid.
+- [ ] P2 publication / remotes / dispatch / source inspection / readiness promotion; still forbidden without separate authority.
+- Next action: see the active request-artifact identity repair checklist.
+
+## Prior Addendum — P0 Trust-Substrate Repair (2026-07-11)
+
+- [x] Every `scripts/boot_preflight.py` Git subprocess sets `GIT_NO_REPLACE_OBJECTS=1`.
+- [x] Git identity removes ambient Git redirection/configuration and requires raw HEAD/upstream commits plus a verified HEAD tree; unborn, broken, and tag-shaped identities fail closed.
+- [x] Loose and packed `refs/replace/*` are discovered by Git enumeration and hard-fail identity verification before ancestry can be trusted.
+- [x] Strict Path A evidence and authorization JSON rejects duplicate keys at any object depth before evaluation or output write; ambiguous legacy JSON is invalid.
+- [x] Focused P0 adversarial tests pass for replacement-ref and duplicate-key paths.
+- [x] This workspace reports verified Git identity with no replacement refs.
+- [x] Planning governance preflight and hard unclassified dirty blockers cleared by hygiene recovery addendum above.
+- [x] Fresh independent Reviewer A/B/C review and reconciliation is complete with no in-scope Critical/High findings for P0.
+- [ ] P2 publication or Gate A/B/C source-access dispatch is authorized; still a separate decision after hygiene green.
+- Next action: see active hygiene recovery checklist.
+
+## Active Addendum - V2 PEAD M6b Slice 0 Contract Correction (2026-07-02)
+
+- [x] Corrected only the active M6b phase brief so first-public/unrestated EPS is the sole strict Gate A pass route.
+- [x] Declared `release_date_aligned_but_restated` non-strict; it cannot satisfy strict Gate A, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- [x] Added repository remote/root, commit, tree, artifact path, artifact-hash, and mismatch-denial fields to the canonical Ship-Fast approval/request template.
+- [x] Verified locally that the denied R0.1 commit does not resolve in Quant and root `R0.1-preflight-plan.md` is absent; no R0.1 material was introduced.
+- [x] Refreshed bridge, impact, planner, multi-stream, post-phase, observability, current-context, notes, decision-log, and lesson current truth.
+- [x] Thin SAW verifies active-contract correction, no forbidden Slice 0 action, evidence structure, and a single next action.
+- [ ] Gate A/B/C factual evidence or source access is authorized; still absent.
+- [ ] Strict M6b readiness is authorized; it remains false.
+- Next action: submit only the prepared Gate A and Gate B/C data-owner source-access requests.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+- [x] Preserved 20260630 contract, request, and Thin SAW artifacts without mutation; created 20260701 successors with supersedes metadata and recomputed predecessor hashes.
+- [x] Bound successor request JSON only to successor Gate A contract SHA-256 `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063`.
+- [x] Added source-capability attestation-at-approval, conditional timing-artifact, immutable calendar source-of-record, eligible-session, and replayable session-mapping requirements to the successor Gate A contract.
+- [x] Preserved Gate B candidate-only, Gate C attribute-scope-blocked, and Gate D integration-gap statuses in successor requests.
+- [ ] Data owner has approved Gate A or Gate B/C source access; not supplied.
+- [ ] Named local immutable source artifacts and fresh real-artifact reviewer capacity exist; not supplied.
+- [ ] Gate A/B/C/D factual verification has occurred; prohibited in this round.
+- [ ] Strict M6b readiness is authorized; it remains false.
+- Next action: complete request-only Thin SAW closure, then submit the successor Gate A and Gate B/C data-owner requests.
+- Status claim: canonical current evidence and strict readiness remain unchanged.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+- [x] Evidence-only strict Gate A-D validator writes only atomic JSON; payload content cannot self-authorize.
+- [x] Distinct authorization is bound to exact evidence-file bytes and scope/mode/action; current gate PASS requires detached authorization and all four verified local source-byte hashes.
+- [x] Focused strict-gate tests pass 68/68; existing M6a tests pass 12/12; compile passes.
+- [x] Exact current-evidence CLI and deterministic second replay pass with SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- [x] Missing explicit `--output`, malformed evidence, malformed authorization JSON/schema, current-evidence-plus-authorization, and synthetic-test-plus-authorization exit 2 with no output or temporary file; synthetic canonical-output targeting is rejected before atomic write; payload-only restated approval is `NOT_AUTHORIZED`; well-formed authorization mismatch exits 0 with A-D blocked; source-byte, static/B-import isolation, output-isolation, and atomic temporary-file cleanup checks pass.
+- [x] Current artifact records A/B/C/D `BLOCKED`, `strict_vintage_pit=false`, restated-EPS exception `NOT_AUTHORIZED`, and `m6b_data_contract_ready=false`.
+- [x] M6a remains sparse engine/framework evidence only; Data Path A is active; UI/frontend and Strategy promotion are held; B remains isolated illustrative-only.
+- [x] One post-validation truth refresh and canonical context build/validation record observed results without using synthetic fixtures, validator existence, tests, or review as readiness evidence.
+- [ ] Terminal independent Reviewer A/B/C infrastructure review and reconciliation complete.
+- [ ] Any strict data gate has authoritative `PASS` evidence; none currently does.
+- [ ] Strict M6b readiness is authorized; it remains false.
+- [x] Inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception is `NOT_AUTHORIZED` and cannot satisfy strict Gate A.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gates Opened (2026-06-29)
+
+- [x] Refreshed stale cross-stream docs (`multi_stream_contract_current.md`, `post_phase_alignment_current.md`) to the June 25 M6 truth.
+- [x] Opened strict M6b Path A data gates in `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md`.
+- [x] Defined Gate 1: First-public EPS vintage or explicit flagged exception.
+- [x] Defined Gate 2: Delisting-adjusted tradable returns.
+- [x] Defined Gate 3: Full as-of liquidity and tradability screen.
+- [x] Defined Gate 4: Borrow assumptions and short-cost evidence.
+- [x] Maintained fail-closed principle for `m6b_data_contract_ready = false`.
+- [ ] Execute strict M6b Path A data prep for Gates 1-4; blocked pending separate data stream implementation and Reviewer C verification.
 
 ## Authoritative Addendum - V2 PEAD M6b Option 1 Repair PASS (2026-06-25)
 

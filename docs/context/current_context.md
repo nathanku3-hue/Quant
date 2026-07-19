@@ -1,17 +1,18 @@
 ## What Was Done
-- Completed the sparse-engine core: DuckDB direct aggregation, global trading-calendar `return_idx:int32`, `entry_idx/exit_idx` interval bounds, numeric-only projected relations, object-dtype rejection, single-thread compensated aggregation, and canonical daily SHA-256 output hashing.
-- Turnover continues to preserve entry, overlap, exit, and final trade-to-zero parity; no wide matrix, chunking, physical repartitioning, Numba, or multiprocessing was added.
-- Focused M6 PASS 12/12; M5a+M6 PASS 16/16; broader PEAD PASS 109/109; 11,798,280-position-day smoke is within the configured bound.
+- E0A operable vertical is **banked substrate** (C `45f9f96` + C2 `446ac6d`; hosted CI PASS; A/B/C PASS; SAW PASS). One current certified decision only.
+- F1C-SHIP closed substrate; dual-fixture never default UI fallback.
+- Context bootstrap prefers product/E0A packets over historical PEAD blocks.
+- Owner audit: E0A-R1 = repair tax; E0B-DV1 = first real GodView product slice.
 
 ## What Is Locked
-- Engine completion does not satisfy M6b data readiness. Strict EPS vintage, delisting-adjusted tradable returns, and full as-of tradability/liquidity remain absent and fail closed.
-- No provider/data/UI/alpha/ranking/action/real-curve scope was opened.
+- E0A is plumbing only — not decision value / alpha / economics.
+- Conjunctive endgame ≈ decision-value maturity (~9/100). Additive substrate scores must not mask that.
+- E0A-R1 hard cap then stop; no dirty-root authority auto-canonization.
+- FS1, providers, PEAD reopen, alpha claims, broker, dual-authority default UI closed.
+- PEAD = `TERMINATED_DIAGNOSTIC_ONLY` history only.
 
 ## What Is Next
-- **Single next action: obtain independent Reviewer A/B/C terminal review for the completed M6a.1 core; only then start M6b data-prep for its independent data gates.**
-- `V2-PEAD-M6A-SCALE-SPARSE-PORTFOLIO-ENGINE`: core implementation complete locally; independent SAW review pending.
-- `V2-PEAD-M6B-DATA-PREP`: blocked by independent strict data decisions.
-- `V2-PEAD-REAL-RUN-EQUITY-CURVE`: blocked until M6b closes its data contract.
+- Finish E0A-R1 (single authority + merge + fresh-checkout smoke), close E0A, open E0B-DV1 with causal decision-improvement pass bar. Not FS1.
 
 ## First Command
-`.venv\\Scripts\\python.exe -m pytest tests\\test_pead_m6_pit_walk_forward_equity_curve.py -q`
+`git show --stat --oneline HEAD`

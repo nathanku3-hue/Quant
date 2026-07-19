@@ -1,0 +1,89 @@
+{
+  "packet_id": "V2_PEAD_M6B_GATE_ABC_SOURCE_ACCESS_DISPATCH_20260711",
+  "round_id": "ROUND-20260711-V2-PEAD-M6B-GATE-ABC-REQUEST-DISPATCH",
+  "scope_id": "V2_PEAD_M6B_GATE_ABC_SOURCE_ACCESS_DISPATCH_ONLY",
+  "mode": "EXECUTION_PACKET",
+  "status": "REQUEST_DISPATCHED_AWAITING_DATA_OWNER_RESPONSE",
+  "authority": "request dispatch only; not source-access authorization, entitlement proof, export authority, archive inspection, provider access, factual gate validation, data output, P2 publication, Gate D, or strict readiness authority",
+  "decision": {
+    "decision": "REOPEN",
+    "action": "dispatch_prepared_Gate_A_and_Gate_B_C_source_access_requests",
+    "decided_on_utc": "2026-07-11",
+    "preconditions_verified": {
+      "head_commit": "e470137d64eb44829e8977c1aaf60bdcc64117d5",
+      "governance_preflight": "PASS_0_findings",
+      "planning_boot_preflight": "PASS",
+      "boot_status": "degraded_deferred_data_context_smoke_only"
+    }
+  },
+  "prepared_request_bundle": {
+    "path": "docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.json",
+    "sha256": "913196ba279dd49442ce6b3bbde54d185c188a2d26e21cf462d853bbe295505b",
+    "status_at_dispatch": "REQUEST_PREPARED_EVIDENCE_MISSING",
+    "historical_artifact_mutated": false
+  },
+  "gate_a_contract": {
+    "path": "docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.json",
+    "sha256": "27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063",
+    "status": "PROPOSED_FOR_DATA_OWNER_APPROVAL"
+  },
+  "dispatched_requests": [
+    {
+      "gate_scope": "A",
+      "dispatch_status": "DISPATCHED_AWAITING_DATA_OWNER_RESPONSE",
+      "factual_gate_status_unchanged": "BLOCKED_STRICT_PIT_ARTIFACT_MISSING",
+      "source_family": "S&P Compustat PIT family",
+      "active_definition_contract_sha256": "27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063",
+      "copyable_request_message": "Subject: Request for strict M6b Gate A local Compustat PIT-family export/source-access approval\n\nHello,\n\nPlease do not send credentials, passwords, tokens, connection strings, provider output, data extracts by email, or API instructions.\n\nFor a local-only strict research-data verification workflow, please confirm whether you can approve a human-owned local export from the licensed S&P Compustat PIT family for the approved M6b issuer-quarter universe. This request binds the successor Gate A semantic contract at docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.json, SHA-256 27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063.\n\nAs part of approval, please provide a non-secret source-capability attestation identifying the exact entitled fields and licensed dictionary definitions for first-public identity, revision/original/restated or source-update status, minute-or-finer release timestamp capability, unambiguous timezone, issuer-quarter identity, and date-ranged mapping. If the selected PIT record lacks complete eligible timing, please name a separately authorized immutable timing artifact and a deterministic one-to-one join.\n\nPlease also bind an immutable market-calendar artifact with source identity, license/owner attestation, exchange timezone, version/export provenance, path, SHA-256, coverage, is_trading_session, scheduled_close_local, holiday schedule, and early-close schedule.\n\nPlease confirm the exact currently entitled tables/views and field names from the licensed dictionary, approved outside-Git local artifact paths, source-as-of/export timestamps, and permission for an agent to inspect only named local bytes after human export.\n\nThis request is source-access approval only. It does not authorize agent login, credentials, provider/API access, downloads, extraction, data generation, factual Gate A validation, or strict readiness.\n\nThank you."
+    },
+    {
+      "gate_scope": "B_and_C",
+      "dispatch_status": "DISPATCHED_AWAITING_DATA_OWNER_RESPONSE",
+      "factual_gate_status_unchanged": {
+        "B": "CANDIDATE_LOCAL_INPUT_PRESENT__AUTHORIZATION_AND_FACTUAL_VERIFICATION_PENDING",
+        "C": "BLOCKED_ATTRIBUTE_SCOPE_UNVERIFIED"
+      },
+      "source_family": "CRSP returns/delisting (B) and CRSP market attributes/tradability (C)",
+      "copyable_request_message": "Subject: Request for strict M6b Gate B/C local CRSP export/source-access approval\n\nHello,\n\nPlease do not send credentials, passwords, tokens, connection strings, provider output, data extracts by email, or API instructions.\n\nFor a local-only strict research-data verification workflow, please confirm whether you can approve human-owned local exports from licensed CRSP data for the approved M6b issuer-security-date universe. This is a combined Gate B and Gate C source-access request only.\n\nGate B (returns/delisting) needs exact licensed fields sufficient to assess daily security returns, delisting events/returns, coverage, licensed dictionaries, human export/query specification, and a non-secret manifest with source-as-of timestamp, row counts, and SHA-256 hashes. Proxy return substitution is not acceptable.\n\nGate C (market attributes/tradability) needs exact licensed fields sufficient to assess decision-date price/volume/shares, date-ranged active listing/trading status, date-ranged EXCHCD and SHRCD or a licensed-dictionary-documented equivalent with identical decision-time semantics, corporate-action/eligibility fields, and date-ranged historical identifiers/mappings, plus dictionaries, export/query specification, and a non-secret hash/manifest package. COMNAM, current CUSIP, ticker, or inferred identity are not substitutes.\n\nPlease confirm exact currently entitled tables/views and field names from the licensed dictionary, approved outside-Git local artifact paths, source-as-of/export timestamps, and permission for an agent to inspect only named local bytes after human export.\n\nThis request is source-access approval only. It does not authorize agent login, credentials, provider/API access, downloads, extraction, data generation, factual Gate B/C validation, Gate D work, or strict readiness.\n\nThank you."
+    }
+  ],
+  "not_dispatched": [
+    {
+      "gate_scope": "D",
+      "status": "DEFERRED_SOURCE_INDEPENDENT_INTEGRATION_GAP",
+      "reason": "no securities-finance archive request until source-independent consumer-interface proof exists"
+    }
+  ],
+  "forbidden_until_data_owner_response": [
+    "source_byte_inspection",
+    "credential_or_secret_use",
+    "provider_api_network_download",
+    "export_generation_by_agent",
+    "ETL_or_data_generation",
+    "factual_gate_validation_run",
+    "P2_publication",
+    "remotes",
+    "readiness_flag_flip",
+    "Gate_D_work",
+    "PEAD_authority_transfer_beyond_request_dispatch",
+    "strategy_ui_alpha_promotion"
+  ],
+  "canonical_state_unchanged": {
+    "m6b_data_contract_ready": false,
+    "strict_vintage_pit": false,
+    "canonical_current_evidence": "unchanged",
+    "A": "BLOCKED_STRICT_PIT_ARTIFACT_MISSING",
+    "B": "CANDIDATE_LOCAL_INPUT_PRESENT__AUTHORIZATION_AND_FACTUAL_VERIFICATION_PENDING",
+    "C": "BLOCKED_ATTRIBUTE_SCOPE_UNVERIFIED",
+    "D": "DEFERRED_SOURCE_INDEPENDENT_INTEGRATION_GAP"
+  },
+  "next_action": "await_separate_data_owner_responses_for_Gate_A_and_Gate_B_C_then_record_approve_or_decline_without_inspection_until_authorization_and_named_artifacts_exist",
+  "dispatch_delivery_state": "PACKET_RECORDED_HUMAN_SEND_PENDING_OR_EXTERNAL",
+  "ship_fast_decision": {
+    "what_is_done": "Owner REOPEN executed as request-dispatch packet with copyable Gate A and Gate B/C messages; factual readiness unchanged.",
+    "what_is_blocked": "Data-owner approve/decline and named immutable artifacts still missing; no inspection authority.",
+    "recommended_next_step": "Human sends the two copyable messages if not already sent; await separate Gate A and Gate B/C responses.",
+    "scope_limit": "request dispatch record only",
+    "stop_rule": "do not inspect sources, use providers, validate gates, flip readiness, open Gate D, or publish P2 from this packet"
+  }
+}

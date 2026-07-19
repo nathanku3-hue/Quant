@@ -5,8 +5,8 @@ from collections.abc import Callable, Mapping
 import streamlit as st
 
 
-PORTFOLIO_PAGE_TITLE = "Research Portfolio / Replay Allocation"
-PORTFOLIO_PAGE_ROUTE = "portfolio-and-allocation"
+PORTFOLIO_PAGE_TITLE = "Certified Portfolio"
+PORTFOLIO_PAGE_ROUTE = "portfolio"
 DISCOVERY_PAGE_TITLE = "Discovery & Analysis"
 STRATEGY_PAGE_TITLE = "Strategy Research Replay"
 

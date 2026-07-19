@@ -1,4 +1,105 @@
+## 2026-07-19 Score Semantics + Functional Stage Definition
+
+### SHIPPED_PRODUCT_SCORE
+- Current value: **39/100**.
+- Meaning: **owner claim ceiling** for shipped product claims. Metric confidence is low. **No alpha**.
+- Non-uplift rule: do **not** numerically move to 40+ because dual-fixture demo, local green paths, CI parity, or docs recuts exist. Uplift requires separate rubric-based owner claim authorization.
+- Rationale repair: obsolete language such as `no visible certified slice` is superseded. A certified dual-fixture static branch demo **does** exist on product tip lineage `490a234`; that fact is expressed via **FUNCTIONAL_STAGE**, not score inflation.
+
+### FUNCTIONAL_STAGE (separate from score)
+| Stage | Meaning | Promote when |
+|---|---|---|
+| `CERTIFIED_STATIC_BRANCH_DEMO` | Permanent dual-fixture certified bundle + default Certified Portfolio route exist on product lineage; deterministic certification substrate closed | Default current stage post-F1C |
+| `CERTIFIED_SINGLE_DECISION_OPERABLE` | One operator-visible **current** decision path: frozen E0 custody → HOLD_FOR_EVIDENCE/NO_POSITION → DecisionEnvelope → book/cert → atomic current publication → visible decision → Streamlit smoke | Only with branch evidence for full E0A vertical |
+
+Stage promotion does **not** auto-change SHIPPED_PRODUCT_SCORE.
+
+### ACTIVE_GATE
+- Sole active gate: **GV-E0A-OPERABLE**.
+- F1C-SHIP: CLOSED_SUBSTRATE (not active).
+- FS1+: future stages only; not next action.
+
+### Formula / identity notes
+- E0 custody hashes (must remain exact):
+  - e0_preregistration.yaml `0a6dc18a44d7532610a73f90b92477fc7bd36644c1a052d81a48162097176618`
+  - evidence_authority_matrix.csv `3306adbed26d27732a0a53d3819a09044e418e183ecc58ebebf82c6f9fe0dcb0`
+  - e0_model_spec.md `28a0ea062777d9364008480266ce933bd6a34348ce0defcac7185398068a38f0`
+  - e0_acceptance_tests.md `9d9a7f195bd8db2caea82859d6a73d951c862f229fc9d72e5302c58ba7b8d55c`
+- Implementation paths for E0A code: owned by parallel code agent; not registered complete in this docs round.
+## 2026-07-19 GV-FS0 F1C-SHIP Terminal
+
+- Permanent two-role certified bundle tracked; default Certified Portfolio loads permanent bytes only.
+- Transport C 48ad053, C2 91b9bf1; hosted product CI 29651784244 PASS; A/B/C PASS; terminal SAW PASS.
+- Official score remains 39/100. Obsolete sequential F1C/F1D active-gate language removed.
+- Boundary: no provider/PEAD/FS1/main merge.
+
 # Feature Engineering Notes
+
+## 2026-07-18 GV-FS0 F1C-SHIP Formula Registry
+
+- Bundle preimage: `bundle_preimage := {schema_version, protocol_id, currency, components=[OPEN_complete_result, NO_POSITION_complete_result]}`.
+- Bundle identity: `bundle_hash := SHA256("GV-FS0:CERTIFIED_BUNDLE:V1\n" || canonical_document(bundle_preimage))`; `bundle_id := "BUNDLE_" || bundle_hash`.
+- Candidate identity: bundle hash `527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c`; file SHA-256 `a9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5`; byte length `55774`.
+- Publication compare: `current_bytes == candidate_bytes => IDEMPOTENT`; else `current_hash != observed_prebuild_hash => PUBLICATION_TARGET_CHANGED`; else atomic replacement may proceed.
+- Post-replace safety: any exact-byte/hash/schema reread failure yields `PUBLICATION_POST_REPLACE_VERIFICATION_FAILED` and converts the lock to durable `RECOVERY_REQUIRED`; recovery-record failure yields `PUBLICATION_RECOVERY_RECORD_FAILED` and retains the lock.
+- Regression rule: `candidate_failure_nodeids ⊆ baseline_c37db09_failure_nodeids`; candidate count is 105 vs baseline 106, therefore zero new failures.
+- Implementation paths: `core/gv_fs0_bundle.py`, `core/gv_fs0_publish.py`, `views/gv_fs0_portfolio_adapter.py`, and `dashboard.py`.
+
+## 2026-07-18 GV-FS0 F1B NO_POSITION Formula Registry
+
+- Normative source-intent rule: `NO_POSITION => requested_quantity = null AND every source_intent.intent_type = VALUATION_INSTRUCTION`.
+- Primary state for every session `t`: `shares_t = 0`; `cash_t = initial_cash = 1000`; `receivables_t = 0`; `market_value_t = shares_t × close_t = 0`; `NAV_t = cash_t + market_value_t + receivables_t = 1000`.
+- Contribution formulas: `session_contribution_t = NAV_t - NAV_(t-1) = 0`; `cumulative_contribution_t = NAV_t - initial_cash = 0`.
+- Certification rule: the same two isolated verifier attempts must reproduce the same canonical primary economic payload and hash; every frozen check must be `TRUE` before status `CERTIFIED`.
+- Implementation paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, `views/gv_fs0_portfolio_adapter.py`; tests in `tests/gv_fs0_product/test_no_position_vertical.py`.
+- Boundary: F1B remains in memory only; no bundle publication or default routing until F1C/F1D.
+
+## 2026-07-18 GV-FS0 F1A Review Reconciliation Formula Registry
+
+- Raw verifier binding: `raw_verifier_valid := economic_payload == expected_projection(primary_snapshots, decision, fixture, fees) AND canonical_payload_hash == H("GV-FS0:ECONOMIC_PAYLOAD:V1", expected_projection)`. Every semantic field, every session, final state, total cost, and the raw canonical hash must match before a formal verifier result exists.
+- Presentation binding: `presentation_valid := rows == projection(terminal_snapshot, certification) AND presentation_hash == H("GV-FS0:PRESENTATION:V1", {rows})`.
+- Duplicate handling: byte-identical identity preimages with the same event ID collapse; the same event ID with a different preimage blocks as `CONFLICTING_EVENT_ID`; different event IDs with the same economic-effect key block as `DUPLICATE_SEMANTIC_EVENT`.
+- Attempt rule: both ordinals execute even when a runner raises an infrastructure exception; any failure blocks certification.
+- Source authority tokens: `DECISION:<decision_hash>` and `CERTIFICATION:<certification_id>`.
+- Implementation paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, and `views/gv_fs0_portfolio_adapter.py`.
+
+## 2026-07-11 Request Artifact Identity Repair V1 Registry
+
+- RoundID: `ROUND-20260711-REQUEST-ARTIFACT-IDENTITY-REPAIR-V1`; ScopeID: `REQUEST_ARTIFACT_IDENTITY_REPAIR_V1`.
+- Payload identity formula: `payload_identity_valid := canonical_remote_match AND repository_root_match AND payload_commit_resolves_as_commit AND payload_tree_matches_commit AND every_declared_path_exists_in_payload_commit AND every_declared_SHA256_matches_exact_blob_bytes`.
+- Detached-binding formula: `identity_envelope_valid := tracked_separate_envelope AND envelope_binds_prior_payload_commit AND distinct_markdown_json_paths_and_hashes AND lifecycle_status == PREPARED_NOT_SENT`. The envelope never binds its own commit/tree.
+- Failure rule: `legacy OR divergent OR reconstructed OR redirected OR cherry_picked OR self_referential OR ambiguous_hash_label OR unbound => dispatch_denied`.
+- Current evidence: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11`; tracked detached envelope with four distinct path/hash pairs and `PREPARED_NOT_SENT`; governance PASS 0 findings; planning boot PASS; fresh A/B/C technical check sets PASS.
+- Current boundary: distinct-agent ownership unavailable, therefore terminal SAW BLOCK. No remote, dispatch, source/provider access, validation, readiness, Gate D, publication, strategy/UI, or data output.
+
+## 2026-07-11 P0 Trust-Substrate Repair Registry
+
+- RoundID: `ROUND-20260711-V2-PEAD-P0-TRUST-SUBSTRATE-REPAIR`; ScopeID: `V2_PEAD_P0_TRUST_SUBSTRATE_REPAIR`.
+- Git identity formula: `git_identity_valid := git_worktree_available AND git_redirection_env_sanitized AND GIT_NO_REPLACE_OBJECTS == "1" AND replacement_refs_status == CLEAR AND raw_HEAD == HEAD^{commit} AND raw_upstream == @{u}^{commit} AND tree == HEAD^{tree} AND identity_verified`. Any false term is a hard authority failure; loose and packed refs are both enumerated through Git.
+- JSON authority formula: `authority_json_valid := JSON_object_parse_succeeds AND every_object_member_name_is_unique`. `duplicate_key_at_any_depth => authority_json_valid = false` before authorization, schema, source-byte, or output-write evaluation.
+- Current state: the adversarial code/test matrix and fresh independent A/B/C review pass; this checkout reports `git_identity_valid = true`, but dirty/unclassified workspace state and broader governance-preflight failure keep authority transfer blocked. P2 remains locally reviewed and non-publishable.
+- Boundary: no backward compatibility for ambiguous JSON; no source-owner dispatch, publication, remote action, source/provider work, Gate D, Strategy/UI, data output, or readiness promotion.
+
+## 2026-07-02 V2 PEAD M6b Slice 0 Active-Contract Deconfliction Registry
+
+- RoundID: `ROUND-20260702-V2-PEAD-M6B-SLICE0-CONTRACT-DECONFLICTION`; ScopeID: `V2_PEAD_M6B_SLICE0_ACTIVE_CONTRACT_DECONFLICTION_DOCS_ONLY`.
+- Strict Gate A rule: `strict_gate_A_PASS := eps_vintage == first_public_unrestated AND all other locked Gate A provenance and validation requirements pass`. `release_date_aligned_but_restated` is non-strict diagnostic evidence only and cannot satisfy `strict_gate_A_PASS`, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- Repository-identity rule for approval/request packets: `identity_valid := commit_resolves AND commit_tree == declared_tree AND artifact_exists_at_declared_path AND SHA256(artifact_bytes) == declared_artifact_sha256 AND payload_identity_matches`. Any false term requires denial and repository rerouting.
+- Quant verification: `cc96053513f445f143632103c478367bbf674e12` does not resolve as a Quant commit and `R0.1-preflight-plan.md` is absent at the repository root; no R0.1 authority is valid here.
+- Boundary: historical addenda are preserved; Slice 0 changes active contract and packet-template language only. No data, provider, source-byte, ETL, curve, readiness, or R0.1 work.
+- Next action: dispatch only the existing Gate A and Gate B/C source-access requests.
+
+## 2026-06-30 V2 PEAD Strict M6b Path A Gate Formula Registry
+
+- RoundID: `ROUND-20260629-V2-PEAD-M6B-STRICT-PATH-A-INFRA`; implementation: `scripts/pead_m6b_strict_path_a_data_gate.py`; tests: `tests/test_pead_m6b_strict_path_a_data_gate.py`.
+- Authorization formula: evidence payload fields never authorize; `authoritative_current_evidence := distinct_authorization_artifact AND exact_evidence_file_sha256_match AND round/scope/mode/action_match`. Malformed authorization JSON/schema and any authorization supplied for `synthetic_test` are CLI input errors; structurally valid but unapproved or mismatched current-evidence authorization is `NOT_AUTHORIZED`.
+- Gate formula: current `gate_status_g = PASS` only when detached authorization is `AUTHORIZED`, all four source-byte SHA-256 checks are verified, and the gate's required provenance, complete coverage, temporal proofs, gate-specific evidence, and validation checks pass; otherwise every current gate is `BLOCKED`.
+- Readiness formula used in the script: `m6b_data_contract_ready := authoritative_current_evidence AND all(A,B,C,D = PASS) AND strict_vintage_pit`.
+- Restatement rule: release-date-aligned/restated EPS has `strict_vintage_pit=false` and is `BLOCKED`; its exception is `NOT_AUTHORIZED`. Inherited exception wording is superseded on current truth surfaces, and even an explicitly approved exception retains hard flags and cannot make strict Gate A or readiness pass.
+- Current evidence: A/B/C/D=`BLOCKED`, source bytes unverified, `m6b_data_contract_ready=false`, `workflow_status=blocked_fail_closed`; JSON SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Validation: strict-gate tests PASS 68/68; existing M6a tests PASS 12/12; compile, deterministic atomic CLI replay, missing explicit `--output`, synthetic canonical-output rejection before atomic write, payload-only restated-approval rejection, malformed-evidence and malformed-authorization JSON/schema CLI errors with no output, authorization mismatch, source-byte tamper, static-isolation, output-isolation, and canonical context build/validation checks PASS.
+- Boundary: M6a remains sparse engine/framework evidence only; Data Path A is active; UI/frontend and Strategy promotion are held; B remains illustrative-only and is never a strict-data fallback.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
 
 ## 2026-06-25 V2 PEAD M6b Best-Available Option 1 Repair Registry
 
@@ -6368,3 +6469,49 @@ Focused tests: `tests/test_pead_m6_pit_walk_forward_equity_curve.py`.
 - Projection/dtype guard: DuckDB receives only `event_idx/security_idx/entry_idx/exit_idx/side`, `security_idx/return_idx/tradable_total_return`, and `return_idx/return_date`. Event/security identifiers are numeric `int32`; object-dtype DuckDB relations are rejected before registration.
 - Determinism: relations are canonically sorted, DuckDB runs one worker with compensated `fsum`, output rows are ordered by `return_idx`, and `daily_portfolio_output_hash = SHA256(canonical_daily_csv_bytes)`; shuffled event/return input must preserve the same hash.
 - Scope boundary: do not introduce physical repartitioning, chunking, Numba, or fold multiprocessing unless a future profile demonstrates a breached memory/latency bound and identifies it as the necessary lever.
+
+# Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+
+- Closure evidence: terminal reviewer-independence PASS is fixed at commit `e50219051df8bc8fc1f21312325f01cea4a8e18d`, reviewing envelope commit `c642a94944831adbd7ecc06fb16259c87fcdd213` and payload commit `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e`.
+- Byte boundary: the four request payloads and detached envelope are unchanged; this round updates governance truth only.
+- Lifecycle boundary: `PREPARED_NOT_SENT`; no message is proven sent and dispatch remains denied.
+- Authority boundary: identity closure does not authorize remotes, source/provider access, factual validation, readiness promotion, Gate D, publication, strategy/UI work, or data output.
+- Formula impact: none; no quantitative formula, estimator, or runtime path changed.
+
+# GV-FS0 Protocol V1 Canonical and Identity Formula Registry (2026-07-17)
+
+Implementation paths: `core/gv_fs0_canonical.py`, `validation/gv_fs0_reconstruction.py`, `validation/gv_fs0_ci_reference_encoder.py`, `scripts/generate_gv_fs0_protocol_v1.py`, and `scripts/verify_gv_fs0_protocol_freeze.py`.
+
+- Canonical document bytes: `canonical_json_text.encode("utf-8") + b"\n"`, with sorted Unicode scalar keys, exact string escapes, no extra whitespace, and exactly one terminal LF.
+- Domain hash: `SHA256(domain_prefix.encode("utf-8") + b"\n" + canonical_json_document_bytes)`, emitted as lowercase 64-character hexadecimal.
+- Price freshness: one unique positive price for the same security/session, `price_timestamp <= valuation_timestamp`, and `max_session_lag = 0`.
+- Origin order key: `(source_sequence, source_intent_id, generated_event_slot)` within `(effective_timestamp_utc, session, event_type_rank)`; duplicate keys block with `DUPLICATE_ORIGIN_ORDER_KEY`.
+- Manifest Git blob identity: `HASH("blob " + ascii(byte_length) + NUL + exact_file_bytes)` using the manifest-declared repository object format `sha1` or `sha256`.
+- Terminal newline count: number of consecutive LF bytes at end of file; every frozen surface requires exactly `1`.
+- Scope boundary: these formulas certify protocol bytes and identities only; they do not authorize economic reduction, certification execution, publication, or UI behavior.
+
+# GV-FS0 Protocol V1 Freeze Audit Formula Registry Addendum (2026-07-17)
+
+Additional implementation paths: `.github/workflows/gv-fs0-protocol-freeze.yml`, `tests/test_gv_fs0_freeze_immutability_v1.py`, and `scripts/verify_gv_fs0_protocol_freeze.py`.
+
+- Hosted branch base selection: feature-branch push and PR bootstrap/enforced decisions must use the default branch or PR base, while only default-branch pushes may use the previous pushed SHA as the accepted base candidate.
+- Windows protocol test expansion: hosted pytest file globs are expanded inside Python with `glob.glob("tests/test_gv_fs0_*.py")`, so Windows and Linux run the same focused protocol suite.
+- Mutation acceptance formula: `freeze_candidate_accepted = deterministic_generation_pass AND independent_vectors_pass AND enforced_self_check_pass AND all_required_mutations_rejected AND restored_tree_equals_candidate_tree AND hosted_windows_linux_ci_pass`.
+- Current value: true as of hosted run `29567754495`.
+
+# GV-FS0 F1A OPEN Portfolio Economics and Certification (2026-07-18)
+
+Implementation paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, and `views/gv_fs0_portfolio_adapter.py`.
+Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
+
+- Execution cash delta: `-(shares * execution_price) = -(10 * 10) = -100`.
+- Explicit fee cash delta: `-fee = -1`; post-entry residual cash is `1000 - 100 - 1 = 899`.
+- Dividend receivable: `entitled_shares * amount_per_share = 10 * 0.5 = 5` on the ex-date.
+- Dividend payment: atomically decreases receivables by `5` and increases cash by `5`, producing cash `904` and receivables `0`.
+- Market value: `shares * session_close`; terminal value is `10 * 14 = 140`.
+- NAV: `cash + market_value + receivables`; terminal NAV is `904 + 140 + 0 = 1044`.
+- Session contribution: `current_NAV - previous_NAV`; canonical series is `0, 9, 15, 10, 10`.
+- Cumulative contribution: `current_NAV - initial_cash`; terminal contribution is `44`.
+- Certification: exactly two isolated verifier attempts must both reproduce the primary economic payload and hash; all ten tri-state checks must be TRUE before status may be CERTIFIED.
+- F1A boundary: certified OPEN remains in memory and is injected into the final read-only adapter. No permanent two-component bundle or default dashboard route is authorized.
+

@@ -1,5 +1,10 @@
 # Unified Opportunity State Machine
 
+Status: **SUPERSEDED as active implementation authority** — historical evidence only
+Superseded-by: `docs/architecture/top_level_roadmap.md` (GV-FS0-First) and the GV-FS0 protocol contract
+Date-superseded: 2026-07-18
+
+---
 Status: Phase 65 G7.2 definition-only state machine
 Date: 2026-05-09
 Authority: G7.2 state definition, transition schema, and validator only
@@ -124,3 +129,4 @@ Source paths:
 - `opportunity_engine/schemas.py`
 - `opportunity_engine/transitions.py`
 - `tests/test_g7_2_opportunity_state_machine.py`
+

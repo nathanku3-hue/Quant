@@ -1,0 +1,323 @@
+# Phase Brief: GV-FS0-F1 — Product Slice (Corrected)
+
+## Active Addendum — Post-F1C Direction Hard Recut (2026-07-19)
+
+- **F1C-SHIP status**: `CLOSED_SUBSTRATE` on product tip lineage `490a234`. Deterministic certification + permanent dual-fixture evidence are banked. F1C is **not** an operator-usable single-decision product endpoint and is **not** reopenable as the active shipment gate.
+- **Sole active gate**: **GV-E0A-OPERABLE** (see `docs/phase_brief/gv-e0a-operable-brief.md` and roadmap hard-recut). Not another F1C reopen. Not broad FS1.
+- **Score**: `SHIPPED_PRODUCT_SCORE = 39/100` (owner claim ceiling; no alpha).
+- **Functional stage**: `CERTIFIED_STATIC_BRANCH_DEMO` until operable single-decision evidence exists; then evidence may support `CERTIFIED_SINGLE_DECISION_OPERABLE` without automatic score uplift.
+- **Forbidden**: providers, real prices, FS1 batch, PEAD, alpha claims, broker, compatibility dual-authority UI, historical-suite repair.
+- **Next action**: execute E0A operable vertical only; do not re-open F1C/F1D sequential language as active.
+
+## Prior Addendum — F1C-SHIP Terminal Closeout T (2026-07-19) [CLOSED_SUBSTRATE]
+
+- **Authority**: owner GO SHIP F1C with mandatory two-SHA sequence repair.
+- **Transport C**: 48ad053dc21d7dda3c8280dcbd3c332584cc184a (runtime, permanent bundle, tests, workflow, default cutover).
+- **Transport C2**: 91b9bf1459439443298886ad6acc4a6181154431 (.gitattributes LF pin for Windows hosted parity).
+- **Hosted product CI**: run 29651784244 PASS — Ubuntu, Windows, Windows/Linux byte parity.
+- **Independent review**: distinct Reviewer A/B/C PASS on C and re-pin PASS on C2.
+- **Canonical bundle**: BUNDLE_527c86b9e50386bf9e5847037642910b47b81697dbf089df3038099feab6282c; 55,774 bytes; file SHA-256 a9dda224da21ab4abfe1f27afdb2875bb34f240d469caf20a90b7e635adb96e5.
+- **Product meaning**: permanent two-role certified bundle is tracked; default Certified Portfolio route loads only permanent validated bytes; product CI is banked.
+- **Score**: official shipped-product score remains **39/100** (owner ceiling; no alpha/readiness promotion).
+- **Gate language**: standalone sequential F1C then F1D is revoked. F1C-SHIP closed as substrate; active gate moved to **GV-E0A-OPERABLE** by direction hard-recut A/A/A/A.
+- **Boundary**: no provider, real data, PEAD, broker/live capital, protocol redesign, historical suite repair, or main merge.
+- **Next action (superseded)**: hold tip language superseded by E0A-OPERABLE active gate.
+
+## Prior Addendum — F1C-SHIP Local Candidate (2026-07-18) [superseded on shipment status]
+
+- Local implementer candidate recorded 201/202 and absent permanent artifact; superseded by materialization, C/C2 transport, hosted PASS, A/B/C PASS, and terminal T.
+
+Mode: CLOSURE_REPORT (F1C substrate); active product gate moved to GV-E0A-OPERABLE
+Status: P0_5_BANKED; F1A_CLOSED; F1B_CLOSED; F1C_SHIP_CLOSED_SUBSTRATE; ACTIVE_GATE=GV_E0A_OPERABLE; SCORE_39_RETAINED; STAGE=CERTIFIED_STATIC_BRANCH_DEMO
+Date: 2026-07-19
+RoundID: ROUND-20260719-GV-FS0-F1C-SHIP-TERMINAL (substrate); direction ROUND-20260719-E0A-OPERABLE-DIRECTION
+ScopeID: GV_FS0_F1C_SHIP_TWO_SHA_CLOSEOUT (closed); next GV_E0A_OPERABLE_VERTICAL
+Authority:
+- docs/architecture/godview_endgame_vision.md
+- docs/architecture/godview_portfolio_first_operating_model.md
+- docs/architecture/godview_portfolio_p0_owner_freeze.md
+- docs/architecture/top_level_roadmap.md (GV-FS0-First; replaces obsolete UOE roadmap)
+- frozen protocol: docs/architecture/gv_fs0_certification_and_data_authority_contract.md (terminal freeze at c007895)
+- V1.1 verifier I/O: docs/architecture/gv_fs0_protocol_v1_1_verifier_io.md (engine compatibility only; frozen V1 schemas byte-immutable)
+- terminal freeze evidence: docs/phase_brief/phase-E0-brief.md (historical/terminal; do not rewrite)
+Hierarchy: L1 Terminal Zero; L2 active Backend/Frontend for **GV-E0A-OPERABLE**; L2 substrate F1C dual-fixture demo closed; L2 held Data admission / Research / PEAD / FS1; L3 historical flow P0 custody → P0.5 bank → F1A OPEN → F1B NO_POSITION → F1C-SHIP (CLOSED_SUBSTRATE). Active next is E0A operable single-decision vertical, not F1C reopen.
+
+## Decision
+
+`	ext
+STRATEGY = REPAIR_AND_SHIP_CURRENT_SLICE
+PROTOCOL_REDESIGN = FORBIDDEN
+CURRENT_CHECKOUT_GIT_REPAIR = FORBIDDEN
+F1A = BANKED_AND_CLOSED at e156c66
+F1B = BANKED_AND_CLOSED at 4359f35; distinct Reviewer A/B/C and terminal SAW PASS
+F1C_SHIP = CLOSED on product branch at closeout T after transport C/C2
+SHIPPED_PRODUCT_SCORE = 39/100 (owner ceiling retained; no alpha claim)
+`
+
+Audit verdict absorbed: `APPROVE_WITH_MANDATORY_REPAIR`, plus bankability repairs for P0.5 atomicity.
+
+**V1.1 blocker closed:** schema-valid `gv_fs0_verifier_input_v1` is accepted by `validation/gv_fs0_reconstruction.py`. Legacy `prices`/`events` inputs fail closed. Frozen V1 schemas under `contracts/gv_fs0/v1/` were already correct and remain byte-immutable (no freeze regen required).
+
+## Endgame Intent
+
+Endgame is a portfolio OS that turns an explicit decision into auditable paper economics with independent certification. GV-FS0-F1 is the first functional product slice:
+
+```text
+DecisionEnvelope
+→ PortfolioBook
+→ Fs0PortfolioSnapshot series
+→ two independent verifier attempts (frozen reconstruction; process-only)
+→ Fs0Certification
+→ certification-reference event
+→ certified decision result
+→ final read-only Streamlit adapter (injected OPEN first; later both components)
+→ permanent two-component certified bundle + default certified route + product CI (F1C-SHIP)
+```
+
+No allocation authority, providers, real data, MU/E0 research, benchmarks, optimizers, or GV-FS1.
+
+## Custody Topology
+
+```text
+PRODUCT_ROOT = isolated worktree or clean clone rooted exactly at c007895
+PRODUCT_BRANCH = codex/gv-fs0-f1-product
+FORBIDDEN = repairing E:\Code\Quant\.git worktree administration as part of F1
+```
+
+### Worktree topology (product tests)
+
+```text
+PRODUCT_ROOT/
+  contracts/gv_fs0/v1/**                 # frozen; consume only
+  core/gv_fs0_canonical.py               # frozen load surface
+  validation/gv_fs0_reconstruction.py    # frozen verifier; process-only; never edit in F1
+  tests/test_gv_fs0_*.py                 # frozen protocol suite only
+  tests/gv_fs0_product/                  # product tests only (never top-level test_gv_fs0_*)
+  docs/architecture/
+    godview_endgame_vision.md            # REQUIRED product canon
+    godview_portfolio_first_operating_model.md
+    godview_portfolio_p0_owner_freeze.md
+    top_level_roadmap.md                 # GV-FS0-First (replaces UOE roadmap)
+    unified_opportunity_engine.md        # SUPERSEDED historical only
+  views/gv_fs0_portfolio_adapter.py      # ONE final adapter (F1A+); injection-first
+  .github/workflows/
+    gv-fs0-protocol-freeze.yml           # leave protocol-only
+    gv-fs0-product.yml                   # banked in F1C-SHIP product CI
+```
+
+## Atomic P0.5 bank (single reviewable commit)
+
+F1A is blocked until **one** commit lands all of:
+
+1. **Three product-canon files** (path-level present + non-empty + Active status):
+   - `docs/architecture/godview_endgame_vision.md`
+   - `docs/architecture/godview_portfolio_first_operating_model.md`
+   - `docs/architecture/godview_portfolio_p0_owner_freeze.md`
+2. **Revised roadmap** replacing obsolete Unified Opportunity Engine roadmap text in `docs/architecture/top_level_roadmap.md` (GV-FS0-First).
+3. **UOE adjacent-scope breadcrumbs demoted** (`unified_opportunity_engine.md` / state machine marked SUPERSEDED historical only).
+4. **Hardened integrity gate** (not hash-only): missing canon fails closed; freeze manifest hashes; runtime external import of `core.gv_fs0_canonical` and runtime load of frozen tables/registries.
+5. **Authority-chain test**: machine proof of intended import/authority boundaries before any F1A product module lands.
+6. **This successor brief** without invented unregistered operational codes.
+7. **No throwaway temporary UI architecture** in plan: one final adapter with injected OPEN data.
+
+Nothing else belongs in the P0.5 commit (no F1A book/cert/publication modules).
+
+## Canonical Integrity Gate (hard, non-lazy)
+
+```text
+P0.5_CANONICAL_INTEGRITY:
+  1. REQUIRED product-canon paths exist (three files above) — missing => fail closed
+  2. top_level_roadmap.md is GV-FS0-First (not UOE active roadmap)
+  3. freeze manifest SHA-256 + byte_length for every entry
+  4. import core.gv_fs0_canonical at product-test import time (non-lazy)
+  5. runtime-load frozen ranks, slots, ownership, both registries, vectors via Path
+  6. external import discipline: product suite must not in-process import
+     validation.gv_fs0_reconstruction as a library; frozen verifier stays process-only
+  7. FAIL CLOSED on any missing path / hash / import / load error — block F1A
+```
+
+Do **not** recreate frozen tables as Python constants. Consume `core/gv_fs0_canonical.py` and `contracts/gv_fs0/v1/**`.
+
+## Corrected Functional Gate Order
+
+```text
+P0   Clean execution custody at exact c007895
+P0.5 Atomic bank: three canons + revised roadmap + integrity + authority-chain + brief
+F1A  OPEN vertical end-to-end into ONE final adapter via injected OPEN presentation/snapshot/cert
+F1B  NO_POSITION through the identical implementation path (inject second component)
+F1C-SHIP  Permanent two-component bundle + default certified route + product CI + independent closeout (active closed gate)
+F1C/F1D sequential labels  SUPERSEDED historical planning only
+```
+
+### F1A detail — OPEN only (starts only after P0.5 green)
+
+1. Immutable synthetic `DecisionEnvelope` + source fixture (OPEN).
+2. Append-only `PortfolioBook` using frozen event ranks/slots/ownership.
+3. Immutable `Fs0PortfolioSnapshot` series (5–10 sessions).
+4. Verifier input **exactly**:
+   ```text
+   original fixture
+   + DecisionEnvelope
+   + source prices
+   + source economic intents
+   + protocol bindings
+   ```
+   Never: primary generated events, book ledger, snapshots, certifications, components, or bundle data.
+5. Two supervised independent verifier attempts (`sys.executable -I` on V1.1-compatible `validation/gv_fs0_reconstruction.py` with schema-valid `gv_fs0_verifier_input_v1` only).
+6. Immutable `Fs0Certification`; CERTIFIED only if all ten checks TRUE.
+7. Certification-reference event + certified decision result + presentation projection.
+8. **Final adapter only:** `views/gv_fs0_portfolio_adapter.py` renders §16 fields from **injected** validated presentation/snapshot/certification objects (OPEN). No disposable temp route, no env-flag throwaway page, no second adapter to delete later. Permanent bundle is still forbidden until F1C (contract §14.2: no partial final bundle file).
+
+### Final adapter injection contract (replaces throwaway temp UI)
+
+```text
+ADAPTER = views/gv_fs0_portfolio_adapter.py
+SHAPE   = single read-only render function(s) accepting injected artifacts
+F1A     = inject OPEN certified presentation/snapshot/cert only
+F1B     = inject NO_POSITION through same functions
+F1C     = publish permanent two-component bundle (not adapter responsibility)
+F1D     = adapter default path loads permanent bundle then injects both components
+FORBIDDEN
+  - temporary / throwaway routes, disposable pages, or second adapters scheduled for deletion
+  - adapter-owned accounting, certification, or verifier execution
+  - publishing data/gv_fs0/gv_fs0_certified_bundle.json before both components CERTIFIED
+```
+
+### F1B — NO_POSITION
+
+Identical code path; separate decision/book/trail/certification; zero execution intents normative.
+
+### F1C — permanent publication
+
+Target: `data/gv_fs0/gv_fs0_certified_bundle.json`  
+Lock: `data/gv_fs0/.gv_fs0_certified_bundle.lock`
+
+Implement contract §15 using **only registered operational codes**:
+
+```text
+PUBLICATION_LOCKED
+PUBLICATION_TARGET_CHANGED
+PUBLICATION_POST_REPLACE_VERIFICATION_FAILED
+PUBLICATION_RECOVERY_RECORD_FAILED
+```
+
+**Do not invent** new operational registry codes. Use only the four frozen publication codes above.  
+Age/PID automatic lock removal remains forbidden by implementing only §15.6 normal release paths and requiring explicit operator recovery for `RECOVERY_REQUIRED` locks. Prove with product tests in F1C; no unregistered error surface in P0.5/F1A.
+
+Publication tests under `tests/gv_fs0_product/` (F1C):
+
+- `PUBLICATION_LOCKED`
+- idempotent identical candidate
+- `PUBLICATION_TARGET_CHANGED`
+- pre-replace failure preserves target
+- post-replace verification failure → durable recovery lock
+- recovery-record write failure retains existing lock
+- no age- or PID-based automatic lock removal (behavior tests against real release paths)
+
+### F1D
+
+§16 fields only (no separate fee column). Separate product CI. Complete repository pytest. Reviewer A/B/C as defined below.
+
+## Verifier Input Boundary + import enforcement
+
+Consume: original fixture + DecisionEnvelope + source prices + source economic intents + protocol bindings.  
+Never: primary generated events, ledger, snapshots, certifications, components, bundle.
+
+Machine checks (P0.5 authority-chain + integrity):
+
+- frozen reconstruction remains process-only (`sys.executable -I`); product tests must not import it as an in-process library
+- product modules (when added) AST-scanned for forbidden imports: `strategies.*` for cert truth, primary book from verifier, views from book, etc.
+- freeze surfaces loaded via path, not duplicated constants
+
+## CI / Test Separation
+
+| Suite | Path | Workflow |
+|---|---|---|
+| Protocol freeze | `tests/test_gv_fs0_*.py` | `gv-fs0-protocol-freeze.yml` |
+| Product | `tests/gv_fs0_product/**` | `gv-fs0-product.yml` (add by F1D; protocol as regression) |
+
+## F1C-SHIP A/B/C criteria (was labeled F1D; sequential split revoked)
+
+| Reviewer | Domain | Must verify |
+|---|---|---|
+| **A** | Strategy/economics | Exact OPEN/NO_POSITION economics; NAV; dividend once; certification mapping; no legacy replay authority |
+| **B** | Runtime/ops | Verifier isolation; publication recovery; single adapter injection; no provider |
+| **C** | Data integrity | Freeze hashes; three canons present; product/protocol CI split; full suite green |
+
+## Forbidden Scope
+
+```text
+protocol redesign / freeze-byte edits
+current-checkout .git repair
+provider / yfinance / WRDS / PEAD reopen
+legacy strategy_replay conversion as FS0 truth
+benchmarks / optimizers / real data / MU / FS1
+invented operational error codes not in frozen registry
+throwaway temporary UI routes
+F1A before atomic P0.5 green
+```
+
+## Acceptance
+
+### P0.5 (this commit)
+
+- [x] Three product-canon files banked with path-level verification
+- [x] `top_level_roadmap.md` is GV-FS0-First
+- [x] UOE roadmap/architecture demoted to SUPERSEDED historical
+- [x] Integrity gate fails closed on missing canon + validates external imports/runtime loads
+- [x] Authority-chain test present and green
+- [x] No invented unregistered publication/error codes in brief/code
+- [x] Final-adapter injection plan (no throwaway temp route)
+- [x] Atomic commit banked on `codex/gv-fs0-f1-product`
+
+### F1A — local implementation evidence
+
+- [x] Immutable OPEN source fixture and `DecisionEnvelope` with deterministic fixture/decision/book identity
+- [x] Append-only canonical event trail using frozen ranks, slots, and transition ownership
+- [x] Five exact snapshots: NAV `1000 → 1009 → 1024 → 1034 → 1044`
+- [x] Execution fee leaves cash `899`; ex-date receivable is `5`; pay-date cash is `904`; terminal receivable is `0`
+- [x] Verifier input contains only original protocol/decision/price/intent projections
+- [x] Exactly two isolated verifier attempts; byte-identical results retain one hash-addressed verifier result
+- [x] All ten certification checks TRUE; certification status CERTIFIED
+- [x] Certification-reference event, certified OPEN result, and presentation projection validate against frozen schemas
+- [x] Final read-only adapter renders injected presentation/snapshot/certification and imports no accounting/certification module
+- [x] Disagreeing verifier attempts fail closed before certification
+- [x] No permanent bundle path created or modified
+- [x] Product suite, protocol suite, generator check, freeze bootstrap, compile, render smoke, and diff hygiene PASS
+- [x] Bank F1A implementation commit `699e664` on `codex/gv-fs0-f1-product`
+- [x] Independent Reviewer A/B/C evidence and SAW closure for exact repair commit `066bdda`
+- [x] Reconcile initial A/B/C BLOCK findings: authority tokens, complete verifier economics, two-attempt infrastructure failures, presentation binding, legacy revocation, duplicate rules, descendant-pipe deadline, and combined-suite module identity
+- [x] Bank reconciliation commit `066bdda` and rerun distinct Reviewer A/B/C against that exact commit
+
+### F1B — local implementation evidence
+
+- [x] Separate immutable NO_POSITION fixture and decision with `requested_quantity=None`
+- [x] Zero execution, fee, dividend, or other non-valuation source intents
+- [x] Shared primary path emits one decision event plus five valuation events; no economic movement events
+- [x] Five exact flat snapshots: shares `0`, cash/NAV `1000`, receivables/market value/contribution `0`
+- [x] Verifier input contains only original protocol/decision/price/valuation-intent projections
+- [x] Exactly two isolated verifier attempts; one retained hash-addressed result
+- [x] All ten certification checks TRUE; role and certification status are `NO_POSITION` / `CERTIFIED`
+- [x] Existing final adapter renders injected NO_POSITION through the same function and validates presentation binding
+- [x] Primary and verifier-side non-valuation intent mutations fail closed
+- [x] No permanent bundle path created or modified; no default route, provider, real data, or FS1 work
+- [x] Product 52/52, protocol 137/137, combined 189/189 PASS
+- [x] Bank exact F1B implementation commit `4359f35` on `codex/gv-fs0-f1-product`
+- [x] Distinct Reviewer A/B/C PASS against that exact commit; terminal SAW PASS
+- [x] Refresh and validate generated `current_context`
+
+Historical note: F1C and F1D sequential unopened language is obsolete; F1C-SHIP is closed on the product branch.
+
+## First Commands
+
+```text
+# product root at c007895 ancestry
+git rev-parse HEAD
+python -m pytest -q tests/gv_fs0_product
+python -c "import glob,pytest,sys; sys.exit(pytest.main(['-q',*glob.glob('tests/test_gv_fs0_*.py')]))"
+# only then F1A modules + final adapter with injected OPEN data
+```
+
+## Next Action
+
+Next action: hold product-branch tip after F1C-SHIP closeout T. Do not open providers, PEAD, FS1, or main merge without a separate owner decision.

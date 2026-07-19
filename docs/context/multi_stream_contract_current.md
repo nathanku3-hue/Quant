@@ -1,4 +1,244 @@
+# Multi-Stream Contract - Current
+
+## Active Addendum — GV-E0A Main Cutover Multi-Stream (2026-07-19)
+
+| Stream | Status | Note |
+|---|---|---|
+| Backend/Strategy | **Closed for E0A product** | Terminal operable vertical banked; no product change in cutover |
+| Frontend/UI | **Closed for E0A product** | One current certified decision default; smoke after main FF |
+| Data admission | Held | No provider/real prices/admission |
+| Docs/Ops | **Active cutover** | Truth repair + context bootstrap + main FF coordination |
+| Product CI | PASS substrate | E0A hosted `29655802878`; F1C `29651784244` |
+| PEAD / FS1 / broker | Held | Forbidden as next |
+
+- Cross-stream rule: **one active integration gate — GV-E0A-MAIN-CUTOVER-PREFLIGHT**. Product gate E0A is terminal; F1C is substrate only.
+- Next action after integrated-main smoke: open **GV-E0B Decision-Value** planning across Backend/Docs only; no FS1 expansion; no F1C reopen; no PEAD.
+
+## Prior Addendum — GV-E0A-OPERABLE Multi-Stream (2026-07-19) [superseded — E0A implemented]
+
+- Backend/Frontend were active for E0A implementation; that product work is terminal. Cutover multi-stream above is authoritative.
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Multi-Stream (2026-07-19) [CLOSED_SUBSTRATE]
+
+| Stream | Status | Note |
+|---|---|---|
+| Backend/Strategy | F1A/F1B preserved; F1C-SHIP closed | Bundle + publication recovery banked |
+| Frontend/UI | Default Certified Portfolio | Permanent-byte adapter only |
+| Data admission | Held | No provider/real admission |
+| Docs/Ops | Terminal SAW PASS | Two-SHA C/C2 + T |
+| Product CI | PASS 29651784244 | Ubuntu/Windows/parity |
+
+- Cross-stream rule: obsolete sequential F1C/F1D split is not an active gate.
+- Next action (superseded): hold → E0A.
+
+
+# Multi-Stream Contract - Current
+
+## Prior Addendum — GV-FS0 F1C-SHIP Local Coordination (2026-07-18) [superseded]
+
+| Stream | Current state | Remaining handoff |
+|---|---|---|
+| Backend/Product | Bundle codec + publisher/recovery locally PASS | Materialize tracked exact bundle and bank immutable candidate |
+| Frontend/UI | Certified default route + headless both-role proof PASS | Re-run from tracked artifact on immutable commit |
+| CI/Ops | Product parity workflow authored; zero-regression local PASS | Hosted Ubuntu/Windows run and branch push |
+| Review/Docs | Evidence and live truth reconciled to BLOCK | Distinct exact-commit A/B/C and terminal SAW |
+| Data/Research | Held | No provider, real data, PEAD, benchmark, policy, or FS1 authority |
+
+- Cross-stream rule: no stream can close independently; F1C-SHIP closes only when artifact, screen, hosted parity, review, and push bind one commit.
+- No compatibility fallback to replay/optimizer truth is allowed.
+- Next action: finish custody/evidence only.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Coordination (2026-07-18)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Backend/Strategy | F1A PASS; F1B PASS at `4359f35` | Preserve exact component identities; no F1C publication |
+| Frontend/UI | Same injected adapter renders OPEN and NO_POSITION | No default bundle loading until F1D |
+| Data/Research | Held | No provider, real data, PEAD, ranking, or FS1 authority |
+| Docs/Ops | Distinct A/B/C, fresh context, and terminal SAW PASS | Stop before F1C |
+
+- Cross-stream rule: F1B is an in-memory second certified component, not bundle publication or product shipment authority.
+- Regression evidence: product 52/52, protocol 137/137, combined 189/189 PASS.
+- Next action: hold. F1C requires a separate owner-authorized round.
+
+## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Backend/Strategy | F1A OPEN book/certification PASS at `066bdda` | F1B may reuse identical path for NO_POSITION only |
+| Frontend/UI | Final injected adapter PASS for certified OPEN | Add NO_POSITION injection only in F1B; no default bundle loading |
+| Docs/Ops | Distinct A/B/C and terminal SAW PASS; truth reconciled | Preserve F1A identities and Medium process-tree hardening risk |
+| Data/Research | Held | No provider, real-data, PEAD, admission, or FS1 scope |
+
+- Cross-stream rule: F1A certification is one synthetic component, not permanent bundle publication authority.
+- Stream freeze: F1C/F1D, publication, default routing, provider/data, and FS1 remain unopened.
+- Next action: F1B only.
+
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | Candidate `d5d03ec` and probe `9954e32` have terminal protocol-freeze evidence PASS | Preserve evidence; await separate reducer/product authorization |
+| Backend/Strategy | Held | No PortfolioBook, balance mutation, reducer, certification execution, or bundle publication in this round |
+| Frontend/UI | Held | No Streamlit or certified-result surface |
+| Data/Research | Held | No provider, real-data, admission, PEAD reopen, or FS1 scope |
+
+- Cross-stream rule: protocol freeze evidence is closed, but it does not itself execute economic logic.
+- Stream freeze: do not widen beyond protocol CI/evidence publication.
+- Next action: separate owner decision before reducer/product work.
+
+## ⛔ TERMINATED — PEAD Strict-PIT Program Formally Closed (2026-07-14)
+
+- **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
+- **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.
+- **Original objective**: 2015–2019 dollar-neutral Q5−Q1 strict-PIT PEAD. **Not achieved.**
+- **Research validity**: ~30/100; delivery/closure: 88/100.
+- **Prohibited**: Strategy/UI promotion, readiness flag changes, provider access, curve/alpha claims, ranking/scoring, alerts, recommendations, broker/order paths.
+- **Reopen condition**: Only for one source-intake slice with genuine effective-dated identifiers + committed data-owner approval; mapping and curves remain closed until ID0 passes.
+
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data/Research | M7F5-ID0 A/B evidence and A/B/C+SAW PASS prove current source lacks committed provenance approval; strict PIT/as-of identifier authority `BLOCKED` | Obtain exact effective-dated source plus committed data-owner approval, authorize acquisition, or terminate |
+| Docs/Ops | Seven-surface truth reconciliation complete for terminal BLOCK state | Preserve A/B/Saw commit identities and dual evidence hashes |
+| Backend/Strategy | Held | No mapping, curve rerun, broker, or strategy action from BLOCK evidence |
+| Frontend/UI | Held | No readiness, score, alpha, or action surface |
+
+- Cross-stream rule: M7F5-ID0 BLOCK evidence is not source-access, mapping, strict curve, readiness, alpha, or tradability authority.
+- Stream freeze: no WRDS/provider access, historical-link construction, new data output, readiness flip, Strategy/UI, remotes, publication, or dispatch.
+- Next action: hold by default; open only one separately authorized owner decision.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data/Research | M7F4-v8 Commit B `9f37745` diagnostic package and independent review PASS; strict curve `BLOCKED` | Four residual windows and non-PIT link ceiling remain |
+| Docs/Ops | Terminal SAW and seven-surface reconciliation complete | Preserve Commit B identity and accepted operational risks |
+| Backend/Strategy | Held | No promotion or strict-run claim |
+| Frontend/UI | Held | No readiness, score, or action surface |
+
+- Cross-stream rule: `DIAGNOSTIC_COMPLETE` plus sensitivity legs is not strict readiness, alpha, or tradability authority.
+- Stream freeze: no CCM/WRDS/provider access, historical-link construction, new data output, readiness flip, Strategy/UI, remotes, or publication.
+- Next action: hold by default; open only one separately authorized bounded scope.
+
+## Prior Addendum — M7F3-v7
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## Active Addendum — M7F3-v7 (2026-07-12)
+
+- **Data:** M7F3-v7 self-financing diagnostic vertical active on c0x/m7f0-v4; strict curve BLOCKED; residual envelope only.
+- **Backend/Strategy:** No promotion; no engine_run_simulation claim upgrade.
+- **Frontend/UI:** Frozen.
+- **Docs/Ops:** Commit C truth surfaces + SAW PASS; research validity ~30.
+
+## Stream freeze
+
+No CCM, WRDS login, readiness flip, alpha UI, or multi-year expansion in this round.
+
+
 # Multi-Stream Contract - Quant Current
+
+## Active Addendum — M7F2-v6-final Outcome Envelope (2026-07-12)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | M7F2-v6-final diagnostic package complete; strict curve BLOCKED | Residual envelope diagnostics only; no readiness flip |
+| Research | Flagged mechanical vertical under snapshot CUSIP8 ceiling ~30 | Not alpha / not tradable |
+| Docs/Ops | Truth surfaces + evidence refreshed for Commit B | Terminal SAW C next |
+| Strategy | Held | No promotion |
+| Frontend/UI | Held | No readiness surface |
+
+- Cross-stream rule: DIAGNOSTIC_COMPLETE with strict_curve_status=BLOCKED is not readiness or alpha authority.
+- Next action: Commit C independent A/B/C + SAW; hold readiness/UI/strategy/historical-link.
+
+
+# Multi-Stream Contract - Quant Current
+
+## Active Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | Request-artifact identity repair and independent terminal review PASS; envelope remains `PREPARED_NOT_SENT` | Hold verified artifacts; no dispatch without separate owner authorization |
+| Data | Held | No source-byte inspection, provider, factual validation, readiness promotion, or data output |
+| Strategy | Held | No return/curve/alpha/tradability work |
+| Frontend/UI | Held | No readiness or strategy surface expansion |
+
+- Cross-stream rule: tracked payload bytes and terminal identity PASS are not dispatch authority. The detached envelope proves identity only and remains `PREPARED_NOT_SENT`.
+- Validation: commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` records three distinct read-only Reviewer A/B/C PASS reports and terminal SAW PASS against unchanged fixed artifacts.
+- Next action: no implementation or reviewer rerun. Hold/no-dispatch unless a separate explicit owner decision authorizes Gate A/B/C dispatch.
+
+## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | Hygiene green at `e470137`; exact request-artifact identity still failed | See active identity-repair addendum |
+| Data / Strategy / Frontend | Held | Unchanged holds |
+
+## Prior Addendum — P0 Trust-Substrate Repair (2026-07-11)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Docs/Ops | P0 identity repair banked; hygiene recovery subsequently cleared planning preflight | See active addendum |
+| Data | Held | Unchanged hold |
+| Strategy | Held | Unchanged hold |
+| Frontend/UI | Held except GOV-002 wording repair in hygiene recovery | Unchanged hold on product claims |
+
+- Cross-stream rule: a duplicate JSON key, ambient Git redirection, a non-commit/broken identity, or any Git replacement-ref state invalidates authority before downstream work begins.
+
+## Active Addendum - V2 PEAD M6b Slice 0 Contract Correction (2026-07-02)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | Held at request-dispatch sequencing; strict Gate A accepts only first-public/unrestated EPS | No source inspection, factual validation, or readiness promotion |
+| Strategy | Held | No return, curve, CAGR, alpha, or tradability work |
+| Frontend/UI | Held | No readiness or strategy surface |
+| Docs/Ops | Active phase brief corrected; repository-identity gate added to canonical approval/request template | Historical addenda remain unchanged; Thin SAW evidence is required before dispatch |
+
+- Cross-stream rule: `release_date_aligned_but_restated` may remain a non-strict diagnostic label but cannot satisfy strict Gate A, `strict_vintage_pit`, or `m6b_data_contract_ready`.
+- Repository-identity rule: a request or approval packet must resolve its declared repository, commit, tree, artifact path, and artifact hash before it can transfer authority.
+- Next action: dispatch only the already prepared Gate A and Gate B/C source-access requests.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | Gate A successor contract/request prepared; A blocked, B candidate-only, C attribute-scope blocked, D deferred | Await separate data-owner source-access approvals; no artifact inspection before approval |
+| Strategy | Held | No flagged curve, long-only substitute, returns, CAGR, alpha, or tradability work |
+| Frontend/UI | Held | No readiness or strategy surface |
+| Docs/Ops | Successor contract/request artifacts and governance refresh in scope | Thin SAW is request-only and cannot substitute for real-artifact A/B/C review |
+
+- Cross-stream dependency: Gate A approval must bind PIT-family bytes, timing artifact only when selected EPS timing is insufficient, and an immutable calendar source of record.
+- Open decisions: data owner must approve or decline Gate A and Gate B/C source-access requests; Gate D waits for source-independent consumer-interface proof.
+- Status claim: canonical current evidence and strict readiness remain unchanged.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+| Stream | Current status | Handoff / boundary |
+|---|---|---|
+| Data | Active Path A; Gates A/B/C/D `BLOCKED`; restated-EPS exception `NOT_AUTHORIZED` | Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate. |
+| Strategy | M6a sparse engine/framework evidence only; promotion held | No real return, curve, CAGR, alpha, or tradability output while `m6b_data_contract_ready=false` |
+| Frontend/UI | Held | No alpha/readiness surface or action path |
+| Docs/Ops | Evidence-only validator, tests, and fail-closed readiness JSON locally validated; terminal A/B/C infrastructure review pending | Review cannot promote data readiness |
+
+- Cross-stream rule: B stays an isolated illustrative diagnostic and is never a strict-data fallback.
+- Authorization rule: evidence content cannot self-authorize; malformed authorization JSON/schema is a CLI input error, and current gate PASS requires distinct exact-file-hash/scope/mode/action authorization plus all four verified local source-byte hashes.
+- Exception reconciliation: inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception remains `NOT_AUTHORIZED` and cannot satisfy strict Gate A.
+- Evidence: `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json`, SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`; strict-gate 68/68 and M6a 12/12 tests pass; well-formed authorization mismatch keeps A-D blocked with exit 0.
+- Current contract: `strict_vintage_pit=false`, `m6b_data_contract_ready=false`, `workflow_status=blocked_fail_closed`.
+
+## Latest Addendum - V2 PEAD M6b Option 1 Repair PASS & Strict M6b Path A Alignment (2026-06-25)
+
+| Stream | M6b status | Boundary |
+|---|---|---|
+| Data | Option 1 B (Best-Available) diagnostic repaired for engine sanity; Strict M6b Path A data prep not yet "done done" (fails on restated EPS, proxy returns, missing liquidity screen) | Open only strict M6b gates next: first-public EPS or explicit flagged exception, delisting-adjusted tradable returns, as-of liquidity/tradability, borrow assumptions |
+| Strategy | M6a.1 sparse portfolio engine core locally complete and Reviewer C rerun PASS; final closure pending Reviewer B | No tradable equity curve, CAGR, or alpha claims until strict M6b data gates pass |
+| Frontend/UI | Held behind Alpha Interpretation Gate | No alpha-named panel, route, card, field, label, or dashboard action state |
+| Docs/Ops | Stale cross-stream docs refreshed to June 25 M6 truth | Keep B path as illustrative engine sanity diagnostic only; align with original intent |
+
+- Cross-stream rule: Fastest valid reboot is strict M6b Data Path A, not Strategy or Frontend. Best-available B artifacts remain illustrative-only / not_alpha / not_tradable_claim.
+- Current bottleneck: Strict M6b data readiness fails due to restated EPS vintage, proxy/non-delisting returns, and lack of full as-of tradability/liquidity screen. Strategy closure is not cleanly reconciled; new frontend remains held behind the alpha-interpretation gate.
 
 ## Latest Addendum - V2 PEAD Alpha Interpretation Gate OPEN (2026-06-24)
 

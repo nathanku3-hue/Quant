@@ -1,0 +1,222 @@
+name: GV-FS0 Product
+
+on:
+  pull_request:
+    paths:
+      - "core/gv_fs0_book.py"
+      - "core/gv_fs0_bundle.py"
+      - "core/gv_fs0_canonical.py"
+      - "core/gv_fs0_certify.py"
+      - "core/gv_fs0_current_decision.py"
+      - "core/gv_fs0_publish.py"
+      - "core/gv_e0a_operable.py"
+      - "data/gv_fs0/gv_fs0_certified_bundle.json"
+      - "data/gv_fs0/gv_fs0_current_decision.json"
+      - "docs/architecture/godview_e0/**"
+      - "scripts/publish_gv_e0a_current.py"
+      - "views/gv_fs0_portfolio_adapter.py"
+      - "views/page_registry.py"
+      - "dashboard.py"
+      - "tests/gv_fs0_product/**"
+      - "tests/test_gv_fs0_*.py"
+      - "tests/test_dash_1_page_registry_shell.py"
+      - ".github/workflows/gv-fs0-product.yml"
+  push:
+    paths:
+      - "core/gv_fs0_book.py"
+      - "core/gv_fs0_bundle.py"
+      - "core/gv_fs0_canonical.py"
+      - "core/gv_fs0_certify.py"
+      - "core/gv_fs0_current_decision.py"
+      - "core/gv_fs0_publish.py"
+      - "core/gv_e0a_operable.py"
+      - "data/gv_fs0/gv_fs0_certified_bundle.json"
+      - "data/gv_fs0/gv_fs0_current_decision.json"
+      - "docs/architecture/godview_e0/**"
+      - "scripts/publish_gv_e0a_current.py"
+      - "views/gv_fs0_portfolio_adapter.py"
+      - "views/page_registry.py"
+      - "dashboard.py"
+      - "tests/gv_fs0_product/**"
+      - "tests/test_gv_fs0_*.py"
+      - "tests/test_dash_1_page_registry_shell.py"
+      - ".github/workflows/gv-fs0-product.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  product-proof:
+    name: Product proof (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install product test dependencies
+        # filelock is imported by dashboard.py; pin explicitly so AppTests do not
+        # depend on transitive resolution drift across hosted runners.
+        run: >-
+          python -m pip install --disable-pip-version-check
+          -r requirements.txt
+          filelock
+
+      - name: Run product suite, frozen protocol, and E0A dashboard AppTests
+        shell: bash
+        run: >-
+          python -c "import glob, pytest, sys;
+          sys.exit(pytest.main([
+            '-q',
+            'tests/gv_fs0_product',
+            *glob.glob('tests/test_gv_fs0_*.py'),
+            'tests/test_dash_1_page_registry_shell.py::test_dash_1_default_portfolio_route_renders_current_decision',
+          ]))"
+
+      - name: Build F1C substrate + E0A current decision twice and emit parity artifact
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          from core.gv_e0a_operable import (
+              build_e0a_certified_result,
+              build_e0a_research_decision,
+          )
+          from core.gv_fs0_bundle import certified_bundle_bytes
+          from core.gv_fs0_canonical import sha256_bytes
+          from core.gv_fs0_current_decision import (
+              certified_decision_result_bytes,
+              parse_current_decision_bytes,
+          )
+          from core.gv_fs0_publish import build_default_certified_bundle
+
+          # Fixed E0A product authority identities (must match tracked artifact).
+          EXPECTED_RESEARCH_DECISION_HASH = (
+              "b4694a69bd1bc35a0d97a839ad47b66b517da1bd0f4abccd56bacca22d9e8e38"
+          )
+          EXPECTED_RESULT_HASH = (
+              "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6"
+          )
+          EXPECTED_CURRENT_FILE_SHA256 = (
+              "7ba9c7c48dfc89ceae2a5a88aba8bfebbe6d5032272b0d254f4139478699b5c9"
+          )
+          EXPECTED_CURRENT_BYTE_LENGTH = 23696
+          EXPECTED_RATIONALE_REF = f"E0A:RD:{EXPECTED_RESEARCH_DECISION_HASH}"
+
+          # --- F1C dual-bundle substrate (evidence only) ---
+          first_bundle = certified_bundle_bytes(build_default_certified_bundle())
+          second_bundle = certified_bundle_bytes(build_default_certified_bundle())
+          if first_bundle != second_bundle:
+              raise SystemExit("GV-FS0 F1C bundle is not byte deterministic")
+          tracked_bundle = Path("data/gv_fs0/gv_fs0_certified_bundle.json").read_bytes()
+          if tracked_bundle != first_bundle:
+              raise SystemExit("tracked F1C bundle differs from current canonical build")
+          bundle = build_default_certified_bundle()
+
+          # --- E0A current decision (default product authority) ---
+          first_current = certified_decision_result_bytes(build_e0a_certified_result())
+          second_current = certified_decision_result_bytes(build_e0a_certified_result())
+          if first_current != second_current:
+              raise SystemExit("E0A current decision is not byte deterministic")
+          tracked_current = Path("data/gv_fs0/gv_fs0_current_decision.json").read_bytes()
+          if tracked_current != first_current:
+              raise SystemExit(
+                  "tracked current-decision artifact differs from published rebuild"
+              )
+          if len(first_current) != EXPECTED_CURRENT_BYTE_LENGTH:
+              raise SystemExit(
+                  f"current decision length {len(first_current)} != "
+                  f"{EXPECTED_CURRENT_BYTE_LENGTH}"
+              )
+          if sha256_bytes(first_current) != EXPECTED_CURRENT_FILE_SHA256:
+              raise SystemExit("current decision file SHA-256 mismatch")
+          research = build_e0a_research_decision()
+          if research["research_decision_hash"] != EXPECTED_RESEARCH_DECISION_HASH:
+              raise SystemExit("research_decision_hash mismatch")
+          if research["rationale_ref"] != EXPECTED_RATIONALE_REF:
+              raise SystemExit("rationale_ref mismatch")
+          parsed = parse_current_decision_bytes(first_current)
+          if parsed["certified_decision_result_hash"] != EXPECTED_RESULT_HASH:
+              raise SystemExit("certified_decision_result_hash mismatch")
+          if parsed["decision"]["rationale_ref"] != EXPECTED_RATIONALE_REF:
+              raise SystemExit("decision.rationale_ref not bound to research hash")
+          if parsed["decision"]["action"] != "NO_POSITION":
+              raise SystemExit("current decision action must be NO_POSITION")
+
+          record = {
+              "f1c_substrate": {
+                  "bundle_hash": bundle["bundle_hash"],
+                  "bundle_id": bundle["bundle_id"],
+                  "byte_length": len(first_bundle),
+                  "file_sha256": sha256_bytes(first_bundle),
+              },
+              "e0a_current_decision": {
+                  "research_decision_hash": EXPECTED_RESEARCH_DECISION_HASH,
+                  "certified_decision_result_hash": EXPECTED_RESULT_HASH,
+                  "rationale_ref": EXPECTED_RATIONALE_REF,
+                  "byte_length": len(first_current),
+                  "file_sha256": EXPECTED_CURRENT_FILE_SHA256,
+                  "role": "NO_POSITION",
+                  "decision_id": parsed["decision"]["decision_id"],
+              },
+          }
+          Path("gv-fs0-product-parity.json").write_text(
+              json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+              newline="\n",
+          )
+          PY
+
+      - name: Upload product parity record
+        uses: actions/upload-artifact@v4
+        with:
+          name: gv-fs0-product-parity-${{ runner.os }}
+          path: gv-fs0-product-parity.json
+          if-no-files-found: error
+          retention-days: 30
+
+  byte-parity:
+    name: Product Windows/Linux byte parity
+    runs-on: ubuntu-latest
+    needs: product-proof
+
+    steps:
+      - name: Download product parity records
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gv-fs0-product-parity-*
+          merge-multiple: false
+
+      - name: Compare exact parity records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          records = sorted(Path(".").glob("gv-fs0-product-parity-*/gv-fs0-product-parity.json"))
+          if len(records) != 2:
+              raise SystemExit(f"expected two parity records, found {len(records)}")
+          payloads = [path.read_bytes() for path in records]
+          if payloads[0] != payloads[1]:
+              raise SystemExit("GV-FS0 product Windows/Linux parity differs")
+          text = payloads[0].decode("utf-8")
+          if "e0a_current_decision" not in text:
+              raise SystemExit("parity record missing e0a_current_decision authority")
+          if "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6" not in text:
+              raise SystemExit("parity record missing fixed E0A result hash")
+          print(text.strip())
+          PY

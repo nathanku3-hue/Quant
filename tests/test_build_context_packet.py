@@ -1009,3 +1009,72 @@ def test_validate_mode_fails_on_markdown_json_drift(tmp_path: Path) -> None:
     )
     assert validate.returncode != 0
     assert "markdown artifact drifted" in validate.stderr.lower()
+
+
+def test_planner_truth_prefers_leading_e0a_packet_over_later_pead_packet(
+    tmp_path: Path,
+) -> None:
+    """Bootstrap must not import historical PEAD when an E0A terminal packet leads."""
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    _write(
+        repo / "docs/context/planner_packet_current.md",
+        "\n".join(
+            [
+                "# Planner Packet - Current",
+                "",
+                "## New Context Packet — GV-E0A-OPERABLE Terminal Main Cutover",
+                "",
+                "## What Was Done",
+                "- E0A operable vertical is terminal on product branch.",
+                "- Bounded cutover preflight repairs context bootstrap.",
+                "",
+                "## What Is Locked",
+                "- Score remains 39/100; stage CERTIFIED_SINGLE_DECISION_OPERABLE.",
+                "- FS1, providers, PEAD, alpha, and broker paths remain closed.",
+                "",
+                "## What Is Next",
+                "- Fast-forward main, smoke one certified decision, then open GV-E0B.",
+                "",
+                "## First Command",
+                "```text",
+                "git show --stat --oneline HEAD",
+                "```",
+                "",
+                "## End Context Packet",
+                "",
+                "## New Context Packet — M7F5-ID0 Terminal Provenance Block",
+                "",
+                "## What Was Done",
+                "- Commit A banked the M7F5-ID0 dated-identifier authority gate.",
+                "",
+                "## What Is Locked",
+                "- BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED.",
+                "",
+                "## What Is Next",
+                "- Obtain a genuine effective-dated source plus data-owner approval.",
+                "",
+                "## First Command",
+                "```text",
+                "git show --stat --oneline pead-only",
+                "```",
+            ]
+        ),
+    )
+    packet = build_context_packet(
+        repo_root=repo,
+        generated_at_utc=datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z"),
+    )
+    done = " ".join(packet["what_was_done"])
+    nxt = " ".join(packet["what_is_next"])
+    locked = " ".join(packet["what_is_locked"])
+    assert "E0A operable vertical is terminal" in done
+    assert "GV-E0B" in nxt or "E0B" in nxt
+    assert "39/100" in locked
+    assert "CERTIFIED_SINGLE_DECISION_OPERABLE" in locked
+    assert "BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED" not in locked
+    assert "effective-dated source" not in nxt
+    assert str(packet["first_command"]).strip() == "git show --stat --oneline HEAD"
+

@@ -1,5 +1,13 @@
 # Unified Opportunity Engine Architecture
 
+Status: **SUPERSEDED as active implementation authority** — historical architecture evidence only
+Superseded-by: `docs/architecture/top_level_roadmap.md` (GodView GV-FS0-First), `docs/architecture/godview_endgame_vision.md`, `docs/architecture/godview_portfolio_first_operating_model.md`, `docs/architecture/godview_portfolio_p0_owner_freeze.md`, and `docs/architecture/gv_fs0_certification_and_data_authority_contract.md`
+Date-superseded: 2026-07-18
+Mode: historical evidence only; not an active product gate
+
+> Do not use this document to authorize concurrent G7–G9 implementation, dashboard expansion, provider work, or any stream parallel to GV-FS0. Active execution authority is GV-FS0-first only.
+
+---
 Status: Phase 65 G7.1A architecture canon
 Date: 2026-05-09
 Authority: G7.1A starter docs / product-spec rewrite
@@ -173,3 +181,4 @@ Unified Opportunity Engine
 ```
 
 `SUPERCYCLE_GEM_DAILY_V0` is downstream under G7.4, after the state engine and source policy are defined.
+

@@ -1,5 +1,228 @@
 # Impact Packet - Current
 
+## Active Addendum — GV-E0A Main Cutover Truth-Repair Impact (2026-07-19)
+
+- **Product evidence (already terminal)**: E0A transport C `45f9f96` + C2 `446ac6d`; hosted product CI `29655802878` PASS; Reviewer A/B/C PASS; terminal SAW PASS on `codex/gv-e0a-operable`.
+- **Cutover defect**: generated `current_context` still resolved to historical PEAD because bootstrap selected the first historical `## New Context Packet` in planner truth.
+- **Docs/Ops owned changes (this round)**:
+  - machine-shaped E0A terminal packet at top of `planner_packet_current.md`
+  - reconcile bridge/done/impact/multi-stream/alignment/observability to terminal + cutover→E0B next
+  - regenerate `current_context.md` / `current_context.json`
+  - regression in `tests/test_build_context_packet.py` that E0A packet wins over later PEAD packet
+- **Runtime product code**: unchanged by this truth-repair cutover.
+- **Touched interfaces**: Docs/Ops bootstrap truth only; no provider/FS1/PEAD/broker/alpha interface.
+- **Failing checks before repair**: active context PEAD (P0). After repair: none in focused context suite.
+- **Next after integrated main smoke**: GV-E0B Decision-Value Slice planning (not FS1; not indefinite hold).
+- **Score**: 39/100 retained; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
+
+## Prior Addendum — GV-E0A-OPERABLE Docs Hard Recut Impact (2026-07-19) [superseded on terminal/cutover]
+
+- Historical docs hard-recut impact retained below for audit; E0A code acceptance is closed and cutover is the active integration impact.
+
+## Prior Addendum — GV-FS0 F1C-SHIP Terminal Impact (2026-07-19) [CLOSED_SUBSTRATE]
+
+- **Runtime impact**: core/gv_fs0_bundle.py, core/gv_fs0_publish.py, permanent bundle, adapter permanent-load path, default Certified Portfolio cutover, product workflow.
+- **Transport commits**: C 48ad053, C2 91b9bf1; closeout T docs/review/truth only.
+- **Hosted impact**: product CI 29651784244 PASS Ubuntu/Windows/parity.
+- **Untouched**: frozen contracts/verifier, providers, PEAD, FS1, main merge, historical suite repair.
+- **Score**: 39/100 retained.
+- **Open residual**: path-filter hygiene for .gitattributes; process-tree hardening Medium inherited.
+
+
+# Impact Packet - Current
+
+## Prior Addendum — GV-FS0 F1C-SHIP Local Impact (2026-07-18) [superseded]
+
+- **Runtime**: new pure bundle validator and publication controller; adapter loads permanent validated bytes; default dashboard route hard-replaced by certified bundle rendering.
+- **Tests**: new bundle/publication/recovery/default-authority suite; obsolete default replay/YTD/lifecycle assertions replaced without compatibility fallback.
+- **CI**: new Windows/Linux product parity workflow; not hosted-run yet.
+- **Artifact**: exact canonical bundle identity established, but `data/gv_fs0/gv_fs0_certified_bundle.json` remains absent.
+- **Regression**: 201/202 focused checks pass; candidate full-suite has zero new failures and one fewer inherited dashboard failure.
+- **Custody**: local detached worktree only; no commit, review pin, or push.
+- **Untouched**: frozen protocol, providers, real data, PEAD, benchmark/policy, broker/live capital, main, and GV-FS1.
+
+## Prior Active Addendum — GV-FS0 F1B NO_POSITION Terminal Impact (2026-07-18)
+
+- **Base authority**: F1A terminal close `e156c66` on `codex/gv-fs0-f1-product`.
+- **Changed runtime**: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, and `views/gv_fs0_portfolio_adapter.py` now pass a separate NO_POSITION component through the same shared path while preserving OPEN regression.
+- **Changed tests**: new `tests/gv_fs0_product/test_no_position_vertical.py`; product 52/52, protocol 137/137, combined 189/189 PASS.
+- **Economic delta**: five sessions remain shares `0`, cash/NAV `1000`, receivables/market value/contribution `0`; zero non-valuation source intents are enforced primary-side and verifier-side.
+- **Untouched**: frozen contracts/verifier, permanent bundle/publication recovery, default route, hosted parity, complete-suite repair, providers, real data, PEAD, broker/live capital, and FS1.
+- **Closure state**: implementation commit `4359f35` is banked on the product branch; distinct Reviewer A/B/C and terminal SAW PASS with no in-scope Critical/High findings.
+- **Docs/Ops delta**: fresh generated context, three reviewer artifacts, terminal SAW evidence, and all seven live-truth surfaces are reconciled; F1C remains unopened.
+
+## Prior Active Addendum — GV-FS0 F1A Certified OPEN Terminal Close (2026-07-18)
+
+- **Banked commits**: `699e664` initial F1A; `066bdda` review reconciliation and terminal review target.
+- **Backend impact**: new primary OPEN book/events/snapshots and certification controller with exact raw-verifier semantic/hash binding, two-attempt supervision, retained-result dedupe, and frozen authority/duplicate rules.
+- **Frontend impact**: final adapter accepts injected artifacts only and rejects presentation row/hash drift against the terminal snapshot and certification.
+- **Legacy impact**: `strategies/strategy_replay.py` is machine-marked `REVOKED_BY_GV_FS0_20260716`; product authority tests enforce no FS0 certification use.
+- **Validation**: exact commit Reviewer A/B/C PASS; product 43/43, protocol 137/137, combined 180/180, generator/freeze/compile PASS.
+- **Open risk**: process-tree termination hardening remains Medium and non-blocking because the frozen verifier has no descendant-spawn path.
+- **Untouched**: F1B NO_POSITION, permanent bundle/publication, default routing, providers, real data, and FS1.
+
+## Prior Addendum — GV-FS0 Protocol V1 Terminal Freeze Audit (2026-07-17) [history]
+
+- **Changed interfaces**: CI branch/base selection portability and Windows pytest glob execution were repaired after the immutable protocol candidate; frozen protocol semantics and machine artifacts are unchanged.
+- **Primary paths**: `.github/workflows/gv-fs0-protocol-freeze.yml`, `tests/test_gv_fs0_freeze_immutability_v1.py`, `docs/phase_brief/phase-E0-brief.md`, `docs/context/*_current.md`, `docs/decision log.md`, `docs/notes.md`, `docs/lessonss.md`, and `docs/saw_reports/saw_gv_fs0_protocol_freeze_v1_20260717.md`.
+- **Validation**: 136 focused tests PASS; generator PASS; independent vectors PASS; enforced verifier PASS; all six final mutation probes reject; final probe branch restores cleanly to tree `a60bc645f670bcc1007afaf9774e72648cb093b2`; hosted run `29567754495` PASS and final confirmation run `29568087448` PASS on Ubuntu, Windows, and byte parity.
+- **Open checks**: none for protocol freeze closure.
+- **Forbidden impact**: no reducer, balance mutation, event execution, snapshot generation, certification execution, certified result, permanent bundle, UI, provider, real-data, or FS1 path changed.
+
+## Prior Addendum — GV-FS0 Protocol V1 Freeze Candidate (2026-07-17) [history]
+
+- **Changed interfaces**: normative contract, 18 machine-readable artifacts, canonical/parser primitives, isolated reconstruction boundary, independent reference encoder, freeze verifier/manifest, protocol tests, and CI workflow.
+- **Primary paths**: `docs/architecture/gv_fs0_certification_and_data_authority_contract.md`, `contracts/gv_fs0/v1/**`, `core/gv_fs0_canonical.py`, `validation/gv_fs0_*.py`, `scripts/*gv_fs0_protocol*`, `tests/test_gv_fs0_*.py`, and `.github/workflows/gv-fs0-protocol-freeze.yml`.
+- **Validation**: 135 focused tests PASS, including local schema-reference resolution and intent-cardinality proofs; generator/reference/bootstrap guards PASS on Windows and Linux Python; parity records byte-identical; workflow YAML and `git diff --check` PASS.
+- **Open checks**: committed-base enforced guard, non-merged mutation probe, hosted CI, immutable candidate audit, and full Reviewer A/B/C SAW.
+- **Forbidden impact**: no reducer, balance mutation, event execution, snapshot generation, certification execution, certified result, permanent bundle, UI, provider, real-data, or FS1 path changed.
+
+## Prior Program State — PEAD Strict-PIT Formally Closed (2026-07-14)
+
+- **Status**: `TERMINATED_DIAGNOSTIC_ONLY` at merge commit `150d322` (tag `pead-v8-diagnostic-terminal` at `076f26b`).
+- **Shipped outcome**: Bounded 2019 long-only future-informed diagnostic (M7F4-v8). NOT strict-PIT, NOT alpha, NOT tradable.
+- **Original objective**: 2015–2019 dollar-neutral Q5−Q1 strict-PIT PEAD. **Not achieved.**
+- **Research validity**: ~30/100; delivery/closure: 88/100.
+- **Prohibited**: Strategy/UI promotion, readiness flag changes, provider access, curve/alpha claims, ranking/scoring, alerts, recommendations, broker/order paths.
+- **Reopen condition**: Only for one source-intake slice with genuine effective-dated identifiers + committed data-owner approval; mapping and curves remain closed until ID0 passes.
+
+## Active Addendum — M7F5-ID0 Terminal Provenance Block (2026-07-14)
+
+- Implementation/repair: `scripts/pead_m7f5_id0_dated_identifier_authority.py`, `tests/test_pead_m7f5_id0_dated_identifier_authority.py`, and the active M7F5-ID0 brief at Commit A `c5a9ab8`.
+- Evidence: `docs/context/e2e_evidence/pead_m7f5_id0_dated_identifier_authority_20260714.json` at Commit B `410d0ca`; checkout/runtime SHA `4abd0112cd535bb1250952296860d8e3d7c160e4bcd510ec97091427580aa903`; committed Git-blob SHA `f15bac8a6b8702b5c91d915812821605a3b4e33253d11ccee3dfd59ee9816913`.
+- SAW/docs: truth repair `a51f349`, terminal SAW report `398732c`, and seven current-truth surfaces reconciled to the BLOCK state.
+- Touched interfaces: Data/Research authority gate and Docs/Ops truth only; Strategy/UI, provider access, mapping, curve rerun, and strict readiness remain held.
+- Failing checks: none in compile/focused/reviewer/SAW checks. Strict PIT identifier authority intentionally remains `BLOCKED_DATED_COMPUSTAT_IDENTIFIER_PROVENANCE_REQUIRED`.
+- Open risks: repository blob authority is not a cryptographic natural-person signature; genuine effective-dated source plus committed data-owner approval remains unavailable.
+
+## Prior Addendum — M7F4-v8 Terminal Commit C (2026-07-13)
+
+- Implementation/repair: `scripts/pead_m7f4_v8_2019_crsp_vertical.py`, `tests/test_pead_m7f4_v8_2019_crsp_vertical.py`, and the active M7F4-v8 brief at A2.1 `b4d35e1`.
+- Commit B evidence: `docs/context/e2e_evidence/pead_m7f4_v8_2019_crsp_vertical.json` plus daily-return and event-ledger manifests at `9f37745`; evidence SHA-256 `bbeb1ea5d864a4f0b67123ec6e84371a8dee92d99fc5adc8ec425b0acb5c51a5`.
+- Commit C docs: three reviewer artifacts, terminal SAW, active brief, decision/formula/lesson records, and seven current-truth surfaces.
+- Touched interfaces: flagged Data/Research diagnostic and Docs/Ops truth only; Strategy/UI and strict readiness remain held.
+- Failing checks: none in compile/focused/reviewer checks. Strict curve intentionally `BLOCKED` by four residual windows.
+- Open risks: nontransactional multi-file publication, unbounded/no-checkpoint memory path, ignored-Parquet portability, and snapshot non-PIT link ceiling.
+
+## Prior Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH
+
+- Superseded as active implementation by M7F4-v8; retained for audit.
+
+## Active Addendum — M7F3-v7 SELF_FINANCING_PORTFOLIO_TRUTH (2026-07-12)
+
+- Changed code/tests: `scripts/pead_m7f3_v7_2019_crsp_vertical.py`, `tests/test_pead_m7f3_v7_2019_crsp_vertical.py`, `scripts/pead_m7f2_v6_2019_crsp_vertical.py` (CLI retired).
+- Brief: `docs/phase_brief/v2-pead-m7f3-v7-self-financing-portfolio-truth.md`.
+- Evidence: `docs/context/e2e_evidence/pead_m7f3_v7_2019_crsp_vertical.json` SHA-256 `49c594c8ac6e71d50dcc6f021e9e3ee5af29a4ca68717b72a90cbab11c00b488`.
+- Legs under `E:/Code/Quant/data/processed/pead_m7f3_v7_2019_daily_returns_*.parquet`.
+- Touched interfaces: Data/research diagnostic only; Strategy/UI frozen; readiness false.
+- Failing checks: none in focused suite (24/24). Strict curve intentionally BLOCKED.
+- Open risk: residual 4-event envelope; snapshot link ceiling ~30; low stderr label polish.
+
+## Prior Addendum — M7F2-v6-final (superseded as active package)
+
+- Retained as audit foil; not active product path.
+
+
+# Impact Packet - Current
+
+## Active Addendum — M7F2-v6-final (2026-07-12)
+
+- Changed code/tests/brief: scripts/pead_m7f2_v6_2019_crsp_vertical.py, tests/test_pead_m7f2_v6_2019_crsp_vertical.py, docs/phase_brief/v2-pead-m7f2-v6-2019-crsp-vertical.md (Commit A `c7724adcaa85`); removed v5.2 runner/tests/brief.
+- Evidence: docs/context/e2e_evidence/pead_m7f2_v6_2019_crsp_vertical.json SHA `58f84cd64e31a41e1307204317d331e54e87a1a23b661cbe9fbb5e4ea105aa8a`; ledger/daily/envelope manifests; map/ledger under ignored data/processed/.
+- Touched interfaces: Data/Research flagged vertical only; Strategy/UI frozen; readiness false.
+- Failing checks: strict_curve_status=BLOCKED with 4 residual ambiguous selected windows (by design). Unit tests 19/19 PASS.
+- Open risk: residual ambiguities require envelope-only use; snapshot-link ceiling ~30; terminal SAW is Commit C.
+
+
+# Impact Packet - Current
+
+## Active Addendum — M7F1-v5.2-final (2026-07-12)
+
+- Changed code/tests: `scripts/pead_m7f1_v5_2019_crsp_vertical.py`, `tests/test_pead_m7f1_v5_2019_crsp_vertical.py`, `docs/phase_brief/v2-pead-m7f1-v5-2019-crsp-vertical.md` (Commit A `138c8b7`).
+- Evidence: `docs/context/e2e_evidence/pead_m7f1_v5_2019_crsp_vertical.json` SHA `0927826206247ea0ac07ce9c59afa196ac9982bc99c3cc90e0d1675626bba292`; ledger/daily manifests; map/ledger under ignored `data/processed/`.
+- Touched interfaces: Data/Research flagged vertical only; Strategy/UI frozen; readiness false.
+- Failing checks: durable residual selected-window BLOCK 7/2448 (5 nonnumeric, 1 unresolved delist, 1 missing session). Unit tests 17/17 PASS.
+- Open risk: residual requires delisting-data/policy gate; snapshot-link ceiling ~30; terminal A/B/C SAW is Commit C only.
+
+## Prior Addendum — Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
+
+- Changed scope: mandatory current-truth surfaces, the active identity-repair phase status, decision/lesson records, generated current context, and one Thin SAW report only.
+- Touched interfaces: Docs/Ops governance truth only; no request payload, envelope, reviewer report, runtime, data, provider, validator, strategy, or UI interface.
+- Preserved semantics: the four request artifacts and detached envelope remain byte-identical; lifecycle stays `PREPARED_NOT_SENT`; no request text, gate semantics, factual gate evidence, or readiness evidence changed.
+- Identity result: Commit 1 `a86c3a0fcc34d29e8d76cded5616c6cbe77f500e` / tree `17d7dd85bee600b3658337b129774ffc629bad11` contains all four exact payloads; commit `c642a94944831adbd7ecc06fb16259c87fcdd213` contains the detached envelope; terminal review commit `e50219051df8bc8fc1f21312325f01cea4a8e18d` records independent Reviewer A/B/C PASS and terminal SAW PASS.
+- Validation result: terminal reviewer independence is closed PASS; context validation PASS; governance preflight PASS with 0 findings; planning boot preflight PASS; fixed payload/envelope/reviewer evidence byte checks PASS. Thin SAW is the final in-round close gate before commit.
+- Current risk: dispatch remains denied pending a separate explicit owner decision. No remote, source/provider access, factual validation, readiness promotion, Gate D, publication, or data output is permitted.
+
+## Prior Addendum — Checkout Hygiene / Governance Recovery (2026-07-11)
+
+- Changed/banked: Path A pair, PEAD claim-boundary module, PEAD status wording, MSFT/MU manifests; commit `e470137`.
+- Validation: governance PASS; planning boot preflight PASS.
+- Open risk: residual advisory dirt may remain; hygiene status does not establish request-artifact identity or permit dispatch.
+
+## Prior Addendum — P0 Trust-Substrate Repair (2026-07-11)
+
+- Changed code/test: `scripts/boot_preflight.py`, `tests/test_boot_preflight.py`, Path A gate/tests (later banked in hygiene recovery).
+- Touched interfaces: boot Git identity status now carries replacement-ref detection, raw commit/tree proof, and `identity_verified`; strict current-evidence and authorization JSON now require unambiguous object-member names.
+- Fail-closed result: ambient Git redirection, a non-commit/broken/unborn identity, or any loose/packed replacement ref blocks preflight; duplicate JSON fails before authorization evaluation and before atomic output creation.
+- Validation: focused P0 test matrix plus terminal Reviewer A/B/C pass. Hygiene recovery subsequently cleared planning preflight.
+- Open risk: authority transfer still needs explicit Gate A/B/C or P2 decision after green preflight.
+
+## Active Addendum - M6b Slice 0 Contract Correction (2026-07-02)
+
+- Active M6b contract: first-public/unrestated EPS is the sole strict Gate A pass route; restated EPS remains non-strict and cannot promote strict readiness.
+- Template update: approval/request packets must verify repository remote/root, commit, tree, artifact path, and artifact hash before authority can proceed.
+- Local identity result: Quant does not resolve `cc96053513f445f143632103c478367bbf674e12`, and no root `R0.1-preflight-plan.md` exists; no R0.1 material was introduced.
+- Scope result: documentation and current-truth updates only; no data, source, provider, ETL, curve, readiness, or runtime interface changed.
+- Next action: request-dispatch sequencing only for the prepared Gate A and Gate B/C source-access requests.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Phase 0 Successor Requests (2026-07-01)
+
+- Changed successor artifacts: `docs/authorization/V2_PEAD_M6B_GATE_A_EPS_DEFINITION_CONTRACT_REQUEST_20260701.{json,md}` and `docs/authorization/V2_PEAD_M6B_STRICT_DATA_SOURCE_ACCESS_REQUESTS_20260701.{json,md}`.
+- Historical preservation: all corresponding 20260630 artifacts remain unchanged and are referenced through `supersedes` metadata and recomputed predecessor hashes.
+- Active contract hash: `27a065e5a37d44acd5e423e448d0a894274b48215eb0bcfc32968d5ba5931063`.
+- Active request hash: `913196ba279dd49442ce6b3bbde54d185c188a2d26e21cf462d853bbe295505b`.
+- Touched interface: Docs/Ops request semantics only—conditional timing artifact, immutable calendar artifact, eligible trading sessions including early closes, replayable session mapping, and source-capability attestation during data-owner approval.
+- No source/data/runtime interface changed: no raw bytes inspected, provider/API/credential action, data transformation, return/curve/alpha output, validator/test change, or readiness action.
+- Open decisions: separate data-owner responses for Gate A and Gate B/C; Gate D remains deferred on an existing consumer-interface proof gap.
+- Status claim: canonical current evidence and strict readiness remain unchanged.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gate Infrastructure (2026-06-30)
+
+- Infrastructure artifacts: `scripts/pead_m6b_strict_path_a_data_gate.py`, `tests/test_pead_m6b_strict_path_a_data_gate.py`, `docs/context/e2e_evidence/pead_m6b_strict_path_a_readiness.json`.
+- Truth refresh: `current_context.json`, `observability_pack_current.md`, `multi_stream_contract_current.md`, `post_phase_alignment_current.md`, `bridge_contract_current.md`, `impact_packet_current.md`, `done_checklist_current.md`, `planner_packet_current.md`, `notes.md`, `decision log.md`, and `lessonss.md`.
+- Touched interface: malformed authorization JSON/schema and synthetic-test-plus-authorization now exit 2 without output; structurally valid unapproved/mismatched authorization exits 0 with fail-closed JSON; current gate PASS requires detached authorization and all four source-byte hashes verified. No provider, source extraction, B import, locked artifact, UI, strategy, return, curve, CAGR, alpha, or tradability interface changed.
+- Validation: strict-gate tests PASS 68/68; M6a tests PASS 12/12; compile, current-evidence CLI, deterministic replay, explicit-`--output` argparse rejection, synthetic canonical-output rejection before atomic write, payload-only restated-approval rejection, malformed-evidence/authorization no-output checks, authorization mismatch, source tamper, atomic cleanup, static isolation, output-isolation, and canonical context build/validation checks PASS.
+- Evidence: A/B/C/D=`BLOCKED`, source bytes unverified, restated-EPS exception=`NOT_AUTHORIZED`, `strict_vintage_pit=false`, `m6b_data_contract_ready=false`; readiness JSON SHA-256 `0ef4b2504f7f573eab734614054e3c3e9ffa746b02522a6ef00a51453010574a`.
+- Exception reconciliation: inherited wording that permits a flagged restated-EPS exception is superseded on current truth surfaces; the exception cannot satisfy strict Gate A.
+- Inherited dirty overlap: the six June 29 Path-A addenda in bridge/done/impact/multi-stream/planner/post-phase files were preserved; pre-existing line-ending-only dirtiness in the other five truth files was not normalized.
+- Review boundary: terminal Reviewer A/B/C infrastructure review remains pending and cannot change strict readiness.
+- Failing checks: none in implementer validation; the data contract itself remains intentionally blocked.
+- Next action: obtain authorized, verifiable evidence for the smallest blocked strict-data gate.
+
+## Authoritative Addendum - V2 PEAD Strict M6b Path A Gates Opened (2026-06-29)
+
+### Changed / Owned Files
+
+- `docs/phase_brief/v2-pead-m6b-strict-data-path-a.md`
+- `docs/context/multi_stream_contract_current.md`
+- `docs/context/post_phase_alignment_current.md`
+- `docs/context/bridge_contract_current.md`
+- `docs/context/impact_packet_current.md`
+- `docs/context/planner_packet_current.md`
+- `docs/context/done_checklist_current.md`
+
+### Touched Interfaces
+
+- Docs/Ops: Stale cross-stream docs refreshed to June 25 M6 truth; strict M6b Path A gates opened.
+- Data/Ops: Strict M6b Path A data prep gates defined (EPS vintage, delisting returns, liquidity screen, borrow assumptions).
+- No provider ingestion, strict M6b readiness flag promotion, M6a evidence flag change, UI, alpha, ranking/scoring, alert, recommendation, live/paper, broker/order, or strict daily-return parquet interface changed.
+
+### Passing Checks
+
+- Cross-stream contracts refreshed to June 25 M6 truth.
+- Strict M6b Path A brief adheres to `APPROVAL_GATE` single-mode rule and explicit gate acceptance criteria.
+- Fail-closed principle preserved for `m6b_data_contract_ready = false`.
+
 ## Authoritative Addendum - V2 PEAD M6b Option 1 Repair PASS (2026-06-25)
 
 ### Changed / Owned Files

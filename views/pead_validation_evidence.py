@@ -9,6 +9,11 @@ from typing import Any
 
 import streamlit as st
 
+from core.pead_evidence_claim_boundary import (
+    EXPECTED_M1B_FORBIDDEN_USE,
+    M1B_FALSE_AUTH_KEYS,
+)
+
 
 DEFAULT_VALIDATION_EVIDENCE_PATH = Path(
     "docs/context/e2e_evidence/pead_real_data_validation_full_universe_v2.json"
@@ -38,7 +43,7 @@ EXPECTED_EVIDENCE_SHA256 = EXPECTED_VALIDATION_EVIDENCE_SHA256
 REVIEW_ONLY_TITLE = "PEAD Evidence Readiness - Read Only"
 REVIEW_ONLY_WARNING = (
     "Evidence readiness only. Alpha interpretation, strategy promotion, ranking, "
-    "recommendations, alerts, and broker/order paths remain blocked."
+    "product-action claims, alerts, and broker/order paths remain blocked."
 )
 EXPECTED_FULL_UNIVERSE_LIMITATIONS = (
     "full universe (9,969 issuers)",
@@ -53,20 +58,6 @@ EXPECTED_LEGACY_LIMITATIONS = (
     "no delisting adjustment",
 )
 EXPECTED_LIMITATIONS = EXPECTED_LEGACY_LIMITATIONS
-EXPECTED_M1B_FORBIDDEN_USE = (
-    "alerts",
-    "alpha_claims",
-    "broker_or_order_paths",
-    "causal_claims",
-    "full_factor_alpha_claims",
-    "net_performance_claims",
-    "population_validity_claims",
-    "ranking_or_scoring",
-    "recommendations",
-    "strategy_promotion",
-    "strict_point_in_time_claims",
-    "tradability_claims",
-)
 _COUNT_KEYS = ("rows", "events", "issuers", "eligible_events", "ineligible_events")
 _LINEAGE_KEYS = ("d1", "d2b", "d3")
 
@@ -405,7 +396,9 @@ def render_pead_validation_evidence(
     st.markdown("**Status Notes**")
     st.markdown("- Primary full-universe evidence pair passes schema, publishable, and parent-link checks.")
     st.markdown("- M1B methodology evidence is read-only and is not an alpha verdict.")
-    st.markdown("- Strategy promotion, ranking, recommendations, alerts, and broker/order paths remain blocked.")
+    st.markdown(
+        "- Strategy promotion, ranking, product-action claims, alerts, and broker/order paths remain blocked."
+    )
     st.markdown(
         "- Calendar-time coverage uses "
         f"{_format_int(status.m1b.retained_sessions)} retained sessions from "
@@ -595,12 +588,7 @@ def _validate_m1b_policy(policy: dict[str, Any]) -> None:
         raise PeadValidationEvidenceError(
             "M1B policy reports interpretation_performed = true"
         )
-    for key in (
-        "strategy_promotion_authorized",
-        "ranking_or_scoring_authorized",
-        "alerts_or_recommendations_authorized",
-        "broker_or_order_path_authorized",
-    ):
+    for key in M1B_FALSE_AUTH_KEYS:
         if _require_bool(policy, key):
             raise PeadValidationEvidenceError(f"M1B policy reports {key} = true")
 

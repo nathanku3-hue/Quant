@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-06-25T00:00:00Z",
+  "generated_at_utc": "2026-07-18T19:19:12Z",
   "source_files": [
     "docs/context/bridge_contract_current.md",
     "docs/context/done_checklist_current.md",
@@ -56,6 +56,7 @@
     "docs/handover/phase65_optimizer_core_structured_diagnostics_handover.md",
     "docs/handover/phase65_rule100_dynamic_ui_replay_ytd_handover.md",
     "docs/lessonss.md",
+    "docs/phase_brief/phase-E0-brief.md",
     "docs/phase_brief/phase0-brief.md",
     "docs/phase_brief/phase10-brief.md",
     "docs/phase_brief/phase11-brief.md",
@@ -114,22 +115,23 @@
   ],
   "active_phase": 65,
   "what_was_done": [
-    "Completed the sparse-engine core: DuckDB direct aggregation, global trading-calendar `return_idx:int32`, `entry_idx/exit_idx` interval bounds, numeric-only projected relations, object-dtype rejection, single-thread compensated aggregation, and canonical daily SHA-256 output hashing.",
-    "Turnover continues to preserve entry, overlap, exit, and final trade-to-zero parity; no wide matrix, chunking, physical repartitioning, Numba, or multiprocessing was added.",
-    "Focused M6 PASS 12/12; M5a+M6 PASS 16/16; broader PEAD PASS 109/109; 11,798,280-position-day smoke is within the configured bound.",
-    "M4A full-universe expansion remains a prior verified milestone reference for context hygiene."
+    "E0A operable vertical is banked substrate (C 45f9f96 + C2 446ac6d; hosted CI PASS; A/B/C PASS; SAW PASS). One current certified decision only.",
+    "F1C-SHIP closed substrate; dual-fixture never default UI fallback.",
+    "Context bootstrap prefers product/E0A packets over historical PEAD blocks.",
+    "Owner audit: E0A-R1 = repair tax; E0B-DV1 = first real GodView product slice."
   ],
   "what_is_locked": [
-    "Engine completion does not satisfy M6b data readiness. Strict EPS vintage, delisting-adjusted tradable returns, and full as-of tradability/liquidity remain absent and fail closed.",
-    "No provider/data/UI/alpha/ranking/action/real-curve scope was opened."
+    "E0A is plumbing only — not decision value / alpha / economics.",
+    "Conjunctive endgame tracks decision-value maturity (~9/100); additive substrate scores must not mask that.",
+    "E0A-R1 hard cap then stop; no dirty-root authority auto-canonization.",
+    "FS1, providers, PEAD reopen, alpha claims, broker, dual-authority default UI closed.",
+    "PEAD = TERMINATED_DIAGNOSTIC_ONLY history only."
   ],
   "what_is_next": [
-    "**Single next action: obtain a fresh independent Reviewer C terminal review for the completed M6a.1 sparse core; Reviewer A and Reviewer B have passed. Only then start M6b data-prep for its independent data gates.**"
+    "Finish E0A-R1 (single authority + merge + fresh-checkout smoke), close E0A, open E0B-DV1 with causal decision-improvement pass bar. Not FS1."
   ],
-  "first_command": ".venv\\\\Scripts\\\\python.exe -m pytest tests\\\\test_pead_m6_pit_walk_forward_equity_curve.py -q",
+  "first_command": "git show --stat --oneline HEAD",
   "next_todos": [
-    "`V2-PEAD-M6A-SCALE-SPARSE-PORTFOLIO-ENGINE`: core implementation complete locally; Reviewer A and Reviewer B passed; fresh Reviewer C rerun pending.",
-    "`V2-PEAD-M6B-DATA-PREP`: blocked by independent strict data decisions.",
-    "`V2-PEAD-REAL-RUN-EQUITY-CURVE`: blocked until M6b closes its data contract."
+    "Finish E0A-R1 (single authority + merge + fresh-checkout smoke), close E0A, open E0B-DV1 with causal decision-improvement pass bar. Not FS1."
   ]
 }

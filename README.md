@@ -1,205 +1,95 @@
-# Terminal Zero: Unified Opportunity Engine
+# Terminal Zero / GodView Certified Portfolio OS
 
-Status: Phase 65 G7.1A starter docs / product-spec rewrite
-Date: 2026-05-09
-Authority: G7.1A docs-only product canon
+Status: Active product framing — GodView certified portfolio OS (paper)
+Date: 2026-07-19
+Product tip: E0A operable banked (`accef5c` lineage); F1C-SHIP closed substrate earlier
+Active work: **E0A-R1** merge-safety repair (hard cap) → then **E0B-DV1** sole product gate
+Authority: `docs/architecture/top_level_roadmap.md`, `PRD.md`, `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`
 
-Terminal Zero is a local-first discretionary augmentation cockpit. It is not a trading bot.
-
-The product is the **Unified Opportunity Engine**:
-
-```text
-Primary alpha:   supercycle gem discovery / de-risked asymmetric upside
-Secondary alpha: GodView market-behavior intelligence
-Output layer:    buying-range, hold-discipline, trim-risk, and thesis-break prompts
-```
-
-The engine helps a discretionary supercycle investor/operator find MU/SNDK-style structural winners and read market behavior well enough to avoid two expensive mistakes:
-
-- buying too early on the left side;
-- selling too early while momentum, flows, positioning, and thesis evidence remain supportive.
-
-All outputs are decision-support states or paper-only prompts. They are not orders, broker instructions, alert authorization, or signal approval.
-
-## Current Canon
-
-Use these starter docs first:
-
-- [PRD.md](PRD.md) - product requirements for the Unified Opportunity Engine
-- [PRODUCT_SPEC.md](PRODUCT_SPEC.md) - product and architecture specification
-- [docs/architecture/top_level_roadmap.md](docs/architecture/top_level_roadmap.md) - G7.1A through G12 roadmap
-- [docs/architecture/unified_opportunity_engine.md](docs/architecture/unified_opportunity_engine.md) - top-level product architecture
-- [docs/architecture/godview_signal_taxonomy.md](docs/architecture/godview_signal_taxonomy.md) - GodView signal families and use boundaries
-- [docs/architecture/data_infra_gap_assessment.md](docs/architecture/data_infra_gap_assessment.md) - current readiness and future provider gaps
-- [docs/architecture/codex_agent_research_workflow.md](docs/architecture/codex_agent_research_workflow.md) - Codex/Chrome research-agent SOP
-- [docs/architecture/dashboard_product_spec.md](docs/architecture/dashboard_product_spec.md) - dashboard state model and product surface
-
-Historical lowercase docs remain for continuity:
-
-- [docs/prd.md](docs/prd.md)
-- [docs/spec.md](docs/spec.md)
-
-Those files now point back to the root canon above. If a conflict appears, the G7.1A root docs win for product framing.
-
-## Product Model
-
-### 1. Primary Alpha: Supercycle Gem Discovery
-
-Find de-risked asymmetric upside: companies or assets where structural demand, supply constraints, ownership behavior, fundamentals, and market action converge into a possible supercycle winner.
-
-This layer is thesis-first. It does not start from generic alpha search, parameter sweeps, or backtest-driven ranking.
-
-### 2. Secondary Alpha: GodView Market-Behavior Intelligence
-
-Read the market around the thesis:
-
-- implied volatility and volatility surface behavior;
-- options whales and unusual options activity;
-- gamma and dealer-positioning estimates;
-- short interest and short-squeeze context;
-- CTA/systematic pressure and CFTC positioning proxies;
-- sector rotation and factor/risk appetite;
-- ETF/passive holdings and flow pressure;
-- dark-pool, ATS, and block activity;
-- ownership whales through 13F/13D/Form 4 style evidence;
-- microstructure and order-book context;
-- catalysts, news, and narrative velocity;
-- broad regime.
-
-Some of these are observed facts. Others are vendor fields or model estimates. The product must label that difference before downstream use.
-
-### 3. Output Layer: Decision Augmentation
-
-The dashboard should resolve evidence into states such as:
+Terminal Zero is a local-first quantitative research console. The **authorized product pivot** is from a UOE discretionary cockpit framing to a **GodView certified portfolio OS** (paper accounting + independent certification). It is not a trading bot, not a broker, and not an alpha claim surface.
 
 ```text
-wait
-watch
-accumulation
-confirmation
-buying range
-let winner run
-trim optional
-exit risk
-thesis broken
+PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
+F1C_SHIP = CLOSED_SUBSTRATE
+E0A_OPERABLE = BANKED_SUBSTRATE (plumbing only; NOT decision value / NOT alpha)
+ACTIVE_REPAIR = E0A-R1 (merge-safety tax; close after clean-main smoke)
+ACTIVE_PRODUCT_GATE_AFTER_REPAIR = E0B-DV1
+FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE (stage-only)
+CONJUNCTIVE_ENDGAME_MATURITY ≈ 9/100 (decision value near zero)
+FORBIDDEN = providers, real prices, FS1 batch, PEAD, alpha claims, broker,
+            compatibility dual-authority UI, dirty-root authority auto-canonization
 ```
 
-These are operator prompts, not automatic trades.
-
-## Current Phase
-
-**Phase G8.2: System-Scouted Candidate Card**
-
-Scope:
-
-- one MSFT candidate-card-only research object from the governed `LOCAL_FACTOR_SCOUT` output;
-- no new scout output;
-- no cards for DELL/AMD/LRCX/ALB;
-- no search, ranking, scoring, thesis validation, buying range, alert, broker call, provider ingestion, or dashboard runtime merge.
-
-G8.2 proves the system-scouted intake-to-card path. Existing dashboard MSFT rows remain legacy runtime output, not the G8.2 card.
-
-Baseline history remains active underneath this product rewrite: D-353 / Phase 64 provenance and validation gates are complete, and R64.1 dependency hygiene is closed with `pip check` passing.
-
-## Roadmap
+## Governing sequence
 
 ```text
-G7.1A - Starter Docs / PRD / Product Spec Rewrite
-G7.1B - Data + Infra Gap Assessment for GodView signals
-G7.1C - Codex/Chrome Research Agent SOP
-G7.2  - Unified Opportunity Engine State Machine
-G7.3  - GodView Signal Source Policy
-G7.4  - Supercycle Gem Family Definition, no search
-G7.5  - Market Behavior Signal Family Definitions, no search
-G8    - One Supercycle Gem Candidate Card, no search
-G8.1  - Discovery intake and origin governance
-G8.2  - One system-scouted MSFT candidate card, no validation
-G9    - One Market Behavior Signal Card, no search
-G10   - Dashboard Prototype: watchlist state view
-G11   - Bounded discovery under sealed families
-G12   - Paper-only buying-range / hold-discipline alerts
+truth substrate → demonstrated decision value → replication → prospective economics → live capital
 ```
 
-Immediate next action:
+## What is banked substrate (not product intelligence)
+
+**F1C-SHIP** (lineage `490a234`): permanent dual-fixture certified bundle + product CI. Closed substrate.
+
+**E0A operable:** frozen E0 custody → `HOLD_FOR_EVIDENCE` → paper `NO_POSITION` → cert → current publish → one UI.  
+Proves custody/cert/publish plumbing. Does **not** prove better decisions, portfolio outcomes, or alpha.
+
+Default UI: one current certified decision only. F1C dual-role bundle is evidence-only (never default fallback).
+
+Operator publish path: `scripts/publish_gv_e0a_current.py`.
+
+## Active work — E0A-R1 (repair tax)
+
+Hard-capped merge-safety only. See [gv-e0a-r1-merge-safety-brief.md](docs/phase_brief/gv-e0a-r1-merge-safety-brief.md).
 
 ```text
-approve_g9_one_market_behavior_signal_card_or_g8_3_one_user_seeded_candidate_card_or_dash_card_reader_or_hold
+single authority + proven-provenance custody refs + no dual-authority default
++ clean main + fresh-checkout smoke → STOP → open E0B-DV1
 ```
 
-## Current Infrastructure Readiness
+**Provenance rule:** prove intended origin before tracking a missing authority file; otherwise amend/remove the reference. Never promote accidental dirty-root bytes.
 
-Ready for governance foundations:
+## Current Canon (start here)
 
-- canonical daily price governance;
-- manifests and provenance checks;
-- Candidate Registry;
-- V1/V2 mechanical replay discipline;
-- dashboard smoke discipline;
-- minimal validation lab;
-- paper-alert readiness foundations.
+- [docs/architecture/top_level_roadmap.md](docs/architecture/top_level_roadmap.md) — active architecture canon
+- [docs/phase_brief/gv-e0a-r1-merge-safety-brief.md](docs/phase_brief/gv-e0a-r1-merge-safety-brief.md) — E0A-R1 hard cap
+- [PRD.md](PRD.md) — product requirements (header may lag; roadmap wins on gate status)
+- [docs/architecture/gv_fs0_certification_and_data_authority_contract.md](docs/architecture/gv_fs0_certification_and_data_authority_contract.md) — frozen certification contract
+- [docs/architecture/godview_portfolio_first_operating_model.md](docs/architecture/godview_portfolio_first_operating_model.md) — portfolio-first operating model
+- [docs/architecture/godview_endgame_vision.md](docs/architecture/godview_endgame_vision.md) — endgame vision
+- [docs/context/planner_packet_current.md](docs/context/planner_packet_current.md) — compact planner entry truth
 
-Not ready for full GodView without future provider layers:
+## Historical product framing (not active authority)
 
-- options, IV, and OPRA-style data;
-- options open interest and volume;
-- whale options flow;
-- gamma/dealer estimates;
-- short interest and borrow/stock-loan context;
-- CFTC COT/TFF positioning;
-- SEC 13F/13D/Form 4 ownership intelligence;
-- ETF holdings and flows;
-- dark-pool, ATS, and block activity;
-- microstructure and order-book feeds;
-- news and narrative velocity capture.
+The earlier **Unified Opportunity Engine (UOE)** discretionary cockpit framing is **historical only**.
 
-These gaps are expected. G7.1A documents them; it does not build them.
+Historical continuity links (superseded as active authority — do not auto-canonize from dirty root):
 
-## Development Environment
+- [docs/architecture/unified_opportunity_engine.md](docs/architecture/unified_opportunity_engine.md)
+- [docs/architecture/godview_signal_taxonomy.md](docs/architecture/godview_signal_taxonomy.md)
+- [docs/architecture/dashboard_product_spec.md](docs/architecture/dashboard_product_spec.md) — historical dashboard state model (historical continuity only)
+- [docs/prd.md](docs/prd.md) / [docs/spec.md](docs/spec.md)
+- [PRODUCT_SPEC.md](PRODUCT_SPEC.md)
+- [docs/phase_brief/gv-e0a-operable-brief.md](docs/phase_brief/gv-e0a-operable-brief.md) — E0A implementation brief (banked)
 
-Hard constraints:
+If a conflict appears, **active roadmap + E0A-R1 brief** win until E0B opens.
 
-- Python 3.12+ through `.venv`;
-- Streamlit UI;
-- DuckDB SQL engine;
-- Pandas/Polars dataframes;
-- Parquet storage;
-- Plotly and Streamlit native components;
-- pytest and `streamlit.testing` where applicable.
+## Sequence after E0A-R1
 
-Common commands:
-
-```powershell
-.\.venv\Scripts\python -m pytest -q
-.\.venv\Scripts\python -m pip check
-.\.venv\Scripts\python scripts\build_context_packet.py
-.\.venv\Scripts\python scripts\build_context_packet.py --validate
-.\.venv\Scripts\streamlit run app.py
+```text
+E0A-R1          ← ACTIVE REPAIR (merge-safety)
+E0B-DV1         one complete decision-value slice (causal improvement required)
+E0B-DV2         replication (heterogeneous cases, null value, adversarial, multi-operator)
+E0B-SHIP        bounded decision-value release
+then only       providers / prospective economics / portfolio expansion eligibility
 ```
 
-## Current Truth Surfaces
+## Run (local)
 
-Start from:
+```text
+.venv\Scripts\python -m pytest
+.venv\Scripts\python launch.py
+# or
+.venv\Scripts\streamlit run app.py
+```
 
-- [docs/context/planner_packet_current.md](docs/context/planner_packet_current.md)
-- [docs/context/impact_packet_current.md](docs/context/impact_packet_current.md)
-- [docs/context/bridge_contract_current.md](docs/context/bridge_contract_current.md)
-- [docs/context/done_checklist_current.md](docs/context/done_checklist_current.md)
-- [docs/context/multi_stream_contract_current.md](docs/context/multi_stream_contract_current.md)
-- [docs/context/post_phase_alignment_current.md](docs/context/post_phase_alignment_current.md)
-- [docs/context/observability_pack_current.md](docs/context/observability_pack_current.md)
-
-These surfaces are advisory. They do not authorize trading, alerts, broker automation, candidate generation, search, replay, proxy runs, promotion packets, or scope widening by themselves.
-
-## Non-Negotiable Boundaries
-
-- Terminal Zero is not a trading bot.
-- G8.2 candidate cards are not scores, ranks, alerts, recommendations, buying ranges, or broker actions.
-- G8 PEAD candidate generation remains held.
-- `PEAD_DAILY_V0` remains a valid tactical family, not the product center.
-- GodView signals must carry source quality, freshness, latency, confidence, observed-vs-estimated status, allowed use, forbidden use, and manifest identity before downstream use.
-- No signal becomes alpha evidence because a research agent captured a source page.
-- No credentials, live broker paths, or canonical market-data writes may be handled by Codex/Chrome research workflows.
-
-## Last Updated
-
-2026-05-10 - Phase 65 G8.2 system-scouted candidate-card proof.
+Use Python 3.12+ and the project `.venv`. No provider credentials are required or authorized for E0A.
