@@ -17,6 +17,7 @@ Frozen endpoint: observed within-case difference only; no causal/general claim.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -55,6 +56,7 @@ DEFAULT_CASE_DIR = ROOT / "data" / "gv_e0b" / "dv1_g08"
 DEFAULT_RESULT_JSON = DEFAULT_CASE_DIR / "result.json"
 DEFAULT_DECISION_PACKET_MD = DEFAULT_CASE_DIR / "decision_packet.md"
 DEFAULT_BASELINE_PATH = DEFAULT_CASE_DIR / "captures" / "baseline_seal.json"
+DEFAULT_PACKET_PATH = DEFAULT_CASE_DIR / "captures" / "packet.json"
 DEFAULT_POST_PATH = DEFAULT_CASE_DIR / "captures" / "post_packet_seal.json"
 DEFAULT_RUBRIC_PATH = DEFAULT_CASE_DIR / "captures" / "rubric_scores.json"
 
@@ -153,9 +155,28 @@ def _require_sha256(value: Any, code: str) -> str:
     return value
 
 
+def _utc_now_canonical() -> str:
+    """Capture actual UTC wall-clock time in canonical microsecond form."""
+
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+
+def _require_generated_at(value: Any) -> str:
+    if not isinstance(value, str) or not CANONICAL_TIMESTAMP_RE.fullmatch(value):
+        raise GvE0bDv1Error("E0B_PACKET_GENERATED_AT_INVALID")
+    return value
+
+
 def _without_keys(record: Mapping[str, Any], *keys: str) -> dict[str, Any]:
     banned = set(keys)
     return {k: _plain(v) for k, v in record.items() if k not in banned}
+
+
+def _persist_sealed_json(path: Path, record: Mapping[str, Any]) -> None:
+    """Atomic write of a sealed record as canonical JSON bytes."""
+
+    payload = canonical_document_bytes(_plain(record))
+    _atomic_write_bytes(path, payload)
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:
@@ -280,8 +301,17 @@ def _find_indispensable_contradictions(
     return contradictions
 
 
-def build_godview_packet(*, bundle: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
-    """Deterministic G08 packet: BLOCKED on contradictory indispensable evidence."""
+def build_godview_packet(
+    *,
+    bundle: Mapping[str, Any] | None = None,
+    generated_at: str | None = None,
+) -> Mapping[str, Any]:
+    """G08 packet: BLOCKED on contradictory indispensable evidence.
+
+    ``generated_at`` must be a real capture timestamp after the baseline seal.
+    When omitted, the actual UTC capture time is recorded (never a hardcoded
+    calendar day). Tests may inject a fixed timestamp for determinism only.
+    """
 
     b_plain = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(b_plain)
@@ -292,11 +322,16 @@ def build_godview_packet(*, bundle: Mapping[str, Any] | None = None) -> Mapping[
     if not contradictions:
         raise GvE0bDv1Error("E0B_G08_EXPECTS_CONTRADICTION")
 
+    ts = (
+        _require_generated_at(generated_at)
+        if generated_at is not None
+        else _utc_now_canonical()
+    )
     body = {
         "case_id": CASE_ID,
         "arm": "GODVIEW_PACKET",
         "bundle_hash": b_plain["bundle_hash"],
-        "generated_at": "2026-07-19T12:30:00.000000Z",
+        "generated_at": ts,
         "run_state": RUN_STATE_BLOCKED,
         "block_reason": BLOCK_REASON,
         "acceptance_case": "G08",
@@ -430,13 +465,13 @@ def load_baseline_seal(
     *,
     expected_bundle_hash: str,
 ) -> Mapping[str, Any]:
+    """Load a *pre-sealed* baseline. Unsealed authoring payloads are rejected."""
+
     raw = _load_json_object(path)
-    # Accept either sealed or unsealed authoring payload.
-    if "baseline_hash" in raw:
-        verify_baseline_seal(raw)
-        sealed = _freeze(_plain(raw))
-    else:
-        sealed = seal_baseline_record(raw)
+    if "baseline_hash" not in raw:
+        raise GvE0bDv1Error("E0B_BASELINE_UNSEALED")
+    verify_baseline_seal(raw)
+    sealed = _freeze(_plain(raw))
     if sealed["bundle_hash"] != expected_bundle_hash:
         raise GvE0bDv1Error("E0B_BASELINE_BUNDLE_MISMATCH")
     return sealed
@@ -508,11 +543,13 @@ def load_post_packet_seal(
     packet: Mapping[str, Any],
     baseline: Mapping[str, Any],
 ) -> Mapping[str, Any]:
+    """Load a *pre-sealed* post decision. Unsealed authoring payloads are rejected."""
+
     raw = _load_json_object(path)
-    if "post_packet_hash" in raw:
-        verify_post_packet_seal(raw, packet=packet, baseline=baseline)
-        return _freeze(_plain(raw))
-    return seal_post_packet_record(raw, packet=packet, baseline=baseline)
+    if "post_packet_hash" not in raw:
+        raise GvE0bDv1Error("E0B_POST_UNSEALED")
+    verify_post_packet_seal(raw, packet=packet, baseline=baseline)
+    return _freeze(_plain(raw))
 
 
 def _validate_rubric_arm_scores(scores: Any, code: str) -> dict[str, dict[str, Any]]:
@@ -613,11 +650,23 @@ def load_rubric_scores(
     post: Mapping[str, Any],
     packet: Mapping[str, Any],
 ) -> Mapping[str, Any]:
+    """Load *pre-sealed* rubric scores. Unsealed authoring payloads are rejected."""
+
     raw = _load_json_object(path)
-    if "rubric_hash" in raw:
-        verify_rubric_seal(raw, baseline=baseline, post=post, packet=packet)
-        return _freeze(_plain(raw))
-    return seal_rubric_record(raw, baseline=baseline, post=post, packet=packet)
+    if "rubric_hash" not in raw:
+        raise GvE0bDv1Error("E0B_RUBRIC_UNSEALED")
+    verify_rubric_seal(raw, baseline=baseline, post=post, packet=packet)
+    return _freeze(_plain(raw))
+
+
+def load_packet_seal(path: Path) -> Mapping[str, Any]:
+    """Load a *pre-sealed* GodView packet. Unsealed payloads are rejected."""
+
+    raw = _load_json_object(path)
+    if "packet_hash" not in raw:
+        raise GvE0bDv1Error("E0B_PACKET_UNSEALED")
+    verify_packet_seal(raw)
+    return _freeze(_plain(raw))
 
 
 def score_totals(arm_scores: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
@@ -652,17 +701,23 @@ def build_comparison(
     rubric_path: Path,
     bundle: Mapping[str, Any] | None = None,
     packet: Mapping[str, Any] | None = None,
+    packet_path: Path | None = None,
 ) -> Mapping[str, Any]:
-    """Assemble comparison from external seals; never invent outcomes."""
+    """Assemble comparison from *pre-sealed* external records; never invent outcomes.
+
+    Packet must already exist (in-memory or on disk). Comparison does not generate
+    a packet and does not seal authoring payloads.
+    """
 
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
-    pkt = (
-        _plain(packet)
-        if packet is not None
-        else _plain(build_godview_packet(bundle=bndl))
-    )
-    verify_packet_seal(pkt)
+    if packet is not None:
+        pkt = _plain(packet)
+        verify_packet_seal(pkt)
+    elif packet_path is not None:
+        pkt = _plain(load_packet_seal(packet_path))
+    else:
+        raise GvE0bDv1Error("E0B_PACKET_REQUIRED")
     if pkt["bundle_hash"] != bndl["bundle_hash"]:
         raise GvE0bDv1Error("E0B_PACKET_BUNDLE_MISMATCH")
 
@@ -797,6 +852,183 @@ def build_result_document(comparison: Mapping[str, Any]) -> Mapping[str, Any]:
     out = dict(result_body)
     out["result_hash"] = result_hash
     return _freeze(out)
+
+
+def verify_comparison_document(comparison: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Recompute comparison seal and eligibility; reject mutated stage fields."""
+
+    plain = _plain(comparison)
+    claimed = _require_sha256(
+        plain.get("comparison_hash"), "E0B_COMPARISON_HASH_INVALID"
+    )
+    body = _without_keys(plain, "comparison_hash")
+    if domain_hash(DOMAIN_COMPARISON, body) != claimed:
+        raise GvE0bDv1Error("E0B_COMPARISON_SEAL_MISMATCH")
+    stage = body.get("stage_claim")
+    if not isinstance(stage, Mapping):
+        raise GvE0bDv1Error("E0B_STAGE_CLAIM_REQUIRED")
+    baseline = body.get("baseline")
+    post = body.get("post_packet")
+    rubric = body.get("rubric")
+    if not all(isinstance(x, Mapping) for x in (baseline, post, rubric)):
+        raise GvE0bDv1Error("E0B_COMPARISON_ARMS_REQUIRED")
+    eligible = is_observed_comparison_eligible(baseline, post, rubric)
+    expected_count = 1 if eligible else 0
+    if stage.get("e0b_close_eligible") is not eligible:
+        raise GvE0bDv1Error("E0B_STAGE_ELIGIBILITY_MISMATCH")
+    try:
+        observed = int(stage.get("observed_comparison_count"))
+    except (TypeError, ValueError) as exc:
+        raise GvE0bDv1Error("E0B_OBSERVED_COUNT_INVALID") from exc
+    if observed != expected_count:
+        raise GvE0bDv1Error("E0B_OBSERVED_COUNT_MISMATCH")
+    if stage.get("shipped_product_score") != 39 or stage.get("score_frozen") is not True:
+        raise GvE0bDv1Error("E0B_SCORE_FREEZE_VIOLATION")
+    if stage.get("functional_stage") != "CERTIFIED_SINGLE_DECISION_OPERABLE":
+        raise GvE0bDv1Error("E0B_STAGE_FREEZE_VIOLATION")
+    if stage.get("alpha_claim") is not False:
+        raise GvE0bDv1Error("E0B_ALPHA_CLAIM_FORBIDDEN")
+    return _freeze(plain)
+
+
+def verify_result_document(result: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Recompute result + comparison seals before any display or count use."""
+
+    plain = _plain(result)
+    claimed = _require_sha256(plain.get("result_hash"), "E0B_RESULT_HASH_INVALID")
+    body = _without_keys(plain, "result_hash")
+    if domain_hash(DOMAIN_RESULT, body) != claimed:
+        raise GvE0bDv1Error("E0B_RESULT_SEAL_MISMATCH")
+    comparison = body.get("comparison")
+    if not isinstance(comparison, Mapping):
+        raise GvE0bDv1Error("E0B_RESULT_COMPARISON_MISSING")
+    verify_comparison_document(comparison)
+    return _freeze(plain)
+
+
+def load_verified_result(path: Path) -> Mapping[str, Any]:
+    raw = _load_json_object(path)
+    return verify_result_document(raw)
+
+
+def stage_capture_baseline(
+    record: Mapping[str, Any],
+    *,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    bundle: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    """Stage 1: seal and persist a real baseline *before* packet generation."""
+
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    sealed = seal_baseline_record(record)
+    if sealed["bundle_hash"] != bndl["bundle_hash"]:
+        raise GvE0bDv1Error("E0B_BASELINE_BUNDLE_MISMATCH")
+    _persist_sealed_json(baseline_path, sealed)
+    return sealed
+
+
+def stage_generate_packet(
+    *,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    packet_path: Path = DEFAULT_PACKET_PATH,
+    bundle: Mapping[str, Any] | None = None,
+    generated_at: str | None = None,
+) -> Mapping[str, Any]:
+    """Stage 2: generate packet only after a sealed baseline exists on disk."""
+
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    baseline = load_baseline_seal(
+        baseline_path, expected_bundle_hash=bndl["bundle_hash"]
+    )
+    ts = (
+        _require_generated_at(generated_at)
+        if generated_at is not None
+        else _utc_now_canonical()
+    )
+    if not (baseline["sealed_at"] < ts):
+        raise GvE0bDv1Error("E0B_PACKET_MUST_FOLLOW_BASELINE")
+    packet = build_godview_packet(bundle=bndl, generated_at=ts)
+    _persist_sealed_json(packet_path, packet)
+    return packet
+
+
+def stage_capture_post(
+    record: Mapping[str, Any],
+    *,
+    post_path: Path = DEFAULT_POST_PATH,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    packet_path: Path = DEFAULT_PACKET_PATH,
+    bundle: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    """Stage 3: seal and persist post decision against sealed baseline + packet."""
+
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    baseline = load_baseline_seal(
+        baseline_path, expected_bundle_hash=bndl["bundle_hash"]
+    )
+    packet = load_packet_seal(packet_path)
+    sealed = seal_post_packet_record(record, packet=packet, baseline=baseline)
+    _persist_sealed_json(post_path, sealed)
+    return sealed
+
+
+def stage_capture_rubric(
+    record: Mapping[str, Any],
+    *,
+    rubric_path: Path = DEFAULT_RUBRIC_PATH,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    post_path: Path = DEFAULT_POST_PATH,
+    packet_path: Path = DEFAULT_PACKET_PATH,
+    bundle: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    """Stage 4: seal and persist independent reviewer rubric."""
+
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    baseline = load_baseline_seal(
+        baseline_path, expected_bundle_hash=bndl["bundle_hash"]
+    )
+    packet = load_packet_seal(packet_path)
+    post = load_post_packet_seal(post_path, packet=packet, baseline=baseline)
+    sealed = seal_rubric_record(
+        record, baseline=baseline, post=post, packet=packet
+    )
+    _persist_sealed_json(rubric_path, sealed)
+    return sealed
+
+
+def stage_compare(
+    *,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    post_path: Path = DEFAULT_POST_PATH,
+    rubric_path: Path = DEFAULT_RUBRIC_PATH,
+    packet_path: Path = DEFAULT_PACKET_PATH,
+    result_json_path: Path = DEFAULT_RESULT_JSON,
+    decision_packet_path: Path = DEFAULT_DECISION_PACKET_MD,
+    bundle: Mapping[str, Any] | None = None,
+    publish: bool = False,
+    current_target: Path = DEFAULT_CURRENT_DECISION_TARGET,
+    current_lock: Path = DEFAULT_CURRENT_DECISION_LOCK,
+    verifier_runner: VerifierRunner = run_isolated_verifier,
+) -> Mapping[str, Any]:
+    """Stage 5: independent comparison over pre-sealed captures only."""
+
+    return run_e0b_dv1_case(
+        baseline_path=baseline_path,
+        post_path=post_path,
+        rubric_path=rubric_path,
+        packet_path=packet_path,
+        result_json_path=result_json_path,
+        decision_packet_path=decision_packet_path,
+        bundle=bundle,
+        publish=publish,
+        current_target=current_target,
+        current_lock=current_lock,
+        verifier_runner=verifier_runner,
+    )
 
 
 def build_decision_packet_markdown(comparison: Mapping[str, Any]) -> str:
@@ -946,9 +1178,21 @@ def publish_e0b_current_decision(
     lock_path: Path = DEFAULT_CURRENT_DECISION_LOCK,
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> CurrentDecisionPublicationResult:
-    """Certify and publish comparison-bound E0B decision (SYNTHETIC_DEV_RUN case)."""
+    """Publish comparison-bound current decision only when close-eligible.
 
-    certified = build_e0b_certified_result(comparison, verifier_runner)
+    Fixture certification may still call ``build_e0b_certified_result`` in tests.
+    Current portfolio authority publication requires ``e0b_close_eligible``.
+    """
+
+    verified = verify_comparison_document(comparison)
+    if verified["stage_claim"]["e0b_close_eligible"] is not True:
+        raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE")
+    certified = build_e0b_certified_result(verified, verifier_runner)
+    # Bind cert decision to comparison hash before publication.
+    decision = certified.get("decision") or {}
+    expected_ref = e0b_rationale_ref(verified["comparison_hash"])
+    if decision.get("rationale_ref") != expected_ref:
+        raise GvE0bDv1Error("E0B_CERT_RATIONALE_BINDING_INVALID")
     return publish_current_decision(certified, target=target, lock_path=lock_path)
 
 
@@ -957,6 +1201,9 @@ def run_e0b_dv1_case(
     baseline_path: Path,
     post_path: Path,
     rubric_path: Path,
+    packet_path: Path | None = None,
+    packet: Mapping[str, Any] | None = None,
+    bundle: Mapping[str, Any] | None = None,
     result_json_path: Path = DEFAULT_RESULT_JSON,
     decision_packet_path: Path = DEFAULT_DECISION_PACKET_MD,
     publish: bool = False,
@@ -964,18 +1211,23 @@ def run_e0b_dv1_case(
     current_lock: Path = DEFAULT_CURRENT_DECISION_LOCK,
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> Mapping[str, Any]:
-    """One-case path: seals → comparison → artifacts → optional cert/publish."""
+    """One-case path over pre-sealed captures → comparison → artifacts → optional publish."""
 
     comparison = build_comparison(
         baseline_path=baseline_path,
         post_path=post_path,
         rubric_path=rubric_path,
+        packet_path=packet_path,
+        packet=packet,
+        bundle=bundle,
     )
     result = write_canonical_artifacts(
         comparison,
         result_json_path=result_json_path,
         decision_packet_path=decision_packet_path,
     )
+    # Always re-verify written result before reporting counts.
+    verified_result = load_verified_result(result_json_path)
     published = None
     if publish:
         published = publish_e0b_current_decision(
@@ -984,10 +1236,11 @@ def run_e0b_dv1_case(
             lock_path=current_lock,
             verifier_runner=verifier_runner,
         )
+    stage = verified_result["comparison"]["stage_claim"]
     return _freeze(
         {
             "comparison": comparison,
-            "result": result,
+            "result": verified_result,
             "published": None
             if published is None
             else {
@@ -995,10 +1248,8 @@ def run_e0b_dv1_case(
                 "target_path": published.target_path,
                 "certified_decision_result_hash": published.certified_decision_result_hash,
             },
-            "observed_comparison_count": comparison["stage_claim"][
-                "observed_comparison_count"
-            ],
-            "e0b_close_eligible": comparison["stage_claim"]["e0b_close_eligible"],
+            "observed_comparison_count": stage["observed_comparison_count"],
+            "e0b_close_eligible": stage["e0b_close_eligible"],
             "run_class": RUN_CLASS_SYNTHETIC,
         }
     )
@@ -1079,16 +1330,20 @@ def render_e0b_dv1_comparison(
     comparison: Mapping[str, Any] | None = None,
     result_json_path: Path | None = None,
 ) -> Mapping[str, Any]:
-    """Injected-renderer presentation for one visible comparison."""
+    """Injected-renderer presentation for one visible comparison.
+
+    Always recomputes comparison/result seals before display. Never trusts
+    raw observed-count fields from disk.
+    """
 
     if comparison is None:
         path = result_json_path or DEFAULT_RESULT_JSON
         if not path.is_file():
             raise GvE0bDv1Error("E0B_RESULT_MISSING")
-        result = _load_json_object(path)
-        comparison = result.get("comparison")
-        if not isinstance(comparison, Mapping):
-            raise GvE0bDv1Error("E0B_RESULT_COMPARISON_MISSING")
+        result = load_verified_result(path)
+        comparison = result["comparison"]
+    else:
+        comparison = verify_comparison_document(comparison)
     presentation = build_comparison_presentation(comparison)
     renderer.subheader(presentation["title"])
     renderer.table(list(presentation["rows"]))
@@ -1105,18 +1360,19 @@ def render_e0b_dv1_comparison(
 def observed_comparison_count_from_disk(
     result_json_path: Path = DEFAULT_RESULT_JSON,
 ) -> int:
-    """Report 0 unless a real-human close-eligible result is on disk."""
+    """Report 0 unless a *verified* real-human close-eligible result is on disk.
+
+    Recomputes result hash, comparison hash, and eligibility. Mutated counts
+    without valid seals cannot inflate the displayed observed-comparison count.
+    """
 
     if not result_json_path.is_file():
         return 0
     try:
-        result = _load_json_object(result_json_path)
-        comparison = result.get("comparison")
-        if not isinstance(comparison, Mapping):
-            return 0
-        stage = comparison.get("stage_claim") or {}
+        result = load_verified_result(result_json_path)
+        stage = result["comparison"]["stage_claim"]
         if stage.get("e0b_close_eligible") is True:
-            return int(stage.get("observed_comparison_count") or 0)
+            return int(stage["observed_comparison_count"])
         return 0
     except GvE0bDv1Error:
         return 0
@@ -1130,6 +1386,7 @@ __all__ = [
     "CASE_ID",
     "DEFAULT_BASELINE_PATH",
     "DEFAULT_DECISION_PACKET_MD",
+    "DEFAULT_PACKET_PATH",
     "DEFAULT_POST_PATH",
     "DEFAULT_RESULT_JSON",
     "DEFAULT_RUBRIC_PATH",
@@ -1149,8 +1406,10 @@ __all__ = [
     "e0b_rationale_ref",
     "is_observed_comparison_eligible",
     "load_baseline_seal",
+    "load_packet_seal",
     "load_post_packet_seal",
     "load_rubric_scores",
+    "load_verified_result",
     "observed_comparison_count_from_disk",
     "publish_e0b_current_decision",
     "render_e0b_dv1_comparison",
@@ -1159,6 +1418,13 @@ __all__ = [
     "seal_post_packet_record",
     "seal_rubric_record",
     "sealed_adversarial_bundle",
+    "stage_capture_baseline",
+    "stage_capture_post",
+    "stage_capture_rubric",
+    "stage_compare",
+    "stage_generate_packet",
     "verify_bundle_seal",
+    "verify_comparison_document",
+    "verify_result_document",
     "write_canonical_artifacts",
 ]

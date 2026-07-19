@@ -20,19 +20,20 @@ ACTIVE_PRODUCT_SLICE = E0B-DV1 Contradiction Case repair
 Unofficial decision-value / conjunctive maturity percentages are **retired**.
 Report **observed-comparison count** only.
 
-## Vertical (one case — no capture platform)
+## Vertical (one case — persisted stages, no compatibility shim)
 
 ```text
 synthetic G08 sealed bundle (evidence may be synthetic)
-→ real human baseline seal (same operator later)
-→ generate G08 packet BLOCKED:CONTRADICTORY_INDISPENSABLE_EVIDENCE
+→ real human baseline seal (persisted; same operator later)
+→ packet generated afterward with actual captured timestamp
 → real human post-packet seal (same operator)
 → independent reviewer rubric (different identity)
+→ comparison over pre-sealed records only (reject unsealed)
 → recompute every hash
 → atomic result.json + decision_packet.md
-→ new E0B DecisionEnvelope rationale_ref = E0B:CMP:<comparison_hash>
-→ certify / publish (run_class = SYNTHETIC_DEV_RUN)
-→ Streamlit surface + AppTest
+→ E0B DecisionEnvelope rationale_ref = E0B:CMP:<comparison_hash>
+→ certify (test-only for fixtures) / publish only if e0b_close_eligible
+→ Streamlit surface recomputes seals before display + AppTest
 → minimal truth refresh
 ```
 

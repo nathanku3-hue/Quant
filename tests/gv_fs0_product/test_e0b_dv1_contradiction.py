@@ -29,6 +29,9 @@ from core.gv_e0b_dv1_contradiction import (
     build_godview_packet,
     e0b_rationale_ref,
     is_observed_comparison_eligible,
+    load_baseline_seal,
+    load_post_packet_seal,
+    load_rubric_scores,
     observed_comparison_count_from_disk,
     publish_e0b_current_decision,
     render_e0b_dv1_comparison,
@@ -37,7 +40,10 @@ from core.gv_e0b_dv1_contradiction import (
     seal_post_packet_record,
     seal_rubric_record,
     sealed_adversarial_bundle,
+    stage_capture_baseline,
+    stage_generate_packet,
     verify_bundle_seal,
+    verify_result_document,
     write_canonical_artifacts,
 )
 from core.gv_fs0_current_decision import parse_current_decision_bytes
@@ -184,6 +190,13 @@ def _write_json(path: Path, payload: Any) -> Path:
     return path
 
 
+# Deterministic stage timestamps for engine tests only (not production capture).
+_TEST_BASELINE_AT = "2026-07-19T12:10:00.000000Z"
+_TEST_PACKET_AT = "2026-07-19T12:30:00.000000Z"
+_TEST_POST_AT = "2026-07-19T12:45:00.000000Z"
+_TEST_RUBRIC_AT = "2026-07-19T13:00:00.000000Z"
+
+
 def _fixture_paths(
     tmp_path: Path,
     *,
@@ -192,9 +205,14 @@ def _fixture_paths(
     post_action: str = "HOLD_FOR_EVIDENCE",
     baseline_action: str = "ADVANCE_TO_FULL_RESEARCH",
     real_human: bool = False,
-) -> tuple[Path, Path, Path, Any, Any]:
+) -> tuple[Path, Path, Path, Path, Any, Any]:
+    """Return sealed baseline/packet/post/rubric paths + bundle + packet.
+
+    Packet is generated *after* baseline with an explicit capture timestamp
+    (tests inject fixed times for determinism; production uses wall-clock).
+    """
+
     bundle = sealed_adversarial_bundle()
-    packet = build_godview_packet(bundle=bundle)
     op = "OP_HUMAN_1" if real_human else "OP_FIXTURE_1"
     rev = "REV_HUMAN_1" if real_human else "REV_FIXTURE_1"
     op_auth = AUTH_REAL_OPERATOR if real_human else AUTH_FIXTURE
@@ -204,14 +222,18 @@ def _fixture_paths(
             operator_id=op,
             authorship=op_auth,
             action=baseline_action,
+            sealed_at=_TEST_BASELINE_AT,
             bundle_hash=bundle["bundle_hash"],
         )
     )
+    # Stage order: baseline sealed first, then packet with actual capture time.
+    packet = build_godview_packet(bundle=bundle, generated_at=_TEST_PACKET_AT)
     post = seal_post_packet_record(
         _post_raw(
             operator_id=op,
             authorship=op_auth,
             action=post_action,
+            sealed_at=_TEST_POST_AT,
             bundle_hash=bundle["bundle_hash"],
             packet_hash=packet["packet_hash"],
             baseline_hash=baseline["baseline_hash"],
@@ -225,6 +247,7 @@ def _fixture_paths(
             authorship=rev_auth,
             baseline_fill=baseline_fill,
             post_fill=post_fill,
+            scored_at=_TEST_RUBRIC_AT,
             bundle_hash=bundle["bundle_hash"],
             baseline_hash=baseline["baseline_hash"],
             packet_hash=packet["packet_hash"],
@@ -235,9 +258,10 @@ def _fixture_paths(
         packet=packet,
     )
     b_path = _write_json(tmp_path / "baseline_seal.json", dict(baseline))
+    pkt_path = _write_json(tmp_path / "packet.json", dict(packet))
     p_path = _write_json(tmp_path / "post_packet_seal.json", dict(post))
     r_path = _write_json(tmp_path / "rubric_scores.json", dict(rubric))
-    return b_path, p_path, r_path, bundle, packet
+    return b_path, pkt_path, p_path, r_path, bundle, packet
 
 
 def test_sealed_bundle_has_indispensable_contradiction() -> None:
@@ -262,14 +286,28 @@ def test_bundle_tamper_under_claimed_hash_rejected() -> None:
 
 
 def test_godview_packet_blocks_g08_without_average() -> None:
-    packet = build_godview_packet()
+    packet = build_godview_packet(generated_at=_TEST_PACKET_AT)
     assert packet["run_state"] == "BLOCKED"
     assert packet["block_reason"] == BLOCK_REASON
     assert packet["run_class"] == RUN_CLASS_SYNTHETIC
     assert packet["engine_may_not_average"] is True
+    assert packet["generated_at"] == _TEST_PACKET_AT
     values = packet["contradictions"][0]["values"]
     assert set(values) == {2, 8}
     assert 5 not in values
+
+
+def test_packet_generated_at_not_hardcoded_calendar_day() -> None:
+    """Production default must capture wall-clock time, not a fixed day."""
+
+    import core.gv_e0b_dv1_contradiction as mod
+    import inspect
+
+    source = inspect.getsource(mod.build_godview_packet)
+    assert "2026-07-19T12:30:00.000000Z" not in source
+    packet = build_godview_packet()
+    assert packet["generated_at"].endswith("Z")
+    assert len(packet["generated_at"]) == len("2026-07-19T12:30:00.000000Z")
 
 
 def test_hardcoded_baseline_apis_removed() -> None:
@@ -286,12 +324,17 @@ def test_hardcoded_baseline_apis_removed() -> None:
 
 def test_comparison_positive_zero_negative_deltas(tmp_path: Path) -> None:
     for baseline_fill, post_fill in ((0, 2), (1, 1), (2, 0)):
-        b, p, r, _bundle, _packet = _fixture_paths(
+        b, pkt, p, r, _bundle, packet = _fixture_paths(
             tmp_path / f"d{baseline_fill}{post_fill}",
             baseline_fill=baseline_fill,
             post_fill=post_fill,
         )
-        comparison = build_comparison(baseline_path=b, post_path=p, rubric_path=r)
+        comparison = build_comparison(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+        )
         expected = (post_fill - baseline_fill) * len(RUBRIC_ITEMS)
         delta = comparison["delta"]["total_score_difference"]
         assert int(delta["value_string"]) == expected
@@ -301,11 +344,12 @@ def test_comparison_positive_zero_negative_deltas(tmp_path: Path) -> None:
         assert comparison["stage_claim"]["observed_comparison_count"] == 0
         assert comparison["stage_claim"]["e0b_close_eligible"] is False
         assert comparison["stage_claim"]["causal_superiority_claim"] is False
+        assert comparison["godview_packet"]["generated_at"] == packet["generated_at"]
 
 
 def test_baseline_after_packet_rejected(tmp_path: Path) -> None:
     bundle = sealed_adversarial_bundle()
-    packet = build_godview_packet(bundle=bundle)
+    packet = build_godview_packet(bundle=bundle, generated_at=_TEST_PACKET_AT)
     baseline = seal_baseline_record(
         _baseline_raw(
             sealed_at="2026-07-19T12:40:00.000000Z",  # after packet 12:30
@@ -349,7 +393,7 @@ def test_outside_research_and_unequal_budget_rejected() -> None:
 
 def test_reviewer_must_differ_from_operator(tmp_path: Path) -> None:
     bundle = sealed_adversarial_bundle()
-    packet = build_godview_packet(bundle=bundle)
+    packet = build_godview_packet(bundle=bundle, generated_at=_TEST_PACKET_AT)
     baseline = seal_baseline_record(
         _baseline_raw(operator_id="SAME_PERSON", bundle_hash=bundle["bundle_hash"])
     )
@@ -380,7 +424,7 @@ def test_reviewer_must_differ_from_operator(tmp_path: Path) -> None:
 
 def test_rubric_reason_required() -> None:
     bundle = sealed_adversarial_bundle()
-    packet = build_godview_packet(bundle=bundle)
+    packet = build_godview_packet(bundle=bundle, generated_at=_TEST_PACKET_AT)
     baseline = seal_baseline_record(
         _baseline_raw(bundle_hash=bundle["bundle_hash"])
     )
@@ -405,8 +449,10 @@ def test_rubric_reason_required() -> None:
 
 
 def test_atomic_result_and_decision_packet(tmp_path: Path) -> None:
-    b, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
-    comparison = build_comparison(baseline_path=b, post_path=p, rubric_path=r)
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    comparison = build_comparison(
+        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+    )
     result_path = tmp_path / "result.json"
     packet_path = tmp_path / "decision_packet.md"
     result = write_canonical_artifacts(
@@ -421,11 +467,15 @@ def test_atomic_result_and_decision_packet(tmp_path: Path) -> None:
     loaded = json.loads(result_path.read_text(encoding="utf-8"))
     assert loaded["run_class"] == RUN_CLASS_SYNTHETIC
     assert loaded["comparison"]["comparison_hash"] == comparison["comparison_hash"]
+    verify_result_document(loaded)
 
 
 def test_e0b_cert_binds_comparison_hash(tmp_path: Path) -> None:
-    b, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
-    comparison = build_comparison(baseline_path=b, post_path=p, rubric_path=r)
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    comparison = build_comparison(
+        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+    )
+    # Fixture cert remains test-only; publication is separately gated.
     certified = build_e0b_certified_result(comparison)
     decision = certified["decision"]
     assert decision["decision_id"] == E0B_DECISION_ID
@@ -435,9 +485,24 @@ def test_e0b_cert_binds_comparison_hash(tmp_path: Path) -> None:
     assert certified["certification"]["certification_status"] == "CERTIFIED"
 
 
-def test_publish_comparison_bound_current(tmp_path: Path) -> None:
-    b, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
-    comparison = build_comparison(baseline_path=b, post_path=p, rubric_path=r)
+def test_fixture_publish_rejected_from_current_authority(tmp_path: Path) -> None:
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    comparison = build_comparison(
+        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+    )
+    target = tmp_path / "current.json"
+    lock = tmp_path / "current.lock"
+    with pytest.raises(GvE0bDv1Error, match="E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE"):
+        publish_e0b_current_decision(comparison, target=target, lock_path=lock)
+    assert not target.is_file()
+
+
+def test_publish_close_eligible_current(tmp_path: Path) -> None:
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps", real_human=True)
+    comparison = build_comparison(
+        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+    )
+    assert comparison["stage_claim"]["e0b_close_eligible"] is True
     target = tmp_path / "current.json"
     lock = tmp_path / "current.lock"
     published = publish_e0b_current_decision(
@@ -452,11 +517,12 @@ def test_publish_comparison_bound_current(tmp_path: Path) -> None:
 
 
 def test_fixture_run_not_observed_close(tmp_path: Path) -> None:
-    b, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
     out = run_e0b_dv1_case(
         baseline_path=b,
         post_path=p,
         rubric_path=r,
+        packet_path=pkt,
         result_json_path=tmp_path / "result.json",
         decision_packet_path=tmp_path / "decision_packet.md",
         publish=False,
@@ -468,8 +534,10 @@ def test_fixture_run_not_observed_close(tmp_path: Path) -> None:
 
 
 def test_real_human_marks_observed_eligible(tmp_path: Path) -> None:
-    b, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps", real_human=True)
-    comparison = build_comparison(baseline_path=b, post_path=p, rubric_path=r)
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps", real_human=True)
+    comparison = build_comparison(
+        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+    )
     assert comparison["stage_claim"]["e0b_close_eligible"] is True
     assert comparison["stage_claim"]["observed_comparison_count"] == 1
     assert is_observed_comparison_eligible(
@@ -480,8 +548,10 @@ def test_real_human_marks_observed_eligible(tmp_path: Path) -> None:
 
 
 def test_presentation_and_render(tmp_path: Path) -> None:
-    b, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
-    comparison = build_comparison(baseline_path=b, post_path=p, rubric_path=r)
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    comparison = build_comparison(
+        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+    )
     presentation = build_comparison_presentation(comparison)
     rows = {row["label"]: row["value"] for row in presentation["rows"]}
     assert rows["BlockReason"] == BLOCK_REASON
@@ -496,7 +566,7 @@ def test_presentation_and_render(tmp_path: Path) -> None:
 
 def test_post_operator_must_match_baseline() -> None:
     bundle = sealed_adversarial_bundle()
-    packet = build_godview_packet(bundle=bundle)
+    packet = build_godview_packet(bundle=bundle, generated_at=_TEST_PACKET_AT)
     baseline = seal_baseline_record(
         _baseline_raw(operator_id="OP_A", bundle_hash=bundle["bundle_hash"])
     )
@@ -510,4 +580,87 @@ def test_post_operator_must_match_baseline() -> None:
             ),
             packet=packet,
             baseline=baseline,
+        )
+
+
+def test_unsealed_loads_rejected(tmp_path: Path) -> None:
+    bundle = sealed_adversarial_bundle()
+    packet = build_godview_packet(bundle=bundle, generated_at=_TEST_PACKET_AT)
+    baseline = seal_baseline_record(
+        _baseline_raw(bundle_hash=bundle["bundle_hash"])
+    )
+    unsealed_b = _baseline_raw(bundle_hash=bundle["bundle_hash"])
+    b_path = _write_json(tmp_path / "unsealed_baseline.json", unsealed_b)
+    with pytest.raises(GvE0bDv1Error, match="E0B_BASELINE_UNSEALED"):
+        load_baseline_seal(b_path, expected_bundle_hash=bundle["bundle_hash"])
+
+    post_raw = _post_raw(
+        bundle_hash=bundle["bundle_hash"],
+        packet_hash=packet["packet_hash"],
+        baseline_hash=baseline["baseline_hash"],
+    )
+    p_path = _write_json(tmp_path / "unsealed_post.json", post_raw)
+    with pytest.raises(GvE0bDv1Error, match="E0B_POST_UNSEALED"):
+        load_post_packet_seal(p_path, packet=packet, baseline=baseline)
+
+    post = seal_post_packet_record(post_raw, packet=packet, baseline=baseline)
+    rubric_raw = _rubric_raw(
+        bundle_hash=bundle["bundle_hash"],
+        baseline_hash=baseline["baseline_hash"],
+        packet_hash=packet["packet_hash"],
+        post_packet_hash=post["post_packet_hash"],
+    )
+    r_path = _write_json(tmp_path / "unsealed_rubric.json", rubric_raw)
+    with pytest.raises(GvE0bDv1Error, match="E0B_RUBRIC_UNSEALED"):
+        load_rubric_scores(r_path, baseline=baseline, post=post, packet=packet)
+
+
+def test_mutated_observed_count_does_not_display(tmp_path: Path) -> None:
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    comparison = build_comparison(
+        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+    )
+    result_path = tmp_path / "result.json"
+    write_canonical_artifacts(
+        comparison,
+        result_json_path=result_path,
+        decision_packet_path=tmp_path / "decision_packet.md",
+    )
+    # Mutate displayed count without a valid result hash — must not inflate count.
+    raw = json.loads(result_path.read_text(encoding="utf-8"))
+    raw["comparison"]["stage_claim"]["observed_comparison_count"] = 7
+    raw["comparison"]["stage_claim"]["e0b_close_eligible"] = True
+    result_path.write_text(json.dumps(raw) + "\n", encoding="utf-8")
+    assert observed_comparison_count_from_disk(result_path) == 0
+    with pytest.raises(GvE0bDv1Error):
+        verify_result_document(raw)
+
+
+def test_staged_pipeline_packet_after_baseline(tmp_path: Path) -> None:
+    bundle = sealed_adversarial_bundle()
+    b_path = tmp_path / "baseline_seal.json"
+    pkt_path = tmp_path / "packet.json"
+    stage_capture_baseline(
+        _baseline_raw(
+            sealed_at=_TEST_BASELINE_AT,
+            bundle_hash=bundle["bundle_hash"],
+        ),
+        baseline_path=b_path,
+        bundle=bundle,
+    )
+    packet = stage_generate_packet(
+        baseline_path=b_path,
+        packet_path=pkt_path,
+        bundle=bundle,
+        generated_at=_TEST_PACKET_AT,
+    )
+    assert packet["generated_at"] == _TEST_PACKET_AT
+    assert pkt_path.is_file()
+    # Packet before baseline seal time is rejected.
+    with pytest.raises(GvE0bDv1Error, match="E0B_PACKET_MUST_FOLLOW_BASELINE"):
+        stage_generate_packet(
+            baseline_path=b_path,
+            packet_path=tmp_path / "packet_bad.json",
+            bundle=bundle,
+            generated_at="2026-07-19T12:00:00.000000Z",
         )

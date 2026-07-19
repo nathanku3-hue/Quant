@@ -119,7 +119,7 @@ DecisionEnvelope
 
 ## GV-E0A-OPERABLE — Banked Substrate (NOT the product endgame)
 
-> **Status:** `BANKED_SUBSTRATE` on product tip. Operator plumbing exists. Decision-value maturity remains ~9/100. Do not treat E0A as GodView product intelligence.
+> **Status:** `BANKED_SUBSTRATE` on product tip. Operator plumbing exists. Observed-comparison count remains 0 until a verified real-human E0B close. Do not treat E0A as GodView product intelligence.
 
 ### Objective (historical gate — closed as product work)
 
@@ -445,6 +445,30 @@ synthetic G08 sealed bundle
 
 **E0B reports only an observed within-case difference.** Positive, zero, or negative rubric deltas may all pass. Causal superiority, general decision-quality improvement, and research-efficiency claims are forbidden.  
 Engine test fixtures validate machinery only and **do not** increment observed-comparison count or close E0B. Close requires real human baseline/post (same operator) plus a different real reviewer.
+
+Persisted stage order (no compatibility shim):
+
+```text
+real baseline capture/seal
+→ packet generated afterward with actual captured timestamp
+→ real post decision seal
+→ independent rubric seal
+→ comparison over pre-sealed records only
+```
+
+Observed paths reject unsealed input. Fixture certification may remain test-only; current publication requires `e0b_close_eligible`. UI/count recomputes result, comparison, and seals before display.
+
+### Frozen MU entry gate (V1 authority, still binding until owner replaces protocol)
+
+From `docs/architecture/godview_e0/e0_acceptance_tests.md` §5–6:
+
+- **E0.6 entry:** all **nineteen** synthetic cases and focused regressions must pass from a clean checkout with no network access **before** the first evidence-bearing MU run.
+- First MU evidence-bearing run acceptance is independent and does not relax the nineteen-case gate.
+
+After G08 closes, choose explicitly:
+
+1. complete V1’s full nineteen-case gate, or
+2. **replace with a clean V2 protocol** (recommended): smallest representative synthetic gate that permits an early bounded evidence-bearing vertical — no backward compatibility and no silent shortcut.
 
 After one valid observed comparison: one independently replicated comparison on a second nontrivial terminal case, then first real evidence admission — not FS1, providers-by-default, PEAD, or more certification infrastructure.
 

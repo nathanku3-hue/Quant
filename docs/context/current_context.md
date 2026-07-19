@@ -6,13 +6,13 @@
 
 ## What Is Locked
 - E0A is plumbing only — not decision value / alpha / economics.
-- Conjunctive endgame ≈ decision-value maturity (~9/100). Additive substrate scores must not mask that.
+- Observed-comparison count remains 0; unofficial decision-value / conjunctive maturity percentages are retired. Additive substrate scores must not mask that.
 - E0A-R1 hard cap then stop; no dirty-root authority auto-canonization.
 - FS1, providers, PEAD reopen, alpha claims, broker, dual-authority default UI closed.
 - PEAD = `TERMINATED_DIAGNOSTIC_ONLY` history only.
 
 ## What Is Next
-- Finish E0A-R1 (single authority + merge + fresh-checkout smoke), close E0A, open E0B-DV1 with causal decision-improvement pass bar. Not FS1.
+- Repair PR #5 E0B-DV1 G08 in place: staged seals, reject unsealed, publish only when close-eligible, verified counts; real operator/reviewer run still required for observed count > 0. Score stays 39 frozen. Not FS1.
 
 ## First Command
 `git show --stat --oneline HEAD`

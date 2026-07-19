@@ -43,8 +43,10 @@ def test_apptest_e0b_fixture_result_renders_comparison_not_close(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    b, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
-    comparison = build_comparison(baseline_path=b, post_path=p, rubric_path=r)
+    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    comparison = build_comparison(
+        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+    )
     result_path = tmp_path / "result.json"
     packet_path = tmp_path / "decision_packet.md"
     write_canonical_artifacts(

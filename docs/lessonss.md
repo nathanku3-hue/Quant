@@ -1,3 +1,10 @@
+## 2026-07-20
+- Mistake or miss: PR #5 repair still hardcoded packet `generated_at`, auto-sealed unsealed loads during comparison, allowed fixture publish to current authority, trusted mutated result fields for observed count, left ~9/100 in active context/roadmap, and omitted the frozen nineteen-case MU entry gate.
+- Root cause: seal recompute was treated as sufficient observed truth; chronology/authorship remained self-asserted at compare-time; publication authority was not gated on close eligibility; display trusted payload fields without full re-verify.
+- Fix applied: staged capture (baseline→packet with real timestamp→post→rubric→compare); load paths reject unsealed; publish requires e0b_close_eligible; UI/count recompute result+comparison seals; CI path includes core/gv_e0b_dv1_contradiction.py; retire ~9/100 remnants; document nineteen-case gate + post-G08 V2 choice.
+- Guardrail for next time: never seal on load for observed paths; never hardcode capture timestamps; never publish fixture comparisons as current portfolio authority; never display observed count without re-verified result hash.
+- Evidence paths: `core/gv_e0b_dv1_contradiction.py`, `tests/gv_fs0_product/test_e0b_dv1_contradiction.py`, `.github/workflows/gv-fs0-product.yml`, `docs/architecture/top_level_roadmap.md`.
+
 ## 2026-07-19
 - Mistake or miss: PR #5 hardcoded baseline/post/rubric in the same module as G08 detection so the “delta” was predetermined; seals not recomputed; comparison only referenced E0A cert; no result.json/decision_packet/Streamlit; roadmap demanded causal improvement and used unofficial maturity scores; context still said finish E0A-R1 after PR #4 merge.
 - Root cause: comparison machinery was shipped as decision evidence; endgame “observed within-case” was narrated as causal win; additive/unofficial scores masked zero real comparisons.
