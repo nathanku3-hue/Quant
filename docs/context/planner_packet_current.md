@@ -1,32 +1,32 @@
 # Planner Packet - Current
 
-## New Context Packet — E0A-R1 Merge-Safety Repair (2026-07-19)
+## New Context Packet — E0B-DV1 Repair Active (2026-07-19)
 
 ## What Was Done
 
-- E0A operable vertical is **banked substrate** on product tip (transport C `45f9f96` + C2 `446ac6d`; hosted CI PASS; A/B/C PASS; SAW PASS). Default UI is one current certified decision (`HOLD_FOR_EVIDENCE` → paper `NO_POSITION`).
-- F1C-SHIP remains closed substrate only (dual-fixture evidence path; never product default fallback).
-- Context bootstrap repaired so generated `current_context` selects E0A/product packets instead of historical PEAD "New Context Packet" blocks.
-- Owner audit reclassified E0A-R1 as **repair tax** (not product maturity) and E0B-DV1 as first real GodView product slice.
+- PR #4 merged on main @ `2653eb1`: E0A operable + merge-safety. E0A-R1 is **closed**.
+- PR #5 repair in place: E0B-DV1 G08 engine/seals rewritten — no hardcoded baseline/post/rubric; external seals; hash recompute; atomic `result.json` + `decision_packet.md`; comparison-bound E0B cert (`E0B:CMP:<hash>`); Streamlit surface + AppTest.
+- G08 synthetic evidence retained. Fabricated human outcomes deleted.
+- Unofficial decision-value / conjunctive maturity percentages **retired**. Report **observed-comparison count = 0**.
 
 ## What Is Locked
 
-- E0A proves plumbing only — not research intelligence, decision value, portfolio outcomes, alpha, or economic value.
-- Conjunctive endgame maturity tracks **decision-value** (~9/100), not additive substrate scores.
-- E0A-R1 hard cap: dual authority, provenance-safe missing refs, no dual-authority default, overclaim fix, focused tests, merge, fresh-checkout smoke — then **stop**.
-- Missing authority files: prove provenance before tracking, else amend/remove reference. No dirty-root auto-canonization.
-- FS1, providers, real prices, PEAD reopen, alpha claims, broker paths, compatibility dual-authority UI remain closed.
-- PEAD program stays `TERMINATED_DIAGNOSTIC_ONLY` history only.
+- `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE` until a complete real observed run is published.
+- Observed within-case difference only; positive/zero/negative deltas all valid; no causal/general-effectiveness claim.
+- Engine fixtures validate machinery only and do not close E0B.
+- E0B close requires same real human operator for baseline+post and a different real reviewer for rubric.
+- FS1, providers-by-default, PEAD, broker, alpha claims remain closed.
+- Portfolio-OS pivot remains explicit acceptable deviation from earlier discretionary-cockpit direction.
 
 ## What Is Next
 
-- Complete **E0A-R1** only: make main single-authority, smoke fresh checkout, close E0A permanently.
-- Then open **E0B-DV1** as sole product gate: blinded baseline → GodView missing-evidence/falsifier packet → revised decision → frozen rubric → **causal** delta → cert → operator-visible result. Not FS1. Not providers.
+- Collect real human baseline + post seals (same operator) and independent reviewer rubric for G08, then publish complete run — or merge engine/seal repair only without stage promotion / E0B close.
+- After one valid observed comparison: one independently replicated comparison on a second nontrivial terminal case, then first real evidence admission.
 
 ## First Command
 
 ```text
-git show --stat --oneline HEAD
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py tests/gv_fs0_product/test_e0b_dv1_streamlit_apptest.py
 ```
 
 ## End Context Packet

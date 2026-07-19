@@ -1,8 +1,15 @@
 ## 2026-07-19
-- Mistake or miss: treating E0A operable (custody/cert/publish plumbing + hardcoded HOLD_FOR_EVIDENCE→NO_POSITION) as product maturity; additive score (39) masked ~9 decision-value maturity; E0A acquired roadmap weight beyond endgame contribution; risk of auto-canonizing dirty-root cockpit files for path-existence; E0B planned as comparison record without requiring causal improvement.
+- Mistake or miss: PR #5 hardcoded baseline/post/rubric in the same module as G08 detection so the “delta” was predetermined; seals not recomputed; comparison only referenced E0A cert; no result.json/decision_packet/Streamlit; roadmap demanded causal improvement and used unofficial maturity scores; context still said finish E0A-R1 after PR #4 merge.
+- Root cause: comparison machinery was shipped as decision evidence; endgame “observed within-case” was narrated as causal win; additive/unofficial scores masked zero real comparisons.
+- Fix applied: delete hardcoded human/rubric APIs; external seals with recompute; atomic artifacts; E0B:CMP comparison-bound cert; Streamlit/AppTest; fixtures cannot close E0B; retire unofficial decision-value/conjunctive scores for observed-comparison count=0; strip causal-superiority roadmap language.
+- Guardrail for next time: never invent baseline/post/rubric in engine code; same real operator for baseline+post and different real reviewer for rubric required for observed count; positive/zero/negative deltas all valid; no stage promotion without real seals.
+- Evidence paths: `core/gv_e0b_dv1_contradiction.py`, `tests/gv_fs0_product/test_e0b_dv1_contradiction.py`, `docs/phase_brief/gv-e0b-dv1-contradiction-brief.md`.
+
+## 2026-07-19
+- Mistake or miss: treating E0A operable (custody/cert/publish plumbing + hardcoded HOLD_FOR_EVIDENCE→NO_POSITION) as product maturity; additive score (39) masked missing observed comparisons; E0A acquired roadmap weight beyond endgame contribution; risk of auto-canonizing dirty-root cockpit files for path-existence; E0B planned with causal-improvement language that drifts from frozen endgame.
 - Root cause: substrate success was narrated as GodView intelligence; single additive score compensated zero baseline-comparison; missing authority refs invited “copy local file” shortcuts; shipment optional framing for decision value.
-- Fix applied: reclassify E0A-R1 as hard-capped merge-safety repair tax; bank E0A as substrate only; three-score frame with conjunctive endgame = decision-value; provenance-before-track rule; E0B-DV1 requires material attributable causal improvement; A1-style mandatory decision-value ship after DV2.
-- Guardrail for next time: never promote plumbing to intelligence; never auto-canonize dirty-root authority bytes; close repair gates immediately after smoke; product gates must measure decision improvement.
+- Fix applied: reclassify E0A-R1 as hard-capped merge-safety repair tax; bank E0A as substrate only; report observed-comparison count instead of unofficial maturity percentages; provenance-before-track rule; E0B reports observed within-case difference only.
+- Guardrail for next time: never promote plumbing to intelligence; never auto-canonize dirty-root authority bytes; close repair gates immediately after smoke; product gates must measure observed comparisons, not fabricated deltas.
 - Evidence paths: `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`, `docs/architecture/top_level_roadmap.md`, `docs/context/planner_packet_current.md`.
 
 ## 2026-07-19

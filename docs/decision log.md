@@ -1,12 +1,23 @@
+## 2026-07-19 — ROUND-20260719-E0B-DV1-REPAIR (owner GO + real-human amendment)
+
+- Decision: repair PR #5 in place; no new phase. Score **39/100 frozen**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE** until a complete real observed run is published.
+- Decision: retire unofficial decision-value / conjunctive maturity percentages; report **observed-comparison count** (currently **0**).
+- Decision: delete hardcoded baseline/post/rubric APIs. G08 evidence may be synthetic; baseline+post must be the **same real human operator**; rubric a **different real reviewer**. Fixtures validate engine only and cannot close E0B.
+- Decision: report **observed within-case difference only**; positive/zero/negative deltas all pass; causal superiority and general-effectiveness claims forbidden.
+- Decision: if real human records unavailable, merge engine/seal repair only — do not promote stage or close E0B.
+- Next after one observed comparison: independent second terminal case, then first real evidence admission — not FS1/providers/PEAD.
+- Evidence: `core/gv_e0b_dv1_contradiction.py`, focused tests + AppTest, phase brief, truth surfaces.
+
 ## 2026-07-19 — ROUND-20260719-E0A-R1-MERGE-SAFETY (owner audit GO)
 
 - Decision: reclassify **E0A-R1 as repair tax**, not a roadmap product milestone. Cap hard: dual authority, provenance-safe missing refs, no dual-authority default surface, overclaim correction, focused tests, merge, fresh-checkout smoke — then **stop**.
 - Decision: **E0A operable is BANKED_SUBSTRATE** (custody/cert/publish plumbing). It does not prove research intelligence, decision value, portfolio outcomes, alpha, or economic value.
-- Decision: after clean-main smoke, **close E0A permanently** and open **E0B-DV1** as sole active product gate (one complete decision-value slice with causal improvement requirement).
-- Decision: use **three separate scores**; conjunctive endgame ≈ decision-value maturity (**~9/100**). Do not let additive plumbing scores mask zero baseline comparison.
+- Decision: after clean-main smoke, **close E0A permanently** and open **E0B-DV1** as sole active product gate (one complete decision-value slice; later amended to observed within-case only, not causal superiority).
+- Decision: score stays 39 frozen; do not let additive plumbing scores mask zero observed comparisons.
 - Decision: missing authority files require **proven provenance** before tracking; otherwise amend/remove the reference. **Do not** auto-canonize dirty-root cockpit bytes.
 - Forbidden in E0A-R1: architecture refinement, cockpit expansion, generalized certification, score optimisation, documentation campaign, providers, FS1, PEAD, broker, dirty-root quarantine as critical path.
 - Evidence brief: `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`.
+- **Supersession:** E0A-R1 closed by PR #4 @ `2653eb1`; E0B repair supersedes “finish E0A-R1” and causal-improvement wording (see E0B repair decision above).
 
 ## 2026-07-19 — ROUND-20260719-E0A-OPERABLE-DIRECTION (A/A/A/A)
 

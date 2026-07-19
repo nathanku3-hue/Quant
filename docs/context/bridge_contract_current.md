@@ -1,6 +1,15 @@
 # Bridge Contract - Current
 
-## Active Addendum — GV-E0A Main Cutover Preflight (2026-07-19)
+## Active Addendum — E0B-DV1 Repair (PR #5 in place) (2026-07-19)
+
+- SYSTEM_DELTA: PR #4 merged @ `2653eb1`. PR #5 E0B-DV1 rewritten: external seals, hash recompute, atomic artifacts, comparison-bound E0B cert, Streamlit surface. Hardcoded human baseline/post/rubric deleted.
+- PM / Product Delta: score **39/100 frozen**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; **observed-comparison count = 0**. Unofficial decision-value/conjunctive maturity numbers retired. E0B not closed without real human operator + independent reviewer.
+- OPEN_DECISION: supply real human baseline+post (same operator) and independent rubric, or merge engine/seal repair only without stage promotion.
+- RECOMMENDED_NEXT_STEP: collect real seals for G08 complete run; else merge engine repair only. After one observed comparison → second independent case → first real evidence admission. Not FS1/providers/PEAD.
+- DO_NOT_REDECIDE: fabricated human outcomes; required positive/causal improvement; score uplift; unofficial maturity scores; framework-first capture platform.
+- PHASE_STATUS: `E0A_BANKED_2653eb1; E0B_DV1_ENGINE_SEAL_REPAIR; OBSERVED_COMPARISON_COUNT_0; SCORE_39; STAGE_CERTIFIED_SINGLE_DECISION_OPERABLE`.
+
+## Prior Addendum — GV-E0A Main Cutover Preflight (2026-07-19) [superseded: PR #4 merged]
 
 - SYSTEM_DELTA: E0A remains terminal on product tip lineage (`45f9f96`/`446ac6d`); cutover preflight repairs generated context bootstrap so active truth is E0A, not PEAD, before fast-forward into `main`.
 - PM / Product Delta: one current certified decision stays default authority; score 39/100; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`; F1C dual bundle remains substrate only.

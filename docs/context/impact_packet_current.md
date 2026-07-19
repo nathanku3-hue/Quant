@@ -1,6 +1,15 @@
 # Impact Packet - Current
 
-## Active Addendum — GV-E0A Main Cutover Truth-Repair Impact (2026-07-19)
+## Active Addendum — E0B-DV1 Repair Impact (2026-07-19)
+
+- **Owned code**: `core/gv_e0b_dv1_contradiction.py` (rewrite), `views/gv_fs0_portfolio_adapter.py` (`render_e0b_dv1_surface`), `dashboard.py` portfolio caption + E0B surface, focused tests + AppTest.
+- **Owned docs**: E0B phase brief, roadmap causal-language fix, planner/bridge/done/impact truth, lesson entry.
+- **Interfaces**: external seal load/verify; comparison assembly; atomic result artifacts; E0B comparison-bound cert/publish; optional portfolio E0B presentation.
+- **Not performed**: real human baseline/post/rubric capture; E0B close; stage promotion; score uplift; providers/FS1/PEAD.
+- **Score/stage**: 39/100 frozen; `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed-comparison count = 0.
+- **Risk**: shipping engine without real seals leaves E0B unclosed by design.
+
+## Prior Addendum — GV-E0A Main Cutover Truth-Repair Impact (2026-07-19)
 
 - **Product evidence (already terminal)**: E0A transport C `45f9f96` + C2 `446ac6d`; hosted product CI `29655802878` PASS; Reviewer A/B/C PASS; terminal SAW PASS on `codex/gv-e0a-operable`.
 - **Cutover defect**: generated `current_context` still resolved to historical PEAD because bootstrap selected the first historical `## New Context Packet` in planner truth.

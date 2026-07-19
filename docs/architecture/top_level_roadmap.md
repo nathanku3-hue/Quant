@@ -1,9 +1,9 @@
 # Top-Level Roadmap: GodView Certified Portfolio OS
 
-Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; next ONE_CASE_DECISION_DELTA_OBSERVED
+Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
 Date: 2026-07-19
-Product tip lineage: `accef5c` (E0A operable banked; F1C-SHIP closed substrate earlier at `490a234`)
-Active work: E0A merge-safety patch (not a product phase) → then E0B-DV1 Contradiction Case
+Product tip lineage: `2653eb1` (PR #4 E0A operable + merge-safety merged; F1C-SHIP closed substrate)
+Active work: E0B-DV1 Contradiction Case repair on PR #5 (engine/seals; real human records required for close)
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
 ## Governing sequence (endgame law)
@@ -26,9 +26,10 @@ F1C_SHIP = CLOSED_SUBSTRATE
 E0A_OPERABLE = BANKED_SUBSTRATE (custody→HOLD_FOR_EVIDENCE→NO_POSITION; NOT decision value)
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
 FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
+OBSERVED_COMPARISON_COUNT = 0
 NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED
-ACTIVE_MERGE_PATCH = E0A-R1 (bounded merge residue only; not a product gate)
-ACTIVE_PRODUCT_SLICE_AFTER_MERGE = E0B-DV1 Contradiction Case (G08)
+E0A_R1_MERGE_PATCH = CLOSED (PR #4 @ 2653eb1)
+ACTIVE_PRODUCT_SLICE = E0B-DV1 Contradiction Case (G08) repair
 SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED
 BACKWARD_COMPATIBILITY_LAYER = PROHIBITED
 REAL_PROVIDER_READ = BLOCKED_PENDING_DATA_ACCESS_AUTHORIZATION
@@ -39,8 +40,9 @@ LIVE_TRADING_MONITORING = OUT_OF_SCOPE
 FS1_BATCH = NOT_NEXT
 ```
 
-**Now:** bounded **E0A merge patch** so main integrates without dual-authority residue, then **E0B-DV1**.  
-E0A is banked plumbing, not GodView decision intelligence. Score stays **39/100**.
+**Now:** **E0B-DV1 repair** only. E0A-R1 is closed with PR #4.  
+E0A is banked plumbing, not GodView decision intelligence. Score stays **39/100**.  
+Report **observed-comparison count** (currently 0); do not use unofficial decision-value or conjunctive maturity percentages.
 
 ### What E0A proves vs does not prove
 
@@ -427,21 +429,23 @@ resolve dual authority
 
 See `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`.
 
-### Immediately after clean-main smoke — sole product gate E0B-DV1
+### Sole product gate E0B-DV1 (after PR #4 @ 2653eb1)
 
 ```text
-frozen case identity
-→ blinded pre-GodView decision
-→ deterministic evidence-gap analysis
-→ explicit missing-evidence and falsifier packet
-→ blinded post-GodView decision
-→ predefined rubric
-→ causal delta (material attributable improvement required)
-→ certification
-→ operator-visible result
+synthetic G08 sealed bundle
+→ real human baseline seal (same operator for post)
+→ deterministic BLOCKED:CONTRADICTORY_INDISPENSABLE_EVIDENCE packet
+→ real human post-packet seal
+→ independent reviewer rubric (different identity)
+→ recompute hashes; atomic result.json + decision_packet.md
+→ comparison-bound E0B DecisionEnvelope (E0B:CMP:<hash>)
+→ certify/publish with SYNTHETIC_DEV_RUN label
+→ operator-visible Streamlit surface
 ```
 
-**E0B pass requires at least one causal decision improvement** (not a nicer packet alone): e.g. indispensable missing evidence baseline missed; invalid action prevented; falsifier quality improved; rationale completeness improved; time to correct blocked state reduced; uncertainty/next-action specificity improved.  
-`BLOCKED: MISSING_INDISPENSABLE_EVIDENCE` is valid. Honest “no improvement” is allowed. Fabricated investment opinion is forbidden.
+**E0B reports only an observed within-case difference.** Positive, zero, or negative rubric deltas may all pass. Causal superiority, general decision-quality improvement, and research-efficiency claims are forbidden.  
+Engine test fixtures validate machinery only and **do not** increment observed-comparison count or close E0B. Close requires real human baseline/post (same operator) plus a different real reviewer.
 
-Do **not** reopen F1C-SHIP or E0A as product gates. Do **not** start providers, FS1, PEAD, alpha claims, broker paths, dual-authority UI, historical-suite repair, or portfolio expansion before E0B-SHIP. E0A-R1 must not raise decision-value maturity.
+After one valid observed comparison: one independently replicated comparison on a second nontrivial terminal case, then first real evidence admission — not FS1, providers-by-default, PEAD, or more certification infrastructure.
+
+Do **not** reopen F1C-SHIP or E0A as product gates. Do **not** start providers, FS1, PEAD, alpha claims, broker paths, dual-authority UI, or portfolio expansion before a real observed comparison exists.
