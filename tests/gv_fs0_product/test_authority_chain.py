@@ -113,16 +113,50 @@ def test_roadmap_declares_gv_fs0_authority_chain() -> None:
     text = _read(ROADMAP_REL)
     for token in AUTHORITY_CHAIN:
         assert token in text, f"roadmap missing authority-chain token {token!r}"
-    # E0A banked as substrate; active repair E0A-R1 then product gate E0B-DV1.
+    # E0A banked as substrate; merge patch E0A-R1 then product slice E0B-DV1.
     # F1C dual-bundle remains closed substrate (never product default).
     assert (
-        "ACTIVE_REPAIR = E0A-R1" in text
+        "ACTIVE_MERGE_PATCH = E0A-R1" in text
+        or "ACTIVE_REPAIR = E0A-R1" in text
         or "ACTIVE_GATE = GV-E0A-OPERABLE" in text
         or "EXECUTION_MODEL = GV_FS0_FIRST" in text
     )
     assert "SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED" in text
     assert "BACKWARD_COMPATIBILITY_LAYER = PROHIBITED" in text
     assert "E0B-DV1" in text or "ACTIVE_GATE = GV-E0A-OPERABLE" in text
+    assert "39/100" in text
+    assert "ONE_CASE_DECISION_DELTA_OBSERVED" in text
+
+
+def test_e0_preregistration_authority_sources_exist_and_are_tracked() -> None:
+    """Merge-safety: every frozen authority_sources path exists and is git-tracked.
+
+    Provenance: paths are named by frozen e0_preregistration.yaml. Missing paths
+    must be dispositioned (track with proven provenance OR amend the reference).
+    Untracked dirty-root bytes alone do not satisfy this check.
+    """
+
+    import subprocess
+
+    prereg = _read("docs/architecture/godview_e0/e0_preregistration.yaml")
+    sources: list[str] = []
+    for line in prereg.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- docs/"):
+            sources.append(stripped[2:].strip())
+    assert sources, "preregistration must declare authority_sources"
+    tracked = subprocess.check_output(
+        ["git", "ls-files", "--", *sources],
+        cwd=REPO_ROOT,
+        text=True,
+    ).splitlines()
+    tracked_set = {path.replace("\\", "/") for path in tracked}
+    for rel in sources:
+        path = REPO_ROOT / rel
+        assert path.is_file(), f"missing preregistered authority source: {rel}"
+        assert rel.replace("\\", "/") in tracked_set, (
+            f"preregistered authority source is not git-tracked: {rel}"
+        )
 
 
 def test_uoe_engine_is_superseded_not_active_gate() -> None:

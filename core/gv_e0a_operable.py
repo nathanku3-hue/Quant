@@ -257,14 +257,6 @@ def publish_e0a_current_decision(
     return publish_current_decision(certified, target=target, lock_path=lock_path)
 
 
-# Backward-compatible name: rationale is now hash-bound, not a fixed string.
-# Resolved at call time from live custody so tests/operators always match.
-def __getattr__(name: str) -> Any:
-    if name == "E0A_RATIONALE_REF":
-        return e0a_rationale_ref()
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-
 __all__ = [
     "CLAIM_BOUNDARY",
     "E0A_DECISION_ID",

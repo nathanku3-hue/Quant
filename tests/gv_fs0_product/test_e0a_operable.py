@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import inspect
+import re
 from pathlib import Path
 from typing import Any
 
@@ -70,6 +71,40 @@ def _current_paths(tmp_path: Path) -> tuple[Path, Path]:
     target = tmp_path / "data" / "gv_fs0" / "gv_fs0_current_decision.json"
     lock = target.parent / ".gv_fs0_current_decision.lock"
     return target, lock
+
+
+def test_preregistered_authority_sources_exist_in_committed_tree() -> None:
+    """Every authority_sources path in frozen preregistration must exist on disk."""
+    prereg = ROOT / "docs" / "architecture" / "godview_e0" / "e0_preregistration.yaml"
+    text = prereg.read_text(encoding="utf-8")
+    # Minimal parse: list items under the authority_sources key only.
+    lines = text.splitlines()
+    in_block = False
+    sources: list[str] = []
+    for line in lines:
+        if re.match(r"^  authority_sources:\s*$", line):
+            in_block = True
+            continue
+        if in_block:
+            m = re.match(r"^    - (.+)$", line)
+            if m:
+                sources.append(m.group(1).strip())
+                continue
+            if line.startswith("  ") and not line.startswith("    "):
+                break
+            if not line.startswith(" "):
+                break
+    assert sources, "authority_sources must be non-empty in frozen preregistration"
+    missing = [rel for rel in sources if not (ROOT / rel).is_file()]
+    assert missing == [], f"preregistered authority_sources missing from tree: {missing}"
+
+
+def test_no_e0a_rationale_ref_compatibility_alias() -> None:
+    import core.gv_e0a_operable as mod
+
+    assert not hasattr(mod, "E0A_RATIONALE_REF")
+    with pytest.raises(AttributeError):
+        getattr(mod, "E0A_RATIONALE_REF")
 
 
 def test_e0_custody_hash_gate_passes_on_frozen_bytes() -> None:
