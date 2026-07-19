@@ -11,6 +11,7 @@ from core.gv_e0b_dv1_contradiction import (
     build_comparison,
     write_canonical_artifacts,
 )
+from core.gv_e0b_dv1_contradiction import _collect_sealed_records
 from tests.gv_fs0_product.test_e0b_dv1_contradiction import _fixture_paths
 from views.page_registry import PORTFOLIO_PAGE_ROUTE, PORTFOLIO_PAGE_TITLE
 
@@ -43,14 +44,27 @@ def test_apptest_e0b_fixture_result_renders_comparison_not_close(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    b, pkt, p, r, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    b, pkt, p, r, sess, bundle, _packet = _fixture_paths(tmp_path / "caps")
     comparison = build_comparison(
-        baseline_path=b, post_path=p, rubric_path=r, packet_path=pkt
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
     )
     result_path = tmp_path / "result.json"
     packet_path = tmp_path / "decision_packet.md"
+    seals = _collect_sealed_records(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        bundle=bundle,
+    )
     write_canonical_artifacts(
         comparison,
+        sealed_records=seals,
         result_json_path=result_path,
         decision_packet_path=packet_path,
     )

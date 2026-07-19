@@ -1,4 +1,11 @@
 ## 2026-07-20
+- Mistake or miss: after staged-seal repair, capture authority still accepted caller timestamps, asserted 60m budget without measurement, treated REAL_HUMAN labels as close evidence, and rehashed summary comparison without replaying complete sealed bodies; V1 nineteen-case gate still framed as default post-G08 path.
+- Root cause: authorship strings and self-stamped times were mistaken for observation; close eligibility lived inside comparison summary instead of attestation + full seal replay.
+- Fix applied: system-stamped arm start/end + measured 60m budget; session nonce + append-only chain; result embeds complete seals and re-verifies them; human IDs attribution-only; external independent attestation required for close; post-G08 direction = V2 BLOCK-ONLY REAL ADMISSION superseding V1-19.
+- Guardrail for next time: never grant close from REAL_HUMAN strings alone; never accept caller timing fields; never display observed count without full seal replay + attestation; do not schedule a second synthetic comparison as default after G08.
+- Evidence paths: `core/gv_e0b_dv1_contradiction.py`, `tests/gv_fs0_product/test_e0b_dv1_contradiction.py`, `docs/architecture/top_level_roadmap.md`.
+
+## 2026-07-20
 - Mistake or miss: PR #5 repair still hardcoded packet `generated_at`, auto-sealed unsealed loads during comparison, allowed fixture publish to current authority, trusted mutated result fields for observed count, left ~9/100 in active context/roadmap, and omitted the frozen nineteen-case MU entry gate.
 - Root cause: seal recompute was treated as sufficient observed truth; chronology/authorship remained self-asserted at compare-time; publication authority was not gated on close eligibility; display trusted payload fields without full re-verify.
 - Fix applied: staged capture (baseline→packet with real timestamp→post→rubric→compare); load paths reject unsealed; publish requires e0b_close_eligible; UI/count recompute result+comparison seals; CI path includes core/gv_e0b_dv1_contradiction.py; retire ~9/100 remnants; document nineteen-case gate + post-G08 V2 choice.

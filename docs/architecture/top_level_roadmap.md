@@ -458,18 +458,21 @@ real baseline capture/seal
 
 Observed paths reject unsealed input. Fixture certification may remain test-only; current publication requires `e0b_close_eligible`. UI/count recomputes result, comparison, and seals before display.
 
-### Frozen MU entry gate (V1 authority, still binding until owner replaces protocol)
+### Post-G08 protocol (owner decision locked direction)
 
-From `docs/architecture/godview_e0/e0_acceptance_tests.md` §5–6:
+**V2 BLOCK-ONLY REAL ADMISSION** (recommended; supersedes V1’s nineteen-case entry gate after G08 closes):
 
-- **E0.6 entry:** all **nineteen** synthetic cases and focused regressions must pass from a clean checkout with no network access **before** the first evidence-bearing MU run.
-- First MU evidence-bearing run acceptance is independent and does not relax the nineteen-case gate.
+```text
+G08 observed close (this PR)
+→ do NOT schedule a second synthetic comparison as the default next gate
+→ V2 BLOCK-ONLY REAL ADMISSION:
+   - allow only blocked terminal states for the admission vertical
+   - run the minimum blocked-integrity synthetic battery
+   - admit the first real MU bundle under blocked-only honesty
+```
 
-After G08 closes, choose explicitly:
+This **explicitly supersedes** V1 E0.6 “all nineteen synthetic cases before first MU run” — no backward compatibility and no silent shortcut. Historical V1 wording in `e0_acceptance_tests.md` remains frozen archive authority until the V2 protocol file replaces it.
 
-1. complete V1’s full nineteen-case gate, or
-2. **replace with a clean V2 protocol** (recommended): smallest representative synthetic gate that permits an early bounded evidence-bearing vertical — no backward compatibility and no silent shortcut.
-
-After one valid observed comparison: one independently replicated comparison on a second nontrivial terminal case, then first real evidence admission — not FS1, providers-by-default, PEAD, or more certification infrastructure.
+Until G08 closes with verified external attestation: score 39 frozen; observed-comparison count 0; no MU real-admission.
 
 Do **not** reopen F1C-SHIP or E0A as product gates. Do **not** start providers, FS1, PEAD, alpha claims, broker paths, dual-authority UI, or portfolio expansion before a real observed comparison exists.
