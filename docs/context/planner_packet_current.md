@@ -1,23 +1,27 @@
 # Planner Packet - Current
 
-## New Context Packet — GV-E0A-OPERABLE Terminal Main Cutover (2026-07-19)
+## New Context Packet — E0A-R1 Merge-Safety Repair (2026-07-19)
 
 ## What Was Done
 
-- E0A operable vertical is terminal on product branch `codex/gv-e0a-operable`: transport C `45f9f96` + C2 pin `446ac6d`; hosted product CI `29655802878` PASS; distinct Reviewer A/B/C PASS; terminal SAW PASS.
-- F1C-SHIP remains closed substrate only; default portfolio authority is one current certified decision at stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
-- Bounded main-cutover preflight repairs planner bootstrap so generated `current_context` selects this E0A terminal packet instead of historical PEAD "New Context Packet" blocks.
+- E0A operable vertical is **banked substrate** on product tip (transport C `45f9f96` + C2 `446ac6d`; hosted CI PASS; A/B/C PASS; SAW PASS). Default UI is one current certified decision (`HOLD_FOR_EVIDENCE` → paper `NO_POSITION`).
+- F1C-SHIP remains closed substrate only (dual-fixture evidence path; never product default fallback).
+- Context bootstrap repaired so generated `current_context` selects E0A/product packets instead of historical PEAD "New Context Packet" blocks.
+- Owner audit reclassified E0A-R1 as **repair tax** (not product maturity) and E0B-DV1 as first real GodView product slice.
 
 ## What Is Locked
 
-- Score remains `SHIPPED_PRODUCT_SCORE = 39/100` (owner ceiling; no alpha uplift). Stage remains `CERTIFIED_SINGLE_DECISION_OPERABLE`.
-- FS1, providers, real prices, PEAD reopen, alpha claims, broker paths, compatibility dual-authority UI, and historical-suite repair remain closed.
-- Do not merge unrepaired tip `2357780` as-is while active generated context still resolves to PEAD. PEAD program stays `TERMINATED_DIAGNOSTIC_ONLY` history only.
-- Certification machinery is substrate, not the product endgame; indefinite hold after merge is forbidden.
+- E0A proves plumbing only — not research intelligence, decision value, portfolio outcomes, alpha, or economic value.
+- Conjunctive endgame maturity tracks **decision-value** (~9/100), not additive substrate scores.
+- E0A-R1 hard cap: dual authority, provenance-safe missing refs, no dual-authority default, overclaim fix, focused tests, merge, fresh-checkout smoke — then **stop**.
+- Missing authority files: prove provenance before tracking, else amend/remove reference. No dirty-root auto-canonization.
+- FS1, providers, real prices, PEAD reopen, alpha claims, broker paths, compatibility dual-authority UI remain closed.
+- PEAD program stays `TERMINATED_DIAGNOSTIC_ONLY` history only.
 
 ## What Is Next
 
-- Fast-forward `main` to the repaired product tip, smoke the single certified decision from integrated main, then open GV-E0B Decision-Value Slice planning only (sealed evidence → cheap baseline vs GodView delta → existing cert/publish path). Not FS1.
+- Complete **E0A-R1** only: make main single-authority, smoke fresh checkout, close E0A permanently.
+- Then open **E0B-DV1** as sole product gate: blinded baseline → GodView missing-evidence/falsifier packet → revised decision → frozen rubric → **causal** delta → cert → operator-visible result. Not FS1. Not providers.
 
 ## First Command
 

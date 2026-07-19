@@ -1,3 +1,13 @@
+## 2026-07-19 — ROUND-20260719-E0A-R1-MERGE-SAFETY (owner audit GO)
+
+- Decision: reclassify **E0A-R1 as repair tax**, not a roadmap product milestone. Cap hard: dual authority, provenance-safe missing refs, no dual-authority default surface, overclaim correction, focused tests, merge, fresh-checkout smoke — then **stop**.
+- Decision: **E0A operable is BANKED_SUBSTRATE** (custody/cert/publish plumbing). It does not prove research intelligence, decision value, portfolio outcomes, alpha, or economic value.
+- Decision: after clean-main smoke, **close E0A permanently** and open **E0B-DV1** as sole active product gate (one complete decision-value slice with causal improvement requirement).
+- Decision: use **three separate scores**; conjunctive endgame ≈ decision-value maturity (**~9/100**). Do not let additive plumbing scores mask zero baseline comparison.
+- Decision: missing authority files require **proven provenance** before tracking; otherwise amend/remove the reference. **Do not** auto-canonize dirty-root cockpit bytes.
+- Forbidden in E0A-R1: architecture refinement, cockpit expansion, generalized certification, score optimisation, documentation campaign, providers, FS1, PEAD, broker, dirty-root quarantine as critical path.
+- Evidence brief: `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`.
+
 ## 2026-07-19 — ROUND-20260719-E0A-OPERABLE-DIRECTION (A/A/A/A)
 
 - Decision: lock product pivot UOE discretionary cockpit → GodView certified portfolio OS (paper); demote F1C-SHIP to CLOSED_SUBSTRATE; set sole active gate **GV-E0A-OPERABLE**.
@@ -6,6 +16,7 @@
 - Forbidden: providers, real prices, FS1 batch, PEAD, alpha claims, broker, compatibility dual-authority UI, historical-suite repair.
 - Evidence: docs hard-recut on branch codex/gv-e0a-operable from product tip lineage 490a234; E0 four-file hashes verified; E0A code not claimed complete by Docs/Ops.
 - Boundary: main may lag product tip; do not claim main is product tip without evidence.
+- **Supersession note (same day):** E0A operable later banked as substrate; active work recut to E0A-R1 then E0B-DV1 (see round above).
 ## 2026-07-19 — GV-FS0 F1C-SHIP Terminal Closeout
 
 - Decision: accept two-SHA shipment closeout on codex/gv-fs0-f1-product after hosted parity and exact-commit A/B/C.

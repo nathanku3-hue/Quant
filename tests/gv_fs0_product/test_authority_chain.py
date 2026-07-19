@@ -113,12 +113,16 @@ def test_roadmap_declares_gv_fs0_authority_chain() -> None:
     text = _read(ROADMAP_REL)
     for token in AUTHORITY_CHAIN:
         assert token in text, f"roadmap missing authority-chain token {token!r}"
-    # Active gate is E0A operable; F1C dual-bundle remains closed substrate.
+    # E0A banked as substrate; active repair E0A-R1 then product gate E0B-DV1.
+    # F1C dual-bundle remains closed substrate (never product default).
     assert (
-        "ACTIVE_GATE = GV-E0A-OPERABLE" in text
+        "ACTIVE_REPAIR = E0A-R1" in text
+        or "ACTIVE_GATE = GV-E0A-OPERABLE" in text
         or "EXECUTION_MODEL = GV_FS0_FIRST" in text
     )
     assert "SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED" in text
+    assert "BACKWARD_COMPATIBILITY_LAYER = PROHIBITED" in text
+    assert "E0B-DV1" in text or "ACTIVE_GATE = GV-E0A-OPERABLE" in text
 
 
 def test_uoe_engine_is_superseded_not_active_gate() -> None:

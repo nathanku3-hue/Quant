@@ -1,4 +1,11 @@
 ## 2026-07-19
+- Mistake or miss: treating E0A operable (custody/cert/publish plumbing + hardcoded HOLD_FOR_EVIDENCE→NO_POSITION) as product maturity; additive score (39) masked ~9 decision-value maturity; E0A acquired roadmap weight beyond endgame contribution; risk of auto-canonizing dirty-root cockpit files for path-existence; E0B planned as comparison record without requiring causal improvement.
+- Root cause: substrate success was narrated as GodView intelligence; single additive score compensated zero baseline-comparison; missing authority refs invited “copy local file” shortcuts; shipment optional framing for decision value.
+- Fix applied: reclassify E0A-R1 as hard-capped merge-safety repair tax; bank E0A as substrate only; three-score frame with conjunctive endgame = decision-value; provenance-before-track rule; E0B-DV1 requires material attributable causal improvement; A1-style mandatory decision-value ship after DV2.
+- Guardrail for next time: never promote plumbing to intelligence; never auto-canonize dirty-root authority bytes; close repair gates immediately after smoke; product gates must measure decision improvement.
+- Evidence paths: `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`, `docs/architecture/top_level_roadmap.md`, `docs/context/planner_packet_current.md`.
+
+## 2026-07-19
 - Mistake or miss: terminal E0A truth surfaces still left historical PEAD `## New Context Packet` as the first bootstrap-selectable block, so validated `current_context` imported terminated PEAD direction into cutover planning.
 - Root cause: context builder selects the first machine-shaped New Context Packet; Active Addendum prose is not parseable as bootstrap sections.
 - Fix applied: lead planner with machine-shaped E0A terminal packet; reconcile cutover surfaces; regenerate context; add regression that E0A wins over later PEAD packet; Option A cutover then E0B (not indefinite hold, not FS1).

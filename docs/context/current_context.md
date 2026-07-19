@@ -1,16 +1,18 @@
 ## What Was Done
-- E0A operable vertical is terminal on product branch `codex/gv-e0a-operable`: transport C `45f9f96` + C2 pin `446ac6d`; hosted product CI `29655802878` PASS; distinct Reviewer A/B/C PASS; terminal SAW PASS.
-- F1C-SHIP remains closed substrate only; default portfolio authority is one current certified decision at stage `CERTIFIED_SINGLE_DECISION_OPERABLE`.
-- Bounded main-cutover preflight repairs planner bootstrap so generated `current_context` selects this E0A terminal packet instead of historical PEAD "New Context Packet" blocks.
+- E0A operable vertical is **banked substrate** (C `45f9f96` + C2 `446ac6d`; hosted CI PASS; A/B/C PASS; SAW PASS). One current certified decision only.
+- F1C-SHIP closed substrate; dual-fixture never default UI fallback.
+- Context bootstrap prefers product/E0A packets over historical PEAD blocks.
+- Owner audit: E0A-R1 = repair tax; E0B-DV1 = first real GodView product slice.
 
 ## What Is Locked
-- Score remains `SHIPPED_PRODUCT_SCORE = 39/100` (owner ceiling; no alpha uplift). Stage remains `CERTIFIED_SINGLE_DECISION_OPERABLE`.
-- FS1, providers, real prices, PEAD reopen, alpha claims, broker paths, compatibility dual-authority UI, and historical-suite repair remain closed.
-- Do not merge unrepaired tip `2357780` as-is while active generated context still resolves to PEAD. PEAD program stays `TERMINATED_DIAGNOSTIC_ONLY` history only.
-- Certification machinery is substrate, not the product endgame; indefinite hold after merge is forbidden.
+- E0A is plumbing only — not decision value / alpha / economics.
+- Conjunctive endgame ≈ decision-value maturity (~9/100). Additive substrate scores must not mask that.
+- E0A-R1 hard cap then stop; no dirty-root authority auto-canonization.
+- FS1, providers, PEAD reopen, alpha claims, broker, dual-authority default UI closed.
+- PEAD = `TERMINATED_DIAGNOSTIC_ONLY` history only.
 
 ## What Is Next
-- Fast-forward `main` to the repaired product tip, smoke the single certified decision from integrated main, then open GV-E0B Decision-Value Slice planning only (sealed evidence → cheap baseline vs GodView delta → existing cert/publish path). Not FS1.
+- Finish E0A-R1 (single authority + merge + fresh-checkout smoke), close E0A, open E0B-DV1 with causal decision-improvement pass bar. Not FS1.
 
 ## First Command
 `git show --stat --oneline HEAD`

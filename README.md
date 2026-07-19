@@ -2,50 +2,57 @@
 
 Status: Active product framing — GodView certified portfolio OS (paper)
 Date: 2026-07-19
-Product tip lineage: `490a234` (F1C-SHIP closed substrate)
-Active gate: **GV-E0A-OPERABLE**
-Authority: `docs/architecture/top_level_roadmap.md`, `PRD.md`, `docs/phase_brief/gv-e0a-operable-brief.md`
+Product tip: E0A operable banked (`accef5c` lineage); F1C-SHIP closed substrate earlier
+Active work: **E0A-R1** merge-safety repair (hard cap) → then **E0B-DV1** sole product gate
+Authority: `docs/architecture/top_level_roadmap.md`, `PRD.md`, `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`
 
 Terminal Zero is a local-first quantitative research console. The **authorized product pivot** is from a UOE discretionary cockpit framing to a **GodView certified portfolio OS** (paper accounting + independent certification). It is not a trading bot, not a broker, and not an alpha claim surface.
 
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
 F1C_SHIP = CLOSED_SUBSTRATE
-ACTIVE_GATE = GV-E0A-OPERABLE
-SHIPPED_PRODUCT_SCORE = 39/100 (owner claim ceiling; no alpha)
-FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
+E0A_OPERABLE = BANKED_SUBSTRATE (plumbing only; NOT decision value / NOT alpha)
+ACTIVE_REPAIR = E0A-R1 (merge-safety tax; close after clean-main smoke)
+ACTIVE_PRODUCT_GATE_AFTER_REPAIR = E0B-DV1
+FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE (stage-only)
+CONJUNCTIVE_ENDGAME_MATURITY ≈ 9/100 (decision value near zero)
 FORBIDDEN = providers, real prices, FS1 batch, PEAD, alpha claims, broker,
-            compatibility dual-authority UI, historical-suite repair
+            compatibility dual-authority UI, dirty-root authority auto-canonization
 ```
 
-## What is shipped substrate
-
-On product tip lineage `490a234`, F1C-SHIP closed:
-
-- permanent dual-fixture certified bundle (synthetic `OPEN` + `NO_POSITION`);
-- product CI Windows/Linux parity.
-
-That path is **closed substrate** (deterministic certification machinery). Dual-fixture demo is not the default operator UI.
-
-## Active gate — GV-E0A-OPERABLE (implemented on `codex/gv-e0a-operable`)
+## Governing sequence
 
 ```text
-frozen MU G_supply evidence (4 files exact hashes)
-→ explicit HOLD_FOR_EVIDENCE research decision / portfolio NO_POSITION
-→ one active DecisionEnvelope
-→ PortfolioBook + independent certification
-→ atomic publication of current decision
-→ one visible current decision
-→ Streamlit default portfolio route
+truth substrate → demonstrated decision value → replication → prospective economics → live capital
 ```
 
-Operator publish path: `scripts/publish_gv_e0a_current.py`. Score remains **39/100** (stage-only progress; no alpha; no numeric uplift without rubric).
+## What is banked substrate (not product intelligence)
+
+**F1C-SHIP** (lineage `490a234`): permanent dual-fixture certified bundle + product CI. Closed substrate.
+
+**E0A operable:** frozen E0 custody → `HOLD_FOR_EVIDENCE` → paper `NO_POSITION` → cert → current publish → one UI.  
+Proves custody/cert/publish plumbing. Does **not** prove better decisions, portfolio outcomes, or alpha.
+
+Default UI: one current certified decision only. F1C dual-role bundle is evidence-only (never default fallback).
+
+Operator publish path: `scripts/publish_gv_e0a_current.py`.
+
+## Active work — E0A-R1 (repair tax)
+
+Hard-capped merge-safety only. See [gv-e0a-r1-merge-safety-brief.md](docs/phase_brief/gv-e0a-r1-merge-safety-brief.md).
+
+```text
+single authority + proven-provenance custody refs + no dual-authority default
++ clean main + fresh-checkout smoke → STOP → open E0B-DV1
+```
+
+**Provenance rule:** prove intended origin before tracking a missing authority file; otherwise amend/remove the reference. Never promote accidental dirty-root bytes.
 
 ## Current Canon (start here)
 
-- [docs/architecture/top_level_roadmap.md](docs/architecture/top_level_roadmap.md) — active architecture canon (E0A sole gate)
-- [PRD.md](PRD.md) — active build authority + product requirements
-- [docs/phase_brief/gv-e0a-operable-brief.md](docs/phase_brief/gv-e0a-operable-brief.md) — E0A EXECUTION_PACKET
+- [docs/architecture/top_level_roadmap.md](docs/architecture/top_level_roadmap.md) — active architecture canon
+- [docs/phase_brief/gv-e0a-r1-merge-safety-brief.md](docs/phase_brief/gv-e0a-r1-merge-safety-brief.md) — E0A-R1 hard cap
+- [PRD.md](PRD.md) — product requirements (header may lag; roadmap wins on gate status)
 - [docs/architecture/gv_fs0_certification_and_data_authority_contract.md](docs/architecture/gv_fs0_certification_and_data_authority_contract.md) — frozen certification contract
 - [docs/architecture/godview_portfolio_first_operating_model.md](docs/architecture/godview_portfolio_first_operating_model.md) — portfolio-first operating model
 - [docs/architecture/godview_endgame_vision.md](docs/architecture/godview_endgame_vision.md) — endgame vision
@@ -53,26 +60,27 @@ Operator publish path: `scripts/publish_gv_e0a_current.py`. Score remains **39/1
 
 ## Historical product framing (not active authority)
 
-The earlier **Unified Opportunity Engine (UOE)** discretionary cockpit framing (supercycle gem discovery + GodView signal taxonomy + buying-range prompts) is **historical product lineage only**. Do not treat UOE as the active primary product.
+The earlier **Unified Opportunity Engine (UOE)** discretionary cockpit framing is **historical only**.
 
-Historical continuity links (superseded as active authority):
+Historical continuity links (superseded as active authority — do not auto-canonize from dirty root):
 
-- [docs/architecture/unified_opportunity_engine.md](docs/architecture/unified_opportunity_engine.md) — historical UOE architecture
-- [docs/architecture/godview_signal_taxonomy.md](docs/architecture/godview_signal_taxonomy.md) — signal family taxonomy (context, not E0A gate)
-- [docs/architecture/dashboard_product_spec.md](docs/architecture/dashboard_product_spec.md) — historical dashboard state model
-- [docs/prd.md](docs/prd.md) / [docs/spec.md](docs/spec.md) — lowercased historical pointers
-- [PRODUCT_SPEC.md](PRODUCT_SPEC.md) — may retain historical UOE/PEAD sections; active header is GodView pivot
+- [docs/architecture/unified_opportunity_engine.md](docs/architecture/unified_opportunity_engine.md)
+- [docs/architecture/godview_signal_taxonomy.md](docs/architecture/godview_signal_taxonomy.md)
+- [docs/architecture/dashboard_product_spec.md](docs/architecture/dashboard_product_spec.md) — historical dashboard state model (historical continuity only)
+- [docs/prd.md](docs/prd.md) / [docs/spec.md](docs/spec.md)
+- [PRODUCT_SPEC.md](PRODUCT_SPEC.md)
+- [docs/phase_brief/gv-e0a-operable-brief.md](docs/phase_brief/gv-e0a-operable-brief.md) — E0A implementation brief (banked)
 
-If a conflict appears, **active roadmap + PRD active authority block + E0A brief** win.
+If a conflict appears, **active roadmap + E0A-R1 brief** win until E0B opens.
 
-## Future stages (not next action)
+## Sequence after E0A-R1
 
 ```text
-GV-E0A-OPERABLE  ← ACTIVE
-GV-FS1           policy/benchmark paths (after E0A)
-GV-FS2           authority/accounting hardening
-GV-RA0           real-data admission (authorization required)
-GV-P1            prospective policy evaluation
+E0A-R1          ← ACTIVE REPAIR (merge-safety)
+E0B-DV1         one complete decision-value slice (causal improvement required)
+E0B-DV2         replication (heterogeneous cases, null value, adversarial, multi-operator)
+E0B-SHIP        bounded decision-value release
+then only       providers / prospective economics / portfolio expansion eligibility
 ```
 
 ## Run (local)

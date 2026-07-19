@@ -1,20 +1,34 @@
 # Top-Level Roadmap: GodView Certified Portfolio OS
 
-Status: Active Architecture Canon — GV-E0A-OPERABLE sole active gate
+Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; next ONE_CASE_DECISION_DELTA_OBSERVED
 Date: 2026-07-19
-Product tip lineage: `490a234` (F1C-SHIP closed substrate on product branch lineage)
-Active working branch (this recut): `codex/gv-e0a-operable`
-Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, and `docs/phase_brief/gv-e0a-operable-brief.md`
+Product tip lineage: `accef5c` (E0A operable banked; F1C-SHIP closed substrate earlier at `490a234`)
+Active work: E0A merge-safety patch (not a product phase) → then E0B-DV1 Contradiction Case
+Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
+
+## Governing sequence (endgame law)
+
+```text
+truth substrate
+→ demonstrated evidence-to-decision improvement
+→ replicated decision value
+→ prospective economic value
+→ live capital
+```
+
+Portfolio truth first. Decision value second. No fabricated alpha. No score engineering.
 
 ## Executive Decision (Active Canon)
 
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
-F1C_SHIP = CLOSED_SUBSTRATE (deterministic certification + permanent dual-fixture evidence; not operator-usable product endpoint)
-ACTIVE_GATE = GV-E0A-OPERABLE
-SHIPPED_PRODUCT_SCORE = 39/100 (owner claim ceiling; metric confidence low; no alpha)
+F1C_SHIP = CLOSED_SUBSTRATE
+E0A_OPERABLE = BANKED_SUBSTRATE (custody→HOLD_FOR_EVIDENCE→NO_POSITION; NOT decision value)
+SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
 FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
-  (stage-only; score stays 39/100; no alpha)
+NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED
+ACTIVE_MERGE_PATCH = E0A-R1 (bounded merge residue only; not a product gate)
+ACTIVE_PRODUCT_SLICE_AFTER_MERGE = E0B-DV1 Contradiction Case (G08)
 SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED
 BACKWARD_COMPATIBILITY_LAYER = PROHIBITED
 REAL_PROVIDER_READ = BLOCKED_PENDING_DATA_ACCESS_AUTHORIZATION
@@ -25,40 +39,67 @@ LIVE_TRADING_MONITORING = OUT_OF_SCOPE
 FS1_BATCH = NOT_NEXT
 ```
 
-**One active gate only:** **GV-E0A-OPERABLE** — a combined research→decision→book→cert→publish→visible vertical on frozen MU `G_supply` custody. F1C-SHIP is closed substrate, not an active shipment gate. Broad FS1 is a future stage, not next action.
+**Now:** bounded **E0A merge patch** so main integrates without dual-authority residue, then **E0B-DV1**.  
+E0A is banked plumbing, not GodView decision intelligence. Score stays **39/100**.
 
-### Score semantics (do not conflate)
+### What E0A proves vs does not prove
 
-| Measure | Value | Meaning |
+| Proves (substrate) | Does **not** prove |
+|---|---|
+| deterministic contract custody | research intelligence |
+| certification + verifier separation | better decisions |
+| publication + operator-visible result | better portfolio outcomes |
+| repository/execution plumbing | alpha or economic value |
+
+Hardcoded `HOLD_FOR_EVIDENCE → NO_POSITION` is substrate validation only.
+
+### Score and stage (do not conflate)
+
+| Measure | Value | Rule |
 |---|---|---|
-| `SHIPPED_PRODUCT_SCORE` | **39/100** | Owner claim ceiling. Does **not** auto-uplift for demos, dual-fixture screens, or local green paths. No alpha. Metric confidence low. |
-| `FUNCTIONAL_STAGE` | **`CERTIFIED_SINGLE_DECISION_OPERABLE`** | E0 custody + `HOLD_FOR_EVIDENCE`→paper `NO_POSITION` + certify + atomic current publish + one default Streamlit decision on branch `codex/gv-e0a-operable`. Prior stage was dual-fixture static demo on `490a234`. |
-| Score rule | no auto-uplift | Stage promotion does **not** raise `SHIPPED_PRODUCT_SCORE`. Score stays 39/100 unless a separate rubric-based owner claim is authorized. |
+| `SHIPPED_PRODUCT_SCORE` | **39/100 frozen** | Low-confidence owner ceiling. No uplift for merge patch, dual-fixture demos, or green CI. No alpha. |
+| `FUNCTIONAL_STAGE` | **`CERTIFIED_SINGLE_DECISION_OPERABLE`** | One certified paper decision path exists. |
+| Next meaningful stage | **`ONE_CASE_DECISION_DELTA_OBSERVED`** | Requires E0B-DV1 sealed baseline-vs-GodView delta on a nontrivial case. |
 
-### Active gate — GV-E0A-OPERABLE
+Do not convert direction into score engineering. Do not promote merge hygiene into a product phase.
+
+### Merge patch — E0A-R1 (not a product gate)
 
 ```text
-frozen MU G_supply evidence (4 files exact hashes)
-→ explicit HOLD_FOR_EVIDENCE research decision / portfolio NO_POSITION
-→ one active DecisionEnvelope
-→ PortfolioBook + independent certification
-→ atomic publication of current decision
-→ one visible current decision
-→ real Streamlit smoke
+remove/tombstone R0.1-preflight-plan.md from resulting tree
++ track cited godview_e0_mu_cockpit_spec.md (frozen preregistration authority_sources)
++ delete unused E0A_RATIONALE_REF compatibility alias
++ one authority-consistency test
++ Thin SAW → merge → clean-worktree smoke
+→ immediately open E0B-DV1
 ```
 
-**Forbidden for this gate:** providers, real prices, FS1 batch, PEAD reopen, alpha claims, broker paths, compatibility dual-authority UI, historical-suite repair.
+**Forbidden for the merge patch:** architecture refinement, cockpit expansion, certification redesign, score recuts, dirty-root cleanup campaigns, providers, FS1, PEAD, broker, live capital, empty-card missing-evidence theatre as the first value case.
+
+### Next product slice — E0B-DV1 Contradiction Case (G08)
+
+```text
+sealed adversarial synthetic bundle (contradictory indispensable evidence)
+→ sealed human baseline
+→ deterministic BLOCKED: CONTRADICTORY_INDISPENSABLE_EVIDENCE packet
+→ post-packet human decision
+→ frozen six-item rubric delta
+→ bind comparison hash to existing NO_POSITION certification
+→ one visible comparison
+```
+
+Endpoint authority: `docs/architecture/godview_e0/e0_acceptance_tests.md` **G08**. No provider. No full valuation engine. Engine may not average or majority-vote the contradiction.
 
 ### Closed substrate (history — not active gates)
 
-- **F1A OPEN / F1B NO_POSITION / F1C-SHIP**: closed on product tip lineage `490a234` (transport C/C2 + closeout T). Permanent two-role certified bundle + default Certified Portfolio route + product CI. Demoted to substrate; do not reopen as active shipment language.
-- **GV-FS0 protocol V1 freeze**: closed earlier; frozen contracts remain byte-immutable authority for certification bytes.
+- **F1A OPEN / F1B NO_POSITION / F1C-SHIP**: closed on product tip lineage `490a234`. Certification machinery only; not product endpoint.
+- **GV-FS0 protocol V1 freeze**: closed; frozen contracts remain byte-immutable for certification bytes.
 - **PEAD strict-PIT**: `TERMINATED_DIAGNOSTIC_ONLY` — not active product work.
-- **UOE / six-stream concurrent execution**: revoked as active product framing; retained only as historical product lineage.
+- **UOE / six-stream concurrent execution**: revoked as active product framing.
 
 ### Why multi-gate language is revoked
 
-Prior truth surfaces stacked “F1C closed / still active / still blocked / implement next” and left FS0 dual-demo language as if still the shipment gate. That multi-active-gate drift is revoked. **Only GV-E0A-OPERABLE is active.**
+Multi-active-gate drift is revoked. After merge smoke, the sole product slice is **E0B-DV1**. E0A remains banked substrate language only.
 
 Six concurrent endgame streams (A–F) remain deferred work packages, not concurrent implementation streams.
 
@@ -74,9 +115,11 @@ DecisionEnvelope
 
 `Fs0Certification` is a first-class immutable result. It is not UI logic, a test comment, or a discretionary reviewer conclusion.
 
-## GV-E0A-OPERABLE — Sole Active Gate (Research → One Operable Decision)
+## GV-E0A-OPERABLE — Banked Substrate (NOT the product endgame)
 
-### Objective
+> **Status:** `BANKED_SUBSTRATE` on product tip. Operator plumbing exists. Decision-value maturity remains ~9/100. Do not treat E0A as GodView product intelligence.
+
+### Objective (historical gate — closed as product work)
 
 Connect frozen MU `G_supply` research custody to one operator-visible **current** certified decision, without reopening FS0 dual-demo shipment language and without starting broad FS1.
 
@@ -369,11 +412,36 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-Implement **GV-E0A-OPERABLE only**:
+### Now — E0A-R1 repair tax only
 
 ```text
-frozen E0 custody → HOLD_FOR_EVIDENCE / NO_POSITION → one DecisionEnvelope
-→ book/cert → atomic current publication → one visible decision → Streamlit smoke
+resolve dual authority
+→ disposition missing authority refs with proven provenance only
+→ remove prohibited dual-authority default surface
+→ correct custody-vs-evidence overclaim
+→ focused tests + thin review
+→ merge to clean main
+→ fresh-checkout smoke
+→ CLOSE E0A permanently
 ```
 
-Do **not** reopen F1C-SHIP as an active gate. Do **not** start FS1, providers, PEAD, alpha claims, broker paths, dual-authority UI, or historical-suite repair. Keep `SHIPPED_PRODUCT_SCORE = 39/100`. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE` is stage-only and does not authorize alpha or score uplift.
+See `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`.
+
+### Immediately after clean-main smoke — sole product gate E0B-DV1
+
+```text
+frozen case identity
+→ blinded pre-GodView decision
+→ deterministic evidence-gap analysis
+→ explicit missing-evidence and falsifier packet
+→ blinded post-GodView decision
+→ predefined rubric
+→ causal delta (material attributable improvement required)
+→ certification
+→ operator-visible result
+```
+
+**E0B pass requires at least one causal decision improvement** (not a nicer packet alone): e.g. indispensable missing evidence baseline missed; invalid action prevented; falsifier quality improved; rationale completeness improved; time to correct blocked state reduced; uncertainty/next-action specificity improved.  
+`BLOCKED: MISSING_INDISPENSABLE_EVIDENCE` is valid. Honest “no improvement” is allowed. Fabricated investment opinion is forbidden.
+
+Do **not** reopen F1C-SHIP or E0A as product gates. Do **not** start providers, FS1, PEAD, alpha claims, broker paths, dual-authority UI, historical-suite repair, or portfolio expansion before E0B-SHIP. E0A-R1 must not raise decision-value maturity.
