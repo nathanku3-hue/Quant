@@ -543,7 +543,18 @@ def main(argv: list[str] | None = None) -> int:
                 load_session_manifest(paths["session"].parent / "session_manifest.json")
             )
             event_files = sorted((paths["session"].parent / "events").glob("*.json"))
-            if len(event_files) <= 1:
+            checkpoints = (
+                load_capture_checkpoints(paths["session"]) if event_files else []
+            )
+            session_open_only = (
+                not checkpoints
+                or (
+                    len(checkpoints) == 1
+                    and checkpoints[0]["operation"] == "OPEN_SESSION"
+                    and checkpoints[0]["state"] == CAPTURE_STATE_RESUMABLE
+                )
+            )
+            if len(event_files) <= 1 and session_open_only:
                 _resume_session_open(paths=paths, manifest=manifest)
                 checkpoint = load_capture_checkpoints(paths["session"])[-1]
                 print("RECOVER_SESSION")
@@ -551,7 +562,6 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"state={checkpoint['state']}")
                 print(f"detail={checkpoint['detail']}")
                 return 0
-            checkpoints = load_capture_checkpoints(paths["session"])
             operation = str(checkpoints[-1]["operation"])
             expected_stage, expected_artifacts = _operation_expectation(paths, operation)
             checkpoint = recover_capture_checkpoint(

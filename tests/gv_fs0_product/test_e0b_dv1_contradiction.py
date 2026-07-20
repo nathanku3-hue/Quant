@@ -2770,6 +2770,41 @@ def test_runner_source_identity_guard_detects_checkout_drift(
         runner._assert_session_source_identity(case_dir, session_path)
 
 
+def test_runner_recovers_active_open_baseline_before_event_append(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import scripts.gv_e0b_g08_capture as runner
+
+    case_dir = tmp_path / "active-open-baseline"
+    session_path = case_dir / "captures" / "session.json"
+    open_capture_session(
+        session_path=session_path,
+        source_commit="a" * 40,
+        source_tree="b" * 40,
+        protocol_freeze_manifest_sha256="d" * 64,
+        operator_principal_id="OP_REAL_001",
+        reviewer_principal_id="REV_REAL_001",
+    )
+    append_capture_checkpoint(
+        session_path=session_path,
+        operation="OPEN_BASELINE",
+        state=CAPTURE_STATE_ACTIVE,
+        detail="operation_started",
+    )
+    monkeypatch.setattr(
+        runner,
+        "_assert_session_source_identity",
+        lambda _case_dir, _session_path: None,
+    )
+
+    assert runner.main(["recover-session", "--case-dir", str(case_dir)]) == 0
+    assert len(list((session_path.parent / "events").glob("*.json"))) == 1
+    checkpoints = load_capture_checkpoints(session_path)
+    assert checkpoints[-1]["operation"] == "OPEN_BASELINE"
+    assert checkpoints[-1]["state"] == CAPTURE_STATE_RESUMABLE
+
+
 def test_session_open_rejects_same_principal_and_nonblank_template(
     tmp_path: Path,
 ) -> None:
