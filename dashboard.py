@@ -49,6 +49,7 @@ from views.page_registry import STRATEGY_PAGE_TITLE
 from views.discovery_view import render_discovery_page
 from views.gv_fs0_portfolio_adapter import (
     GvFs0PresentationError,
+    render_e0b_dv1_surface,
     render_gv_fs0_current_decision,
 )
 from views.pead_validation_evidence import render_pead_validation_evidence
@@ -4744,8 +4745,10 @@ def _render_portfolio_allocation_page() -> None:
     st.header(PORTFOLIO_PAGE_TITLE)
     st.caption(
         "E0A operable · research HOLD_FOR_EVIDENCE → paper NO_POSITION. "
-        "One active certified decision. Legacy replay and optimizer outputs are "
-        "non-certifying research surfaces. F1C dual-role bundle remains evidence-only."
+        "One active certified decision. E0B-DV1 G08 is the active decision-value "
+        "slice (external seals only; score 39 frozen; observed-comparison count "
+        "starts at 0). Legacy replay and optimizer outputs are non-certifying. "
+        "F1C dual-role bundle remains evidence-only."
     )
     try:
         render_gv_fs0_current_decision(st)
@@ -4754,6 +4757,8 @@ def _render_portfolio_allocation_page() -> None:
         # bundle, replay, optimizer, or any non-certifying surface.
         st.error("Certified decision unavailable")
         st.caption(f"Authority refused: {exc}")
+    # Optional one-case E0B surface; missing real seals keep observed count at 0.
+    render_e0b_dv1_surface(st)
 
 
 def _render_discovery_page() -> None:

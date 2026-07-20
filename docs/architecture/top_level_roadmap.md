@@ -1,34 +1,42 @@
 # Top-Level Roadmap: GodView Certified Portfolio OS
 
-Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; next ONE_CASE_DECISION_DELTA_OBSERVED
-Date: 2026-07-19
-Product tip lineage: `accef5c` (E0A operable banked; F1C-SHIP closed substrate earlier at `490a234`)
-Active work: E0A merge-safety patch (not a product phase) → then E0B-DV1 Contradiction Case
+Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
+Date: 2026-07-21
+Product tip lineage: `2653eb1` main → PR #5 C0 `b7a24d3` → hosted/reviewed E0B candidate `43dce24`
+Active work: E0B-DV1 code/custody candidate PASS; real G08 human capture remains required for observed close
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
 ## Governing sequence (endgame law)
 
 ```text
 truth substrate
-→ demonstrated evidence-to-decision improvement
-→ replicated decision value
-→ prospective economic value
-→ live capital
+→ G08 observed comparison
+→ frozen V2-B0 protocol
+→ first real MU block-only admission
+→ independent decision-value replication
+→ prospective paper economics
+→ live-capital consideration
 ```
 
 Portfolio truth first. Decision value second. No fabricated alpha. No score engineering.
+Real MU admission may replace a second synthetic comparison as the immediate next gate after G08; it does **not** satisfy replicated decision value and must not silently move the project toward economics.
 
 ## Executive Decision (Active Canon)
 
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
+EXECUTION_MODEL = GV_FS0_FIRST
+ACTIVE_GATE = E0B-DV1
 F1C_SHIP = CLOSED_SUBSTRATE
 E0A_OPERABLE = BANKED_SUBSTRATE (custody→HOLD_FOR_EVIDENCE→NO_POSITION; NOT decision value)
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
 FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
+OBSERVED_COMPARISON_COUNT = 0
 NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED
-ACTIVE_MERGE_PATCH = E0A-R1 (bounded merge residue only; not a product gate)
-ACTIVE_PRODUCT_SLICE_AFTER_MERGE = E0B-DV1 Contradiction Case (G08)
+E0A_R1_MERGE_PATCH = CLOSED (PR #4 @ 2653eb1)
+ACTIVE_PRODUCT_SLICE = E0B-DV1 Contradiction Case (G08) repair
+V2_BLOCK_ONLY_REAL_ADMISSION = RECOMMENDED_NEXT_PROTOCOL
+V1_PROTOCOL_AUTHORITY = FORMAL_UNTIL_V2_ARTIFACT_COMMITTED
 SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED
 BACKWARD_COMPATIBILITY_LAYER = PROHIBITED
 REAL_PROVIDER_READ = BLOCKED_PENDING_DATA_ACCESS_AUTHORIZATION
@@ -39,8 +47,9 @@ LIVE_TRADING_MONITORING = OUT_OF_SCOPE
 FS1_BATCH = NOT_NEXT
 ```
 
-**Now:** bounded **E0A merge patch** so main integrates without dual-authority residue, then **E0B-DV1**.  
-E0A is banked plumbing, not GodView decision intelligence. Score stays **39/100**.
+**Now:** **E0B-DV1 repair** only. E0A-R1 is closed with PR #4.  
+E0A is banked plumbing, not GodView decision intelligence. Score stays **39/100**.  
+Report **observed-comparison count** (currently 0); do not use unofficial decision-value or conjunctive maturity percentages.
 
 ### What E0A proves vs does not prove
 
@@ -117,7 +126,7 @@ DecisionEnvelope
 
 ## GV-E0A-OPERABLE — Banked Substrate (NOT the product endgame)
 
-> **Status:** `BANKED_SUBSTRATE` on product tip. Operator plumbing exists. Decision-value maturity remains ~9/100. Do not treat E0A as GodView product intelligence.
+> **Status:** `BANKED_SUBSTRATE` on product tip. Operator plumbing exists. Observed-comparison count remains 0 until a verified real-human E0B close. Do not treat E0A as GodView product intelligence.
 
 ### Objective (historical gate — closed as product work)
 
@@ -412,36 +421,99 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-### Now — E0A-R1 repair tax only
+### Now — S-009X / E0B-DV1 only
+
+E0A-R1 is permanently closed on PR #4 at `2653eb1`. Do not reopen E0A, F1C, or the frozen protocol.
+
+Custody lineage is now explicit:
 
 ```text
-resolve dual authority
-→ disposition missing authority refs with proven provenance only
-→ remove prohibited dual-authority default surface
-→ correct custody-vs-evidence overclaim
-→ focused tests + thin review
-→ merge to clean main
-→ fresh-checkout smoke
-→ CLOSE E0A permanently
+main 2653eb1
+→ e9e9a9a
+→ C0 b7a24d3 (hosted-green publication-authority substrate)
+→ C1 observation/value semantic repair (must be a direct descendant)
 ```
 
-See `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`.
+Do not reconstruct from `e9e9a9a`, force-push over unexplained remote movement, or run G08 on C0. Use a fresh approved-root clone or standalone checkout of C0, transfer exactly 15 source-of-truth files, regenerate derived context, and bank C1 before acceptance.
 
-### Immediately after clean-main smoke — sole product gate E0B-DV1
+### Sole product gate E0B-DV1 (after PR #4 @ 2653eb1)
 
 ```text
-frozen case identity
-→ blinded pre-GodView decision
-→ deterministic evidence-gap analysis
-→ explicit missing-evidence and falsifier packet
-→ blinded post-GodView decision
-→ predefined rubric
-→ causal delta (material attributable improvement required)
-→ certification
-→ operator-visible result
+synthetic G08 sealed bundle
+→ real human baseline seal (same operator for post)
+→ deterministic BLOCKED:CONTRADICTORY_INDISPENSABLE_EVIDENCE packet
+→ real human post-packet seal
+→ independent reviewer rubric (different identity)
+→ recompute hashes; atomic result.json + decision_packet.md
+→ comparison-bound E0B DecisionEnvelope (E0B:CMP:<hash>)
+→ certify/publish with SYNTHETIC_DEV_RUN label
+→ operator-visible Streamlit surface
 ```
 
-**E0B pass requires at least one causal decision improvement** (not a nicer packet alone): e.g. indispensable missing evidence baseline missed; invalid action prevented; falsifier quality improved; rationale completeness improved; time to correct blocked state reduced; uncertainty/next-action specificity improved.  
-`BLOCKED: MISSING_INDISPENSABLE_EVIDENCE` is valid. Honest “no improvement” is allowed. Fabricated investment opinion is forbidden.
+**E0B reports one observed within-case difference and a separate bounded value disposition.** Positive, zero, or negative results may all be methodologically valid and retained. Causal superiority, population effectiveness, generalized research efficiency, alpha, and score uplift claims are forbidden.
+Engine fixtures validate machinery only and never increment observed-comparison count. A real human baseline/post (same operator) plus a different blinded reviewer may establish `comparison_observed_eligible=true`. Only `decision_value_disposition=IMPROVED` closes S-009X as product PASS; `NOT_IMPROVED` is honest falsification and triggers replan without maturity uplift.
 
-Do **not** reopen F1C-SHIP or E0A as product gates. Do **not** start providers, FS1, PEAD, alpha claims, broker paths, dual-authority UI, historical-suite repair, or portfolio expansion before E0B-SHIP. E0A-R1 must not raise decision-value maturity.
+Frozen one-case value rule:
+
+```text
+IMPROVED iff
+  total blinded-rubric delta > 0
+  AND at least one targeted dimension improves:
+      indispensable_missing_evidence_identification
+      OR falsifier_and_contradiction_recognition
+  AND neither core safety dimension worsens:
+      selected_action_defensibility
+      avoidance_of_claims_beyond_evidence
+else NOT_IMPROVED
+```
+
+Persisted stage order (no compatibility shim):
+
+```text
+real baseline capture/seal
+→ packet generated afterward with actual captured timestamp
+→ real post decision seal
+→ independent rubric seal
+→ comparison over pre-sealed records only
+```
+
+Observed paths reject unsealed input. Fixture certification may remain test-only; current publication requires `comparison_observed_eligible=true` and exact observed count `1`. UI/count recomputes result, comparison, seals, observation eligibility, and value disposition before display. No `e0b_close_eligible` compatibility alias exists.
+
+### Post-G08 protocol (recommended; not yet authoritative)
+
+```text
+V2_BLOCK_ONLY_REAL_ADMISSION = RECOMMENDED_NEXT_PROTOCOL
+```
+
+Until a **frozen V2 protocol artifact is committed**, **V1 remains formal protocol authority**. V2 does **not** yet supersede V1 and **no real MU admission is authorized**.
+
+Terminal G08 disposition:
+
+```text
+valid G08 observation
+→ count 0→1; stage ONE_CASE_DECISION_DELTA_OBSERVED; score stays 39
+→ IMPROVED: S-009X PASS; choose the next value-bearing slice
+→ NOT_IMPROVED: publish/retain falsification; no uplift; replan GodView value hypothesis
+```
+
+V2-B0 and real MU admission remain closed until this disposition. Do not repeat G08 to obtain a preferred result.
+
+Accepted deviations from earlier roadmap framing:
+- Portfolio OS replaces discretionary-cockpit framing (accepted).
+- V2 block-only real admission replaces V1’s nineteen-case route (**proposed**, not authoritative until artifact).
+- Two humans (operator + different blinded reviewer) replace operator/reviewer/attestor (accepted).
+- Equal 60-minute **maximum** budget with early submit (not forced exact elapsed 60 minutes).
+- Mechanical REVIEW_PACKAGE blinding (ARM_A/ARM_B); reviewer self-label alone is insufficient.
+
+Capture chain (exact):
+
+```text
+SESSION_OPEN → BASELINE_OPEN → BASELINE_CLOSE → PACKET
+→ POST_OPEN → POST_CLOSE → REVIEW_PACKAGE → RUBRIC_CLOSE
+```
+
+Ledger is **tamper-evident under capture-process custody**. Local hashes do not independently prove wall-clock history or human identity against a privileged repository operator.
+
+Until G08 closes with verified two-human structure + bound chain replay: score 39 frozen; observed-comparison count 0; no MU real-admission.
+
+Do **not** reopen F1C-SHIP or E0A as product gates. Do **not** start providers, FS1, PEAD, alpha claims, broker paths, dual-authority UI, or portfolio expansion before a real observed comparison exists.

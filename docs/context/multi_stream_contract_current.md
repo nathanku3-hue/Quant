@@ -1,18 +1,29 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-E0A Main Cutover Multi-Stream (2026-07-19)
+## Terminal Addendum — E0B-DV1 Candidate (2026-07-21)
 
 | Stream | Status | Note |
 |---|---|---|
-| Backend/Strategy | **Closed for E0A product** | Terminal operable vertical banked; no product change in cutover |
-| Frontend/UI | **Closed for E0A product** | One current certified decision default; smoke after main FF |
-| Data admission | Held | No provider/real prices/admission |
-| Docs/Ops | **Active cutover** | Truth repair + context bootstrap + main FF coordination |
-| Product CI | PASS substrate | E0A hosted `29655802878`; F1C `29651784244` |
-| PEAD / FS1 / broker | Held | Forbidden as next |
+| Backend/Product | **Candidate PASS** | Code pin `43dce24`; recovery/source-custody repair closed |
+| Product CI / Review | **PASS** | Hosted `29777518085`; distinct A/B/C PASS |
+| Docs/Ops | **Terminal evidence** | Current truth, generated context, reviewer reports, and SAW reconciled |
+| Product/Research | Next gate held | Real G08 not run; count remains 0 |
+| Data / PEAD / FS1 / broker | Held | No adjacent scope opened |
 
-- Cross-stream rule: **one active integration gate — GV-E0A-MAIN-CUTOVER-PREFLIGHT**. Product gate E0A is terminal; F1C is substrate only.
-- Next action after integrated-main smoke: open **GV-E0B Decision-Value** planning across Backend/Docs only; no FS1 expansion; no F1C reopen; no PEAD.
+## Active Addendum — S-009X / E0B-DV1 Direction and Custody (2026-07-21)
+
+| Stream | Status | Note |
+|---|---|---|
+| Backend/Product | **C1 source ready** | C0 `b7a24d3` hosted-green; observation/value split local 305/305; immutable C1 absent |
+| Frontend/UI | Held stable | Existing operator-visible comparison surface only; no new UI programme |
+| Product/Research | **Active disposition contract** | `IMPROVED` vs `NOT_IMPROVED`; valid falsification retained |
+| Docs/Ops | **Active custody** | Transfer exact 15 source files onto C0; regenerate context and SAW only after C1 banking |
+| Product CI / Review | C0 green; C1 pending | Push exact C1, then hosted Ubuntu/Windows/parity and A/B/C concurrently |
+| Data / PEAD / FS1 / broker | Held | No providers, alpha, live capital, or adjacent phase |
+
+- Cross-stream rule: **one active product gate — S-009X / E0B-DV1**. E0A-R1 and F1C are closed substrate; Leningrad is independent.
+- Product semantics determine result disposition. Meta-Harness signer/fileset limitations do not deform or block Quant.
+- Next action: fresh-clone or standalone-checkout C0 `b7a24d3` under the approved root, transfer 15 source files, regenerate derived context, bank C1, prove the clean exact tree, push, then run hosted evidence and independent review concurrently.
 
 ## Prior Addendum — GV-E0A-OPERABLE Multi-Stream (2026-07-19) [superseded — E0A implemented]
 

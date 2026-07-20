@@ -1,32 +1,58 @@
 # Planner Packet - Current
 
-## New Context Packet — E0A-R1 Merge-Safety Repair (2026-07-19)
+## New Context Packet — E0B-DV1 Candidate SAW PASS (2026-07-21)
 
 ## What Was Done
 
-- E0A operable vertical is **banked substrate** on product tip (transport C `45f9f96` + C2 `446ac6d`; hosted CI PASS; A/B/C PASS; SAW PASS). Default UI is one current certified decision (`HOLD_FOR_EVIDENCE` → paper `NO_POSITION`).
-- F1C-SHIP remains closed substrate only (dual-fixture evidence path; never product default fallback).
-- Context bootstrap repaired so generated `current_context` selects E0A/product packets instead of historical PEAD "New Context Packet" blocks.
-- Owner audit reclassified E0A-R1 as **repair tax** (not product maturity) and E0B-DV1 as first real GodView product slice.
+- Banked and pushed exact code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54` (tree `9db1243e110015082216a7fa31fd56616c383d97`) above hosted C0 `b7a24d3`.
+- Closed interrupted session initialization, source-drift attribution, strict descriptor, CLI replay, and ACTIVE first-stage recovery findings with regression coverage.
+- Passed immutable local 98 focused / 191 product / 137 protocol / 329 combined, AppTest 2, context/freeze validation; hosted run `29777518085` passed Ubuntu, Windows, and parity; distinct Reviewer A/B/C passed with no Critical/High/Medium findings.
 
 ## What Is Locked
 
-- E0A proves plumbing only — not research intelligence, decision value, portfolio outcomes, alpha, or economic value.
-- Conjunctive endgame maturity tracks **decision-value** (~9/100), not additive substrate scores.
-- E0A-R1 hard cap: dual authority, provenance-safe missing refs, no dual-authority default, overclaim fix, focused tests, merge, fresh-checkout smoke — then **stop**.
-- Missing authority files: prove provenance before tracking, else amend/remove reference. No dirty-root auto-canonization.
-- FS1, providers, real prices, PEAD reopen, alpha claims, broker paths, compatibility dual-authority UI remain closed.
-- PEAD program stays `TERMINATED_DIAGNOSTIC_ONLY` history only.
+- Candidate code and custody are terminal for this round. Score remains 39/100, stage remains `CERTIFIED_SINGLE_DECISION_OPERABLE`, observed comparison count remains 0, and S-009X PASS is not earned.
+- No production-code change may occur after real capture begins; any such change invalidates that run.
+
+## What Remains
+
+- From a fresh clean checkout of the exact hosted-green candidate, execute one real G08 with one operator and one different blinded reviewer, then verify/publish and retain either `IMPROVED` or `NOT_IMPROVED` without rerunning for sign.
+
+## Immediate Next Step
+
+- Prepare the clean exact-pin G08 custody checkout and human handoff; do not open FS1, providers, PEAD, broker, alpha, or V2-B0 implementation.
+
+## New Context Packet — E0B-DV1 Direction and Custody Repair (2026-07-21)
+
+## What Was Done
+
+- Verified remote PR #5 advanced to hosted-green C0 `b7a24d3da65f78c673f7e08b5f719603f404282e`; preserved its verified-result-only publication hardening, fail-closed path identity, pairwise alias/hard-link rejection, and paired canonical-artifact rollback.
+- Rejected mutable-worktree test counts, generated context, and SAW counts as exact-candidate evidence; no immutable candidate exists yet.
+- Deleted the conflated `e0b_close_eligible` concept without compatibility.
+- Added sign-independent `comparison_observed_eligible` for publication/count and separate `decision_value_disposition = IMPROVED | NOT_IMPROVED` for product outcome.
+- `IMPROVED` requires positive total blinded-rubric delta, at least one targeted GodView gain, and no core safety regression. Every other valid observed result is `NOT_IMPROVED` and remains publishable as honest falsification.
+- Local boundary proof is focused E0B 74/74, product 168/168, and frozen protocol 137/137 (305/305 total), with identical pre/post code-test diff hash C0-relative `c5459187846100b3dbfbfe3a98ae5eb0909bd23e` for both complete suites. This remains mutable-worktree evidence, not immutable-SHA acceptance.
+- C0 is already committed, pushed, and hosted-green. No C1 semantic-repair commit/push, C1 hosted run, independent Reviewer A/B/C, real G08, publication, stage promotion, score uplift, or merge occurred.
+
+## What Is Locked
+
+- `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`. `OBSERVED_COMPARISON_COUNT = 0`. S-009X PASS is not earned.
+- Observation eligibility and product-value success are separate; no valid `NOT_IMPROVED` result may be suppressed or retried for a preferred sign.
+- Any production-code change after human capture invalidates G08 and requires a new run.
+- E0A-R1, S-006M, F1C, the frozen protocol, Leningrad rebinding, providers, PEAD, FS1, broker, alpha, V2-B0, and generic Meta-Harness work remain closed.
+- Meta-Harness’s unavailable epoch-2 signer does not block Quant and must not be bypassed or forged.
 
 ## What Is Next
 
-- Complete **E0A-R1** only: make main single-authority, smoke fresh checkout, close E0A permanently.
-- Then open **E0B-DV1** as sole product gate: blinded baseline → GodView missing-evidence/falsifier packet → revised decision → frozen rubric → **causal** delta → cert → operator-visible result. Not FS1. Not providers.
+1. Reconstruct the exact 15-source-file semantic repair on C0 `b7a24d3`, bank one intentional C1 SHA, and regenerate context and SAW only from that exact source state.
+2. Prove exact C1 locally: focused E0B, complete product, frozen protocol, combined boundary, AppTest, context validation, diff hygiene, clean worktree, parent=`b7a24d3`, and unchanged tree.
+3. Push immediately; run hosted Ubuntu/Windows/parity and independent Reviewer A/B/C concurrently; reconcile once.
+4. Run real G08 only from a fresh clean checkout of the exact hosted-green SHA.
+5. Publish the valid result regardless of sign. `IMPROVED` => S-009X PASS. `NOT_IMPROVED` => falsified hypothesis, no uplift, replan.
 
 ## First Command
 
 ```text
-git show --stat --oneline HEAD
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py
 ```
 
 ## End Context Packet

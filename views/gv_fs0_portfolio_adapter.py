@@ -207,6 +207,39 @@ def render_gv_fs0_current_decision(
     )
 
 
+def render_e0b_dv1_surface(
+    renderer: PortfolioRenderer,
+    *,
+    result_json_path: Path | None = None,
+) -> dict[str, Any] | None:
+    """Optional E0B comparison surface. Missing artifact → count 0, no raise."""
+
+    from core.gv_e0b_dv1_contradiction import (
+        DEFAULT_RESULT_JSON,
+        GvE0bDv1Error,
+        observed_comparison_count_from_disk,
+        render_e0b_dv1_comparison,
+    )
+
+    path = Path(result_json_path) if result_json_path is not None else DEFAULT_RESULT_JSON
+    count = observed_comparison_count_from_disk(path)
+    if not path.is_file():
+        renderer.caption(
+            f"E0B observed-comparison count = {count} "
+            "(no published comparison artifact; stage stays "
+            "CERTIFIED_SINGLE_DECISION_OPERABLE; score 39 frozen)"
+        )
+        return None
+    try:
+        return dict(render_e0b_dv1_comparison(renderer, result_json_path=path))
+    except GvE0bDv1Error as exc:
+        renderer.caption(
+            f"E0B observed-comparison count = {count} "
+            f"(comparison artifact refused: {exc})"
+        )
+        return None
+
+
 __all__ = [
     "DEFAULT_BUNDLE_PATH",
     "DEFAULT_CURRENT_DECISION_PATH",
@@ -214,6 +247,7 @@ __all__ = [
     "build_portfolio_view_model",
     "load_current_certified_decision",
     "load_default_certified_bundle",
+    "render_e0b_dv1_surface",
     "render_gv_fs0_certified_bundle",
     "render_gv_fs0_current_decision",
     "render_gv_fs0_portfolio",

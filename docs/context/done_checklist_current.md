@@ -1,6 +1,41 @@
 # Done Checklist - Current
 
-## Active Addendum — GV-E0A-OPERABLE Direction + Gate Checklist (2026-07-19)
+## Terminal Candidate Addendum — E0B-DV1 C1 (2026-07-21)
+
+- [x] Exact code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54`, tree `9db1243e110015082216a7fa31fd56616c383d97`, is committed, pushed, and clean.
+- [x] Interrupted open boundaries and ACTIVE `OPEN_BASELINE` recovery are fail-closed, idempotent, checkpoint-aware, and regression-tested.
+- [x] Immutable local boundary: 98 focused, 191 product, 137 protocol, 329 combined, AppTest 2, context validation, and freeze enforcement PASS.
+- [x] Hosted run `29777518085` PASS on Ubuntu, Windows, and exact byte parity.
+- [x] Distinct Reviewer A/B/C PASS with no unresolved Critical/High/Medium findings.
+- [ ] Real two-human G08 capture, result publication, count 0→1, value disposition, and result-bearing merge remain intentionally unperformed.
+
+## Active Addendum — E0B-DV1 Direction and Custody Repair Checklist (2026-07-21)
+
+- [x] Hosted-green PR #5 substrate C0 is exact remote `b7a24d3da65f78c673f7e08b5f719603f404282e`; score 39 frozen; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed count 0.
+- [x] Hardcoded baseline/post/rubric APIs deleted (no shim); staged seals, timing, blinding, replay, and atomic artifacts retained.
+- [x] Comparison-only E0B decision, book, certification, and publication helpers removed from the public module surface with no compatibility path.
+- [x] Generic current-decision publisher imported only under a private alias.
+- [x] `run_e0b_dv1_case()` is the sole official E0B publication entry point.
+- [x] Publication is bound only to the reloaded verified result with `comparison_observed_eligible=true`, exact integer count `1`, pinned result schema/case/run class, complete comparison reconstruction from verified sealed records, and rationale bound to the embedded comparison hash.
+- [x] `e0b_close_eligible` deleted with no compatibility path; observation eligibility and decision-value disposition are independent verified claims.
+- [x] `IMPROVED` requires positive total rubric delta, a targeted evidence/falsifier gain, and no core safety regression; every other valid observed result is `NOT_IMPROVED`.
+- [x] Fixture publication cannot create or replace a target; observation false, count zero/wrong type, result identity tamper, fully re-sealed comparison mismatch, public-surface composition, uncertain path identity, and pairwise path aliases (including hard links) fail before any evidence or publication write.
+- [x] Canonical result and decision-packet bytes stage before replacement; any second-replacement failure restores both prior paths or leaves both absent.
+- [x] Valid two-human `IMPROVED` and `NOT_IMPROVED` results both certify/publish with exact result-comparison rationale binding; only `IMPROVED` can earn S-009X product PASS.
+- [x] Focused E0B 74/74, product 168/168, frozen protocol 137/137, 305/305 total, and default-route AppTest PASS locally; exact code/test diff hash C0-relative `c5459187846100b3dbfbfe3a98ae5eb0909bd23e` unchanged before/after both complete suites.
+- [ ] The same boundary and context validation pass against one immutable clean candidate SHA/tree with a clean worktree.
+- [x] Tracked E0A current-decision bytes remain unchanged: SHA-256 `7ba9c7c48dfc89ceae2a5a88aba8bfebbe6d5032272b0d254f4139478699b5c9`, 23,696 bytes.
+- [ ] One intentional C1 commit descends from C0 `b7a24d3`, with exact SHA/tree/patch identity, clean worktree, no untracked stale SAW, and regenerated current context.
+- [ ] Candidate pushed to PR #5; hosted Ubuntu, Windows, byte parity and frozen protocol proof run concurrently with independent Reviewer A/B/C.
+- [ ] Terminal SAW PASS on the same exact hosted-green candidate.
+- [ ] Real human baseline + post (same operator) + independent blinded reviewer rubric captured on the immutable green tip.
+- [ ] Replay/verify/publish complete; count 0→1; stage promoted to `ONE_CASE_DECISION_DELTA_OBSERVED`; value disposition recorded.
+- [ ] Canonical G08 evidence/publication/truth committed and pushed; result-bearing tip hosted-green and narrowly audited; no production-code change after capture.
+- [ ] `IMPROVED`: PR #5 merged and S-009X PASS earned. `NOT_IMPROVED`: valid falsification retained/merged, no uplift, hypothesis replanned.
+
+Next action: reconstruct the exact 15-source-file delta on C0 `b7a24d3`, bank C1, then prove and push that immutable SHA.
+
+## Prior Addendum — GV-E0A-OPERABLE Direction + Gate Checklist (2026-07-19)
 
 ### Direction hard-recut (Docs/Ops)
 
@@ -30,11 +65,8 @@
 - [x] Machine-shaped E0A terminal context packet is the first bootstrap-selectable packet.
 - [x] Stale Impact/Multi-stream/Alignment/Observability/Done/Bridge surfaces reconciled to terminal + cutover→E0B.
 - [x] Regression ensures context bootstrap prefers E0A terminal packet over later PEAD packets.
-- [ ] Fast-forward `main` to repaired product tip.
-- [ ] Smoke single certified decision from integrated main.
-- [ ] Open GV-E0B Decision-Value planning after smoke (not FS1; not indefinite hold).
-
-Next action: FF main after truth-repair bank; smoke one certified decision; then E0B planning only. Do not open FS1, providers, PEAD, alpha, or broker.
+- [x] Fast-forward/merge main via PR #4 @ `2653eb1`.
+- [x] Open E0B-DV1 repair (active addendum above).
 
 ## Prior Addendum — GV-FS0 F1C-SHIP Terminal Checklist (2026-07-19) [CLOSED_SUBSTRATE]
 

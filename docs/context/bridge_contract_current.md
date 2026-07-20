@@ -1,6 +1,45 @@
 # Bridge Contract - Current
 
-## Active Addendum — GV-E0A Main Cutover Preflight (2026-07-19)
+## New Context Packet — E0B-DV1 Candidate SAW PASS (2026-07-21)
+
+## What Was Done
+
+- Banked hosted/reviewed code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54` with immutable local 329/329 and distinct Reviewer A/B/C PASS.
+- Closed session initialization, source-drift, strict descriptor, CLI replay, and ACTIVE first-stage recovery findings.
+
+## What Is Locked
+
+- Score remains 39/100; stage remains `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed comparison count remains 0; S-009X PASS is not earned.
+- Real G08 must use a fresh clean checkout of the exact hosted-green code pin with no production-code change after capture begins.
+
+## What Is Next
+
+- Prepare the exact-pin G08 human handoff, execute one valid comparison, then verify/publish and retain either `IMPROVED` or `NOT_IMPROVED` without rerunning for sign.
+
+## First Command
+
+```text
+git show --stat --oneline 43dce24f806908f1a80f017f9d9b4125d908eb54
+```
+
+## Terminal Candidate Addendum — E0B-DV1 C1 Custody Closed (2026-07-21)
+
+- SYSTEM_DELTA: PR #5 now pins repaired code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54` (tree `9db1243e110015082216a7fa31fd56616c383d97`) above C0 `b7a24d3`. Interrupted SESSION_OPEN is idempotently replayable, every mutating runner path rechecks sealed source identity, and ACTIVE first-stage recovery is checkpoint-aware.
+- EVIDENCE: 98 focused + 191 product + 137 frozen protocol = 329/329 local PASS with unchanged HEAD/tree; AppTest 2/2; context/freeze validation PASS; hosted run `29777518085` PASS on Ubuntu, Windows, and byte parity; Reviewer A/B/C PASS with no Critical/High/Medium findings.
+- PRODUCT_STATE: score 39/100 frozen; `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed comparison count 0; S-009X product PASS not earned. Candidate custody is closed; real G08 remains the next separate gate.
+- PHASE_STATUS: `E0B_DV1_CANDIDATE_SAW_PASS; CODE_PIN_43DCE24; HOSTED_GREEN; REVIEWERS_A_B_C_PASS; OBSERVED_COMPARISON_COUNT_0; REAL_G08_NOT_RUN`.
+
+## Active Addendum — E0B-DV1 Direction and Custody Repair (2026-07-21)
+
+- SYSTEM_DELTA: remote PR #5 C0 is hosted-green `b7a24d3`; preserve that publication-authority substrate and layer C1 as a direct descendant that replaces conflated close semantics with `comparison_observed_eligible` for methodological publication/count authority and `decision_value_disposition=IMPROVED|NOT_IMPROVED` for the product hypothesis. `IMPROVED` requires positive total rubric delta, a targeted evidence/falsifier gain, and no core safety regression. No compatibility alias exists.
+- PM / Product Delta: score **39/100 frozen**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; **observed-comparison count = 0**; S-009X product PASS **NOT_EARNED**. Local boundary is 74 focused + 168 product + 137 frozen protocol = 305/305 with stable pre/post code-test diff hash C0-relative `c5459187846100b3dbfbfe3a98ae5eb0909bd23e`, but no immutable candidate SHA or clean-tree acceptance exists.
+- OPEN_DECISION: none for product direction. Operational gates are one intentional C1 SHA with parent `b7a24d3`, exact local proof, push, concurrent hosted parity plus independent Reviewer A/B/C, real G08, and result-bearing disposition.
+- RECOMMENDED_NEXT_STEP: fresh-clone or standalone-checkout C0 `b7a24d3` under the approved project root, transfer exactly 15 source files, regenerate derived context, bank C1, prove a clean unchanged tree locally, push immediately, run hosted and independent reviews concurrently, then execute G08 from a fresh clean checkout. Publish every valid result: `IMPROVED` merges as S-009X PASS; `NOT_IMPROVED` is retained falsification with no uplift and triggers replan.
+- DO_NOT_REDECIDE: S-006M/E0A/F1C/protocol reopen; Leningrad rebinding; fabricated human/reviewer evidence; compatibility close aliases; suppressing or rerunning a valid negative/zero result; V2-B0/FS1/providers/PEAD/broker/alpha; generic Meta-Harness work.
+- CUSTODY_LIMIT: the dirty repair worktree is source evidence, not acceptance custody. Meta-Harness signer unavailability does not block Quant and must not be bypassed.
+- PHASE_STATUS: `E0B_DV1_DIRECTION_CUSTODY_REPAIR; C0_B7A24D3_HOSTED_GREEN; C1_ABSENT; FOCUSED_74_PASS; PRODUCT_168_PASS; PROTOCOL_137_PASS; OBSERVED_COMPARISON_COUNT_0; S009X_PASS_NOT_EARNED; SCORE_39`.
+
+## Prior Addendum — GV-E0A Main Cutover Preflight (2026-07-19) [superseded: PR #4 merged]
 
 - SYSTEM_DELTA: E0A remains terminal on product tip lineage (`45f9f96`/`446ac6d`); cutover preflight repairs generated context bootstrap so active truth is E0A, not PEAD, before fast-forward into `main`.
 - PM / Product Delta: one current certified decision stays default authority; score 39/100; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`; F1C dual bundle remains substrate only.

@@ -1,18 +1,13 @@
 ## What Was Done
-- E0A operable vertical is **banked substrate** (C `45f9f96` + C2 `446ac6d`; hosted CI PASS; A/B/C PASS; SAW PASS). One current certified decision only.
-- F1C-SHIP closed substrate; dual-fixture never default UI fallback.
-- Context bootstrap prefers product/E0A packets over historical PEAD blocks.
-- Owner audit: E0A-R1 = repair tax; E0B-DV1 = first real GodView product slice.
+- Banked hosted/reviewed code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54` with immutable local 329/329 and distinct Reviewer A/B/C PASS.
+- Closed session initialization, source-drift, strict descriptor, CLI replay, and ACTIVE first-stage recovery findings.
 
 ## What Is Locked
-- E0A is plumbing only — not decision value / alpha / economics.
-- Conjunctive endgame ≈ decision-value maturity (~9/100). Additive substrate scores must not mask that.
-- E0A-R1 hard cap then stop; no dirty-root authority auto-canonization.
-- FS1, providers, PEAD reopen, alpha claims, broker, dual-authority default UI closed.
-- PEAD = `TERMINATED_DIAGNOSTIC_ONLY` history only.
+- Score remains 39/100; stage remains `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed comparison count remains 0; S-009X PASS is not earned.
+- Real G08 must use a fresh clean checkout of the exact hosted-green code pin with no production-code change after capture begins.
 
 ## What Is Next
-- Finish E0A-R1 (single authority + merge + fresh-checkout smoke), close E0A, open E0B-DV1 with causal decision-improvement pass bar. Not FS1.
+- Prepare the exact-pin G08 human handoff, execute one valid comparison, then verify/publish and retain either `IMPROVED` or `NOT_IMPROVED` without rerunning for sign.
 
 ## First Command
-`git show --stat --oneline HEAD`
+`git show --stat --oneline 43dce24f806908f1a80f017f9d9b4125d908eb54`
