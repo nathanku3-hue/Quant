@@ -1,3 +1,10 @@
+## 2026-07-21 E0B Capture Recovery Invariants
+
+- Runtime: `core/gv_e0b_dv1_contradiction.py` and `scripts/gv_e0b_g08_capture.py`.
+- SESSION_OPEN replay: exactly one sealed opening event; reconstructible index may be rewritten; missing RESUMABLE opening checkpoint may be appended; an existing valid opening checkpoint is returned without duplication.
+- Source identity: before every post-open mutation, `HEAD == manifest.source_commit`, `HEAD^{tree} == manifest.source_tree`, and the enforced protocol-freeze manifest hash must match; tracked dirt or untracked paths outside the canonical case directory block.
+- Recovery routing: `session_open_only := no checkpoints OR exactly one OPEN_SESSION/RESUMABLE checkpoint`; otherwise recover the latest checkpoint operation even when only the opening event exists.
+
 ## 2026-07-21 E0B Observation / Decision-Value Formula Registry
 
 - Runtime: `core/gv_e0b_dv1_contradiction.py::decision_value_disposition_from_comparison`.
@@ -6529,4 +6536,3 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Cumulative contribution: `current_NAV - initial_cash`; terminal contribution is `44`.
 - Certification: exactly two isolated verifier attempts must both reproduce the primary economic payload and hash; all ten tri-state checks must be TRUE before status may be CERTIFIED.
 - F1A boundary: certified OPEN remains in memory and is injected into the final read-only adapter. No permanent two-component bundle or default dashboard route is authorized.
-

@@ -1,5 +1,34 @@
 # Bridge Contract - Current
 
+## New Context Packet — E0B-DV1 Candidate SAW PASS (2026-07-21)
+
+## What Was Done
+
+- Banked hosted/reviewed code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54` with immutable local 329/329 and distinct Reviewer A/B/C PASS.
+- Closed session initialization, source-drift, strict descriptor, CLI replay, and ACTIVE first-stage recovery findings.
+
+## What Is Locked
+
+- Score remains 39/100; stage remains `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed comparison count remains 0; S-009X PASS is not earned.
+- Real G08 must use a fresh clean checkout of the exact hosted-green code pin with no production-code change after capture begins.
+
+## What Is Next
+
+- Prepare the exact-pin G08 human handoff, execute one valid comparison, then verify/publish and retain either `IMPROVED` or `NOT_IMPROVED` without rerunning for sign.
+
+## First Command
+
+```text
+git show --stat --oneline 43dce24f806908f1a80f017f9d9b4125d908eb54
+```
+
+## Terminal Candidate Addendum — E0B-DV1 C1 Custody Closed (2026-07-21)
+
+- SYSTEM_DELTA: PR #5 now pins repaired code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54` (tree `9db1243e110015082216a7fa31fd56616c383d97`) above C0 `b7a24d3`. Interrupted SESSION_OPEN is idempotently replayable, every mutating runner path rechecks sealed source identity, and ACTIVE first-stage recovery is checkpoint-aware.
+- EVIDENCE: 98 focused + 191 product + 137 frozen protocol = 329/329 local PASS with unchanged HEAD/tree; AppTest 2/2; context/freeze validation PASS; hosted run `29777518085` PASS on Ubuntu, Windows, and byte parity; Reviewer A/B/C PASS with no Critical/High/Medium findings.
+- PRODUCT_STATE: score 39/100 frozen; `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed comparison count 0; S-009X product PASS not earned. Candidate custody is closed; real G08 remains the next separate gate.
+- PHASE_STATUS: `E0B_DV1_CANDIDATE_SAW_PASS; CODE_PIN_43DCE24; HOSTED_GREEN; REVIEWERS_A_B_C_PASS; OBSERVED_COMPARISON_COUNT_0; REAL_G08_NOT_RUN`.
+
 ## Active Addendum — E0B-DV1 Direction and Custody Repair (2026-07-21)
 
 - SYSTEM_DELTA: remote PR #5 C0 is hosted-green `b7a24d3`; preserve that publication-authority substrate and layer C1 as a direct descendant that replaces conflated close semantics with `comparison_observed_eligible` for methodological publication/count authority and `decision_value_disposition=IMPROVED|NOT_IMPROVED` for the product hypothesis. `IMPROVED` requires positive total rubric delta, a targeted evidence/falsifier gain, and no core safety regression. No compatibility alias exists.

@@ -1,9 +1,9 @@
 # Top-Level Roadmap: GodView Certified Portfolio OS
 
 Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
-Date: 2026-07-20
-Product tip lineage: `2653eb1` (PR #4 E0A operable + merge-safety merged; F1C-SHIP closed substrate)
-Active work: E0B-DV1 Contradiction Case repair on PR #5 (ledger, blinding, capture runner; real human records required for close)
+Date: 2026-07-21
+Product tip lineage: `2653eb1` main → PR #5 C0 `b7a24d3` → hosted/reviewed E0B candidate `43dce24`
+Active work: E0B-DV1 code/custody candidate PASS; real G08 human capture remains required for observed close
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
 ## Governing sequence (endgame law)

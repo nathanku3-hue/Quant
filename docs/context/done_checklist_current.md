@@ -1,5 +1,14 @@
 # Done Checklist - Current
 
+## Terminal Candidate Addendum — E0B-DV1 C1 (2026-07-21)
+
+- [x] Exact code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54`, tree `9db1243e110015082216a7fa31fd56616c383d97`, is committed, pushed, and clean.
+- [x] Interrupted open boundaries and ACTIVE `OPEN_BASELINE` recovery are fail-closed, idempotent, checkpoint-aware, and regression-tested.
+- [x] Immutable local boundary: 98 focused, 191 product, 137 protocol, 329 combined, AppTest 2, context validation, and freeze enforcement PASS.
+- [x] Hosted run `29777518085` PASS on Ubuntu, Windows, and exact byte parity.
+- [x] Distinct Reviewer A/B/C PASS with no unresolved Critical/High/Medium findings.
+- [ ] Real two-human G08 capture, result publication, count 0→1, value disposition, and result-bearing merge remain intentionally unperformed.
+
 ## Active Addendum — E0B-DV1 Direction and Custody Repair Checklist (2026-07-21)
 
 - [x] Hosted-green PR #5 substrate C0 is exact remote `b7a24d3da65f78c673f7e08b5f719603f404282e`; score 39 frozen; stage `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed count 0.

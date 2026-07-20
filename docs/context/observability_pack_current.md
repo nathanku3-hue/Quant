@@ -1,5 +1,12 @@
 # Observability Pack - Current
 
+## Terminal Addendum — E0B-DV1 Candidate Observability (2026-07-21)
+
+- Candidate sentinel: `43dce24f806908f1a80f017f9d9b4125d908eb54` / tree `9db1243e110015082216a7fa31fd56616c383d97`, clean and remote-equal.
+- Evidence sentinel: local 98/191/137/329 PASS; AppTest 2; context/freeze PASS; hosted `29777518085` Ubuntu/Windows/parity PASS; A/B/C PASS.
+- Recovery sentinel: SESSION_OPEN replay is idempotent across four persistence boundaries; ACTIVE post-open recovery routes by checkpoint state; every mutating runner command rechecks sealed commit/tree/freeze.
+- Remaining sentinel: real G08 is not run, observed count remains 0, score stays 39, and S-009X PASS is not earned.
+
 ## Active Addendum — S-009X / E0B-DV1 Observability (2026-07-21)
 
 - ObservabilityRating: GREEN for hosted-green C0 `b7a24d3` publication authority and the local C1 semantic/security boundary (74 focused, 168 product, 137 frozen protocol, 305 total, stable pre/post C0-relative code/CLI/test patch `c5459187…`); RED for immutable C1, C1 hosted proof, independent review, real G08, result-bearing tip, and merge.

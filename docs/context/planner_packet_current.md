@@ -1,5 +1,26 @@
 # Planner Packet - Current
 
+## New Context Packet — E0B-DV1 Candidate SAW PASS (2026-07-21)
+
+## What Was Done
+
+- Banked and pushed exact code candidate `43dce24f806908f1a80f017f9d9b4125d908eb54` (tree `9db1243e110015082216a7fa31fd56616c383d97`) above hosted C0 `b7a24d3`.
+- Closed interrupted session initialization, source-drift attribution, strict descriptor, CLI replay, and ACTIVE first-stage recovery findings with regression coverage.
+- Passed immutable local 98 focused / 191 product / 137 protocol / 329 combined, AppTest 2, context/freeze validation; hosted run `29777518085` passed Ubuntu, Windows, and parity; distinct Reviewer A/B/C passed with no Critical/High/Medium findings.
+
+## What Is Locked
+
+- Candidate code and custody are terminal for this round. Score remains 39/100, stage remains `CERTIFIED_SINGLE_DECISION_OPERABLE`, observed comparison count remains 0, and S-009X PASS is not earned.
+- No production-code change may occur after real capture begins; any such change invalidates that run.
+
+## What Remains
+
+- From a fresh clean checkout of the exact hosted-green candidate, execute one real G08 with one operator and one different blinded reviewer, then verify/publish and retain either `IMPROVED` or `NOT_IMPROVED` without rerunning for sign.
+
+## Immediate Next Step
+
+- Prepare the clean exact-pin G08 custody checkout and human handoff; do not open FS1, providers, PEAD, broker, alpha, or V2-B0 implementation.
+
 ## New Context Packet — E0B-DV1 Direction and Custody Repair (2026-07-21)
 
 ## What Was Done

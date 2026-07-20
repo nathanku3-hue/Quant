@@ -1,3 +1,10 @@
+## 2026-07-21 Round Entry (Recovery Must Route by Authority State, Not File Count)
+- Date: 2026-07-21
+- Mistake or miss: initial recovery repaired interrupted SESSION_OPEN but the documented CLI could still reject manifest-only/lost-output retries, and an ACTIVE `OPEN_BASELINE` checkpoint with only one journal event was misclassified as session initialization.
+- Root cause: core idempotence was not exercised through the operator CLI, and recovery routing used event count as a proxy for lifecycle authority instead of inspecting checkpoint operation/state.
+- Fix applied: exposed sealed replay through both runner commands, guarded every mutating path with commit/tree/freeze identity, enforced exact manifest descriptor fields, and routed ACTIVE recovery by checkpoint state with runner-level crash-boundary tests.
+- Guardrail for next time: test crash recovery at every durable-write boundary through the public operator surface; route from authoritative state records, never from incidental file counts; freeze and independently review one remote-equal SHA before evidence capture.
+
 ## 2026-07-21 Round Entry (Observation Is Not Product Value; Mutable Bytes Are Not Evidence)
 - Date: 2026-07-21
 - Mistake or miss: the E0B repair correctly hardened publication authority, but repeated concurrent writes meant passing tests were not bound to one candidate; generated context and SAW counts drifted; an unreported remote push advanced PR #5 to hosted-green `b7a24d3`; and `e0b_close_eligible` silently conflated a methodologically valid observed comparison with successful decision-value proof.
@@ -1978,4 +1985,3 @@ Application pattern:
 - Fix applied: Implemented OPEN vertically from source fixture and `DecisionEnvelope` through canonical events, exact snapshots, two isolated verifier attempts, ten-check certification, certification-reference event, certified result, and injection into the final read-only adapter. Permanent bundle publication remains unopened.
 - Guardrail for next time: For each portfolio gate, execute one complete decision path first and require exact canonical bytes plus a deliberate disagreement test before adding a second decision or any permanent publication mechanism.
 - Evidence paths: `core/gv_fs0_book.py`, `core/gv_fs0_certify.py`, `views/gv_fs0_portfolio_adapter.py`, `tests/gv_fs0_product/test_open_vertical.py`, `docs/phase_brief/gv-fs0-f1-product-slice-brief.md`.
-

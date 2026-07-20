@@ -1,5 +1,11 @@
 # Post-Phase Alignment - Current
 
+## Terminal Addendum — E0B-DV1 Candidate Alignment (2026-07-21)
+
+- Candidate custody is closed at `43dce24f806908f1a80f017f9d9b4125d908eb54`: immutable local boundary, hosted Ubuntu/Windows/parity, and distinct Reviewer A/B/C all PASS.
+- The active bottleneck moves from code/custody repair to the separate real G08 human-capture gate. Product score/stage/count remain 39 / `CERTIFIED_SINGLE_DECISION_OPERABLE` / 0.
+- Next active stream: fresh clean exact-pin checkout → real operator baseline/post → different blinded reviewer → verify/publish once → retain `IMPROVED` or `NOT_IMPROVED` honestly.
+
 ## Active Addendum — S-009X / E0B-DV1 Alignment (2026-07-21)
 
 - **What changed**: E0A-R1 remains permanently closed. Remote PR #5 C0 `b7a24d3` is the hosted-green publication-authority substrate; the local C1 donor now separates sign-independent observation eligibility from `IMPROVED | NOT_IMPROVED` product-value disposition.

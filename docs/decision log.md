@@ -1,3 +1,9 @@
+## 2026-07-21 — ROUND-20260721-E0B-DV1-CANDIDATE-TERMINAL
+
+- Decision: accept `43dce24f806908f1a80f017f9d9b4125d908eb54` (tree `9db1243e110015082216a7fa31fd56616c383d97`) as the terminal E0B code/custody candidate after immutable local 329/329, hosted run `29777518085`, and distinct Reviewer A/B/C PASS.
+- Recovery law: SESSION_OPEN replay is idempotent across manifest/event/index/checkpoint interruptions; every mutating runner command revalidates the sealed commit/tree/freeze; recovery routing follows checkpoint state so ACTIVE first-stage work cannot be misclassified as session initialization.
+- Boundary: this closes candidate custody only. Real G08, observed count 0→1, value disposition, result-bearing evidence, merge, and score/stage decisions remain separate and unperformed.
+
 ## 2026-07-21 — ROUND-20260721-E0B-DV1-DIRECTION-CUSTODY-REPAIR
 
 - Decision: remote PR #5 commit `b7a24d3da65f78c673f7e08b5f719603f404282e` is the immutable hosted-green publication-authority substrate C0. Preserve it, reject the mutable donor worktree and stale generated/SAW artifacts as acceptance custody, and require C1 to descend directly from C0.
@@ -7436,4 +7442,3 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Exact economics: initial cash `1000`; 10 shares at `10`; explicit fee `1`; residual cash `899`; dividend receivable/payment `5`; terminal cash `904`; terminal market value `140`; terminal NAV `1044`; cumulative contribution `44`.
 - Boundary: no permanent bundle, publication lock, default dashboard route, provider, real data, legacy replay authority, NO_POSITION implementation, or FS1 work in F1A.
 - Evidence state: focused product and protocol suites, deterministic two-run bytes, generator/freeze checks, compile, adapter smoke, and diff hygiene pass locally. Banked-commit identity and independent Reviewer A/B/C remain the next closure actions.
-

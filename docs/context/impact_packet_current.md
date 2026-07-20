@@ -1,5 +1,12 @@
 # Impact Packet - Current
 
+## Terminal Addendum — E0B-DV1 Candidate Custody (2026-07-21)
+
+- **Code pin**: `43dce24f806908f1a80f017f9d9b4125d908eb54`; tree `9db1243e110015082216a7fa31fd56616c383d97`; direct lineage from hosted C0 `b7a24d3` through intentional repair commits.
+- **Repair impact**: session-open replay survives manifest/event/index/checkpoint interruptions without duplicate authority; the runner exposes replay for `open-session` and `recover-session`; all mutating commands revalidate commit/tree/freeze; checkpoint-aware routing recovers ACTIVE first-stage work; manifest authoring descriptors reject extra fields.
+- **Validation**: 98 focused, 191 product, 137 protocol, 329 combined, AppTest 2, context/freeze PASS; hosted run `29777518085` Ubuntu/Windows/parity PASS; Reviewer A/B/C PASS with no Critical/High/Medium findings.
+- **Scope ceiling**: no real G08, publication, result evidence, count increment, score/stage uplift, merge, provider, FS1, PEAD, broker, or alpha work.
+
 ## Active Addendum — E0B-DV1 Direction and Custody Repair (2026-07-21)
 
 - **Owned runtime/test files**: `core/gv_e0b_dv1_contradiction.py`, `scripts/gv_e0b_g08_capture.py`, and `tests/gv_fs0_product/test_e0b_dv1_contradiction.py`.

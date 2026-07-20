@@ -1,5 +1,15 @@
 # Multi-Stream Contract - Current
 
+## Terminal Addendum — E0B-DV1 Candidate (2026-07-21)
+
+| Stream | Status | Note |
+|---|---|---|
+| Backend/Product | **Candidate PASS** | Code pin `43dce24`; recovery/source-custody repair closed |
+| Product CI / Review | **PASS** | Hosted `29777518085`; distinct A/B/C PASS |
+| Docs/Ops | **Terminal evidence** | Current truth, generated context, reviewer reports, and SAW reconciled |
+| Product/Research | Next gate held | Real G08 not run; count remains 0 |
+| Data / PEAD / FS1 / broker | Held | No adjacent scope opened |
+
 ## Active Addendum — S-009X / E0B-DV1 Direction and Custody (2026-07-21)
 
 | Stream | Status | Note |

@@ -1,11 +1,11 @@
 # Phase Brief: GV-E0B-DV1 Contradiction Case (G08) — Authority Repair
 
 Mode: `EXECUTION_PACKET`
-Status: `C0_HOSTED_GREEN_C1_SOURCE_READY` (C0=`b7a24d3`; C1 local donor boundary 74 focused + 168 product + 137 protocol = 305/305; C0-relative code/CLI/test patch `c5459187…` stable; C1 not committed, pushed, hosted, independently reviewed, G08-run, or closed)
+Status: `CANDIDATE_SAW_PASS_REAL_G08_PENDING` (code pin=`43dce24f806908f1a80f017f9d9b4125d908eb54`; tree=`9db1243e110015082216a7fa31fd56616c383d97`; local 98 focused + 191 product + 137 protocol = 329/329; hosted run `29777518085` PASS; Reviewer A/B/C PASS; real G08 not run)
 Date: 2026-07-21
 RoundID: `ROUND-20260721-E0B-DV1-C1-CUSTODY`
 ScopeID: `GV_E0B_DV1_CONTRADICTION_G08_REPAIR`
-Authority: main `2653eb1` (PR #4); PR #5 hosted-green C0 `b7a24d3`; C1 must descend directly from C0; frozen endgame + G08
+Authority: main `2653eb1` (PR #4); PR #5 hosted-green candidate `43dce24` descending from C0 `b7a24d3`; frozen endgame + real G08 next
 
 ## Stage frame
 
