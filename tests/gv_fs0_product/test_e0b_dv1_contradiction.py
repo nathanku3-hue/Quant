@@ -2642,9 +2642,11 @@ def test_session_manifest_rejects_extra_authoring_descriptor_fields(tmp_path: Pa
         verify_session_manifest(forged)
 
 
-def test_runner_rechecks_source_identity_before_finalize(
+@pytest.mark.parametrize("command", ("finalize", "recover-session"))
+def test_runner_rechecks_source_identity_before_mutating_commands(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    command: str,
 ) -> None:
     import scripts.gv_e0b_g08_capture as runner
 
@@ -2652,7 +2654,7 @@ def test_runner_rechecks_source_identity_before_finalize(
         raise GvE0bDv1Error("E0B_SESSION_SOURCE_COMMIT_DRIFT")
 
     monkeypatch.setattr(runner, "_assert_session_source_identity", reject_drift)
-    assert runner.main(["finalize", "--case-dir", str(tmp_path / "case")]) == 2
+    assert runner.main([command, "--case-dir", str(tmp_path / "case")]) == 2
 
 
 def test_runner_source_identity_guard_detects_checkout_drift(

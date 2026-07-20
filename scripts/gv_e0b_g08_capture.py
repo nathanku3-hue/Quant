@@ -490,10 +490,10 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
         if args.cmd == "recover-session":
+            _assert_session_source_identity(case_dir, paths["session"])
             checkpoints = load_capture_checkpoints(paths["session"])
             if not checkpoints:
                 manifest = load_session_manifest(paths["session"].parent / "session_manifest.json")
-                _assert_session_source_identity(case_dir, paths["session"])
                 forms = {
                     "baseline": paths["authoring_dir"] / "baseline_authoring.json",
                     "post": paths["authoring_dir"] / "post_authoring.json",
