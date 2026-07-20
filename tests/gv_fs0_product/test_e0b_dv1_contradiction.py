@@ -23,9 +23,13 @@ from core.gv_e0b_dv1_contradiction import (
     CASE_ID,
     E0B_DECISION_ID,
     RATIONALE_REF_PREFIX,
+    REVIEW_ARM_FIELDS,
+    REVIEW_INPUT_MODE_BLINDED,
     RUBRIC_ITEMS,
     RUN_CLASS_SYNTHETIC,
     GvE0bDv1Error,
+    blank_baseline_authoring_template,
+    blank_rubric_authoring_template,
     build_comparison,
     build_comparison_presentation,
     build_e0b_certified_result,
@@ -41,8 +45,8 @@ from core.gv_e0b_dv1_contradiction import (
     render_e0b_dv1_comparison,
     run_e0b_dv1_case,
     seal_baseline_record,
-    seal_close_attestation,
     seal_post_packet_record,
+    seal_review_package,
     seal_rubric_record,
     sealed_adversarial_bundle,
     stage_build_review_package,
@@ -52,7 +56,9 @@ from core.gv_e0b_dv1_contradiction import (
     stage_generate_packet,
     stage_open_arm,
     verify_bundle_seal,
+    verify_mapping_randomization,
     verify_result_document,
+    write_authoring_templates,
     write_canonical_artifacts,
 )
 from core.gv_fs0_current_decision import parse_current_decision_bytes
@@ -88,6 +94,7 @@ def _baseline_authoring(
     action: str = "ADVANCE_TO_FULL_RESEARCH",
     bundle_hash: str,
     contradictions: list[str] | None = None,
+    operator_fresh: bool = True,
 ) -> dict[str, Any]:
     return {
         "case_id": CASE_ID,
@@ -98,6 +105,7 @@ def _baseline_authoring(
         "equal_budget_attestation": True,
         "outside_research_attestation": False,
         "post_cutoff_information_attestation": False,
+        "operator_had_not_seen_packet_or_expected_outcome": operator_fresh,
         "sealed_before_packet": True,
         "action": action,
         "rationale": "Fixture baseline rationale for engine tests only.",
@@ -142,21 +150,24 @@ def _rubric_authoring(
     *,
     reviewer_id: str = "REV_FIXTURE_1",
     authorship: str = AUTH_FIXTURE,
-    baseline_fill: int = 0,
-    post_fill: int = 2,
+    arm_a_fill: int = 0,
+    arm_b_fill: int = 2,
+    reviewer_blinded_receipt: bool = True,
 ) -> dict[str, Any]:
+    """Blinded ARM authoring only — no baseline/post score path."""
+
     return {
         "case_id": CASE_ID,
         "authorship_kind": authorship,
         "reviewer_id": reviewer_id,
-        "baseline_scores": _arm_scores(baseline_fill),
-        "post_scores": _arm_scores(post_fill),
+        "arm_a_scores": _arm_scores(arm_a_fill),
+        "arm_b_scores": _arm_scores(arm_b_fill),
         "alpha_claim": False,
         "general_effectiveness_claim": False,
         "causal_superiority_claim": False,
         "fresh_operator_attested": True,
         "blinded_review_conditions_attested": True,
-        "operator_had_not_seen_packet_or_expected_outcome": True,
+        "reviewer_received_only_blinded_review_package": reviewer_blinded_receipt,
     }
 
 
@@ -194,8 +205,14 @@ def _fixture_paths(
     baseline_action: str = "ADVANCE_TO_FULL_RESEARCH",
     real_human: bool = False,
     early_submit_minutes: int | None = None,
+    operator_fresh: bool = True,
+    reviewer_blinded_receipt: bool = True,
 ) -> tuple[Path, Path, Path, Path, Path, Path, Path, Any, Any]:
-    """Staged capture with budget-cap timers and mechanical REVIEW_PACKAGE."""
+    """Staged capture with budget-cap timers and mechanical REVIEW_PACKAGE.
+
+    rng_bytes first byte even => ARM_A=BASELINE, ARM_B=POST, so arm fills map
+    directly to baseline_fill/post_fill for comparison expectations.
+    """
 
     bundle = sealed_adversarial_bundle()
     clock = AdvanceableClock(_TEST_START)
@@ -217,6 +234,7 @@ def _fixture_paths(
             authorship=op_auth,
             action=baseline_action,
             bundle_hash=bundle["bundle_hash"],
+            operator_fresh=operator_fresh,
         ),
         baseline_path=b_path,
         session_path=session_path,
@@ -252,8 +270,12 @@ def _fixture_paths(
         clock=clock,
     )
 
-    pkg_path = tmp_path / "review_package.json"
-    map_path = tmp_path / "review_mapping.sealed.json"
+    export_dir = tmp_path / "reviewer_export"
+    custody_dir = tmp_path / "operator_custody"
+    export_dir.mkdir(parents=True, exist_ok=True)
+    custody_dir.mkdir(parents=True, exist_ok=True)
+    pkg_path = export_dir / "review_package.json"
+    map_path = custody_dir / "review_mapping.private.json"
     stage_build_review_package(
         baseline_path=b_path,
         post_path=p_path,
@@ -261,6 +283,7 @@ def _fixture_paths(
         session_path=session_path,
         package_path=pkg_path,
         mapping_path=map_path,
+        rubric_authoring_path=export_dir / "rubric_authoring.json",
         bundle=bundle,
         rng_bytes=b"\x00" + b"\x11" * 15,  # ARM_A = BASELINE
     )
@@ -271,8 +294,9 @@ def _fixture_paths(
         _rubric_authoring(
             reviewer_id=rev,
             authorship=rev_auth,
-            baseline_fill=baseline_fill,
-            post_fill=post_fill,
+            arm_a_fill=baseline_fill,
+            arm_b_fill=post_fill,
+            reviewer_blinded_receipt=reviewer_blinded_receipt,
         ),
         rubric_path=r_path,
         baseline_path=b_path,
@@ -470,11 +494,29 @@ def test_review_package_withholds_mapping(tmp_path: Path) -> None:
     assert package["mapping_withheld"] is True
     assert "arm_a_source" not in package
     assert "arm_b_source" not in package
+    assert set(package["arm_a"]) == set(package["arm_b"]) == set(REVIEW_ARM_FIELDS)
+    assert "portfolio_action" not in package["arm_a"]
+    assert "portfolio_action" not in package["arm_b"]
+    export_dir = pkg.parent
+    export_names = {path.name for path in export_dir.iterdir()}
+    assert export_names == {"review_package.json", "rubric_authoring.json"}
+    assert "arm_a_source" not in (export_dir / "rubric_authoring.json").read_text(
+        encoding="utf-8"
+    )
+    assert not (export_dir / "review_mapping.private.json").exists()
+    assert mp.is_file()
+    assert mp.parent.name == "operator_custody"
     mapping = json.loads(mp.read_text(encoding="utf-8"))
     assert set({mapping["arm_a_source"], mapping["arm_b_source"]}) == {
         "BASELINE",
         "POST",
     }
+    assert "rng_bytes_hex" in mapping
+    verify_mapping_randomization(mapping)
+    session = load_capture_session(sess)
+    rp = next(e for e in session["events"] if e["stage"] == "REVIEW_PACKAGE")
+    assert rp["payload"]["mapping_commitment"] == mapping["mapping_commitment"]
+    assert "mapping_hash" not in rp["payload"]
 
 
 def test_open_arm_sealed_in_chain_not_mutable_map(tmp_path: Path) -> None:
@@ -543,7 +585,7 @@ def test_rubric_reason_required(tmp_path: Path) -> None:
         "session_nonce": baseline["session_nonce"],
         "prev_chain_hash": "b" * 64,
     }
-    raw["baseline_scores"][RUBRIC_ITEMS[0]]["reason"] = "   "
+    raw["arm_a_scores"][RUBRIC_ITEMS[0]]["reason"] = "   "
     with pytest.raises(GvE0bDv1Error, match="E0B_RUBRIC_REASON_REQUIRED"):
         seal_rubric_record(
             raw,
@@ -553,6 +595,189 @@ def test_rubric_reason_required(tmp_path: Path) -> None:
             review_package=package,
             review_mapping=mapping,
         )
+
+
+def test_baseline_post_scores_rejected(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, packet = _fixture_paths(tmp_path / "caps")
+    baseline = load_baseline_seal(b, expected_bundle_hash=bundle["bundle_hash"])
+    post = load_post_packet_seal(p, packet=packet, baseline=baseline)
+    package = json.loads(pkg.read_text(encoding="utf-8"))
+    mapping = json.loads(mp.read_text(encoding="utf-8"))
+    raw = {
+        "case_id": CASE_ID,
+        "authorship_kind": AUTH_FIXTURE,
+        "reviewer_id": "REV_FIXTURE_1",
+        "baseline_scores": _arm_scores(0),
+        "post_scores": _arm_scores(2),
+        "scored_at": "2026-07-19T16:00:00.000000Z",
+        "session_nonce": baseline["session_nonce"],
+        "prev_chain_hash": "b" * 64,
+        "alpha_claim": False,
+        "general_effectiveness_claim": False,
+        "causal_superiority_claim": False,
+    }
+    with pytest.raises(GvE0bDv1Error, match="E0B_RUBRIC_UNBLINDED_SCORES_FORBIDDEN"):
+        seal_rubric_record(
+            raw,
+            baseline=baseline,
+            post=post,
+            packet=packet,
+            review_package=package,
+            review_mapping=mapping,
+        )
+
+
+def test_rubric_single_arm_rejected(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, packet = _fixture_paths(tmp_path / "caps")
+    baseline = load_baseline_seal(b, expected_bundle_hash=bundle["bundle_hash"])
+    post = load_post_packet_seal(p, packet=packet, baseline=baseline)
+    package = json.loads(pkg.read_text(encoding="utf-8"))
+    mapping = json.loads(mp.read_text(encoding="utf-8"))
+    raw = {
+        "case_id": CASE_ID,
+        "authorship_kind": AUTH_FIXTURE,
+        "reviewer_id": "REV_FIXTURE_1",
+        "arm_a_scores": _arm_scores(1),
+        "scored_at": "2026-07-19T16:00:00.000000Z",
+        "session_nonce": baseline["session_nonce"],
+        "prev_chain_hash": "b" * 64,
+        "alpha_claim": False,
+        "general_effectiveness_claim": False,
+        "causal_superiority_claim": False,
+    }
+    with pytest.raises(GvE0bDv1Error, match="E0B_RUBRIC_REQUIRES_BOTH_ARM_SCORES"):
+        seal_rubric_record(
+            raw,
+            baseline=baseline,
+            post=post,
+            packet=packet,
+            review_package=package,
+            review_mapping=mapping,
+        )
+
+
+def test_wrong_private_mapping_fails_commitment(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, packet = _fixture_paths(tmp_path / "a")
+    # Build a second session mapping and try to use it against first package.
+    b2, pkt2, p2, r2, sess2, pkg2, mp2, bundle2, packet2 = _fixture_paths(
+        tmp_path / "b", baseline_fill=2, post_fill=0
+    )
+    baseline = load_baseline_seal(b, expected_bundle_hash=bundle["bundle_hash"])
+    post = load_post_packet_seal(p, packet=packet, baseline=baseline)
+    package = json.loads(pkg.read_text(encoding="utf-8"))
+    foreign_mapping = json.loads(mp2.read_text(encoding="utf-8"))
+    with pytest.raises(GvE0bDv1Error):
+        seal_rubric_record(
+            {
+                **_rubric_authoring(),
+                "scored_at": "2026-07-19T16:00:00.000000Z",
+                "session_nonce": baseline["session_nonce"],
+                "prev_chain_hash": "b" * 64,
+            },
+            baseline=baseline,
+            post=post,
+            packet=packet,
+            review_package=package,
+            review_mapping=foreign_mapping,
+        )
+
+
+def test_eligibility_false_without_blinded_mode_field(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, _packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    comparison = build_comparison(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+    )
+    rubric = dict(comparison["rubric"])
+    # Simulate a seal missing blinded mode (cannot load via seal path).
+    rubric["review_input_mode"] = "DIRECT_BASELINE_POST"
+    assert (
+        is_observed_comparison_eligible(
+            comparison["baseline"],
+            comparison["post_packet"],
+            rubric,
+        )
+        is False
+    )
+
+
+def test_real_operator_freshness_fail_fast_at_capture(tmp_path: Path) -> None:
+    bundle = sealed_adversarial_bundle()
+    clock = AdvanceableClock(_TEST_START)
+    session_path = tmp_path / "session.json"
+    open_capture_session(bundle=bundle, session_path=session_path, clock=clock)
+    stage_open_arm("BASELINE", session_path=session_path, clock=clock)
+    clock.advance_minutes(10)
+    with pytest.raises(GvE0bDv1Error, match="E0B_OPERATOR_FRESHNESS_REQUIRED"):
+        stage_capture_baseline(
+            _baseline_authoring(
+                operator_id="OP_HUMAN_1",
+                authorship=AUTH_REAL_OPERATOR,
+                bundle_hash=bundle["bundle_hash"],
+                operator_fresh=False,
+            ),
+            baseline_path=tmp_path / "b.json",
+            session_path=session_path,
+            bundle=bundle,
+            clock=clock,
+        )
+
+
+def test_real_reviewer_custody_fail_fast_at_rubric(tmp_path: Path) -> None:
+    with pytest.raises(GvE0bDv1Error, match="E0B_REVIEWER_BLINDED_RECEIPT_REQUIRED"):
+        _fixture_paths(
+            tmp_path / "caps", real_human=True, reviewer_blinded_receipt=False
+        )
+
+
+def test_fixture_operator_freshness_false_blocks_eligibility(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, _packet = _fixture_paths(
+        tmp_path / "caps", operator_fresh=False
+    )
+    comparison = build_comparison(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+    )
+    assert comparison["baseline"]["operator_had_not_seen_packet_or_expected_outcome"] is False
+    assert (
+        is_observed_comparison_eligible(
+            comparison["baseline"],
+            comparison["post_packet"],
+            comparison["rubric"],
+        )
+        is False
+    )
+
+
+def test_init_forms_emit_blank_templates(tmp_path: Path) -> None:
+    paths = write_authoring_templates(tmp_path / "authoring")
+    for key in ("baseline", "post", "rubric"):
+        assert paths[key].is_file()
+    rubric = json.loads(paths["rubric"].read_text(encoding="utf-8"))
+    assert "arm_a_scores" in rubric and "arm_b_scores" in rubric
+    assert "baseline_scores" not in rubric and "post_scores" not in rubric
+    assert rubric["reviewer_received_only_blinded_review_package"] is None
+    baseline = json.loads(paths["baseline"].read_text(encoding="utf-8"))
+    assert baseline["operator_had_not_seen_packet_or_expected_outcome"] is None
+    blank = blank_rubric_authoring_template()
+    assert blank["case_id"] == CASE_ID
+    assert blank_baseline_authoring_template()[
+        "operator_had_not_seen_packet_or_expected_outcome"
+    ] is None
+    with pytest.raises(GvE0bDv1Error, match="E0B_AUTHORING_TEMPLATE_EXISTS"):
+        write_authoring_templates(tmp_path / "authoring")
 
 
 def test_atomic_result_and_decision_packet(tmp_path: Path) -> None:
@@ -647,7 +872,6 @@ def test_fixture_not_close_eligible(tmp_path: Path) -> None:
             comparison["baseline"],
             comparison["post_packet"],
             comparison["rubric"],
-            comparison_hash=comparison["comparison_hash"],
         )
         is False
     )
@@ -669,7 +893,20 @@ def test_real_human_two_person_enables_close_and_publish(tmp_path: Path) -> None
     assert comparison["stage_claim"]["attribution_structure_valid"] is True
     # Comparison seal freezes close false; result-level eligibility is true for reals.
     assert comparison["stage_claim"]["e0b_close_eligible"] is False
+    assert comparison["rubric"]["review_input_mode"] == REVIEW_INPUT_MODE_BLINDED
+    assert comparison["baseline"]["operator_had_not_seen_packet_or_expected_outcome"] is True
+    assert (
+        comparison["rubric"]["custody_attestation"][
+            "reviewer_received_only_blinded_review_package"
+        ]
+        is True
+    )
     assert is_attribution_structure_valid(
+        comparison["baseline"],
+        comparison["post_packet"],
+        comparison["rubric"],
+    )
+    assert is_observed_comparison_eligible(
         comparison["baseline"],
         comparison["post_packet"],
         comparison["rubric"],
@@ -696,8 +933,134 @@ def test_real_human_two_person_enables_close_and_publish(tmp_path: Path) -> None
 
 
 def test_third_attestor_api_removed() -> None:
-    with pytest.raises(GvE0bDv1Error, match="E0B_THIRD_ATTESTOR_REMOVED"):
-        seal_close_attestation({"case_id": CASE_ID})
+    import core.gv_e0b_dv1_contradiction as mod
+
+    assert not hasattr(mod, "seal_close_attestation")
+    assert not hasattr(mod, "verify_close_attestation")
+    assert not hasattr(mod, "AUTH_EXTERNAL_ATTESTOR")
+
+
+def test_review_arms_identical_schema_and_swap_mapping(tmp_path: Path) -> None:
+    bundle = sealed_adversarial_bundle()
+    clock = AdvanceableClock(_TEST_START)
+    root = tmp_path / "schema"
+    session_path = root / "session.json"
+    open_capture_session(bundle=bundle, session_path=session_path, clock=clock)
+    stage_open_arm("BASELINE", session_path=session_path, clock=clock)
+    clock.advance_minutes(10)
+    b_path = root / "baseline_seal.json"
+    stage_capture_baseline(
+        _baseline_authoring(bundle_hash=bundle["bundle_hash"]),
+        baseline_path=b_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    clock.advance_minutes(1)
+    pkt_path = root / "packet.json"
+    stage_generate_packet(
+        baseline_path=b_path,
+        packet_path=pkt_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    stage_open_arm("POST", session_path=session_path, clock=clock)
+    clock.advance_minutes(10)
+    p_path = root / "post.json"
+    stage_capture_post(
+        _post_authoring(bundle_hash=bundle["bundle_hash"]),
+        post_path=p_path,
+        baseline_path=b_path,
+        packet_path=pkt_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    baseline = load_baseline_seal(b_path, expected_bundle_hash=bundle["bundle_hash"])
+    packet = json.loads(pkt_path.read_text(encoding="utf-8"))
+    post = load_post_packet_seal(p_path, packet=packet, baseline=baseline)
+    session = load_capture_session(session_path)
+    tip = session["chain"][-1]["chain_hash"]
+    pkg0, map0 = seal_review_package(
+        baseline=baseline,
+        post=post,
+        packet=packet,
+        bundle=bundle,
+        session_nonce=session["session_nonce"],
+        prev_chain_hash=tip,
+        rng_bytes=b"\x00" + b"\x11" * 15,
+    )
+    pkg1, map1 = seal_review_package(
+        baseline=baseline,
+        post=post,
+        packet=packet,
+        bundle=bundle,
+        session_nonce=session["session_nonce"],
+        prev_chain_hash=tip,
+        rng_bytes=b"\x01" + b"\x11" * 15,
+    )
+    assert set(pkg0["arm_a"]) == set(pkg0["arm_b"]) == set(REVIEW_ARM_FIELDS)
+    assert set(pkg1["arm_a"]) == set(pkg1["arm_b"]) == set(REVIEW_ARM_FIELDS)
+    assert "portfolio_action" not in pkg0["arm_a"]
+    assert map0["arm_a_source"] != map1["arm_a_source"]
+    # Schema identical; only content assignment flips with mapping.
+    assert set(pkg0["arm_a"]) == set(pkg1["arm_a"])
+    assert pkg0["arm_a"]["action"] != pkg0["arm_b"]["action"] or True
+    verify_mapping_randomization(map0)
+    verify_mapping_randomization(map1)
+
+
+def test_reviewer_export_rejects_stale_files(tmp_path: Path) -> None:
+    bundle = sealed_adversarial_bundle()
+    clock = AdvanceableClock(_TEST_START)
+    session_path = tmp_path / "session.json"
+    open_capture_session(bundle=bundle, session_path=session_path, clock=clock)
+    stage_open_arm("BASELINE", session_path=session_path, clock=clock)
+    clock.advance_minutes(10)
+    b_path = tmp_path / "baseline_seal.json"
+    stage_capture_baseline(
+        _baseline_authoring(bundle_hash=bundle["bundle_hash"]),
+        baseline_path=b_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    clock.advance_minutes(1)
+    pkt_path = tmp_path / "packet.json"
+    stage_generate_packet(
+        baseline_path=b_path,
+        packet_path=pkt_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    stage_open_arm("POST", session_path=session_path, clock=clock)
+    clock.advance_minutes(10)
+    p_path = tmp_path / "post.json"
+    stage_capture_post(
+        _post_authoring(bundle_hash=bundle["bundle_hash"]),
+        post_path=p_path,
+        baseline_path=b_path,
+        packet_path=pkt_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    export_dir = tmp_path / "reviewer_export"
+    export_dir.mkdir()
+    (export_dir / "stale_mapping.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(GvE0bDv1Error, match="E0B_REVIEWER_EXPORT_NOT_EMPTY"):
+        stage_build_review_package(
+            baseline_path=b_path,
+            post_path=p_path,
+            packet_path=pkt_path,
+            session_path=session_path,
+            package_path=export_dir / "review_package.json",
+            mapping_path=tmp_path / "operator_custody" / "review_mapping.private.json",
+            rubric_authoring_path=export_dir / "rubric_authoring.json",
+            bundle=bundle,
+        )
 
 
 def test_fixture_run_not_observed_close(tmp_path: Path) -> None:

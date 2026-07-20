@@ -61,8 +61,14 @@ DEFAULT_POST_PATH = DEFAULT_CASE_DIR / "captures" / "post_packet_seal.json"
 DEFAULT_RUBRIC_PATH = DEFAULT_CASE_DIR / "captures" / "rubric_scores.json"
 DEFAULT_SESSION_PATH = DEFAULT_CASE_DIR / "captures" / "session.json"
 DEFAULT_EVENTS_DIR = DEFAULT_CASE_DIR / "captures" / "events"
-DEFAULT_REVIEW_PACKAGE_PATH = DEFAULT_CASE_DIR / "captures" / "review_package.json"
-DEFAULT_REVIEW_MAPPING_PATH = DEFAULT_CASE_DIR / "captures" / "review_mapping.sealed.json"
+DEFAULT_REVIEWER_EXPORT_DIR = DEFAULT_CASE_DIR / "captures" / "reviewer_export"
+DEFAULT_REVIEW_PACKAGE_PATH = DEFAULT_REVIEWER_EXPORT_DIR / "review_package.json"
+DEFAULT_RUBRIC_AUTHORING_PATH = DEFAULT_REVIEWER_EXPORT_DIR / "rubric_authoring.json"
+DEFAULT_OPERATOR_CUSTODY_DIR = DEFAULT_CASE_DIR / "captures" / "operator_custody"
+DEFAULT_REVIEW_MAPPING_PATH = (
+    DEFAULT_OPERATOR_CUSTODY_DIR / "review_mapping.private.json"
+)
+DEFAULT_AUTHORING_TEMPLATES_DIR = DEFAULT_CASE_DIR / "captures" / "authoring"
 
 CASE_ID = "E0B_DV1_G08_CONTRADICTION_1"
 PROTOCOL_ID = "GODVIEW-E0-P0-V1"
@@ -92,8 +98,22 @@ DOMAIN_REVIEW_MAPPING = "GV-E0B:DV1:REVIEW_MAPPING:V1"
 AUTH_FIXTURE = "ENGINE_TEST_FIXTURE"
 AUTH_REAL_OPERATOR = "REAL_HUMAN_OPERATOR"
 AUTH_REAL_REVIEWER = "REAL_HUMAN_REVIEWER"
-# Retained only so callers that still import the symbol fail closed if used for close.
-AUTH_EXTERNAL_ATTESTOR = "EXTERNAL_INDEPENDENT_ATTESTOR"
+
+# Canonical blinded review-arm schema: identical keys on every arm (no provenance leaks).
+REVIEW_ARM_FIELDS: tuple[str, ...] = (
+    "action",
+    "rationale",
+    "missing_evidence",
+    "falsifiers",
+    "contradictions_recognized",
+    "bundle_hash",
+    "alpha_claim",
+    "case_id",
+)
+REVIEWER_EXPORT_EXACT_NAMES: frozenset[str] = frozenset(
+    {"review_package.json", "rubric_authoring.json"}
+)
+DOMAIN_RNG = "GV-E0B:DV1:RNG:V1"
 
 BUDGET_MINUTES = 60
 ZERO_CHAIN_HASH = "0" * 64
@@ -101,6 +121,8 @@ ARM_BASELINE = "BASELINE"
 ARM_POST = "POST"
 LABEL_ARM_A = "ARM_A"
 LABEL_ARM_B = "ARM_B"
+REVIEW_INPUT_MODE_BLINDED = "BLINDED_ARM_LABELS"
+BLINDING_CUSTODY_MODEL = "ARM_LABEL_BLINDING_SEPARATED_EXPORT_CUSTODY"
 
 STAGE_SESSION_OPEN = "SESSION_OPEN"
 STAGE_BASELINE_OPEN = "BASELINE_OPEN"
@@ -139,8 +161,8 @@ ALLOWED_ACTIONS = frozenset(
     }
 )
 
-# Decision fields stripped from blinded review package.
-_BLIND_STRIP_KEYS = frozenset(
+# Provenance / timing / identity fields never projected into blinded review arms.
+_BLIND_FORBIDDEN_KEYS = frozenset(
     {
         "arm",
         "arm_started_at",
@@ -157,9 +179,15 @@ _BLIND_STRIP_KEYS = frozenset(
         "post_packet_hash",
         "packet_hash",
         "sealed_before_packet",
-        "baseline_hash",
         "authorship_kind",
         "operator_id",
+        "portfolio_action",
+        "baseline",
+        "post",
+        "BASELINE",
+        "POST",
+        "HUMAN_BASELINE",
+        "HUMAN_POST_PACKET",
     }
 )
 
@@ -558,8 +586,34 @@ def verify_session_bound_to_records(
         "review_package_hash"
     ]:
         raise GvE0bDv1Error("E0B_RUBRIC_PACKAGE_MISMATCH")
-    if seals["rubric"].get("mapping_hash") != mapping.get("mapping_hash"):
+    if seals["rubric"].get("mapping_commitment") != mapping.get("mapping_commitment"):
         raise GvE0bDv1Error("E0B_RUBRIC_MAPPING_MISMATCH")
+    # Canonical ledger holds only the mapping commitment (hash), not plaintext mapping.
+    # Chain links are hashes only; commitment lives on the append-only event payload.
+    events = list(plain.get("events") or [])
+    if not events and isinstance(plain.get("events_dir"), str):
+        events_dir = Path(plain["events_dir"])
+        if events_dir.is_dir():
+            events = list(_rebuild_session_from_events(events_dir).get("events") or [])
+    rp_payload = None
+    for event in events:
+        if event.get("stage") == STAGE_REVIEW_PACKAGE:
+            rp_payload = _require_mapping(
+                event.get("payload"), "E0B_REVIEW_PACKAGE_PAYLOAD_REQUIRED"
+            )
+    if not isinstance(rp_payload, Mapping):
+        raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_PAYLOAD_REQUIRED")
+    commitment = rp_payload.get("mapping_commitment")
+    if commitment != mapping.get("mapping_commitment"):
+        raise GvE0bDv1Error("E0B_MAPPING_COMMITMENT_MISMATCH")
+    if seals["rubric"].get("review_input_mode") != REVIEW_INPUT_MODE_BLINDED:
+        raise GvE0bDv1Error("E0B_REVIEW_INPUT_MODE_REQUIRED")
+    verify_mapping_randomization(mapping)
+    pkg = seals["review_package"]
+    if set(pkg.get("arm_a") or {}) != set(pkg.get("arm_b") or {}):
+        raise GvE0bDv1Error("E0B_REVIEW_ARM_SCHEMA_MISMATCH")
+    if set(pkg.get("arm_a") or {}) != set(REVIEW_ARM_FIELDS):
+        raise GvE0bDv1Error("E0B_REVIEW_ARM_SCHEMA_INVALID")
 
 
 def _append_event(
@@ -1010,6 +1064,15 @@ def seal_baseline_record(record: Mapping[str, Any]) -> Mapping[str, Any]:
     if "sealed_before_packet" in record and record["sealed_before_packet"] is not True:
         raise GvE0bDv1Error("E0B_BASELINE_MUST_PREDATE_PACKET_FLAG")
     body["sealed_before_packet"] = True
+    # Human custody attestation (not personhood proof). REAL operators must
+    # actively set true at capture time; fixtures may be false for tests.
+    fresh = record.get("operator_had_not_seen_packet_or_expected_outcome")
+    if body["authorship_kind"] == AUTH_REAL_OPERATOR:
+        if fresh is not True:
+            raise GvE0bDv1Error("E0B_OPERATOR_FRESHNESS_REQUIRED")
+        body["operator_had_not_seen_packet_or_expected_outcome"] = True
+    else:
+        body["operator_had_not_seen_packet_or_expected_outcome"] = fresh is True
     digest = domain_hash(DOMAIN_BASELINE, body)
     out = dict(body)
     out["baseline_hash"] = digest
@@ -1134,22 +1197,54 @@ def _validate_rubric_arm_scores(scores: Any, code: str) -> dict[str, dict[str, A
     return out
 
 
-def _strip_decision_for_blind(decision: Mapping[str, Any]) -> dict[str, Any]:
+def _project_decision_for_blind(decision: Mapping[str, Any]) -> dict[str, Any]:
+    """Project a decision into the canonical review-arm schema (identical keys always)."""
+
     plain = _plain(decision)
-    out = {k: v for k, v in plain.items() if k not in _BLIND_STRIP_KEYS}
-    # Keep decision content only.
-    keep = {
-        "action",
-        "rationale",
-        "missing_evidence",
-        "falsifiers",
-        "contradictions_recognized",
-        "portfolio_action",
-        "bundle_hash",
-        "alpha_claim",
-        "case_id",
+    if plain.get("alpha_claim") is not False:
+        raise GvE0bDv1Error("E0B_ALPHA_CLAIM_FORBIDDEN")
+    projected = {
+        "action": _require_str(plain, "action", "E0B_ACTION_REQUIRED"),
+        "rationale": _require_str(plain, "rationale", "E0B_RATIONALE_REQUIRED"),
+        "missing_evidence": list(plain.get("missing_evidence") or []),
+        "falsifiers": list(plain.get("falsifiers") or []),
+        "contradictions_recognized": list(plain.get("contradictions_recognized") or []),
+        "bundle_hash": _require_sha256(plain.get("bundle_hash"), "E0B_BUNDLE_HASH_INVALID"),
+        "alpha_claim": False,
+        "case_id": _require_str(plain, "case_id", "E0B_CASE_ID_MISMATCH"),
     }
-    return {k: out[k] for k in keep if k in out}
+    if set(projected) != set(REVIEW_ARM_FIELDS):
+        raise GvE0bDv1Error("E0B_REVIEW_ARM_SCHEMA_INVALID")
+    if any(key in projected for key in _BLIND_FORBIDDEN_KEYS):
+        raise GvE0bDv1Error("E0B_REVIEW_ARM_LEAKS_PROVENANCE")
+    return projected
+
+
+def _arm_assignment_from_rng(raw: bytes) -> tuple[str, str]:
+    if not raw:
+        raise GvE0bDv1Error("E0B_RNG_PREIMAGE_REQUIRED")
+    if raw[0] % 2 == 0:
+        return ARM_BASELINE, ARM_POST
+    return ARM_POST, ARM_BASELINE
+
+
+def verify_mapping_randomization(mapping: Mapping[str, Any]) -> None:
+    """Verify rng preimage, commitment, and arm assignment parity (final replay)."""
+
+    plain = _plain(mapping)
+    preimage_hex = plain.get("rng_bytes_hex")
+    if not isinstance(preimage_hex, str) or not preimage_hex:
+        raise GvE0bDv1Error("E0B_RNG_PREIMAGE_REQUIRED")
+    try:
+        raw = bytes.fromhex(preimage_hex)
+    except ValueError as exc:
+        raise GvE0bDv1Error("E0B_RNG_PREIMAGE_INVALID") from exc
+    expected_commitment = domain_hash(DOMAIN_RNG, {"bytes_hex": preimage_hex})
+    if plain.get("rng_commitment") != expected_commitment:
+        raise GvE0bDv1Error("E0B_RNG_COMMITMENT_MISMATCH")
+    arm_a, arm_b = _arm_assignment_from_rng(raw)
+    if plain.get("arm_a_source") != arm_a or plain.get("arm_b_source") != arm_b:
+        raise GvE0bDv1Error("E0B_RNG_ASSIGNMENT_MISMATCH")
 
 
 def seal_review_package(
@@ -1174,12 +1269,15 @@ def seal_review_package(
     verify_bundle_seal(bndl)
     # Random assignment: first byte even => ARM_A=BASELINE, else ARM_A=POST.
     raw = rng_bytes if rng_bytes is not None else secrets.token_bytes(16)
-    if raw[0] % 2 == 0:
-        arm_a_source, arm_b_source = ARM_BASELINE, ARM_POST
+    arm_a_source, arm_b_source = _arm_assignment_from_rng(raw)
+    if arm_a_source == ARM_BASELINE:
         arm_a_decision, arm_b_decision = b, p
     else:
-        arm_a_source, arm_b_source = ARM_POST, ARM_BASELINE
         arm_a_decision, arm_b_decision = p, b
+    arm_a = _project_decision_for_blind(arm_a_decision)
+    arm_b = _project_decision_for_blind(arm_b_decision)
+    if set(arm_a) != set(arm_b) or set(arm_a) != set(REVIEW_ARM_FIELDS):
+        raise GvE0bDv1Error("E0B_REVIEW_ARM_SCHEMA_MISMATCH")
     package_body = {
         "case_id": CASE_ID,
         "session_nonce": session_nonce,
@@ -1192,14 +1290,16 @@ def seal_review_package(
         "instructions": (
             "Score ARM_A and ARM_B independently with the frozen six-item rubric. "
             "Arms are randomly labeled; do not infer baseline vs post order. "
-            "Identical evidence bundle and instructions for both arms."
+            "Identical evidence bundle, schema, and instructions for both arms."
         ),
         "rubric_items": list(RUBRIC_ITEMS),
         "score_scale": {"min": 0, "max": 2},
-        "arm_a": _strip_decision_for_blind(arm_a_decision),
-        "arm_b": _strip_decision_for_blind(arm_b_decision),
+        "arm_a": arm_a,
+        "arm_b": arm_b,
         "blinding": "MECHANICAL_RANDOM_ARM_LABELS",
+        "blinding_custody_model": BLINDING_CUSTODY_MODEL,
         "mapping_withheld": True,
+        "review_input_mode_required": REVIEW_INPUT_MODE_BLINDED,
     }
     package_hash = domain_hash(DOMAIN_REVIEW_PACKAGE, package_body)
     package = {**package_body, "review_package_hash": package_hash}
@@ -1211,11 +1311,16 @@ def seal_review_package(
         "arm_b_source": arm_b_source,
         "baseline_hash": b["baseline_hash"],
         "post_packet_hash": p["post_packet_hash"],
-        "rng_commitment": domain_hash("GV-E0B:DV1:RNG:V1", {"bytes_hex": raw.hex()}),
+        "rng_commitment": domain_hash(DOMAIN_RNG, {"bytes_hex": raw.hex()}),
         "revealed": False,
     }
-    mapping_hash = domain_hash(DOMAIN_REVIEW_MAPPING, mapping_body)
-    mapping = {**mapping_body, "mapping_hash": mapping_hash}
+    mapping_commitment = domain_hash(DOMAIN_REVIEW_MAPPING, mapping_body)
+    # Commitment is ledger/export-visible; preimage stays operator-custody only.
+    mapping = {
+        **mapping_body,
+        "mapping_commitment": mapping_commitment,
+        "rng_bytes_hex": raw.hex(),
+    }
     return package, mapping
 
 
@@ -1231,6 +1336,15 @@ def verify_review_package(package: Mapping[str, Any]) -> str:
         raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_MUST_WITHHOLD_MAPPING")
     if "arm_a_source" in plain or "arm_b_source" in plain:
         raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_LEAKS_MAPPING")
+    if plain.get("review_input_mode_required") != REVIEW_INPUT_MODE_BLINDED:
+        raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_BLINDING_MODE_REQUIRED")
+    arm_a = _require_mapping(plain.get("arm_a"), "E0B_REVIEW_ARM_A_REQUIRED")
+    arm_b = _require_mapping(plain.get("arm_b"), "E0B_REVIEW_ARM_B_REQUIRED")
+    if set(arm_a) != set(arm_b) or set(arm_a) != set(REVIEW_ARM_FIELDS):
+        raise GvE0bDv1Error("E0B_REVIEW_ARM_SCHEMA_MISMATCH")
+    for forbidden in _BLIND_FORBIDDEN_KEYS:
+        if forbidden in arm_a or forbidden in arm_b:
+            raise GvE0bDv1Error("E0B_REVIEW_ARM_LEAKS_PROVENANCE")
     return claimed
 
 
@@ -1240,8 +1354,11 @@ def verify_review_mapping(
     review_package_hash: str,
 ) -> str:
     plain = _plain(mapping)
-    claimed = _require_sha256(plain.get("mapping_hash"), "E0B_MAPPING_HASH_INVALID")
-    body = _without_keys(plain, "mapping_hash")
+    claimed = _require_sha256(
+        plain.get("mapping_commitment"), "E0B_MAPPING_COMMITMENT_INVALID"
+    )
+    # Operator-custody preimage is outside the sealed mapping body.
+    body = _without_keys(plain, "mapping_commitment", "rng_bytes_hex")
     if domain_hash(DOMAIN_REVIEW_MAPPING, body) != claimed:
         raise GvE0bDv1Error("E0B_MAPPING_SEAL_MISMATCH")
     if plain.get("review_package_hash") != review_package_hash:
@@ -1263,7 +1380,10 @@ def seal_rubric_record(
     review_package: Mapping[str, Any],
     review_mapping: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    """Seal rubric from blinded ARM_A/ARM_B scores; map to baseline/post after seal inputs."""
+    """Seal rubric from blinded ARM_A/ARM_B only; map to baseline/post after input seal.
+
+    No compatibility path for already-mapped baseline_scores/post_scores.
+    """
 
     b = _plain(baseline)
     p = _plain(post)
@@ -1277,6 +1397,30 @@ def seal_rubric_record(
     plain = _require_mapping(record, "E0B_RUBRIC_RECORD_INVALID")
     if plain.get("case_id") != CASE_ID:
         raise GvE0bDv1Error("E0B_CASE_ID_MISMATCH")
+    has_a = "arm_a_scores" in plain
+    has_b = "arm_b_scores" in plain
+    has_mapped_labels = "baseline_scores" in plain or "post_scores" in plain
+    # Authoring may not supply already-mapped baseline/post scores as the input path.
+    # Sealed records may *contain* mapped scores as derived outputs after ARM sealing;
+    # re-verify still requires both ARM score blocks and recomputes the mapping.
+    if has_mapped_labels and not (has_a and has_b):
+        raise GvE0bDv1Error("E0B_RUBRIC_UNBLINDED_SCORES_FORBIDDEN")
+    for key in ("baseline", "post", "BASELINE", "POST"):
+        if key in plain:
+            raise GvE0bDv1Error("E0B_RUBRIC_BASELINE_POST_LABEL_FORBIDDEN")
+    if not has_a or not has_b:
+        raise GvE0bDv1Error("E0B_RUBRIC_REQUIRES_BOTH_ARM_SCORES")
+    arm_a_scores = _validate_rubric_arm_scores(
+        plain.get("arm_a_scores"), "E0B_ARM_A_SCORES_REQUIRED"
+    )
+    arm_b_scores = _validate_rubric_arm_scores(
+        plain.get("arm_b_scores"), "E0B_ARM_B_SCORES_REQUIRED"
+    )
+    # Map blinded arms to baseline/post only after ARM scores are validated.
+    if mp["arm_a_source"] == ARM_BASELINE:
+        baseline_scores, post_scores = arm_a_scores, arm_b_scores
+    else:
+        baseline_scores, post_scores = arm_b_scores, arm_a_scores
     auth = _require_str(plain, "authorship_kind", "E0B_RUBRIC_AUTHORSHIP_REQUIRED")
     if auth not in {AUTH_FIXTURE, AUTH_REAL_REVIEWER}:
         raise GvE0bDv1Error("E0B_RUBRIC_AUTHORSHIP_INVALID")
@@ -1298,56 +1442,22 @@ def seal_rubric_record(
         raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
     if session_nonce != pkt.get("session_nonce") or session_nonce != pkg.get("session_nonce"):
         raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
-    # Accept either blinded scores or already-mapped baseline/post scores.
-    if "arm_a_scores" in plain or "arm_b_scores" in plain:
-        arm_a_scores = _validate_rubric_arm_scores(
-            plain.get("arm_a_scores"), "E0B_ARM_A_SCORES_REQUIRED"
-        )
-        arm_b_scores = _validate_rubric_arm_scores(
-            plain.get("arm_b_scores"), "E0B_ARM_B_SCORES_REQUIRED"
-        )
-        if mp["arm_a_source"] == ARM_BASELINE:
-            baseline_scores, post_scores = arm_a_scores, arm_b_scores
-        else:
-            baseline_scores, post_scores = arm_b_scores, arm_a_scores
-    else:
-        baseline_scores = _validate_rubric_arm_scores(
-            plain.get("baseline_scores"), "E0B_BASELINE_SCORES_REQUIRED"
-        )
-        post_scores = _validate_rubric_arm_scores(
-            plain.get("post_scores"), "E0B_POST_SCORES_REQUIRED"
-        )
-        # Reconstruct blinded labels for seal body consistency.
-        if mp["arm_a_source"] == ARM_BASELINE:
-            arm_a_scores, arm_b_scores = baseline_scores, post_scores
-        else:
-            arm_a_scores, arm_b_scores = post_scores, baseline_scores
-    # Optional reviewer custody attestation (not a third person).
+    # Reviewer custody attestation (human assertion; not cryptographic personhood).
     existing_custody = plain.get("custody_attestation")
     if isinstance(existing_custody, Mapping):
-        custody = {
-            "fresh_operator_attested": bool(
-                existing_custody.get("fresh_operator_attested", False)
-            ),
-            "blinded_review_conditions_attested": bool(
-                existing_custody.get("blinded_review_conditions_attested", False)
-            ),
-            "operator_had_not_seen_packet_or_expected_outcome": bool(
-                existing_custody.get(
-                    "operator_had_not_seen_packet_or_expected_outcome", False
-                )
-            ),
-        }
+        custody_src = existing_custody
     else:
-        custody = {
-            "fresh_operator_attested": bool(plain.get("fresh_operator_attested", False)),
-            "blinded_review_conditions_attested": bool(
-                plain.get("blinded_review_conditions_attested", False)
-            ),
-            "operator_had_not_seen_packet_or_expected_outcome": bool(
-                plain.get("operator_had_not_seen_packet_or_expected_outcome", False)
-            ),
-        }
+        custody_src = plain
+    receipt = custody_src.get("reviewer_received_only_blinded_review_package")
+    if auth == AUTH_REAL_REVIEWER and receipt is not True:
+        raise GvE0bDv1Error("E0B_REVIEWER_BLINDED_RECEIPT_REQUIRED")
+    custody = {
+        "fresh_operator_attested": custody_src.get("fresh_operator_attested") is True,
+        "blinded_review_conditions_attested": (
+            custody_src.get("blinded_review_conditions_attested") is True
+        ),
+        "reviewer_received_only_blinded_review_package": receipt is True,
+    }
     body = {
         "case_id": CASE_ID,
         "authorship_kind": auth,
@@ -1360,9 +1470,11 @@ def seal_rubric_record(
         "packet_hash": pkt["packet_hash"],
         "post_packet_hash": p["post_packet_hash"],
         "review_package_hash": pkg["review_package_hash"],
-        "mapping_hash": mp["mapping_hash"],
+        "mapping_commitment": mp["mapping_commitment"],
+        "review_input_mode": REVIEW_INPUT_MODE_BLINDED,
         "arm_a_scores": arm_a_scores,
         "arm_b_scores": arm_b_scores,
+        # Mapped after blinded input validation for comparison/replay only.
         "baseline_scores": baseline_scores,
         "post_scores": post_scores,
         "custody_attestation": custody,
@@ -1453,19 +1565,30 @@ def is_observed_comparison_eligible(
     baseline: Mapping[str, Any],
     post: Mapping[str, Any],
     rubric: Mapping[str, Any],
-    *,
-    attestation: Mapping[str, Any] | None = None,
-    comparison_hash: str | None = None,
 ) -> bool:
-    """True only for real operator + different real reviewer (no third attestor).
+    """True only when methodological + two-human boundaries are sealed.
 
-    ``attestation`` / third-person seals are ignored (governance expansion removed).
-    REAL_HUMAN labels remain attribution only relative to personhood proof; eligibility
-    still requires the two-human authorship structure on sealed records.
+    Requires:
+    - real operator (both arms) + different real reviewer;
+    - blinded ARM input mode on the sealed rubric;
+    - baseline operator custody assertion (not seen packet/outcome before baseline);
+    - reviewer custody assertion (received only blinded review package).
+
+    These remain human attestations, not cryptographic identity proof.
     """
 
-    del attestation, comparison_hash  # unused; kept for call-site compatibility
-    return is_attribution_structure_valid(baseline, post, rubric)
+    if not is_attribution_structure_valid(baseline, post, rubric):
+        return False
+    if rubric.get("review_input_mode") != REVIEW_INPUT_MODE_BLINDED:
+        return False
+    if baseline.get("operator_had_not_seen_packet_or_expected_outcome") is not True:
+        return False
+    custody = rubric.get("custody_attestation")
+    if not isinstance(custody, Mapping):
+        return False
+    if custody.get("reviewer_received_only_blinded_review_package") is not True:
+        return False
+    return True
 
 
 def stage_capture_baseline(
@@ -1599,6 +1722,120 @@ def stage_capture_post(
     return sealed
 
 
+def blank_rubric_authoring_template() -> dict[str, Any]:
+    """Schema-shaped blank blinded rubric form (ARM_A/ARM_B only)."""
+
+    blank_arm = {
+        item: {"score": None, "reason": ""}
+        for item in RUBRIC_ITEMS
+    }
+    return {
+        "case_id": CASE_ID,
+        "authorship_kind": AUTH_REAL_REVIEWER,
+        "reviewer_id": "REPLACE_WITH_REVIEWER_ID",
+        "arm_a_scores": blank_arm,
+        "arm_b_scores": {
+            item: {"score": None, "reason": ""}
+            for item in RUBRIC_ITEMS
+        },
+        "alpha_claim": False,
+        "general_effectiveness_claim": False,
+        "causal_superiority_claim": False,
+        "fresh_operator_attested": None,
+        "blinded_review_conditions_attested": None,
+        "reviewer_received_only_blinded_review_package": None,
+        "notes": (
+            "Score ARM_A and ARM_B only. Do not write baseline/post labels. "
+            "Fill score 0|1|2 and non-empty reason per item. "
+            "Set reviewer_received_only_blinded_review_package to true only after "
+            "you confirm you received only the blinded export package."
+        ),
+    }
+
+
+def blank_baseline_authoring_template() -> dict[str, Any]:
+    return {
+        "case_id": CASE_ID,
+        "arm": "HUMAN_BASELINE",
+        "authorship_kind": AUTH_REAL_OPERATOR,
+        "operator_id": "REPLACE_WITH_OPERATOR_ID",
+        "equal_budget_attestation": True,
+        "outside_research_attestation": False,
+        "post_cutoff_information_attestation": False,
+        "operator_had_not_seen_packet_or_expected_outcome": None,
+        "sealed_before_packet": True,
+        "action": "HOLD_FOR_EVIDENCE",
+        "rationale": "REPLACE_WITH_BASELINE_RATIONALE",
+        "missing_evidence": [],
+        "falsifiers": [],
+        "contradictions_recognized": [],
+        "alpha_claim": False,
+        "notes": (
+            "Set operator_had_not_seen_packet_or_expected_outcome to true only if "
+            "you had not seen the GodView packet or expected outcome before baseline."
+        ),
+    }
+
+
+def blank_post_authoring_template() -> dict[str, Any]:
+    return {
+        "case_id": CASE_ID,
+        "arm": "HUMAN_POST_PACKET",
+        "authorship_kind": AUTH_REAL_OPERATOR,
+        "operator_id": "REPLACE_WITH_OPERATOR_ID",
+        "equal_budget_attestation": True,
+        "outside_research_attestation": False,
+        "post_cutoff_information_attestation": False,
+        "action": "HOLD_FOR_EVIDENCE",
+        "portfolio_action": "NO_POSITION",
+        "rationale": "REPLACE_WITH_POST_RATIONALE",
+        "missing_evidence": [],
+        "falsifiers": [],
+        "contradictions_recognized": [],
+        "alpha_claim": False,
+    }
+
+
+def write_authoring_templates(authoring_dir: Path) -> dict[str, Path]:
+    """Create-only blank baseline/post/rubric authoring JSON (narrow G08 handoff)."""
+
+    authoring_dir.mkdir(parents=True, exist_ok=True)
+    paths = {
+        "baseline": authoring_dir / "baseline_authoring.json",
+        "post": authoring_dir / "post_authoring.json",
+        "rubric": authoring_dir / "rubric_authoring.json",
+    }
+    for path in paths.values():
+        if path.exists():
+            raise GvE0bDv1Error(f"E0B_AUTHORING_TEMPLATE_EXISTS:{path.name}")
+    _persist_sealed_json(paths["baseline"], blank_baseline_authoring_template())
+    _persist_sealed_json(paths["post"], blank_post_authoring_template())
+    _persist_sealed_json(paths["rubric"], blank_rubric_authoring_template())
+    return paths
+
+
+def _assert_reviewer_export_ready(export_dir: Path) -> None:
+    if export_dir.exists():
+        if not export_dir.is_dir():
+            raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_NOT_DIR")
+        entries = list(export_dir.iterdir())
+        if entries:
+            raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_NOT_EMPTY")
+    else:
+        export_dir.mkdir(parents=True, exist_ok=True)
+
+
+def _assert_reviewer_export_exact(export_dir: Path) -> None:
+    if not export_dir.is_dir():
+        raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_NOT_DIR")
+    names = {path.name for path in export_dir.iterdir()}
+    if names != set(REVIEWER_EXPORT_EXACT_NAMES):
+        raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_CONTENTS_INVALID")
+    for path in export_dir.iterdir():
+        if path.is_dir() or path.is_symlink():
+            raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_CONTENTS_INVALID")
+
+
 def stage_build_review_package(
     *,
     baseline_path: Path = DEFAULT_BASELINE_PATH,
@@ -1607,10 +1844,19 @@ def stage_build_review_package(
     session_path: Path = DEFAULT_SESSION_PATH,
     package_path: Path = DEFAULT_REVIEW_PACKAGE_PATH,
     mapping_path: Path = DEFAULT_REVIEW_MAPPING_PATH,
+    rubric_authoring_path: Path | None = None,
     bundle: Mapping[str, Any] | None = None,
     rng_bytes: bytes | None = None,
 ) -> Mapping[str, Any]:
-    """Seal blinded REVIEW_PACKAGE; mapping sealed separately and withheld from export body."""
+    """Seal blinded REVIEW_PACKAGE under separated export custody.
+
+    Reviewer export directory receives only:
+      - review_package.json
+      - blank rubric_authoring.json (ARM_A/ARM_B)
+
+    Private mapping is written under operator custody (not in export dir).
+    Canonical ledger stores mapping_commitment only.
+    """
 
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
@@ -1630,10 +1876,29 @@ def stage_build_review_package(
         prev_chain_hash=_session_tip_from_chain(session["chain"]),
         rng_bytes=rng_bytes,
     )
-    # Export for reviewer: package only (no mapping fields).
     export = _plain(package)
+    package_path = Path(package_path)
+    mapping_path = Path(mapping_path)
+    # Prefer session-nonce-specific export dir; require clean exact contents.
+    export_dir = package_path.parent.resolve()
+    if mapping_path.resolve().is_relative_to(export_dir):
+        raise GvE0bDv1Error("E0B_MAPPING_MUST_LEAVE_REVIEWER_EXPORT")
+    _assert_reviewer_export_ready(export_dir)
+    blank_path = (
+        Path(rubric_authoring_path)
+        if rubric_authoring_path is not None
+        else export_dir / "rubric_authoring.json"
+    )
+    if blank_path.resolve().parent != export_dir:
+        raise GvE0bDv1Error("E0B_RUBRIC_TEMPLATE_MUST_LIVE_IN_EXPORT")
+    if package_path.name != "review_package.json":
+        raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_NAME_INVALID")
+    if blank_path.name != "rubric_authoring.json":
+        raise GvE0bDv1Error("E0B_RUBRIC_TEMPLATE_NAME_INVALID")
     _persist_sealed_json(package_path, export)
-    # Mapping sealed on disk for finalize/replay; not for reviewer presentation.
+    _persist_sealed_json(blank_path, blank_rubric_authoring_template())
+    _assert_reviewer_export_exact(export_dir)
+    # Private mapping under operator custody only (not exported to reviewer).
     _persist_sealed_json(mapping_path, mapping)
     _append_event(
         session_path=session_path,
@@ -1641,7 +1906,7 @@ def stage_build_review_package(
         record_hash=package["review_package_hash"],
         payload={
             "review_package_hash": package["review_package_hash"],
-            "mapping_hash": mapping["mapping_hash"],
+            "mapping_commitment": mapping["mapping_commitment"],
         },
         case_id=session["case_id"],
         session_nonce=session["session_nonce"],
@@ -1688,6 +1953,19 @@ def stage_capture_rubric(
         "session_nonce": session["session_nonce"],
         "prev_chain_hash": _session_tip_from_chain(session["chain"]),
     }
+    # Private mapping must match ledger commitment before scores are sealed.
+    rp_events = [
+        e for e in (session.get("events") or []) if e.get("stage") == STAGE_REVIEW_PACKAGE
+    ]
+    if not rp_events:
+        raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_EVENT_MISSING")
+    rp_payload = _require_mapping(
+        rp_events[-1].get("payload"), "E0B_REVIEW_PACKAGE_PAYLOAD_REQUIRED"
+    )
+    commitment = rp_payload.get("mapping_commitment")
+    if commitment != mapping.get("mapping_commitment"):
+        raise GvE0bDv1Error("E0B_MAPPING_COMMITMENT_MISMATCH")
+    verify_mapping_randomization(mapping)
     sealed = seal_rubric_record(
         record,
         baseline=baseline,
@@ -1696,23 +1974,30 @@ def stage_capture_rubric(
         review_package=package,
         review_mapping=mapping,
     )
-    # Mapping file stays immutable (pre-reveal seal). Audit-only reveal sidecar
-    # is written after rubric seal so the mapping is no longer withheld.
+    # Materialize revealed mapping + rng preimage only after rubric seal.
     reveal_path = mapping_path.with_name(
-        mapping_path.name.replace(".sealed.json", "") + ".revealed.json"
-        if mapping_path.name.endswith(".sealed.json")
-        else mapping_path.name + ".revealed"
+        mapping_path.name.replace(".private.json", ".revealed.json")
+        if mapping_path.name.endswith(".private.json")
+        else mapping_path.name + ".revealed.json"
     )
     _persist_sealed_json(
         reveal_path,
         {
-            "mapping_hash": mapping["mapping_hash"],
+            "mapping_commitment": mapping["mapping_commitment"],
             "review_package_hash": mapping["review_package_hash"],
             "arm_a_source": mapping["arm_a_source"],
             "arm_b_source": mapping["arm_b_source"],
+            "baseline_hash": mapping["baseline_hash"],
+            "post_packet_hash": mapping["post_packet_hash"],
+            "rng_commitment": mapping["rng_commitment"],
+            "rng_bytes_hex": mapping["rng_bytes_hex"],
             "revealed_at": scored_at,
             "revealed_after": "RUBRIC_CLOSE",
-            "note": "Mapping withheld until rubric sealed; reveal is post-seal audit only.",
+            "blinding_custody_model": BLINDING_CUSTODY_MODEL,
+            "note": (
+                "Arm-label blinding under separated export custody. "
+                "RNG preimage revealed post-rubric-seal for replay verification."
+            ),
         },
     )
     _append_event(
@@ -1781,9 +2066,7 @@ def build_comparison(
     session_path: Path | None = None,
     package_path: Path | None = None,
     mapping_path: Path | None = None,
-    attestation: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
-    del attestation  # third attestor removed
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
     if packet is not None:
@@ -1863,6 +2146,9 @@ def build_comparison(
                 "rationale": baseline["rationale"],
                 "allowed_budget_minutes": baseline["allowed_budget_minutes"],
                 "elapsed_seconds": baseline["elapsed_seconds"],
+                "operator_had_not_seen_packet_or_expected_outcome": bool(
+                    baseline.get("operator_had_not_seen_packet_or_expected_outcome")
+                ),
             },
             "godview_packet": {
                 "run_state": pkt["run_state"],
@@ -1883,6 +2169,8 @@ def build_comparison(
                 "authorship_kind": rubric["authorship_kind"],
                 "reviewer_id": rubric["reviewer_id"],
                 "scored_at": rubric["scored_at"],
+                "review_input_mode": rubric.get("review_input_mode"),
+                "custody_attestation": _plain(rubric.get("custody_attestation") or {}),
                 "baseline": baseline_totals,
                 "post_packet": post_totals,
             },
@@ -1906,9 +2194,7 @@ def build_result_document(
     comparison: Mapping[str, Any],
     *,
     sealed_records: Mapping[str, Any],
-    attestation: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
-    del attestation
     plain = _plain(comparison)
     claimed = _require_sha256(plain.get("comparison_hash"), "E0B_COMPARISON_HASH_INVALID")
     body = _without_keys(plain, "comparison_hash")
@@ -1993,9 +2279,12 @@ def build_result_document(
             "Observed within-case difference only. No causal superiority, "
             "general decision-quality improvement, research-efficiency, alpha, "
             "or score uplift claim. REAL_HUMAN labels are attribution only. "
-            "Close requires two-human structure, mechanical blinding, bound chain "
-            "replay. Engine fixtures do not count as observed comparisons. "
-            "Ledger is tamper-evident under capture-process custody only."
+            "Close requires two-human structure, blinded ARM input mode, "
+            "operator/reviewer custody attestations, and bound chain replay. "
+            "Blinding is arm-label blinding under separated export custody, not "
+            "absolute cryptographic proof of reviewer ignorance. Engine fixtures "
+            "do not count as observed comparisons. Ledger is tamper-evident under "
+            "capture-process custody only."
         ),
     }
     result_hash = domain_hash(DOMAIN_RESULT, result_body)
@@ -2097,14 +2386,12 @@ def stage_compare(
     mapping_path: Path = DEFAULT_REVIEW_MAPPING_PATH,
     result_json_path: Path = DEFAULT_RESULT_JSON,
     decision_packet_path: Path = DEFAULT_DECISION_PACKET_MD,
-    attestation_path: Path | None = None,
     bundle: Mapping[str, Any] | None = None,
     publish: bool = False,
     current_target: Path = DEFAULT_CURRENT_DECISION_TARGET,
     current_lock: Path = DEFAULT_CURRENT_DECISION_LOCK,
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> Mapping[str, Any]:
-    del attestation_path
     return run_e0b_dv1_case(
         baseline_path=baseline_path,
         post_path=post_path,
@@ -2180,11 +2467,9 @@ def write_canonical_artifacts(
     comparison: Mapping[str, Any],
     *,
     sealed_records: Mapping[str, Any],
-    attestation: Mapping[str, Any] | None = None,
     result_json_path: Path = DEFAULT_RESULT_JSON,
     decision_packet_path: Path = DEFAULT_DECISION_PACKET_MD,
 ) -> Mapping[str, Any]:
-    del attestation
     result = build_result_document(comparison, sealed_records=sealed_records)
     result_bytes = canonical_document_bytes(_plain(result))
     packet_md = build_decision_packet_markdown(comparison).encode("utf-8")
@@ -2293,7 +2578,6 @@ def run_e0b_dv1_case(
     session_path: Path | None = None,
     package_path: Path | None = None,
     mapping_path: Path | None = None,
-    attestation_path: Path | None = None,
     packet: Mapping[str, Any] | None = None,
     bundle: Mapping[str, Any] | None = None,
     result_json_path: Path = DEFAULT_RESULT_JSON,
@@ -2303,7 +2587,6 @@ def run_e0b_dv1_case(
     current_lock: Path = DEFAULT_CURRENT_DECISION_LOCK,
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> Mapping[str, Any]:
-    del attestation_path
     if packet_path is None and packet is None:
         raise GvE0bDv1Error("E0B_PACKET_REQUIRED")
     if session_path is None or package_path is None or mapping_path is None:
@@ -2480,44 +2763,42 @@ def observed_comparison_count_from_disk(
         return 0
 
 
-# Compatibility stubs: third-attestor APIs fail closed.
-def seal_close_attestation(record: Mapping[str, Any]) -> Mapping[str, Any]:
-    raise GvE0bDv1Error("E0B_THIRD_ATTESTOR_REMOVED")
-
-
-def verify_close_attestation(
-    attestation: Mapping[str, Any],
-    **kwargs: Any,
-) -> str:
-    raise GvE0bDv1Error("E0B_THIRD_ATTESTOR_REMOVED")
-
-
 __all__ = [
-    "AUTH_EXTERNAL_ATTESTOR",
     "AUTH_FIXTURE",
     "AUTH_REAL_OPERATOR",
     "AUTH_REAL_REVIEWER",
     "AdvanceableClock",
     "BUDGET_MINUTES",
     "BLOCK_REASON",
+    "BLINDING_CUSTODY_MODEL",
     "CANONICAL_STAGE_ORDER",
     "CASE_ID",
+    "DEFAULT_AUTHORING_TEMPLATES_DIR",
+    "REVIEW_ARM_FIELDS",
+    "REVIEWER_EXPORT_EXACT_NAMES",
     "DEFAULT_BASELINE_PATH",
     "DEFAULT_DECISION_PACKET_MD",
     "DEFAULT_EVENTS_DIR",
+    "DEFAULT_OPERATOR_CUSTODY_DIR",
     "DEFAULT_PACKET_PATH",
     "DEFAULT_POST_PATH",
     "DEFAULT_RESULT_JSON",
+    "DEFAULT_REVIEWER_EXPORT_DIR",
     "DEFAULT_REVIEW_MAPPING_PATH",
     "DEFAULT_REVIEW_PACKAGE_PATH",
+    "DEFAULT_RUBRIC_AUTHORING_PATH",
     "DEFAULT_RUBRIC_PATH",
     "DEFAULT_SESSION_PATH",
     "E0B_DECISION_ID",
     "RATIONALE_REF_PREFIX",
+    "REVIEW_INPUT_MODE_BLINDED",
     "RUBRIC_ITEMS",
     "RUN_CLASS_SYNTHETIC",
     "WallClock",
     "GvE0bDv1Error",
+    "blank_baseline_authoring_template",
+    "blank_post_authoring_template",
+    "blank_rubric_authoring_template",
     "build_comparison",
     "build_comparison_presentation",
     "build_decision_packet_markdown",
@@ -2541,7 +2822,6 @@ __all__ = [
     "render_e0b_dv1_comparison",
     "run_e0b_dv1_case",
     "seal_baseline_record",
-    "seal_close_attestation",
     "seal_post_packet_record",
     "seal_review_package",
     "seal_rubric_record",
@@ -2554,10 +2834,9 @@ __all__ = [
     "stage_generate_packet",
     "stage_open_arm",
     "verify_bundle_seal",
-    "verify_close_attestation",
     "verify_comparison_document",
+    "verify_mapping_randomization",
     "verify_result_document",
-    "verify_session_bound_to_records",
-    "verify_session_chain",
+    "write_authoring_templates",
     "write_canonical_artifacts",
 ]
