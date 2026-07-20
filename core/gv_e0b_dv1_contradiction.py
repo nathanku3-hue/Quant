@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timedelta, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -68,6 +69,8 @@ DEFAULT_REVIEW_MAPPING_PATH = (
     DEFAULT_OPERATOR_CUSTODY_DIR / "review_mapping.private.json"
 )
 DEFAULT_AUTHORING_TEMPLATES_DIR = DEFAULT_CASE_DIR / "captures" / "authoring"
+DEFAULT_SESSION_MANIFEST_PATH = DEFAULT_CASE_DIR / "captures" / "session_manifest.json"
+DEFAULT_CHECKPOINTS_DIR = DEFAULT_CASE_DIR / "captures" / "checkpoints"
 
 CASE_ID = "E0B_DV1_G08_CONTRADICTION_1"
 PROTOCOL_ID = "GODVIEW-E0-P0-V1"
@@ -93,6 +96,8 @@ DOMAIN_CHAIN = "GV-E0B:DV1:CHAIN:V1"
 DOMAIN_ARM_OPEN = "GV-E0B:DV1:ARM_OPEN:V1"
 DOMAIN_REVIEW_PACKAGE = "GV-E0B:DV1:REVIEW_PACKAGE:V1"
 DOMAIN_REVIEW_MAPPING = "GV-E0B:DV1:REVIEW_MAPPING:V1"
+DOMAIN_SESSION_MANIFEST = "GV-E0B:DV1:SESSION_MANIFEST:V1"
+DOMAIN_CHECKPOINT = "GV-E0B:DV1:CHECKPOINT:V1"
 
 AUTH_FIXTURE = "ENGINE_TEST_FIXTURE"
 AUTH_REAL_OPERATOR = "REAL_HUMAN_OPERATOR"
@@ -122,6 +127,24 @@ LABEL_ARM_A = "ARM_A"
 LABEL_ARM_B = "ARM_B"
 REVIEW_INPUT_MODE_BLINDED = "BLINDED_ARM_LABELS"
 BLINDING_CUSTODY_MODEL = "ARM_LABEL_BLINDING_SEPARATED_EXPORT_CUSTODY"
+AUTHORING_ONLY = "AUTHORING_ONLY"
+BASELINE_TEMPLATE_ID = "GV_E0B_G08_BASELINE_AUTHORING_V1"
+POST_TEMPLATE_ID = "GV_E0B_G08_POST_AUTHORING_V1"
+RUBRIC_TEMPLATE_ID = "GV_E0B_G08_RUBRIC_AUTHORING_V1"
+SESSION_MANIFEST_SCHEMA = "gv_e0b_g08_session_manifest_v1"
+CHECKPOINT_SCHEMA = "gv_e0b_g08_checkpoint_v1"
+CAPTURE_STATE_ACTIVE = "ACTIVE"
+CAPTURE_STATE_RESUMABLE = "RESUMABLE"
+CAPTURE_STATE_ABORTED = "ABORTED"
+CAPTURE_STATE_COMPLETE = "COMPLETE"
+CAPTURE_STATES = frozenset(
+    {
+        CAPTURE_STATE_ACTIVE,
+        CAPTURE_STATE_RESUMABLE,
+        CAPTURE_STATE_ABORTED,
+        CAPTURE_STATE_COMPLETE,
+    }
+)
 
 STAGE_SESSION_OPEN = "SESSION_OPEN"
 STAGE_BASELINE_OPEN = "BASELINE_OPEN"
@@ -150,6 +173,17 @@ RUBRIC_ITEMS: tuple[str, ...] = (
     "supply_demand_business_shareholder_valuation_claim_separation",
     "avoidance_of_claims_beyond_evidence",
     "rationale_traceability",
+)
+
+DECISION_VALUE_IMPROVED = "IMPROVED"
+DECISION_VALUE_NOT_IMPROVED = "NOT_IMPROVED"
+TARGETED_VALUE_DIMENSIONS: tuple[str, ...] = (
+    "indispensable_missing_evidence_identification",
+    "falsifier_and_contradiction_recognition",
+)
+CORE_SAFETY_DIMENSIONS: tuple[str, ...] = (
+    "selected_action_defensibility",
+    "avoidance_of_claims_beyond_evidence",
 )
 
 ALLOWED_ACTIONS = frozenset(
@@ -209,6 +243,43 @@ def _plain(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return [_plain(item) for item in value]
     return value
+
+
+def _paths_alias(left: Path, right: Path) -> bool:
+    left_path = Path(left)
+    right_path = Path(right)
+    try:
+        left_identity = os.path.normcase(str(left_path.resolve(strict=False)))
+        right_identity = os.path.normcase(str(right_path.resolve(strict=False)))
+        if left_identity == right_identity:
+            return True
+        try:
+            left_stat = left_path.stat()
+        except FileNotFoundError:
+            left_stat = None
+        try:
+            right_stat = right_path.stat()
+        except FileNotFoundError:
+            right_stat = None
+        return (
+            left_stat is not None
+            and right_stat is not None
+            and os.path.samestat(left_stat, right_stat)
+        )
+    except OSError as exc:
+        raise GvE0bDv1Error("E0B_CASE_PATH_IDENTITY_UNCERTAIN") from exc
+
+
+def _require_distinct_case_paths(
+    named_paths: Sequence[tuple[str, Path | None]],
+) -> None:
+    active = [(name, Path(path)) for name, path in named_paths if path is not None]
+    for index, (left_name, left_path) in enumerate(active):
+        for right_name, right_path in active[index + 1 :]:
+            if _paths_alias(left_path, right_path):
+                raise GvE0bDv1Error(
+                    f"E0B_CASE_PATH_ALIAS:{left_name}:{right_name}"
+                )
 
 
 def _require_mapping(value: Any, code: str) -> dict[str, Any]:
@@ -361,7 +432,30 @@ def _reject_caller_timing_fields(record: Mapping[str, Any]) -> None:
             raise GvE0bDv1Error(f"E0B_CALLER_TIMING_FORBIDDEN:{key}")
 
 
-def _atomic_write_bytes(target: Path, payload: bytes) -> None:
+def _best_effort_fsync_directory(directory: Path) -> None:
+    """Fsync directory metadata where the host exposes a portable handle.
+
+    File payloads are fsynced before atomic replacement. Windows does not expose
+    a portable directory-fsync handle, so directory durability remains an honest
+    best-effort boundary matching the canonical GV-FS0 publisher.
+    """
+
+    flags = getattr(os, "O_RDONLY", 0)
+    if hasattr(os, "O_DIRECTORY"):
+        flags |= os.O_DIRECTORY
+    try:
+        descriptor = os.open(directory, flags)
+    except OSError:
+        return
+    try:
+        os.fsync(descriptor)
+    except OSError:
+        return
+    finally:
+        os.close(descriptor)
+
+
+def _stage_temp_bytes(target: Path, payload: bytes) -> Path:
     target.parent.mkdir(parents=True, exist_ok=True)
     descriptor, raw_name = tempfile.mkstemp(
         prefix=f".{target.name}.",
@@ -374,12 +468,94 @@ def _atomic_write_bytes(target: Path, payload: bytes) -> None:
             handle.write(payload)
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temp_path, target)
     except Exception:
         try:
             temp_path.unlink(missing_ok=True)
         except OSError:
             pass
+        raise
+    return temp_path
+
+
+def _atomic_write_bytes(target: Path, payload: bytes) -> None:
+    temp_path = _stage_temp_bytes(target, payload)
+    try:
+        os.replace(temp_path, target)
+        _best_effort_fsync_directory(target.parent)
+    except Exception:
+        try:
+            temp_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        raise
+
+
+def _read_optional_bytes(path: Path) -> bytes | None:
+    try:
+        return path.read_bytes()
+    except FileNotFoundError:
+        return None
+
+
+def _restore_path_bytes(path: Path, previous: bytes | None) -> None:
+    if previous is None:
+        path.unlink(missing_ok=True)
+        _best_effort_fsync_directory(path.parent)
+        return
+    _atomic_write_bytes(path, previous)
+
+
+def _atomic_write_pair(
+    first_path: Path,
+    first_payload: bytes,
+    second_path: Path,
+    second_payload: bytes,
+) -> None:
+    _require_distinct_case_paths(
+        [("canonical_result", first_path), ("canonical_packet", second_path)]
+    )
+    first_previous = _read_optional_bytes(first_path)
+    second_previous = _read_optional_bytes(second_path)
+    first_temp = _stage_temp_bytes(first_path, first_payload)
+    try:
+        second_temp = _stage_temp_bytes(second_path, second_payload)
+    except Exception:
+        first_temp.unlink(missing_ok=True)
+        raise
+
+    first_replaced = False
+    second_replaced = False
+    try:
+        os.replace(first_temp, first_path)
+        first_temp = None
+        first_replaced = True
+        _best_effort_fsync_directory(first_path.parent)
+        os.replace(second_temp, second_path)
+        second_temp = None
+        second_replaced = True
+        _best_effort_fsync_directory(second_path.parent)
+    except Exception as exc:
+        for temp_path in (first_temp, second_temp):
+            if temp_path is not None:
+                try:
+                    temp_path.unlink(missing_ok=True)
+                except OSError:
+                    pass
+        rollback_errors: list[Exception] = []
+        if second_replaced:
+            try:
+                _restore_path_bytes(second_path, second_previous)
+            except Exception as rollback_exc:
+                rollback_errors.append(rollback_exc)
+        if first_replaced:
+            try:
+                _restore_path_bytes(first_path, first_previous)
+            except Exception as rollback_exc:
+                rollback_errors.append(rollback_exc)
+        if rollback_errors:
+            raise GvE0bDv1Error(
+                "E0B_CANONICAL_ARTIFACT_ROLLBACK_FAILED"
+            ) from exc
         raise
 
 
@@ -397,6 +573,434 @@ def _load_json_object(path: Path) -> dict[str, Any]:
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise GvE0bDv1Error(f"E0B_PATH_INVALID_JSON:{path.name}") from exc
     return _require_mapping(data, f"E0B_PATH_NOT_OBJECT:{path.name}")
+
+
+def _sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _session_manifest_path(session_path: Path) -> Path:
+    return session_path.parent / "session_manifest.json"
+
+
+def _checkpoints_dir_for(session_path: Path) -> Path:
+    return session_path.parent / "checkpoints"
+
+
+def _require_git_object_id(value: Any, code: str) -> str:
+    if not isinstance(value, str) or len(value) not in {40, 64}:
+        raise GvE0bDv1Error(code)
+    if any(char not in "0123456789abcdef" for char in value):
+        raise GvE0bDv1Error(code)
+    return value
+
+
+def _require_principal_id(value: Any, code: str) -> str:
+    principal = _reject_placeholder_identity(value, code).strip()
+    if len(principal) > 128:
+        raise GvE0bDv1Error(code)
+    if any(char.isspace() or char in "/\\" for char in principal):
+        raise GvE0bDv1Error(code)
+    return principal
+
+
+def _authoring_template_specs() -> dict[str, tuple[str, str, Callable[[], dict[str, Any]]]]:
+    return {
+        "baseline": ("baseline_authoring.json", BASELINE_TEMPLATE_ID, blank_baseline_authoring_template),
+        "post": ("post_authoring.json", POST_TEMPLATE_ID, blank_post_authoring_template),
+        "rubric": ("rubric_authoring.json", RUBRIC_TEMPLATE_ID, blank_rubric_authoring_template),
+    }
+
+
+def _authoring_template_descriptor(
+    role: str,
+    path: Path,
+) -> dict[str, Any]:
+    specs = _authoring_template_specs()
+    if role not in specs:
+        raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_ROLE_INVALID")
+    expected_name, template_id, builder = specs[role]
+    path = Path(path)
+    if path.name != expected_name or not path.is_file() or path.is_symlink():
+        raise GvE0bDv1Error(f"E0B_AUTHORING_TEMPLATE_PATH_INVALID:{role}")
+    raw = path.read_bytes()
+    expected = canonical_document_bytes(builder())
+    if raw != expected:
+        raise GvE0bDv1Error(f"E0B_AUTHORING_TEMPLATE_NOT_BLANK:{role}")
+    return {
+        "role": role,
+        "file_name": expected_name,
+        "artifact_role": AUTHORING_ONLY,
+        "template_id": template_id,
+        "sha256": _sha256_bytes(raw),
+        "byte_length": len(raw),
+    }
+
+
+def _in_memory_authoring_template_descriptors() -> list[dict[str, Any]]:
+    descriptors: list[dict[str, Any]] = []
+    for role, (file_name, template_id, builder) in _authoring_template_specs().items():
+        payload = canonical_document_bytes(builder())
+        descriptors.append(
+            {
+                "role": role,
+                "file_name": file_name,
+                "artifact_role": AUTHORING_ONLY,
+                "template_id": template_id,
+                "sha256": _sha256_bytes(payload),
+                "byte_length": len(payload),
+            }
+        )
+    return descriptors
+
+
+def _build_session_manifest(
+    *,
+    session_id: str,
+    source_commit: str,
+    source_tree: str,
+    protocol_freeze_manifest_sha256: str,
+    operator_principal_id: str,
+    reviewer_principal_id: str,
+    budget_started_at: str,
+    authoring_templates: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    operator_id = _require_principal_id(operator_principal_id, "E0B_OPERATOR_REQUIRED")
+    reviewer_id = _require_principal_id(reviewer_principal_id, "E0B_REVIEWER_REQUIRED")
+    if reviewer_id == operator_id:
+        raise GvE0bDv1Error("E0B_REVIEWER_MUST_DIFFER_FROM_OPERATOR")
+    body = {
+        "schema_version": SESSION_MANIFEST_SCHEMA,
+        "case_id": CASE_ID,
+        "session_id": _require_str(
+            {"session_id": session_id}, "session_id", "E0B_SESSION_NONCE_REQUIRED"
+        ),
+        "source_commit": _require_git_object_id(
+            source_commit, "E0B_SOURCE_COMMIT_INVALID"
+        ),
+        "source_tree": _require_git_object_id(source_tree, "E0B_SOURCE_TREE_INVALID"),
+        "protocol_id": PROTOCOL_ID,
+        "protocol_freeze_manifest_sha256": _require_sha256(
+            protocol_freeze_manifest_sha256,
+            "E0B_PROTOCOL_FREEZE_MANIFEST_HASH_INVALID",
+        ),
+        "operator_principal_id": operator_id,
+        "reviewer_principal_id": reviewer_id,
+        "budget_started_at": _require_timestamp(
+            {"budget_started_at": budget_started_at},
+            "budget_started_at",
+            "E0B_BUDGET_START_INVALID",
+        ),
+        "budget_cap_minutes": BUDGET_MINUTES,
+        "authoring_templates": [_plain(item) for item in authoring_templates],
+        "authoring_boundary": {
+            "artifact_role": AUTHORING_ONLY,
+            "templates_are_evidence": False,
+            "template_descriptors_permitted_in_session_manifest": True,
+            "template_documents_permitted_in_session_or_result": False,
+            "authoring_fields_permitted_in_sealed_records": False,
+        },
+    }
+    roles = [item.get("role") for item in body["authoring_templates"]]
+    if roles != ["baseline", "post", "rubric"]:
+        raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_SET_INVALID")
+    out = dict(body)
+    out["session_manifest_hash"] = domain_hash(DOMAIN_SESSION_MANIFEST, body)
+    return out
+
+
+def verify_session_manifest(manifest: Mapping[str, Any]) -> str:
+    plain = _plain(manifest)
+    claimed = _require_sha256(
+        plain.get("session_manifest_hash"), "E0B_SESSION_MANIFEST_HASH_INVALID"
+    )
+    body = _without_keys(plain, "session_manifest_hash")
+    if body.get("schema_version") != SESSION_MANIFEST_SCHEMA:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_SCHEMA_INVALID")
+    if body.get("case_id") != CASE_ID or body.get("protocol_id") != PROTOCOL_ID:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_AUTHORITY_INVALID")
+    _require_git_object_id(body.get("source_commit"), "E0B_SOURCE_COMMIT_INVALID")
+    _require_git_object_id(body.get("source_tree"), "E0B_SOURCE_TREE_INVALID")
+    _require_sha256(
+        body.get("protocol_freeze_manifest_sha256"),
+        "E0B_PROTOCOL_FREEZE_MANIFEST_HASH_INVALID",
+    )
+    operator_id = _require_principal_id(
+        body.get("operator_principal_id"), "E0B_OPERATOR_REQUIRED"
+    )
+    reviewer_id = _require_principal_id(
+        body.get("reviewer_principal_id"), "E0B_REVIEWER_REQUIRED"
+    )
+    if operator_id == reviewer_id:
+        raise GvE0bDv1Error("E0B_REVIEWER_MUST_DIFFER_FROM_OPERATOR")
+    templates = body.get("authoring_templates")
+    if not isinstance(templates, list) or [item.get("role") for item in templates] != [
+        "baseline",
+        "post",
+        "rubric",
+    ]:
+        raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_SET_INVALID")
+    expected_specs = {
+        role: {
+            "file_name": file_name,
+            "template_id": template_id,
+            "sha256": _sha256_bytes(canonical_document_bytes(builder())),
+            "byte_length": len(canonical_document_bytes(builder())),
+        }
+        for role, (file_name, template_id, builder) in _authoring_template_specs().items()
+    }
+    for descriptor in templates:
+        role = descriptor.get("role")
+        expected = expected_specs.get(role)
+        if expected is None:
+            raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_ROLE_INVALID")
+        if descriptor.get("artifact_role") != AUTHORING_ONLY:
+            raise GvE0bDv1Error("E0B_AUTHORING_ROLE_INVALID")
+        for field in ("file_name", "template_id", "sha256", "byte_length"):
+            if descriptor.get(field) != expected[field]:
+                raise GvE0bDv1Error(f"E0B_AUTHORING_TEMPLATE_DESCRIPTOR_INVALID:{field}")
+    boundary = _require_mapping(
+        body.get("authoring_boundary"),
+        "E0B_AUTHORING_BOUNDARY_REQUIRED",
+    )
+    if boundary != {
+        "artifact_role": AUTHORING_ONLY,
+        "templates_are_evidence": False,
+        "template_descriptors_permitted_in_session_manifest": True,
+        "template_documents_permitted_in_session_or_result": False,
+        "authoring_fields_permitted_in_sealed_records": False,
+    }:
+        raise GvE0bDv1Error("E0B_AUTHORING_BOUNDARY_INVALID")
+    if domain_hash(DOMAIN_SESSION_MANIFEST, body) != claimed:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_SEAL_MISMATCH")
+    return claimed
+
+
+def load_session_manifest(path: Path) -> dict[str, Any]:
+    manifest = _load_json_object(path)
+    verify_session_manifest(manifest)
+    return manifest
+
+
+def _sanitize_authoring_submission(
+    authoring: Mapping[str, Any],
+    *,
+    expected_template_id: str,
+) -> dict[str, Any]:
+    plain = _plain(authoring)
+    auth = plain.get("authorship_kind")
+    if auth in {AUTH_REAL_OPERATOR, AUTH_REAL_REVIEWER}:
+        if plain.get("artifact_role") != AUTHORING_ONLY:
+            raise GvE0bDv1Error("E0B_AUTHORING_ROLE_REQUIRED")
+        if plain.get("template_id") != expected_template_id:
+            raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_ID_INVALID")
+    return {
+        key: value
+        for key, value in plain.items()
+        if key not in {"artifact_role", "template_id", "notes"}
+    }
+
+
+def _reject_authoring_metadata_in_evidence(value: Any) -> None:
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            if key in {"artifact_role", "template_id"}:
+                raise GvE0bDv1Error("E0B_AUTHORING_METADATA_IN_EVIDENCE")
+            _reject_authoring_metadata_in_evidence(item)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _reject_authoring_metadata_in_evidence(item)
+
+
+def _create_sealed_json(path: Path, record: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = canonical_document_bytes(_plain(record))
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError as exc:
+        raise GvE0bDv1Error(f"E0B_APPEND_ONLY_FILE_EXISTS:{path.name}") from exc
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        _best_effort_fsync_directory(path.parent)
+    except Exception:
+        path.unlink(missing_ok=True)
+        raise
+
+
+def _checkpoint_path(checkpoints_dir: Path, seq: int) -> Path:
+    return checkpoints_dir / f"{seq:04d}.json"
+
+
+def load_capture_checkpoints(
+    session_path: Path = DEFAULT_SESSION_PATH,
+) -> list[dict[str, Any]]:
+    session = load_capture_session(session_path)
+    directory = _checkpoints_dir_for(session_path)
+    if not directory.is_dir():
+        return []
+    files = sorted(directory.glob("*.json"))
+    checkpoints: list[dict[str, Any]] = []
+    previous = ZERO_CHAIN_HASH
+    for index, path in enumerate(files):
+        checkpoint = _load_json_object(path)
+        if checkpoint.get("schema_version") != CHECKPOINT_SCHEMA:
+            raise GvE0bDv1Error("E0B_CHECKPOINT_SCHEMA_INVALID")
+        if checkpoint.get("sequence") != index:
+            raise GvE0bDv1Error("E0B_CHECKPOINT_SEQUENCE_INVALID")
+        if checkpoint.get("prev_checkpoint_hash") != previous:
+            raise GvE0bDv1Error("E0B_CHECKPOINT_CHAIN_BREAK")
+        if checkpoint.get("session_id") != session["session_nonce"]:
+            raise GvE0bDv1Error("E0B_CHECKPOINT_SESSION_MISMATCH")
+        if checkpoint.get("session_manifest_hash") != session["session_manifest_hash"]:
+            raise GvE0bDv1Error("E0B_CHECKPOINT_MANIFEST_MISMATCH")
+        state = checkpoint.get("state")
+        if state not in CAPTURE_STATES:
+            raise GvE0bDv1Error("E0B_CHECKPOINT_STATE_INVALID")
+        claimed = _require_sha256(
+            checkpoint.get("checkpoint_hash"), "E0B_CHECKPOINT_HASH_INVALID"
+        )
+        body = _without_keys(checkpoint, "checkpoint_hash")
+        if domain_hash(DOMAIN_CHECKPOINT, body) != claimed:
+            raise GvE0bDv1Error("E0B_CHECKPOINT_SEAL_MISMATCH")
+        checkpoints.append(checkpoint)
+        previous = claimed
+    return checkpoints
+
+
+def append_capture_checkpoint(
+    *,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    operation: str,
+    state: str,
+    detail: str,
+    clock: CaptureClock | None = None,
+) -> Mapping[str, Any]:
+    if state not in CAPTURE_STATES:
+        raise GvE0bDv1Error("E0B_CHECKPOINT_STATE_INVALID")
+    session = load_capture_session(session_path)
+    existing = load_capture_checkpoints(session_path)
+    if existing and existing[-1]["state"] in {CAPTURE_STATE_ABORTED, CAPTURE_STATE_COMPLETE}:
+        raise GvE0bDv1Error("E0B_CAPTURE_STATE_TERMINAL")
+    sequence = len(existing)
+    previous = existing[-1]["checkpoint_hash"] if existing else ZERO_CHAIN_HASH
+    body = {
+        "schema_version": CHECKPOINT_SCHEMA,
+        "case_id": CASE_ID,
+        "session_id": session["session_nonce"],
+        "session_manifest_hash": session["session_manifest_hash"],
+        "sequence": sequence,
+        "operation": _require_str(
+            {"operation": operation}, "operation", "E0B_CHECKPOINT_OPERATION_INVALID"
+        ),
+        "state": state,
+        "detail": str(detail),
+        "created_at": (clock or WallClock()).now(),
+        "event_count": len(session["chain"]),
+        "tip_chain_hash": _session_tip_from_chain(session["chain"]),
+        "prev_checkpoint_hash": previous,
+    }
+    checkpoint = {**body, "checkpoint_hash": domain_hash(DOMAIN_CHECKPOINT, body)}
+    _create_sealed_json(_checkpoint_path(_checkpoints_dir_for(session_path), sequence), checkpoint)
+    return _freeze(checkpoint)
+
+
+def capture_lifecycle_state(session_path: Path = DEFAULT_SESSION_PATH) -> str:
+    checkpoints = load_capture_checkpoints(session_path)
+    if not checkpoints:
+        return CAPTURE_STATE_RESUMABLE
+    return str(checkpoints[-1]["state"])
+
+
+def require_capture_resumable(session_path: Path = DEFAULT_SESSION_PATH) -> None:
+    state = capture_lifecycle_state(session_path)
+    if state == CAPTURE_STATE_ACTIVE:
+        raise GvE0bDv1Error("E0B_CAPTURE_RECOVERY_REQUIRED")
+    if state == CAPTURE_STATE_ABORTED:
+        raise GvE0bDv1Error("E0B_CAPTURE_ABORTED")
+    if state == CAPTURE_STATE_COMPLETE:
+        raise GvE0bDv1Error("E0B_CAPTURE_COMPLETE")
+
+
+def _require_active_checkpoint_for_authoritative_stage(
+    session_path: Path,
+    operation: str,
+) -> None:
+    manifest = load_session_manifest(_session_manifest_path(session_path))
+    if (
+        manifest["source_commit"] == "0" * 40
+        and manifest["source_tree"] == "1" * 40
+    ):
+        return
+    checkpoints = load_capture_checkpoints(session_path)
+    if not checkpoints:
+        raise GvE0bDv1Error("E0B_CAPTURE_CHECKPOINT_MISSING")
+    latest = checkpoints[-1]
+    if latest["state"] != CAPTURE_STATE_ACTIVE:
+        raise GvE0bDv1Error("E0B_CAPTURE_ACTIVE_CHECKPOINT_REQUIRED")
+    if latest["operation"] != operation:
+        raise GvE0bDv1Error("E0B_CAPTURE_OPERATION_MISMATCH")
+
+
+def recover_capture_checkpoint(
+    *,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    operation: str,
+    expected_stage: str | None,
+    expected_artifacts: Sequence[Path],
+    clock: CaptureClock | None = None,
+) -> Mapping[str, Any]:
+    checkpoints = load_capture_checkpoints(session_path)
+    if not checkpoints or checkpoints[-1]["state"] != CAPTURE_STATE_ACTIVE:
+        raise GvE0bDv1Error("E0B_CAPTURE_NOT_ACTIVE")
+    active = checkpoints[-1]
+    if active["operation"] != operation:
+        raise GvE0bDv1Error("E0B_CAPTURE_OPERATION_MISMATCH")
+    session = load_capture_session(session_path)
+    current_count = len(session["chain"])
+    start_count = int(active["event_count"])
+    current_stage = session["chain"][-1]["stage"] if session["chain"] else None
+    artifacts_ready = all(Path(path).is_file() for path in expected_artifacts)
+    if current_count == start_count:
+        state = CAPTURE_STATE_RESUMABLE
+        detail = "no_authoritative_event_mutation_detected"
+    elif (
+        current_count == start_count + 1
+        and expected_stage is not None
+        and current_stage == expected_stage
+        and artifacts_ready
+    ):
+        state = CAPTURE_STATE_RESUMABLE
+        detail = "authoritative_stage_committed_before_checkpoint"
+    else:
+        state = CAPTURE_STATE_ABORTED
+        detail = "partial_or_ambiguous_authoritative_mutation"
+    return append_capture_checkpoint(
+        session_path=session_path,
+        operation=operation,
+        state=state,
+        detail=detail,
+        clock=clock,
+    )
+
+
+def abort_capture_session(
+    *,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    reason: str,
+    clock: CaptureClock | None = None,
+) -> Mapping[str, Any]:
+    if not isinstance(reason, str) or not reason.strip():
+        raise GvE0bDv1Error("E0B_ABORT_REASON_REQUIRED")
+    return append_capture_checkpoint(
+        session_path=session_path,
+        operation="ABORT_SESSION",
+        state=CAPTURE_STATE_ABORTED,
+        detail=reason.strip(),
+        clock=clock,
+    )
 
 
 def _events_dir_for(session_path: Path) -> Path:
@@ -451,6 +1055,7 @@ def _rebuild_session_from_events(events_dir: Path) -> dict[str, Any]:
     session_nonce: str | None = None
     bundle_hash: str | None = None
     created_at: str | None = None
+    session_manifest_hash: str | None = None
     expected_prev = ZERO_CHAIN_HASH
     for idx, path in enumerate(files):
         event = _load_json_object(path)
@@ -473,6 +1078,10 @@ def _rebuild_session_from_events(events_dir: Path) -> dict[str, Any]:
             session_nonce = _require_str(event, "session_nonce", "E0B_SESSION_NONCE_REQUIRED")
             bundle_hash = _require_sha256(event.get("bundle_hash"), "E0B_BUNDLE_HASH_INVALID")
             created_at = _require_timestamp(event, "created_at", "E0B_CREATED_AT_INVALID")
+            session_manifest_hash = _require_sha256(
+                event.get("session_manifest_hash"),
+                "E0B_SESSION_MANIFEST_HASH_INVALID",
+            )
         else:
             if event.get("case_id") != case_id:
                 raise GvE0bDv1Error("E0B_CASE_ID_MISMATCH")
@@ -480,16 +1089,19 @@ def _rebuild_session_from_events(events_dir: Path) -> dict[str, Any]:
                 raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
             if event.get("bundle_hash") != bundle_hash:
                 raise GvE0bDv1Error("E0B_SESSION_BUNDLE_MISMATCH")
+            if event.get("session_manifest_hash") != session_manifest_hash:
+                raise GvE0bDv1Error("E0B_SESSION_MANIFEST_MISMATCH")
         if link.get("session_nonce") != session_nonce:
             raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
         chain.append(_plain(link))
         events.append(_plain(event))
-    assert case_id and session_nonce and bundle_hash and created_at
+    assert case_id and session_nonce and bundle_hash and created_at and session_manifest_hash
     session_body = {
         "case_id": case_id,
         "session_nonce": session_nonce,
         "bundle_hash": bundle_hash,
         "created_at": created_at,
+        "session_manifest_hash": session_manifest_hash,
         "chain": chain,
     }
     session_hash = domain_hash(DOMAIN_SESSION, session_body)
@@ -534,6 +1146,10 @@ def verify_session_chain(session: Mapping[str, Any]) -> str:
         "session_nonce": nonce,
         "bundle_hash": plain["bundle_hash"],
         "created_at": plain["created_at"],
+        "session_manifest_hash": _require_sha256(
+            plain.get("session_manifest_hash"),
+            "E0B_SESSION_MANIFEST_HASH_INVALID",
+        ),
         "chain": [_plain(e) for e in chain],
     }
     if domain_hash(DOMAIN_SESSION, body) != claimed:
@@ -549,6 +1165,15 @@ def verify_session_bound_to_records(
 
     plain = _plain(session)
     verify_session_chain(plain)
+    manifest = _require_mapping(
+        seals.get("session_manifest"),
+        "E0B_SESSION_MANIFEST_REQUIRED",
+    )
+    verify_session_manifest(manifest)
+    if plain.get("session_manifest_hash") != manifest["session_manifest_hash"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_MISMATCH")
+    if plain.get("session_nonce") != manifest["session_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_SESSION_MISMATCH")
     chain = list(plain.get("chain") or [])
     stages = [str(e.get("stage")) for e in chain]
     if stages != list(CANONICAL_STAGE_ORDER):
@@ -613,6 +1238,27 @@ def verify_session_bound_to_records(
         raise GvE0bDv1Error("E0B_RUBRIC_PACKAGE_MISMATCH")
     if seals["rubric"].get("mapping_commitment") != mapping.get("mapping_commitment"):
         raise GvE0bDv1Error("E0B_RUBRIC_MAPPING_MISMATCH")
+    if seals["baseline"].get("operator_id") != manifest["operator_principal_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_OPERATOR_MISMATCH")
+    if seals["post"].get("operator_id") != manifest["operator_principal_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_OPERATOR_MISMATCH")
+    if seals["rubric"].get("reviewer_id") != manifest["reviewer_principal_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_REVIEWER_MISMATCH")
+    if seals["review_package"].get("session_manifest_hash") != manifest[
+        "session_manifest_hash"
+    ]:
+        raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_MANIFEST_MISMATCH")
+    if seals["rubric"].get("session_manifest_hash") != manifest[
+        "session_manifest_hash"
+    ]:
+        raise GvE0bDv1Error("E0B_RUBRIC_MANIFEST_MISMATCH")
+    for evidence_record in (
+        seals["baseline"],
+        seals["packet"],
+        seals["post"],
+        seals["rubric"],
+    ):
+        _reject_authoring_metadata_in_evidence(evidence_record)
     # Canonical ledger holds only the mapping commitment (hash), not plaintext mapping.
     # Chain links are hashes only; commitment lives on the append-only event payload.
     events = list(plain.get("events") or [])
@@ -652,6 +1298,9 @@ def _append_event(
     bundle_hash: str,
     created_at: str,
 ) -> dict[str, Any]:
+    manifest = load_session_manifest(_session_manifest_path(session_path))
+    if manifest["session_id"] != session_nonce:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_SESSION_MISMATCH")
     events_dir = _events_dir_for(session_path)
     events_dir.mkdir(parents=True, exist_ok=True)
     existing = _list_event_files(events_dir)
@@ -675,6 +1324,7 @@ def _append_event(
         "session_nonce": session_nonce,
         "bundle_hash": bundle_hash,
         "created_at": created_at,
+        "session_manifest_hash": manifest["session_manifest_hash"],
         "seq": seq,
         "stage": stage,
         "payload": _plain(payload),
@@ -691,6 +1341,7 @@ def _append_event(
         "session_nonce": session["session_nonce"],
         "bundle_hash": session["bundle_hash"],
         "created_at": session["created_at"],
+        "session_manifest_hash": session["session_manifest_hash"],
         "session_hash": session["session_hash"],
         "tip_chain_hash": session["chain"][-1]["chain_hash"],
         "event_count": len(session["chain"]),
@@ -706,8 +1357,19 @@ def open_capture_session(
     bundle: Mapping[str, Any] | None = None,
     session_path: Path = DEFAULT_SESSION_PATH,
     clock: CaptureClock | None = None,
+    source_commit: str = "0" * 40,
+    source_tree: str = "1" * 40,
+    protocol_freeze_manifest_sha256: str = "4" * 64,
+    operator_principal_id: str = "OP_FIXTURE_1",
+    reviewer_principal_id: str = "REV_FIXTURE_1",
+    authoring_template_paths: Mapping[str, Path] | None = None,
 ) -> Mapping[str, Any]:
-    """Open append-only capture session: first immutable event is SESSION_OPEN."""
+    """Open one manifest-bound append-only capture session.
+
+    Production callers must supply the exact Git commit/tree, the reserved
+    operator/reviewer principal IDs, and the three pristine authoring templates.
+    Fixture defaults exist only for deterministic engine tests.
+    """
 
     clk = clock or WallClock()
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
@@ -715,13 +1377,48 @@ def open_capture_session(
     events_dir = _events_dir_for(session_path)
     if _list_event_files(events_dir):
         raise GvE0bDv1Error("E0B_SESSION_ALREADY_OPEN")
-    created_at = clk.now()
-    session_nonce = secrets.token_hex(32)
+    manifest_path = _session_manifest_path(session_path)
+    if manifest_path.exists():
+        manifest = load_session_manifest(manifest_path)
+        session_nonce = str(manifest["session_id"])
+        created_at = str(manifest["budget_started_at"])
+        if manifest["source_commit"] != source_commit or manifest["source_tree"] != source_tree:
+            raise GvE0bDv1Error("E0B_SESSION_MANIFEST_GIT_MISMATCH")
+        if manifest["protocol_freeze_manifest_sha256"] != protocol_freeze_manifest_sha256:
+            raise GvE0bDv1Error("E0B_SESSION_MANIFEST_PROTOCOL_FREEZE_MISMATCH")
+        if manifest["operator_principal_id"] != operator_principal_id:
+            raise GvE0bDv1Error("E0B_SESSION_MANIFEST_OPERATOR_MISMATCH")
+        if manifest["reviewer_principal_id"] != reviewer_principal_id:
+            raise GvE0bDv1Error("E0B_SESSION_MANIFEST_REVIEWER_MISMATCH")
+    else:
+        created_at = clk.now()
+        session_nonce = secrets.token_hex(32)
+        if authoring_template_paths is None:
+            descriptors = _in_memory_authoring_template_descriptors()
+        else:
+            if set(authoring_template_paths) != {"baseline", "post", "rubric"}:
+                raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_SET_INVALID")
+            descriptors = [
+                _authoring_template_descriptor(role, authoring_template_paths[role])
+                for role in ("baseline", "post", "rubric")
+            ]
+        manifest = _build_session_manifest(
+            session_id=session_nonce,
+            source_commit=source_commit,
+            source_tree=source_tree,
+            protocol_freeze_manifest_sha256=protocol_freeze_manifest_sha256,
+            operator_principal_id=operator_principal_id,
+            reviewer_principal_id=reviewer_principal_id,
+            budget_started_at=created_at,
+            authoring_templates=descriptors,
+        )
+        _create_sealed_json(manifest_path, manifest)
     open_body = {
         "case_id": CASE_ID,
         "session_nonce": session_nonce,
         "bundle_hash": bndl["bundle_hash"],
         "created_at": created_at,
+        "session_manifest_hash": manifest["session_manifest_hash"],
     }
     open_hash = domain_hash(DOMAIN_SESSION, open_body)
     session = _append_event(
@@ -734,13 +1431,26 @@ def open_capture_session(
         bundle_hash=bndl["bundle_hash"],
         created_at=created_at,
     )
+    append_capture_checkpoint(
+        session_path=session_path,
+        operation="OPEN_SESSION",
+        state=CAPTURE_STATE_RESUMABLE,
+        detail="session_manifest_and_session_open_committed",
+        clock=clk,
+    )
     return _freeze(session)
 
 
 def load_capture_session(session_path: Path = DEFAULT_SESSION_PATH) -> dict[str, Any]:
+    manifest = load_session_manifest(_session_manifest_path(session_path))
     events_dir = _events_dir_for(session_path)
     session = _rebuild_session_from_events(events_dir)
     verify_session_chain(session)
+    if session["session_nonce"] != manifest["session_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_SESSION_MISMATCH")
+    if session["session_manifest_hash"] != manifest["session_manifest_hash"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_MISMATCH")
+    session["session_manifest"] = manifest
     return session
 
 
@@ -764,6 +1474,8 @@ def stage_open_arm(
         raise GvE0bDv1Error("E0B_ARM_UNKNOWN")
     if int(allowed_budget_minutes) != BUDGET_MINUTES:
         raise GvE0bDv1Error("E0B_BUDGET_CONFIG_INVALID")
+    operation = "OPEN_BASELINE" if arm == ARM_BASELINE else "OPEN_POST"
+    _require_active_checkpoint_for_authoritative_stage(session_path, operation)
     clk = clock or WallClock()
     session = load_capture_session(session_path)
     stages = [e["stage"] for e in session["chain"]]
@@ -1292,6 +2004,7 @@ def seal_review_package(
     bundle: Mapping[str, Any],
     session_nonce: str,
     prev_chain_hash: str,
+    session_manifest_hash: str = "2" * 64,
     rng_bytes: bytes | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Build blinded review package + sealed mapping (mapping withheld from export).
@@ -1346,6 +2059,22 @@ def seal_review_package(
         "blinding_custody_model": BLINDING_CUSTODY_MODEL,
         "mapping_withheld": True,
         "review_input_mode_required": REVIEW_INPUT_MODE_BLINDED,
+        "session_manifest_hash": _require_sha256(
+            session_manifest_hash,
+            "E0B_SESSION_MANIFEST_HASH_INVALID",
+        ),
+        "reviewer_export_boundary": {
+            "exact_file_names": sorted(REVIEWER_EXPORT_EXACT_NAMES),
+            "private_mapping_excluded": True,
+            "session_scoped_directory": True,
+            "rubric_template": {
+                "artifact_role": AUTHORING_ONLY,
+                "template_id": RUBRIC_TEMPLATE_ID,
+                "sha256": _sha256_bytes(
+                    canonical_document_bytes(blank_rubric_authoring_template())
+                ),
+            },
+        },
     }
     package_hash = domain_hash(DOMAIN_REVIEW_PACKAGE, package_body)
     package = {**package_body, "review_package_hash": package_hash}
@@ -1384,6 +2113,33 @@ def verify_review_package(package: Mapping[str, Any]) -> str:
         raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_LEAKS_MAPPING")
     if plain.get("review_input_mode_required") != REVIEW_INPUT_MODE_BLINDED:
         raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_BLINDING_MODE_REQUIRED")
+    _require_sha256(
+        plain.get("session_manifest_hash"),
+        "E0B_SESSION_MANIFEST_HASH_INVALID",
+    )
+    boundary = _require_mapping(
+        plain.get("reviewer_export_boundary"),
+        "E0B_REVIEWER_EXPORT_BOUNDARY_REQUIRED",
+    )
+    if boundary.get("exact_file_names") != sorted(REVIEWER_EXPORT_EXACT_NAMES):
+        raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_BOUNDARY_INVALID")
+    if boundary.get("private_mapping_excluded") is not True:
+        raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_BOUNDARY_INVALID")
+    if boundary.get("session_scoped_directory") is not True:
+        raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_BOUNDARY_INVALID")
+    template = _require_mapping(
+        boundary.get("rubric_template"),
+        "E0B_REVIEWER_EXPORT_TEMPLATE_REQUIRED",
+    )
+    if template.get("artifact_role") != AUTHORING_ONLY:
+        raise GvE0bDv1Error("E0B_AUTHORING_ROLE_INVALID")
+    if template.get("template_id") != RUBRIC_TEMPLATE_ID:
+        raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_ID_INVALID")
+    expected_template_hash = _sha256_bytes(
+        canonical_document_bytes(blank_rubric_authoring_template())
+    )
+    if template.get("sha256") != expected_template_hash:
+        raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_HASH_INVALID")
     arm_a = _require_mapping(plain.get("arm_a"), "E0B_REVIEW_ARM_A_REQUIRED")
     arm_b = _require_mapping(plain.get("arm_b"), "E0B_REVIEW_ARM_B_REQUIRED")
     if set(arm_a) != set(arm_b) or set(arm_a) != set(REVIEW_ARM_FIELDS):
@@ -1554,14 +2310,39 @@ def seal_rubric_record(
     else:
         custody_src = plain
     receipt = custody_src.get("reviewer_received_only_blinded_review_package")
-    if auth == AUTH_REAL_REVIEWER and receipt is not True:
-        raise GvE0bDv1Error("E0B_REVIEWER_BLINDED_RECEIPT_REQUIRED")
+    package_attested = custody_src.get("review_package_hash_attested")
+    manifest_attested = custody_src.get("session_manifest_hash_attested")
+    export_boundary_attested = custody_src.get("reviewer_export_boundary_attested")
+    if auth == AUTH_REAL_REVIEWER:
+        if receipt is not True:
+            raise GvE0bDv1Error("E0B_REVIEWER_BLINDED_RECEIPT_REQUIRED")
+        if package_attested != pkg["review_package_hash"]:
+            raise GvE0bDv1Error("E0B_REVIEWER_PACKAGE_ATTESTATION_MISMATCH")
+        if manifest_attested != pkg["session_manifest_hash"]:
+            raise GvE0bDv1Error("E0B_REVIEWER_MANIFEST_ATTESTATION_MISMATCH")
+        if export_boundary_attested is not True:
+            raise GvE0bDv1Error("E0B_REVIEWER_EXPORT_ATTESTATION_REQUIRED")
     custody = {
         "fresh_operator_attested": custody_src.get("fresh_operator_attested") is True,
         "blinded_review_conditions_attested": (
             custody_src.get("blinded_review_conditions_attested") is True
         ),
         "reviewer_received_only_blinded_review_package": receipt is True,
+        "review_package_hash_attested": (
+            package_attested
+            if auth == AUTH_REAL_REVIEWER
+            else pkg["review_package_hash"]
+        ),
+        "session_manifest_hash_attested": (
+            manifest_attested
+            if auth == AUTH_REAL_REVIEWER
+            else pkg["session_manifest_hash"]
+        ),
+        "reviewer_export_boundary_attested": (
+            export_boundary_attested is True
+            if auth == AUTH_REAL_REVIEWER
+            else True
+        ),
     }
     body = {
         "case_id": CASE_ID,
@@ -1575,6 +2356,7 @@ def seal_rubric_record(
         "packet_hash": pkt["packet_hash"],
         "post_packet_hash": p["post_packet_hash"],
         "review_package_hash": pkg["review_package_hash"],
+        "session_manifest_hash": pkg["session_manifest_hash"],
         "mapping_commitment": mp["mapping_commitment"],
         "review_input_mode": REVIEW_INPUT_MODE_BLINDED,
         "arm_a_scores": arm_a_scores,
@@ -1650,6 +2432,58 @@ def score_totals(arm_scores: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _verified_delta_value(entry: Any, code: str) -> int:
+    delta = _require_mapping(entry, code)
+    raw = delta.get("value_string")
+    if not isinstance(raw, str):
+        raise GvE0bDv1Error(code)
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise GvE0bDv1Error(code) from exc
+    magnitude = delta.get("magnitude")
+    if type(magnitude) is not int or magnitude != abs(value):
+        raise GvE0bDv1Error(code)
+    if delta.get("is_negative") is not (value < 0):
+        raise GvE0bDv1Error(code)
+    return value
+
+
+def decision_value_disposition_from_comparison(
+    comparison: Mapping[str, Any],
+) -> str:
+    """Classify one observed G08 result without making a general causal claim.
+
+    IMPROVED requires a positive total blinded-rubric delta, improvement in at
+    least one GodView-targeted dimension, and no regression in either core safety
+    dimension. Every other valid observed comparison is NOT_IMPROVED.
+    """
+
+    plain = _plain(comparison)
+    delta = _require_mapping(plain.get("delta"), "E0B_VALUE_DELTA_REQUIRED")
+    item_deltas = _require_mapping(
+        delta.get("item_score_differences"), "E0B_VALUE_ITEM_DELTAS_REQUIRED"
+    )
+    if set(item_deltas) != set(RUBRIC_ITEMS):
+        raise GvE0bDv1Error("E0B_VALUE_ITEM_DELTAS_INVALID")
+    total_delta = _verified_delta_value(
+        delta.get("total_score_difference"), "E0B_VALUE_TOTAL_DELTA_INVALID"
+    )
+    values = {
+        item: _verified_delta_value(
+            item_deltas[item], f"E0B_VALUE_ITEM_DELTA_INVALID:{item}"
+        )
+        for item in RUBRIC_ITEMS
+    }
+    if total_delta != sum(values.values()):
+        raise GvE0bDv1Error("E0B_VALUE_TOTAL_DELTA_MISMATCH")
+    targeted_improved = any(values[item] > 0 for item in TARGETED_VALUE_DIMENSIONS)
+    safety_not_worse = all(values[item] >= 0 for item in CORE_SAFETY_DIMENSIONS)
+    if total_delta > 0 and targeted_improved and safety_not_worse:
+        return DECISION_VALUE_IMPROVED
+    return DECISION_VALUE_NOT_IMPROVED
+
+
 def is_attribution_structure_valid(
     baseline: Mapping[str, Any],
     post: Mapping[str, Any],
@@ -1693,6 +2527,12 @@ def is_observed_comparison_eligible(
         return False
     if custody.get("reviewer_received_only_blinded_review_package") is not True:
         return False
+    if custody.get("reviewer_export_boundary_attested") is not True:
+        return False
+    if not isinstance(custody.get("review_package_hash_attested"), str):
+        return False
+    if not isinstance(custody.get("session_manifest_hash_attested"), str):
+        return False
     return True
 
 
@@ -1706,6 +2546,13 @@ def stage_capture_baseline(
 ) -> Mapping[str, Any]:
     clk = clock or WallClock()
     _reject_caller_timing_fields(authoring)
+    clean_authoring = _sanitize_authoring_submission(
+        authoring,
+        expected_template_id=BASELINE_TEMPLATE_ID,
+    )
+    _require_active_checkpoint_for_authoritative_stage(
+        session_path, "SUBMIT_BASELINE"
+    )
     session = load_capture_session(session_path)
     open_payload = _find_open_payload(session, STAGE_BASELINE_OPEN)
     ended = clk.now()
@@ -1715,13 +2562,15 @@ def stage_capture_baseline(
     if session["bundle_hash"] != bndl["bundle_hash"]:
         raise GvE0bDv1Error("E0B_SESSION_BUNDLE_MISMATCH")
     record = {
-        **_plain(authoring),
+        **clean_authoring,
         **timing,
         "session_nonce": session["session_nonce"],
         "prev_chain_hash": _session_tip_from_chain(session["chain"]),
         "bundle_hash": bndl["bundle_hash"],
     }
     sealed = seal_baseline_record(record)
+    if sealed["operator_id"] != session["session_manifest"]["operator_principal_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_OPERATOR_MISMATCH")
     _append_event(
         session_path=session_path,
         stage=STAGE_BASELINE_CLOSE,
@@ -1745,6 +2594,9 @@ def stage_generate_packet(
     clock: CaptureClock | None = None,
 ) -> Mapping[str, Any]:
     clk = clock or WallClock()
+    _require_active_checkpoint_for_authoritative_stage(
+        session_path, "GENERATE_PACKET"
+    )
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
     session = load_capture_session(session_path)
@@ -1795,6 +2647,11 @@ def stage_capture_post(
 ) -> Mapping[str, Any]:
     clk = clock or WallClock()
     _reject_caller_timing_fields(authoring)
+    clean_authoring = _sanitize_authoring_submission(
+        authoring,
+        expected_template_id=POST_TEMPLATE_ID,
+    )
+    _require_active_checkpoint_for_authoritative_stage(session_path, "SUBMIT_POST")
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
     session = load_capture_session(session_path)
@@ -1806,13 +2663,15 @@ def stage_capture_post(
     )
     packet = load_packet_seal(packet_path)
     record = {
-        **_plain(authoring),
+        **clean_authoring,
         **timing,
         "session_nonce": session["session_nonce"],
         "prev_chain_hash": _session_tip_from_chain(session["chain"]),
         "bundle_hash": bndl["bundle_hash"],
     }
     sealed = seal_post_packet_record(record, packet=packet, baseline=baseline)
+    if sealed["operator_id"] != session["session_manifest"]["operator_principal_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_OPERATOR_MISMATCH")
     _append_event(
         session_path=session_path,
         stage=STAGE_POST_CLOSE,
@@ -1838,6 +2697,8 @@ def blank_rubric_authoring_template() -> dict[str, Any]:
         for item in RUBRIC_ITEMS
     }
     return {
+        "artifact_role": AUTHORING_ONLY,
+        "template_id": RUBRIC_TEMPLATE_ID,
         "case_id": CASE_ID,
         "authorship_kind": AUTH_REAL_REVIEWER,
         "reviewer_id": None,
@@ -1852,6 +2713,9 @@ def blank_rubric_authoring_template() -> dict[str, Any]:
         "fresh_operator_attested": None,
         "blinded_review_conditions_attested": None,
         "reviewer_received_only_blinded_review_package": None,
+        "review_package_hash_attested": None,
+        "session_manifest_hash_attested": None,
+        "reviewer_export_boundary_attested": None,
         "notes": (
             "Score ARM_A and ARM_B only. Do not write baseline/post labels. "
             "Fill score 0|1|2 and non-empty reason per item. "
@@ -1866,6 +2730,8 @@ def blank_baseline_authoring_template() -> dict[str, Any]:
     """Blank baseline form: no preselected action and no placeholder identity."""
 
     return {
+        "artifact_role": AUTHORING_ONLY,
+        "template_id": BASELINE_TEMPLATE_ID,
         "case_id": CASE_ID,
         "arm": "HUMAN_BASELINE",
         "authorship_kind": AUTH_REAL_OPERATOR,
@@ -1894,6 +2760,8 @@ def blank_post_authoring_template() -> dict[str, Any]:
     """Blank post form: no preselected action/portfolio and no placeholder identity."""
 
     return {
+        "artifact_role": AUTHORING_ONLY,
+        "template_id": POST_TEMPLATE_ID,
         "case_id": CASE_ID,
         "arm": "HUMAN_POST_PACKET",
         "authorship_kind": AUTH_REAL_OPERATOR,
@@ -1980,6 +2848,9 @@ def stage_build_review_package(
     Canonical ledger stores mapping_commitment only.
     """
 
+    _require_active_checkpoint_for_authoritative_stage(
+        session_path, "EXPORT_REVIEW_PACKAGE"
+    )
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
     session = load_capture_session(session_path)
@@ -1996,6 +2867,7 @@ def stage_build_review_package(
         bundle=bndl,
         session_nonce=session["session_nonce"],
         prev_chain_hash=_session_tip_from_chain(session["chain"]),
+        session_manifest_hash=session["session_manifest_hash"],
     )
     verify_review_package_bound_to_records(
         package=package,
@@ -2062,6 +2934,13 @@ def stage_capture_rubric(
 
     clk = clock or WallClock()
     _reject_caller_timing_fields(authoring)
+    clean_authoring = _sanitize_authoring_submission(
+        authoring,
+        expected_template_id=RUBRIC_TEMPLATE_ID,
+    )
+    _require_active_checkpoint_for_authoritative_stage(
+        session_path, "SUBMIT_RUBRIC"
+    )
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
     session = load_capture_session(session_path)
@@ -2077,7 +2956,7 @@ def stage_capture_rubric(
     verify_review_mapping(mapping, review_package_hash=package["review_package_hash"])
     scored_at = clk.now()
     record = {
-        **_plain(authoring),
+        **clean_authoring,
         "scored_at": scored_at,
         "session_nonce": session["session_nonce"],
         "prev_chain_hash": _session_tip_from_chain(session["chain"]),
@@ -2103,6 +2982,8 @@ def stage_capture_rubric(
         review_package=package,
         review_mapping=mapping,
     )
+    if sealed["reviewer_id"] != session["session_manifest"]["reviewer_principal_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_REVIEWER_MISMATCH")
     # Durable order: compute seal → persist rubric → RUBRIC_CLOSE → reload/verify
     # complete chain → only then materialize revealed mapping + RNG preimage.
     _persist_sealed_json(rubric_path, sealed)
@@ -2137,6 +3018,7 @@ def stage_capture_rubric(
         "review_package": _plain(package),
         "review_mapping": _plain(mapping),
         "rubric": _plain(reloaded_rubric),
+        "session_manifest": reloaded_session["session_manifest"],
         "session": reloaded_session,
     }
     verify_session_bound_to_records(reloaded_session, seals_for_bind)
@@ -2214,6 +3096,7 @@ def _collect_sealed_records(
         review_mapping=mapping,
     )
     session = load_capture_session(session_path)
+    manifest = load_session_manifest(_session_manifest_path(session_path))
     return {
         "bundle": bndl,
         "baseline": _plain(baseline),
@@ -2222,45 +3105,19 @@ def _collect_sealed_records(
         "review_package": _plain(package),
         "review_mapping": _plain(mapping),
         "rubric": _plain(rubric),
+        "session_manifest": manifest,
         "session": session,
     }
 
 
-def build_comparison(
+def _build_comparison_from_verified_records(
     *,
-    baseline_path: Path,
-    post_path: Path,
-    rubric_path: Path,
-    bundle: Mapping[str, Any] | None = None,
-    packet: Mapping[str, Any] | None = None,
-    packet_path: Path | None = None,
-    session_path: Path | None = None,
-    package_path: Path | None = None,
-    mapping_path: Path | None = None,
+    bundle: Mapping[str, Any],
+    packet: Mapping[str, Any],
+    seals: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
-    verify_bundle_seal(bndl)
-    if packet is not None:
-        pkt = _plain(packet)
-        verify_packet_seal(pkt)
-    elif packet_path is not None:
-        pkt = _plain(load_packet_seal(packet_path))
-    else:
-        raise GvE0bDv1Error("E0B_PACKET_REQUIRED")
-    if pkt["bundle_hash"] != bndl["bundle_hash"]:
-        raise GvE0bDv1Error("E0B_PACKET_BUNDLE_MISMATCH")
-    if session_path is None or package_path is None or mapping_path is None:
-        raise GvE0bDv1Error("E0B_SESSION_PACKAGE_REQUIRED")
-    seals = _collect_sealed_records(
-        baseline_path=baseline_path,
-        post_path=post_path,
-        rubric_path=rubric_path,
-        packet_path=packet_path or DEFAULT_PACKET_PATH,
-        session_path=session_path,
-        package_path=package_path,
-        mapping_path=mapping_path,
-        bundle=bndl,
-    )
+    bndl = _plain(bundle)
+    pkt = _plain(packet)
     verify_session_bound_to_records(seals["session"], seals)
     baseline = seals["baseline"]
     post = seals["post"]
@@ -2298,7 +3155,8 @@ def build_comparison(
                 "functional_stage": "CERTIFIED_SINGLE_DECISION_OPERABLE",
                 "target_stage": "ONE_CASE_DECISION_DELTA_OBSERVED",
                 "observed_comparison_count": 0,
-                "e0b_close_eligible": False,
+                "comparison_observed_eligible": False,
+                "decision_value_disposition": None,
                 "attribution_structure_valid": attribution_ok,
                 "alpha_claim": False,
             },
@@ -2309,6 +3167,14 @@ def build_comparison(
             "review_package_hash": seals["review_package"]["review_package_hash"],
             "rubric_hash": rubric["rubric_hash"],
             "session_hash": seals["session"]["session_hash"],
+            "session_manifest_hash": seals["session_manifest"][
+                "session_manifest_hash"
+            ],
+            "source_commit": seals["session_manifest"]["source_commit"],
+            "source_tree": seals["session_manifest"]["source_tree"],
+            "protocol_freeze_manifest_sha256": seals["session_manifest"][
+                "protocol_freeze_manifest_sha256"
+            ],
             "baseline": {
                 "authorship_kind": baseline["authorship_kind"],
                 "operator_id": baseline["operator_id"],
@@ -2361,6 +3227,50 @@ def build_comparison(
     return _freeze(comparison)
 
 
+def build_comparison(
+    *,
+    baseline_path: Path,
+    post_path: Path,
+    rubric_path: Path,
+    bundle: Mapping[str, Any] | None = None,
+    packet: Mapping[str, Any] | None = None,
+    packet_path: Path | None = None,
+    session_path: Path | None = None,
+    package_path: Path | None = None,
+    mapping_path: Path | None = None,
+) -> Mapping[str, Any]:
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    if packet is not None:
+        pkt = _plain(packet)
+        verify_packet_seal(pkt)
+    elif packet_path is not None:
+        pkt = _plain(load_packet_seal(packet_path))
+    else:
+        raise GvE0bDv1Error("E0B_PACKET_REQUIRED")
+    if pkt["bundle_hash"] != bndl["bundle_hash"]:
+        raise GvE0bDv1Error("E0B_PACKET_BUNDLE_MISMATCH")
+    if session_path is None or package_path is None or mapping_path is None:
+        raise GvE0bDv1Error("E0B_SESSION_PACKAGE_REQUIRED")
+    seals = _collect_sealed_records(
+        baseline_path=baseline_path,
+        post_path=post_path,
+        rubric_path=rubric_path,
+        packet_path=packet_path or DEFAULT_PACKET_PATH,
+        session_path=session_path,
+        package_path=package_path,
+        mapping_path=mapping_path,
+        bundle=bndl,
+    )
+    if seals["packet"]["packet_hash"] != pkt["packet_hash"]:
+        raise GvE0bDv1Error("E0B_PACKET_SOURCE_MISMATCH")
+    return _build_comparison_from_verified_records(
+        bundle=bndl,
+        packet=pkt,
+        seals=seals,
+    )
+
+
 def build_result_document(
     comparison: Mapping[str, Any],
     *,
@@ -2381,6 +3291,7 @@ def build_result_document(
         "review_package",
         "review_mapping",
         "rubric",
+        "session_manifest",
         "session",
     ):
         if key not in seals:
@@ -2421,12 +3332,17 @@ def build_result_document(
         raise GvE0bDv1Error("E0B_RESULT_POST_HASH_MISMATCH")
     if seals["rubric"]["rubric_hash"] != plain["rubric_hash"]:
         raise GvE0bDv1Error("E0B_RESULT_RUBRIC_HASH_MISMATCH")
-    eligible = is_observed_comparison_eligible(
+    observed_eligible = is_observed_comparison_eligible(
         seals["baseline"], seals["post"], seals["rubric"]
     )
-    close_claim = {
-        "e0b_close_eligible": eligible,
-        "observed_comparison_count": 1 if eligible else 0,
+    disposition = (
+        decision_value_disposition_from_comparison(plain)
+        if observed_eligible
+        else None
+    )
+    observation_claim = {
+        "comparison_observed_eligible": observed_eligible,
+        "observed_comparison_count": 1 if observed_eligible else 0,
         "human_ids_are_attribution_only": True,
         "external_attestation_required": False,
         "third_attestor_required": False,
@@ -2434,8 +3350,16 @@ def build_result_document(
         "budget_model": "EQUAL_MAX_MINUTES_EARLY_SUBMIT_ALLOWED",
         "ledger_custody_note": seals["session"].get("ledger_custody_note"),
     }
+    value_claim = {
+        "decision_value_disposition": disposition,
+        "rule_version": "G08_ONE_CASE_VALUE_V1",
+        "improved_requires_positive_total_delta": True,
+        "improved_requires_targeted_dimension_gain": list(TARGETED_VALUE_DIMENSIONS),
+        "improved_forbids_core_safety_regression": list(CORE_SAFETY_DIMENSIONS),
+        "general_causal_superiority_claim": False,
+    }
     result_body = {
-        "schema_version": "gv_e0b_dv1_result_v3",
+        "schema_version": "gv_e0b_dv1_result_v4",
         "case_id": CASE_ID,
         "run_class": RUN_CLASS_SYNTHETIC,
         "comparison": plain,
@@ -2447,19 +3371,23 @@ def build_result_document(
             "review_package": _plain(seals["review_package"]),
             "review_mapping": _plain(seals["review_mapping"]),
             "rubric": _plain(seals["rubric"]),
+            "session_manifest": _plain(seals["session_manifest"]),
             "session": {
                 k: _plain(v)
                 for k, v in seals["session"].items()
-                if k != "events_dir"
+                if k not in {"events_dir", "session_manifest"}
             },
         },
-        "close_claim": close_claim,
+        "observation_claim": observation_claim,
+        "value_claim": value_claim,
         "claim_boundary": (
-            "Observed within-case difference only. No causal superiority, "
-            "general decision-quality improvement, research-efficiency, alpha, "
-            "or score uplift claim. REAL_HUMAN labels are attribution only. "
-            "Close requires two-human structure, blinded ARM input mode, "
-            "operator/reviewer custody attestations, and bound chain replay. "
+            "Observed within-case difference only. A methodologically valid "
+            "comparison does not itself demonstrate decision value. IMPROVED is "
+            "a bounded one-case disposition under the frozen rubric, not general "
+            "causal superiority, population effectiveness, research-efficiency, "
+            "alpha, or score uplift. REAL_HUMAN labels are attribution only. "
+            "Observation eligibility requires two-human structure, blinded ARM "
+            "input mode, operator/reviewer custody attestations, and bound chain replay. "
             "Blinding is arm-label blinding under separated export custody, not "
             "absolute cryptographic proof of reviewer ignorance. Engine fixtures "
             "do not count as observed comparisons. Ledger is tamper-evident under "
@@ -2483,10 +3411,13 @@ def verify_comparison_document(comparison: Mapping[str, Any]) -> Mapping[str, An
     stage = body.get("stage_claim")
     if not isinstance(stage, Mapping):
         raise GvE0bDv1Error("E0B_STAGE_CLAIM_REQUIRED")
-    if stage.get("observed_comparison_count") != 0:
+    comparison_count = stage.get("observed_comparison_count")
+    if type(comparison_count) is not int or comparison_count != 0:
         raise GvE0bDv1Error("E0B_COMPARISON_COUNT_MUST_BE_ZERO")
-    if stage.get("e0b_close_eligible") is not False:
-        raise GvE0bDv1Error("E0B_COMPARISON_CLOSE_MUST_BE_FALSE")
+    if stage.get("comparison_observed_eligible") is not False:
+        raise GvE0bDv1Error("E0B_COMPARISON_OBSERVED_MUST_BE_FALSE")
+    if stage.get("decision_value_disposition") is not None:
+        raise GvE0bDv1Error("E0B_COMPARISON_VALUE_MUST_BE_UNEVALUATED")
     if stage.get("shipped_product_score") != 39 or stage.get("score_frozen") is not True:
         raise GvE0bDv1Error("E0B_SCORE_FREEZE_VIOLATION")
     if stage.get("functional_stage") != "CERTIFIED_SINGLE_DECISION_OPERABLE":
@@ -2502,6 +3433,12 @@ def verify_result_document(result: Mapping[str, Any]) -> Mapping[str, Any]:
     body = _without_keys(plain, "result_hash")
     if domain_hash(DOMAIN_RESULT, body) != claimed:
         raise GvE0bDv1Error("E0B_RESULT_SEAL_MISMATCH")
+    if body.get("schema_version") != "gv_e0b_dv1_result_v4":
+        raise GvE0bDv1Error("E0B_RESULT_SCHEMA_INVALID")
+    if body.get("case_id") != CASE_ID:
+        raise GvE0bDv1Error("E0B_RESULT_CASE_ID_MISMATCH")
+    if body.get("run_class") != RUN_CLASS_SYNTHETIC:
+        raise GvE0bDv1Error("E0B_RESULT_RUN_CLASS_MISMATCH")
     comparison = body.get("comparison")
     if not isinstance(comparison, Mapping):
         raise GvE0bDv1Error("E0B_RESULT_COMPARISON_MISSING")
@@ -2509,6 +3446,20 @@ def verify_result_document(result: Mapping[str, Any]) -> Mapping[str, Any]:
     seals = body.get("sealed_records")
     if not isinstance(seals, Mapping):
         raise GvE0bDv1Error("E0B_SEALED_RECORDS_REQUIRED")
+    for key in (
+        "bundle",
+        "baseline",
+        "packet",
+        "post",
+        "review_package",
+        "review_mapping",
+        "rubric",
+        "session_manifest",
+        "session",
+    ):
+        if key not in seals:
+            raise GvE0bDv1Error(f"E0B_SEALED_RECORD_MISSING:{key}")
+    verify_session_manifest(seals["session_manifest"])
     verify_bundle_seal(seals["bundle"])
     verify_baseline_seal(seals["baseline"])
     verify_packet_seal(seals["packet"])
@@ -2537,6 +3488,13 @@ def verify_result_document(result: Mapping[str, Any]) -> Mapping[str, Any]:
         review_mapping=seals["review_mapping"],
     )
     verify_session_bound_to_records(seals["session"], seals)
+    expected_comparison = _build_comparison_from_verified_records(
+        bundle=seals["bundle"],
+        packet=seals["packet"],
+        seals=seals,
+    )
+    if _plain(comparison) != _plain(expected_comparison):
+        raise GvE0bDv1Error("E0B_RESULT_COMPARISON_BINDING_MISMATCH")
     if seals["baseline"]["baseline_hash"] != comparison["baseline_hash"]:
         raise GvE0bDv1Error("E0B_RESULT_BASELINE_HASH_MISMATCH")
     if seals["packet"]["packet_hash"] != comparison["packet_hash"]:
@@ -2545,15 +3503,42 @@ def verify_result_document(result: Mapping[str, Any]) -> Mapping[str, Any]:
         raise GvE0bDv1Error("E0B_RESULT_POST_HASH_MISMATCH")
     if seals["rubric"]["rubric_hash"] != comparison["rubric_hash"]:
         raise GvE0bDv1Error("E0B_RESULT_RUBRIC_HASH_MISMATCH")
-    eligible = is_observed_comparison_eligible(
+    observed_eligible = is_observed_comparison_eligible(
         seals["baseline"], seals["post"], seals["rubric"]
     )
-    close_claim = body.get("close_claim") or {}
-    if close_claim.get("e0b_close_eligible") is not eligible:
-        raise GvE0bDv1Error("E0B_CLOSE_CLAIM_MISMATCH")
-    expected_count = 1 if eligible else 0
-    if int(close_claim.get("observed_comparison_count", -1)) != expected_count:
+    observation_claim = _require_mapping(
+        body.get("observation_claim"), "E0B_OBSERVATION_CLAIM_REQUIRED"
+    )
+    if observation_claim.get("comparison_observed_eligible") is not observed_eligible:
+        raise GvE0bDv1Error("E0B_OBSERVATION_ELIGIBILITY_MISMATCH")
+    expected_count = 1 if observed_eligible else 0
+    observed_count = observation_claim.get("observed_comparison_count")
+    if type(observed_count) is not int or observed_count != expected_count:
         raise GvE0bDv1Error("E0B_OBSERVED_COUNT_MISMATCH")
+    value_claim = _require_mapping(
+        body.get("value_claim"), "E0B_VALUE_CLAIM_REQUIRED"
+    )
+    expected_disposition = (
+        decision_value_disposition_from_comparison(comparison)
+        if observed_eligible
+        else None
+    )
+    if value_claim.get("decision_value_disposition") != expected_disposition:
+        raise GvE0bDv1Error("E0B_VALUE_DISPOSITION_MISMATCH")
+    if value_claim.get("rule_version") != "G08_ONE_CASE_VALUE_V1":
+        raise GvE0bDv1Error("E0B_VALUE_RULE_VERSION_INVALID")
+    if value_claim.get("improved_requires_positive_total_delta") is not True:
+        raise GvE0bDv1Error("E0B_VALUE_RULE_TOTAL_INVALID")
+    if value_claim.get("improved_requires_targeted_dimension_gain") != list(
+        TARGETED_VALUE_DIMENSIONS
+    ):
+        raise GvE0bDv1Error("E0B_VALUE_RULE_TARGETED_INVALID")
+    if value_claim.get("improved_forbids_core_safety_regression") != list(
+        CORE_SAFETY_DIMENSIONS
+    ):
+        raise GvE0bDv1Error("E0B_VALUE_RULE_SAFETY_INVALID")
+    if value_claim.get("general_causal_superiority_claim") is not False:
+        raise GvE0bDv1Error("E0B_VALUE_CAUSAL_CLAIM_FORBIDDEN")
     return _freeze(plain)
 
 
@@ -2589,8 +3574,11 @@ def stage_compare(
     )
 
 
-def build_decision_packet_markdown(comparison: Mapping[str, Any]) -> str:
-    c = _plain(comparison)
+def build_decision_packet_markdown(result: Mapping[str, Any]) -> str:
+    verified = verify_result_document(result)
+    c = _plain(verified["comparison"])
+    observation = _plain(verified["observation_claim"])
+    value = _plain(verified["value_claim"])
     lines = [
         "# GV-E0B-DV1 Decision Packet — G08 Contradiction Case",
         "",
@@ -2604,8 +3592,9 @@ def build_decision_packet_markdown(comparison: Mapping[str, Any]) -> str:
         f"- post_packet_hash: `{c['post_packet_hash']}`",
         f"- review_package_hash: `{c.get('review_package_hash', '')}`",
         f"- rubric_hash: `{c['rubric_hash']}`",
-        f"- observed_comparison_count: `{c['stage_claim']['observed_comparison_count']}`",
-        f"- e0b_close_eligible: `{c['stage_claim']['e0b_close_eligible']}`",
+        f"- observed_comparison_count: `{observation['observed_comparison_count']}`",
+        f"- comparison_observed_eligible: `{observation['comparison_observed_eligible']}`",
+        f"- decision_value_disposition: `{value['decision_value_disposition']}`",
         f"- shipped_product_score: `39` (frozen)",
         f"- functional_stage: `{c['stage_claim']['functional_stage']}`",
         "",
@@ -2635,8 +3624,9 @@ def build_decision_packet_markdown(comparison: Mapping[str, Any]) -> str:
         f"- total_score_difference: `{c['delta']['total_score_difference']['value_string']}`",
         f"- action_change: `{c['delta']['action_change']}`",
         "",
-        "Interpretation: observed within-case difference only. "
-        "No causal or general-effectiveness claim.",
+        "Interpretation: observed within-case difference only. Observation "
+        "eligibility and decision-value disposition are separate. No general "
+        "causal or population-effectiveness claim.",
         "",
     ]
     return "\n".join(lines)
@@ -2651,11 +3641,17 @@ def write_canonical_artifacts(
 ) -> Mapping[str, Any]:
     result = build_result_document(comparison, sealed_records=sealed_records)
     result_bytes = canonical_document_bytes(_plain(result))
-    packet_md = build_decision_packet_markdown(comparison).encode("utf-8")
-    _atomic_write_bytes(result_json_path, result_bytes)
-    _atomic_write_bytes(decision_packet_path, packet_md)
+    packet_md = build_decision_packet_markdown(result).encode("utf-8")
+    _atomic_write_pair(
+        result_json_path,
+        result_bytes,
+        decision_packet_path,
+        packet_md,
+    )
     if result_json_path.read_bytes() != result_bytes:
         raise GvE0bDv1Error("E0B_RESULT_JSON_VERIFY_FAILED")
+    if decision_packet_path.read_bytes() != packet_md:
+        raise GvE0bDv1Error("E0B_DECISION_PACKET_VERIFY_FAILED")
     return result
 
 
@@ -2705,16 +3701,24 @@ def _build_e0b_certified_result_from_verified_result(
     verified_result: Mapping[str, Any],
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> dict[str, Any]:
-    verified = verify_result_document(_plain(verified_result))
-    close = _require_mapping(
-        verified.get("close_claim"), "E0B_CLOSE_CLAIM_REQUIRED"
+    """Build the private E0B certificate from one verified result only.
+
+    This closes the official E0B comparison-only authority route. It does not
+    claim to stop a privileged repository operator from manually invoking lower-
+    level certification or publication infrastructure outside this module.
+    """
+
+    candidate = _plain(verified_result)
+    observation = _require_mapping(
+        candidate.get("observation_claim"), "E0B_OBSERVATION_CLAIM_REQUIRED"
     )
-    if close.get("e0b_close_eligible") is not True:
-        raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE")
-    count = close.get("observed_comparison_count")
+    if observation.get("comparison_observed_eligible") is not True:
+        raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_OBSERVED_ELIGIBLE")
+    count = observation.get("observed_comparison_count")
     if type(count) is not int or count != 1:
         raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_COUNT_ONE")
 
+    verified = verify_result_document(candidate)
     comparison = _require_mapping(
         verified.get("comparison"), "E0B_RESULT_COMPARISON_MISSING"
     )
@@ -2760,6 +3764,26 @@ def run_e0b_dv1_case(
         raise GvE0bDv1Error("E0B_PACKET_REQUIRED")
     if session_path is None or package_path is None or mapping_path is None:
         raise GvE0bDv1Error("E0B_SESSION_PACKAGE_REQUIRED")
+    _require_active_checkpoint_for_authoritative_stage(session_path, "FINALIZE")
+    case_paths: list[tuple[str, Path | None]] = [
+        ("baseline", baseline_path),
+        ("post", post_path),
+        ("rubric", rubric_path),
+        ("packet", packet_path or DEFAULT_PACKET_PATH),
+        ("session", session_path),
+        ("review_package", package_path),
+        ("review_mapping", mapping_path),
+        ("result", result_json_path),
+        ("decision_packet", decision_packet_path),
+    ]
+    if publish:
+        case_paths.extend(
+            [
+                ("current_target", current_target),
+                ("current_lock", current_lock),
+            ]
+        )
+    _require_distinct_case_paths(case_paths)
     comparison = build_comparison(
         baseline_path=baseline_path,
         post_path=post_path,
@@ -2781,6 +3805,16 @@ def run_e0b_dv1_case(
         mapping_path=mapping_path,
         bundle=bundle,
     )
+    if publish:
+        preflight_result = verify_result_document(
+            build_result_document(comparison, sealed_records=sealed_records)
+        )
+        preflight_observation = preflight_result["observation_claim"]
+        if preflight_observation.get("comparison_observed_eligible") is not True:
+            raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_OBSERVED_ELIGIBLE")
+        preflight_count = preflight_observation.get("observed_comparison_count")
+        if type(preflight_count) is not int or preflight_count != 1:
+            raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_COUNT_ONE")
     result = write_canonical_artifacts(
         comparison,
         sealed_records=sealed_records,
@@ -2788,12 +3822,13 @@ def run_e0b_dv1_case(
         decision_packet_path=decision_packet_path,
     )
     verified_result = load_verified_result(result_json_path)
-    close = verified_result["close_claim"]
+    observation = verified_result["observation_claim"]
+    value_claim = verified_result["value_claim"]
     published = None
     if publish:
-        if close["e0b_close_eligible"] is not True:
-            raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE")
-        observed_count = close.get("observed_comparison_count")
+        if observation["comparison_observed_eligible"] is not True:
+            raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_OBSERVED_ELIGIBLE")
+        observed_count = observation.get("observed_comparison_count")
         if type(observed_count) is not int or observed_count != 1:
             raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_COUNT_ONE")
         certified = _build_e0b_certified_result_from_verified_result(
@@ -2820,15 +3855,46 @@ def run_e0b_dv1_case(
                 "target_path": published.target_path,
                 "certified_decision_result_hash": published.certified_decision_result_hash,
             },
-            "observed_comparison_count": close["observed_comparison_count"],
-            "e0b_close_eligible": close["e0b_close_eligible"],
+            "observed_comparison_count": observation["observed_comparison_count"],
+            "comparison_observed_eligible": observation[
+                "comparison_observed_eligible"
+            ],
+            "decision_value_disposition": value_claim[
+                "decision_value_disposition"
+            ],
             "run_class": RUN_CLASS_SYNTHETIC,
         }
     )
 
 
-def build_comparison_presentation(comparison: Mapping[str, Any]) -> Mapping[str, Any]:
+def build_comparison_presentation(
+    comparison: Mapping[str, Any],
+    *,
+    observation_claim: Mapping[str, Any] | None = None,
+    value_claim: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
     c = _plain(comparison)
+    observation = (
+        _plain(observation_claim)
+        if observation_claim is not None
+        else {
+            "observed_comparison_count": c["stage_claim"][
+                "observed_comparison_count"
+            ],
+            "comparison_observed_eligible": c["stage_claim"][
+                "comparison_observed_eligible"
+            ],
+        }
+    )
+    value = (
+        _plain(value_claim)
+        if value_claim is not None
+        else {
+            "decision_value_disposition": c["stage_claim"][
+                "decision_value_disposition"
+            ]
+        }
+    )
     rows = [
         {"label": "Case", "value": str(c["case_id"])},
         {"label": "AcceptanceCase", "value": "G08"},
@@ -2871,11 +3937,19 @@ def build_comparison_presentation(comparison: Mapping[str, Any]) -> Mapping[str,
         },
         {
             "label": "ObservedComparisonCount",
-            "value": str(c["stage_claim"]["observed_comparison_count"]),
+            "value": str(observation["observed_comparison_count"]),
         },
         {
-            "label": "E0BCloseEligible",
-            "value": "TRUE" if c["stage_claim"]["e0b_close_eligible"] else "FALSE",
+            "label": "ComparisonObservedEligible",
+            "value": (
+                "TRUE"
+                if observation["comparison_observed_eligible"]
+                else "FALSE"
+            ),
+        },
+        {
+            "label": "DecisionValueDisposition",
+            "value": str(value["decision_value_disposition"] or "NOT_EVALUATED"),
         },
         {
             "label": "ComparisonHash",
@@ -2903,25 +3977,38 @@ def render_e0b_dv1_comparison(
     result_json_path: Path | None = None,
 ) -> Mapping[str, Any]:
     obs = 0
-    close = False
+    observed_eligible = False
+    disposition: str | None = None
+    observation_claim: Mapping[str, Any] | None = None
+    value_claim: Mapping[str, Any] | None = None
     if comparison is None:
         path = result_json_path or DEFAULT_RESULT_JSON
         if not path.is_file():
             raise GvE0bDv1Error("E0B_RESULT_MISSING")
         result = load_verified_result(path)
         comparison = result["comparison"]
-        close_claim = result["close_claim"]
-        obs = int(close_claim["observed_comparison_count"])
-        close = bool(close_claim["e0b_close_eligible"])
+        observation_claim = result["observation_claim"]
+        value_claim = result["value_claim"]
+        obs = int(observation_claim["observed_comparison_count"])
+        observed_eligible = bool(
+            observation_claim["comparison_observed_eligible"]
+        )
+        disposition = value_claim["decision_value_disposition"]
     else:
         comparison = verify_comparison_document(comparison)
-    presentation = build_comparison_presentation(comparison)
+    presentation = build_comparison_presentation(
+        comparison,
+        observation_claim=observation_claim,
+        value_claim=value_claim,
+    )
     renderer.subheader(presentation["title"])
     renderer.table(list(presentation["rows"]))
     renderer.caption(
         "E0B-DV1 · G08 · SYNTHETIC_DEV_RUN · score 39 frozen · "
-        f"observed-comparison count = {obs} · close_eligible={close} · "
-        "within-case difference only · no causal/alpha claim"
+        f"observed-comparison count = {obs} · "
+        f"observed_eligible={observed_eligible} · "
+        f"value_disposition={disposition or 'NOT_EVALUATED'} · "
+        "within-case difference only · no general causal/alpha claim"
     )
     return presentation
 
@@ -2933,9 +4020,9 @@ def observed_comparison_count_from_disk(
         return 0
     try:
         result = load_verified_result(result_json_path)
-        close = result["close_claim"]
-        if close.get("e0b_close_eligible") is True:
-            return int(close["observed_comparison_count"])
+        observation = result["observation_claim"]
+        if observation.get("comparison_observed_eligible") is True:
+            return int(observation["observed_comparison_count"])
         return 0
     except GvE0bDv1Error:
         return 0
@@ -2945,13 +4032,25 @@ __all__ = [
     "AUTH_FIXTURE",
     "AUTH_REAL_OPERATOR",
     "AUTH_REAL_REVIEWER",
+    "AUTHORING_ONLY",
     "AdvanceableClock",
+    "BASELINE_TEMPLATE_ID",
     "BUDGET_MINUTES",
     "BLOCK_REASON",
     "BLINDING_CUSTODY_MODEL",
     "CANONICAL_STAGE_ORDER",
+    "CAPTURE_STATE_ABORTED",
+    "CAPTURE_STATE_ACTIVE",
+    "CAPTURE_STATE_COMPLETE",
+    "CAPTURE_STATE_RESUMABLE",
     "CASE_ID",
+    "CORE_SAFETY_DIMENSIONS",
+    "DECISION_VALUE_IMPROVED",
+    "DECISION_VALUE_NOT_IMPROVED",
     "DEFAULT_AUTHORING_TEMPLATES_DIR",
+    "DEFAULT_CHECKPOINTS_DIR",
+    "DEFAULT_SESSION_MANIFEST_PATH",
+    "POST_TEMPLATE_ID",
     "REVIEW_ARM_FIELDS",
     "REVIEWER_EXPORT_EXACT_NAMES",
     "DEFAULT_BASELINE_PATH",
@@ -2971,9 +4070,13 @@ __all__ = [
     "RATIONALE_REF_PREFIX",
     "REVIEW_INPUT_MODE_BLINDED",
     "RUBRIC_ITEMS",
+    "RUBRIC_TEMPLATE_ID",
     "RUN_CLASS_SYNTHETIC",
+    "TARGETED_VALUE_DIMENSIONS",
     "WallClock",
     "GvE0bDv1Error",
+    "abort_capture_session",
+    "append_capture_checkpoint",
     "blank_baseline_authoring_template",
     "blank_post_authoring_template",
     "blank_rubric_authoring_template",
@@ -2982,18 +4085,24 @@ __all__ = [
     "build_decision_packet_markdown",
     "build_godview_packet",
     "build_result_document",
+    "capture_lifecycle_state",
+    "decision_value_disposition_from_comparison",
     "e0b_rationale_ref",
     "is_attribution_structure_valid",
     "is_observed_comparison_eligible",
     "load_baseline_seal",
+    "load_capture_checkpoints",
     "load_capture_session",
+    "load_session_manifest",
     "load_packet_seal",
     "load_post_packet_seal",
     "load_rubric_scores",
     "load_verified_result",
     "observed_comparison_count_from_disk",
     "open_capture_session",
+    "recover_capture_checkpoint",
     "render_e0b_dv1_comparison",
+    "require_capture_resumable",
     "run_e0b_dv1_case",
     "seal_baseline_record",
     "seal_post_packet_record",
@@ -3014,6 +4123,7 @@ __all__ = [
     "verify_review_package",
     "verify_review_package_bound_to_records",
     "verify_result_document",
+    "verify_session_manifest",
     "write_authoring_templates",
     "write_canonical_artifacts",
 ]

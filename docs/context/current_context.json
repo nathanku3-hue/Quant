@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-18T19:19:12Z",
+  "generated_at_utc": "2026-07-20T19:48:59Z",
   "source_files": [
     "docs/context/bridge_contract_current.md",
     "docs/context/done_checklist_current.md",
@@ -115,23 +115,34 @@
   ],
   "active_phase": 65,
   "what_was_done": [
-    "E0A operable vertical is banked substrate (C 45f9f96 + C2 446ac6d; hosted CI PASS; A/B/C PASS; SAW PASS). One current certified decision only.",
-    "F1C-SHIP closed substrate; dual-fixture never default UI fallback.",
-    "Context bootstrap prefers product/E0A packets over historical PEAD blocks.",
-    "Owner audit: E0A-R1 = repair tax; E0B-DV1 = first real GodView product slice."
+    "Verified remote PR #5 advanced to hosted-green C0 `b7a24d3da65f78c673f7e08b5f719603f404282e`; preserved its verified-result-only publication hardening, fail-closed path identity, pairwise alias/hard-link rejection, and paired canonical-artifact rollback.",
+    "Rejected mutable-worktree test counts, generated context, and SAW counts as exact-candidate evidence; no immutable candidate exists yet.",
+    "Deleted the conflated `e0b_close_eligible` concept without compatibility.",
+    "Added sign-independent `comparison_observed_eligible` for publication/count and separate `decision_value_disposition = IMPROVED | NOT_IMPROVED` for product outcome.",
+    "`IMPROVED` requires positive total blinded-rubric delta, at least one targeted GodView gain, and no core safety regression. Every other valid observed result is `NOT_IMPROVED` and remains publishable as honest falsification.",
+    "Local boundary proof is focused E0B 74/74, product 168/168, and frozen protocol 137/137 (305/305 total), with identical pre/post code-test diff hash C0-relative `c5459187846100b3dbfbfe3a98ae5eb0909bd23e` for both complete suites. This remains mutable-worktree evidence, not immutable-SHA acceptance.",
+    "C0 is already committed, pushed, and hosted-green. No C1 semantic-repair commit/push, C1 hosted run, independent Reviewer A/B/C, real G08, publication, stage promotion, score uplift, or merge occurred."
   ],
   "what_is_locked": [
-    "E0A is plumbing only — not decision value / alpha / economics.",
-    "Observed-comparison count remains 0; unofficial decision-value/conjunctive maturity percentages are retired; additive substrate scores must not mask that.",
-    "E0A-R1 hard cap then stop; no dirty-root authority auto-canonization.",
-    "FS1, providers, PEAD reopen, alpha claims, broker, dual-authority default UI closed.",
-    "PEAD = TERMINATED_DIAGNOSTIC_ONLY history only."
+    "`SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`. `OBSERVED_COMPARISON_COUNT = 0`. S-009X PASS is not earned.",
+    "Observation eligibility and product-value success are separate; no valid `NOT_IMPROVED` result may be suppressed or retried for a preferred sign.",
+    "Any production-code change after human capture invalidates G08 and requires a new run.",
+    "E0A-R1, S-006M, F1C, the frozen protocol, Leningrad rebinding, providers, PEAD, FS1, broker, alpha, V2-B0, and generic Meta-Harness work remain closed.",
+    "Meta-Harness\u2019s unavailable epoch-2 signer does not block Quant and must not be bypassed or forged."
   ],
   "what_is_next": [
-    "Repair PR #5 E0B-DV1 G08 in place: staged seals, reject unsealed, publish only when close-eligible, verified counts; real operator/reviewer run still required for observed count > 0. Score stays 39 frozen. Not FS1."
+    "Reconstruct the exact 15-source-file semantic repair on C0 `b7a24d3`, bank one intentional C1 SHA, and regenerate context and SAW only from that exact source state.",
+    "Prove exact C1 locally: focused E0B, complete product, frozen protocol, combined boundary, AppTest, context validation, diff hygiene, clean worktree, parent=`b7a24d3`, and unchanged tree.",
+    "Push immediately; run hosted Ubuntu/Windows/parity and independent Reviewer A/B/C concurrently; reconcile once.",
+    "Run real G08 only from a fresh clean checkout of the exact hosted-green SHA.",
+    "Publish the valid result regardless of sign. `IMPROVED` => S-009X PASS. `NOT_IMPROVED` => falsified hypothesis, no uplift, replan."
   ],
-  "first_command": "git show --stat --oneline HEAD",
+  "first_command": ".venv\\Scripts\\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py",
   "next_todos": [
-    "Complete real human baseline/post + independent reviewer seals for G08; keep score 39 frozen until verified observed comparison exists."
+    "Reconstruct the exact 15-source-file semantic repair on C0 `b7a24d3`, bank one intentional C1 SHA, and regenerate context and SAW only from that exact source state.",
+    "Prove exact C1 locally: focused E0B, complete product, frozen protocol, combined boundary, AppTest, context validation, diff hygiene, clean worktree, parent=`b7a24d3`, and unchanged tree.",
+    "Push immediately; run hosted Ubuntu/Windows/parity and independent Reviewer A/B/C concurrently; reconcile once.",
+    "Run real G08 only from a fresh clean checkout of the exact hosted-green SHA.",
+    "Publish the valid result regardless of sign. `IMPROVED` => S-009X PASS. `NOT_IMPROVED` => falsified hypothesis, no uplift, replan."
   ]
 }

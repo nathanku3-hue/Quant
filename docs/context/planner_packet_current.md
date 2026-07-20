@@ -1,34 +1,37 @@
 # Planner Packet - Current
 
-## New Context Packet — E0B-DV1 Authority Repair (2026-07-20)
+## New Context Packet — E0B-DV1 Direction and Custody Repair (2026-07-21)
 
 ## What Was Done
 
-- PR #5 authority repair (do **not** merge `7c6e19c`; do **not** run human experiment on it).
-- Append-only event journal; sealed arm-open events; bound exact chain with REVIEW_PACKAGE.
-- Equal 60m **budget cap** (early submit allowed); third attestor removed; mechanical ARM_A/ARM_B blinding.
-- Narrow capture runner: `scripts/gv_e0b_g08_capture.py`.
-- V2 = `RECOMMENDED_NEXT_PROTOCOL`; V1 formal until frozen V2 artifact.
-- Score 39 frozen; observed-comparison count 0; stage unchanged.
+- Verified remote PR #5 advanced to hosted-green C0 `b7a24d3da65f78c673f7e08b5f719603f404282e`; preserved its verified-result-only publication hardening, fail-closed path identity, pairwise alias/hard-link rejection, and paired canonical-artifact rollback.
+- Rejected mutable-worktree test counts, generated context, and SAW counts as exact-candidate evidence; no immutable candidate exists yet.
+- Deleted the conflated `e0b_close_eligible` concept without compatibility.
+- Added sign-independent `comparison_observed_eligible` for publication/count and separate `decision_value_disposition = IMPROVED | NOT_IMPROVED` for product outcome.
+- `IMPROVED` requires positive total blinded-rubric delta, at least one targeted GodView gain, and no core safety regression. Every other valid observed result is `NOT_IMPROVED` and remains publishable as honest falsification.
+- Local boundary proof is focused E0B 74/74, product 168/168, and frozen protocol 137/137 (305/305 total), with identical pre/post code-test diff hash C0-relative `c5459187846100b3dbfbfe3a98ae5eb0909bd23e` for both complete suites. This remains mutable-worktree evidence, not immutable-SHA acceptance.
+- C0 is already committed, pushed, and hosted-green. No C1 semantic-repair commit/push, C1 hosted run, independent Reviewer A/B/C, real G08, publication, stage promotion, score uplift, or merge occurred.
 
 ## What Is Locked
 
-- `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`.
-- Ledger is tamper-evident under capture-process custody only (not independent wall-clock/personhood proof).
-- Two humans only: operator (baseline+post) + different blinded reviewer (rubric).
-- FS1, providers, PEAD, broker, alpha, score design remain closed.
+- `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`. `OBSERVED_COMPARISON_COUNT = 0`. S-009X PASS is not earned.
+- Observation eligibility and product-value success are separate; no valid `NOT_IMPROVED` result may be suppressed or retried for a preferred sign.
+- Any production-code change after human capture invalidates G08 and requires a new run.
+- E0A-R1, S-006M, F1C, the frozen protocol, Leningrad rebinding, providers, PEAD, FS1, broker, alpha, V2-B0, and generic Meta-Harness work remain closed.
+- Meta-Harness’s unavailable epoch-2 signer does not block Quant and must not be bypassed or forged.
 
 ## What Is Next
 
-1. Hosted CI green (Ubuntu + Windows + parity) on this repair tip.
-2. Thin authority review.
-3. Real G08 capture via runner (1 operator + 1 blinded reviewer) — only on green tip.
-4. Full replay → publish if eligible → count 0→1 → stage promote → merge → open V2-B0.
+1. Reconstruct the exact 15-source-file semantic repair on C0 `b7a24d3`, bank one intentional C1 SHA, and regenerate context and SAW only from that exact source state.
+2. Prove exact C1 locally: focused E0B, complete product, frozen protocol, combined boundary, AppTest, context validation, diff hygiene, clean worktree, parent=`b7a24d3`, and unchanged tree.
+3. Push immediately; run hosted Ubuntu/Windows/parity and independent Reviewer A/B/C concurrently; reconcile once.
+4. Run real G08 only from a fresh clean checkout of the exact hosted-green SHA.
+5. Publish the valid result regardless of sign. `IMPROVED` => S-009X PASS. `NOT_IMPROVED` => falsified hypothesis, no uplift, replan.
 
 ## First Command
 
 ```text
-.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py tests/gv_fs0_product/test_authority_chain.py::test_roadmap_declares_gv_fs0_authority_chain tests/gv_fs0_product/test_open_vertical.py::test_static_product_boundaries
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py
 ```
 
 ## End Context Packet
