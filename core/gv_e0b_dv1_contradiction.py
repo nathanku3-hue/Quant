@@ -26,11 +26,11 @@ from types import MappingProxyType
 from typing import Any, Protocol
 
 from core.gv_fs0_book import (
-    DecisionEnvelope,
-    OpenBookBuild,
+    DecisionEnvelope as _DecisionEnvelope,
+    OpenBookBuild as _OpenBookBuild,
     _build_book,
     _build_decision,
-    build_no_position_source_fixture,
+    build_no_position_source_fixture as _build_no_position_source_fixture,
 )
 from core.gv_fs0_canonical import (
     CANONICAL_TIMESTAMP_RE,
@@ -39,14 +39,13 @@ from core.gv_fs0_canonical import (
     domain_hash,
 )
 from core.gv_fs0_certify import (
-    build_certified_result_from_book,
+    build_certified_result_from_book as _build_certified_result_from_book,
     run_isolated_verifier,
 )
 from core.gv_fs0_publish import (
-    CurrentDecisionPublicationResult,
     DEFAULT_CURRENT_DECISION_LOCK,
     DEFAULT_CURRENT_DECISION_TARGET,
-    publish_current_decision,
+    publish_current_decision as _publish_current_decision,
 )
 
 VerifierRunner = Callable[[Mapping[str, Any]], dict[str, Any]]
@@ -2575,10 +2574,6 @@ def stage_compare(
     result_json_path: Path = DEFAULT_RESULT_JSON,
     decision_packet_path: Path = DEFAULT_DECISION_PACKET_MD,
     bundle: Mapping[str, Any] | None = None,
-    publish: bool = False,
-    current_target: Path = DEFAULT_CURRENT_DECISION_TARGET,
-    current_lock: Path = DEFAULT_CURRENT_DECISION_LOCK,
-    verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> Mapping[str, Any]:
     return run_e0b_dv1_case(
         baseline_path=baseline_path,
@@ -2591,10 +2586,6 @@ def stage_compare(
         result_json_path=result_json_path,
         decision_packet_path=decision_packet_path,
         bundle=bundle,
-        publish=publish,
-        current_target=current_target,
-        current_lock=current_lock,
-        verifier_runner=verifier_runner,
     )
 
 
@@ -2676,12 +2667,12 @@ def e0b_rationale_ref(comparison_hash: str) -> str:
     return ref
 
 
-def build_e0b_decision(
+def _build_e0b_decision(
     fixture_hash: str,
     fixture_id: str,
     *,
     rationale_ref: str,
-) -> DecisionEnvelope:
+) -> _DecisionEnvelope:
     if not rationale_ref.startswith(RATIONALE_REF_PREFIX):
         raise GvE0bDv1Error("E0B_RATIONALE_REF_PREFIX_INVALID")
     return _build_decision(
@@ -2694,35 +2685,44 @@ def build_e0b_decision(
     )
 
 
-def build_e0b_book(*, comparison_hash: str) -> OpenBookBuild:
+def _build_e0b_book(*, comparison_hash: str) -> _OpenBookBuild:
     rationale_ref = e0b_rationale_ref(comparison_hash)
 
-    def decision_builder(fixture_hash: str, fixture_id: str) -> DecisionEnvelope:
-        return build_e0b_decision(
+    def decision_builder(fixture_hash: str, fixture_id: str) -> _DecisionEnvelope:
+        return _build_e0b_decision(
             fixture_hash,
             fixture_id,
             rationale_ref=rationale_ref,
         )
 
     return _build_book(
-        fixture=build_no_position_source_fixture(),
+        fixture=_build_no_position_source_fixture(),
         decision_builder=decision_builder,
     )
 
 
-def build_e0b_certified_result(
-    comparison: Mapping[str, Any],
+def _build_e0b_certified_result_from_verified_result(
+    verified_result: Mapping[str, Any],
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> dict[str, Any]:
-    plain = _plain(comparison)
-    comparison_hash = _require_sha256(
-        plain.get("comparison_hash"), "E0B_COMPARISON_HASH_INVALID"
+    verified = verify_result_document(_plain(verified_result))
+    close = _require_mapping(
+        verified.get("close_claim"), "E0B_CLOSE_CLAIM_REQUIRED"
     )
-    body = _without_keys(plain, "comparison_hash")
-    if domain_hash(DOMAIN_COMPARISON, body) != comparison_hash:
-        raise GvE0bDv1Error("E0B_COMPARISON_SEAL_MISMATCH")
-    certified = build_certified_result_from_book(
-        build_e0b_book(comparison_hash=comparison_hash),
+    if close.get("e0b_close_eligible") is not True:
+        raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE")
+    count = close.get("observed_comparison_count")
+    if type(count) is not int or count != 1:
+        raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_COUNT_ONE")
+
+    comparison = _require_mapping(
+        verified.get("comparison"), "E0B_RESULT_COMPARISON_MISSING"
+    )
+    comparison_hash = _require_sha256(
+        comparison.get("comparison_hash"), "E0B_COMPARISON_HASH_INVALID"
+    )
+    certified = _build_certified_result_from_book(
+        _build_e0b_book(comparison_hash=comparison_hash),
         verifier_runner,
     )
     decision = certified.get("decision") or {}
@@ -2736,25 +2736,6 @@ def build_e0b_certified_result(
     if certified.get("certification", {}).get("certification_status") != "CERTIFIED":
         raise GvE0bDv1Error("E0B_CERT_STATUS_REQUIRED")
     return certified
-
-
-def publish_e0b_current_decision(
-    comparison: Mapping[str, Any],
-    *,
-    target: Path = DEFAULT_CURRENT_DECISION_TARGET,
-    lock_path: Path = DEFAULT_CURRENT_DECISION_LOCK,
-    verifier_runner: VerifierRunner = run_isolated_verifier,
-    close_eligible: bool = False,
-) -> CurrentDecisionPublicationResult:
-    verified = verify_comparison_document(comparison)
-    if close_eligible is not True:
-        raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE")
-    certified = build_e0b_certified_result(verified, verifier_runner)
-    decision = certified.get("decision") or {}
-    expected_ref = e0b_rationale_ref(verified["comparison_hash"])
-    if decision.get("rationale_ref") != expected_ref:
-        raise GvE0bDv1Error("E0B_CERT_RATIONALE_BINDING_INVALID")
-    return publish_current_decision(certified, target=target, lock_path=lock_path)
 
 
 def run_e0b_dv1_case(
@@ -2812,12 +2793,21 @@ def run_e0b_dv1_case(
     if publish:
         if close["e0b_close_eligible"] is not True:
             raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE")
-        published = publish_e0b_current_decision(
-            comparison,
+        observed_count = close.get("observed_comparison_count")
+        if type(observed_count) is not int or observed_count != 1:
+            raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_COUNT_ONE")
+        certified = _build_e0b_certified_result_from_verified_result(
+            verified_result,
+            verifier_runner,
+        )
+        comparison_hash = verified_result["comparison"]["comparison_hash"]
+        decision = certified.get("decision") or {}
+        if decision.get("rationale_ref") != e0b_rationale_ref(comparison_hash):
+            raise GvE0bDv1Error("E0B_CERT_RATIONALE_BINDING_INVALID")
+        published = _publish_current_decision(
+            certified,
             target=current_target,
             lock_path=current_lock,
-            verifier_runner=verifier_runner,
-            close_eligible=True,
         )
     return _freeze(
         {
@@ -2990,9 +2980,6 @@ __all__ = [
     "build_comparison",
     "build_comparison_presentation",
     "build_decision_packet_markdown",
-    "build_e0b_book",
-    "build_e0b_certified_result",
-    "build_e0b_decision",
     "build_godview_packet",
     "build_result_document",
     "e0b_rationale_ref",
@@ -3006,7 +2993,6 @@ __all__ = [
     "load_verified_result",
     "observed_comparison_count_from_disk",
     "open_capture_session",
-    "publish_e0b_current_decision",
     "render_e0b_dv1_comparison",
     "run_e0b_dv1_case",
     "seal_baseline_record",
