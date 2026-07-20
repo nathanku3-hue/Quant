@@ -1,32 +1,34 @@
 # Planner Packet - Current
 
-## New Context Packet — E0B-DV1 Repair Active (2026-07-19)
+## New Context Packet — E0B-DV1 Authority Repair (2026-07-20)
 
 ## What Was Done
 
-- PR #4 merged on main @ `2653eb1`: E0A operable + merge-safety. E0A-R1 is **closed**.
-- PR #5 repair in place: E0B-DV1 G08 engine/seals rewritten — no hardcoded baseline/post/rubric; external seals; hash recompute; atomic `result.json` + `decision_packet.md`; comparison-bound E0B cert (`E0B:CMP:<hash>`); Streamlit surface + AppTest.
-- G08 synthetic evidence retained. Fabricated human outcomes deleted.
-- Unofficial decision-value / conjunctive maturity percentages **retired**. Report **observed-comparison count = 0**.
+- PR #5 authority repair (do **not** merge `7c6e19c`; do **not** run human experiment on it).
+- Append-only event journal; sealed arm-open events; bound exact chain with REVIEW_PACKAGE.
+- Equal 60m **budget cap** (early submit allowed); third attestor removed; mechanical ARM_A/ARM_B blinding.
+- Narrow capture runner: `scripts/gv_e0b_g08_capture.py`.
+- V2 = `RECOMMENDED_NEXT_PROTOCOL`; V1 formal until frozen V2 artifact.
+- Score 39 frozen; observed-comparison count 0; stage unchanged.
 
 ## What Is Locked
 
-- `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE` until a complete real observed run is published.
-- Observed within-case difference only; positive/zero/negative deltas all valid; no causal/general-effectiveness claim.
-- Engine fixtures validate machinery only and do not close E0B.
-- E0B close requires same real human operator for baseline+post and a different real reviewer for rubric.
-- FS1, providers-by-default, PEAD, broker, alpha claims remain closed.
-- Portfolio-OS pivot remains explicit acceptable deviation from earlier discretionary-cockpit direction.
+- `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`.
+- Ledger is tamper-evident under capture-process custody only (not independent wall-clock/personhood proof).
+- Two humans only: operator (baseline+post) + different blinded reviewer (rubric).
+- FS1, providers, PEAD, broker, alpha, score design remain closed.
 
 ## What Is Next
 
-- Collect real human baseline + post seals (same operator) and independent reviewer rubric for G08, then publish complete run — or merge engine/seal repair only without stage promotion / E0B close.
-- After one valid observed comparison: one independently replicated comparison on a second nontrivial terminal case, then first real evidence admission.
+1. Hosted CI green (Ubuntu + Windows + parity) on this repair tip.
+2. Thin authority review.
+3. Real G08 capture via runner (1 operator + 1 blinded reviewer) — only on green tip.
+4. Full replay → publish if eligible → count 0→1 → stage promote → merge → open V2-B0.
 
 ## First Command
 
 ```text
-.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py tests/gv_fs0_product/test_e0b_dv1_streamlit_apptest.py
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py tests/gv_fs0_product/test_authority_chain.py::test_roadmap_declares_gv_fs0_authority_chain tests/gv_fs0_product/test_open_vertical.py::test_static_product_boundaries
 ```
 
 ## End Context Packet

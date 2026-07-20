@@ -1,27 +1,32 @@
 # Top-Level Roadmap: GodView Certified Portfolio OS
 
 Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
-Date: 2026-07-19
+Date: 2026-07-20
 Product tip lineage: `2653eb1` (PR #4 E0A operable + merge-safety merged; F1C-SHIP closed substrate)
-Active work: E0B-DV1 Contradiction Case repair on PR #5 (engine/seals; real human records required for close)
+Active work: E0B-DV1 Contradiction Case repair on PR #5 (ledger, blinding, capture runner; real human records required for close)
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
 ## Governing sequence (endgame law)
 
 ```text
 truth substrate
-→ demonstrated evidence-to-decision improvement
-→ replicated decision value
-→ prospective economic value
-→ live capital
+→ G08 observed comparison
+→ frozen V2-B0 protocol
+→ first real MU block-only admission
+→ independent decision-value replication
+→ prospective paper economics
+→ live-capital consideration
 ```
 
 Portfolio truth first. Decision value second. No fabricated alpha. No score engineering.
+Real MU admission may replace a second synthetic comparison as the immediate next gate after G08; it does **not** satisfy replicated decision value and must not silently move the project toward economics.
 
 ## Executive Decision (Active Canon)
 
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
+EXECUTION_MODEL = GV_FS0_FIRST
+ACTIVE_GATE = E0B-DV1
 F1C_SHIP = CLOSED_SUBSTRATE
 E0A_OPERABLE = BANKED_SUBSTRATE (custody→HOLD_FOR_EVIDENCE→NO_POSITION; NOT decision value)
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
@@ -30,6 +35,8 @@ OBSERVED_COMPARISON_COUNT = 0
 NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED
 E0A_R1_MERGE_PATCH = CLOSED (PR #4 @ 2653eb1)
 ACTIVE_PRODUCT_SLICE = E0B-DV1 Contradiction Case (G08) repair
+V2_BLOCK_ONLY_REAL_ADMISSION = RECOMMENDED_NEXT_PROTOCOL
+V1_PROTOCOL_AUTHORITY = FORMAL_UNTIL_V2_ARTIFACT_COMMITTED
 SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED
 BACKWARD_COMPATIBILITY_LAYER = PROHIBITED
 REAL_PROVIDER_READ = BLOCKED_PENDING_DATA_ACCESS_AUTHORIZATION
@@ -458,21 +465,41 @@ real baseline capture/seal
 
 Observed paths reject unsealed input. Fixture certification may remain test-only; current publication requires `e0b_close_eligible`. UI/count recomputes result, comparison, and seals before display.
 
-### Post-G08 protocol (owner decision locked direction)
-
-**V2 BLOCK-ONLY REAL ADMISSION** (recommended; supersedes V1’s nineteen-case entry gate after G08 closes):
+### Post-G08 protocol (recommended; not yet authoritative)
 
 ```text
-G08 observed close (this PR)
-→ do NOT schedule a second synthetic comparison as the default next gate
-→ V2 BLOCK-ONLY REAL ADMISSION:
-   - allow only blocked terminal states for the admission vertical
-   - run the minimum blocked-integrity synthetic battery
-   - admit the first real MU bundle under blocked-only honesty
+V2_BLOCK_ONLY_REAL_ADMISSION = RECOMMENDED_NEXT_PROTOCOL
 ```
 
-This **explicitly supersedes** V1 E0.6 “all nineteen synthetic cases before first MU run” — no backward compatibility and no silent shortcut. Historical V1 wording in `e0_acceptance_tests.md` remains frozen archive authority until the V2 protocol file replaces it.
+Until a **frozen V2 protocol artifact is committed**, **V1 remains formal protocol authority**. V2 does **not** yet supersede V1 and **no real MU admission is authorized**.
 
-Until G08 closes with verified external attestation: score 39 frozen; observed-comparison count 0; no MU real-admission.
+Recommended endgame after a valid G08 observed close:
+
+```text
+G08 observed comparison (count 0→1; stage ONE_CASE_DECISION_DELTA_OBSERVED; score stays 39)
+→ freeze minimal V2-B0 protocol artifact
+→ first real MU block-only admission (replaces second synthetic comparison as next gate)
+→ independent decision-value replication (still mandatory before economics)
+→ prospective paper economics
+→ live-capital consideration
+```
+
+Accepted deviations from earlier roadmap framing:
+- Portfolio OS replaces discretionary-cockpit framing (accepted).
+- V2 block-only real admission replaces V1’s nineteen-case route (**proposed**, not authoritative until artifact).
+- Two humans (operator + different blinded reviewer) replace operator/reviewer/attestor (accepted).
+- Equal 60-minute **maximum** budget with early submit (not forced exact elapsed 60 minutes).
+- Mechanical REVIEW_PACKAGE blinding (ARM_A/ARM_B); reviewer self-label alone is insufficient.
+
+Capture chain (exact):
+
+```text
+SESSION_OPEN → BASELINE_OPEN → BASELINE_CLOSE → PACKET
+→ POST_OPEN → POST_CLOSE → REVIEW_PACKAGE → RUBRIC_CLOSE
+```
+
+Ledger is **tamper-evident under capture-process custody**. Local hashes do not independently prove wall-clock history or human identity against a privileged repository operator.
+
+Until G08 closes with verified two-human structure + bound chain replay: score 39 frozen; observed-comparison count 0; no MU real-admission.
 
 Do **not** reopen F1C-SHIP or E0A as product gates. Do **not** start providers, FS1, PEAD, alpha claims, broker paths, dual-authority UI, or portfolio expansion before a real observed comparison exists.

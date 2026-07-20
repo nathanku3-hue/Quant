@@ -421,6 +421,7 @@ def test_static_product_boundaries() -> None:
     adapter_core_imports = {name for name in adapter_imports if name.startswith("core.")}
     # Read-only presentation: F1C bundle loader + shared current-decision canonical parser.
     assert adapter_core_imports == {
+        "core.gv_e0b_dv1_contradiction",
         "core.gv_fs0_bundle",
         "core.gv_fs0_current_decision",
     }

@@ -1,22 +1,21 @@
 """GV-E0B-DV1 Contradiction Case (G08): observed within-case decision comparison.
 
-One-case product path after banked E0A substrate. G08 evidence remains a
-synthetic adversarial fixture. Human baseline and post-packet decisions must be
-externally authored; rubric scores must be authored by a different reviewer.
-
-Hardcoded baseline/post/rubric outcomes are prohibited. Positive, zero, or
-negative rubric deltas are all protocol-valid. E0B product close requires real
-human operator records (same operator for baseline and post) plus an independent
-human reviewer for the rubric. Engine test fixtures validate machinery only and
-never count as an observed comparison.
+Capture authority (PR #5 repair):
+- Append-only sequence-numbered event journal (tamper-evident under process custody).
+- Arm opens are sealed chain events; closes reference exact open-event hashes.
+- Equal 60-minute *budget cap* (early submit allowed; late submit rejected).
+- Mechanical reviewer blinding via sealed REVIEW_PACKAGE (ARM_A/ARM_B).
+- Two humans only: operator (baseline+post) + different blinded reviewer (rubric).
+- Local hashes do not prove wall-clock history or personhood against a privileged
+  repository operator; SAW/repo review remains external accountability.
 
 Endpoint authority: docs/architecture/godview_e0/e0_acceptance_tests.md G08.
-Frozen endpoint: observed within-case difference only; no causal/general claim.
+Score 39 frozen; observed-comparison count stays 0 until real eligible close.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timedelta, timezone
 import json
 import os
@@ -61,7 +60,9 @@ DEFAULT_PACKET_PATH = DEFAULT_CASE_DIR / "captures" / "packet.json"
 DEFAULT_POST_PATH = DEFAULT_CASE_DIR / "captures" / "post_packet_seal.json"
 DEFAULT_RUBRIC_PATH = DEFAULT_CASE_DIR / "captures" / "rubric_scores.json"
 DEFAULT_SESSION_PATH = DEFAULT_CASE_DIR / "captures" / "session.json"
-DEFAULT_ATTESTATION_PATH = DEFAULT_CASE_DIR / "captures" / "close_attestation.json"
+DEFAULT_EVENTS_DIR = DEFAULT_CASE_DIR / "captures" / "events"
+DEFAULT_REVIEW_PACKAGE_PATH = DEFAULT_CASE_DIR / "captures" / "review_package.json"
+DEFAULT_REVIEW_MAPPING_PATH = DEFAULT_CASE_DIR / "captures" / "review_mapping.sealed.json"
 
 CASE_ID = "E0B_DV1_G08_CONTRADICTION_1"
 PROTOCOL_ID = "GODVIEW-E0-P0-V1"
@@ -84,24 +85,42 @@ DOMAIN_COMPARISON = "GV-E0B:DV1:COMPARISON:V1"
 DOMAIN_RESULT = "GV-E0B:DV1:RESULT:V1"
 DOMAIN_SESSION = "GV-E0B:DV1:SESSION:V1"
 DOMAIN_CHAIN = "GV-E0B:DV1:CHAIN:V1"
-DOMAIN_ATTESTATION = "GV-E0B:DV1:ATTESTATION:V1"
+DOMAIN_ARM_OPEN = "GV-E0B:DV1:ARM_OPEN:V1"
+DOMAIN_REVIEW_PACKAGE = "GV-E0B:DV1:REVIEW_PACKAGE:V1"
+DOMAIN_REVIEW_MAPPING = "GV-E0B:DV1:REVIEW_MAPPING:V1"
 
 AUTH_FIXTURE = "ENGINE_TEST_FIXTURE"
 AUTH_REAL_OPERATOR = "REAL_HUMAN_OPERATOR"
 AUTH_REAL_REVIEWER = "REAL_HUMAN_REVIEWER"
+# Retained only so callers that still import the symbol fail closed if used for close.
 AUTH_EXTERNAL_ATTESTOR = "EXTERNAL_INDEPENDENT_ATTESTOR"
 
 BUDGET_MINUTES = 60
 ZERO_CHAIN_HASH = "0" * 64
 ARM_BASELINE = "BASELINE"
 ARM_POST = "POST"
-ARM_RUBRIC = "RUBRIC"
+LABEL_ARM_A = "ARM_A"
+LABEL_ARM_B = "ARM_B"
+
 STAGE_SESSION_OPEN = "SESSION_OPEN"
-STAGE_BASELINE = "BASELINE"
+STAGE_BASELINE_OPEN = "BASELINE_OPEN"
+STAGE_BASELINE_CLOSE = "BASELINE_CLOSE"
 STAGE_PACKET = "PACKET"
-STAGE_POST = "POST"
-STAGE_RUBRIC = "RUBRIC"
-STAGE_COMPARISON = "COMPARISON"
+STAGE_POST_OPEN = "POST_OPEN"
+STAGE_POST_CLOSE = "POST_CLOSE"
+STAGE_REVIEW_PACKAGE = "REVIEW_PACKAGE"
+STAGE_RUBRIC_CLOSE = "RUBRIC_CLOSE"
+
+CANONICAL_STAGE_ORDER: tuple[str, ...] = (
+    STAGE_SESSION_OPEN,
+    STAGE_BASELINE_OPEN,
+    STAGE_BASELINE_CLOSE,
+    STAGE_PACKET,
+    STAGE_POST_OPEN,
+    STAGE_POST_CLOSE,
+    STAGE_REVIEW_PACKAGE,
+    STAGE_RUBRIC_CLOSE,
+)
 
 RUBRIC_ITEMS: tuple[str, ...] = (
     "selected_action_defensibility",
@@ -117,6 +136,30 @@ ALLOWED_ACTIONS = frozenset(
         "ADVANCE_TO_FULL_RESEARCH",
         "HOLD_FOR_EVIDENCE",
         "REJECT_THESIS",
+    }
+)
+
+# Decision fields stripped from blinded review package.
+_BLIND_STRIP_KEYS = frozenset(
+    {
+        "arm",
+        "arm_started_at",
+        "arm_ended_at",
+        "sealed_at",
+        "session_nonce",
+        "prev_chain_hash",
+        "human_analysis_time_minutes",
+        "elapsed_seconds",
+        "allowed_budget_minutes",
+        "arm_opened_event_hash",
+        "equal_budget_attestation",
+        "baseline_hash",
+        "post_packet_hash",
+        "packet_hash",
+        "sealed_before_packet",
+        "baseline_hash",
+        "authorship_kind",
+        "operator_id",
     }
 )
 
@@ -175,8 +218,6 @@ def _require_sha256(value: Any, code: str) -> str:
 
 
 def _utc_now_canonical() -> str:
-    """Capture actual UTC wall-clock time in canonical microsecond form."""
-
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 
@@ -214,6 +255,12 @@ class AdvanceableClock:
         self._current = self._current + timedelta(minutes=int(minutes))
         return self.now()
 
+    def advance_seconds(self, seconds: int) -> str:
+        if seconds < 0:
+            raise GvE0bDv1Error("E0B_CLOCK_ADVANCE_NEGATIVE")
+        self._current = self._current + timedelta(seconds=int(seconds))
+        return self.now()
+
 
 def _parse_ts(value: str) -> datetime:
     if not CANONICAL_TIMESTAMP_RE.fullmatch(value):
@@ -221,15 +268,23 @@ def _parse_ts(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
-def _elapsed_whole_minutes(start: str, end: str) -> int:
+def _add_minutes(ts: str, minutes: int) -> str:
+    return (_parse_ts(ts) + timedelta(minutes=int(minutes))).strftime(
+        "%Y-%m-%dT%H:%M:%S.%fZ"
+    )
+
+
+def _elapsed_seconds(start: str, end: str) -> int:
     s = _parse_ts(start)
     e = _parse_ts(end)
     if e <= s:
         raise GvE0bDv1Error("E0B_ARM_END_BEFORE_START")
-    total = int((e - s).total_seconds())
-    if total % 60 != 0:
-        raise GvE0bDv1Error("E0B_BUDGET_NOT_WHOLE_MINUTES")
-    return total // 60
+    return int((e - s).total_seconds())
+
+
+def _without_keys(record: Mapping[str, Any], *keys: str) -> dict[str, Any]:
+    banned = set(keys)
+    return {k: _plain(v) for k, v in record.items() if k not in banned}
 
 
 def _reject_caller_timing_fields(record: Mapping[str, Any]) -> None:
@@ -240,194 +295,17 @@ def _reject_caller_timing_fields(record: Mapping[str, Any]) -> None:
         "session_nonce",
         "prev_chain_hash",
         "human_analysis_time_minutes",
+        "elapsed_seconds",
+        "allowed_budget_minutes",
+        "arm_opened_event_hash",
+        "deadline_at",
         "scored_at",
         "generated_at",
+        "opened_at",
     )
     for key in banned:
         if key in record:
             raise GvE0bDv1Error(f"E0B_CALLER_TIMING_FORBIDDEN:{key}")
-
-
-def _chain_link(
-    *,
-    session_nonce: str,
-    stage: str,
-    record_hash: str,
-    prev_chain_hash: str,
-) -> dict[str, Any]:
-    body = {
-        "session_nonce": session_nonce,
-        "stage": stage,
-        "record_hash": _require_sha256(record_hash, "E0B_CHAIN_RECORD_HASH_INVALID"),
-        "prev_chain_hash": _require_sha256(prev_chain_hash, "E0B_CHAIN_PREV_INVALID"),
-    }
-    out = dict(body)
-    out["chain_hash"] = domain_hash(DOMAIN_CHAIN, body)
-    return out
-
-
-def _session_tip(session: Mapping[str, Any]) -> str:
-    entries = list(session.get("chain") or [])
-    if not entries:
-        return ZERO_CHAIN_HASH
-    tip = entries[-1].get("chain_hash")
-    return _require_sha256(tip, "E0B_SESSION_TIP_INVALID")
-
-
-def _append_session_chain(
-    session: dict[str, Any],
-    *,
-    stage: str,
-    record_hash: str,
-) -> dict[str, Any]:
-    link = _chain_link(
-        session_nonce=session["session_nonce"],
-        stage=stage,
-        record_hash=record_hash,
-        prev_chain_hash=_session_tip(session),
-    )
-    chain = list(session.get("chain") or [])
-    chain.append(link)
-    session["chain"] = chain
-    session["session_hash"] = domain_hash(
-        DOMAIN_SESSION,
-        {
-            "case_id": session["case_id"],
-            "session_nonce": session["session_nonce"],
-            "bundle_hash": session["bundle_hash"],
-            "created_at": session["created_at"],
-            "chain": chain,
-        },
-    )
-    return link
-
-
-def verify_session_chain(session: Mapping[str, Any]) -> str:
-    plain = _plain(session)
-    claimed = _require_sha256(plain.get("session_hash"), "E0B_SESSION_HASH_INVALID")
-    chain = list(plain.get("chain") or [])
-    if not chain:
-        raise GvE0bDv1Error("E0B_SESSION_CHAIN_EMPTY")
-    expected_prev = ZERO_CHAIN_HASH
-    nonce = _require_str(plain, "session_nonce", "E0B_SESSION_NONCE_REQUIRED")
-    for idx, entry in enumerate(chain):
-        if not isinstance(entry, Mapping):
-            raise GvE0bDv1Error(f"E0B_SESSION_ENTRY_INVALID:{idx}")
-        body = _without_keys(entry, "chain_hash")
-        if body.get("session_nonce") != nonce:
-            raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
-        if body.get("prev_chain_hash") != expected_prev:
-            raise GvE0bDv1Error(f"E0B_SESSION_CHAIN_BREAK:{idx}")
-        recomputed = domain_hash(DOMAIN_CHAIN, body)
-        claimed_link = _require_sha256(entry.get("chain_hash"), "E0B_CHAIN_HASH_INVALID")
-        if recomputed != claimed_link:
-            raise GvE0bDv1Error(f"E0B_SESSION_CHAIN_SEAL_MISMATCH:{idx}")
-        expected_prev = claimed_link
-    body = {
-        "case_id": plain["case_id"],
-        "session_nonce": nonce,
-        "bundle_hash": plain["bundle_hash"],
-        "created_at": plain["created_at"],
-        "chain": [_plain(e) for e in chain],
-    }
-    if domain_hash(DOMAIN_SESSION, body) != claimed:
-        raise GvE0bDv1Error("E0B_SESSION_SEAL_MISMATCH")
-    return claimed
-
-
-def open_capture_session(
-    *,
-    bundle: Mapping[str, Any] | None = None,
-    session_path: Path = DEFAULT_SESSION_PATH,
-    clock: CaptureClock | None = None,
-) -> Mapping[str, Any]:
-    """Open append-only capture session with generated nonce (system-stamped)."""
-
-    clk = clock or WallClock()
-    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
-    verify_bundle_seal(bndl)
-    created_at = clk.now()
-    session_nonce = secrets.token_hex(32)
-    session: dict[str, Any] = {
-        "case_id": CASE_ID,
-        "session_nonce": session_nonce,
-        "bundle_hash": bndl["bundle_hash"],
-        "created_at": created_at,
-        "open_arms": {},
-        "chain": [],
-    }
-    open_body = {
-        "case_id": CASE_ID,
-        "session_nonce": session_nonce,
-        "bundle_hash": bndl["bundle_hash"],
-        "created_at": created_at,
-    }
-    open_hash = domain_hash(DOMAIN_SESSION, open_body)
-    _append_session_chain(session, stage=STAGE_SESSION_OPEN, record_hash=open_hash)
-    _persist_sealed_json(session_path, session)
-    return _freeze(session)
-
-
-def load_capture_session(session_path: Path = DEFAULT_SESSION_PATH) -> dict[str, Any]:
-    raw = _load_json_object(session_path)
-    verify_session_chain(raw)
-    return _plain(raw)
-
-
-def stage_open_arm(
-    arm: str,
-    *,
-    session_path: Path = DEFAULT_SESSION_PATH,
-    clock: CaptureClock | None = None,
-) -> str:
-    """System-stamp arm start. Caller cannot supply the start timestamp."""
-
-    if arm not in {ARM_BASELINE, ARM_POST, ARM_RUBRIC}:
-        raise GvE0bDv1Error("E0B_ARM_UNKNOWN")
-    clk = clock or WallClock()
-    session = load_capture_session(session_path)
-    open_arms = dict(session.get("open_arms") or {})
-    if arm in open_arms:
-        raise GvE0bDv1Error(f"E0B_ARM_ALREADY_OPEN:{arm}")
-    started = clk.now()
-    open_arms[arm] = started
-    session["open_arms"] = open_arms
-    # Recompute session hash after open_arms mutation (open_arms not in seal body).
-    session["session_hash"] = domain_hash(
-        DOMAIN_SESSION,
-        {
-            "case_id": session["case_id"],
-            "session_nonce": session["session_nonce"],
-            "bundle_hash": session["bundle_hash"],
-            "created_at": session["created_at"],
-            "chain": session["chain"],
-        },
-    )
-    _persist_sealed_json(session_path, session)
-    return started
-
-
-def _without_keys(record: Mapping[str, Any], *keys: str) -> dict[str, Any]:
-    banned = set(keys)
-    return {k: _plain(v) for k, v in record.items() if k not in banned}
-
-
-def _persist_sealed_json(path: Path, record: Mapping[str, Any]) -> None:
-    """Atomic write of a sealed record as canonical JSON bytes."""
-
-    payload = canonical_document_bytes(_plain(record))
-    _atomic_write_bytes(path, payload)
-
-
-def _load_json_object(path: Path) -> dict[str, Any]:
-    if not path.is_file():
-        raise GvE0bDv1Error(f"E0B_PATH_MISSING:{path.name}")
-    try:
-        raw = path.read_text(encoding="utf-8")
-        data = json.loads(raw)
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-        raise GvE0bDv1Error(f"E0B_PATH_INVALID_JSON:{path.name}") from exc
-    return _require_mapping(data, f"E0B_PATH_NOT_OBJECT:{path.name}")
 
 
 def _atomic_write_bytes(target: Path, payload: bytes) -> None:
@@ -450,6 +328,401 @@ def _atomic_write_bytes(target: Path, payload: bytes) -> None:
         except OSError:
             pass
         raise
+
+
+def _persist_sealed_json(path: Path, record: Mapping[str, Any]) -> None:
+    payload = canonical_document_bytes(_plain(record))
+    _atomic_write_bytes(path, payload)
+
+
+def _load_json_object(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        raise GvE0bDv1Error(f"E0B_PATH_MISSING:{path.name}")
+    try:
+        raw = path.read_text(encoding="utf-8")
+        data = json.loads(raw)
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise GvE0bDv1Error(f"E0B_PATH_INVALID_JSON:{path.name}") from exc
+    return _require_mapping(data, f"E0B_PATH_NOT_OBJECT:{path.name}")
+
+
+def _events_dir_for(session_path: Path) -> Path:
+    return session_path.parent / "events"
+
+
+def _event_path(events_dir: Path, seq: int) -> Path:
+    return events_dir / f"{seq:04d}.json"
+
+
+def _list_event_files(events_dir: Path) -> list[Path]:
+    if not events_dir.is_dir():
+        return []
+    files = sorted(events_dir.glob("*.json"))
+    return [p for p in files if p.name[:4].isdigit()]
+
+
+def _chain_link(
+    *,
+    session_nonce: str,
+    stage: str,
+    record_hash: str,
+    prev_chain_hash: str,
+    seq: int,
+) -> dict[str, Any]:
+    body = {
+        "session_nonce": session_nonce,
+        "stage": stage,
+        "seq": int(seq),
+        "record_hash": _require_sha256(record_hash, "E0B_CHAIN_RECORD_HASH_INVALID"),
+        "prev_chain_hash": _require_sha256(prev_chain_hash, "E0B_CHAIN_PREV_INVALID"),
+    }
+    out = dict(body)
+    out["chain_hash"] = domain_hash(DOMAIN_CHAIN, body)
+    return out
+
+
+def _session_tip_from_chain(chain: Sequence[Mapping[str, Any]]) -> str:
+    if not chain:
+        return ZERO_CHAIN_HASH
+    tip = chain[-1].get("chain_hash")
+    return _require_sha256(tip, "E0B_SESSION_TIP_INVALID")
+
+
+def _rebuild_session_from_events(events_dir: Path) -> dict[str, Any]:
+    files = _list_event_files(events_dir)
+    if not files:
+        raise GvE0bDv1Error("E0B_SESSION_CHAIN_EMPTY")
+    chain: list[dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
+    case_id: str | None = None
+    session_nonce: str | None = None
+    bundle_hash: str | None = None
+    created_at: str | None = None
+    expected_prev = ZERO_CHAIN_HASH
+    for idx, path in enumerate(files):
+        event = _load_json_object(path)
+        seq = int(event.get("seq", -1))
+        if seq != idx:
+            raise GvE0bDv1Error(f"E0B_EVENT_SEQ_GAP:{idx}")
+        link = _require_mapping(event.get("link"), f"E0B_EVENT_LINK_MISSING:{idx}")
+        body = _without_keys(link, "chain_hash")
+        recomputed = domain_hash(DOMAIN_CHAIN, body)
+        claimed = _require_sha256(link.get("chain_hash"), "E0B_CHAIN_HASH_INVALID")
+        if recomputed != claimed:
+            raise GvE0bDv1Error(f"E0B_SESSION_CHAIN_SEAL_MISMATCH:{idx}")
+        if body.get("prev_chain_hash") != expected_prev:
+            raise GvE0bDv1Error(f"E0B_SESSION_CHAIN_BREAK:{idx}")
+        if body.get("seq") != idx:
+            raise GvE0bDv1Error(f"E0B_EVENT_SEQ_MISMATCH:{idx}")
+        expected_prev = claimed
+        if case_id is None:
+            case_id = _require_str(event, "case_id", "E0B_CASE_ID_MISMATCH")
+            session_nonce = _require_str(event, "session_nonce", "E0B_SESSION_NONCE_REQUIRED")
+            bundle_hash = _require_sha256(event.get("bundle_hash"), "E0B_BUNDLE_HASH_INVALID")
+            created_at = _require_timestamp(event, "created_at", "E0B_CREATED_AT_INVALID")
+        else:
+            if event.get("case_id") != case_id:
+                raise GvE0bDv1Error("E0B_CASE_ID_MISMATCH")
+            if event.get("session_nonce") != session_nonce:
+                raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
+            if event.get("bundle_hash") != bundle_hash:
+                raise GvE0bDv1Error("E0B_SESSION_BUNDLE_MISMATCH")
+        if link.get("session_nonce") != session_nonce:
+            raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
+        chain.append(_plain(link))
+        events.append(_plain(event))
+    assert case_id and session_nonce and bundle_hash and created_at
+    session_body = {
+        "case_id": case_id,
+        "session_nonce": session_nonce,
+        "bundle_hash": bundle_hash,
+        "created_at": created_at,
+        "chain": chain,
+    }
+    session_hash = domain_hash(DOMAIN_SESSION, session_body)
+    return {
+        **session_body,
+        "session_hash": session_hash,
+        "events": events,
+        "events_dir": str(events_dir),
+        "ledger_custody_note": (
+            "Tamper-evident under capture-process custody. Local hashes do not "
+            "independently prove wall-clock history or human identity against a "
+            "privileged repository operator."
+        ),
+    }
+
+
+def verify_session_chain(session: Mapping[str, Any]) -> str:
+    plain = _plain(session)
+    claimed = _require_sha256(plain.get("session_hash"), "E0B_SESSION_HASH_INVALID")
+    chain = list(plain.get("chain") or [])
+    if not chain:
+        raise GvE0bDv1Error("E0B_SESSION_CHAIN_EMPTY")
+    expected_prev = ZERO_CHAIN_HASH
+    nonce = _require_str(plain, "session_nonce", "E0B_SESSION_NONCE_REQUIRED")
+    for idx, entry in enumerate(chain):
+        if not isinstance(entry, Mapping):
+            raise GvE0bDv1Error(f"E0B_SESSION_ENTRY_INVALID:{idx}")
+        body = _without_keys(entry, "chain_hash")
+        if body.get("session_nonce") != nonce:
+            raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
+        if body.get("prev_chain_hash") != expected_prev:
+            raise GvE0bDv1Error(f"E0B_SESSION_CHAIN_BREAK:{idx}")
+        if int(body.get("seq", -1)) != idx:
+            raise GvE0bDv1Error(f"E0B_EVENT_SEQ_MISMATCH:{idx}")
+        recomputed = domain_hash(DOMAIN_CHAIN, body)
+        claimed_link = _require_sha256(entry.get("chain_hash"), "E0B_CHAIN_HASH_INVALID")
+        if recomputed != claimed_link:
+            raise GvE0bDv1Error(f"E0B_SESSION_CHAIN_SEAL_MISMATCH:{idx}")
+        expected_prev = claimed_link
+    body = {
+        "case_id": plain["case_id"],
+        "session_nonce": nonce,
+        "bundle_hash": plain["bundle_hash"],
+        "created_at": plain["created_at"],
+        "chain": [_plain(e) for e in chain],
+    }
+    if domain_hash(DOMAIN_SESSION, body) != claimed:
+        raise GvE0bDv1Error("E0B_SESSION_SEAL_MISMATCH")
+    return claimed
+
+
+def verify_session_bound_to_records(
+    session: Mapping[str, Any],
+    seals: Mapping[str, Any],
+) -> None:
+    """Enforce exact canonical chain and bind each close/link to embedded records."""
+
+    plain = _plain(session)
+    verify_session_chain(plain)
+    chain = list(plain.get("chain") or [])
+    stages = [str(e.get("stage")) for e in chain]
+    if stages != list(CANONICAL_STAGE_ORDER):
+        raise GvE0bDv1Error("E0B_CHAIN_STAGE_ORDER")
+    by_stage = {str(e["stage"]): e for e in chain}
+    if by_stage[STAGE_BASELINE_CLOSE]["record_hash"] != seals["baseline"]["baseline_hash"]:
+        raise GvE0bDv1Error("E0B_CHAIN_RECORD_UNBOUND:BASELINE")
+    if by_stage[STAGE_PACKET]["record_hash"] != seals["packet"]["packet_hash"]:
+        raise GvE0bDv1Error("E0B_CHAIN_RECORD_UNBOUND:PACKET")
+    if by_stage[STAGE_POST_CLOSE]["record_hash"] != seals["post"]["post_packet_hash"]:
+        raise GvE0bDv1Error("E0B_CHAIN_RECORD_UNBOUND:POST")
+    if by_stage[STAGE_REVIEW_PACKAGE]["record_hash"] != seals["review_package"][
+        "review_package_hash"
+    ]:
+        raise GvE0bDv1Error("E0B_CHAIN_RECORD_UNBOUND:REVIEW_PACKAGE")
+    if by_stage[STAGE_RUBRIC_CLOSE]["record_hash"] != seals["rubric"]["rubric_hash"]:
+        raise GvE0bDv1Error("E0B_CHAIN_RECORD_UNBOUND:RUBRIC")
+
+    # Open-event hashes must match decision close records.
+    events = list(plain.get("events") or [])
+    if len(events) != len(chain):
+        # Rebuild open hashes from event payloads when available.
+        events_dir = plain.get("events_dir")
+        if isinstance(events_dir, str) and Path(events_dir).is_dir():
+            rebuilt = _rebuild_session_from_events(Path(events_dir))
+            events = list(rebuilt.get("events") or [])
+    open_by_stage: dict[str, dict[str, Any]] = {}
+    for event in events:
+        stage = str(event.get("stage") or event.get("link", {}).get("stage"))
+        if stage in {STAGE_BASELINE_OPEN, STAGE_POST_OPEN}:
+            payload = _require_mapping(event.get("payload"), "E0B_OPEN_PAYLOAD_REQUIRED")
+            open_by_stage[stage] = payload
+    if STAGE_BASELINE_OPEN not in open_by_stage or STAGE_POST_OPEN not in open_by_stage:
+        raise GvE0bDv1Error("E0B_CHAIN_OPEN_MISSING")
+    b_open = open_by_stage[STAGE_BASELINE_OPEN]
+    p_open = open_by_stage[STAGE_POST_OPEN]
+    if seals["baseline"]["arm_opened_event_hash"] != b_open["open_event_hash"]:
+        raise GvE0bDv1Error("E0B_CHAIN_OPEN_REF_MISMATCH:BASELINE")
+    if seals["post"]["arm_opened_event_hash"] != p_open["open_event_hash"]:
+        raise GvE0bDv1Error("E0B_CHAIN_OPEN_REF_MISMATCH:POST")
+    if seals["baseline"]["arm_started_at"] != b_open["opened_at"]:
+        raise GvE0bDv1Error("E0B_CHAIN_OPEN_TIME_MISMATCH:BASELINE")
+    if seals["post"]["arm_started_at"] != p_open["opened_at"]:
+        raise GvE0bDv1Error("E0B_CHAIN_OPEN_TIME_MISMATCH:POST")
+    # Equal configured budgets (not equal elapsed).
+    if (
+        int(seals["baseline"]["allowed_budget_minutes"]) != BUDGET_MINUTES
+        or int(seals["post"]["allowed_budget_minutes"]) != BUDGET_MINUTES
+    ):
+        raise GvE0bDv1Error("E0B_BUDGET_CONFIG_MISMATCH")
+    if seals["baseline"]["allowed_budget_minutes"] != seals["post"]["allowed_budget_minutes"]:
+        raise GvE0bDv1Error("E0B_UNEQUAL_CONFIGURED_BUDGETS")
+    # Mapping bind.
+    mapping = seals.get("review_mapping")
+    if not isinstance(mapping, Mapping):
+        raise GvE0bDv1Error("E0B_REVIEW_MAPPING_REQUIRED")
+    if mapping.get("review_package_hash") != seals["review_package"]["review_package_hash"]:
+        raise GvE0bDv1Error("E0B_MAPPING_PACKAGE_MISMATCH")
+    if seals["rubric"].get("review_package_hash") != seals["review_package"][
+        "review_package_hash"
+    ]:
+        raise GvE0bDv1Error("E0B_RUBRIC_PACKAGE_MISMATCH")
+    if seals["rubric"].get("mapping_hash") != mapping.get("mapping_hash"):
+        raise GvE0bDv1Error("E0B_RUBRIC_MAPPING_MISMATCH")
+
+
+def _append_event(
+    *,
+    session_path: Path,
+    stage: str,
+    record_hash: str,
+    payload: Mapping[str, Any],
+    case_id: str,
+    session_nonce: str,
+    bundle_hash: str,
+    created_at: str,
+) -> dict[str, Any]:
+    events_dir = _events_dir_for(session_path)
+    events_dir.mkdir(parents=True, exist_ok=True)
+    existing = _list_event_files(events_dir)
+    seq = len(existing)
+    if existing:
+        session = _rebuild_session_from_events(events_dir)
+        prev = _session_tip_from_chain(session["chain"])
+        if session["session_nonce"] != session_nonce:
+            raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
+    else:
+        prev = ZERO_CHAIN_HASH
+    link = _chain_link(
+        session_nonce=session_nonce,
+        stage=stage,
+        record_hash=record_hash,
+        prev_chain_hash=prev,
+        seq=seq,
+    )
+    event = {
+        "case_id": case_id,
+        "session_nonce": session_nonce,
+        "bundle_hash": bundle_hash,
+        "created_at": created_at,
+        "seq": seq,
+        "stage": stage,
+        "payload": _plain(payload),
+        "link": link,
+    }
+    path = _event_path(events_dir, seq)
+    if path.exists():
+        raise GvE0bDv1Error(f"E0B_EVENT_ALREADY_EXISTS:{seq}")
+    _persist_sealed_json(path, event)
+    session = _rebuild_session_from_events(events_dir)
+    # Tip index only (reconstructible from events; not the sealed authority).
+    index = {
+        "case_id": session["case_id"],
+        "session_nonce": session["session_nonce"],
+        "bundle_hash": session["bundle_hash"],
+        "created_at": session["created_at"],
+        "session_hash": session["session_hash"],
+        "tip_chain_hash": session["chain"][-1]["chain_hash"],
+        "event_count": len(session["chain"]),
+        "events_dir": str(events_dir),
+        "ledger_custody_note": session["ledger_custody_note"],
+    }
+    _persist_sealed_json(session_path, index)
+    return session
+
+
+def open_capture_session(
+    *,
+    bundle: Mapping[str, Any] | None = None,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    clock: CaptureClock | None = None,
+) -> Mapping[str, Any]:
+    """Open append-only capture session: first immutable event is SESSION_OPEN."""
+
+    clk = clock or WallClock()
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    events_dir = _events_dir_for(session_path)
+    if _list_event_files(events_dir):
+        raise GvE0bDv1Error("E0B_SESSION_ALREADY_OPEN")
+    created_at = clk.now()
+    session_nonce = secrets.token_hex(32)
+    open_body = {
+        "case_id": CASE_ID,
+        "session_nonce": session_nonce,
+        "bundle_hash": bndl["bundle_hash"],
+        "created_at": created_at,
+    }
+    open_hash = domain_hash(DOMAIN_SESSION, open_body)
+    session = _append_event(
+        session_path=session_path,
+        stage=STAGE_SESSION_OPEN,
+        record_hash=open_hash,
+        payload=open_body,
+        case_id=CASE_ID,
+        session_nonce=session_nonce,
+        bundle_hash=bndl["bundle_hash"],
+        created_at=created_at,
+    )
+    return _freeze(session)
+
+
+def load_capture_session(session_path: Path = DEFAULT_SESSION_PATH) -> dict[str, Any]:
+    events_dir = _events_dir_for(session_path)
+    session = _rebuild_session_from_events(events_dir)
+    verify_session_chain(session)
+    return session
+
+
+def _find_open_payload(session: Mapping[str, Any], open_stage: str) -> dict[str, Any]:
+    for event in session.get("events") or []:
+        if event.get("stage") == open_stage:
+            return _require_mapping(event.get("payload"), "E0B_OPEN_PAYLOAD_REQUIRED")
+    raise GvE0bDv1Error(f"E0B_ARM_NOT_OPEN:{open_stage}")
+
+
+def stage_open_arm(
+    arm: str,
+    *,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    clock: CaptureClock | None = None,
+    allowed_budget_minutes: int = BUDGET_MINUTES,
+) -> Mapping[str, Any]:
+    """System-stamp arm open as a sealed chain event (no mutable open_arms map)."""
+
+    if arm not in {ARM_BASELINE, ARM_POST}:
+        raise GvE0bDv1Error("E0B_ARM_UNKNOWN")
+    if int(allowed_budget_minutes) != BUDGET_MINUTES:
+        raise GvE0bDv1Error("E0B_BUDGET_CONFIG_INVALID")
+    clk = clock or WallClock()
+    session = load_capture_session(session_path)
+    stages = [e["stage"] for e in session["chain"]]
+    open_stage = STAGE_BASELINE_OPEN if arm == ARM_BASELINE else STAGE_POST_OPEN
+    if open_stage in stages:
+        raise GvE0bDv1Error(f"E0B_ARM_ALREADY_OPEN:{arm}")
+    if arm == ARM_BASELINE and stages != [STAGE_SESSION_OPEN]:
+        raise GvE0bDv1Error("E0B_CHAIN_STAGE_ORDER")
+    if arm == ARM_POST and stages != [
+        STAGE_SESSION_OPEN,
+        STAGE_BASELINE_OPEN,
+        STAGE_BASELINE_CLOSE,
+        STAGE_PACKET,
+    ]:
+        raise GvE0bDv1Error("E0B_CHAIN_STAGE_ORDER")
+    opened_at = clk.now()
+    deadline_at = _add_minutes(opened_at, BUDGET_MINUTES)
+    payload = {
+        "arm": arm,
+        "opened_at": opened_at,
+        "deadline_at": deadline_at,
+        "allowed_budget_minutes": BUDGET_MINUTES,
+        "session_nonce": session["session_nonce"],
+        "prev_chain_hash": _session_tip_from_chain(session["chain"]),
+    }
+    open_event_hash = domain_hash(DOMAIN_ARM_OPEN, payload)
+    payload = {**payload, "open_event_hash": open_event_hash}
+    session = _append_event(
+        session_path=session_path,
+        stage=open_stage,
+        record_hash=open_event_hash,
+        payload=payload,
+        case_id=session["case_id"],
+        session_nonce=session["session_nonce"],
+        bundle_hash=session["bundle_hash"],
+        created_at=session["created_at"],
+    )
+    return _freeze(payload)
 
 
 def sealed_adversarial_bundle() -> Mapping[str, Any]:
@@ -504,8 +777,6 @@ def sealed_adversarial_bundle() -> Mapping[str, Any]:
 
 
 def verify_bundle_seal(bundle: Mapping[str, Any]) -> str:
-    """Recompute bundle hash; reject modified evidence under a claimed hash."""
-
     plain = _plain(bundle)
     claimed = _require_sha256(plain.get("bundle_hash"), "E0B_BUNDLE_HASH_INVALID")
     body = _without_keys(plain, "bundle_hash")
@@ -548,13 +819,6 @@ def build_godview_packet(
     session_nonce: str,
     prev_chain_hash: str,
 ) -> Mapping[str, Any]:
-    """G08 packet: BLOCKED on contradictory indispensable evidence.
-
-    ``generated_at`` must be supplied by the capture stage clock (never a
-    hardcoded calendar day and never inventable by the human authoring payload).
-    Packet is chain-bound via session_nonce + prev_chain_hash.
-    """
-
     b_plain = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(b_plain)
     claims = list(b_plain.get("indispensable_claims") or [])
@@ -563,7 +827,6 @@ def build_godview_packet(
     contradictions = _find_indispensable_contradictions(claims)
     if not contradictions:
         raise GvE0bDv1Error("E0B_G08_EXPECTS_CONTRADICTION")
-
     ts = _require_generated_at(generated_at)
     body = {
         "case_id": CASE_ID,
@@ -615,14 +878,51 @@ def verify_packet_seal(packet: Mapping[str, Any]) -> str:
     return recomputed
 
 
+def load_packet_seal(path: Path) -> Mapping[str, Any]:
+    raw = _load_json_object(path)
+    if "packet_hash" not in raw:
+        raise GvE0bDv1Error("E0B_PACKET_UNSEALED")
+    verify_packet_seal(raw)
+    return _freeze(_plain(raw))
+
+
+def _stamp_decision_timing(
+    *,
+    open_payload: Mapping[str, Any],
+    ended_at: str,
+) -> dict[str, Any]:
+    opened_at = _require_timestamp(open_payload, "opened_at", "E0B_ARM_STARTED_REQUIRED")
+    deadline_at = _require_timestamp(open_payload, "deadline_at", "E0B_DEADLINE_REQUIRED")
+    open_event_hash = _require_sha256(
+        open_payload.get("open_event_hash"), "E0B_OPEN_EVENT_HASH_INVALID"
+    )
+    allowed = int(open_payload.get("allowed_budget_minutes", -1))
+    if allowed != BUDGET_MINUTES:
+        raise GvE0bDv1Error("E0B_BUDGET_CONFIG_MISMATCH")
+    if ended_at > deadline_at:
+        raise GvE0bDv1Error("E0B_BUDGET_EXCEEDED")
+    elapsed = _elapsed_seconds(opened_at, ended_at)
+    max_seconds = BUDGET_MINUTES * 60
+    if elapsed > max_seconds:
+        raise GvE0bDv1Error("E0B_BUDGET_EXCEEDED")
+    return {
+        "arm_started_at": opened_at,
+        "arm_ended_at": ended_at,
+        "sealed_at": ended_at,
+        "arm_opened_event_hash": open_event_hash,
+        "allowed_budget_minutes": BUDGET_MINUTES,
+        "elapsed_seconds": elapsed,
+        "human_analysis_time_minutes": elapsed // 60,
+        "equal_budget_attestation": True,
+    }
+
+
 def _validate_decision_arm(
     record: Mapping[str, Any],
     *,
     expected_arm: str,
     allowed_auth: frozenset[str],
 ) -> dict[str, Any]:
-    """Validate decision content. Timing/budget fields are system-stamped only."""
-
     plain = _require_mapping(record, "E0B_DECISION_RECORD_INVALID")
     if plain.get("case_id") != CASE_ID:
         raise GvE0bDv1Error("E0B_CASE_ID_MISMATCH")
@@ -634,9 +934,19 @@ def _validate_decision_arm(
     operator_id = _require_str(plain, "operator_id", "E0B_OPERATOR_REQUIRED")
     arm_started_at = _require_timestamp(plain, "arm_started_at", "E0B_ARM_STARTED_REQUIRED")
     arm_ended_at = _require_timestamp(plain, "arm_ended_at", "E0B_ARM_ENDED_REQUIRED")
-    measured = _elapsed_whole_minutes(arm_started_at, arm_ended_at)
-    if measured != BUDGET_MINUTES:
-        raise GvE0bDv1Error("E0B_BUDGET_NOT_60")
+    elapsed = int(plain.get("elapsed_seconds", -1))
+    if elapsed < 0:
+        elapsed = _elapsed_seconds(arm_started_at, arm_ended_at)
+    allowed = int(plain.get("allowed_budget_minutes", -1))
+    if allowed != BUDGET_MINUTES:
+        raise GvE0bDv1Error("E0B_BUDGET_CONFIG_MISMATCH")
+    if elapsed > allowed * 60:
+        raise GvE0bDv1Error("E0B_BUDGET_EXCEEDED")
+    if arm_ended_at <= arm_started_at:
+        raise GvE0bDv1Error("E0B_ARM_END_BEFORE_START")
+    open_hash = _require_sha256(
+        plain.get("arm_opened_event_hash"), "E0B_OPEN_EVENT_HASH_INVALID"
+    )
     session_nonce = _require_str(plain, "session_nonce", "E0B_SESSION_NONCE_REQUIRED")
     prev_chain_hash = _require_sha256(
         plain.get("prev_chain_hash"), "E0B_CHAIN_PREV_INVALID"
@@ -644,8 +954,6 @@ def _validate_decision_arm(
     sealed_at = arm_ended_at
     if "sealed_at" in plain and plain["sealed_at"] != sealed_at:
         raise GvE0bDv1Error("E0B_SEALED_AT_MUST_MATCH_ARM_END")
-    if "human_analysis_time_minutes" in plain and plain["human_analysis_time_minutes"] != BUDGET_MINUTES:
-        raise GvE0bDv1Error("E0B_BUDGET_FIELD_MISMATCH")
     bundle_hash = _require_sha256(plain.get("bundle_hash"), "E0B_BUNDLE_HASH_INVALID")
     _require_bool(plain, "equal_budget_attestation", True, "E0B_EQUAL_BUDGET_REQUIRED")
     _require_bool(
@@ -674,10 +982,13 @@ def _validate_decision_arm(
         "arm_started_at": arm_started_at,
         "arm_ended_at": arm_ended_at,
         "sealed_at": sealed_at,
+        "arm_opened_event_hash": open_hash,
         "session_nonce": session_nonce,
         "prev_chain_hash": prev_chain_hash,
         "bundle_hash": bundle_hash,
-        "human_analysis_time_minutes": BUDGET_MINUTES,
+        "allowed_budget_minutes": BUDGET_MINUTES,
+        "elapsed_seconds": elapsed,
+        "human_analysis_time_minutes": elapsed // 60,
         "equal_budget_attestation": True,
         "outside_research_attestation": False,
         "post_cutoff_information_attestation": False,
@@ -691,8 +1002,6 @@ def _validate_decision_arm(
 
 
 def seal_baseline_record(record: Mapping[str, Any]) -> Mapping[str, Any]:
-    """Validate and attach baseline_hash for an externally authored baseline."""
-
     body = _validate_decision_arm(
         record,
         expected_arm="HUMAN_BASELINE",
@@ -711,7 +1020,6 @@ def verify_baseline_seal(baseline: Mapping[str, Any]) -> str:
     plain = _plain(baseline)
     claimed = _require_sha256(plain.get("baseline_hash"), "E0B_BASELINE_HASH_INVALID")
     body = _without_keys(plain, "baseline_hash")
-    # Re-validate fields after stripping hash.
     sealed = seal_baseline_record(body)
     if sealed["baseline_hash"] != claimed:
         raise GvE0bDv1Error("E0B_BASELINE_SEAL_MISMATCH")
@@ -723,8 +1031,6 @@ def load_baseline_seal(
     *,
     expected_bundle_hash: str,
 ) -> Mapping[str, Any]:
-    """Load a *pre-sealed* baseline. Unsealed authoring payloads are rejected."""
-
     raw = _load_json_object(path)
     if "baseline_hash" not in raw:
         raise GvE0bDv1Error("E0B_BASELINE_UNSEALED")
@@ -741,8 +1047,6 @@ def seal_post_packet_record(
     packet: Mapping[str, Any],
     baseline: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    """Validate and attach post_packet_hash for an externally authored post decision."""
-
     p = _plain(packet)
     b = _plain(baseline)
     verify_packet_seal(p)
@@ -769,7 +1073,8 @@ def seal_post_packet_record(
         raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
     if body["session_nonce"] != p.get("session_nonce"):
         raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
-    # Ordering: baseline sealed_at < packet.generated_at <= post.sealed_at
+    if int(body["allowed_budget_minutes"]) != int(b["allowed_budget_minutes"]):
+        raise GvE0bDv1Error("E0B_UNEQUAL_CONFIGURED_BUDGETS")
     if not (b["sealed_at"] < p["generated_at"] <= body["sealed_at"]):
         raise GvE0bDv1Error("E0B_INVALID_BASELINE_SEAL_ORDERING")
     portfolio_action = record.get("portfolio_action", PORTFOLIO_ACTION_NO_POSITION)
@@ -805,8 +1110,6 @@ def load_post_packet_seal(
     packet: Mapping[str, Any],
     baseline: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    """Load a *pre-sealed* post decision. Unsealed authoring payloads are rejected."""
-
     raw = _load_json_object(path)
     if "post_packet_hash" not in raw:
         raise GvE0bDv1Error("E0B_POST_UNSEALED")
@@ -831,20 +1134,146 @@ def _validate_rubric_arm_scores(scores: Any, code: str) -> dict[str, dict[str, A
     return out
 
 
+def _strip_decision_for_blind(decision: Mapping[str, Any]) -> dict[str, Any]:
+    plain = _plain(decision)
+    out = {k: v for k, v in plain.items() if k not in _BLIND_STRIP_KEYS}
+    # Keep decision content only.
+    keep = {
+        "action",
+        "rationale",
+        "missing_evidence",
+        "falsifiers",
+        "contradictions_recognized",
+        "portfolio_action",
+        "bundle_hash",
+        "alpha_claim",
+        "case_id",
+    }
+    return {k: out[k] for k in keep if k in out}
+
+
+def seal_review_package(
+    *,
+    baseline: Mapping[str, Any],
+    post: Mapping[str, Any],
+    packet: Mapping[str, Any],
+    bundle: Mapping[str, Any],
+    session_nonce: str,
+    prev_chain_hash: str,
+    rng_bytes: bytes | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Build blinded review package + sealed mapping (mapping withheld from export)."""
+
+    b = _plain(baseline)
+    p = _plain(post)
+    pkt = _plain(packet)
+    bndl = _plain(bundle)
+    verify_baseline_seal(b)
+    verify_post_packet_seal(p, packet=pkt, baseline=b)
+    verify_packet_seal(pkt)
+    verify_bundle_seal(bndl)
+    # Random assignment: first byte even => ARM_A=BASELINE, else ARM_A=POST.
+    raw = rng_bytes if rng_bytes is not None else secrets.token_bytes(16)
+    if raw[0] % 2 == 0:
+        arm_a_source, arm_b_source = ARM_BASELINE, ARM_POST
+        arm_a_decision, arm_b_decision = b, p
+    else:
+        arm_a_source, arm_b_source = ARM_POST, ARM_BASELINE
+        arm_a_decision, arm_b_decision = p, b
+    package_body = {
+        "case_id": CASE_ID,
+        "session_nonce": session_nonce,
+        "prev_chain_hash": _require_sha256(prev_chain_hash, "E0B_CHAIN_PREV_INVALID"),
+        "bundle": bndl,
+        "packet_run_state": pkt["run_state"],
+        "packet_block_reason": pkt["block_reason"],
+        "packet_rationale": pkt["rationale"],
+        "packet_contradictions": pkt["contradictions"],
+        "instructions": (
+            "Score ARM_A and ARM_B independently with the frozen six-item rubric. "
+            "Arms are randomly labeled; do not infer baseline vs post order. "
+            "Identical evidence bundle and instructions for both arms."
+        ),
+        "rubric_items": list(RUBRIC_ITEMS),
+        "score_scale": {"min": 0, "max": 2},
+        "arm_a": _strip_decision_for_blind(arm_a_decision),
+        "arm_b": _strip_decision_for_blind(arm_b_decision),
+        "blinding": "MECHANICAL_RANDOM_ARM_LABELS",
+        "mapping_withheld": True,
+    }
+    package_hash = domain_hash(DOMAIN_REVIEW_PACKAGE, package_body)
+    package = {**package_body, "review_package_hash": package_hash}
+    mapping_body = {
+        "case_id": CASE_ID,
+        "session_nonce": session_nonce,
+        "review_package_hash": package_hash,
+        "arm_a_source": arm_a_source,
+        "arm_b_source": arm_b_source,
+        "baseline_hash": b["baseline_hash"],
+        "post_packet_hash": p["post_packet_hash"],
+        "rng_commitment": domain_hash("GV-E0B:DV1:RNG:V1", {"bytes_hex": raw.hex()}),
+        "revealed": False,
+    }
+    mapping_hash = domain_hash(DOMAIN_REVIEW_MAPPING, mapping_body)
+    mapping = {**mapping_body, "mapping_hash": mapping_hash}
+    return package, mapping
+
+
+def verify_review_package(package: Mapping[str, Any]) -> str:
+    plain = _plain(package)
+    claimed = _require_sha256(
+        plain.get("review_package_hash"), "E0B_REVIEW_PACKAGE_HASH_INVALID"
+    )
+    body = _without_keys(plain, "review_package_hash")
+    if domain_hash(DOMAIN_REVIEW_PACKAGE, body) != claimed:
+        raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_SEAL_MISMATCH")
+    if plain.get("mapping_withheld") is not True:
+        raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_MUST_WITHHOLD_MAPPING")
+    if "arm_a_source" in plain or "arm_b_source" in plain:
+        raise GvE0bDv1Error("E0B_REVIEW_PACKAGE_LEAKS_MAPPING")
+    return claimed
+
+
+def verify_review_mapping(
+    mapping: Mapping[str, Any],
+    *,
+    review_package_hash: str,
+) -> str:
+    plain = _plain(mapping)
+    claimed = _require_sha256(plain.get("mapping_hash"), "E0B_MAPPING_HASH_INVALID")
+    body = _without_keys(plain, "mapping_hash")
+    if domain_hash(DOMAIN_REVIEW_MAPPING, body) != claimed:
+        raise GvE0bDv1Error("E0B_MAPPING_SEAL_MISMATCH")
+    if plain.get("review_package_hash") != review_package_hash:
+        raise GvE0bDv1Error("E0B_MAPPING_PACKAGE_MISMATCH")
+    if set({plain.get("arm_a_source"), plain.get("arm_b_source")}) != {
+        ARM_BASELINE,
+        ARM_POST,
+    }:
+        raise GvE0bDv1Error("E0B_MAPPING_ARMS_INVALID")
+    return claimed
+
+
 def seal_rubric_record(
     record: Mapping[str, Any],
     *,
     baseline: Mapping[str, Any],
     post: Mapping[str, Any],
     packet: Mapping[str, Any],
+    review_package: Mapping[str, Any],
+    review_mapping: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    """Validate separately authored rubric scores for both arms."""
+    """Seal rubric from blinded ARM_A/ARM_B scores; map to baseline/post after seal inputs."""
 
     b = _plain(baseline)
     p = _plain(post)
     pkt = _plain(packet)
+    pkg = _plain(review_package)
+    mp = _plain(review_mapping)
     verify_baseline_seal(b)
     verify_post_packet_seal(p, packet=pkt, baseline=b)
+    verify_review_package(pkg)
+    verify_review_mapping(mp, review_package_hash=pkg["review_package_hash"])
     plain = _require_mapping(record, "E0B_RUBRIC_RECORD_INVALID")
     if plain.get("case_id") != CASE_ID:
         raise GvE0bDv1Error("E0B_CASE_ID_MISMATCH")
@@ -854,53 +1283,89 @@ def seal_rubric_record(
     reviewer_id = _require_str(plain, "reviewer_id", "E0B_REVIEWER_REQUIRED")
     if reviewer_id == b["operator_id"]:
         raise GvE0bDv1Error("E0B_REVIEWER_MUST_DIFFER_FROM_OPERATOR")
-    # Real close path: reviewer must be real if operator is real; fixtures may pair.
     if b["authorship_kind"] == AUTH_REAL_OPERATOR and auth != AUTH_REAL_REVIEWER:
         raise GvE0bDv1Error("E0B_REAL_OPERATOR_REQUIRES_REAL_REVIEWER")
     if b["authorship_kind"] == AUTH_FIXTURE and auth != AUTH_FIXTURE:
         raise GvE0bDv1Error("E0B_FIXTURE_OPERATOR_REQUIRES_FIXTURE_REVIEWER")
-    arm_started_at = _require_timestamp(plain, "arm_started_at", "E0B_ARM_STARTED_REQUIRED")
-    arm_ended_at = _require_timestamp(plain, "arm_ended_at", "E0B_ARM_ENDED_REQUIRED")
-    measured = _elapsed_whole_minutes(arm_started_at, arm_ended_at)
-    if measured != BUDGET_MINUTES:
-        raise GvE0bDv1Error("E0B_BUDGET_NOT_60")
-    scored_at = arm_ended_at
-    if "scored_at" in plain and plain["scored_at"] != scored_at:
-        raise GvE0bDv1Error("E0B_SCORED_AT_MUST_MATCH_ARM_END")
+    scored_at = _require_timestamp(plain, "scored_at", "E0B_SCORED_AT_REQUIRED")
     if scored_at < p["sealed_at"]:
         raise GvE0bDv1Error("E0B_RUBRIC_BEFORE_POST_FORBIDDEN")
-    if arm_started_at < p["sealed_at"]:
-        raise GvE0bDv1Error("E0B_RUBRIC_ARM_BEFORE_POST_FORBIDDEN")
     session_nonce = _require_str(plain, "session_nonce", "E0B_SESSION_NONCE_REQUIRED")
     prev_chain_hash = _require_sha256(
         plain.get("prev_chain_hash"), "E0B_CHAIN_PREV_INVALID"
     )
     if session_nonce != b["session_nonce"] or session_nonce != p["session_nonce"]:
         raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
-    if session_nonce != pkt.get("session_nonce"):
+    if session_nonce != pkt.get("session_nonce") or session_nonce != pkg.get("session_nonce"):
         raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
-    baseline_scores = _validate_rubric_arm_scores(
-        plain.get("baseline_scores"), "E0B_BASELINE_SCORES_REQUIRED"
-    )
-    post_scores = _validate_rubric_arm_scores(
-        plain.get("post_scores"), "E0B_POST_SCORES_REQUIRED"
-    )
+    # Accept either blinded scores or already-mapped baseline/post scores.
+    if "arm_a_scores" in plain or "arm_b_scores" in plain:
+        arm_a_scores = _validate_rubric_arm_scores(
+            plain.get("arm_a_scores"), "E0B_ARM_A_SCORES_REQUIRED"
+        )
+        arm_b_scores = _validate_rubric_arm_scores(
+            plain.get("arm_b_scores"), "E0B_ARM_B_SCORES_REQUIRED"
+        )
+        if mp["arm_a_source"] == ARM_BASELINE:
+            baseline_scores, post_scores = arm_a_scores, arm_b_scores
+        else:
+            baseline_scores, post_scores = arm_b_scores, arm_a_scores
+    else:
+        baseline_scores = _validate_rubric_arm_scores(
+            plain.get("baseline_scores"), "E0B_BASELINE_SCORES_REQUIRED"
+        )
+        post_scores = _validate_rubric_arm_scores(
+            plain.get("post_scores"), "E0B_POST_SCORES_REQUIRED"
+        )
+        # Reconstruct blinded labels for seal body consistency.
+        if mp["arm_a_source"] == ARM_BASELINE:
+            arm_a_scores, arm_b_scores = baseline_scores, post_scores
+        else:
+            arm_a_scores, arm_b_scores = post_scores, baseline_scores
+    # Optional reviewer custody attestation (not a third person).
+    existing_custody = plain.get("custody_attestation")
+    if isinstance(existing_custody, Mapping):
+        custody = {
+            "fresh_operator_attested": bool(
+                existing_custody.get("fresh_operator_attested", False)
+            ),
+            "blinded_review_conditions_attested": bool(
+                existing_custody.get("blinded_review_conditions_attested", False)
+            ),
+            "operator_had_not_seen_packet_or_expected_outcome": bool(
+                existing_custody.get(
+                    "operator_had_not_seen_packet_or_expected_outcome", False
+                )
+            ),
+        }
+    else:
+        custody = {
+            "fresh_operator_attested": bool(plain.get("fresh_operator_attested", False)),
+            "blinded_review_conditions_attested": bool(
+                plain.get("blinded_review_conditions_attested", False)
+            ),
+            "operator_had_not_seen_packet_or_expected_outcome": bool(
+                plain.get("operator_had_not_seen_packet_or_expected_outcome", False)
+            ),
+        }
     body = {
         "case_id": CASE_ID,
         "authorship_kind": auth,
         "reviewer_id": reviewer_id,
-        "arm_started_at": arm_started_at,
-        "arm_ended_at": arm_ended_at,
         "scored_at": scored_at,
         "session_nonce": session_nonce,
         "prev_chain_hash": prev_chain_hash,
-        "human_analysis_time_minutes": BUDGET_MINUTES,
         "bundle_hash": b["bundle_hash"],
         "baseline_hash": b["baseline_hash"],
         "packet_hash": pkt["packet_hash"],
         "post_packet_hash": p["post_packet_hash"],
+        "review_package_hash": pkg["review_package_hash"],
+        "mapping_hash": mp["mapping_hash"],
+        "arm_a_scores": arm_a_scores,
+        "arm_b_scores": arm_b_scores,
         "baseline_scores": baseline_scores,
         "post_scores": post_scores,
+        "custody_attestation": custody,
         "alpha_claim": False,
         "general_effectiveness_claim": False,
         "causal_superiority_claim": False,
@@ -917,11 +1382,20 @@ def verify_rubric_seal(
     baseline: Mapping[str, Any],
     post: Mapping[str, Any],
     packet: Mapping[str, Any],
+    review_package: Mapping[str, Any],
+    review_mapping: Mapping[str, Any],
 ) -> str:
     plain = _plain(rubric)
     claimed = _require_sha256(plain.get("rubric_hash"), "E0B_RUBRIC_HASH_INVALID")
     body = _without_keys(plain, "rubric_hash")
-    sealed = seal_rubric_record(body, baseline=baseline, post=post, packet=packet)
+    sealed = seal_rubric_record(
+        body,
+        baseline=baseline,
+        post=post,
+        packet=packet,
+        review_package=review_package,
+        review_mapping=review_mapping,
+    )
     if sealed["rubric_hash"] != claimed:
         raise GvE0bDv1Error("E0B_RUBRIC_SEAL_MISMATCH")
     return claimed
@@ -933,23 +1407,20 @@ def load_rubric_scores(
     baseline: Mapping[str, Any],
     post: Mapping[str, Any],
     packet: Mapping[str, Any],
+    review_package: Mapping[str, Any],
+    review_mapping: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    """Load *pre-sealed* rubric scores. Unsealed authoring payloads are rejected."""
-
     raw = _load_json_object(path)
     if "rubric_hash" not in raw:
         raise GvE0bDv1Error("E0B_RUBRIC_UNSEALED")
-    verify_rubric_seal(raw, baseline=baseline, post=post, packet=packet)
-    return _freeze(_plain(raw))
-
-
-def load_packet_seal(path: Path) -> Mapping[str, Any]:
-    """Load a *pre-sealed* GodView packet. Unsealed payloads are rejected."""
-
-    raw = _load_json_object(path)
-    if "packet_hash" not in raw:
-        raise GvE0bDv1Error("E0B_PACKET_UNSEALED")
-    verify_packet_seal(raw)
+    verify_rubric_seal(
+        raw,
+        baseline=baseline,
+        post=post,
+        packet=packet,
+        review_package=review_package,
+        review_mapping=review_mapping,
+    )
     return _freeze(_plain(raw))
 
 
@@ -967,7 +1438,7 @@ def is_attribution_structure_valid(
     post: Mapping[str, Any],
     rubric: Mapping[str, Any],
 ) -> bool:
-    """Human ID labels are attribution only — never sufficient for close."""
+    """Two-human structure: same real operator for both arms; different real reviewer."""
 
     return (
         baseline.get("authorship_kind") == AUTH_REAL_OPERATOR
@@ -978,75 +1449,6 @@ def is_attribution_structure_valid(
     )
 
 
-def seal_close_attestation(record: Mapping[str, Any]) -> Mapping[str, Any]:
-    """External independent attestation required for e0b_close_eligible."""
-
-    plain = _require_mapping(record, "E0B_ATTESTATION_INVALID")
-    if plain.get("case_id") != CASE_ID:
-        raise GvE0bDv1Error("E0B_CASE_ID_MISMATCH")
-    if plain.get("authorship_kind") != AUTH_EXTERNAL_ATTESTOR:
-        raise GvE0bDv1Error("E0B_ATTESTOR_KIND_REQUIRED")
-    attestor_id = _require_str(plain, "attestor_id", "E0B_ATTESTOR_REQUIRED")
-    operator_id = _require_str(plain, "operator_id", "E0B_OPERATOR_REQUIRED")
-    reviewer_id = _require_str(plain, "reviewer_id", "E0B_REVIEWER_REQUIRED")
-    if attestor_id in {operator_id, reviewer_id}:
-        raise GvE0bDv1Error("E0B_ATTESTOR_MUST_BE_INDEPENDENT")
-    comparison_hash = _require_sha256(
-        plain.get("comparison_hash"), "E0B_COMPARISON_HASH_INVALID"
-    )
-    session_nonce = _require_str(plain, "session_nonce", "E0B_SESSION_NONCE_REQUIRED")
-    attested_at = _require_timestamp(plain, "attested_at", "E0B_ATTESTED_AT_INVALID")
-    if plain.get("fresh_operator_attested") is not True:
-        raise GvE0bDv1Error("E0B_FRESH_OPERATOR_REQUIRED")
-    if plain.get("blinded_reviewer_attested") is not True:
-        raise GvE0bDv1Error("E0B_BLINDED_REVIEWER_REQUIRED")
-    if plain.get("operator_had_not_seen_packet_or_expected_outcome") is not True:
-        raise GvE0bDv1Error("E0B_OPERATOR_MUST_BE_UNSEEN")
-    notes = plain.get("notes")
-    if not isinstance(notes, str) or not notes.strip():
-        raise GvE0bDv1Error("E0B_ATTESTATION_NOTES_REQUIRED")
-    body = {
-        "case_id": CASE_ID,
-        "authorship_kind": AUTH_EXTERNAL_ATTESTOR,
-        "attestor_id": attestor_id,
-        "operator_id": operator_id,
-        "reviewer_id": reviewer_id,
-        "comparison_hash": comparison_hash,
-        "session_nonce": session_nonce,
-        "attested_at": attested_at,
-        "fresh_operator_attested": True,
-        "blinded_reviewer_attested": True,
-        "operator_had_not_seen_packet_or_expected_outcome": True,
-        "notes": notes.strip(),
-    }
-    out = dict(body)
-    out["attestation_hash"] = domain_hash(DOMAIN_ATTESTATION, body)
-    return _freeze(out)
-
-
-def verify_close_attestation(
-    attestation: Mapping[str, Any],
-    *,
-    comparison_hash: str,
-    operator_id: str,
-    reviewer_id: str,
-    session_nonce: str,
-) -> str:
-    plain = _plain(attestation)
-    claimed = _require_sha256(plain.get("attestation_hash"), "E0B_ATTESTATION_HASH_INVALID")
-    body = _without_keys(plain, "attestation_hash")
-    sealed = seal_close_attestation(body)
-    if sealed["attestation_hash"] != claimed:
-        raise GvE0bDv1Error("E0B_ATTESTATION_SEAL_MISMATCH")
-    if sealed["comparison_hash"] != comparison_hash:
-        raise GvE0bDv1Error("E0B_ATTESTATION_COMPARISON_MISMATCH")
-    if sealed["operator_id"] != operator_id or sealed["reviewer_id"] != reviewer_id:
-        raise GvE0bDv1Error("E0B_ATTESTATION_IDENTITY_MISMATCH")
-    if sealed["session_nonce"] != session_nonce:
-        raise GvE0bDv1Error("E0B_ATTESTATION_SESSION_MISMATCH")
-    return claimed
-
-
 def is_observed_comparison_eligible(
     baseline: Mapping[str, Any],
     post: Mapping[str, Any],
@@ -1055,26 +1457,317 @@ def is_observed_comparison_eligible(
     attestation: Mapping[str, Any] | None = None,
     comparison_hash: str | None = None,
 ) -> bool:
-    """True only with external independent attestation.
+    """True only for real operator + different real reviewer (no third attestor).
 
-    REAL_HUMAN_* labels are attribution only and never close E0B alone.
+    ``attestation`` / third-person seals are ignored (governance expansion removed).
+    REAL_HUMAN labels remain attribution only relative to personhood proof; eligibility
+    still requires the two-human authorship structure on sealed records.
     """
 
-    if attestation is None or comparison_hash is None:
-        return False
-    if not is_attribution_structure_valid(baseline, post, rubric):
-        return False
-    try:
-        verify_close_attestation(
-            attestation,
-            comparison_hash=comparison_hash,
-            operator_id=str(baseline.get("operator_id")),
-            reviewer_id=str(rubric.get("reviewer_id")),
-            session_nonce=str(baseline.get("session_nonce")),
-        )
-    except GvE0bDv1Error:
-        return False
-    return True
+    del attestation, comparison_hash  # unused; kept for call-site compatibility
+    return is_attribution_structure_valid(baseline, post, rubric)
+
+
+def stage_capture_baseline(
+    authoring: Mapping[str, Any],
+    *,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    bundle: Mapping[str, Any] | None = None,
+    clock: CaptureClock | None = None,
+) -> Mapping[str, Any]:
+    clk = clock or WallClock()
+    _reject_caller_timing_fields(authoring)
+    session = load_capture_session(session_path)
+    open_payload = _find_open_payload(session, STAGE_BASELINE_OPEN)
+    ended = clk.now()
+    timing = _stamp_decision_timing(open_payload=open_payload, ended_at=ended)
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    if session["bundle_hash"] != bndl["bundle_hash"]:
+        raise GvE0bDv1Error("E0B_SESSION_BUNDLE_MISMATCH")
+    record = {
+        **_plain(authoring),
+        **timing,
+        "session_nonce": session["session_nonce"],
+        "prev_chain_hash": _session_tip_from_chain(session["chain"]),
+        "bundle_hash": bndl["bundle_hash"],
+    }
+    sealed = seal_baseline_record(record)
+    _append_event(
+        session_path=session_path,
+        stage=STAGE_BASELINE_CLOSE,
+        record_hash=sealed["baseline_hash"],
+        payload={"baseline_hash": sealed["baseline_hash"]},
+        case_id=session["case_id"],
+        session_nonce=session["session_nonce"],
+        bundle_hash=session["bundle_hash"],
+        created_at=session["created_at"],
+    )
+    _persist_sealed_json(baseline_path, sealed)
+    return sealed
+
+
+def stage_generate_packet(
+    *,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    packet_path: Path = DEFAULT_PACKET_PATH,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    bundle: Mapping[str, Any] | None = None,
+    clock: CaptureClock | None = None,
+) -> Mapping[str, Any]:
+    clk = clock or WallClock()
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    session = load_capture_session(session_path)
+    baseline = load_baseline_seal(
+        baseline_path, expected_bundle_hash=bndl["bundle_hash"]
+    )
+    if baseline["session_nonce"] != session["session_nonce"]:
+        raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
+    stages = [e["stage"] for e in session["chain"]]
+    if stages != [
+        STAGE_SESSION_OPEN,
+        STAGE_BASELINE_OPEN,
+        STAGE_BASELINE_CLOSE,
+    ]:
+        raise GvE0bDv1Error("E0B_CHAIN_STAGE_ORDER")
+    ts = clk.now()
+    if not (baseline["sealed_at"] < ts):
+        raise GvE0bDv1Error("E0B_PACKET_MUST_FOLLOW_BASELINE")
+    packet = build_godview_packet(
+        bundle=bndl,
+        generated_at=ts,
+        session_nonce=session["session_nonce"],
+        prev_chain_hash=_session_tip_from_chain(session["chain"]),
+    )
+    _append_event(
+        session_path=session_path,
+        stage=STAGE_PACKET,
+        record_hash=packet["packet_hash"],
+        payload={"packet_hash": packet["packet_hash"]},
+        case_id=session["case_id"],
+        session_nonce=session["session_nonce"],
+        bundle_hash=session["bundle_hash"],
+        created_at=session["created_at"],
+    )
+    _persist_sealed_json(packet_path, packet)
+    return packet
+
+
+def stage_capture_post(
+    authoring: Mapping[str, Any],
+    *,
+    post_path: Path = DEFAULT_POST_PATH,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    packet_path: Path = DEFAULT_PACKET_PATH,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    bundle: Mapping[str, Any] | None = None,
+    clock: CaptureClock | None = None,
+) -> Mapping[str, Any]:
+    clk = clock or WallClock()
+    _reject_caller_timing_fields(authoring)
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    session = load_capture_session(session_path)
+    open_payload = _find_open_payload(session, STAGE_POST_OPEN)
+    ended = clk.now()
+    timing = _stamp_decision_timing(open_payload=open_payload, ended_at=ended)
+    baseline = load_baseline_seal(
+        baseline_path, expected_bundle_hash=bndl["bundle_hash"]
+    )
+    packet = load_packet_seal(packet_path)
+    record = {
+        **_plain(authoring),
+        **timing,
+        "session_nonce": session["session_nonce"],
+        "prev_chain_hash": _session_tip_from_chain(session["chain"]),
+        "bundle_hash": bndl["bundle_hash"],
+    }
+    sealed = seal_post_packet_record(record, packet=packet, baseline=baseline)
+    _append_event(
+        session_path=session_path,
+        stage=STAGE_POST_CLOSE,
+        record_hash=sealed["post_packet_hash"],
+        payload={"post_packet_hash": sealed["post_packet_hash"]},
+        case_id=session["case_id"],
+        session_nonce=session["session_nonce"],
+        bundle_hash=session["bundle_hash"],
+        created_at=session["created_at"],
+    )
+    _persist_sealed_json(post_path, sealed)
+    return sealed
+
+
+def stage_build_review_package(
+    *,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    post_path: Path = DEFAULT_POST_PATH,
+    packet_path: Path = DEFAULT_PACKET_PATH,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    package_path: Path = DEFAULT_REVIEW_PACKAGE_PATH,
+    mapping_path: Path = DEFAULT_REVIEW_MAPPING_PATH,
+    bundle: Mapping[str, Any] | None = None,
+    rng_bytes: bytes | None = None,
+) -> Mapping[str, Any]:
+    """Seal blinded REVIEW_PACKAGE; mapping sealed separately and withheld from export body."""
+
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    session = load_capture_session(session_path)
+    stages = [e["stage"] for e in session["chain"]]
+    if stages != list(CANONICAL_STAGE_ORDER[:6]):
+        raise GvE0bDv1Error("E0B_CHAIN_STAGE_ORDER")
+    baseline = load_baseline_seal(baseline_path, expected_bundle_hash=bndl["bundle_hash"])
+    packet = load_packet_seal(packet_path)
+    post = load_post_packet_seal(post_path, packet=packet, baseline=baseline)
+    package, mapping = seal_review_package(
+        baseline=baseline,
+        post=post,
+        packet=packet,
+        bundle=bndl,
+        session_nonce=session["session_nonce"],
+        prev_chain_hash=_session_tip_from_chain(session["chain"]),
+        rng_bytes=rng_bytes,
+    )
+    # Export for reviewer: package only (no mapping fields).
+    export = _plain(package)
+    _persist_sealed_json(package_path, export)
+    # Mapping sealed on disk for finalize/replay; not for reviewer presentation.
+    _persist_sealed_json(mapping_path, mapping)
+    _append_event(
+        session_path=session_path,
+        stage=STAGE_REVIEW_PACKAGE,
+        record_hash=package["review_package_hash"],
+        payload={
+            "review_package_hash": package["review_package_hash"],
+            "mapping_hash": mapping["mapping_hash"],
+        },
+        case_id=session["case_id"],
+        session_nonce=session["session_nonce"],
+        bundle_hash=session["bundle_hash"],
+        created_at=session["created_at"],
+    )
+    return _freeze(export)
+
+
+def stage_capture_rubric(
+    authoring: Mapping[str, Any],
+    *,
+    rubric_path: Path = DEFAULT_RUBRIC_PATH,
+    baseline_path: Path = DEFAULT_BASELINE_PATH,
+    post_path: Path = DEFAULT_POST_PATH,
+    packet_path: Path = DEFAULT_PACKET_PATH,
+    session_path: Path = DEFAULT_SESSION_PATH,
+    package_path: Path = DEFAULT_REVIEW_PACKAGE_PATH,
+    mapping_path: Path = DEFAULT_REVIEW_MAPPING_PATH,
+    bundle: Mapping[str, Any] | None = None,
+    clock: CaptureClock | None = None,
+) -> Mapping[str, Any]:
+    """Rubric close: no 60-minute timer; scores against blinded package."""
+
+    clk = clock or WallClock()
+    _reject_caller_timing_fields(authoring)
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    session = load_capture_session(session_path)
+    stages = [e["stage"] for e in session["chain"]]
+    if stages != list(CANONICAL_STAGE_ORDER[:7]):
+        raise GvE0bDv1Error("E0B_CHAIN_STAGE_ORDER")
+    baseline = load_baseline_seal(baseline_path, expected_bundle_hash=bndl["bundle_hash"])
+    packet = load_packet_seal(packet_path)
+    post = load_post_packet_seal(post_path, packet=packet, baseline=baseline)
+    package = _load_json_object(package_path)
+    verify_review_package(package)
+    mapping = _load_json_object(mapping_path)
+    verify_review_mapping(mapping, review_package_hash=package["review_package_hash"])
+    scored_at = clk.now()
+    record = {
+        **_plain(authoring),
+        "scored_at": scored_at,
+        "session_nonce": session["session_nonce"],
+        "prev_chain_hash": _session_tip_from_chain(session["chain"]),
+    }
+    sealed = seal_rubric_record(
+        record,
+        baseline=baseline,
+        post=post,
+        packet=packet,
+        review_package=package,
+        review_mapping=mapping,
+    )
+    # Mapping file stays immutable (pre-reveal seal). Audit-only reveal sidecar
+    # is written after rubric seal so the mapping is no longer withheld.
+    reveal_path = mapping_path.with_name(
+        mapping_path.name.replace(".sealed.json", "") + ".revealed.json"
+        if mapping_path.name.endswith(".sealed.json")
+        else mapping_path.name + ".revealed"
+    )
+    _persist_sealed_json(
+        reveal_path,
+        {
+            "mapping_hash": mapping["mapping_hash"],
+            "review_package_hash": mapping["review_package_hash"],
+            "arm_a_source": mapping["arm_a_source"],
+            "arm_b_source": mapping["arm_b_source"],
+            "revealed_at": scored_at,
+            "revealed_after": "RUBRIC_CLOSE",
+            "note": "Mapping withheld until rubric sealed; reveal is post-seal audit only.",
+        },
+    )
+    _append_event(
+        session_path=session_path,
+        stage=STAGE_RUBRIC_CLOSE,
+        record_hash=sealed["rubric_hash"],
+        payload={"rubric_hash": sealed["rubric_hash"]},
+        case_id=session["case_id"],
+        session_nonce=session["session_nonce"],
+        bundle_hash=session["bundle_hash"],
+        created_at=session["created_at"],
+    )
+    _persist_sealed_json(rubric_path, sealed)
+    return sealed
+
+
+def _collect_sealed_records(
+    *,
+    baseline_path: Path,
+    post_path: Path,
+    rubric_path: Path,
+    packet_path: Path,
+    session_path: Path,
+    package_path: Path,
+    mapping_path: Path,
+    bundle: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
+    verify_bundle_seal(bndl)
+    baseline = load_baseline_seal(baseline_path, expected_bundle_hash=bndl["bundle_hash"])
+    packet = load_packet_seal(packet_path)
+    post = load_post_packet_seal(post_path, packet=packet, baseline=baseline)
+    package = _load_json_object(package_path)
+    verify_review_package(package)
+    mapping = _load_json_object(mapping_path)
+    verify_review_mapping(mapping, review_package_hash=package["review_package_hash"])
+    rubric = load_rubric_scores(
+        rubric_path,
+        baseline=baseline,
+        post=post,
+        packet=packet,
+        review_package=package,
+        review_mapping=mapping,
+    )
+    session = load_capture_session(session_path)
+    return {
+        "bundle": bndl,
+        "baseline": _plain(baseline),
+        "packet": _plain(packet),
+        "post": _plain(post),
+        "review_package": _plain(package),
+        "review_mapping": _plain(mapping),
+        "rubric": _plain(rubric),
+        "session": session,
+    }
 
 
 def build_comparison(
@@ -1086,16 +1779,11 @@ def build_comparison(
     packet: Mapping[str, Any] | None = None,
     packet_path: Path | None = None,
     session_path: Path | None = None,
+    package_path: Path | None = None,
+    mapping_path: Path | None = None,
     attestation: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
-    """Assemble comparison from *pre-sealed* external records; never invent outcomes.
-
-    Comparison seal always records observed_comparison_count=0 and
-    e0b_close_eligible=False. Close authority is result-level: embedded complete
-    seals + external independent attestation bound to comparison_hash.
-    REAL_HUMAN_* labels alone never close.
-    """
-
+    del attestation  # third attestor removed
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
     if packet is not None:
@@ -1107,22 +1795,26 @@ def build_comparison(
         raise GvE0bDv1Error("E0B_PACKET_REQUIRED")
     if pkt["bundle_hash"] != bndl["bundle_hash"]:
         raise GvE0bDv1Error("E0B_PACKET_BUNDLE_MISMATCH")
-
-    baseline = load_baseline_seal(baseline_path, expected_bundle_hash=bndl["bundle_hash"])
+    if session_path is None or package_path is None or mapping_path is None:
+        raise GvE0bDv1Error("E0B_SESSION_PACKAGE_REQUIRED")
+    seals = _collect_sealed_records(
+        baseline_path=baseline_path,
+        post_path=post_path,
+        rubric_path=rubric_path,
+        packet_path=packet_path or DEFAULT_PACKET_PATH,
+        session_path=session_path,
+        package_path=package_path,
+        mapping_path=mapping_path,
+        bundle=bndl,
+    )
+    verify_session_bound_to_records(seals["session"], seals)
+    baseline = seals["baseline"]
+    post = seals["post"]
+    rubric = seals["rubric"]
+    if baseline.get("session_nonce") != seals["session"]["session_nonce"]:
+        raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
     if not (baseline["sealed_at"] < pkt["generated_at"]):
         raise GvE0bDv1Error("E0B_INVALID_BASELINE_SEAL")
-    if baseline.get("session_nonce") != pkt.get("session_nonce"):
-        raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
-    post = load_post_packet_seal(post_path, packet=pkt, baseline=baseline)
-    rubric = load_rubric_scores(
-        rubric_path, baseline=baseline, post=post, packet=pkt
-    )
-    session = None
-    if session_path is not None:
-        session = load_capture_session(session_path)
-        if session["session_nonce"] != baseline["session_nonce"]:
-            raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
-
     baseline_totals = score_totals(rubric["baseline_scores"])
     post_totals = score_totals(rubric["post_scores"])
     item_deltas: dict[str, dict[str, Any]] = {}
@@ -1139,9 +1831,7 @@ def build_comparison(
         "is_negative": total_raw < 0,
         "value_string": str(total_raw),
     }
-    # Labels alone never grant close; comparison seal freezes count at 0.
     attribution_ok = is_attribution_structure_valid(baseline, post, rubric)
-
     comparison = _plain(
         {
             "case_id": CASE_ID,
@@ -1157,90 +1847,58 @@ def build_comparison(
                 "e0b_close_eligible": False,
                 "attribution_structure_valid": attribution_ok,
                 "alpha_claim": False,
-                "general_effectiveness_claim": False,
-                "causal_superiority_claim": False,
             },
             "bundle_hash": bndl["bundle_hash"],
             "baseline_hash": baseline["baseline_hash"],
             "packet_hash": pkt["packet_hash"],
             "post_packet_hash": post["post_packet_hash"],
+            "review_package_hash": seals["review_package"]["review_package_hash"],
             "rubric_hash": rubric["rubric_hash"],
+            "session_hash": seals["session"]["session_hash"],
             "baseline": {
                 "authorship_kind": baseline["authorship_kind"],
                 "operator_id": baseline["operator_id"],
-                "session_nonce": baseline["session_nonce"],
-                "arm_started_at": baseline["arm_started_at"],
-                "arm_ended_at": baseline["arm_ended_at"],
                 "sealed_at": baseline["sealed_at"],
                 "action": baseline["action"],
                 "rationale": baseline["rationale"],
-                "missing_evidence": list(baseline["missing_evidence"]),
-                "falsifiers": list(baseline["falsifiers"]),
-                "contradictions_recognized": list(
-                    baseline["contradictions_recognized"]
-                ),
+                "allowed_budget_minutes": baseline["allowed_budget_minutes"],
+                "elapsed_seconds": baseline["elapsed_seconds"],
             },
             "godview_packet": {
                 "run_state": pkt["run_state"],
                 "block_reason": pkt["block_reason"],
-                "research_action": pkt["research_action"],
                 "generated_at": pkt["generated_at"],
-                "session_nonce": pkt["session_nonce"],
                 "rationale": pkt["rationale"],
-                "contradictions": list(pkt["contradictions"]),
-                "falsifiers": list(pkt["falsifiers"]),
             },
             "post_packet": {
                 "authorship_kind": post["authorship_kind"],
                 "operator_id": post["operator_id"],
-                "session_nonce": post["session_nonce"],
-                "arm_started_at": post["arm_started_at"],
-                "arm_ended_at": post["arm_ended_at"],
                 "sealed_at": post["sealed_at"],
                 "action": post["action"],
-                "portfolio_action": post["portfolio_action"],
                 "rationale": post["rationale"],
-                "missing_evidence": list(post["missing_evidence"]),
-                "falsifiers": list(post["falsifiers"]),
-                "contradictions_recognized": list(post["contradictions_recognized"]),
+                "allowed_budget_minutes": post["allowed_budget_minutes"],
+                "elapsed_seconds": post["elapsed_seconds"],
             },
             "rubric": {
                 "authorship_kind": rubric["authorship_kind"],
                 "reviewer_id": rubric["reviewer_id"],
-                "session_nonce": rubric["session_nonce"],
-                "arm_started_at": rubric["arm_started_at"],
-                "arm_ended_at": rubric["arm_ended_at"],
                 "scored_at": rubric["scored_at"],
                 "baseline": baseline_totals,
                 "post_packet": post_totals,
             },
             "delta": {
-                "action_change": baseline["action"] != post["action"],
-                "baseline_action": baseline["action"],
-                "post_action": post["action"],
-                "rubric_item_deltas": item_deltas,
+                "item_score_differences": item_deltas,
                 "total_score_difference": total_delta,
-                "total_score_difference_raw_note": (
-                    "Signed difference encoded as magnitude+is_negative+"
-                    "value_string because canonical integers are non-negative."
-                ),
-                "missing_evidence_delta": list(post["missing_evidence"]),
-                "falsifier_delta": list(post["falsifiers"]),
-                "interpretation": "observed_within_case_difference_only",
+                "action_change": baseline["action"] != post["action"],
             },
+            "claim_boundary": (
+                "Observed within-case difference only. No causal superiority, "
+                "general decision-quality improvement, research-efficiency, alpha, "
+                "or score uplift claim."
+            ),
         }
     )
     comparison["comparison_hash"] = domain_hash(DOMAIN_COMPARISON, comparison)
-    # Attestation may be checked later at result layer against this hash.
-    if attestation is not None:
-        # Presence alone does not flip comparison stage_claim (hash stable).
-        verify_close_attestation(
-            attestation,
-            comparison_hash=comparison["comparison_hash"],
-            operator_id=str(baseline["operator_id"]),
-            reviewer_id=str(rubric["reviewer_id"]),
-            session_nonce=str(baseline["session_nonce"]),
-        )
     return _freeze(comparison)
 
 
@@ -1250,35 +1908,46 @@ def build_result_document(
     sealed_records: Mapping[str, Any],
     attestation: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
-    """Build result embedding complete sealed records for full replay verify."""
-
+    del attestation
     plain = _plain(comparison)
     claimed = _require_sha256(plain.get("comparison_hash"), "E0B_COMPARISON_HASH_INVALID")
     body = _without_keys(plain, "comparison_hash")
     recomputed = domain_hash(DOMAIN_COMPARISON, body)
     if recomputed != claimed:
         raise GvE0bDv1Error("E0B_COMPARISON_SEAL_MISMATCH")
-
     seals = _require_mapping(sealed_records, "E0B_SEALED_RECORDS_REQUIRED")
-    for key in ("bundle", "baseline", "packet", "post", "rubric", "session"):
+    for key in (
+        "bundle",
+        "baseline",
+        "packet",
+        "post",
+        "review_package",
+        "review_mapping",
+        "rubric",
+        "session",
+    ):
         if key not in seals:
             raise GvE0bDv1Error(f"E0B_SEALED_RECORD_MISSING:{key}")
-
-    # Replay every complete seal before hashing the result.
     verify_bundle_seal(seals["bundle"])
     verify_baseline_seal(seals["baseline"])
     verify_packet_seal(seals["packet"])
     verify_post_packet_seal(
         seals["post"], packet=seals["packet"], baseline=seals["baseline"]
     )
+    verify_review_package(seals["review_package"])
+    verify_review_mapping(
+        seals["review_mapping"],
+        review_package_hash=seals["review_package"]["review_package_hash"],
+    )
     verify_rubric_seal(
         seals["rubric"],
         baseline=seals["baseline"],
         post=seals["post"],
         packet=seals["packet"],
+        review_package=seals["review_package"],
+        review_mapping=seals["review_mapping"],
     )
-    verify_session_chain(seals["session"])
-
+    verify_session_bound_to_records(seals["session"], seals)
     if seals["baseline"]["baseline_hash"] != plain["baseline_hash"]:
         raise GvE0bDv1Error("E0B_RESULT_BASELINE_HASH_MISMATCH")
     if seals["packet"]["packet_hash"] != plain["packet_hash"]:
@@ -1287,23 +1956,21 @@ def build_result_document(
         raise GvE0bDv1Error("E0B_RESULT_POST_HASH_MISMATCH")
     if seals["rubric"]["rubric_hash"] != plain["rubric_hash"]:
         raise GvE0bDv1Error("E0B_RESULT_RUBRIC_HASH_MISMATCH")
-
-    att_plain = _plain(attestation) if attestation is not None else None
     eligible = is_observed_comparison_eligible(
-        seals["baseline"],
-        seals["post"],
-        seals["rubric"],
-        attestation=att_plain,
-        comparison_hash=claimed,
+        seals["baseline"], seals["post"], seals["rubric"]
     )
     close_claim = {
         "e0b_close_eligible": eligible,
         "observed_comparison_count": 1 if eligible else 0,
         "human_ids_are_attribution_only": True,
-        "external_attestation_required": True,
+        "external_attestation_required": False,
+        "third_attestor_required": False,
+        "mechanical_blinding_required": True,
+        "budget_model": "EQUAL_MAX_MINUTES_EARLY_SUBMIT_ALLOWED",
+        "ledger_custody_note": seals["session"].get("ledger_custody_note"),
     }
     result_body = {
-        "schema_version": "gv_e0b_dv1_result_v2",
+        "schema_version": "gv_e0b_dv1_result_v3",
         "case_id": CASE_ID,
         "run_class": RUN_CLASS_SYNTHETIC,
         "comparison": plain,
@@ -1312,17 +1979,23 @@ def build_result_document(
             "baseline": _plain(seals["baseline"]),
             "packet": _plain(seals["packet"]),
             "post": _plain(seals["post"]),
+            "review_package": _plain(seals["review_package"]),
+            "review_mapping": _plain(seals["review_mapping"]),
             "rubric": _plain(seals["rubric"]),
-            "session": _plain(seals["session"]),
+            "session": {
+                k: _plain(v)
+                for k, v in seals["session"].items()
+                if k != "events_dir"
+            },
         },
-        "external_close_attestation": att_plain,
         "close_claim": close_claim,
         "claim_boundary": (
             "Observed within-case difference only. No causal superiority, "
             "general decision-quality improvement, research-efficiency, alpha, "
             "or score uplift claim. REAL_HUMAN labels are attribution only. "
-            "Close requires external independent attestation and full seal replay. "
-            "Engine fixtures do not count as observed comparisons."
+            "Close requires two-human structure, mechanical blinding, bound chain "
+            "replay. Engine fixtures do not count as observed comparisons. "
+            "Ledger is tamper-evident under capture-process custody only."
         ),
     }
     result_hash = domain_hash(DOMAIN_RESULT, result_body)
@@ -1332,8 +2005,6 @@ def build_result_document(
 
 
 def verify_comparison_document(comparison: Mapping[str, Any]) -> Mapping[str, Any]:
-    """Recompute comparison seal; comparison stage close fields stay frozen false/0."""
-
     plain = _plain(comparison)
     claimed = _require_sha256(
         plain.get("comparison_hash"), "E0B_COMPARISON_HASH_INVALID"
@@ -1358,8 +2029,6 @@ def verify_comparison_document(comparison: Mapping[str, Any]) -> Mapping[str, An
 
 
 def verify_result_document(result: Mapping[str, Any]) -> Mapping[str, Any]:
-    """Full replay: result hash, comparison hash, every complete seal, attestation."""
-
     plain = _plain(result)
     claimed = _require_sha256(plain.get("result_hash"), "E0B_RESULT_HASH_INVALID")
     body = _without_keys(plain, "result_hash")
@@ -1372,20 +2041,26 @@ def verify_result_document(result: Mapping[str, Any]) -> Mapping[str, Any]:
     seals = body.get("sealed_records")
     if not isinstance(seals, Mapping):
         raise GvE0bDv1Error("E0B_SEALED_RECORDS_REQUIRED")
-    # Replay seals (not merely rehash the summary).
     verify_bundle_seal(seals["bundle"])
     verify_baseline_seal(seals["baseline"])
     verify_packet_seal(seals["packet"])
     verify_post_packet_seal(
         seals["post"], packet=seals["packet"], baseline=seals["baseline"]
     )
+    verify_review_package(seals["review_package"])
+    verify_review_mapping(
+        seals["review_mapping"],
+        review_package_hash=seals["review_package"]["review_package_hash"],
+    )
     verify_rubric_seal(
         seals["rubric"],
         baseline=seals["baseline"],
         post=seals["post"],
         packet=seals["packet"],
+        review_package=seals["review_package"],
+        review_mapping=seals["review_mapping"],
     )
-    verify_session_chain(seals["session"])
+    verify_session_bound_to_records(seals["session"], seals)
     if seals["baseline"]["baseline_hash"] != comparison["baseline_hash"]:
         raise GvE0bDv1Error("E0B_RESULT_BASELINE_HASH_MISMATCH")
     if seals["packet"]["packet_hash"] != comparison["packet_hash"]:
@@ -1394,14 +2069,8 @@ def verify_result_document(result: Mapping[str, Any]) -> Mapping[str, Any]:
         raise GvE0bDv1Error("E0B_RESULT_POST_HASH_MISMATCH")
     if seals["rubric"]["rubric_hash"] != comparison["rubric_hash"]:
         raise GvE0bDv1Error("E0B_RESULT_RUBRIC_HASH_MISMATCH")
-
-    att = body.get("external_close_attestation")
     eligible = is_observed_comparison_eligible(
-        seals["baseline"],
-        seals["post"],
-        seals["rubric"],
-        attestation=att if isinstance(att, Mapping) else None,
-        comparison_hash=comparison["comparison_hash"],
+        seals["baseline"], seals["post"], seals["rubric"]
     )
     close_claim = body.get("close_claim") or {}
     if close_claim.get("e0b_close_eligible") is not eligible:
@@ -1417,204 +2086,6 @@ def load_verified_result(path: Path) -> Mapping[str, Any]:
     return verify_result_document(raw)
 
 
-def stage_capture_baseline(
-    authoring: Mapping[str, Any],
-    *,
-    baseline_path: Path = DEFAULT_BASELINE_PATH,
-    session_path: Path = DEFAULT_SESSION_PATH,
-    bundle: Mapping[str, Any] | None = None,
-    clock: CaptureClock | None = None,
-) -> Mapping[str, Any]:
-    """Stage 1 close: system-stamp arm end, enforce 60m budget, seal + chain."""
-
-    clk = clock or WallClock()
-    _reject_caller_timing_fields(authoring)
-    session = load_capture_session(session_path)
-    open_arms = dict(session.get("open_arms") or {})
-    started = open_arms.pop(ARM_BASELINE, None)
-    if not isinstance(started, str):
-        raise GvE0bDv1Error("E0B_BASELINE_ARM_NOT_OPEN")
-    ended = clk.now()
-    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
-    verify_bundle_seal(bndl)
-    if session["bundle_hash"] != bndl["bundle_hash"]:
-        raise GvE0bDv1Error("E0B_SESSION_BUNDLE_MISMATCH")
-    record = {
-        **_plain(authoring),
-        "arm_started_at": started,
-        "arm_ended_at": ended,
-        "session_nonce": session["session_nonce"],
-        "prev_chain_hash": _session_tip(session),
-        "bundle_hash": bndl["bundle_hash"],
-        "equal_budget_attestation": True,
-    }
-    sealed = seal_baseline_record(record)
-    _append_session_chain(
-        session, stage=STAGE_BASELINE, record_hash=sealed["baseline_hash"]
-    )
-    session["open_arms"] = open_arms
-    _persist_sealed_json(baseline_path, sealed)
-    _persist_sealed_json(session_path, session)
-    return sealed
-
-
-def stage_generate_packet(
-    *,
-    baseline_path: Path = DEFAULT_BASELINE_PATH,
-    packet_path: Path = DEFAULT_PACKET_PATH,
-    session_path: Path = DEFAULT_SESSION_PATH,
-    bundle: Mapping[str, Any] | None = None,
-    clock: CaptureClock | None = None,
-) -> Mapping[str, Any]:
-    """Stage 2: system-stamp packet time after sealed baseline; chain-append."""
-
-    clk = clock or WallClock()
-    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
-    verify_bundle_seal(bndl)
-    session = load_capture_session(session_path)
-    baseline = load_baseline_seal(
-        baseline_path, expected_bundle_hash=bndl["bundle_hash"]
-    )
-    if baseline["session_nonce"] != session["session_nonce"]:
-        raise GvE0bDv1Error("E0B_SESSION_NONCE_MISMATCH")
-    ts = clk.now()
-    if not (baseline["sealed_at"] < ts):
-        raise GvE0bDv1Error("E0B_PACKET_MUST_FOLLOW_BASELINE")
-    packet = build_godview_packet(
-        bundle=bndl,
-        generated_at=ts,
-        session_nonce=session["session_nonce"],
-        prev_chain_hash=_session_tip(session),
-    )
-    _append_session_chain(
-        session, stage=STAGE_PACKET, record_hash=packet["packet_hash"]
-    )
-    _persist_sealed_json(packet_path, packet)
-    _persist_sealed_json(session_path, session)
-    return packet
-
-
-def stage_capture_post(
-    authoring: Mapping[str, Any],
-    *,
-    post_path: Path = DEFAULT_POST_PATH,
-    baseline_path: Path = DEFAULT_BASELINE_PATH,
-    packet_path: Path = DEFAULT_PACKET_PATH,
-    session_path: Path = DEFAULT_SESSION_PATH,
-    bundle: Mapping[str, Any] | None = None,
-    clock: CaptureClock | None = None,
-) -> Mapping[str, Any]:
-    """Stage 3: system-stamp post arm end, 60m budget, seal + chain."""
-
-    clk = clock or WallClock()
-    _reject_caller_timing_fields(authoring)
-    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
-    verify_bundle_seal(bndl)
-    session = load_capture_session(session_path)
-    open_arms = dict(session.get("open_arms") or {})
-    started = open_arms.pop(ARM_POST, None)
-    if not isinstance(started, str):
-        raise GvE0bDv1Error("E0B_POST_ARM_NOT_OPEN")
-    ended = clk.now()
-    baseline = load_baseline_seal(
-        baseline_path, expected_bundle_hash=bndl["bundle_hash"]
-    )
-    packet = load_packet_seal(packet_path)
-    record = {
-        **_plain(authoring),
-        "arm_started_at": started,
-        "arm_ended_at": ended,
-        "session_nonce": session["session_nonce"],
-        "prev_chain_hash": _session_tip(session),
-        "bundle_hash": bndl["bundle_hash"],
-        "equal_budget_attestation": True,
-    }
-    sealed = seal_post_packet_record(record, packet=packet, baseline=baseline)
-    _append_session_chain(
-        session, stage=STAGE_POST, record_hash=sealed["post_packet_hash"]
-    )
-    session["open_arms"] = open_arms
-    _persist_sealed_json(post_path, sealed)
-    _persist_sealed_json(session_path, session)
-    return sealed
-
-
-def stage_capture_rubric(
-    authoring: Mapping[str, Any],
-    *,
-    rubric_path: Path = DEFAULT_RUBRIC_PATH,
-    baseline_path: Path = DEFAULT_BASELINE_PATH,
-    post_path: Path = DEFAULT_POST_PATH,
-    packet_path: Path = DEFAULT_PACKET_PATH,
-    session_path: Path = DEFAULT_SESSION_PATH,
-    bundle: Mapping[str, Any] | None = None,
-    clock: CaptureClock | None = None,
-) -> Mapping[str, Any]:
-    """Stage 4: system-stamp rubric arm end, 60m budget, seal + chain."""
-
-    clk = clock or WallClock()
-    _reject_caller_timing_fields(authoring)
-    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
-    verify_bundle_seal(bndl)
-    session = load_capture_session(session_path)
-    open_arms = dict(session.get("open_arms") or {})
-    started = open_arms.pop(ARM_RUBRIC, None)
-    if not isinstance(started, str):
-        raise GvE0bDv1Error("E0B_RUBRIC_ARM_NOT_OPEN")
-    ended = clk.now()
-    baseline = load_baseline_seal(
-        baseline_path, expected_bundle_hash=bndl["bundle_hash"]
-    )
-    packet = load_packet_seal(packet_path)
-    post = load_post_packet_seal(post_path, packet=packet, baseline=baseline)
-    record = {
-        **_plain(authoring),
-        "arm_started_at": started,
-        "arm_ended_at": ended,
-        "session_nonce": session["session_nonce"],
-        "prev_chain_hash": _session_tip(session),
-        "equal_budget_attestation": True,
-    }
-    sealed = seal_rubric_record(
-        record, baseline=baseline, post=post, packet=packet
-    )
-    _append_session_chain(
-        session, stage=STAGE_RUBRIC, record_hash=sealed["rubric_hash"]
-    )
-    session["open_arms"] = open_arms
-    _persist_sealed_json(rubric_path, sealed)
-    _persist_sealed_json(session_path, session)
-    return sealed
-
-
-def _collect_sealed_records(
-    *,
-    baseline_path: Path,
-    post_path: Path,
-    rubric_path: Path,
-    packet_path: Path,
-    session_path: Path,
-    bundle: Mapping[str, Any] | None,
-) -> dict[str, Any]:
-    bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
-    verify_bundle_seal(bndl)
-    baseline = load_baseline_seal(baseline_path, expected_bundle_hash=bndl["bundle_hash"])
-    packet = load_packet_seal(packet_path)
-    post = load_post_packet_seal(post_path, packet=packet, baseline=baseline)
-    rubric = load_rubric_scores(
-        rubric_path, baseline=baseline, post=post, packet=packet
-    )
-    session = load_capture_session(session_path)
-    return {
-        "bundle": bndl,
-        "baseline": _plain(baseline),
-        "packet": _plain(packet),
-        "post": _plain(post),
-        "rubric": _plain(rubric),
-        "session": session,
-    }
-
-
 def stage_compare(
     *,
     baseline_path: Path = DEFAULT_BASELINE_PATH,
@@ -1622,6 +2093,8 @@ def stage_compare(
     rubric_path: Path = DEFAULT_RUBRIC_PATH,
     packet_path: Path = DEFAULT_PACKET_PATH,
     session_path: Path = DEFAULT_SESSION_PATH,
+    package_path: Path = DEFAULT_REVIEW_PACKAGE_PATH,
+    mapping_path: Path = DEFAULT_REVIEW_MAPPING_PATH,
     result_json_path: Path = DEFAULT_RESULT_JSON,
     decision_packet_path: Path = DEFAULT_DECISION_PACKET_MD,
     attestation_path: Path | None = None,
@@ -1631,15 +2104,15 @@ def stage_compare(
     current_lock: Path = DEFAULT_CURRENT_DECISION_LOCK,
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> Mapping[str, Any]:
-    """Stage 5: comparison over pre-sealed captures + embedded-seal result."""
-
+    del attestation_path
     return run_e0b_dv1_case(
         baseline_path=baseline_path,
         post_path=post_path,
         rubric_path=rubric_path,
         packet_path=packet_path,
         session_path=session_path,
-        attestation_path=attestation_path,
+        package_path=package_path,
+        mapping_path=mapping_path,
         result_json_path=result_json_path,
         decision_packet_path=decision_packet_path,
         bundle=bundle,
@@ -1663,6 +2136,7 @@ def build_decision_packet_markdown(comparison: Mapping[str, Any]) -> str:
         f"- baseline_hash: `{c['baseline_hash']}`",
         f"- packet_hash: `{c['packet_hash']}`",
         f"- post_packet_hash: `{c['post_packet_hash']}`",
+        f"- review_package_hash: `{c.get('review_package_hash', '')}`",
         f"- rubric_hash: `{c['rubric_hash']}`",
         f"- observed_comparison_count: `{c['stage_claim']['observed_comparison_count']}`",
         f"- e0b_close_eligible: `{c['stage_claim']['e0b_close_eligible']}`",
@@ -1672,6 +2146,7 @@ def build_decision_packet_markdown(comparison: Mapping[str, Any]) -> str:
         "## Baseline",
         f"- authorship: `{c['baseline']['authorship_kind']}` / `{c['baseline']['operator_id']}`",
         f"- sealed_at: `{c['baseline']['sealed_at']}`",
+        f"- elapsed_seconds: `{c['baseline'].get('elapsed_seconds')}` / budget `{c['baseline'].get('allowed_budget_minutes')}m`",
         f"- action: `{c['baseline']['action']}`",
         f"- rationale: {c['baseline']['rationale']}",
         "",
@@ -1683,6 +2158,7 @@ def build_decision_packet_markdown(comparison: Mapping[str, Any]) -> str:
         "## Post-packet",
         f"- authorship: `{c['post_packet']['authorship_kind']}` / `{c['post_packet']['operator_id']}`",
         f"- sealed_at: `{c['post_packet']['sealed_at']}`",
+        f"- elapsed_seconds: `{c['post_packet'].get('elapsed_seconds')}` / budget `{c['post_packet'].get('allowed_budget_minutes')}m`",
         f"- action: `{c['post_packet']['action']}`",
         f"- rationale: {c['post_packet']['rationale']}",
         "",
@@ -1708,16 +2184,12 @@ def write_canonical_artifacts(
     result_json_path: Path = DEFAULT_RESULT_JSON,
     decision_packet_path: Path = DEFAULT_DECISION_PACKET_MD,
 ) -> Mapping[str, Any]:
-    """Atomically emit result.json and decision_packet.md bound to comparison_hash."""
-
-    result = build_result_document(
-        comparison, sealed_records=sealed_records, attestation=attestation
-    )
+    del attestation
+    result = build_result_document(comparison, sealed_records=sealed_records)
     result_bytes = canonical_document_bytes(_plain(result))
     packet_md = build_decision_packet_markdown(comparison).encode("utf-8")
     _atomic_write_bytes(result_json_path, result_bytes)
     _atomic_write_bytes(decision_packet_path, packet_md)
-    # Post-write exact-byte check on JSON.
     if result_json_path.read_bytes() != result_bytes:
         raise GvE0bDv1Error("E0B_RESULT_JSON_VERIFY_FAILED")
     return result
@@ -1773,7 +2245,6 @@ def build_e0b_certified_result(
     comparison_hash = _require_sha256(
         plain.get("comparison_hash"), "E0B_COMPARISON_HASH_INVALID"
     )
-    # Recompute comparison seal.
     body = _without_keys(plain, "comparison_hash")
     if domain_hash(DOMAIN_COMPARISON, body) != comparison_hash:
         raise GvE0bDv1Error("E0B_COMPARISON_SEAL_MISMATCH")
@@ -1802,18 +2273,10 @@ def publish_e0b_current_decision(
     verifier_runner: VerifierRunner = run_isolated_verifier,
     close_eligible: bool = False,
 ) -> CurrentDecisionPublicationResult:
-    """Publish comparison-bound current decision only when close-eligible.
-
-    Fixture certification may still call ``build_e0b_certified_result`` in tests.
-    Current portfolio authority publication requires verified close eligibility
-    (external attestation + full seal replay), not REAL_HUMAN labels alone.
-    """
-
     verified = verify_comparison_document(comparison)
     if close_eligible is not True:
         raise GvE0bDv1Error("E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE")
     certified = build_e0b_certified_result(verified, verifier_runner)
-    # Bind cert decision to comparison hash before publication.
     decision = certified.get("decision") or {}
     expected_ref = e0b_rationale_ref(verified["comparison_hash"])
     if decision.get("rationale_ref") != expected_ref:
@@ -1828,6 +2291,8 @@ def run_e0b_dv1_case(
     rubric_path: Path,
     packet_path: Path | None = None,
     session_path: Path | None = None,
+    package_path: Path | None = None,
+    mapping_path: Path | None = None,
     attestation_path: Path | None = None,
     packet: Mapping[str, Any] | None = None,
     bundle: Mapping[str, Any] | None = None,
@@ -1838,15 +2303,11 @@ def run_e0b_dv1_case(
     current_lock: Path = DEFAULT_CURRENT_DECISION_LOCK,
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> Mapping[str, Any]:
-    """One-case path over pre-sealed captures → embedded-seal result → optional publish."""
-
+    del attestation_path
     if packet_path is None and packet is None:
         raise GvE0bDv1Error("E0B_PACKET_REQUIRED")
-    if session_path is None:
-        raise GvE0bDv1Error("E0B_SESSION_REQUIRED")
-    attestation = None
-    if attestation_path is not None and attestation_path.is_file():
-        attestation = _load_json_object(attestation_path)
+    if session_path is None or package_path is None or mapping_path is None:
+        raise GvE0bDv1Error("E0B_SESSION_PACKAGE_REQUIRED")
     comparison = build_comparison(
         baseline_path=baseline_path,
         post_path=post_path,
@@ -1855,7 +2316,8 @@ def run_e0b_dv1_case(
         packet=packet,
         bundle=bundle,
         session_path=session_path,
-        attestation=attestation,
+        package_path=package_path,
+        mapping_path=mapping_path,
     )
     sealed_records = _collect_sealed_records(
         baseline_path=baseline_path,
@@ -1863,12 +2325,13 @@ def run_e0b_dv1_case(
         rubric_path=rubric_path,
         packet_path=packet_path or DEFAULT_PACKET_PATH,
         session_path=session_path,
+        package_path=package_path,
+        mapping_path=mapping_path,
         bundle=bundle,
     )
     result = write_canonical_artifacts(
         comparison,
         sealed_records=sealed_records,
-        attestation=attestation,
         result_json_path=result_json_path,
         decision_packet_path=decision_packet_path,
     )
@@ -1978,12 +2441,6 @@ def render_e0b_dv1_comparison(
     comparison: Mapping[str, Any] | None = None,
     result_json_path: Path | None = None,
 ) -> Mapping[str, Any]:
-    """Injected-renderer presentation for one visible comparison.
-
-    Always recomputes comparison/result seals before display. Never trusts
-    raw observed-count fields from disk. Close authority is result-level.
-    """
-
     obs = 0
     close = False
     if comparison is None:
@@ -2011,11 +2468,6 @@ def render_e0b_dv1_comparison(
 def observed_comparison_count_from_disk(
     result_json_path: Path = DEFAULT_RESULT_JSON,
 ) -> int:
-    """Report 0 unless a *verified* close-eligible result is on disk.
-
-    Full seal replay + external attestation required. Labels alone never count.
-    """
-
     if not result_json_path.is_file():
         return 0
     try:
@@ -2028,6 +2480,18 @@ def observed_comparison_count_from_disk(
         return 0
 
 
+# Compatibility stubs: third-attestor APIs fail closed.
+def seal_close_attestation(record: Mapping[str, Any]) -> Mapping[str, Any]:
+    raise GvE0bDv1Error("E0B_THIRD_ATTESTOR_REMOVED")
+
+
+def verify_close_attestation(
+    attestation: Mapping[str, Any],
+    **kwargs: Any,
+) -> str:
+    raise GvE0bDv1Error("E0B_THIRD_ATTESTOR_REMOVED")
+
+
 __all__ = [
     "AUTH_EXTERNAL_ATTESTOR",
     "AUTH_FIXTURE",
@@ -2036,13 +2500,16 @@ __all__ = [
     "AdvanceableClock",
     "BUDGET_MINUTES",
     "BLOCK_REASON",
+    "CANONICAL_STAGE_ORDER",
     "CASE_ID",
-    "DEFAULT_ATTESTATION_PATH",
     "DEFAULT_BASELINE_PATH",
     "DEFAULT_DECISION_PACKET_MD",
+    "DEFAULT_EVENTS_DIR",
     "DEFAULT_PACKET_PATH",
     "DEFAULT_POST_PATH",
     "DEFAULT_RESULT_JSON",
+    "DEFAULT_REVIEW_MAPPING_PATH",
+    "DEFAULT_REVIEW_PACKAGE_PATH",
     "DEFAULT_RUBRIC_PATH",
     "DEFAULT_SESSION_PATH",
     "E0B_DECISION_ID",
@@ -2076,8 +2543,10 @@ __all__ = [
     "seal_baseline_record",
     "seal_close_attestation",
     "seal_post_packet_record",
+    "seal_review_package",
     "seal_rubric_record",
     "sealed_adversarial_bundle",
+    "stage_build_review_package",
     "stage_capture_baseline",
     "stage_capture_post",
     "stage_capture_rubric",
@@ -2088,6 +2557,7 @@ __all__ = [
     "verify_close_attestation",
     "verify_comparison_document",
     "verify_result_document",
+    "verify_session_bound_to_records",
     "verify_session_chain",
     "write_canonical_artifacts",
 ]
