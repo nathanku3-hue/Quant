@@ -754,6 +754,15 @@ def verify_session_manifest(manifest: Mapping[str, Any]) -> str:
         expected = expected_specs.get(role)
         if expected is None:
             raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_ROLE_INVALID")
+        if set(descriptor) != {
+            "role",
+            "file_name",
+            "artifact_role",
+            "template_id",
+            "sha256",
+            "byte_length",
+        }:
+            raise GvE0bDv1Error("E0B_AUTHORING_TEMPLATE_DESCRIPTOR_FIELDS_INVALID")
         if descriptor.get("artifact_role") != AUTHORING_ONLY:
             raise GvE0bDv1Error("E0B_AUTHORING_ROLE_INVALID")
         for field in ("file_name", "template_id", "sha256", "byte_length"):
@@ -1335,21 +1344,93 @@ def _append_event(
         raise GvE0bDv1Error(f"E0B_EVENT_ALREADY_EXISTS:{seq}")
     _persist_sealed_json(path, event)
     session = _rebuild_session_from_events(events_dir)
-    # Tip index only (reconstructible from events; not the sealed authority).
-    index = {
+    _persist_session_index(session_path, session)
+    return session
+
+
+def _session_index(
+    session: Mapping[str, Any],
+    events_dir: Path,
+) -> dict[str, Any]:
+    """Build the reconstructible session tip index from sealed events."""
+
+    chain = list(session["chain"])
+    return {
         "case_id": session["case_id"],
         "session_nonce": session["session_nonce"],
         "bundle_hash": session["bundle_hash"],
         "created_at": session["created_at"],
         "session_manifest_hash": session["session_manifest_hash"],
         "session_hash": session["session_hash"],
-        "tip_chain_hash": session["chain"][-1]["chain_hash"],
-        "event_count": len(session["chain"]),
+        "tip_chain_hash": chain[-1]["chain_hash"],
+        "event_count": len(chain),
         "events_dir": str(events_dir),
         "ledger_custody_note": session["ledger_custody_note"],
     }
-    _persist_sealed_json(session_path, index)
-    return session
+
+
+def _persist_session_index(
+    session_path: Path,
+    session: Mapping[str, Any],
+) -> None:
+    # The index is not sealed authority and is safely reconstructible from the
+    # append-only event journal after an interrupted atomic replacement.
+    _persist_sealed_json(
+        session_path,
+        _session_index(session, _events_dir_for(session_path)),
+    )
+
+
+def _resume_interrupted_session_open(
+    *,
+    session_path: Path,
+    manifest: Mapping[str, Any],
+    open_body: Mapping[str, Any],
+    open_hash: str,
+    clock: CaptureClock,
+) -> Mapping[str, Any]:
+    """Idempotently finish SESSION_OPEN after a process interruption."""
+
+    events_dir = _events_dir_for(session_path)
+    if len(_list_event_files(events_dir)) != 1:
+        raise GvE0bDv1Error("E0B_SESSION_ALREADY_OPEN")
+    session = _rebuild_session_from_events(events_dir)
+    if [entry["stage"] for entry in session["chain"]] != [STAGE_SESSION_OPEN]:
+        raise GvE0bDv1Error("E0B_SESSION_ALREADY_OPEN")
+    event = session["events"][0]
+    if event.get("payload") != _plain(open_body):
+        raise GvE0bDv1Error("E0B_SESSION_OPEN_PAYLOAD_MISMATCH")
+    link = _require_mapping(event.get("link"), "E0B_SESSION_OPEN_LINK_MISSING")
+    if link.get("record_hash") != open_hash:
+        raise GvE0bDv1Error("E0B_SESSION_OPEN_HASH_MISMATCH")
+    if session.get("session_nonce") != manifest["session_id"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_SESSION_MISMATCH")
+    if session.get("session_manifest_hash") != manifest["session_manifest_hash"]:
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_MISMATCH")
+
+    # Repair or recreate only the reconstructible index. The sealed event is
+    # never replaced, appended, or re-timestamped.
+    _persist_session_index(session_path, session)
+    checkpoints = load_capture_checkpoints(session_path)
+    if not checkpoints:
+        append_capture_checkpoint(
+            session_path=session_path,
+            operation="OPEN_SESSION",
+            state=CAPTURE_STATE_RESUMABLE,
+            detail="interrupted_session_open_recovered",
+            clock=clock,
+        )
+    else:
+        latest = checkpoints[-1]
+        if (
+            len(checkpoints) != 1
+            or latest["operation"] != "OPEN_SESSION"
+            or latest["state"] != CAPTURE_STATE_RESUMABLE
+            or int(latest["event_count"]) != 1
+            or latest["tip_chain_hash"] != session["chain"][-1]["chain_hash"]
+        ):
+            raise GvE0bDv1Error("E0B_SESSION_ALREADY_OPEN")
+    return _freeze(session)
 
 
 def open_capture_session(
@@ -1375,9 +1456,10 @@ def open_capture_session(
     bndl = _plain(bundle) if bundle is not None else _plain(sealed_adversarial_bundle())
     verify_bundle_seal(bndl)
     events_dir = _events_dir_for(session_path)
-    if _list_event_files(events_dir):
-        raise GvE0bDv1Error("E0B_SESSION_ALREADY_OPEN")
+    existing_events = _list_event_files(events_dir)
     manifest_path = _session_manifest_path(session_path)
+    if existing_events and not manifest_path.is_file():
+        raise GvE0bDv1Error("E0B_SESSION_MANIFEST_REQUIRED")
     if manifest_path.exists():
         manifest = load_session_manifest(manifest_path)
         session_nonce = str(manifest["session_id"])
@@ -1421,6 +1503,14 @@ def open_capture_session(
         "session_manifest_hash": manifest["session_manifest_hash"],
     }
     open_hash = domain_hash(DOMAIN_SESSION, open_body)
+    if existing_events:
+        return _resume_interrupted_session_open(
+            session_path=session_path,
+            manifest=manifest,
+            open_body=open_body,
+            open_hash=open_hash,
+            clock=clk,
+        )
     session = _append_event(
         session_path=session_path,
         stage=STAGE_SESSION_OPEN,

@@ -65,6 +65,7 @@ from core.gv_e0b_dv1_contradiction import (  # noqa: E402
     capture_lifecycle_state,
     load_capture_checkpoints,
     load_capture_session,
+    load_session_manifest,
     open_capture_session,
     recover_capture_checkpoint,
     require_capture_resumable,
@@ -206,6 +207,37 @@ def _capture_preflight(case_dir: Path) -> tuple[str, str, str, dict[str, Path]]:
         _verify_protocol_freeze(),
         forms,
     )
+
+
+def _assert_session_source_identity(case_dir: Path, session_path: Path) -> None:
+    """Fail closed if the executing checkout moved after SESSION_OPEN."""
+
+    try:
+        relative_case = case_dir.resolve().relative_to(ROOT.resolve())
+    except ValueError as exc:
+        raise GvE0bDv1Error("E0B_CASE_DIR_OUTSIDE_REPOSITORY") from exc
+    if relative_case.as_posix() != "data/gv_e0b/dv1_g08":
+        raise GvE0bDv1Error("E0B_CANONICAL_CASE_DIR_REQUIRED")
+
+    status = _git_text("status", "--porcelain=v1", "--untracked-files=all")
+    case_prefix = relative_case.as_posix() + "/"
+    for line in status.splitlines():
+        if not line:
+            continue
+        code = line[:2]
+        path = line[3:].replace("\\", "/")
+        if code != "??":
+            raise GvE0bDv1Error("E0B_CAPTURE_TRACKED_TREE_DIRTY")
+        if not path.startswith(case_prefix):
+            raise GvE0bDv1Error("E0B_CAPTURE_UNTRACKED_OUTSIDE_CASE")
+
+    manifest = load_session_manifest(session_path.parent / "session_manifest.json")
+    if _git_text("rev-parse", "HEAD") != manifest["source_commit"]:
+        raise GvE0bDv1Error("E0B_SESSION_SOURCE_COMMIT_DRIFT")
+    if _git_text("rev-parse", "HEAD^{tree}") != manifest["source_tree"]:
+        raise GvE0bDv1Error("E0B_SESSION_SOURCE_TREE_DRIFT")
+    if _verify_protocol_freeze() != manifest["protocol_freeze_manifest_sha256"]:
+        raise GvE0bDv1Error("E0B_SESSION_PROTOCOL_FREEZE_DRIFT")
 
 
 def _operation_expectation(
@@ -460,7 +492,31 @@ def main(argv: list[str] | None = None) -> int:
         if args.cmd == "recover-session":
             checkpoints = load_capture_checkpoints(paths["session"])
             if not checkpoints:
-                raise GvE0bDv1Error("E0B_CAPTURE_CHECKPOINT_MISSING")
+                manifest = load_session_manifest(paths["session"].parent / "session_manifest.json")
+                _assert_session_source_identity(case_dir, paths["session"])
+                forms = {
+                    "baseline": paths["authoring_dir"] / "baseline_authoring.json",
+                    "post": paths["authoring_dir"] / "post_authoring.json",
+                    "rubric": paths["authoring_dir"] / "rubric_authoring.json",
+                }
+                open_capture_session(
+                    bundle=sealed_adversarial_bundle(),
+                    session_path=paths["session"],
+                    source_commit=str(manifest["source_commit"]),
+                    source_tree=str(manifest["source_tree"]),
+                    protocol_freeze_manifest_sha256=str(
+                        manifest["protocol_freeze_manifest_sha256"]
+                    ),
+                    operator_principal_id=str(manifest["operator_principal_id"]),
+                    reviewer_principal_id=str(manifest["reviewer_principal_id"]),
+                    authoring_template_paths=forms,
+                )
+                checkpoint = load_capture_checkpoints(paths["session"])[-1]
+                print("RECOVER_SESSION")
+                print("operation=OPEN_SESSION")
+                print(f"state={checkpoint['state']}")
+                print(f"detail={checkpoint['detail']}")
+                return 0
             operation = str(checkpoints[-1]["operation"])
             expected_stage, expected_artifacts = _operation_expectation(paths, operation)
             checkpoint = recover_capture_checkpoint(
@@ -474,6 +530,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"state={checkpoint['state']}")
             print(f"detail={checkpoint['detail']}")
             return 0 if checkpoint["state"] == CAPTURE_STATE_RESUMABLE else 2
+
+        _assert_session_source_identity(case_dir, paths["session"])
 
         if args.cmd == "abort-session":
             checkpoint = abort_capture_session(

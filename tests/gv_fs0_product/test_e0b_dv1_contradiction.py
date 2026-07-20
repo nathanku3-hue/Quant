@@ -2519,6 +2519,180 @@ def test_session_manifest_binds_git_principals_templates_and_budget_start(
         verify_session_manifest(forged)
 
 
+@pytest.mark.parametrize(
+    "failure_point",
+    ("after_manifest", "after_event_before_index", "after_index_before_checkpoint"),
+)
+def test_session_open_retry_recovers_each_initialization_boundary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    failure_point: str,
+) -> None:
+    case_dir = tmp_path / failure_point
+    forms = write_authoring_templates(case_dir / "captures" / "authoring")
+    session_path = case_dir / "captures" / "session.json"
+    kwargs = {
+        "session_path": session_path,
+        "clock": AdvanceableClock(_TEST_START),
+        "source_commit": "a" * 40,
+        "source_tree": "b" * 40,
+        "protocol_freeze_manifest_sha256": "d" * 64,
+        "operator_principal_id": "OP_REAL_001",
+        "reviewer_principal_id": "REV_REAL_001",
+        "authoring_template_paths": forms,
+    }
+
+    original_append_event = e0b_mod._append_event
+    original_persist = e0b_mod._persist_sealed_json
+    original_checkpoint = e0b_mod.append_capture_checkpoint
+    if failure_point == "after_manifest":
+        monkeypatch.setattr(
+            e0b_mod,
+            "_append_event",
+            lambda **_kwargs: (_ for _ in ()).throw(OSError("after manifest")),
+        )
+    elif failure_point == "after_event_before_index":
+        def fail_session_index(path: Path, record: dict[str, Any]) -> None:
+            if Path(path) == session_path:
+                raise OSError("after event")
+            original_persist(path, record)
+
+        monkeypatch.setattr(e0b_mod, "_persist_sealed_json", fail_session_index)
+    else:
+        monkeypatch.setattr(
+            e0b_mod,
+            "append_capture_checkpoint",
+            lambda **_kwargs: (_ for _ in ()).throw(OSError("after index")),
+        )
+
+    with pytest.raises(OSError):
+        open_capture_session(**kwargs)
+
+    monkeypatch.setattr(e0b_mod, "_append_event", original_append_event)
+    monkeypatch.setattr(e0b_mod, "_persist_sealed_json", original_persist)
+    monkeypatch.setattr(e0b_mod, "append_capture_checkpoint", original_checkpoint)
+    recovered = open_capture_session(**kwargs)
+
+    assert [entry["stage"] for entry in recovered["chain"]] == ["SESSION_OPEN"]
+    assert session_path.is_file()
+    assert len(list((session_path.parent / "events").glob("*.json"))) == 1
+    checkpoints = load_capture_checkpoints(session_path)
+    assert len(checkpoints) == 1
+    assert checkpoints[0]["operation"] == "OPEN_SESSION"
+    assert checkpoints[0]["state"] == CAPTURE_STATE_RESUMABLE
+    assert checkpoints[0]["event_count"] == 1
+
+
+def test_runner_recover_session_repairs_missing_open_checkpoint(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import scripts.gv_e0b_g08_capture as runner
+
+    case_dir = tmp_path / "runner-recovery"
+    forms = write_authoring_templates(case_dir / "captures" / "authoring")
+    session_path = case_dir / "captures" / "session.json"
+    original_checkpoint = e0b_mod.append_capture_checkpoint
+    monkeypatch.setattr(
+        e0b_mod,
+        "append_capture_checkpoint",
+        lambda **_kwargs: (_ for _ in ()).throw(OSError("after index")),
+    )
+    with pytest.raises(OSError):
+        open_capture_session(
+            session_path=session_path,
+            clock=AdvanceableClock(_TEST_START),
+            source_commit="a" * 40,
+            source_tree="b" * 40,
+            protocol_freeze_manifest_sha256="d" * 64,
+            operator_principal_id="OP_REAL_001",
+            reviewer_principal_id="REV_REAL_001",
+            authoring_template_paths=forms,
+        )
+    monkeypatch.setattr(e0b_mod, "append_capture_checkpoint", original_checkpoint)
+    monkeypatch.setattr(
+        runner,
+        "_assert_session_source_identity",
+        lambda _case_dir, _session_path: None,
+    )
+
+    assert runner.main(["recover-session", "--case-dir", str(case_dir)]) == 0
+    checkpoint = load_capture_checkpoints(session_path)[-1]
+    assert checkpoint["operation"] == "OPEN_SESSION"
+    assert checkpoint["state"] == CAPTURE_STATE_RESUMABLE
+    assert checkpoint["detail"] == "interrupted_session_open_recovered"
+
+
+def test_session_manifest_rejects_extra_authoring_descriptor_fields(tmp_path: Path) -> None:
+    session_path = tmp_path / "strict-descriptor" / "session.json"
+    open_capture_session(
+        session_path=session_path,
+        operator_principal_id="OP_REAL_001",
+        reviewer_principal_id="REV_REAL_001",
+    )
+    manifest_path = session_path.parent / "session_manifest.json"
+    forged = json.loads(manifest_path.read_text(encoding="utf-8"))
+    forged["authoring_templates"][0]["action"] = "HOLD_FOR_EVIDENCE"
+    body = {key: value for key, value in forged.items() if key != "session_manifest_hash"}
+    forged["session_manifest_hash"] = domain_hash(e0b_mod.DOMAIN_SESSION_MANIFEST, body)
+    with pytest.raises(
+        GvE0bDv1Error,
+        match="E0B_AUTHORING_TEMPLATE_DESCRIPTOR_FIELDS_INVALID",
+    ):
+        verify_session_manifest(forged)
+
+
+def test_runner_rechecks_source_identity_before_finalize(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import scripts.gv_e0b_g08_capture as runner
+
+    def reject_drift(_case_dir: Path, _session_path: Path) -> None:
+        raise GvE0bDv1Error("E0B_SESSION_SOURCE_COMMIT_DRIFT")
+
+    monkeypatch.setattr(runner, "_assert_session_source_identity", reject_drift)
+    assert runner.main(["finalize", "--case-dir", str(tmp_path / "case")]) == 2
+
+
+def test_runner_source_identity_guard_detects_checkout_drift(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import scripts.gv_e0b_g08_capture as runner
+
+    case_dir = tmp_path / "data" / "gv_e0b" / "dv1_g08"
+    session_path = case_dir / "captures" / "session.json"
+    open_capture_session(
+        session_path=session_path,
+        source_commit="a" * 40,
+        source_tree="b" * 40,
+        protocol_freeze_manifest_sha256="d" * 64,
+        operator_principal_id="OP_REAL_001",
+        reviewer_principal_id="REV_REAL_001",
+    )
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "_verify_protocol_freeze", lambda: "d" * 64)
+
+    commit = "a" * 40
+
+    def git_text(*args: str) -> str:
+        if args[0] == "status":
+            return "?? data/gv_e0b/dv1_g08/captures/session_manifest.json"
+        if args[-1] == "HEAD":
+            return commit
+        if args[-1] == "HEAD^{tree}":
+            return "b" * 40
+        raise AssertionError(args)
+
+    monkeypatch.setattr(runner, "_git_text", git_text)
+    runner._assert_session_source_identity(case_dir, session_path)
+
+    commit = "c" * 40
+    with pytest.raises(GvE0bDv1Error, match="E0B_SESSION_SOURCE_COMMIT_DRIFT"):
+        runner._assert_session_source_identity(case_dir, session_path)
+
+
 def test_session_open_rejects_same_principal_and_nonblank_template(
     tmp_path: Path,
 ) -> None:
