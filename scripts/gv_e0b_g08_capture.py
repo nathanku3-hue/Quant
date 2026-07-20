@@ -240,6 +240,38 @@ def _assert_session_source_identity(case_dir: Path, session_path: Path) -> None:
         raise GvE0bDv1Error("E0B_SESSION_PROTOCOL_FREEZE_DRIFT")
 
 
+def _resume_session_open(
+    *,
+    paths: dict[str, Path],
+    manifest: dict[str, Any],
+    operator_principal_id: str | None = None,
+    reviewer_principal_id: str | None = None,
+) -> dict[str, Any]:
+    forms = {
+        "baseline": paths["authoring_dir"] / "baseline_authoring.json",
+        "post": paths["authoring_dir"] / "post_authoring.json",
+        "rubric": paths["authoring_dir"] / "rubric_authoring.json",
+    }
+    return dict(
+        open_capture_session(
+            bundle=sealed_adversarial_bundle(),
+            session_path=paths["session"],
+            source_commit=str(manifest["source_commit"]),
+            source_tree=str(manifest["source_tree"]),
+            protocol_freeze_manifest_sha256=str(
+                manifest["protocol_freeze_manifest_sha256"]
+            ),
+            operator_principal_id=(
+                operator_principal_id or str(manifest["operator_principal_id"])
+            ),
+            reviewer_principal_id=(
+                reviewer_principal_id or str(manifest["reviewer_principal_id"])
+            ),
+            authoring_template_paths=forms,
+        )
+    )
+
+
 def _operation_expectation(
     paths: dict[str, Path],
     operation: str,
@@ -467,19 +499,35 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
         if args.cmd == "open-session":
-            source_commit, source_tree, freeze_manifest_sha256, forms = _capture_preflight(
-                case_dir
-            )
-            session = open_capture_session(
-                bundle=sealed_adversarial_bundle(),
-                session_path=paths["session"],
-                source_commit=source_commit,
-                source_tree=source_tree,
-                protocol_freeze_manifest_sha256=freeze_manifest_sha256,
-                operator_principal_id=args.operator_id,
-                reviewer_principal_id=args.reviewer_id,
-                authoring_template_paths=forms,
-            )
+            manifest_path = paths["session"].parent / "session_manifest.json"
+            if manifest_path.is_file():
+                _assert_session_source_identity(case_dir, paths["session"])
+                manifest = dict(load_session_manifest(manifest_path))
+                session = _resume_session_open(
+                    paths=paths,
+                    manifest=manifest,
+                    operator_principal_id=args.operator_id,
+                    reviewer_principal_id=args.reviewer_id,
+                )
+                source_commit = str(manifest["source_commit"])
+                source_tree = str(manifest["source_tree"])
+                freeze_manifest_sha256 = str(
+                    manifest["protocol_freeze_manifest_sha256"]
+                )
+            else:
+                source_commit, source_tree, freeze_manifest_sha256, forms = (
+                    _capture_preflight(case_dir)
+                )
+                session = open_capture_session(
+                    bundle=sealed_adversarial_bundle(),
+                    session_path=paths["session"],
+                    source_commit=source_commit,
+                    source_tree=source_tree,
+                    protocol_freeze_manifest_sha256=freeze_manifest_sha256,
+                    operator_principal_id=args.operator_id,
+                    reviewer_principal_id=args.reviewer_id,
+                    authoring_template_paths=forms,
+                )
             print("SESSION_OPEN")
             print(f"session_nonce={session['session_nonce']}")
             print(f"source_commit={source_commit}")
@@ -491,32 +539,19 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.cmd == "recover-session":
             _assert_session_source_identity(case_dir, paths["session"])
-            checkpoints = load_capture_checkpoints(paths["session"])
-            if not checkpoints:
-                manifest = load_session_manifest(paths["session"].parent / "session_manifest.json")
-                forms = {
-                    "baseline": paths["authoring_dir"] / "baseline_authoring.json",
-                    "post": paths["authoring_dir"] / "post_authoring.json",
-                    "rubric": paths["authoring_dir"] / "rubric_authoring.json",
-                }
-                open_capture_session(
-                    bundle=sealed_adversarial_bundle(),
-                    session_path=paths["session"],
-                    source_commit=str(manifest["source_commit"]),
-                    source_tree=str(manifest["source_tree"]),
-                    protocol_freeze_manifest_sha256=str(
-                        manifest["protocol_freeze_manifest_sha256"]
-                    ),
-                    operator_principal_id=str(manifest["operator_principal_id"]),
-                    reviewer_principal_id=str(manifest["reviewer_principal_id"]),
-                    authoring_template_paths=forms,
-                )
+            manifest = dict(
+                load_session_manifest(paths["session"].parent / "session_manifest.json")
+            )
+            event_files = sorted((paths["session"].parent / "events").glob("*.json"))
+            if len(event_files) <= 1:
+                _resume_session_open(paths=paths, manifest=manifest)
                 checkpoint = load_capture_checkpoints(paths["session"])[-1]
                 print("RECOVER_SESSION")
                 print("operation=OPEN_SESSION")
                 print(f"state={checkpoint['state']}")
                 print(f"detail={checkpoint['detail']}")
                 return 0
+            checkpoints = load_capture_checkpoints(paths["session"])
             operation = str(checkpoints[-1]["operation"])
             expected_stage, expected_artifacts = _operation_expectation(paths, operation)
             checkpoint = recover_capture_checkpoint(

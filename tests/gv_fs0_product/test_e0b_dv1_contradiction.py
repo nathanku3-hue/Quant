@@ -2623,6 +2623,81 @@ def test_runner_recover_session_repairs_missing_open_checkpoint(
     assert checkpoint["detail"] == "interrupted_session_open_recovered"
 
 
+@pytest.mark.parametrize("command", ("open-session", "recover-session"))
+@pytest.mark.parametrize(
+    "failure_point",
+    ("after_manifest", "after_event", "after_index", "after_checkpoint"),
+)
+def test_runner_replays_every_session_open_boundary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    command: str,
+    failure_point: str,
+) -> None:
+    import scripts.gv_e0b_g08_capture as runner
+
+    case_dir = tmp_path / f"{command}-{failure_point}"
+    forms = write_authoring_templates(case_dir / "captures" / "authoring")
+    session_path = case_dir / "captures" / "session.json"
+    kwargs = {
+        "session_path": session_path,
+        "clock": AdvanceableClock(_TEST_START),
+        "source_commit": "a" * 40,
+        "source_tree": "b" * 40,
+        "protocol_freeze_manifest_sha256": "d" * 64,
+        "operator_principal_id": "OP_REAL_001",
+        "reviewer_principal_id": "REV_REAL_001",
+        "authoring_template_paths": forms,
+    }
+    original_append_event = e0b_mod._append_event
+    original_persist = e0b_mod._persist_sealed_json
+    original_checkpoint = e0b_mod.append_capture_checkpoint
+    if failure_point == "after_manifest":
+        monkeypatch.setattr(
+            e0b_mod,
+            "_append_event",
+            lambda **_kwargs: (_ for _ in ()).throw(OSError("after manifest")),
+        )
+    elif failure_point == "after_event":
+        def fail_session_index(path: Path, record: dict[str, Any]) -> None:
+            if Path(path) == session_path:
+                raise OSError("after event")
+            original_persist(path, record)
+
+        monkeypatch.setattr(e0b_mod, "_persist_sealed_json", fail_session_index)
+    elif failure_point == "after_index":
+        monkeypatch.setattr(
+            e0b_mod,
+            "append_capture_checkpoint",
+            lambda **_kwargs: (_ for _ in ()).throw(OSError("after index")),
+        )
+
+    if failure_point == "after_checkpoint":
+        open_capture_session(**kwargs)
+    else:
+        with pytest.raises(OSError):
+            open_capture_session(**kwargs)
+
+    monkeypatch.setattr(e0b_mod, "_append_event", original_append_event)
+    monkeypatch.setattr(e0b_mod, "_persist_sealed_json", original_persist)
+    monkeypatch.setattr(e0b_mod, "append_capture_checkpoint", original_checkpoint)
+    monkeypatch.setattr(
+        runner,
+        "_assert_session_source_identity",
+        lambda _case_dir, _session_path: None,
+    )
+    argv = [command, "--case-dir", str(case_dir)]
+    if command == "open-session":
+        argv.extend(["--operator-id", "OP_REAL_001", "--reviewer-id", "REV_REAL_001"])
+
+    assert runner.main(argv) == 0
+    assert len(list((session_path.parent / "events").glob("*.json"))) == 1
+    checkpoints = load_capture_checkpoints(session_path)
+    assert len(checkpoints) == 1
+    assert checkpoints[0]["operation"] == "OPEN_SESSION"
+    assert checkpoints[0]["state"] == CAPTURE_STATE_RESUMABLE
+
+
 def test_session_manifest_rejects_extra_authoring_descriptor_fields(tmp_path: Path) -> None:
     session_path = tmp_path / "strict-descriptor" / "session.json"
     open_capture_session(
