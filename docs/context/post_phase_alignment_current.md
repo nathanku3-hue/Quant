@@ -1,13 +1,13 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — B0A Local Source Abstention Repair (2026-07-23)
+## Active Addendum — B0A Closed on Main; B0B Active Gate (2026-07-23)
 
-- **What changed**: Independent audit reclassified PR #6 as B0A local-source abstention (not real admission). B0A-R1 truth repair applied: relabel, package-manifest binding, positive-path deletion, honest authorization metadata.
-- **Streams**: Backend/Product owns B0A repair close + merge; Docs/Ops owns classification truth; Frontend caption/table relabeled; FS1/PEAD/optimizer/broker held.
-- **Current bottleneck**: hosted green + narrow review + merge of PR #6; then one official MU source package under detached authorization (B0B).
-- **Endgame boundary**: real external bytes (B0B) before maturity uplift; local abstention path is banked substrate only.
-- **Next active stream**: B0A hosted close → merge → B0B official-source intake.
+- **What changed**: PR #6 merged (`3e995f1`). B0A local-source abstention is **CLOSED/BANKED** on canonical main. Active truth is not merge-pending.
+- **Streams**: Backend/Product own B0B official-source intake; Docs/Ops owns closed-B0A + active-B0B truth; Frontend stable; FS1/PEAD/optimizer/broker held.
+- **Current bottleneck**: one detached source-specific authorization + one exact official MU raw package (B0B) — not B0A ceremony.
+- **Endgame boundary**: real external bytes under B0B before maturity uplift; B0A is closed local-abstention substrate only.
+- **Next active stream**: **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE** only. Hard rules: ADMITTED ≠ auto ADVANCE; contradiction = NOT_EVALUATED when no admitted facts.
 
-## Prior Addendum — Roadmap Recut Alignment (2026-07-22) [superseded classification]
+## Prior Addendum — B0A Local Source Abstention Repair (2026-07-23) [closed]
 
-- Attempt-1 invalidated; sole gate was recut to V2-B0; overclaim of “real admission complete” superseded by B0A classification.
+- B0A-R1 truth repair + hosted green + audit fixed; superseded as active gate by B0B after merge.

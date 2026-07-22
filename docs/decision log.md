@@ -1,4 +1,14 @@
 
+## 2026-07-23 — ROUND-20260723-V2-B0A-CLOSED-ON-MAIN
+
+- Decision: merge PR #6 after exact-head product/protocol/Windows/Linux/parity green on tip `79c309b`; merge commit `3e995f1`.
+- Decision: mark **GV-V2-B0A-LOCAL-SOURCE-ABSTENTION CLOSED/BANKED** on canonical main immediately — do not leave merge-pending as active truth.
+- Classification banked: local research-card admission preflight / certified source-authority abstention; score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed 0; local_source_abstention_verticals=1; external packages 0; certificates 0.
+- Explicit deviation: original real-source gate is split B0A (done) / B0B (active). Module filename retention is acceptable; classification and behavior are authoritative; no compatibility path.
+- Vacuous contradiction PASS is non-blocking for closed B0A only; B0B must use `NOT_EVALUATED` when no admitted facts exist.
+- Sole next functional gate: **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE** — detached authorization → one exact official MU raw package → PIT/custody admission → separate claim evaluation → ADVANCE|HOLD|REJECT → certified portfolio action. ADMITTED never implies automatic advancement.
+- Closed: G08 Attempt-2 as product gate, FS1, providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital, generic evidence platform.
+
 ## 2026-07-23 — ROUND-20260723-V2-B0A-R1-LOCAL-ABSTENTION-TRUTH-REPAIR
 
 - Decision: accept independent audit REPAIR_CURRENT_SLICE on PR #6; do not merge under overclaim `GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION complete`.

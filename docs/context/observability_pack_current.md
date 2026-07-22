@@ -6,7 +6,7 @@
 - Observation sentinel: Attempt-1 sealed claims are **not** observation authority; invalidation supersedes.
 - Identity sentinel: future real comparisons require GitHub receipt v2 author/committer logins ≠ operator.
 - Score/stage sentinel: 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
-- Gate sentinel: active classification **GV-V2-B0A-LOCAL-SOURCE-ABSTENTION** (B0A-R1 repair). Next real-source gate B0B after merge. Same-case Attempt-2 is deferred validation, not blocker.
+- Gate sentinel: **B0A CLOSED** on main (`3e995f1`). Sole active gate **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE**. Same-case Attempt-2 is deferred validation, not blocker.
 - Drift sentinel: do not treat historical result tag or smoke E0B current as promotion evidence.
 
 ## Prior Addendum — S-009X / E0B-DV1 Observability (2026-07-21) [superseded next-action]

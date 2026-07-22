@@ -115,21 +115,21 @@
   ],
   "active_phase": 65,
   "what_was_done": [
-    "V2-B0A-R1 local source abstention truth repair: relabel, package-manifest binding, delete positive ADMITTED path.",
-    "MU research-card preflight blocked MISSING_POINT_IN_TIME_AUTHORITY; retained SOURCE_PACKAGE_MANIFEST_BINDING_INVALID.",
-    "Certified HOLD_FOR_EVIDENCE / NO_POSITION DECISION_V2_B0_MU_G_SUPPLY_1 published as current (admission d1b89115…).",
-    "Score 39; observed 0; no uplift; classification GV-V2-B0A-LOCAL-SOURCE-ABSTENTION."
+    "PR #6 merged to main at 3e995f1 (head 79c309b); hosted product/protocol/Windows/Linux/parity green.",
+    "GV-V2-B0A-LOCAL-SOURCE-ABSTENTION CLOSED/BANKED on canonical main (not merge-pending).",
+    "Certified HOLD/NO_POSITION DECISION_V2_B0_MU_G_SUPPLY_1 remains current authority until B0B.",
+    "Score 39; observed 0; local_source_abstention_verticals=1; external packages 0; certificates 0."
   ],
   "what_is_locked": [
     "SHIPPED_PRODUCT_SCORE=39; FUNCTIONAL_STAGE=CERTIFIED_SINGLE_DECISION_OPERABLE; OBSERVED=0.",
-    "Not real external admission; no DataAdmissionCertificate; no auto ADVANCE_TO_FULL_RESEARCH.",
+    "B0A closed substrate; explicit B0A/B0B deviation from original real-source gate.",
     "G08 Attempt-2 deferred; FS1/providers/PEAD/optimizer/broker/alpha closed."
   ],
   "what_is_next": [
-    "Hosted product+protocol+parity on B0A repair tip; narrow review; merge PR #6; then B0B official-source intake."
+    "Sole gate GV-V2-B0B-OFFICIAL-SOURCE-INTAKE: detached auth → one official MU package → PIT admission → separate claim eval → ADVANCE|HOLD|REJECT → certified action (ADMITTED never auto-advances; contradiction NOT_EVALUATED when no admitted facts)."
   ],
   "first_command": ".venv\\Scripts\\python -m pytest -q tests/gv_fs0_product/test_v2_b0_real_block_only.py",
   "next_todos": [
-    "Hosted product+protocol+parity on B0A repair tip; narrow review; merge PR #6; then B0B official-source intake."
+    "Execute GV-V2-B0B-OFFICIAL-SOURCE-INTAKE only."
   ]
 }
