@@ -8,4 +8,7 @@ data/gv_v2_b0/** text eol=lf
 data/gv_v2_b0b/**/*.json text eol=lf
 data/gv_v2_b0b/**/*.md text eol=lf
 data/gv_v2_b0b/**/raw/** -text
+data/gv_v2_alpha0/**/*.json text eol=lf
+data/gv_v2_alpha0/**/*.md text eol=lf
+data/gv_v2_alpha0/**/raw/** -text
 docs/architecture/godview_e0/** text eol=lf
