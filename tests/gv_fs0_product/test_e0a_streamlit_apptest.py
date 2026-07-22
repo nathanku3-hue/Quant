@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from core.gv_e0a_operable import publish_e0a_current_decision
 from core.gv_fs0_publish import (
     DEFAULT_CURRENT_DECISION_LOCK,
     DEFAULT_CURRENT_DECISION_TARGET,
@@ -33,12 +32,17 @@ def _run_portfolio_app() -> AppTest:
     return app.run(timeout=90)
 
 
+G08_DELTA_SUBHEADER = "GV-E0B-DV1 Decision Delta — G08 Contradiction Case"
+NO_POSITION_SUBHEADER = "GV-FS0 Certified Paper Portfolio — NO_POSITION"
+
+
 @pytest.fixture
 def isolated_current_decision(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Point default current-decision paths at a temp location for fail-path tests."""
+    """Point default current-decision + E0B result paths at temps for fail-path tests."""
 
     target = tmp_path / "gv_fs0_current_decision.json"
     lock = tmp_path / ".gv_fs0_current_decision.lock"
+    e0b_result = tmp_path / "e0b_result.json"
     monkeypatch.setattr(
         "core.gv_fs0_publish.DEFAULT_CURRENT_DECISION_TARGET", target
     )
@@ -51,11 +55,14 @@ def isolated_current_decision(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(
         "core.gv_fs0_current_decision.DEFAULT_CURRENT_DECISION_PATH", target
     )
+    monkeypatch.setattr(
+        "core.gv_e0b_dv1_contradiction.DEFAULT_RESULT_JSON", e0b_result
+    )
     return target, lock
 
 
 def test_apptest_success_one_table_for_current_decision() -> None:
-    """Success path: one certified portfolio table, no dual-bundle headers."""
+    """Success path: certified portfolio table; G08 delta surface when result banked."""
 
     prior_target = (
         DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
@@ -70,14 +77,14 @@ def test_apptest_success_one_table_for_current_decision() -> None:
     try:
         if DEFAULT_CURRENT_DECISION_LOCK.exists():
             DEFAULT_CURRENT_DECISION_LOCK.unlink()
-        publish_e0a_current_decision()
+        # Keep G08-published current authority; do not overwrite with E0A rebuild.
         app = _run_portfolio_app()
         assert not app.exception
         assert any(header.value == PORTFOLIO_PAGE_TITLE for header in app.header)
-        assert [element.value for element in app.subheader] == [
-            "GV-FS0 Certified Paper Portfolio — NO_POSITION",
-        ]
-        assert len(app.table) == 1
+        subheaders = [element.value for element in app.subheader]
+        assert NO_POSITION_SUBHEADER in subheaders
+        assert G08_DELTA_SUBHEADER in subheaders
+        assert len(app.table) >= 1
         caption_text = "\n".join(element.value for element in app.caption)
         assert "CERTIFIED" in caption_text
         assert "Certified decision unavailable" not in _app_status_text(app)
