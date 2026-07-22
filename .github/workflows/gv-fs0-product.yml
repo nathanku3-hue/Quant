@@ -12,7 +12,9 @@ on:
       - "core/gv_e0a_operable.py"
       - "core/gv_e0b_dv1_contradiction.py"
       - "core/gv_v2_b0_real_block_only.py"
+      - "core/gv_v2_b0b_official_source_intake.py"
       - "data/gv_v2_b0/**"
+      - "data/gv_v2_b0b/**"
       - "data/gv_fs0/gv_fs0_certified_bundle.json"
       - "data/gv_fs0/gv_fs0_current_decision.json"
       - "data/gv_e0b/**"
@@ -36,7 +38,9 @@ on:
       - "core/gv_e0a_operable.py"
       - "core/gv_e0b_dv1_contradiction.py"
       - "core/gv_v2_b0_real_block_only.py"
+      - "core/gv_v2_b0b_official_source_intake.py"
       - "data/gv_v2_b0/**"
+      - "data/gv_v2_b0b/**"
       - "data/gv_fs0/gv_fs0_certified_bundle.json"
       - "data/gv_fs0/gv_fs0_current_decision.json"
       - "data/gv_e0b/**"
@@ -191,19 +195,22 @@ jobs:
           EXPECTED_E0A_CURRENT_BYTE_LENGTH = 23696
           EXPECTED_E0A_RATIONALE_REF = f"E0A:RD:{EXPECTED_RESEARCH_DECISION_HASH}"
 
-          # Tracked product authority after V2-B0A local-source abstention repair.
-          EXPECTED_V2B0_DECISION_ID = "DECISION_V2_B0_MU_G_SUPPLY_1"
-          EXPECTED_V2B0_ADMISSION_HASH = (
-              "d1b891152477504b29e041baba304396fa2a7be2d01fcc701f960a15d7f49f2f"
+          # Tracked product authority after V2-B0B official-source intake (B0B-R1).
+          EXPECTED_V2B0_DECISION_ID = "DECISION_V2_B0B_MU_G_SUPPLY_1"
+          EXPECTED_V2B0_CLAIM_HASH = (
+              "21e4f669bbaa337e963ecaa7e7ff7ccdcb1187e30a3db7afaeb9300794eac6c0"
           )
-          EXPECTED_V2B0_RATIONALE_REF = f"V2B0:ADM:{EXPECTED_V2B0_ADMISSION_HASH}"
+          EXPECTED_V2B0_ADMISSION_HASH = (
+              "731a9970887c54a847014c0cc57e0b7bc3c534034ac79e7148c59b9335bc350d"
+          )
+          EXPECTED_V2B0_RATIONALE_REF = f"V2B0B:CLM:{EXPECTED_V2B0_CLAIM_HASH}"
           EXPECTED_V2B0_RESULT_HASH = (
-              "4a1e8089ce477611cdb64410f9ac82b76f982fdf3a39024265470bcff824b747"
+              "48cab285c9a146a2044cfb2bb16b235451c8dabe9cfbaa08fdcb60236cd83dea"
           )
           EXPECTED_V2B0_CURRENT_FILE_SHA256 = (
-              "8530f4f0a9509253fb2cd3be87f0438d2423415d39f58556071221b6f1bad157"
+              "20fba702166f1684c334f817f8aa7fc95a7ca2451304e5a57b41ed80d41eda5e"
           )
-          EXPECTED_V2B0_CURRENT_BYTE_LENGTH = 23636
+          EXPECTED_V2B0_CURRENT_BYTE_LENGTH = 23669
 
           # --- F1C dual-bundle substrate (evidence only) ---
           first_bundle = certified_bundle_bytes(build_default_certified_bundle())
@@ -250,11 +257,11 @@ jobs:
           if v2["decision"]["action"] != "NO_POSITION":
               raise SystemExit("current decision action must be NO_POSITION")
           if v2["decision"]["rationale_ref"] != EXPECTED_V2B0_RATIONALE_REF:
-              raise SystemExit("V2-B0 rationale_ref must bind admission hash")
+              raise SystemExit("V2-B0B rationale_ref must bind claim evaluation hash")
           if v2["certified_decision_result_hash"] != EXPECTED_V2B0_RESULT_HASH:
-              raise SystemExit("V2-B0 certified_decision_result_hash mismatch")
+              raise SystemExit("V2-B0B certified_decision_result_hash mismatch")
           if v2["certification"]["certification_status"] != "CERTIFIED":
-              raise SystemExit("V2-B0 certification_status must be CERTIFIED")
+              raise SystemExit("V2-B0B certification_status must be CERTIFIED")
 
           record = {
               "f1c_substrate": {
@@ -275,12 +282,14 @@ jobs:
               "v2b0_current_decision": {
                   "decision_id": EXPECTED_V2B0_DECISION_ID,
                   "admission_hash": EXPECTED_V2B0_ADMISSION_HASH,
+                  "claim_evaluation_hash": EXPECTED_V2B0_CLAIM_HASH,
                   "certified_decision_result_hash": EXPECTED_V2B0_RESULT_HASH,
                   "rationale_ref": EXPECTED_V2B0_RATIONALE_REF,
                   "byte_length": len(tracked_current),
                   "file_sha256": EXPECTED_V2B0_CURRENT_FILE_SHA256,
                   "role": "NO_POSITION",
-                  "primary_block_reason": "MISSING_POINT_IN_TIME_AUTHORITY",
+                  "claim_outcome": "CLAIM_INSUFFICIENT",
+                  "research_action": "HOLD_FOR_EVIDENCE",
               },
           }
           Path("gv-fs0-product-parity.json").write_text(
@@ -327,10 +336,12 @@ jobs:
               raise SystemExit("parity record missing v2b0_current_decision authority")
           if "e0a_substrate_rebuild" not in text:
               raise SystemExit("parity record missing e0a_substrate_rebuild")
-          if "d1b891152477504b29e041baba304396fa2a7be2d01fcc701f960a15d7f49f2f" not in text:
-              raise SystemExit("parity record missing V2-B0 admission hash")
-          if "4a1e8089ce477611cdb64410f9ac82b76f982fdf3a39024265470bcff824b747" not in text:
-              raise SystemExit("parity record missing V2-B0 certified result hash")
+          if "731a9970887c54a847014c0cc57e0b7bc3c534034ac79e7148c59b9335bc350d" not in text:
+              raise SystemExit("parity record missing V2-B0B admission hash")
+          if "21e4f669bbaa337e963ecaa7e7ff7ccdcb1187e30a3db7afaeb9300794eac6c0" not in text:
+              raise SystemExit("parity record missing V2-B0B claim evaluation hash")
+          if "48cab285c9a146a2044cfb2bb16b235451c8dabe9cfbaa08fdcb60236cd83dea" not in text:
+              raise SystemExit("parity record missing V2-B0B certified result hash")
           if "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6" not in text:
               raise SystemExit("parity record missing fixed E0A substrate result hash")
           print(text.strip())

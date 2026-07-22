@@ -312,6 +312,120 @@ def render_v2_b0_surface(
     return dict(result)
 
 
+def render_v2_b0b_surface(
+    renderer: PortfolioRenderer,
+    *,
+    result_json_path: Path | None = None,
+) -> dict[str, Any] | None:
+    """Optional V2-B0B official-source surface.
+
+    Loads only a verified B0B result (complete-chain integrity). When current
+    authority is available, requires decision_id + rationale_ref bind.
+    Missing/invalid artifact → quiet no-raise (never render arbitrary JSON).
+    """
+
+    from core.gv_v2_b0b_official_source_intake import (
+        CASE_ID,
+        DEFAULT_RESULT_PATH,
+        GvV2B0BError,
+        load_verified_b0b_result,
+    )
+
+    path = Path(result_json_path) if result_json_path is not None else DEFAULT_RESULT_PATH
+    if not path.is_file():
+        renderer.caption(
+            "V2-B0B official-source intake: no result artifact "
+            "(score 39 frozen; observed comparison count unchanged)"
+        )
+        return None
+    try:
+        result = load_verified_b0b_result(result_json_path=path)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, GvV2B0BError) as exc:
+        renderer.caption(f"V2-B0B official-source intake artifact refused: {exc}")
+        return None
+    if not isinstance(result, dict):
+        renderer.caption("V2-B0B official-source intake artifact refused: not an object")
+        return None
+
+    # When certified current authority exists, B0B surface must bind to it.
+    try:
+        current = load_current_certified_decision()
+    except GvFs0PresentationError:
+        current = None
+    if current is not None:
+        decision = current.get("decision") or {}
+        if str(result.get("decision_id")) != str(decision.get("decision_id")):
+            renderer.caption(
+                "V2-B0B official-source intake artifact refused: "
+                "decision_id does not match current authority"
+            )
+            return None
+        if str(result.get("rationale_ref")) != str(decision.get("rationale_ref")):
+            renderer.caption(
+                "V2-B0B official-source intake artifact refused: "
+                "rationale_ref does not match current authority"
+            )
+            return None
+        if str(result.get("certification_status")) != "CERTIFIED":
+            renderer.caption(
+                "V2-B0B official-source intake artifact refused: "
+                "result not CERTIFIED"
+            )
+            return None
+        if str(result.get("certified_decision_result_hash")) != str(
+            current.get("certified_decision_result_hash")
+        ):
+            renderer.caption(
+                "V2-B0B official-source intake artifact refused: "
+                "certified_decision_result_hash does not match current authority"
+            )
+            return None
+
+    renderer.subheader("GV-V2-B0B Official Source Intake — MU G_supply")
+    rows = [
+        {
+            "label": "slice_classification",
+            "value": str(result.get("slice_classification", "GV-V2-B0B-OFFICIAL-SOURCE-INTAKE")),
+        },
+        {"label": "case_id", "value": str(result.get("case_id", CASE_ID))},
+        {"label": "accession", "value": str(result.get("accession"))},
+        {"label": "admission_status", "value": str(result.get("admission_status"))},
+        {"label": "claim_outcome", "value": str(result.get("claim_outcome"))},
+        {"label": "research_action", "value": str(result.get("research_action"))},
+        {"label": "portfolio_action", "value": str(result.get("portfolio_action"))},
+        {"label": "decision_id", "value": str(result.get("decision_id"))},
+        {"label": "rationale_ref", "value": str(result.get("rationale_ref"))},
+        {
+            "label": "independent_source_count",
+            "value": str(result.get("independent_source_count", 1)),
+        },
+        {
+            "label": "data_admission_certificates_earned",
+            "value": str(result.get("data_admission_certificates_earned")),
+        },
+        {
+            "label": "real_external_source_packages_processed",
+            "value": str(result.get("real_external_source_packages_processed")),
+        },
+        {
+            "label": "certification_status",
+            "value": str(result.get("certification_status")),
+        },
+        {
+            "label": "shipped_product_score",
+            "value": str(result.get("shipped_product_score", 39)),
+        },
+    ]
+    renderer.table(rows)
+    renderer.caption(
+        "V2-B0B · verified chain · one official SEC accession · ADMITTED≠ADVANCE · "
+        "independent_source_count=1 · claim separate from admission · "
+        "paper NO_POSITION · score 39 frozen · not a G08 observation"
+    )
+    return dict(result)
+
+
+
 __all__ = [
     "DEFAULT_BUNDLE_PATH",
     "DEFAULT_CURRENT_DECISION_PATH",
@@ -323,5 +437,6 @@ __all__ = [
     "render_gv_fs0_certified_bundle",
     "render_gv_fs0_current_decision",
     "render_v2_b0_surface",
+    "render_v2_b0b_surface",
     "render_gv_fs0_portfolio",
 ]

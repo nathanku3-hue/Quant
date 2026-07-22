@@ -1,23 +1,23 @@
 # Planner Packet - Current
 
-## New Context Packet — B0A Closed on Main; B0B Sole Gate (2026-07-23)
+## New Context Packet — B0B Official Source Intake Executed (2026-07-23)
 
 ## What Was Done
-- PR #6 merged (`3e995f1` / head `79c309b`). Exact-head product, protocol, Windows/Linux, and parity green.
-- B0A local-source abstention banked and **closed** on canonical main.
-- Metrics unchanged: 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
+- Pre-read authorization for accession `0000723125-26-000015` remotely retained (`401a657`) before EDGAR fetch.
+- Exact three-object package banked; admission ADMITTED; claim CLAIM_INSUFFICIENT; HOLD → certified paper NO_POSITION.
+- Metrics: score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**; external packages **1**; certificates **1**.
 
 ## What Is Locked
-- B0A CLOSED — do not leave “merge pending” as active truth.
-- Explicit B0A/B0B deviation from original real-source gate is recorded.
-- No score uplift; no real external packages; no admission certificates.
+- ADMITTED never auto-ADVANCE; independent_source_count=1; B0A immutable.
+- Score/stage/observed unchanged by official-byte custody.
+- One issuer filing is not independent corroboration.
 
 ## What Is Next
-1. Open **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE** only (one official MU package).
-2. Detached authorization → exact official bytes → PIT/custody admission → separate claim evaluation → ADVANCE|HOLD|REJECT → certified action.
-3. Admission must never auto-advance research. Vacuous contradiction: use `NOT_EVALUATED` in B0B when no admitted facts.
+1. Hosted product + protocol + Ubuntu/Windows + parity green on this tip.
+2. Narrow audit → merge.
+3. After merge: first valid independent comparison on this fresh real case (observational only).
 
 ## First Command
 ```text
-.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_b0_real_block_only.py
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_b0b_official_source_intake.py
 ```

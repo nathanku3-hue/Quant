@@ -318,6 +318,9 @@ def test_default_dashboard_authority_is_current_decision_only() -> None:
             imports.update(alias.name for alias in node.names)
     assert "core.gv_fs0_bundle" in imports
     assert "core.gv_fs0_current_decision" in imports  # shared canonical reader only
+    # B0B active gate: adapter intentionally depends on verified B0B loader.
+    assert "core.gv_v2_b0b_official_source_intake" in imports
+    assert "load_verified_b0b_result" in adapter_source
     assert not any(
         name in imports
         for name in (
@@ -328,6 +331,9 @@ def test_default_dashboard_authority_is_current_decision_only() -> None:
             "strategies.strategy_replay",
         )
     )
+    # Portfolio page must fail closed on missing/invalid current authority.
+    assert "return" in body
+    assert "Certified decision unavailable" in body
 
 
 def test_tracked_permanent_bundle_matches_current_build() -> None:

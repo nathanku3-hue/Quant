@@ -419,12 +419,14 @@ def _imports(path: Path) -> set[str]:
 def test_static_product_boundaries() -> None:
     adapter_imports = _imports(ROOT / "views" / "gv_fs0_portfolio_adapter.py")
     adapter_core_imports = {name for name in adapter_imports if name.startswith("core.")}
-    # Read-only presentation: F1C bundle + current decision + E0B/V2-B0 result surfaces.
+    # Read-only presentation: F1C bundle + current decision + E0B/V2-B0/V2-B0B surfaces.
+    # B0B active gate intentionally imports the verified B0B loader (rebuild-from-raw).
     assert adapter_core_imports == {
         "core.gv_e0b_dv1_contradiction",
         "core.gv_fs0_bundle",
         "core.gv_fs0_current_decision",
         "core.gv_v2_b0_real_block_only",
+        "core.gv_v2_b0b_official_source_intake",
     }
     assert not any(name.startswith("validation.") for name in adapter_imports)
     assert not any(name.startswith("strategies.") for name in adapter_imports)
