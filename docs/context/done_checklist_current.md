@@ -9,11 +9,11 @@
 - [x] Authoritative state: score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed count 0.
 - [x] Product hosted green on repair tip `3c404479d9af963f497c889013e078adae68d516`.
 - [x] Invalidation tag `gv-e0b-dv1-g08-attempt-1-invalidated` peels to repair tip; historical result tag preserved non-authority.
-- [ ] Canonical main cutover of exact repair lineage (product + protocol + parity on main SHA).
+- [x] Canonical main cutover of exact repair lineage (product + protocol + parity on main SHA).
 - [ ] Open sole gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION (one real MU PIT package or certified data abstention).
 - [ ] Deferred: same-case Attempt-2 only when two real separate humans available (not roadmap blocker).
 
-Next action: complete main cutover, then V2-B0 real block-only admission — not synthetic G08 re-run.
+Next action: open sole gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION — not synthetic G08 re-run.
 
 ## Prior Addendum — E0B-DV1 Direction and Custody Repair Checklist (2026-07-21) [superseded next-actions]
 
