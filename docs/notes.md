@@ -6536,3 +6536,10 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - IMPROVED: total_delta > 0 AND >=1 targeted delta > 0 AND every core-safety delta >= 0; else valid complete comparison is NOT_IMPROVED.
 - One-shot artifact hash = domain_hash(ONESHOT_AUTH, {tag_object, case_id, attempt=1, candidate_commit, candidate_tree, preregistration_sha256}).
 - GitHub receipt hash = domain_hash(GITHUB_RECEIPT, receipt body without receipt_hash); rubric_sha256 must equal SHA-256 of exact imported bytes.
+
+## G08 Attempt-1 (2026-07-22)
+- Banked IMPROVED observed comparison on tip fb4769d5…; observed_count=1; score 39 frozen.
+- Product loop exercised: DecisionEnvelope NO_POSITION + certification bound to comparison hash.
+- Residual: operational principal labels / same-process agent execution; GitHub receipt is operational separation only.
+- Next: V2-B0 real block-only admission after this result-bearing commit hosted green.
+

@@ -1,0 +1,28 @@
+{
+  "action": "HOLD_FOR_EVIDENCE",
+  "alpha_claim": false,
+  "arm": "HUMAN_BASELINE",
+  "artifact_role": "AUTHORING_ONLY",
+  "authorship_kind": "REAL_HUMAN_OPERATOR",
+  "case_id": "E0B_DV1_G08_CONTRADICTION_1",
+  "contradictions_recognized": [
+    "SRC_A_FAB_UTIL_SYNTH value=8 SLOWER_RELIEF vs SRC_B_CAPEX_RAMP_SYNTH value=2 FASTER_RELIEF on qualified_sellable_supply_relief_quarters"
+  ],
+  "equal_budget_attestation": true,
+  "falsifiers": [
+    "F_G08_INDISPENSABLE_CONTRADICTION: if both SRC_A and SRC_B remain indispensable and unresolved, no unique physical-relief path is identified"
+  ],
+  "missing_evidence": [
+    "Reconciled point-in-time definition of qualified_sellable_supply_relief_quarters across SRC_A and SRC_B",
+    "Admissible hierarchy or veto rule for contradictory indispensable C1_PHYSICAL_RELIEF_SLOWER claims",
+    "Independent source that either corroborates one side or invalidates one source under protocol"
+  ],
+  "notes": "Baseline sealed before GodView packet; synthetic case only; no alpha claim.",
+  "operator_had_not_seen_packet_or_expected_outcome": true,
+  "operator_id": "OP_NATHANKU3",
+  "outside_research_attestation": false,
+  "post_cutoff_information_attestation": false,
+  "rationale": "Two indispensable synthetic sources disagree on qualified sellable supply relief horizon (8 quarters slower-relief vs 2 quarters faster-relief) for the same fact_key. Engine prohibitions bar averaging or majority-vote of contradictory indispensable values. Without a reconciling authority that resolves which relief path is admissible at the information cutoff, ADVANCE_TO_FULL_RESEARCH is not defensible; REJECT is also premature because the contradiction itself is evidence of identification failure rather than thesis falsification. HOLD_FOR_EVIDENCE is the correct research-triage abstention.",
+  "sealed_before_packet": true,
+  "template_id": "GV_E0B_G08_BASELINE_AUTHORING_V1"
+}

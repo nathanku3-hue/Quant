@@ -7445,3 +7445,15 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Added receipt-bound GitHub reviewer import and one-shot Attempt-1 authorization design; no production session or human comparison in this round.
 - Score 39 and stage `CERTIFIED_SINGLE_DECISION_OPERABLE` remain frozen; observed comparison count remains 0.
 - Hosted CI, independent A/B/C, terminal SAW, push, and G08 Attempt-1 remain separate gates.
+
+## 2026-07-22 — ROUND-20260722-E0B-DV1-G08-ATTEMPT-1
+
+- Decision: execute and bank single G08 Attempt-1 product vertical on frozen candidate `fb4769d5d44b749f9725f1f3590ba8d89e22bbf5` / tree `4342655b24685acb6ca43cf3f7bfc0fb57e55a84`.
+- Authorization: remote annotated tag `gv-e0b-dv1-g08-attempt-1` object `d19be4e05c46db05bfe5147c1089a607018fea3e`; oneshot auth artifact retained.
+- Principals (attribution only): operator `OP_NATHANKU3` (baseline+post); reviewer `REV_BLINDED_EXTERNAL` (receipt-bound). Operational separation only; no natural-personhood proof.
+- Product path: synthetic contradiction → baseline HOLD_FOR_EVIDENCE → GodView packet BLOCKED/CONTRADICTORY_INDISPENSABLE_EVIDENCE → post HOLD_FOR_EVIDENCE + NO_POSITION → DecisionEnvelope `DECISION_E0B_DV1_G08_1` rationale_ref `E0B:CMP:4524a358…` → Fs0Certification CERTIFIED → published current decision.
+- Observation: `comparison_observed_eligible=true`; `observed_comparison_count=1`; `decision_value_disposition=IMPROVED`; total delta +2; targeted gain on `falsifier_and_contradiction_recognition` (+1); core-safety deltas 0.
+- Claim ceiling: real-human-labeled within-case observation on synthetic case only; not real market decision, not general effectiveness, not causal superiority, not alpha, not score uplift. Score remains 39.
+- Next automatic gate: `GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION` (not opened in this bank).
+- Evidence: `data/gv_e0b/dv1_g08/**`, `data/gv_fs0/gv_fs0_current_decision.json`, tag `gv-e0b-dv1-g08-attempt-1`, reviewer receipt branch `g08/attempt-1-reviewer-receipt` @ `859a00ad…`.
+

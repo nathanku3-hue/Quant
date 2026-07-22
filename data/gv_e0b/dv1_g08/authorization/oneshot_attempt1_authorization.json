@@ -1,0 +1,16 @@
+{
+  "attempt": 1,
+  "authorization_artifact_sha256": "46e3a642f61742adb1cec9fdd050985def51959047feb7b97cae7199f8f19eb5",
+  "authorization_body_hash": "b185a226b1c61f0a161305b321032f21f8a74d050d6a8369aefef9cd83dabc9e",
+  "authorization_tag_object": "d19be4e05c46db05bfe5147c1089a607018fea3e",
+  "candidate_commit": "fb4769d5d44b749f9725f1f3590ba8d89e22bbf5",
+  "candidate_tree": "4342655b24685acb6ca43cf3f7bfc0fb57e55a84",
+  "case_id": "GV_E0B_DV1_G08",
+  "claim_boundary": {
+    "causal_superiority_proven": false,
+    "natural_personhood_proven": false,
+    "operational_separation_only": true
+  },
+  "preregistration_sha256": "2654af635b1db38eb2e0da43dd23e831a54b0abcdd6e02fd26d23c03fe7e0b09",
+  "schema_version": "gv_e0b_g08_oneshot_authorization_v1"
+}

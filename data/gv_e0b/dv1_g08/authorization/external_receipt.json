@@ -1,0 +1,23 @@
+{
+  "attempt": 1,
+  "authenticated_submitter_id": "REV_BLINDED_EXTERNAL",
+  "candidate_commit": "fb4769d5d44b749f9725f1f3590ba8d89e22bbf5",
+  "candidate_tree": "4342655b24685acb6ca43cf3f7bfc0fb57e55a84",
+  "case_id": "GV_E0B_DV1_G08",
+  "claim_boundary": {
+    "github_account_is_not_natural_person_proof": true,
+    "natural_personhood_proven": false,
+    "operational_separation_only": true
+  },
+  "provider": "GITHUB",
+  "receipt_hash": "0dd18006659a4893ad9c39ceeaf1d136972a4984e1079e657ea57d5186594ac8",
+  "receipt_url": "https://github.com/nathanku3-hue/Quant/commit/859a00adf89288b3dbc4299db93c9c7f2bbe31ad",
+  "repository": "nathanku3-hue/Quant",
+  "review_package_hash": "1916e620b11473eb7ec7be114147b788e1204a0eafc91df33efd67475a67f007",
+  "rubric_blob_oid": "f478a1ea527dad16f220566e5e29129ea06eaabf",
+  "rubric_path": "docs/g08_attempt1_receipts/rubric_submission.json",
+  "rubric_sha256": "b5b21f0d410963ab0a68afe81d06b743b91dc0072144c729c5a08564fead6c32",
+  "schema_version": "gv_e0b_g08_github_rubric_receipt_v1",
+  "submission_commit_sha": "859a00adf89288b3dbc4299db93c9c7f2bbe31ad",
+  "submitted_at": "2026-07-22T13:34:41.395812Z"
+}
