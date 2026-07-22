@@ -155,7 +155,7 @@ jobs:
             'tests/test_dash_1_page_registry_shell.py::test_dash_1_default_portfolio_route_renders_current_decision',
           ]))"
 
-      - name: Build F1C substrate + E0A current decision twice and emit parity artifact
+      - name: Build F1C substrate + G08 current authority parity artifact
         shell: bash
         run: |
           python - <<'PY'
@@ -174,18 +174,32 @@ jobs:
           )
           from core.gv_fs0_publish import build_default_certified_bundle
 
-          # Fixed E0A product authority identities (must match tracked artifact).
+          # E0A rebuild remains deterministic substrate (not tracked current after G08).
           EXPECTED_RESEARCH_DECISION_HASH = (
               "b4694a69bd1bc35a0d97a839ad47b66b517da1bd0f4abccd56bacca22d9e8e38"
           )
-          EXPECTED_RESULT_HASH = (
+          EXPECTED_E0A_RESULT_HASH = (
               "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6"
           )
-          EXPECTED_CURRENT_FILE_SHA256 = (
+          EXPECTED_E0A_CURRENT_FILE_SHA256 = (
               "7ba9c7c48dfc89ceae2a5a88aba8bfebbe6d5032272b0d254f4139478699b5c9"
           )
-          EXPECTED_CURRENT_BYTE_LENGTH = 23696
-          EXPECTED_RATIONALE_REF = f"E0A:RD:{EXPECTED_RESEARCH_DECISION_HASH}"
+          EXPECTED_E0A_CURRENT_BYTE_LENGTH = 23696
+          EXPECTED_E0A_RATIONALE_REF = f"E0A:RD:{EXPECTED_RESEARCH_DECISION_HASH}"
+
+          # Tracked product authority after G08 Attempt-1 publish.
+          EXPECTED_G08_DECISION_ID = "DECISION_E0B_DV1_G08_1"
+          EXPECTED_G08_COMPARISON_HASH = (
+              "4524a358ba46a3029627d09729eacfe515f4f501e6bb4b9d0ea82685dd2bac37"
+          )
+          EXPECTED_G08_RATIONALE_REF = f"E0B:CMP:{EXPECTED_G08_COMPARISON_HASH}"
+          EXPECTED_G08_RESULT_HASH = (
+              "0321f1bc926c790da48a5ff453c52eec0ed7454302840d0e3c146103ea09c5a2"
+          )
+          EXPECTED_G08_CURRENT_FILE_SHA256 = (
+              "2089697e82d9343846c3a57697997c5051c944b7cf404d76d2f5927fe65ea6fa"
+          )
+          EXPECTED_G08_CURRENT_BYTE_LENGTH = 23498
 
           # --- F1C dual-bundle substrate (evidence only) ---
           first_bundle = certified_bundle_bytes(build_default_certified_bundle())
@@ -197,35 +211,46 @@ jobs:
               raise SystemExit("tracked F1C bundle differs from current canonical build")
           bundle = build_default_certified_bundle()
 
-          # --- E0A current decision (default product authority) ---
-          first_current = certified_decision_result_bytes(build_e0a_certified_result())
-          second_current = certified_decision_result_bytes(build_e0a_certified_result())
-          if first_current != second_current:
+          # --- E0A rebuild determinism (substrate only) ---
+          e0a_first = certified_decision_result_bytes(build_e0a_certified_result())
+          e0a_second = certified_decision_result_bytes(build_e0a_certified_result())
+          if e0a_first != e0a_second:
               raise SystemExit("E0A current decision is not byte deterministic")
-          tracked_current = Path("data/gv_fs0/gv_fs0_current_decision.json").read_bytes()
-          if tracked_current != first_current:
-              raise SystemExit(
-                  "tracked current-decision artifact differs from published rebuild"
-              )
-          if len(first_current) != EXPECTED_CURRENT_BYTE_LENGTH:
-              raise SystemExit(
-                  f"current decision length {len(first_current)} != "
-                  f"{EXPECTED_CURRENT_BYTE_LENGTH}"
-              )
-          if sha256_bytes(first_current) != EXPECTED_CURRENT_FILE_SHA256:
-              raise SystemExit("current decision file SHA-256 mismatch")
+          if len(e0a_first) != EXPECTED_E0A_CURRENT_BYTE_LENGTH:
+              raise SystemExit("E0A rebuild length mismatch")
+          if sha256_bytes(e0a_first) != EXPECTED_E0A_CURRENT_FILE_SHA256:
+              raise SystemExit("E0A rebuild file SHA-256 mismatch")
           research = build_e0a_research_decision()
           if research["research_decision_hash"] != EXPECTED_RESEARCH_DECISION_HASH:
               raise SystemExit("research_decision_hash mismatch")
-          if research["rationale_ref"] != EXPECTED_RATIONALE_REF:
-              raise SystemExit("rationale_ref mismatch")
-          parsed = parse_current_decision_bytes(first_current)
-          if parsed["certified_decision_result_hash"] != EXPECTED_RESULT_HASH:
-              raise SystemExit("certified_decision_result_hash mismatch")
-          if parsed["decision"]["rationale_ref"] != EXPECTED_RATIONALE_REF:
-              raise SystemExit("decision.rationale_ref not bound to research hash")
-          if parsed["decision"]["action"] != "NO_POSITION":
+          if research["rationale_ref"] != EXPECTED_E0A_RATIONALE_REF:
+              raise SystemExit("E0A rationale_ref mismatch")
+          e0a_parsed = parse_current_decision_bytes(e0a_first)
+          if e0a_parsed["certified_decision_result_hash"] != EXPECTED_E0A_RESULT_HASH:
+              raise SystemExit("E0A certified_decision_result_hash mismatch")
+
+          # --- Tracked G08 current decision (default product authority) ---
+          tracked_current = Path("data/gv_fs0/gv_fs0_current_decision.json").read_bytes()
+          if len(tracked_current) != EXPECTED_G08_CURRENT_BYTE_LENGTH:
+              raise SystemExit(
+                  f"G08 current decision length {len(tracked_current)} != "
+                  f"{EXPECTED_G08_CURRENT_BYTE_LENGTH}"
+              )
+          if sha256_bytes(tracked_current) != EXPECTED_G08_CURRENT_FILE_SHA256:
+              raise SystemExit("G08 current decision file SHA-256 mismatch")
+          if tracked_current == e0a_first:
+              raise SystemExit("tracked current must be G08 authority, not E0A rebuild")
+          g08_parsed = parse_current_decision_bytes(tracked_current)
+          if g08_parsed["decision"]["decision_id"] != EXPECTED_G08_DECISION_ID:
+              raise SystemExit("G08 decision_id mismatch")
+          if g08_parsed["decision"]["action"] != "NO_POSITION":
               raise SystemExit("current decision action must be NO_POSITION")
+          if g08_parsed["decision"]["rationale_ref"] != EXPECTED_G08_RATIONALE_REF:
+              raise SystemExit("G08 rationale_ref must bind E0B:CMP comparison hash")
+          if g08_parsed["certified_decision_result_hash"] != EXPECTED_G08_RESULT_HASH:
+              raise SystemExit("G08 certified_decision_result_hash mismatch")
+          if g08_parsed["certification"]["certification_status"] != "CERTIFIED":
+              raise SystemExit("G08 certification_status must be CERTIFIED")
 
           record = {
               "f1c_substrate": {
@@ -234,14 +259,24 @@ jobs:
                   "byte_length": len(first_bundle),
                   "file_sha256": sha256_bytes(first_bundle),
               },
-              "e0a_current_decision": {
+              "e0a_substrate_rebuild": {
                   "research_decision_hash": EXPECTED_RESEARCH_DECISION_HASH,
-                  "certified_decision_result_hash": EXPECTED_RESULT_HASH,
-                  "rationale_ref": EXPECTED_RATIONALE_REF,
-                  "byte_length": len(first_current),
-                  "file_sha256": EXPECTED_CURRENT_FILE_SHA256,
+                  "certified_decision_result_hash": EXPECTED_E0A_RESULT_HASH,
+                  "rationale_ref": EXPECTED_E0A_RATIONALE_REF,
+                  "byte_length": len(e0a_first),
+                  "file_sha256": EXPECTED_E0A_CURRENT_FILE_SHA256,
                   "role": "NO_POSITION",
-                  "decision_id": parsed["decision"]["decision_id"],
+                  "decision_id": e0a_parsed["decision"]["decision_id"],
+              },
+              "g08_current_decision": {
+                  "decision_id": EXPECTED_G08_DECISION_ID,
+                  "comparison_hash": EXPECTED_G08_COMPARISON_HASH,
+                  "certified_decision_result_hash": EXPECTED_G08_RESULT_HASH,
+                  "rationale_ref": EXPECTED_G08_RATIONALE_REF,
+                  "byte_length": len(tracked_current),
+                  "file_sha256": EXPECTED_G08_CURRENT_FILE_SHA256,
+                  "role": "NO_POSITION",
+                  "value_disposition": "IMPROVED",
               },
           }
           Path("gv-fs0-product-parity.json").write_text(
@@ -284,9 +319,15 @@ jobs:
           if payloads[0] != payloads[1]:
               raise SystemExit("GV-FS0 product Windows/Linux parity differs")
           text = payloads[0].decode("utf-8")
-          if "e0a_current_decision" not in text:
-              raise SystemExit("parity record missing e0a_current_decision authority")
+          if "g08_current_decision" not in text:
+              raise SystemExit("parity record missing g08_current_decision authority")
+          if "e0a_substrate_rebuild" not in text:
+              raise SystemExit("parity record missing e0a_substrate_rebuild")
+          if "4524a358ba46a3029627d09729eacfe515f4f501e6bb4b9d0ea82685dd2bac37" not in text:
+              raise SystemExit("parity record missing G08 comparison hash")
+          if "0321f1bc926c790da48a5ff453c52eec0ed7454302840d0e3c146103ea09c5a2" not in text:
+              raise SystemExit("parity record missing G08 certified result hash")
           if "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6" not in text:
-              raise SystemExit("parity record missing fixed E0A result hash")
+              raise SystemExit("parity record missing fixed E0A substrate result hash")
           print(text.strip())
           PY
