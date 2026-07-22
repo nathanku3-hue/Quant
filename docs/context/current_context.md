@@ -1,36 +1,30 @@
-## Active Addendum — B0B Official Source Intake (2026-07-23)
+## Active Addendum — GV-ALPHA0_ACTIVE (2026-07-23)
 
-- **Gate:** GV-V2-B0B-OFFICIAL-SOURCE-INTAKE executed on accession 0000723125-26-000015.
-- **Result:** ADMITTED + CLAIM_INSUFFICIENT + HOLD_FOR_EVIDENCE → certified paper NO_POSITION (DECISION_V2_B0B_MU_G_SUPPLY_1).
-- **Metrics:** score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**; local abstention verticals **1**; external packages **1**; certificates **1**.
-- **Hard rules:** ADMITTED never auto-ADVANCE; contradiction NOT_EVALUATED when no claim-level admitted facts; independent_source_count=1.
+- **Train:** **GV-ALPHA0_ACTIVE** — end-to-end Alpha product by 2026-07-30 intent.
+- **Main:** PR #8 merged at `2c7f32c` (substrate `29cfeff`). B0B banked as **source family one**.
+- **Metrics:** score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**.
+- **Hard rules:** ADMITTED never auto-ADVANCE; formal comparison deferred after Alpha; case promote is result-last fail-closed (not rollback atomicity).
 - **B0A:** CLOSED/BANKED unchanged.
-- **Next after bank/merge:** first valid independent comparison on this fresh real case (not score uplift).
+- **Next (no stop):** exact authorized source family two → 3–5 facts + operator capture + certified result as one vertical → later reconciliation/export/dogfood on the same train.
 
 ## What Was Done
-- **PR #6 merged** to main at `3e995f1` (head `79c309b`). Hosted product + protocol + Ubuntu/Windows + parity green.
-- **GV-V2-B0A-LOCAL-SOURCE-ABSTENTION closed** on canonical main: certified local research-card abstention banked.
-- Result: BLOCKED / primary `MISSING_POINT_IN_TIME_AUTHORITY`; retained `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID` + incompleteness → HOLD_FOR_EVIDENCE → certified paper NO_POSITION (`DECISION_V2_B0_MU_G_SUPPLY_1`).
-- Positive ADMITTED path absent; no DataAdmissionCertificate; no automatic ADVANCE_TO_FULL_RESEARCH.
-- Metrics: score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**; local_source_abstention_verticals **1**; external packages **0**; certificates **0**.
+- B0B official SEC accession `0000723125-26-000015` admitted; claim INSUFFICIENT; HOLD → paper NO_POSITION.
+- R2 rebuild-from-raw; R2.1 auth-object set + parity pins; ALPHA0 strict JSON/byte locators/atomic promote.
+- Stale worker direction toward B0B-closure/comparison revoked.
 
 ## What Is Locked
-- B0A is **CLOSED / BANKED** — not “merge pending.” Classification is local source-authority abstention, not real external admission.
-- B0A/B0B split is an **explicit deviation** from the original single real-source gate (no silent drift).
-- Module path `core/gv_v2_b0_real_block_only.py` retained; classification + behavior are authoritative; no compatibility path.
-- G08 Attempt-2 deferred; FS1/providers/PEAD/optimizer/broker/alpha closed.
+- `GV-ALPHA0_ACTIVE` is sole active product train language.
+- Source family one = B0B MU package; independent_source_count=1 until family two banks.
+- No live capital, no score uplift, no formal human comparison gate for Alpha.
 
 ## What Is Next
-Sole functional gate: **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE**
 ```text
-detached source-specific authorization
-→ one exact official MU raw package
-→ PIT/custody admission
-→ separate G_supply claim evaluation
-→ ADVANCE | HOLD_FOR_EVIDENCE | REJECT_THESIS
-→ DecisionEnvelope → certified portfolio action
+authorize + bank independent source family two (exact objects)
+→ extract 3–5 case-specific facts
+→ operator decision capture
+→ certified paper NO_POSITION result
+→ (later) reconciliation / export / fresh-clone / dogfood
 ```
-Hard rule: `ADMITTED` never implies automatic advancement. When no admitted facts exist, contradiction check must be `NOT_EVALUATED` (not vacuous PASS).
 
 ## First Command
-`.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_b0_real_block_only.py`
+`.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_b0b_official_source_intake.py`

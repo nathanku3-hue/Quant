@@ -1,9 +1,9 @@
 # GV-V2-B0B-OFFICIAL-SOURCE-INTAKE — Controlling Brief (GV-ALPHA0 train)
 
-**Status:** REVISE_AND_GO — fold B0B into **GV-ALPHA0** release train (not phase-stop → B0C)  
-**Base:** main `2cd3e858…` · tip on PR #8 · score/stage/observed locked: `39` / `CERTIFIED_SINGLE_DECISION_OPERABLE` / `0`  
+**Status:** BANKED as source family one under **GV-ALPHA0_ACTIVE** (PR #8 @ `2c7f32c`)  
+**Base:** main `2c7f32c` · substrate `29cfeff` · score/stage/observed locked: `39` / `CERTIFIED_SINGLE_DECISION_OPERABLE` / `0`  
 **Deadline intent:** Alpha product by **2026-07-30** — optimize end-to-end operability, not sequential phase closure  
-**Audit:** R2.1 technical direction PASS; merge→truth-cutover→stop→B0C **revoked** as sole next sequence
+**Audit:** R2.1 PASS; ALPHA0 authority repairs PASS; merge-without-stop authorized; next = source family two
 
 ---
 

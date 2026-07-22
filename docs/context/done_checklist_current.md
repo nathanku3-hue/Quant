@@ -1,23 +1,20 @@
 # Done Checklist - Current
 
-## Active Addendum — B0B Official Source Intake (2026-07-23)
+## Active — GV-ALPHA0_ACTIVE (2026-07-23)
 
-- [x] Pre-read authorization remotely retained before first SEC fetch (`401a657`).
-- [x] Exact package banked: index + complete submission + primary `mu-20260528.htm` (accession `0000723125-26-000015`).
-- [x] Relational package_manifest with retrieved_at (auth receipt time null).
-- [x] Admission ADMITTED + certificate; contradiction status `NOT_EVALUATED` at admission layer.
-- [x] Separate claim evaluation `CLAIM_INSUFFICIENT`; research `HOLD_FOR_EVIDENCE`; paper `NO_POSITION`.
-- [x] Current decision `DECISION_V2_B0B_MU_G_SUPPLY_1`; score 39; observed 0; packages 1; certificates 1.
-- [x] B0A bank untouched.
-- [ ] Hosted product + protocol + Ubuntu/Windows + parity green.
-- [ ] Merge to main; then open first valid independent comparison on this fresh real case.
+- [x] PR #8 merged to main (`2c7f32c`); B0B substrate `29cfeff` banked as source family one.
+- [x] Hosted product + protocol + Ubuntu/Windows + parity green on merge tip (report-sourced).
+- [x] ALPHA0 authority: strict JSON, true byte locators, result-last case promote.
+- [x] Truth surfaces cut to **GV-ALPHA0_ACTIVE** (not B0B-stop → B0C).
+- [ ] Exact authorized **source family two** banked (pre-read auth before fetch; no reconciliation machinery first).
+- [ ] Family-two vertical: 3–5 case-specific facts + operator capture + certified NO_POSITION result.
+- [ ] Export/replay, fresh-clone proof, non-author dogfood (later Alpha cars).
+- [ ] Formal comparison: deferred after Alpha.
 
-## Banked B0A evidence (unchanged)
-- Classification: `GV-V2-B0A-LOCAL-SOURCE-ABSTENTION`
-- Decision: `DECISION_V2_B0_MU_G_SUPPLY_1` / HOLD → paper NO_POSITION
-- Score 39; observed 0; local abstention verticals 1
+## Banked substrate
 
-## Banked B0B evidence
-- Classification: `GV-V2-B0B-OFFICIAL-SOURCE-INTAKE`
-- Decision: `DECISION_V2_B0B_MU_G_SUPPLY_1` / HOLD → paper NO_POSITION
-- Admission ADMITTED; claim CLAIM_INSUFFICIENT; independent_source_count=1
+| Slice | Classification | Role in Alpha |
+|---|---|---|
+| B0A | `GV-V2-B0A-LOCAL-SOURCE-ABSTENTION` | Immutable local abstention |
+| B0B | `GV-V2-B0B-OFFICIAL-SOURCE-INTAKE` | Source family one (MU SEC accession) |
+| Family two | pending authorize+bank | Independent issuer package |

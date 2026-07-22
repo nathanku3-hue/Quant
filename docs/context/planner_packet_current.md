@@ -1,21 +1,25 @@
 # Planner Packet - Current
 
-## New Context Packet — B0B Official Source Intake Executed (2026-07-23)
+## New Context Packet — GV-ALPHA0_ACTIVE (2026-07-23)
 
 ## What Was Done
-- Pre-read authorization for accession `0000723125-26-000015` remotely retained (`401a657`) before EDGAR fetch.
-- Exact three-object package banked; admission ADMITTED; claim CLAIM_INSUFFICIENT; HOLD → certified paper NO_POSITION.
-- Metrics: score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**; external packages **1**; certificates **1**.
+- PR #8 merged to main at `2c7f32c` (tip substrate `29cfeff`). B0B banked as **source family one** inside Alpha — not a phase-stop.
+- ALPHA0 authority repairs on tip: strict duplicate-key JSON rejection; true byte locators; result-last fail-closed case promote (not full rollback atomicity).
+- Metrics locked: score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**.
 
 ## What Is Locked
-- ADMITTED never auto-ADVANCE; independent_source_count=1; B0A immutable.
-- Score/stage/observed unchanged by official-byte custody.
-- One issuer filing is not independent corroboration.
+- Active product train: **GV-ALPHA0_ACTIVE** (not B0B-closure / not B0C-as-phase / not formal comparison gate).
+- B0A CLOSED/BANKED; B0B = source family one (`SEC:0000723125-26-000015`).
+- ADMITTED never auto-ADVANCE; formal human comparison deferred until after Alpha.
+- Case promote is result-last fail-closed, not multi-file rollback transaction.
 
 ## What Is Next
-1. Hosted product + protocol + Ubuntu/Windows + parity green on this tip.
-2. Narrow audit → merge.
-3. After merge: first valid independent comparison on this fresh real case (observational only).
+```text
+exact authorized source family two (bank before reconciliation machinery)
+→ 3–5 case-specific facts + operator capture + certified result (one vertical)
+→ independent-source reconciliation (later car on same train)
+→ export/replay → fresh-clone proof → non-author dogfood
+```
 
 ## First Command
 ```text

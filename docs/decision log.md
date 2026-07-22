@@ -1,4 +1,13 @@
 
+## 2026-07-23 — ROUND-20260723-GV-ALPHA0-ACTIVE-CUTOVER
+
+- Decision: merge PR #8 (`2c7f32c`, substrate `29cfeff`) **without stopping**; cut main truth to **GV-ALPHA0_ACTIVE**.
+- Decision: B0B is banked **source family one**, not a phase-complete terminal. Revoke worker direction: merge → truth cutover → stop → B0C; revoke formal comparison as next Alpha gate.
+- Honesty: multi-file case promote is **result-last fail-closed**, not multi-file rollback atomicity.
+- Next: bank exact authorized **source family two** before reconciliation machinery; implement 3–5 case-specific facts + operator capture + certified result as **one vertical**.
+- Metrics unchanged: score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed 0.
+- Comparison/G08: deferred until after Alpha.
+
 ## 2026-07-23 — ROUND-20260723-V2-B0B-OFFICIAL-SOURCE-INTAKE
 
 - Decision: execute GV-V2-B0B-OFFICIAL-SOURCE-INTAKE on accession 0000723125-26-000015 (Micron 10-Q primary mu-20260528.htm; complete submission; index).

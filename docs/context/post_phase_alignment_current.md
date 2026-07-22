@@ -1,13 +1,13 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — B0A Closed on Main; B0B Active Gate (2026-07-23)
+## Active Addendum — GV-ALPHA0_ACTIVE (2026-07-23)
 
-- **What changed**: PR #6 merged (`3e995f1`). B0A local-source abstention is **CLOSED/BANKED** on canonical main. Active truth is not merge-pending.
-- **Streams**: Backend/Product own B0B official-source intake; Docs/Ops owns closed-B0A + active-B0B truth; Frontend stable; FS1/PEAD/optimizer/broker held.
-- **Current bottleneck**: one detached source-specific authorization + one exact official MU raw package (B0B) — not B0A ceremony.
-- **Endgame boundary**: real external bytes under B0B before maturity uplift; B0A is closed local-abstention substrate only.
-- **Next active stream**: **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE** only. Hard rules: ADMITTED ≠ auto ADVANCE; contradiction = NOT_EVALUATED when no admitted facts.
+- **What changed**: PR #8 merged. Product train is **GV-ALPHA0_ACTIVE**. B0B is source family one, not a stop.
+- **Streams**: Backend/Product own family-two bank + one vertical; Docs/Ops owns ALPHA0 truth; Frontend stable; FS1/PEAD/optimizer/broker held.
+- **Current bottleneck**: exact authorized independent source family two (pre-read auth → exact bytes) before any reconciliation engine.
+- **Endgame boundary**: Alpha = operability (sources → operator → certified result → replay/dogfood); formal comparison after Alpha.
+- **Next active stream**: authorize+bank source family two → facts + operator capture + certified result as **one vertical**.
 
-## Prior Addendum — B0A Local Source Abstention Repair (2026-07-23) [closed]
+## Prior — B0B as sole gate [revoked as stop]
 
-- B0A-R1 truth repair + hosted green + audit fixed; superseded as active gate by B0B after merge.
+Historical B0B-only gate language superseded by ALPHA0 train; B0B retained as banked family one only.

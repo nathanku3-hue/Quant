@@ -2,26 +2,29 @@
 
 Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
 Date: 2026-07-23
-Product tip lineage: main `3e995f1` (PR #6 merge; B0A head `79c309b`)
-Active work: **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE** (sole next functional gate). B0A CLOSED on main.
+Product tip lineage: main `2c7f32c` (PR #8 merge; B0B substrate `29cfeff`; B0A head `79c309b`)
+Active work: **GV-ALPHA0_ACTIVE** release train (not B0B phase-stop; not B0C-as-sole-gate).
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
-## Governing sequence (endgame law — explicit recut 2026-07-23)
+## Governing sequence (endgame law — explicit ALPHA0 recut 2026-07-23)
 
 ```text
 truth substrate
-→ invalidation-safe E0B product machinery shipped
-→ V2-B0A local research-card abstention preflight ← CLOSED/BANKED on main (PR #6)
-→ V2-B0B one official MU source intake           ← SOLE ACTIVE GATE
-→ first valid independent comparison on a fresh real case
-→ prospective paper economics
-→ independent replication
-→ live-capital consideration
+→ E0A/E0B machinery banked
+→ V2-B0A local abstention ← CLOSED/BANKED (PR #6)
+→ V2-B0B official MU intake ← BANKED as source family one (PR #8 @ 2c7f32c)
+→ GV-ALPHA0_ACTIVE train:
+     exact authorized source family two
+  → 3–5 facts + operator capture + certified result (one vertical)
+  → independent-source reconciliation (machinery after family two banked)
+  → export/replay → fresh-clone proof → non-author dogfood
+→ formal comparison DEFERRED until after Alpha
+→ prospective paper economics → replication → live-capital consideration
 ```
 
-**Deviation register:** same-case synthetic G08 Attempt-2 is **demoted** from sole roadmap blocker to deferred external validation.  
-Attempt-1 is **INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED** (append-only); sealed evidence preserved; observation count remains 0.  
-Original V2-B0 “real admission” claim is **explicitly split**: B0A = local abstention (done); B0B = official-source intake (active). No silent drift.
+**Deviation register:** B0B-closure → stop → B0C phase is **revoked** as Alpha direction.  
+Formal human comparison / G08 Attempt-2 is **deferred after Alpha**, not an Alpha release gate.  
+Case promote is result-last fail-closed, not multi-file rollback atomicity.
 
 Portfolio truth first. Decision value second. No fabricated alpha. No score engineering.
 
@@ -30,14 +33,16 @@ Portfolio truth first. Decision value second. No fabricated alpha. No score engi
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
 EXECUTION_MODEL = GV_FS0_FIRST
-ACTIVE_GATE = GV-V2-B0B-OFFICIAL-SOURCE-INTAKE (product vertical executed on branch; merge/parity pending)
-V2_B0A = CLOSED_BANKED_ON_MAIN (PR #6 @ 3e995f1 / head 79c309b; not merge-pending)
+ACTIVE_TRAIN = GV-ALPHA0_ACTIVE
+SOURCE_FAMILY_ONE = B0B_BANKED (SEC:0000723125-26-000015; PR #8 @ 2c7f32c)
+V2_B0A = CLOSED_BANKED_ON_MAIN (PR #6 @ 3e995f1 / head 79c309b)
 F1C_SHIP = CLOSED_SUBSTRATE
-E0A_OPERABLE = BANKED_SUBSTRATE (custody→HOLD_FOR_EVIDENCE→NO_POSITION; NOT decision value)
-E0B_G08_ATTEMPT_1 = INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED (evidence preserved; not observation authority)
-E0B_SAME_CASE_ATTEMPT_2 = DEFERRED_EXTERNAL_VALIDATION (not sole product gate)
+E0A_OPERABLE = BANKED_SUBSTRATE
+E0B_G08_ATTEMPT_1 = INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED
+E0B_SAME_CASE_ATTEMPT_2 = DEFERRED_AFTER_ALPHA (not Alpha gate)
 V2_B0A_RESULT = CERTIFIED_LOCAL_SOURCE_ABSTENTION → HOLD_FOR_EVIDENCE → NO_POSITION
-V2_B0_DECISION = DECISION_V2_B0B_MU_G_SUPPLY_1 (B0B current; B0A DECISION_V2_B0_MU_G_SUPPLY_1 banked)
+V2_B0_DECISION = DECISION_V2_B0B_MU_G_SUPPLY_1 (family one current authority)
+NEXT = exact authorized source family two → one vertical (facts+operator+certified result)
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
 FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
 OBSERVED_COMPARISON_COUNT = 0
@@ -434,27 +439,23 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-### Now — GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION only
+### Now — GV-ALPHA0_ACTIVE (source family two → one vertical)
 
-Objective: admit one bounded real MU point-in-time evidence package, or produce an exact certified data abstention.
+Objective: bank an **exact authorized independent source family two** *before* reconciliation machinery; then implement **one vertical**: 3–5 case-specific facts, operator decision capture, certified paper NO_POSITION.
 
-`	ext
-explicit DataAccessAuthorization
-→ exact immutable source bytes
-→ publication/known-at/effective-time identities
-→ evidence-purpose and licence checks
-→ contradiction and completeness checks
-→ DataAdmissionCertificate or exact admission block
-→ one real MU G_supply evaluation
-→ ADVANCE / HOLD_FOR_EVIDENCE / REJECT_THESIS
-→ DecisionEnvelope
-→ certified NO_POSITION or bounded paper action
-→ visible operator decision
-`
+```text
+pre-read detached authorization (family two)
+→ exact immutable independent source bytes
+→ package/admission (custody only; not auto-ADVANCE)
+→ 3–5 case-specific facts with true byte locators
+→ operator decision capture
+→ certified paper NO_POSITION (one atomic result surface)
+→ (later cars) reconciliation / export / replay / fresh-clone / dogfood
+```
 
-Legitimate terminal results include DATA_ABSTENTION, BLOCKED_MISSING_POINT_IN_TIME_AUTHORITY, BLOCKED_CONTRADICTORY_INDISPENSABLE_EVIDENCE, and HOLD_FOR_EVIDENCE / NO_POSITION. Do not force positive admission.
+Legitimate terminal results include HOLD_FOR_EVIDENCE / NO_POSITION and honest insufficiency. Do not force multi-source corroboration claims without banked family two. Formal comparison is **after Alpha**.
 
-Closed until valid real admission + later valid independent comparison: FS1, broad providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital, generic experiment platforms.
+Closed for Alpha release gate: G08 formal comparison, FS1, broad providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital.
 
 ### Same-case G08 Attempt-2 (deferred)
 

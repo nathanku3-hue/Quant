@@ -1,14 +1,14 @@
 # Impact Packet - Current
 
-## Active Addendum — Invalidation + V2-B0 Recut Impact (2026-07-22)
+## Active Addendum — GV-ALPHA0_ACTIVE Truth Cutover (2026-07-23)
 
-- **Owned runtime/test files**: `core/gv_e0b_dv1_contradiction.py` (receipt v2 + invalidation authority), `views/gv_fs0_portfolio_adapter.py`, E0B tests, product workflow parity pins restored to E0A current.
-- **Custody**: repair tip `3c404479d9af963f497c889013e078adae68d516`; invalidation supersedes observation without rewriting sealed Attempt-1 bytes.
-- **Public authority**: default current = E0A NO_POSITION; E0B smoke non-authoritative.
-- **Roadmap impact**: PR #6 merged; B0A CLOSED/BANKED on main; ACTIVE_GATE = GV-V2-B0B-OFFICIAL-SOURCE-INTAKE; same-case Attempt-2 demoted.
-- **Score/stage**: 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
-- **Not performed**: real external source intake (0 packages); B0B not started.
+- **Owned runtime:** `core/gv_v2_b0b_official_source_intake.py` (source family one); family-two module pending after exact authorize+bank.
+- **Custody:** main `2c7f32c` (PR #8); substrate `29cfeff`.
+- **Public authority:** default current decision remains B0B certified paper NO_POSITION until Alpha vertical advances publication deliberately.
+- **Roadmap impact:** ACTIVE_TRAIN = **GV-ALPHA0_ACTIVE**; B0B-closure/comparison worker direction revoked; next = source family two bank before reconciliation machinery.
+- **Score/stage:** 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
+- **Not performed:** source family two bank; multi-source reconciliation; formal comparison; export/dogfood.
 
-## Prior Addendum — E0B-DV1 Direction and Custody Repair (2026-07-21) [superseded next-step]
+## Prior — B0B merge (substrate)
 
-Historical C1-pending impact retained as history only.
+B0B official-source intake banked as family one; retained as history under ALPHA0 train.
