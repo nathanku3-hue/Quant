@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-18T19:19:12Z",
+  "generated_at_utc": "2026-07-22T12:24:00Z",
   "source_files": [
     "docs/context/bridge_contract_current.md",
     "docs/context/done_checklist_current.md",
@@ -115,23 +115,29 @@
   ],
   "active_phase": 65,
   "what_was_done": [
-    "E0A operable vertical is banked substrate (C 45f9f96 + C2 446ac6d; hosted CI PASS; A/B/C PASS; SAW PASS). One current certified decision only.",
-    "F1C-SHIP closed substrate; dual-fixture never default UI fallback.",
-    "Context bootstrap prefers product/E0A packets over historical PEAD blocks.",
-    "Owner audit: E0A-R1 = repair tax; E0B-DV1 = first real GodView product slice."
+    "Local C1 candidate banking on exact base `b7a24d3` / tree `c13b0a08` via explicit b7\u2192donor-byte transformation (donor committed base `e9e9a9a`; not a b7-descendant claim).",
+    "Path model: 18 authored/input paths + 2 regenerated current-context outputs + 1 tracked candidate manifest = 21 final paths.",
+    "Receipt-bound GitHub reviewer import + one-shot Attempt-1 authorization design (no production session open; no human comparison).",
+    "Preregistration brief freezes rubric, endpoint, IMPROVED formula, blinding, publication/rerun rules, and claim boundary.",
+    "`filelock==3.32.0` pinned in requirements.txt and pyproject.toml; product workflow emits runner image/version and full package inventory evidence."
   ],
   "what_is_locked": [
-    "E0A is plumbing only — not decision value / alpha / economics.",
-    "Observed-comparison count remains 0; unofficial decision-value/conjunctive maturity percentages are retired; additive substrate scores must not mask that.",
-    "E0A-R1 hard cap then stop; no dirty-root authority auto-canonization.",
-    "FS1, providers, PEAD reopen, alpha claims, broker, dual-authority default UI closed.",
-    "PEAD = TERMINATED_DIAGNOSTIC_ONLY history only."
+    "`SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`. `OBSERVED_COMPARISON_COUNT = 0`.",
+    "Within-case observational comparison only; no causal superiority; no cryptographic personhood; GitHub account separation is operational only.",
+    "FS1, V2-B0, providers, PEAD, broker, alpha, score uplift remain closed.",
+    "Hosted CI, independent A/B/C, terminal SAW, and G08 Attempt-1 remain pending after local bank."
   ],
   "what_is_next": [
-    "Repair PR #5 E0B-DV1 G08 in place: staged seals, reject unsealed, publish only when close-eligible, verified counts; real operator/reviewer run still required for observed count > 0. Score stays 39 frozen. Not FS1."
+    "Prove local C1 commit/tag identity, clean tree, and full local suites.",
+    "Push candidate when authorized; hosted Ubuntu/Windows + byte parity with recorded runner image/version.",
+    "Independent Reviewer A/B/C + terminal SAW on exact candidate commit/tree/tag.",
+    "Remotely retain one-shot Attempt-1 authorization; only then open real G08."
   ],
-  "first_command": "git show --stat --oneline HEAD",
+  "first_command": ".venv\\Scripts\\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py",
   "next_todos": [
-    "Complete real human baseline/post + independent reviewer seals for G08; keep score 39 frozen until verified observed comparison exists."
+    "Prove local C1 commit/tag identity, clean tree, and full local suites.",
+    "Push candidate when authorized; hosted Ubuntu/Windows + byte parity with recorded runner image/version.",
+    "Independent Reviewer A/B/C + terminal SAW on exact candidate commit/tree/tag.",
+    "Remotely retain one-shot Attempt-1 authorization; only then open real G08."
   ]
 }

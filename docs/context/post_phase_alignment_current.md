@@ -1,11 +1,12 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-E0A Main Cutover Alignment (2026-07-19)
+## Active Addendum — S-009X / E0B-DV1 Alignment (2026-07-21)
 
-- **What changed**: E0A product vertical is terminal on the product branch. Cutover preflight repairs stale active context (PEAD bootstrap) and reconciles truth surfaces so `main` can fast-forward honestly.
-- **Streams**: Docs/Ops owns cutover truth; Backend/Frontend product paths closed for E0A; Data/PEAD/FS1/broker held.
-- **Current bottleneck**: main lag + repaired-context custody (not missing product design). After smoke, bottleneck becomes missing **decision-value proof** (E0B), not more certification machinery.
-- **Next active stream**: Docs/Ops complete FF+smoke; then Backend/Docs plan **GV-E0B Decision-Value** only.
+- **What changed**: E0A-R1 remains permanently closed. Remote PR #5 C0 `b7a24d3` is the hosted-green publication-authority substrate; the local C1 donor now separates sign-independent observation eligibility from `IMPROVED | NOT_IMPROVED` product-value disposition.
+- **Streams**: Backend/Product and Product/Research own the bounded repair; Docs/Ops owns candidate/context custody; Frontend remains stable; Data/PEAD/FS1/broker remain held.
+- **Current bottleneck**: fresh approved-root C0 checkout and immutable C1 banking, followed by C1 hosted proof and independent acceptance — not product architecture and not additional certification machinery.
+- **Endgame boundary**: every valid G08 result is published/retained. `IMPROVED` earns S-009X PASS; `NOT_IMPROVED` falsifies the hypothesis without uplift and triggers replan.
+- **Next active stream**: bank C1 on exact `b7a24d3` (18+2+1=21 paths; receipt-bound reviewer custody + one-shot Attempt-1 design) → clean local proof → push → hosted parity and A/B/C → remote one-shot auth → real G08 from clean hosted-green checkout.
 
 ## Prior Addendum — GV-E0A-OPERABLE Direction Alignment (2026-07-19) [superseded on terminal/cutover]
 

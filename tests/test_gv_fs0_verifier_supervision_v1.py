@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
+import sys
+
+import pytest
+
+from core.gv_fs0_certify import GvFs0CertificationError, _supervise_process
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "docs/architecture/gv_fs0_certification_and_data_authority_contract.md"
@@ -89,3 +95,64 @@ def test_minimal_environment_allowlists_are_platform_specific() -> None:
     for variable in ["HOME", "TMPDIR", "TZ", "LC_ALL", "LANG", "SystemRoot", "WINDIR", "COMSPEC", "PATHEXT", "TEMP", "TMP"]:
         assert variable in contract
     assert "PATH may be included only if the selected Python distribution demonstrably requires it" in contract
+
+
+def test_production_supervisor_enforces_stdout_limit(tmp_path: Path) -> None:
+    command = [
+        sys.executable,
+        "-c",
+        "import sys; sys.stdout.buffer.write(b'x' * 65); sys.stdout.flush()",
+    ]
+    with pytest.raises(
+        GvFs0CertificationError,
+        match="VERIFIER_OUTPUT_LIMIT_EXCEEDED",
+    ):
+        _supervise_process(
+            command,
+            cwd=str(tmp_path),
+            env=os.environ,
+            deadline_seconds=2.0,
+            shutdown_seconds=0.5,
+            stdout_limit=64,
+            stderr_limit=64,
+        )
+
+
+def test_production_supervisor_enforces_monotonic_timeout(tmp_path: Path) -> None:
+    command = [sys.executable, "-c", "import time; time.sleep(1)"]
+    with pytest.raises(GvFs0CertificationError, match="VERIFIER_TIMEOUT"):
+        _supervise_process(
+            command,
+            cwd=str(tmp_path),
+            env=os.environ,
+            deadline_seconds=0.05,
+            shutdown_seconds=0.5,
+            stdout_limit=64,
+            stderr_limit=64,
+        )
+
+
+def test_production_supervisor_captures_stdout_and_stderr_concurrently(
+    tmp_path: Path,
+) -> None:
+    command = [
+        sys.executable,
+        "-c",
+        (
+            "import sys; "
+            "sys.stdout.buffer.write(b'out'); sys.stdout.flush(); "
+            "sys.stderr.buffer.write(b'err'); sys.stderr.flush()"
+        ),
+    ]
+    returncode, stdout, stderr = _supervise_process(
+        command,
+        cwd=str(tmp_path),
+        env=os.environ,
+        deadline_seconds=2.0,
+        shutdown_seconds=0.5,
+        stdout_limit=64,
+        stderr_limit=64,
+    )
+    assert returncode == 0
+    assert stdout == b"out"
+    assert stderr == b"err"

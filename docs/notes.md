@@ -1,3 +1,18 @@
+## 2026-07-21 E0B Observation / Decision-Value Formula Registry
+
+- Runtime: `core/gv_e0b_dv1_contradiction.py::decision_value_disposition_from_comparison`.
+- Observation gate: `comparison_observed_eligible := real_same_operator_baseline_post AND different_real_blinded_reviewer AND operator_freshness_attested AND reviewer_blinded_receipt_attested AND full_seal_chain_replay_valid`.
+- Observed count: `observed_comparison_count := 1 if comparison_observed_eligible else 0`.
+- Item delta: `delta_i := post_packet_score_i - baseline_score_i` for each frozen rubric item.
+- Total delta: `delta_total := Σ_i delta_i`; the runtime rejects any stored total inconsistent with the six item deltas.
+- Targeted gain: `targeted_gain := (delta_indispensable_missing_evidence_identification > 0) OR (delta_falsifier_and_contradiction_recognition > 0)`.
+- Core safety preservation: `safety_not_worse := (delta_selected_action_defensibility >= 0) AND (delta_avoidance_of_claims_beyond_evidence >= 0)`.
+- Value disposition: `IMPROVED iff delta_total > 0 AND targeted_gain AND safety_not_worse; else NOT_IMPROVED`.
+- Claim boundary: observation eligibility is sign-independent and controls publication/count. Only `IMPROVED` is positive one-case decision-value evidence for S-009X. `NOT_IMPROVED` is retained falsification, not product PASS. Neither disposition establishes general causal superiority, alpha, population effectiveness, or score uplift.
+- No compatibility alias: `e0b_close_eligible` is deleted rather than mapped to either observation or value.
+- Custody lineage: `main@2653eb1 → e9e9a9a → C0=b7a24d3 → C1 observation/value repair`; C1 must have parent `b7a24d3`.
+- C1 source transfer: exactly 15 source-of-truth files. `current_context.json`, `current_context.md`, stale SAW, caches, and test output are excluded and regenerated after C1 source stabilization.
+
 ## 2026-07-19 Score Semantics + Functional Stage Definition
 
 ### SHIPPED_PRODUCT_SCORE
@@ -6515,3 +6530,9 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Certification: exactly two isolated verifier attempts must both reproduce the primary economic payload and hash; all ten tri-state checks must be TRUE before status may be CERTIFIED.
 - F1A boundary: certified OPEN remains in memory and is injected into the final read-only adapter. No permanent two-component bundle or default dashboard route is authorized.
 
+
+## 2026-07-22 — E0B C1 custody formulas
+
+- IMPROVED: total_delta > 0 AND >=1 targeted delta > 0 AND every core-safety delta >= 0; else valid complete comparison is NOT_IMPROVED.
+- One-shot artifact hash = domain_hash(ONESHOT_AUTH, {tag_object, case_id, attempt=1, candidate_commit, candidate_tree, preregistration_sha256}).
+- GitHub receipt hash = domain_hash(GITHUB_RECEIPT, receipt body without receipt_hash); rubric_sha256 must equal SHA-256 of exact imported bytes.

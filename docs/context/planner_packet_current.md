@@ -1,34 +1,33 @@
 # Planner Packet - Current
 
-## New Context Packet — E0B-DV1 Authority Repair (2026-07-20)
+## New Context Packet — E0B-DV1 C1 Candidate Bank (2026-07-22)
 
 ## What Was Done
 
-- PR #5 authority repair (do **not** merge `7c6e19c`; do **not** run human experiment on it).
-- Append-only event journal; sealed arm-open events; bound exact chain with REVIEW_PACKAGE.
-- Equal 60m **budget cap** (early submit allowed); third attestor removed; mechanical ARM_A/ARM_B blinding.
-- Narrow capture runner: `scripts/gv_e0b_g08_capture.py`.
-- V2 = `RECOMMENDED_NEXT_PROTOCOL`; V1 formal until frozen V2 artifact.
-- Score 39 frozen; observed-comparison count 0; stage unchanged.
+- Local C1 candidate banking on exact base `b7a24d3` / tree `c13b0a08` via explicit b7→donor-byte transformation (donor committed base `e9e9a9a`; not a b7-descendant claim).
+- Path model: 18 authored/input paths + 2 regenerated current-context outputs + 1 tracked candidate manifest = 21 final paths.
+- Receipt-bound GitHub reviewer import + one-shot Attempt-1 authorization design (no production session open; no human comparison).
+- Preregistration brief freezes rubric, endpoint, IMPROVED formula, blinding, publication/rerun rules, and claim boundary.
+- `filelock==3.32.0` pinned in requirements.txt and pyproject.toml; product workflow emits runner image/version and full package inventory evidence.
 
 ## What Is Locked
 
-- `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`.
-- Ledger is tamper-evident under capture-process custody only (not independent wall-clock/personhood proof).
-- Two humans only: operator (baseline+post) + different blinded reviewer (rubric).
-- FS1, providers, PEAD, broker, alpha, score design remain closed.
+- `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`. `OBSERVED_COMPARISON_COUNT = 0`.
+- Within-case observational comparison only; no causal superiority; no cryptographic personhood; GitHub account separation is operational only.
+- FS1, V2-B0, providers, PEAD, broker, alpha, score uplift remain closed.
+- Hosted CI, independent A/B/C, terminal SAW, and G08 Attempt-1 remain pending after local bank.
 
 ## What Is Next
 
-1. Hosted CI green (Ubuntu + Windows + parity) on this repair tip.
-2. Thin authority review.
-3. Real G08 capture via runner (1 operator + 1 blinded reviewer) — only on green tip.
-4. Full replay → publish if eligible → count 0→1 → stage promote → merge → open V2-B0.
+1. Prove local C1 commit/tag identity, clean tree, and full local suites.
+2. Push candidate when authorized; hosted Ubuntu/Windows + byte parity with recorded runner image/version.
+3. Independent Reviewer A/B/C + terminal SAW on exact candidate commit/tree/tag.
+4. Remotely retain one-shot Attempt-1 authorization; only then open real G08.
 
 ## First Command
 
 ```text
-.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py tests/gv_fs0_product/test_authority_chain.py::test_roadmap_declares_gv_fs0_authority_chain tests/gv_fs0_product/test_open_vertical.py::test_static_product_boundaries
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py
 ```
 
 ## End Context Packet

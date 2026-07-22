@@ -6,7 +6,7 @@ Close requires real operator + different real reviewer + bound chain replay.
 
 from __future__ import annotations
 
-import inspect
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -18,32 +18,58 @@ from core.gv_e0b_dv1_contradiction import (
     AUTH_FIXTURE,
     AUTH_REAL_OPERATOR,
     AUTH_REAL_REVIEWER,
+    FIXTURE_SOURCE_COMMIT,
+    FIXTURE_SOURCE_TREE,
+    ONESHOT_ATTEMPT,
+    ONESHOT_CASE_ID,
+    build_github_rubric_receipt,
+    build_oneshot_authorization,
+    verify_oneshot_authorization,
+    verify_github_rubric_receipt,
+    import_external_rubric_submission,
+    assert_mapping_reveal_allowed,
+    AUTHORING_ONLY,
+    BASELINE_TEMPLATE_ID,
     AdvanceableClock,
     BLOCK_REASON,
     BUDGET_MINUTES,
     CANONICAL_STAGE_ORDER,
+    CAPTURE_STATE_ABORTED,
+    CAPTURE_STATE_ACTIVE,
+    CAPTURE_STATE_RESUMABLE,
     CASE_ID,
+    DECISION_VALUE_IMPROVED,
+    DECISION_VALUE_NOT_IMPROVED,
     E0B_DECISION_ID,
+    POST_TEMPLATE_ID,
     RATIONALE_REF_PREFIX,
     REVIEW_ARM_FIELDS,
     REVIEW_INPUT_MODE_BLINDED,
     RUBRIC_ITEMS,
+    RUBRIC_TEMPLATE_ID,
     RUN_CLASS_SYNTHETIC,
     GvE0bDv1Error,
+    abort_capture_session,
+    append_capture_checkpoint,
     blank_baseline_authoring_template,
     blank_post_authoring_template,
     blank_rubric_authoring_template,
     build_comparison,
     build_comparison_presentation,
     build_result_document,
+    decision_value_disposition_from_comparison,
     e0b_rationale_ref,
     is_attribution_structure_valid,
     is_observed_comparison_eligible,
+    capture_lifecycle_state,
     load_baseline_seal,
+    load_capture_checkpoints,
     load_capture_session,
+    load_session_manifest,
     load_post_packet_seal,
     observed_comparison_count_from_disk,
     open_capture_session,
+    recover_capture_checkpoint,
     render_e0b_dv1_comparison,
     run_e0b_dv1_case,
     seal_baseline_record,
@@ -55,13 +81,13 @@ from core.gv_e0b_dv1_contradiction import (
     stage_capture_baseline,
     stage_capture_post,
     stage_capture_rubric,
-    stage_compare,
     stage_generate_packet,
     stage_open_arm,
     verify_bundle_seal,
     verify_mapping_randomization,
     verify_review_package_bound_to_records,
     verify_result_document,
+    verify_session_manifest,
     write_authoring_templates,
     write_canonical_artifacts,
 )
@@ -102,6 +128,8 @@ def _baseline_authoring(
     operator_fresh: bool = True,
 ) -> dict[str, Any]:
     return {
+        "artifact_role": AUTHORING_ONLY,
+        "template_id": BASELINE_TEMPLATE_ID,
         "case_id": CASE_ID,
         "arm": "HUMAN_BASELINE",
         "authorship_kind": authorship,
@@ -129,6 +157,8 @@ def _post_authoring(
     bundle_hash: str,
 ) -> dict[str, Any]:
     return {
+        "artifact_role": AUTHORING_ONLY,
+        "template_id": POST_TEMPLATE_ID,
         "case_id": CASE_ID,
         "arm": "HUMAN_POST_PACKET",
         "authorship_kind": authorship,
@@ -158,10 +188,14 @@ def _rubric_authoring(
     arm_a_fill: int = 0,
     arm_b_fill: int = 2,
     reviewer_blinded_receipt: bool = True,
+    review_package_hash: str | None = None,
+    session_manifest_hash: str | None = None,
 ) -> dict[str, Any]:
     """Blinded ARM authoring only — no baseline/post score path."""
 
     return {
+        "artifact_role": AUTHORING_ONLY,
+        "template_id": RUBRIC_TEMPLATE_ID,
         "case_id": CASE_ID,
         "authorship_kind": authorship,
         "reviewer_id": reviewer_id,
@@ -173,6 +207,9 @@ def _rubric_authoring(
         "fresh_operator_attested": True,
         "blinded_review_conditions_attested": True,
         "reviewer_received_only_blinded_review_package": reviewer_blinded_receipt,
+        "review_package_hash_attested": review_package_hash,
+        "session_manifest_hash_attested": session_manifest_hash,
+        "reviewer_export_boundary_attested": True,
     }
 
 
@@ -187,6 +224,31 @@ def _plain(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return [_plain(item) for item in value]
     return value
+
+
+def _comparison_with_deltas(
+    comparison: Any,
+    item_values: dict[str, int],
+    *,
+    total_override: int | None = None,
+) -> dict[str, Any]:
+    candidate = _plain(comparison)
+    values = {item: int(item_values.get(item, 0)) for item in RUBRIC_ITEMS}
+    candidate["delta"]["item_score_differences"] = {
+        item: {
+            "magnitude": abs(value),
+            "is_negative": value < 0,
+            "value_string": str(value),
+        }
+        for item, value in values.items()
+    }
+    total = sum(values.values()) if total_override is None else total_override
+    candidate["delta"]["total_score_difference"] = {
+        "magnitude": abs(total),
+        "is_negative": total < 0,
+        "value_string": str(total),
+    }
+    return candidate
 
 
 def _write_json(path: Path, payload: Any) -> Path:
@@ -228,10 +290,16 @@ def _fixture_paths(
     bundle = sealed_adversarial_bundle()
     clock = AdvanceableClock(_TEST_START)
     session_path = tmp_path / "session.json"
-    open_capture_session(bundle=bundle, session_path=session_path, clock=clock)
-
     op = "OP_HUMAN_1" if real_human else "OP_FIXTURE_1"
     rev = "REV_HUMAN_1" if real_human else "REV_FIXTURE_1"
+    open_capture_session(
+        bundle=bundle,
+        session_path=session_path,
+        clock=clock,
+        operator_principal_id=op,
+        reviewer_principal_id=rev,
+    )
+
     op_auth = AUTH_REAL_OPERATOR if real_human else AUTH_FIXTURE
     rev_auth = AUTH_REAL_REVIEWER if real_human else AUTH_FIXTURE
     spend = early_submit_minutes if early_submit_minutes is not None else 30
@@ -320,14 +388,47 @@ def _fixture_paths(
 
     clock.advance_minutes(5)
     r_path = tmp_path / "rubric_scores.json"
+    package_record = json.loads(pkg_path.read_text(encoding="utf-8"))
+    session_record = load_capture_session(session_path)
+    rubric_auth = _rubric_authoring(
+        reviewer_id=rev,
+        authorship=rev_auth,
+        arm_a_fill=baseline_fill,
+        arm_b_fill=post_fill,
+        reviewer_blinded_receipt=reviewer_blinded_receipt,
+        review_package_hash=package_record["review_package_hash"],
+        session_manifest_hash=session_record["session_manifest_hash"],
+    )
+    external_receipt = None
+    external_rubric_path = None
+    if real_human:
+        # Operational separation via external GitHub receipt (fixture bytes).
+        ext_path = tmp_path / "external_rubric_submission.json"
+        ext_bytes = (
+            json.dumps(rubric_auth, indent=2, sort_keys=True) + "\n"
+        ).encode("utf-8")
+        ext_path.write_bytes(ext_bytes)
+        import hashlib as _hashlib
+        rubric_sha = _hashlib.sha256(ext_bytes).hexdigest()
+        manifest = session_record["session_manifest"]
+        external_receipt = build_github_rubric_receipt(
+            repository="example/quant-reviewer-fixtures",
+            authenticated_submitter_id=rev,
+            submission_commit_sha="a" * 40,
+            rubric_path="reviewer_submissions/g08_rubric.json",
+            rubric_blob_oid="b" * 40,
+            rubric_sha256=rubric_sha,
+            receipt_url="https://github.com/example/quant-reviewer-fixtures/commit/" + ("a" * 40),
+            submitted_at=clock.now(),
+            review_package_hash=package_record["review_package_hash"],
+            candidate_commit=str(manifest["source_commit"]),
+            candidate_tree=str(manifest["source_tree"]),
+            case_id=ONESHOT_CASE_ID,
+            attempt=ONESHOT_ATTEMPT,
+        )
+        external_rubric_path = ext_path
     stage_capture_rubric(
-        _rubric_authoring(
-            reviewer_id=rev,
-            authorship=rev_auth,
-            arm_a_fill=baseline_fill,
-            arm_b_fill=post_fill,
-            reviewer_blinded_receipt=reviewer_blinded_receipt,
-        ),
+        rubric_auth,
         rubric_path=r_path,
         baseline_path=b_path,
         post_path=p_path,
@@ -337,6 +438,8 @@ def _fixture_paths(
         mapping_path=map_path,
         bundle=bundle,
         clock=clock,
+        external_receipt=external_receipt,
+        external_rubric_path=external_rubric_path,
     )
     return b_path, pkt_path, p_path, r_path, session_path, pkg_path, map_path, bundle, packet
 
@@ -435,8 +538,86 @@ def test_comparison_positive_zero_negative_deltas(tmp_path: Path) -> None:
         assert int(delta["value_string"]) == expected
         assert comparison["stage_claim"]["shipped_product_score"] == 39
         assert comparison["stage_claim"]["observed_comparison_count"] == 0
-        assert comparison["stage_claim"]["e0b_close_eligible"] is False
+        assert comparison["stage_claim"]["comparison_observed_eligible"] is False
+        assert comparison["stage_claim"]["decision_value_disposition"] is None
+        expected_disposition = (
+            DECISION_VALUE_IMPROVED
+            if post_fill > baseline_fill
+            else DECISION_VALUE_NOT_IMPROVED
+        )
+        assert (
+            decision_value_disposition_from_comparison(comparison)
+            == expected_disposition
+        )
         assert comparison["godview_packet"]["generated_at"] == packet["generated_at"]
+
+
+def test_value_disposition_requires_targeted_gain(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "no_target_gain"
+    )
+    comparison = build_comparison(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+    )
+    candidate = _comparison_with_deltas(comparison, {"rationale_traceability": 1})
+    assert (
+        decision_value_disposition_from_comparison(candidate)
+        == DECISION_VALUE_NOT_IMPROVED
+    )
+
+
+def test_value_disposition_rejects_core_safety_regression(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "safety_regression"
+    )
+    comparison = build_comparison(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+    )
+    candidate = _comparison_with_deltas(
+        comparison,
+        {
+            "indispensable_missing_evidence_identification": 2,
+            "selected_action_defensibility": -1,
+        },
+    )
+    assert (
+        decision_value_disposition_from_comparison(candidate)
+        == DECISION_VALUE_NOT_IMPROVED
+    )
+
+
+def test_value_disposition_rejects_inconsistent_total(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "inconsistent_total"
+    )
+    comparison = build_comparison(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+    )
+    candidate = _comparison_with_deltas(
+        comparison,
+        {"indispensable_missing_evidence_identification": 1},
+        total_override=2,
+    )
+    with pytest.raises(GvE0bDv1Error, match="E0B_VALUE_TOTAL_DELTA_MISMATCH"):
+        decision_value_disposition_from_comparison(candidate)
 
 
 def test_early_submit_within_budget_cap_accepted(tmp_path: Path) -> None:
@@ -852,14 +1033,183 @@ def test_atomic_result_and_decision_packet(tmp_path: Path) -> None:
     )
     assert result_path.is_file()
     assert result["result_hash"]
-    assert result["close_claim"]["observed_comparison_count"] == 0
-    assert result["close_claim"]["third_attestor_required"] is False
+    assert result["observation_claim"]["observed_comparison_count"] == 0
+    assert result["observation_claim"]["third_attestor_required"] is False
+    assert result["value_claim"]["decision_value_disposition"] is None
     loaded = json.loads(result_path.read_text(encoding="utf-8"))
     verify_result_document(loaded)
     assert "sealed_records" in loaded
+    assert packet_path.read_text(encoding="utf-8").startswith(
+        "# GV-E0B-DV1 Decision Packet"
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "error"),
+    [
+        ("rule_version", "G08_OTHER", "E0B_VALUE_RULE_VERSION_INVALID"),
+        (
+            "improved_requires_positive_total_delta",
+            False,
+            "E0B_VALUE_RULE_TOTAL_INVALID",
+        ),
+        (
+            "improved_requires_targeted_dimension_gain",
+            ["indispensable_missing_evidence_identification"],
+            "E0B_VALUE_RULE_TARGETED_INVALID",
+        ),
+        (
+            "improved_forbids_core_safety_regression",
+            ["selected_action_defensibility"],
+            "E0B_VALUE_RULE_SAFETY_INVALID",
+        ),
+        (
+            "general_causal_superiority_claim",
+            True,
+            "E0B_VALUE_CAUSAL_CLAIM_FORBIDDEN",
+        ),
+    ],
+)
+def test_resealed_value_rule_metadata_tamper_is_rejected(
+    tmp_path: Path,
+    field: str,
+    value: Any,
+    error: str,
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, _packet = _fixture_paths(
+        tmp_path / field,
+        real_human=True,
+    )
+    comparison = build_comparison(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+    )
+    from core.gv_e0b_dv1_contradiction import _collect_sealed_records
+
+    seals = _collect_sealed_records(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+        bundle=bundle,
+    )
+    raw = _plain(build_result_document(comparison, sealed_records=seals))
+    raw["value_claim"][field] = value
+    body = {key: item for key, item in raw.items() if key != "result_hash"}
+    raw["result_hash"] = domain_hash("GV-E0B:DV1:RESULT:V1", body)
+    with pytest.raises(GvE0bDv1Error, match=error):
+        verify_result_document(raw)
+
+
+@pytest.mark.parametrize("preexisting", [False, True])
+def test_canonical_artifact_pair_rolls_back_on_second_replace_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    preexisting: bool,
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, _packet = _fixture_paths(tmp_path / "caps")
+    comparison = build_comparison(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+    )
+    from core.gv_e0b_dv1_contradiction import _collect_sealed_records
+
+    seals = _collect_sealed_records(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+        bundle=bundle,
+    )
+    result_path = tmp_path / "result.json"
+    packet_path = tmp_path / "decision_packet.md"
+    result_before = b"prior-result\n"
+    packet_before = b"prior-packet\n"
+    if preexisting:
+        result_path.write_bytes(result_before)
+        packet_path.write_bytes(packet_before)
+
+    real_replace = e0b_mod.os.replace
+    replace_calls = 0
+
+    def fail_second_replace(source: Any, target: Any) -> None:
+        nonlocal replace_calls
+        replace_calls += 1
+        if replace_calls == 2:
+            raise OSError("forced-second-replace-failure")
+        real_replace(source, target)
+
+    monkeypatch.setattr(e0b_mod.os, "replace", fail_second_replace)
+    with pytest.raises(OSError, match="forced-second-replace-failure"):
+        write_canonical_artifacts(
+            comparison,
+            sealed_records=seals,
+            result_json_path=result_path,
+            decision_packet_path=packet_path,
+        )
+
+    if preexisting:
+        assert result_path.read_bytes() == result_before
+        assert packet_path.read_bytes() == packet_before
+    else:
+        assert not result_path.exists()
+        assert not packet_path.exists()
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_path_identity_uncertainty_fails_before_artifact_mutation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    monkeypatch.setattr(
+        e0b_mod.os.path,
+        "samestat",
+        lambda *_args: (_ for _ in ()).throw(PermissionError("identity denied")),
+    )
+    result_path = tmp_path / "result.json"
+    packet_path = tmp_path / "decision_packet.md"
+    target = tmp_path / "current.json"
+    with pytest.raises(GvE0bDv1Error, match="E0B_CASE_PATH_IDENTITY_UNCERTAIN"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=result_path,
+            decision_packet_path=packet_path,
+            publish=True,
+            current_target=target,
+            current_lock=tmp_path / "current.lock",
+        )
+    assert not result_path.exists()
+    assert not packet_path.exists()
+    assert not target.exists()
 
 
 def test_e0b_official_publication_surface_is_result_bound_only() -> None:
+    import inspect
+
     forbidden = {
         "build_e0b_certified_result",
         "build_e0b_book",
@@ -870,9 +1220,163 @@ def test_e0b_official_publication_surface_is_result_bound_only() -> None:
     assert forbidden.isdisjoint(set(e0b_mod.__all__))
     for name in forbidden:
         assert not hasattr(e0b_mod, name), name
-    assert "publish" not in inspect.signature(stage_compare).parameters
-    assert "publish" in inspect.signature(run_e0b_dv1_case).parameters
-    assert "close_eligible" not in inspect.signature(run_e0b_dv1_case).parameters
+    assert e0b_mod.run_e0b_dv1_case is run_e0b_dv1_case
+    public_publication_entries = []
+    for name in e0b_mod.__all__:
+        value = getattr(e0b_mod, name)
+        if inspect.isfunction(value) and "publish" in inspect.signature(value).parameters:
+            public_publication_entries.append(name)
+    assert public_publication_entries == ["run_e0b_dv1_case"]
+    assert "current_target" not in inspect.signature(e0b_mod.stage_compare).parameters
+    assert "current_lock" not in inspect.signature(e0b_mod.stage_compare).parameters
+
+
+@pytest.mark.parametrize(
+    "alias_kind",
+    ["target_result", "target_decision_packet", "target_baseline", "lock_result"],
+)
+def test_publication_paths_cannot_alias_case_evidence(
+    tmp_path: Path, alias_kind: str
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    baseline_before = b.read_bytes()
+    result_path = tmp_path / "result.json"
+    decision_packet_path = tmp_path / "decision_packet.md"
+    current_target = tmp_path / "current.json"
+    current_lock = tmp_path / "current.lock"
+    if alias_kind == "target_result":
+        current_target = result_path
+    elif alias_kind == "target_decision_packet":
+        current_target = decision_packet_path
+    elif alias_kind == "target_baseline":
+        current_target = b
+        current_lock = b.parent / "current.lock"
+    elif alias_kind == "lock_result":
+        current_lock = result_path
+
+    with pytest.raises(GvE0bDv1Error, match="E0B_CASE_PATH_ALIAS"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=result_path,
+            decision_packet_path=decision_packet_path,
+            publish=True,
+            current_target=current_target,
+            current_lock=current_lock,
+        )
+
+    assert b.read_bytes() == baseline_before
+    assert not result_path.exists()
+    assert not decision_packet_path.exists()
+    if current_target not in {b, result_path, decision_packet_path}:
+        assert not current_target.exists()
+
+
+def test_result_and_decision_packet_paths_cannot_alias(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(tmp_path / "caps")
+    shared_path = tmp_path / "result-and-packet"
+    with pytest.raises(GvE0bDv1Error, match="E0B_CASE_PATH_ALIAS"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=shared_path,
+            decision_packet_path=shared_path,
+        )
+    assert not shared_path.exists()
+
+
+def test_in_memory_packet_must_match_verified_disk_packet(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, packet = _fixture_paths(tmp_path / "caps")
+    alternate = _plain(packet)
+    alternate["rationale"] = "adversarial alternate packet rationale"
+    alternate_body = {
+        key: item for key, item in alternate.items() if key != "packet_hash"
+    }
+    alternate["packet_hash"] = domain_hash("GV-E0B:DV1:PACKET:V1", alternate_body)
+    result_path = tmp_path / "result.json"
+    decision_packet_path = tmp_path / "decision_packet.md"
+
+    with pytest.raises(GvE0bDv1Error, match="E0B_PACKET_SOURCE_MISMATCH"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            packet=alternate,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=result_path,
+            decision_packet_path=decision_packet_path,
+        )
+
+    assert not result_path.exists()
+    assert not decision_packet_path.exists()
+
+
+def test_in_memory_packet_default_path_cannot_alias_result(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    b, _pkt, p, r, sess, pkg, mp, _bundle, packet = _fixture_paths(tmp_path / "caps")
+    shared_path = tmp_path / "implicit-packet-and-result.json"
+    monkeypatch.setattr(e0b_mod, "DEFAULT_PACKET_PATH", shared_path)
+
+    with pytest.raises(GvE0bDv1Error, match="E0B_CASE_PATH_ALIAS:packet:result"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet=packet,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=shared_path,
+            decision_packet_path=tmp_path / "decision_packet.md",
+        )
+
+    assert not shared_path.exists()
+
+
+def test_publication_rejects_hard_link_alias_to_result(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    result_path = tmp_path / "result.json"
+    current_target = tmp_path / "current.json"
+    sentinel = b"verified-result-custody\n"
+    result_path.write_bytes(sentinel)
+    current_target.hardlink_to(result_path)
+
+    with pytest.raises(GvE0bDv1Error, match="E0B_CASE_PATH_ALIAS"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=result_path,
+            decision_packet_path=tmp_path / "decision_packet.md",
+            publish=True,
+            current_target=current_target,
+            current_lock=tmp_path / "current.lock",
+        )
+
+    assert result_path.read_bytes() == sentinel
+    assert current_target.read_bytes() == sentinel
 
 
 @pytest.mark.parametrize("preexisting", [False, True])
@@ -884,8 +1388,9 @@ def test_fixture_publish_rejected_without_creating_or_replacing_target(
     sentinel = b"fixture-publication-must-not-replace\n"
     if preexisting:
         target.write_bytes(sentinel)
-
-    with pytest.raises(GvE0bDv1Error, match="E0B_PUBLISH_REQUIRES_CLOSE_ELIGIBLE"):
+    with pytest.raises(
+        GvE0bDv1Error, match="E0B_PUBLISH_REQUIRES_OBSERVED_ELIGIBLE"
+    ):
         run_e0b_dv1_case(
             baseline_path=b,
             post_path=p,
@@ -900,28 +1405,26 @@ def test_fixture_publish_rejected_without_creating_or_replacing_target(
             current_target=target,
             current_lock=tmp_path / "current.lock",
         )
-
     if preexisting:
         assert target.read_bytes() == sentinel
     else:
         assert not target.exists()
 
 
-@pytest.mark.parametrize("invalid_count", [0, 1.0, "1", True])
-def test_publish_requires_exact_integer_count_one_from_reloaded_result(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, invalid_count: Any
+def test_publish_requires_exact_count_one_from_reloaded_result(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
         tmp_path / "caps", real_human=True
     )
     real_loader = e0b_mod.load_verified_result
 
-    def invalid_count_loader(path: Path) -> Any:
+    def count_zero_loader(path: Path) -> Any:
         result = _plain(real_loader(path))
-        result["close_claim"]["observed_comparison_count"] = invalid_count
+        result["observation_claim"]["observed_comparison_count"] = 0
         return result
 
-    monkeypatch.setattr(e0b_mod, "load_verified_result", invalid_count_loader)
+    monkeypatch.setattr(e0b_mod, "load_verified_result", count_zero_loader)
     target = tmp_path / "current.json"
     with pytest.raises(GvE0bDv1Error, match="E0B_PUBLISH_REQUIRES_COUNT_ONE"):
         run_e0b_dv1_case(
@@ -977,22 +1480,27 @@ def test_tampered_reloaded_result_cannot_publish(
     assert not target.exists()
 
 
-def test_reloaded_result_comparison_mismatch_cannot_publish(
+def test_result_comparison_mismatch_cannot_publish(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
         tmp_path / "caps", real_human=True
     )
-    real_loader = e0b_mod.load_verified_result
+    real_writer = e0b_mod.write_canonical_artifacts
 
-    def mismatching_loader(path: Path) -> Any:
-        result = _plain(real_loader(path))
-        result["comparison"]["comparison_hash"] = "0" * 64
+    def mismatching_writer(*args: Any, **kwargs: Any) -> Any:
+        result = real_writer(*args, **kwargs)
+        result_path = Path(kwargs["result_json_path"])
+        raw = json.loads(result_path.read_text(encoding="utf-8"))
+        raw["comparison"]["comparison_hash"] = "0" * 64
+        body = {key: value for key, value in raw.items() if key != "result_hash"}
+        raw["result_hash"] = domain_hash("GV-E0B:DV1:RESULT:V1", body)
+        _write_json(result_path, raw)
         return result
 
-    monkeypatch.setattr(e0b_mod, "load_verified_result", mismatching_loader)
+    monkeypatch.setattr(e0b_mod, "write_canonical_artifacts", mismatching_writer)
     target = tmp_path / "current.json"
-    with pytest.raises(GvE0bDv1Error, match="E0B_RESULT_SEAL_MISMATCH"):
+    with pytest.raises(GvE0bDv1Error, match="E0B_COMPARISON_SEAL_MISMATCH"):
         run_e0b_dv1_case(
             baseline_path=b,
             post_path=p,
@@ -1010,7 +1518,177 @@ def test_reloaded_result_comparison_mismatch_cannot_publish(
     assert not target.exists()
 
 
-def test_fixture_not_close_eligible(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("field", "value", "error"),
+    [
+        ("schema_version", "gv_e0b_dv1_result_v999", "E0B_RESULT_SCHEMA_INVALID"),
+        ("case_id", "G08-OTHER", "E0B_RESULT_CASE_ID_MISMATCH"),
+        ("run_class", "OTHER", "E0B_RESULT_RUN_CLASS_MISMATCH"),
+    ],
+)
+def test_resealed_result_identity_tamper_cannot_publish(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    field: str,
+    value: str,
+    error: str,
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    real_writer = e0b_mod.write_canonical_artifacts
+
+    def identity_tampering_writer(*args: Any, **kwargs: Any) -> Any:
+        result = real_writer(*args, **kwargs)
+        result_path = Path(kwargs["result_json_path"])
+        raw = json.loads(result_path.read_text(encoding="utf-8"))
+        raw[field] = value
+        body = {key: item for key, item in raw.items() if key != "result_hash"}
+        raw["result_hash"] = domain_hash("GV-E0B:DV1:RESULT:V1", body)
+        _write_json(result_path, raw)
+        return result
+
+    monkeypatch.setattr(e0b_mod, "write_canonical_artifacts", identity_tampering_writer)
+    target = tmp_path / "current.json"
+    with pytest.raises(GvE0bDv1Error, match=error):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=tmp_path / "result.json",
+            decision_packet_path=tmp_path / "decision_packet.md",
+            publish=True,
+            current_target=target,
+            current_lock=tmp_path / "current.lock",
+        )
+    assert not target.exists()
+
+
+def test_resealed_comparison_metadata_tamper_cannot_publish(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    real_writer = e0b_mod.write_canonical_artifacts
+
+    def comparison_tampering_writer(*args: Any, **kwargs: Any) -> Any:
+        result = real_writer(*args, **kwargs)
+        result_path = Path(kwargs["result_json_path"])
+        raw = json.loads(result_path.read_text(encoding="utf-8"))
+        raw["comparison"]["case_id"] = "G08-OTHER"
+        comparison_body = {
+            key: item
+            for key, item in raw["comparison"].items()
+            if key != "comparison_hash"
+        }
+        raw["comparison"]["comparison_hash"] = domain_hash(
+            "GV-E0B:DV1:COMPARISON:V1", comparison_body
+        )
+        result_body = {key: item for key, item in raw.items() if key != "result_hash"}
+        raw["result_hash"] = domain_hash("GV-E0B:DV1:RESULT:V1", result_body)
+        _write_json(result_path, raw)
+        return result
+
+    monkeypatch.setattr(e0b_mod, "write_canonical_artifacts", comparison_tampering_writer)
+    target = tmp_path / "current.json"
+    with pytest.raises(GvE0bDv1Error, match="E0B_RESULT_COMPARISON_BINDING_MISMATCH"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=tmp_path / "result.json",
+            decision_packet_path=tmp_path / "decision_packet.md",
+            publish=True,
+            current_target=target,
+            current_lock=tmp_path / "current.lock",
+        )
+    assert not target.exists()
+
+
+@pytest.mark.parametrize("invalid_count", ["1", True])
+def test_non_integer_canonical_count_one_cannot_publish(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    invalid_count: Any,
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    real_writer = e0b_mod.write_canonical_artifacts
+
+    def invalid_count_writer(*args: Any, **kwargs: Any) -> Any:
+        result = real_writer(*args, **kwargs)
+        result_path = Path(kwargs["result_json_path"])
+        raw = json.loads(result_path.read_text(encoding="utf-8"))
+        raw["observation_claim"]["observed_comparison_count"] = invalid_count
+        body = {key: item for key, item in raw.items() if key != "result_hash"}
+        raw["result_hash"] = domain_hash("GV-E0B:DV1:RESULT:V1", body)
+        _write_json(result_path, raw)
+        return result
+
+    monkeypatch.setattr(e0b_mod, "write_canonical_artifacts", invalid_count_writer)
+    target = tmp_path / "current.json"
+    with pytest.raises(GvE0bDv1Error, match="E0B_OBSERVED_COUNT_MISMATCH"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=tmp_path / "result.json",
+            decision_packet_path=tmp_path / "decision_packet.md",
+            publish=True,
+            current_target=target,
+            current_lock=tmp_path / "current.lock",
+        )
+    assert not target.exists()
+
+
+def test_float_count_one_from_loader_cannot_publish(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    real_loader = e0b_mod.load_verified_result
+
+    def float_count_loader(path: Path) -> Any:
+        result = _plain(real_loader(path))
+        result["observation_claim"]["observed_comparison_count"] = 1.0
+        return result
+
+    monkeypatch.setattr(e0b_mod, "load_verified_result", float_count_loader)
+    target = tmp_path / "current.json"
+    with pytest.raises(GvE0bDv1Error, match="E0B_PUBLISH_REQUIRES_COUNT_ONE"):
+        run_e0b_dv1_case(
+            baseline_path=b,
+            post_path=p,
+            rubric_path=r,
+            packet_path=pkt,
+            session_path=sess,
+            package_path=pkg,
+            mapping_path=mp,
+            result_json_path=tmp_path / "result.json",
+            decision_packet_path=tmp_path / "decision_packet.md",
+            publish=True,
+            current_target=target,
+            current_lock=tmp_path / "current.lock",
+        )
+    assert not target.exists()
+
+
+def test_fixture_not_observation_eligible(tmp_path: Path) -> None:
     b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(tmp_path / "caps")
     comparison = build_comparison(
         baseline_path=b,
@@ -1021,7 +1699,8 @@ def test_fixture_not_close_eligible(tmp_path: Path) -> None:
         package_path=pkg,
         mapping_path=mp,
     )
-    assert comparison["stage_claim"]["e0b_close_eligible"] is False
+    assert comparison["stage_claim"]["comparison_observed_eligible"] is False
+    assert comparison["stage_claim"]["decision_value_disposition"] is None
     assert (
         is_observed_comparison_eligible(
             comparison["baseline"],
@@ -1032,7 +1711,7 @@ def test_fixture_not_close_eligible(tmp_path: Path) -> None:
     )
 
 
-def test_real_human_two_person_enables_close_and_publish(tmp_path: Path) -> None:
+def test_real_human_two_person_enables_observation_and_publish(tmp_path: Path) -> None:
     b, pkt, p, r, sess, pkg, mp, bundle, _packet = _fixture_paths(
         tmp_path / "caps", real_human=True
     )
@@ -1046,8 +1725,9 @@ def test_real_human_two_person_enables_close_and_publish(tmp_path: Path) -> None
         mapping_path=mp,
     )
     assert comparison["stage_claim"]["attribution_structure_valid"] is True
-    # Comparison seal freezes close false; result-level eligibility is true for reals.
-    assert comparison["stage_claim"]["e0b_close_eligible"] is False
+    # Comparison seal freezes observation/value claims; result derives them from seals.
+    assert comparison["stage_claim"]["comparison_observed_eligible"] is False
+    assert comparison["stage_claim"]["decision_value_disposition"] is None
     assert comparison["rubric"]["review_input_mode"] == REVIEW_INPUT_MODE_BLINDED
     assert comparison["baseline"]["operator_had_not_seen_packet_or_expected_outcome"] is True
     assert (
@@ -1080,7 +1760,8 @@ def test_real_human_two_person_enables_close_and_publish(tmp_path: Path) -> None
         current_target=tmp_path / "current.json",
         current_lock=tmp_path / "current.lock",
     )
-    assert out["e0b_close_eligible"] is True
+    assert out["comparison_observed_eligible"] is True
+    assert out["decision_value_disposition"] == DECISION_VALUE_IMPROVED
     assert out["observed_comparison_count"] == 1
     assert observed_comparison_count_from_disk(tmp_path / "result.json") == 1
     component = parse_current_decision_bytes((tmp_path / "current.json").read_bytes())
@@ -1090,6 +1771,42 @@ def test_real_human_two_person_enables_close_and_publish(tmp_path: Path) -> None
         result_comparison_hash
     )
     assert component["decision"]["rationale_ref"].startswith(RATIONALE_REF_PREFIX)
+
+
+def test_valid_not_improved_result_still_publishes_as_falsification(
+    tmp_path: Path,
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, _bundle, _packet = _fixture_paths(
+        tmp_path / "not_improved",
+        real_human=True,
+        baseline_fill=1,
+        post_fill=1,
+    )
+    out = run_e0b_dv1_case(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+        result_json_path=tmp_path / "result.json",
+        decision_packet_path=tmp_path / "decision_packet.md",
+        publish=True,
+        current_target=tmp_path / "current.json",
+        current_lock=tmp_path / "current.lock",
+    )
+    assert out["comparison_observed_eligible"] is True
+    assert out["observed_comparison_count"] == 1
+    assert out["decision_value_disposition"] == DECISION_VALUE_NOT_IMPROVED
+    assert out["published"]["status"] in {
+        "PUBLISHED",
+        "REPLACED",
+        "ALREADY_CURRENT",
+    }
+    assert (tmp_path / "current.json").is_file()
+    packet_text = (tmp_path / "decision_packet.md").read_text(encoding="utf-8")
+    assert "decision_value_disposition: `NOT_IMPROVED`" in packet_text
 
 
 def test_third_attestor_api_removed() -> None:
@@ -1263,7 +1980,8 @@ def test_fixture_run_not_observed_close(tmp_path: Path) -> None:
         publish=False,
     )
     assert out["observed_comparison_count"] == 0
-    assert out["e0b_close_eligible"] is False
+    assert out["comparison_observed_eligible"] is False
+    assert out["decision_value_disposition"] is None
     assert out["run_class"] == RUN_CLASS_SYNTHETIC
     assert observed_comparison_count_from_disk(tmp_path / "result.json") == 0
 
@@ -1357,8 +2075,8 @@ def test_mutated_observed_count_does_not_display(tmp_path: Path) -> None:
         decision_packet_path=tmp_path / "decision_packet.md",
     )
     raw = json.loads(result_path.read_text(encoding="utf-8"))
-    raw["close_claim"]["observed_comparison_count"] = 7
-    raw["close_claim"]["e0b_close_eligible"] = True
+    raw["observation_claim"]["observed_comparison_count"] = 7
+    raw["observation_claim"]["comparison_observed_eligible"] = True
     result_path.write_text(json.dumps(raw) + "\n", encoding="utf-8")
     assert observed_comparison_count_from_disk(result_path) == 0
     with pytest.raises(GvE0bDv1Error):
@@ -1789,3 +2507,613 @@ def test_stage_build_review_package_has_no_rng_bytes_param() -> None:
 
     sig = inspect.signature(stage_build_review_package)
     assert "rng_bytes" not in sig.parameters
+
+
+def test_session_manifest_binds_git_principals_templates_and_budget_start(
+    tmp_path: Path,
+) -> None:
+    authoring_dir = tmp_path / "captures" / "authoring"
+    forms = write_authoring_templates(authoring_dir)
+    session_path = tmp_path / "captures" / "session.json"
+    clock = AdvanceableClock(_TEST_START)
+    prereg = "f" * 64
+    oneshot = build_oneshot_authorization(
+        authorization_tag_object="c" * 40,
+        candidate_commit="a" * 40,
+        candidate_tree="b" * 40,
+        preregistration_sha256=prereg,
+    )
+    session = open_capture_session(
+        session_path=session_path,
+        clock=clock,
+        source_commit="a" * 40,
+        source_tree="b" * 40,
+        protocol_freeze_manifest_sha256="d" * 64,
+        operator_principal_id="OP_REAL_001",
+        reviewer_principal_id="REV_REAL_001",
+        authoring_template_paths=forms,
+        oneshot_authorization=oneshot,
+        preregistration_sha256=prereg,
+    )
+    manifest_path = session_path.parent / "session_manifest.json"
+    manifest = load_session_manifest(manifest_path)
+    assert verify_session_manifest(manifest) == manifest["session_manifest_hash"]
+    assert manifest["session_id"] == session["session_nonce"]
+    assert manifest["source_commit"] == "a" * 40
+    assert manifest["source_tree"] == "b" * 40
+    assert manifest["protocol_freeze_manifest_sha256"] == "d" * 64
+    assert manifest["operator_principal_id"] == "OP_REAL_001"
+    assert manifest["reviewer_principal_id"] == "REV_REAL_001"
+    assert manifest["oneshot_authorization"]["authorization_body_hash"] == oneshot[
+        "authorization_body_hash"
+    ]
+    assert manifest["budget_started_at"] == _TEST_START
+    assert [item["role"] for item in manifest["authoring_templates"]] == [
+        "baseline",
+        "post",
+        "rubric",
+    ]
+    by_role = {item["role"]: item for item in manifest["authoring_templates"]}
+    for role, path in forms.items():
+        assert by_role[role]["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
+        assert by_role[role]["byte_length"] == len(path.read_bytes())
+        assert by_role[role]["artifact_role"] == AUTHORING_ONLY
+
+    forged = _plain(manifest)
+    forged["authoring_templates"][0]["sha256"] = "c" * 64
+    body = {k: v for k, v in forged.items() if k != "session_manifest_hash"}
+    forged["session_manifest_hash"] = domain_hash(
+        "GV-E0B:DV1:SESSION_MANIFEST:V1", body
+    )
+    with pytest.raises(
+        GvE0bDv1Error,
+        match="E0B_AUTHORING_TEMPLATE_DESCRIPTOR_INVALID:sha256",
+    ):
+        verify_session_manifest(forged)
+
+
+def test_session_open_rejects_same_principal_and_nonblank_template(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(GvE0bDv1Error, match="E0B_REVIEWER_MUST_DIFFER_FROM_OPERATOR"):
+        open_capture_session(
+            session_path=tmp_path / "same" / "session.json",
+            operator_principal_id="PRINCIPAL_1",
+            reviewer_principal_id="PRINCIPAL_1",
+        )
+
+    authoring_dir = tmp_path / "changed" / "captures" / "authoring"
+    forms = write_authoring_templates(authoring_dir)
+    changed = json.loads(forms["baseline"].read_text(encoding="utf-8"))
+    changed["action"] = "HOLD_FOR_EVIDENCE"
+    forms["baseline"].write_text(json.dumps(changed) + "\n", encoding="utf-8")
+    session_path = tmp_path / "changed" / "captures" / "session.json"
+    with pytest.raises(GvE0bDv1Error, match="E0B_AUTHORING_TEMPLATE_NOT_BLANK:baseline"):
+        open_capture_session(
+            session_path=session_path,
+            operator_principal_id="OP_REAL_001",
+            reviewer_principal_id="REV_REAL_001",
+            authoring_template_paths=forms,
+        )
+    assert not session_path.exists()
+    assert not (session_path.parent / "session_manifest.json").exists()
+
+
+def test_real_reviewer_attests_exact_package_manifest_and_export_boundary(
+    tmp_path: Path,
+) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, packet = _fixture_paths(
+        tmp_path / "caps", real_human=True
+    )
+    package = json.loads(pkg.read_text(encoding="utf-8"))
+    rubric = json.loads(r.read_text(encoding="utf-8"))
+    session = load_capture_session(sess)
+    boundary = package["reviewer_export_boundary"]
+    assert boundary["exact_file_names"] == [
+        "review_package.json",
+        "rubric_authoring.json",
+    ]
+    assert boundary["private_mapping_excluded"] is True
+    assert boundary["session_scoped_directory"] is True
+    custody = rubric["custody_attestation"]
+    assert custody["review_package_hash_attested"] == package["review_package_hash"]
+    assert custody["session_manifest_hash_attested"] == session["session_manifest_hash"]
+    assert custody["reviewer_export_boundary_attested"] is True
+
+    baseline = load_baseline_seal(b, expected_bundle_hash=bundle["bundle_hash"])
+    post = load_post_packet_seal(p, packet=packet, baseline=baseline)
+    mapping = json.loads(mp.read_text(encoding="utf-8"))
+    bad = {
+        **_rubric_authoring(
+            reviewer_id="REV_HUMAN_1",
+            authorship=AUTH_REAL_REVIEWER,
+            review_package_hash="0" * 64,
+            session_manifest_hash=session["session_manifest_hash"],
+        ),
+        "scored_at": "2026-07-19T14:00:00.000000Z",
+        "session_nonce": session["session_nonce"],
+        "prev_chain_hash": "3" * 64,
+    }
+    with pytest.raises(GvE0bDv1Error, match="E0B_REVIEWER_PACKAGE_ATTESTATION_MISMATCH"):
+        seal_rubric_record(
+            bad,
+            baseline=baseline,
+            post=post,
+            packet=packet,
+            review_package=package,
+            review_mapping=mapping,
+        )
+
+
+def test_production_session_rejects_stage_without_active_checkpoint(
+    tmp_path: Path,
+) -> None:
+    forms = write_authoring_templates(tmp_path / "captures" / "authoring")
+    session_path = tmp_path / "captures" / "session.json"
+    clock = AdvanceableClock(_TEST_START)
+    prereg = "f" * 64
+    oneshot = build_oneshot_authorization(
+        authorization_tag_object="d" * 40,
+        candidate_commit="a" * 40,
+        candidate_tree="b" * 40,
+        preregistration_sha256=prereg,
+    )
+    open_capture_session(
+        session_path=session_path,
+        clock=clock,
+        source_commit="a" * 40,
+        source_tree="b" * 40,
+        protocol_freeze_manifest_sha256="c" * 64,
+        operator_principal_id="OP_REAL_001",
+        reviewer_principal_id="REV_REAL_001",
+        authoring_template_paths=forms,
+        oneshot_authorization=oneshot,
+        preregistration_sha256=prereg,
+    )
+    with pytest.raises(
+        GvE0bDv1Error,
+        match="E0B_CAPTURE_ACTIVE_CHECKPOINT_REQUIRED",
+    ):
+        stage_open_arm("BASELINE", session_path=session_path, clock=clock)
+    append_capture_checkpoint(
+        session_path=session_path,
+        operation="OPEN_BASELINE",
+        state=CAPTURE_STATE_ACTIVE,
+        detail="operation_started",
+        clock=clock,
+    )
+    opened = stage_open_arm("BASELINE", session_path=session_path, clock=clock)
+    assert opened["arm"] == "BASELINE"
+
+
+def test_checkpoint_recovery_distinguishes_resumable_and_aborted(
+    tmp_path: Path,
+) -> None:
+    bundle = sealed_adversarial_bundle()
+    clock = AdvanceableClock(_TEST_START)
+    session_path = tmp_path / "captures" / "session.json"
+    open_capture_session(bundle=bundle, session_path=session_path, clock=clock)
+    assert capture_lifecycle_state(session_path) == CAPTURE_STATE_RESUMABLE
+
+    append_capture_checkpoint(
+        session_path=session_path,
+        operation="OPEN_BASELINE",
+        state=CAPTURE_STATE_ACTIVE,
+        detail="operation_started",
+        clock=clock,
+    )
+    stage_open_arm("BASELINE", session_path=session_path, clock=clock)
+    recovered = recover_capture_checkpoint(
+        session_path=session_path,
+        operation="OPEN_BASELINE",
+        expected_stage="BASELINE_OPEN",
+        expected_artifacts=(),
+        clock=clock,
+    )
+    assert recovered["state"] == CAPTURE_STATE_RESUMABLE
+
+    clock.advance_minutes(10)
+    baseline_path = tmp_path / "baseline.json"
+    append_capture_checkpoint(
+        session_path=session_path,
+        operation="SUBMIT_BASELINE",
+        state=CAPTURE_STATE_ACTIVE,
+        detail="operation_started",
+        clock=clock,
+    )
+    stage_capture_baseline(
+        _baseline_authoring(bundle_hash=bundle["bundle_hash"]),
+        baseline_path=baseline_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    baseline_path.unlink()
+    aborted = recover_capture_checkpoint(
+        session_path=session_path,
+        operation="SUBMIT_BASELINE",
+        expected_stage="BASELINE_CLOSE",
+        expected_artifacts=(baseline_path,),
+        clock=clock,
+    )
+    assert aborted["state"] == CAPTURE_STATE_ABORTED
+    assert capture_lifecycle_state(session_path) == CAPTURE_STATE_ABORTED
+    sequences = [item["sequence"] for item in load_capture_checkpoints(session_path)]
+    assert sequences == list(range(len(sequences)))
+    with pytest.raises(GvE0bDv1Error, match="E0B_CAPTURE_STATE_TERMINAL"):
+        append_capture_checkpoint(
+            session_path=session_path,
+            operation="SHOULD_NOT_RUN",
+            state=CAPTURE_STATE_RESUMABLE,
+            detail="invalid_after_abort",
+            clock=clock,
+        )
+
+
+def test_authoring_documents_never_enter_sealed_result_records(tmp_path: Path) -> None:
+    b, pkt, p, r, sess, pkg, mp, bundle, _packet = _fixture_paths(tmp_path / "caps")
+    from core.gv_e0b_dv1_contradiction import _collect_sealed_records
+
+    seals = _collect_sealed_records(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+        bundle=bundle,
+    )
+    comparison = build_comparison(
+        baseline_path=b,
+        post_path=p,
+        rubric_path=r,
+        packet_path=pkt,
+        session_path=sess,
+        package_path=pkg,
+        mapping_path=mp,
+        bundle=bundle,
+    )
+    result = build_result_document(comparison, sealed_records=seals)
+    for key in ("baseline", "post", "rubric"):
+        record = result["sealed_records"][key]
+        assert "artifact_role" not in record
+        assert "template_id" not in record
+        assert "notes" not in record
+    descriptors = result["sealed_records"]["session_manifest"]["authoring_templates"]
+    assert [item["artifact_role"] for item in descriptors] == [
+        AUTHORING_ONLY,
+        AUTHORING_ONLY,
+        AUTHORING_ONLY,
+    ]
+    assert all("action" not in item and "rationale" not in item for item in descriptors)
+
+
+def test_runner_preflight_requires_clean_tracked_tree_and_exact_form_allowlist(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import scripts.gv_e0b_g08_capture as runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    case_dir = tmp_path / "data" / "gv_e0b" / "dv1_g08"
+    forms = write_authoring_templates(case_dir / "captures" / "authoring")
+    allowed_lines = "\n".join(
+        f"?? {path.relative_to(tmp_path).as_posix()}" for path in forms.values()
+    )
+
+    def clean_git(*args: str) -> str:
+        if args[:2] == ("status", "--porcelain=v1"):
+            return allowed_lines
+        if args == ("rev-parse", "HEAD"):
+            return "a" * 40
+        if args == ("rev-parse", "HEAD^{tree}"):
+            return "b" * 40
+        raise AssertionError(args)
+
+    monkeypatch.setattr(runner, "_git_text", clean_git)
+    monkeypatch.setattr(runner, "_verify_protocol_freeze", lambda: "c" * 64)
+    commit, tree, freeze_hash, observed_forms = runner._capture_preflight(case_dir)
+    assert (commit, tree, freeze_hash) == ("a" * 40, "b" * 40, "c" * 64)
+    assert observed_forms == forms
+
+    def dirty_git(*args: str) -> str:
+        if args[:2] == ("status", "--porcelain=v1"):
+            return " M core/gv_e0b_dv1_contradiction.py\n" + allowed_lines
+        return clean_git(*args)
+
+    monkeypatch.setattr(runner, "_git_text", dirty_git)
+    with pytest.raises(GvE0bDv1Error, match="E0B_CAPTURE_TRACKED_TREE_DIRTY"):
+        runner._capture_preflight(case_dir)
+
+    def extra_untracked_git(*args: str) -> str:
+        if args[:2] == ("status", "--porcelain=v1"):
+            return allowed_lines + "\n?? unexpected.json"
+        return clean_git(*args)
+
+    monkeypatch.setattr(runner, "_git_text", extra_untracked_git)
+    with pytest.raises(
+        GvE0bDv1Error,
+        match="E0B_CAPTURE_UNTRACKED_ALLOWLIST_MISMATCH",
+    ):
+        runner._capture_preflight(case_dir)
+
+
+def _synthetic_oneshot(*, commit: str, tree: str, prereg: str, tag: str = "c" * 40):
+    return build_oneshot_authorization(
+        authorization_tag_object=tag,
+        candidate_commit=commit,
+        candidate_tree=tree,
+        preregistration_sha256=prereg,
+    )
+
+
+def test_oneshot_authorization_happy_path() -> None:
+    commit = "d" * 40
+    tree = "e" * 40
+    prereg = "f" * 64
+    auth = _synthetic_oneshot(commit=commit, tree=tree, prereg=prereg, tag="c" * 40)
+    verified = verify_oneshot_authorization(
+        auth,
+        candidate_commit=commit,
+        candidate_tree=tree,
+        preregistration_sha256=prereg,
+    )
+    assert verified["case_id"] == ONESHOT_CASE_ID
+    assert verified["attempt"] == 1
+
+
+def test_oneshot_authorization_rejects_missing() -> None:
+    with pytest.raises(GvE0bDv1Error, match="E0B_ONESHOT_AUTHORIZATION_MISSING"):
+        verify_oneshot_authorization(
+            None,
+            candidate_commit="d" * 40,
+            candidate_tree="e" * 40,
+            preregistration_sha256="f" * 64,
+        )
+
+
+def test_oneshot_authorization_rejects_second_attempt() -> None:
+    commit = "d" * 40
+    tree = "e" * 40
+    prereg = "f" * 64
+    auth = _plain(_synthetic_oneshot(commit=commit, tree=tree, prereg=prereg))
+    auth["attempt"] = 2
+    # body hash no longer matches; attempt gate fires first
+    with pytest.raises(GvE0bDv1Error, match="E0B_ONESHOT_ATTEMPT_NOT_FIRST"):
+        verify_oneshot_authorization(
+            auth,
+            candidate_commit=commit,
+            candidate_tree=tree,
+            preregistration_sha256=prereg,
+        )
+
+
+def test_oneshot_authorization_rejects_commit_mismatch() -> None:
+    commit = "d" * 40
+    tree = "e" * 40
+    prereg = "f" * 64
+    auth = _synthetic_oneshot(commit=commit, tree=tree, prereg=prereg)
+    with pytest.raises(GvE0bDv1Error, match="E0B_ONESHOT_CANDIDATE_COMMIT_MISMATCH"):
+        verify_oneshot_authorization(
+            auth,
+            candidate_commit="a" * 40,
+            candidate_tree=tree,
+            preregistration_sha256=prereg,
+        )
+
+
+def test_oneshot_authorization_rejects_preregistration_mismatch() -> None:
+    commit = "d" * 40
+    tree = "e" * 40
+    prereg = "f" * 64
+    auth = _synthetic_oneshot(commit=commit, tree=tree, prereg=prereg)
+    with pytest.raises(GvE0bDv1Error, match="E0B_ONESHOT_PREREGISTRATION_MISMATCH"):
+        verify_oneshot_authorization(
+            auth,
+            candidate_commit=commit,
+            candidate_tree=tree,
+            preregistration_sha256="1" * 64,
+        )
+
+
+def test_open_session_requires_oneshot_for_non_fixture_git(tmp_path: Path) -> None:
+    commit = "d" * 40
+    tree = "e" * 40
+    with pytest.raises(GvE0bDv1Error, match="E0B_ONESHOT_"):
+        open_capture_session(
+            session_path=tmp_path / "session.json",
+            source_commit=commit,
+            source_tree=tree,
+            protocol_freeze_manifest_sha256="4" * 64,
+            operator_principal_id="OP_HUMAN_1",
+            reviewer_principal_id="REV_HUMAN_1",
+        )
+
+
+def test_open_session_binds_valid_oneshot(tmp_path: Path) -> None:
+    commit = "d" * 40
+    tree = "e" * 40
+    prereg = "f" * 64
+    auth = _synthetic_oneshot(commit=commit, tree=tree, prereg=prereg, tag="c" * 40)
+    session = open_capture_session(
+        session_path=tmp_path / "session.json",
+        source_commit=commit,
+        source_tree=tree,
+        protocol_freeze_manifest_sha256="4" * 64,
+        operator_principal_id="OP_HUMAN_1",
+        reviewer_principal_id="REV_HUMAN_1",
+        oneshot_authorization=auth,
+        preregistration_sha256=prereg,
+    )
+    manifest = load_session_manifest(tmp_path / "session_manifest.json")
+    assert manifest["oneshot_authorization"]["authorization_body_hash"] == auth[
+        "authorization_body_hash"
+    ]
+    assert session["session_manifest_hash"] == manifest["session_manifest_hash"]
+
+
+def test_github_receipt_byte_mismatch_rejected(tmp_path: Path) -> None:
+    rubric = {"arm_a_scores": {}, "reviewer_id": "REV_HUMAN_1"}
+    raw = (json.dumps(rubric, sort_keys=True) + "\n").encode("utf-8")
+    path = tmp_path / "rubric.json"
+    path.write_bytes(raw)
+    import hashlib as _hashlib
+    receipt = build_github_rubric_receipt(
+        repository="example/repo",
+        authenticated_submitter_id="REV_HUMAN_1",
+        submission_commit_sha="a" * 40,
+        rubric_path="r.json",
+        rubric_blob_oid=None,
+        rubric_sha256="0" * 64,
+        receipt_url="https://example.test/receipt",
+        submitted_at="2026-07-21T12:00:00.000000Z",
+        review_package_hash="1" * 64,
+        candidate_commit=FIXTURE_SOURCE_COMMIT,
+        candidate_tree=FIXTURE_SOURCE_TREE,
+    )
+    with pytest.raises(GvE0bDv1Error, match="E0B_RECEIPT_RUBRIC_BYTE_MISMATCH"):
+        verify_github_rubric_receipt(
+            receipt,
+            rubric_bytes=raw,
+            expected_submitter_id="REV_HUMAN_1",
+            expected_candidate_commit=FIXTURE_SOURCE_COMMIT,
+            expected_candidate_tree=FIXTURE_SOURCE_TREE,
+            expected_review_package_hash="1" * 64,
+        )
+
+
+def test_github_receipt_submitter_mismatch_rejected(tmp_path: Path) -> None:
+    rubric = {"ok": True}
+    raw = (json.dumps(rubric, sort_keys=True) + "\n").encode("utf-8")
+    import hashlib as _hashlib
+    sha = _hashlib.sha256(raw).hexdigest()
+    receipt = build_github_rubric_receipt(
+        repository="example/repo",
+        authenticated_submitter_id="REV_HUMAN_1",
+        submission_commit_sha="a" * 40,
+        rubric_path="r.json",
+        rubric_blob_oid=None,
+        rubric_sha256=sha,
+        receipt_url="https://example.test/receipt",
+        submitted_at="2026-07-21T12:00:00.000000Z",
+        review_package_hash="1" * 64,
+        candidate_commit=FIXTURE_SOURCE_COMMIT,
+        candidate_tree=FIXTURE_SOURCE_TREE,
+    )
+    with pytest.raises(GvE0bDv1Error, match="E0B_RECEIPT_SUBMITTER_MISMATCH"):
+        verify_github_rubric_receipt(
+            receipt,
+            rubric_bytes=raw,
+            expected_submitter_id="REV_OTHER",
+            expected_candidate_commit=FIXTURE_SOURCE_COMMIT,
+            expected_candidate_tree=FIXTURE_SOURCE_TREE,
+            expected_review_package_hash="1" * 64,
+        )
+
+
+def test_real_reviewer_requires_external_receipt(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # Build through package stage then attempt real rubric without receipt.
+    import secrets as secrets_mod
+    import core.gv_e0b_dv1_contradiction as e0b_mod
+
+    bundle = sealed_adversarial_bundle()
+    clock = AdvanceableClock(_TEST_START)
+    session_path = tmp_path / "session.json"
+    open_capture_session(
+        bundle=bundle,
+        session_path=session_path,
+        clock=clock,
+        operator_principal_id="OP_HUMAN_1",
+        reviewer_principal_id="REV_HUMAN_1",
+    )
+    stage_open_arm("BASELINE", session_path=session_path, clock=clock)
+    clock.advance_minutes(10)
+    b_path = tmp_path / "baseline_seal.json"
+    stage_capture_baseline(
+        _baseline_authoring(
+            operator_id="OP_HUMAN_1",
+            authorship=AUTH_REAL_OPERATOR,
+            bundle_hash=bundle["bundle_hash"],
+        ),
+        baseline_path=b_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    clock.advance_minutes(1)
+    pkt_path = tmp_path / "packet.json"
+    stage_generate_packet(
+        baseline_path=b_path,
+        packet_path=pkt_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    stage_open_arm("POST", session_path=session_path, clock=clock)
+    clock.advance_minutes(10)
+    p_path = tmp_path / "post_packet_seal.json"
+    stage_capture_post(
+        _post_authoring(
+            operator_id="OP_HUMAN_1",
+            authorship=AUTH_REAL_OPERATOR,
+            bundle_hash=bundle["bundle_hash"],
+        ),
+        post_path=p_path,
+        baseline_path=b_path,
+        packet_path=pkt_path,
+        session_path=session_path,
+        bundle=bundle,
+        clock=clock,
+    )
+    export_dir = tmp_path / "reviewer_export"
+    custody_dir = tmp_path / "operator_custody"
+    export_dir.mkdir()
+    custody_dir.mkdir()
+    pkg_path = export_dir / "review_package.json"
+    map_path = custody_dir / "review_mapping.private.json"
+    forced_rng = bytes([0]) + b"\x11" * 15
+    monkeypatch.setattr(e0b_mod.secrets, "token_bytes", lambda n: forced_rng)
+    stage_build_review_package(
+        baseline_path=b_path,
+        post_path=p_path,
+        packet_path=pkt_path,
+        session_path=session_path,
+        package_path=pkg_path,
+        mapping_path=map_path,
+        rubric_authoring_path=export_dir / "rubric_authoring.json",
+        bundle=bundle,
+    )
+    package_record = json.loads(pkg_path.read_text(encoding="utf-8"))
+    session_record = load_capture_session(session_path)
+    with pytest.raises(GvE0bDv1Error, match="E0B_EXTERNAL_RECEIPT_MISSING"):
+        stage_capture_rubric(
+            _rubric_authoring(
+                reviewer_id="REV_HUMAN_1",
+                authorship=AUTH_REAL_REVIEWER,
+                review_package_hash=package_record["review_package_hash"],
+                session_manifest_hash=session_record["session_manifest_hash"],
+            ),
+            rubric_path=tmp_path / "rubric_scores.json",
+            baseline_path=b_path,
+            post_path=p_path,
+            packet_path=pkt_path,
+            session_path=session_path,
+            package_path=pkg_path,
+            mapping_path=map_path,
+            bundle=bundle,
+            clock=clock,
+        )
+
+
+def test_mapping_reveal_requires_receipt_bound_rubric() -> None:
+    with pytest.raises(
+        GvE0bDv1Error, match="E0B_MAPPING_REVEAL_BEFORE_RECEIPT_BOUND_RUBRIC"
+    ):
+        assert_mapping_reveal_allowed(
+            rubric={
+                "authorship_kind": AUTH_REAL_REVIEWER,
+                "external_submission_receipt": {},
+            },
+            revealed_exists=False,
+        )

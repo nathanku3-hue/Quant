@@ -1,13 +1,16 @@
 # Impact Packet - Current
 
-## Active Addendum — E0B-DV1 Repair Impact (2026-07-19)
+## Active Addendum — E0B-DV1 Direction and Custody Repair (2026-07-21)
 
-- **Owned code**: `core/gv_e0b_dv1_contradiction.py` (rewrite), `views/gv_fs0_portfolio_adapter.py` (`render_e0b_dv1_surface`), `dashboard.py` portfolio caption + E0B surface, focused tests + AppTest.
-- **Owned docs**: E0B phase brief, roadmap causal-language fix, planner/bridge/done/impact truth, lesson entry.
-- **Interfaces**: external seal load/verify; comparison assembly; atomic result artifacts; E0B comparison-bound cert/publish; optional portfolio E0B presentation.
-- **Not performed**: real human baseline/post/rubric capture; E0B close; stage promotion; score uplift; providers/FS1/PEAD.
-- **Score/stage**: 39/100 frozen; `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed-comparison count = 0.
-- **Risk**: shipping engine without real seals leaves E0B unclosed by design.
+- **Owned runtime/test files**: `core/gv_e0b_dv1_contradiction.py`, `scripts/gv_e0b_g08_capture.py`, and `tests/gv_fs0_product/test_e0b_dv1_contradiction.py`.
+- **Custody base**: remote PR #5 C0 is hosted-green `b7a24d3da65f78c673f7e08b5f719603f404282e`. The transferable C1 scope is 18 authored/input paths + 2 regenerated current-context outputs + 1 tracked candidate manifest = 21 final paths. Donor committed base is `e9e9a9a` (not a b7 descendant claim). Stale SAW is not transferred.
+- **Public-interface delta**: removed comparison-only E0B book, decision, certification, and publication helpers with no compatibility path; the generic publisher is private; `run_e0b_dv1_case()` is the sole official publication entry.
+- **Authority delta**: publication is built only from `load_verified_result()` output with `comparison_observed_eligible=true`, exact integer count `1`, pinned result schema/case/run class, complete comparison reconstruction from verified sealed records, and certificate rationale bound to the embedded comparison hash. Product value is separately classified as `IMPROVED` or `NOT_IMPROVED`; no close compatibility alias remains.
+- **Adversarial/value proof**: fixture publication cannot create or replace a target; observation false, count zero/wrong type, result identity tamper, fully re-sealed comparison mismatch, public-surface composition, uncertain path identity, pairwise aliases/hard links, and second-replacement failure fail closed. Positive total without targeted gain and positive total with safety regression classify `NOT_IMPROVED`; valid zero-delta human evidence still publishes as falsification.
+- **Validation**: focused E0B 74/74; product 168/168; frozen protocol 137/137; 305/305 total; default-route AppTest included. Product and protocol suites each retained exact pre/post code-test diff hash C0-relative `c5459187846100b3dbfbfe3a98ae5eb0909bd23e`. This is stable local evidence, not immutable-SHA acceptance.
+- **Not performed**: immutable C1 commit descending from C0, clean exact-tree proof, terminal Reviewer A/B/C, C1 push/hosted validation, real G08, publication, result-bearing commit, merge, stage promotion, score uplift, providers, FS1, PEAD, or V2-B0 implementation.
+- **Score/stage**: 39/100 frozen; `CERTIFIED_SINGLE_DECISION_OPERABLE`; observed-comparison count = 0; S-009X product PASS not earned.
+- **Custody limit**: C0 is immutable hosted substrate, but this dirty worktree is only the C1 source donor and is not acceptance custody. The stale generated context and current SAW must not be transferred. A privileged repository operator can still manually invoke lower-level infrastructure.
 
 ## Prior Addendum — GV-E0A Main Cutover Truth-Repair Impact (2026-07-19)
 

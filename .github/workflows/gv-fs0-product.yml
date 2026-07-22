@@ -71,12 +71,78 @@ jobs:
           python-version: "3.12"
 
       - name: Install product test dependencies
-        # filelock is imported by dashboard.py; pin explicitly so AppTests do not
-        # depend on transitive resolution drift across hosted runners.
+        # filelock is a direct pin in requirements.txt / pyproject.toml (dashboard import).
         run: >-
           python -m pip install --disable-pip-version-check
           -r requirements.txt
-          filelock
+
+      - name: Emit environment custody evidence
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import platform
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          def sha256_file(path: Path) -> str:
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def git_text(*args: str) -> str:
+              return subprocess.check_output(["git", *args], text=True).strip()
+
+          freeze = subprocess.check_output(
+              [sys.executable, "-m", "pip", "freeze"], text=True
+          )
+          filelock_ver = "ABSENT"
+          for line in freeze.splitlines():
+              if line.lower().startswith("filelock=="):
+                  filelock_ver = line.split("==", 1)[1].strip()
+                  break
+
+          prereg = Path("docs/phase_brief/gv-e0b-dv1-contradiction-brief.md")
+          manifest = Path("docs/candidate_manifests/gv_e0b_dv1_c1_candidate.json")
+          record = {
+              "runner_os": platform.platform(),
+              "runner_image_name": os.environ.get("ImageOS", "unknown"),
+              "runner_image_version": os.environ.get("ImageVersion", "unknown"),
+              "python_version": sys.version.replace("\n", " "),
+              "pip_version": subprocess.check_output(
+                  [sys.executable, "-m", "pip", "--version"], text=True
+              ).strip(),
+              "pip_freeze": freeze.splitlines(),
+              "filelock_version": filelock_ver,
+              "candidate_commit": git_text("rev-parse", "HEAD"),
+              "candidate_tree": git_text("rev-parse", "HEAD^{tree}"),
+              "preregistration_sha256": (
+                  sha256_file(prereg) if prereg.is_file() else None
+              ),
+              "candidate_manifest_sha256": (
+                  sha256_file(manifest) if manifest.is_file() else None
+              ),
+          }
+          Path("gv-fs0-environment-custody.json").write_text(
+              json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+              newline="\n",
+          )
+          print(json.dumps({k: record[k] for k in (
+              "runner_os", "runner_image_name", "runner_image_version",
+              "python_version", "filelock_version", "candidate_commit",
+              "candidate_tree"
+          )}, indent=2))
+          PY
+
+      - name: Upload environment custody evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gv-fs0-environment-custody-${{ runner.os }}
+          path: gv-fs0-environment-custody.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Run product suite, frozen protocol, and E0A dashboard AppTests
         shell: bash

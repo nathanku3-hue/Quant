@@ -1,18 +1,19 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-E0A Main Cutover Multi-Stream (2026-07-19)
+## Active Addendum — S-009X / E0B-DV1 Direction and Custody (2026-07-21)
 
 | Stream | Status | Note |
 |---|---|---|
-| Backend/Strategy | **Closed for E0A product** | Terminal operable vertical banked; no product change in cutover |
-| Frontend/UI | **Closed for E0A product** | One current certified decision default; smoke after main FF |
-| Data admission | Held | No provider/real prices/admission |
-| Docs/Ops | **Active cutover** | Truth repair + context bootstrap + main FF coordination |
-| Product CI | PASS substrate | E0A hosted `29655802878`; F1C `29651784244` |
-| PEAD / FS1 / broker | Held | Forbidden as next |
+| Backend/Product | **C1 source ready** | C0 `b7a24d3` hosted-green; observation/value split local 305/305; immutable C1 absent |
+| Frontend/UI | Held stable | Existing operator-visible comparison surface only; no new UI programme |
+| Product/Research | **Active disposition contract** | `IMPROVED` vs `NOT_IMPROVED`; valid falsification retained |
+| Docs/Ops | **Active custody** | Transfer 18 authored/input paths onto C0; regenerate 2 context outputs + 1 tracked manifest (21 paths); SAW only after independent review |
+| Product CI / Review | C0 green; C1 pending | Push exact C1, then hosted Ubuntu/Windows/parity and A/B/C concurrently |
+| Data / PEAD / FS1 / broker | Held | No providers, alpha, live capital, or adjacent phase |
 
-- Cross-stream rule: **one active integration gate — GV-E0A-MAIN-CUTOVER-PREFLIGHT**. Product gate E0A is terminal; F1C is substrate only.
-- Next action after integrated-main smoke: open **GV-E0B Decision-Value** planning across Backend/Docs only; no FS1 expansion; no F1C reopen; no PEAD.
+- Cross-stream rule: **one active product gate — S-009X / E0B-DV1**. E0A-R1 and F1C are closed substrate; Leningrad is independent.
+- Product semantics determine result disposition. Meta-Harness signer/fileset limitations do not deform or block Quant.
+- Next action: bank local C1 on exact `b7a24d3` (21-path model; explicit b7→donor-byte transformation), prove clean tree, push, then hosted evidence and independent A/B/C concurrently. No G08 session in banking round.
 
 ## Prior Addendum — GV-E0A-OPERABLE Multi-Stream (2026-07-19) [superseded — E0A implemented]
 

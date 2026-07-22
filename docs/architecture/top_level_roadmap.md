@@ -421,20 +421,20 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-### Now — E0A-R1 repair tax only
+### Now — S-009X / E0B-DV1 only
+
+E0A-R1 is permanently closed on PR #4 at `2653eb1`. Do not reopen E0A, F1C, or the frozen protocol.
+
+Custody lineage is now explicit:
 
 ```text
-resolve dual authority
-→ disposition missing authority refs with proven provenance only
-→ remove prohibited dual-authority default surface
-→ correct custody-vs-evidence overclaim
-→ focused tests + thin review
-→ merge to clean main
-→ fresh-checkout smoke
-→ CLOSE E0A permanently
+main 2653eb1
+→ e9e9a9a
+→ C0 b7a24d3 (hosted-green publication-authority substrate)
+→ C1 observation/value semantic repair (must be a direct descendant)
 ```
 
-See `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`.
+Do not reconstruct from `e9e9a9a` as if it were based on `b7a24d3`, force-push over unexplained remote movement, or run G08 on C0. Candidate construction is an explicit `b7a24d3` → donor-byte transformation: transfer 18 authored/input paths from the read-only donor working tree, regenerate 2 current-context outputs, add 1 tracked candidate manifest (21 final paths), and bank C1 before acceptance.
 
 ### Sole product gate E0B-DV1 (after PR #4 @ 2653eb1)
 
@@ -450,8 +450,22 @@ synthetic G08 sealed bundle
 → operator-visible Streamlit surface
 ```
 
-**E0B reports only an observed within-case difference.** Positive, zero, or negative rubric deltas may all pass. Causal superiority, general decision-quality improvement, and research-efficiency claims are forbidden.  
-Engine test fixtures validate machinery only and **do not** increment observed-comparison count or close E0B. Close requires real human baseline/post (same operator) plus a different real reviewer.
+**E0B reports one observed within-case difference and a separate bounded value disposition.** Positive, zero, or negative results may all be methodologically valid and retained. Causal superiority, population effectiveness, generalized research efficiency, alpha, and score uplift claims are forbidden.
+Engine fixtures validate machinery only and never increment observed-comparison count. A real human baseline/post (same operator) plus a different blinded reviewer may establish `comparison_observed_eligible=true`. Only `decision_value_disposition=IMPROVED` closes S-009X as product PASS; `NOT_IMPROVED` is honest falsification and triggers replan without maturity uplift.
+
+Frozen one-case value rule:
+
+```text
+IMPROVED iff
+  total blinded-rubric delta > 0
+  AND at least one targeted dimension improves:
+      indispensable_missing_evidence_identification
+      OR falsifier_and_contradiction_recognition
+  AND neither core safety dimension worsens:
+      selected_action_defensibility
+      avoidance_of_claims_beyond_evidence
+else NOT_IMPROVED
+```
 
 Persisted stage order (no compatibility shim):
 
@@ -463,7 +477,7 @@ real baseline capture/seal
 → comparison over pre-sealed records only
 ```
 
-Observed paths reject unsealed input. Fixture certification may remain test-only; current publication requires `e0b_close_eligible`. UI/count recomputes result, comparison, and seals before display.
+Observed paths reject unsealed input. Fixture certification may remain test-only; current publication requires `comparison_observed_eligible=true` and exact observed count `1`. UI/count recomputes result, comparison, seals, observation eligibility, and value disposition before display. No `e0b_close_eligible` compatibility alias exists.
 
 ### Post-G08 protocol (recommended; not yet authoritative)
 
@@ -473,16 +487,16 @@ V2_BLOCK_ONLY_REAL_ADMISSION = RECOMMENDED_NEXT_PROTOCOL
 
 Until a **frozen V2 protocol artifact is committed**, **V1 remains formal protocol authority**. V2 does **not** yet supersede V1 and **no real MU admission is authorized**.
 
-Recommended endgame after a valid G08 observed close:
+Terminal G08 disposition:
 
 ```text
-G08 observed comparison (count 0→1; stage ONE_CASE_DECISION_DELTA_OBSERVED; score stays 39)
-→ freeze minimal V2-B0 protocol artifact
-→ first real MU block-only admission (replaces second synthetic comparison as next gate)
-→ independent decision-value replication (still mandatory before economics)
-→ prospective paper economics
-→ live-capital consideration
+valid G08 observation
+→ count 0→1; stage ONE_CASE_DECISION_DELTA_OBSERVED; score stays 39
+→ IMPROVED: S-009X PASS; choose the next value-bearing slice
+→ NOT_IMPROVED: publish/retain falsification; no uplift; replan GodView value hypothesis
 ```
+
+V2-B0 and real MU admission remain closed until this disposition. Do not repeat G08 to obtain a preferred result.
 
 Accepted deviations from earlier roadmap framing:
 - Portfolio OS replaces discretionary-cockpit framing (accepted).

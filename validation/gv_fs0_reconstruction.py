@@ -8,6 +8,11 @@ Protocol V1.1 verifier I/O compatibility: this engine accepts only schema-valid
 ``gv_fs0_verifier_input_v1`` documents (source_prices + source_intents). Legacy
 ``prices``/``events`` inputs are rejected. It imports no repository module and
 writes no repository artifact.
+
+The file is intentionally self-contained. Splitting codec, validator, reducer,
+or CLI code into local modules would violate the frozen verifier rule that the
+isolated process imports Python standard-library modules only. Responsibilities
+remain separated by narrow pure-function interfaces inside this one process file.
 """
 
 from __future__ import annotations
@@ -35,8 +40,22 @@ ECONOMIC_PAYLOAD_DOMAIN = "GV-FS0:ECONOMIC_PAYLOAD:V1"
 VERIFIER_RESULT_DOMAIN = "GV-FS0:VERIFIER_RESULT:V1"
 
 MAX_INTEGER = 9_007_199_254_740_991
+MAX_INPUT_BYTES = 1_048_576
+MAX_OUTPUT_BYTES = 1_048_576
+MAX_JSON_DEPTH = 32
+MAX_SOURCE_INTENTS = 64
+MAX_REFERENCE_LENGTH = 192
+MAX_RATIONALE_LENGTH = 128
+FS0_COLD_START_BUDGET_SECONDS = 5.0
+FS0_PEAK_RSS_BUDGET_BYTES = 134_217_728
 INTEGER_TOKEN = re.compile(r"^(0|[1-9][0-9]*)$")
 DECIMAL_TOKEN = re.compile(r"^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$")
+CANONICAL_DATE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+CANONICAL_TIMESTAMP = re.compile(
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}Z$"
+)
+REFERENCE_TOKEN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,191}$")
+SOURCE_INTENT_TOKEN = re.compile(r"^[A-Z][A-Z0-9_]*:[A-Za-z0-9][A-Za-z0-9._:-]{0,191}$")
 EVENT_RANK = {"EXECUTION": 0, "DIVIDEND_EX": 1, "DIVIDEND_PAY": 2}
 ROOT_KEYS = {"schema_version", "protocol", "decision", "source_prices", "source_intents"}
 LEGACY_ROOT_KEYS = {"prices", "events"}
@@ -171,6 +190,33 @@ def _terminal_lf_count(raw: bytes) -> int:
     return count
 
 
+def _validate_structure_limits(raw: str) -> None:
+    depth = 0
+    in_string = False
+    escaped = False
+    for character in raw:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+            continue
+        if character == '"':
+            in_string = True
+        elif character in "[{":
+            depth += 1
+            if depth > MAX_JSON_DEPTH:
+                raise ReconstructionError("JSON_DEPTH_LIMIT_EXCEEDED")
+        elif character in "]}":
+            depth -= 1
+            if depth < 0:
+                raise ReconstructionError("INPUT_JSON_INVALID")
+    if in_string or depth != 0:
+        raise ReconstructionError("INPUT_JSON_INVALID")
+
+
 def _validate_number_tokens(raw: str) -> None:
     index = 0
     in_string = False
@@ -236,7 +282,12 @@ def _load_input(path: Path) -> tuple[dict[str, Any], str]:
     if not path.is_absolute():
         raise ReconstructionError("ABSOLUTE_INPUT_PATH_REQUIRED")
     try:
+        size = path.stat().st_size
+        if size > MAX_INPUT_BYTES:
+            raise ReconstructionError("INPUT_BYTE_LIMIT_EXCEEDED", str(size))
         raw = path.read_bytes()
+        if len(raw) > MAX_INPUT_BYTES:
+            raise ReconstructionError("INPUT_BYTE_LIMIT_EXCEEDED", str(len(raw)))
     except OSError as exc:
         raise ReconstructionError("INPUT_READ_FAILED", type(exc).__name__) from exc
     if raw.startswith(b"\xef\xbb\xbf"):
@@ -249,6 +300,7 @@ def _load_input(path: Path) -> tuple[dict[str, Any], str]:
         raise ReconstructionError("UTF8_INVALID") from exc
     _validate_scalars(text)
     body = text[:-1]
+    _validate_structure_limits(body)
     _validate_number_tokens(body)
     try:
         payload = json.loads(
@@ -288,8 +340,15 @@ def _text(value: Any, context: str) -> str:
     return value
 
 
-def _reference(value: Any, context: str) -> str:
+def _reference(
+    value: Any,
+    context: str,
+    *,
+    max_length: int = MAX_REFERENCE_LENGTH,
+) -> str:
     text = _text(value, context)
+    if len(text) > max_length or not REFERENCE_TOKEN.fullmatch(text):
+        raise ReconstructionError("IDENTITY_TOKEN_INVALID", context)
     if "/" in text or "\\" in text or re.match(r"^[A-Za-z]:", text):
         raise ReconstructionError("PATH_DEPENDENT_IDENTITY_PROHIBITED", context)
     return _identity(text)
@@ -304,6 +363,10 @@ def _decimal(value: Any, context: str, *, positive: bool = False) -> Decimal:
         raise ReconstructionError("DECIMAL_INVALID", context) from exc
     if not parsed.is_finite() or parsed.is_signed():
         raise ReconstructionError("DECIMAL_NONNEGATIVE_FINITE_REQUIRED", context)
+    if "." in value:
+        fractional = value.split(".", 1)[1]
+        if len(fractional) > 6 and any(digit != "0" for digit in fractional[6:]):
+            raise ReconstructionError("DECIMAL_EXCESS_PRECISION", context)
     if positive and parsed <= 0:
         raise ReconstructionError("DECIMAL_MUST_BE_POSITIVE", context)
     return parsed
@@ -324,6 +387,8 @@ def _shares(value: Any, context: str) -> int:
 
 def _session(value: Any, context: str) -> date:
     raw = _text(value, context)
+    if not CANONICAL_DATE.fullmatch(raw):
+        raise ReconstructionError("SESSION_DATE_INVALID", context)
     try:
         parsed = date.fromisoformat(raw)
     except ValueError as exc:
@@ -335,9 +400,11 @@ def _session(value: Any, context: str) -> date:
 
 def _timestamp(value: Any, context: str) -> datetime:
     raw = _text(value, context)
+    if not CANONICAL_TIMESTAMP.fullmatch(raw):
+        raise ReconstructionError("TIMESTAMP_SHAPE_INVALID", context)
     if re.search(r":60(?:\.|Z|[+-])", raw):
         raise ReconstructionError("LEAP_SECOND_PROHIBITED", context)
-    normalized = raw[:-1] + "+00:00" if raw.endswith("Z") else raw
+    normalized = raw[:-1] + "+00:00"
     try:
         parsed = datetime.fromisoformat(normalized)
     except ValueError as exc:
@@ -512,7 +579,11 @@ def _validate(payload: dict[str, Any]) -> dict[str, Any]:
         "security_id": _reference(decision["security_id"], "decision.security_id"),
         "decision_timestamp": _timestamp(decision["decision_timestamp"], "decision.decision_timestamp"),
         "effective_timestamp": _timestamp(decision["effective_timestamp"], "decision.effective_timestamp"),
-        "rationale_reference": _reference(decision["rationale_reference"], "decision.rationale_reference"),
+        "rationale_reference": _reference(
+            decision["rationale_reference"],
+            "decision.rationale_reference",
+            max_length=MAX_RATIONALE_LENGTH,
+        ),
     }
 
     raw_prices = root["source_prices"]
@@ -559,6 +630,8 @@ def _validate(payload: dict[str, Any]) -> dict[str, Any]:
     raw_intents = root["source_intents"]
     if not isinstance(raw_intents, list):
         raise ReconstructionError("SOURCE_INTENTS_LIST_REQUIRED")
+    if len(raw_intents) > MAX_SOURCE_INTENTS:
+        raise ReconstructionError("SOURCE_INTENT_COUNT_LIMIT_EXCEEDED")
     intents: list[dict[str, Any]] = []
     for index, raw_intent in enumerate(raw_intents):
         row = _expect_keys(raw_intent, INTENT_KEYS, f"source_intents[{index}]")
@@ -578,9 +651,18 @@ def _validate(payload: dict[str, Any]) -> dict[str, Any]:
             raise ReconstructionError("SOURCE_SEQUENCE_INVALID", f"source_intents[{index}]")
         session = _session(row["session"], f"source_intents[{index}].session")
         security = _reference(row["security_id"], f"source_intents[{index}].security_id")
+        source_intent_id = _reference(
+            row["source_intent_id"],
+            f"source_intents[{index}].source_intent_id",
+        )
+        if not SOURCE_INTENT_TOKEN.fullmatch(source_intent_id):
+            raise ReconstructionError(
+                "SOURCE_INTENT_ID_INVALID",
+                f"source_intents[{index}].source_intent_id",
+            )
         intents.append(
             {
-                "source_intent_id": _reference(row["source_intent_id"], f"source_intents[{index}].source_intent_id"),
+                "source_intent_id": source_intent_id,
                 "source_sequence": sequence,
                 "intent_type": intent_type,
                 "effective_timestamp": _timestamp(
@@ -650,6 +732,7 @@ def _reconstruct(validated: dict[str, Any]) -> dict[str, Any]:
     shares = 0
     total_costs = Decimal("0")
     receivables: dict[str, dict[str, Any]] = {}
+    receivable_total = Decimal("0")
     paid: set[str] = set()
     previous_nav: Decimal = protocol["initial_cash"]
     sessions: list[dict[str, Any]] = []
@@ -670,6 +753,7 @@ def _reconstruct(validated: dict[str, Any]) -> dict[str, Any]:
                 if amount <= 0:
                     raise ReconstructionError("DIVIDEND_ENTITLEMENT_NONPOSITIVE")
                 receivables[event["event_id"]] = {"amount": amount, "pay_session": event["pay_session"]}
+                receivable_total += amount
             else:
                 entitlement_id = event["entitlement_event_id"]
                 if entitlement_id in paid:
@@ -680,10 +764,12 @@ def _reconstruct(validated: dict[str, Any]) -> dict[str, Any]:
                 if entitlement["pay_session"] != session:
                     raise ReconstructionError("DIVIDEND_PAY_SESSION_MISMATCH", entitlement_id)
                 cash += entitlement["amount"]
+                receivable_total -= entitlement["amount"]
                 paid.add(entitlement_id)
                 del receivables[entitlement_id]
 
-        receivable_total = sum((entry["amount"] for entry in receivables.values()), Decimal("0"))
+        if receivable_total < 0:
+            raise ReconstructionError("NEGATIVE_RECEIVABLE_BLOCKED")
         market_value = Decimal(shares) * price["close"]
         nav = cash + market_value + receivable_total
         contribution = nav - previous_nav
@@ -772,7 +858,12 @@ def main() -> int:
         internal = ReconstructionError("INTERNAL_RECONSTRUCTION_ERROR", type(exc).__name__)
         sys.stderr.buffer.write(_canonical_document_bytes(_error(internal)))
         return 2
-    sys.stdout.buffer.write(_canonical_document_bytes(result))
+    output = _canonical_document_bytes(result)
+    if len(output) > MAX_OUTPUT_BYTES:
+        error = ReconstructionError("OUTPUT_BYTE_LIMIT_EXCEEDED", str(len(output)))
+        sys.stderr.buffer.write(_canonical_document_bytes(_error(error)))
+        return 2
+    sys.stdout.buffer.write(output)
     return 0
 
 

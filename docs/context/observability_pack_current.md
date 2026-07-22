@@ -1,14 +1,15 @@
 # Observability Pack - Current
 
-## Active Addendum — GV-E0A Main Cutover Observability (2026-07-19)
+## Active Addendum — S-009X / E0B-DV1 Observability (2026-07-21)
 
-- ObservabilityRating: GREEN for E0A terminal product evidence (hosted `29655802878`, A/B/C, SAW, stage operable); AMBER until integrated `main` generates E0A context and smokes one certified decision; RED/held for providers/PEAD/FS1/alpha/broker.
-- Bootstrap sentinel: generated `current_context` must not resolve to historical PEAD while E0A is terminal; first machine `New Context Packet` must be E0A cutover/terminal.
-- Active-gate sentinel: cutover preflight is the only integration gate; product E0A is terminal; multi-active F1C/FS1 language is drift.
-- Score/stage sentinel: score **39/100** owner ceiling; stage **CERTIFIED_SINGLE_DECISION_OPERABLE** (no score uplift).
-- Endgame sentinel: after smoke, next is E0B decision-value delta — not indefinite hold and not broad FS1.
-- Boundary sentinel: no providers, real prices, FS1 batch, PEAD, alpha, broker, dual-authority UI, historical suite repair.
-- Next-action sentinel: FF main → smoke one certified decision → open E0B planning.
+- ObservabilityRating: GREEN for hosted-green C0 `b7a24d3` publication authority and the local C1 semantic/security boundary (74 focused, 168 product, 137 frozen protocol, 305 total, stable pre/post C0-relative code/CLI/test patch `c5459187…`); RED for immutable C1, C1 hosted proof, independent review, real G08, result-bearing tip, and merge.
+- Active-gate sentinel: S-009X / E0B-DV1 is the sole product gate. E0A-R1, F1C, protocol, V2-B0, FS1, providers, PEAD, alpha, broker, and Leningrad rebinding are drift if presented as active.
+- Custody sentinel: C0 is immutable hosted substrate; the mutable worktree is only a C1 source donor. Acceptance requires C1 parent=`b7a24d3`, exact commit/tree, clean worktree, unchanged tree after tests, push, hosted parity, and distinct A/B/C. Generated context and stale SAW are not transferred.
+- Observation sentinel: `comparison_observed_eligible` is method validity and publication/count authority; it is not product success.
+- Value sentinel: `IMPROVED` requires positive total, targeted gain, and no core safety regression. `NOT_IMPROVED` must be retained/published as falsification and must not uplift maturity.
+- Score/stage sentinel: score **39/100**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed count **0**; S-009X PASS not earned.
+- Experiment sentinel: real G08 starts only from a fresh clean checkout of the exact hosted-green SHA; any production-code change after capture invalidates the run; do not repeat for a preferred sign.
+- Next-action sentinel: exact b7 worktree → transfer 18 authored/input paths → implement receipt/oneshot custody → regenerate 2 context outputs → bank 21-path C1 commit+tag → clean local proof → push → hosted plus A/B/C → one-shot auth → real G08 → result disposition.
 
 ## Prior Addendum — GV-E0A-OPERABLE Direction Observability (2026-07-19) [superseded]
 

@@ -1,3 +1,24 @@
+## 2026-07-21 — ROUND-20260721-E0B-DV1-DIRECTION-CUSTODY-REPAIR
+
+- Decision: remote PR #5 commit `b7a24d3da65f78c673f7e08b5f719603f404282e` is the immutable hosted-green publication-authority substrate C0. Preserve it, reject the mutable donor worktree and stale generated/SAW artifacts as acceptance custody, and require C1 to descend directly from C0.
+- Decision: hard-delete `e0b_close_eligible` as a conflated term. Publication/count authority is now `comparison_observed_eligible`; product-value outcome is separately `decision_value_disposition = IMPROVED | NOT_IMPROVED`. No compatibility alias.
+- Frozen one-case rule: `IMPROVED` iff total blinded-rubric delta is positive, at least one targeted GodView dimension improves (`indispensable_missing_evidence_identification` or `falsifier_and_contradiction_recognition`), and neither core safety dimension worsens (`selected_action_defensibility`, `avoidance_of_claims_beyond_evidence`). All other valid observed results are `NOT_IMPROVED`.
+- Disposition: every valid observed result is verified, published/retained, and increments observed count. `IMPROVED` earns S-009X product PASS for G08; `NOT_IMPROVED` is honest hypothesis falsification, earns no maturity uplift, and triggers replan. Do not rerun G08 to manufacture a positive result.
+- Custody mechanism: use a fresh clone or standalone checkout under the approved project root, not the broken primary worktree registry. Transfer exactly 15 source-of-truth files from the donor; regenerate `current_context.json`/`.md` and create a new SAW only after C1 exists.
+- Velocity: after exact C1 passes locally with parent `b7a24d3`, push immediately and run hosted Ubuntu/Windows/parity plus independent Reviewer A/B/C concurrently; reconcile once. Real G08 runs only from a fresh clean checkout of that hosted-green SHA, with no production-code change after capture begins.
+- State lock: `SHIPPED_PRODUCT_SCORE=39/100 FROZEN`; `FUNCTIONAL_STAGE=CERTIFIED_SINGLE_DECISION_OPERABLE`; `OBSERVED_COMPARISON_COUNT=0`; S-009X PASS not earned. V2-B0, FS1, providers, PEAD, broker, alpha, Leningrad rebinding, and Meta-Harness feature work remain closed.
+- Evidence: `core/gv_e0b_dv1_contradiction.py`, `scripts/gv_e0b_g08_capture.py`, `tests/gv_fs0_product/test_e0b_dv1_contradiction.py`, `docs/notes.md`, the E0B brief, and current truth surfaces.
+
+## 2026-07-20 — ROUND-20260720-E0B-DV1-PUBLICATION-AUTHORITY-REPAIR [superseded on custody and product-success semantics]
+
+- Decision: close the full official comparison-only E0B authority surface with no compatibility path. `build_e0b_decision`, `build_e0b_book`, `build_e0b_certified_result`, `publish_e0b_current_decision`, and the directly imported generic publisher must not remain public module authority.
+- The Decision (Hardcoded): import the generic publisher only under a private alias; keep `run_e0b_dv1_case()` as the sole official E0B publication entry; construct certification only from the object reloaded by `load_verified_result()` after pinned schema/case/run class and complete comparison reconstruction from verified sealed records; require exact close `true`, exact integer observed-comparison count `1`, and certificate rationale equal to `E0B:CMP:<embedded comparison_hash>`.
+- Fail-closed contract: fixture publication cannot create or replace current authority; close false, count zero/wrong type, result identity tamper, fully re-sealed comparison mismatch, removed public-surface composition, uncertain path identity, and pairwise path aliases (including hard links) all block before any evidence or publication write. Canonical result/decision-packet payloads stage together and restore both prior paths if either replacement fails. The valid two-human path remains required and retains exact rationale binding.
+- Custody claim: this removes the official E0B module bypass. It does not claim to prevent a privileged repository operator from manually invoking lower-level certification or publication infrastructure.
+- Shipment gate: after real G08, replay/verify/publish and promote count/stage; commit and push canonical G08 evidence, current publication, and truth; rerun hosted Ubuntu/Windows/byte parity and narrow evidence audit; merge only the final green result-bearing tip. Any code change after human capture invalidates that run.
+- State lock before verified G08 publication: `SHIPPED_PRODUCT_SCORE=39/100 FROZEN`; `FUNCTIONAL_STAGE=CERTIFIED_SINGLE_DECISION_OPERABLE`; `OBSERVED_COMPARISON_COUNT=0`; `E0B_CLOSE=NOT_EARNED`.
+- Evidence: `core/gv_e0b_dv1_contradiction.py`, `tests/gv_fs0_product/test_e0b_dv1_contradiction.py`, authorized current-truth surfaces, and exact-candidate SAW evidence.
+
 ## 2026-07-19 — ROUND-20260719-E0B-DV1-REPAIR (owner GO + real-human amendment)
 
 - Decision: repair PR #5 in place; no new phase. Score **39/100 frozen**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE** until a complete real observed run is published.
@@ -7416,3 +7437,11 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Boundary: no permanent bundle, publication lock, default dashboard route, provider, real data, legacy replay authority, NO_POSITION implementation, or FS1 work in F1A.
 - Evidence state: focused product and protocol suites, deterministic two-run bytes, generator/freeze checks, compile, adapter smoke, and diff hygiene pass locally. Banked-commit identity and independent Reviewer A/B/C remain the next closure actions.
 
+
+## 2026-07-22 — GV-E0B-DV1 C1 candidate custody bank
+
+- Decision: bank one local C1 candidate on exact base `b7a24d3` via explicit b7→donor-byte transformation (donor committed base `e9e9a9a`; not a b7-descendant claim).
+- Path model locked: 18 authored/input + 2 regenerated current-context + 1 tracked candidate manifest = 21 final paths.
+- Added receipt-bound GitHub reviewer import and one-shot Attempt-1 authorization design; no production session or human comparison in this round.
+- Score 39 and stage `CERTIFIED_SINGLE_DECISION_OPERABLE` remain frozen; observed comparison count remains 0.
+- Hosted CI, independent A/B/C, terminal SAW, push, and G08 Attempt-1 remain separate gates.

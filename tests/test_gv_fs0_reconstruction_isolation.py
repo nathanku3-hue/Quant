@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 import pytest
 
@@ -356,3 +357,126 @@ def test_stdout_is_exactly_one_canonical_json_document(tmp_path: Path) -> None:
     assert not result.stdout.endswith(b"\n\n")
     assert b"\r" not in result.stdout
     assert canonical_document_bytes(parse_canonical_document_bytes(result.stdout)) == result.stdout
+
+
+@pytest.mark.parametrize(
+    ("field_path", "value", "code"),
+    [
+        (("decision", "decision_timestamp"), "2026-07-12T00:00:00Z", "TIMESTAMP_SHAPE_INVALID"),
+        (("decision", "effective_timestamp"), "2026-07-12T00:00:00.000000+00:00", "TIMESTAMP_SHAPE_INVALID"),
+        (("source_prices", 0, "session"), "20260713", "SESSION_DATE_INVALID"),
+        (("decision", "decision_id"), "A" * 193, "IDENTITY_TOKEN_INVALID"),
+        (("decision", "decision_id"), "e\u0301", "IDENTITY_TOKEN_INVALID"),
+        (("protocol", "initial_cash"), "1000.0000001", "DECIMAL_EXCESS_PRECISION"),
+    ],
+)
+def test_exact_contract_shapes_reject_permissive_variants(
+    tmp_path: Path,
+    field_path: tuple[object, ...],
+    value: object,
+    code: str,
+) -> None:
+    payload = _payload()
+    cursor: object = payload
+    for part in field_path[:-1]:
+        cursor = cursor[part]  # type: ignore[index]
+    cursor[field_path[-1]] = value  # type: ignore[index]
+    failure = _failure(_run(tmp_path, payload))
+    assert failure["failure_reasons"] == [code]
+
+
+def test_input_byte_limit_blocks_before_json_parse(tmp_path: Path) -> None:
+    raw = b"{" + (b" " * 1_048_576) + b"}\n"
+    failure = _failure(_run(tmp_path, _payload(), raw=raw))
+    assert failure["failure_reasons"] == ["INPUT_BYTE_LIMIT_EXCEEDED"]
+
+
+def test_json_depth_limit_blocks_before_host_parser(tmp_path: Path) -> None:
+    raw = (b"[" * 33) + b"0" + (b"]" * 33) + b"\n"
+    failure = _failure(_run(tmp_path, _payload(), raw=raw))
+    assert failure["failure_reasons"] == ["JSON_DEPTH_LIMIT_EXCEEDED"]
+
+
+def test_source_intent_count_limit_blocks(tmp_path: Path) -> None:
+    payload = _payload("NO_POSITION")
+    payload["source_intents"] = [
+        _intent(
+            "VALUATION_INSTRUCTION",
+            index,
+            session="2026-07-13",
+            valuation_timestamp="2026-07-13T20:00:00.000000Z",
+            effective_timestamp="2026-07-13T20:00:00.000000Z",
+        )
+        for index in range(65)
+    ]
+    failure = _failure(_run(tmp_path, payload))
+    assert failure["failure_reasons"] == ["SOURCE_INTENT_COUNT_LIMIT_EXCEEDED"]
+
+
+def _process_rss_bytes(pid: int) -> int | None:
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+
+        class ProcessMemoryCounters(ctypes.Structure):
+            _fields_ = [
+                ("cb", wintypes.DWORD),
+                ("PageFaultCount", wintypes.DWORD),
+                ("PeakWorkingSetSize", ctypes.c_size_t),
+                ("WorkingSetSize", ctypes.c_size_t),
+                ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                ("PagefileUsage", ctypes.c_size_t),
+                ("PeakPagefileUsage", ctypes.c_size_t),
+            ]
+
+        handle = ctypes.windll.kernel32.OpenProcess(0x1010, False, pid)
+        if not handle:
+            return None
+        try:
+            counters = ProcessMemoryCounters()
+            counters.cb = ctypes.sizeof(counters)
+            ok = ctypes.windll.psapi.GetProcessMemoryInfo(
+                handle,
+                ctypes.byref(counters),
+                counters.cb,
+            )
+            return int(counters.PeakWorkingSetSize) if ok else None
+        finally:
+            ctypes.windll.kernel32.CloseHandle(handle)
+    status = Path(f"/proc/{pid}/status")
+    try:
+        for line in status.read_text(encoding="utf-8").splitlines():
+            if line.startswith("VmRSS:"):
+                return int(line.split()[1]) * 1024
+    except (OSError, ValueError, IndexError):
+        return None
+    return None
+
+
+def test_fs0_process_budgets_and_repeatability(tmp_path: Path) -> None:
+    input_path = (tmp_path / "budget-input.json").resolve()
+    input_bytes = canonical_document_bytes(_payload())
+    input_path.write_bytes(input_bytes)
+    command = [sys.executable, "-I", "-X", "utf8", str(SCRIPT), "--input", str(input_path)]
+    started = time.perf_counter()
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    peak_rss = 0
+    while process.poll() is None:
+        observed = _process_rss_bytes(process.pid)
+        if observed is not None:
+            peak_rss = max(peak_rss, observed)
+        time.sleep(0.002)
+    stdout, stderr = process.communicate()
+    elapsed = time.perf_counter() - started
+    assert process.returncode == 0, stderr.decode("utf-8", errors="replace")
+    assert elapsed < 5.0
+    assert len(input_bytes) <= 1_048_576
+    assert len(stdout) <= 1_048_576
+    if peak_rss:
+        assert peak_rss <= 134_217_728
+    second = subprocess.run(command, capture_output=True, check=False)
+    assert second.returncode == 0
+    assert second.stdout == stdout
