@@ -4746,21 +4746,23 @@ def _render_portfolio_allocation_page() -> None:
 
     st.header(PORTFOLIO_PAGE_TITLE)
     st.caption(
-        "V2-B0A local-source abstention is the active product gate on this tip. "
-        "One certified decision path. Default current is local research-card "
-        "preflight HOLD_FOR_EVIDENCE mapped to paper NO_POSITION after a "
-        "certified source-authority abstention (not real external admission). "
-        "E0B G08 remains invalidated observation smoke (count 0). Score 39 frozen. "
-        "Legacy replay/optimizer non-certifying; F1C dual bundle evidence-only."
+        "V2-B0B official-source intake is the active product gate on this tip. "
+        "One certified decision path. Default current is ADMITTED official SEC "
+        "package + CLAIM_INSUFFICIENT → HOLD_FOR_EVIDENCE → paper NO_POSITION "
+        "(one issuer filing is not independent corroboration). "
+        "B0A remains banked substrate. E0B G08 remains invalidated observation "
+        "smoke (count 0). Score 39 frozen. Legacy replay/optimizer non-certifying; "
+        "F1C dual bundle evidence-only."
     )
     try:
         render_gv_fs0_current_decision(st)
     except GvFs0PresentationError as exc:
         # Fail closed: explicit unavailable authority. Never fall back to F1C dual
-        # bundle, replay, optimizer, or any non-certifying surface.
+        # bundle, replay, optimizer, B0A/B0B result tables, or any non-certifying surface.
         st.error("Certified decision unavailable")
         st.caption(f"Authority refused: {exc}")
-    # V2-B0 admission result surface (block/abstention is a valid functional outcome).
+        return
+    # Authority present: optional surfaces. B0B adapter verifies chain + current bind.
     render_v2_b0_surface(st)
     render_v2_b0b_surface(st)
     # Optional E0B surface; Attempt-1 invalidation keeps observed count at 0.

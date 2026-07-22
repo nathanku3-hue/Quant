@@ -45,6 +45,7 @@ def isolated_current_decision(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     lock = tmp_path / ".gv_fs0_current_decision.lock"
     e0b_result = tmp_path / "e0b_result.json"
     v2b0_result = tmp_path / "v2b0_result.json"
+    v2b0b_result = tmp_path / "v2b0b_result.json"
     monkeypatch.setattr(
         "core.gv_fs0_publish.DEFAULT_CURRENT_DECISION_TARGET", target
     )
@@ -60,9 +61,13 @@ def isolated_current_decision(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(
         "core.gv_e0b_dv1_contradiction.DEFAULT_RESULT_JSON", e0b_result
     )
-    # V2-B0 surface must not emit a table when authority fail-paths are under test.
+    # Optional surfaces must not emit tables when authority fail-paths are under test.
+    # Primary defense is dashboard early-return; these pins are defense-in-depth.
     monkeypatch.setattr(
         "core.gv_v2_b0_real_block_only.DEFAULT_RESULT_PATH", v2b0_result
+    )
+    monkeypatch.setattr(
+        "core.gv_v2_b0b_official_source_intake.DEFAULT_RESULT_PATH", v2b0b_result
     )
     return target, lock
 

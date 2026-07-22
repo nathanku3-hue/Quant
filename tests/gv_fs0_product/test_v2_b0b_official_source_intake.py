@@ -26,11 +26,14 @@ from core.gv_v2_b0b_official_source_intake import (
     GvV2B0BError,
     build_g_supply_research_decision,
     build_package_manifest,
+    derive_sec_package_identity,
     evaluate_g_supply_claim,
     load_access_authorization,
+    load_verified_b0b_result,
     run_admission_checks,
     run_v2_b0b_official_source_intake,
     v2b0b_rationale_ref,
+    verify_b0b_chain,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -67,6 +70,28 @@ def test_auth_before_retrieval_ordering() -> None:
         assert auth["authorization_recorded_at"] < obj["retrieved_at"]
 
 
+def test_source_pit_derived_from_sec_header() -> None:
+    derived = derive_sec_package_identity(root=ROOT)
+    assert derived["accession"] == ACCESSION
+    assert derived["cik"] == "0000723125"
+    assert derived["form"] == "10-Q"
+    assert derived["acceptance_datetime"] == "2026-06-24T18:59:46.000000Z"
+    assert derived["period_ended"] == "2026-05-28"
+    assert derived["filed_at"] == "2026-06-25"
+    assert derived["primary_document_filename"] == "mu-20260528.htm"
+
+    admission = run_admission_checks(root=ROOT)
+    # Rebuild source path via admission bindings.
+    from core.gv_v2_b0b_official_source_intake import build_source_manifest
+
+    source = build_source_manifest(root=ROOT)
+    assert source["publication_time"] == derived["acceptance_datetime"]
+    assert source["known_at"] == derived["acceptance_datetime"]
+    assert source["source_derived_pit"]["filed_at"] == derived["filed_at"]
+    assert source["entity_identity"]["primary_document_filename"] == "mu-20260528.htm"
+    assert admission["status"] == "ADMITTED"
+
+
 def test_admission_admitted_with_certificate_and_not_evaluated_contradiction() -> None:
     admission = run_admission_checks(root=ROOT)
     assert admission["status"] == "ADMITTED"
@@ -82,6 +107,15 @@ def test_claim_insufficient_one_issuer_source() -> None:
     claim = evaluate_g_supply_claim(root=ROOT)
     assert claim["claim_outcome"] == CLAIM_INSUFFICIENT
     assert claim["independent_source_count"] == 1
+    assert claim["contradiction_status"] == CONTRADICTION_NOT_EVALUATED
+    dims = claim["evidence_dimensions"]
+    assert dims["official_filing_admitted"] == "PASS"
+    assert dims["relevant_issuer_supply_assertions_present"] == "PASS"
+    assert dims["capacity_facility_disclosures_present"] == "PASS"
+    assert dims["independent_source_corroboration"] == "FAIL"
+    assert dims["physical_supply_telemetry"] == "FAIL"
+    assert dims["cross_source_contradiction_evaluation"] == "NOT_EVALUATED"
+    assert dims["sufficient_for_research_advancement"] == "FAIL"
     assert len(claim["statements"]) >= 3
     for stmt in claim["statements"]:
         assert stmt["source_object_hash"]
@@ -101,7 +135,7 @@ def test_claim_insufficient_one_issuer_source() -> None:
 def test_admitted_does_not_auto_advance() -> None:
     admission = run_admission_checks(root=ROOT)
     claim = evaluate_g_supply_claim(root=ROOT, admission=admission)
-    research = build_g_supply_research_decision(admission, claim)
+    research = build_g_supply_research_decision(admission, claim, root=ROOT)
     assert admission["status"] == "ADMITTED"
     assert research["research_action"] == RESEARCH_ACTION_HOLD
     assert research["research_action"] != RESEARCH_ACTION_ADVANCE
@@ -111,15 +145,31 @@ def test_admitted_does_not_auto_advance() -> None:
     assert research["admission_hash"] == admission["admission_hash"]
 
 
-def test_advance_requires_sufficient_claim() -> None:
+def test_stale_claim_hash_mutation_raises_integrity_error() -> None:
+    """Tampering claim_outcome while leaving hash stale must fail closed."""
+
     admission = run_admission_checks(root=ROOT)
     claim = evaluate_g_supply_claim(root=ROOT, admission=admission)
     fake = dict(claim)
     fake["claim_outcome"] = CLAIM_SUFFICIENT
-    # Hash is stale; research still maps by outcome fields.
-    research = build_g_supply_research_decision(admission, fake)
-    assert research["research_action"] == RESEARCH_ACTION_ADVANCE
-    assert research["portfolio_action"] == PORTFOLIO_ACTION_NO_POSITION
+    # Hash is intentionally stale relative to mutated outcome.
+    with pytest.raises(GvV2B0BError, match="CLAIM_EVALUATION_HASH_MISMATCH"):
+        build_g_supply_research_decision(admission, fake, root=ROOT)
+
+
+def test_sufficient_claim_not_authorized_in_b0b() -> None:
+    """Even a rehashed SUFFICIENT claim cannot ADVANCE in the B0B slice."""
+
+    from core.gv_fs0_canonical import domain_hash
+    from core.gv_v2_b0b_official_source_intake import CLAIM_DOMAIN
+
+    admission = run_admission_checks(root=ROOT)
+    claim = evaluate_g_supply_claim(root=ROOT, admission=admission)
+    fake = {k: v for k, v in claim.items() if k != "claim_evaluation_hash"}
+    fake["claim_outcome"] = CLAIM_SUFFICIENT
+    fake["claim_evaluation_hash"] = domain_hash(CLAIM_DOMAIN, fake)
+    with pytest.raises(GvV2B0BError, match="SUFFICIENT_CLAIM_NOT_AUTHORIZED_IN_B0B"):
+        build_g_supply_research_decision(admission, fake, root=ROOT)
 
 
 def test_full_vertical_publishes_certified_no_position(tmp_path: Path) -> None:
@@ -130,9 +180,6 @@ def test_full_vertical_publishes_certified_no_position(tmp_path: Path) -> None:
         current_target=tmp_path / "current.json",
         current_lock=tmp_path / "current.lock",
     )
-    # case_dir lacks pre-read auth bank — runner requires auth in ROOT auth path
-    # but writes other artifacts to case_dir. Re-run with default case under tmp
-    # is awkward; instead assert via tracked bank path after publish-only.
     assert out["case_id"]
     assert out["slice_classification"] == SLICE_CLASSIFICATION
     assert out["admission_status"] == "ADMITTED"
@@ -180,10 +227,33 @@ def test_full_vertical_on_banked_case_dir(tmp_path: Path) -> None:
         "access_authorization.json",
     ):
         assert (case / name).is_file()
-    result = json.loads((case / "result.json").read_text(encoding="utf-8"))
-    assert result["admission_hash"]
-    assert result["claim_evaluation_hash"]
-    assert result["data_admission_certificates_earned"] == 1
+    verified = load_verified_b0b_result(root=ROOT, case_dir=case)
+    assert verified["admission_hash"]
+    assert verified["claim_evaluation_hash"]
+    assert verified["data_admission_certificates_earned"] == 1
+    assert verified["claim_outcome"] == CLAIM_INSUFFICIENT
+
+
+def test_load_verified_b0b_result_rejects_tampered_claim_field(tmp_path: Path) -> None:
+    import shutil
+
+    src = ROOT / "data/gv_v2_b0b/mu_0000723125-26-000015"
+    case = tmp_path / "bank"
+    shutil.copytree(src, case)
+    run_v2_b0b_official_source_intake(
+        root=ROOT,
+        case_dir=case,
+        publish=False,
+    )
+    claim_path = case / "claim_evaluation.json"
+    claim = json.loads(claim_path.read_text(encoding="utf-8"))
+    claim["claim_outcome"] = CLAIM_SUFFICIENT
+    claim_path.write_text(
+        json.dumps(claim, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(GvV2B0BError, match="CLAIM_EVALUATION_HASH_MISMATCH"):
+        load_verified_b0b_result(root=ROOT, case_dir=case)
 
 
 def test_rationale_ref_helper() -> None:

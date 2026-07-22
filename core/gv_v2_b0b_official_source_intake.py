@@ -299,6 +299,186 @@ def _assert_auth_before_receipt(auth_at: str, retrieved_at: str) -> None:
         )
 
 
+def _body_without_hash(payload: Mapping[str, Any], hash_key: str) -> dict[str, Any]:
+    return {k: v for k, v in _plain(payload).items() if k != hash_key}
+
+
+def recompute_domain_hash(
+    domain: str, payload: Mapping[str, Any], hash_key: str
+) -> str:
+    """Recompute domain hash from complete body excluding the hash field itself."""
+
+    return domain_hash(domain, _body_without_hash(payload, hash_key))
+
+
+def require_domain_hash(
+    payload: Mapping[str, Any],
+    *,
+    domain: str,
+    hash_key: str,
+    error_code: str,
+) -> str:
+    """Fail closed when a stored domain hash does not match the recomputed body."""
+
+    stored = payload.get(hash_key)
+    recomputed = recompute_domain_hash(domain, payload, hash_key)
+    if stored != recomputed:
+        raise GvV2B0BError(error_code)
+    return str(recomputed)
+
+
+def _header_field(header_text: str, label: str) -> str:
+    # SEC complete-submission headers use either SGML tags or "LABEL:value".
+    m = re.search(
+        rf"(?:<{re.escape(label)}>([^\r\n<]+)|{re.escape(label)}\s*:\s*([^\r\n]+))",
+        header_text,
+    )
+    if not m:
+        raise GvV2B0BError(f"V2B0B_SEC_HEADER_FIELD_MISSING:{label}")
+    return (m.group(1) or m.group(2) or "").strip()
+
+
+def _acceptance_datetime_to_iso(raw: str) -> str:
+    """Map SEC ACCEPTANCE-DATETIME YYYYMMDDHHMMSS → UTC ISO with six fractional digits."""
+
+    text = raw.strip()
+    if not re.fullmatch(r"\d{14}", text):
+        raise GvV2B0BError(f"V2B0B_SEC_ACCEPTANCE_DATETIME_INVALID:{text}")
+    return (
+        f"{text[0:4]}-{text[4:6]}-{text[6:8]}T"
+        f"{text[8:10]}:{text[10:12]}:{text[12:14]}.000000Z"
+    )
+
+
+def _yyyymmdd_to_iso_date(raw: str) -> str:
+    text = raw.strip()
+    if not re.fullmatch(r"\d{8}", text):
+        raise GvV2B0BError(f"V2B0B_SEC_DATE_INVALID:{text}")
+    return f"{text[0:4]}-{text[4:6]}-{text[6:8]}"
+
+
+def parse_sec_complete_submission_header(data: bytes) -> dict[str, str]:
+    """Parse identity/PIT fields from one exact SEC complete-submission package.
+
+    Narrow parser for this accession format only — not a provider framework.
+    """
+
+    # Header is small; cap decode window to avoid loading multi-MB body for metadata.
+    window = data[: min(len(data), 256_000)].decode("utf-8", errors="replace")
+    end = window.find("</SEC-HEADER>")
+    if end < 0:
+        raise GvV2B0BError("V2B0B_SEC_HEADER_MISSING")
+    header = window[:end]
+
+    accession = _header_field(header, "ACCESSION NUMBER")
+    form = _header_field(header, "CONFORMED SUBMISSION TYPE")
+    period = _header_field(header, "CONFORMED PERIOD OF REPORT")
+    filed = _header_field(header, "FILED AS OF DATE")
+    cik = _header_field(header, "CENTRAL INDEX KEY")
+    acceptance_raw = _header_field(header, "ACCEPTANCE-DATETIME")
+
+    # First primary document of TYPE 10-Q in the submission stream.
+    primary_match = re.search(
+        r"<TYPE>\s*10-Q\s*<SEQUENCE>\s*\d+\s*<FILENAME>\s*([^\r\n<]+)",
+        window,
+        flags=re.IGNORECASE,
+    )
+    if not primary_match:
+        raise GvV2B0BError("V2B0B_SEC_PRIMARY_FILENAME_MISSING")
+    primary_filename = primary_match.group(1).strip()
+
+    company_match = re.search(
+        r"COMPANY CONFORMED NAME:\s*([^\r\n]+)", header
+    )
+    company_name = (
+        company_match.group(1).strip() if company_match else "Micron Technology, Inc."
+    )
+
+    return {
+        "accession": accession,
+        "cik": cik,
+        "form": form,
+        "acceptance_datetime_raw": acceptance_raw,
+        "acceptance_datetime": _acceptance_datetime_to_iso(acceptance_raw),
+        "period_ended": _yyyymmdd_to_iso_date(period),
+        "filed_at": _yyyymmdd_to_iso_date(filed),
+        "primary_document_filename": primary_filename,
+        "company_name": company_name,
+    }
+
+
+def parse_sec_accession_index_primary(data: bytes) -> dict[str, str]:
+    """Derive primary 10-Q filename from the accession index HTML bytes."""
+
+    text = data.decode("utf-8", errors="replace")
+    # Index table row: Type 10-Q document link to mu-20260528.htm
+    m = re.search(
+        r'href="[^"]*?(mu-20260528\.htm)"[^>]*>\s*mu-20260528\.htm',
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not m:
+        # Fallback: any 10-Q cell followed by the primary htm name.
+        m2 = re.search(
+            r">\s*10-Q\s*<.*?>\s*<a[^>]+>(mu-20260528\.htm)</a>",
+            text,
+            flags=re.IGNORECASE | re.DOTALL,
+        )
+        if not m2:
+            raise GvV2B0BError("V2B0B_INDEX_PRIMARY_FILENAME_MISSING")
+        primary = m2.group(1).strip()
+    else:
+        primary = m.group(1).strip()
+
+    acc = re.search(r"0000723125-26-000015", text)
+    if not acc:
+        raise GvV2B0BError("V2B0B_INDEX_ACCESSION_MISSING")
+    return {
+        "accession": ACCESSION,
+        "primary_document_filename": primary,
+        "form": FORM,
+    }
+
+
+def derive_sec_package_identity(*, root: Path) -> dict[str, str]:
+    """Cross-check complete submission header ↔ accession index ↔ package pins."""
+
+    raw_dir = root / "data/gv_v2_b0b/mu_0000723125-26-000015/raw"
+    complete_path = _require_file(
+        raw_dir / "0000723125-26-000015.txt",
+        "V2B0B_PACKAGE_OBJECT_MISSING:0000723125-26-000015.txt",
+    )
+    index_path = _require_file(
+        raw_dir / "0000723125-26-000015-index.htm",
+        "V2B0B_PACKAGE_OBJECT_MISSING:0000723125-26-000015-index.htm",
+    )
+    primary_path = _require_file(
+        raw_dir / "mu-20260528.htm",
+        "V2B0B_PACKAGE_OBJECT_MISSING:mu-20260528.htm",
+    )
+
+    header = parse_sec_complete_submission_header(complete_path.read_bytes())
+    index = parse_sec_accession_index_primary(index_path.read_bytes())
+
+    if header["accession"] != ACCESSION or index["accession"] != ACCESSION:
+        raise GvV2B0BError("V2B0B_SOURCE_DERIVED_ACCESSION_MISMATCH")
+    if header["cik"] != CIK:
+        raise GvV2B0BError("V2B0B_SOURCE_DERIVED_CIK_MISMATCH")
+    if header["form"] != FORM:
+        raise GvV2B0BError("V2B0B_SOURCE_DERIVED_FORM_MISMATCH")
+    if header["primary_document_filename"] != "mu-20260528.htm":
+        raise GvV2B0BError("V2B0B_SOURCE_DERIVED_PRIMARY_MISMATCH")
+    if index["primary_document_filename"] != "mu-20260528.htm":
+        raise GvV2B0BError("V2B0B_INDEX_PRIMARY_MISMATCH")
+    if not primary_path.is_file():
+        raise GvV2B0BError("V2B0B_PRIMARY_OBJECT_MISSING")
+    # Primary object role pin must match submission-identified primary document.
+    primary_spec = PACKAGE_OBJECTS[2]
+    if primary_spec["filename"] != header["primary_document_filename"]:
+        raise GvV2B0BError("V2B0B_PACKAGE_PRIMARY_ROLE_MISMATCH")
+    return header
+
+
 def load_access_authorization(*, root: Path | None = None) -> dict[str, Any]:
     """Load the remotely retained pre-read authorization object."""
 
@@ -418,11 +598,49 @@ def build_source_manifest(
         if access_authorization is not None
         else load_access_authorization(root=base)
     )
+    # Pre-read authorization identity must match package pins before source derivation.
+    if auth.get("accession") != ACCESSION:
+        raise GvV2B0BError("V2B0B_AUTH_ACCESSION_MISMATCH")
+    if auth.get("cik") != CIK:
+        raise GvV2B0BError("V2B0B_AUTH_CIK_MISMATCH")
+    if auth.get("form") != FORM:
+        raise GvV2B0BError("V2B0B_AUTH_FORM_MISMATCH")
+    require_domain_hash(
+        auth,
+        domain=ACCESS_AUTH_DOMAIN,
+        hash_key="authorization_hash",
+        error_code="V2B0B_AUTH_HASH_MISMATCH",
+    )
+
     package = (
         _plain(package_manifest)
         if package_manifest is not None
         else build_package_manifest(root=base, access_authorization=auth)
     )
+    require_domain_hash(
+        package,
+        domain=PACKAGE_MANIFEST_DOMAIN,
+        hash_key="package_manifest_hash",
+        error_code="V2B0B_PACKAGE_MANIFEST_HASH_MISMATCH",
+    )
+    if package.get("accession") != ACCESSION or package.get("cik") != CIK:
+        raise GvV2B0BError("V2B0B_PACKAGE_IDENTITY_MISMATCH")
+    if package.get("form") != FORM:
+        raise GvV2B0BError("V2B0B_PACKAGE_FORM_MISMATCH")
+    if package.get("access_authorization_hash") != auth.get("authorization_hash"):
+        raise GvV2B0BError("V2B0B_AUTH_PACKAGE_BINDING_INVALID")
+
+    # Source-derived PIT/identity from complete submission + index cross-check.
+    derived = derive_sec_package_identity(root=base)
+    if derived["accession"] != auth.get("accession"):
+        raise GvV2B0BError("V2B0B_AUTH_HEADER_ACCESSION_MISMATCH")
+    if derived["cik"] != auth.get("cik"):
+        raise GvV2B0BError("V2B0B_AUTH_HEADER_CIK_MISMATCH")
+    if derived["form"] != auth.get("form"):
+        raise GvV2B0BError("V2B0B_AUTH_HEADER_FORM_MISMATCH")
+    if derived["accession"] != package.get("accession"):
+        raise GvV2B0BError("V2B0B_PACKAGE_HEADER_ACCESSION_MISMATCH")
+
     files = [
         {
             "path": obj["relative_path"],
@@ -439,26 +657,36 @@ def build_source_manifest(
         "subject": SUBJECT,
         "module": MODULE,
         "slice_classification": SLICE_CLASSIFICATION,
-        "accession": ACCESSION,
+        "accession": derived["accession"],
         "source_family_id": SOURCE_FAMILY_ID,
         "independent_source_count": 1,
         "access_authorization_hash": auth["authorization_hash"],
         "package_manifest_hash": package["package_manifest_hash"],
         "files": files,
-        "publication_time": "2026-06-24T18:59:46.000000Z",
-        "known_at": "2026-06-24T18:59:46.000000Z",
+        "publication_time": derived["acceptance_datetime"],
+        "known_at": derived["acceptance_datetime"],
         "effective_period": {
-            "period_ended": "2026-05-28",
-            "accepted_at": "2026-06-24T18:59:46.000000Z",
-            "filed_at": "2026-06-25",
+            "period_ended": derived["period_ended"],
+            "accepted_at": derived["acceptance_datetime"],
+            "filed_at": derived["filed_at"],
         },
-        "revision_or_vintage_state": "sec_10q_accession_0000723125-26-000015",
+        "revision_or_vintage_state": f"sec_10q_accession_{derived['accession']}",
         "units": None,
         "entity_identity": {
             "ticker": "MU",
             "company_name": "Micron Technology, Inc.",
-            "cik": CIK,
+            "cik": derived["cik"],
             "identity_source": SOURCE_FAMILY_ID,
+            "primary_document_filename": derived["primary_document_filename"],
+            "source_derived": True,
+        },
+        "source_derived_pit": {
+            "acceptance_datetime_raw": derived["acceptance_datetime_raw"],
+            "acceptance_datetime": derived["acceptance_datetime"],
+            "period_ended": derived["period_ended"],
+            "filed_at": derived["filed_at"],
+            "primary_document_filename": derived["primary_document_filename"],
+            "derivation": "complete_submission_header_and_accession_index",
         },
         "upstream_duplication": "single_sec_accession_three_custody_objects",
         "point_in_time_available": True,
@@ -530,19 +758,35 @@ def run_admission_checks(
     if not licence_ok:
         blocks.append("LICENCE_NOT_AUTHORIZED")
 
-    # 2) Point-in-time availability
+    # 2) Point-in-time availability — must be source-derived, not free constants.
+    require_domain_hash(
+        manifest,
+        domain=SOURCE_MANIFEST_DOMAIN,
+        hash_key="source_manifest_hash",
+        error_code="V2B0B_SOURCE_MANIFEST_HASH_MISMATCH",
+    )
+    derived_pit = manifest.get("source_derived_pit")
+    period = manifest.get("effective_period")
     pit_ok = (
         manifest.get("point_in_time_available") is True
-        and manifest.get("known_at") is not None
-        and manifest.get("publication_time") is not None
-        and isinstance(manifest.get("effective_period"), Mapping)
+        and isinstance(derived_pit, Mapping)
+        and isinstance(period, Mapping)
+        and manifest.get("known_at") == derived_pit.get("acceptance_datetime")
+        and manifest.get("publication_time") == derived_pit.get("acceptance_datetime")
+        and period.get("accepted_at") == derived_pit.get("acceptance_datetime")
+        and period.get("period_ended") == derived_pit.get("period_ended")
+        and period.get("filed_at") == derived_pit.get("filed_at")
+        and derived_pit.get("primary_document_filename") == "mu-20260528.htm"
+        and (manifest.get("entity_identity") or {}).get("cik") == CIK
+        and manifest.get("accession") == ACCESSION
     )
     checks["point_in_time_availability"] = {
         "pass": pit_ok,
         "detail": (
-            "SEC acceptance/filing/period metadata present on source_manifest."
+            "SEC acceptance/filing/period metadata derived from complete submission "
+            "header and cross-checked to accession index + package + authorization."
             if pit_ok
-            else "Missing known_at/publication_time/effective_period."
+            else "Missing or non-source-derived known_at/publication_time/effective_period."
         ),
     }
     if not pit_ok:
@@ -832,13 +1076,59 @@ def _extract_statements(*, root: Path) -> list[dict[str, Any]]:
     return statements
 
 
+def _verify_statement_locators(
+    statements: list[dict[str, Any]], *, root: Path
+) -> None:
+    """Re-resolve each statement byte window against primary document bytes."""
+
+    primary_rel = "data/gv_v2_b0b/mu_0000723125-26-000015/raw/mu-20260528.htm"
+    primary_path = _require_file(root / primary_rel, "V2B0B_PRIMARY_MISSING")
+    data = primary_path.read_bytes()
+    text = data.decode("utf-8", errors="replace")
+    source_hash = _sha256_bytes(data)
+    for stmt in statements:
+        if stmt.get("source_object_hash") != source_hash:
+            raise GvV2B0BError(
+                f"V2B0B_STATEMENT_SOURCE_HASH_MISMATCH:{stmt.get('statement_id')}"
+            )
+        start = int(stmt["byte_start"])
+        end = int(stmt["byte_end"])
+        if start < 0 or end > len(text) or start >= end:
+            raise GvV2B0BError(
+                f"V2B0B_STATEMENT_LOCATOR_INVALID:{stmt.get('statement_id')}"
+            )
+        excerpt = text[start:end]
+        if excerpt != stmt.get("exact_excerpt"):
+            raise GvV2B0BError(
+                f"V2B0B_STATEMENT_EXCERPT_MISMATCH:{stmt.get('statement_id')}"
+            )
+        if _sha256_bytes(excerpt.encode("utf-8")) != stmt.get("exact_excerpt_hash"):
+            raise GvV2B0BError(
+                f"V2B0B_STATEMENT_EXCERPT_HASH_MISMATCH:{stmt.get('statement_id')}"
+            )
+        if stmt.get("source_family_id") != SOURCE_FAMILY_ID:
+            raise GvV2B0BError(
+                f"V2B0B_STATEMENT_SOURCE_FAMILY_MISMATCH:{stmt.get('statement_id')}"
+            )
+        contrib = stmt.get("independent_source_count_contribution")
+        if contrib is None or int(contrib) != 0:
+            raise GvV2B0BError(
+                f"V2B0B_STATEMENT_INDEPENDENT_COUNT_INVALID:{stmt.get('statement_id')}"
+            )
+
+
 def evaluate_g_supply_claim(
     *,
     root: Path | None = None,
     admission: Mapping[str, Any] | None = None,
     package_manifest: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Separate claim evaluation — never inside admission pass."""
+    """Separate claim evaluation — never inside admission pass.
+
+    B0B uses an explicit narrow evidence-dimension rule. A positive
+    SUFFICIENT_FOR_RESEARCH_TRIAGE outcome is not producible in this one-source
+    slice (belongs to multi-source B0C).
+    """
 
     base = Path(root) if root is not None else ROOT
     adm = _plain(admission) if admission is not None else run_admission_checks(root=base)
@@ -848,8 +1138,31 @@ def evaluate_g_supply_claim(
         else build_package_manifest(root=base)
     )
 
+    require_domain_hash(
+        adm,
+        domain=ADMISSION_DOMAIN,
+        hash_key="admission_hash",
+        error_code="V2B0B_ADMISSION_HASH_MISMATCH",
+    )
+    require_domain_hash(
+        package,
+        domain=PACKAGE_MANIFEST_DOMAIN,
+        hash_key="package_manifest_hash",
+        error_code="V2B0B_PACKAGE_MANIFEST_HASH_MISMATCH",
+    )
+    cert = adm.get("admission_certificate")
+    if isinstance(cert, Mapping) and cert:
+        require_domain_hash(
+            cert,
+            domain=CERTIFICATE_DOMAIN,
+            hash_key="admission_certificate_hash",
+            error_code="V2B0B_ADMISSION_CERTIFICATE_HASH_MISMATCH",
+        )
+
     if int(package.get("independent_source_count") or 0) != 1:
         raise GvV2B0BError("V2B0B_CLAIM_DEDUP_VIOLATION")
+    if package.get("source_family_id") != SOURCE_FAMILY_ID:
+        raise GvV2B0BError("V2B0B_CLAIM_SOURCE_FAMILY_MISMATCH")
 
     if adm.get("status") != "ADMITTED":
         body = {
@@ -864,6 +1177,15 @@ def evaluate_g_supply_claim(
             "source_family_id": SOURCE_FAMILY_ID,
             "independent_source_count": 1,
             "claim_outcome": CLAIM_NOT_EVALUABLE,
+            "evidence_dimensions": {
+                "official_filing_admitted": "FAIL",
+                "relevant_issuer_supply_assertions_present": "NOT_EVALUATED",
+                "capacity_facility_disclosures_present": "NOT_EVALUATED",
+                "independent_source_corroboration": "FAIL",
+                "physical_supply_telemetry": "FAIL",
+                "cross_source_contradiction_evaluation": "NOT_EVALUATED",
+                "sufficient_for_research_advancement": "FAIL",
+            },
             "statements": [],
             "evaluation_notes": [
                 "Admission not ADMITTED; claim evaluation is NOT_EVALUABLE.",
@@ -876,23 +1198,61 @@ def evaluate_g_supply_claim(
         return body
 
     statements = _extract_statements(root=base)
+    _verify_statement_locators(statements, root=base)
     classes = {s["statement_class"] for s in statements}
-    # Honest outcome for one issuer filing: relevant language exists, but
-    # independent physical-supply identification / corroboration is absent.
-    outcome = CLAIM_INSUFFICIENT
+    issuer_assertions = [
+        s for s in statements if s["statement_class"] == "ISSUER_ASSERTION"
+    ]
+    facility_disclosures = [
+        s
+        for s in statements
+        if s["statement_class"] in {"FINANCIAL_FACT", "CONTRACTUAL_DISCLOSURE"}
+    ]
+
+    # Explicit B0B dimension rule (one-source slice only).
+    dimensions = {
+        "official_filing_admitted": "PASS",
+        "relevant_issuer_supply_assertions_present": (
+            "PASS" if len(issuer_assertions) >= 3 else "FAIL"
+        ),
+        "capacity_facility_disclosures_present": (
+            "PASS" if len(facility_disclosures) >= 2 else "FAIL"
+        ),
+        "independent_source_corroboration": "FAIL",
+        "physical_supply_telemetry": "FAIL",
+        "cross_source_contradiction_evaluation": "NOT_EVALUATED",
+        "sufficient_for_research_advancement": "FAIL",
+    }
+    # Derivation: independent corroboration absent OR physical identification
+    # absent → CLAIM_INSUFFICIENT. B0B does not implement positive SUFFICIENT.
+    if (
+        dimensions["independent_source_corroboration"] != "PASS"
+        or dimensions["physical_supply_telemetry"] != "PASS"
+        or dimensions["sufficient_for_research_advancement"] != "PASS"
+    ):
+        outcome = CLAIM_INSUFFICIENT
+    else:
+        # Unreachable in B0B one-source rule; refuse speculative positive logic.
+        raise GvV2B0BError("V2B0B_SUFFICIENT_CLAIM_NOT_AUTHORIZED_IN_B0B")
+
     notes = [
-        "Extracted issuer disclosures are decision-relevant to G_supply themes "
-        "(constrained supply, allocation, capacity expansion).",
-        "independent_source_count remains 1; index/primary/submission are not "
-        "three corroborators.",
-        "real_physical_supply_bytes_present=false; issuer assertions and "
-        "contractual/facility disclosures are not independent physical telemetry.",
-        "Therefore claim outcome is CLAIM_INSUFFICIENT for advancement, not "
-        "SUFFICIENT_FOR_RESEARCH_TRIAGE.",
+        "Evidence dimensions evaluated under B0B one-source rule.",
+        f"official_filing_admitted={dimensions['official_filing_admitted']}",
+        f"relevant_issuer_supply_assertions_present="
+        f"{dimensions['relevant_issuer_supply_assertions_present']} "
+        f"(count={len(issuer_assertions)})",
+        f"capacity_facility_disclosures_present="
+        f"{dimensions['capacity_facility_disclosures_present']} "
+        f"(count={len(facility_disclosures)})",
+        "independent_source_corroboration=FAIL (independent_source_count=1)",
+        "physical_supply_telemetry=FAIL (real_physical_supply_bytes_present=false)",
+        "cross_source_contradiction_evaluation=NOT_EVALUATED",
+        "sufficient_for_research_advancement=FAIL",
+        "Derivation: independent corroboration absent OR physical identification "
+        "absent → CLAIM_INSUFFICIENT.",
         f"Statement classes observed: {sorted(classes)}.",
     ]
-    # Within this single source family, no internal contradiction among extracts.
-    contradiction_status = CONTRADICTION_PASS
+    contradiction_status = CONTRADICTION_NOT_EVALUATED
 
     body = {
         "schema_version": CLAIM_SCHEMA,
@@ -909,6 +1269,7 @@ def evaluate_g_supply_claim(
         "source_family_id": SOURCE_FAMILY_ID,
         "independent_source_count": 1,
         "claim_outcome": outcome,
+        "evidence_dimensions": dimensions,
         "statements": statements,
         "evaluation_notes": notes,
         "contradiction_status": contradiction_status,
@@ -922,25 +1283,64 @@ def evaluate_g_supply_claim(
 def build_g_supply_research_decision(
     admission: Mapping[str, Any],
     claim: Mapping[str, Any],
+    *,
+    root: Path | None = None,
 ) -> dict[str, Any]:
-    """Map admission + claim → research action. ADMITTED never auto-ADVANCE."""
+    """Map admission + claim → research action.
+
+    B0B refuses SUFFICIENT→ADVANCE (no speculative positive path). Every
+    consuming boundary recomputes domain hashes before reading semantic fields.
+    """
 
     admission = _plain(admission)
     claim = _plain(claim)
+    base = Path(root) if root is not None else ROOT
+
+    require_domain_hash(
+        admission,
+        domain=ADMISSION_DOMAIN,
+        hash_key="admission_hash",
+        error_code="V2B0B_ADMISSION_HASH_MISMATCH",
+    )
+    require_domain_hash(
+        claim,
+        domain=CLAIM_DOMAIN,
+        hash_key="claim_evaluation_hash",
+        error_code="V2B0B_CLAIM_EVALUATION_HASH_MISMATCH",
+    )
+    cert = admission.get("admission_certificate")
+    if isinstance(cert, Mapping) and cert:
+        require_domain_hash(
+            cert,
+            domain=CERTIFICATE_DOMAIN,
+            hash_key="admission_certificate_hash",
+            error_code="V2B0B_ADMISSION_CERTIFICATE_HASH_MISMATCH",
+        )
+        if claim.get("admission_certificate_hash") != cert.get(
+            "admission_certificate_hash"
+        ):
+            raise GvV2B0BError("V2B0B_CLAIM_CERTIFICATE_BINDING_INVALID")
+
     if claim.get("admission_hash") != admission.get("admission_hash"):
         raise GvV2B0BError("V2B0B_CLAIM_ADMISSION_BINDING_INVALID")
+    if claim.get("package_manifest_hash") != admission.get("package_manifest_hash"):
+        raise GvV2B0BError("V2B0B_CLAIM_PACKAGE_BINDING_INVALID")
+    if claim.get("source_family_id") != SOURCE_FAMILY_ID:
+        raise GvV2B0BError("V2B0B_CLAIM_SOURCE_FAMILY_MISMATCH")
+    if int(claim.get("independent_source_count") or 0) != 1:
+        raise GvV2B0BError("V2B0B_CLAIM_DEDUP_VIOLATION")
+
+    statements = list(claim.get("statements") or [])
+    if statements:
+        _verify_statement_locators(statements, root=base)
 
     adm_status = admission.get("status")
     claim_outcome = claim.get("claim_outcome")
 
-    if adm_status == "ADMITTED" and claim_outcome == CLAIM_SUFFICIENT:
-        research_action = RESEARCH_ACTION_ADVANCE
-        rationale = (
-            "Admission ADMITTED and claim evaluation SUFFICIENT_FOR_RESEARCH_TRIAGE: "
-            "may ADVANCE_TO_FULL_RESEARCH for paper research only. Does not open a "
-            "position and does not claim thesis truth or independent corroboration."
-        )
-    elif adm_status == "ADMITTED" and claim_outcome == CLAIM_CONTRADICTED:
+    # B0B one-source slice: no ADVANCE path. Positive triage belongs to B0C.
+    if claim_outcome == CLAIM_SUFFICIENT:
+        raise GvV2B0BError("V2B0B_SUFFICIENT_CLAIM_NOT_AUTHORIZED_IN_B0B")
+    if adm_status == "ADMITTED" and claim_outcome == CLAIM_CONTRADICTED:
         research_action = RESEARCH_ACTION_REJECT
         rationale = (
             "Admission ADMITTED but claim evaluation CLAIM_CONTRADICTED: "
@@ -962,11 +1362,14 @@ def build_g_supply_research_decision(
             "HOLD_FOR_EVIDENCE (BLOCKED or NOT_EVALUABLE paths cannot advance)."
         )
 
-    # B0B never opens positions regardless of research action.
-    portfolio_action = PORTFOLIO_ACTION_NO_POSITION
-    if research_action == RESEARCH_ACTION_ADVANCE and claim_outcome != CLAIM_SUFFICIENT:
-        raise GvV2B0BError("V2B0B_ADVANCE_WITHOUT_SUFFICIENT_CLAIM")
+    if research_action == RESEARCH_ACTION_ADVANCE:
+        raise GvV2B0BError("V2B0B_ADVANCE_NOT_AUTHORIZED_IN_B0B")
 
+    portfolio_action = PORTFOLIO_ACTION_NO_POSITION
+
+    rationale_ref = f"{RATIONALE_REF_PREFIX}{claim['claim_evaluation_hash']}"
+    if len(rationale_ref) > 128:
+        raise GvV2B0BError("V2B0B_RATIONALE_REF_TOO_LONG")
     body = {
         "schema_version": RESEARCH_SCHEMA,
         "case_id": CASE_ID,
@@ -981,17 +1384,14 @@ def build_g_supply_research_decision(
         "claim_outcome": claim_outcome,
         "primary_block_reason": admission.get("primary_block_reason"),
         "rationale": rationale,
+        "rationale_ref": rationale_ref,
         "slice_classification": SLICE_CLASSIFICATION,
         "source_family_id": SOURCE_FAMILY_ID,
         "independent_source_count": 1,
         "alpha_claim": False,
         "claim_boundary": CLAIM_BOUNDARY,
     }
-    research_hash = domain_hash(RESEARCH_DOMAIN, body)
-    body["research_decision_hash"] = research_hash
-    body["rationale_ref"] = f"{RATIONALE_REF_PREFIX}{claim['claim_evaluation_hash']}"
-    if len(body["rationale_ref"]) > 128:
-        raise GvV2B0BError("V2B0B_RATIONALE_REF_TOO_LONG")
+    body["research_decision_hash"] = domain_hash(RESEARCH_DOMAIN, body)
     return body
 
 
@@ -1137,6 +1537,202 @@ def build_decision_packet_markdown(
     return "\n".join(lines)
 
 
+def verify_b0b_chain(
+    *,
+    root: Path | None = None,
+    access_authorization: Mapping[str, Any],
+    package_manifest: Mapping[str, Any],
+    source_manifest: Mapping[str, Any],
+    admission: Mapping[str, Any],
+    claim: Mapping[str, Any],
+    research: Mapping[str, Any],
+    result: Mapping[str, Any] | None = None,
+) -> None:
+    """Narrow B0B complete-chain verifier (not a generic evidence framework).
+
+    authorization → package/raw bytes → source → admission/certificate →
+    claim + statement locators → research → optional result.
+    Every boundary recomputes its domain hash before semantic consumption.
+    """
+
+    base = Path(root) if root is not None else ROOT
+    auth = _plain(access_authorization)
+    package = _plain(package_manifest)
+    source = _plain(source_manifest)
+    adm = _plain(admission)
+    clm = _plain(claim)
+    res = _plain(research)
+
+    require_domain_hash(
+        auth,
+        domain=ACCESS_AUTH_DOMAIN,
+        hash_key="authorization_hash",
+        error_code="V2B0B_AUTH_HASH_MISMATCH",
+    )
+    if auth.get("authorization_hash") != EXPECTED_AUTH_HASH:
+        raise GvV2B0BError("V2B0B_AUTH_HASH_NOT_PINNED")
+    if auth.get("accession") != ACCESSION or auth.get("cik") != CIK:
+        raise GvV2B0BError("V2B0B_AUTH_IDENTITY_MISMATCH")
+
+    require_domain_hash(
+        package,
+        domain=PACKAGE_MANIFEST_DOMAIN,
+        hash_key="package_manifest_hash",
+        error_code="V2B0B_PACKAGE_MANIFEST_HASH_MISMATCH",
+    )
+    raw_dir = base / "data/gv_v2_b0b/mu_0000723125-26-000015/raw"
+    for spec in PACKAGE_OBJECTS:
+        path = _require_file(
+            raw_dir / spec["filename"], f"V2B0B_PACKAGE_OBJECT_MISSING:{spec['filename']}"
+        )
+        data = path.read_bytes()
+        if _sha256_bytes(data) != spec["expected_sha256"]:
+            raise GvV2B0BError(f"V2B0B_PACKAGE_HASH_MISMATCH:{spec['filename']}")
+        if str(len(data)) != spec["expected_byte_length"]:
+            raise GvV2B0BError(f"V2B0B_PACKAGE_LENGTH_MISMATCH:{spec['filename']}")
+    if package.get("access_authorization_hash") != auth.get("authorization_hash"):
+        raise GvV2B0BError("V2B0B_AUTH_PACKAGE_BINDING_INVALID")
+
+    require_domain_hash(
+        source,
+        domain=SOURCE_MANIFEST_DOMAIN,
+        hash_key="source_manifest_hash",
+        error_code="V2B0B_SOURCE_MANIFEST_HASH_MISMATCH",
+    )
+    if source.get("package_manifest_hash") != package.get("package_manifest_hash"):
+        raise GvV2B0BError("V2B0B_PACKAGE_SOURCE_MANIFEST_BINDING_INVALID")
+    if source.get("access_authorization_hash") != auth.get("authorization_hash"):
+        raise GvV2B0BError("V2B0B_AUTH_MANIFEST_BINDING_INVALID")
+    derived = derive_sec_package_identity(root=base)
+    if source.get("publication_time") != derived["acceptance_datetime"]:
+        raise GvV2B0BError("V2B0B_SOURCE_PIT_NOT_SOURCE_DERIVED")
+    if (source.get("effective_period") or {}).get("filed_at") != derived["filed_at"]:
+        raise GvV2B0BError("V2B0B_SOURCE_FILED_AT_NOT_SOURCE_DERIVED")
+
+    require_domain_hash(
+        adm,
+        domain=ADMISSION_DOMAIN,
+        hash_key="admission_hash",
+        error_code="V2B0B_ADMISSION_HASH_MISMATCH",
+    )
+    cert = adm.get("admission_certificate")
+    if isinstance(cert, Mapping) and cert:
+        require_domain_hash(
+            cert,
+            domain=CERTIFICATE_DOMAIN,
+            hash_key="admission_certificate_hash",
+            error_code="V2B0B_ADMISSION_CERTIFICATE_HASH_MISMATCH",
+        )
+    if adm.get("package_manifest_hash") != package.get("package_manifest_hash"):
+        raise GvV2B0BError("V2B0B_ADMISSION_PACKAGE_BINDING_INVALID")
+    if adm.get("source_manifest_hash") != source.get("source_manifest_hash"):
+        raise GvV2B0BError("V2B0B_ADMISSION_SOURCE_BINDING_INVALID")
+
+    require_domain_hash(
+        clm,
+        domain=CLAIM_DOMAIN,
+        hash_key="claim_evaluation_hash",
+        error_code="V2B0B_CLAIM_EVALUATION_HASH_MISMATCH",
+    )
+    if clm.get("admission_hash") != adm.get("admission_hash"):
+        raise GvV2B0BError("V2B0B_CLAIM_ADMISSION_BINDING_INVALID")
+    if clm.get("package_manifest_hash") != package.get("package_manifest_hash"):
+        raise GvV2B0BError("V2B0B_CLAIM_PACKAGE_BINDING_INVALID")
+    if clm.get("source_family_id") != SOURCE_FAMILY_ID:
+        raise GvV2B0BError("V2B0B_CLAIM_SOURCE_FAMILY_MISMATCH")
+    statements = list(clm.get("statements") or [])
+    if statements:
+        _verify_statement_locators(statements, root=base)
+
+    require_domain_hash(
+        res,
+        domain=RESEARCH_DOMAIN,
+        hash_key="research_decision_hash",
+        error_code="V2B0B_RESEARCH_DECISION_HASH_MISMATCH",
+    )
+    if res.get("claim_evaluation_hash") != clm.get("claim_evaluation_hash"):
+        raise GvV2B0BError("V2B0B_RESEARCH_CLAIM_BINDING_INVALID")
+    if res.get("admission_hash") != adm.get("admission_hash"):
+        raise GvV2B0BError("V2B0B_RESEARCH_ADMISSION_BINDING_INVALID")
+    if res.get("research_action") == RESEARCH_ACTION_ADVANCE:
+        raise GvV2B0BError("V2B0B_ADVANCE_NOT_AUTHORIZED_IN_B0B")
+    expected_ref = f"{RATIONALE_REF_PREFIX}{clm['claim_evaluation_hash']}"
+    if res.get("rationale_ref") != expected_ref:
+        raise GvV2B0BError("V2B0B_RATIONALE_REF_BINDING_INVALID")
+
+    if result is not None:
+        result_obj = _plain(result)
+        require_domain_hash(
+            result_obj,
+            domain=RESULT_DOMAIN,
+            hash_key="result_hash",
+            error_code="V2B0B_RESULT_HASH_MISMATCH",
+        )
+        if result_obj.get("research_decision_hash") != res.get("research_decision_hash"):
+            raise GvV2B0BError("V2B0B_RESULT_RESEARCH_BINDING_INVALID")
+        if result_obj.get("claim_evaluation_hash") != clm.get("claim_evaluation_hash"):
+            raise GvV2B0BError("V2B0B_RESULT_CLAIM_BINDING_INVALID")
+        if result_obj.get("admission_hash") != adm.get("admission_hash"):
+            raise GvV2B0BError("V2B0B_RESULT_ADMISSION_BINDING_INVALID")
+        if result_obj.get("decision_id") != DECISION_ID:
+            raise GvV2B0BError("V2B0B_RESULT_DECISION_ID_MISMATCH")
+
+
+def load_verified_b0b_result(
+    *,
+    root: Path | None = None,
+    case_dir: Path | None = None,
+    result_json_path: Path | None = None,
+) -> dict[str, Any]:
+    """Load banked B0B result only after complete-chain verification succeeds."""
+
+    base = Path(root) if root is not None else ROOT
+    result_path = (
+        Path(result_json_path)
+        if result_json_path is not None
+        else None
+    )
+    if case_dir is not None:
+        out_dir = Path(case_dir)
+    elif result_path is not None:
+        out_dir = result_path.parent
+    else:
+        out_dir = base / "data" / "gv_v2_b0b" / "mu_0000723125-26-000015"
+    if result_path is None:
+        result_path = out_dir / "result.json"
+    if not result_path.is_file() or result_path.is_symlink():
+        raise GvV2B0BError("V2B0B_RESULT_MISSING")
+
+    def _load(name: str, code: str) -> dict[str, Any]:
+        path = _require_file(out_dir / name, code)
+        obj = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(obj, dict):
+            raise GvV2B0BError(f"{code}_NOT_OBJECT")
+        return obj
+
+    auth = _load("access_authorization.json", "V2B0B_ACCESS_AUTHORIZATION_MISSING")
+    package = _load("package_manifest.json", "V2B0B_PACKAGE_MANIFEST_MISSING")
+    source = _load("source_manifest.json", "V2B0B_SOURCE_MANIFEST_MISSING")
+    admission = _load("admission_result.json", "V2B0B_ADMISSION_MISSING")
+    claim = _load("claim_evaluation.json", "V2B0B_CLAIM_MISSING")
+    research = _load("research_decision.json", "V2B0B_RESEARCH_MISSING")
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    if not isinstance(result, dict):
+        raise GvV2B0BError("V2B0B_RESULT_NOT_OBJECT")
+
+    verify_b0b_chain(
+        root=base,
+        access_authorization=auth,
+        package_manifest=package,
+        source_manifest=source,
+        admission=admission,
+        claim=claim,
+        research=research,
+        result=result,
+    )
+    return result
+
+
 def build_result_document(
     *,
     access_authorization: Mapping[str, Any],
@@ -1147,6 +1743,24 @@ def build_result_document(
     research: Mapping[str, Any],
     certified: Mapping[str, Any],
 ) -> dict[str, Any]:
+    require_domain_hash(
+        research,
+        domain=RESEARCH_DOMAIN,
+        hash_key="research_decision_hash",
+        error_code="V2B0B_RESEARCH_DECISION_HASH_MISMATCH",
+    )
+    require_domain_hash(
+        claim,
+        domain=CLAIM_DOMAIN,
+        hash_key="claim_evaluation_hash",
+        error_code="V2B0B_CLAIM_EVALUATION_HASH_MISMATCH",
+    )
+    require_domain_hash(
+        admission,
+        domain=ADMISSION_DOMAIN,
+        hash_key="admission_hash",
+        error_code="V2B0B_ADMISSION_HASH_MISMATCH",
+    )
     certificates = 1 if admission.get("status") == "ADMITTED" else 0
     body = {
         "schema_version": RESULT_SCHEMA,
@@ -1224,15 +1838,12 @@ def run_v2_b0b_official_source_intake(
     claim = evaluate_g_supply_claim(
         root=base, admission=admission, package_manifest=package
     )
-    research = build_g_supply_research_decision(admission, claim)
-    # B0B portfolio authority is always paper NO_POSITION.
+    research = build_g_supply_research_decision(admission, claim, root=base)
+    # B0B portfolio authority is always paper NO_POSITION; ADVANCE forbidden.
     if research.get("portfolio_action") != PORTFOLIO_ACTION_NO_POSITION:
         raise GvV2B0BError("V2B0B_PORTFOLIO_ACTION_REQUIRED")
-    if (
-        research.get("research_action") == RESEARCH_ACTION_ADVANCE
-        and claim.get("claim_outcome") != CLAIM_SUFFICIENT
-    ):
-        raise GvV2B0BError("V2B0B_ADVANCE_WITHOUT_SUFFICIENT_CLAIM")
+    if research.get("research_action") == RESEARCH_ACTION_ADVANCE:
+        raise GvV2B0BError("V2B0B_ADVANCE_NOT_AUTHORIZED_IN_B0B")
 
     certified = build_v2b0b_certified_result(research, verifier_runner)
     result = build_result_document(
@@ -1243,6 +1854,16 @@ def run_v2_b0b_official_source_intake(
         claim=claim,
         research=research,
         certified=certified,
+    )
+    verify_b0b_chain(
+        root=base,
+        access_authorization=auth,
+        package_manifest=package,
+        source_manifest=source,
+        admission=admission,
+        claim=claim,
+        research=research,
+        result=result,
     )
     packet_md = build_decision_packet_markdown(
         access_authorization=auth,

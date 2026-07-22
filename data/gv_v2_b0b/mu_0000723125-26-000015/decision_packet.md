@@ -11,16 +11,16 @@
 - retrieval_or_receipt_time (auth): `None`
 - package_retrieved_at: `2026-07-22T17:22:39.732000Z`
 - package_manifest_hash: `a8a35cf0ec0d205101e7dce6b4c25574605c20fb1c1454af7ea7ca678839d347`
-- source_manifest_hash: `de1216de5a05fa86b3c99b40a85d4e3c165cb9fb89843d23d5ffa85337039036`
-- admission_hash: `882b15e18239e48f1eae53dfd2693b23630c9a51dac4e4db73f6af07b9b56581`
+- source_manifest_hash: `68fdfca693d33f6657ae1174a0a4e25aa3706cf89294f4c87a987f1b8d1f0232`
+- admission_hash: `731a9970887c54a847014c0cc57e0b7bc3c534034ac79e7148c59b9335bc350d`
 - admission_status: `ADMITTED`
-- admission_certificate_hash: `c50840524795259603a317bc03c42bbb8909f913399a67611928271a0903b552`
-- claim_evaluation_hash: `4534c1eda555e6988276c173724a79136ba4b9d567761e3d0c99e1ba252abb52`
+- admission_certificate_hash: `e906d9be8f403510f2c96cbcf6fa5b60423ebd598c3deb5aa222f5bc391a7b2e`
+- claim_evaluation_hash: `21e4f669bbaa337e963ecaa7e7ff7ccdcb1187e30a3db7afaeb9300794eac6c0`
 - claim_outcome: `CLAIM_INSUFFICIENT`
 - research_action: `HOLD_FOR_EVIDENCE`
 - portfolio_action: `NO_POSITION`
 - decision_id: `DECISION_V2_B0B_MU_G_SUPPLY_1`
-- rationale_ref: `V2B0B:CLM:4534c1eda555e6988276c173724a79136ba4b9d567761e3d0c99e1ba252abb52`
+- rationale_ref: `V2B0B:CLM:21e4f669bbaa337e963ecaa7e7ff7ccdcb1187e30a3db7afaeb9300794eac6c0`
 - certification_status: `CERTIFIED`
 - shipped_product_score: `39` (frozen; no uplift)
 - functional_stage: `CERTIFIED_SINGLE_DECISION_OPERABLE`
@@ -40,13 +40,13 @@
 - `immutable_byte_identity`: `PASS` — exact hashes verified
 - `licence_and_permitted_use`: `PASS` — Access auth permits official raw custody + admission eval; auto-advance and multi-object corroboration banned.
 - `package_manifest_binding`: `PASS` — source→locator→role→sha256→length bound for three exact objects
-- `point_in_time_availability`: `PASS` — SEC acceptance/filing/period metadata present on source_manifest.
+- `point_in_time_availability`: `PASS` — SEC acceptance/filing/period metadata derived from complete submission header and cross-checked to accession index + package + authorization.
 - `purpose_compatibility`: `PASS` — Purpose is official-source intake for one MU G_supply accession.
 - `semantic_and_schema_validity`: `PASS` — Official company filing package present; physical supply telemetry present=False (not required for filing admission).
 
 ## Claim evaluation
 - outcome: `CLAIM_INSUFFICIENT`
-- contradiction_status: `PASS`
+- contradiction_status: `NOT_EVALUATED`
 - statements: `5`
 
 ## Research rationale

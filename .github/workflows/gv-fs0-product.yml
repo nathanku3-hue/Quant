@@ -195,20 +195,20 @@ jobs:
           EXPECTED_E0A_CURRENT_BYTE_LENGTH = 23696
           EXPECTED_E0A_RATIONALE_REF = f"E0A:RD:{EXPECTED_RESEARCH_DECISION_HASH}"
 
-          # Tracked product authority after V2-B0B official-source intake.
+          # Tracked product authority after V2-B0B official-source intake (B0B-R1).
           EXPECTED_V2B0_DECISION_ID = "DECISION_V2_B0B_MU_G_SUPPLY_1"
           EXPECTED_V2B0_CLAIM_HASH = (
-              "4534c1eda555e6988276c173724a79136ba4b9d567761e3d0c99e1ba252abb52"
+              "21e4f669bbaa337e963ecaa7e7ff7ccdcb1187e30a3db7afaeb9300794eac6c0"
           )
           EXPECTED_V2B0_ADMISSION_HASH = (
-              "882b15e18239e48f1eae53dfd2693b23630c9a51dac4e4db73f6af07b9b56581"
+              "731a9970887c54a847014c0cc57e0b7bc3c534034ac79e7148c59b9335bc350d"
           )
           EXPECTED_V2B0_RATIONALE_REF = f"V2B0B:CLM:{EXPECTED_V2B0_CLAIM_HASH}"
           EXPECTED_V2B0_RESULT_HASH = (
-              "6415d751ec84a1af55aea16f3d9ccb23cf05841a7fb807db6c90b2568d0eaa52"
+              "48cab285c9a146a2044cfb2bb16b235451c8dabe9cfbaa08fdcb60236cd83dea"
           )
           EXPECTED_V2B0_CURRENT_FILE_SHA256 = (
-              "a6ca795d9f61b657a5e8f4b3d225f30140d13007d844992df95e9da8ad8d54e3"
+              "20fba702166f1684c334f817f8aa7fc95a7ca2451304e5a57b41ed80d41eda5e"
           )
           EXPECTED_V2B0_CURRENT_BYTE_LENGTH = 23669
 

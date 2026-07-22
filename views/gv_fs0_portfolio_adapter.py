@@ -317,9 +317,19 @@ def render_v2_b0b_surface(
     *,
     result_json_path: Path | None = None,
 ) -> dict[str, Any] | None:
-    """Optional V2-B0B official-source surface. Missing artifact → quiet no-raise."""
+    """Optional V2-B0B official-source surface.
 
-    from core.gv_v2_b0b_official_source_intake import DEFAULT_RESULT_PATH, CASE_ID
+    Loads only a verified B0B result (complete-chain integrity). When current
+    authority is available, requires decision_id + rationale_ref bind.
+    Missing/invalid artifact → quiet no-raise (never render arbitrary JSON).
+    """
+
+    from core.gv_v2_b0b_official_source_intake import (
+        CASE_ID,
+        DEFAULT_RESULT_PATH,
+        GvV2B0BError,
+        load_verified_b0b_result,
+    )
 
     path = Path(result_json_path) if result_json_path is not None else DEFAULT_RESULT_PATH
     if not path.is_file():
@@ -329,13 +339,48 @@ def render_v2_b0b_surface(
         )
         return None
     try:
-        result = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        result = load_verified_b0b_result(result_json_path=path)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, GvV2B0BError) as exc:
         renderer.caption(f"V2-B0B official-source intake artifact refused: {exc}")
         return None
     if not isinstance(result, dict):
         renderer.caption("V2-B0B official-source intake artifact refused: not an object")
         return None
+
+    # When certified current authority exists, B0B surface must bind to it.
+    try:
+        current = load_current_certified_decision()
+    except GvFs0PresentationError:
+        current = None
+    if current is not None:
+        decision = current.get("decision") or {}
+        if str(result.get("decision_id")) != str(decision.get("decision_id")):
+            renderer.caption(
+                "V2-B0B official-source intake artifact refused: "
+                "decision_id does not match current authority"
+            )
+            return None
+        if str(result.get("rationale_ref")) != str(decision.get("rationale_ref")):
+            renderer.caption(
+                "V2-B0B official-source intake artifact refused: "
+                "rationale_ref does not match current authority"
+            )
+            return None
+        if str(result.get("certification_status")) != "CERTIFIED":
+            renderer.caption(
+                "V2-B0B official-source intake artifact refused: "
+                "result not CERTIFIED"
+            )
+            return None
+        if str(result.get("certified_decision_result_hash")) != str(
+            current.get("certified_decision_result_hash")
+        ):
+            renderer.caption(
+                "V2-B0B official-source intake artifact refused: "
+                "certified_decision_result_hash does not match current authority"
+            )
+            return None
+
     renderer.subheader("GV-V2-B0B Official Source Intake — MU G_supply")
     rows = [
         {
@@ -373,7 +418,7 @@ def render_v2_b0b_surface(
     ]
     renderer.table(rows)
     renderer.caption(
-        "V2-B0B · one official SEC accession · ADMITTED≠ADVANCE · "
+        "V2-B0B · verified chain · one official SEC accession · ADMITTED≠ADVANCE · "
         "independent_source_count=1 · claim separate from admission · "
         "paper NO_POSITION · score 39 frozen · not a G08 observation"
     )

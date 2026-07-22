@@ -1,9 +1,35 @@
-# GV-V2-B0B-OFFICIAL-SOURCE-INTAKE — Controlling Brief (REVISE_AND_GO)
+# GV-V2-B0B-OFFICIAL-SOURCE-INTAKE — Controlling Brief (REVISE_AND_GO + B0B-R1)
 
-**Status:** ACTIVE PRODUCT GATE  
-**Base:** main `2cd3e858…` · B0A banked head `79c309b`  
-**Audit:** REVISE_AND_GO (four mandatory deltas locked inline)  
+**Status:** ACTIVE PRODUCT GATE — REPAIR_CURRENT_SLICE (B0B-R1)  
+**Base:** main `2cd3e858…` · B0A banked head `79c309b` · do **not** merge `21fa4de` un-repaired  
+**Audit:** REVISE_AND_GO accepted custody; REPAIR_CURRENT_SLICE for authority/PIT/claim/product  
 **Score / stage / observed (locked):** `39` / `CERTIFIED_SINGLE_DECISION_OPERABLE` / `0`
+
+---
+
+## B0B-R1 — mandatory repair (before merge)
+
+Preserve package + pre-read authorization. Do **not** refetch SEC objects, change accession, reopen B0A, or start B0C.
+
+1. **Complete-chain verification** — every boundary recomputes domain hash before consuming semantic fields; stale/tampered claim fields raise integrity errors; adapter loads verified result only.
+2. **Source-derived PIT** — parse complete submission header + accession index; equalize auth ↔ header ↔ index ↔ package ↔ source.
+3. **Evidence-dimension claim rule** — derive CLAIM_INSUFFICIENT from independent-corroboration/physical-telemetry FAIL; no hardcoded outcome without dimensions.
+4. **No B0B ADVANCE path** — delete SUFFICIENT→ADVANCE; positive path belongs to B0C.
+5. **Dashboard fail-closed** — missing/invalid current authority → `st.error` + `st.caption` + **return** (no result tables).
+6. **Active-gate presentation** — caption/boundary tests name B0B; static adapter import expects verified B0B loader.
+
+### Revised post-close sequence (audit recut)
+
+```text
+B0B-R1 authority repair
+→ merge and bank first official-source intake
+→ GV-V2-B0C-INDEPENDENT-SOURCE-RECONCILIATION
+→ first valid independent comparison on that multi-source case
+→ prospective paper economics
+→ replication
+```
+
+**Revoked:** immediate independent human comparison on the one-source HOLD case (G08 failure mode risk).
 
 ---
 
