@@ -1,29 +1,24 @@
 # Planner Packet - Current
 
-## New Context Packet — Roadmap Recut: V2-B0 Sole Gate (2026-07-22)
+## New Context Packet — V2-B0A Local Source Abstention Repair (2026-07-23)
 
 ## What Was Done
-
-- Repair tip `3c404479d9af963f497c889013e078adae68d516` / tree `c808849a492a5138364a1eda00f5c4c502abdda3` accepted: Attempt-1 invalidated, E0A current restored, reviewer receipt v2 enforced, product hosted green.
-- Explicit roadmap deviation: invalidation-safe E0B machinery shipped → **V2-B0 first real block-only admission** (not same-case Attempt-2).
-- Historical result tag preserved as non-authority; invalidation tag peels to repair tip.
+- B0A-R1 truth repair on PR #6: relabel local research-card preflight; enforce package-manifest binding; delete positive ADMITTED path; honest authorization metadata.
+- Primary block: `MISSING_POINT_IN_TIME_AUTHORITY`; retained `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID`.
+- Certified HOLD / paper NO_POSITION remains current authority.
 
 ## What Is Locked
-
-- Score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed count 0.
-- Default current authority E0A NO_POSITION; E0B comparison is smoke / invalidated observation only.
-- Same-case Attempt-2 deferred (requires two separate real humans + non-exposure attestation).
+- 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
+- Classification: `GV-V2-B0A-LOCAL-SOURCE-ABSTENTION`.
+- Current decision `DECISION_V2_B0_MU_G_SUPPLY_1`.
+- No score uplift; no real external source packages processed (0).
 
 ## What Is Next
-
-1. Complete canonical main cutover to repair tip (product + protocol + parity on exact main SHA).
-2. Open **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** only.
-3. Do not spend implementation rounds on synthetic G08 infrastructure.
+1. Hosted product+protocol+parity on repair tip.
+2. Narrow review → merge PR #6.
+3. Open B0B only after merge (one official MU source intake).
 
 ## First Command
-
 ```text
-.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_b0_real_block_only.py
 ```
-
-## End Context Packet

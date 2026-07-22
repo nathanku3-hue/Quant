@@ -39,19 +39,32 @@ from views.gv_fs0_portfolio_adapter import (
 
 ROOT = Path(__file__).resolve().parents[2]
 
-# Mandatory tracked current-decision identities (hosted parity pins these).
-# After Attempt-1 invalidation, product authority is restored to E0A NO_POSITION.
+# E0A rebuild remains deterministic substrate (not necessarily tracked current).
 EXPECTED_RESEARCH_DECISION_HASH = (
     "b4694a69bd1bc35a0d97a839ad47b66b517da1bd0f4abccd56bacca22d9e8e38"
 )
 EXPECTED_CERTIFIED_RESULT_HASH = (
     "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6"
 )
-EXPECTED_CURRENT_FILE_SHA256 = (
+EXPECTED_E0A_CURRENT_FILE_SHA256 = (
     "7ba9c7c48dfc89ceae2a5a88aba8bfebbe6d5032272b0d254f4139478699b5c9"
 )
-EXPECTED_CURRENT_BYTE_LENGTH = 23_696
+EXPECTED_E0A_CURRENT_BYTE_LENGTH = 23_696
 EXPECTED_RATIONALE_REF = f"{RATIONALE_REF_PREFIX}{EXPECTED_RESEARCH_DECISION_HASH}"
+
+# Tracked product authority after V2-B0A local-source abstention (NO_POSITION).
+EXPECTED_V2B0_DECISION_ID = "DECISION_V2_B0_MU_G_SUPPLY_1"
+EXPECTED_V2B0_ADMISSION_HASH = (
+    "d1b891152477504b29e041baba304396fa2a7be2d01fcc701f960a15d7f49f2f"
+)
+EXPECTED_V2B0_RATIONALE_REF = f"V2B0:ADM:{EXPECTED_V2B0_ADMISSION_HASH}"
+EXPECTED_V2B0_CERTIFIED_RESULT_HASH = (
+    "4a1e8089ce477611cdb64410f9ac82b76f982fdf3a39024265470bcff824b747"
+)
+EXPECTED_V2B0_CURRENT_FILE_SHA256 = (
+    "8530f4f0a9509253fb2cd3be87f0438d2423415d39f58556071221b6f1bad157"
+)
+EXPECTED_V2B0_CURRENT_BYTE_LENGTH = 23_636
 
 
 class FakeRenderer:
@@ -320,41 +333,49 @@ def test_dashboard_default_path_is_single_current_not_dual_bundle() -> None:
     assert "render_gv_fs0_certified_bundle" not in imports
 
 
-def test_tracked_current_decision_artifact_is_mandatory_e0a_identity() -> None:
-    """Tracked default product authority must exist and match fixed hashes (no skip)."""
+def test_tracked_current_decision_artifact_is_mandatory_v2b0_identity() -> None:
+    """Tracked default product authority is V2-B0 MU block-only NO_POSITION."""
 
     path = DEFAULT_CURRENT_DECISION_TARGET
     assert path.is_file(), "tracked current-decision artifact is mandatory"
     raw = path.read_bytes()
-    assert len(raw) == EXPECTED_CURRENT_BYTE_LENGTH
-    assert hashlib.sha256(raw).hexdigest() == EXPECTED_CURRENT_FILE_SHA256
+    assert len(raw) == EXPECTED_V2B0_CURRENT_BYTE_LENGTH
+    assert hashlib.sha256(raw).hexdigest() == EXPECTED_V2B0_CURRENT_FILE_SHA256
 
     research = build_e0a_research_decision(root=ROOT)
     assert research["research_decision_hash"] == EXPECTED_RESEARCH_DECISION_HASH
     assert research["rationale_ref"] == EXPECTED_RATIONALE_REF
 
     component = load_current_certified_decision(path)
-    assert component["decision"]["decision_id"] == E0A_DECISION_ID
+    assert component["decision"]["decision_id"] == EXPECTED_V2B0_DECISION_ID
     assert component["decision"]["action"] == "NO_POSITION"
-    assert component["decision"]["rationale_ref"] == EXPECTED_RATIONALE_REF
-    assert component["certified_decision_result_hash"] == EXPECTED_CERTIFIED_RESULT_HASH
+    assert component["decision"]["rationale_ref"] == EXPECTED_V2B0_RATIONALE_REF
+    assert component["certified_decision_result_hash"] == EXPECTED_V2B0_CERTIFIED_RESULT_HASH
     assert component["certification"]["certification_status"] == "CERTIFIED"
 
-    # Double publish determinism vs tracked bytes.
+    # E0A rebuild stays deterministic substrate, distinct from V2-B0 current.
     rebuilt = build_e0a_certified_result(root=ROOT)
     from core.gv_fs0_current_decision import certified_decision_result_bytes
 
     first = certified_decision_result_bytes(rebuilt)
     second = certified_decision_result_bytes(build_e0a_certified_result(root=ROOT))
-    assert first == second == raw
+    assert first == second
+    assert first != raw
+    assert hashlib.sha256(first).hexdigest() == EXPECTED_E0A_CURRENT_FILE_SHA256
+    assert len(first) == EXPECTED_E0A_CURRENT_BYTE_LENGTH
 
 
-def test_publish_e0a_twice_matches_tracked_bytes(tmp_path: Path) -> None:
+def test_publish_e0a_twice_matches_e0a_identity_not_v2b0_current(tmp_path: Path) -> None:
     target, lock = _current_paths(tmp_path)
     first = publish_e0a_current_decision(target=target, lock_path=lock, root=ROOT)
     second = publish_e0a_current_decision(target=target, lock_path=lock, root=ROOT)
     assert first.status == "REPLACED"
     assert second.status == "IDEMPOTENT"
     assert first.certified_decision_result_hash == EXPECTED_CERTIFIED_RESULT_HASH
-    assert target.read_bytes() == DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
-    assert hashlib.sha256(target.read_bytes()).hexdigest() == EXPECTED_CURRENT_FILE_SHA256
+    assert hashlib.sha256(target.read_bytes()).hexdigest() == EXPECTED_E0A_CURRENT_FILE_SHA256
+    assert len(target.read_bytes()) == EXPECTED_E0A_CURRENT_BYTE_LENGTH
+    assert target.read_bytes() != DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
+    assert (
+        hashlib.sha256(DEFAULT_CURRENT_DECISION_TARGET.read_bytes()).hexdigest()
+        == EXPECTED_V2B0_CURRENT_FILE_SHA256
+    )

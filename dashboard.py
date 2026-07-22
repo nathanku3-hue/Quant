@@ -51,6 +51,7 @@ from views.gv_fs0_portfolio_adapter import (
     GvFs0PresentationError,
     render_e0b_dv1_surface,
     render_gv_fs0_current_decision,
+    render_v2_b0_surface,
 )
 from views.pead_validation_evidence import render_pead_validation_evidence
 from views.strategy_view import render_strategy_page
@@ -4744,11 +4745,12 @@ def _render_portfolio_allocation_page() -> None:
 
     st.header(PORTFOLIO_PAGE_TITLE)
     st.caption(
-        "E0A operable · research HOLD_FOR_EVIDENCE → paper NO_POSITION. "
-        "One active certified decision. E0B-DV1 G08 is the active decision-value "
-        "slice (external seals only; score 39 frozen; observed-comparison count "
-        "starts at 0). Legacy replay and optimizer outputs are non-certifying. "
-        "F1C dual-role bundle remains evidence-only."
+        "V2-B0A local-source abstention is the active product gate on this tip. "
+        "One certified decision path. Default current is local research-card "
+        "preflight HOLD_FOR_EVIDENCE mapped to paper NO_POSITION after a "
+        "certified source-authority abstention (not real external admission). "
+        "E0B G08 remains invalidated observation smoke (count 0). Score 39 frozen. "
+        "Legacy replay/optimizer non-certifying; F1C dual bundle evidence-only."
     )
     try:
         render_gv_fs0_current_decision(st)
@@ -4757,7 +4759,9 @@ def _render_portfolio_allocation_page() -> None:
         # bundle, replay, optimizer, or any non-certifying surface.
         st.error("Certified decision unavailable")
         st.caption(f"Authority refused: {exc}")
-    # Optional one-case E0B surface; missing real seals keep observed count at 0.
+    # V2-B0 admission result surface (block/abstention is a valid functional outcome).
+    render_v2_b0_surface(st)
+    # Optional E0B surface; Attempt-1 invalidation keeps observed count at 0.
     render_e0b_dv1_surface(st)
 
 

@@ -1,20 +1,16 @@
 # Done Checklist - Current
 
-## Active Addendum — Attempt-1 Invalidation + V2-B0 Recut (2026-07-22)
+## Active Addendum — V2-B0A Local Source Abstention Repair (2026-07-23)
 
-- [x] C1 product implementation banked and pushed; Attempt-1 session sealed; evidence preserved.
-- [x] Attempt-1 observation classified INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED (append-only).
-- [x] Provider-authenticated GitHub reviewer receipt v2 required for future eligibility.
-- [x] Default product current restored to E0A NO_POSITION; E0B current archived as smoke.
-- [x] Authoritative state: score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed count 0.
-- [x] Product hosted green on repair tip `3c404479d9af963f497c889013e078adae68d516`.
-- [x] Invalidation tag `gv-e0b-dv1-g08-attempt-1-invalidated` peels to repair tip; historical result tag preserved non-authority.
-- [x] Canonical main cutover of exact repair lineage (product + protocol + parity on main SHA).
-- [ ] Open sole gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION (one real MU PIT package or certified data abstention).
-- [ ] Deferred: same-case Attempt-2 only when two real separate humans available (not roadmap blocker).
+- [x] Audit accepted: REPAIR_CURRENT_SLICE (semantic blockers; CI already green).
+- [x] Relabel slice/UI to local research-card preflight / certified source-authority abstention.
+- [x] Validate package manifest URI/hash; emit `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID` (historical package preserved).
+- [x] Authorization: `retrieval_or_receipt_time=null`; explicit `authorization_recorded_at` + out-of-band provenance.
+- [x] Delete positive ADMITTED publication, DataAdmissionCertificate, automatic ADVANCE_TO_FULL_RESEARCH.
+- [x] Reject positive admission with `V2B0_POSITIVE_ADMISSION_NOT_AUTHORIZED`.
+- [x] Narrow regressions for binding mismatch, positive rejection, forbidden-use failure, no auto-advancement.
+- [x] Regenerate block/result/current decision; pin CI hashes.
+- [ ] Hosted product + protocol + Ubuntu/Windows parity green on repair tip.
+- [ ] Narrow independent review; merge PR #6.
 
-Next action: open sole gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION — not synthetic G08 re-run.
-
-## Prior Addendum — E0B-DV1 Direction and Custody Repair Checklist (2026-07-21) [superseded next-actions]
-
-Historical C1/Attempt-1 pending checkboxes are superseded by the invalidation + recut above.
+Next action: push repair tip → hosted green → independent review → merge. Do not open B0B until merge.
