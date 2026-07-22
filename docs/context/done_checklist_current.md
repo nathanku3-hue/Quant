@@ -1,16 +1,17 @@
 # Done Checklist - Current
 
-## Active Addendum — V2-B0A Local Source Abstention Repair (2026-07-23)
+## Active Addendum — B0A Closed on Main (2026-07-23)
 
-- [x] Audit accepted: REPAIR_CURRENT_SLICE (semantic blockers; CI already green).
-- [x] Relabel slice/UI to local research-card preflight / certified source-authority abstention.
-- [x] Validate package manifest URI/hash; emit `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID` (historical package preserved).
-- [x] Authorization: `retrieval_or_receipt_time=null`; explicit `authorization_recorded_at` + out-of-band provenance.
-- [x] Delete positive ADMITTED publication, DataAdmissionCertificate, automatic ADVANCE_TO_FULL_RESEARCH.
-- [x] Reject positive admission with `V2B0_POSITIVE_ADMISSION_NOT_AUTHORIZED`.
-- [x] Narrow regressions for binding mismatch, positive rejection, forbidden-use failure, no auto-advancement.
-- [x] Regenerate block/result/current decision; pin CI hashes.
-- [ ] Hosted product + protocol + Ubuntu/Windows parity green on repair tip.
-- [ ] Narrow independent review; merge PR #6.
+- [x] B0A-R1 truth repair complete on tip `79c309b`.
+- [x] Hosted product + protocol + Ubuntu/Windows + parity green (duplicate PR product run also green; not a defect).
+- [x] Independent audit: all material findings fixed.
+- [x] PR #6 merged to main (`3e995f1`).
+- [x] B0A marked **CLOSED / BANKED** on canonical main (not merge-pending).
+- [ ] Execute sole next gate **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE** (not started).
 
-Next action: push repair tip → hosted green → independent review → merge. Do not open B0B until merge.
+## Banked B0A evidence
+- Classification: `GV-V2-B0A-LOCAL-SOURCE-ABSTENTION`
+- Decision: `DECISION_V2_B0_MU_G_SUPPLY_1` / HOLD → paper NO_POSITION
+- Score 39; observed 0; local abstention verticals 1; external packages 0; certificates 0
+
+Next action: B0B only — one detached authorization + one official MU raw package. Do not reopen B0A.

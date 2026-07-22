@@ -1,22 +1,21 @@
 # Planner Packet - Current
 
-## New Context Packet — V2-B0A Local Source Abstention Repair (2026-07-23)
+## New Context Packet — B0A Closed on Main; B0B Sole Gate (2026-07-23)
 
 ## What Was Done
-- B0A-R1 truth repair on PR #6: relabel local research-card preflight; enforce package-manifest binding; delete positive ADMITTED path; honest authorization metadata.
-- Primary block: `MISSING_POINT_IN_TIME_AUTHORITY`; retained `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID`.
-- Certified HOLD / paper NO_POSITION remains current authority.
+- PR #6 merged (`3e995f1` / head `79c309b`). Exact-head product, protocol, Windows/Linux, and parity green.
+- B0A local-source abstention banked and **closed** on canonical main.
+- Metrics unchanged: 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
 
 ## What Is Locked
-- 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
-- Classification: `GV-V2-B0A-LOCAL-SOURCE-ABSTENTION`.
-- Current decision `DECISION_V2_B0_MU_G_SUPPLY_1`.
-- No score uplift; no real external source packages processed (0).
+- B0A CLOSED — do not leave “merge pending” as active truth.
+- Explicit B0A/B0B deviation from original real-source gate is recorded.
+- No score uplift; no real external packages; no admission certificates.
 
 ## What Is Next
-1. Hosted product+protocol+parity on repair tip.
-2. Narrow review → merge PR #6.
-3. Open B0B only after merge (one official MU source intake).
+1. Open **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE** only (one official MU package).
+2. Detached authorization → exact official bytes → PIT/custody admission → separate claim evaluation → ADVANCE|HOLD|REJECT → certified action.
+3. Admission must never auto-advance research. Vacuous contradiction: use `NOT_EVALUATED` in B0B when no admitted facts.
 
 ## First Command
 ```text

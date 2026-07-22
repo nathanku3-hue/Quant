@@ -1,22 +1,27 @@
 ## What Was Done
-- **GV-V2-B0A-LOCAL-SOURCE-ABSTENTION** (B0A-R1 truth repair): local MU research-card preflight, fail-closed admission, certified HOLD_FOR_EVIDENCE / NO_POSITION.
-- Package: `data/candidate_cards/MU_supercycle_candidate_card_v0.json` (research card only; not real external source).
-- Admission status: **BLOCKED** / primary `MISSING_POINT_IN_TIME_AUTHORITY`; retained `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID` + `INCOMPLETE_INDISPENSABLE_EVIDENCE`.
-- Positive ADMITTED path removed; no DataAdmissionCertificate; no automatic ADVANCE_TO_FULL_RESEARCH.
-- Authorization: out-of-band local evaluation (`retrieval_or_receipt_time=null`; provenance `OUT_OF_BAND_OWNER_APPROVAL_FOR_LOCAL_EVALUATION_ONLY`).
-- Decision `DECISION_V2_B0_MU_G_SUPPLY_1` certified and published as current; rationale `V2B0:ADM:d1b89115…`.
-- Artifacts under `data/gv_v2_b0/mu_g_supply_b0/`. Observed comparison count remains **0**.
+- **PR #6 merged** to main at `3e995f1` (head `79c309b`). Hosted product + protocol + Ubuntu/Windows + parity green.
+- **GV-V2-B0A-LOCAL-SOURCE-ABSTENTION closed** on canonical main: certified local research-card abstention banked.
+- Result: BLOCKED / primary `MISSING_POINT_IN_TIME_AUTHORITY`; retained `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID` + incompleteness → HOLD_FOR_EVIDENCE → certified paper NO_POSITION (`DECISION_V2_B0_MU_G_SUPPLY_1`).
+- Positive ADMITTED path absent; no DataAdmissionCertificate; no automatic ADVANCE_TO_FULL_RESEARCH.
+- Metrics: score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**; local_source_abstention_verticals **1**; external packages **0**; certificates **0**.
 
 ## What Is Locked
-- Score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**.
-- Classification is local source-authority abstention — not real external admission.
+- B0A is **CLOSED / BANKED** — not “merge pending.” Classification is local source-authority abstention, not real external admission.
+- B0A/B0B split is an **explicit deviation** from the original single real-source gate (no silent drift).
+- Module path `core/gv_v2_b0_real_block_only.py` retained; classification + behavior are authoritative; no compatibility path.
 - G08 Attempt-2 deferred; FS1/providers/PEAD/optimizer/broker/alpha closed.
-- No synthetic package presented as real admitted evidence.
 
 ## What Is Next
-1. Hosted product+protocol+parity green on B0A repair tip.
-2. Narrow independent review; merge PR #6.
-3. Later (not this slice): **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE** — one official MU package under detached source-specific authorization.
+Sole functional gate: **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE**
+```text
+detached source-specific authorization
+→ one exact official MU raw package
+→ PIT/custody admission
+→ separate G_supply claim evaluation
+→ ADVANCE | HOLD_FOR_EVIDENCE | REJECT_THESIS
+→ DecisionEnvelope → certified portfolio action
+```
+Hard rule: `ADMITTED` never implies automatic advancement. When no admitted facts exist, contradiction check must be `NOT_EVALUATED` (not vacuous PASS).
 
 ## First Command
 `.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_b0_real_block_only.py`
