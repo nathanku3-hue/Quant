@@ -327,9 +327,9 @@ jobs:
               raise SystemExit("parity record missing v2b0_current_decision authority")
           if "e0a_substrate_rebuild" not in text:
               raise SystemExit("parity record missing e0a_substrate_rebuild")
-          if "5bbc438597cc31d0d34c6c6bd984e345e1ffb1c1743d40d51daa920bf9ac1f5a" not in text:
+          if "03a4f427843b8a7e2e0726c0bc86d1338d2e42d185bb5ad90adc47fbffc57176" not in text:
               raise SystemExit("parity record missing V2-B0 admission hash")
-          if "32f179002ffb188908a632f786c899a5410094a86f03418638f52d2c6ffc8e8b" not in text:
+          if "0b614f189f876beadff1fc0677b16f3ec2e1ec763cd64f60574c0c48f5f00e9c" not in text:
               raise SystemExit("parity record missing V2-B0 certified result hash")
           if "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6" not in text:
               raise SystemExit("parity record missing fixed E0A substrate result hash")
