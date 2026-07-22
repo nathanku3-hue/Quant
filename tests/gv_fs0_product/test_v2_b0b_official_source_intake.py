@@ -168,8 +168,102 @@ def test_sufficient_claim_not_authorized_in_b0b() -> None:
     fake = {k: v for k, v in claim.items() if k != "claim_evaluation_hash"}
     fake["claim_outcome"] = CLAIM_SUFFICIENT
     fake["claim_evaluation_hash"] = domain_hash(CLAIM_DOMAIN, fake)
-    with pytest.raises(GvV2B0BError, match="SUFFICIENT_CLAIM_NOT_AUTHORIZED_IN_B0B"):
+    with pytest.raises(GvV2B0BError, match="CLAIM_OUTCOME_NOT_AUTHORIZED_IN_B0B"):
         build_g_supply_research_decision(admission, fake, root=ROOT)
+
+
+def test_rehashed_contradicted_claim_not_authorized_in_b0b() -> None:
+    """Rehashed CLAIM_CONTRADICTED must not open REJECT_THESIS in B0B."""
+
+    from core.gv_fs0_canonical import domain_hash
+    from core.gv_v2_b0b_official_source_intake import CLAIM_CONTRADICTED, CLAIM_DOMAIN
+
+    admission = run_admission_checks(root=ROOT)
+    claim = evaluate_g_supply_claim(root=ROOT, admission=admission)
+    fake = {k: v for k, v in claim.items() if k != "claim_evaluation_hash"}
+    fake["claim_outcome"] = CLAIM_CONTRADICTED
+    fake["claim_evaluation_hash"] = domain_hash(CLAIM_DOMAIN, fake)
+    with pytest.raises(GvV2B0BError, match="CLAIM_OUTCOME_NOT_AUTHORIZED_IN_B0B"):
+        build_g_supply_research_decision(admission, fake, root=ROOT)
+
+
+def test_rehashed_false_locator_rejected_by_canonical_rebuild() -> None:
+    """Hash-self-consistent package with false SEC locator fails rebuild compare."""
+
+    from core.gv_fs0_canonical import domain_hash
+    from core.gv_v2_b0b_official_source_intake import (
+        PACKAGE_MANIFEST_DOMAIN,
+        build_source_manifest,
+        verify_b0b_chain,
+    )
+
+    auth = load_access_authorization(root=ROOT)
+    package = build_package_manifest(root=ROOT, access_authorization=auth)
+    # Mutate an official locator and rehash — proves hash self-consistency is not enough.
+    fake_package = {k: v for k, v in package.items() if k != "package_manifest_hash"}
+    objects = [dict(o) for o in fake_package["objects"]]
+    objects[0] = dict(objects[0])
+    objects[0]["official_locator"] = "https://evil.example/false-sec-locator"
+    fake_package["objects"] = objects
+    fake_package["package_manifest_hash"] = domain_hash(PACKAGE_MANIFEST_DOMAIN, fake_package)
+
+    # Rehashed body is self-consistent.
+    from core.gv_v2_b0b_official_source_intake import recompute_domain_hash
+
+    assert (
+        recompute_domain_hash(
+            PACKAGE_MANIFEST_DOMAIN, fake_package, "package_manifest_hash"
+        )
+        == fake_package["package_manifest_hash"]
+    )
+
+    source = build_source_manifest(
+        root=ROOT, access_authorization=auth, package_manifest=package
+    )
+    admission = run_admission_checks(
+        root=ROOT,
+        access_authorization=auth,
+        package_manifest=package,
+        source_manifest=source,
+    )
+    claim = evaluate_g_supply_claim(
+        root=ROOT, admission=admission, package_manifest=package
+    )
+    research = build_g_supply_research_decision(admission, claim, root=ROOT)
+    with pytest.raises(GvV2B0BError, match="PACKAGE_NOT_CANONICAL"):
+        verify_b0b_chain(
+            root=ROOT,
+            access_authorization=auth,
+            package_manifest=fake_package,
+            source_manifest=source,
+            admission=admission,
+            claim=claim,
+            research=research,
+            result=None,
+        )
+
+
+def test_load_verified_rejects_rehashed_claim_outcome(tmp_path: Path) -> None:
+    """Banked rehashed CLAIM_CONTRADICTED fails canonical rebuild compare."""
+
+    import shutil
+
+    from core.gv_fs0_canonical import domain_hash
+    from core.gv_v2_b0b_official_source_intake import CLAIM_CONTRADICTED, CLAIM_DOMAIN
+
+    src = ROOT / "data/gv_v2_b0b/mu_0000723125-26-000015"
+    case = tmp_path / "bank"
+    shutil.copytree(src, case)
+    claim_path = case / "claim_evaluation.json"
+    claim = json.loads(claim_path.read_text(encoding="utf-8"))
+    body = {k: v for k, v in claim.items() if k != "claim_evaluation_hash"}
+    body["claim_outcome"] = CLAIM_CONTRADICTED
+    body["claim_evaluation_hash"] = domain_hash(CLAIM_DOMAIN, body)
+    claim_path.write_bytes(
+        (json.dumps(body, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+    )
+    with pytest.raises(GvV2B0BError, match="CLAIM_NOT_CANONICAL"):
+        load_verified_b0b_result(root=ROOT, case_dir=case)
 
 
 def test_full_vertical_publishes_certified_no_position(tmp_path: Path) -> None:
@@ -247,12 +341,13 @@ def test_load_verified_b0b_result_rejects_tampered_claim_field(tmp_path: Path) -
     )
     claim_path = case / "claim_evaluation.json"
     claim = json.loads(claim_path.read_text(encoding="utf-8"))
+    # Stale hash (no rehash) — fails canonical rebuild compare.
     claim["claim_outcome"] = CLAIM_SUFFICIENT
     claim_path.write_text(
         json.dumps(claim, sort_keys=True, separators=(",", ":")) + "\n",
         encoding="utf-8",
     )
-    with pytest.raises(GvV2B0BError, match="CLAIM_EVALUATION_HASH_MISMATCH"):
+    with pytest.raises(GvV2B0BError, match="CLAIM_NOT_CANONICAL"):
         load_verified_b0b_result(root=ROOT, case_dir=case)
 
 

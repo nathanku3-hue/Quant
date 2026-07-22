@@ -1337,16 +1337,14 @@ def build_g_supply_research_decision(
     adm_status = admission.get("status")
     claim_outcome = claim.get("claim_outcome")
 
-    # B0B one-source slice: no ADVANCE path. Positive triage belongs to B0C.
-    if claim_outcome == CLAIM_SUFFICIENT:
-        raise GvV2B0BError("V2B0B_SUFFICIENT_CLAIM_NOT_AUTHORIZED_IN_B0B")
-    if adm_status == "ADMITTED" and claim_outcome == CLAIM_CONTRADICTED:
-        research_action = RESEARCH_ACTION_REJECT
-        rationale = (
-            "Admission ADMITTED but claim evaluation CLAIM_CONTRADICTED: "
-            "REJECT_THESIS for this G_supply path."
+    # B0B one-source slice: no ADVANCE and no REJECT path.
+    # SUFFICIENT / CONTRADICTED belong to multi-source B0C; rehashed semantic
+    # fields must not open speculative research actions here.
+    if claim_outcome in {CLAIM_SUFFICIENT, CLAIM_CONTRADICTED}:
+        raise GvV2B0BError(
+            f"V2B0B_CLAIM_OUTCOME_NOT_AUTHORIZED_IN_B0B:{claim_outcome}"
         )
-    elif adm_status == "ADMITTED" and claim_outcome == CLAIM_INSUFFICIENT:
+    if adm_status == "ADMITTED" and claim_outcome == CLAIM_INSUFFICIENT:
         research_action = RESEARCH_ACTION_HOLD
         rationale = (
             "Admission ADMITTED for official MU 10-Q package "
@@ -1355,15 +1353,19 @@ def build_g_supply_research_decision(
             "HOLD_FOR_EVIDENCE is the correct research triage. "
             "ADMITTED does not auto-advance research."
         )
-    else:
+    elif claim_outcome in {CLAIM_INSUFFICIENT, CLAIM_NOT_EVALUABLE} or adm_status != "ADMITTED":
         research_action = RESEARCH_ACTION_HOLD
         rationale = (
             f"Admission status={adm_status}, claim_outcome={claim_outcome}: "
             "HOLD_FOR_EVIDENCE (BLOCKED or NOT_EVALUABLE paths cannot advance)."
         )
+    else:
+        raise GvV2B0BError(
+            f"V2B0B_CLAIM_OUTCOME_NOT_AUTHORIZED_IN_B0B:{claim_outcome}"
+        )
 
-    if research_action == RESEARCH_ACTION_ADVANCE:
-        raise GvV2B0BError("V2B0B_ADVANCE_NOT_AUTHORIZED_IN_B0B")
+    if research_action in {RESEARCH_ACTION_ADVANCE, RESEARCH_ACTION_REJECT}:
+        raise GvV2B0BError("V2B0B_NON_HOLD_RESEARCH_NOT_AUTHORIZED_IN_B0B")
 
     portfolio_action = PORTFOLIO_ACTION_NO_POSITION
 
@@ -1537,6 +1539,70 @@ def build_decision_packet_markdown(
     return "\n".join(lines)
 
 
+def _exact_artifact_match(
+    banked: Mapping[str, Any],
+    rebuilt: Mapping[str, Any],
+    *,
+    error_code: str,
+) -> None:
+    """Exact canonical JSON equality — not mere hash self-consistency."""
+
+    if _canonical_json_bytes(banked) != _canonical_json_bytes(rebuilt):
+        raise GvV2B0BError(error_code)
+
+
+def rebuild_canonical_b0b_chain(
+    *,
+    root: Path | None = None,
+    verifier_runner: VerifierRunner = run_isolated_verifier,
+    include_result: bool = True,
+) -> dict[str, Any]:
+    """Deterministically rebuild B0B artifacts from pinned auth + raw SEC bytes.
+
+    This is the sole derivation authority for verification. Banked artifacts are
+    accepted only when they exact-match this rebuild.
+    """
+
+    base = Path(root) if root is not None else ROOT
+    auth = load_access_authorization(root=base)
+    package = build_package_manifest(root=base, access_authorization=auth)
+    source = build_source_manifest(
+        root=base, access_authorization=auth, package_manifest=package
+    )
+    admission = run_admission_checks(
+        root=base,
+        access_authorization=auth,
+        package_manifest=package,
+        source_manifest=source,
+    )
+    claim = evaluate_g_supply_claim(
+        root=base, admission=admission, package_manifest=package
+    )
+    research = build_g_supply_research_decision(admission, claim, root=base)
+    out: dict[str, Any] = {
+        "access_authorization": auth,
+        "package_manifest": package,
+        "source_manifest": source,
+        "admission": admission,
+        "claim": claim,
+        "research": research,
+    }
+    if include_result:
+        certified = build_v2b0b_certified_result(research, verifier_runner)
+        result = build_result_document(
+            access_authorization=auth,
+            package_manifest=package,
+            source_manifest=source,
+            admission=admission,
+            claim=claim,
+            research=research,
+            certified=certified,
+        )
+        out["certified"] = certified
+        out["result"] = result
+    return out
+
+
 def verify_b0b_chain(
     *,
     root: Path | None = None,
@@ -1547,135 +1613,66 @@ def verify_b0b_chain(
     claim: Mapping[str, Any],
     research: Mapping[str, Any],
     result: Mapping[str, Any] | None = None,
+    verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> None:
-    """Narrow B0B complete-chain verifier (not a generic evidence framework).
+    """B0B-R2: rebuild from pinned auth + raw SEC bytes; exact-compare banked.
 
-    authorization → package/raw bytes → source → admission/certificate →
-    claim + statement locators → research → optional result.
-    Every boundary recomputes its domain hash before semantic consumption.
+    Hash self-consistency alone is insufficient: a rehashed false locator or a
+    rehashed CLAIM_CONTRADICTED must fail. Canonical derivation is the rebuild.
     """
 
     base = Path(root) if root is not None else ROOT
-    auth = _plain(access_authorization)
-    package = _plain(package_manifest)
-    source = _plain(source_manifest)
-    adm = _plain(admission)
-    clm = _plain(claim)
-    res = _plain(research)
-
-    require_domain_hash(
-        auth,
-        domain=ACCESS_AUTH_DOMAIN,
-        hash_key="authorization_hash",
-        error_code="V2B0B_AUTH_HASH_MISMATCH",
+    rebuilt = rebuild_canonical_b0b_chain(
+        root=base,
+        verifier_runner=verifier_runner,
+        include_result=result is not None,
     )
-    if auth.get("authorization_hash") != EXPECTED_AUTH_HASH:
-        raise GvV2B0BError("V2B0B_AUTH_HASH_NOT_PINNED")
-    if auth.get("accession") != ACCESSION or auth.get("cik") != CIK:
-        raise GvV2B0BError("V2B0B_AUTH_IDENTITY_MISMATCH")
 
-    require_domain_hash(
-        package,
-        domain=PACKAGE_MANIFEST_DOMAIN,
-        hash_key="package_manifest_hash",
-        error_code="V2B0B_PACKAGE_MANIFEST_HASH_MISMATCH",
+    _exact_artifact_match(
+        access_authorization,
+        rebuilt["access_authorization"],
+        error_code="V2B0B_AUTH_NOT_CANONICAL",
     )
-    raw_dir = base / "data/gv_v2_b0b/mu_0000723125-26-000015/raw"
-    for spec in PACKAGE_OBJECTS:
-        path = _require_file(
-            raw_dir / spec["filename"], f"V2B0B_PACKAGE_OBJECT_MISSING:{spec['filename']}"
-        )
-        data = path.read_bytes()
-        if _sha256_bytes(data) != spec["expected_sha256"]:
-            raise GvV2B0BError(f"V2B0B_PACKAGE_HASH_MISMATCH:{spec['filename']}")
-        if str(len(data)) != spec["expected_byte_length"]:
-            raise GvV2B0BError(f"V2B0B_PACKAGE_LENGTH_MISMATCH:{spec['filename']}")
-    if package.get("access_authorization_hash") != auth.get("authorization_hash"):
-        raise GvV2B0BError("V2B0B_AUTH_PACKAGE_BINDING_INVALID")
-
-    require_domain_hash(
-        source,
-        domain=SOURCE_MANIFEST_DOMAIN,
-        hash_key="source_manifest_hash",
-        error_code="V2B0B_SOURCE_MANIFEST_HASH_MISMATCH",
+    _exact_artifact_match(
+        package_manifest,
+        rebuilt["package_manifest"],
+        error_code="V2B0B_PACKAGE_NOT_CANONICAL",
     )
-    if source.get("package_manifest_hash") != package.get("package_manifest_hash"):
-        raise GvV2B0BError("V2B0B_PACKAGE_SOURCE_MANIFEST_BINDING_INVALID")
-    if source.get("access_authorization_hash") != auth.get("authorization_hash"):
-        raise GvV2B0BError("V2B0B_AUTH_MANIFEST_BINDING_INVALID")
-    derived = derive_sec_package_identity(root=base)
-    if source.get("publication_time") != derived["acceptance_datetime"]:
-        raise GvV2B0BError("V2B0B_SOURCE_PIT_NOT_SOURCE_DERIVED")
-    if (source.get("effective_period") or {}).get("filed_at") != derived["filed_at"]:
-        raise GvV2B0BError("V2B0B_SOURCE_FILED_AT_NOT_SOURCE_DERIVED")
-
-    require_domain_hash(
-        adm,
-        domain=ADMISSION_DOMAIN,
-        hash_key="admission_hash",
-        error_code="V2B0B_ADMISSION_HASH_MISMATCH",
+    _exact_artifact_match(
+        source_manifest,
+        rebuilt["source_manifest"],
+        error_code="V2B0B_SOURCE_NOT_CANONICAL",
     )
-    cert = adm.get("admission_certificate")
-    if isinstance(cert, Mapping) and cert:
-        require_domain_hash(
-            cert,
-            domain=CERTIFICATE_DOMAIN,
-            hash_key="admission_certificate_hash",
-            error_code="V2B0B_ADMISSION_CERTIFICATE_HASH_MISMATCH",
-        )
-    if adm.get("package_manifest_hash") != package.get("package_manifest_hash"):
-        raise GvV2B0BError("V2B0B_ADMISSION_PACKAGE_BINDING_INVALID")
-    if adm.get("source_manifest_hash") != source.get("source_manifest_hash"):
-        raise GvV2B0BError("V2B0B_ADMISSION_SOURCE_BINDING_INVALID")
-
-    require_domain_hash(
-        clm,
-        domain=CLAIM_DOMAIN,
-        hash_key="claim_evaluation_hash",
-        error_code="V2B0B_CLAIM_EVALUATION_HASH_MISMATCH",
+    _exact_artifact_match(
+        admission,
+        rebuilt["admission"],
+        error_code="V2B0B_ADMISSION_NOT_CANONICAL",
     )
-    if clm.get("admission_hash") != adm.get("admission_hash"):
-        raise GvV2B0BError("V2B0B_CLAIM_ADMISSION_BINDING_INVALID")
-    if clm.get("package_manifest_hash") != package.get("package_manifest_hash"):
-        raise GvV2B0BError("V2B0B_CLAIM_PACKAGE_BINDING_INVALID")
-    if clm.get("source_family_id") != SOURCE_FAMILY_ID:
-        raise GvV2B0BError("V2B0B_CLAIM_SOURCE_FAMILY_MISMATCH")
-    statements = list(clm.get("statements") or [])
-    if statements:
-        _verify_statement_locators(statements, root=base)
-
-    require_domain_hash(
-        res,
-        domain=RESEARCH_DOMAIN,
-        hash_key="research_decision_hash",
-        error_code="V2B0B_RESEARCH_DECISION_HASH_MISMATCH",
+    _exact_artifact_match(
+        claim,
+        rebuilt["claim"],
+        error_code="V2B0B_CLAIM_NOT_CANONICAL",
     )
-    if res.get("claim_evaluation_hash") != clm.get("claim_evaluation_hash"):
-        raise GvV2B0BError("V2B0B_RESEARCH_CLAIM_BINDING_INVALID")
-    if res.get("admission_hash") != adm.get("admission_hash"):
-        raise GvV2B0BError("V2B0B_RESEARCH_ADMISSION_BINDING_INVALID")
-    if res.get("research_action") == RESEARCH_ACTION_ADVANCE:
-        raise GvV2B0BError("V2B0B_ADVANCE_NOT_AUTHORIZED_IN_B0B")
-    expected_ref = f"{RATIONALE_REF_PREFIX}{clm['claim_evaluation_hash']}"
-    if res.get("rationale_ref") != expected_ref:
-        raise GvV2B0BError("V2B0B_RATIONALE_REF_BINDING_INVALID")
-
+    _exact_artifact_match(
+        research,
+        rebuilt["research"],
+        error_code="V2B0B_RESEARCH_NOT_CANONICAL",
+    )
     if result is not None:
-        result_obj = _plain(result)
-        require_domain_hash(
-            result_obj,
-            domain=RESULT_DOMAIN,
-            hash_key="result_hash",
-            error_code="V2B0B_RESULT_HASH_MISMATCH",
+        _exact_artifact_match(
+            result,
+            rebuilt["result"],
+            error_code="V2B0B_RESULT_NOT_CANONICAL",
         )
-        if result_obj.get("research_decision_hash") != res.get("research_decision_hash"):
-            raise GvV2B0BError("V2B0B_RESULT_RESEARCH_BINDING_INVALID")
-        if result_obj.get("claim_evaluation_hash") != clm.get("claim_evaluation_hash"):
-            raise GvV2B0BError("V2B0B_RESULT_CLAIM_BINDING_INVALID")
-        if result_obj.get("admission_hash") != adm.get("admission_hash"):
-            raise GvV2B0BError("V2B0B_RESULT_ADMISSION_BINDING_INVALID")
-        if result_obj.get("decision_id") != DECISION_ID:
-            raise GvV2B0BError("V2B0B_RESULT_DECISION_ID_MISMATCH")
+    # Defense: B0B research surface must remain HOLD / NO_POSITION.
+    if rebuilt["research"].get("research_action") != RESEARCH_ACTION_HOLD:
+        raise GvV2B0BError("V2B0B_CANONICAL_RESEARCH_MUST_HOLD")
+    if rebuilt["research"].get("portfolio_action") != PORTFOLIO_ACTION_NO_POSITION:
+        raise GvV2B0BError("V2B0B_CANONICAL_PORTFOLIO_MUST_NO_POSITION")
+    if rebuilt["claim"].get("claim_outcome") != CLAIM_INSUFFICIENT:
+        # Banked B0B ADMITTED package always evaluates insufficient in this slice.
+        if rebuilt["admission"].get("status") == "ADMITTED":
+            raise GvV2B0BError("V2B0B_CANONICAL_CLAIM_MUST_BE_INSUFFICIENT")
 
 
 def load_verified_b0b_result(
@@ -1683,8 +1680,9 @@ def load_verified_b0b_result(
     root: Path | None = None,
     case_dir: Path | None = None,
     result_json_path: Path | None = None,
+    verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> dict[str, Any]:
-    """Load banked B0B result only after complete-chain verification succeeds."""
+    """Load banked B0B result only after rebuild-from-raw exact match succeeds."""
 
     base = Path(root) if root is not None else ROOT
     result_path = (
@@ -1729,6 +1727,7 @@ def load_verified_b0b_result(
         claim=claim,
         research=research,
         result=result,
+        verifier_runner=verifier_runner,
     )
     return result
 
