@@ -10,7 +10,7 @@
 - [x] G_supply research action HOLD_FOR_EVIDENCE → DecisionEnvelope NO_POSITION certified and published.
 - [x] Visible operator surface updated (current + V2-B0 caption/table).
 - [x] Focused tests for V2-B0 vertical.
-- [ ] Hosted product + protocol + parity on exact result commit.
-- [ ] Narrow independent review on result commit.
+- [x] Hosted product + protocol + Ubuntu/Windows parity green on tip `fc9290b` (PR #6).
+- [ ] Narrow independent review on result tip (human).
 
-Next action: hosted close only — then stop this round.
+Next action: independent review of PR #6 / tip `fc9290b` — then stop this round. Do not open next roadmap phase.
