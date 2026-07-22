@@ -1,21 +1,20 @@
 ## What Was Done
-- Local C1 candidate banking on exact base `b7a24d3` / tree `c13b0a08` via explicit b7→donor-byte transformation (donor committed base `e9e9a9a`; not a b7-descendant claim).
-- Path model: 18 authored/input paths + 2 regenerated current-context outputs + 1 tracked candidate manifest = 21 final paths.
-- Receipt-bound GitHub reviewer import + one-shot Attempt-1 authorization design (no production session open; no human comparison).
-- Preregistration brief freezes rubric, endpoint, IMPROVED formula, blinding, publication/rerun rules, and claim boundary.
-- `filelock==3.32.0` pinned in requirements.txt and pyproject.toml; product workflow emits runner image/version and full package inventory evidence.
+- Canonical E0B product machinery shipped through repair tip `3c404479d9af963f497c889013e078adae68d516` (tree `c808849a492a5138364a1eda00f5c4c502abdda3`): C1 candidate, Attempt-1 sealed evidence, append-only invalidation, provider-authenticated reviewer receipt v2, restored E0A current authority.
+- Attempt-1 classified **INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED**; sealed evidence preserved; observation authority count **0**.
+- Invalidation tag `gv-e0b-dv1-g08-attempt-1-invalidated` peels to repair tip. Historical `gv-e0b-dv1-g08-attempt-1-result` -> da55c073… preserved as evidence, **not** observation authority.
+- Hosted product+parity green on repair tip; same-case Attempt-2 demoted to deferred external validation.
 
 ## What Is Locked
 - `SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`. `OBSERVED_COMPARISON_COUNT = 0`.
-- Within-case observational comparison only; no causal superiority; no cryptographic personhood; GitHub account separation is operational only.
-- FS1, V2-B0, providers, PEAD, broker, alpha, score uplift remain closed.
-- Hosted CI, independent A/B/C, terminal SAW, and G08 Attempt-1 remain pending after local bank.
+- Default product current decision = E0A `DECISION_E0A_HOLD_FOR_EVIDENCE_1` / NO_POSITION. E0B G08 current is smoke only under `data/gv_e0b/dv1_g08/smoke/`.
+- No valid independent comparison; no IMPROVED; no stage promotion; no alpha.
+- FS1, PEAD, optimizer, broker, score uplift, live capital closed.
+- Same-case Attempt-2 is **not** the sole product gate.
 
 ## What Is Next
-- Prove local C1 commit/tag identity, clean tree, and full local suites.
-- Push candidate when authorized; hosted Ubuntu/Windows + byte parity with recorded runner image/version.
-- Independent Reviewer A/B/C + terminal SAW on exact candidate commit/tree/tag.
-- Remotely retain one-shot Attempt-1 authorization; only then open real G08.
+- Canonical cutover: fast-forward main to repair lineage.
+- Sole functional gate: **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** (one real MU PIT evidence package or certified data abstention).
+- First valid independent comparison deferred to a fresh real case after admission, not synthetic G08 re-run.
 
 ## First Command
 `.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py`

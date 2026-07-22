@@ -1,5 +1,17 @@
 # Multi-Stream Contract - Current
 
+## Active Addendum — V2-B0 Sole Gate (2026-07-22)
+
+- Backend/Product: sole implementation gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION after main cutover.
+- Docs/Ops: cutover truth + invalidation tag; no documentation campaign.
+- Frontend: stable certified portfolio route; E0B surface may show invalidated smoke only (count 0).
+- Data: held until V2-B0 authorization for one bounded real MU package.
+- Research/PEAD/FS1/optimizer/broker: held.
+
+## Prior content retained below as history
+
+# Multi-Stream Contract - Current
+
 ## Active Addendum — S-009X / E0B-DV1 Direction and Custody (2026-07-21)
 
 | Stream | Status | Note |

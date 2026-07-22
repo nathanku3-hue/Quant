@@ -7467,3 +7467,13 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Code repair: GitHub rubric receipt schema v2 requires `github_author_login` / `github_committer_login`; submitter must equal author login and differ from operator; observation authority supersedable by invalidation packet.
 - Next: Attempt-2 only with fresh operator (not exposed to packet/result) and separate real reviewer GitHub account; no preferred-sign reuse of Attempt-1. V2-B0 remains closed until a valid observed comparison.
 
+
+## 2026-07-22 — ROUND-20260722-ROADMAP-RECUT-V2-B0-SOLE-GATE
+
+- Decision: accept repair tip `3c404479d9af963f497c889013e078adae68d516` as cutover source; Attempt-1 remains INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED with observed count 0.
+- Decision: create annotated tag `gv-e0b-dv1-g08-attempt-1-invalidated` → `3c40447…`; preserve historical result tag `gv-e0b-dv1-g08-attempt-1-result` → `da55c073…` as non-authority evidence.
+- Decision: explicit roadmap recut — sole product gate `GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION`; demote same-case Attempt-2 to deferred external validation.
+- Decision: fast-forward main from `2653eb1` through repair lineage after active truth-surface/roadmap correction only (no documentation campaign).
+- State lock: score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed 0; default current E0A NO_POSITION; E0B smoke non-authoritative.
+- Forbidden: preferred-sign Attempt-1 reuse; treating invalidated result as observation; FS1/PEAD/optimizer/broker/alpha/score uplift as next.
+

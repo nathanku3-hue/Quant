@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-22T12:24:00Z",
+  "generated_at_utc": "2026-07-22T15:16:49Z",
   "source_files": [
     "docs/context/bridge_contract_current.md",
     "docs/context/done_checklist_current.md",
@@ -115,29 +115,24 @@
   ],
   "active_phase": 65,
   "what_was_done": [
-    "Local C1 candidate banking on exact base `b7a24d3` / tree `c13b0a08` via explicit b7\u2192donor-byte transformation (donor committed base `e9e9a9a`; not a b7-descendant claim).",
-    "Path model: 18 authored/input paths + 2 regenerated current-context outputs + 1 tracked candidate manifest = 21 final paths.",
-    "Receipt-bound GitHub reviewer import + one-shot Attempt-1 authorization design (no production session open; no human comparison).",
-    "Preregistration brief freezes rubric, endpoint, IMPROVED formula, blinding, publication/rerun rules, and claim boundary.",
-    "`filelock==3.32.0` pinned in requirements.txt and pyproject.toml; product workflow emits runner image/version and full package inventory evidence."
+    "Repair tip 3c404479d9af963f497c889013e078adae68d516 / tree c808849a492a5138364a1eda00f5c4c502abdda3: Attempt-1 invalidated; E0A current restored; receipt v2.",
+    "Invalidation tag peels to repair tip; historical result tag preserved non-authority.",
+    "Same-case Attempt-2 demoted; sole next gate V2-B0 real block-only admission."
   ],
   "what_is_locked": [
-    "`SHIPPED_PRODUCT_SCORE = 39/100` frozen. `FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE`. `OBSERVED_COMPARISON_COUNT = 0`.",
-    "Within-case observational comparison only; no causal superiority; no cryptographic personhood; GitHub account separation is operational only.",
-    "FS1, V2-B0, providers, PEAD, broker, alpha, score uplift remain closed.",
-    "Hosted CI, independent A/B/C, terminal SAW, and G08 Attempt-1 remain pending after local bank."
+    "SHIPPED_PRODUCT_SCORE = 39/100 frozen. FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE. OBSERVED_COMPARISON_COUNT = 0.",
+    "Default current decision = E0A NO_POSITION; E0B is smoke/invalidated only.",
+    "FS1, PEAD, optimizer, broker, alpha, score uplift closed. Same-case Attempt-2 not sole gate."
   ],
   "what_is_next": [
-    "Prove local C1 commit/tag identity, clean tree, and full local suites.",
-    "Push candidate when authorized; hosted Ubuntu/Windows + byte parity with recorded runner image/version.",
-    "Independent Reviewer A/B/C + terminal SAW on exact candidate commit/tree/tag.",
-    "Remotely retain one-shot Attempt-1 authorization; only then open real G08."
+    "Canonical main cutover to repair lineage (product+protocol+parity on main SHA).",
+    "Open sole gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION.",
+    "First valid independent comparison on fresh real case after admission — not synthetic G08 re-run."
   ],
   "first_command": ".venv\\Scripts\\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py",
   "next_todos": [
-    "Prove local C1 commit/tag identity, clean tree, and full local suites.",
-    "Push candidate when authorized; hosted Ubuntu/Windows + byte parity with recorded runner image/version.",
-    "Independent Reviewer A/B/C + terminal SAW on exact candidate commit/tree/tag.",
-    "Remotely retain one-shot Attempt-1 authorization; only then open real G08."
+    "Canonical main cutover to repair lineage (product+protocol+parity on main SHA).",
+    "Open sole gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION.",
+    "First valid independent comparison on fresh real case after admission — not synthetic G08 re-run."
   ]
 }

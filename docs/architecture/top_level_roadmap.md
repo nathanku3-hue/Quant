@@ -1,41 +1,45 @@
 # Top-Level Roadmap: GodView Certified Portfolio OS
 
 Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
-Date: 2026-07-20
-Product tip lineage: `2653eb1` (PR #4 E0A operable + merge-safety merged; F1C-SHIP closed substrate)
-Active work: E0B-DV1 Contradiction Case repair on PR #5 (ledger, blinding, capture runner; real human records required for close)
+Date: 2026-07-22
+Product tip lineage: repair tip `3c40447` (E0B machinery + Attempt-1 invalidation; cutover to main)
+Active work: **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** (sole product gate after canonical cutover)
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
-## Governing sequence (endgame law)
+## Governing sequence (endgame law — explicit recut 2026-07-22)
 
 ```text
 truth substrate
-→ G08 observed comparison
-→ frozen V2-B0 protocol
-→ first real MU block-only admission
-→ independent decision-value replication
+→ invalidation-safe E0B product machinery shipped
+→ V2-B0 first real block-only admission          ← SOLE ACTIVE GATE
+→ first valid independent comparison on a fresh real case
 → prospective paper economics
+→ independent replication
 → live-capital consideration
 ```
 
+**Deviation register:** same-case synthetic G08 Attempt-2 is **demoted** from sole roadmap blocker to deferred external validation.  
+Attempt-1 is **INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED** (append-only); sealed evidence preserved; observation count remains 0.
+
 Portfolio truth first. Decision value second. No fabricated alpha. No score engineering.
-Real MU admission may replace a second synthetic comparison as the immediate next gate after G08; it does **not** satisfy replicated decision value and must not silently move the project toward economics.
 
 ## Executive Decision (Active Canon)
 
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
 EXECUTION_MODEL = GV_FS0_FIRST
-ACTIVE_GATE = E0B-DV1
+ACTIVE_GATE = GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION
 F1C_SHIP = CLOSED_SUBSTRATE
 E0A_OPERABLE = BANKED_SUBSTRATE (custody→HOLD_FOR_EVIDENCE→NO_POSITION; NOT decision value)
+E0B_G08_ATTEMPT_1 = INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED (evidence preserved; not observation authority)
+E0B_SAME_CASE_ATTEMPT_2 = DEFERRED_EXTERNAL_VALIDATION (not sole product gate)
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
 FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
 OBSERVED_COMPARISON_COUNT = 0
-NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED
+NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED (via fresh real case after V2-B0, not synthetic re-run)
 E0A_R1_MERGE_PATCH = CLOSED (PR #4 @ 2653eb1)
-ACTIVE_PRODUCT_SLICE = E0B-DV1 Contradiction Case (G08) repair
-V2_BLOCK_ONLY_REAL_ADMISSION = RECOMMENDED_NEXT_PROTOCOL
+ACTIVE_PRODUCT_SLICE = V2-B0 one real MU point-in-time package or certified data abstention
+V2_BLOCK_ONLY_REAL_ADMISSION = ACTIVE_SOLE_GATE
 V1_PROTOCOL_AUTHORITY = FORMAL_UNTIL_V2_ARTIFACT_COMMITTED
 SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED
 BACKWARD_COMPATIBILITY_LAYER = PROHIBITED
@@ -47,8 +51,8 @@ LIVE_TRADING_MONITORING = OUT_OF_SCOPE
 FS1_BATCH = NOT_NEXT
 ```
 
-**Now:** **E0B-DV1 repair** only. E0A-R1 is closed with PR #4.  
-E0A is banked plumbing, not GodView decision intelligence. Score stays **39/100**.  
+**Now:** **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** only (after main cutover of repair tip `3c40447`).  
+E0A is banked plumbing; E0B is invalidation-safe machinery + smoke, not a valid observed comparison. Score stays **39/100**.  
 Report **observed-comparison count** (currently 0); do not use unofficial decision-value or conjunctive maturity percentages.
 
 ### What E0A proves vs does not prove
@@ -68,7 +72,7 @@ Hardcoded `HOLD_FOR_EVIDENCE → NO_POSITION` is substrate validation only.
 |---|---|---|
 | `SHIPPED_PRODUCT_SCORE` | **39/100 frozen** | Low-confidence owner ceiling. No uplift for merge patch, dual-fixture demos, or green CI. No alpha. |
 | `FUNCTIONAL_STAGE` | **`CERTIFIED_SINGLE_DECISION_OPERABLE`** | One certified paper decision path exists. |
-| Next meaningful stage | **`ONE_CASE_DECISION_DELTA_OBSERVED`** | Requires E0B-DV1 sealed baseline-vs-GodView delta on a nontrivial case. |
+| Next meaningful stage | **`ONE_CASE_DECISION_DELTA_OBSERVED`** | Prefer first valid independent comparison on a **fresh real admitted case** after V2-B0; same-case synthetic Attempt-2 is deferred. |
 
 Do not convert direction into score engineering. Do not promote merge hygiene into a product phase.
 
@@ -421,7 +425,34 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-### Now — S-009X / E0B-DV1 only
+### Now — GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION only
+
+Objective: admit one bounded real MU point-in-time evidence package, or produce an exact certified data abstention.
+
+`	ext
+explicit DataAccessAuthorization
+→ exact immutable source bytes
+→ publication/known-at/effective-time identities
+→ evidence-purpose and licence checks
+→ contradiction and completeness checks
+→ DataAdmissionCertificate or exact admission block
+→ one real MU G_supply evaluation
+→ ADVANCE / HOLD_FOR_EVIDENCE / REJECT_THESIS
+→ DecisionEnvelope
+→ certified NO_POSITION or bounded paper action
+→ visible operator decision
+`
+
+Legitimate terminal results include DATA_ABSTENTION, BLOCKED_MISSING_POINT_IN_TIME_AUTHORITY, BLOCKED_CONTRADICTORY_INDISPENSABLE_EVIDENCE, and HOLD_FOR_EVIDENCE / NO_POSITION. Do not force positive admission.
+
+Closed until valid real admission + later valid independent comparison: FS1, broad providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital, generic experiment platforms.
+
+### Same-case G08 Attempt-2 (deferred)
+
+Not a sole roadmap gate. Run only when two genuinely separate humans are available and a fresh operator can attest non-exposure to Attempt-1 materials. Prefer first valid observation on a real admitted MU case.
+
+### Superseded historical section — S-009X / E0B-DV1 only
+
 
 E0A-R1 is permanently closed on PR #4 at `2653eb1`. Do not reopen E0A, F1C, or the frozen protocol.
 
