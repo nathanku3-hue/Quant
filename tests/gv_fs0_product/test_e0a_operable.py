@@ -52,19 +52,22 @@ EXPECTED_E0A_CURRENT_FILE_SHA256 = (
 EXPECTED_E0A_CURRENT_BYTE_LENGTH = 23_696
 EXPECTED_RATIONALE_REF = f"{RATIONALE_REF_PREFIX}{EXPECTED_RESEARCH_DECISION_HASH}"
 
-# Tracked product authority after V2-B0A local-source abstention (NO_POSITION).
-EXPECTED_V2B0_DECISION_ID = "DECISION_V2_B0_MU_G_SUPPLY_1"
-EXPECTED_V2B0_ADMISSION_HASH = (
-    "d1b891152477504b29e041baba304396fa2a7be2d01fcc701f960a15d7f49f2f"
+# Tracked product authority after V2-B0B official-source intake (NO_POSITION).
+EXPECTED_V2B0_DECISION_ID = "DECISION_V2_B0B_MU_G_SUPPLY_1"
+EXPECTED_V2B0_CLAIM_HASH = (
+    "4534c1eda555e6988276c173724a79136ba4b9d567761e3d0c99e1ba252abb52"
 )
-EXPECTED_V2B0_RATIONALE_REF = f"V2B0:ADM:{EXPECTED_V2B0_ADMISSION_HASH}"
+EXPECTED_V2B0_ADMISSION_HASH = (
+    "882b15e18239e48f1eae53dfd2693b23630c9a51dac4e4db73f6af07b9b56581"
+)
+EXPECTED_V2B0_RATIONALE_REF = f"V2B0B:CLM:{EXPECTED_V2B0_CLAIM_HASH}"
 EXPECTED_V2B0_CERTIFIED_RESULT_HASH = (
-    "4a1e8089ce477611cdb64410f9ac82b76f982fdf3a39024265470bcff824b747"
+    "6415d751ec84a1af55aea16f3d9ccb23cf05841a7fb807db6c90b2568d0eaa52"
 )
 EXPECTED_V2B0_CURRENT_FILE_SHA256 = (
-    "8530f4f0a9509253fb2cd3be87f0438d2423415d39f58556071221b6f1bad157"
+    "a6ca795d9f61b657a5e8f4b3d225f30140d13007d844992df95e9da8ad8d54e3"
 )
-EXPECTED_V2B0_CURRENT_BYTE_LENGTH = 23_636
+EXPECTED_V2B0_CURRENT_BYTE_LENGTH = 23_669
 
 
 class FakeRenderer:
@@ -334,7 +337,7 @@ def test_dashboard_default_path_is_single_current_not_dual_bundle() -> None:
 
 
 def test_tracked_current_decision_artifact_is_mandatory_v2b0_identity() -> None:
-    """Tracked default product authority is V2-B0 MU block-only NO_POSITION."""
+    """Tracked default product authority is V2-B0B official-source NO_POSITION."""
 
     path = DEFAULT_CURRENT_DECISION_TARGET
     assert path.is_file(), "tracked current-decision artifact is mandatory"

@@ -5,4 +5,7 @@ data/gv_fs0/gv_fs0_certified_bundle.json text eol=lf
 data/gv_fs0/gv_fs0_current_decision.json text eol=lf
 data/candidate_cards/** text eol=lf
 data/gv_v2_b0/** text eol=lf
+data/gv_v2_b0b/**/*.json text eol=lf
+data/gv_v2_b0b/**/*.md text eol=lf
+data/gv_v2_b0b/**/raw/** -text
 docs/architecture/godview_e0/** text eol=lf

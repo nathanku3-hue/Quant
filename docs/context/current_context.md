@@ -1,3 +1,12 @@
+## Active Addendum — B0B Official Source Intake (2026-07-23)
+
+- **Gate:** GV-V2-B0B-OFFICIAL-SOURCE-INTAKE executed on accession 0000723125-26-000015.
+- **Result:** ADMITTED + CLAIM_INSUFFICIENT + HOLD_FOR_EVIDENCE → certified paper NO_POSITION (DECISION_V2_B0B_MU_G_SUPPLY_1).
+- **Metrics:** score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**; local abstention verticals **1**; external packages **1**; certificates **1**.
+- **Hard rules:** ADMITTED never auto-ADVANCE; contradiction NOT_EVALUATED when no claim-level admitted facts; independent_source_count=1.
+- **B0A:** CLOSED/BANKED unchanged.
+- **Next after bank/merge:** first valid independent comparison on this fresh real case (not score uplift).
+
 ## What Was Done
 - **PR #6 merged** to main at `3e995f1` (head `79c309b`). Hosted product + protocol + Ubuntu/Windows + parity green.
 - **GV-V2-B0A-LOCAL-SOURCE-ABSTENTION closed** on canonical main: certified local research-card abstention banked.

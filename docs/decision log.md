@@ -1,4 +1,14 @@
 
+## 2026-07-23 — ROUND-20260723-V2-B0B-OFFICIAL-SOURCE-INTAKE
+
+- Decision: execute GV-V2-B0B-OFFICIAL-SOURCE-INTAKE on accession 0000723125-26-000015 (Micron 10-Q primary mu-20260528.htm; complete submission; index).
+- Custody: pre-read authorization commit 401a657 remotely retained before first SEC retrieval; retrieval_or_receipt_time remains null on auth; package_manifest carries retrieved_at.
+- Package: exact three objects only; source_family_id=SEC:0000723125-26-000015; independent_source_count=1.
+- Result: ADMITTED + CLAIM_INSUFFICIENT + HOLD_FOR_EVIDENCE → paper NO_POSITION DECISION_V2_B0B_MU_G_SUPPLY_1; rationale V2B0B:CLM:4534c1eda555…; admission_hash 882b15e18239…; certificates=1; external packages=1; score 39; observed 0.
+- Hard rules enforced: ADMITTED never auto-ADVANCE; contradiction status enum PASS|FAIL|NOT_EVALUATED at admission (NOT_EVALUATED when no claim-level admitted facts).
+- B0A bank untouched. Post-B0B: first valid independent comparison on this fresh real case remains next after bank/merge — not this commit's scope.
+- Evidence: core/gv_v2_b0b_official_source_intake.py, data/gv_v2_b0b/mu_0000723125-26-000015/*, tests/gv_fs0_product/test_v2_b0b_official_source_intake.py.
+
 ## 2026-07-23 — ROUND-20260723-V2-B0A-CLOSED-ON-MAIN
 
 - Decision: merge PR #6 after exact-head product/protocol/Windows/Linux/parity green on tip `79c309b`; merge commit `3e995f1`.
@@ -7508,4 +7518,5 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Evidence: `core/gv_v2_b0_real_block_only.py`, `data/gv_v2_b0/mu_g_supply_b0/**`, `tests/gv_fs0_product/test_v2_b0_real_block_only.py`.
 - Hosted close: tip `fc9290b` — GV-FS0 Product (ubuntu+windows+byte parity) green; Protocol Freeze (ubuntu+windows+parity) green. PR https://github.com/nathanku3-hue/Quant/pull/6.
 - Stop: narrow independent human review of tip only; do not open next roadmap phase in this round. G08 Attempt-2 remains deferred.
+
 

@@ -52,6 +52,7 @@ from views.gv_fs0_portfolio_adapter import (
     render_e0b_dv1_surface,
     render_gv_fs0_current_decision,
     render_v2_b0_surface,
+    render_v2_b0b_surface,
 )
 from views.pead_validation_evidence import render_pead_validation_evidence
 from views.strategy_view import render_strategy_page
@@ -4761,6 +4762,7 @@ def _render_portfolio_allocation_page() -> None:
         st.caption(f"Authority refused: {exc}")
     # V2-B0 admission result surface (block/abstention is a valid functional outcome).
     render_v2_b0_surface(st)
+    render_v2_b0b_surface(st)
     # Optional E0B surface; Attempt-1 invalidation keeps observed count at 0.
     render_e0b_dv1_surface(st)
 
