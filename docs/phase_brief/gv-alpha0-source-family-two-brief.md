@@ -1,10 +1,10 @@
 # GV-ALPHA0 Source Family Two — Controlling Brief
 
-**Status:** PRE-READ AUTHORIZED — bank exact package next (before reconciliation machinery)  
+**Status:** BANKED vertical — source family two + 5 facts + operator + certified NO_POSITION  
 **Train:** `GV-ALPHA0_ACTIVE`  
 **Main base:** `2c7f32c` (PR #8)  
 **Family one (banked):** `SEC:0000723125-26-000015` (MU)  
-**Family two (authorized):** `SEC:0001045810-26-000052` (NVDA 10-Q period ended 2026-04-26)
+**Family two (banked):** `SEC:0001045810-26-000052` (NVDA 10-Q period ended 2026-04-26)
 
 ## Why this package
 

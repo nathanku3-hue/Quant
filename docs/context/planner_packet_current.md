@@ -15,13 +15,12 @@
 
 ## What Is Next
 ```text
-exact authorized source family two (bank before reconciliation machinery)
-→ 3–5 case-specific facts + operator capture + certified result (one vertical)
-→ independent-source reconciliation (later car on same train)
+source family two BANKED (NVDA 0001045810-26-000052; 5 facts + operator + certified NO_POSITION)
+→ independent-source reconciliation machinery (next car; do not invent comparison)
 → export/replay → fresh-clone proof → non-author dogfood
 ```
 
 ## First Command
 ```text
-.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_b0b_official_source_intake.py
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_alpha0_source_family_two.py
 ```

@@ -6,8 +6,8 @@
 - [x] Hosted product + protocol + Ubuntu/Windows + parity green on merge tip (report-sourced).
 - [x] ALPHA0 authority: strict JSON, true byte locators, result-last case promote.
 - [x] Truth surfaces cut to **GV-ALPHA0_ACTIVE** (not B0B-stop → B0C).
-- [ ] Exact authorized **source family two** banked (pre-read auth before fetch; no reconciliation machinery first).
-- [ ] Family-two vertical: 3–5 case-specific facts + operator capture + certified NO_POSITION result.
+- [x] Exact authorized **source family two** banked (NVDA `0001045810-26-000052`; pre-read auth `80a267e` before fetch).
+- [x] Family-two vertical: 5 case-specific facts + operator capture + certified NO_POSITION (`DECISION_V2_ALPHA0_SF2_MU_G_SUPPLY_1`).
 - [ ] Export/replay, fresh-clone proof, non-author dogfood (later Alpha cars).
 - [ ] Formal comparison: deferred after Alpha.
 
