@@ -91,8 +91,9 @@ DEFAULT_DECISION_PACKET_PATH = DEFAULT_CASE_DIR / "decision_packet.md"
 # One local package only: existing MU research card (not real PIT supply evidence).
 MU_CARD_REL = "data/candidate_cards/MU_supercycle_candidate_card_v0.json"
 MU_CARD_MANIFEST_REL = "data/candidate_cards/MU_supercycle_candidate_card_v0.manifest.json"
+# Repository blob identity (LF-normalized; see .gitattributes data/candidate_cards/**).
 EXPECTED_MU_CARD_SHA256 = (
-    "368c4fb3f7afc4673f2bbffd3a39a977159a779e8929e0a327db461d1ee05abd"
+    "f87e7908854791c327b3a04eb46b873fb995283a4b8015c1bca7bd7066f53f2d"
 )
 
 CLAIM_BOUNDARY = (

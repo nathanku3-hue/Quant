@@ -2,15 +2,15 @@
 
 - case_id: `V2_B0_MU_G_SUPPLY_BLOCK_ONLY_1`
 - subject/module: `MU` / `G_supply`
-- access_authorization_hash: `96e5c2557b2edc52192bb4dee4860a3b8cda0f81b982ccf85ee7ce8c541746d3`
-- source_manifest_hash: `9a2c793c83f54324a3ea43372163c15fb9a761407a70868310ecd71eac9894e0`
-- admission_hash: `5bbc438597cc31d0d34c6c6bd984e345e1ffb1c1743d40d51daa920bf9ac1f5a`
+- access_authorization_hash: `430b1a2b195dc92b4ee42f0e39f42be7b8d2f969bd4c77a3d0789187fb1cdf74`
+- source_manifest_hash: `8d43b05ab37dc5bc0dd4f5657244672328695843ea9b958f2bfdda13363ffb00`
+- admission_hash: `03a4f427843b8a7e2e0726c0bc86d1338d2e42d185bb5ad90adc47fbffc57176`
 - admission_status: `BLOCKED`
 - primary_block_reason: `MISSING_POINT_IN_TIME_AUTHORITY`
 - research_action: `HOLD_FOR_EVIDENCE`
 - portfolio_action: `NO_POSITION`
 - decision_id: `DECISION_V2_B0_MU_G_SUPPLY_1`
-- rationale_ref: `V2B0:ADM:5bbc438597cc31d0d34c6c6bd984e345e1ffb1c1743d40d51daa920bf9ac1f5a`
+- rationale_ref: `V2B0:ADM:03a4f427843b8a7e2e0726c0bc86d1338d2e42d185bb5ad90adc47fbffc57176`
 - certification_status: `CERTIFIED`
 - shipped_product_score: `39` (frozen; no uplift)
 - functional_stage: `CERTIFIED_SINGLE_DECISION_OPERABLE`
@@ -18,7 +18,7 @@
 
 ## Source package
 - path: `data/candidate_cards/MU_supercycle_candidate_card_v0.json`
-- sha256: `368c4fb3f7afc4673f2bbffd3a39a977159a779e8929e0a327db461d1ee05abd`
+- sha256: `f87e7908854791c327b3a04eb46b873fb995283a4b8015c1bca7bd7066f53f2d`
 - class: local research candidate card (not official filing / not physical supply)
 
 ## Admission checks (fail-closed)

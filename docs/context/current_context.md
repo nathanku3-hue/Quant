@@ -2,7 +2,7 @@
 - **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** executed on main lineage: one local MU package bound, fail-closed admission, certified HOLD_FOR_EVIDENCE / NO_POSITION.
 - Package: `data/candidate_cards/MU_supercycle_candidate_card_v0.json` (research card only).
 - Admission status: **BLOCKED** / `MISSING_POINT_IN_TIME_AUTHORITY` (not forced positive).
-- Decision `DECISION_V2_B0_MU_G_SUPPLY_1` certified and published as current; rationale `V2B0:ADM:5bbc4385…`.
+- Decision `DECISION_V2_B0_MU_G_SUPPLY_1` certified and published as current; rationale `V2B0:ADM:03a4f427…` (LF blob custody for MU package).
 - Artifacts under `data/gv_v2_b0/mu_g_supply_b0/`. Observed comparison count remains **0**.
 
 ## What Is Locked
