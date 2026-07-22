@@ -1,0 +1,280 @@
+# GV-V2-B0B-OFFICIAL-SOURCE-INTAKE — Controlling Brief (REVISE_AND_GO)
+
+**Status:** ACTIVE PRODUCT GATE  
+**Base:** main `2cd3e858…` · B0A banked head `79c309b`  
+**Audit:** REVISE_AND_GO (four mandatory deltas locked inline)  
+**Score / stage / observed (locked):** `39` / `CERTIFIED_SINGLE_DECISION_OPERABLE` / `0`
+
+---
+
+## Product vertical (sole job)
+
+```text
+official external bytes
+→ relational source authority
+→ honest admission
+→ separate claim evaluation
+→ explicit research decision
+→ certified portfolio consequence
+```
+
+Authority chain layers remain distinct:
+
+| Layer | Artifact | Proves | Does not prove |
+|---|---|---|---|
+| Authorization | `access_authorization.json` | pre-read scope | admission or receipt |
+| Retrieval | `package_manifest.json` (or receipt bound into it) | when/how bytes arrived | claim truth |
+| Custody | three exact objects + relational binds | immutable package identity | multi-source corroboration |
+| Admission | `admission_result.json` (+ certificate if earned) | package may enter decision evidence | ADVANCE |
+| Claim eval | `claim_evaluation.json` | research-triage sufficiency | thesis truth / investability |
+| Portfolio | DecisionEnvelope → book → cert → current | paper action | capital authority |
+
+B0A remains immutable banked substrate.
+
+---
+
+## Mandatory delta 1 — pre-read authorization (remote before fetch)
+
+Before the first SEC request, remotely retain an **authorization-only** commit or annotated tag that binds:
+
+```text
+accession, CIK, form, purpose,
+permitted uses, forbidden uses,
+accountable authorizer, expiry/one-shot boundary,
+claim ceiling
+```
+
+Sequence:
+
+```text
+authorization object (remote)
+→ SEC retrieval
+→ package receipt
+→ implementation
+```
+
+Forbidden: create authorization retrospectively in the same commit as downloaded package bytes.
+
+This is the only extra custody step. Not an authorization framework.
+
+Path: `data/gv_v2_b0b/mu_0000723125-26-000015/access_authorization.json`
+
+---
+
+## Mandatory delta 2 — authorization time ≠ receipt time
+
+```text
+access_authorization.json
+  authorization_recorded_at   # pre-read wall time
+  retrieval_or_receipt_time = null
+
+package_manifest.json
+  retrieved_at
+  retrieval_method
+  source_locator (per object)
+  response_byte_length / response_sha256 (per object)
+```
+
+Authority ordering:
+
+```text
+authorization_recorded_at < retrieved_at
+```
+
+Tests reject reversed or equal ordering when exact ordering is required.
+
+---
+
+## Mandatory delta 3 — exact package objects (no equivalents)
+
+Exactly three objects (no “archive or equivalent”):
+
+```text
+0000723125-26-000015-index.htm
+0000723125-26-000015.txt
+mu-20260528.htm
+```
+
+Official locators (SEC EDGAR):
+
+```text
+https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/0000723125-26-000015-index.htm
+https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/0000723125-26-000015.txt
+https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm
+```
+
+Each object binds:
+
+```text
+official SEC locator
+accession
+object role
+sha256
+byte_length
+retrieved_at
+```
+
+Evidence deduplication (non-negotiable):
+
+```text
+source_family_id = SEC:0000723125-26-000015
+independent_source_count = 1
+```
+
+Index, primary, and complete submission are **custody redundancy**, not three corroborators. Claim evaluation must not count them as independent sources.
+
+---
+
+## Mandatory delta 4 — narrow claim outcomes
+
+Claim evaluation outcomes:
+
+```text
+SUFFICIENT_FOR_RESEARCH_TRIAGE
+CLAIM_INSUFFICIENT
+CLAIM_CONTRADICTED
+NOT_EVALUABLE
+```
+
+Research mapping:
+
+```text
+ADMITTED + SUFFICIENT_FOR_RESEARCH_TRIAGE → may ADVANCE_TO_FULL_RESEARCH
+ADMITTED + CLAIM_INSUFFICIENT             → HOLD_FOR_EVIDENCE
+ADMITTED + CLAIM_CONTRADICTED             → REJECT_THESIS
+BLOCKED or NOT_EVALUABLE                  → HOLD_FOR_EVIDENCE
+```
+
+`SUFFICIENT_FOR_RESEARCH_TRIAGE` means only that the official filing contains enough relevant evidence to justify deeper research. It does **not** mean: thesis true, physical supply independently identified, issuer claims corroborated, investment justified, or a position may open.
+
+Every extracted statement binds:
+
+```text
+source object hash
+document or byte locator
+section or element locator
+exact excerpt hash
+statement class ∈ {
+  FINANCIAL_FACT,
+  CONTRACTUAL_DISCLOSURE,
+  ISSUER_ASSERTION,
+  FORWARD_LOOKING_STATEMENT,
+  RISK_DISCLOSURE
+}
+```
+
+---
+
+## Contradiction semantics (B0B only; B0A untouched)
+
+Explicit enum (not nullable bool):
+
+```text
+PASS | FAIL | NOT_EVALUATED
+```
+
+```text
+facts absent   → NOT_EVALUATED
+facts conflict → FAIL + CONTRADICTORY_INDISPENSABLE_EVIDENCE
+facts cohere   → PASS with non-vacuous evidence
+```
+
+---
+
+## Portfolio semantics
+
+```text
+ADMITTED ≠ claim support
+ADMITTED ≠ ADVANCE
+ADVANCE ≠ portfolio position
+```
+
+All B0B research outcomes map to paper `NO_POSITION` (no sizing / capital authority).
+
+Certified result binds both:
+
+```text
+admission_hash
+claim_evaluation_hash
+```
+
+`DecisionEnvelope.rationale_ref` resolves to claim evaluation and transitively binds admission certificate or block — not merely the source package.
+
+---
+
+## Pinned package identity
+
+| Field | Value |
+|---|---|
+| Issuer | Micron Technology, Inc. |
+| CIK | 0000723125 |
+| Form | 10-Q |
+| Accession | 0000723125-26-000015 |
+| Period ended | 2026-05-28 |
+| Accepted | 2026-06-24 18:59:46 |
+| Filed | 2026-06-25 |
+| Primary | mu-20260528.htm |
+| Submission | 0000723125-26-000015.txt |
+| Index | 0000723125-26-000015-index.htm |
+| Module | G_supply |
+| Classification | GV-V2-B0B-OFFICIAL-SOURCE-INTAKE |
+
+One issuer source; not independent corroboration.
+
+---
+
+## Execution gates
+
+### B0B-0 — authority
+
+1. Clean worktree from `2cd3e858…`
+2. Branch `codex/gv-v2-b0b-official-source-intake`
+3. Remotely retain authorization-only commit/tag
+4. No product code required before this point
+
+### B0B-1 — exact package
+
+Fetch only the three named objects. Bank immutable bytes + relational package manifest.  
+Do not fetch XBRL linkbases, exhibits, IR material, prices, providers, or a second filing.
+
+### B0B-2 — one product vertical
+
+```text
+authorization → receipt → package_manifest → source_manifest
+→ ADMITTED | BLOCKED
+→ separate claim evaluation
+→ research action
+→ DecisionEnvelope → PortfolioBook → Fs0Certification
+→ atomic current publication → visible operator result
+```
+
+### B0B-3 — ship
+
+Focused tests → product suite → protocol freeze → Ubuntu/Windows parity → narrow audit → merge → truth cutover → **stop**.
+
+---
+
+## Metrics
+
+| Measure | Now | After valid B0B close |
+|---|---:|---:|
+| SHIPPED_PRODUCT_SCORE | 39 | 39 (no uplift) |
+| FUNCTIONAL_STAGE | CERTIFIED_SINGLE_DECISION_OPERABLE | unchanged |
+| OBSERVED_COMPARISON_COUNT | 0 | 0 |
+| Local abstention verticals | 1 | 1 |
+| External source packages processed | 0 | 1 |
+| Admission certificates earned | 0 | 1 if ADMITTED else 0 |
+
+---
+
+## Post-B0B (precommitted, not this PR)
+
+- Package admitted (any research action): bank B0B → first valid independent comparison on this fresh real case
+- Package blocked by implementation/custody defect: repair narrowly on same accession
+- ADMITTED + CLAIM_INSUFFICIENT + HOLD + NO_POSITION is a valid B0B close
+
+---
+
+## Closed / forbidden this round
+
+G08 Attempt-2 as product gate · FS1 · providers platform · PEAD · optimizer · rankings · broker · alpha · score uplift · live capital · generic evidence platform · reopen B0A · multi-source fabrication · equivalent package substitution
