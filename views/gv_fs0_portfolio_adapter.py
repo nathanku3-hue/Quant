@@ -247,6 +247,64 @@ def render_e0b_dv1_surface(
         return None
 
 
+def render_v2_b0_surface(
+    renderer: PortfolioRenderer,
+    *,
+    result_json_path: Path | None = None,
+) -> dict[str, Any] | None:
+    """Optional V2-B0 admission surface. Missing artifact → quiet no-raise."""
+
+    from core.gv_v2_b0_real_block_only import DEFAULT_RESULT_PATH, CASE_ID
+
+    path = Path(result_json_path) if result_json_path is not None else DEFAULT_RESULT_PATH
+    if not path.is_file():
+        renderer.caption(
+            "V2-B0 real block-only admission: no result artifact "
+            "(score 39 frozen; observed comparison count unchanged)"
+        )
+        return None
+    try:
+        result = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        renderer.caption(f"V2-B0 admission artifact refused: {exc}")
+        return None
+    if not isinstance(result, dict):
+        renderer.caption("V2-B0 admission artifact refused: not an object")
+        return None
+    renderer.subheader("GV-V2-B0 Real Block-Only Admission — MU G_supply")
+    rows = [
+        {"label": "case_id", "value": str(result.get("case_id", CASE_ID))},
+        {"label": "admission_status", "value": str(result.get("admission_status"))},
+        {
+            "label": "primary_block_reason",
+            "value": str(result.get("primary_block_reason")),
+        },
+        {"label": "research_action", "value": str(result.get("research_action"))},
+        {"label": "portfolio_action", "value": str(result.get("portfolio_action"))},
+        {"label": "decision_id", "value": str(result.get("decision_id"))},
+        {"label": "rationale_ref", "value": str(result.get("rationale_ref"))},
+        {
+            "label": "certification_status",
+            "value": str(result.get("certification_status")),
+        },
+        {
+            "label": "observed_comparison_count",
+            "value": str(result.get("observed_comparison_count", 0)),
+        },
+        {
+            "label": "shipped_product_score",
+            "value": str(result.get("shipped_product_score", 39)),
+        },
+    ]
+    renderer.table(rows)
+    renderer.caption(
+        "V2-B0 · one MU source package · fail-closed admission · "
+        "certified block/abstention is a valid functional result · "
+        "no alpha · score 39 frozen · not a G08 observation"
+    )
+    return dict(result)
+
+
 __all__ = [
     "DEFAULT_BUNDLE_PATH",
     "DEFAULT_CURRENT_DECISION_PATH",
@@ -257,5 +315,6 @@ __all__ = [
     "render_e0b_dv1_surface",
     "render_gv_fs0_certified_bundle",
     "render_gv_fs0_current_decision",
+    "render_v2_b0_surface",
     "render_gv_fs0_portfolio",
 ]

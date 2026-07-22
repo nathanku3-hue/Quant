@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-22T15:16:49Z",
+  "generated_at_utc": "2026-07-22T15:35:47Z",
   "source_files": [
     "docs/context/bridge_contract_current.md",
     "docs/context/done_checklist_current.md",
@@ -115,24 +115,19 @@
   ],
   "active_phase": 65,
   "what_was_done": [
-    "Repair tip 3c404479d9af963f497c889013e078adae68d516 / tree c808849a492a5138364a1eda00f5c4c502abdda3: Attempt-1 invalidated; E0A current restored; receipt v2.",
-    "Invalidation tag peels to repair tip; historical result tag preserved non-authority.",
-    "Same-case Attempt-2 demoted; sole next gate V2-B0 real block-only admission."
+    "V2-B0 real block-only: MU research-card package blocked MISSING_POINT_IN_TIME_AUTHORITY.",
+    "Certified HOLD_FOR_EVIDENCE / NO_POSITION DECISION_V2_B0_MU_G_SUPPLY_1 published as current.",
+    "Score 39; observed 0; no uplift."
   ],
   "what_is_locked": [
-    "SHIPPED_PRODUCT_SCORE = 39/100 frozen. FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE. OBSERVED_COMPARISON_COUNT = 0.",
-    "Default current decision = E0A NO_POSITION; E0B is smoke/invalidated only.",
-    "FS1, PEAD, optimizer, broker, alpha, score uplift closed. Same-case Attempt-2 not sole gate."
+    "SHIPPED_PRODUCT_SCORE=39; FUNCTIONAL_STAGE=CERTIFIED_SINGLE_DECISION_OPERABLE; OBSERVED=0.",
+    "G08 Attempt-2 deferred; FS1/providers/PEAD/optimizer/broker/alpha closed."
   ],
   "what_is_next": [
-    "Canonical main cutover to repair lineage (product+protocol+parity on main SHA).",
-    "Open sole gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION.",
-    "First valid independent comparison on fresh real case after admission — not synthetic G08 re-run."
+    "Hosted product+protocol+parity on result tip; then stop this round."
   ],
-  "first_command": ".venv\\Scripts\\python -m pytest -q tests/gv_fs0_product/test_e0b_dv1_contradiction.py",
+  "first_command": ".venv\\Scripts\\python -m pytest -q tests/gv_fs0_product/test_v2_b0_real_block_only.py",
   "next_todos": [
-    "Canonical main cutover to repair lineage (product+protocol+parity on main SHA).",
-    "Open sole gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION.",
-    "First valid independent comparison on fresh real case after admission — not synthetic G08 re-run."
+    "Hosted product+protocol+parity on result tip; then stop this round."
   ]
 }

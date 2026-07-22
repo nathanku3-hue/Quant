@@ -7477,3 +7477,14 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - State lock: score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed 0; default current E0A NO_POSITION; E0B smoke non-authoritative.
 - Forbidden: preferred-sign Attempt-1 reuse; treating invalidated result as observation; FS1/PEAD/optimizer/broker/alpha/score uplift as next.
 
+
+## 2026-07-22 — ROUND-20260722-V2-B0-REAL-BLOCK-ONLY-ADMISSION
+
+- Decision: execute sole product gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION on main lineage.
+- Source package: local `data/candidate_cards/MU_supercycle_candidate_card_v0.json` (SHA-256 `368c4fb3…`) under evaluation-only DataAccessAuthorization (no credentials; no real provider read).
+- Admission: **BLOCKED** / `MISSING_POINT_IN_TIME_AUTHORITY` (research card is not official filing or physical-supply PIT authority). Exact block is a valid functional result.
+- Research: HOLD_FOR_EVIDENCE; portfolio NO_POSITION; DecisionEnvelope `DECISION_V2_B0_MU_G_SUPPLY_1`; rationale `V2B0:ADM:5bbc4385…`; certification CERTIFIED; published as current.
+- State lock: score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed comparison count 0; no score uplift.
+- Evidence: `core/gv_v2_b0_real_block_only.py`, `data/gv_v2_b0/mu_g_supply_b0/**`, `tests/gv_fs0_product/test_v2_b0_real_block_only.py`.
+- Stop: after hosted close of result-bearing tip; do not open next roadmap phase in this round. G08 Attempt-2 remains deferred.
+

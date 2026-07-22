@@ -3,7 +3,7 @@
 Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
 Date: 2026-07-22
 Product tip lineage: repair tip `3c40447` (E0B machinery + Attempt-1 invalidation; cutover to main)
-Active work: **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** (sole product gate after canonical cutover)
+Active work: **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** executed — certified real-data abstention banked (round closes after hosted green; no next phase opened)
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
 ## Governing sequence (endgame law — explicit recut 2026-07-22)
@@ -11,7 +11,7 @@ Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model
 ```text
 truth substrate
 → invalidation-safe E0B product machinery shipped
-→ V2-B0 first real block-only admission          ← SOLE ACTIVE GATE
+→ V2-B0 first real block-only admission          ← EXECUTED (BLOCKED / MISSING_PIT → NO_POSITION)
 → first valid independent comparison on a fresh real case
 → prospective paper economics
 → independent replication
@@ -28,18 +28,20 @@ Portfolio truth first. Decision value second. No fabricated alpha. No score engi
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
 EXECUTION_MODEL = GV_FS0_FIRST
-ACTIVE_GATE = GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION
+ACTIVE_GATE = GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION (EXECUTED; certified abstention; hosted close pending)
 F1C_SHIP = CLOSED_SUBSTRATE
 E0A_OPERABLE = BANKED_SUBSTRATE (custody→HOLD_FOR_EVIDENCE→NO_POSITION; NOT decision value)
 E0B_G08_ATTEMPT_1 = INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED (evidence preserved; not observation authority)
 E0B_SAME_CASE_ATTEMPT_2 = DEFERRED_EXTERNAL_VALIDATION (not sole product gate)
+V2_B0_RESULT = CERTIFIED_BLOCKED_MISSING_POINT_IN_TIME_AUTHORITY → HOLD_FOR_EVIDENCE → NO_POSITION
+V2_B0_DECISION = DECISION_V2_B0_MU_G_SUPPLY_1 (current authority)
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
 FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
 OBSERVED_COMPARISON_COUNT = 0
-NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED (via fresh real case after V2-B0, not synthetic re-run)
+NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED (via fresh real case after admitted real evidence; not opened this round)
 E0A_R1_MERGE_PATCH = CLOSED (PR #4 @ 2653eb1)
-ACTIVE_PRODUCT_SLICE = V2-B0 one real MU point-in-time package or certified data abstention
-V2_BLOCK_ONLY_REAL_ADMISSION = ACTIVE_SOLE_GATE
+ACTIVE_PRODUCT_SLICE = V2-B0 banked certified real-data abstention (MU research card blocked; no synthetic as real)
+V2_BLOCK_ONLY_REAL_ADMISSION = EXECUTED_CERTIFIED_ABSTENTION
 V1_PROTOCOL_AUTHORITY = FORMAL_UNTIL_V2_ARTIFACT_COMMITTED
 SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED
 BACKWARD_COMPATIBILITY_LAYER = PROHIBITED
@@ -51,7 +53,7 @@ LIVE_TRADING_MONITORING = OUT_OF_SCOPE
 FS1_BATCH = NOT_NEXT
 ```
 
-**Now:** **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** only (after main cutover of repair tip `3c40447`).  
+**Now:** V2-B0 executed — one local MU package under evaluation-only authorization; fail-closed **BLOCKED / MISSING_POINT_IN_TIME_AUTHORITY**; certified **NO_POSITION** published as current. Hosted product+protocol+parity close on the result tip; **do not open the next roadmap phase in this round**.  
 E0A is banked plumbing; E0B is invalidation-safe machinery + smoke, not a valid observed comparison. Score stays **39/100**.  
 Report **observed-comparison count** (currently 0); do not use unofficial decision-value or conjunctive maturity percentages.
 

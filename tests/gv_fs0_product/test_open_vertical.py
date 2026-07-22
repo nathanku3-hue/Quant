@@ -419,11 +419,12 @@ def _imports(path: Path) -> set[str]:
 def test_static_product_boundaries() -> None:
     adapter_imports = _imports(ROOT / "views" / "gv_fs0_portfolio_adapter.py")
     adapter_core_imports = {name for name in adapter_imports if name.startswith("core.")}
-    # Read-only presentation: F1C bundle loader + shared current-decision canonical parser.
+    # Read-only presentation: F1C bundle + current decision + E0B/V2-B0 result surfaces.
     assert adapter_core_imports == {
         "core.gv_e0b_dv1_contradiction",
         "core.gv_fs0_bundle",
         "core.gv_fs0_current_decision",
+        "core.gv_v2_b0_real_block_only",
     }
     assert not any(name.startswith("validation.") for name in adapter_imports)
     assert not any(name.startswith("strategies.") for name in adapter_imports)

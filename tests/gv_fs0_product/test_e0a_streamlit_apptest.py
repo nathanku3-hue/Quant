@@ -39,11 +39,12 @@ NO_POSITION_SUBHEADER = "GV-FS0 Certified Paper Portfolio — NO_POSITION"
 
 @pytest.fixture
 def isolated_current_decision(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Point default current-decision + E0B result paths at temps for fail-path tests."""
+    """Point current-decision + optional surfaces at temps for fail-path tests."""
 
     target = tmp_path / "gv_fs0_current_decision.json"
     lock = tmp_path / ".gv_fs0_current_decision.lock"
     e0b_result = tmp_path / "e0b_result.json"
+    v2b0_result = tmp_path / "v2b0_result.json"
     monkeypatch.setattr(
         "core.gv_fs0_publish.DEFAULT_CURRENT_DECISION_TARGET", target
     )
@@ -58,6 +59,10 @@ def isolated_current_decision(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     )
     monkeypatch.setattr(
         "core.gv_e0b_dv1_contradiction.DEFAULT_RESULT_JSON", e0b_result
+    )
+    # V2-B0 surface must not emit a table when authority fail-paths are under test.
+    monkeypatch.setattr(
+        "core.gv_v2_b0_real_block_only.DEFAULT_RESULT_PATH", v2b0_result
     )
     return target, lock
 
