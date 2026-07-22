@@ -2,7 +2,7 @@
 
 ## Active Addendum — V2-B0 Sole Gate (2026-07-22)
 
-- Backend/Product: sole implementation gate GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION after main cutover.
+- Backend/Product: active classification GV-V2-B0A-LOCAL-SOURCE-ABSTENTION (B0A-R1); B0B official-source intake after PR #6 merge.
 - Docs/Ops: cutover truth + invalidation tag; no documentation campaign.
 - Frontend: stable certified portfolio route; E0B surface may show invalidated smoke only (count 0).
 - Data: held until V2-B0 authorization for one bounded real MU package.

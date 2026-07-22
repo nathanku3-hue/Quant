@@ -1,20 +1,26 @@
-"""GV-V2-B0 real block-only admission — one MU source package, fail-closed.
+"""GV-V2-B0A local-source abstention — one MU research-card package, fail-closed.
 
-Vertical (sole product gate after canonical cutover):
+Classification (honest product identity):
 
-  DataAccessAuthorization
-  → exact immutable source bytes
+  GV-V2-B0A-LOCAL-SOURCE-ABSTENTION
+
+Vertical (bounded local preflight; not real external admission):
+
+  out-of-band local evaluation authorization
+  → exact immutable repository source bytes
+  → package-manifest binding validation
   → admission checks (licence, PIT, identity, schema, completeness,
     contradiction, purpose, forbidden use)
-  → DataAdmissionCertificate OR exact admission block
-  → one MU G_supply research action
+  → exact admission BLOCK only (no positive ADMITTED path)
+  → one MU G_supply research HOLD
   → DecisionEnvelope → PortfolioBook → Fs0Certification
-  → visible operator decision
+  → visible operator decision (paper NO_POSITION)
 
-A certified DATA_ABSTENTION / MISSING_POINT_IN_TIME_AUTHORITY block is a
-successful functional result when real authority is inadequate.
+A certified local source-authority abstention is a successful functional
+result when real point-in-time authority is inadequate.
 
-No generic provider platform. No synthetic evidence presented as real.
+No generic provider platform. No DataAdmissionCertificate in B0A.
+No automatic ADVANCE_TO_FULL_RESEARCH. No synthetic-as-real evidence.
 No score uplift. No credentials in authorization artifacts.
 """
 
@@ -54,6 +60,7 @@ CASE_ID = "V2_B0_MU_G_SUPPLY_BLOCK_ONLY_1"
 SUBJECT = "MU"
 MODULE = "G_supply"
 DECISION_ID = "DECISION_V2_B0_MU_G_SUPPLY_1"
+SLICE_CLASSIFICATION = "GV-V2-B0A-LOCAL-SOURCE-ABSTENTION"
 RESEARCH_ACTION_HOLD = "HOLD_FOR_EVIDENCE"
 RESEARCH_ACTION_ADVANCE = "ADVANCE_TO_FULL_RESEARCH"
 RESEARCH_ACTION_REJECT = "REJECT_THESIS"
@@ -79,6 +86,11 @@ BLOCK_LICENCE = "LICENCE_NOT_AUTHORIZED"
 BLOCK_PURPOSE = "PURPOSE_INCOMPATIBLE"
 BLOCK_CONTRADICTION = "CONTRADICTORY_INDISPENSABLE_EVIDENCE"
 BLOCK_COMPLETENESS = "INCOMPLETE_INDISPENSABLE_EVIDENCE"
+BLOCK_MANIFEST_BINDING = "SOURCE_PACKAGE_MANIFEST_BINDING_INVALID"
+BLOCK_POSITIVE_ADMISSION = "V2B0_POSITIVE_ADMISSION_NOT_AUTHORIZED"
+
+AUTH_PROVENANCE_LOCAL = "OUT_OF_BAND_OWNER_APPROVAL_FOR_LOCAL_EVALUATION_ONLY"
+PURPOSE_LOCAL_ABSTENTION = "GV_V2_B0A_LOCAL_SOURCE_ABSTENTION_MU_G_SUPPLY"
 
 DEFAULT_CASE_DIR = ROOT / "data" / "gv_v2_b0" / "mu_g_supply_b0"
 DEFAULT_ACCESS_AUTH_PATH = DEFAULT_CASE_DIR / "access_authorization.json"
@@ -97,16 +109,18 @@ EXPECTED_MU_CARD_SHA256 = (
 )
 
 CLAIM_BOUNDARY = (
-    "V2-B0 block-only real admission attempt for one MU G_supply package. "
-    "No established mispricing, alpha, investability, tradability, "
-    "trade recommendation, score uplift, or general decision improvement claim. "
-    "A certified admission block / data abstention is a valid functional result. "
-    "Research HOLD_FOR_EVIDENCE maps only to paper NO_POSITION."
+    "V2-B0A local research-card admission preflight / certified source-authority "
+    "abstention for one MU G_supply package. Not a real external source admission. "
+    "No established mispricing, alpha, investability, tradability, trade "
+    "recommendation, score uplift, or general decision improvement claim. "
+    "A certified local-source abstention is a valid functional result. "
+    "Research HOLD_FOR_EVIDENCE maps only to paper NO_POSITION. "
+    "Positive ADMITTED / ADVANCE_TO_FULL_RESEARCH is not authorized in B0A."
 )
 
 
 class GvV2B0Error(RuntimeError):
-    """Fail-closed V2-B0 real block-only admission error."""
+    """Fail-closed V2-B0A local-source abstention error."""
 
 
 def _freeze(value: Any) -> Any:
@@ -152,16 +166,35 @@ def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> str:
     return sha256(raw).hexdigest()
 
 
+def _primary_block_reason(blocks: list[str]) -> str:
+    priority = (
+        BLOCK_POSITIVE_ADMISSION,
+        BLOCK_MISSING_PIT,
+        BLOCK_MANIFEST_BINDING,
+        BLOCK_LICENCE,
+        BLOCK_PURPOSE,
+        BLOCK_COMPLETENESS,
+        BLOCK_CONTRADICTION,
+        BLOCK_DATA_ABSTENTION,
+    )
+    present = set(blocks)
+    for code in priority:
+        if code in present:
+            return code
+    return BLOCK_DATA_ABSTENTION
+
+
 def build_data_access_authorization(
     *,
     root: Path | None = None,
     authorized_by: str = "OWNER_V2_B0_GATE",
     authorized_at: str = "2026-07-22T00:00:00.000000Z",
 ) -> dict[str, Any]:
-    """Detached authorization for admission evaluation of one local MU package.
+    """Out-of-band local-evaluation scope grant for one repository MU package.
 
     Does **not** authorize real provider network reads, WRDS probes, or
-    investable/promotional uses. Contains no credentials.
+    investable/promotional uses. Contains no credentials. Not a verified
+    source receipt; ``retrieval_or_receipt_time`` is unknown.
     """
 
     base = Path(root) if root is not None else ROOT
@@ -181,6 +214,7 @@ def build_data_access_authorization(
         "permitted_use": [
             "v2_b0_admission_evaluation_only",
             "fail_closed_point_in_time_gate",
+            "local_source_abstention_preflight",
         ],
         "forbidden_use": [
             "real_provider_network_read",
@@ -191,10 +225,15 @@ def build_data_access_authorization(
             "live_capital",
             "score_uplift",
             "synthetic_as_real_evidence",
+            "positive_admission_publication",
+            "automatic_research_advancement",
         ],
-        "purpose": "GV_V2_B0_REAL_BLOCK_ONLY_ADMISSION_MU_G_SUPPLY",
+        "purpose": PURPOSE_LOCAL_ABSTENTION,
         "credentials_boundary": "none_present_none_authorized",
-        "retrieval_or_receipt_time": authorized_at,
+        # Not proven source receipt metadata — unknown for local preflight.
+        "retrieval_or_receipt_time": None,
+        "authorization_recorded_at": authorized_at,
+        "authorization_provenance": AUTH_PROVENANCE_LOCAL,
         "coverage": {
             "entity": "MU",
             "scope": "single_local_package",
@@ -202,8 +241,10 @@ def build_data_access_authorization(
         },
         "restrictions": [
             "Package is research-card identity only; not official filing or physical supply evidence.",
+            "Authorization is out-of-band local evaluation only; not detached source-specific authority.",
             "Authorization does not grant candidate admission.",
             "No current snapshot may substitute for point-in-time authority.",
+            "Positive ADMITTED path is not authorized in B0A.",
         ],
         "accountable_authorizer": authorized_by,
         "repository_artifact_path": MU_CARD_REL,
@@ -211,11 +252,12 @@ def build_data_access_authorization(
         "authorized_actions": [
             "hash_local_bytes",
             "run_admission_checks",
-            "emit_admission_block_or_certificate",
+            "emit_admission_block_only",
             "route_hold_no_position",
         ],
         "expiration_or_revocation": "round_scoped_gate_only",
         "alpha_claim": False,
+        "slice_classification": SLICE_CLASSIFICATION,
         "claim_boundary": CLAIM_BOUNDARY,
     }
     body["authorization_hash"] = domain_hash(ACCESS_AUTH_DOMAIN, body)
@@ -269,10 +311,50 @@ def build_source_manifest(
         "point_in_time_available": False,
         "real_physical_supply_bytes_present": False,
         "official_company_filing_bytes_present": False,
+        "slice_classification": SLICE_CLASSIFICATION,
         "claim_boundary": CLAIM_BOUNDARY,
     }
     body["source_manifest_hash"] = domain_hash(SOURCE_MANIFEST_DOMAIN, body)
     return body
+
+
+def _validate_package_manifest_binding(
+    *,
+    base: Path,
+) -> tuple[bool, str]:
+    """Validate historical package manifest binds the actual card URI/hash.
+
+    Historical bytes are preserved even when the declared hash is wrong;
+    admission must surface the contradiction rather than rewrite the package.
+    """
+
+    card_path = base / MU_CARD_REL
+    pkg_manifest_path = base / MU_CARD_MANIFEST_REL
+    if not card_path.is_file() or not pkg_manifest_path.is_file():
+        return False, "package_card_or_manifest_missing"
+    try:
+        pkg_manifest = json.loads(pkg_manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        return False, f"package_manifest_unreadable:{exc}"
+    if not isinstance(pkg_manifest, dict):
+        return False, "package_manifest_not_object"
+    declared_uri = pkg_manifest.get("artifact_uri")
+    declared_sha = pkg_manifest.get("artifact_sha256")
+    actual_sha = _sha256_file(card_path)
+    notes: list[str] = []
+    if declared_uri != MU_CARD_REL:
+        notes.append(f"uri_mismatch:declared={declared_uri!r}")
+    if not isinstance(declared_sha, str) or len(declared_sha) != 64:
+        notes.append("declared_sha_invalid")
+    elif declared_sha != actual_sha:
+        notes.append(
+            f"sha_mismatch:declared={declared_sha}:actual={actual_sha}"
+        )
+    if actual_sha != EXPECTED_MU_CARD_SHA256:
+        notes.append("actual_card_not_pinned_blob")
+    if notes:
+        return False, "; ".join(notes)
+    return True, "package_manifest_binds_actual_card"
 
 
 def run_admission_checks(
@@ -281,7 +363,7 @@ def run_admission_checks(
     access_authorization: Mapping[str, Any] | None = None,
     source_manifest: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Fail-closed admission: emit certificate or exact block. Never force admit."""
+    """Fail-closed admission: emit exact BLOCK only. Never publish ADMITTED."""
 
     base = Path(root) if root is not None else ROOT
     auth = (
@@ -310,7 +392,7 @@ def run_admission_checks(
     )
     checks["licence_and_permitted_use"] = {
         "pass": licence_ok,
-        "detail": "Access auth is evaluation-only; investable/real-provider uses forbidden.",
+        "detail": "Access auth is local evaluation-only; investable/real-provider uses forbidden.",
     }
     if not licence_ok:
         blocks.append(BLOCK_LICENCE)
@@ -329,7 +411,7 @@ def run_admission_checks(
     if not pit_ok:
         blocks.append(BLOCK_MISSING_PIT)
 
-    # 3) Immutable byte identity
+    # 3) Immutable byte identity (tracked source_manifest files vs disk)
     identity_ok = True
     identity_notes: list[str] = []
     for item in manifest.get("files") or []:
@@ -353,7 +435,16 @@ def run_admission_checks(
     if not identity_ok:
         blocks.append(BLOCK_DATA_ABSTENTION)
 
-    # 4) Semantic / schema validity for G_supply real admission
+    # 3b) Historical package-manifest binding (URI + declared artifact_sha256)
+    binding_ok, binding_detail = _validate_package_manifest_binding(base=base)
+    checks["package_manifest_binding"] = {
+        "pass": binding_ok,
+        "detail": binding_detail,
+    }
+    if not binding_ok:
+        blocks.append(BLOCK_MANIFEST_BINDING)
+
+    # 4) Semantic / schema validity for G_supply real-evidence admission
     card = json.loads((base / MU_CARD_REL).read_text(encoding="utf-8"))
     quality = card.get("source_quality_summary") or {}
     has_real_supply = bool(manifest.get("real_physical_supply_bytes_present"))
@@ -385,91 +476,67 @@ def run_admission_checks(
         blocks.append(BLOCK_COMPLETENESS)
 
     # 6) Contradictions among indispensable admitted facts
-    # No admitted indispensable facts → no contradiction pass (not a free pass).
+    # No admitted indispensable facts → vacuous pass (not a free pass to ADMITTED).
     checks["contradictions"] = {
         "pass": True,
         "detail": "No admitted indispensable real facts to contradict; contradiction check vacuous.",
     }
 
-    # 7) Purpose compatibility
+    # 7) Purpose compatibility (local abstention preflight)
     purpose = str(auth.get("purpose") or "")
-    purpose_ok = purpose == "GV_V2_B0_REAL_BLOCK_ONLY_ADMISSION_MU_G_SUPPLY" and semantic_ok
+    purpose_ok = purpose == PURPOSE_LOCAL_ABSTENTION
     checks["purpose_compatibility"] = {
         "pass": purpose_ok,
         "detail": (
-            "Gate purpose requires real G_supply admission evidence; "
-            "local package is research_only identity."
+            "Gate purpose is local research-card admission preflight / "
+            "certified source-authority abstention; not real external admission."
         ),
     }
     if not purpose_ok:
         blocks.append(BLOCK_PURPOSE)
 
-    # 8) Forbidden-use enforcement
+    # 8) Forbidden-use enforcement (computed result is authoritative)
     forbidden_ok = "synthetic_as_real_evidence" in forbidden and not semantic_ok
-    # If we wrongly admitted research as real, forbidden use would fail; we do not admit.
     checks["forbidden_use_enforcement"] = {
-        "pass": True,
-        "detail": "Research card not promoted to real evidence; forbidden synthetic-as-real held.",
+        "pass": forbidden_ok,
+        "detail": (
+            "Research card not promoted to real evidence; forbidden synthetic-as-real held."
+            if forbidden_ok
+            else "Forbidden-use enforcement failed (synthetic-as-real risk or missing ban)."
+        ),
     }
+    if not forbidden_ok:
+        blocks.append(BLOCK_DATA_ABSTENTION)
 
-    admitted = not blocks and all(c["pass"] for c in checks.values())
-    if admitted:
-        status = "ADMITTED"
-        primary_block = None
-        certificate = {
-            "schema_version": "gv_v2_b0_data_admission_certificate_v1",
-            "case_id": CASE_ID,
-            "subject": SUBJECT,
-            "module": MODULE,
-            "access_authorization_hash": auth["authorization_hash"],
-            "source_manifest_hash": manifest["source_manifest_hash"],
-            "checks": checks,
-            "claim_boundary": CLAIM_BOUNDARY,
-        }
-        certificate["admission_certificate_hash"] = domain_hash(
-            ADMISSION_DOMAIN, certificate
-        )
-        result_body: dict[str, Any] = {
-            "schema_version": ADMISSION_SCHEMA,
-            "case_id": CASE_ID,
-            "status": status,
-            "primary_block_reason": None,
-            "block_reasons": [],
-            "checks": checks,
-            "access_authorization_hash": auth["authorization_hash"],
-            "source_manifest_hash": manifest["source_manifest_hash"],
-            "admission_certificate": certificate,
-            "alpha_claim": False,
-            "claim_boundary": CLAIM_BOUNDARY,
+    # B0A never publishes positive admission. If checks would otherwise clear,
+    # reject explicitly rather than emit ADMITTED / certificate / advancement.
+    if not blocks and all(c["pass"] for c in checks.values()):
+        blocks.append(BLOCK_POSITIVE_ADMISSION)
+        checks["positive_admission_gate"] = {
+            "pass": False,
+            "detail": "B0A rejects positive ADMITTED publication; use B0B for official-source intake.",
         }
     else:
-        # Prefer exact primary block reason (PIT first when present).
-        if BLOCK_MISSING_PIT in blocks:
-            primary_block = BLOCK_MISSING_PIT
-        elif BLOCK_LICENCE in blocks:
-            primary_block = BLOCK_LICENCE
-        elif BLOCK_PURPOSE in blocks:
-            primary_block = BLOCK_PURPOSE
-        elif BLOCK_COMPLETENESS in blocks:
-            primary_block = BLOCK_COMPLETENESS
-        elif BLOCK_CONTRADICTION in blocks:
-            primary_block = BLOCK_CONTRADICTION
-        else:
-            primary_block = BLOCK_DATA_ABSTENTION
-        status = "BLOCKED"
-        result_body = {
-            "schema_version": ADMISSION_SCHEMA,
-            "case_id": CASE_ID,
-            "status": status,
-            "primary_block_reason": primary_block,
-            "block_reasons": sorted(set(blocks)),
-            "checks": checks,
-            "access_authorization_hash": auth["authorization_hash"],
-            "source_manifest_hash": manifest["source_manifest_hash"],
-            "admission_certificate": None,
-            "alpha_claim": False,
-            "claim_boundary": CLAIM_BOUNDARY,
+        checks["positive_admission_gate"] = {
+            "pass": True,
+            "detail": "No ADMITTED path taken; block-only local abstention retained.",
         }
+
+    primary_block = _primary_block_reason(blocks)
+    result_body: dict[str, Any] = {
+        "schema_version": ADMISSION_SCHEMA,
+        "case_id": CASE_ID,
+        "status": "BLOCKED",
+        "primary_block_reason": primary_block,
+        "block_reasons": sorted(set(blocks)),
+        "checks": checks,
+        "access_authorization_hash": auth["authorization_hash"],
+        "source_manifest_hash": manifest["source_manifest_hash"],
+        "admission_certificate": None,
+        "slice_classification": SLICE_CLASSIFICATION,
+        "alpha_claim": False,
+        "claim_boundary": CLAIM_BOUNDARY,
+    }
     result_body["admission_hash"] = domain_hash(ADMISSION_DOMAIN, result_body)
     return result_body
 
@@ -477,25 +544,27 @@ def run_admission_checks(
 def build_g_supply_research_decision(
     admission: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """One MU G_supply evaluation from admission result (no forced positive)."""
+    """One MU G_supply evaluation from admission result.
+
+    B0A separation: ADMITTED ≠ research advancement. Positive admission is
+    not authorized in this slice.
+    """
 
     admission = _plain(admission)
     if admission.get("status") == "ADMITTED":
-        research_action = RESEARCH_ACTION_ADVANCE
-        rationale = (
-            "Admitted real G_supply evidence supports advancing to full research under "
-            "the frozen E0 claim boundary. No alpha or investability claim."
-        )
-    else:
-        # Inadequate real authority → HOLD, not forced REJECT of thesis.
-        research_action = RESEARCH_ACTION_HOLD
-        primary = admission.get("primary_block_reason") or BLOCK_DATA_ABSTENTION
-        rationale = (
-            f"Admission blocked ({primary}). No real point-in-time physical-supply or "
-            "official filing authority is admitted for MU G_supply. "
-            "HOLD_FOR_EVIDENCE is the correct research-triage abstention; "
-            "REJECT_THESIS would overclaim thesis death from data absence."
-        )
+        raise GvV2B0Error(BLOCK_POSITIVE_ADMISSION)
+    if admission.get("status") != "BLOCKED":
+        raise GvV2B0Error("V2B0_ADMISSION_STATUS_INVALID")
+
+    research_action = RESEARCH_ACTION_HOLD
+    primary = admission.get("primary_block_reason") or BLOCK_DATA_ABSTENTION
+    rationale = (
+        f"Admission blocked ({primary}). Local research-card package lacks real "
+        "point-in-time physical-supply or official filing authority for MU G_supply. "
+        "HOLD_FOR_EVIDENCE is the correct research-triage abstention; "
+        "REJECT_THESIS would overclaim thesis death from data absence. "
+        "Positive ADMITTED / ADVANCE_TO_FULL_RESEARCH is not authorized in B0A."
+    )
     body = {
         "schema_version": RESEARCH_SCHEMA,
         "case_id": CASE_ID,
@@ -508,6 +577,7 @@ def build_g_supply_research_decision(
         "admission_status": admission.get("status"),
         "primary_block_reason": admission.get("primary_block_reason"),
         "rationale": rationale,
+        "slice_classification": SLICE_CLASSIFICATION,
         "alpha_claim": False,
         "claim_boundary": CLAIM_BOUNDARY,
     }
@@ -593,11 +663,14 @@ def build_decision_packet_markdown(
     cert = certified.get("certification") or {}
     decision = certified.get("decision") or {}
     lines = [
-        "# GV-V2-B0 Decision Packet — MU G_supply Real Block-Only Admission",
+        "# GV-V2-B0A Decision Packet — MU G_supply Local Source Abstention",
         "",
+        f"- slice_classification: `{SLICE_CLASSIFICATION}`",
         f"- case_id: `{CASE_ID}`",
         f"- subject/module: `{SUBJECT}` / `{MODULE}`",
         f"- access_authorization_hash: `{access_authorization['authorization_hash']}`",
+        f"- authorization_provenance: `{access_authorization.get('authorization_provenance')}`",
+        f"- retrieval_or_receipt_time: `{access_authorization.get('retrieval_or_receipt_time')}`",
         f"- source_manifest_hash: `{source_manifest['source_manifest_hash']}`",
         f"- admission_hash: `{admission['admission_hash']}`",
         f"- admission_status: `{admission['status']}`",
@@ -609,14 +682,16 @@ def build_decision_packet_markdown(
         f"- certification_status: `{cert.get('certification_status')}`",
         f"- shipped_product_score: `39` (frozen; no uplift)",
         f"- functional_stage: `CERTIFIED_SINGLE_DECISION_OPERABLE`",
-        f"- observed_comparison_count: `0` (V2-B0 is admission, not G08 observation)",
+        f"- observed_comparison_count: `0` (B0A is local abstention, not G08 observation)",
         "",
         "## Source package",
         f"- path: `{MU_CARD_REL}`",
         f"- sha256: `{EXPECTED_MU_CARD_SHA256}`",
         "- class: local research candidate card (not official filing / not physical supply)",
+        "- note: package manifest may declare a non-binding historical artifact_sha256; "
+        "admission surfaces SOURCE_PACKAGE_MANIFEST_BINDING_INVALID when so.",
         "",
-        "## Admission checks (fail-closed)",
+        "## Admission checks (fail-closed; block-only)",
     ]
     for name, check in sorted((admission.get("checks") or {}).items()):
         lines.append(
@@ -649,11 +724,13 @@ def build_result_document(
         "case_id": CASE_ID,
         "subject": SUBJECT,
         "module": MODULE,
+        "slice_classification": SLICE_CLASSIFICATION,
         "access_authorization_hash": access_authorization["authorization_hash"],
         "source_manifest_hash": source_manifest["source_manifest_hash"],
         "admission_hash": admission["admission_hash"],
         "admission_status": admission["status"],
         "primary_block_reason": admission.get("primary_block_reason"),
+        "block_reasons": list(admission.get("block_reasons") or []),
         "research_decision_hash": research["research_decision_hash"],
         "research_action": research["research_action"],
         "portfolio_action": research["portfolio_action"],
@@ -664,6 +741,9 @@ def build_result_document(
         "shipped_product_score": 39,
         "functional_stage": "CERTIFIED_SINGLE_DECISION_OPERABLE",
         "observed_comparison_count": 0,
+        "local_source_abstention_verticals": 1,
+        "real_external_source_packages_processed": 0,
+        "data_admission_certificates_earned": 0,
         "alpha_claim": False,
         "claim_boundary": CLAIM_BOUNDARY,
     }
@@ -680,7 +760,7 @@ def run_v2_b0_real_block_only(
     current_lock: Path = DEFAULT_CURRENT_DECISION_LOCK,
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> dict[str, Any]:
-    """Execute the full V2-B0 vertical once; bank artifacts; optional current publish."""
+    """Execute the full V2-B0A local-abstention vertical once; bank artifacts."""
 
     base = Path(root) if root is not None else ROOT
     out_dir = Path(case_dir) if case_dir is not None else (base / "data" / "gv_v2_b0" / "mu_g_supply_b0")
@@ -691,7 +771,11 @@ def run_v2_b0_real_block_only(
     admission = run_admission_checks(
         root=base, access_authorization=auth, source_manifest=manifest
     )
+    if admission.get("status") == "ADMITTED":
+        raise GvV2B0Error(BLOCK_POSITIVE_ADMISSION)
     research = build_g_supply_research_decision(admission)
+    if research.get("research_action") == RESEARCH_ACTION_ADVANCE:
+        raise GvV2B0Error(BLOCK_POSITIVE_ADMISSION)
     certified = build_v2b0_certified_result(research, verifier_runner)
     result = build_result_document(
         access_authorization=auth,
@@ -724,8 +808,10 @@ def run_v2_b0_real_block_only(
 
     return {
         "case_id": CASE_ID,
+        "slice_classification": SLICE_CLASSIFICATION,
         "admission_status": admission["status"],
         "primary_block_reason": admission.get("primary_block_reason"),
+        "block_reasons": list(admission.get("block_reasons") or []),
         "admission_hash": admission["admission_hash"],
         "research_action": research["research_action"],
         "portfolio_action": research["portfolio_action"],
@@ -744,11 +830,14 @@ def run_v2_b0_real_block_only(
 
 __all__ = [
     "ADMISSION_SCHEMA",
+    "AUTH_PROVENANCE_LOCAL",
     "BLOCK_COMPLETENESS",
     "BLOCK_CONTRADICTION",
     "BLOCK_DATA_ABSTENTION",
     "BLOCK_LICENCE",
+    "BLOCK_MANIFEST_BINDING",
     "BLOCK_MISSING_PIT",
+    "BLOCK_POSITIVE_ADMISSION",
     "BLOCK_PURPOSE",
     "CASE_ID",
     "CLAIM_BOUNDARY",
@@ -757,9 +846,13 @@ __all__ = [
     "EXPECTED_MU_CARD_SHA256",
     "MODULE",
     "MU_CARD_REL",
+    "MU_CARD_MANIFEST_REL",
     "PORTFOLIO_ACTION_NO_POSITION",
+    "PURPOSE_LOCAL_ABSTENTION",
     "RATIONALE_REF_PREFIX",
+    "RESEARCH_ACTION_ADVANCE",
     "RESEARCH_ACTION_HOLD",
+    "SLICE_CLASSIFICATION",
     "SUBJECT",
     "GvV2B0Error",
     "build_data_access_authorization",

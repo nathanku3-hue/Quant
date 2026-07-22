@@ -3,7 +3,7 @@
 Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
 Date: 2026-07-22
 Product tip lineage: repair tip `3c40447` (E0B machinery + Attempt-1 invalidation; cutover to main)
-Active work: **GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION** executed — certified real-data abstention banked (round closes after hosted green; no next phase opened)
+Active work: **GV-V2-B0A-LOCAL-SOURCE-ABSTENTION** banked (B0A-R1 truth repair); next real-source gate is B0B after PR #6 merge
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
 ## Governing sequence (endgame law — explicit recut 2026-07-22)
@@ -11,7 +11,8 @@ Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model
 ```text
 truth substrate
 → invalidation-safe E0B product machinery shipped
-→ V2-B0 first real block-only admission          ← EXECUTED (BLOCKED / MISSING_PIT → NO_POSITION)
+→ V2-B0A local research-card abstention preflight ← BANKED (BLOCKED / MISSING_PIT + MANIFEST_BINDING → NO_POSITION)
+→ V2-B0B one official MU source intake           ← NEXT after PR #6 merge
 → first valid independent comparison on a fresh real case
 → prospective paper economics
 → independent replication
@@ -19,7 +20,8 @@ truth substrate
 ```
 
 **Deviation register:** same-case synthetic G08 Attempt-2 is **demoted** from sole roadmap blocker to deferred external validation.  
-Attempt-1 is **INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED** (append-only); sealed evidence preserved; observation count remains 0.
+Attempt-1 is **INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED** (append-only); sealed evidence preserved; observation count remains 0.  
+Original V2-B0 “real admission” claim is **narrowed** to B0A local-source abstention; real external bytes wait for B0B.
 
 Portfolio truth first. Decision value second. No fabricated alpha. No score engineering.
 
@@ -28,20 +30,24 @@ Portfolio truth first. Decision value second. No fabricated alpha. No score engi
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
 EXECUTION_MODEL = GV_FS0_FIRST
-ACTIVE_GATE = GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION (EXECUTED; certified abstention; hosted close pending)
+ACTIVE_GATE = GV-V2-B0A-LOCAL-SOURCE-ABSTENTION (BANKED; B0A-R1 repair; merge/hosted close pending)
+NEXT_GATE_AFTER_MERGE = GV-V2-B0B-OFFICIAL-SOURCE-INTAKE (not opened this round)
 F1C_SHIP = CLOSED_SUBSTRATE
 E0A_OPERABLE = BANKED_SUBSTRATE (custody→HOLD_FOR_EVIDENCE→NO_POSITION; NOT decision value)
 E0B_G08_ATTEMPT_1 = INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED (evidence preserved; not observation authority)
 E0B_SAME_CASE_ATTEMPT_2 = DEFERRED_EXTERNAL_VALIDATION (not sole product gate)
-V2_B0_RESULT = CERTIFIED_BLOCKED_MISSING_POINT_IN_TIME_AUTHORITY → HOLD_FOR_EVIDENCE → NO_POSITION
+V2_B0A_RESULT = CERTIFIED_LOCAL_SOURCE_ABSTENTION → HOLD_FOR_EVIDENCE → NO_POSITION
 V2_B0_DECISION = DECISION_V2_B0_MU_G_SUPPLY_1 (current authority)
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
 FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
 OBSERVED_COMPARISON_COUNT = 0
+LOCAL_SOURCE_ABSTENTION_VERTICALS = 1
+REAL_EXTERNAL_SOURCE_PACKAGES_PROCESSED = 0
+DATA_ADMISSION_CERTIFICATES_EARNED = 0
 NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED (via fresh real case after admitted real evidence; not opened this round)
 E0A_R1_MERGE_PATCH = CLOSED (PR #4 @ 2653eb1)
-ACTIVE_PRODUCT_SLICE = V2-B0 banked certified real-data abstention (MU research card blocked; no synthetic as real)
-V2_BLOCK_ONLY_REAL_ADMISSION = EXECUTED_CERTIFIED_ABSTENTION
+ACTIVE_PRODUCT_SLICE = V2-B0A certified local source-authority abstention (MU research card; not real external admission)
+V2_BLOCK_ONLY_REAL_ADMISSION = SUPERSEDED_BY_B0A_LOCAL_ABSTENTION (B0B carries real-source objective)
 V1_PROTOCOL_AUTHORITY = FORMAL_UNTIL_V2_ARTIFACT_COMMITTED
 SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED
 BACKWARD_COMPATIBILITY_LAYER = PROHIBITED

@@ -1,3 +1,13 @@
+
+## 2026-07-23 — ROUND-20260723-V2-B0A-R1-LOCAL-ABSTENTION-TRUTH-REPAIR
+
+- Decision: accept independent audit REPAIR_CURRENT_SLICE on PR #6; do not merge under overclaim `GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION complete`.
+- Classification: bank as `GV-V2-B0A-LOCAL-SOURCE-ABSTENTION` only (local research-card admission preflight / certified source-authority abstention).
+- Repair: validate package-manifest URI/hash → `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID` (preserve historical package bytes); set `retrieval_or_receipt_time=null` with explicit authorization metadata; delete positive ADMITTED / DataAdmissionCertificate / automatic ADVANCE_TO_FULL_RESEARCH; reject ADMITTED input with `V2B0_POSITIVE_ADMISSION_NOT_AUTHORIZED`.
+- Result: BLOCKED primary `MISSING_POINT_IN_TIME_AUTHORITY`; retained binding + incompleteness blocks; HOLD_FOR_EVIDENCE → certified paper NO_POSITION `DECISION_V2_B0_MU_G_SUPPLY_1`; rationale `V2B0:ADM:d1b89115…`; current file sha `8530f4f0…` len 23636.
+- Metrics unchanged: score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE; observed 0; real external packages 0; admission certificates 0.
+- Next: hosted product+protocol+parity green → narrow review → merge PR #6 → open B0B official-source intake (not this commit).
+- Evidence: `core/gv_v2_b0_real_block_only.py`, `tests/gv_fs0_product/test_v2_b0_real_block_only.py`, `data/gv_v2_b0/mu_g_supply_b0/*`, dashboard/adapter relabel.
 ## 2026-07-21 — ROUND-20260721-E0B-DV1-DIRECTION-CUSTODY-REPAIR
 
 - Decision: remote PR #5 commit `b7a24d3da65f78c673f7e08b5f719603f404282e` is the immutable hosted-green publication-authority substrate C0. Preserve it, reject the mutable donor worktree and stale generated/SAW artifacts as acceptance custody, and require C1 to descend directly from C0.

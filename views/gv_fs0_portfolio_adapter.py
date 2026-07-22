@@ -259,20 +259,26 @@ def render_v2_b0_surface(
     path = Path(result_json_path) if result_json_path is not None else DEFAULT_RESULT_PATH
     if not path.is_file():
         renderer.caption(
-            "V2-B0 real block-only admission: no result artifact "
+            "V2-B0A local source abstention: no result artifact "
             "(score 39 frozen; observed comparison count unchanged)"
         )
         return None
     try:
         result = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        renderer.caption(f"V2-B0 admission artifact refused: {exc}")
+        renderer.caption(f"V2-B0A local-source abstention artifact refused: {exc}")
         return None
     if not isinstance(result, dict):
-        renderer.caption("V2-B0 admission artifact refused: not an object")
+        renderer.caption("V2-B0A local-source abstention artifact refused: not an object")
         return None
-    renderer.subheader("GV-V2-B0 Real Block-Only Admission — MU G_supply")
+    renderer.subheader("GV-V2-B0A Local Source Abstention — MU G_supply")
     rows = [
+        {
+            "label": "slice_classification",
+            "value": str(
+                result.get("slice_classification", "GV-V2-B0A-LOCAL-SOURCE-ABSTENTION")
+            ),
+        },
         {"label": "case_id", "value": str(result.get("case_id", CASE_ID))},
         {"label": "admission_status", "value": str(result.get("admission_status"))},
         {
@@ -298,8 +304,9 @@ def render_v2_b0_surface(
     ]
     renderer.table(rows)
     renderer.caption(
-        "V2-B0 · one MU source package · fail-closed admission · "
-        "certified block/abstention is a valid functional result · "
+        "V2-B0A · local research-card admission preflight · "
+        "certified source-authority abstention · "
+        "not a real external source admission · "
         "no alpha · score 39 frozen · not a G08 observation"
     )
     return dict(result)

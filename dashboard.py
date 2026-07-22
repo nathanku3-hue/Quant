@@ -4745,11 +4745,11 @@ def _render_portfolio_allocation_page() -> None:
 
     st.header(PORTFOLIO_PAGE_TITLE)
     st.caption(
-        "V2-B0 real block-only MU admission is the sole active product gate. "
-        "One certified decision path. Default current may be V2-B0 "
-        "HOLD_FOR_EVIDENCE research triage mapped to paper NO_POSITION "
-        "after a real admission block/abstention. E0B G08 remains invalidated "
-        "observation smoke (count 0). Score 39 frozen. "
+        "V2-B0A local-source abstention is the active product gate on this tip. "
+        "One certified decision path. Default current is local research-card "
+        "preflight HOLD_FOR_EVIDENCE mapped to paper NO_POSITION after a "
+        "certified source-authority abstention (not real external admission). "
+        "E0B G08 remains invalidated observation smoke (count 0). Score 39 frozen. "
         "Legacy replay/optimizer non-certifying; F1C dual bundle evidence-only."
     )
     try:
