@@ -1,31 +1,36 @@
 # GV-V2-B0B-OFFICIAL-SOURCE-INTAKE — Controlling Brief (REVISE_AND_GO + B0B-R2)
 
-**Status:** ACTIVE PRODUCT GATE — REPAIR_CURRENT_SLICE (B0B-R2)  
-**Base:** main `2cd3e858…` · B0A banked head `79c309b` · do **not** merge `f1e1f76` / `21fa4de` unrepaired  
-**Audit:** B0B-R1 direction accepted; R2 required — rebuild-from-raw exact compare, not hash self-consistency  
+**Status:** ACTIVE PRODUCT GATE — REPAIR_CURRENT_SLICE (B0B-R2.1)  
+**Base:** main `2cd3e858…` · B0A banked head `79c309b` · do **not** merge `03d2fad` / `f1e1f76` / `21fa4de` unrepaired  
+**Audit:** B0B-R2 direction PASS; R2.1 required — auth scope ≡ package object set + parity hash pins  
 **Score / stage / observed (locked):** `39` / `CERTIFIED_SINGLE_DECISION_OPERABLE` / `0`
 
 ---
 
-## B0B-R2 — mandatory repair (before merge)
+## B0B-R2.1 — mandatory repair (before merge)
 
 Preserve package + pre-read authorization. Do **not** refetch SEC objects, change accession, reopen B0A, or start B0C.
 
-### R1 retained
+### R1 + R2 retained
 
 1. Domain-hash checks at boundaries; source-derived PIT; evidence-dimension claim rule.
-2. No B0B ADVANCE; dashboard fail-closed return; B0B active-gate caption.
+2. No B0B ADVANCE/REJECT; dashboard fail-closed return; B0B active-gate caption.
+3. Canonical rebuild-from-raw exact compare (rehashed false locator fails).
+4. Static boundary — `test_open_vertical.py` adapter import set includes `core.gv_v2_b0b_official_source_intake`.
 
-### R2 additions (blocking)
+### R2.1 additions (blocking)
 
-1. **Canonical rebuild verification** — deterministically rebuild `package → source → admission → claim → research → result` from pinned authorization + raw SEC bytes, then **exact-compare** every banked artifact. Hash self-consistency alone is insufficient (rehashed false locator must fail).
-2. **No B0B REJECT path** — rehashed `CLAIM_CONTRADICTED` must not open `REJECT_THESIS`; only HOLD is authorized in this one-source slice.
-3. **Static boundary** — `test_open_vertical.py` adapter import set includes `core.gv_v2_b0b_official_source_intake`.
+1. **Authorized object set enforcement** — before package construction, require  
+   `access_authorization.authorized_objects` exact `(role, filename, official_locator)` set  
+   equals `PACKAGE_OBJECTS` (same three fields). Detached auth must not silently diverge  
+   from retrieval scope. Error: `V2B0B_AUTHORIZED_OBJECTS_MISMATCH`.
+2. **Parity job pins** — product byte-parity asserts current banked hashes  
+   `731a…` / `21e4…` / `48cab…` (not obsolete `882b…` / `4534…` / `6415…`).
 
 ### Revised post-close sequence
 
 ```text
-B0B-R2 rebuild-from-raw authority
+B0B-R2.1 auth-scope + parity pin repair
 → full product + protocol + Ubuntu/Windows parity green
 → narrow re-audit
 → merge and bank first official-source intake

@@ -299,6 +299,48 @@ def _assert_auth_before_receipt(auth_at: str, retrieved_at: str) -> None:
         )
 
 
+def _package_object_identity_set() -> frozenset[tuple[str, str, str]]:
+    """Exact (role, filename, official_locator) set for PACKAGE_OBJECTS."""
+
+    return frozenset(
+        (
+            str(spec["role"]),
+            str(spec["filename"]),
+            str(spec["official_locator"]),
+        )
+        for spec in PACKAGE_OBJECTS
+    )
+
+
+def _assert_authorized_objects_match_package(access_authorization: Mapping[str, Any]) -> None:
+    """Fail closed if detached auth scope diverges from package retrieval pins.
+
+    Authorization pins and PACKAGE_OBJECTS must name the same exact
+    role/filename/official_locator set. Order is not authoritative; membership is.
+    """
+
+    raw = access_authorization.get("authorized_objects")
+    if not isinstance(raw, list) or not raw:
+        raise GvV2B0BError("V2B0B_AUTHORIZED_OBJECTS_MISSING")
+    auth_set: set[tuple[str, str, str]] = set()
+    for item in raw:
+        if not isinstance(item, Mapping):
+            raise GvV2B0BError("V2B0B_AUTHORIZED_OBJECTS_MISMATCH")
+        try:
+            triple = (
+                str(item["role"]),
+                str(item["filename"]),
+                str(item["official_locator"]),
+            )
+        except KeyError as exc:
+            raise GvV2B0BError("V2B0B_AUTHORIZED_OBJECTS_MISMATCH") from exc
+        if triple in auth_set:
+            raise GvV2B0BError("V2B0B_AUTHORIZED_OBJECTS_MISMATCH")
+        auth_set.add(triple)
+    if frozenset(auth_set) != _package_object_identity_set():
+        raise GvV2B0BError("V2B0B_AUTHORIZED_OBJECTS_MISMATCH")
+
+
 def _body_without_hash(payload: Mapping[str, Any], hash_key: str) -> dict[str, Any]:
     return {k: v for k, v in _plain(payload).items() if k != hash_key}
 
@@ -510,6 +552,7 @@ def load_access_authorization(*, root: Path | None = None) -> dict[str, Any]:
         auth.get("credentials_boundary", "")
     ).lower():
         raise GvV2B0BError("V2B0B_CREDENTIALS_PROHIBITED")
+    _assert_authorized_objects_match_package(auth)
     return auth
 
 
@@ -526,6 +569,9 @@ def build_package_manifest(
         if access_authorization is not None
         else load_access_authorization(root=base)
     )
+    # Detached auth may be injected without load_access_authorization; scope must
+    # still match PACKAGE_OBJECTS before any package construction.
+    _assert_authorized_objects_match_package(auth)
     raw_dir = base / "data/gv_v2_b0b/mu_0000723125-26-000015/raw"
     objects: list[dict[str, Any]] = []
     for spec in PACKAGE_OBJECTS:

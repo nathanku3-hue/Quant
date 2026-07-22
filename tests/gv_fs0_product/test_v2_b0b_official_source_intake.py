@@ -187,6 +187,44 @@ def test_rehashed_contradicted_claim_not_authorized_in_b0b() -> None:
         build_g_supply_research_decision(admission, fake, root=ROOT)
 
 
+def test_authorized_objects_must_match_package_identity_set() -> None:
+    """Detached auth whose role/filename/locator set diverges cannot build package."""
+
+    auth = load_access_authorization(root=ROOT)
+    # Happy path: banked auth already matches PACKAGE_OBJECTS.
+    package = build_package_manifest(root=ROOT, access_authorization=auth)
+    assert len(package["objects"]) == len(PACKAGE_OBJECTS)
+
+    # Mismatch: change one official_locator while leaving everything else intact.
+    fake = dict(auth)
+    objects = [dict(o) for o in fake["authorized_objects"]]
+    objects[0] = dict(objects[0])
+    objects[0]["official_locator"] = "https://evil.example/not-authorized-sec-object"
+    fake["authorized_objects"] = objects
+    with pytest.raises(GvV2B0BError, match="AUTHORIZED_OBJECTS_MISMATCH"):
+        build_package_manifest(root=ROOT, access_authorization=fake)
+
+    # Mismatch: drop one authorized object (scope narrower than package pins).
+    fake_short = dict(auth)
+    fake_short["authorized_objects"] = [dict(o) for o in auth["authorized_objects"][:2]]
+    with pytest.raises(GvV2B0BError, match="AUTHORIZED_OBJECTS_MISMATCH"):
+        build_package_manifest(root=ROOT, access_authorization=fake_short)
+
+    # Mismatch: extra object (scope broader than package pins).
+    fake_extra = dict(auth)
+    extra = [dict(o) for o in auth["authorized_objects"]]
+    extra.append(
+        {
+            "role": "rogue_exhibit",
+            "filename": "rogue.htm",
+            "official_locator": "https://www.sec.gov/Archives/edgar/data/723125/rogue.htm",
+        }
+    )
+    fake_extra["authorized_objects"] = extra
+    with pytest.raises(GvV2B0BError, match="AUTHORIZED_OBJECTS_MISMATCH"):
+        build_package_manifest(root=ROOT, access_authorization=fake_extra)
+
+
 def test_rehashed_false_locator_rejected_by_canonical_rebuild() -> None:
     """Hash-self-consistent package with false SEC locator fails rebuild compare."""
 
