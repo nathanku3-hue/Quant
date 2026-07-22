@@ -28,6 +28,8 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import uuid
 from collections.abc import Callable, Mapping
 from hashlib import sha256
 from pathlib import Path
@@ -41,7 +43,11 @@ from core.gv_fs0_book import (
     _build_decision,
     build_no_position_source_fixture,
 )
-from core.gv_fs0_canonical import domain_hash
+from core.gv_fs0_canonical import (
+    CanonicalizationError,
+    domain_hash,
+    parse_json_text,
+)
 from core.gv_fs0_certify import (
     build_certified_result_from_book,
     run_isolated_verifier,
@@ -271,6 +277,102 @@ def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> str:
     if path.read_bytes() != raw:
         raise GvV2B0BError(f"V2B0B_WRITE_VERIFY_FAILED:{path.name}")
     return sha256(raw).hexdigest()
+
+
+def _load_authority_json(path: Path, *, missing_code: str) -> dict[str, Any]:
+    """Load authority JSON with duplicate-key rejection at every object depth."""
+
+    path = _require_file(path, missing_code)
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise GvV2B0BError(missing_code) from exc
+    try:
+        obj = parse_json_text(raw)
+    except CanonicalizationError as exc:
+        detail = str(exc) if str(exc) else "JSON_AUTHORITY_INVALID"
+        raise GvV2B0BError(f"V2B0B_JSON_AUTHORITY_INVALID:{path.name}:{detail}") from exc
+    if not isinstance(obj, dict):
+        raise GvV2B0BError(f"{missing_code}_NOT_OBJECT")
+    return obj
+
+
+def _byte_window_excerpt(
+    data: bytes,
+    *,
+    needle: str,
+    window_before: int,
+    window_after: int,
+    statement_id: str,
+) -> tuple[int, int, str]:
+    """Resolve a true byte window; fail closed if UTF-8 decode would split a codepoint."""
+
+    needle_b = needle.encode("utf-8")
+    idx = data.find(needle_b)
+    if idx < 0:
+        raise GvV2B0BError(f"V2B0B_CLAIM_NEEDLE_MISSING:{statement_id}")
+    start = max(0, idx - int(window_before))
+    end = min(len(data), idx + len(needle_b) + int(window_after))
+    if start >= end:
+        raise GvV2B0BError(f"V2B0B_STATEMENT_LOCATOR_INVALID:{statement_id}")
+    try:
+        excerpt = data[start:end].decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise GvV2B0BError(
+            f"V2B0B_STATEMENT_BYTE_WINDOW_NOT_UTF8:{statement_id}"
+        ) from exc
+    return start, end, excerpt
+
+
+def _atomic_write_case_bundle(
+    out_dir: Path,
+    artifacts: Mapping[str, Mapping[str, Any] | str],
+    *,
+    promote_order: tuple[str, ...],
+) -> None:
+    """Stage all case artifacts, then promote with result last as commit marker.
+
+    Individual path replaces are atomic on the same filesystem. Multi-file
+    consistency is fail-closed: loaders re-verify the full chain; partial
+    promote leaves a state that cannot pass rebuild-from-raw.
+    """
+
+    if set(artifacts) != set(promote_order):
+        raise GvV2B0BError("V2B0B_CASE_BUNDLE_ORDER_MISMATCH")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    staging_root = out_dir / ".b0b_tx"
+    staging = staging_root / f"pending_{uuid.uuid4().hex}"
+    staging.mkdir(parents=True, exist_ok=False)
+    try:
+        staged_bytes: dict[str, bytes] = {}
+        for name, payload in artifacts.items():
+            if isinstance(payload, str):
+                raw = payload.encode("utf-8")
+                if not raw.endswith(b"\n"):
+                    raw = raw + b"\n"
+            else:
+                raw = _canonical_json_bytes(payload)
+            target = staging / name
+            target.write_bytes(raw)
+            if target.read_bytes() != raw:
+                raise GvV2B0BError(f"V2B0B_WRITE_VERIFY_FAILED:{name}")
+            staged_bytes[name] = raw
+        # Promote non-commit artifacts first; result.json last = commit.
+        for name in promote_order:
+            raw = staged_bytes[name]
+            final = out_dir / name
+            tmp = out_dir / f".{name}.promotetmp"
+            tmp.write_bytes(raw)
+            tmp.replace(final)
+            if final.read_bytes() != raw:
+                raise GvV2B0BError(f"V2B0B_WRITE_VERIFY_FAILED:{name}")
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
+        try:
+            if staging_root.is_dir() and not any(staging_root.iterdir()):
+                staging_root.rmdir()
+        except OSError:
+            pass
 
 
 def _parse_ts(value: str) -> str:
@@ -525,13 +627,10 @@ def load_access_authorization(*, root: Path | None = None) -> dict[str, Any]:
     """Load the remotely retained pre-read authorization object."""
 
     base = Path(root) if root is not None else ROOT
-    path = _require_file(
+    auth = _load_authority_json(
         base / "data/gv_v2_b0b/mu_0000723125-26-000015/access_authorization.json",
-        "V2B0B_ACCESS_AUTHORIZATION_MISSING",
+        missing_code="V2B0B_ACCESS_AUTHORIZATION_MISSING",
     )
-    auth = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(auth, dict):
-        raise GvV2B0BError("V2B0B_ACCESS_AUTHORIZATION_NOT_OBJECT")
     if auth.get("retrieval_or_receipt_time") is not None:
         raise GvV2B0BError("V2B0B_AUTH_MUST_NOT_CONTAIN_RECEIPT_TIME")
     if auth.get("accession") != ACCESSION:
@@ -1090,19 +1189,16 @@ def _extract_statements(*, root: Path) -> list[dict[str, Any]]:
     )
     primary_path = _require_file(root / primary_rel, "V2B0B_PRIMARY_MISSING")
     data = primary_path.read_bytes()
-    text = data.decode("utf-8", errors="replace")
     source_hash = _sha256_bytes(data)
     statements: list[dict[str, Any]] = []
     for spec in CLAIM_NEEDLES:
-        needle = spec["needle"]
-        idx = text.find(needle)
-        if idx < 0:
-            raise GvV2B0BError(f"V2B0B_CLAIM_NEEDLE_MISSING:{spec['statement_id']}")
-        before = int(spec["window_before"])
-        after = int(spec["window_after"])
-        start = max(0, idx - before)
-        end = min(len(text), idx + len(needle) + after)
-        excerpt = text[start:end]
+        start, end, excerpt = _byte_window_excerpt(
+            data,
+            needle=spec["needle"],
+            window_before=int(spec["window_before"]),
+            window_after=int(spec["window_after"]),
+            statement_id=spec["statement_id"],
+        )
         statements.append(
             {
                 "statement_id": spec["statement_id"],
@@ -1125,42 +1221,33 @@ def _extract_statements(*, root: Path) -> list[dict[str, Any]]:
 def _verify_statement_locators(
     statements: list[dict[str, Any]], *, root: Path
 ) -> None:
-    """Re-resolve each statement byte window against primary document bytes."""
+    """Re-resolve each statement against true primary document *byte* windows."""
 
     primary_rel = "data/gv_v2_b0b/mu_0000723125-26-000015/raw/mu-20260528.htm"
     primary_path = _require_file(root / primary_rel, "V2B0B_PRIMARY_MISSING")
     data = primary_path.read_bytes()
-    text = data.decode("utf-8", errors="replace")
     source_hash = _sha256_bytes(data)
     for stmt in statements:
+        sid = str(stmt.get("statement_id"))
         if stmt.get("source_object_hash") != source_hash:
-            raise GvV2B0BError(
-                f"V2B0B_STATEMENT_SOURCE_HASH_MISMATCH:{stmt.get('statement_id')}"
-            )
+            raise GvV2B0BError(f"V2B0B_STATEMENT_SOURCE_HASH_MISMATCH:{sid}")
         start = int(stmt["byte_start"])
         end = int(stmt["byte_end"])
-        if start < 0 or end > len(text) or start >= end:
-            raise GvV2B0BError(
-                f"V2B0B_STATEMENT_LOCATOR_INVALID:{stmt.get('statement_id')}"
-            )
-        excerpt = text[start:end]
+        if start < 0 or end > len(data) or start >= end:
+            raise GvV2B0BError(f"V2B0B_STATEMENT_LOCATOR_INVALID:{sid}")
+        try:
+            excerpt = data[start:end].decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise GvV2B0BError(f"V2B0B_STATEMENT_BYTE_WINDOW_NOT_UTF8:{sid}") from exc
         if excerpt != stmt.get("exact_excerpt"):
-            raise GvV2B0BError(
-                f"V2B0B_STATEMENT_EXCERPT_MISMATCH:{stmt.get('statement_id')}"
-            )
+            raise GvV2B0BError(f"V2B0B_STATEMENT_EXCERPT_MISMATCH:{sid}")
         if _sha256_bytes(excerpt.encode("utf-8")) != stmt.get("exact_excerpt_hash"):
-            raise GvV2B0BError(
-                f"V2B0B_STATEMENT_EXCERPT_HASH_MISMATCH:{stmt.get('statement_id')}"
-            )
+            raise GvV2B0BError(f"V2B0B_STATEMENT_EXCERPT_HASH_MISMATCH:{sid}")
         if stmt.get("source_family_id") != SOURCE_FAMILY_ID:
-            raise GvV2B0BError(
-                f"V2B0B_STATEMENT_SOURCE_FAMILY_MISMATCH:{stmt.get('statement_id')}"
-            )
+            raise GvV2B0BError(f"V2B0B_STATEMENT_SOURCE_FAMILY_MISMATCH:{sid}")
         contrib = stmt.get("independent_source_count_contribution")
         if contrib is None or int(contrib) != 0:
-            raise GvV2B0BError(
-                f"V2B0B_STATEMENT_INDEPENDENT_COUNT_INVALID:{stmt.get('statement_id')}"
-            )
+            raise GvV2B0BError(f"V2B0B_STATEMENT_INDEPENDENT_COUNT_INVALID:{sid}")
 
 
 def evaluate_g_supply_claim(
@@ -1748,11 +1835,7 @@ def load_verified_b0b_result(
         raise GvV2B0BError("V2B0B_RESULT_MISSING")
 
     def _load(name: str, code: str) -> dict[str, Any]:
-        path = _require_file(out_dir / name, code)
-        obj = json.loads(path.read_text(encoding="utf-8"))
-        if not isinstance(obj, dict):
-            raise GvV2B0BError(f"{code}_NOT_OBJECT")
-        return obj
+        return _load_authority_json(out_dir / name, missing_code=code)
 
     auth = _load("access_authorization.json", "V2B0B_ACCESS_AUTHORIZATION_MISSING")
     package = _load("package_manifest.json", "V2B0B_PACKAGE_MANIFEST_MISSING")
@@ -1760,9 +1843,7 @@ def load_verified_b0b_result(
     admission = _load("admission_result.json", "V2B0B_ADMISSION_MISSING")
     claim = _load("claim_evaluation.json", "V2B0B_CLAIM_MISSING")
     research = _load("research_decision.json", "V2B0B_RESEARCH_MISSING")
-    result = json.loads(result_path.read_text(encoding="utf-8"))
-    if not isinstance(result, dict):
-        raise GvV2B0BError("V2B0B_RESULT_NOT_OBJECT")
+    result = _load_authority_json(result_path, missing_code="V2B0B_RESULT_MISSING")
 
     verify_b0b_chain(
         root=base,
@@ -1925,7 +2006,9 @@ def run_v2_b0b_official_source_intake(
     # otherwise copy the verified pre-read object once for case banking.
     auth_path = out_dir / "access_authorization.json"
     if auth_path.is_file():
-        existing_auth = json.loads(auth_path.read_text(encoding="utf-8"))
+        existing_auth = _load_authority_json(
+            auth_path, missing_code="V2B0B_ACCESS_AUTHORIZATION_MISSING"
+        )
         if existing_auth.get("authorization_hash") != auth["authorization_hash"]:
             raise GvV2B0BError("V2B0B_AUTH_BANK_TAMPER")
         if existing_auth.get("retrieval_or_receipt_time") is not None:
@@ -1933,14 +2016,28 @@ def run_v2_b0b_official_source_intake(
     else:
         _atomic_write_json(auth_path, auth)
 
-    _atomic_write_json(out_dir / "package_manifest.json", package)
-    _atomic_write_json(out_dir / "source_manifest.json", source)
-    _atomic_write_json(out_dir / "admission_result.json", admission)
-    _atomic_write_json(out_dir / "claim_evaluation.json", claim)
-    _atomic_write_json(out_dir / "research_decision.json", research)
-    _atomic_write_json(out_dir / "result.json", result)
-    packet_path = out_dir / "decision_packet.md"
-    packet_path.write_text(packet_md, encoding="utf-8", newline="\n")
+    # Single transactional promote: stage all derived artifacts, result last.
+    _atomic_write_case_bundle(
+        out_dir,
+        {
+            "package_manifest.json": package,
+            "source_manifest.json": source,
+            "admission_result.json": admission,
+            "claim_evaluation.json": claim,
+            "research_decision.json": research,
+            "decision_packet.md": packet_md,
+            "result.json": result,
+        },
+        promote_order=(
+            "package_manifest.json",
+            "source_manifest.json",
+            "admission_result.json",
+            "claim_evaluation.json",
+            "research_decision.json",
+            "decision_packet.md",
+            "result.json",
+        ),
+    )
 
     publication: CurrentDecisionPublicationResult | None = None
     if publish:

@@ -1,318 +1,84 @@
-# GV-V2-B0B-OFFICIAL-SOURCE-INTAKE — Controlling Brief (REVISE_AND_GO + B0B-R2)
+# GV-V2-B0B-OFFICIAL-SOURCE-INTAKE — Controlling Brief (GV-ALPHA0 train)
 
-**Status:** ACTIVE PRODUCT GATE — REPAIR_CURRENT_SLICE (B0B-R2.1)  
-**Base:** main `2cd3e858…` · B0A banked head `79c309b` · do **not** merge `03d2fad` / `f1e1f76` / `21fa4de` unrepaired  
-**Audit:** B0B-R2 direction PASS; R2.1 required — auth scope ≡ package object set + parity hash pins  
-**Score / stage / observed (locked):** `39` / `CERTIFIED_SINGLE_DECISION_OPERABLE` / `0`
-
----
-
-## B0B-R2.1 — mandatory repair (before merge)
-
-Preserve package + pre-read authorization. Do **not** refetch SEC objects, change accession, reopen B0A, or start B0C.
-
-### R1 + R2 retained
-
-1. Domain-hash checks at boundaries; source-derived PIT; evidence-dimension claim rule.
-2. No B0B ADVANCE/REJECT; dashboard fail-closed return; B0B active-gate caption.
-3. Canonical rebuild-from-raw exact compare (rehashed false locator fails).
-4. Static boundary — `test_open_vertical.py` adapter import set includes `core.gv_v2_b0b_official_source_intake`.
-
-### R2.1 additions (blocking)
-
-1. **Authorized object set enforcement** — before package construction, require  
-   `access_authorization.authorized_objects` exact `(role, filename, official_locator)` set  
-   equals `PACKAGE_OBJECTS` (same three fields). Detached auth must not silently diverge  
-   from retrieval scope. Error: `V2B0B_AUTHORIZED_OBJECTS_MISMATCH`.
-2. **Parity job pins** — product byte-parity asserts current banked hashes  
-   `731a…` / `21e4…` / `48cab…` (not obsolete `882b…` / `4534…` / `6415…`).
-
-### Revised post-close sequence
-
-```text
-B0B-R2.1 auth-scope + parity pin repair
-→ full product + protocol + Ubuntu/Windows parity green
-→ narrow re-audit
-→ merge and bank first official-source intake
-→ STOP
-→ GV-V2-B0C-INDEPENDENT-SOURCE-RECONCILIATION
-→ first valid independent comparison only when multi-source creates a contestable decision
-→ prospective paper economics
-→ replication
-```
-
-**Revoked:** immediate independent human comparison on the one-source HOLD case (G08 failure mode risk).
+**Status:** REVISE_AND_GO — fold B0B into **GV-ALPHA0** release train (not phase-stop → B0C)  
+**Base:** main `2cd3e858…` · tip on PR #8 · score/stage/observed locked: `39` / `CERTIFIED_SINGLE_DECISION_OPERABLE` / `0`  
+**Deadline intent:** Alpha product by **2026-07-30** — optimize end-to-end operability, not sequential phase closure  
+**Audit:** R2.1 technical direction PASS; merge→truth-cutover→stop→B0C **revoked** as sole next sequence
 
 ---
 
-## Product vertical (sole job)
+## Strategic recut (binding)
 
 ```text
-official external bytes
-→ relational source authority
-→ honest admission
-→ separate claim evaluation
-→ explicit research decision
-→ certified portfolio consequence
+WRONG:  B0B merge → bank → STOP → open B0C as separate phase
+RIGHT:  Fold B0B into one GV-ALPHA0 release train
 ```
 
-Authority chain layers remain distinct:
+B0B is **source family one** inside Alpha — not a terminal product milestone.
 
-| Layer | Artifact | Proves | Does not prove |
-|---|---|---|---|
-| Authorization | `access_authorization.json` | pre-read scope | admission or receipt |
-| Retrieval | `package_manifest.json` (or receipt bound into it) | when/how bytes arrived | claim truth |
-| Custody | three exact objects + relational binds | immutable package identity | multi-source corroboration |
-| Admission | `admission_result.json` (+ certificate if earned) | package may enter decision evidence | ADVANCE |
-| Claim eval | `claim_evaluation.json` | research-triage sufficiency | thesis truth / investability |
-| Portfolio | DecisionEnvelope → book → cert → current | paper action | capital authority |
+### GV-ALPHA0 release train (end-to-end)
 
-B0A remains immutable banked substrate.
+```text
+1. Authority repairs (strict JSON, true byte locators, atomic case promote)
+2. Bank B0B as source family one (SEC accession custody + claim HOLD)
+3. Independent source reconciliation (second family; still paper)
+4. Operator decision capture (visible NO_POSITION path)
+5. Certified NO_POSITION + one atomic result surface
+6. Export / replay
+7. Fresh-clone proof
+8. Non-author dogfood
+9. Formal human comparison DEFERRED until after Alpha
+```
+
+**Revoked for Alpha:** formal comparison / G08-style independent human observation as a release gate.  
+**Preserved:** score 39, observed 0, ADMITTED never auto-ADVANCE, B0A immutable, no live capital.
 
 ---
 
-## Mandatory delta 1 — pre-read authorization (remote before fetch)
+## Alpha-critical authority gaps (B0B module)
 
-Before the first SEC request, remotely retain an **authorization-only** commit or annotated tag that binds:
-
-```text
-accession, CIK, form, purpose,
-permitted uses, forbidden uses,
-accountable authorizer, expiry/one-shot boundary,
-claim ceiling
-```
-
-Sequence:
-
-```text
-authorization object (remote)
-→ SEC retrieval
-→ package receipt
-→ implementation
-```
-
-Forbidden: create authorization retrospectively in the same commit as downloaded package bytes.
-
-This is the only extra custody step. Not an authorization framework.
-
-Path: `data/gv_v2_b0b/mu_0000723125-26-000015/access_authorization.json`
-
----
-
-## Mandatory delta 2 — authorization time ≠ receipt time
-
-```text
-access_authorization.json
-  authorization_recorded_at   # pre-read wall time
-  retrieval_or_receipt_time = null
-
-package_manifest.json
-  retrieved_at
-  retrieval_method
-  source_locator (per object)
-  response_byte_length / response_sha256 (per object)
-```
-
-Authority ordering:
-
-```text
-authorization_recorded_at < retrieved_at
-```
-
-Tests reject reversed or equal ordering when exact ordering is required.
-
----
-
-## Mandatory delta 3 — exact package objects (no equivalents)
-
-Exactly three objects (no “archive or equivalent”):
-
-```text
-0000723125-26-000015-index.htm
-0000723125-26-000015.txt
-mu-20260528.htm
-```
-
-Official locators (SEC EDGAR):
-
-```text
-https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/0000723125-26-000015-index.htm
-https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/0000723125-26-000015.txt
-https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm
-```
-
-Each object binds:
-
-```text
-official SEC locator
-accession
-object role
-sha256
-byte_length
-retrieved_at
-```
-
-Evidence deduplication (non-negotiable):
-
-```text
-source_family_id = SEC:0000723125-26-000015
-independent_source_count = 1
-```
-
-Index, primary, and complete submission are **custody redundancy**, not three corroborators. Claim evaluation must not count them as independent sources.
-
----
-
-## Mandatory delta 4 — narrow claim outcomes
-
-Claim evaluation outcomes:
-
-```text
-SUFFICIENT_FOR_RESEARCH_TRIAGE
-CLAIM_INSUFFICIENT
-CLAIM_CONTRADICTED
-NOT_EVALUABLE
-```
-
-Research mapping:
-
-```text
-ADMITTED + SUFFICIENT_FOR_RESEARCH_TRIAGE → may ADVANCE_TO_FULL_RESEARCH
-ADMITTED + CLAIM_INSUFFICIENT             → HOLD_FOR_EVIDENCE
-ADMITTED + CLAIM_CONTRADICTED             → REJECT_THESIS
-BLOCKED or NOT_EVALUABLE                  → HOLD_FOR_EVIDENCE
-```
-
-`SUFFICIENT_FOR_RESEARCH_TRIAGE` means only that the official filing contains enough relevant evidence to justify deeper research. It does **not** mean: thesis true, physical supply independently identified, issuer claims corroborated, investment justified, or a position may open.
-
-Every extracted statement binds:
-
-```text
-source object hash
-document or byte locator
-section or element locator
-exact excerpt hash
-statement class ∈ {
-  FINANCIAL_FACT,
-  CONTRACTUAL_DISCLOSURE,
-  ISSUER_ASSERTION,
-  FORWARD_LOOKING_STATEMENT,
-  RISK_DISCLOSURE
-}
-```
-
----
-
-## Contradiction semantics (B0B only; B0A untouched)
-
-Explicit enum (not nullable bool):
-
-```text
-PASS | FAIL | NOT_EVALUATED
-```
-
-```text
-facts absent   → NOT_EVALUATED
-facts conflict → FAIL + CONTRADICTORY_INDISPENSABLE_EVIDENCE
-facts cohere   → PASS with non-vacuous evidence
-```
-
----
-
-## Portfolio semantics
-
-```text
-ADMITTED ≠ claim support
-ADMITTED ≠ ADVANCE
-ADVANCE ≠ portfolio position
-```
-
-All B0B research outcomes map to paper `NO_POSITION` (no sizing / capital authority).
-
-Certified result binds both:
-
-```text
-admission_hash
-claim_evaluation_hash
-```
-
-`DecisionEnvelope.rationale_ref` resolves to claim evaluation and transitively binds admission certificate or block — not merely the source package.
-
----
-
-## Pinned package identity
-
-| Field | Value |
+| Gap | Repair |
 |---|---|
-| Issuer | Micron Technology, Inc. |
-| CIK | 0000723125 |
-| Form | 10-Q |
-| Accession | 0000723125-26-000015 |
-| Period ended | 2026-05-28 |
-| Accepted | 2026-06-24 18:59:46 |
-| Filed | 2026-06-25 |
-| Primary | mu-20260528.htm |
-| Submission | 0000723125-26-000015.txt |
-| Index | 0000723125-26-000015-index.htm |
-| Module | G_supply |
-| Classification | GV-V2-B0B-OFFICIAL-SOURCE-INTAKE |
+| Duplicate-key JSON acceptance (`json.loads` last-wins) | Authority loads via `parse_json_text` → `V2B0B_JSON_AUTHORITY_INVALID` |
+| Character offsets labelled as `byte_start` / `byte_end` | True byte windows on raw document bytes; mid-codepoint cut fails closed |
+| Non-transactional multi-file publication | Stage under `.b0b_tx/`, promote in order, **`result.json` last** as commit marker |
 
-One issuer source; not independent corroboration.
+R1 / R2 / R2.1 retained: rebuild-from-raw exact compare, HOLD-only outcomes, auth object set ≡ `PACKAGE_OBJECTS`, parity pins `731a…` / `21e4…` / `48cab…`.
 
 ---
 
-## Execution gates
-
-### B0B-0 — authority
-
-1. Clean worktree from `2cd3e858…`
-2. Branch `codex/gv-v2-b0b-official-source-intake`
-3. Remotely retain authorization-only commit/tag
-4. No product code required before this point
-
-### B0B-1 — exact package
-
-Fetch only the three named objects. Bank immutable bytes + relational package manifest.  
-Do not fetch XBRL linkbases, exhibits, IR material, prices, providers, or a second filing.
-
-### B0B-2 — one product vertical
+## Product vertical (B0B role inside ALPHA0)
 
 ```text
-authorization → receipt → package_manifest → source_manifest
-→ ADMITTED | BLOCKED
-→ separate claim evaluation
-→ research action
-→ DecisionEnvelope → PortfolioBook → Fs0Certification
-→ atomic current publication → visible operator result
+pre-read access_authorization
+ → exact three SEC objects (custody redundancy, independent_source_count=1)
+ → package_manifest (receipt)
+ → source_manifest (SEC-header PIT)
+ → admission (+ certificate if earned)
+ → claim evaluation (separate)
+ → research HOLD only in one-source B0B
+ → certified paper NO_POSITION
+ → atomic case bundle + optional current-decision publish
 ```
 
-### B0B-3 — ship
-
-Focused tests → product suite → protocol freeze → Ubuntu/Windows parity → narrow audit → merge → truth cutover → **stop**.
+Authority chain layers remain distinct. B0A remains immutable banked substrate.
 
 ---
 
-## Metrics
+## Mandatory custody rules (unchanged)
 
-| Measure | Now | After valid B0B close |
-|---|---:|---:|
-| SHIPPED_PRODUCT_SCORE | 39 | 39 (no uplift) |
-| FUNCTIONAL_STAGE | CERTIFIED_SINGLE_DECISION_OPERABLE | unchanged |
-| OBSERVED_COMPARISON_COUNT | 0 | 0 |
-| Local abstention verticals | 1 | 1 |
-| External source packages processed | 0 | 1 |
-| Admission certificates earned | 0 | 1 if ADMITTED else 0 |
+- Pre-read authorization remote before first SEC fetch
+- `authorization_recorded_at < retrieved_at`; auth has null receipt time
+- Exact three objects only; no equivalents
+- `independent_source_count = 1` (index/submission/primary are not three corroborators)
+- Claim vocabulary separate from admission
+- No score uplift / alpha / live capital claims
 
 ---
 
-## Post-B0B (precommitted, not this PR)
+## Ship posture for Alpha
 
-- Package admitted (any research action): bank B0B → first valid independent comparison on this fresh real case
-- Package blocked by implementation/custody defect: repair narrowly on same accession
-- ADMITTED + CLAIM_INSUFFICIENT + HOLD + NO_POSITION is a valid B0B close
-
----
-
-## Closed / forbidden this round
-
-G08 Attempt-2 as product gate · FS1 · providers platform · PEAD · optimizer · rankings · broker · alpha · score uplift · live capital · generic evidence platform · reopen B0A · multi-source fabrication · equivalent package substitution
+1. Land authority repairs on the B0B PR tip without treating merge as “phase complete.”
+2. Keep product/protocol/parity green on every tip.
+3. Extend the **same train** toward second-source reconciliation and operator/export/fresh-clone/dogfood — not a stop-the-world B0C phase.
+4. Formal comparison only **after** Alpha if a multi-source case is genuinely contestable.

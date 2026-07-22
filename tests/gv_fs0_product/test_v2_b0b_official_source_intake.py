@@ -24,6 +24,8 @@ from core.gv_v2_b0b_official_source_intake import (
     SLICE_CLASSIFICATION,
     SOURCE_FAMILY_ID,
     GvV2B0BError,
+    _byte_window_excerpt,
+    _load_authority_json,
     build_g_supply_research_decision,
     build_package_manifest,
     derive_sec_package_identity,
@@ -47,6 +49,69 @@ def test_authorization_pre_read_and_null_receipt() -> None:
     assert "password" not in json.dumps(auth).lower()
     raw = json.dumps(auth)
     assert "secret" not in raw.lower() or "none" in str(auth.get("credentials_boundary")).lower()
+
+
+def test_authority_json_rejects_duplicate_keys(tmp_path: Path) -> None:
+    """Duplicate object member names are invalid authority JSON (not last-wins)."""
+
+    path = tmp_path / "dup.json"
+    path.write_text('{"a":1,"a":2}\n', encoding="utf-8")
+    with pytest.raises(GvV2B0BError, match="JSON_AUTHORITY_INVALID"):
+        _load_authority_json(path, missing_code="V2B0B_TEST_MISSING")
+
+
+def test_statement_locators_are_true_byte_offsets() -> None:
+    """Windows are measured in bytes; multi-byte prefix must shift start."""
+
+    # UTF-8 euro is 3 bytes; character-index would wrongly report start=1.
+    data = "€needleHERE".encode("utf-8")
+    start, end, excerpt = _byte_window_excerpt(
+        data,
+        needle="needle",
+        window_before=0,
+        window_after=0,
+        statement_id="SYNTH_BYTE",
+    )
+    assert start == 3  # after 3-byte euro
+    assert end == 9
+    assert excerpt == "needle"
+    assert data[start:end] == b"needle"
+
+    # Mid-codepoint cut fails closed.
+    with pytest.raises(GvV2B0BError, match="BYTE_WINDOW_NOT_UTF8"):
+        _byte_window_excerpt(
+            data,
+            needle="needle",
+            window_before=1,  # would start inside the euro codepoint
+            window_after=0,
+            statement_id="SYNTH_BAD",
+        )
+
+
+def test_case_bundle_promote_is_result_last(tmp_path: Path) -> None:
+    """Derived case artifacts promote together; result is the commit marker."""
+
+    out = run_v2_b0b_official_source_intake(
+        root=ROOT,
+        case_dir=tmp_path / "case",
+        publish=False,
+    )
+    case = tmp_path / "case"
+    assert out["result_hash"]
+    for name in (
+        "package_manifest.json",
+        "source_manifest.json",
+        "admission_result.json",
+        "claim_evaluation.json",
+        "research_decision.json",
+        "decision_packet.md",
+        "result.json",
+    ):
+        assert (case / name).is_file()
+    # Staging residue must not remain after successful promote.
+    assert not (case / ".b0b_tx").exists()
+    verified = load_verified_b0b_result(root=ROOT, case_dir=case)
+    assert verified["result_hash"] == out["result_hash"]
 
 
 def test_package_exact_three_objects_and_hashes() -> None:
