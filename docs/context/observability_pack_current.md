@@ -1,14 +1,11 @@
 # Observability Pack - Current
 
-## Active Addendum — Invalidation + V2-B0 Observability (2026-07-22)
+## Active Addendum — GV-ALPHA0_ACTIVE (2026-07-23)
 
-- ObservabilityRating: GREEN for repair tip product hosted proof and fail-closed observation authority (count 0); AMBER until main cutover; RED for real PIT admissions (0).
-- Observation sentinel: Attempt-1 sealed claims are **not** observation authority; invalidation supersedes.
-- Identity sentinel: future real comparisons require GitHub receipt v2 author/committer logins ≠ operator.
+- ObservabilityRating: GREEN for PR #8 merge tip product/protocol/parity (report-sourced); AMBER for family-two bank pending; RED for formal comparison (deferred).
 - Score/stage sentinel: 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
-- Gate sentinel: **B0A CLOSED** on main (`3e995f1`). Sole active gate **GV-V2-B0B-OFFICIAL-SOURCE-INTAKE**. Same-case Attempt-2 is deferred validation, not blocker.
-- Drift sentinel: do not treat historical result tag or smoke E0B current as promotion evidence.
+- Train sentinel: **GV-ALPHA0_ACTIVE**. Source family one banked (B0B). Family two not yet banked.
+- Promote sentinel: case bundle is result-last fail-closed, not rollback-atomic.
+- Drift sentinel: do not direct workers to B0B-closure/comparison or B0C-as-phase-stop.
 
-## Prior Addendum — S-009X / E0B-DV1 Observability (2026-07-21) [superseded next-action]
-
-Historical C1/Attempt-1 pending sentinels superseded.
+## Prior — B0B sole-gate observability [superseded as stop]

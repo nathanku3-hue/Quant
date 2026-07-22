@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-22T17:30:00Z",
+  "generated_at_utc": "2026-07-23T00:00:00Z",
   "source_files": [
     "docs/context/bridge_contract_current.md",
     "docs/context/done_checklist_current.md",
@@ -10,26 +10,30 @@
     "docs/context/planner_packet_current.md",
     "docs/context/post_phase_alignment_current.md",
     "docs/decision log.md",
-    "docs/phase_brief/gv-v2-b0b-official-source-intake-brief.md"
+    "docs/phase_brief/gv-v2-b0b-official-source-intake-brief.md",
+    "docs/architecture/top_level_roadmap.md"
   ],
   "active_phase": 65,
+  "active_train": "GV-ALPHA0_ACTIVE",
   "what_was_done": [
-    "GV-V2-B0B-OFFICIAL-SOURCE-INTAKE executed for SEC accession 0000723125-26-000015.",
-    "Pre-read authorization 401a657 retained before retrieval; package banked with independent_source_count=1.",
-    "ADMITTED + CLAIM_INSUFFICIENT + HOLD_FOR_EVIDENCE → DECISION_V2_B0B_MU_G_SUPPLY_1 NO_POSITION.",
-    "Score 39; observed 0; local abstention verticals 1; external packages 1; certificates 1."
+    "PR #8 merged to main at 2c7f32c; B0B banked as source family one (not phase-stop).",
+    "ALPHA0 authority repairs: strict JSON, true byte locators, result-last fail-closed promote.",
+    "Truth cutover to GV-ALPHA0_ACTIVE; formal comparison deferred after Alpha."
   ],
   "what_is_locked": [
     "SHIPPED_PRODUCT_SCORE=39; FUNCTIONAL_STAGE=CERTIFIED_SINGLE_DECISION_OPERABLE; OBSERVED=0.",
-    "B0A closed substrate; B0B hard rules: ADMITTED never auto-ADVANCE; contradiction NOT_EVALUATED when no claim-level admitted facts.",
-    "G08 Attempt-2 deferred; FS1/providers/PEAD/optimizer/broker/alpha closed."
+    "ACTIVE_TRAIN=GV-ALPHA0_ACTIVE; SOURCE_FAMILY_ONE=SEC:0000723125-26-000015.",
+    "ADMITTED never auto-ADVANCE; B0A immutable; no live capital/score uplift."
   ],
   "what_is_next": [
-    "Hosted product+protocol+parity green → narrow audit → merge → first valid independent comparison on this fresh real case."
+    "Bank exact authorized independent source family two before reconciliation machinery.",
+    "Implement family-two vertical: 3-5 facts + operator capture + certified result.",
+    "Continue Alpha train: reconciliation, export/replay, fresh-clone, non-author dogfood."
   ],
   "first_command": ".venv\\Scripts\\python -m pytest -q tests/gv_fs0_product/test_v2_b0b_official_source_intake.py",
   "next_todos": [
-    "Ship B0B tip through hosted green parity and merge.",
-    "Open first valid independent comparison on accession 0000723125-26-000015 case."
+    "Authorize and bank exact source family two package.",
+    "One vertical: facts + operator capture + certified NO_POSITION.",
+    "Defer formal comparison until after Alpha."
   ]
 }
