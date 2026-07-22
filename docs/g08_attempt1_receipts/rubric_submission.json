@@ -1,0 +1,69 @@
+{
+  "alpha_claim": false,
+  "arm_a_scores": {
+    "avoidance_of_claims_beyond_evidence": {
+      "reason": "No alpha, no ADVANCE, no overclaim of thesis death; synthetic scope respected.",
+      "score": 2
+    },
+    "falsifier_and_contradiction_recognition": {
+      "reason": "Recognizes F_G08 and source conflict; less explicit on packet-level BLOCK resolution structure.",
+      "score": 1
+    },
+    "indispensable_missing_evidence_identification": {
+      "reason": "Names reconciling definition, hierarchy/veto rule, and independent corroboration/invalidation path.",
+      "score": 2
+    },
+    "rationale_traceability": {
+      "reason": "Rationale links source IDs, values, engine prohibitions, and triage options.",
+      "score": 2
+    },
+    "selected_action_defensibility": {
+      "reason": "HOLD_FOR_EVIDENCE is defensible given unresolved 8-vs-2 indispensable contradiction and ban on average/majority.",
+      "score": 2
+    },
+    "supply_demand_business_shareholder_valuation_claim_separation": {
+      "reason": "Stays in G_supply physical-relief identification; does not smuggle valuation or demand claims.",
+      "score": 1
+    }
+  },
+  "arm_b_scores": {
+    "avoidance_of_claims_beyond_evidence": {
+      "reason": "Rejects ADVANCE against block and REJECT as overclaim; no general-effectiveness claim.",
+      "score": 2
+    },
+    "falsifier_and_contradiction_recognition": {
+      "reason": "Binds packet contradiction object, BLOCK_NO_AVERAGE_NO_MAJORITY, run_state=BLOCKED, and anti-average falsifier.",
+      "score": 2
+    },
+    "indispensable_missing_evidence_identification": {
+      "reason": "Identifies reconciling authority gap and separates synthetic G08 from later real PIT admission needs.",
+      "score": 2
+    },
+    "rationale_traceability": {
+      "reason": "Traceable from packet fields (block_reason, contradictions, portfolio_action) to decision.",
+      "score": 2
+    },
+    "selected_action_defensibility": {
+      "reason": "HOLD_FOR_EVIDENCE with explicit NO_POSITION portfolio translation matches blocked engine surface.",
+      "score": 2
+    },
+    "supply_demand_business_shareholder_valuation_claim_separation": {
+      "reason": "Keeps physical-supply identification failure distinct from shareholder-value or alpha claims.",
+      "score": 2
+    }
+  },
+  "artifact_role": "AUTHORING_ONLY",
+  "authorship_kind": "REAL_HUMAN_REVIEWER",
+  "blinded_review_conditions_attested": true,
+  "case_id": "E0B_DV1_G08_CONTRADICTION_1",
+  "causal_superiority_claim": false,
+  "fresh_operator_attested": true,
+  "general_effectiveness_claim": false,
+  "notes": "Blinded ARM scores only; operational account separation claim only; no personhood proof.",
+  "review_package_hash_attested": "1916e620b11473eb7ec7be114147b788e1204a0eafc91df33efd67475a67f007",
+  "reviewer_export_boundary_attested": true,
+  "reviewer_id": "REV_BLINDED_EXTERNAL",
+  "reviewer_received_only_blinded_review_package": true,
+  "session_manifest_hash_attested": "83ed0fc6c0d13999998caa02b46c555d0e1c0d50da67938d2ce315abf22b56e2",
+  "template_id": "GV_E0B_G08_RUBRIC_AUTHORING_V1"
+}
