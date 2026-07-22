@@ -7457,3 +7457,13 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Next automatic gate: `GV-V2-B0-REAL-BLOCK-ONLY-ADMISSION` (not opened in this bank).
 - Evidence: `data/gv_e0b/dv1_g08/**`, `data/gv_fs0/gv_fs0_current_decision.json`, tag `gv-e0b-dv1-g08-attempt-1`, reviewer receipt branch `g08/attempt-1-reviewer-receipt` @ `859a00ad…`.
 
+
+## 2026-07-22 — ROUND-20260722-E0B-DV1-G08-ATTEMPT-1-INVALIDATION
+
+- Decision: classify G08 Attempt-1 as `INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED`. Accept remote custody, hosted-green code path, certified synthetic decision, and product-surface smoke. Reject `comparison_observed_eligible=true`, `IMPROVED`, observed count 1, and stage promotion.
+- Authoritative state restored: `SHIPPED_PRODUCT_SCORE=39`; `FUNCTIONAL_STAGE=CERTIFIED_SINGLE_DECISION_OPERABLE`; `OBSERVED_COMPARISON_COUNT=0`.
+- Evidence: append-only `data/gv_e0b/dv1_g08/invalidation/ATTEMPT_1_INVALIDATION.json`; sealed Attempt-1 captures/result **not rewritten**; smoke copy of G08 current under `data/gv_e0b/dv1_g08/smoke/`; product current restored to pre-G08 E0A identity.
+- Grounds: same process authored arms and scores; receipt commit 859a00ad… has GitHub author/committer login null; free-text REV_BLINDED_EXTERNAL is not provider-authenticated separation; sealed stage_claim already eligible=false/count=0 while top-level observation fields claimed true/1/IMPROVED.
+- Code repair: GitHub rubric receipt schema v2 requires `github_author_login` / `github_committer_login`; submitter must equal author login and differ from operator; observation authority supersedable by invalidation packet.
+- Next: Attempt-2 only with fresh operator (not exposed to packet/result) and separate real reviewer GitHub account; no preferred-sign reuse of Attempt-1. V2-B0 remains closed until a valid observed comparison.
+

@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 from streamlit.testing.v1 import AppTest
 
+from core.gv_e0a_operable import publish_e0a_current_decision
 from core.gv_fs0_publish import (
     DEFAULT_CURRENT_DECISION_LOCK,
     DEFAULT_CURRENT_DECISION_TARGET,
@@ -137,7 +138,7 @@ def test_dash_1_default_portfolio_route_renders_current_decision() -> None:
     try:
         if DEFAULT_CURRENT_DECISION_LOCK.exists():
             DEFAULT_CURRENT_DECISION_LOCK.unlink()
-        # Use banked G08-published current decision (do not overwrite with E0A rebuild).
+        publish_e0a_current_decision()
         app = AppTest.from_file("dashboard.py")
         app.query_params["page"] = PORTFOLIO_PAGE_ROUTE
         app = app.run(timeout=90)
@@ -146,11 +147,12 @@ def test_dash_1_default_portfolio_route_renders_current_decision() -> None:
         assert any(header.value == PORTFOLIO_PAGE_TITLE for header in app.header)
         subheaders = [element.value for element in app.subheader]
         assert "GV-FS0 Certified Paper Portfolio — NO_POSITION" in subheaders
-        assert "GV-E0B-DV1 Decision Delta — G08 Contradiction Case" in subheaders
         assert len(app.table) >= 1
         caption_text = "\n".join(element.value for element in app.caption)
         assert caption_text.count("CERTIFIED") >= 1
         assert "Replay selection unavailable" not in _app_status_text(app)
+        if "GV-E0B-DV1 Decision Delta — G08 Contradiction Case" in subheaders:
+            assert "observed-comparison count = 0" in caption_text
     finally:
         if prior_target is None:
             DEFAULT_CURRENT_DECISION_TARGET.unlink(missing_ok=True)

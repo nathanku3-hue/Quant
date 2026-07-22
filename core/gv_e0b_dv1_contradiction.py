@@ -106,6 +106,14 @@ ONESHOT_CASE_ID = "GV_E0B_DV1_G08"
 ONESHOT_ATTEMPT = 1
 ONESHOT_AUTH_SCHEMA = "gv_e0b_g08_oneshot_authorization_v1"
 GITHUB_RECEIPT_SCHEMA = "gv_e0b_g08_github_rubric_receipt_v1"
+# v2 requires provider-authenticated GitHub login fields (author/committer).
+GITHUB_RECEIPT_SCHEMA_V2 = "gv_e0b_g08_github_rubric_receipt_v2"
+INVALIDATION_CLASS_REVIEWER_INDEPENDENCE = (
+    "INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED"
+)
+DEFAULT_ATTEMPT1_INVALIDATION_PATH = (
+    DEFAULT_CASE_DIR / "invalidation" / "ATTEMPT_1_INVALIDATION.json"
+)
 RECEIPT_PROVIDER_GITHUB = "GITHUB"
 FIXTURE_SOURCE_COMMIT = "0" * 40
 FIXTURE_SOURCE_TREE = "1" * 40
@@ -1558,18 +1566,44 @@ def build_github_rubric_receipt(
     candidate_tree: str,
     case_id: str = ONESHOT_CASE_ID,
     attempt: int = ONESHOT_ATTEMPT,
+    github_author_login: str | None = None,
+    github_committer_login: str | None = None,
 ) -> dict[str, Any]:
-    """Build a machine-readable GitHub external rubric receipt (fixture helper)."""
+    """Build a machine-readable GitHub external rubric receipt (fixture helper).
 
+    Production eligibility requires v2 fields: provider-authenticated
+    ``github_author_login`` / ``github_committer_login``. Submitter id must equal
+    the author login (not free-text Git metadata alone).
+    """
+
+    submitter = _require_principal_id(
+        authenticated_submitter_id, "E0B_RECEIPT_SUBMITTER_REQUIRED"
+    )
+    author_login = (
+        _require_principal_id(github_author_login, "E0B_RECEIPT_GITHUB_AUTHOR_LOGIN_REQUIRED")
+        if github_author_login is not None
+        else None
+    )
+    committer_login = (
+        _require_principal_id(
+            github_committer_login, "E0B_RECEIPT_GITHUB_COMMITTER_LOGIN_REQUIRED"
+        )
+        if github_committer_login is not None
+        else None
+    )
+    if author_login is None or committer_login is None:
+        raise GvE0bDv1Error("E0B_RECEIPT_GITHUB_LOGIN_REQUIRED")
+    if author_login != submitter:
+        raise GvE0bDv1Error("E0B_RECEIPT_SUBMITTER_NOT_GITHUB_AUTHOR")
     body = {
-        "schema_version": GITHUB_RECEIPT_SCHEMA,
+        "schema_version": GITHUB_RECEIPT_SCHEMA_V2,
         "provider": RECEIPT_PROVIDER_GITHUB,
         "repository": _require_str(
             {"repository": repository}, "repository", "E0B_RECEIPT_REPOSITORY_REQUIRED"
         ),
-        "authenticated_submitter_id": _require_principal_id(
-            authenticated_submitter_id, "E0B_RECEIPT_SUBMITTER_REQUIRED"
-        ),
+        "authenticated_submitter_id": submitter,
+        "github_author_login": author_login,
+        "github_committer_login": committer_login,
         "submission_commit_sha": _require_git_object_id(
             submission_commit_sha, "E0B_RECEIPT_SUBMISSION_COMMIT_INVALID"
         ),
@@ -1605,6 +1639,7 @@ def build_github_rubric_receipt(
             "natural_personhood_proven": False,
             "github_account_is_not_natural_person_proof": True,
             "operational_separation_only": True,
+            "provider_authenticated_login_required": True,
         },
     }
     out = dict(body)
@@ -1628,13 +1663,19 @@ def verify_github_rubric_receipt(
     if receipt is None:
         raise GvE0bDv1Error("E0B_EXTERNAL_RECEIPT_MISSING")
     plain = _require_mapping(receipt, "E0B_EXTERNAL_RECEIPT_INVALID")
-    if plain.get("schema_version") != GITHUB_RECEIPT_SCHEMA:
+    schema = plain.get("schema_version")
+    if schema not in {GITHUB_RECEIPT_SCHEMA, GITHUB_RECEIPT_SCHEMA_V2}:
         raise GvE0bDv1Error("E0B_RECEIPT_SCHEMA_INVALID")
+    # v1 free-text submitter receipts are no longer production-eligible.
+    if schema != GITHUB_RECEIPT_SCHEMA_V2:
+        raise GvE0bDv1Error("E0B_RECEIPT_SCHEMA_V2_REQUIRED")
     if plain.get("provider") != RECEIPT_PROVIDER_GITHUB:
         raise GvE0bDv1Error("E0B_RECEIPT_PROVIDER_INVALID")
     for field in (
         "repository",
         "authenticated_submitter_id",
+        "github_author_login",
+        "github_committer_login",
         "submission_commit_sha",
         "rubric_path",
         "rubric_sha256",
@@ -1651,11 +1692,20 @@ def verify_github_rubric_receipt(
     submitter = _require_principal_id(
         plain.get("authenticated_submitter_id"), "E0B_RECEIPT_SUBMITTER_REQUIRED"
     )
+    author_login = _require_principal_id(
+        plain.get("github_author_login"), "E0B_RECEIPT_GITHUB_AUTHOR_LOGIN_REQUIRED"
+    )
+    committer_login = _require_principal_id(
+        plain.get("github_committer_login"),
+        "E0B_RECEIPT_GITHUB_COMMITTER_LOGIN_REQUIRED",
+    )
     expected_submitter = _require_principal_id(
         expected_submitter_id, "E0B_RECEIPT_SUBMITTER_REQUIRED"
     )
     if submitter != expected_submitter:
         raise GvE0bDv1Error("E0B_RECEIPT_SUBMITTER_MISMATCH")
+    if author_login != submitter:
+        raise GvE0bDv1Error("E0B_RECEIPT_SUBMITTER_NOT_GITHUB_AUTHOR")
     if plain.get("case_id") != expected_case_id:
         raise GvE0bDv1Error("E0B_RECEIPT_CASE_MISMATCH")
     attempt = plain.get("attempt")
@@ -1704,10 +1754,12 @@ def verify_github_rubric_receipt(
     if blob_oid is not None:
         _require_git_object_id(blob_oid, "E0B_RECEIPT_RUBRIC_BLOB_INVALID")
     body = {
-        "schema_version": GITHUB_RECEIPT_SCHEMA,
+        "schema_version": GITHUB_RECEIPT_SCHEMA_V2,
         "provider": RECEIPT_PROVIDER_GITHUB,
         "repository": plain["repository"],
         "authenticated_submitter_id": submitter,
+        "github_author_login": author_login,
+        "github_committer_login": committer_login,
         "submission_commit_sha": plain["submission_commit_sha"],
         "rubric_path": plain["rubric_path"],
         "rubric_blob_oid": blob_oid,
@@ -1723,6 +1775,7 @@ def verify_github_rubric_receipt(
             "natural_personhood_proven": False,
             "github_account_is_not_natural_person_proof": True,
             "operational_separation_only": True,
+            "provider_authenticated_login_required": True,
         },
     }
     expected_receipt_hash = domain_hash(DOMAIN_GITHUB_RECEIPT, body)
@@ -2823,8 +2876,20 @@ def seal_rubric_record(
         ext = _require_mapping(raw_ext, "E0B_EXTERNAL_RECEIPT_INVALID")
         if ext.get("provider") != RECEIPT_PROVIDER_GITHUB:
             raise GvE0bDv1Error("E0B_RECEIPT_PROVIDER_INVALID")
+        if ext.get("schema_version") != GITHUB_RECEIPT_SCHEMA_V2:
+            raise GvE0bDv1Error("E0B_RECEIPT_SCHEMA_V2_REQUIRED")
         if ext.get("authenticated_submitter_id") != reviewer_id:
             raise GvE0bDv1Error("E0B_RECEIPT_SUBMITTER_MISMATCH")
+        author_login = ext.get("github_author_login")
+        committer_login = ext.get("github_committer_login")
+        if not isinstance(author_login, str) or not author_login.strip():
+            raise GvE0bDv1Error("E0B_RECEIPT_GITHUB_AUTHOR_LOGIN_REQUIRED")
+        if not isinstance(committer_login, str) or not committer_login.strip():
+            raise GvE0bDv1Error("E0B_RECEIPT_GITHUB_COMMITTER_LOGIN_REQUIRED")
+        if author_login != reviewer_id:
+            raise GvE0bDv1Error("E0B_RECEIPT_SUBMITTER_NOT_GITHUB_AUTHOR")
+        if author_login == b.get("operator_id") or author_login == p.get("operator_id"):
+            raise GvE0bDv1Error("E0B_RECEIPT_REVIEWER_EQUALS_OPERATOR")
         if ext.get("rubric_sha256") != rubric_bytes_sha:
             raise GvE0bDv1Error("E0B_RECEIPT_RUBRIC_BYTE_MISMATCH")
         if ext.get("review_package_hash") != pkg["review_package_hash"]:
@@ -2834,10 +2899,12 @@ def seal_rubric_record(
         if ext.get("attempt") != ONESHOT_ATTEMPT:
             raise GvE0bDv1Error("E0B_RECEIPT_ATTEMPT_MISMATCH")
         body_for_hash = {
-            "schema_version": GITHUB_RECEIPT_SCHEMA,
+            "schema_version": GITHUB_RECEIPT_SCHEMA_V2,
             "provider": RECEIPT_PROVIDER_GITHUB,
             "repository": ext.get("repository"),
             "authenticated_submitter_id": ext.get("authenticated_submitter_id"),
+            "github_author_login": author_login,
+            "github_committer_login": committer_login,
             "submission_commit_sha": ext.get("submission_commit_sha"),
             "rubric_path": ext.get("rubric_path"),
             "rubric_blob_oid": ext.get("rubric_blob_oid"),
@@ -2853,6 +2920,7 @@ def seal_rubric_record(
                 "natural_personhood_proven": False,
                 "github_account_is_not_natural_person_proof": True,
                 "operational_separation_only": True,
+                "provider_authenticated_login_required": True,
             },
         }
         expected_receipt_hash = domain_hash(DOMAIN_GITHUB_RECEIPT, body_for_hash)
@@ -3054,9 +3122,11 @@ def is_observed_comparison_eligible(
     - real operator (both arms) + different real reviewer;
     - blinded ARM input mode on the sealed rubric;
     - baseline operator custody assertion (not seen packet/outcome before baseline);
-    - reviewer custody assertion (received only blinded review package).
+    - reviewer custody assertion (received only blinded review package);
+    - external GitHub receipt v2 with provider-authenticated author login
+      equal to reviewer_id and unequal to operator_id.
 
-    These remain human attestations, not cryptographic identity proof.
+    These remain human attestations plus provider-login binding, not personhood proof.
     """
 
     if not is_attribution_structure_valid(baseline, post, rubric):
@@ -3075,6 +3145,25 @@ def is_observed_comparison_eligible(
     if not isinstance(custody.get("review_package_hash_attested"), str):
         return False
     if not isinstance(custody.get("session_manifest_hash_attested"), str):
+        return False
+    # Provider-authenticated reviewer independence (not free-text git name).
+    ext = rubric.get("external_submission_receipt")
+    if not isinstance(ext, Mapping):
+        return False
+    if ext.get("schema_version") != GITHUB_RECEIPT_SCHEMA_V2:
+        return False
+    author_login = ext.get("github_author_login")
+    committer_login = ext.get("github_committer_login")
+    submitter = ext.get("authenticated_submitter_id")
+    reviewer_id = rubric.get("reviewer_id")
+    operator_id = baseline.get("operator_id")
+    if not isinstance(author_login, str) or not author_login.strip():
+        return False
+    if not isinstance(committer_login, str) or not committer_login.strip():
+        return False
+    if author_login != submitter or author_login != reviewer_id:
+        return False
+    if author_login == operator_id:
         return False
     return True
 
@@ -3819,6 +3908,11 @@ def _build_comparison_from_verified_records(
                 "scored_at": rubric["scored_at"],
                 "review_input_mode": rubric.get("review_input_mode"),
                 "custody_attestation": _plain(rubric.get("custody_attestation") or {}),
+                "external_submission_receipt": (
+                    _plain(rubric.get("external_submission_receipt"))
+                    if isinstance(rubric.get("external_submission_receipt"), Mapping)
+                    else None
+                ),
                 "baseline": baseline_totals,
                 "post_packet": post_totals,
             },
@@ -4592,19 +4686,31 @@ def render_e0b_dv1_comparison(
     disposition: str | None = None
     observation_claim: Mapping[str, Any] | None = None
     value_claim: Mapping[str, Any] | None = None
+    inv_note = ""
     if comparison is None:
         path = result_json_path or DEFAULT_RESULT_JSON
         if not path.is_file():
             raise GvE0bDv1Error("E0B_RESULT_MISSING")
         result = load_verified_result(path)
         comparison = result["comparison"]
-        observation_claim = result["observation_claim"]
-        value_claim = result["value_claim"]
-        obs = int(observation_claim["observed_comparison_count"])
-        observed_eligible = bool(
-            observation_claim["comparison_observed_eligible"]
-        )
-        disposition = value_claim["decision_value_disposition"]
+        authority = observation_authority_from_disk(path)
+        obs = int(authority["observed_comparison_count"])
+        observed_eligible = bool(authority["comparison_observed_eligible"])
+        disposition = authority.get("decision_value_disposition")
+        if authority.get("invalidation") is not None:
+            inv = authority["invalidation"]
+            inv_note = (
+                f" · INVALIDATED:{inv.get('classification')} "
+                "(Attempt-1 observation authority superseded; sealed evidence preserved)"
+            )
+            observation_claim = {
+                "comparison_observed_eligible": False,
+                "observed_comparison_count": 0,
+            }
+            value_claim = {"decision_value_disposition": None}
+        else:
+            observation_claim = result["observation_claim"]
+            value_claim = result["value_claim"]
     else:
         comparison = verify_comparison_document(comparison)
     presentation = build_comparison_presentation(
@@ -4620,23 +4726,111 @@ def render_e0b_dv1_comparison(
         f"observed_eligible={observed_eligible} · "
         f"value_disposition={disposition or 'NOT_EVALUATED'} · "
         "within-case difference only · no general causal/alpha claim"
+        f"{inv_note}"
     )
     return presentation
+
+
+def load_attempt1_invalidation(
+    path: Path = DEFAULT_ATTEMPT1_INVALIDATION_PATH,
+) -> dict[str, Any] | None:
+    """Load append-only Attempt-1 invalidation authority if present."""
+
+    inv_path = Path(path)
+    if not inv_path.is_file():
+        return None
+    try:
+        raw = json.loads(inv_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(raw, dict):
+        return None
+    if raw.get("attempt") != 1:
+        return None
+    if raw.get("classification") != INVALIDATION_CLASS_REVIEWER_INDEPENDENCE:
+        return None
+    if raw.get("observation_authority_superseded") is not True:
+        return None
+    return raw
+
+
+def observation_authority_from_disk(
+    result_json_path: Path = DEFAULT_RESULT_JSON,
+    *,
+    invalidation_path: Path = DEFAULT_ATTEMPT1_INVALIDATION_PATH,
+) -> dict[str, Any]:
+    """Authoritative observation status after optional invalidation supersession.
+
+    Preserved sealed Attempt-1 result bytes are never rewritten. An append-only
+    invalidation packet supersedes observation eligibility / count only for the
+    canonical case result path (not isolated fixture temp results).
+    """
+
+    result_path = Path(result_json_path)
+    # Invalidation binds only the production case result, not test fixtures.
+    apply_invalidation = False
+    try:
+        apply_invalidation = result_path.resolve() == DEFAULT_RESULT_JSON.resolve()
+    except OSError:
+        apply_invalidation = str(result_path).replace("\\", "/").endswith(
+            "data/gv_e0b/dv1_g08/result.json"
+        )
+    inv = load_attempt1_invalidation(invalidation_path) if apply_invalidation else None
+    if inv is not None:
+        return {
+            "comparison_observed_eligible": False,
+            "observed_comparison_count": 0,
+            "decision_value_disposition": None,
+            "functional_stage": "CERTIFIED_SINGLE_DECISION_OPERABLE",
+            "shipped_product_score": 39,
+            "invalidation": inv,
+            "authority": "INVALIDATION_SUPERSEDES_SEALED_RESULT",
+        }
+    if not result_path.is_file():
+        return {
+            "comparison_observed_eligible": False,
+            "observed_comparison_count": 0,
+            "decision_value_disposition": None,
+            "functional_stage": "CERTIFIED_SINGLE_DECISION_OPERABLE",
+            "shipped_product_score": 39,
+            "invalidation": None,
+            "authority": "NO_RESULT",
+        }
+    try:
+        result = load_verified_result(result_path)
+        observation = result["observation_claim"]
+        value = result["value_claim"]
+        eligible = observation.get("comparison_observed_eligible") is True
+        return {
+            "comparison_observed_eligible": eligible,
+            "observed_comparison_count": (
+                int(observation["observed_comparison_count"]) if eligible else 0
+            ),
+            "decision_value_disposition": (
+                value.get("decision_value_disposition") if eligible else None
+            ),
+            "functional_stage": "CERTIFIED_SINGLE_DECISION_OPERABLE",
+            "shipped_product_score": 39,
+            "invalidation": None,
+            "authority": "SEALED_RESULT",
+        }
+    except GvE0bDv1Error:
+        return {
+            "comparison_observed_eligible": False,
+            "observed_comparison_count": 0,
+            "decision_value_disposition": None,
+            "functional_stage": "CERTIFIED_SINGLE_DECISION_OPERABLE",
+            "shipped_product_score": 39,
+            "invalidation": None,
+            "authority": "RESULT_UNVERIFIED",
+        }
 
 
 def observed_comparison_count_from_disk(
     result_json_path: Path = DEFAULT_RESULT_JSON,
 ) -> int:
-    if not result_json_path.is_file():
-        return 0
-    try:
-        result = load_verified_result(result_json_path)
-        observation = result["observation_claim"]
-        if observation.get("comparison_observed_eligible") is True:
-            return int(observation["observed_comparison_count"])
-        return 0
-    except GvE0bDv1Error:
-        return 0
+    auth = observation_authority_from_disk(result_json_path)
+    return int(auth["observed_comparison_count"])
 
 
 __all__ = [
@@ -4741,6 +4935,11 @@ __all__ = [
     "ONESHOT_ATTEMPT",
     "ONESHOT_AUTH_SCHEMA",
     "GITHUB_RECEIPT_SCHEMA",
+    "GITHUB_RECEIPT_SCHEMA_V2",
+    "INVALIDATION_CLASS_REVIEWER_INDEPENDENCE",
+    "DEFAULT_ATTEMPT1_INVALIDATION_PATH",
+    "load_attempt1_invalidation",
+    "observation_authority_from_disk",
     "RECEIPT_PROVIDER_GITHUB",
     "PREREGISTRATION_RELATIVE_PATH",
     "assert_mapping_reveal_allowed",

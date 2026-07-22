@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from streamlit.testing.v1 import AppTest
 
+from core.gv_e0a_operable import publish_e0a_current_decision
 from core.gv_fs0_publish import (
     DEFAULT_CURRENT_DECISION_LOCK,
     DEFAULT_CURRENT_DECISION_TARGET,
@@ -62,7 +63,7 @@ def isolated_current_decision(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
 
 
 def test_apptest_success_one_table_for_current_decision() -> None:
-    """Success path: certified portfolio table; G08 delta surface when result banked."""
+    """Success path: certified portfolio table; G08 smoke surface may coexist (count 0)."""
 
     prior_target = (
         DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
@@ -77,17 +78,20 @@ def test_apptest_success_one_table_for_current_decision() -> None:
     try:
         if DEFAULT_CURRENT_DECISION_LOCK.exists():
             DEFAULT_CURRENT_DECISION_LOCK.unlink()
-        # Keep G08-published current authority; do not overwrite with E0A rebuild.
+        publish_e0a_current_decision()
         app = _run_portfolio_app()
         assert not app.exception
         assert any(header.value == PORTFOLIO_PAGE_TITLE for header in app.header)
         subheaders = [element.value for element in app.subheader]
         assert NO_POSITION_SUBHEADER in subheaders
-        assert G08_DELTA_SUBHEADER in subheaders
-        assert len(app.table) >= 1
+        # Attempt-1 sealed comparison may still render as smoke; observation count is 0.
         caption_text = "\n".join(element.value for element in app.caption)
         assert "CERTIFIED" in caption_text
         assert "Certified decision unavailable" not in _app_status_text(app)
+        assert len(app.table) >= 1
+        if G08_DELTA_SUBHEADER in subheaders:
+            assert "observed-comparison count = 0" in caption_text
+            assert "INVALIDATED" in caption_text
     finally:
         if prior_target is None:
             DEFAULT_CURRENT_DECISION_TARGET.unlink(missing_ok=True)

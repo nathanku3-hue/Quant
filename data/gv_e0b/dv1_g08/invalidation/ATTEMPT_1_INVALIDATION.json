@@ -1,0 +1,100 @@
+{
+  "accepted": {
+    "certified_synthetic_decision_smoke": true,
+    "hosted_green_code_path": true,
+    "product_surface_smoke": true,
+    "remote_custody": true
+  },
+  "attempt": 1,
+  "authoritative_state": {
+    "FUNCTIONAL_STAGE": "CERTIFIED_SINGLE_DECISION_OPERABLE",
+    "OBSERVED_COMPARISON_COUNT": 0,
+    "SHIPPED_PRODUCT_SCORE": 39,
+    "comparison_observed_eligible": false,
+    "decision_value_disposition": null
+  },
+  "case_id": "GV_E0B_DV1_G08",
+  "classification": "INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED",
+  "code_repair": {
+    "receipt_schema": "gv_e0b_g08_github_rubric_receipt_v2",
+    "requires_github_author_login": true,
+    "requires_github_committer_login": true,
+    "reviewer_must_differ_from_operator": true,
+    "submitter_must_equal_github_author_login": true,
+    "v1_receipts_rejected_for_production_eligibility": true
+  },
+  "current_product_authority": {
+    "decision_id": "DECISION_E0A_HOLD_FOR_EVIDENCE_1",
+    "path": "data/gv_fs0/gv_fs0_current_decision.json",
+    "restored_to": "pre-G08 E0A HOLD_FOR_EVIDENCE / NO_POSITION substrate"
+  },
+  "grounds": [
+    "Frozen contract required a different real reviewer under separate authenticated custody.",
+    "Same process authored both arms and their scores.",
+    "Receipt commit 859a00ad\u2026 is immutable blob custody but GitHub reports author.login=null and committer.login=null; REV_BLINDED_EXTERNAL is unverified Git metadata only.",
+    "Sealed result self-contradicts: claim boundary requires two-human structure; embedded stage_claim has eligible=false, count=0, disposition=null while observation_claim/value_claim override to true/1/IMPROVED.",
+    "Green CI validates bytes/code, not false human-attestation inputs."
+  ],
+  "next": {
+    "attempt": 2,
+    "no_preferred_sign_reuse_of_attempt_1": true,
+    "requires_fresh_operator_not_exposed_to_packet_or_result": true,
+    "requires_separate_real_reviewer_github_account": true
+  },
+  "observation_authority_superseded": true,
+  "preserve_sealed_attempt1_evidence": true,
+  "preserved_evidence": {
+    "comparison_hash": "4524a358ba46a3029627d09729eacfe515f4f501e6bb4b9d0ea82685dd2bac37",
+    "receipt_github_author_login": null,
+    "receipt_github_committer_login": null,
+    "receipt_submission_commit": "859a00adf89288b3dbc4299db93c9c7f2bbe31ad",
+    "result_hash_field": "3f3133139f2d66115971d5f2b3d3204c3702df15c6192b804a9baaf0ef2d5f02",
+    "result_json_path": "data/gv_e0b/dv1_g08/result.json",
+    "result_sha256": "8fa17258162b5ddeff330f9705a60ff0582eea7771bb1b861724d2a028b6b065",
+    "sealed_observation_claim_snapshot": {
+      "budget_model": "EQUAL_MAX_MINUTES_EARLY_SUBMIT_ALLOWED",
+      "comparison_observed_eligible": true,
+      "external_attestation_required": false,
+      "human_ids_are_attribution_only": true,
+      "ledger_custody_note": "Tamper-evident under capture-process custody. Local hashes do not independently prove wall-clock history or human identity against a privileged repository operator.",
+      "mechanical_blinding_required": true,
+      "observed_comparison_count": 1,
+      "third_attestor_required": false
+    },
+    "sealed_stage_claim_snapshot": {
+      "alpha_claim": false,
+      "attribution_structure_valid": true,
+      "comparison_observed_eligible": false,
+      "decision_value_disposition": null,
+      "functional_stage": "CERTIFIED_SINGLE_DECISION_OPERABLE",
+      "observed_comparison_count": 0,
+      "score_frozen": true,
+      "shipped_product_score": 39,
+      "target_stage": "ONE_CASE_DECISION_DELTA_OBSERVED"
+    },
+    "sealed_value_claim_snapshot": {
+      "decision_value_disposition": "IMPROVED",
+      "general_causal_superiority_claim": false,
+      "improved_forbids_core_safety_regression": [
+        "selected_action_defensibility",
+        "avoidance_of_claims_beyond_evidence"
+      ],
+      "improved_requires_positive_total_delta": true,
+      "improved_requires_targeted_dimension_gain": [
+        "indispensable_missing_evidence_identification",
+        "falsifier_and_contradiction_recognition"
+      ],
+      "rule_version": "G08_ONE_CASE_VALUE_V1"
+    },
+    "session_nonce": "7a8874689d1cd624136716041498432304e7e20f2869534282ca84eb5c082655",
+    "smoke_current_decision_path": "data/gv_e0b/dv1_g08/smoke/certified_current_decision_attempt1_smoke.json"
+  },
+  "recorded_at": "2026-07-22T14:51:48.409900Z",
+  "rejected": {
+    "IMPROVED": true,
+    "comparison_observed_eligible_true": true,
+    "observed_count_1": true,
+    "stage_promotion": true
+  },
+  "schema_version": "gv_e0b_g08_attempt_invalidation_v1"
+}

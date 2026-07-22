@@ -6543,3 +6543,9 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Residual: operational principal labels / same-process agent execution; GitHub receipt is operational separation only.
 - Next: V2-B0 real block-only admission after this result-bearing commit hosted green.
 
+
+## G08 Attempt-1 invalidation (2026-07-22)
+- INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED; observed authority 0; score 39; stage CERTIFIED_SINGLE_DECISION_OPERABLE.
+- Sealed Attempt-1 evidence preserved; observation eligibility superseded by append-only invalidation.
+- Receipts now require provider-authenticated GitHub author login (v2).
+

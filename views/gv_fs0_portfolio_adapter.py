@@ -217,12 +217,14 @@ def render_e0b_dv1_surface(
     from core.gv_e0b_dv1_contradiction import (
         DEFAULT_RESULT_JSON,
         GvE0bDv1Error,
-        observed_comparison_count_from_disk,
+        observation_authority_from_disk,
         render_e0b_dv1_comparison,
     )
 
     path = Path(result_json_path) if result_json_path is not None else DEFAULT_RESULT_JSON
-    count = observed_comparison_count_from_disk(path)
+    authority = observation_authority_from_disk(path)
+    count = int(authority["observed_comparison_count"])
+    inv = authority.get("invalidation")
     if not path.is_file():
         renderer.caption(
             f"E0B observed-comparison count = {count} "
@@ -231,11 +233,16 @@ def render_e0b_dv1_surface(
         )
         return None
     try:
+        # Always render sealed product-smoke comparison; observation authority
+        # is supersedable by append-only invalidation (count may remain 0).
         return dict(render_e0b_dv1_comparison(renderer, result_json_path=path))
     except GvE0bDv1Error as exc:
+        inv_bit = ""
+        if isinstance(inv, dict):
+            inv_bit = f"; invalidation={inv.get('classification')}"
         renderer.caption(
             f"E0B observed-comparison count = {count} "
-            f"(comparison artifact refused: {exc})"
+            f"(comparison artifact refused: {exc}{inv_bit})"
         )
         return None
 

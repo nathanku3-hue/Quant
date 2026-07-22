@@ -414,6 +414,8 @@ def _fixture_paths(
         external_receipt = build_github_rubric_receipt(
             repository="example/quant-reviewer-fixtures",
             authenticated_submitter_id=rev,
+            github_author_login=rev,
+            github_committer_login=rev,
             submission_commit_sha="a" * 40,
             rubric_path="reviewer_submissions/g08_rubric.json",
             rubric_blob_oid="b" * 40,
@@ -2962,6 +2964,8 @@ def test_github_receipt_byte_mismatch_rejected(tmp_path: Path) -> None:
     receipt = build_github_rubric_receipt(
         repository="example/repo",
         authenticated_submitter_id="REV_HUMAN_1",
+            github_author_login="REV_HUMAN_1",
+            github_committer_login="REV_HUMAN_1",
         submission_commit_sha="a" * 40,
         rubric_path="r.json",
         rubric_blob_oid=None,
@@ -2991,6 +2995,8 @@ def test_github_receipt_submitter_mismatch_rejected(tmp_path: Path) -> None:
     receipt = build_github_rubric_receipt(
         repository="example/repo",
         authenticated_submitter_id="REV_HUMAN_1",
+            github_author_login="REV_HUMAN_1",
+            github_committer_login="REV_HUMAN_1",
         submission_commit_sha="a" * 40,
         rubric_path="r.json",
         rubric_blob_oid=None,

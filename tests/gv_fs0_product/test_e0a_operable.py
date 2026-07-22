@@ -39,32 +39,19 @@ from views.gv_fs0_portfolio_adapter import (
 
 ROOT = Path(__file__).resolve().parents[2]
 
-# E0A rebuilt research identity (engine fixture; not necessarily tracked current).
+# Mandatory tracked current-decision identities (hosted parity pins these).
+# After Attempt-1 invalidation, product authority is restored to E0A NO_POSITION.
 EXPECTED_RESEARCH_DECISION_HASH = (
     "b4694a69bd1bc35a0d97a839ad47b66b517da1bd0f4abccd56bacca22d9e8e38"
 )
 EXPECTED_CERTIFIED_RESULT_HASH = (
     "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6"
 )
-EXPECTED_E0A_CURRENT_FILE_SHA256 = (
+EXPECTED_CURRENT_FILE_SHA256 = (
     "7ba9c7c48dfc89ceae2a5a88aba8bfebbe6d5032272b0d254f4139478699b5c9"
 )
-EXPECTED_E0A_CURRENT_BYTE_LENGTH = 23_696
+EXPECTED_CURRENT_BYTE_LENGTH = 23_696
 EXPECTED_RATIONALE_REF = f"{RATIONALE_REF_PREFIX}{EXPECTED_RESEARCH_DECISION_HASH}"
-
-# Tracked product authority after G08 Attempt-1 publish (NO_POSITION + E0B:CMP binding).
-EXPECTED_G08_DECISION_ID = "DECISION_E0B_DV1_G08_1"
-EXPECTED_G08_COMPARISON_HASH = (
-    "4524a358ba46a3029627d09729eacfe515f4f501e6bb4b9d0ea82685dd2bac37"
-)
-EXPECTED_G08_RATIONALE_REF = f"E0B:CMP:{EXPECTED_G08_COMPARISON_HASH}"
-EXPECTED_G08_CERTIFIED_RESULT_HASH = (
-    "0321f1bc926c790da48a5ff453c52eec0ed7454302840d0e3c146103ea09c5a2"
-)
-EXPECTED_G08_CURRENT_FILE_SHA256 = (
-    "2089697e82d9343846c3a57697997c5051c944b7cf404d76d2f5927fe65ea6fa"
-)
-EXPECTED_G08_CURRENT_BYTE_LENGTH = 23_498
 
 
 class FakeRenderer:
@@ -333,53 +320,41 @@ def test_dashboard_default_path_is_single_current_not_dual_bundle() -> None:
     assert "render_gv_fs0_certified_bundle" not in imports
 
 
-def test_tracked_current_decision_artifact_is_mandatory_g08_identity() -> None:
-    """Tracked default product authority is the G08-published NO_POSITION decision."""
+def test_tracked_current_decision_artifact_is_mandatory_e0a_identity() -> None:
+    """Tracked default product authority must exist and match fixed hashes (no skip)."""
 
     path = DEFAULT_CURRENT_DECISION_TARGET
     assert path.is_file(), "tracked current-decision artifact is mandatory"
     raw = path.read_bytes()
-    assert len(raw) == EXPECTED_G08_CURRENT_BYTE_LENGTH
-    assert hashlib.sha256(raw).hexdigest() == EXPECTED_G08_CURRENT_FILE_SHA256
+    assert len(raw) == EXPECTED_CURRENT_BYTE_LENGTH
+    assert hashlib.sha256(raw).hexdigest() == EXPECTED_CURRENT_FILE_SHA256
 
-    # E0A research rebuild remains deterministic substrate (not the tracked current).
     research = build_e0a_research_decision(root=ROOT)
     assert research["research_decision_hash"] == EXPECTED_RESEARCH_DECISION_HASH
     assert research["rationale_ref"] == EXPECTED_RATIONALE_REF
 
     component = load_current_certified_decision(path)
-    assert component["decision"]["decision_id"] == EXPECTED_G08_DECISION_ID
+    assert component["decision"]["decision_id"] == E0A_DECISION_ID
     assert component["decision"]["action"] == "NO_POSITION"
-    assert component["decision"]["rationale_ref"] == EXPECTED_G08_RATIONALE_REF
-    assert component["certified_decision_result_hash"] == EXPECTED_G08_CERTIFIED_RESULT_HASH
+    assert component["decision"]["rationale_ref"] == EXPECTED_RATIONALE_REF
+    assert component["certified_decision_result_hash"] == EXPECTED_CERTIFIED_RESULT_HASH
     assert component["certification"]["certification_status"] == "CERTIFIED"
 
-    # E0A rebuild stays deterministic and distinct from G08 current authority.
+    # Double publish determinism vs tracked bytes.
     rebuilt = build_e0a_certified_result(root=ROOT)
     from core.gv_fs0_current_decision import certified_decision_result_bytes
 
     first = certified_decision_result_bytes(rebuilt)
     second = certified_decision_result_bytes(build_e0a_certified_result(root=ROOT))
-    assert first == second
-    assert first != raw
-    assert hashlib.sha256(first).hexdigest() == EXPECTED_E0A_CURRENT_FILE_SHA256
-    assert len(first) == EXPECTED_E0A_CURRENT_BYTE_LENGTH
+    assert first == second == raw
 
 
-def test_publish_e0a_twice_matches_e0a_identity_not_g08_current(tmp_path: Path) -> None:
-    """E0A publish path remains idempotent; G08 owns tracked current after Attempt-1."""
-
+def test_publish_e0a_twice_matches_tracked_bytes(tmp_path: Path) -> None:
     target, lock = _current_paths(tmp_path)
     first = publish_e0a_current_decision(target=target, lock_path=lock, root=ROOT)
     second = publish_e0a_current_decision(target=target, lock_path=lock, root=ROOT)
     assert first.status == "REPLACED"
     assert second.status == "IDEMPOTENT"
     assert first.certified_decision_result_hash == EXPECTED_CERTIFIED_RESULT_HASH
-    assert hashlib.sha256(target.read_bytes()).hexdigest() == EXPECTED_E0A_CURRENT_FILE_SHA256
-    assert len(target.read_bytes()) == EXPECTED_E0A_CURRENT_BYTE_LENGTH
-    # Tracked product authority remains the G08 publication, not the E0A rebuild.
-    assert target.read_bytes() != DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
-    assert (
-        hashlib.sha256(DEFAULT_CURRENT_DECISION_TARGET.read_bytes()).hexdigest()
-        == EXPECTED_G08_CURRENT_FILE_SHA256
-    )
+    assert target.read_bytes() == DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
+    assert hashlib.sha256(target.read_bytes()).hexdigest() == EXPECTED_CURRENT_FILE_SHA256
