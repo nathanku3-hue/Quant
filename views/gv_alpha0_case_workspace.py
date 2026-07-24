@@ -8,6 +8,9 @@ Product bank is sealed-only until dogfood confirmation. Page load never
 auto-builds. Operator confirmation requires a verified seal load first.
 CERTIFIED_MULTI_SOURCE_CASE_OPERABLE is earned only by UI dogfood confirmation,
 not offline bank tooling.
+
+RC1.2: after UI confirm, force a verified full-page rerun so the page shows
+exactly one canonical state (certified) — never sealed table + success toast.
 """
 
 from __future__ import annotations
@@ -199,54 +202,18 @@ def apply_operator_confirmation(
         raise GvAlpha0CaseWorkspaceError(str(exc)) from exc
 
 
-def render_case_workspace(
-    st: WorkspaceRenderer,
-    *,
-    root: Path | None = None,
-    verify: bool = True,
-) -> dict[str, Any]:
-    """Render default Case Workspace for GV-ALPHA0-CLOSE.
-
-    Product path must use verify=True. Confirmation is refused without a
-    verified seal load (dogfood interaction, not offline pre-cert).
-    """
-
-    st.header("Case Workspace")
-    st.caption(
-        "GV-ALPHA0-CLOSE default surface. Multi-source MU G_supply case: "
-        "coverage=PARTIAL (evidence overlap only) · claim=CLAIM_INSUFFICIENT · "
-        "research=HOLD_FOR_EVIDENCE · portfolio=NO_POSITION (invariant paper). "
-        "Product bank is sealed-only until dogfood confirmation. "
-        "Load verifies seal from raw; certification requires explicit operator "
-        "confirm action. OPERABLE stage is UI-dogfood only (not offline bank). "
-        "Score 39 frozen; observed 0; publish/truth/tag deferred until after "
-        "fresh-clone/dogfood."
-    )
-    if not verify:
-        st.error("Case Workspace product path requires verify=True")
-        st.caption("Authority refused: ALPHA0_CLOSE_VERIFY_REQUIRED_BEFORE_CONFIRM")
-        raise GvAlpha0CaseWorkspaceError("ALPHA0_CLOSE_VERIFY_REQUIRED_BEFORE_CONFIRM")
-
-    try:
-        model = load_workspace_model(root=root, verify=True)
-    except GvAlpha0CaseWorkspaceError as exc:
-        st.error("Case Workspace unavailable")
-        st.caption(f"Authority refused: {exc}")
-        raise
-
-    if not model.get("seal_verified_on_load"):
-        st.error("Seal was not verified on load; confirmation blocked")
-        raise GvAlpha0CaseWorkspaceError("ALPHA0_CLOSE_SEAL_NOT_VERIFIED_ON_LOAD")
-
+def _is_awaiting_confirmation(model: Mapping[str, Any]) -> bool:
     stage = str(model.get("functional_stage", ""))
-    awaiting = bool(model.get("awaiting_operator_confirmation"))
-    if awaiting or stage == FUNCTIONAL_STAGE_PRE_ADJUDICATION:
-        st.subheader("MU G_supply — sealed pre-adjudication case")
-    else:
-        st.subheader("MU G_supply — certified multi-source case")
+    if bool(model.get("awaiting_operator_confirmation")):
+        return True
+    if stage == FUNCTIONAL_STAGE_PRE_ADJUDICATION:
+        return True
+    if not model.get("adjudication_present"):
+        return True
+    return False
 
-    st.table(build_workspace_rows(model))
 
+def _render_evidence(st: WorkspaceRenderer, model: Mapping[str, Any]) -> None:
     st.subheader("Both-source evidence (excerpts · locators · overlap)")
     evidence_rows = build_evidence_rows(model)
     if evidence_rows:
@@ -276,46 +243,61 @@ def render_case_workspace(
         "business capture, and economics. Alpha remains paper NO_POSITION."
     )
 
-    if awaiting or not model.get("adjudication_present"):
-        st.subheader("Operator confirmation (required before certification)")
-        st.caption(
-            f"Verified seal loaded. Type phrase `{OPERATOR_CONFIRMATION_PHRASE}` "
-            f"and a self-labelled operator id, then confirm. Sole permitted action: "
-            f"`{PORTFOLIO_ACTION_NO_POSITION}`. "
-            f"UI confirm earns `{FUNCTIONAL_STAGE_OPERABLE}` (dogfood); "
-            f"offline bank tooling cannot."
-        )
-        label = st.text_input(
-            "Self-labelled operator id",
-            value="SELF_LABELLED_OPERATOR",
-            key="alpha0_operator_label",
-        )
-        phrase = st.text_input(
-            "Confirmation phrase",
-            value="",
-            key="alpha0_confirm_phrase",
-        )
-        if st.button("Confirm NO_POSITION and certify", key="alpha0_confirm_btn"):
-            try:
-                out = apply_operator_confirmation(
-                    root=root,
-                    adjudicator_label=label.strip(),
-                    confirmation_phrase=phrase.strip(),
-                    require_verified_load=True,
-                )
-                st.success(
-                    f"Confirmed and certified. stage={out.get('functional_stage')} "
-                    f"result_hash={out.get('result_hash', '')[:16]}…"
-                )
-                model = dict(out.get("view") or load_workspace_model(root=root, verify=True))
-            except GvAlpha0CaseWorkspaceError as exc:
-                st.error(f"Confirmation refused: {exc}")
-    else:
-        st.success(
-            f"Operator confirmation present; certification="
-            f"{model.get('certification_status')} · stage={model.get('functional_stage')} "
-            f"· surface={model.get('capture_surface')}"
-        )
+
+def _render_sealed_pre_adjudication(
+    st: WorkspaceRenderer,
+    model: Mapping[str, Any],
+    *,
+    root: Path | None,
+) -> dict[str, Any]:
+    """Single canonical sealed state + confirm form. Never mixed with certified rows."""
+
+    st.caption(
+        "GV-ALPHA0-CLOSE · sealed pre-adjudication only. "
+        "coverage=PARTIAL (overlap only) · claim=CLAIM_INSUFFICIENT · "
+        "portfolio=NO_POSITION. Score 39 / observed 0. "
+        "Confirm requires verified seal; OPERABLE is UI-dogfood only."
+    )
+    st.subheader("MU G_supply — sealed pre-adjudication case")
+    st.table(build_workspace_rows(model))
+    _render_evidence(st, model)
+
+    st.subheader("Operator confirmation (required before certification)")
+    st.caption(
+        f"Verified seal loaded. Type phrase `{OPERATOR_CONFIRMATION_PHRASE}` "
+        f"and a self-labelled operator id, then confirm. Sole permitted action: "
+        f"`{PORTFOLIO_ACTION_NO_POSITION}`. "
+        f"UI confirm earns `{FUNCTIONAL_STAGE_OPERABLE}` (dogfood); "
+        f"offline bank tooling cannot."
+    )
+    label = st.text_input(
+        "Self-labelled operator id",
+        value="SELF_LABELLED_OPERATOR",
+        key="alpha0_operator_label",
+    )
+    phrase = st.text_input(
+        "Confirmation phrase",
+        value="",
+        key="alpha0_confirm_phrase",
+    )
+    if st.button("Confirm NO_POSITION and certify", key="alpha0_confirm_btn"):
+        try:
+            apply_operator_confirmation(
+                root=root,
+                adjudicator_label=label.strip(),
+                confirmation_phrase=phrase.strip(),
+                require_verified_load=True,
+            )
+            # Force a full verified re-run so the next paint is certified-only.
+            # Do not mutate on-page tables in this same run (avoids dual state).
+            rerun = getattr(st, "rerun", None)
+            if callable(rerun):
+                rerun()
+            # AppTest / non-streamlit fallback: verified reload of certified bank.
+            model = load_workspace_model(root=root, verify=True)
+            return _render_certified_canonical(st, model)
+        except GvAlpha0CaseWorkspaceError as exc:
+            st.error(f"Confirmation refused: {exc}")
 
     st.warning(
         "Publication of current decision and truth cutover are not authorized "
@@ -324,6 +306,76 @@ def render_case_workspace(
     if model.get("claim_boundary"):
         st.caption(str(model["claim_boundary"]))
     return dict(model)
+
+
+def _render_certified_canonical(
+    st: WorkspaceRenderer,
+    model: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Single canonical certified state — no sealed/NOT_YET/pre-adjudication chrome."""
+
+    stage = str(model.get("functional_stage", ""))
+    st.caption(
+        "GV-ALPHA0-CLOSE · certified multi-source case (canonical post-confirm). "
+        "coverage=PARTIAL (overlap only) · claim=CLAIM_INSUFFICIENT · "
+        f"stage=`{stage}` · surface=`{model.get('capture_surface') or '—'}`. "
+        "Score 39 / observed 0. Publication not authorized on this surface."
+    )
+    st.subheader("MU G_supply — certified multi-source case")
+    st.success(
+        f"Operator confirmation present; certification="
+        f"{model.get('certification_status')} · stage={stage} "
+        f"· surface={model.get('capture_surface')} "
+        f"· result_hash={(model.get('result_hash') or '')[:16]}…"
+    )
+    st.table(build_workspace_rows(model))
+    _render_evidence(st, model)
+
+    # Explicit absence of pre-adjudication / confirm chrome.
+    st.warning(
+        "Publication of current decision and truth cutover are not authorized "
+        "from this surface yet."
+    )
+    if model.get("claim_boundary"):
+        st.caption(str(model["claim_boundary"]))
+    return dict(model)
+
+
+def render_case_workspace(
+    st: WorkspaceRenderer,
+    *,
+    root: Path | None = None,
+    verify: bool = True,
+) -> dict[str, Any]:
+    """Render default Case Workspace for GV-ALPHA0-CLOSE.
+
+    Product path must use verify=True. Confirmation is refused without a
+    verified seal load (dogfood interaction, not offline pre-cert).
+
+    Exactly one of sealed-pre-adjudication or certified-canonical is painted
+    per run. Post-confirm always forces verified reload/rerun (RC1.2).
+    """
+
+    st.header("Case Workspace")
+    if not verify:
+        st.error("Case Workspace product path requires verify=True")
+        st.caption("Authority refused: ALPHA0_CLOSE_VERIFY_REQUIRED_BEFORE_CONFIRM")
+        raise GvAlpha0CaseWorkspaceError("ALPHA0_CLOSE_VERIFY_REQUIRED_BEFORE_CONFIRM")
+
+    try:
+        model = load_workspace_model(root=root, verify=True)
+    except GvAlpha0CaseWorkspaceError as exc:
+        st.error("Case Workspace unavailable")
+        st.caption(f"Authority refused: {exc}")
+        raise
+
+    if not model.get("seal_verified_on_load"):
+        st.error("Seal was not verified on load; confirmation blocked")
+        raise GvAlpha0CaseWorkspaceError("ALPHA0_CLOSE_SEAL_NOT_VERIFIED_ON_LOAD")
+
+    if _is_awaiting_confirmation(model):
+        return _render_sealed_pre_adjudication(st, model, root=root)
+    return _render_certified_canonical(st, model)
 
 
 # Re-export banked path for tests.

@@ -159,6 +159,18 @@ def test_alpha_app_apptest_pre_adj_then_confirm(
     assert clicked, "confirm button not found"
     app = app.run(timeout=120)
     assert not app.exception, app.exception
+    # RC1.2: confirm forces verified rerun → single certified paint.
+    # Drain residual sealed paint (AppTest may need one extra run after st.rerun).
+    for _ in range(3):
+        sub_blob = "\n".join(str(getattr(s, "value", s)) for s in app.subheader)
+        table_blob = "\n".join(str(getattr(t, "value", t)) for t in app.table)
+        sealed_still = "sealed pre-adjudication" in sub_blob.lower() or (
+            FUNCTIONAL_STAGE_PRE_ADJUDICATION in table_blob
+        )
+        if not sealed_still:
+            break
+        app = app.run(timeout=120)
+        assert not app.exception, app.exception
 
     assert (case_dir / "operator_confirmation.json").is_file()
     assert (case_dir / "result.json").is_file()
@@ -167,6 +179,27 @@ def test_alpha_app_apptest_pre_adj_then_confirm(
     assert "CASE_WORKSPACE_UI" in (case_dir / "operator_confirmation.json").read_text(
         encoding="utf-8"
     )
+
+    # Fresh session load of the same bank must paint certified-only (no dual state).
+    app2 = AppTest.from_file(str(ROOT / "alpha_app.py"))
+    app2 = app2.run(timeout=90)
+    assert not app2.exception, app2.exception
+    subheaders = [str(getattr(s, "value", s)) for s in app2.subheader]
+    table_after = "\n".join(str(getattr(t, "value", t)) for t in app2.table)
+    success_after = "\n".join(str(getattr(s, "value", s)) for s in app2.success)
+    captions = [str(getattr(c, "value", c)) for c in app2.caption]
+    page_blob = "\n".join(subheaders + [table_after, success_after] + captions)
+    assert any("certified multi-source case" in s.lower() for s in subheaders), subheaders
+    assert not any("sealed pre-adjudication" in s.lower() for s in subheaders), subheaders
+    assert not any("sealed pre-adjudication only" in c.lower() for c in captions)
+    assert FUNCTIONAL_STAGE_OPERABLE in page_blob or FUNCTIONAL_STAGE_OPERABLE in table_after
+    assert FUNCTIONAL_STAGE_PRE_ADJUDICATION not in table_after
+    assert "NOT_YET" not in table_after
+    # Confirm form is sealed-path only; certified reload must not offer it.
+    assert not any(
+        "Confirm NO_POSITION and certify" in str(getattr(b, "label", "") or "")
+        for b in app2.button
+    ), [getattr(b, "label", None) for b in app2.button]
 
 
 def test_workspace_no_autobuild_on_missing_bank(
@@ -227,6 +260,83 @@ def test_render_refuses_verify_false() -> None:
 
     with pytest.raises(GvAlpha0CaseWorkspaceError, match="VERIFY_REQUIRED"):
         render_case_workspace(_Fake(), verify=False)
+
+
+def test_render_certified_has_no_sealed_subheader(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """RC1.2: certified paint must not include sealed pre-adjudication chrome."""
+
+    from core.gv_v2_alpha0_case_close import (
+        CAPTURE_SURFACE_UI,
+        confirm_operator_and_certify,
+        seal_pre_adjudication_case,
+    )
+    from views.gv_alpha0_case_workspace import render_case_workspace
+    import views.gv_alpha0_case_workspace as ws
+
+    case_dir = tmp_path / "case"
+    seal_pre_adjudication_case(root=ROOT, case_dir=case_dir)
+    confirm_operator_and_certify(
+        root=ROOT,
+        case_dir=case_dir,
+        adjudicator_label="UNIT_TEST_OPERATOR",
+        confirmed_at="2026-07-24T15:00:00.000000Z",
+        confirmation_phrase=OPERATOR_CONFIRMATION_PHRASE,
+        capture_surface=CAPTURE_SURFACE_UI,
+    )
+    monkeypatch.setattr(ws, "resolve_case_dir", lambda *, root=None: case_dir)
+
+    class _Fake:
+        def __init__(self) -> None:
+            self.subheaders: list[str] = []
+            self.tables: list[object] = []
+            self.successes: list[str] = []
+            self.captions: list[str] = []
+
+        def header(self, body: str) -> None:
+            return None
+
+        def caption(self, body: str) -> None:
+            self.captions.append(body)
+
+        def error(self, body: str) -> None:
+            return None
+
+        def subheader(self, body: str) -> None:
+            self.subheaders.append(body)
+
+        def table(self, data: object) -> None:
+            self.tables.append(data)
+
+        def info(self, body: str) -> None:
+            return None
+
+        def warning(self, body: str) -> None:
+            return None
+
+        def success(self, body: str) -> None:
+            self.successes.append(body)
+
+        def markdown(self, body: str) -> None:
+            return None
+
+        def text_input(self, label: str, value: str = "", key: str | None = None) -> str:
+            return value
+
+        def button(self, label: str, key: str | None = None) -> bool:
+            return False
+
+    fake = _Fake()
+    model = render_case_workspace(fake, root=ROOT, verify=True)
+    assert model.get("functional_stage") == FUNCTIONAL_STAGE_OPERABLE
+    assert any("certified multi-source case" in s.lower() for s in fake.subheaders)
+    assert not any("sealed pre-adjudication" in s.lower() for s in fake.subheaders)
+    assert fake.successes
+    table_blob = "\n".join(str(t) for t in fake.tables)
+    assert FUNCTIONAL_STAGE_PRE_ADJUDICATION not in table_blob
+    assert "NOT_YET" not in table_blob
+    assert not any("sealed pre-adjudication only" in c.lower() for c in fake.captions)
 
 
 def test_launch_alpha_strips_broker_env_keys() -> None:
