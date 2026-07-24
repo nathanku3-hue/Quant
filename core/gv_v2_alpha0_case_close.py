@@ -44,6 +44,7 @@ from core.gv_fs0_certify import (
     build_certified_result_from_book,
     run_isolated_verifier,
 )
+from core.gv_fs0_current_decision import certified_decision_result_bytes
 from core.gv_fs0_publish import (
     CurrentDecisionPublicationResult,
     DEFAULT_CURRENT_DECISION_LOCK,
@@ -807,6 +808,7 @@ def build_export_bundle(
     evidence_panel: Mapping[str, Any] | None = None,
     pre_adjudication_seal: Mapping[str, Any] | None = None,
     operator_confirmation: Mapping[str, Any] | None = None,
+    certified: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     artifacts: dict[str, Any] = {
         "case_manifest": _plain(case_manifest),
@@ -822,6 +824,10 @@ def build_export_bundle(
         artifacts["pre_adjudication_seal"] = _plain(pre_adjudication_seal)
     if operator_confirmation is not None:
         artifacts["operator_confirmation"] = _plain(operator_confirmation)
+    # Full role-bearing certified object (not hash-only) — required for later
+    # publish_current_decision import (RC1.1 custody).
+    if certified is not None:
+        artifacts["certified_decision_result"] = _plain(certified)
     body: dict[str, Any] = {
         "schema_version": "gv_alpha0_case_export_v1",
         "case_id": CASE_ID,
@@ -845,6 +851,10 @@ def build_export_bundle(
     if pre_adjudication_seal is not None:
         body["pre_adjudication_seal_hash"] = pre_adjudication_seal[
             "pre_adjudication_seal_hash"
+        ]
+    if certified is not None:
+        body["certified_decision_result_hash"] = certified[
+            "certified_decision_result_hash"
         ]
     body["export_hash"] = domain_hash(EXPORT_DOMAIN, body)
     return body
@@ -1081,6 +1091,7 @@ def rebuild_canonical_close_chain(
             evidence_panel=evidence_panel,
             pre_adjudication_seal=pre_seal,
             operator_confirmation=confirmation,
+            certified=certified,
         )
         out["certified"] = certified
         out["result"] = result
@@ -1147,6 +1158,10 @@ def verify_close_chain(
     banked_result = _load_json(
         out_dir / "result.json", missing_code="ALPHA0_CLOSE_RESULT_MISSING"
     )
+    banked_certified = _load_json(
+        out_dir / "certified_decision_result.json",
+        missing_code="ALPHA0_CLOSE_CERTIFIED_DECISION_RESULT_MISSING",
+    )
     banked_export = _load_json(
         out_dir / "export_bundle.json", missing_code="ALPHA0_CLOSE_EXPORT_MISSING"
     )
@@ -1203,12 +1218,20 @@ def verify_close_chain(
         error_code="ALPHA0_CLOSE_RESEARCH_NOT_CANONICAL",
     )
     _exact_match(
+        banked_certified,
+        rebuilt["certified"],
+        error_code="ALPHA0_CLOSE_CERTIFIED_DECISION_RESULT_NOT_CANONICAL",
+    )
+    _exact_match(
         banked_result, rebuilt["result"], error_code="ALPHA0_CLOSE_RESULT_NOT_CANONICAL"
     )
     _exact_match(
         banked_export,
         rebuilt["export"],
         error_code="ALPHA0_CLOSE_EXPORT_NOT_CANONICAL",
+    )
+    _assert_certified_publish_ready(
+        banked_certified, result_hash=banked_result.get("certified_decision_result_hash")
     )
     if banked_result.get("portfolio_action") != PORTFOLIO_ACTION_NO_POSITION:
         raise GvAlpha0CloseError("ALPHA0_CLOSE_RESULT_POSITION_INVARIANT_BROKEN")
@@ -1225,13 +1248,37 @@ def verify_close_chain(
     return rebuilt
 
 
+def _assert_certified_publish_ready(
+    certified: Mapping[str, Any],
+    *,
+    result_hash: Any,
+) -> None:
+    """Fail closed if certified object cannot feed publish_current_decision."""
+
+    role = certified.get("role")
+    if role not in {"OPEN", "NO_POSITION"}:
+        raise GvAlpha0CloseError(f"ALPHA0_CLOSE_CERTIFIED_ROLE_INVALID:{role!r}")
+    cdr_hash = certified.get("certified_decision_result_hash")
+    if not cdr_hash:
+        raise GvAlpha0CloseError("ALPHA0_CLOSE_CERTIFIED_HASH_MISSING")
+    if result_hash is not None and cdr_hash != result_hash:
+        raise GvAlpha0CloseError("ALPHA0_CLOSE_CERTIFIED_HASH_RESULT_MISMATCH")
+    try:
+        # Exercises the same role-bearing byte gate used by publish_current_decision.
+        certified_decision_result_bytes(certified)
+    except Exception as exc:  # noqa: BLE001 — surface as close custody error
+        raise GvAlpha0CloseError(
+            f"ALPHA0_CLOSE_CERTIFIED_NOT_PUBLISH_READY:{exc}"
+        ) from exc
+
+
 def replay_export_bundle(
     export_bundle: Mapping[str, Any],
     *,
     root: Path | None = None,
     verifier_runner: VerifierRunner = run_isolated_verifier,
 ) -> dict[str, Any]:
-    """Replay: rebuild chain and require export/result hash match."""
+    """Replay: rebuild chain and require export/result/certified hash match."""
 
     arts = export_bundle["artifacts"]
     adj = arts["adjudication"]
@@ -1251,6 +1298,18 @@ def replay_export_bundle(
         raise GvAlpha0CloseError("ALPHA0_CLOSE_REPLAY_RESULT_MISMATCH")
     if rebuilt["export"]["export_hash"] != export_bundle["export_hash"]:
         raise GvAlpha0CloseError("ALPHA0_CLOSE_REPLAY_EXPORT_MISMATCH")
+    banked_certified = arts.get("certified_decision_result")
+    if banked_certified is None:
+        raise GvAlpha0CloseError("ALPHA0_CLOSE_REPLAY_CERTIFIED_MISSING")
+    _exact_match(
+        banked_certified,
+        rebuilt["certified"],
+        error_code="ALPHA0_CLOSE_REPLAY_CERTIFIED_MISMATCH",
+    )
+    _assert_certified_publish_ready(
+        banked_certified,
+        result_hash=arts["result"].get("certified_decision_result_hash"),
+    )
     return rebuilt
 
 
@@ -1269,6 +1328,7 @@ def _write_close_bundle(
     packet_md: str,
     view: Mapping[str, Any],
     result: Mapping[str, Any],
+    certified: Mapping[str, Any],
 ) -> None:
     _atomic_write_case_bundle(
         out_dir,
@@ -1281,6 +1341,7 @@ def _write_close_bundle(
             "operator_confirmation.json": operator_confirmation,
             "adjudication.json": adjudication,
             "research_decision.json": research,
+            "certified_decision_result.json": certified,
             "export_bundle.json": export,
             "decision_packet.md": packet_md,
             "case_workspace_view.json": view,
@@ -1295,6 +1356,7 @@ def _write_close_bundle(
             "operator_confirmation.json",
             "adjudication.json",
             "research_decision.json",
+            "certified_decision_result.json",
             "export_bundle.json",
             "decision_packet.md",
             "case_workspace_view.json",
@@ -1449,6 +1511,7 @@ def confirm_operator_and_certify(
         evidence_panel=banked_evidence,
         pre_adjudication_seal=banked_seal,
         operator_confirmation=confirmation,
+        certified=certified,
     )
 
     packet_md = build_decision_packet_markdown(
@@ -1469,6 +1532,9 @@ def confirm_operator_and_certify(
         adjudication=adjudication,
         result=result,
     )
+    _assert_certified_publish_ready(
+        certified, result_hash=result.get("certified_decision_result_hash")
+    )
     _write_close_bundle(
         out_dir,
         case_manifest=banked_manifest,
@@ -1483,6 +1549,7 @@ def confirm_operator_and_certify(
         packet_md=packet_md,
         view=view,
         result=result,
+        certified=certified,
     )
     return {
         "case_id": CASE_ID,
@@ -1490,6 +1557,7 @@ def confirm_operator_and_certify(
         "operator_confirmation_hash": confirmation["operator_confirmation_hash"],
         "adjudication_hash": adjudication["adjudication_hash"],
         "certification_status": result["certification_status"],
+        "certified_decision_result_hash": certified["certified_decision_result_hash"],
         "result_hash": result["result_hash"],
         "export_hash": export["export_hash"],
         "case_dir": str(out_dir),
@@ -1558,6 +1626,9 @@ def run_v2_alpha0_case_close(
         result=result,
     )
 
+    _assert_certified_publish_ready(
+        certified, result_hash=result.get("certified_decision_result_hash")
+    )
     _write_close_bundle(
         out_dir,
         case_manifest=case_manifest,
@@ -1572,6 +1643,7 @@ def run_v2_alpha0_case_close(
         packet_md=packet_md,
         view=view,
         result=result,
+        certified=certified,
     )
 
     publication: CurrentDecisionPublicationResult | None = None
@@ -1591,6 +1663,7 @@ def run_v2_alpha0_case_close(
         "research_action": research["research_action"],
         "portfolio_action": research["portfolio_action"],
         "certification_status": result["certification_status"],
+        "certified_decision_result_hash": certified["certified_decision_result_hash"],
         "result_hash": result["result_hash"],
         "export_hash": export["export_hash"],
         "shipped_product_score": result["shipped_product_score"],

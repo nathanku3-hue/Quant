@@ -43,21 +43,13 @@ from views.optimizer_view import (
 from views.drift_monitor_view import render_drift_monitor_view
 
 from views.page_registry import build_dashboard_navigation
-from views.page_registry import CASE_WORKSPACE_PAGE_TITLE
 from views.page_registry import DISCOVERY_PAGE_TITLE
 from views.page_registry import PORTFOLIO_PAGE_TITLE
 from views.page_registry import STRATEGY_PAGE_TITLE
 from views.discovery_view import render_discovery_page
-from views.gv_alpha0_case_workspace import (
-    GvAlpha0CaseWorkspaceError,
-    render_case_workspace,
-)
 from views.gv_fs0_portfolio_adapter import (
     GvFs0PresentationError,
-    render_e0b_dv1_surface,
     render_gv_fs0_current_decision,
-    render_v2_b0_surface,
-    render_v2_b0b_surface,
 )
 from views.pead_validation_evidence import render_pead_validation_evidence
 from views.strategy_view import render_strategy_page
@@ -4746,38 +4738,22 @@ def _render_placeholder_page(title: str) -> None:
     st.info("DASH-1 shell placeholder. Content design is held for a later approved dashboard phase.")
 
 
-def _render_case_workspace_page() -> None:
-    """Default Alpha product surface: GV-ALPHA0-CLOSE Case Workspace."""
-
-    try:
-        render_case_workspace(st, verify=True)
-    except GvAlpha0CaseWorkspaceError:
-        return
-
-
 def _render_portfolio_allocation_page() -> None:
-    """Secondary certified portfolio authority (current publication surface)."""
+    """Render the sole default certified portfolio authority (one active decision)."""
 
     st.header(PORTFOLIO_PAGE_TITLE)
     st.caption(
-        "Secondary surface. Default product path is Case Workspace (GV-ALPHA0-CLOSE). "
-        "Publication of close as current is deferred until after rebuild + adversarial "
-        "+ fresh-clone/dogfood. Score 39 frozen; observed 0. "
-        "Legacy B0B/E0B surfaces remain optional history only."
+        "E0A operable · research HOLD_FOR_EVIDENCE → paper NO_POSITION. "
+        "One active certified decision. Legacy replay and optimizer outputs are "
+        "non-certifying research surfaces. F1C dual-role bundle remains evidence-only."
     )
     try:
         render_gv_fs0_current_decision(st)
     except GvFs0PresentationError as exc:
         # Fail closed: explicit unavailable authority. Never fall back to F1C dual
-        # bundle, replay, optimizer, B0A/B0B result tables, or any non-certifying surface.
+        # bundle, replay, optimizer, or any non-certifying surface.
         st.error("Certified decision unavailable")
         st.caption(f"Authority refused: {exc}")
-        return
-    # Authority present: optional surfaces. B0B adapter verifies chain + current bind.
-    render_v2_b0_surface(st)
-    render_v2_b0b_surface(st)
-    # Optional E0B surface; Attempt-1 invalidation keeps observed count at 0.
-    render_e0b_dv1_surface(st)
 
 
 def _render_discovery_page() -> None:
@@ -4829,7 +4805,6 @@ def _render_settings_ops_page() -> None:
 
 page = build_dashboard_navigation(
     {
-        CASE_WORKSPACE_PAGE_TITLE: _render_case_workspace_page,
         PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page,
         DISCOVERY_PAGE_TITLE: _render_discovery_page,
         STRATEGY_PAGE_TITLE: _render_strategy_page,

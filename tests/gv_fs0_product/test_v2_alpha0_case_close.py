@@ -163,10 +163,23 @@ def test_seal_then_confirm_path(tmp_path: Path) -> None:
     assert out["functional_stage"] == FUNCTIONAL_STAGE_OPERABLE
     assert (case / "operator_confirmation.json").is_file()
     assert (case / "result.json").is_file()
+    assert (case / "certified_decision_result.json").is_file()
     confirm = json.loads((case / "operator_confirmation.json").read_text(encoding="utf-8"))
     assert confirm["confirmed"] is True
     assert confirm["confirmation_phrase"] == OPERATOR_CONFIRMATION_PHRASE
     assert confirm["capture_surface"] == CAPTURE_SURFACE_UI
+    certified = json.loads(
+        (case / "certified_decision_result.json").read_text(encoding="utf-8")
+    )
+    result = json.loads((case / "result.json").read_text(encoding="utf-8"))
+    assert certified["role"] == "NO_POSITION"
+    assert certified["certified_decision_result_hash"] == (
+        result["certified_decision_result_hash"]
+    )
+    from core.gv_fs0_current_decision import certified_decision_result_bytes
+
+    # Same role-bearing object publish_current_decision requires.
+    certified_decision_result_bytes(certified)
 
 
 def test_product_bank_is_sealed_only() -> None:
@@ -178,6 +191,7 @@ def test_product_bank_is_sealed_only() -> None:
     assert not (case / "result.json").exists()
     assert not (case / "operator_confirmation.json").exists()
     assert not (case / "adjudication.json").exists()
+    assert not (case / "certified_decision_result.json").exists()
     model = load_banked_case_workspace(
         root=ROOT, case_dir=case, verify=True, allow_pre_adjudication=True
     )
@@ -217,6 +231,7 @@ def test_close_vertical_certified_no_position_no_publish(tmp_path: Path) -> None
         "operator_confirmation.json",
         "adjudication.json",
         "research_decision.json",
+        "certified_decision_result.json",
         "export_bundle.json",
         "decision_packet.md",
         "case_workspace_view.json",
@@ -229,6 +244,18 @@ def test_close_vertical_certified_no_position_no_publish(tmp_path: Path) -> None
     assert result["portfolio_action_invariant"] is True
     assert result["coverage_status"] == COVERAGE_PARTIAL
     assert result["claim_outcome"] == CLAIM_OUTCOME_INSUFFICIENT
+    certified = json.loads(
+        (case / "certified_decision_result.json").read_text(encoding="utf-8")
+    )
+    assert certified["role"] == "NO_POSITION"
+    assert certified["certified_decision_result_hash"] == (
+        result["certified_decision_result_hash"]
+    )
+    export = json.loads((case / "export_bundle.json").read_text(encoding="utf-8"))
+    assert "certified_decision_result" in export["artifacts"]
+    assert export["artifacts"]["certified_decision_result"][
+        "certified_decision_result_hash"
+    ] == result["certified_decision_result_hash"]
 
 
 def test_publish_blocked_until_authorized() -> None:
@@ -273,6 +300,34 @@ def test_export_replay_matches(tmp_path: Path) -> None:
     replayed = replay_export_bundle(export, root=ROOT)
     assert replayed["result"]["result_hash"] == export["artifacts"]["result"]["result_hash"]
     assert replayed["export"]["export_hash"] == export["export_hash"]
+    assert (
+        replayed["certified"]["certified_decision_result_hash"]
+        == export["artifacts"]["certified_decision_result"][
+            "certified_decision_result_hash"
+        ]
+    )
+
+
+def test_certified_object_is_publish_current_ready(tmp_path: Path) -> None:
+    """RC1.1: full role-bearing object, not hash-only custody."""
+
+    from core.gv_fs0_current_decision import certified_decision_result_bytes
+    from core.gv_fs0_publish import publish_current_decision
+
+    case = tmp_path / "case"
+    run_v2_alpha0_case_close(root=ROOT, case_dir=case, publish=False)
+    certified = json.loads(
+        (case / "certified_decision_result.json").read_text(encoding="utf-8")
+    )
+    target = tmp_path / "gv_fs0_current_decision.json"
+    lock = tmp_path / "gv_fs0_current_decision.lock"
+    raw = certified_decision_result_bytes(certified)
+    assert raw
+    pub = publish_current_decision(certified, target=target, lock_path=lock)
+    assert pub.certified_decision_result_hash == certified[
+        "certified_decision_result_hash"
+    ]
+    assert target.is_file()
 
 
 def test_case_workspace_view_model_fields(tmp_path: Path) -> None:
