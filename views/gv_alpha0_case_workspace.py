@@ -250,7 +250,11 @@ def _render_sealed_pre_adjudication(
     *,
     root: Path | None,
 ) -> dict[str, Any]:
-    """Single canonical sealed state + confirm form. Never mixed with certified rows."""
+    """Single canonical sealed state + confirm form. Never mixed with certified rows.
+
+    Confirm controls are evaluated *before* sealed tables are painted so a click
+    run never leaves sealed/NOT_YET rows on the same page as success chrome.
+    """
 
     st.caption(
         "GV-ALPHA0-CLOSE · sealed pre-adjudication only. "
@@ -258,9 +262,6 @@ def _render_sealed_pre_adjudication(
         "portfolio=NO_POSITION. Score 39 / observed 0. "
         "Confirm requires verified seal; OPERABLE is UI-dogfood only."
     )
-    st.subheader("MU G_supply — sealed pre-adjudication case")
-    st.table(build_workspace_rows(model))
-    _render_evidence(st, model)
 
     st.subheader("Operator confirmation (required before certification)")
     st.caption(
@@ -288,16 +289,21 @@ def _render_sealed_pre_adjudication(
                 confirmation_phrase=phrase.strip(),
                 require_verified_load=True,
             )
-            # Force a full verified re-run so the next paint is certified-only.
-            # Do not mutate on-page tables in this same run (avoids dual state).
+            # Full verified re-run → next paint is certified-only.
             rerun = getattr(st, "rerun", None)
             if callable(rerun):
                 rerun()
-            # AppTest / non-streamlit fallback: verified reload of certified bank.
+            # AppTest / non-streamlit fallback: do not paint sealed rows this run.
             model = load_workspace_model(root=root, verify=True)
             return _render_certified_canonical(st, model)
         except GvAlpha0CaseWorkspaceError as exc:
             st.error(f"Confirmation refused: {exc}")
+            # Fall through to sealed paint so operator can correct input.
+
+    # Sealed evidence tables only when this run is not a successful confirm.
+    st.subheader("MU G_supply — sealed pre-adjudication case")
+    st.table(build_workspace_rows(model))
+    _render_evidence(st, model)
 
     st.warning(
         "Publication of current decision and truth cutover are not authorized "
