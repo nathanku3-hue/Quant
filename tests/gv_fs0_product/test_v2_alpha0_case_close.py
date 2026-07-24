@@ -182,23 +182,39 @@ def test_seal_then_confirm_path(tmp_path: Path) -> None:
     certified_decision_result_bytes(certified)
 
 
-def test_product_bank_is_sealed_only() -> None:
-    """Committed product bank must not pre-certify (clone must dogfood confirm)."""
+def test_product_bank_sealed_or_operable() -> None:
+    """Product bank is either sealed-only (pre-dogfood) or UI-OPERABLE (post RC2)."""
 
     case = CASE_DIR
     assert (case / "pre_adjudication_seal.json").is_file()
     assert (case / "evidence_panel.json").is_file()
-    assert not (case / "result.json").exists()
-    assert not (case / "operator_confirmation.json").exists()
-    assert not (case / "adjudication.json").exists()
-    assert not (case / "certified_decision_result.json").exists()
     model = load_banked_case_workspace(
         root=ROOT, case_dir=case, verify=True, allow_pre_adjudication=True
     )
-    assert model["functional_stage"] == FUNCTIONAL_STAGE_PRE_ADJUDICATION
     assert model["seal_verified_on_load"] is True
-    assert model["awaiting_operator_confirmation"] is True
     assert model["overlap_panels"]
+    if (case / "result.json").exists():
+        # Post Commit B / dogfood: OPERABLE bank with full certified custody.
+        assert (case / "operator_confirmation.json").is_file()
+        assert (case / "certified_decision_result.json").is_file()
+        assert (case / "export_bundle.json").is_file()
+        assert model["functional_stage"] == FUNCTIONAL_STAGE_OPERABLE
+        assert model["awaiting_operator_confirmation"] is False
+        confirm = json.loads(
+            (case / "operator_confirmation.json").read_text(encoding="utf-8")
+        )
+        assert confirm.get("capture_surface") == CAPTURE_SURFACE_UI
+        result = json.loads((case / "result.json").read_text(encoding="utf-8"))
+        assert result["shipped_product_score"] == SHIPPED_PRODUCT_SCORE
+        assert result["observed_comparison_count"] == OBSERVED_COMPARISON_COUNT
+        assert result["portfolio_action"] == PORTFOLIO_ACTION_NO_POSITION
+    else:
+        # Pre-dogfood sealed-only candidate.
+        assert not (case / "operator_confirmation.json").exists()
+        assert not (case / "adjudication.json").exists()
+        assert not (case / "certified_decision_result.json").exists()
+        assert model["functional_stage"] == FUNCTIONAL_STAGE_PRE_ADJUDICATION
+        assert model["awaiting_operator_confirmation"] is True
 
 
 def test_close_vertical_certified_no_position_no_publish(tmp_path: Path) -> None:
