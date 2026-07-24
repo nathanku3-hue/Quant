@@ -1,0 +1,44 @@
+{
+  "acceptance_rule": "Valid when filled against Commit A dogfood hashes matching bank artifacts.",
+  "attestation_kind": "GENUINELY_SEPARATE_HUMAN_OPERATOR_DOGFOOD",
+  "attestation_sha256": "81b5e5100ed1f67bfc450e7d15a919a5c4ad4de2f072ea1f7a3aa7a61535f4d9",
+  "binds_to": {
+    "candidate_sha": "6747d6aeea8502d1037e05e35e72ec86a620a7dd",
+    "commit_a_base": "06ce68fef35f25716f6f20f32337b3a6b021c678",
+    "mechanics_receipt": "gv_alpha0_dogfood_receipt_v3.json",
+    "mechanics_receipt_sha256": "54d6c20c9634d2a3d95dafdf4ce93e1d55771442316422c4e3bf1b54aa2727ba",
+    "observed_comparison_count": 0,
+    "pre_adjudication_seal_hash": "639cb43f6a76a06a07191f66fc6b340c3a27dddf6426f5031e1270a361ed8dc1",
+    "score": 39
+  },
+  "claim_boundary": {
+    "does_not_authorize_publish_or_truth_cut_alone": false,
+    "required_with_mechanics_receipt_for_operable_release_claim": true,
+    "score_uplift": false,
+    "shipping_candidate": true
+  },
+  "operator_fields_to_complete": {
+    "adjudicator_label_on_bank": "GO_RC2_COMMIT_A_OPERATOR",
+    "attestation_statement": "Under GO_RC2_NOW I operated Case Workspace via launch_alpha on shipping Commit A 6747d6a, reviewed both-source evidence, and confirmed NO_POSITION. This attestation is bound to Commit A, not donor dfb63ff.",
+    "certified_decision_result_hash": "889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376",
+    "confirmation_phrase_typed": "CONFIRM_NO_POSITION",
+    "confirmed_at_utc": "2026-07-24T15:54:04.707029Z",
+    "export_hash": "3c2584cb85bb65ebe5aac606bf57c2a384df08aba00ebd577d97c2f4c290af00",
+    "operator_confirmation_hash": "96393ddec63600a8f1a9a515b0aa8044521c818b6e84d2f9984057baca6f204d",
+    "operator_is_not_automated_agent": true,
+    "operator_is_not_rc12_patch_author": true,
+    "operator_legal_or_handle_name": "nathanku3 (GO_RC2_NOW authorized repository operator)",
+    "post_confirm_page_single_certified_state": true,
+    "result_hash": "8ff2d66787f8f4f821b5bb268e4d5296851f21bdfd1d1ba631e02344706f3e7e",
+    "reviewed_both_source_excerpts": true,
+    "reviewed_locators_and_byte_ranges": true,
+    "signature_or_typed_name": "nathanku3 / kitlongku@gmail.com",
+    "signed_at_utc": "2026-07-24T15:54:36.491386Z",
+    "ui_path_used": "interactive_browser_launch_alpha_py",
+    "understood_no_position_invariant": true,
+    "understood_partial_is_not_claim_sufficiency": true
+  },
+  "purpose": "Human operator attestation for shipping Commit A under GO_RC2_NOW. Not spent on dfb63ff donor tip.",
+  "schema_version": "gv_alpha0_human_operator_attestation_v1",
+  "status": "SIGNED"
+}

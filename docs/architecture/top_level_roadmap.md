@@ -1,9 +1,9 @@
 # Top-Level Roadmap: GodView Certified Portfolio OS
 
-Status: Active Architecture Canon — CERTIFIED_SINGLE_DECISION_OPERABLE; observed-comparison count = 0
-Date: 2026-07-23
-Product tip lineage: main `2c7f32c` (PR #8 merge; B0B substrate `29cfeff`; B0A head `79c309b`)
-Active work: **GV-ALPHA0_ACTIVE** release train (not B0B phase-stop; not B0C-as-sole-gate).
+Status: Active Architecture Canon — CERTIFIED_MULTI_SOURCE_CASE_OPERABLE; observed-comparison count = 0
+Date: 2026-07-24
+Product tip lineage: RC2 Commit B on `codex/gv-alpha0-rc2` (base main `06ce68f`; Commit A `6747d6a`; Alpha close vertical banked)
+Active work: **GV-ALPHA0 close vertical banked** — formal comparison still deferred; no score uplift.
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
 ## Governing sequence (endgame law — explicit ALPHA0 recut 2026-07-23)
@@ -41,17 +41,21 @@ E0A_OPERABLE = BANKED_SUBSTRATE
 E0B_G08_ATTEMPT_1 = INVALID_REVIEWER_INDEPENDENCE_NOT_ESTABLISHED
 E0B_SAME_CASE_ATTEMPT_2 = DEFERRED_AFTER_ALPHA (not Alpha gate)
 V2_B0A_RESULT = CERTIFIED_LOCAL_SOURCE_ABSTENTION → HOLD_FOR_EVIDENCE → NO_POSITION
-V2_B0_DECISION = DECISION_V2_B0B_MU_G_SUPPLY_1 (family one current authority)
-NEXT = exact authorized source family two → one vertical (facts+operator+certified result)
+V2_B0_DECISION = DECISION_V2_B0B_MU_G_SUPPLY_1 (family one banked)
+ALPHA0_CLOSE_DECISION = DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1 (multi-source current authority)
+ALPHA0_CLOSE_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE (UI dogfood on Commit A + receipt v3 + human attestation v1)
+CURRENT_PUBLISHED_CDR_HASH = 889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376
+NEXT = formal comparison DEFERRED; prospective paper economics later
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
-FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
+FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
 OBSERVED_COMPARISON_COUNT = 0
 LOCAL_SOURCE_ABSTENTION_VERTICALS = 1
-REAL_EXTERNAL_SOURCE_PACKAGES_PROCESSED = 1
-DATA_ADMISSION_CERTIFICATES_EARNED = 1
-NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED (via fresh real case after admitted real evidence)
+REAL_EXTERNAL_SOURCE_PACKAGES_PROCESSED = 2
+DATA_ADMISSION_CERTIFICATES_EARNED = 2
+INDEPENDENT_SOURCE_COUNT = 2
+NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED (formal comparison deferred after Alpha)
 E0A_R1_MERGE_PATCH = CLOSED (PR #4 @ 2653eb1)
-ACTIVE_PRODUCT_SLICE = B0B official-source intake executed (ADMITTED+CLAIM_INSUFFICIENT+HOLD); B0A banked substrate
+ACTIVE_PRODUCT_SLICE = GV-ALPHA0-CLOSE multi-source case OPERABLE (CLAIM_INSUFFICIENT + HOLD + paper NO_POSITION); broker-free Case Workspace
 V2_BLOCK_ONLY_REAL_ADMISSION = SUPERSEDED_BY_B0A_CLOSED_PLUS_B0B_ACTIVE
 B0B_HARD_RULES = ADMITTED_NEVER_AUTO_ADVANCES; CONTRADICTION_NOT_EVALUATED_WHEN_NO_ADMITTED_FACTS
 V1_PROTOCOL_AUTHORITY = FORMAL_UNTIL_V2_ARTIFACT_COMMITTED
@@ -65,9 +69,7 @@ LIVE_TRADING_MONITORING = OUT_OF_SCOPE
 FS1_BATCH = NOT_NEXT
 ```
 
-**Now:** V2-B0 executed — one local MU package under evaluation-only authorization; fail-closed **BLOCKED / MISSING_POINT_IN_TIME_AUTHORITY**; certified **NO_POSITION** published as current. Hosted product+protocol+parity close on the result tip; **do not open the next roadmap phase in this round**.  
-E0A is banked plumbing; E0B is invalidation-safe machinery + smoke, not a valid observed comparison. Score stays **39/100**.  
-Report **observed-comparison count** (currently 0); do not use unofficial decision-value or conjunctive maturity percentages.
+**Now:** GV-ALPHA0-CLOSE multi-source vertical banked — both source families, sealed pre-adjudication, UI dogfood confirmation, full certified-object custody, receipt v3 + human attestation v1 on Commit A, current decision published to `gv_fs0_current_decision.json` (role `NO_POSITION`, decision `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`). Score stays **39/100**. Observed-comparison count stays **0**. Formal comparison deferred. No alpha claim.
 
 ### What E0A proves vs does not prove
 
@@ -85,8 +87,8 @@ Hardcoded `HOLD_FOR_EVIDENCE → NO_POSITION` is substrate validation only.
 | Measure | Value | Rule |
 |---|---|---|
 | `SHIPPED_PRODUCT_SCORE` | **39/100 frozen** | Low-confidence owner ceiling. No uplift for merge patch, dual-fixture demos, or green CI. No alpha. |
-| `FUNCTIONAL_STAGE` | **`CERTIFIED_SINGLE_DECISION_OPERABLE`** | One certified paper decision path exists. |
-| Next meaningful stage | **`ONE_CASE_DECISION_DELTA_OBSERVED`** | Prefer first valid independent comparison on a **fresh real admitted case** after V2-B0; same-case synthetic Attempt-2 is deferred. |
+| `FUNCTIONAL_STAGE` | **`CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`** | Multi-source Alpha close vertical banked (UI dogfood + publish). |
+| Next meaningful stage | **`ONE_CASE_DECISION_DELTA_OBSERVED`** | Formal comparison deferred after Alpha; no score uplift from this cut. |
 
 Do not convert direction into score engineering. Do not promote merge hygiene into a product phase.
 
@@ -439,23 +441,24 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-### Now — GV-ALPHA0_ACTIVE (source family two → one vertical)
+### Now — merge Alpha (branch complete; main pending)
 
-Objective: bank an **exact authorized independent source family two** *before* reconciliation machinery; then implement **one vertical**: 3–5 case-specific facts, operator decision capture, certified paper NO_POSITION.
+**Alpha is complete on branch** `codex/gv-alpha0-rc2`. Canonical stage is **`CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`**. Current decision is **`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`** (paper NO_POSITION). Score **39**; observed **0**; no alpha claim.
 
 ```text
-pre-read detached authorization (family two)
-→ exact immutable independent source bytes
-→ package/admission (custody only; not auto-ADVANCE)
-→ 3–5 case-specific facts with true byte locators
-→ operator decision capture
-→ certified paper NO_POSITION (one atomic result surface)
-→ (later cars) reconciliation / export / replay / fresh-clone / dogfood
+immediate gate: merge Alpha to main
+  (merge commit only — not squash/rebase; preserve gv-alpha0-close-rc2 ancestry)
+→ hosted green
+→ merge
+→ fresh-clone 25-test + verify/replay/current-receipt smoke
+→ final tag gv-alpha0-close on accepted main commit
+   (keep existing gv-alpha0-close-rc2 tag immutable)
+→ first post-merge product gate:
+   one fresh real ONE_CASE_DECISION_DELTA_OBSERVED comparison
+   (not another custody / governance / provider phase)
 ```
 
-Legitimate terminal results include HOLD_FOR_EVIDENCE / NO_POSITION and honest insufficiency. Do not force multi-source corroboration claims without banked family two. Formal comparison is **after Alpha**.
-
-Closed for Alpha release gate: G08 formal comparison, FS1, broad providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital.
+Closed for Alpha release gate: G08 formal comparison, FS1, broad providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital, reopening family-two bank as an Alpha gate.
 
 ### Same-case G08 Attempt-2 (deferred)
 

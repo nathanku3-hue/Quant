@@ -1,0 +1,24 @@
+{
+  "artifact_dir": "dogfood_case_artifacts",
+  "base_main": "06ce68fef35f25716f6f20f32337b3a6b021c678",
+  "bindings": {
+    "candidate_sha": "6747d6aeea8502d1037e05e35e72ec86a620a7dd",
+    "certified_decision_result_hash": "889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376",
+    "export_hash": "3c2584cb85bb65ebe5aac606bf57c2a384df08aba00ebd577d97c2f4c290af00",
+    "harness_entry_sha256": "e463ff6698dd3b5d5dbffbf18efcecce8f57080889b8af7b1f6a2c4f9e76ccc0",
+    "operator_confirmation_hash": "96393ddec63600a8f1a9a515b0aa8044521c818b6e84d2f9984057baca6f204d",
+    "pre_adjudication_seal_hash": "639cb43f6a76a06a07191f66fc6b340c3a27dddf6426f5031e1270a361ed8dc1",
+    "result_hash": "8ff2d66787f8f4f821b5bb268e4d5296851f21bdfd1d1ba631e02344706f3e7e"
+  },
+  "candidate_sha": "6747d6aeea8502d1037e05e35e72ec86a620a7dd",
+  "human_attestation": "HUMAN_OPERATOR_ATTESTATION_v1.json",
+  "human_attestation_sha256": "81b5e5100ed1f67bfc450e7d15a919a5c4ad4de2f072ea1f7a3aa7a61535f4d9",
+  "human_attestation_status": "SIGNED",
+  "observed": 0,
+  "receipt": "gv_alpha0_dogfood_receipt_v3.json",
+  "receipt_sha256": "54d6c20c9634d2a3d95dafdf4ce93e1d55771442316422c4e3bf1b54aa2727ba",
+  "receipt_status": "DOGFOOD_UI_CAPTURED",
+  "schema_version": "gv_alpha0_dogfood_package_manifest_v3",
+  "score": 39,
+  "single_state_dual_rejected": true
+}

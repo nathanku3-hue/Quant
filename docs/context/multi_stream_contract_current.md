@@ -1,13 +1,13 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-ALPHA0_ACTIVE (2026-07-23)
+## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
 
-- Backend/Product: **GV-ALPHA0_ACTIVE** — bank exact source family two; one vertical (facts + operator + certified result). No reconciliation engine before family-two bank.
-- Docs/Ops: ALPHA0 truth cutover; revoke B0B-stop / comparison-as-next language.
-- Frontend: stable certified portfolio route; operator capture surface for Alpha vertical.
-- Data: held beyond exact authorized family-two objects.
-- Research/PEAD/FS1/optimizer/broker: held.
+- Backend/Product: Alpha close vertical **complete on branch**; current decision published (`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`). No further Alpha custody cars.
+- Docs/Ops: Commit C syncs seven current-truth surfaces + `current_context.*`; merge pending.
+- Frontend: broker-free Case Workspace (`launch_alpha.py`) is Alpha product entry; no legacy dashboard coupling required for Alpha.
+- Data/Research/PEAD/FS1/optimizer/broker: held.
+- Next stream after merge: one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison — not another custody/governance/provider phase.
 
-## Prior Addendum — V2-B0 Sole Gate (2026-07-22) [superseded as stop]
+## Prior — family-two / reconciliation open gates [closed]
 
-B0B banked as source family one under ALPHA0; not sole remaining gate.
+Family-two bank, multi-source close, export/replay, dogfood, and publish-current are banked on branch; not open Alpha gates.

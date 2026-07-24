@@ -1,0 +1,8 @@
+# Minimal Alpha product surface deps (GV-ALPHA0 Case Workspace).
+# Broker/trading SDKs are intentionally excluded from this surface.
+# Install with: pip install -r requirements-alpha.txt
+#
+# Full monorepo stack remains in requirements.txt / pyproject.toml.
+
+streamlit==1.54.0
+pytest==9.0.2

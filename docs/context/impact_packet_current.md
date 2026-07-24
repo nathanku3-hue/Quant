@@ -1,14 +1,14 @@
 # Impact Packet - Current
 
-## Active Addendum — GV-ALPHA0_ACTIVE Truth Cutover (2026-07-23)
+## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
 
-- **Owned runtime:** `core/gv_v2_b0b_official_source_intake.py` (source family one); family-two module pending after exact authorize+bank.
-- **Custody:** main `2c7f32c` (PR #8); substrate `29cfeff`.
-- **Public authority:** default current decision remains B0B certified paper NO_POSITION until Alpha vertical advances publication deliberately.
-- **Roadmap impact:** ACTIVE_TRAIN = **GV-ALPHA0_ACTIVE**; B0B-closure/comparison worker direction revoked; next = source family two bank before reconciliation machinery.
-- **Score/stage:** 39 / CERTIFIED_SINGLE_DECISION_OPERABLE / observed 0.
-- **Not performed:** source family two bank; multi-source reconciliation; formal comparison; export/dogfood.
+- **Owned runtime:** `core/gv_v2_alpha0_case_close.py`, `views/gv_alpha0_case_workspace.py`, `alpha_app.py` / `launch_alpha.py`; source families one+two banked substrates.
+- **Custody:** branch tip on `codex/gv-alpha0-rc2` (Commit A–C); base main `06ce68f`; published current decision CDR `889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376`.
+- **Public authority:** default current decision is Alpha close certified paper **NO_POSITION** (`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`).
+- **Roadmap impact:** Alpha complete on branch; **merge pending**. Stage **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**. Immediate gate = merge Alpha. First post-merge product gate = one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison (not custody/governance/provider phase).
+- **Score/stage:** 39 / CERTIFIED_MULTI_SOURCE_CASE_OPERABLE / observed 0; no alpha claim.
+- **Not performed:** merge to main; formal comparison; score uplift; live capital.
 
-## Prior — B0B merge (substrate)
+## Prior — family-two / B0B substrate (banked history)
 
-B0B official-source intake banked as family one; retained as history under ALPHA0 train.
+Source family one (B0B) and source family two remain banked substrates under the closed Alpha vertical; not open gates.
