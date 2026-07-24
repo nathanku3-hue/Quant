@@ -1,26 +1,32 @@
 # Planner Packet - Current
 
-## New Context Packet — GV-ALPHA0_ACTIVE (2026-07-23)
+## New Context Packet — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
 
 ## What Was Done
-- PR #8 merged to main at `2c7f32c` (tip substrate `29cfeff`). B0B banked as **source family one** inside Alpha — not a phase-stop.
-- ALPHA0 authority repairs on tip: strict duplicate-key JSON rejection; true byte locators; result-last fail-closed case promote (not full rollback atomicity).
-- Metrics locked: score **39**; stage **CERTIFIED_SINGLE_DECISION_OPERABLE**; observed **0**.
+- Alpha close vertical complete on branch `codex/gv-alpha0-rc2` (base `origin/main@06ce68f`).
+- Commit A selective Alpha import (no dashboard/page-registry); Commit B dogfood import + guarded publish-current + truth cut; Commit C docs-only current-truth sync.
+- Stage **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**; current decision **DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1** (paper NO_POSITION); CDR `889cc831…` published.
+- Receipt v3 + human attestation v1 bound to Commit A tip `6747d6a`; tag `gv-alpha0-close-rc2` immutable on RC2 ancestry.
+- Metrics locked: score **39**; observed **0**; no alpha claim.
 
 ## What Is Locked
-- Active product train: **GV-ALPHA0_ACTIVE** (not B0B-closure / not B0C-as-phase / not formal comparison gate).
-- B0A CLOSED/BANKED; B0B = source family one (`SEC:0000723125-26-000015`).
-- ADMITTED never auto-ADVANCE; formal human comparison deferred until after Alpha.
-- Case promote is result-last fail-closed, not multi-file rollback transaction.
+- Alpha product shipment is ready on branch; **merge to main is pending** (merge-commit only; preserve `gv-alpha0-close-rc2` ancestry).
+- `FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`.
+- Current decision authority: `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1` → paper `NO_POSITION`.
+- Score **39** frozen; observed **0**; formal comparison still deferred; no live capital / score uplift.
+- Broker-free entry: `python launch_alpha.py` (Case Workspace).
 
 ## What Is Next
 ```text
-source family two BANKED (NVDA 0001045810-26-000052; 5 facts + operator + certified NO_POSITION)
-→ independent-source reconciliation machinery (next car; do not invent comparison)
-→ export/replay → fresh-clone proof → non-author dogfood
+immediate gate: merge Alpha to main (merge commit, not squash/rebase)
+→ after hosted green: merge
+→ fresh-clone 25-test + verify/replay/current-receipt smoke
+→ final tag gv-alpha0-close on accepted main commit (RC2 tag stays immutable)
+→ first post-merge product gate: one fresh real ONE_CASE_DECISION_DELTA_OBSERVED comparison
+   (not another custody/governance/provider phase)
 ```
 
 ## First Command
 ```text
-.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_alpha0_source_family_two.py
+.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_alpha0_case_close.py tests/gv_fs0_product/test_v2_alpha0_alpha_app.py
 ```

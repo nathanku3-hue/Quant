@@ -441,23 +441,24 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-### Now — GV-ALPHA0_ACTIVE (source family two → one vertical)
+### Now — merge Alpha (branch complete; main pending)
 
-Objective: bank an **exact authorized independent source family two** *before* reconciliation machinery; then implement **one vertical**: 3–5 case-specific facts, operator decision capture, certified paper NO_POSITION.
+**Alpha is complete on branch** `codex/gv-alpha0-rc2`. Canonical stage is **`CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`**. Current decision is **`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`** (paper NO_POSITION). Score **39**; observed **0**; no alpha claim.
 
 ```text
-pre-read detached authorization (family two)
-→ exact immutable independent source bytes
-→ package/admission (custody only; not auto-ADVANCE)
-→ 3–5 case-specific facts with true byte locators
-→ operator decision capture
-→ certified paper NO_POSITION (one atomic result surface)
-→ (later cars) reconciliation / export / replay / fresh-clone / dogfood
+immediate gate: merge Alpha to main
+  (merge commit only — not squash/rebase; preserve gv-alpha0-close-rc2 ancestry)
+→ hosted green
+→ merge
+→ fresh-clone 25-test + verify/replay/current-receipt smoke
+→ final tag gv-alpha0-close on accepted main commit
+   (keep existing gv-alpha0-close-rc2 tag immutable)
+→ first post-merge product gate:
+   one fresh real ONE_CASE_DECISION_DELTA_OBSERVED comparison
+   (not another custody / governance / provider phase)
 ```
 
-Legitimate terminal results include HOLD_FOR_EVIDENCE / NO_POSITION and honest insufficiency. Do not force multi-source corroboration claims without banked family two. Formal comparison is **after Alpha**.
-
-Closed for Alpha release gate: G08 formal comparison, FS1, broad providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital.
+Closed for Alpha release gate: G08 formal comparison, FS1, broad providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital, reopening family-two bank as an Alpha gate.
 
 ### Same-case G08 Attempt-2 (deferred)
 

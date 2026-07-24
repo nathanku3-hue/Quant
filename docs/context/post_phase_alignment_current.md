@@ -1,13 +1,13 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-ALPHA0_ACTIVE (2026-07-23)
+## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
 
-- **What changed**: PR #8 merged. Product train is **GV-ALPHA0_ACTIVE**. B0B is source family one, not a stop.
-- **Streams**: Backend/Product own family-two bank + one vertical; Docs/Ops owns ALPHA0 truth; Frontend stable; FS1/PEAD/optimizer/broker held.
-- **Current bottleneck**: exact authorized independent source family two (pre-read auth → exact bytes) before any reconciliation engine.
-- **Endgame boundary**: Alpha = operability (sources → operator → certified result → replay/dogfood); formal comparison after Alpha.
-- **Next active stream**: authorize+bank source family two → facts + operator capture + certified result as **one vertical**.
+- **What changed**: Alpha product shipment is ready on `codex/gv-alpha0-rc2`. Canonical stage is **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**. Current decision is **DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1** (paper NO_POSITION). Score 39; observed 0; no alpha claim.
+- **Streams**: Docs/Ops owns Commit C current-truth sync + merge packaging; Backend holds further Alpha custody work closed; Frontend Alpha entry is `launch_alpha.py`.
+- **Current bottleneck**: **merge Alpha to main** (merge commit; preserve RC2 ancestry). Not family-two, not reconciliation, not provider intake.
+- **Endgame boundary**: Alpha operability is banked. First post-merge product gate is one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison — not another custody/governance/provider phase.
+- **Next active stream**: merge → hosted-green confirmation → final `gv-alpha0-close` tag on accepted main commit (`gv-alpha0-close-rc2` stays immutable).
 
-## Prior — B0B as sole gate [revoked as stop]
+## Prior — open multi-source bank / dogfood cars [closed on branch]
 
-Historical B0B-only gate language superseded by ALPHA0 train; B0B retained as banked family one only.
+Historical open-gate language for multi-source bank and dogfood is superseded by banked Alpha close + pending merge.
