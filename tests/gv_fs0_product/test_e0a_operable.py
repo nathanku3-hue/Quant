@@ -52,22 +52,19 @@ EXPECTED_E0A_CURRENT_FILE_SHA256 = (
 EXPECTED_E0A_CURRENT_BYTE_LENGTH = 23_696
 EXPECTED_RATIONALE_REF = f"{RATIONALE_REF_PREFIX}{EXPECTED_RESEARCH_DECISION_HASH}"
 
-# Tracked product authority after V2-B0B official-source intake (NO_POSITION).
-EXPECTED_V2B0_DECISION_ID = "DECISION_V2_B0B_MU_G_SUPPLY_1"
-EXPECTED_V2B0_CLAIM_HASH = (
-    "21e4f669bbaa337e963ecaa7e7ff7ccdcb1187e30a3db7afaeb9300794eac6c0"
+# Tracked product authority after GV-ALPHA0-CLOSE publish (NO_POSITION).
+EXPECTED_ALPHA0_DECISION_ID = "DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1"
+EXPECTED_ALPHA0_CASE_CLAIM_HASH = (
+    "f2d6a71b139683292af8c71950c3478557b3e21826990699b2809ba24a040d82"
 )
-EXPECTED_V2B0_ADMISSION_HASH = (
-    "731a9970887c54a847014c0cc57e0b7bc3c534034ac79e7148c59b9335bc350d"
+EXPECTED_ALPHA0_RATIONALE_REF = f"ALPHA0:CLOSE:CLM:{EXPECTED_ALPHA0_CASE_CLAIM_HASH}"
+EXPECTED_ALPHA0_CERTIFIED_RESULT_HASH = (
+    "889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376"
 )
-EXPECTED_V2B0_RATIONALE_REF = f"V2B0B:CLM:{EXPECTED_V2B0_CLAIM_HASH}"
-EXPECTED_V2B0_CERTIFIED_RESULT_HASH = (
-    "48cab285c9a146a2044cfb2bb16b235451c8dabe9cfbaa08fdcb60236cd83dea"
+EXPECTED_ALPHA0_CURRENT_FILE_SHA256 = (
+    "d939cd67e247b4f25c254cbec515b9f15e2e1d6efd2b9c87f023a86d5b249e13"
 )
-EXPECTED_V2B0_CURRENT_FILE_SHA256 = (
-    "20fba702166f1684c334f817f8aa7fc95a7ca2451304e5a57b41ed80d41eda5e"
-)
-EXPECTED_V2B0_CURRENT_BYTE_LENGTH = 23_669
+EXPECTED_ALPHA0_CURRENT_BYTE_LENGTH = 23_942
 
 
 class FakeRenderer:
@@ -336,27 +333,31 @@ def test_dashboard_default_path_is_single_current_not_dual_bundle() -> None:
     assert "render_gv_fs0_certified_bundle" not in imports
 
 
-def test_tracked_current_decision_artifact_is_mandatory_v2b0_identity() -> None:
-    """Tracked default product authority is V2-B0B official-source NO_POSITION."""
+def test_tracked_current_decision_artifact_is_mandatory_alpha0_identity() -> None:
+    """Tracked default product authority is Alpha close multi-source NO_POSITION."""
 
     path = DEFAULT_CURRENT_DECISION_TARGET
     assert path.is_file(), "tracked current-decision artifact is mandatory"
     raw = path.read_bytes()
-    assert len(raw) == EXPECTED_V2B0_CURRENT_BYTE_LENGTH
-    assert hashlib.sha256(raw).hexdigest() == EXPECTED_V2B0_CURRENT_FILE_SHA256
+    assert len(raw) == EXPECTED_ALPHA0_CURRENT_BYTE_LENGTH
+    assert hashlib.sha256(raw).hexdigest() == EXPECTED_ALPHA0_CURRENT_FILE_SHA256
 
     research = build_e0a_research_decision(root=ROOT)
     assert research["research_decision_hash"] == EXPECTED_RESEARCH_DECISION_HASH
     assert research["rationale_ref"] == EXPECTED_RATIONALE_REF
 
     component = load_current_certified_decision(path)
-    assert component["decision"]["decision_id"] == EXPECTED_V2B0_DECISION_ID
+    assert component["decision"]["decision_id"] == EXPECTED_ALPHA0_DECISION_ID
     assert component["decision"]["action"] == "NO_POSITION"
-    assert component["decision"]["rationale_ref"] == EXPECTED_V2B0_RATIONALE_REF
-    assert component["certified_decision_result_hash"] == EXPECTED_V2B0_CERTIFIED_RESULT_HASH
+    assert component["decision"]["rationale_ref"] == EXPECTED_ALPHA0_RATIONALE_REF
+    assert (
+        component["certified_decision_result_hash"]
+        == EXPECTED_ALPHA0_CERTIFIED_RESULT_HASH
+    )
     assert component["certification"]["certification_status"] == "CERTIFIED"
+    assert component["role"] == "NO_POSITION"
 
-    # E0A rebuild stays deterministic substrate, distinct from V2-B0 current.
+    # E0A rebuild remains deterministic historical substrate, distinct from Alpha.
     rebuilt = build_e0a_certified_result(root=ROOT)
     from core.gv_fs0_current_decision import certified_decision_result_bytes
 
@@ -368,7 +369,11 @@ def test_tracked_current_decision_artifact_is_mandatory_v2b0_identity() -> None:
     assert len(first) == EXPECTED_E0A_CURRENT_BYTE_LENGTH
 
 
-def test_publish_e0a_twice_matches_e0a_identity_not_v2b0_current(tmp_path: Path) -> None:
+def test_publish_e0a_twice_matches_e0a_identity_not_alpha0_current(
+    tmp_path: Path,
+) -> None:
+    """E0A rebuild remains distinct substrate from shipped Alpha current."""
+
     target, lock = _current_paths(tmp_path)
     first = publish_e0a_current_decision(target=target, lock_path=lock, root=ROOT)
     second = publish_e0a_current_decision(target=target, lock_path=lock, root=ROOT)
@@ -380,5 +385,8 @@ def test_publish_e0a_twice_matches_e0a_identity_not_v2b0_current(tmp_path: Path)
     assert target.read_bytes() != DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
     assert (
         hashlib.sha256(DEFAULT_CURRENT_DECISION_TARGET.read_bytes()).hexdigest()
-        == EXPECTED_V2B0_CURRENT_FILE_SHA256
+        == EXPECTED_ALPHA0_CURRENT_FILE_SHA256
+    )
+    assert len(DEFAULT_CURRENT_DECISION_TARGET.read_bytes()) == (
+        EXPECTED_ALPHA0_CURRENT_BYTE_LENGTH
     )
