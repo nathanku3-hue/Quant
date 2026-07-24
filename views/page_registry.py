@@ -5,12 +5,16 @@ from collections.abc import Callable, Mapping
 import streamlit as st
 
 
+CASE_WORKSPACE_PAGE_TITLE = "Case Workspace"
+CASE_WORKSPACE_PAGE_ROUTE = "case-workspace"
 PORTFOLIO_PAGE_TITLE = "Certified Portfolio"
 PORTFOLIO_PAGE_ROUTE = "portfolio"
 DISCOVERY_PAGE_TITLE = "Discovery & Analysis"
 STRATEGY_PAGE_TITLE = "Strategy Research Replay"
 
+# Case Workspace is the default Alpha product surface (GV-ALPHA0-CLOSE).
 APPROVED_PAGE_TITLES: tuple[str, ...] = (
+    CASE_WORKSPACE_PAGE_TITLE,
     PORTFOLIO_PAGE_TITLE,
     DISCOVERY_PAGE_TITLE,
     STRATEGY_PAGE_TITLE,
@@ -18,6 +22,7 @@ APPROVED_PAGE_TITLES: tuple[str, ...] = (
 
 PAGE_GROUPS: Mapping[str, tuple[str, ...]] = {
     "Views": (
+        CASE_WORKSPACE_PAGE_TITLE,
         PORTFOLIO_PAGE_TITLE,
         DISCOVERY_PAGE_TITLE,
         STRATEGY_PAGE_TITLE,
@@ -25,7 +30,7 @@ PAGE_GROUPS: Mapping[str, tuple[str, ...]] = {
 }
 
 LEGACY_PAGE_MOVEMENT: Mapping[str, str] = {
-    "Command Center": PORTFOLIO_PAGE_TITLE,
+    "Command Center": CASE_WORKSPACE_PAGE_TITLE,
     "Ticker Pool & Proxies": DISCOVERY_PAGE_TITLE,
     "Opportunities": DISCOVERY_PAGE_TITLE,
     "Thesis Card": DISCOVERY_PAGE_TITLE,
@@ -57,20 +62,24 @@ def build_dashboard_navigation(
 
     pages = [
         st.Page(
-            renderers[PORTFOLIO_PAGE_TITLE],
-            title=PORTFOLIO_PAGE_TITLE,
-            url_path=PORTFOLIO_PAGE_ROUTE,
+            renderers[CASE_WORKSPACE_PAGE_TITLE],
+            title=CASE_WORKSPACE_PAGE_TITLE,
+            url_path=CASE_WORKSPACE_PAGE_ROUTE,
             default=True,
         ),
         *[
             st.Page(
                 renderers[title],
                 title=title,
-                url_path=_url_path(title),
+                url_path=(
+                    PORTFOLIO_PAGE_ROUTE
+                    if title == PORTFOLIO_PAGE_TITLE
+                    else _url_path(title)
+                ),
                 default=False,
             )
             for title in APPROVED_PAGE_TITLES
-            if title != PORTFOLIO_PAGE_TITLE
+            if title != CASE_WORKSPACE_PAGE_TITLE
         ],
     ]
     return st.navigation(pages, position="sidebar", expanded=True)

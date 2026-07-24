@@ -43,10 +43,15 @@ from views.optimizer_view import (
 from views.drift_monitor_view import render_drift_monitor_view
 
 from views.page_registry import build_dashboard_navigation
+from views.page_registry import CASE_WORKSPACE_PAGE_TITLE
 from views.page_registry import DISCOVERY_PAGE_TITLE
 from views.page_registry import PORTFOLIO_PAGE_TITLE
 from views.page_registry import STRATEGY_PAGE_TITLE
 from views.discovery_view import render_discovery_page
+from views.gv_alpha0_case_workspace import (
+    GvAlpha0CaseWorkspaceError,
+    render_case_workspace,
+)
 from views.gv_fs0_portfolio_adapter import (
     GvFs0PresentationError,
     render_e0b_dv1_surface,
@@ -4741,18 +4746,24 @@ def _render_placeholder_page(title: str) -> None:
     st.info("DASH-1 shell placeholder. Content design is held for a later approved dashboard phase.")
 
 
+def _render_case_workspace_page() -> None:
+    """Default Alpha product surface: GV-ALPHA0-CLOSE Case Workspace."""
+
+    try:
+        render_case_workspace(st, verify=True)
+    except GvAlpha0CaseWorkspaceError:
+        return
+
+
 def _render_portfolio_allocation_page() -> None:
-    """Render the sole default certified portfolio authority (one active decision)."""
+    """Secondary certified portfolio authority (current publication surface)."""
 
     st.header(PORTFOLIO_PAGE_TITLE)
     st.caption(
-        "V2-B0B official-source intake is the active product gate on this tip. "
-        "One certified decision path. Default current is ADMITTED official SEC "
-        "package + CLAIM_INSUFFICIENT → HOLD_FOR_EVIDENCE → paper NO_POSITION "
-        "(one issuer filing is not independent corroboration). "
-        "B0A remains banked substrate. E0B G08 remains invalidated observation "
-        "smoke (count 0). Score 39 frozen. Legacy replay/optimizer non-certifying; "
-        "F1C dual bundle evidence-only."
+        "Secondary surface. Default product path is Case Workspace (GV-ALPHA0-CLOSE). "
+        "Publication of close as current is deferred until after rebuild + adversarial "
+        "+ fresh-clone/dogfood. Score 39 frozen; observed 0. "
+        "Legacy B0B/E0B surfaces remain optional history only."
     )
     try:
         render_gv_fs0_current_decision(st)
@@ -4818,6 +4829,7 @@ def _render_settings_ops_page() -> None:
 
 page = build_dashboard_navigation(
     {
+        CASE_WORKSPACE_PAGE_TITLE: _render_case_workspace_page,
         PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page,
         DISCOVERY_PAGE_TITLE: _render_discovery_page,
         STRATEGY_PAGE_TITLE: _render_strategy_page,
