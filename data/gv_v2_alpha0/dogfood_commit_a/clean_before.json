@@ -1,0 +1,20 @@
+{
+  "git_status_porcelain": [],
+  "case_bank_files": [
+    "case_claim.json",
+    "case_manifest.json",
+    "case_workspace_view.json",
+    "coverage.json",
+    "evidence_panel.json",
+    "pre_adjudication_seal.json"
+  ],
+  "forbidden_present": {
+    "result": false,
+    "export_bundle": false,
+    "certified_decision_result": false,
+    "operator_confirmation": false
+  },
+  "candidate_sha": "6747d6aeea8502d1037e05e35e72ec86a620a7dd",
+  "captured_at": "2026-07-24T15:52:16.8870512Z",
+  "dirty": false
+}

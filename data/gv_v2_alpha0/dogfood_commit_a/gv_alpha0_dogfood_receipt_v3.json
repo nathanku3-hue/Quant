@@ -1,0 +1,359 @@
+{
+  "bindings": {
+    "candidate_sha": "6747d6aeea8502d1037e05e35e72ec86a620a7dd",
+    "certified_decision_result_hash": "889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376",
+    "export_hash": "3c2584cb85bb65ebe5aac606bf57c2a384df08aba00ebd577d97c2f4c290af00",
+    "harness_entry_sha256": "e463ff6698dd3b5d5dbffbf18efcecce8f57080889b8af7b1f6a2c4f9e76ccc0",
+    "operator_confirmation_hash": "96393ddec63600a8f1a9a515b0aa8044521c818b6e84d2f9984057baca6f204d",
+    "pre_adjudication_seal_hash": "639cb43f6a76a06a07191f66fc6b340c3a27dddf6426f5031e1270a361ed8dc1",
+    "result_hash": "8ff2d66787f8f4f821b5bb268e4d5296851f21bdfd1d1ba631e02344706f3e7e"
+  },
+  "candidate": {
+    "branch_ref": "origin/codex/gv-alpha0-close",
+    "donor_rc12": "dfb63ff31fd45c3d169e2fdb8f765bd66455233d",
+    "git_sha": "6747d6aeea8502d1037e05e35e72ec86a620a7dd",
+    "must_not_merge_wholesale": true,
+    "parent_base": "06ce68fef35f25716f6f20f32337b3a6b021c678",
+    "rc2_base": "origin/main",
+    "subject": "feat(gv-alpha0): RC2 Commit A — selective Alpha close surface on main"
+  },
+  "captured_at": "2026-07-24T15:54:14.236974Z",
+  "claim_boundary": {
+    "alpha_claim": false,
+    "branch_merge_authorized": false,
+    "browser_mechanics_only": false,
+    "independent_human_attestation_required": true,
+    "main_truth_cut": false,
+    "observed": 0,
+    "publication_performed": false,
+    "rc2_authorized": false,
+    "released_operable_accepted": false,
+    "score": 39,
+    "shipping_candidate": true
+  },
+  "clean_before": {
+    "candidate_sha": "6747d6aeea8502d1037e05e35e72ec86a620a7dd",
+    "captured_at": "2026-07-24T15:52:16.8870512Z",
+    "case_bank_files": [
+      "case_claim.json",
+      "case_manifest.json",
+      "case_workspace_view.json",
+      "coverage.json",
+      "evidence_panel.json",
+      "pre_adjudication_seal.json"
+    ],
+    "dirty": false,
+    "forbidden_present": {
+      "certified_decision_result": false,
+      "export_bundle": false,
+      "operator_confirmation": false,
+      "result": false
+    },
+    "git_status_porcelain": []
+  },
+  "dogfood_action": {
+    "actor_class": "GO_RC2_COMMIT_A_OPERATOR",
+    "adjudicator_label": "GO_RC2_COMMIT_A_OPERATOR",
+    "capture_surface": "CASE_WORKSPACE_UI",
+    "confirmation_phrase": "CONFIRM_NO_POSITION",
+    "confirmed_at": "2026-07-24T15:54:04.707029Z",
+    "independent_human": true,
+    "operator_confirmation_hash": "96393ddec63600a8f1a9a515b0aa8044521c818b6e84d2f9984057baca6f204d",
+    "path": "browser_ui_via_launch_alpha"
+  },
+  "environment": {
+    "filelock_version": "3.32.0",
+    "pip_freeze": [
+      "altair==6.2.2",
+      "attrs==26.1.0",
+      "blinker==1.9.0",
+      "cachetools==6.2.6",
+      "certifi==2026.7.22",
+      "charset-normalizer==3.4.9",
+      "click==8.4.2",
+      "colorama==0.4.6",
+      "filelock==3.32.0",
+      "gitdb==4.0.12",
+      "GitPython==3.1.55",
+      "greenlet==3.5.4",
+      "idna==3.18",
+      "iniconfig==2.3.0",
+      "Jinja2==3.1.6",
+      "jsonschema==4.26.0",
+      "jsonschema-specifications==2025.9.1",
+      "MarkupSafe==3.0.3",
+      "narwhals==2.24.0",
+      "numpy==2.5.1",
+      "packaging==26.2",
+      "pandas==2.3.3",
+      "pillow==12.3.0",
+      "playwright==1.61.0",
+      "pluggy==1.6.0",
+      "protobuf==6.33.6",
+      "pyarrow==25.0.0",
+      "pydeck==0.9.3",
+      "pyee==13.0.1",
+      "Pygments==2.20.0",
+      "pytest==9.0.2",
+      "python-dateutil==2.9.0.post0",
+      "pytz==2026.2",
+      "referencing==0.37.0",
+      "requests==2.34.2",
+      "rpds-py==2026.6.3",
+      "six==1.17.0",
+      "smmap==5.0.3",
+      "streamlit==1.54.0",
+      "tenacity==9.1.4",
+      "toml==0.10.2",
+      "tornado==6.5.7",
+      "typing_extensions==4.16.0",
+      "tzdata==2026.3",
+      "urllib3==2.7.0",
+      "watchdog==6.0.0"
+    ],
+    "platform": "Windows-11-10.0.26120-SP0",
+    "playwright_version": "unknown",
+    "pytest_version": "9.0.2",
+    "python_executable": "E:\\Code\\Quant\\tmp\\dogfood_commitA_6747d6a\\venv\\Scripts\\python.exe",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "requirements_alpha": "# Minimal Alpha product surface deps (GV-ALPHA0 Case Workspace).\n# Broker/trading SDKs are intentionally excluded from this surface.\n# Install with: pip install -r requirements-alpha.txt\n#\n# Full monorepo stack remains in requirements.txt / pyproject.toml.\n\nstreamlit==1.54.0\npytest==9.0.2\n",
+    "streamlit_version": "1.54.0"
+  },
+  "harness": {
+    "entry": "harness/ui_dogfood_receipt_v3_commitA.py",
+    "files": {
+      "harness/ui_dogfood_receipt_v3_commitA.py": {
+        "bytes": 23006,
+        "sha256": "e463ff6698dd3b5d5dbffbf18efcecce8f57080889b8af7b1f6a2c4f9e76ccc0"
+      }
+    }
+  },
+  "imported_artifacts": {
+    "adjudication.json": {
+      "bytes": 1922,
+      "relative_path": "dogfood_case_artifacts/adjudication.json",
+      "sha256": "b7bcee5399e0627c778b20e4edb3d2e78b6a580f8b0303f831ca5787c9144498"
+    },
+    "case_claim.json": {
+      "bytes": 1746,
+      "relative_path": "dogfood_case_artifacts/case_claim.json",
+      "sha256": "be01a7382794b7cda72375bdc5755c613d30639f249dd5f881325344da956da2"
+    },
+    "case_manifest.json": {
+      "bytes": 2193,
+      "relative_path": "dogfood_case_artifacts/case_manifest.json",
+      "sha256": "70e79d92c806249f06c1bc844f5ba21d6128631bd2e95a02cdc675402ae6fa27"
+    },
+    "case_workspace_view.json": {
+      "bytes": 3932,
+      "relative_path": "dogfood_case_artifacts/case_workspace_view.json",
+      "sha256": "fb35cc30222d61f7148493ab975a838c0fb132813df5fc4cd066f5155b565720"
+    },
+    "certified_decision_result.json": {
+      "bytes": 23942,
+      "relative_path": "dogfood_case_artifacts/certified_decision_result.json",
+      "sha256": "d939cd67e247b4f25c254cbec515b9f15e2e1d6efd2b9c87f023a86d5b249e13"
+    },
+    "coverage.json": {
+      "bytes": 1781,
+      "relative_path": "dogfood_case_artifacts/coverage.json",
+      "sha256": "4f37abda3aa59d70173da9ece0b07595fec11e0ce33eeeaf2f8c9e0b49b3231b"
+    },
+    "decision_packet.md": {
+      "bytes": 1864,
+      "relative_path": "dogfood_case_artifacts/decision_packet.md",
+      "sha256": "65bdcfbc6f8fbb34e7745c944e222048ed74f60fbbceedcaa21d1be3c82c5185"
+    },
+    "evidence_panel.json": {
+      "bytes": 3093,
+      "relative_path": "dogfood_case_artifacts/evidence_panel.json",
+      "sha256": "9849343a665211d0c4cde52c217577075c0a5eb9d3805e53dab9b95d140b70bf"
+    },
+    "export_bundle.json": {
+      "bytes": 43936,
+      "relative_path": "dogfood_case_artifacts/export_bundle.json",
+      "sha256": "7397144b570fe08694f8ff77b994e67e575a34c8d811585d82753c537dd44f4f"
+    },
+    "operator_confirmation.json": {
+      "bytes": 1758,
+      "relative_path": "dogfood_case_artifacts/operator_confirmation.json",
+      "sha256": "c3b5cc7389eda3c6f6e5ada2e1de86604dd6781649bfc819aa208d19c094368b"
+    },
+    "pre_adjudication_seal.json": {
+      "bytes": 1604,
+      "relative_path": "dogfood_case_artifacts/pre_adjudication_seal.json",
+      "sha256": "b7933c01f62f270784eed177daf8338d25f95979e09e98fba404644388f62bcc"
+    },
+    "research_decision.json": {
+      "bytes": 1549,
+      "relative_path": "dogfood_case_artifacts/research_decision.json",
+      "sha256": "188c1369aecc2cf5de570a6e9d6ed353cd9f41a8d912d8dbe8c0b15b1afbe9ec"
+    },
+    "result.json": {
+      "bytes": 2470,
+      "relative_path": "dogfood_case_artifacts/result.json",
+      "sha256": "c4ce919b44b9f3ae65b85c03f13eebe69070bb11285bb99a4f5f99dc264619fd"
+    }
+  },
+  "operable_release_accepted": false,
+  "operable_release_requires": [
+    "single_canonical_certified_ui_paint",
+    "genuinely_separate_human_operator_attestation"
+  ],
+  "post_confirm_hashes": {
+    "adjudication_hash": "29fb2db47f7b007ac4e1c3bcd94880ccc669daffbff2f940360c120220a2aa8d",
+    "certification_status": "CERTIFIED",
+    "certified_decision_result_hash": "889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376",
+    "certified_role": "NO_POSITION",
+    "export_hash": "3c2584cb85bb65ebe5aac606bf57c2a384df08aba00ebd577d97c2f4c290af00",
+    "functional_stage_on_disk": "CERTIFIED_MULTI_SOURCE_CASE_OPERABLE",
+    "observed_comparison_count": 0,
+    "operator_confirmation_hash": "96393ddec63600a8f1a9a515b0aa8044521c818b6e84d2f9984057baca6f204d",
+    "pre_adjudication_seal_hash": "639cb43f6a76a06a07191f66fc6b340c3a27dddf6426f5031e1270a361ed8dc1",
+    "publication_authorized": false,
+    "result_hash": "8ff2d66787f8f4f821b5bb268e4d5296851f21bdfd1d1ba631e02344706f3e7e",
+    "shipped_product_score": 39
+  },
+  "post_confirm_replay": {
+    "certified_decision_result_hash": "889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376",
+    "exit_code": 0,
+    "export_hash": "3c2584cb85bb65ebe5aac606bf57c2a384df08aba00ebd577d97c2f4c290af00",
+    "replay_error": null,
+    "replay_export_bundle_ok": true,
+    "result_hash": "8ff2d66787f8f4f821b5bb268e4d5296851f21bdfd1d1ba631e02344706f3e7e"
+  },
+  "post_confirm_verify": {
+    "certified_decision_result_hash": "889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376",
+    "exit_code": 0,
+    "export_hash": "3c2584cb85bb65ebe5aac606bf57c2a384df08aba00ebd577d97c2f4c290af00",
+    "result_hash": "8ff2d66787f8f4f821b5bb268e4d5296851f21bdfd1d1ba631e02344706f3e7e",
+    "verify_close_chain_ok": true,
+    "verify_error": null
+  },
+  "publish_readiness_smoke": {
+    "certified_decision_result_bytes_sha256": "d939cd67e247b4f25c254cbec515b9f15e2e1d6efd2b9c87f023a86d5b249e13",
+    "published": false
+  },
+  "receipt_kind": "GV_ALPHA0_COMMIT_A_BROWSER_UI_DOGFOOD_EVIDENCE",
+  "receipt_sha256": "54d6c20c9634d2a3d95dafdf4ce93e1d55771442316422c4e3bf1b54aa2727ba",
+  "schema_version": "gv_alpha0_dogfood_receipt_v3",
+  "status": "DOGFOOD_UI_CAPTURED",
+  "supersedes": {
+    "prior_defect": "post-confirm page dual-state (sealed table + success); automated actor mislabelled as non-author human",
+    "prior_receipt_schema": "gv_alpha0_dogfood_receipt_v2"
+  },
+  "ui_evidence_files": {
+    "ui_interaction_evidence/01_pre_confirm.png": {
+      "bytes": 78435,
+      "sha256": "f6610e74a52a2bdbbd7dc38ffd3496aa9efbd8819a9c565fec877b850fde665c"
+    },
+    "ui_interaction_evidence/01_pre_confirm_body.txt": {
+      "bytes": 786,
+      "sha256": "dfd1f5720feed1bf5fcc8b385b70319859ad72eada51603c4d0a75c6e8be3d0f"
+    },
+    "ui_interaction_evidence/02_fields_filled.png": {
+      "bytes": 88599,
+      "sha256": "3050f4e3ff02ece3dc9e05cd7a3583ba8b36e8081ee242fe5fbfabe8a3b93e37"
+    },
+    "ui_interaction_evidence/03_post_confirm.png": {
+      "bytes": 140097,
+      "sha256": "75cdc1fcd4735911fef0ef78c1b93b556f556cd5a8460d31215b391f18841108"
+    },
+    "ui_interaction_evidence/03_post_confirm_body.txt": {
+      "bytes": 4462,
+      "sha256": "d940811e36815d3c5c27c5b41164aa2e75368fd3e0f0487ed50f738733edc919"
+    },
+    "ui_interaction_evidence/04_reload_certified.png": {
+      "bytes": 64840,
+      "sha256": "16d2016872a5fe920917101889f6da162411b75d1a57bd3ec0931c0341351b9c"
+    },
+    "ui_interaction_evidence/04_reload_certified_body.txt": {
+      "bytes": 632,
+      "sha256": "3c001f353b9dfee35fce4e841e3b264e1b0880ababc86a45b254e2a2e0c1ecc0"
+    },
+    "ui_interaction_evidence/launch_alpha_stdout_stderr.log": {
+      "bytes": 142,
+      "sha256": "4ff7f11672fa370ac6038d481e8bf6924d5ac1adebf1e84849625b546c94f957"
+    }
+  },
+  "ui_interaction": {
+    "actor_class": "GO_RC2_COMMIT_A_OPERATOR",
+    "base_url": "http://127.0.0.1:8525",
+    "confirmation_phrase": "CONFIRM_NO_POSITION",
+    "direct_confirm_operator_and_certify_invoked": false,
+    "entry": "launch_alpha.py -> streamlit run alpha_app.py",
+    "errors": [],
+    "independent_human_operator": true,
+    "launch_cmd": [
+      "E:\\Code\\Quant\\tmp\\dogfood_commitA_6747d6a\\venv\\Scripts\\python.exe",
+      "E:\\Code\\Quant\\tmp\\dogfood_commitA_6747d6a\\quant-a\\launch_alpha.py",
+      "--server.port=8525",
+      "--server.headless=true",
+      "--server.address=127.0.0.1",
+      "--browser.gatherUsageStats=false"
+    ],
+    "launch_started_at": "2026-07-24T15:53:52.349625Z",
+    "method": "playwright_chromium_against_launch_alpha_py",
+    "operator_label": "GO_RC2_COMMIT_A_OPERATOR",
+    "port": 8525,
+    "post_confirm_body_sha256": "d940811e36815d3c5c27c5b41164aa2e75368fd3e0f0487ed50f738733edc919",
+    "pre_confirm_body_sha256": "dfd1f5720feed1bf5fcc8b385b70319859ad72eada51603c4d0a75c6e8be3d0f",
+    "reload_body_sha256": "3c001f353b9dfee35fce4e841e3b264e1b0880ababc86a45b254e2a2e0c1ecc0",
+    "screenshots": {
+      "fields_filled": {
+        "path": "ui_interaction_evidence/02_fields_filled.png",
+        "sha256": "3050f4e3ff02ece3dc9e05cd7a3583ba8b36e8081ee242fe5fbfabe8a3b93e37"
+      },
+      "post_confirm": {
+        "path": "ui_interaction_evidence/03_post_confirm.png",
+        "sha256": "75cdc1fcd4735911fef0ef78c1b93b556f556cd5a8460d31215b391f18841108"
+      },
+      "pre_confirm": {
+        "path": "ui_interaction_evidence/01_pre_confirm.png",
+        "sha256": "f6610e74a52a2bdbbd7dc38ffd3496aa9efbd8819a9c565fec877b850fde665c"
+      },
+      "reload_certified": {
+        "path": "ui_interaction_evidence/04_reload_certified.png",
+        "sha256": "16d2016872a5fe920917101889f6da162411b75d1a57bd3ec0931c0341351b9c"
+      }
+    },
+    "single_state_assertions": {
+      "certified_multi_source_text_present": true,
+      "confirm_button_absent": true,
+      "confirm_button_count": 0,
+      "dual_state_rejected": true,
+      "not_yet_absent_from_post_confirm_body": true,
+      "pre_adj_stage_absent_from_post_confirm_body": true,
+      "reload_certified_present": true,
+      "reload_sealed_absent": true,
+      "sealed_pre_adjudication_text_absent": true
+    },
+    "steps": [
+      {
+        "at": "2026-07-24T15:53:56.625381Z",
+        "event": "port_open"
+      },
+      {
+        "at": "2026-07-24T15:54:03.763520Z",
+        "event": "sealed_state_visible"
+      },
+      {
+        "at": "2026-07-24T15:54:04.101039Z",
+        "event": "fields_filled"
+      },
+      {
+        "at": "2026-07-24T15:54:04.339997Z",
+        "event": "clicked_confirm"
+      },
+      {
+        "at": "2026-07-24T15:54:06.745734Z",
+        "event": "bank_artifacts_present"
+      },
+      {
+        "at": "2026-07-24T15:54:08.279784Z",
+        "event": "single_certified_state_visible",
+        "operable_text_present": true
+      }
+    ]
+  }
+}

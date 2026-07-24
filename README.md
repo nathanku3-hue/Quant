@@ -1,10 +1,10 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
 Status: Active product framing — GodView certified portfolio OS (paper)
-Date: 2026-07-19
-Product tip: E0A operable banked (`accef5c` lineage); F1C-SHIP closed substrate earlier
-Active work: **E0A-R1** merge-safety repair (hard cap) → then **E0B-DV1** sole product gate
-Authority: `docs/architecture/top_level_roadmap.md`, `PRD.md`, `docs/phase_brief/gv-e0a-r1-merge-safety-brief.md`
+Date: 2026-07-24
+Product tip: **GV-ALPHA0-CLOSE** multi-source case OPERABLE (Commit A `6747d6a` + Commit B truth cut); score 39 / observed 0
+Active work: Alpha close vertical banked; formal comparison deferred; no score uplift
+Authority: `docs/architecture/top_level_roadmap.md`, `PRD.md`
 
 Terminal Zero is a local-first quantitative research console. The **authorized product pivot** is from a UOE discretionary cockpit framing to a **GodView certified portfolio OS** (paper accounting + independent certification). It is not a trading bot, not a broker, and not an alpha claim surface.
 
@@ -12,10 +12,12 @@ Terminal Zero is a local-first quantitative research console. The **authorized p
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
 F1C_SHIP = CLOSED_SUBSTRATE
 E0A_OPERABLE = BANKED_SUBSTRATE (plumbing only; NOT decision value / NOT alpha)
-ACTIVE_REPAIR = E0A-R1 (merge-safety tax; close after clean-main smoke)
-ACTIVE_PRODUCT_GATE_AFTER_REPAIR = E0B-DV1
-FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE (stage-only)
-CONJUNCTIVE_ENDGAME_MATURITY ≈ 9/100 (decision value near zero)
+ACTIVE_PRODUCT = GV-ALPHA0-CLOSE multi-source case (UI dogfood OPERABLE)
+FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
+SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN)
+OBSERVED_COMPARISON_COUNT = 0
+CURRENT_DECISION = DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1 → paper NO_POSITION
+ALPHA_ENTRY = python launch_alpha.py  (broker-free Case Workspace)
 FORBIDDEN = providers, real prices, FS1 batch, PEAD, alpha claims, broker,
             compatibility dual-authority UI, dirty-root authority auto-canonization
 ```
