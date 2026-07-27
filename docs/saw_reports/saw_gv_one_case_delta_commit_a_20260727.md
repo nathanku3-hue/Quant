@@ -103,7 +103,9 @@ Independent candidate review remains required.
 | High | Session creation initially accepted self-asserted hosted-green strings from a local JSON file. | Require a pinned-provider SSHSIG receipt binding exact candidate SHA/tree, workflow, separate Windows/Linux run IDs and SUCCESS conclusions, proof ID, and verification timestamp. | Implementer | Fixed |
 | High | Initial exposure state did not bind the exact bundle/projection artifacts and accepted an operator identity hash without verifying the signed record. | Bind bundle/projection/manifest/schema hashes in the session, replay hosted proof on state creation, verify full operator identity before `BASELINE_OPEN`, and reject post-exposure substitution. | Implementer | Fixed |
 | Low | One all-in-one CI-equivalent local command hit repeated DevSpace transport 502 responses. | Executed the identical test matrix in deterministic segments; all 426 collected tests passed. Hosted CI remains the exact-candidate parity authority. | Environment | Mitigated |
-| High | First pushed candidate `313c2aa` passed Linux but failed four Windows tests because checkout converted canonical one-case JSON terminal LF to CRLF. | Pin `data/gv_one_case_delta/**/*.json` and instructions to `eol=lf`; add a Git-attribute and raw-byte regression; require a new exact repair candidate to pass both hosted OS jobs. | Implementer | Fixed locally; hosted repair proof pending |
+| High | First pushed candidate `313c2aa` passed Linux but failed four Windows tests because checkout converted canonical one-case JSON terminal LF to CRLF. | Pin `data/gv_one_case_delta/**/*.json` and instructions to `eol=lf`; add a Git-attribute and raw-byte regression. Repair candidate `14b3773` passed hosted Product and Protocol Windows/Linux/parity. | Implementer | Fixed and hosted-proven |
+| P1 | Candidate `14b3773` originally had only transient API observation while its own phase brief and SAW still said hosted proof pending. | Record a detached signed hosted receipt, pin the issuer public key, validate it through `verify_hosted_proof()`, and keep the receipt outside the candidate commit to avoid self-reference. | Implementer | Fixed on detached evidence branch |
+| P1 | Root checkout dirtiness was conflated with candidate custody. | Treat root `main@accef5c` as a separate unsafe checkout; candidate evidence comes only from the clean isolated worktree at `14b3773`. | Implementer | Fixed |
 
 ## Scope Split Summary
 
@@ -130,8 +132,9 @@ Inherited out-of-scope findings/actions:
 | `core/gv_one_case_delta.py` | Narrow source/session/identity/seal/replay/rubric machinery with no publication authority. | Mechanical PASS; independent review pending |
 | `scripts/gv_one_case_delta_capture.py` | Pre-human deterministic build, session-manifest, and identity-preflight CLI. | Mechanical PASS; independent review pending |
 | `data/gv_one_case_delta/case_1/*` | Frozen binding, instructions, evidence bundle, answer-free projection, projection manifest. | Mechanical PASS; independent review pending |
-| `tests/gv_fs0_product/test_one_case_delta_*.py` | 26 focused projection, checkout-custody, state, artifact-binding, identity, attestation, and mutation tests. | PASS |
-| `.github/workflows/gv-fs0-product.yml` | Existing Windows/Linux product gate includes Commit A paths and custody hashes. | Static PASS; hosted pending |
+| `tests/gv_fs0_product/test_one_case_delta_*.py` | 28 focused projection, checkout-custody, hosted-receipt, state, artifact-binding, identity, attestation, and mutation tests. | PASS |
+| `data/gv_one_case_delta/hosted_receipts/14b3773/*` | Detached signed hosted receipt, pinned proof issuer, and custody note for exact candidate `14b3773`. | PASS |
+| `.github/workflows/gv-fs0-product.yml` | Existing Windows/Linux product gate includes Commit A paths and custody hashes. Product run `30285531998` passed Windows, Ubuntu, and byte parity. | Hosted PASS |
 | `docs/phase_brief/gv-one-case-decision-delta-brief.md` | Audit authority and live Commit A state. | PASS |
 | `docs/context/*`, `docs/architecture/top_level_roadmap.md`, `README.md` | Alpha merge correction and pre-human stop gate. | PASS |
 | `docs/notes.md`, `docs/lessonss.md` | Formula/identity registry and implementation lessons. | PASS |
@@ -152,14 +155,18 @@ Canonical review order:
 
 ## Validation Evidence
 
-- Focused Commit A suite: 26 passed.
+- Focused Commit A plus detached hosted-receipt suite: 28 passed.
 - Existing product core/authority group: 89 passed.
 - E0B/B0/Alpha custody group: 147 passed.
 - Streamlit/AppTest/current-decision group: 14 passed.
 - Frozen protocol/external GV-FS0 group: 150 passed.
 - Total local hosted-product matrix: 426 passed; one existing websockets deprecation warning only.
 - First hosted candidate `313c2aa`, run `30277303768`: Ubuntu PASS; Windows FAIL on four canonical-document tests due CRLF checkout conversion; parity job skipped.
-- Additive repair: `.gitattributes` LF custody plus checkout-custody test; hosted repair run remains required.
+- Repair candidate `14b3773`, Product run `30285531998`: Windows `90042256003` PASS; Ubuntu `90042256059` PASS; byte parity `90043281214` PASS.
+- Repair candidate `14b3773`, Protocol Freeze run `30285532512`: Windows `90042257227` PASS; Ubuntu `90042257211` PASS; byte parity `90042562009` PASS.
+- Detached hosted receipt: `data/gv_one_case_delta/hosted_receipts/14b3773/hosted_proof.json`; issuer registry `trusted_proof_issuers.json`; runtime validation hash `246357afc2848f71d1252b79987ea8ba980c323a3be5e25751d3a9a8b78b283a`.
+- Receipt validation through `verify_hosted_proof()`: PASS; exact candidate SHA/tree, Product workflow, Windows/Linux conclusions, OpenSSH signature, pinned provider key, and embedded hash all verified.
+- Runtime candidate branch: clean and synchronized at `14b3773` before detached evidence work. Receipt branch contains only the bounded receipt/test/docs changes. Root checkout: separate unsafe `main@accef5c`; default porcelain reports 5,601 changed paths and expanded untracked enumeration reports 179,365 entries. Root is not used as candidate evidence.
 - Deterministic tracked pre-human artifact replay: PASS.
 - Current-context generation/validation: PASS.
 - Current decision: unchanged SHA-256 `d939cd67e247b4f25c254cbec515b9f15e2e1d6efd2b9c87f023a86d5b249e13`, 23,942 bytes.
@@ -172,14 +179,13 @@ Canonical review order:
 
 Open Risks:
 
-- independent implementation Reviewer A/B/C candidate review is unavailable in this environment and remains mandatory before human exposure;
-- first exact candidate failed hosted Windows LF custody; the additive repair candidate still requires hosted Windows/Linux proof;
+- independent implementation Reviewer A/B/C candidate review is unavailable in this environment and remains mandatory before human preflight or exposure;
 - two eligible separately verified humans and their signed identity evidence have not been supplied;
 - the current user is exposed to the Alpha case and implementation context and therefore cannot serve as the materially case/outcome-naive operator.
 
-Next action: locally validate and push one additive LF-custody repair commit, require hosted Windows/Linux green, then stop for independent candidate audit and two-human preflight without opening `BASELINE_OPEN`.
+Next action: publish the detached hosted-receipt evidence branch, then stop for independent candidate A/B/C review. Do not create `session_manifest.json`, preflight identities, or open `BASELINE_OPEN` until review accepts the receipt and candidate.
 
 ClosureValidation: PASS
 SAWBlockValidation: PASS
 
-ClosurePacket: RoundID=ROUND-20260727-GV-ONE-CASE-DELTA-COMMIT-A; ScopeID=GV_ONE_CASE_EVIDENCE_GAP_TRIAGE_COMMIT_A; ChecksTotal=14; ChecksPassed=10; ChecksFailed=4; Verdict=BLOCK; OpenRisks=independent_reviewer_a_b_c_unavailable_hosted_windows_lf_repair_pending_two_eligible_humans_not_supplied; NextAction=validate_push_additive_lf_repair_require_hosted_windows_linux_green_then_stop
+ClosurePacket: RoundID=ROUND-20260727-GV-ONE-CASE-DELTA-COMMIT-A; ScopeID=GV_ONE_CASE_EVIDENCE_GAP_TRIAGE_COMMIT_A; ChecksTotal=14; ChecksPassed=11; ChecksFailed=3; Verdict=BLOCK; OpenRisks=independent_reviewer_a_b_c_unavailable_two_eligible_humans_not_supplied_root_checkout_unsafe_but_separate; NextAction=publish_detached_hosted_receipt_then_stop_for_independent_candidate_review

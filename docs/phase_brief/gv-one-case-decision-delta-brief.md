@@ -1,7 +1,7 @@
 # Phase Brief: GV One-Case Decision Delta — Evidence-Gap Triage
 
 Mode: `APPROVAL_GATE`
-Status: `AUDIT_PASS; COMMIT_A_IMPLEMENTED; HOSTED_GREEN_REQUIRED_BEFORE_HUMAN_EXPOSURE`
+Status: `AUDIT_PASS; COMMIT_A_CANDIDATE_14B3773; DETACHED_HOSTED_RECEIPT_RECORDED_AND_VALIDATED; HUMAN_PREFLIGHT_BLOCKED_PENDING_INDEPENDENT_REVIEW`
 Date: 2026-07-27
 RoundID: `ROUND-20260727-GV-ONE-CASE-DELTA-PLAN-REDLINE`
 ScopeID: `GV_ONE_CASE_EVIDENCE_GAP_TRIAGE_PLAN`
@@ -28,11 +28,14 @@ Audit approval was received before implementation. Commit A must stop after exac
 ## Verified Local State
 
 - The branch base remains `origin/main = gv-alpha0-close^{}` at `48a43b99350465202f8bcd09113a34fa724580af`.
-- Commit A candidate `313c2aa9eae44d0f5c90fd6a6509feea9110d47c` was committed and pushed after the complete local matrix passed.
-- Hosted run `30277303768` proved Linux green but Windows failed closed because Git checkout converted the new canonical JSON files from LF to CRLF; no human exposure occurred.
-- The current additive repair pins `data/gv_one_case_delta/**/*.json` and instructions to LF in `.gitattributes` and adds an explicit checkout-custody regression.
-- The ignored local Python 3.12.10 `.venv` contains the pinned repository requirements and is used for all local validation.
-- The root checkout is unsafe and must remain untouched: local `main` is stale at `accef5c6be62f63cfc57f0118e0b6b7ae46fad4f` with massive staged deletions and unrelated untracked files.
+- Initial candidate `313c2aa9eae44d0f5c90fd6a6509feea9110d47c` passed Linux but failed hosted Windows because Git checkout converted new canonical JSON files from LF to CRLF.
+- Repair candidate `14b37734b4ea0d5b4cb61f6bcea56accbd52ff87` / tree `54d24cf15a7f27f5399e2ac07ea603e4accf4738` pins one-case JSON and instructions to LF and adds an explicit checkout-custody regression.
+- Product run `30285531998` is terminal green for candidate `14b3773`: Windows job `90042256003`, Ubuntu job `90042256059`, and byte-parity job `90043281214` all succeeded.
+- Protocol Freeze run `30285532512` is terminal green for candidate `14b3773`: Windows job `90042257227`, Ubuntu job `90042257211`, and byte-parity job `90042562009` all succeeded.
+- Because hosted proof occurs after candidate creation, the proof is recorded as detached evidence on branch `codex/gv-one-case-delta-1-hosted-receipt`, not embedded into the candidate commit. The signed receipt is `data/gv_one_case_delta/hosted_receipts/14b3773/hosted_proof.json`; runtime validation hash is `246357afc2848f71d1252b79987ea8ba980c323a3be5e25751d3a9a8b78b283a`.
+- No `session_manifest.json`, identity evidence, human capture, rubric, attestation, or result exists. Independent implementation review remains required before human preflight.
+- The ignored local Python 3.12.10 `.venv` contains the pinned repository requirements and is used for validation.
+- Candidate and root checkout are separate custody domains. Before this detached evidence edit, the candidate worktree was clean at `14b3773`; only the receipt branch now contains the bounded evidence changes. The root checkout is unsafe and untouched: local `main@accef5c6be62f63cfc57f0118e0b6b7ae46fad4f` reports 5,601 changed paths under default porcelain and 179,365 entries with expanded untracked enumeration, plus unreadable temporary directories. Root state is not candidate evidence.
 - Alpha current authority remains `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`, CDR `889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376`, score 39, observed 0, no alpha claim.
 - Active current-truth surfaces now state that Alpha is merged on `main@48a43b9` and that Commit A is pre-human machinery only.
 
