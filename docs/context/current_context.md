@@ -1,24 +1,26 @@
 ## What Was Done
-- Alpha close vertical complete on branch `codex/gv-alpha0-rc2` (base `origin/main@06ce68f`).
-- Commit A selective Alpha import (no dashboard/page-registry); Commit B dogfood import + guarded publish-current + truth cut; Commit C docs-only current-truth sync.
-- Stage **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**; current decision **DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1** (paper NO_POSITION); CDR `889cc831…` published.
-- Receipt v3 + human attestation v1 bound to Commit A tip `6747d6a`; tag `gv-alpha0-close-rc2` immutable on RC2 ancestry.
-- Metrics locked: score **39**; observed **0**; no alpha claim.
+- Alpha merge closed on `main@48a43b99350465202f8bcd09113a34fa724580af`; final tag `gv-alpha0-close` is banked.
+- Opened only `ONE_CASE_EVIDENCE_GAP_TRIAGE_MACHINERY` under the audited `EVIDENCE_GAP_TRIAGE_ONLY` deviation.
+- Froze static experiment custody without a self-referential candidate SHA.
+- Built an answer-free projection from exactly nine allowlisted, hash-bound, repository-confined source files.
+- Added post-hosted-green session binding, separately signed verified-human identity validation, equal maximum budgets, one-shot capture/seal/blinding/replay, focused tests, and CI filters.
 
 ## What Is Locked
-- Alpha product shipment is ready on branch; **merge to main is pending** (merge-commit only; preserve `gv-alpha0-close-rc2` ancestry).
-- `FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`.
-- Current decision authority: `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1` → paper `NO_POSITION`.
-- Score **39** frozen; observed **0**; formal comparison still deferred; no live capital / score uplift.
-- Broker-free entry: `python launch_alpha.py` (Case Workspace).
+- Current product authority remains `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1` → paper `NO_POSITION`; CDR `889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376`.
+- `SHIPPED_PRODUCT_SCORE = 39`, `FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`, `OBSERVED_COMPARISON_COUNT = 0`, and no alpha claim.
+- This slice cannot establish physical supply, industry economics, MU business capture, shareholder capture, price-envelope inconsistency, investment value, portfolio value, or alpha.
+- Commit A contains no comparison UI, current-decision publication, stage/count promotion, score uplift, provider work, authority redesign, human result, or human exposure before hosted green.
 
 ## What Is Next
-- immediate gate: merge Alpha to main (merge commit, not squash/rebase)
-- → after hosted green: merge
-- → fresh-clone 25-test + verify/replay/current-receipt smoke
-- → final tag gv-alpha0-close on accepted main commit (RC2 tag stays immutable)
-- → first post-merge product gate: one fresh real ONE_CASE_DECISION_DELTA_OBSERVED comparison
-- (not another custody/governance/provider phase)
+- Complete the full local product suite, context validation, current-decision smoke, and terminal SAW.
+- Commit and push the exact Commit A candidate once.
+- Require hosted Windows/Linux product green, then stop before human exposure.
+- After hosted green, create `session_manifest.json` bound to the exact candidate and preflight one materially case/outcome-naive operator plus a different blinded reviewer using separately verifiable signed identity evidence.
+- Keep Commit B closed until one terminal human run exists.
+- Do not call `BASELINE_OPEN` until both human roles are independently viable.
+- Preserve score 39, observed 0, current Alpha authority, and the no-alpha boundary throughout Commit A.
 
 ## First Command
-`.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_alpha0_case_close.py tests/gv_fs0_product/test_v2_alpha0_alpha_app.py`
+```text
+`.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_one_case_delta_projection.py tests/gv_fs0_product/test_one_case_delta_capture.py tests/gv_fs0_product/test_one_case_delta_attestation.py`
+```

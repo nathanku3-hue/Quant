@@ -1,13 +1,10 @@
 # Post-Phase Alignment - Current
 
-## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
+## Active Addendum — One-Case Evidence-Gap Triage Commit A (2026-07-27)
 
-- **What changed**: Alpha product shipment is ready on `codex/gv-alpha0-rc2`. Canonical stage is **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**. Current decision is **DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1** (paper NO_POSITION). Score 39; observed 0; no alpha claim.
-- **Streams**: Docs/Ops owns Commit C current-truth sync + merge packaging; Backend holds further Alpha custody work closed; Frontend Alpha entry is `launch_alpha.py`.
-- **Current bottleneck**: **merge Alpha to main** (merge commit; preserve RC2 ancestry). Not family-two, not reconciliation, not provider intake.
-- **Endgame boundary**: Alpha operability is banked. First post-merge product gate is one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison — not another custody/governance/provider phase.
-- **Next active stream**: merge → hosted-green confirmation → final `gv-alpha0-close` tag on accepted main commit (`gv-alpha0-close-rc2` stays immutable).
-
-## Prior — open multi-source bank / dogfood cars [closed on branch]
-
-Historical open-gate language for multi-source bank and dogfood is superseded by banked Alpha close + pending merge.
+- **What changed:** Alpha merge is closed on `main@48a43b9`. The active slice is narrow pre-human evidence-gap-triage machinery.
+- **Standing truth:** score 39; stage `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`; observed 0; current decision `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1` paper `NO_POSITION`; no alpha claim.
+- **Intent boundary:** `EVIDENCE_GAP_TRIAGE_ONLY` is an explicit bounded deviation. It cannot establish the full physical-supply → economics → business → shareholder → price-envelope chain.
+- **Current bottleneck:** exact candidate local and hosted Windows/Linux proof, not provider access, governance, UI, or publication.
+- **Human gate:** after hosted green, bind the exact candidate through `session_manifest.json` and preflight two materially case/outcome-naive signed identities. Stop before `BASELINE_OPEN` until both are viable.
+- **Commit B:** remains closed until one terminal human run exists; only Commit B may import a result, publish UI/current authority, or promote observed count/stage.

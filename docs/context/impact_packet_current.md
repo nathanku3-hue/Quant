@@ -1,14 +1,11 @@
 # Impact Packet - Current
 
-## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
+## Active Addendum — One-Case Evidence-Gap Triage Commit A (2026-07-27)
 
-- **Owned runtime:** `core/gv_v2_alpha0_case_close.py`, `views/gv_alpha0_case_workspace.py`, `alpha_app.py` / `launch_alpha.py`; source families one+two banked substrates.
-- **Custody:** branch tip on `codex/gv-alpha0-rc2` (Commit A–C); base main `06ce68f`; published current decision CDR `889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376`.
-- **Public authority:** default current decision is Alpha close certified paper **NO_POSITION** (`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`).
-- **Roadmap impact:** Alpha complete on branch; **merge pending**. Stage **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**. Immediate gate = merge Alpha. First post-merge product gate = one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison (not custody/governance/provider phase).
-- **Score/stage:** 39 / CERTIFIED_MULTI_SOURCE_CASE_OPERABLE / observed 0; no alpha claim.
-- **Not performed:** merge to main; formal comparison; score uplift; live capital.
-
-## Prior — family-two / B0B substrate (banked history)
-
-Source family one (B0B) and source family two remain banked substrates under the closed Alpha vertical; not open gates.
+- **Merged custody:** Alpha is on `main@48a43b99350465202f8bcd09113a34fa724580af`; tag `gv-alpha0-close` is banked.
+- **Public authority:** unchanged Alpha certified paper `NO_POSITION`, decision `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`, CDR `889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376`.
+- **Score/stage:** 39 / `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE` / observed 0; no alpha claim.
+- **Active product delta:** narrow pre-human machinery for one `EVIDENCE_GAP_TRIAGE_ONLY` observation: answer-free projection, exact source allowlist, candidate/session custody, separately signed verified-human identities, equal maximum budgets, one-shot semantics, blinded review, replay, and sign-independent disposition.
+- **Claim boundary:** this slice cannot establish physical supply, industry economics, MU business capture, shareholder capture, price-envelope inconsistency, investment value, portfolio value, or alpha.
+- **Not performed in Commit A:** human exposure, comparison result, UI, current-decision publication, stage/count promotion, score uplift, provider ingestion, or authority redesign.
+- **Immediate gate:** exact candidate local green → one push → hosted Windows/Linux green → stop before human exposure.

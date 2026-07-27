@@ -1,9 +1,9 @@
 # Top-Level Roadmap: GodView Certified Portfolio OS
 
 Status: Active Architecture Canon — CERTIFIED_MULTI_SOURCE_CASE_OPERABLE; observed-comparison count = 0
-Date: 2026-07-24
-Product tip lineage: RC2 Commit B on `codex/gv-alpha0-rc2` (base main `06ce68f`; Commit A `6747d6a`; Alpha close vertical banked)
-Active work: **GV-ALPHA0 close vertical banked** — formal comparison still deferred; no score uplift.
+Date: 2026-07-27
+Product tip lineage: Alpha merged on `main@48a43b99350465202f8bcd09113a34fa724580af`; final tag `gv-alpha0-close` banked
+Active work: **ONE_CASE_EVIDENCE_GAP_TRIAGE_MACHINERY** — Commit A pre-human only; no score uplift.
 Authority: `godview_endgame_vision.md`, `godview_portfolio_first_operating_model.md`, `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, frozen `docs/architecture/godview_e0/*`
 
 ## Governing sequence (endgame law — explicit ALPHA0 recut 2026-07-23)
@@ -33,7 +33,7 @@ Portfolio truth first. Decision value second. No fabricated alpha. No score engi
 ```text
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
 EXECUTION_MODEL = GV_FS0_FIRST
-ACTIVE_TRAIN = GV-ALPHA0_ACTIVE
+ACTIVE_TRAIN = ONE_CASE_EVIDENCE_GAP_TRIAGE_MACHINERY
 SOURCE_FAMILY_ONE = B0B_BANKED (SEC:0000723125-26-000015; PR #8 @ 2c7f32c)
 V2_B0A = CLOSED_BANKED_ON_MAIN (PR #6 @ 3e995f1 / head 79c309b)
 F1C_SHIP = CLOSED_SUBSTRATE
@@ -45,7 +45,7 @@ V2_B0_DECISION = DECISION_V2_B0B_MU_G_SUPPLY_1 (family one banked)
 ALPHA0_CLOSE_DECISION = DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1 (multi-source current authority)
 ALPHA0_CLOSE_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE (UI dogfood on Commit A + receipt v3 + human attestation v1)
 CURRENT_PUBLISHED_CDR_HASH = 889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376
-NEXT = formal comparison DEFERRED; prospective paper economics later
+NEXT = exact Commit A local green → one push → hosted Windows/Linux green → stop before human exposure
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN; low-confidence; no uplift; not endgame maturity)
 FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
 OBSERVED_COMPARISON_COUNT = 0
@@ -53,9 +53,9 @@ LOCAL_SOURCE_ABSTENTION_VERTICALS = 1
 REAL_EXTERNAL_SOURCE_PACKAGES_PROCESSED = 2
 DATA_ADMISSION_CERTIFICATES_EARNED = 2
 INDEPENDENT_SOURCE_COUNT = 2
-NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED (formal comparison deferred after Alpha)
+NEXT_MEANINGFUL_STAGE = ONE_CASE_DECISION_DELTA_OBSERVED only after one eligible terminal human run and Commit B
 E0A_R1_MERGE_PATCH = CLOSED (PR #4 @ 2653eb1)
-ACTIVE_PRODUCT_SLICE = GV-ALPHA0-CLOSE multi-source case OPERABLE (CLAIM_INSUFFICIENT + HOLD + paper NO_POSITION); broker-free Case Workspace
+ACTIVE_PRODUCT_SLICE = ONE_CASE_EVIDENCE_GAP_TRIAGE_MACHINERY; current Alpha authority remains unchanged
 V2_BLOCK_ONLY_REAL_ADMISSION = SUPERSEDED_BY_B0A_CLOSED_PLUS_B0B_ACTIVE
 B0B_HARD_RULES = ADMITTED_NEVER_AUTO_ADVANCES; CONTRADICTION_NOT_EVALUATED_WHEN_NO_ADMITTED_FACTS
 V1_PROTOCOL_AUTHORITY = FORMAL_UNTIL_V2_ARTIFACT_COMMITTED
@@ -69,7 +69,7 @@ LIVE_TRADING_MONITORING = OUT_OF_SCOPE
 FS1_BATCH = NOT_NEXT
 ```
 
-**Now:** GV-ALPHA0-CLOSE multi-source vertical banked — both source families, sealed pre-adjudication, UI dogfood confirmation, full certified-object custody, receipt v3 + human attestation v1 on Commit A, current decision published to `gv_fs0_current_decision.json` (role `NO_POSITION`, decision `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`). Score stays **39/100**. Observed-comparison count stays **0**. Formal comparison deferred. No alpha claim.
+**Now:** Alpha is merged and banked on `main@48a43b9`. Commit A opens only pre-human `EVIDENCE_GAP_TRIAGE_ONLY` machinery: an answer-free projection from nine allowlisted hash-bound inputs, post-hosted-green candidate/session binding, separately signed verified-human identity evidence, equal maximum budgets, one-shot capture, blinded review, and replay. Current decision remains `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1` paper `NO_POSITION`; score stays **39/100**; observed count stays **0**; no alpha claim.
 
 ### What E0A proves vs does not prove
 
@@ -441,28 +441,28 @@ They are activated only through the staged gates above. They have no concurrent-
 
 ## Active Next Action
 
-### Now — merge Alpha (branch complete; main pending)
+### Now — Commit A pre-human evidence-gap-triage machinery
 
-**Alpha is complete on branch** `codex/gv-alpha0-rc2`. Canonical stage is **`CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`**. Current decision is **`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`** (paper NO_POSITION). Score **39**; observed **0**; no alpha claim.
+Alpha merge is closed on `main@48a43b99350465202f8bcd09113a34fa724580af`. Canonical stage remains **`CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`**. Current decision remains **`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`** paper `NO_POSITION`. Score **39**; observed **0**; no alpha claim.
 
 ```text
-immediate gate: merge Alpha to main
-  (merge commit only — not squash/rebase; preserve gv-alpha0-close-rc2 ancestry)
-→ hosted green
-→ merge
-→ fresh-clone 25-test + verify/replay/current-receipt smoke
-→ final tag gv-alpha0-close on accepted main commit
-   (keep existing gv-alpha0-close-rc2 tag immutable)
-→ first post-merge product gate:
-   one fresh real ONE_CASE_DECISION_DELTA_OBSERVED comparison
-   (not another custody / governance / provider phase)
+answer-free projection + positive source custody
+→ minimal session/seal/blinding/replay machinery
+→ separately signed verified-human identity adapter
+→ local full green
+→ one push of exact candidate
+→ hosted Windows/Linux product green
+→ STOP before human exposure
+→ post-green session_manifest.json + two-human preflight
 ```
 
-Closed for Alpha release gate: G08 formal comparison, FS1, broad providers, PEAD, optimizer, rankings, broker, alpha, score uplift, live capital, reopening family-two bank as an Alpha gate.
+`OBSERVATION_CLASS = EVIDENCE_GAP_TRIAGE_ONLY`. This bounded deviation cannot establish physical supply, industry economics, MU business capture, shareholder capture, price-envelope inconsistency, investment value, portfolio value, or alpha.
 
-### Same-case G08 Attempt-2 (deferred)
+Commit A forbids comparison UI, current-decision publication, stage/count promotion, score uplift, providers, current prices, broad governance, and human exposure before hosted green. Commit B remains closed until one terminal human run exists.
 
-Not a sole roadmap gate. Run only when two genuinely separate humans are available and a fresh operator can attest non-exposure to Attempt-1 materials. Prefer first valid observation on a real admitted MU case.
+### Same-case human run (closed until hosted-green preflight)
+
+Run only when one materially case/outcome-naive operator and a different blinded reviewer each provide separately verifiable signed identity evidence linked to distinct verified human subjects. `BASELINE_OPEN` consumes the one-shot authorization; no rerun is allowed after exposure.
 
 ### Superseded historical section — S-009X / E0B-DV1 only
 

@@ -1,13 +1,11 @@
 # Multi-Stream Contract - Current
 
-## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
+## Active Addendum — One-Case Evidence-Gap Triage Commit A (2026-07-27)
 
-- Backend/Product: Alpha close vertical **complete on branch**; current decision published (`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`). No further Alpha custody cars.
-- Docs/Ops: Commit C syncs seven current-truth surfaces + `current_context.*`; merge pending.
-- Frontend: broker-free Case Workspace (`launch_alpha.py`) is Alpha product entry; no legacy dashboard coupling required for Alpha.
-- Data/Research/PEAD/FS1/optimizer/broker: held.
-- Next stream after merge: one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison — not another custody/governance/provider phase.
-
-## Prior — family-two / reconciliation open gates [closed]
-
-Family-two bank, multi-source close, export/replay, dogfood, and publish-current are banked on branch; not open Alpha gates.
+- Backend/Product: owns only `core/gv_one_case_delta.py`, the minimal capture CLI, frozen experiment artifacts, focused tests, and replay/identity/custody machinery.
+- Docs/Ops: owns the post-merge truth correction, phase brief, formula register, SAW, and hosted-proof reconciliation.
+- Identity preflight: select `OPENSSH_SSHSIG_V1`; operator and reviewer evidence must be signed separately and linked by a pinned issuer to distinct verified human subjects. Actual human exposure remains closed.
+- Frontend: held. No comparison UI in Commit A.
+- Data/Research: reuse exact banked bytes only; no provider refresh, current prices, post-cutoff events, or outside research.
+- Portfolio/publication: held. Current Alpha authority, score 39, observed 0, and stage remain unchanged.
+- Next gate: local green → one push → hosted Windows/Linux green → stop before human exposure.

@@ -1,9 +1,9 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
 Status: Active product framing — GodView certified portfolio OS (paper)
-Date: 2026-07-24
-Product tip: **GV-ALPHA0-CLOSE** multi-source case OPERABLE (Commit A `6747d6a` + Commit B truth cut); score 39 / observed 0
-Active work: Alpha close vertical banked; formal comparison deferred; no score uplift
+Date: 2026-07-27
+Product tip: Alpha merged on **main@48a43b9**; current multi-source case remains OPERABLE; score 39 / observed 0
+Active work: **ONE_CASE_EVIDENCE_GAP_TRIAGE_MACHINERY**; Commit A pre-human only; no score uplift
 Authority: `docs/architecture/top_level_roadmap.md`, `PRD.md`
 
 Terminal Zero is a local-first quantitative research console. The **authorized product pivot** is from a UOE discretionary cockpit framing to a **GodView certified portfolio OS** (paper accounting + independent certification). It is not a trading bot, not a broker, and not an alpha claim surface.
@@ -12,7 +12,7 @@ Terminal Zero is a local-first quantitative research console. The **authorized p
 PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
 F1C_SHIP = CLOSED_SUBSTRATE
 E0A_OPERABLE = BANKED_SUBSTRATE (plumbing only; NOT decision value / NOT alpha)
-ACTIVE_PRODUCT = GV-ALPHA0-CLOSE multi-source case (UI dogfood OPERABLE)
+ACTIVE_PRODUCT = ONE_CASE_EVIDENCE_GAP_TRIAGE_MACHINERY (current Alpha authority unchanged)
 FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
 SHIPPED_PRODUCT_SCORE = 39/100 (FROZEN)
 OBSERVED_COMPARISON_COUNT = 0
@@ -39,21 +39,25 @@ Default UI: one current certified decision only. F1C dual-role bundle is evidenc
 
 Operator publish path: `scripts/publish_gv_e0a_current.py`.
 
-## Active work — E0A-R1 (repair tax)
+## Active work — one-case evidence-gap triage Commit A
 
-Hard-capped merge-safety only. See [gv-e0a-r1-merge-safety-brief.md](docs/phase_brief/gv-e0a-r1-merge-safety-brief.md).
+See [gv-one-case-decision-delta-brief.md](docs/phase_brief/gv-one-case-decision-delta-brief.md).
 
 ```text
-single authority + proven-provenance custody refs + no dual-authority default
-+ clean main + fresh-checkout smoke → STOP → open E0B-DV1
+answer-free projection from nine allowlisted hash-bound inputs
+→ post-hosted-green session binding
+→ separately signed verified-human identity evidence
+→ equal maximum budgets + one-shot seal/blinding/replay
+→ local green → one push → hosted Windows/Linux green
+→ STOP before human exposure
 ```
 
-**Provenance rule:** prove intended origin before tracking a missing authority file; otherwise amend/remove the reference. Never promote accidental dirty-root bytes.
+`OBSERVATION_CLASS = EVIDENCE_GAP_TRIAGE_ONLY`. This slice does not test the full physical-supply → economics → business → shareholder → price-envelope chain and cannot establish investment value, portfolio value, or alpha. Commit A contains no comparison UI, current-decision publication, stage/count promotion, provider work, or human result.
 
 ## Current Canon (start here)
 
 - [docs/architecture/top_level_roadmap.md](docs/architecture/top_level_roadmap.md) — active architecture canon
-- [docs/phase_brief/gv-e0a-r1-merge-safety-brief.md](docs/phase_brief/gv-e0a-r1-merge-safety-brief.md) — E0A-R1 hard cap
+- [docs/phase_brief/gv-one-case-decision-delta-brief.md](docs/phase_brief/gv-one-case-decision-delta-brief.md) — active Commit A approval contract
 - [PRD.md](PRD.md) — product requirements (header may lag; roadmap wins on gate status)
 - [docs/architecture/gv_fs0_certification_and_data_authority_contract.md](docs/architecture/gv_fs0_certification_and_data_authority_contract.md) — frozen certification contract
 - [docs/architecture/godview_portfolio_first_operating_model.md](docs/architecture/godview_portfolio_first_operating_model.md) — portfolio-first operating model
@@ -73,16 +77,17 @@ Historical continuity links (superseded as active authority — do not auto-cano
 - [PRODUCT_SPEC.md](PRODUCT_SPEC.md)
 - [docs/phase_brief/gv-e0a-operable-brief.md](docs/phase_brief/gv-e0a-operable-brief.md) — E0A implementation brief (banked)
 
-If a conflict appears, **active roadmap + E0A-R1 brief** win until E0B opens.
+If a conflict appears, **active roadmap + one-case evidence-gap-triage brief** win.
 
-## Sequence after E0A-R1
+## Active sequence
 
 ```text
-E0A-R1          ← ACTIVE REPAIR (merge-safety)
-E0B-DV1         one complete decision-value slice (causal improvement required)
-E0B-DV2         replication (heterogeneous cases, null value, adversarial, multi-operator)
-E0B-SHIP        bounded decision-value release
-then only       providers / prospective economics / portfolio expansion eligibility
+Commit A        pre-human EVIDENCE_GAP_TRIAGE_ONLY machinery
+hosted proof    exact Windows/Linux green candidate
+human preflight two eligible separately verified humans; no exposure yet
+one-shot run    one terminal sign-independent observation
+Commit B        immutable result import and publication only
+then            one full original E0 vertical only if disposition is IMPROVED
 ```
 
 ## Run (local)
