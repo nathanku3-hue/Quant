@@ -1,7 +1,7 @@
 # Phase Brief: GV One-Case Decision Delta — Evidence-Gap Triage
 
 Mode: `APPROVAL_GATE`
-Status: `AUDIT_PASS; COMMIT_A_LOCAL_GREEN; CANDIDATE_CUSTODY_PENDING`
+Status: `AUDIT_PASS; COMMIT_A_IMPLEMENTED; HOSTED_GREEN_REQUIRED_BEFORE_HUMAN_EXPOSURE`
 Date: 2026-07-27
 RoundID: `ROUND-20260727-GV-ONE-CASE-DELTA-PLAN-REDLINE`
 ScopeID: `GV_ONE_CASE_EVIDENCE_GAP_TRIAGE_PLAN`
@@ -28,8 +28,9 @@ Audit approval was received before implementation. Commit A must stop after exac
 ## Verified Local State
 
 - The branch base remains `origin/main = gv-alpha0-close^{}` at `48a43b99350465202f8bcd09113a34fa724580af`.
-- The worktree contains the audited planning artifacts plus the authorized Commit A implementation, focused tests, experiment artifacts, truth correction, and CI filter changes.
-- No commit or push has occurred yet; exact-candidate custody begins only after local full proof.
+- Commit A candidate `313c2aa9eae44d0f5c90fd6a6509feea9110d47c` was committed and pushed after the complete local matrix passed.
+- Hosted run `30277303768` proved Linux green but Windows failed closed because Git checkout converted the new canonical JSON files from LF to CRLF; no human exposure occurred.
+- The current additive repair pins `data/gv_one_case_delta/**/*.json` and instructions to LF in `.gitattributes` and adds an explicit checkout-custody regression.
 - The ignored local Python 3.12.10 `.venv` contains the pinned repository requirements and is used for all local validation.
 - The root checkout is unsafe and must remain untouched: local `main` is stale at `accef5c6be62f63cfc57f0118e0b6b7ae46fad4f` with massive staged deletions and unrelated untracked files.
 - Alpha current authority remains `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`, CDR `889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376`, score 39, observed 0, no alpha claim.

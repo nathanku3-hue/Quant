@@ -11,4 +11,6 @@ data/gv_v2_b0b/**/raw/** -text
 data/gv_v2_alpha0/**/*.json text eol=lf
 data/gv_v2_alpha0/**/*.md text eol=lf
 data/gv_v2_alpha0/**/raw/** -text
+data/gv_one_case_delta/**/*.json text eol=lf
+data/gv_one_case_delta/**/*.md text eol=lf
 docs/architecture/godview_e0/** text eol=lf

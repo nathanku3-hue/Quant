@@ -32,7 +32,7 @@ Independent implementation Reviewer A/B/C agents are not available in this execu
 - CHK-11: Independent Reviewer A strategy/regression pass.
 - CHK-12: Independent Reviewer B runtime/operational-resilience pass.
 - CHK-13: Independent Reviewer C data-integrity/performance-path pass.
-- CHK-14: Push one exact candidate and require hosted Windows/Linux product green before any human exposure.
+- CHK-14: Push exact candidates only after local green and require hosted Windows/Linux product green before any human exposure; retain failed hosted candidates as explicit evidence.
 
 ## Implementer Pass
 
@@ -102,7 +102,8 @@ Independent candidate review remains required.
 | High | Reviewer identity initially proved session/role control but did not bind the exact review package and rubric; terminal eligibility initially accepted caller-supplied authority hashes. | Split reviewer preflight from final package/rubric-bound evidence; terminal sealing now replays both signed identities, complete sealed event hashes, rubric, package, and detached attestation before mapping reveal. | Implementer | Fixed |
 | High | Session creation initially accepted self-asserted hosted-green strings from a local JSON file. | Require a pinned-provider SSHSIG receipt binding exact candidate SHA/tree, workflow, separate Windows/Linux run IDs and SUCCESS conclusions, proof ID, and verification timestamp. | Implementer | Fixed |
 | High | Initial exposure state did not bind the exact bundle/projection artifacts and accepted an operator identity hash without verifying the signed record. | Bind bundle/projection/manifest/schema hashes in the session, replay hosted proof on state creation, verify full operator identity before `BASELINE_OPEN`, and reject post-exposure substitution. | Implementer | Fixed |
-| Low | One all-in-one CI-equivalent local command hit two DevSpace transport 502 responses. | Executed the identical test matrix in deterministic segments; all 425 collected tests passed. Hosted CI remains the exact-candidate parity authority. | Environment | Mitigated |
+| Low | One all-in-one CI-equivalent local command hit repeated DevSpace transport 502 responses. | Executed the identical test matrix in deterministic segments; all 426 collected tests passed. Hosted CI remains the exact-candidate parity authority. | Environment | Mitigated |
+| High | First pushed candidate `313c2aa` passed Linux but failed four Windows tests because checkout converted canonical one-case JSON terminal LF to CRLF. | Pin `data/gv_one_case_delta/**/*.json` and instructions to `eol=lf`; add a Git-attribute and raw-byte regression; require a new exact repair candidate to pass both hosted OS jobs. | Implementer | Fixed locally; hosted repair proof pending |
 
 ## Scope Split Summary
 
@@ -129,7 +130,7 @@ Inherited out-of-scope findings/actions:
 | `core/gv_one_case_delta.py` | Narrow source/session/identity/seal/replay/rubric machinery with no publication authority. | Mechanical PASS; independent review pending |
 | `scripts/gv_one_case_delta_capture.py` | Pre-human deterministic build, session-manifest, and identity-preflight CLI. | Mechanical PASS; independent review pending |
 | `data/gv_one_case_delta/case_1/*` | Frozen binding, instructions, evidence bundle, answer-free projection, projection manifest. | Mechanical PASS; independent review pending |
-| `tests/gv_fs0_product/test_one_case_delta_*.py` | 25 focused projection, state, artifact-binding, identity, attestation, and mutation tests. | PASS |
+| `tests/gv_fs0_product/test_one_case_delta_*.py` | 26 focused projection, checkout-custody, state, artifact-binding, identity, attestation, and mutation tests. | PASS |
 | `.github/workflows/gv-fs0-product.yml` | Existing Windows/Linux product gate includes Commit A paths and custody hashes. | Static PASS; hosted pending |
 | `docs/phase_brief/gv-one-case-decision-delta-brief.md` | Audit authority and live Commit A state. | PASS |
 | `docs/context/*`, `docs/architecture/top_level_roadmap.md`, `README.md` | Alpha merge correction and pre-human stop gate. | PASS |
@@ -151,12 +152,14 @@ Canonical review order:
 
 ## Validation Evidence
 
-- Focused Commit A suite: 25 passed.
+- Focused Commit A suite: 26 passed.
 - Existing product core/authority group: 89 passed.
 - E0B/B0/Alpha custody group: 147 passed.
 - Streamlit/AppTest/current-decision group: 14 passed.
 - Frozen protocol/external GV-FS0 group: 150 passed.
-- Total hosted-product matrix: 425 passed; one existing websockets deprecation warning only.
+- Total local hosted-product matrix: 426 passed; one existing websockets deprecation warning only.
+- First hosted candidate `313c2aa`, run `30277303768`: Ubuntu PASS; Windows FAIL on four canonical-document tests due CRLF checkout conversion; parity job skipped.
+- Additive repair: `.gitattributes` LF custody plus checkout-custody test; hosted repair run remains required.
 - Deterministic tracked pre-human artifact replay: PASS.
 - Current-context generation/validation: PASS.
 - Current decision: unchanged SHA-256 `d939cd67e247b4f25c254cbec515b9f15e2e1d6efd2b9c87f023a86d5b249e13`, 23,942 bytes.
@@ -170,13 +173,13 @@ Canonical review order:
 Open Risks:
 
 - independent implementation Reviewer A/B/C candidate review is unavailable in this environment and remains mandatory before human exposure;
-- exact-candidate hosted Windows/Linux proof is pending until the one authorized push;
+- first exact candidate failed hosted Windows LF custody; the additive repair candidate still requires hosted Windows/Linux proof;
 - two eligible separately verified humans and their signed identity evidence have not been supplied;
 - the current user is exposed to the Alpha case and implementation context and therefore cannot serve as the materially case/outcome-naive operator.
 
-Next action: freeze one commit, push the exact candidate once, require hosted Windows/Linux green, then stop for independent candidate audit and two-human preflight without opening `BASELINE_OPEN`.
+Next action: locally validate and push one additive LF-custody repair commit, require hosted Windows/Linux green, then stop for independent candidate audit and two-human preflight without opening `BASELINE_OPEN`.
 
 ClosureValidation: PASS
 SAWBlockValidation: PASS
 
-ClosurePacket: RoundID=ROUND-20260727-GV-ONE-CASE-DELTA-COMMIT-A; ScopeID=GV_ONE_CASE_EVIDENCE_GAP_TRIAGE_COMMIT_A; ChecksTotal=14; ChecksPassed=10; ChecksFailed=4; Verdict=BLOCK; OpenRisks=independent_reviewer_a_b_c_unavailable_hosted_candidate_pending_two_eligible_humans_not_supplied; NextAction=commit_push_once_require_hosted_windows_linux_green_then_stop_for_independent_candidate_audit
+ClosurePacket: RoundID=ROUND-20260727-GV-ONE-CASE-DELTA-COMMIT-A; ScopeID=GV_ONE_CASE_EVIDENCE_GAP_TRIAGE_COMMIT_A; ChecksTotal=14; ChecksPassed=10; ChecksFailed=4; Verdict=BLOCK; OpenRisks=independent_reviewer_a_b_c_unavailable_hosted_windows_lf_repair_pending_two_eligible_humans_not_supplied; NextAction=validate_push_additive_lf_repair_require_hosted_windows_linux_green_then_stop

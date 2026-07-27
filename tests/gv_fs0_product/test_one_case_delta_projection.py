@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 from pathlib import Path
 import shutil
+import subprocess
 
 import pytest
 
@@ -24,6 +25,24 @@ def _copy_allowlist(tmp_path: Path) -> Path:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
     return root
+
+
+def test_canonical_case_artifacts_are_lf_pinned_in_git() -> None:
+    paths = [
+        delta.DEFAULT_BINDING_PATH,
+        delta.DEFAULT_BUNDLE_PATH,
+        delta.DEFAULT_PROJECTION_PATH,
+        delta.DEFAULT_PROJECTION_MANIFEST_PATH,
+    ]
+    for path in paths:
+        relative = path.relative_to(delta.ROOT).as_posix()
+        output = subprocess.check_output(
+            ["git", "check-attr", "eol", "--", relative],
+            cwd=delta.ROOT,
+            text=True,
+        )
+        assert output.rstrip().endswith(": eol: lf")
+        assert b"\r\n" not in path.read_bytes()
 
 
 def test_tracked_projection_is_exact_deterministic_answer_free_build() -> None:
