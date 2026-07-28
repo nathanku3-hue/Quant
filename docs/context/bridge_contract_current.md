@@ -1,14 +1,14 @@
 # Bridge Contract - Current
 
-## Active — GV-ALPHA0-SHIP repaired local candidate ready for re-audit (2026-07-28)
+## Active — GV-ALPHA0-SHIP hosted-cleanliness repair pending commit (2026-07-28)
 
 - SYSTEM_DELTA: one complete release workflow and deterministic narrow package are implemented on `codex/gv-alpha0-ship` from accepted `main@48a43b9`.
-- PM / Product Delta: canonical score **39**, observed **0**, stage `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`; release-readiness estimate held at **65/100** planning-only pending re-audit.
+- PM / Product Delta: canonical score **39**, observed **0**, stage `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`; release readiness remains **65/100** pending hosted rerun.
 - USER_FLOW_DELTA: launch → review → confirm → persist → reopen is locally green; startup validates the complete release manifest before initialization and rejects canonical path escapes, junctions into the bundle, and linked seed paths outside runtime.
-- OPEN_DECISION: none for product design. External audit and shipment evidence remain procedural gates.
-- RECOMMENDED_NEXT_STEP: independently re-audit the repaired diff; if accepted, commit/push and require hosted Windows/Linux tests, extracted smoke, and exact package parity.
+- HOSTED_DELTA: run `30343141406` passed Windows/Linux product tests but both package builds failed because checkout-local custody evidence violated the clean-tree package precondition; parity was skipped.
+- RECOMMENDED_NEXT_STEP: commit/push the bounded runner-temp custody repair, then require hosted Windows/Linux package, extracted-smoke, and exact byte-parity green.
 - DO_NOT_REDECIDE: trust anchors, receipts, identity, human comparison, A/B/C release machinery, experimental branches, providers, score uplift, live capital, or research redesign.
-- PHASE_STATUS: `REPAIRED_LOCAL_CANDIDATE_READY_FOR_REAUDIT; SCORE_39; OBSERVED_0; READINESS_ESTIMATE_65; HOSTED_PILOT_RELEASE_PENDING`.
+- PHASE_STATUS: `HOSTED_CLEAN_TREE_REPAIR_PENDING_COMMIT; SCORE_39; OBSERVED_0; READINESS_ESTIMATE_65; HOSTED_GREEN_PENDING`.
 
 ## Active — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
 

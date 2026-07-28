@@ -10,6 +10,18 @@ from pathlib import Path
 
 from scripts.build_gv_alpha0_release import ARCHIVE_PREFIX, build_release
 
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_ci_custody_evidence_stays_outside_checkout() -> None:
+    workflow = (ROOT / ".github/workflows/gv-fs0-product.yml").read_text(
+        encoding="utf-8"
+    )
+    assert 'Path(os.environ["RUNNER_TEMP"])' in workflow
+    assert '/ "gv-fs0-environment-custody.json"' in workflow
+    assert 'path: ${{ runner.temp }}/gv-fs0-environment-custody.json' in workflow
+    assert 'Path("gv-fs0-environment-custody.json").write_text' not in workflow
+
 
 def test_release_archive_is_reproducible_and_narrow(tmp_path: Path) -> None:
     first_dir = tmp_path / "first"

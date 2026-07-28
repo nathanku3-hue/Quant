@@ -2002,3 +2002,11 @@ Application pattern:
 - Fix applied: Canonicalized existing path ancestors before any write, confined every package/runtime/seed file after link resolution, rejected routes entering the bundle or escaping runtime, and validated the exact packaged file set and hashes against `RELEASE_MANIFEST.json` before seed initialization.
 - Guardrail for next time: A release bootstrap must establish package integrity before deriving any runtime manifest, and path confinement must be tested with real platform link primitives—especially Windows junctions—not only `Path.is_symlink()`.
 - Evidence paths: `core/gv_alpha0_ship_runtime.py`, `tests/gv_fs0_product/test_gv_alpha0_ship_runtime.py`, `tests/gv_fs0_product/test_gv_alpha0_release_package.py`, `release/gv-alpha0/README.md`.
+
+## 2026-07-28 Round Entry (Hosted Evidence Must Not Dirty a Clean-Commit Build)
+- Date: 2026-07-28
+- Mistake or miss: The first hosted shipment run generated environment-custody evidence inside the checkout before invoking the release builder, so both Windows and Linux correctly failed the clean-tree package guard even though their full product suites passed.
+- Root cause: Workflow evidence placement was treated as operationally neutral, but any checkout-local output changes the source state seen by a commit-bound builder.
+- Fix applied: Routed custody JSON through GitHub `RUNNER_TEMP`, uploaded it from `${{ runner.temp }}`, and added a regression forbidding checkout-local custody output.
+- Guardrail for next time: All pre-package CI evidence and logs must live under runner-temporary or artifact staging paths; the repository checkout must remain byte-identical to the candidate commit until package construction completes.
+- Evidence paths: `.github/workflows/gv-fs0-product.yml`, `tests/gv_fs0_product/test_gv_alpha0_release_package.py`, hosted run `30343141406`, local focused suite `39/39`.

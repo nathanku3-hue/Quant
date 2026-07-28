@@ -156,7 +156,11 @@ jobs:
                   sha256_file(manifest) if manifest.is_file() else None
               ),
           }
-          Path("gv-fs0-environment-custody.json").write_text(
+          custody_path = (
+              Path(os.environ["RUNNER_TEMP"])
+              / "gv-fs0-environment-custody.json"
+          )
+          custody_path.write_text(
               json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n",
               encoding="utf-8",
               newline="\n",
@@ -172,7 +176,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gv-fs0-environment-custody-${{ runner.os }}
-          path: gv-fs0-environment-custody.json
+          path: ${{ runner.temp }}/gv-fs0-environment-custody.json
           if-no-files-found: error
           retention-days: 30
 

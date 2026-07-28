@@ -7,16 +7,19 @@
 - [x] Deterministic sealed first-run sample; no prior confirmation or certified result copied.
 - [x] User-writable persistence outside package/repository.
 - [x] Complete review → confirm paper `NO_POSITION` → persist → reopen workflow.
-- [x] Native Windows focused suite **38/38 PASS**.
+- [x] Native Windows focused suite **39/39 PASS**.
 - [x] Canonical runtime confinement rejects Windows-junction routes into the bundle and linked seed paths escaping runtime.
 - [x] Extracted package validates the complete `RELEASE_MANIFEST.json` before initialization; modified seed bytes and missing/fake-manifest fallback fail closed.
 - [x] Deterministic versioned allowlisted ZIP, manifest, artifact hash, onboarding, and rollback.
 - [x] Fresh extracted Windows package smoke PASS.
 - [x] Native Windows/Linux package build byte parity PASS.
 - [x] Hosted Windows/Linux workflow updated for tests, package, smoke, upload, and byte parity.
-- [ ] Independent re-audit of repaired candidate diff.
-- [ ] Accepted commit and push on `codex/gv-alpha0-ship`.
-- [ ] Hosted Windows/Linux green.
+- [x] Independent re-audit accepted the repaired shipment diff.
+- [x] Accepted shipment commit `ec5c1ea` pushed on `codex/gv-alpha0-ship`.
+- [x] First hosted run `30343141406` proves both OS product suites pass and exposes the checkout-local custody-output build blocker.
+- [x] Bounded repair writes custody evidence under runner temp and has a static regression.
+- [ ] Commit and push the hosted-cleanliness repair.
+- [ ] Hosted Windows/Linux package, extracted smoke, and byte parity green.
 - [ ] Clean commit-bound release artifact and hashes.
 - [ ] Clean Windows and Linux machine smoke.
 - [ ] One pilot user completes the workflow; fix P0/P1 only.

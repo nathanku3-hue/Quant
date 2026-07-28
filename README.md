@@ -3,7 +3,7 @@
 Status: Active product framing — GodView certified portfolio OS (paper)
 Date: 2026-07-24
 Product tip: **GV-ALPHA0-CLOSE** multi-source case OPERABLE (Commit A `6747d6a` + Commit B truth cut); score 39 / observed 0
-Active work: GV-ALPHA0 ship candidate — complete local workflow and deterministic package; audit/hosted/pilot/release pending
+Active work: GV-ALPHA0 ship branch — accepted commit pushed; bounded hosted-cleanliness repair pending commit/rerun
 Authority: `docs/architecture/top_level_roadmap.md`, `PRD.md`
 
 Terminal Zero is a local-first quantitative research console. The **authorized product pivot** is from a UOE discretionary cockpit framing to a **GodView certified portfolio OS** (paper accounting + independent certification). It is not a trading bot, not a broker, and not an alpha claim surface.
@@ -19,7 +19,7 @@ OBSERVED_COMPARISON_COUNT = 0
 CURRENT_DECISION = DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1 → paper NO_POSITION
 ALPHA_ENTRY = python launch_alpha.py  (broker-free Case Workspace)
 SHIP_BRANCH = codex/gv-alpha0-ship (local candidate; not released)
-RELEASE_READINESS_ESTIMATE = 65/100 (held pending re-audit; product score remains 39)
+RELEASE_READINESS_ESTIMATE = 65/100 (held pending hosted rerun; product score remains 39)
 USER_FLOW = launch → review → confirm NO_POSITION → persist → reopen
 FORBIDDEN = providers, real prices, FS1 batch, PEAD, alpha claims, broker,
             compatibility dual-authority UI, dirty-root authority auto-canonization
@@ -46,7 +46,7 @@ Operator publish path: `scripts/publish_gv_e0a_current.py`.
 
 The release path is intentionally narrow: one user-writable deterministic sample workspace, one verified paper `NO_POSITION` workflow, one reproducible package, cross-platform smoke, one pilot, then release. See [gv-alpha0-ship-brief.md](docs/phase_brief/gv-alpha0-ship-brief.md).
 
-Current repaired-candidate evidence: native Windows focused suite 38/38, including real Windows-junction and tampered-package regressions; fresh extracted Windows package smoke PASS; native Windows/Linux package bytes identical. Still pending: independent re-audit, accepted commit/push, hosted Windows/Linux green, clean-machine smoke, pilot, and release.
+Accepted commit `ec5c1ea` is pushed and clean. Hosted run `30343141406` passed the full product suite on Windows and Linux, then both package builds correctly refused because custody evidence had dirtied the checkout; parity was skipped. The bounded repair writes custody evidence under runner temp and passes the focused local suite **39/39**. Still pending: repair commit/push, hosted Windows/Linux/parity green, clean-machine smoke, pilot, and release.
 
 No trust-anchor, receipt, identity, human-comparison, provider, score-uplift, live-capital, or research-platform track is on the release path.
 
