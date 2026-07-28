@@ -2010,3 +2010,19 @@ Application pattern:
 - Fix applied: Routed custody JSON through GitHub `RUNNER_TEMP`, uploaded it from `${{ runner.temp }}`, and added a regression forbidding checkout-local custody output.
 - Guardrail for next time: All pre-package CI evidence and logs must live under runner-temporary or artifact staging paths; the repository checkout must remain byte-identical to the candidate commit until package construction completes.
 - Evidence paths: `.github/workflows/gv-fs0-product.yml`, `tests/gv_fs0_product/test_gv_alpha0_release_package.py`, hosted run `30343141406`, local focused suite `39/39`.
+
+## 2026-07-28 Round Entry (Hosted Parity Must Be Bound to the Same Clean Artifact)
+- Date: 2026-07-28
+- Mistake or miss: Local clean-build evidence alone could have been reported as closure without proving that hosted Windows, hosted Linux, and an independent rebuild all emitted the same commit-bound archive.
+- Root cause: Build success, fresh-machine smoke, and cross-platform byte identity are separate shipment claims even when they use the same package script.
+- Fix applied: Required hosted Windows/Linux clean builds and extracted-venv smokes, exact hosted archive parity, then independently rebuilt `a88ed05` and matched SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57` before advancing to pilot.
+- Guardrail for next time: Do not advance a packaged product to pilot until commit identity, clean tree state, artifact hash, extracted workflow smoke, and cross-platform parity all reconcile to one artifact record.
+- Evidence paths: hosted run `30346381138`, `scripts/build_gv_alpha0_release.py`, `scripts/smoke_gv_alpha0_release.py`, `docs/phase_brief/gv-alpha0-ship-brief.md`.
+
+## 2026-07-28 Round Entry (A Pilot Must Exercise the Real Packaged UI and Restart Boundary)
+- Date: 2026-07-28
+- Mistake or miss: An in-process AppTest or workflow helper could be overread as a pilot even though neither proves the packaged Streamlit server, browser controls, and persisted restart experience together.
+- Root cause: Functional automation and operator experience share the same workflow but cross different runtime boundaries; a wrong confirmation phrase in the first browser attempt also showed that driver mistakes must be separated from product defects before assigning P0/P1.
+- Fix applied: Served the exact clean `a88ed05` package, operated it through Chromium as `PILOT_BROWSER_OPERATOR_001`, confirmed the visible `CONFIRM_NO_POSITION` phrase, verified persisted `CASE_WORKSPACE_UI` certification, restarted the server against the same user-data root, and reopened certified-only in 4.435 seconds. No P0/P1 was found.
+- Guardrail for next time: A release pilot must use the exact clean artifact through a real browser and include a process restart; classify a failure only after confirming the operator input matched the visible product contract.
+- Evidence paths: clean artifact SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`, `alpha_app.py`, `views/gv_alpha0_case_workspace.py`, temporary Chromium pilot record under the host temp directory, `docs/phase_brief/gv-alpha0-ship-brief.md`.

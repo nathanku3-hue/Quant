@@ -1,14 +1,15 @@
 # Planner Packet - Current
 
-## Active — GV-ALPHA0-SHIP hosted-cleanliness repair pending commit (2026-07-28)
+## Active — GV-ALPHA0-SHIP browser pilot closed; release next (2026-07-28)
 
-- Accepted shipment commit `ec5c1ea71dd4f87dc1b2b09adbefe7775028c392` is pushed on `codex/gv-alpha0-ship`; local and remote were clean and `0/0` before the hosted run.
-- One complete workflow remains implemented: launch → deterministic sealed sample → review → confirm paper `NO_POSITION` → persist → reopen certified state.
-- Hosted run `30343141406`: Windows and Linux full product suites PASS; both deterministic package builds FAIL with `GV_ALPHA0_RELEASE_DIRTY_WORKTREE_REFUSED`; byte parity is skipped.
-- Root cause: the workflow wrote `gv-fs0-environment-custody.json` inside the Git checkout before invoking the clean-tree release builder.
-- Bounded repair: write/upload custody evidence from `${{ runner.temp }}` / `RUNNER_TEMP`; no builder exception or scope expansion. Native Windows focused suite is now **39/39 PASS**, workflow YAML and diff checks PASS.
-- Product score remains **39**; observed remains **0**; stage remains `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`; release readiness remains **65/100** pending a green hosted rerun.
-- Immediate gate: commit/push this two-file workflow repair → hosted Windows/Linux/package/parity green → clean artifact → fresh machines → pilot → release.
+- Ship branch `codex/gv-alpha0-ship` is clean and synchronized at `a88ed05bbd360d8cc053f9ed835992c48958e7f5`.
+- One complete workflow is implemented: launch → deterministic sealed sample → review → confirm paper `NO_POSITION` → persist → reopen certified state.
+- Hosted run `30346381138` is fully green: Windows/Linux product suites, clean commit-bound package builds, isolated extracted-package smokes, artifact uploads, and exact byte parity PASS.
+- Windows and Linux produced the same clean artifact: 18,666,047 bytes, SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`, source commit `a88ed05`, tree state `clean`.
+- Independent local rebuild matched the hosted hash exactly; a newly created Windows venv completed initialize → confirm → persist → reopen smoke PASS. Native Windows focused suite remains **39/39 PASS**.
+- Clean-package browser pilot PASS: a fresh Streamlit server was operated through Chromium, confirmed with `PILOT_BROWSER_OPERATOR_001`, persisted `CASE_WORKSPACE_UI` certification, then restarted against the same user-data root and reopened certified-only in 4.435 seconds. No P0/P1 was found.
+- Product score remains **39**; observed remains **0**; stage remains `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`; release readiness advances to **87/100** planning-only.
+- Immediate gate: tag and publish the clean `a88ed05` artifact; no repair commit is needed.
 - Do not open trust anchors, receipts, identities, human comparison, providers, formal score uplift, live capital, or research redesign.
 
 ## New Context Packet — GV-ALPHA0-CLOSE complete on branch (2026-07-25)

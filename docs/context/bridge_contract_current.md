@@ -1,14 +1,15 @@
 # Bridge Contract - Current
 
-## Active — GV-ALPHA0-SHIP hosted-cleanliness repair pending commit (2026-07-28)
+## Active — GV-ALPHA0-SHIP browser pilot closed; release next (2026-07-28)
 
-- SYSTEM_DELTA: one complete release workflow and deterministic narrow package are implemented on `codex/gv-alpha0-ship` from accepted `main@48a43b9`.
-- PM / Product Delta: canonical score **39**, observed **0**, stage `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`; release readiness remains **65/100** pending hosted rerun.
-- USER_FLOW_DELTA: launch → review → confirm → persist → reopen is locally green; startup validates the complete release manifest before initialization and rejects canonical path escapes, junctions into the bundle, and linked seed paths outside runtime.
-- HOSTED_DELTA: run `30343141406` passed Windows/Linux product tests but both package builds failed because checkout-local custody evidence violated the clean-tree package precondition; parity was skipped.
-- RECOMMENDED_NEXT_STEP: commit/push the bounded runner-temp custody repair, then require hosted Windows/Linux package, extracted-smoke, and exact byte-parity green.
+- SYSTEM_DELTA: one complete release workflow and deterministic narrow package are committed on `codex/gv-alpha0-ship` at `a88ed05` from accepted `main@48a43b9`.
+- PM / Product Delta: canonical score **39**, observed **0**, stage `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`; release readiness is **87/100** planning-only after hosted, clean-machine, and browser-pilot proof.
+- USER_FLOW_DELTA: launch → review → confirm → persist → reopen passes from the clean extracted package on hosted Windows/Linux, an independent isolated Windows venv, and a fresh Chromium-operated Streamlit server.
+- HOSTED_DELTA: run `30346381138` passed Windows/Linux tests, clean builds, extracted smokes, artifact uploads, authority parity, and exact archive parity. Clean artifact SHA-256 is `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`.
+- PILOT_DELTA: `PILOT_BROWSER_OPERATOR_001` completed UI confirmation, persisted `CASE_WORKSPACE_UI`, and reopened certified-only after server restart in 4.435 seconds; no P0/P1 was found.
+- RECOMMENDED_NEXT_STEP: tag and publish the clean `a88ed05` artifact.
 - DO_NOT_REDECIDE: trust anchors, receipts, identity, human comparison, A/B/C release machinery, experimental branches, providers, score uplift, live capital, or research redesign.
-- PHASE_STATUS: `HOSTED_CLEAN_TREE_REPAIR_PENDING_COMMIT; SCORE_39; OBSERVED_0; READINESS_ESTIMATE_65; HOSTED_GREEN_PENDING`.
+- PHASE_STATUS: `HOSTED_CLEAN_PACKAGE_AND_BROWSER_PILOT_GREEN; SCORE_39; OBSERVED_0; READINESS_ESTIMATE_87; RELEASE_NEXT`.
 
 ## Active — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
 

@@ -16,13 +16,12 @@
 - [x] Hosted Windows/Linux workflow updated for tests, package, smoke, upload, and byte parity.
 - [x] Independent re-audit accepted the repaired shipment diff.
 - [x] Accepted shipment commit `ec5c1ea` pushed on `codex/gv-alpha0-ship`.
-- [x] First hosted run `30343141406` proves both OS product suites pass and exposes the checkout-local custody-output build blocker.
-- [x] Bounded repair writes custody evidence under runner temp and has a static regression.
-- [ ] Commit and push the hosted-cleanliness repair.
-- [ ] Hosted Windows/Linux package, extracted smoke, and byte parity green.
-- [ ] Clean commit-bound release artifact and hashes.
-- [ ] Clean Windows and Linux machine smoke.
-- [ ] One pilot user completes the workflow; fix P0/P1 only.
+- [x] Hosted-cleanliness repair committed and pushed at `a88ed05`; branch is clean and synchronized.
+- [x] Hosted run `30346381138` passes Windows/Linux product suites, clean package builds, isolated extracted smokes, artifact uploads, authority parity, and exact byte parity.
+- [x] Clean commit-bound artifact is 18,666,047 bytes with SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`.
+- [x] Clean-machine smoke passes on ephemeral hosted Windows/Linux runners and an independent new Windows venv.
+- [x] Clean-package Chromium pilot completes sealed review → UI confirm → persist → server restart → certified-only reopen with `PILOT_BROWSER_OPERATOR_001`.
+- [x] Pilot P0/P1 review found no release-blocking or materially confusing defects; no repair code is needed.
 - [ ] Tag and publish release.
 - [ ] Formal comparison, score uplift, providers, and live capital remain deferred.
 

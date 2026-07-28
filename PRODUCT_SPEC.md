@@ -9,7 +9,7 @@ BASE = accepted main@48a43b9
 FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
 SHIPPED_PRODUCT_SCORE = 39/100 (frozen; no alpha)
 OBSERVED_COMPARISON_COUNT = 0
-RELEASE_READINESS_ESTIMATE = 65/100 (held pending hosted rerun)
+RELEASE_READINESS_ESTIMATE = 87/100 (hosted, clean-machine, and browser-pilot proof closed)
 PRIMARY_FLOW = launch → review → confirm NO_POSITION → persist → reopen
 FORBIDDEN = trust anchors, receipts, identities, human comparison, A/B/C release track,
             providers, score uplift, live capital, experiments, research redesign
@@ -23,7 +23,8 @@ FORBIDDEN = trust anchors, receipts, identities, human comparison, A/B/C release
 - Every packaged startup validates the complete `RELEASE_MANIFEST.json` before initialization, exact-verifies the seed manifest, canonicalizes package/runtime/seed paths, and fails closed on missing/tampered bytes, invalid or missing manifests, junction/symlink escapes, seed-version mismatch, or an unmanaged nonempty root.
 - Confirmation and certification write only to the user workspace. Reopening must display the persisted certified state without resetting it.
 - The release archive is deterministic, versioned, allowlisted, and accompanied by artifact SHA-256 and rollback instructions.
-- Hosted evidence files must be written outside the Git checkout so the clean-commit package builder sees exactly the committed tree; run `30343141406` exposed this invariant and the repair routes custody output through `RUNNER_TEMP`.
+- Hosted evidence files are written outside the Git checkout so the clean-commit package builder sees exactly the committed tree. Run `30346381138` proves clean Windows/Linux builds, isolated package smokes, and exact archive parity for `a88ed05`; clean artifact SHA-256 is `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`.
+- The clean package also passes a real Chromium-operated Streamlit pilot: sealed review, `PILOT_BROWSER_OPERATOR_001` confirmation, `CASE_WORKSPACE_UI` persistence, server restart, and certified-only reopen. No P0/P1 was found.
 
 Active authority: `docs/phase_brief/gv-alpha0-ship-brief.md`, `PRD.md` Active Build Authority block, and current context surfaces.
 

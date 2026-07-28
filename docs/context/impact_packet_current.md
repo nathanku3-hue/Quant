@@ -7,9 +7,11 @@
 - **Release surface:** deterministic allowlisted ZIP builder, extracted-package smoke, Windows/Linux run wrappers, onboarding, rollback, and hosted matrix/package parity updates.
 - **Tests:** two focused shipment test modules plus existing Alpha product tests; native Windows combined result **39/39 PASS**, including actual Windows junction routing, tampered-package startup refusal, and the hosted custody-path regression.
 - **P1 repair:** all packaged files are checked against `RELEASE_MANIFEST.json` before initialization; package/runtime/seed paths are canonicalized; junction/symlink escapes and runtime routes entering the bundle fail closed.
-- **Hosted result:** run `30343141406` passed the full product suite on Windows and Linux, then both release builds failed because checkout-local custody evidence triggered the clean-tree guard; parity was skipped.
-- **Authority unchanged:** score 39, observed 0, `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`, no alpha or decision-improvement claim.
-- **Repair surface:** `.github/workflows/gv-fs0-product.yml` now writes/uploads custody evidence from runner temp; `tests/gv_fs0_product/test_gv_alpha0_release_package.py` locks that invariant. Repair commit/push, hosted rerun, clean artifact, clean-machine smoke, pilot, tag, and release remain open.
+- **Hosted result:** run `30346381138` is fully green on Windows and Linux: product suites, clean package builds, isolated extracted-package smokes, uploads, authority parity, and exact archive parity PASS.
+- **Clean artifact:** both hosted builders and an independent local rebuild produced 18,666,047 bytes with SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`, bound to clean commit `a88ed05`.
+- **Browser pilot:** the exact clean package ran behind a fresh Streamlit server and was operated through Chromium from sealed review to `CASE_WORKSPACE_UI` confirmation, certification, server restart, and certified-only reopen. No P0/P1 was found.
+- **Authority unchanged:** score 39, observed 0, `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`, no alpha or decision-improvement claim. Release readiness is 87/100 planning-only.
+- **Remaining surface:** tag and publication only. No repair, provider, comparison, score-uplift, live-capital, or redesign work is opened.
 
 ## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
 

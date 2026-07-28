@@ -37,13 +37,15 @@ launch
 - Native Windows focused product tests: `39/39 PASS`, including real Windows-junction, tampered-package, and hosted custody-path regressions.
 - Deterministic package test: two local builds byte-identical.
 - Fresh extracted Windows package smoke: PASS.
-- Accepted shipment commit `ec5c1ea71dd4f87dc1b2b09adbefe7775028c392` is pushed.
-- Hosted run `30343141406`: Windows/Linux full product suites PASS; both package builds fail with `GV_ALPHA0_RELEASE_DIRTY_WORKTREE_REFUSED`; parity skips.
-- Hosted repair routes custody evidence through `RUNNER_TEMP`, preserving a clean checkout for the commit-bound builder.
+- Hosted-cleanliness repair commit `a88ed05bbd360d8cc053f9ed835992c48958e7f5` is pushed; branch is clean and synchronized.
+- Hosted run `30346381138`: Windows/Linux full product suites, clean package builds, isolated extracted-package smokes, uploads, authority parity, and exact archive parity PASS.
+- Clean Windows and Linux artifacts are byte-identical: 18,666,047 bytes, SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`, source tree state `clean`.
+- Independent local rebuild matches the hosted hash; a newly created Windows venv completes initialize → confirm → persist → reopen smoke PASS.
+- Clean-package Chromium pilot PASS: a fresh Streamlit server opened sealed state, `PILOT_BROWSER_OPERATOR_001` confirmed through the real UI, `CASE_WORKSPACE_UI` certification persisted, and a restarted server reopened certified-only in 4.435 seconds. No P0/P1 was found.
 - Workflow YAML parse: PASS.
 - `git diff --check`: PASS.
 
-The artifact hash above is a dirty-worktree candidate hash, not a releasable commit-bound hash. A clean commit changes the embedded release manifest and therefore produces the final artifact hash.
+The artifact hash above is the clean commit-bound release candidate hash for `a88ed05`.
 
 ## Score and claim boundary
 
@@ -54,15 +56,15 @@ Release-readiness planning estimate:
 | Dimension | Before | Candidate | Evidence |
 |---|---:|---:|---|
 | Primary user flow | 70 | 90 | launch-review-confirm-persist-reopen tested |
-| Startup resilience | 40 | 75 | manifest-first validation and canonical path confinement accepted; hosted rerun pending |
-| Persistence/data safety | 55 | 80 | user-writable root plus junction/symlink escape refusal accepted |
-| Packaging | 10 | 70 | clean-tree builder is correct; hosted workflow output location repaired, rerun pending |
-| Cross-platform proof | 40 | 72 | local archive parity; hosted runtime pending |
+| Startup resilience | 40 | 85 | manifest-first validation and canonical path confinement pass locally and hosted |
+| Persistence/data safety | 55 | 85 | user-writable root plus junction/symlink escape refusal accepted and packaged-smoked |
+| Packaging | 10 | 90 | clean commit-bound deterministic artifact and exact SHA proven on both OS families |
+| Cross-platform proof | 40 | 90 | hosted Windows/Linux builds, isolated smokes, and exact byte parity PASS |
 | Onboarding/rollback | 25 | 75 | packaged runbooks and wrappers |
-| Pilot evidence | 0 | 0 | not yet performed |
-| **Overall release readiness** | **45** | **65** | intentionally held pending hosted Windows/Linux/parity rerun |
+| Pilot evidence | 0 | 85 | real-browser packaged workflow completed; no P0/P1 found |
+| **Overall release readiness** | **45** | **87** | hosted, clean-machine, and browser-pilot proof closed |
 
-Expected readiness after hosted Windows/Linux/parity green and clean fresh-machine smoke: **80/100**. Expected after one successful pilot and P0/P1 usability repair: **87/100**. These are shipment-planning estimates, not product score uplifts.
+This is a shipment-planning estimate, not a product score uplift.
 
 ## Forbidden scope
 
@@ -73,9 +75,5 @@ Expected readiness after hosted Windows/Linux/parity green and clean fresh-machi
 
 ## Remaining gates
 
-1. Commit and push the bounded hosted-cleanliness repair.
-2. Hosted Windows/Linux product, package, extracted smoke, and byte-parity green.
-3. Build clean commit-bound release artifact.
-4. Smoke on clean Windows and Linux machines.
-5. One real pilot user completes the workflow.
-6. Fix P0/P1 usability failures only; tag and publish.
+1. Tag the clean `a88ed05` release candidate.
+2. Publish the release artifact and minimal onboarding/rollback notes.

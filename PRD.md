@@ -10,9 +10,8 @@ FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
 SHIPPED_PRODUCT_SCORE = 39/100 (frozen; no alpha)
 OBSERVED_COMPARISON_COUNT = 0
 USER_FLOW = launch → review → confirm paper NO_POSITION → persist → reopen
-RELEASE_READINESS_ESTIMATE = 65/100 (held pending hosted rerun; not product score)
-NEXT = commit/push bounded hosted-cleanliness repair → hosted Windows/Linux/parity green
-       → clean artifact → fresh-machine smoke → pilot → release
+RELEASE_READINESS_ESTIMATE = 87/100 (hosted, clean-machine, and browser-pilot proof closed; not product score)
+NEXT = tag clean a88ed05 artifact → publish release
 FORBIDDEN = trust anchors, receipts, identity, human comparison, A/B/C release track,
             experiments, providers, formal score uplift, live capital, research redesign
 ```
@@ -23,7 +22,7 @@ FORBIDDEN = trust anchors, receipts, identity, human comparison, A/B/C release t
 - **Claim boundary**: the product supports one certified paper `NO_POSITION` workflow. It does not prove decision improvement, alpha, live-capital readiness, or provider breadth.
 - **Score rule**: keep canonical product score at 39 and observed count at 0 until a separately authorized evidence gate changes them. Shipment-readiness estimates must remain explicitly separate.
 
-The two audited P1s are accepted and committed at `ec5c1ea`. Hosted run `30343141406` passed both OS test suites but failed both release builds because checkout-local custody evidence triggered the clean-tree guard. A bounded workflow repair moves that evidence to runner temp and passes **39/39** locally. Readiness remains 65 pending hosted Windows/Linux/parity green; clean artifact, fresh-machine smoke, pilot, tag, and publication remain open.
+The two audited P1s and hosted-cleanliness repair are committed through `a88ed05`. Hosted run `30346381138` passes Windows/Linux product suites, clean commit-bound builds, isolated extracted-package smokes, uploads, authority parity, and exact byte parity. The clean artifact is 18,666,047 bytes with SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`; an independent isolated Windows smoke and clean-package Chromium pilot also pass. The pilot persisted a `CASE_WORKSPACE_UI` confirmation and reopened certified-only after server restart with no P0/P1. Readiness is 87; tag and publication remain open.
 
 ---
 
