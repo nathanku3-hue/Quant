@@ -1,0 +1,5 @@
+# GV-ALPHA0 paper-decision release runtime only.
+# No broker, provider, trading, research, or test dependencies.
+streamlit==1.54.0
+jsonschema==4.26.0
+referencing==0.37.0

@@ -1986,3 +1986,19 @@ Application pattern:
 - Mistake risk: counting only git status clean. Guardrail: also prove no skip-worktree/assume-unchanged flags and working-file blob equality to index.
 - Mistake risk: operator-authored rubric replacement. Guardrail: real reviewer path requires external GitHub receipt and exact imported bytes before seal; mapping reveal only after receipt-bound seal.
 - Mistake risk: self-referential manifest hash. Guardrail: staged envelope or annotated-tag binding of final manifest blob without claiming impossible self-hash.
+
+## 2026-07-28 Round Entry (A Release Must Separate Installed Seed From User State)
+- Date: 2026-07-28
+- Mistake or miss: The operable Case Workspace wrote confirmation and certified output into repository-banked product data, and the first package draft omitted runtime-only contract/verifier dependencies and assumed script-path imports would resolve the repository root.
+- Root cause: Branch-level dogfood was treated as equivalent to installation behavior; dependency closure and script entry semantics were not tested from a clean extracted archive.
+- Fix applied: Added a fail-closed user-workspace bootstrap with exact immutable-seed verification, preserved mutable state outside the package, built an explicit deterministic release allowlist, and repeatedly executed the package from a clean extraction until the full workflow passed.
+- Guardrail for next time: No product slice is shipment-ready until a clean extracted artifact can initialize, complete, persist, and reopen its primary workflow using only packaged files; run the builder and smoke by file path on both operating-system families, not only as imported test modules.
+- Evidence paths: `core/gv_alpha0_ship_runtime.py`, `scripts/build_gv_alpha0_release.py`, `scripts/smoke_gv_alpha0_release.py`, `tests/gv_fs0_product/test_gv_alpha0_ship_runtime.py`, `tests/gv_fs0_product/test_gv_alpha0_release_package.py`, `.github/workflows/gv-fs0-product.yml`.
+
+## 2026-07-28 Round Entry (Lexical Confinement and Self-Hashed Seeds Are Not Release Integrity)
+- Date: 2026-07-28
+- Mistake or miss: The first shipment candidate compared an absolute-but-noncanonical runtime path against the package and recomputed the seed digest from whatever bytes were present, allowing Windows-junction routing into the bundle and accepting freshly modified package seeds.
+- Root cause: Symlink checks were applied only to final path objects, while Windows junctions and linked parents require canonical containment; the workspace seed manifest proved runtime-copy consistency but did not prove installed-package integrity.
+- Fix applied: Canonicalized existing path ancestors before any write, confined every package/runtime/seed file after link resolution, rejected routes entering the bundle or escaping runtime, and validated the exact packaged file set and hashes against `RELEASE_MANIFEST.json` before seed initialization.
+- Guardrail for next time: A release bootstrap must establish package integrity before deriving any runtime manifest, and path confinement must be tested with real platform link primitives—especially Windows junctions—not only `Path.is_symlink()`.
+- Evidence paths: `core/gv_alpha0_ship_runtime.py`, `tests/gv_fs0_product/test_gv_alpha0_ship_runtime.py`, `tests/gv_fs0_product/test_gv_alpha0_release_package.py`, `release/gv-alpha0/README.md`.

@@ -1,20 +1,32 @@
 # Product Specification: Terminal Zero / GodView Certified Portfolio OS
 
-## Active Product Header (2026-07-19) — HARD RECUT
+## Active Product Header (2026-07-28) — GV-ALPHA0 SHIP
 
 ```text
-PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
-F1C_SHIP = CLOSED_SUBSTRATE (product tip lineage 490a234)
-ACTIVE_GATE = GV-E0A-OPERABLE
-SHIPPED_PRODUCT_SCORE = 39/100 (owner claim ceiling; no alpha)
-FUNCTIONAL_STAGE = CERTIFIED_STATIC_BRANCH_DEMO
-FORBIDDEN = providers, real prices, FS1 batch, PEAD, alpha claims, broker,
-            compatibility dual-authority UI, historical-suite repair
+PRODUCT = broker-free certified paper-decision workflow
+ACTIVE_BRANCH = codex/gv-alpha0-ship
+BASE = accepted main@48a43b9
+FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
+SHIPPED_PRODUCT_SCORE = 39/100 (frozen; no alpha)
+OBSERVED_COMPARISON_COUNT = 0
+RELEASE_READINESS_ESTIMATE = 65/100 (held pending re-audit)
+PRIMARY_FLOW = launch → review → confirm NO_POSITION → persist → reopen
+FORBIDDEN = trust anchors, receipts, identities, human comparison, A/B/C release track,
+            providers, score uplift, live capital, experiments, research redesign
 ```
 
-Active authority: `docs/architecture/top_level_roadmap.md`, `PRD.md` Active Build Authority block, `docs/phase_brief/gv-e0a-operable-brief.md`.
+### Shipment behavior
 
-**UOE-as-primary and PEAD-as-active-build sections below are historical / superseded as active product authority.** Keep them for audit continuity; do not use them to reopen concurrent UOE or PEAD gates.
+- `launch_alpha.py` performs startup diagnostics before Streamlit and accepts `--data-dir <path>`.
+- `core/gv_alpha0_ship_runtime.py` initializes a deterministic sealed sample in platform user storage or `GV_ALPHA0_HOME`.
+- The sample contains only the two fixed source-family authorization inputs, their six raw source objects, and five sealed pre-adjudication case artifacts; it never copies derived family research/results, prior operator confirmation, or certified output.
+- Every packaged startup validates the complete `RELEASE_MANIFEST.json` before initialization, exact-verifies the seed manifest, canonicalizes package/runtime/seed paths, and fails closed on missing/tampered bytes, invalid or missing manifests, junction/symlink escapes, seed-version mismatch, or an unmanaged nonempty root.
+- Confirmation and certification write only to the user workspace. Reopening must display the persisted certified state without resetting it.
+- The release archive is deterministic, versioned, allowlisted, and accompanied by artifact SHA-256 and rollback instructions.
+
+Active authority: `docs/phase_brief/gv-alpha0-ship-brief.md`, `PRD.md` Active Build Authority block, and current context surfaces.
+
+**UOE-as-primary, E0A-as-active, and PEAD-as-active-build sections below are historical / superseded as active product authority.** Keep them for audit continuity; do not use them to reopen concurrent research or governance gates.
 
 ---
 

@@ -3,6 +3,11 @@ name: GV-FS0 Product
 on:
   pull_request:
     paths:
+      - "core/gv_alpha0_ship_runtime.py"
+      - "scripts/build_gv_alpha0_release.py"
+      - "scripts/smoke_gv_alpha0_release.py"
+      - "release/gv-alpha0/**"
+      - "requirements-release.txt"
       - "core/gv_fs0_book.py"
       - "core/gv_fs0_bundle.py"
       - "core/gv_fs0_canonical.py"
@@ -36,6 +41,11 @@ on:
       - ".github/workflows/gv-fs0-product.yml"
   push:
     paths:
+      - "core/gv_alpha0_ship_runtime.py"
+      - "scripts/build_gv_alpha0_release.py"
+      - "scripts/smoke_gv_alpha0_release.py"
+      - "release/gv-alpha0/**"
+      - "requirements-release.txt"
       - "core/gv_fs0_book.py"
       - "core/gv_fs0_bundle.py"
       - "core/gv_fs0_canonical.py"
@@ -176,6 +186,83 @@ jobs:
             *glob.glob('tests/test_gv_fs0_*.py'),
             'tests/test_dash_1_page_registry_shell.py::test_dash_1_default_portfolio_route_renders_current_decision',
           ]))"
+
+      - name: Build deterministic GV-ALPHA0 release
+        shell: bash
+        run: python scripts/build_gv_alpha0_release.py --output-dir dist
+
+      - name: Smoke extracted GV-ALPHA0 release
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          import sys
+          import tempfile
+          import zipfile
+          from pathlib import Path
+
+          archives = list(Path("dist").glob("gv-alpha0-paper-decision-*.zip"))
+          if len(archives) != 1:
+              raise SystemExit(f"expected one release archive, found {len(archives)}")
+          with tempfile.TemporaryDirectory(prefix="gv-alpha0-ci-smoke-") as tmp:
+              extract_root = Path(tmp)
+              with zipfile.ZipFile(archives[0]) as archive:
+                  archive.extractall(extract_root)
+              product_roots = [p for p in extract_root.iterdir() if p.is_dir()]
+              if len(product_roots) != 1:
+                  raise SystemExit("release archive must contain one product root")
+              product_root = product_roots[0]
+              venv_root = extract_root / "release-venv"
+              subprocess.run(
+                  [sys.executable, "-m", "venv", str(venv_root)], check=True
+              )
+              venv_python = (
+                  venv_root / "Scripts" / "python.exe"
+                  if sys.platform == "win32"
+                  else venv_root / "bin" / "python"
+              )
+              subprocess.run(
+                  [
+                      str(venv_python),
+                      "-m",
+                      "pip",
+                      "install",
+                      "--disable-pip-version-check",
+                      "-r",
+                      str(product_root / "requirements-release.txt"),
+                  ],
+                  check=True,
+              )
+              subprocess.run(
+                  [
+                      str(venv_python),
+                      "-c",
+                      "import streamlit, jsonschema, referencing",
+                  ],
+                  cwd=product_root,
+                  check=True,
+              )
+              completed = subprocess.run(
+                  [str(venv_python), "scripts/smoke_gv_alpha0_release.py"],
+                  cwd=product_root,
+                  check=True,
+                  capture_output=True,
+                  text=True,
+              )
+              record = json.loads(completed.stdout.strip().splitlines()[-1])
+              if record.get("status") != "PASS":
+                  raise SystemExit("fresh release smoke did not pass")
+              print(json.dumps(record, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload GV-ALPHA0 release candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: gv-alpha0-release-${{ runner.os }}
+          path: dist/gv-alpha0-paper-decision-*
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Build F1C substrate + Alpha0 current authority parity artifact
         shell: bash
@@ -334,7 +421,13 @@ jobs:
           pattern: gv-fs0-product-parity-*
           merge-multiple: false
 
-      - name: Compare exact parity records
+      - name: Download GV-ALPHA0 release candidates
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gv-alpha0-release-*
+          merge-multiple: false
+
+      - name: Compare exact parity records and release archives
         shell: bash
         run: |
           python - <<'PY'
@@ -359,5 +452,29 @@ jobs:
               raise SystemExit("parity record missing Alpha0 current file SHA-256")
           if "627c136926ecf947f2ea00f24de85291d44ef5594016f022fac7f2217093d6e6" not in text:
               raise SystemExit("parity record missing fixed E0A substrate result hash")
+
+          archives = sorted(
+              Path(".").glob(
+                  "gv-alpha0-release-*/gv-alpha0-paper-decision-*.zip"
+              )
+          )
+          if len(archives) != 2:
+              raise SystemExit(f"expected two release archives, found {len(archives)}")
+          archive_payloads = [path.read_bytes() for path in archives]
+          if archive_payloads[0] != archive_payloads[1]:
+              raise SystemExit("GV-ALPHA0 Windows/Linux release archive differs")
+
+          release_records = sorted(
+              Path(".").glob(
+                  "gv-alpha0-release-*/gv-alpha0-paper-decision-*.release.json"
+              )
+          )
+          if len(release_records) != 2:
+              raise SystemExit(
+                  f"expected two release records, found {len(release_records)}"
+              )
+          if release_records[0].read_bytes() != release_records[1].read_bytes():
+              raise SystemExit("GV-ALPHA0 Windows/Linux release record differs")
           print(text.strip())
+          print(release_records[0].read_text(encoding="utf-8").strip())
           PY

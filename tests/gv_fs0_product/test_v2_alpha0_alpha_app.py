@@ -97,6 +97,8 @@ def test_alpha_app_apptest_pre_adj_then_confirm(
     pytest.importorskip("streamlit")
     from streamlit.testing.v1 import AppTest
 
+    runtime_root = tmp_path / "runtime"
+    monkeypatch.setenv("GV_ALPHA0_HOME", str(runtime_root))
     case_dir = tmp_path / "case"
     seal_pre_adjudication_case(root=ROOT, case_dir=case_dir)
     assert not (case_dir / "result.json").exists()

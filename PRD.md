@@ -1,30 +1,29 @@
 # Product Requirements Document: Terminal Zero / GodView Certified Portfolio OS
 
-## Active Build Authority (2026-07-19) — HARD RECUT
+## Active Build Authority (2026-07-28) — GV-ALPHA0 SHIP
 
 ```text
-PRODUCT_PIVOT = AUTHORIZED (UOE discretionary cockpit → GodView certified portfolio OS)
-F1C_SHIP = CLOSED_SUBSTRATE on product tip lineage 490a234
-  (deterministic certification + permanent dual-fixture evidence;
-   not operator-usable single-decision product endpoint)
-ACTIVE_GATE = GV-E0A-OPERABLE
-SHIPPED_PRODUCT_SCORE = 39/100 (owner claim ceiling; metric confidence low; no alpha)
-FUNCTIONAL_STAGE = CERTIFIED_SINGLE_DECISION_OPERABLE
-  (CERTIFIED_SINGLE_DECISION_OPERABLE only with operable evidence on branch)
-NEXT = frozen E0 custody → HOLD_FOR_EVIDENCE/NO_POSITION → one DecisionEnvelope
-       → book/cert → atomic current publication → one visible decision → Streamlit smoke
-FORBIDDEN = providers, real prices, FS1 batch, PEAD, alpha claims, broker,
-            compatibility dual-authority UI, historical-suite repair
+PRODUCT = usable certified paper-decision product
+ACTIVE_BRANCH = codex/gv-alpha0-ship
+BASE = accepted main@48a43b9
+FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
+SHIPPED_PRODUCT_SCORE = 39/100 (frozen; no alpha)
+OBSERVED_COMPARISON_COUNT = 0
+USER_FLOW = launch → review → confirm paper NO_POSITION → persist → reopen
+RELEASE_READINESS_ESTIMATE = 65/100 (held pending re-audit; not product score)
+NEXT = independent re-audit → accepted commit/push → hosted Windows/Linux green
+       → clean artifact → fresh-machine smoke → pilot → release
+FORBIDDEN = trust anchors, receipts, identity, human comparison, A/B/C release track,
+            experiments, providers, formal score uplift, live capital, research redesign
 ```
 
-- **Authority docs**: `docs/architecture/top_level_roadmap.md`, `docs/phase_brief/gv-e0a-operable-brief.md`, `docs/architecture/gv_fs0_certification_and_data_authority_contract.md`.
-- **F1C-SHIP**: closed substrate (transport C/C2 + closeout T). Do not reopen as active shipment gate.
-- **FS1**: future stage after E0A; **not** next action.
-- **UOE / six-stream concurrent authority**: superseded as active product framing; retained below as history only.
-- **PEAD notices** below are historical research program residue; PEAD strict-PIT is `TERMINATED_DIAGNOSTIC_ONLY` and is not active build authority.
-- **Score rule**: do not numerically uplift past 39/100 without a separate rubric-based owner claim. Dual-fixture demo existence is already reflected in stage `CERTIFIED_STATIC_BRANCH_DEMO`, not in score inflation.
+- **Authority docs**: `docs/phase_brief/gv-alpha0-ship-brief.md`, `docs/context/planner_packet_current.md`, and `docs/architecture/top_level_roadmap.md` for endgame continuity.
+- **Release requirement**: before initialization, every packaged file must match `RELEASE_MANIFEST.json`; package/runtime/seed paths must be canonical and confined; a deterministic sample must initialize in user-writable storage; operator state must persist outside the installed package.
+- **Package requirement**: versioned allowlisted artifact, exact source commit, artifact SHA-256, clean Windows/Linux smoke, rollback instructions, and no broker/provider dependency.
+- **Claim boundary**: the product supports one certified paper `NO_POSITION` workflow. It does not prove decision improvement, alpha, live-capital readiness, or provider breadth.
+- **Score rule**: keep canonical product score at 39 and observed count at 0 until a separately authorized evidence gate changes them. Shipment-readiness estimates must remain explicitly separate.
 
-Mode for this block: active build authority supersession. Implementation of E0A code is a separate Backend/Frontend round; this block does not claim E0A operable code complete.
+The two audited P1s are locally repaired with real Windows-junction and tampered-package regressions. Readiness remains held at 65 pending independent re-audit; hosted CI, clean commit-bound artifact, fresh-machine runtime smoke, pilot, tag, and publication remain open.
 
 ---
 
