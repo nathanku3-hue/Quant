@@ -483,75 +483,6 @@ def test_github_origin_and_receipt_repository_must_match() -> None:
         )
 
 
-def test_cli_provider_boundary_promotes_shadow_to_terminal_certification() -> None:
-    workspace = _observed_workspace()
-    initial_shadow = build_replay_evidence(workspace)
-    receipt, commit, tree, implementer = _synthetic_audit_receipt(
-        initial_shadow["source_event_ledger_hash"]
-    )
-    receipt_bound_shadow = build_replay_evidence(
-        workspace,
-        audit_receipt=receipt,
-        expected_candidate_commit=commit,
-        expected_candidate_tree=tree,
-        expected_implementer_github_login=implementer,
-    )
-    provider_verification = replay_cli._build_provider_verification_record(
-        receipt,
-        candidate_commit=commit,
-        candidate_tree=tree,
-    )
-
-    certified = replay_cli._promote_verified_replay_evidence(
-        receipt_bound_shadow,
-        provider_verification=provider_verification,
-    )
-    certified_again = replay_cli._promote_verified_replay_evidence(
-        receipt_bound_shadow,
-        provider_verification=provider_verification,
-    )
-
-    assert canonical_document_bytes(certified) == canonical_document_bytes(
-        certified_again
-    )
-    assert certified["schema_version"] == replay_cli.CERTIFIED_EVIDENCE_SCHEMA
-    assert certified["audit_gate"]["status"] == "PASS"
-    assert certified["replay_certification"]["certification_id"].startswith("CRT_")
-    assert certified["replay_certification"]["candidate_commit"] == commit
-    assert certified["replay_certification"]["candidate_tree"] == tree
-    assert certified["replay_certification"]["source_shadow_evidence_hash"] == (
-        receipt_bound_shadow["evidence_hash"]
-    )
-    assert certified["provider_verification"] == provider_verification
-
-
-def test_cli_provider_promotion_rejects_tampered_verification_hash() -> None:
-    workspace = _observed_workspace()
-    initial_shadow = build_replay_evidence(workspace)
-    receipt, commit, tree, implementer = _synthetic_audit_receipt(
-        initial_shadow["source_event_ledger_hash"]
-    )
-    receipt_bound_shadow = build_replay_evidence(
-        workspace,
-        audit_receipt=receipt,
-        expected_candidate_commit=commit,
-        expected_candidate_tree=tree,
-        expected_implementer_github_login=implementer,
-    )
-    provider_verification = replay_cli._build_provider_verification_record(
-        receipt,
-        candidate_commit=commit,
-        candidate_tree=tree,
-    )
-    provider_verification["candidate_tree"] = "f" * 40
-
-    with pytest.raises(ReplayV0Error, match="PROVIDER_VERIFICATION_HASH_MISMATCH"):
-        replay_cli._promote_verified_replay_evidence(
-            receipt_bound_shadow,
-            provider_verification=provider_verification,
-        )
-
-
 def test_legacy_self_asserted_audit_receipt_cannot_certify() -> None:
     workspace = _observed_workspace()
     shadow = build_replay_evidence(workspace)
@@ -645,7 +576,7 @@ def test_audit_receipt_rejects_report_byte_mismatch() -> None:
     assert evidence["replay_certification"] is None
 
 
-def test_cli_main_promotes_only_after_provider_boundary(
+def test_cli_provider_preflight_remains_non_authorizing(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -659,7 +590,7 @@ def test_cli_main_promotes_only_after_provider_boundary(
     )
     receipt_path = tmp_path / "audit-receipt.json"
     receipt_path.write_bytes(canonical_document_bytes(receipt))
-    output = tmp_path / "certified-evidence.json"
+    output = tmp_path / "provider-verified-shadow.json"
     verified_domains: list[str] = []
 
     monkeypatch.setattr(replay_cli, "_git_identity", lambda: (commit, tree))
@@ -686,14 +617,13 @@ def test_cli_main_promotes_only_after_provider_boundary(
                 "--require-certification",
             ]
         )
-        == 0
+        == 2
     )
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert verified_domains == ["A", "B", "C"]
-    assert payload["audit_gate"]["status"] == "PASS"
-    assert payload["replay_certification"] is not None
-    assert payload["replay_certification"]["candidate_commit"] == commit
-    assert payload["replay_certification"]["candidate_tree"] == tree
+    assert payload["audit_gate"]["status"] == "BLOCKED"
+    assert payload["audit_gate"]["reason"] == "EXTERNAL_PROVIDER_VERIFICATION_REQUIRED"
+    assert payload["replay_certification"] is None
 
 
 def test_cli_writes_byte_stable_shadow_evidence_and_require_gate_returns_two(

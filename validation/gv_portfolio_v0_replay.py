@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import base64
-from copy import deepcopy
 import json
 import os
 from pathlib import Path
@@ -16,20 +15,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
-from contracts.gv_portfolio.v0 import identifier as custody_identifier
-from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
-from gv_portfolio_v0.replay import (
-    REPLAY_CERTIFICATION_SCHEMA,
-    REPLAY_DOMAIN,
-    ReplayV0Error,
-    build_replay_evidence,
-)
+from core.gv_fs0_canonical import canonical_document_bytes
+from gv_portfolio_v0.replay import ReplayV0Error, build_replay_evidence
 from gv_portfolio_v0.storage import load_workspace
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = Path("docs/context/e2e_evidence/gv_deterministic_replay_0_shadow_local.json")
-CERTIFIED_EVIDENCE_SCHEMA = "gv_portfolio_v0_replay_certified_evidence_v1"
-PROVIDER_VERIFICATION_SCHEMA = "gv_portfolio_v0_github_provider_verification_v1"
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:
@@ -248,150 +239,6 @@ def verify_github_provider_receipt(receipt: Mapping[str, Any]) -> None:
         raise ReplayV0Error("GITHUB_PROVIDER_REPORT_BYTES_MISMATCH")
 
 
-def _build_provider_verification_record(
-    audit_receipt: Mapping[str, Any],
-    *,
-    candidate_commit: str,
-    candidate_tree: str,
-) -> dict[str, Any]:
-    reviewers = audit_receipt.get("reviewers")
-    if not isinstance(reviewers, list) or len(reviewers) != 3:
-        raise ReplayV0Error("AUDIT_RECEIPT_THREE_REVIEWERS_REQUIRED")
-    reviewer_records: list[dict[str, Any]] = []
-    for reviewer in reviewers:
-        if not isinstance(reviewer, Mapping):
-            raise ReplayV0Error("AUDIT_RECEIPT_REVIEWER_OBJECT_REQUIRED")
-        reviewer_records.append(
-            {
-                "domain": reviewer.get("domain"),
-                "repository": reviewer.get("repository"),
-                "github_author_login": reviewer.get("github_author_login"),
-                "github_committer_login": reviewer.get("github_committer_login"),
-                "submission_commit_sha": reviewer.get("submission_commit_sha"),
-                "report_path": reviewer.get("report_path"),
-                "report_sha256": reviewer.get("report_sha256"),
-                "receipt_hash": reviewer.get("receipt_hash"),
-            }
-        )
-    reviewer_records.sort(key=lambda row: str(row["domain"]))
-    body = {
-        "schema_version": PROVIDER_VERIFICATION_SCHEMA,
-        "provider": "GITHUB",
-        "verification_method": "GITHUB_REST_API_2022-11-28",
-        "candidate_commit": candidate_commit,
-        "candidate_tree": candidate_tree,
-        "audit_receipt_hash": audit_receipt.get("audit_receipt_hash"),
-        "checks": {
-            "clean_local_checkout": True,
-            "origin_repository_exact": True,
-            "candidate_commit_and_tree_remote": True,
-            "reviewer_submission_accounts_remote": True,
-            "reviewer_report_bytes_remote": True,
-        },
-        "reviewers": reviewer_records,
-    }
-    return {
-        **body,
-        "provider_verification_hash": domain_hash(
-            f"{REPLAY_DOMAIN}:GITHUB_PROVIDER_VERIFICATION:V1", body
-        ),
-    }
-
-
-def _promote_verified_replay_evidence(
-    shadow_evidence: Mapping[str, Any],
-    *,
-    provider_verification: Mapping[str, Any],
-) -> dict[str, Any]:
-    evidence = deepcopy(dict(shadow_evidence))
-    gate = evidence.get("audit_gate")
-    if not isinstance(gate, Mapping):
-        raise ReplayV0Error("REPLAY_AUDIT_GATE_OBJECT_REQUIRED")
-    if gate.get("status") != "BLOCKED" or gate.get("reason") != (
-        "EXTERNAL_PROVIDER_VERIFICATION_REQUIRED"
-    ):
-        raise ReplayV0Error("REPLAY_AUDIT_GATE_NOT_READY_FOR_PROVIDER_PROMOTION")
-    if evidence.get("replay_certification") is not None:
-        raise ReplayV0Error("REPLAY_CERTIFICATION_ALREADY_PRESENT")
-    checks = evidence.get("checks")
-    if not isinstance(checks, Mapping) or not checks or any(
-        value is not True for value in checks.values()
-    ):
-        raise ReplayV0Error("REPLAY_CHECKS_NOT_ALL_PASS")
-
-    verification = deepcopy(dict(provider_verification))
-    verification_hash = verification.get("provider_verification_hash")
-    verification_body = {
-        key: value
-        for key, value in verification.items()
-        if key != "provider_verification_hash"
-    }
-    expected_verification_hash = domain_hash(
-        f"{REPLAY_DOMAIN}:GITHUB_PROVIDER_VERIFICATION:V1",
-        verification_body,
-    )
-    if verification_hash != expected_verification_hash:
-        raise ReplayV0Error("PROVIDER_VERIFICATION_HASH_MISMATCH")
-    if verification.get("schema_version") != PROVIDER_VERIFICATION_SCHEMA:
-        raise ReplayV0Error("PROVIDER_VERIFICATION_SCHEMA_INVALID")
-    audit_receipt_hash = gate.get("audit_receipt_hash")
-    if not audit_receipt_hash or verification.get("audit_receipt_hash") != audit_receipt_hash:
-        raise ReplayV0Error("PROVIDER_VERIFICATION_AUDIT_HASH_MISMATCH")
-    verification_checks = verification.get("checks")
-    if not isinstance(verification_checks, Mapping) or not verification_checks or any(
-        value is not True for value in verification_checks.values()
-    ):
-        raise ReplayV0Error("PROVIDER_VERIFICATION_CHECK_FAILED")
-
-    source_shadow_evidence_hash = evidence.get("evidence_hash")
-    if not isinstance(source_shadow_evidence_hash, str) or not source_shadow_evidence_hash:
-        raise ReplayV0Error("SHADOW_EVIDENCE_HASH_REQUIRED")
-    certification_payload = {
-        "schema_version": REPLAY_CERTIFICATION_SCHEMA,
-        "candidate_commit": verification["candidate_commit"],
-        "candidate_tree": verification["candidate_tree"],
-        "source_shadow_evidence_hash": source_shadow_evidence_hash,
-        "source_event_ledger_hash": evidence["source_event_ledger_hash"],
-        "normalized_event_stream_hash": evidence["normalized_event_stream_hash"],
-        "replay_state_hash": evidence["replay_state_hash"],
-        "terminal_book_hash": evidence["terminal_book_hash"],
-        "decision_state_hash": evidence["decision_state_hash"],
-        "execution_hash": evidence["execution_hash"],
-        "fixture_matrix_hash": evidence["fixture_matrix_hash"],
-        "product_certification_ids": evidence["product_certification_ids"],
-        "audit_receipt_hash": audit_receipt_hash,
-        "provider_verification_hash": verification_hash,
-        "checks": dict(checks),
-        "declared_precision": evidence["declared_precision"],
-    }
-    certification = {
-        "certification_id": custody_identifier("CRT", certification_payload),
-        **certification_payload,
-    }
-    evidence["schema_version"] = CERTIFIED_EVIDENCE_SCHEMA
-    evidence["provider_verification"] = verification
-    evidence["audit_gate"] = {
-        "status": "PASS",
-        "reason": None,
-        "audit_receipt_hash": audit_receipt_hash,
-        "provider_verification_hash": verification_hash,
-        "reviewer_github_logins": [
-            row["github_author_login"] for row in verification["reviewers"]
-        ],
-    }
-    evidence["claim_boundary"] = (
-        "Terminal replay certification issued by the clean-checkout CLI only after "
-        "GitHub verified the candidate commit/tree, reviewer accounts, and exact "
-        "remote report bytes. Natural-person identity is not claimed."
-    )
-    evidence["replay_certification"] = certification
-    evidence["evidence_hash"] = domain_hash(
-        f"{REPLAY_DOMAIN}:CERTIFIED_EVIDENCE:V1",
-        {key: value for key, value in evidence.items() if key != "evidence_hash"},
-    )
-    return evidence
-
-
 def run(
     *,
     workspace_root: Path | None,
@@ -455,18 +302,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                 expected_candidate_tree=tree,
                 expected_implementer_github_login=args.implementer_github_login,
             )
-            provider_verification = _build_provider_verification_record(
-                receipt,
-                candidate_commit=commit or "",
-                candidate_tree=tree or "",
+            _atomic_write(args.output, shadow_evidence)
+            print(
+                "GV-DETERMINISTIC-REPLAY-0 PROVIDER_PREFLIGHT_PASS_"
+                f"TERMINAL_AUTHORITY_BLOCKED evidence={args.output}"
             )
-            certified_evidence = _promote_verified_replay_evidence(
-                shadow_evidence,
-                provider_verification=provider_verification,
-            )
-            _atomic_write(args.output, certified_evidence)
-            print(f"GV-DETERMINISTIC-REPLAY-0 CERTIFIED evidence={args.output}")
-            return 0
+            return 2 if args.require_certification else 0
         return run(
             workspace_root=args.workspace_root,
             output=args.output,
