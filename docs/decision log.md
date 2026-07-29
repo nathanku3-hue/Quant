@@ -7568,3 +7568,57 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Root custody: leave `E:\Code\Quant` untouched and unusable as execution authority. Future worktree must descend from the exact audited `ROADMAP_FREEZE_COMMIT`, never raw `93e7a55`.
 - Stop: bank and push R0, publish validation evidence, then wait for independent audit. Do not start the micro-portfolio implementation in this round.
 
+## 2026-07-29 — ROUND-20260729-GV-MICRO-PORTFOLIO-VERTICAL-0-CANDIDATE
+
+- Gate result: accept the user-supplied independent R0 audit PASS for exact commit `1db250169cdfe57ffa5d5cc5e5d24b2e937d5d33`; preserve the earlier SAW BLOCK as immutable pre-audit evidence.
+- Custody decision: create `codex/gv-micro-portfolio-v0` from exact audited ancestry. First bank the audit receipt and nine minimum seams, then bank truth/decision and operator-closure commits separately.
+- Product decision: implement one complete deterministic four-security portfolio loop in new namespace `gv_portfolio_v0`; released `gv_fs0_v1` and Alpha remain unchanged.
+- Economic lock: opening NAV `1500`; Northstar 2:1 split residual `0`; Harbor BUY `5 @ 40` plus fee `1`; terminal classified cash `774 + 25`; terminal position value `700`; terminal NAV `1499`.
+- Decision lock: principal `ADMIT`, substitute `ADMIT`, competitor `REJECT`, alternative `ABSTAIN`, and explicit `CASH`; capital competition selects Harbor by deterministic net-score and lexical tie-break.
+- Integrity lock: original decision snapshot is immutable; persistence is atomic and hash-bound; reopen recomputes identities/book/certification; missing prices yield `VALUATION_PENDING` rather than invented NAV.
+- Observation lock: one later deterministic `WATCH` fixture appends evidence and preserves the portfolio aim because no hard falsifier fired. This is not real external prospective evidence.
+- Validation result: new tests `10/10 PASS`; existing protocol/product regression `413/413 PASS` on host Python 3.12.10 after the authority-regression repair recorded below.
+- Environment caveat: current host pytest/Streamlit `9.1.0/1.58.0` differ from locked `9.0.2/1.54.0`; no canonical `.venv` exists in the worktree.
+- Score decision: canonical score remains `39/100`; local candidate estimate `64–66` is nonbinding until pinned-environment and independent Reviewer A/B/C audit PASS.
+- Execution-topology deviation: Packages A/B/C were integrated sequentially on one isolated branch because managed worktree creation from the dirty root was blocked by unreadable legacy directories. Scope and ancestry remained unchanged; root received no writes.
+- Single next action: independently audit and reproduce the Slice 0 candidate. On PASS, open only `GV-DETERMINISTIC-REPLAY-0`; bounded portfolio remains blocked.
+
+## 2026-07-29 — ROUND-20260729-GV-MICRO-PORTFOLIO-AUTHORITY-REGRESSION-REPAIR
+
+- Finding: four existing product tests still encoded E0A/FS0 as the active product gate and therefore rejected the corrected Slice 0 → replay roadmap despite the operator vertical passing 10/10.
+- Decision: preserve released FS0/Alpha and the supporting/frozen status of historical canons; do not relabel them active merely to satisfy stale assertions.
+- Repair: bind machine checks to `ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0`, `NEXT_GATE = GV-DETERMINISTIC-REPLAY-0`, root-checkout refusal, released substrate, score/observation boundaries, and the nine minimum seams.
+- Validation: frozen protocol `150/150`; existing product authority/runtime `263/263`; Slice 0 `10/10`; combined `423/423 PASS` on host Python 3.12.10.
+- Claim boundary: canonical score remains `39/100`; candidate estimate remains `64–66`; pinned dependency reproduction and genuinely independent Reviewer A/B/C remain terminal blockers.
+- Stop: do not certify replay, open bounded portfolio, or widen providers/optimizer/broker/live scope before independent Slice 0 audit PASS.
+
+## 2026-07-29 — ROUND-20260729-GV-PORTFOLIO-PINNED-CANDIDATE-AND-REPLAY-SHADOW
+
+- Environment closure: create a repository `.venv` with Python `3.12.10`, pytest `9.0.2`, Streamlit `1.54.0`, and jsonschema `4.26.0`; reproduce an explicit provider-free matrix at `275/275 PASS` (`31` portfolio/shadow + `150` protocol + `25` context + `24` current-authority + `45` Alpha release/core).
+- Custody decision: accept `contracts/gv_portfolio/v0` and `core/gv_portfolio_v0` as the single low-level identity, evidence, and immutable-event authority. `gv_portfolio_v0.vertical` delegates those primitives and remains the bounded product-orchestration facade.
+- Replay decision: implement `GV-DETERMINISTIC-REPLAY-0` as shadow evidence from the actual Slice 0 event stream, including duplicate-delivery idempotence, exact state reconstruction, correction lineage, partial-fill residual state, overfill rejection, valuation-pending, split conservation, and prior-certification byte stability.
+- Independence correction: reject the first replay gate because a local JSON could self-assert `independent=true` and A/B/C PASS. The v2 structure binds three distinct account names, candidate commit/tree, report bytes, locked environment, package hash, and subject-event ledger hash, but structure alone still cannot prove provider authentication.
+- Claim boundary: locally supplied receipts are byte-consistent evidence only and remain `BLOCKED: EXTERNAL_PROVIDER_VERIFICATION_REQUIRED`. Operational account separation is not proven until a separate external provider boundary verifies it; natural personhood is never claimed.
+- Authority status: Slice 0 implementation and replay shadow are complete candidates; independent Reviewer A/B/C acceptance and replay certification remain `0/1`.
+- Score decision: canonical score remains `39/100`; pinned-candidate and replay forecasts remain planning aids only.
+- Stop: freeze concurrent writes, remove the accidental untracked `NUL` artifact, commit and push the exact candidate, then wait for provider-verified independent evidence. Bounded portfolio and all later slices remain blocked until replay certification PASS.
+
+## 2026-07-29 — ROUND-20260729-GV-REPLAY-SELF-AUTHORIZATION-REPAIR
+
+- High finding: the v2 replay gate accepted a completely caller-generated set of GitHub-looking reviewer receipts and issued a terminal replay certification. Hashes proved internal byte consistency, not provider authentication or independent ownership.
+- Repair: preserve structural receipt validation for future import, but force every locally supplied receipt to `BLOCKED: EXTERNAL_PROVIDER_VERIFICATION_REQUIRED`; `build_replay_evidence()` cannot emit `replay_certification` from local JSON.
+- Regression: the former synthetic-certification test now proves that a structurally valid three-reviewer fixture remains blocked and produces no certification; all 31 portfolio/custody/replay tests pass.
+- Environment evidence: exact pinned provider-free matrix `275/275 PASS`; broader current-byte host boundary `444/444 PASS`. Five legacy dashboard AppTests are excluded from the pinned matrix because they import the Alpaca SDK, which is deliberately outside Slice 0 provider-free scope.
+- Custody blocker: concurrent streams left unbanked files plus an accidental untracked `NUL` command-output artifact. Do not claim a clean candidate, commit, push, or remote equality until writes are frozen and that artifact is explicitly removed.
+- Score: canonical `39/100`; weighted candidate forecast remains `65–68`, not accepted or shipped.
+
+## 2026-07-29 — ROUND-20260729-GV-REPLAY-PROVIDER-VERIFICATION-CLOSE
+
+- Supersession: the prior self-authorization repair correctly blocked local JSON, but its statement that a separate provider boundary did not exist is superseded by this implementation.
+- Provider decision: add a GitHub API verifier to the replay-certification CLI. For each Reviewer A/B/C receipt it resolves the exact submission commit, verifies provider-returned author and committer logins, fetches the declared report path at that commit, and requires exact canonical report bytes.
+- Fail-closed behavior: missing network/provider state, null/unmatched GitHub account identity, commit mismatch, receipt URL mismatch, missing report, non-base64 content, or byte mismatch blocks certification.
+- Library boundary: structural receipts remain non-authorizing when no provider verifier is supplied. Tests may inject a bounded verifier fixture; production CLI uses the GitHub verifier.
+- Validation: portfolio/custody/operator/replay suite `34/34 PASS`; exact pinned provider-free matrix `278/278 PASS`.
+- Authority state: the replay mechanism is complete, but no genuine external Reviewer A/B/C receipts exist. Slice 0 acceptance and replay certification remain `0/1`.
+- Stop: bank/push the exact candidate and wait for independent reports. Do not open bounded portfolio work before real provider-verified replay PASS.
+

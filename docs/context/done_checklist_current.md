@@ -2,50 +2,47 @@
 
 ## R0 — `ROADMAP-CUSTODY-REPAIR`
 
-- [x] Prior roadmap downgraded from frozen authority to validated candidate before repair.
-- [x] Stale SAW direct-base instruction explicitly superseded.
-- [x] Standalone `GV-CANON-RESET-0` removed as a product slice.
-- [x] First product slice recut as `GV-MICRO-PORTFOLIO-VERTICAL-0`.
-- [x] Released `gv_fs0_v1` preserved unchanged; new portfolio namespace required.
-- [x] `docs/context/ACTIVE_BRIEF` added as explicit active authority selector.
-- [x] Highest-numeric-phase selection made migration-only and fail-closed by default.
-- [x] Numeric Phase 66 bridge removed from active authority.
-- [x] Three mergeable work packages replace seven automatic branches.
-- [x] Minimum cross-layer identity/event seams defined before parallel work.
-- [x] Canonical shipped score remains 39/100; observed comparisons remain 0; no alpha claim.
-- [x] Root source checkout remains untouched.
-- [x] Context packet regenerated and validated from the explicit active brief.
-- [x] Corrected roadmap committed and pushed as the branch tip designated `ROADMAP_FREEZE_COMMIT`.
-- [ ] independent audit confirms R0 bankability and exact remote commit.
+- [x] corrected authority banked at `1db250169cdfe57ffa5d5cc5e5d24b2e937d5d33`;
+- [x] remote equality, clean audit worktree, root non-interference, pinned environment, and 220/220 audit tests independently reproduced;
+- [x] standalone canon-reset product slice removed;
+- [x] explicit active-brief authority and fail-closed selection retained;
+- [x] released `gv_fs0_v1` preserved; new portfolio namespace required.
 
 ## Slice 0 — `GV-MICRO-PORTFOLIO-VERTICAL-0`
 
-- [ ] blocked until independent R0 audit PASS;
-- [ ] create clean isolated implementation worktree from `ROADMAP_FREEZE_COMMIT`;
-- [ ] use new `gv_portfolio_v0` namespace;
-- [ ] operate 3–5 securities, benchmark, and classified cash;
-- [ ] include principal thesis, substitute, competitor, rejection/abstention, and cash;
-- [ ] exercise permanent identity, content-addressed evidence, and one corporate action;
-- [ ] reconcile multi-position book and NAV;
-- [ ] execute deterministic capital competition, one transition, one paper order, and one fill;
-- [ ] certify, persist, reopen, and process one later prospective observation;
-- [ ] preserve immutable original decision snapshot;
-- [ ] complete one operator workspace and explain what changed and why;
-- [ ] make no alpha, calibration, score-uplift, or live-readiness claim.
+- [x] exact audited ancestry and isolated branch;
+- [x] nine minimum seams frozen before product code;
+- [x] single custody backend for identity, evidence, and immutable events;
+- [x] four securities, benchmark, classified cash, and all required relationship/outcome roles;
+- [x] Living Thesis Lite and Bull/Base/Bear ranges;
+- [x] deterministic capital competition, aim, transition, paper order, and fill;
+- [x] value-preserving 2:1 split and exact NAV reconciliation;
+- [x] immutable original decision snapshot;
+- [x] certification, atomic persist/reopen, and corruption refusal;
+- [x] broker-free operator workspace;
+- [x] later WATCH fixture explains unchanged aim without claiming real prospective evidence;
+- [x] exact pinned environment and 278/278 focused matrix;
+- [ ] commit and push final candidate; prove clean remote equality;
+- [ ] independent Reviewer A/B/C accept exact candidate commit/tree/report bytes.
 
 ## Slice 1 — `GV-DETERMINISTIC-REPLAY-0`
 
-- [ ] replay skeleton may build from real Slice 0 events;
-- [ ] exact cash, quantities, costs, NAV, and thesis-state reconstruction;
-- [ ] byte-stable prior certification;
-- [ ] idempotence and correction lineage;
-- [ ] partial-fill residual state;
-- [ ] valuation-pending without fabricated prices;
-- [ ] at least one split or equivalent value-transfer event;
-- [ ] zero unexplained residual at declared precision;
-- [ ] block bounded portfolio work until PASS.
+- [x] replay from real Slice 0 events;
+- [x] exact cash, quantities, costs, NAV, aim, decision snapshot, thesis state, and certification chain;
+- [x] byte-idempotence and duplicate-delivery deduplication;
+- [x] explicit correction lineage;
+- [x] partial-fill residual state and overfill rejection;
+- [x] valuation-pending without invented prices or NAV;
+- [x] value-transfer split residual zero;
+- [x] prior product certifications byte-stable;
+- [x] self-asserted audit receipt rejected;
+- [x] v2 three-reviewer receipt structure and distinct-account rules;
+- [x] GitHub API verification of reviewer accounts and exact remote report bytes;
+- [ ] exact independent Slice 0 receipts imported;
+- [ ] replay certification issued from accepted candidate.
 
 ## Deferred by authority
 
-- [ ] `GV-BOUNDED-PORTFOLIO-1` and later slices remain blocked by predecessor evidence.
-- [ ] providers, broad loaders, optimizer/copula/graph/adaptive execution, tactical capital, broker, live capital, and score uplift remain deferred.
+- [ ] real prospective external observation remains 0/1;
+- [ ] `GV-BOUNDED-PORTFOLIO-1` remains blocked until replay certification PASS;
+- [ ] providers, broad loaders, optimizer/copula/graph/adaptive execution, tax/FX/derivatives/shorting, broker, alpha, score uplift, and live capital remain deferred.

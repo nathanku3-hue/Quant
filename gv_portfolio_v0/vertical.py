@@ -9,10 +9,24 @@ from __future__ import annotations
 
 from copy import deepcopy
 from decimal import Decimal, InvalidOperation
-import hashlib
 from typing import Any, Iterable, Mapping
 
+from contracts.gv_portfolio.v0 import (
+    CustodyContractError,
+    evidence_reference as custody_evidence_reference,
+    identifier as custody_identifier,
+    instrument_identity,
+    record_with_id as custody_record_with_id,
+    verify_evidence_reference,
+    verify_instrument_identity,
+    verify_record_id,
+)
 from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
+from core.gv_portfolio_v0.events import (
+    CanonicalEventStream,
+    CustodyEventError,
+    portfolio_book_event,
+)
 
 SCHEMA_VERSION = "gv_portfolio_v0_workspace_v1"
 ID_DOMAIN = "GV-PORTFOLIO-V0"
@@ -44,12 +58,11 @@ def _decimal_text(value: str | int | Decimal) -> str:
 
 
 def _identifier(kind: str, payload: Mapping[str, Any]) -> str:
-    return f"{kind}_" + domain_hash(f"{ID_DOMAIN}:{kind}:V1", dict(payload))
+    return custody_identifier(kind, payload)
 
 
 def _record_with_id(kind: str, id_key: str, payload: Mapping[str, Any]) -> dict[str, Any]:
-    body = dict(payload)
-    return {id_key: _identifier(kind, body), **body}
+    return custody_record_with_id(kind, id_key, payload)
 
 
 def _instrument(
@@ -58,13 +71,8 @@ def _instrument(
     name: str,
     role: str,
 ) -> dict[str, Any]:
-    identity = {
-        "namespace": "GV_SYNTHETIC_PERMANENT_V0",
-        "permanent_key": permanent_key,
-        "security_class": "COMMON_STOCK",
-    }
+    identity = instrument_identity(permanent_key)
     return {
-        "instrument_id": _identifier("INS", identity),
         **identity,
         "symbol": symbol,
         "name": name,
@@ -75,19 +83,12 @@ def _instrument(
 def evidence_reference(
     *, content: str, locator: str, observed_at: str, media_type: str = "text/plain"
 ) -> dict[str, Any]:
-    raw = content.encode("utf-8")
-    content_sha256 = hashlib.sha256(raw).hexdigest()
-    identity = {
-        "content_sha256": content_sha256,
-        "media_type": media_type,
-        "locator": locator,
-        "observed_at": observed_at,
-    }
-    return {
-        "evidence_reference_id": _identifier("EVD", identity),
-        **identity,
-        "content": content,
-    }
+    return custody_evidence_reference(
+        content=content,
+        locator=locator,
+        observed_at=observed_at,
+        media_type=media_type,
+    )
 
 
 def _event(
@@ -100,16 +101,15 @@ def _event(
     cash_bucket: str | None = None,
     payload: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    preimage = {
-        "sequence": sequence,
-        "event_type": event_type,
-        "effective_at": effective_at,
-        "source_identity": source_identity,
-        "instrument_id": instrument_id,
-        "cash_bucket": cash_bucket,
-        "payload": dict(payload or {}),
-    }
-    return {"event_id": _identifier("EVT", preimage), **preimage}
+    return portfolio_book_event(
+        sequence,
+        event_type,
+        effective_at,
+        source_identity,
+        instrument_id=instrument_id,
+        cash_bucket=cash_bucket,
+        payload=payload,
+    )
 
 
 def _aim(benchmark_instrument_id: str) -> dict[str, Any]:
@@ -644,14 +644,14 @@ def admit_watch_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
             "no accounting break, mandate breach, or thesis hard falsifier fired."
         ),
         locator="fixture://northstar/later-watch-v1",
-        observed_at="2026-08-20T12:00:00.000000Z",
+        observed_at="2026-07-21T12:00:00.000000Z",
     )
     result["evidence_references"].append(observation)
     result["events"].append(
         _event(
             len(result["events"]),
             "LATER_OBSERVATION_ADMITTED",
-            "2026-08-20T12:00:00.000000Z",
+            "2026-07-21T12:00:00.000000Z",
             observation["evidence_reference_id"],
             instrument_id=result["instruments"][0]["instrument_id"],
             payload={
@@ -683,7 +683,7 @@ def admit_watch_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
         _event(
             len(result["events"]),
             "CERTIFICATION_RECORDED",
-            "2026-08-20T12:01:00.000000Z",
+            "2026-07-21T12:01:00.000000Z",
             certification["certification_id"],
             payload={"certification_id": certification["certification_id"]},
         )
@@ -698,10 +698,10 @@ def admit_watch_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _verify_id(record: Mapping[str, Any], *, kind: str, id_key: str) -> None:
-    body = {key: value for key, value in record.items() if key != id_key}
-    expected = _identifier(kind, body)
-    if record.get(id_key) != expected:
-        raise PortfolioV0Error(f"IDENTITY_MISMATCH:{id_key}")
+    try:
+        verify_record_id(record, kind=kind, id_key=id_key)
+    except CustodyContractError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
 
 
 def validate_workspace(
@@ -716,13 +716,10 @@ def validate_workspace(
     for row in all_instruments:
         if not isinstance(row, Mapping):
             raise PortfolioV0Error("INSTRUMENT_OBJECT_REQUIRED")
-        identity = {
-            "namespace": row["namespace"],
-            "permanent_key": row["permanent_key"],
-            "security_class": row["security_class"],
-        }
-        if row["instrument_id"] != _identifier("INS", identity):
-            raise PortfolioV0Error("INSTRUMENT_ID_MISMATCH")
+        try:
+            verify_instrument_identity(row)
+        except CustodyContractError as exc:
+            raise PortfolioV0Error(str(exc)) from exc
     outcomes = {row["outcome"] for row in workspace.get("reviews") or []}
     if not {"ADMIT", "REJECT", "ABSTAIN"}.issubset(outcomes):
         raise PortfolioV0Error("DECISION_OUTCOME_COVERAGE_INCOMPLETE")
@@ -730,28 +727,20 @@ def validate_workspace(
         raise PortfolioV0Error("CASH_OUTCOME_REQUIRED")
 
     for evidence in workspace.get("evidence_references") or []:
-        raw_hash = hashlib.sha256(evidence["content"].encode("utf-8")).hexdigest()
-        if raw_hash != evidence["content_sha256"]:
-            raise PortfolioV0Error("EVIDENCE_CONTENT_HASH_MISMATCH")
-        identity = {
-            "content_sha256": evidence["content_sha256"],
-            "media_type": evidence["media_type"],
-            "locator": evidence["locator"],
-            "observed_at": evidence["observed_at"],
-        }
-        if evidence["evidence_reference_id"] != _identifier("EVD", identity):
-            raise PortfolioV0Error("EVIDENCE_REFERENCE_ID_MISMATCH")
+        try:
+            verify_evidence_reference(evidence)
+        except CustodyContractError as exc:
+            raise PortfolioV0Error(str(exc)) from exc
 
     _verify_id(workspace["portfolio_aim"], kind="AIM", id_key="portfolio_aim_id")
     _verify_id(
         workspace["decision_snapshot"], kind="DSN", id_key="decision_snapshot_id"
     )
     workspace_events = list(workspace.get("events") or [])
-    workspace_sequences = [event["sequence"] for event in workspace_events]
-    if workspace_sequences != list(range(len(workspace_events))):
-        raise PortfolioV0Error("EVENT_SEQUENCE_NOT_CONTIGUOUS")
-    for event in workspace_events:
-        _verify_id(event, kind="EVT", id_key="event_id")
+    try:
+        CanonicalEventStream(workspace_events)
+    except (CustodyContractError, CustodyEventError) as exc:
+        raise PortfolioV0Error(str(exc)) from exc
     rebuilt = reduce_events(workspace_events)
     if canonical_document_bytes(rebuilt) != canonical_document_bytes(workspace["book"]):
         raise PortfolioV0Error("BOOK_REDUCTION_MISMATCH")

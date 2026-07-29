@@ -1,25 +1,21 @@
 ## What Was Done
-- Repaired the roadmap candidate so `R0 — ROADMAP-CUSTODY-REPAIR` is an internal custody step rather than a product slice.
-- Removed standalone `GV-CANON-RESET-0` from the product sequence.
-- Selected this brief explicitly through `docs/context/ACTIVE_BRIEF`; numerically higher historical briefs cannot override it.
-- Preserved released Alpha/FS0 unchanged and defined a new portfolio namespace boundary.
-- Replaced seven independent branches with three mergeable work packages.
+- Banked the independent R0 receipt and nine-seam contract before implementation.
+- Implemented the complete micro-portfolio operator loop in an isolated branch.
+- Integrated one custody backend for identity, evidence, and immutable events.
+- Implemented exact shadow replay, corrections, partial fills, valuation-pending, and fail-closed certification issuance.
+- Closed a high-severity self-authorization path: locally generated GitHub-looking receipts can no longer produce replay certification.
+- Reproduced the explicit 278-test provider-free matrix under exact pinned dependencies.
 
 ## What Is Locked
-- `ROADMAP_SEQUENCE = GV-MICRO-PORTFOLIO-VERTICAL-0 → GV-DETERMINISTIC-REPLAY-0 → GV-BOUNDED-PORTFOLIO-1 → GV-PORTFOLIO-SCALE-1 → GV-UNIVERSE-SCALE-1 → GV-CHALLENGER-PROMOTION-1 → GV-LIMITED-LIVE-1`.
-- `EXECUTION_AUTHORIZED = GV-MICRO-PORTFOLIO-VERTICAL-0, GV-DETERMINISTIC-REPLAY-0`.
-- `SHIPPED_PRODUCT_SCORE = 39/100`; observed comparisons remain `0`; no alpha or live-capital claim.
-- The root checkout remains untouched and is not execution authority.
-- Bounded portfolio work remains blocked until exact deterministic replay passes.
+- Exact implementation ancestry is `1db250169cdfe57ffa5d5cc5e5d24b2e937d5d33`.
+- Released FS0/Alpha remain substrate; product namespace is `gv_portfolio_v0`.
+- Canonical score remains 39; real prospective evidence remains 0/1.
+- Replay certification requires exact external-review receipts; bounded portfolio remains blocked.
 
 ## What Is Next
-- Wait for independent audit of the banked R0 roadmap repair.
-- After audit PASS, create a clean isolated implementation worktree from `ROADMAP_FREEZE_COMMIT`.
-- Ship the complete micro-portfolio operator loop through the three work packages.
-- Build replay early but certify it only from real vertical events.
-- `GV-MICRO-PORTFOLIO-VERTICAL-0`;
-- `GV-DETERMINISTIC-REPLAY-0`;
-- evidence-gated later slices only.
+- Bank and push the exact candidate.
+- Run genuinely independent Reviewer A/B/C product audit against that commit and tree.
+- Import exact receipt-bound reports and certify replay only after PASS.
 
 ## First Command
-`git status --short --branch && git rev-parse HEAD && cat docs/context/ACTIVE_BRIEF`
+`git status --short --branch && git rev-parse HEAD && .venv\Scripts\python -m pytest -q tests/gv_portfolio_v0`

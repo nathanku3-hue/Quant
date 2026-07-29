@@ -1,21 +1,24 @@
 # Observability Pack — Current
 
-## Active — R0 custody and drift sentinels (2026-07-29)
+## Active — Candidate, replay, and audit sentinels (2026-07-29)
 
-- **Authority sentinel:** `docs/context/ACTIVE_BRIEF` selects `phase0-gv-micro-portfolio-vertical-0-brief.md`.
-- **Migration sentinel:** highest-numeric-phase discovery requires explicit `--allow-legacy-discovery`; default generation fails closed without a valid pointer.
-- **Custody sentinel:** corrected roadmap is banked as `ROADMAP_FREEZE_COMMIT`; implementation waits for independent audit.
-- **Execution sentinel:** authorized after audit = `GV-MICRO-PORTFOLIO-VERTICAL-0`, then `GV-DETERMINISTIC-REPLAY-0`.
-- **Product sentinel:** released Alpha-0 substrate; score `39`; observed `0`; no alpha claim; released FS0 unchanged.
-- **Sequence sentinel:** micro-portfolio vertical → deterministic replay → bounded portfolio.
-- **Parallelism sentinel:** Packages A/B/C; do not create branches merely because B0–B6 lanes exist conceptually.
-- **Interface sentinel:** minimum identity/event seams freeze first; detailed fields are fixture-earned.
-- **Replay sentinel:** bounded portfolio remains blocked until exact replay PASS.
-- **Root sentinel:** source checkout is unsafe and must not become execution or publication authority.
-- **Drift sentinel:** do not reopen contract catalogues, providers, PEAD, legacy Phase 62–80+, optimizer, graph, adaptive execution, tactical capital, broker, score uplift, or live capital.
+- **Authority sentinel:** `docs/context/ACTIVE_BRIEF` selects the Slice 0 brief explicitly.
+- **Ancestry sentinel:** candidate descends from audited R0 commit `1db2501`.
+- **Custody sentinel:** permanent IDs, evidence, and events have one low-level authority; duplicate semantics are prohibited.
+- **Product sentinel:** four-security operator loop is complete under `gv_portfolio_v0`.
+- **Accounting sentinel:** split residual `0`; terminal NAV `1499`; valuation-pending never invents NAV.
+- **Environment sentinel:** Python 3.12.10, pytest 9.0.2, Streamlit 1.54.0, jsonschema 4.26.0.
+- **Regression sentinel:** provider-free focused matrix 278/278 PASS.
+- **Replay sentinel:** exact replay, correction/partial-fill/valuation cases pass.
+- **Independence sentinel:** legacy self-asserted receipt is rejected; three distinct reviewer accounts are required.
+- **Provider sentinel:** certification checks GitHub commit author/committer identity and exact remote report-file bytes; provider failure blocks.
+- **Claim sentinel:** score 39, real prospective evidence 0, no alpha/live claim.
+- **Sequence sentinel:** independent Slice 0 audit → provider verification → replay certification → bounded portfolio.
+- **Root sentinel:** dirty source checkout remains quarantined and untouched.
+- **Drift sentinel:** do not reopen providers, PEAD, legacy queues, optimizer/copula/graph/adaptive execution, tax/FX/derivatives/shorting, broker, score uplift, alpha, or live capital.
 
 ## Rating
 
-- GREEN: semantic roadmap repair, explicit authority selection, released-substrate preservation.
-- AMBER: independent audit and canonical `.venv` closure remain pending.
-- RED: micro-portfolio operation, later prospective observation, exact replay, alpha evidence, and live capital remain unproven or unauthorized.
+- GREEN: product loop, custody integration, accounting, persistence, operator UX, pinned environment, replay implementation, provider verification code, regression matrix.
+- AMBER: final commit/push/remote equality and external Reviewer A/B/C receipts.
+- RED: replay certification, real prospective evidence, bounded portfolio, alpha evidence, and live capital remain unproven or unauthorized.

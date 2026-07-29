@@ -1,27 +1,30 @@
 # Multi-Stream Contract — Current
 
-## Active — Three-package micro-portfolio execution (2026-07-29)
+## Active — Candidate custody and external audit handoff (2026-07-29)
 
-| Package | Ownership | Parallel boundary | Hard handoff |
+| Stream | Ownership | Current state | Hard handoff |
 |---|---|---|---|
-| A — Truth core | permanent IDs, evidence, immutable events, book reducer, classified cash, NAV, replay API skeleton | owns disjoint truth/accounting paths after minimum seams freeze | reconciled book and replayable event log |
-| B — Decision vertical | Living Thesis Lite, scenarios, admission, capital competition, aim, transition, paper order/fill | consumes Package A IDs/events; cannot invent alternate lineage | certified portfolio aim and fill events |
-| C — Product closure | launch/review/confirm/persist/reopen, read models, acceptance fixture, later-observation explanation, docs/ops | consumes A/B read models; cannot mutate certified truth directly | operator-complete vertical and synchronized authority |
+| Truth core | IDs, exact-byte evidence, immutable events, book, classified cash, NAV | implemented and pinned | canonical event ledger and reconciled book |
+| Decision vertical | thesis/scenarios, outcomes, competition, aim, order/fill | implemented and pinned | immutable decision snapshot and execution records |
+| Product closure | launch/review/confirm/certify/persist/reopen/WATCH explanation | implemented and pinned | operator-complete workspace |
+| Replay/certification | exact reconstruction, corrections, partial fills, certification chain | implemented; shadow evidence bankable | verified external receipts before certification |
+| Independent audit | Reviewer A strategy, B runtime, C data integrity | external and pending | exact candidate commit/tree/report receipts |
 
-## Minimum frozen seams
+## Frozen seams
 
 `InstrumentId`, `EventId`, `EvidenceReference`, `PortfolioBookEvent`, `DecisionSnapshotId`, `PortfolioAimId`, `OrderId`, `FillId`, and `CertificationId`.
 
 ## Coordination laws
 
-- One product authority only: `GV-MICRO-PORTFOLIO-VERTICAL-0` after independent R0 audit PASS.
-- Maximum parallelism means independent executable work, not maximum worker or branch count.
-- A package may run separately only when it owns disjoint files, uses exercised seams, can merge independently, and does not force global redesign on failure.
-- Detailed fields freeze only when the operator fixture exercises them.
-- Replay builds early from real vertical events; replay certification is the immediate next slice.
-- Learn work remains shadow-only and cannot mutate the certified book or create competing authority.
-- Cross-package blockers are limited to P0/P1 custody, accounting, mandate, mandatory-action, or replay defects.
+- `contracts/gv_portfolio/v0` and `core/gv_portfolio_v0` are the single low-level custody authority.
+- `gv_portfolio_v0.vertical` orchestrates the bounded fixture and may not create competing custody semantics.
+- Replay may produce shadow evidence before audit, but cannot issue terminal certification without verified receipts.
+- Structural receipt validation is insufficient; the certification CLI verifies GitHub account identity and exact report bytes at the submitted commit.
+- Three reviewer accounts must differ from the implementer and from each other. Natural personhood is not claimed.
+- Detailed fields freeze only when exercised by the operator/replay fixtures.
+- Released FS0 remains substrate and cannot reclaim active product queue authority.
+- Bounded portfolio remains blocked by replay certification.
 
 ## Current bottleneck
 
-Independent audit must confirm the banked R0 authority before any implementation worktree is created.
+Bank and push one exact clean candidate, then obtain independent Reviewer A/B/C receipts. No additional product implementation stream is needed before that evidence arrives.

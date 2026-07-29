@@ -6549,3 +6549,38 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Sealed Attempt-1 evidence preserved; observation eligibility superseded by append-only invalidation.
 - Receipts now require provider-authenticated GitHub author login (v2).
 
+# GV Portfolio V0 Micro-Portfolio Formula Registry (2026-07-29)
+
+Implementation paths: `gv_portfolio_v0/vertical.py`, `gv_portfolio_v0/storage.py`, and `views/gv_portfolio_v0_workspace.py`.
+Focused tests: `tests/gv_portfolio_v0/test_vertical.py`, `tests/gv_portfolio_v0/test_app.py`.
+
+- Domain identity: `ID = KIND + "_" + SHA256(domain_prefix + LF + canonical_json(preimage) + LF)` using the frozen GV-FS0 canonical encoder without modifying its protocol.
+- Capital competition: `net_score_bps = expected_value_bps - risk_penalty_bps - cost_penalty_bps`; eligible candidates are `ADMIT` or `CASH`; ties break lexically.
+- Split preservation: `post_quantity = pre_quantity × numerator / denominator`; `post_price = pre_price × denominator / numerator`; required residual is `post_quantity × post_price - pre_quantity × pre_price = 0`.
+- Fill cash cost: `quantity × price + fee = 5 × 40 + 1 = 201`.
+- Terminal available cash: `975 - 201 = 774`; research reserve remains `25`.
+- Terminal position value: Northstar `20 × 25 = 500`; Harbor `5 × 40 = 200`; total `700`.
+- Terminal NAV: `position_value + sum(classified_cash) = 700 + 774 + 25 = 1499`.
+- Missing valuation: any position without a price forces `valuation_status=VALUATION_PENDING`, `position_value=null`, and `nav=null`; no price is invented.
+- Certification subject: canonical non-certification event ledger hash + terminal book hash + decision snapshot + aim + deterministic checks. Certification-reference events do not certify themselves.
+- Persistence: canonical workspace envelope hash, atomic temp write, `fsync`, then `os.replace`; reopen recomputes evidence, event, book, execution, and certification identities.
+- WATCH rule: later evidence may append a `WATCH` event; when `hard_falsifier_fired=false`, `PortfolioAimId` and original `DecisionSnapshotId` remain unchanged.
+- Claim boundary: the later observation is deterministic fixture chronology, not real external prospective evidence; canonical score remains 39 pending independent audit.
+
+# GV Portfolio V0 Deterministic Replay Formula Registry (2026-07-29)
+
+Implementation paths: `gv_portfolio_v0/replay.py`, `validation/gv_portfolio_v0_replay.py`, `contracts/gv_portfolio/v0/identity.py`, and `core/gv_portfolio_v0/events.py`.
+Focused tests: `tests/gv_portfolio_v0/test_custody_backend.py`, `tests/gv_portfolio_v0/test_replay.py`.
+
+- Canonical event custody: `EventId = EVT_ + domain_hash(event envelope without EventId)`; persisted full streams require sequence `0..N-1`, unique IDs, exact canonical bytes, and append-only byte-prefix preservation.
+- Replay normalization: exact duplicate deliveries with the same `EventId` and bytes collapse to one event; conflicting duplicates fail closed.
+- Correction lineage: `CorrectionId = COR_ + domain_hash(target EventId + target byte hash + replacement event + reason + recorded_at)`; one target permits at most one replacement and sequence identity must be preserved.
+- Partial-fill residual: `remaining_quantity = ordered_quantity - Σ(fill_quantity)`; negative residual blocks as overfill. `cash_cost = Σ(fill_quantity × fill_price + fill_fee)`.
+- Exact replay state: canonical hashes bind normalized events, book, execution, aim, decision snapshot, thesis states, later observations, and product-certification chain.
+- Valuation pending: any required position without a valuation price yields `valuation_status=VALUATION_PENDING`, `market_value=null`, `position_value=null`, and `NAV=null`.
+- Audit package hash: binds exact candidate commit, candidate tree, subject event-ledger hash, and locked Python/pytest/Streamlit/jsonschema versions.
+- Reviewer receipt gate: each A/B/C report is exact-byte hashed and bound to a distinct GitHub author account, candidate commit/tree, package hash, and subject ledger. Reviewer accounts must differ from the implementer and from each other.
+- Provider verification: the certification CLI queries the GitHub commit API to verify author/committer logins and retrieves the report file at the submitted commit; remote bytes must equal the canonical embedded report bytes exactly.
+- Replay certification: emitted only when all deterministic checks, v2 structural checks, and GitHub provider checks pass. A self-asserted `independent=true` JSON object is insufficient and remains BLOCKED.
+- Claim boundary: provider account separation proves operational separation only, not natural-person identity. Shadow replay evidence is not terminal certification.
+

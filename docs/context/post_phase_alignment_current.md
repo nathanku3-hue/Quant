@@ -1,22 +1,24 @@
 # Post-Phase Alignment — Current
 
-## Active — R0 repaired and banked; product audit pending (2026-07-29)
+## Active — Slice 0 and replay implementation locally complete (2026-07-29)
 
-- **What changed:** contract-only `GV-CANON-RESET-0` was removed from the product queue; explicit active-brief authority replaced highest-numeric-phase selection.
-- **Product center:** one complete prospective micro-portfolio operator loop followed immediately by exact replay.
-- **Released substrate:** `gv-alpha0-paper-decision-v0.1.0`; score 39, observed 0, no alpha claim; released FS0 unchanged.
-- **Current bottleneck:** independent audit of the banked roadmap authority.
-- **Execution topology:** three mergeable packages—Truth core, Decision vertical, Product closure.
-- **Interface rule:** freeze minimum IDs/events first; freeze detailed fields only when exercised.
-- **Next active scope:** after audit PASS, create a clean isolated worktree from `ROADMAP_FREEZE_COMMIT` and execute `GV-MICRO-PORTFOLIO-VERTICAL-0`.
-- **Next blocked scope:** deterministic replay certifies from real vertical events; bounded portfolio waits for exact replay PASS.
-- **Held scope:** root cleanup, providers, PEAD, legacy phase queue, broad ontology, released FS0 mutation, optimizers, copulas, graph propagation, adaptive execution, tactical capital, broker, live capital.
+- **Product result:** complete four-security paper-portfolio operator loop, persisted and reopened locally.
+- **Truth result:** one permanent-identity/evidence/event custody backend; exact split and NAV accounting.
+- **Replay result:** exact reconstruction, idempotence, correction lineage, partial-fill residuals, valuation-pending, and byte-stable certification chain.
+- **Provider gate:** GitHub API verification binds reviewer account identity and exact remote report bytes; no real receipts exist yet.
+- **Environment result:** exact pinned Python/dependencies reproduced; provider-free focused matrix 278/278 PASS.
+- **Released substrate:** FS0/Alpha remains unchanged in behavior and outside the active product namespace.
+- **Canonical score:** 39/100; observed real prospective evidence 0; no alpha claim.
+- **Current bottleneck:** bank/push exact candidate and obtain independent Reviewer A/B/C receipts.
+- **Next blocked scope:** replay certification waits for those receipts; bounded portfolio waits for replay PASS.
+- **Held scope:** root cleanup, providers, PEAD, broad ontology, optimizer, copula, graph, adaptive execution, tax/FX/derivatives/shorting, tactical capital, broker, score uplift, alpha, and live capital.
 
 ## Alignment decision
 
 ```text
-AUDIT BANKED R0
-→ SHIP MICRO-PORTFOLIO VERTICAL
-→ CERTIFY EXACT REPLAY
-→ SCALE ONLY FROM EVIDENCE
+BANK EXACT CANDIDATE
+→ INDEPENDENT THREE-REVIEWER AUDIT
+→ PROVIDER-VERIFY REPORTS
+→ CERTIFY REPLAY
+→ SCALE ONLY FROM CERTIFIED EVIDENCE
 ```

@@ -61,32 +61,37 @@ def test_canonical_module_is_importable_and_present() -> None:
     assert hasattr(gv_fs0_canonical, "encode_json_string")
 
 
-def test_product_canon_files_exist_with_active_status() -> None:
-    """Fail closed if any of the three product canons is absent."""
-    for rel in REQUIRED_PRODUCT_CANON:
+def test_product_canon_files_exist_with_current_status_contract() -> None:
+    """Fail closed if supporting and deferred product canons compete with sequence authority."""
+    expected_status = {
+        "docs/architecture/godview_endgame_vision.md": "Supporting Endgame Canon",
+        "docs/architecture/godview_portfolio_first_operating_model.md": (
+            "Supporting Operating Contract"
+        ),
+        "docs/architecture/godview_portfolio_p0_owner_freeze.md": (
+            "Frozen Later-Mandate Profile"
+        ),
+    }
+    for rel, status in expected_status.items():
         path = _require_file(rel)
         text = path.read_text(encoding="utf-8")
         assert "Status:" in text
-        assert "Active" in text.splitlines()[2] or "Active" in text[:500]
+        assert status in text[:800]
+        assert "godview_v2_frozen_build_learn_roadmap.md" in text[:1200]
         assert "GV-FS0" in text or "Portfolio" in text or "Owner Freeze" in text
 
 
-def test_top_level_roadmap_is_gv_fs0_first_not_uoe() -> None:
+def test_top_level_roadmap_selects_micro_portfolio_then_replay() -> None:
     path = _require_file("docs/architecture/top_level_roadmap.md")
     text = path.read_text(encoding="utf-8")
     head = "\n".join(text.splitlines()[:20])
-    # E0A operable is the sole active gate; FS0 remains substrate authority language.
-    assert (
-        "GV-E0A-OPERABLE" in head
-        or "GV-FS0-First" in head
-        or "GV-FS0 First" in head
-        or "GodView Certified Portfolio OS" in text.splitlines()[0]
-    )
-    assert (
-        "ACTIVE_GATE = GV-E0A-OPERABLE" in text
-        or "EXECUTION_MODEL = GV_FS0_FIRST" in text
-        or "GodView Certified Portfolio OS" in text.splitlines()[0]
-    )
+    assert "# GodView Top-Level Roadmap" in text.splitlines()[0]
+    assert "ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0" in head
+    assert "NEXT_GATE = GV-DETERMINISTIC-REPLAY-0" in head
+    assert "ROOT_CHECKOUT = UNSAFE / DO_NOT_USE" in head
+    assert "GV-BOUNDED-PORTFOLIO-1" in text
+    assert "blocked by replay" in text
+    assert "ACTIVE_GATE = GV-E0A-OPERABLE" not in text
     # Obsolete active UOE roadmap title must not remain the H1.
     assert not text.splitlines()[0].startswith("# Top-Level Roadmap: Unified Opportunity Engine")
 

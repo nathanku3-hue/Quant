@@ -1,3 +1,27 @@
+## 2026-07-29 Round Entry (Hashes Cannot Prove External Reviewer Authentication)
+- Date: 2026-07-29
+- Mistake or miss: the replay gate treated three internally consistent GitHub-looking receipts as provider-authenticated evidence and issued certification from a fully caller-generated fixture.
+- Root cause: byte integrity, distinct account strings, commit-shaped values, and GitHub URLs were conflated with provider verification; the test explicitly proved that local code could mint every supposedly independent field.
+- Fix applied: retain strict structural and byte validation, but make every locally supplied receipt non-authorizing with `EXTERNAL_PROVIDER_VERIFICATION_REQUIRED`; replay certification remains null until a separate external provider boundary verifies the audit. Reproduced 31/31 portfolio tests, the exact provider-free pinned matrix at 275/275, and the broader host boundary at 444/444.
+- Guardrail for next time: no self-contained payload may grant authority whose premise is external identity, account ownership, dispatch, or provider state; validate bytes locally, verify identity externally, and keep certification blocked between those boundaries.
+- Evidence paths: `gv_portfolio_v0/replay.py`, `tests/gv_portfolio_v0/test_replay.py`, `docs/context/planner_packet_current.md`, and `docs/decision log.md`.
+
+## 2026-07-29 Round Entry (External Identity Needs Live Provider Resolution)
+- Date: 2026-07-29
+- Mistake or miss: Blocking locally self-asserted receipts was necessary but left replay certification with no executable path even after a genuine reviewer submitted evidence.
+- Root cause: Structural byte verification and provider identity verification were separated correctly, but the second boundary was documented rather than implemented.
+- Fix applied: Added a fail-closed GitHub API verifier that resolves each reviewer submission commit, checks provider-returned author/committer logins, fetches the declared report file at that commit, and compares its exact bytes with the canonical embedded report. Structural-only library calls remain non-authorizing.
+- Guardrail for next time: When authority depends on external state, implement both sides of the boundary: local structural validation and live provider resolution. A permanent manual placeholder is not a completed gate.
+- Evidence paths: `validation/gv_portfolio_v0_replay.py`, `gv_portfolio_v0/replay.py`, `tests/gv_portfolio_v0/test_replay.py`.
+
+## 2026-07-29 Round Entry (Roadmap Recuts Must Rebind Machine Authority Tests)
+- Date: 2026-07-29
+- Mistake or miss: the Slice 0 candidate and its focused tests passed, but four existing product-authority tests still required E0A/FS0 documents to remain active and rejected the corrected micro-portfolio → replay roadmap.
+- Root cause: the authority recut updated canonical documents and the new product slice, but validation relied on a previously reported partial regression count instead of rerunning every released protocol/product authority boundary after the active-gate change.
+- Fix applied: preserved the supporting/frozen status of historical canons, replaced obsolete E0A-active assertions with exact Slice 0, replay-next, root-unsafe, released-substrate, score, and nine-seam checks, and reproduced 413/413 existing protocol/product tests plus 10/10 Slice 0 tests.
+- Guardrail for next time: every active-product or roadmap recut must rerun the complete authority/runtime boundary before claiming audit readiness; repair stale assertions to current truth rather than making frozen documents falsely active.
+- Evidence paths: `tests/gv_fs0_product/test_authority_chain.py`, `tests/gv_fs0_product/test_canonical_integrity_gate.py`, `docs/architecture/top_level_roadmap.md`, `docs/context/planner_packet_current.md`, and `docs/saw_reports/saw_gv_micro_portfolio_vertical_0_20260729.md`.
+
 ## 2026-07-21 Round Entry (Observation Is Not Product Value; Mutable Bytes Are Not Evidence)
 - Date: 2026-07-21
 - Mistake or miss: the E0B repair correctly hardened publication authority, but repeated concurrent writes meant passing tests were not bound to one candidate; generated context and SAW counts drifted; an unreported remote push advanced PR #5 to hosted-green `b7a24d3`; and `e0b_close_eligible` silently conflated a methodologically valid observed comparison with successful decision-value proof.
@@ -2050,3 +2074,43 @@ Application pattern:
 - Fix applied: Added fail-closed `docs/context/ACTIVE_BRIEF` selection; archived Phase 66; explicitly superseded contradictory evidence; recut canon reset into internal R0; made the micro-portfolio operator loop the first product slice; preserved released FS0; and grouped execution into three mergeable packages with minimum seams frozen first.
 - Guardrail for next time: A roadmap is authority only when checkoutable from the implementation base. Active context must be explicitly pointed, not inferred from filenames. Governance work is not a product slice unless it changes a user-visible operating capability. Maximize independent executable work, not worker or branch count.
 - Evidence paths: `scripts/build_context_packet.py`, `tests/test_build_context_packet.py`, `docs/context/ACTIVE_BRIEF`, `docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md`, `docs/architecture/godview_v2_frozen_build_learn_roadmap.md`, `docs/saw_reports/saw_gv_v2_roadmap_custody_repair_20260729.md`.
+
+## 2026-07-29 Round Entry (A Functional Fixture Is Not Prospective Evidence)
+- Date: 2026-07-29
+- Mistake or miss: The first micro-portfolio implementation dated its later WATCH fixture after the current date, which could be misread as a real prospective observation rather than deterministic acceptance chronology.
+- Root cause: Product-flow completeness and external evidence maturity were represented by the same word, “later,” without an explicit claim boundary.
+- Fix applied: Moved the fixture observation to a deterministic post-decision timestamp within known chronology, labelled it fixture-only across product and authority surfaces, and kept the real external prospective gate at 0/1.
+- Guardrail for next time: Never earn prospective-evidence maturity from a synthetic or predetermined fixture. Track functional chronology and externally observed evidence as separate gates.
+- Evidence paths: `gv_portfolio_v0/vertical.py`, `docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md`, `docs/context/planner_packet_current.md`.
+
+## 2026-07-29 Round Entry (Certification Projections Need Explicit Sequence Semantics)
+- Date: 2026-07-29
+- Mistake or miss: The first certification projection removed certification-reference events but retained original event sequence numbers, while the reducer incorrectly required a contiguous sequence.
+- Root cause: Full-ledger custody and derived certification projection were treated as if they had identical sequence invariants.
+- Fix applied: Full persisted workspaces still require exact contiguous sequences; derived projections require ordered unique source sequences and preserve original lineage.
+- Guardrail for next time: Define whether a reducer consumes a complete ledger or a lineage-preserving projection. Never silently renumber a certification subject or weaken full-ledger continuity.
+- Evidence paths: `gv_portfolio_v0/vertical.py`, `tests/gv_portfolio_v0/test_vertical.py`.
+
+## 2026-07-29 Round Entry (Pinned Environment Is a Separate Closure Claim)
+- Date: 2026-07-29
+- Mistake or miss: The complete vertical and 230 focused tests passed on host Python 3.12.10, but the worktree had no `.venv` and installed pytest/Streamlit versions differed from the locks.
+- Root cause: Runtime compatibility evidence was available immediately, while exact dependency-custody evidence required a separate reproducible environment.
+- Fix applied: Preserved local PASS evidence but blocked terminal Slice 0 acceptance, recorded exact installed versus locked versions, and made pinned-environment reproduction part of independent audit.
+- Guardrail for next time: Report interpreter compatibility, dependency parity, and independent review as separate claims; none substitutes for the others.
+- Evidence paths: `requirements.lock`, `pyproject.toml`, `docs/saw_reports/saw_gv_micro_portfolio_vertical_0_20260729.md`.
+
+## 2026-07-29 Round Entry (A Boolean Independence Claim Is Not Reviewer Independence)
+- Date: 2026-07-29
+- Mistake or miss: The first replay-certification gate accepted a local JSON object containing `independent=true` and three PASS strings, so the implementer could manufacture the evidence intended to constrain the implementer.
+- Root cause: Receipt content was validated semantically but had no external account identity, exact report-byte binding, candidate-tree binding, or reviewer-to-implementer separation.
+- Fix applied: Replaced the v1 receipt with a v2 structure binding three distinct reviewer account names, exact report and receipt hashes, exact candidate commit/tree, locked environment, audit-package hash, and subject-event ledger hash. A later adversarial review showed that those caller-supplied fields still could not prove provider authentication, so local receipts were made permanently non-authorizing pending external provider verification.
+- Guardrail for next time: Any gate whose purpose is independence must bind evidence to a principal and channel outside the implementation process. Content hashes prove bytes, not authorship or separation.
+- Evidence paths: `gv_portfolio_v0/replay.py`, `tests/gv_portfolio_v0/test_replay.py`, `validation/gv_portfolio_v0_replay.py`.
+
+## 2026-07-29 Round Entry (Concurrent Writers Need Reconciliation, Not Last-Writer-Wins)
+- Date: 2026-07-29
+- Mistake or miss: A concurrent implementation process added custody and replay files to the same worktree while the original vertical was being closed, temporarily creating duplicate identity/event implementations and transiently modifying adjacent integrity tests.
+- Root cause: Parallel execution shared one filesystem boundary without explicit owned-file isolation or a merge checkpoint.
+- Fix applied: Detected files by timestamp/status, waited for the concurrent process to finish, reviewed every added path, retained valid custody/replay work, and rewired the product vertical to delegate to one low-level authority rather than discarding or silently overwriting either implementation.
+- Guardrail for next time: Parallel workers must own disjoint worktrees or explicit file allowlists. When overlap occurs, freeze writes, inventory provenance, run semantic reconciliation, and only then resume custody operations.
+- Evidence paths: `contracts/gv_portfolio/v0/**`, `core/gv_portfolio_v0/**`, `gv_portfolio_v0/vertical.py`, `tests/gv_portfolio_v0/test_custody_backend.py`, `tests/gv_portfolio_v0/test_replay.py`.

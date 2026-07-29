@@ -1,35 +1,43 @@
 # Impact Packet — Current
 
-## Active — R0 roadmap custody repair (2026-07-29)
-
-### Changed authority surfaces
-
-- corrected canonical roadmap and compact top-level roadmap;
-- root product surfaces: `README.md`, `PRD.md`, `PRODUCT_SPEC.md`, `PHASE_QUEUE.md`;
-- explicit active brief pointer: `docs/context/ACTIVE_BRIEF`;
-- new active brief: `docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md`;
-- Phase 66 bridge moved to historical archive;
-- context generator and focused tests updated for explicit selection and fail-closed behavior;
-- current truth, decision/lesson entries, SAW evidence, and handover reconciled.
+## Active — Micro-portfolio candidate plus replay implementation (2026-07-29)
 
 ### Product impact
 
-- standalone contract-only `GV-CANON-RESET-0` is removed from the product sequence;
-- the first product slice is the complete micro-portfolio operator loop;
-- deterministic replay remains immediately before any bounded portfolio expansion;
-- released FS0 remains immutable and a new portfolio namespace is required.
+- complete four-security operator loop under `gv_portfolio_v0`;
+- principal, substitute, rejected competitor, abstained alternative, benchmark, and classified cash;
+- thesis/scenario review, deterministic capital competition, aim, order/fill, certification, persist/reopen, and later WATCH explanation;
+- broker-free Streamlit workspace.
 
-### Execution impact
+### Truth and accounting impact
 
-- three mergeable packages replace seven automatic independent branches;
-- minimum identity/event seams freeze before parallel implementation;
-- detailed schema fields freeze only when exercised by the vertical fixture;
-- implementation remains stopped pending independent audit of `ROADMAP_FREEZE_COMMIT`.
+- `contracts/gv_portfolio/v0/**` owns permanent IDs and exact-byte evidence references;
+- `core/gv_portfolio_v0/**` owns immutable canonical event custody;
+- `gv_portfolio_v0/vertical.py` delegates exercised custody primitives and owns product orchestration;
+- one value-preserving 2:1 split; terminal NAV 1499; unexplained split residual zero;
+- missing valuation yields `VALUATION_PENDING` and null NAV.
 
-### Runtime/data impact
+### Replay impact
 
-No portfolio runtime, provider, data artifact, model, score, broker, or live-capital behavior changed in R0. The only code change is the context-authority selector and its focused tests.
+- exact state reconstruction from real Slice 0 events;
+- duplicate-delivery idempotence;
+- correction lineage and partial-fill residual state;
+- prior certification byte stability;
+- structural audit receipts remain non-authorizing without provider verification;
+- the CLI verifies GitHub reviewer identity and exact remote report bytes before certification.
+
+### Verification impact
+
+- exact pinned environment reproduced;
+- portfolio/replay suite: 34/34 PASS;
+- provider-free focused matrix: 278/278 PASS;
+- current-authority tests reject stale FS0-first queue language;
+- runtime persist/reopen/replay smoke: PASS.
+
+### Custody impact
+
+The candidate is not terminally accepted until committed, pushed, remote-equal, clean, and independently audited. Released FS0/Alpha runtime remains unchanged. The dirty root checkout remains untouched.
 
 ### Open risk
 
-The root source checkout remains unsafe and untouched. Any implementation branch created from raw `93e7a55` or another stale base would omit the corrected authority and is invalid.
+Independent Reviewer A/B/C receipts do not yet exist. Replay certification and bounded portfolio therefore remain blocked.
