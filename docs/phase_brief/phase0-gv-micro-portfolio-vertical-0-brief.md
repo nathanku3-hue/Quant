@@ -2,19 +2,20 @@
 
 Date: 2026-07-29
 Mode: `EXECUTION_PACKET`
-Status: `IMPLEMENTED_PINNED_CANDIDATE; REPLAY_SHADOW_READY; INDEPENDENT_AUDIT_PENDING`
+Status: `IMPLEMENTED_PUSHED_CANDIDATE; REPLAY_SHADOW_COMPLETE; INDEPENDENT_AUDIT_PENDING`
 Authority base: `1db250169cdfe57ffa5d5cc5e5d24b2e937d5d33`
 Candidate branch: `codex/gv-micro-portfolio-v0`
+Audit target commit: `f64cadcb2a9aaf0708744099ddc03ea2c41617eb`
+Audit target tree: `8c6dc88543847a06268b83db0dd68ea7f5fb12c1`
 Namespace: `gv_portfolio_v0`
 
 ## Hierarchy
 
 - L1: GodView point-in-time certified portfolio operating system.
-- L2 completed implementation streams: Truth core, Decision vertical, Product closure.
+- L2 completed implementation streams: Truth core, Decision vertical, Product closure, Replay shadow.
 - L2 active gate: independent Slice 0 Reviewer A/B/C audit.
-- L2 shadow-ready next stream: deterministic replay and certification.
-- L2 deferred: Bounded Portfolio, Portfolio Scale, Universe Scale, Challenger Promotion, Limited Live Capital.
-- L3 flow: R0 Audit PASS → Slice 0 Candidate → Independent Product Audit → Replay Certification → Bounded Portfolio.
+- L2 deferred: terminal replay certification, Bounded Portfolio, Portfolio Scale, Universe Scale, Challenger Promotion, Limited Live Capital.
+- L3 flow: R0 Audit PASS → Slice 0 Candidate → Independent Product Audit → External Replay Certification → Bounded Portfolio.
 
 ## Product result
 
@@ -31,7 +32,7 @@ launch
 → explain why the aim remained unchanged
 ```
 
-The complete broker-free operator loop is implemented and reproduced under the pinned environment. It remains a candidate until three distinct reviewers independently accept the exact pushed commit, tree, report bytes, and replay subject and an external provider boundary verifies their account separation.
+The complete broker-free operator loop is implemented and pushed. It remains a candidate until genuinely independent Reviewer A/B/C reports accept the exact audit target.
 
 ## Delivered vertical
 
@@ -50,11 +51,11 @@ The complete broker-free operator loop is implemented and reproduced under the p
 - one later deterministic WATCH observation that changes evidence but not the aim because no hard falsifier fired;
 - one broker-free Streamlit operator workspace.
 
-## Replay shadow result
+## Replay result
 
 `GV-DETERMINISTIC-REPLAY-0` is implemented as shadow evidence from the real Slice 0 event stream. It proves locally:
 
-- exact cash, position, cost, NAV, aim, decision-snapshot, thesis-state, and certification reconstruction;
+- exact cash, position, cost, NAV, aim, decision-snapshot, thesis-state, and product-certification reconstruction;
 - byte-idempotent replay and duplicate-delivery deduplication;
 - explicit correction lineage;
 - partial-fill residual quantity and cash state;
@@ -63,7 +64,7 @@ The complete broker-free operator loop is implemented and reproduced under the p
 - value-preserving split residual of zero;
 - byte-stable prior product certifications.
 
-Replay certification cannot issue from self-asserted JSON. Its v2 gate requires three distinct GitHub-account-bound reviewer receipts tied to the exact candidate commit, tree, report bytes, locked environment, and subject-event ledger hash.
+Terminal replay certification remains external. The local CLI can verify GitHub repository, candidate commit/tree, reviewer account identity, and exact remote report bytes, but it cannot mint a terminal certificate from caller-built data. Provider preflight remains non-authorizing and `--require-certification` returns blocked.
 
 ## Exact fixture economics
 
@@ -106,37 +107,39 @@ Pinned environment:
 
 Evidence:
 
-- portfolio, custody, operator, and replay tests: `34/34 PASS`;
-- exact pinned provider-free matrix: `278/278 PASS` = `34` portfolio/shadow + `150` protocol + `25` context + `24` current-authority + `45` Alpha release/core;
+- portfolio, custody, operator, and replay tests: `38/38 PASS`;
+- exact pinned focused matrix: `282/282 PASS` = `38` portfolio/replay + `150` protocol + `25` context + `24` current-authority + `45` Alpha release/core;
 - context generation and fail-closed validation: PASS;
 - network-denied Streamlit AppTest: PASS;
 - deterministic bytes across independent workspace roots: PASS;
-- released FS0/Alpha focused regressions: PASS.
+- compile, JSON, runtime smoke, and diff hygiene: PASS;
+- local/origin equality at audit target: PASS;
+- root checkout untouched at `accef5c6` with 5,600 status entries.
 
-Independent Reviewer A/B/C evidence is not available through the current connector. Structural receipt validation alone remains non-authorizing; the certification CLI additionally verifies each reviewer’s GitHub commit identity and exact remote report-file bytes through the GitHub API. Terminal Slice 0 acceptance and replay certification therefore remain blocked until real receipts exist and pass that provider check.
+Independent Reviewer A/B/C ownership is not available through the current connector. Terminal Slice 0 acceptance and replay certification therefore remain blocked.
 
 ## Score update
 
 Canonical shipped score remains `39/100`. No score uplift is earned before independent audit.
 
-| Dimension | Current canonical | Pinned candidate | After audited replay forecast |
+| Dimension | Current canonical | Pushed candidate | After audited replay forecast |
 |---|---:|---:|---:|
 | Product capability | 28 | 63–65 | 65–70 |
 | User flow | 42 | 73–75 | 74–78 |
 | Portfolio completeness | 18 | 67–70 | 70–75 |
 | Integrity and replay | 64 | 82–86 shadow | 90–95 |
 | Prospective evidence | 10 | 20–25 fixture-only | 30–40 |
-| Shipping and custody | 78 | 87–90 | 90–95 |
+| Shipping and custody | 78 | 88–91 | 90–95 |
 | Weighted audit maturity | ≈39 | 65–68 candidate | 70–74 |
 
 Operational evidence:
 
 ```text
 Roadmap custody banked                         1/1
-Micro-portfolio operator loop, pinned candidate 1/1
+Micro-portfolio implementation pushed          1/1
 Replay shadow exact                            1/1
 Independent Slice 0 product audit              0/1
-Replay certification                           0/1
+Terminal replay certification                  0/1
 Real prospective external observation          0/1
 Bounded repeated portfolio                     0/1
 ```
@@ -156,43 +159,44 @@ The later WATCH step is a deterministic acceptance fixture, not a real externall
 | duplicate identity/event authority | P1 | one custody backend; vertical delegates exercised primitives |
 | released FS0 mutation | P1 | new namespace; integrity guards preserve substrate boundary |
 | fixture mistaken for prospective evidence | P1 | explicit claim boundary and score freeze |
-| self-asserted reviewer independence | P1 | local receipts are byte-validated but never authorizing; external provider verification is required |
+| caller-mintable terminal certification | P1 | local promotion path removed; provider checks are preflight-only |
 
 ## Forbidden scope
 
-providers · WRDS · broad historical loaders · optimizer · copula/MES production · automated graph propagation · adaptive intraday execution · tactical capital · broad tax · FX · shorting · leverage · derivatives · broker · live capital · score uplift · alpha claim
+providers/WRDS data acquisition · broad historical loaders · optimizer · copula/MES production · automated graph propagation · adaptive intraday execution · tactical capital · broad tax · FX · shorting · leverage · derivatives · broker · live capital · score uplift · alpha claim
 
 ## Stop rules
 
 1. Stop if independent audit finds any P0/P1 identity, accounting, mandate, persistence, replay, or custody defect.
-2. Stop replay certification unless exact external-review evidence passes the built-in GitHub provider-verification boundary.
+2. Stop terminal replay certification until an external authority accepts exact independent reports.
 3. Stop before bounded portfolio work until replay certification passes.
 
 ## Next action
 
-Freeze concurrent writes, remove the accidental untracked `NUL` artifact, commit and push the exact candidate, then obtain genuinely independent Reviewer A/B/C evidence through a provider-verification boundary. Only after that PASS may Slice 0 be accepted and replay certification issued from the shadow path. Do not open bounded portfolio work before certification.
+Independently audit commit `f64cadcb2a9aaf0708744099ddc03ea2c41617eb` and tree `8c6dc88543847a06268b83db0dd68ea7f5fb12c1`. Publish exact Reviewer A/B/C reports and use the GitHub verifier as preflight evidence. Terminal certification remains external; bounded portfolio remains closed.
 
 ## What Was Done
 
 - Banked the independent R0 receipt and nine-seam contract before implementation.
-- Implemented the complete micro-portfolio operator loop in an isolated branch.
+- Implemented and pushed the complete micro-portfolio operator loop.
 - Integrated one custody backend for identity, evidence, and immutable events.
-- Implemented exact shadow replay, corrections, partial fills, valuation-pending, and fail-closed certification issuance.
-- Closed a high-severity self-authorization path: locally generated GitHub-looking receipts can no longer produce replay certification.
-- Reproduced the explicit 278-test provider-free matrix under exact pinned dependencies.
+- Implemented exact shadow replay, corrections, partial fills, valuation-pending, and provider preflight.
+- Removed caller-mintable terminal-certification promotion.
+- Reproduced the focused matrix under exact pinned dependencies.
 
 ## What Is Locked
 
 - Exact implementation ancestry is `1db250169cdfe57ffa5d5cc5e5d24b2e937d5d33`.
+- Exact audit target is `f64cadc` / tree `8c6dc885`.
 - Released FS0/Alpha remain substrate; product namespace is `gv_portfolio_v0`.
 - Canonical score remains 39; real prospective evidence remains 0/1.
-- Replay certification requires exact external-review receipts; bounded portfolio remains blocked.
+- Terminal replay certification remains external; bounded portfolio remains blocked.
 
 ## What Is Next
 
-- Bank and push the exact candidate.
-- Run genuinely independent Reviewer A/B/C product audit against that commit and tree.
-- Import exact receipt-bound reports and certify replay only after PASS.
+- Run genuinely independent Reviewer A/B/C audit against the exact target.
+- Verify report custody and provider identity as preflight.
+- Accept Slice 0 and issue replay certification only through an external authority.
 
 ## First Command
 

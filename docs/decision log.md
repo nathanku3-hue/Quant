@@ -7622,3 +7622,35 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Authority state: the replay mechanism is complete, but no genuine external Reviewer A/B/C receipts exist. Slice 0 acceptance and replay certification remain `0/1`.
 - Stop: bank/push the exact candidate and wait for independent reports. Do not open bounded portfolio work before real provider-verified replay PASS.
 
+## 2026-07-29 — ROUND-20260729-GV-MICRO-PORTFOLIO-AUDIT-TARGET-BANK
+
+- Candidate authority: audit exact commit `177d6031e1f1164deb50f6926e653ae8e64e385f` and tree `630df0f2ccf99b00995d89c7f9e9df7b1ad1bf58` on branch `codex/gv-micro-portfolio-v0`.
+- Remote custody: fetched origin equals the local candidate commit exactly.
+- Validation: exact pinned portfolio/custody/operator/replay suite `37/37 PASS`; complete focused matrix `281/281 PASS`; context, compile, JSON, diff, runtime persist/reopen, and shadow-evidence byte checks PASS.
+- Root custody: source checkout remains untouched at `accef5c6` with 5,600 status entries and is not authority.
+- Product state: Slice 0 implementation and replay mechanism are complete and pushed. Canonical score remains `39/100`; real prospective evidence remains `0`; no alpha or live claim.
+- External gate: independent Reviewer A/B/C reports are absent. Slice 0 terminal acceptance and replay certification remain blocked until exact reports pass GitHub provider verification.
+- Stop: no further product implementation before independent audit. Bounded portfolio remains closed.
+
+## 2026-07-29 — ROUND-20260729-GV-REPLAY-PROMOTION-CAPABILITY-REPAIR
+
+- Verdict: `REPAIR_CURRENT_SLICE`. Do not audit remote tip `9f083ff`, which inherits the unsafe capability introduced at `0f027d6`.
+- High finding: `0f027d6` introduced `_build_provider_verification_record()` and `_promote_verified_replay_evidence()`. Both accepted caller-built mappings; the tests directly called them and minted a terminal replay certificate without executing GitHub provider verification. A self-hash over caller-controlled bytes is integrity, not external authority.
+- Safe repair: remove the terminal-promotion helpers and the three tests that authorize them; restore `validation/gv_portfolio_v0_replay.py` to provider preflight plus shadow evidence only. Core `build_replay_evidence()` remains `BLOCKED: EXTERNAL_PROVIDER_VERIFICATION_REQUIRED` and cannot emit replay certification.
+- Preserved capability: the GitHub preflight still fails closed on dirty checkout, non-origin repository, candidate commit/tree mismatch, reviewer account mismatch, missing provider state, and exact report-byte mismatch.
+- Validation: safe local portfolio/custody/operator/replay suite `38/38 PASS`; exact pinned focused matrix `282/282 PASS` (`38 + 150 + 25 + 24 + 45`).
+- Custody: `177d603` is the last safe pushed code; remote `9f083ff` is rejected; the repaired candidate and corrected audit packet are local and unbanked. No independent audit target exists until a new exact commit is pushed and remote equality is proven.
+- Score: canonical shipped score remains `39/100`; candidate maturity forecast remains `65–68`, nonbinding.
+- Stop: bank/push only the safe deletion and corrected truth/SAW, then wait for independent Reviewer A/B/C. Do not implement terminal certification, bounded portfolio, providers, broker, score uplift, alpha, or live capital before audit PASS.
+
+## 2026-07-29 — ROUND-20260729-GV-SAFE-AUDIT-TARGET-FINAL
+
+- Final code authority: independently audit commit `f64cadcb2a9aaf0708744099ddc03ea2c41617eb` and tree `8c6dc88543847a06268b83db0dd68ea7f5fb12c1` on branch `codex/gv-micro-portfolio-v0`.
+- Remote custody: local and origin are exactly equal at the final code target.
+- Safety repair: remove caller-mintable terminal replay promotion while preserving fail-closed GitHub repository, candidate commit/tree, reviewer-account, and exact report-byte preflight. Provider preflight cannot produce a terminal certificate.
+- Validation: exact pinned portfolio/custody/operator/replay suite `38/38 PASS`; focused matrix `282/282 PASS`; context, compile, JSON, runtime persist/reopen, shadow replay, and diff hygiene PASS.
+- Root custody: source checkout remains untouched at `accef5c6` with 5,600 status entries and is not authority.
+- Product state: Slice 0 implementation and exact replay shadow are complete and pushed. Canonical score remains `39/100`; real prospective evidence remains `0`; no alpha or live claim.
+- External gate: independent Reviewer A/B/C reports are absent. Slice 0 terminal acceptance and replay certification remain blocked.
+- Stop: no further product implementation before independent audit. Bounded portfolio remains closed.
+

@@ -1,43 +1,40 @@
 # Impact Packet — Current
 
-## Active — Micro-portfolio candidate plus replay implementation (2026-07-29)
+## Active — Safe pushed micro-portfolio candidate (2026-07-29)
+
+### Audit identity
+
+- commit `f64cadcb2a9aaf0708744099ddc03ea2c41617eb`;
+- tree `8c6dc88543847a06268b83db0dd68ea7f5fb12c1`;
+- origin equality PASS.
 
 ### Product impact
 
 - complete four-security operator loop under `gv_portfolio_v0`;
 - principal, substitute, rejected competitor, abstained alternative, benchmark, and classified cash;
-- thesis/scenario review, deterministic capital competition, aim, order/fill, certification, persist/reopen, and later WATCH explanation;
+- thesis/scenario review, deterministic competition, aim, order/fill, certification, persist/reopen, and WATCH explanation;
 - broker-free Streamlit workspace.
 
 ### Truth and accounting impact
 
-- `contracts/gv_portfolio/v0/**` owns permanent IDs and exact-byte evidence references;
-- `core/gv_portfolio_v0/**` owns immutable canonical event custody;
-- `gv_portfolio_v0/vertical.py` delegates exercised custody primitives and owns product orchestration;
-- one value-preserving 2:1 split; terminal NAV 1499; unexplained split residual zero;
+- one permanent-ID, exact-byte evidence, and immutable-event custody backend;
+- value-preserving 2:1 split; terminal NAV 1499; unexplained residual zero;
 - missing valuation yields `VALUATION_PENDING` and null NAV.
 
-### Replay impact
+### Replay and audit impact
 
-- exact state reconstruction from real Slice 0 events;
-- duplicate-delivery idempotence;
-- correction lineage and partial-fill residual state;
-- prior certification byte stability;
-- structural audit receipts remain non-authorizing without provider verification;
-- the CLI verifies GitHub reviewer identity and exact remote report bytes before certification.
+- exact shadow reconstruction, idempotence, corrections, partial-fill residuals, and prior-certification byte stability;
+- GitHub report custody and identity verification available as preflight;
+- caller-mintable terminal promotion removed;
+- terminal certification remains external.
 
 ### Verification impact
 
 - exact pinned environment reproduced;
-- portfolio/replay suite: 34/34 PASS;
-- provider-free focused matrix: 278/278 PASS;
-- current-authority tests reject stale FS0-first queue language;
-- runtime persist/reopen/replay smoke: PASS.
-
-### Custody impact
-
-The candidate is not terminally accepted until committed, pushed, remote-equal, clean, and independently audited. Released FS0/Alpha runtime remains unchanged. The dirty root checkout remains untouched.
+- portfolio/custody/operator/replay suite: 38/38 PASS;
+- focused matrix: 282/282 PASS;
+- runtime persist/reopen/replay smoke, context, compile, JSON, and diff hygiene: PASS.
 
 ### Open risk
 
-Independent Reviewer A/B/C receipts do not yet exist. Replay certification and bounded portfolio therefore remain blocked.
+Independent Reviewer A/B/C reports do not yet exist. Slice 0 terminal acceptance, replay certification, and bounded portfolio remain blocked.

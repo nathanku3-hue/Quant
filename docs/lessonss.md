@@ -1,3 +1,11 @@
+## 2026-07-29 Round Entry (Provider Preflight Must Not Expose a Caller-Mintable Promotion Capability)
+- Date: 2026-07-29
+- Mistake or miss: after correctly separating structural receipts from GitHub preflight, `0f027d6` added helper functions that accepted a caller-built provider-verification mapping and promoted shadow evidence to a terminal replay certificate; current remote tip `9f083ff` inherited them. The tests proved the bypass by calling those helpers directly without provider requests.
+- Root cause: a clean CLI path was mistaken for a capability boundary. In Python, underscored helpers remain callable, and a content hash over caller-controlled fields does not attest that GitHub checks occurred.
+- Fix applied: remove terminal-promotion helpers and their authorization tests; keep GitHub resolution as fail-closed preflight, including wrapped-base64 report content; keep core replay shadow-only with `EXTERNAL_PROVIDER_VERIFICATION_REQUIRED`. Safe local evidence passes `38/38` portfolio tests and the exact pinned `282/282` matrix.
+- Guardrail for next time: authority requiring external state must not be representable by an unsigned caller-constructible object. Until an independently reviewed attestation or re-verification boundary exists, provider checks may block but may not mint terminal authority.
+- Evidence paths: `validation/gv_portfolio_v0_replay.py`, `tests/gv_portfolio_v0/test_replay.py`, `docs/context/planner_packet_current.md`, and `docs/decision log.md`.
+
 ## 2026-07-29 Round Entry (Hashes Cannot Prove External Reviewer Authentication)
 - Date: 2026-07-29
 - Mistake or miss: the replay gate treated three internally consistent GitHub-looking receipts as provider-authenticated evidence and issued certification from a fully caller-generated fixture.
@@ -2114,3 +2122,11 @@ Application pattern:
 - Fix applied: Detected files by timestamp/status, waited for the concurrent process to finish, reviewed every added path, retained valid custody/replay work, and rewired the product vertical to delegate to one low-level authority rather than discarding or silently overwriting either implementation.
 - Guardrail for next time: Parallel workers must own disjoint worktrees or explicit file allowlists. When overlap occurs, freeze writes, inventory provenance, run semantic reconciliation, and only then resume custody operations.
 - Evidence paths: `contracts/gv_portfolio/v0/**`, `core/gv_portfolio_v0/**`, `gv_portfolio_v0/vertical.py`, `tests/gv_portfolio_v0/test_custody_backend.py`, `tests/gv_portfolio_v0/test_replay.py`.
+
+## 2026-07-29 Round Entry (A Local Promotion Helper Cannot Create External Authority)
+- Date: 2026-07-29
+- Mistake or miss: A clean-checkout CLI verified GitHub evidence, then passed caller-built mappings into importable helpers that could mint the same terminal certification without executing provider checks.
+- Root cause: Execution sequencing was mistaken for an authority boundary. Private naming, clean Git state, and self-hashes constrain normal use but do not prevent another caller from invoking or recreating the promotion operation.
+- Fix applied: Removed all local terminal-promotion helpers and their authorizing tests. GitHub verification remains fail-closed preflight, and `--require-certification` remains blocked even after preflight succeeds.
+- Guardrail for next time: Terminal authority must be established outside the implementation process or independently re-verifiable from external attestations. Never encode an external governance decision as a locally callable constructor.
+- Evidence paths: `validation/gv_portfolio_v0_replay.py`, `tests/gv_portfolio_v0/test_replay.py`, `docs/decision log.md`.

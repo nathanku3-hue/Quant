@@ -1,25 +1,34 @@
 # Planner Packet — Current
 
-## Active — Slice 0 pinned candidate and replay mechanism complete (2026-07-29)
+## Active — Safe Slice 0 audit target pushed (2026-07-29)
+
+### Audit target
+
+- branch: `codex/gv-micro-portfolio-v0`;
+- commit: `f64cadcb2a9aaf0708744099ddc03ea2c41617eb`;
+- tree: `8c6dc88543847a06268b83db0dd68ea7f5fb12c1`;
+- origin equality: PASS;
+- audited base: `1db250169cdfe57ffa5d5cc5e5d24b2e937d5d33`;
+- root checkout: untouched at `accef5c6`, still unsafe with 5,600 status entries.
 
 ### Current truth
 
-- R0 custody repair is independently audited and banked at `1db250169cdfe57ffa5d5cc5e5d24b2e937d5d33`.
-- Branch `codex/gv-micro-portfolio-v0` implements the complete four-security operator loop in the new `gv_portfolio_v0` namespace.
+- The complete four-security operator loop is implemented and pushed in `gv_portfolio_v0`.
 - One custody backend owns permanent identity, exact-byte evidence, and immutable canonical events.
-- Deterministic replay is implemented from the actual Slice 0 event stream: exact reconstruction, idempotence, correction lineage, partial-fill residuals, valuation-pending, split conservation, and prior-certification byte stability pass.
-- Replay certification is structurally and externally gated: structural receipt validation alone cannot authorize; the CLI verifies reviewer GitHub commit identities and exact remote report bytes through the GitHub API.
-- Pinned environment is exact: Python 3.12.10, pytest 9.0.2, Streamlit 1.54.0, jsonschema 4.26.0.
-- Exact provider-free focused matrix: 278/278 PASS.
-- Canonical shipped score remains 39/100; real prospective comparisons remain 0; no alpha or live-capital claim.
+- Deterministic shadow replay is exact: reconstruction, idempotence, corrections, partial fills, valuation-pending, split conservation, and prior-certification byte stability pass.
+- GitHub repository, candidate commit/tree, reviewer account identity, and exact report bytes can be verified as preflight evidence.
+- Local terminal-certification promotion was removed because caller-built data cannot establish external authority.
+- Exact pinned environment: Python 3.12.10, pytest 9.0.2, Streamlit 1.54.0, jsonschema 4.26.0.
+- Exact focused matrix: 282/282 PASS.
+- Canonical shipped score remains 39/100; real prospective evidence remains 0; no alpha or live-capital claim.
 
 ### Binding sequence
 
 ```text
-bank and push exact candidate
-→ independent Slice 0 Reviewer A/B/C audit
-→ provider-verify three distinct receipt-bound GitHub reports
-→ issue deterministic replay certification
+independent Reviewer A/B/C audit of f64cadc / 8c6dc885
+→ provider-verify report custody as preflight
+→ external acceptance of Slice 0
+→ external terminal replay certification
 → bounded portfolio only after replay PASS
 ```
 
@@ -27,23 +36,19 @@ bank and push exact candidate
 
 ```text
 Roadmap custody banked             1/1
-Slice 0 pinned implementation      1/1
-Replay implementation/shadow       1/1
+Slice 0 implementation pushed      1/1
+Replay shadow exact                1/1
 Independent Slice 0 audit          0/1
-Replay certification               0/1
+Terminal replay certification      0/1
 Bounded repeated portfolio         0/1
 ```
 
-### Root warning
-
-`E:\Code\Quant` remains massively dirty and is not execution or publication authority. Do not clean, revert, or use it for this programme.
-
 ### Do not reopen
 
-Released FS0/Alpha mechanics; providers or WRDS; PEAD; legacy phase queues; optimizer, copula, graph, adaptive execution, tax/FX/derivatives/shorting, tactical capital, broker, score uplift, alpha, or live capital.
+Root cleanup; released FS0/Alpha mechanics; providers or WRDS; PEAD; legacy phase queues; optimizer, copula, graph, adaptive execution, tax/FX/derivatives/shorting, tactical capital, broker, score uplift, alpha, or live capital.
 
 ### Immediate action
 
-Finish candidate custody: regenerate context, validate SAW, commit, push, and prove remote equality. Then stop for genuine independent audit; do not fabricate receipts or open bounded portfolio work.
+Obtain genuinely independent Reviewer A/B/C reports against the exact audit target. No additional product implementation is authorized or needed before those reports arrive.
 
 Active brief: `docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md`.
