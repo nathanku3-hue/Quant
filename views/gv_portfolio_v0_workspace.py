@@ -29,7 +29,8 @@ class WorkspaceRenderer(Protocol):
 def build_review_rows(workspace: Mapping[str, Any]) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     for review in workspace["reviews"]:
-        scenario = review["living_thesis_lite"]["scenario_range"]
+        thesis = review["living_thesis_lite"]
+        scenario = thesis["scenario_range"]
         rows.append(
             {
                 "symbol": review["symbol"],
@@ -39,8 +40,8 @@ def build_review_rows(workspace: Mapping[str, Any]) -> list[dict[str, str]]:
                     f"{scenario['bear_value']} / {scenario['base_value']} / "
                     f"{scenario['bull_value']}"
                 ),
-                "thesis": review["living_thesis_lite"]["principal_claim"],
-                "state": review["living_thesis_lite"]["state"],
+                "thesis": thesis["principal_claim"],
+                "state": "WATCH" if thesis["watch_conditions"] else "NO_WATCH_RULE",
             }
         )
     rows.append(

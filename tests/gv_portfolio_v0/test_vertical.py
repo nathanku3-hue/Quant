@@ -26,6 +26,7 @@ from gv_portfolio_v0.vertical import (
 
 def test_draft_exercises_review_outcomes_benchmark_cash_and_split() -> None:
     workspace = build_draft_workspace()
+    assert workspace["schema_version"] == "gv_portfolio_v0_workspace_v2"
     assert workspace["status"] == "DRAFT_REVIEW"
     assert len(workspace["instruments"]) == 4
     assert workspace["benchmark"]["role"] == "BENCHMARK"
@@ -55,6 +56,16 @@ def test_confirm_certify_persist_and_reopen_complete_operator_loop(tmp_path: Pat
     assert reopened["status"] == "CERTIFIED"
     assert canonical_document_bytes(reopened["decision_snapshot"]) == snapshot_bytes
     assert reopened["order"]["execution_mode"] == "DETERMINISTIC_PAPER"
+    assert reopened["transition_event"]["event_type"] == "PORTFOLIO_TRANSITION_PLANNED"
+    assert reopened["order"]["transition_event_id"] == reopened["transition_event"][
+        "event_id"
+    ]
+    assert reopened["execution_authority_chain"]["order_id"] == reopened["order"][
+        "order_id"
+    ]
+    assert reopened["execution_authority_chain"]["fill_id"] == reopened["fill"][
+        "fill_id"
+    ]
     assert reopened["fill"]["quantity"] == "5"
     assert reopened["fill"]["price"] == "40"
     assert reopened["fill"]["fee"] == "1"
@@ -66,6 +77,13 @@ def test_confirm_certify_persist_and_reopen_complete_operator_loop(tmp_path: Pat
     assert reopened["book"]["position_value"] == "700"
     assert reopened["book"]["total_cash"] == "799"
     assert reopened["book"]["nav"] == "1499"
+    assert reopened["book"]["opening_nav"] == "1500"
+    assert reopened["book"]["total_costs"] == "1"
+    assert reopened["book"]["unexplained_residual"] == "0"
+    assert reopened["book"]["reconciliation_status"] == "RECONCILED"
+    assert reopened["certification"]["terminal_book_hash"] == reopened["book"][
+        "book_hash"
+    ]
     assert all(reopened["certification"]["checks"].values())
     assert workspace_path(tmp_path).is_file()
 
@@ -88,7 +106,13 @@ def test_later_watch_observation_preserves_aim_and_original_snapshot(tmp_path: P
             "evidence_reference_id"
         ],
         "classification": "WATCH",
+        "watch_condition_matches": [
+            "order_intake_softens_without_covenant_breach"
+        ],
+        "hard_falsifier_matches": [],
         "hard_falsifier_fired": False,
+        "portfolio_aim_id_before": aim_id,
+        "portfolio_aim_id_after": aim_id,
         "aim_changed": False,
     }
     assert canonical_document_bytes(observed["certification_history"][0]) == prior_cert_bytes
@@ -145,7 +169,9 @@ def test_certification_rejects_negative_buy_fill_quantity() -> None:
     )
     fill_event["payload"]["fill"]["quantity"] = "-5"
 
-    with pytest.raises(PortfolioV0Error, match="FILL_QUANTITY_MUST_BE_POSITIVE"):
+    with pytest.raises(
+        PortfolioV0Error, match="POSITIVE_QUANTITY_REQUIRED:fill.quantity"
+    ):
         certify_workspace(workspace)
 
 
@@ -153,7 +179,7 @@ def test_identity_or_snapshot_tampering_is_rejected() -> None:
     draft = build_draft_workspace()
     tampered = deepcopy(draft)
     tampered["decision_snapshot"]["selected_quantity"] = "999"
-    with pytest.raises(PortfolioV0Error, match="IDENTITY_MISMATCH:decision_snapshot_id"):
+    with pytest.raises(PortfolioV0Error, match="DECISION_SNAPSHOT_ID_MISMATCH"):
         confirm_draft_workspace(tampered)
 
 
@@ -172,7 +198,7 @@ def test_ineligible_abstain_candidate_cannot_be_selected_and_certified() -> None
         {key: value for key, value in snapshot.items() if key != "decision_snapshot_id"},
     )
 
-    with pytest.raises(PortfolioV0Error, match="INELIGIBLE_SELECTED_CANDIDATE"):
+    with pytest.raises(PortfolioV0Error, match="CAPITAL_COMPETITION_MISMATCH"):
         certify_workspace(tampered)
 
 
@@ -188,7 +214,7 @@ def test_contradictory_decision_projection_cannot_certify() -> None:
         {key: value for key, value in snapshot.items() if key != "decision_snapshot_id"},
     )
 
-    with pytest.raises(PortfolioV0Error, match="DECISION_PROJECTION_MISMATCH"):
+    with pytest.raises(PortfolioV0Error, match="DECISION_SELECTION_MISMATCH"):
         confirm_draft_workspace(tampered)
 
 

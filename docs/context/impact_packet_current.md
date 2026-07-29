@@ -1,35 +1,36 @@
 # Impact Packet — Current
 
-## Active — R0 roadmap custody repair (2026-07-29)
+## Change under review
 
-### Changed authority surfaces
+The Integrator combined the three bounded repair streams into the existing GV Micro-Portfolio V0 operator loop without opening Product or Replay feature scope.
 
-- corrected canonical roadmap and compact top-level roadmap;
-- root product surfaces: `README.md`, `PRD.md`, `PRODUCT_SPEC.md`, `PHASE_QUEUE.md`;
-- explicit active brief pointer: `docs/context/ACTIVE_BRIEF`;
-- new active brief: `docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md`;
-- Phase 66 bridge moved to historical archive;
-- context generator and focused tests updated for explicit selection and fail-closed behavior;
-- current truth, decision/lesson entries, SAW evidence, and handover reconciled.
+### Functional impact
+
+- Strategy is the sole authority for Living Thesis Lite, ADMIT/REJECT/ABSTAIN/CASH decisions, capital competition, and decision projections.
+- Execution is the sole authority for the planned transition, order, fill, immutable event identities, timestamps, and lineage validation.
+- Accounting is the sole reducer for positions, classified cash, explicit costs, opening/terminal NAV, split preservation, and unexplained residual.
+- Product orchestration persists and reopens those records, renders a derived review state, and certifies the reconciled terminal book.
+- The persisted schema is now `gv_portfolio_v0_workspace_v2`; the prior incompatible shape is rejected rather than translated.
 
 ### Product impact
 
-- standalone contract-only `GV-CANON-RESET-0` is removed from the product sequence;
-- the first product slice is the complete micro-portfolio operator loop;
-- deterministic replay remains immediately before any bounded portfolio expansion;
-- released FS0 remains immutable and a new portfolio namespace is required.
+The existing user flow remains bounded and intact:
 
-### Execution impact
+review four securities and cash → confirm one portfolio aim → emit one transition → create one deterministic paper order and fill → reconcile and certify → persist and reopen → admit one later WATCH observation with unchanged aim.
 
-- three mergeable packages replace seven automatic independent branches;
-- minimum identity/event seams freeze before parallel implementation;
-- detailed schema fields freeze only when exercised by the vertical fixture;
-- implementation remains stopped pending independent audit of `ROADMAP_FREEZE_COMMIT`.
+The visible product gains explicit transition lineage, classified execution cost, opening NAV, terminal NAV, reconciliation status, and zero unexplained residual. It gains no provider, broker, alpha, score-uplift, or live-capital capability.
 
-### Runtime/data impact
+### Verification impact
 
-No portfolio runtime, provider, data artifact, model, score, broker, or live-capital behavior changed in R0. The only code change is the context-authority selector and its focused tests.
+- Slice tests: 82/82 PASS.
+- Frozen protocol tests: 150/150 PASS.
+- Legacy product compatibility: 259/263 PASS; four unrelated frozen authority-document assertions remain red.
+- Full repository collection cannot be certified because existing declared environments are incomplete for existing tests.
 
-### Open risk
+### Repository impact
 
-The root source checkout remains unsafe and untouched. Any implementation branch created from raw `93e7a55` or another stale base would omit the corrected authority and is invalid.
+The dirty root checkout remains untouched. All work is isolated in `gv-micro-portfolio-v0-repair`, descended from exact base `b3d5092`. Three stream commits and the shared integration are locally banked in required order. Remote custody remains blocked by the connector push gate.
+
+### Score impact
+
+Canonical shipped score remains **39/100**. The implementation improves candidate completeness but cannot change the score until the terminal SHA is pushed and independently accepted.

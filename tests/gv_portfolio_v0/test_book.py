@@ -35,16 +35,42 @@ def _mutated_fill_events(**changes: Any) -> list[dict[str, Any]]:
     return events
 
 
-def test_extracted_reducer_preserves_valid_fixture_bytes() -> None:
+def test_vertical_uses_reconciled_book_while_legacy_projection_remains_compatible() -> None:
     draft = build_draft_workspace()
     certified = confirm_draft_workspace(draft)
+    legacy_keys = {
+        "positions",
+        "classified_cash",
+        "total_cash",
+        "position_value",
+        "nav",
+        "valuation_status",
+        "split_value_residual",
+        "declared_precision",
+    }
 
-    assert canonical_document_bytes(reduce_events(draft["events"])) == (
-        canonical_document_bytes(draft["book"])
-    )
-    assert canonical_document_bytes(reduce_events(certified["events"])) == (
-        canonical_document_bytes(certified["book"])
-    )
+    for workspace in (draft, certified):
+        rich = build_portfolio_book(workspace["events"])
+        legacy = reduce_events(workspace["events"])
+        assert canonical_document_bytes(rich) == canonical_document_bytes(
+            workspace["book"]
+        )
+        assert {key: legacy[key] for key in legacy_keys} == {
+            key: rich[key] for key in legacy_keys
+        }
+
+
+def test_transition_plan_is_non_economic_for_accounting() -> None:
+    events = _confirmed_events()
+    without_transition = [
+        deepcopy(event)
+        for event in events
+        if event["event_type"] != "PORTFOLIO_TRANSITION_PLANNED"
+    ]
+    for sequence, event in enumerate(without_transition):
+        event["sequence"] = sequence
+
+    assert build_portfolio_book(events) == build_portfolio_book(without_transition)
 
 
 def test_reconciled_book_exposes_explicit_costs_and_zero_residual() -> None:

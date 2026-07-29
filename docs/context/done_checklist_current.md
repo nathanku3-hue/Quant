@@ -1,51 +1,39 @@
 # Done Checklist — Current
 
-## R0 — `ROADMAP-CUSTODY-REPAIR`
+## Repository custody
 
-- [x] Prior roadmap downgraded from frozen authority to validated candidate before repair.
-- [x] Stale SAW direct-base instruction explicitly superseded.
-- [x] Standalone `GV-CANON-RESET-0` removed as a product slice.
-- [x] First product slice recut as `GV-MICRO-PORTFOLIO-VERTICAL-0`.
-- [x] Released `gv_fs0_v1` preserved unchanged; new portfolio namespace required.
-- [x] `docs/context/ACTIVE_BRIEF` added as explicit active authority selector.
-- [x] Highest-numeric-phase selection made migration-only and fail-closed by default.
-- [x] Numeric Phase 66 bridge removed from active authority.
-- [x] Three mergeable work packages replace seven automatic branches.
-- [x] Minimum cross-layer identity/event seams defined before parallel work.
-- [x] Canonical shipped score remains 39/100; observed comparisons remain 0; no alpha claim.
-- [x] Root source checkout remains untouched.
-- [x] Context packet regenerated and validated from the explicit active brief.
-- [x] Corrected roadmap committed and pushed as the branch tip designated `ROADMAP_FREEZE_COMMIT`.
-- [ ] independent audit confirms R0 bankability and exact remote commit.
+- [x] Dirty root checkout identified and left untouched.
+- [x] Repair worktree starts from exact remote-equal base `b3d5092`.
+- [x] S2 banked locally as isolated commit `92f587d`.
+- [x] S3 banked locally as isolated commit `3040a77`.
+- [x] S4 banked locally as isolated commit `1f11c0c`.
+- [x] Terminal integration commit banked locally.
+- [ ] Terminal branch pushed and remote-equal.
 
-## Slice 0 — `GV-MICRO-PORTFOLIO-VERTICAL-0`
+## Functional integration
 
-- [ ] blocked until independent R0 audit PASS;
-- [ ] create clean isolated implementation worktree from `ROADMAP_FREEZE_COMMIT`;
-- [ ] use new `gv_portfolio_v0` namespace;
-- [ ] operate 3–5 securities, benchmark, and classified cash;
-- [ ] include principal thesis, substitute, competitor, rejection/abstention, and cash;
-- [ ] exercise permanent identity, content-addressed evidence, and one corporate action;
-- [ ] reconcile multi-position book and NAV;
-- [ ] execute deterministic capital competition, one transition, one paper order, and one fill;
-- [ ] certify, persist, reopen, and process one later prospective observation;
-- [ ] preserve immutable original decision snapshot;
-- [ ] complete one operator workspace and explain what changed and why;
-- [ ] make no alpha, calibration, score-uplift, or live-readiness claim.
+- [x] S2 ignores non-economic `PORTFOLIO_TRANSITION_PLANNED` while preserving strict economic reduction.
+- [x] S3 canonical thesis shape replaces the stale product-only `state` field.
+- [x] S3 decision snapshot is the sole authority for reviews, cash outcome, competition, and selection.
+- [x] S4 emits and validates aim-confirmation, transition, order, and fill lineage.
+- [x] `vertical.py` contains no duplicate reducer, strategy validator, or order/fill constructor.
+- [x] Certification consumes `build_portfolio_book` and requires explicit costs, reconciled NAV, zero unexplained residual, and valid execution lineage.
+- [x] Persisted workspace schema bumped to `gv_portfolio_v0_workspace_v2`.
+- [x] Product review state is derived at render time rather than persisted as strategy truth.
 
-## Slice 1 — `GV-DETERMINISTIC-REPLAY-0`
+## Verification
 
-- [ ] replay skeleton may build from real Slice 0 events;
-- [ ] exact cash, quantities, costs, NAV, and thesis-state reconstruction;
-- [ ] byte-stable prior certification;
-- [ ] idempotence and correction lineage;
-- [ ] partial-fill residual state;
-- [ ] valuation-pending without fabricated prices;
-- [ ] at least one split or equivalent value-transfer event;
-- [ ] zero unexplained residual at declared precision;
-- [ ] block bounded portfolio work until PASS.
+- [x] Python 3.12.10, pytest 9.0.2, Streamlit 1.54.0 confirmed.
+- [x] Portfolio slice: 82/82 PASS.
+- [x] Frozen GV-FS0 protocol set: 150/150 PASS.
+- [x] Legacy product suite executed read-only: 259/263 PASS.
+- [x] Four legacy product failures classified as frozen authority-document drift outside this slice.
+- [ ] Full repository suite PASS; blocked at collection by undeclared/incomplete environment dependencies.
+- [ ] Independent Reviewer A/B/C PASS against one terminal SHA.
 
-## Deferred by authority
+## Scope and claims
 
-- [ ] `GV-BOUNDED-PORTFOLIO-1` and later slices remain blocked by predecessor evidence.
-- [ ] providers, broad loaders, optimizer/copula/graph/adaptive execution, tactical capital, broker, live capital, and score uplift remain deferred.
+- [x] Product and Replay remained read-only during shared integration.
+- [x] No provider, optimizer, broker, alpha, score-uplift, or live-capital work added.
+- [x] Canonical shipped score remains 39/100; observed comparisons remain 0.
+- [ ] Phase accepted and shipped.

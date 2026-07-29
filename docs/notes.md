@@ -6549,3 +6549,16 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Sealed Attempt-1 evidence preserved; observation eligibility superseded by append-only invalidation.
 - Receipts now require provider-authenticated GitHub author login (v2).
 
+## GV Micro-Portfolio V0 integration checkpoint (2026-07-29)
+
+- Base: exact remote-equal `b3d5092`; dirty root untouched.
+- Local stream commits: S2 `92f587d`, S3 `3040a77`, S4 `1f11c0c`.
+- Accounting: `PORTFOLIO_TRANSITION_PLANNED` is accepted as non-economic; fills remain fail-closed; reconciled V2 book exposes opening NAV 1500, execution cost 1, terminal NAV 1499, and unexplained residual 0.
+- Strategy: canonical Living Thesis Lite has no persisted product-only `state`; decision snapshot owns reviews, cash outcome, competition, and selection.
+- Execution: canonical chain is aim confirmation → transition planned → order created → fill completed, with immutable identifiers and lineage validation.
+- Product: review/confirm/certify/persist/reopen/later-WATCH flow remains intact; render-time state is derived; persisted schema is `gv_portfolio_v0_workspace_v2`.
+- Verification: portfolio 82/82 PASS; frozen protocol 150/150 PASS; legacy product 259/263 with four unrelated authority-document failures.
+- Full suite: blocked at collection by incomplete declared environments (`alpaca`, `psycopg2`, `schedule`, `yaml` across available pinned venvs). No full-pinned PASS claim.
+- Custody: connector blocks push; terminal remote SHA and independent audit remain open.
+- Score: canonical shipped 39/100; observed 0; no alpha or live-capital claim.
+

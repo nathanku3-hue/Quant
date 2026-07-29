@@ -304,6 +304,7 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
 
         elif event_type in {
             "PORTFOLIO_AIM_CONFIRMED",
+            "PORTFOLIO_TRANSITION_PLANNED",
             "LATER_OBSERVATION_ADMITTED",
             "CERTIFICATION_RECORDED",
         }:

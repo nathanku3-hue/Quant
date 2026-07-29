@@ -1,46 +1,49 @@
-"""Deterministic four-security micro-portfolio vertical.
+"""Deterministic four-security micro-portfolio product integrator.
 
-The module owns the bounded acceptance fixture, immutable event identities,
-book reduction, decision/order/fill identities, and certification. It performs
-no provider, broker, network, optimization, or live-capital work.
+The module owns the bounded acceptance fixture, workspace orchestration, and
+certification. Strategy, execution events, and accounting remain authoritative
+in their dedicated modules. No provider, broker, network, optimization, or
+live-capital work is performed.
 """
 
 from __future__ import annotations
 
 from copy import deepcopy
-from decimal import Decimal, InvalidOperation
 import hashlib
 from typing import Any, Iterable, Mapping
 
 from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
+from gv_portfolio_v0.admission import (
+    StrategyAdmissionError,
+    build_decision_snapshot,
+    decision_projections,
+    validate_decision_projections,
+)
+from gv_portfolio_v0.book import (
+    PortfolioBookError,
+    build_portfolio_book,
+    certification_eligible,
+)
+from gv_portfolio_v0.execution import (
+    ExecutionError,
+    emit_execution_chain,
+    portfolio_book_event,
+    validate_execution_chain,
+)
+from gv_portfolio_v0.thesis import (
+    StrategyThesisError,
+    living_thesis_lite,
+    scenario_range,
+    unchanged_aim_watch_observation,
+)
 
-SCHEMA_VERSION = "gv_portfolio_v0_workspace_v1"
+SCHEMA_VERSION = "gv_portfolio_v0_workspace_v2"
 ID_DOMAIN = "GV-PORTFOLIO-V0"
 DECLARED_PRECISION = "0.01"
 
 
 class PortfolioV0Error(ValueError):
     """Fail-closed micro-portfolio error."""
-
-
-def _decimal(value: str | int | Decimal) -> Decimal:
-    try:
-        parsed = Decimal(str(value))
-    except (InvalidOperation, ValueError) as exc:
-        raise PortfolioV0Error(f"DECIMAL_INVALID:{value}") from exc
-    if not parsed.is_finite():
-        raise PortfolioV0Error("DECIMAL_FINITE_REQUIRED")
-    return parsed
-
-
-def _decimal_text(value: str | int | Decimal) -> str:
-    parsed = _decimal(value)
-    if parsed == 0:
-        return "0"
-    text = format(parsed.normalize(), "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text
 
 
 def _identifier(kind: str, payload: Mapping[str, Any]) -> str:
@@ -100,16 +103,20 @@ def _event(
     cash_bucket: str | None = None,
     payload: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    preimage = {
-        "sequence": sequence,
-        "event_type": event_type,
-        "effective_at": effective_at,
-        "source_identity": source_identity,
-        "instrument_id": instrument_id,
-        "cash_bucket": cash_bucket,
-        "payload": dict(payload or {}),
-    }
-    return {"event_id": _identifier("EVT", preimage), **preimage}
+    """Bind all vertical events to Stream 4's frozen executable seam."""
+
+    try:
+        return portfolio_book_event(
+            sequence,
+            event_type,
+            effective_at,
+            source_identity,
+            instrument_id=instrument_id,
+            cash_bucket=cash_bucket,
+            payload=payload,
+        )
+    except ExecutionError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
 
 
 def _aim(benchmark_instrument_id: str) -> dict[str, Any]:
@@ -130,7 +137,10 @@ def _aim(benchmark_instrument_id: str) -> dict[str, Any]:
 
 
 def _scenario(bear: str, base: str, bull: str) -> dict[str, str]:
-    return {"bear_value": bear, "base_value": base, "bull_value": bull}
+    try:
+        return scenario_range(bear_value=bear, base_value=base, bull_value=bull)
+    except StrategyThesisError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
 
 
 def _review(
@@ -144,25 +154,29 @@ def _review(
     hard_falsifiers: Iterable[str],
     watch_conditions: Iterable[str],
 ) -> dict[str, Any]:
-    return {
-        "instrument_id": instrument["instrument_id"],
-        "symbol": instrument["symbol"],
-        "relationship": relationship,
-        "outcome": outcome,
-        "living_thesis_lite": {
-            "principal_claim": thesis,
-            "scenario_range": dict(scenario),
-            "evidence_reference_ids": list(evidence_ids),
-            "hard_falsifiers": list(hard_falsifiers),
-            "watch_conditions": list(watch_conditions),
-            "state": "WATCH",
-        },
-    }
+    try:
+        return {
+            "instrument_id": instrument["instrument_id"],
+            "symbol": instrument["symbol"],
+            "relationship": relationship,
+            "outcome": outcome,
+            "living_thesis_lite": living_thesis_lite(
+                principal_claim=thesis,
+                scenario=scenario,
+                evidence_reference_ids=evidence_ids,
+                hard_falsifiers=hard_falsifiers,
+                watch_conditions=watch_conditions,
+            ),
+        }
+    except StrategyThesisError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
 
 
-def _capital_competition(reviews: list[dict[str, Any]]) -> dict[str, Any]:
+def _competition_candidates(reviews: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return fixture inputs; Strategy recomputes scores, eligibility, and winner."""
+
     by_symbol = {row["symbol"]: row for row in reviews}
-    candidates = [
+    return [
         {
             "candidate": "HARBOR",
             "instrument_id": by_symbol["HARBOR"]["instrument_id"],
@@ -188,288 +202,39 @@ def _capital_competition(reviews: list[dict[str, Any]]) -> dict[str, Any]:
             "cost_penalty_bps": 0,
         },
     ]
-    for row in candidates:
-        row["net_score_bps"] = (
-            row["expected_value_bps"]
-            - row["risk_penalty_bps"]
-            - row["cost_penalty_bps"]
-        )
-        row["eligible"] = row["outcome"] in {"ADMIT", "CASH"}
-    eligible = [row for row in candidates if row["eligible"]]
-    eligible.sort(key=lambda row: (-row["net_score_bps"], row["candidate"]))
-    winner = eligible[0]
-    return {
-        "method": "MAX_NET_SCORE_BPS_THEN_LEXICAL",
-        "candidates": candidates,
-        "selected_candidate": winner["candidate"],
-        "selected_instrument_id": winner["instrument_id"],
-        "selected_net_score_bps": winner["net_score_bps"],
-    }
-
-
-def _validate_capital_competition(
-    competition: Mapping[str, Any], reviews: Iterable[Mapping[str, Any]]
-) -> None:
-    """Require the recorded winner to be the highest-scoring eligible candidate."""
-    candidates = list(competition.get("candidates") or [])
-    if not candidates:
-        raise PortfolioV0Error("COMPETITION_CANDIDATES_REQUIRED")
-
-    review_outcomes = {row["instrument_id"]: row["outcome"] for row in reviews}
-    eligible: list[Mapping[str, Any]] = []
-    candidate_names: set[str] = set()
-    for candidate in candidates:
-        if not isinstance(candidate, Mapping):
-            raise PortfolioV0Error("COMPETITION_CANDIDATE_OBJECT_REQUIRED")
-        name = candidate.get("candidate")
-        outcome = candidate.get("outcome")
-        if not isinstance(name, str) or name in candidate_names:
-            raise PortfolioV0Error("COMPETITION_CANDIDATE_NAME_INVALID")
-        candidate_names.add(name)
-        if name == "CASH":
-            if candidate.get("instrument_id") is not None or outcome != "CASH":
-                raise PortfolioV0Error("COMPETITION_CASH_CANDIDATE_INVALID")
-        elif review_outcomes.get(candidate.get("instrument_id")) != outcome:
-            raise PortfolioV0Error("COMPETITION_REVIEW_OUTCOME_MISMATCH")
-        expected_score = (
-            _decimal(candidate["expected_value_bps"])
-            - _decimal(candidate["risk_penalty_bps"])
-            - _decimal(candidate["cost_penalty_bps"])
-        )
-        if _decimal(candidate["net_score_bps"]) != expected_score:
-            raise PortfolioV0Error("COMPETITION_NET_SCORE_MISMATCH")
-        if outcome in {"ADMIT", "CASH"}:
-            eligible.append(candidate)
-
-    selected_name = competition.get("selected_candidate")
-    selected = next(
-        (candidate for candidate in candidates if candidate["candidate"] == selected_name),
-        None,
-    )
-    if selected is None:
-        raise PortfolioV0Error("COMPETITION_SELECTED_CANDIDATE_MISSING")
-    if selected["outcome"] not in {"ADMIT", "CASH"}:
-        raise PortfolioV0Error("INELIGIBLE_SELECTED_CANDIDATE")
-    if (
-        competition.get("selected_instrument_id") != selected.get("instrument_id")
-        or _decimal(competition.get("selected_net_score_bps"))
-        != _decimal(selected["net_score_bps"])
-    ):
-        raise PortfolioV0Error("COMPETITION_SELECTION_MISMATCH")
-    if not eligible:
-        raise PortfolioV0Error("COMPETITION_ELIGIBLE_CANDIDATE_REQUIRED")
-    winner = min(
-        eligible,
-        key=lambda candidate: (
-            -_decimal(candidate["net_score_bps"]),
-            candidate["candidate"],
-        ),
-    )
-    if selected["candidate"] != winner["candidate"]:
-        raise PortfolioV0Error("COMPETITION_WINNER_MISMATCH")
-
-
-def _validate_decision_projection(snapshot: Mapping[str, Any]) -> None:
-    """Require the executable decision to project the competition winner."""
-    competition = snapshot.get("capital_competition")
-    if not isinstance(competition, Mapping):
-        raise PortfolioV0Error("CAPITAL_COMPETITION_REQUIRED")
-    selected_name = competition.get("selected_candidate")
-    winners = [
-        row
-        for row in competition.get("candidates") or []
-        if row.get("candidate") == selected_name
-    ]
-    if len(winners) != 1:
-        raise PortfolioV0Error("CAPITAL_COMPETITION_WINNER_INVALID")
-    winner = winners[0]
-    if winner.get("outcome") not in {"ADMIT", "CASH"}:
-        raise PortfolioV0Error("DECISION_WINNER_NOT_ADMISSIBLE")
-    if (
-        snapshot.get("selected_action") != "BUY"
-        or snapshot.get("selected_instrument_id") != winner.get("instrument_id")
-        or competition.get("selected_instrument_id") != winner.get("instrument_id")
-        or _decimal(competition.get("selected_net_score_bps"))
-        != _decimal(winner.get("net_score_bps"))
-    ):
-        raise PortfolioV0Error("DECISION_PROJECTION_MISMATCH")
 
 
 def _decision_snapshot(
-    *, aim: Mapping[str, Any], reviews: list[dict[str, Any]], competition: Mapping[str, Any]
+    *,
+    aim: Mapping[str, Any],
+    reviews: list[dict[str, Any]],
+    cash_outcome: Mapping[str, Any],
+    competition_candidates: Iterable[Mapping[str, Any]],
+    evidence_reference_ids: Iterable[str],
 ) -> dict[str, Any]:
-    payload = {
-        "created_at": "2026-07-20T09:05:00.000000Z",
-        "portfolio_aim_id": aim["portfolio_aim_id"],
-        "reviews": reviews,
-        "capital_competition": dict(competition),
-        "selected_action": "BUY",
-        "selected_instrument_id": competition["selected_instrument_id"],
-        "selected_quantity": "5",
-        "reference_price": "40",
-        "fee": "1",
-    }
-    return _record_with_id("DSN", "decision_snapshot_id", payload)
-
-
-def _order(snapshot: Mapping[str, Any], aim: Mapping[str, Any]) -> dict[str, Any]:
-    payload = {
-        "decision_snapshot_id": snapshot["decision_snapshot_id"],
-        "portfolio_aim_id": aim["portfolio_aim_id"],
-        "instrument_id": snapshot["selected_instrument_id"],
-        "side": "BUY",
-        "quantity": snapshot["selected_quantity"],
-        "reference_price": snapshot["reference_price"],
-        "created_at": "2026-07-20T09:06:00.000000Z",
-        "execution_mode": "DETERMINISTIC_PAPER",
-    }
-    return _record_with_id("ORD", "order_id", payload)
-
-
-def _fill(order: Mapping[str, Any]) -> dict[str, Any]:
-    payload = {
-        "order_id": order["order_id"],
-        "instrument_id": order["instrument_id"],
-        "side": order["side"],
-        "quantity": order["quantity"],
-        "price": order["reference_price"],
-        "fee": "1",
-        "cash_bucket": "AVAILABLE",
-        "filled_at": "2026-07-20T09:06:01.000000Z",
-    }
-    return _record_with_id("FIL", "fill_id", payload)
+    try:
+        return build_decision_snapshot(
+            created_at="2026-07-20T09:05:00.000000Z",
+            portfolio_aim_id=aim["portfolio_aim_id"],
+            reviews=reviews,
+            cash_outcome=cash_outcome,
+            competition_candidates=competition_candidates,
+            available_evidence_reference_ids=evidence_reference_ids,
+            selected_quantity="5",
+            reference_price="40",
+            fee="1",
+        )
+    except StrategyAdmissionError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
 
 
 def reduce_events(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
-    rows = sorted((dict(row) for row in events), key=lambda row: row["sequence"])
-    sequences = [row["sequence"] for row in rows]
-    if not sequences or sequences[0] != 0 or sequences != sorted(set(sequences)):
-        raise PortfolioV0Error("EVENT_SEQUENCE_ORDER_INVALID")
-    event_ids = [row["event_id"] for row in rows]
-    if len(event_ids) != len(set(event_ids)):
-        raise PortfolioV0Error("DUPLICATE_EVENT_ID")
+    """Return Stream 2's reconciled PortfolioBook as the sole vertical book."""
 
-    cash: dict[str, Decimal] = {}
-    positions: dict[str, dict[str, Decimal | None]] = {}
-    split_residuals: list[Decimal] = []
-
-    for row in rows:
-        event_type = row["event_type"]
-        payload = row["payload"]
-        instrument_id = row.get("instrument_id")
-        cash_bucket = row.get("cash_bucket")
-        if event_type == "CASH_OPENING":
-            if not cash_bucket:
-                raise PortfolioV0Error("CASH_BUCKET_REQUIRED")
-            cash[cash_bucket] = cash.get(cash_bucket, Decimal("0")) + _decimal(
-                payload["amount"]
-            )
-        elif event_type == "POSITION_OPENING":
-            if not instrument_id:
-                raise PortfolioV0Error("INSTRUMENT_REQUIRED")
-            if instrument_id in positions:
-                raise PortfolioV0Error("DUPLICATE_OPENING_POSITION")
-            positions[instrument_id] = {
-                "quantity": _decimal(payload["quantity"]),
-                "valuation_price": (
-                    None
-                    if payload.get("valuation_price") is None
-                    else _decimal(payload["valuation_price"])
-                ),
-            }
-        elif event_type == "CORPORATE_ACTION_SPLIT":
-            if not instrument_id or instrument_id not in positions:
-                raise PortfolioV0Error("SPLIT_POSITION_MISSING")
-            position = positions[instrument_id]
-            before_quantity = _decimal(payload["pre_quantity"])
-            before_price = _decimal(payload["pre_reference_price"])
-            if position["quantity"] != before_quantity:
-                raise PortfolioV0Error("SPLIT_PRE_QUANTITY_MISMATCH")
-            if position["valuation_price"] != before_price:
-                raise PortfolioV0Error("SPLIT_PRE_PRICE_MISMATCH")
-            numerator = _decimal(payload["numerator"])
-            denominator = _decimal(payload["denominator"])
-            if numerator <= 0 or denominator <= 0:
-                raise PortfolioV0Error("SPLIT_RATIO_INVALID")
-            after_quantity = before_quantity * numerator / denominator
-            after_price = before_price * denominator / numerator
-            before_value = before_quantity * before_price
-            after_value = after_quantity * after_price
-            residual = after_value - before_value
-            if residual != 0:
-                raise PortfolioV0Error("SPLIT_VALUE_NOT_PRESERVED")
-            split_residuals.append(residual)
-            position["quantity"] = after_quantity
-            position["valuation_price"] = after_price
-        elif event_type == "FILL_COMPLETED":
-            fill = payload["fill"]
-            if fill["side"] != "BUY":
-                raise PortfolioV0Error("UNSUPPORTED_FILL_SIDE")
-            quantity = _decimal(fill["quantity"])
-            if quantity <= 0:
-                raise PortfolioV0Error("FILL_QUANTITY_MUST_BE_POSITIVE")
-            price = _decimal(fill["price"])
-            fee = _decimal(fill["fee"])
-            bucket = fill["cash_bucket"]
-            required_cash = quantity * price + fee
-            available = cash.get(bucket, Decimal("0"))
-            if available < required_cash:
-                raise PortfolioV0Error("INSUFFICIENT_CLASSIFIED_CASH")
-            cash[bucket] = available - required_cash
-            position = positions.setdefault(
-                fill["instrument_id"],
-                {"quantity": Decimal("0"), "valuation_price": None},
-            )
-            position["quantity"] = _decimal(position["quantity"] or "0") + quantity
-            position["valuation_price"] = price
-        elif event_type in {
-            "PORTFOLIO_AIM_CONFIRMED",
-            "ORDER_CREATED",
-            "LATER_OBSERVATION_ADMITTED",
-            "CERTIFICATION_RECORDED",
-        }:
-            continue
-        else:
-            raise PortfolioV0Error(f"UNSUPPORTED_EVENT_TYPE:{event_type}")
-
-    cash_rows = [
-        {"bucket": bucket, "amount": _decimal_text(amount)}
-        for bucket, amount in sorted(cash.items())
-    ]
-    position_rows: list[dict[str, Any]] = []
-    valuation_pending = False
-    position_value = Decimal("0")
-    for instrument_id, position in sorted(positions.items()):
-        quantity = _decimal(position["quantity"] or "0")
-        price = position["valuation_price"]
-        if price is None:
-            market_value = None
-            valuation_pending = True
-        else:
-            market_value = quantity * _decimal(price)
-            position_value += market_value
-        position_rows.append(
-            {
-                "instrument_id": instrument_id,
-                "quantity": _decimal_text(quantity),
-                "valuation_price": None if price is None else _decimal_text(price),
-                "market_value": None if market_value is None else _decimal_text(market_value),
-            }
-        )
-    total_cash = sum((_decimal(row["amount"]) for row in cash_rows), Decimal("0"))
-    nav = None if valuation_pending else position_value + total_cash
-    book = {
-        "positions": position_rows,
-        "classified_cash": cash_rows,
-        "total_cash": _decimal_text(total_cash),
-        "position_value": None if valuation_pending else _decimal_text(position_value),
-        "nav": None if nav is None else _decimal_text(nav),
-        "valuation_status": "VALUATION_PENDING" if valuation_pending else "COMPLETE",
-        "split_value_residual": _decimal_text(sum(split_residuals, Decimal("0"))),
-        "declared_precision": DECLARED_PRECISION,
-    }
-    book["book_hash"] = domain_hash(f"{ID_DOMAIN}:BOOK:V1", book)
-    return book
+    try:
+        return build_portfolio_book(events)
+    except PortfolioBookError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
 
 
 def _certification_subject_events(events: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -479,26 +244,60 @@ def _certification_subject_events(events: Iterable[Mapping[str, Any]]) -> list[d
 def certify_workspace(
     workspace: Mapping[str, Any], *, prior_certification_id: str | None = None
 ) -> dict[str, Any]:
-    _validate_capital_competition(
-        workspace["decision_snapshot"]["capital_competition"], workspace["reviews"]
-    )
-    _validate_decision_projection(workspace["decision_snapshot"])
     events = _certification_subject_events(workspace["events"])
     book = reduce_events(events)
+    evidence_ids = [
+        row["evidence_reference_id"] for row in workspace["evidence_references"]
+    ]
+    try:
+        validate_decision_projections(
+            workspace["decision_snapshot"],
+            reviews_projection=workspace["reviews"],
+            cash_projection=workspace["cash_outcome"],
+            available_evidence_reference_ids=evidence_ids,
+        )
+        execution_events = [
+            row
+            for row in events
+            if row["event_type"]
+            in {
+                "PORTFOLIO_AIM_CONFIRMED",
+                "PORTFOLIO_TRANSITION_PLANNED",
+                "ORDER_CREATED",
+                "FILL_COMPLETED",
+            }
+        ]
+        execution_chain = validate_execution_chain(
+            workspace["decision_snapshot"],
+            workspace["portfolio_aim"],
+            execution_events,
+            order=workspace.get("order"),
+            fill=workspace.get("fill"),
+        )
+    except (StrategyAdmissionError, ExecutionError) as exc:
+        raise PortfolioV0Error(str(exc)) from exc
+
     event_ledger_hash = domain_hash(f"{ID_DOMAIN}:EVENT_LEDGER:V1", events)
     order_count = sum(row["event_type"] == "ORDER_CREATED" for row in events)
     fill_count = sum(row["event_type"] == "FILL_COMPLETED" for row in events)
-    cash_nonnegative = all(_decimal(row["amount"]) >= 0 for row in book["classified_cash"])
+    transition_count = sum(
+        row["event_type"] == "PORTFOLIO_TRANSITION_PLANNED" for row in events
+    )
     checks = {
         "event_ids_unique": len({row["event_id"] for row in events}) == len(events),
         "split_value_preserved": book["split_value_residual"] == "0",
-        "classified_cash_nonnegative": cash_nonnegative,
-        "nav_reconciled": book["valuation_status"] == "COMPLETE" and book["nav"] == "1499",
+        "classified_cash_nonnegative": book["classified_cash_nonnegative"] is True,
+        "nav_reconciled": book["nav"] == "1499",
         "decision_snapshot_present": bool(workspace.get("decision_snapshot")),
         "portfolio_aim_present": bool(workspace.get("portfolio_aim")),
+        "exactly_one_transition": transition_count == 1,
         "exactly_one_order": order_count == 1,
         "exactly_one_fill": fill_count == 1,
         "valuation_complete": book["valuation_status"] == "COMPLETE",
+        "book_reconciled": certification_eligible(book),
+        "unexplained_residual_zero": book["unexplained_residual"] == "0",
+        "execution_costs_explicit": book["total_costs"] == "1",
+        "execution_chain_valid": bool(execution_chain.get("fill_id")),
     }
     if not all(checks.values()):
         failed = sorted(key for key, value in checks.items() if not value)
@@ -508,6 +307,7 @@ def certify_workspace(
         "terminal_book_hash": book["book_hash"],
         "decision_snapshot_id": workspace["decision_snapshot"]["decision_snapshot_id"],
         "portfolio_aim_id": workspace["portfolio_aim"]["portfolio_aim_id"],
+        "transition_event_id": execution_chain["transition_event_id"],
         "checks": checks,
         "declared_precision": DECLARED_PRECISION,
         "prior_certification_id": prior_certification_id,
@@ -589,8 +389,19 @@ def build_draft_workspace() -> dict[str, Any]:
         ),
     ]
     aim = _aim(benchmark["instrument_id"])
-    competition = _capital_competition(reviews)
-    snapshot = _decision_snapshot(aim=aim, reviews=reviews, competition=competition)
+    cash_outcome = {
+        "outcome": "CASH",
+        "classification": ["AVAILABLE", "RESEARCH_RESERVE"],
+        "role": "explicit_competing_allocation",
+    }
+    snapshot = _decision_snapshot(
+        aim=aim,
+        reviews=reviews,
+        cash_outcome=cash_outcome,
+        competition_candidates=_competition_candidates(reviews),
+        evidence_reference_ids=evd,
+    )
+    reviews, cash_outcome = decision_projections(snapshot)
 
     events = [
         _event(
@@ -639,15 +450,13 @@ def build_draft_workspace() -> dict[str, Any]:
         "benchmark": benchmark,
         "evidence_references": evidence,
         "reviews": reviews,
-        "cash_outcome": {
-            "outcome": "CASH",
-            "classification": ["AVAILABLE", "RESEARCH_RESERVE"],
-            "role": "explicit_competing_allocation",
-        },
+        "cash_outcome": cash_outcome,
         "portfolio_aim": aim,
         "decision_snapshot": snapshot,
         "events": events,
         "book": reduce_events(events),
+        "transition_event": None,
+        "execution_authority_chain": None,
         "order": None,
         "fill": None,
         "certification": None,
@@ -666,40 +475,36 @@ def confirm_draft_workspace(workspace: Mapping[str, Any]) -> dict[str, Any]:
         raise PortfolioV0Error("DRAFT_CONFIRMATION_REQUIRED")
     result = deepcopy(dict(workspace))
     snapshot_before = canonical_document_bytes(result["decision_snapshot"])
-    order = _order(result["decision_snapshot"], result["portfolio_aim"])
-    fill = _fill(order)
-    events = list(result["events"])
-    events.extend(
-        [
-            _event(
-                len(events),
-                "PORTFOLIO_AIM_CONFIRMED",
-                "2026-07-20T09:05:30.000000Z",
-                result["portfolio_aim"]["portfolio_aim_id"],
-                payload={"portfolio_aim_id": result["portfolio_aim"]["portfolio_aim_id"]},
-            ),
-            _event(
-                len(events) + 1,
-                "ORDER_CREATED",
-                order["created_at"],
-                order["order_id"],
-                instrument_id=order["instrument_id"],
-                payload={"order": order},
-            ),
-            _event(
-                len(events) + 2,
-                "FILL_COMPLETED",
-                fill["filled_at"],
-                fill["fill_id"],
-                instrument_id=fill["instrument_id"],
-                cash_bucket=fill["cash_bucket"],
-                payload={"fill": fill},
-            ),
-        ]
+    selected_instrument_id = result["decision_snapshot"]["selected_instrument_id"]
+    selected_position = next(
+        (
+            row
+            for row in result["book"]["positions"]
+            if row["instrument_id"] == selected_instrument_id
+        ),
+        None,
     )
+    current_quantity = "0" if selected_position is None else selected_position["quantity"]
+    try:
+        execution = emit_execution_chain(
+            result["decision_snapshot"],
+            result["portfolio_aim"],
+            current_quantity=current_quantity,
+            cash_bucket="AVAILABLE",
+            start_sequence=len(result["events"]),
+            aim_confirmed_at="2026-07-20T09:05:30.000000Z",
+            transition_effective_at="2026-07-20T09:05:45.000000Z",
+            order_created_at="2026-07-20T09:06:00.000000Z",
+            filled_at="2026-07-20T09:06:01.000000Z",
+        )
+    except ExecutionError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
+    events = [*result["events"], *execution["events"]]
     result["events"] = events
-    result["order"] = order
-    result["fill"] = fill
+    result["transition_event"] = execution["transition_event"]
+    result["execution_authority_chain"] = execution["authority_chain"]
+    result["order"] = execution["order"]
+    result["fill"] = execution["fill"]
     result["book"] = reduce_events(events)
     result["status"] = "CERTIFIED"
     result["explanation"] = (
@@ -741,6 +546,25 @@ def admit_watch_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
         observed_at="2026-08-20T12:00:00.000000Z",
     )
     result["evidence_references"].append(observation)
+    principal_review = next(
+        row for row in result["reviews"] if row["relationship"] == "PRINCIPAL_THESIS"
+    )
+    try:
+        observation_state = unchanged_aim_watch_observation(
+            living_thesis=principal_review["living_thesis_lite"],
+            available_evidence_reference_ids=[
+                row["evidence_reference_id"] for row in result["evidence_references"]
+            ],
+            evidence_reference_id=observation["evidence_reference_id"],
+            watch_condition_matches=[
+                "order_intake_softens_without_covenant_breach"
+            ],
+            hard_falsifier_matches=[],
+            portfolio_aim_id_before=original_aim_id,
+            portfolio_aim_id_after=original_aim_id,
+        )
+    except StrategyThesisError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
     result["events"].append(
         _event(
             len(result["events"]),
@@ -748,21 +572,10 @@ def admit_watch_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
             "2026-08-20T12:00:00.000000Z",
             observation["evidence_reference_id"],
             instrument_id=result["instruments"][0]["instrument_id"],
-            payload={
-                "evidence_reference_id": observation["evidence_reference_id"],
-                "classification": "WATCH",
-                "hard_falsifier_fired": False,
-                "portfolio_aim_id_before": original_aim_id,
-                "portfolio_aim_id_after": original_aim_id,
-            },
+            payload=observation_state,
         )
     )
-    result["later_observation"] = {
-        "evidence_reference_id": observation["evidence_reference_id"],
-        "classification": "WATCH",
-        "hard_falsifier_fired": False,
-        "aim_changed": False,
-    }
+    result["later_observation"] = observation_state
     result["certification_history"] = [*result["certification_history"], prior]
     result["status"] = "OBSERVED_WATCH_AIM_UNCHANGED"
     result["explanation"] = (
@@ -796,28 +609,6 @@ def _verify_id(record: Mapping[str, Any], *, kind: str, id_key: str) -> None:
     expected = _identifier(kind, body)
     if record.get(id_key) != expected:
         raise PortfolioV0Error(f"IDENTITY_MISMATCH:{id_key}")
-
-
-def _validate_decision_projection(snapshot: Mapping[str, Any]) -> None:
-    """Require the executable decision to be the declared competition winner."""
-    competition = snapshot.get("capital_competition")
-    if not isinstance(competition, Mapping):
-        raise PortfolioV0Error("CAPITAL_COMPETITION_REQUIRED")
-    selected_candidate = competition.get("selected_candidate")
-    candidates = list(competition.get("candidates") or [])
-    winners = [row for row in candidates if row.get("candidate") == selected_candidate]
-    if len(winners) != 1:
-        raise PortfolioV0Error("CAPITAL_COMPETITION_WINNER_INVALID")
-    winner = winners[0]
-    if not winner.get("eligible") or winner.get("outcome") != "ADMIT":
-        raise PortfolioV0Error("DECISION_WINNER_NOT_ADMISSIBLE")
-    if (
-        snapshot.get("selected_action") != "BUY"
-        or snapshot.get("selected_instrument_id") != winner.get("instrument_id")
-        or competition.get("selected_instrument_id") != winner.get("instrument_id")
-        or competition.get("selected_net_score_bps") != winner.get("net_score_bps")
-    ):
-        raise PortfolioV0Error("DECISION_PROJECTION_MISMATCH")
 
 
 def validate_workspace(
@@ -859,13 +650,18 @@ def validate_workspace(
             raise PortfolioV0Error("EVIDENCE_REFERENCE_ID_MISMATCH")
 
     _verify_id(workspace["portfolio_aim"], kind="AIM", id_key="portfolio_aim_id")
-    _verify_id(
-        workspace["decision_snapshot"], kind="DSN", id_key="decision_snapshot_id"
-    )
-    _validate_capital_competition(
-        workspace["decision_snapshot"]["capital_competition"], workspace["reviews"]
-    )
-    _validate_decision_projection(workspace["decision_snapshot"])
+    evidence_ids = [
+        row["evidence_reference_id"] for row in workspace["evidence_references"]
+    ]
+    try:
+        validate_decision_projections(
+            workspace["decision_snapshot"],
+            reviews_projection=workspace["reviews"],
+            cash_projection=workspace["cash_outcome"],
+            available_evidence_reference_ids=evidence_ids,
+        )
+    except StrategyAdmissionError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
     workspace_events = list(workspace.get("events") or [])
     workspace_sequences = [event["sequence"] for event in workspace_events]
     if workspace_sequences != list(range(len(workspace_events))):
@@ -880,15 +676,58 @@ def validate_workspace(
     if status == "DRAFT_REVIEW":
         if not allow_uncertified:
             raise PortfolioV0Error("UNCERTIFIED_WORKSPACE")
-        if workspace.get("order") is not None or workspace.get("fill") is not None:
+        if any(
+            workspace.get(key) is not None
+            for key in (
+                "transition_event",
+                "execution_authority_chain",
+                "order",
+                "fill",
+            )
+        ):
             raise PortfolioV0Error("DRAFT_HAS_EXECUTION")
         if workspace.get("certification") is not None:
             raise PortfolioV0Error("DRAFT_HAS_CERTIFICATION")
         return
     if status not in {"CERTIFIED", "OBSERVED_WATCH_AIM_UNCHANGED"}:
         raise PortfolioV0Error("WORKSPACE_STATUS_INVALID")
-    _verify_id(workspace["order"], kind="ORD", id_key="order_id")
-    _verify_id(workspace["fill"], kind="FIL", id_key="fill_id")
+    execution_events = [
+        row
+        for row in workspace_events
+        if row["event_type"]
+        in {
+            "PORTFOLIO_AIM_CONFIRMED",
+            "PORTFOLIO_TRANSITION_PLANNED",
+            "ORDER_CREATED",
+            "FILL_COMPLETED",
+        }
+    ]
+    try:
+        execution_chain = validate_execution_chain(
+            workspace["decision_snapshot"],
+            workspace["portfolio_aim"],
+            execution_events,
+            order=workspace.get("order"),
+            fill=workspace.get("fill"),
+        )
+    except ExecutionError as exc:
+        raise PortfolioV0Error(str(exc)) from exc
+    transition_event = workspace.get("transition_event")
+    if not isinstance(transition_event, Mapping):
+        raise PortfolioV0Error("TRANSITION_EVENT_REQUIRED")
+    expected_transition = next(
+        row
+        for row in execution_events
+        if row["event_type"] == "PORTFOLIO_TRANSITION_PLANNED"
+    )
+    if canonical_document_bytes(transition_event) != canonical_document_bytes(
+        expected_transition
+    ):
+        raise PortfolioV0Error("TRANSITION_EVENT_PROJECTION_MISMATCH")
+    if canonical_document_bytes(
+        workspace.get("execution_authority_chain")
+    ) != canonical_document_bytes(execution_chain):
+        raise PortfolioV0Error("EXECUTION_AUTHORITY_CHAIN_MISMATCH")
     certification = workspace.get("certification")
     if not isinstance(certification, Mapping):
         raise PortfolioV0Error("CERTIFICATION_REQUIRED")
@@ -899,9 +738,35 @@ def validate_workspace(
         raise PortfolioV0Error("CERTIFICATION_MISMATCH")
     if status == "OBSERVED_WATCH_AIM_UNCHANGED":
         observation = workspace.get("later_observation") or {}
-        if observation.get("classification") != "WATCH":
-            raise PortfolioV0Error("WATCH_OBSERVATION_REQUIRED")
-        if observation.get("hard_falsifier_fired") or observation.get("aim_changed"):
+        principal_review = next(
+            row
+            for row in workspace["reviews"]
+            if row["relationship"] == "PRINCIPAL_THESIS"
+        )
+        try:
+            expected_observation = unchanged_aim_watch_observation(
+                living_thesis=principal_review["living_thesis_lite"],
+                available_evidence_reference_ids=evidence_ids,
+                evidence_reference_id=observation.get("evidence_reference_id"),
+                watch_condition_matches=observation.get("watch_condition_matches") or [],
+                hard_falsifier_matches=observation.get("hard_falsifier_matches") or [],
+                portfolio_aim_id_before=observation.get("portfolio_aim_id_before"),
+                portfolio_aim_id_after=observation.get("portfolio_aim_id_after"),
+            )
+        except StrategyThesisError as exc:
+            raise PortfolioV0Error(str(exc)) from exc
+        if canonical_document_bytes(observation) != canonical_document_bytes(
+            expected_observation
+        ):
             raise PortfolioV0Error("WATCH_OBSERVATION_STATE_INVALID")
+        admitted_events = [
+            row
+            for row in workspace_events
+            if row["event_type"] == "LATER_OBSERVATION_ADMITTED"
+        ]
+        if len(admitted_events) != 1 or canonical_document_bytes(
+            admitted_events[0]["payload"]
+        ) != canonical_document_bytes(expected_observation):
+            raise PortfolioV0Error("WATCH_OBSERVATION_EVENT_MISMATCH")
         if len(workspace.get("certification_history") or []) != 1:
             raise PortfolioV0Error("PRIOR_CERTIFICATION_HISTORY_REQUIRED")

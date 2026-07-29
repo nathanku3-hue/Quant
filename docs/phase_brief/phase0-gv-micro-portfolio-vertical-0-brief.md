@@ -2,19 +2,21 @@
 
 Date: 2026-07-29
 Mode: `EXECUTION_PACKET`
-Status: `AUTHORIZED_AFTER_ROADMAP_FREEZE_BANK; NOT_STARTED`
+Status: `IMPLEMENTATION_COMPLETE_LOCAL; CUSTODY_AND_AUDIT_BLOCKED`
 Authority: corrected GodView portfolio roadmap and R0 custody-repair acceptance
 
 ## Hierarchy
 
 - L1: GodView point-in-time certified portfolio operating system.
-- L2 active streams after audit: Truth core, Decision vertical, Product closure, Replay/Certification.
-- L2 deferred streams: Bounded Portfolio, Portfolio Scale, Universe Scale, Challenger Promotion, Limited Live Capital.
-- L3 stage flow: R0 Final Verification → Independent Audit → Slice 0 Execution → Slice 0 Verification → Slice 1 Replay Certification.
+- L2 active phase: `GV-MICRO-PORTFOLIO-VERTICAL-0` only.
+- L2 bounded repair owners: S2 Accounting, S3 Strategy, S4 Execution; only the Integrator may change shared code.
+- L2 read-only: Product compatibility and Replay/Certification.
+- L2 deferred: Bounded Portfolio, Portfolio Scale, Universe Scale, Challenger Promotion, Limited Live Capital.
+- L3 stage flow: Local Integration → Terminal Custody → Independent Audit → Slice 1 Replay Certification.
 
 ## Recommended next action
 
-After independent audit confirms the banked roadmap authority, create one clean isolated implementation worktree from `ROADMAP_FREEZE_COMMIT` and ship the complete micro-portfolio operator loop. Do not open bounded-portfolio scale work before deterministic replay passes.
+Push the exact terminal branch tip, prove local/remote equality, and audit that SHA. Do not open Product feature work, Replay implementation, or bounded-portfolio scale work before remote custody and independent audit PASS.
 
 ## Product target
 
@@ -91,8 +93,9 @@ Operational gates remain binary:
 
 ```text
 Roadmap custody banked             1/1
-Micro-portfolio operator loop      0/1
-Prospective later observation      0/1
+Micro-portfolio candidate built    1/1
+Terminal remote custody            0/1
+Independent candidate audit        0/1
 Exact deterministic replay         0/1
 Bounded repeated portfolio         0/1
 ```
@@ -121,11 +124,12 @@ providers · WRDS acquisition · broad historical loaders · optimizer · copula
 
 ## What Was Done
 
-- Repaired the roadmap candidate so `R0 — ROADMAP-CUSTODY-REPAIR` is an internal custody step rather than a product slice.
-- Removed standalone `GV-CANON-RESET-0` from the product sequence.
-- Selected this brief explicitly through `docs/context/ACTIVE_BRIEF`; numerically higher historical briefs cannot override it.
-- Preserved released Alpha/FS0 unchanged and defined a new portfolio namespace boundary.
-- Replaced seven independent branches with three mergeable work packages.
+- Banked S2 Accounting, S3 Strategy, and S4 Execution as isolated local commits from exact base `b3d5092`.
+- Integrated the three streams through canonical Strategy records, immutable Execution lineage, and the reconciled PortfolioBook.
+- Removed duplicate reducer, decision-validator, and order/fill authority from `vertical.py`.
+- Preserved the complete review → confirm → transition → order/fill → certify → persist/reopen → later WATCH operator loop.
+- Bumped persisted bytes to `gv_portfolio_v0_workspace_v2` instead of silently reusing the incompatible v1 label.
+- Verified portfolio 82/82 and frozen protocol 150/150; classified four unrelated legacy product-document failures.
 
 ## What Is Locked
 
@@ -137,10 +141,10 @@ providers · WRDS acquisition · broad historical loaders · optimizer · copula
 
 ## What Is Next
 
-- Wait for independent audit of the banked R0 roadmap repair.
-- After audit PASS, create a clean isolated implementation worktree from `ROADMAP_FREEZE_COMMIT`.
-- Ship the complete micro-portfolio operator loop through the three work packages.
-- Build replay early but certify it only from real vertical events.
+- Retry the authorized push and prove remote equality at the terminal branch tip.
+- Repair the repository dependency declaration/environment before claiming a full pinned-suite PASS.
+- Run independent Reviewer A/B/C audit against the exact remote terminal SHA.
+- Keep Product and Replay read-only until that audit passes.
 
 ## First Command
 
