@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from core.gv_fs0_canonical import canonical_document_bytes
+from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
 from gv_portfolio_v0.storage import (
     admit_later_watch_observation,
     confirm_and_certify,
@@ -155,6 +155,25 @@ def test_identity_or_snapshot_tampering_is_rejected() -> None:
     tampered["decision_snapshot"]["selected_quantity"] = "999"
     with pytest.raises(PortfolioV0Error, match="IDENTITY_MISMATCH:decision_snapshot_id"):
         confirm_draft_workspace(tampered)
+
+
+def test_ineligible_abstain_candidate_cannot_be_selected_and_certified() -> None:
+    tampered = confirm_draft_workspace(build_draft_workspace())
+    competition = tampered["decision_snapshot"]["capital_competition"]
+    abstain = next(
+        row for row in competition["candidates"] if row["candidate"] == "ORBIT"
+    )
+    competition["selected_candidate"] = abstain["candidate"]
+    competition["selected_instrument_id"] = abstain["instrument_id"]
+    competition["selected_net_score_bps"] = abstain["net_score_bps"]
+    snapshot = tampered["decision_snapshot"]
+    snapshot["decision_snapshot_id"] = "DSN_" + domain_hash(
+        "GV-PORTFOLIO-V0:DSN:V1",
+        {key: value for key, value in snapshot.items() if key != "decision_snapshot_id"},
+    )
+
+    with pytest.raises(PortfolioV0Error, match="INELIGIBLE_SELECTED_CANDIDATE"):
+        certify_workspace(tampered)
 
 
 def test_watch_admission_requires_certified_state() -> None:

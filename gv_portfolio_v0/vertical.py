@@ -207,6 +207,68 @@ def _capital_competition(reviews: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _validate_capital_competition(
+    competition: Mapping[str, Any], reviews: Iterable[Mapping[str, Any]]
+) -> None:
+    """Require the recorded winner to be the highest-scoring eligible candidate."""
+    candidates = list(competition.get("candidates") or [])
+    if not candidates:
+        raise PortfolioV0Error("COMPETITION_CANDIDATES_REQUIRED")
+
+    review_outcomes = {row["instrument_id"]: row["outcome"] for row in reviews}
+    eligible: list[Mapping[str, Any]] = []
+    candidate_names: set[str] = set()
+    for candidate in candidates:
+        if not isinstance(candidate, Mapping):
+            raise PortfolioV0Error("COMPETITION_CANDIDATE_OBJECT_REQUIRED")
+        name = candidate.get("candidate")
+        outcome = candidate.get("outcome")
+        if not isinstance(name, str) or name in candidate_names:
+            raise PortfolioV0Error("COMPETITION_CANDIDATE_NAME_INVALID")
+        candidate_names.add(name)
+        if name == "CASH":
+            if candidate.get("instrument_id") is not None or outcome != "CASH":
+                raise PortfolioV0Error("COMPETITION_CASH_CANDIDATE_INVALID")
+        elif review_outcomes.get(candidate.get("instrument_id")) != outcome:
+            raise PortfolioV0Error("COMPETITION_REVIEW_OUTCOME_MISMATCH")
+        expected_score = (
+            _decimal(candidate["expected_value_bps"])
+            - _decimal(candidate["risk_penalty_bps"])
+            - _decimal(candidate["cost_penalty_bps"])
+        )
+        if _decimal(candidate["net_score_bps"]) != expected_score:
+            raise PortfolioV0Error("COMPETITION_NET_SCORE_MISMATCH")
+        if outcome in {"ADMIT", "CASH"}:
+            eligible.append(candidate)
+
+    selected_name = competition.get("selected_candidate")
+    selected = next(
+        (candidate for candidate in candidates if candidate["candidate"] == selected_name),
+        None,
+    )
+    if selected is None:
+        raise PortfolioV0Error("COMPETITION_SELECTED_CANDIDATE_MISSING")
+    if selected["outcome"] not in {"ADMIT", "CASH"}:
+        raise PortfolioV0Error("INELIGIBLE_SELECTED_CANDIDATE")
+    if (
+        competition.get("selected_instrument_id") != selected.get("instrument_id")
+        or _decimal(competition.get("selected_net_score_bps"))
+        != _decimal(selected["net_score_bps"])
+    ):
+        raise PortfolioV0Error("COMPETITION_SELECTION_MISMATCH")
+    if not eligible:
+        raise PortfolioV0Error("COMPETITION_ELIGIBLE_CANDIDATE_REQUIRED")
+    winner = min(
+        eligible,
+        key=lambda candidate: (
+            -_decimal(candidate["net_score_bps"]),
+            candidate["candidate"],
+        ),
+    )
+    if selected["candidate"] != winner["candidate"]:
+        raise PortfolioV0Error("COMPETITION_WINNER_MISMATCH")
+
+
 def _decision_snapshot(
     *, aim: Mapping[str, Any], reviews: list[dict[str, Any]], competition: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -391,6 +453,9 @@ def _certification_subject_events(events: Iterable[Mapping[str, Any]]) -> list[d
 def certify_workspace(
     workspace: Mapping[str, Any], *, prior_certification_id: str | None = None
 ) -> dict[str, Any]:
+    _validate_capital_competition(
+        workspace["decision_snapshot"]["capital_competition"], workspace["reviews"]
+    )
     events = _certification_subject_events(workspace["events"])
     book = reduce_events(events)
     event_ledger_hash = domain_hash(f"{ID_DOMAIN}:EVENT_LEDGER:V1", events)
@@ -747,6 +812,9 @@ def validate_workspace(
     _verify_id(workspace["portfolio_aim"], kind="AIM", id_key="portfolio_aim_id")
     _verify_id(
         workspace["decision_snapshot"], kind="DSN", id_key="decision_snapshot_id"
+    )
+    _validate_capital_competition(
+        workspace["decision_snapshot"]["capital_competition"], workspace["reviews"]
     )
     workspace_events = list(workspace.get("events") or [])
     workspace_sequences = [event["sequence"] for event in workspace_events]
