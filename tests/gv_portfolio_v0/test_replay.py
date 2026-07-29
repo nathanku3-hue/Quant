@@ -371,12 +371,16 @@ def test_github_provider_verifier_binds_commit_identity_and_report_bytes(
                 "committer": {"login": reviewer["github_committer_login"]},
                 "html_url": reviewer["receipt_url"],
             }
+        encoded = base64.b64encode(
+            canonical_document_bytes(reviewer["report"])
+        ).decode("ascii")
         return {
             "type": "file",
             "encoding": "base64",
-            "content": base64.b64encode(
-                canonical_document_bytes(reviewer["report"])
-            ).decode("ascii"),
+            "content": "\n".join(
+                encoded[index : index + 60]
+                for index in range(0, len(encoded), 60)
+            ),
         }
 
     monkeypatch.setattr(replay_cli, "_github_api_json", _provider_json)

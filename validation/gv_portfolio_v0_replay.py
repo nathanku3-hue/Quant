@@ -236,8 +236,9 @@ def verify_github_provider_receipt(receipt: Mapping[str, Any]) -> None:
     encoded = content.get("content")
     if not isinstance(encoded, str):
         raise ReplayV0Error("GITHUB_PROVIDER_REPORT_CONTENT_MISSING")
+    compact_encoded = "".join(encoded.split())
     try:
-        remote_bytes = base64.b64decode(encoded, validate=True)
+        remote_bytes = base64.b64decode(compact_encoded, validate=True)
     except (ValueError, TypeError) as exc:
         raise ReplayV0Error("GITHUB_PROVIDER_REPORT_BASE64_INVALID") from exc
     report = receipt.get("report")
