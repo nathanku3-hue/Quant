@@ -358,6 +358,11 @@ def test_github_provider_verifier_binds_commit_identity_and_report_bytes(
     reviewer = receipt["reviewers"][0]
 
     def _provider_json(url: str) -> dict[str, object]:
+        if url.endswith(f"/{reviewer['candidate_commit']}"):
+            return {
+                "sha": reviewer["candidate_commit"],
+                "commit": {"tree": {"sha": reviewer["candidate_tree"]}},
+            }
         if "/commits/" in url:
             return {
                 "sha": reviewer["submission_commit_sha"],
@@ -398,6 +403,79 @@ def test_provider_verification_failure_is_fail_closed(
     monkeypatch.setattr(replay_cli, "_github_api_json", _provider_json)
     with pytest.raises(ReplayV0Error, match="GITHUB_PROVIDER_AUTHOR_LOGIN_MISMATCH"):
         verify_github_provider_receipt(reviewer)
+
+
+def test_github_provider_verifier_rejects_candidate_tree_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workspace = _observed_workspace()
+    shadow = build_replay_evidence(workspace)
+    receipt, _commit, _tree, _implementer = _synthetic_audit_receipt(
+        shadow["source_event_ledger_hash"]
+    )
+    reviewer = receipt["reviewers"][0]
+
+    def _provider_json(url: str) -> dict[str, object]:
+        if url.endswith(f"/{reviewer['candidate_commit']}"):
+            return {
+                "sha": reviewer["candidate_commit"],
+                "commit": {"tree": {"sha": "f" * 40}},
+            }
+        if "/commits/" in url:
+            return {
+                "sha": reviewer["submission_commit_sha"],
+                "author": {"login": reviewer["github_author_login"]},
+                "committer": {"login": reviewer["github_committer_login"]},
+                "html_url": reviewer["receipt_url"],
+            }
+        return {
+            "type": "file",
+            "encoding": "base64",
+            "content": base64.b64encode(
+                canonical_document_bytes(reviewer["report"])
+            ).decode("ascii"),
+        }
+
+    monkeypatch.setattr(replay_cli, "_github_api_json", _provider_json)
+    with pytest.raises(ReplayV0Error, match="GITHUB_PROVIDER_CANDIDATE_TREE_MISMATCH"):
+        verify_github_provider_receipt(reviewer)
+
+
+def test_git_identity_rejects_dirty_checkout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        replay_cli,
+        "_run_git",
+        lambda *arguments: "?? audit-receipt.json" if arguments[0] == "status" else "",
+    )
+    with pytest.raises(ReplayV0Error, match="CANDIDATE_CHECKOUT_NOT_CLEAN"):
+        replay_cli._git_identity()
+
+
+def test_github_origin_and_receipt_repository_must_match() -> None:
+    assert (
+        replay_cli._github_repository_from_remote(
+            "https://github.com/example/quant.git"
+        )
+        == "example/quant"
+    )
+    assert (
+        replay_cli._github_repository_from_remote("git@github.com:example/quant.git")
+        == "example/quant"
+    )
+    workspace = _observed_workspace()
+    shadow = build_replay_evidence(workspace)
+    receipt, _commit, _tree, _implementer = _synthetic_audit_receipt(
+        shadow["source_event_ledger_hash"]
+    )
+    replay_cli._verify_receipt_repository_against_origin(
+        receipt, origin_repository="example/quant"
+    )
+    with pytest.raises(ReplayV0Error, match="AUDIT_RECEIPT_REPOSITORY_NOT_ORIGIN"):
+        replay_cli._verify_receipt_repository_against_origin(
+            receipt, origin_repository="other/quant"
+        )
 
 
 def test_legacy_self_asserted_audit_receipt_cannot_certify() -> None:
