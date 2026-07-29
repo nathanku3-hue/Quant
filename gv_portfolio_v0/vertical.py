@@ -318,6 +318,8 @@ def reduce_events(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
             if fill["side"] != "BUY":
                 raise PortfolioV0Error("UNSUPPORTED_FILL_SIDE")
             quantity = _decimal(fill["quantity"])
+            if quantity <= 0:
+                raise PortfolioV0Error("FILL_QUANTITY_MUST_BE_POSITIVE")
             price = _decimal(fill["price"])
             fee = _decimal(fill["fee"])
             bucket = fill["cash_bucket"]

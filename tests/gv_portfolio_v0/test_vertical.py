@@ -18,6 +18,7 @@ from gv_portfolio_v0.vertical import (
     PortfolioV0Error,
     admit_watch_observation,
     build_draft_workspace,
+    certify_workspace,
     confirm_draft_workspace,
     reduce_events,
 )
@@ -134,6 +135,18 @@ def test_reducer_reports_valuation_pending_without_invented_price() -> None:
     assert book["valuation_status"] == "VALUATION_PENDING"
     assert book["nav"] is None
     assert book["position_value"] is None
+
+
+def test_certification_rejects_negative_buy_fill_quantity() -> None:
+    """A negative BUY must not turn into synthetic classified cash."""
+    workspace = confirm_draft_workspace(build_draft_workspace())
+    fill_event = next(
+        event for event in workspace["events"] if event["event_type"] == "FILL_COMPLETED"
+    )
+    fill_event["payload"]["fill"]["quantity"] = "-5"
+
+    with pytest.raises(PortfolioV0Error, match="FILL_QUANTITY_MUST_BE_POSITIVE"):
+        certify_workspace(workspace)
 
 
 def test_identity_or_snapshot_tampering_is_rejected() -> None:
