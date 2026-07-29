@@ -269,6 +269,32 @@ def _validate_capital_competition(
         raise PortfolioV0Error("COMPETITION_WINNER_MISMATCH")
 
 
+def _validate_decision_projection(snapshot: Mapping[str, Any]) -> None:
+    """Require the executable decision to project the competition winner."""
+    competition = snapshot.get("capital_competition")
+    if not isinstance(competition, Mapping):
+        raise PortfolioV0Error("CAPITAL_COMPETITION_REQUIRED")
+    selected_name = competition.get("selected_candidate")
+    winners = [
+        row
+        for row in competition.get("candidates") or []
+        if row.get("candidate") == selected_name
+    ]
+    if len(winners) != 1:
+        raise PortfolioV0Error("CAPITAL_COMPETITION_WINNER_INVALID")
+    winner = winners[0]
+    if winner.get("outcome") not in {"ADMIT", "CASH"}:
+        raise PortfolioV0Error("DECISION_WINNER_NOT_ADMISSIBLE")
+    if (
+        snapshot.get("selected_action") != "BUY"
+        or snapshot.get("selected_instrument_id") != winner.get("instrument_id")
+        or competition.get("selected_instrument_id") != winner.get("instrument_id")
+        or _decimal(competition.get("selected_net_score_bps"))
+        != _decimal(winner.get("net_score_bps"))
+    ):
+        raise PortfolioV0Error("DECISION_PROJECTION_MISMATCH")
+
+
 def _decision_snapshot(
     *, aim: Mapping[str, Any], reviews: list[dict[str, Any]], competition: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -456,6 +482,7 @@ def certify_workspace(
     _validate_capital_competition(
         workspace["decision_snapshot"]["capital_competition"], workspace["reviews"]
     )
+    _validate_decision_projection(workspace["decision_snapshot"])
     events = _certification_subject_events(workspace["events"])
     book = reduce_events(events)
     event_ledger_hash = domain_hash(f"{ID_DOMAIN}:EVENT_LEDGER:V1", events)
@@ -771,6 +798,28 @@ def _verify_id(record: Mapping[str, Any], *, kind: str, id_key: str) -> None:
         raise PortfolioV0Error(f"IDENTITY_MISMATCH:{id_key}")
 
 
+def _validate_decision_projection(snapshot: Mapping[str, Any]) -> None:
+    """Require the executable decision to be the declared competition winner."""
+    competition = snapshot.get("capital_competition")
+    if not isinstance(competition, Mapping):
+        raise PortfolioV0Error("CAPITAL_COMPETITION_REQUIRED")
+    selected_candidate = competition.get("selected_candidate")
+    candidates = list(competition.get("candidates") or [])
+    winners = [row for row in candidates if row.get("candidate") == selected_candidate]
+    if len(winners) != 1:
+        raise PortfolioV0Error("CAPITAL_COMPETITION_WINNER_INVALID")
+    winner = winners[0]
+    if not winner.get("eligible") or winner.get("outcome") != "ADMIT":
+        raise PortfolioV0Error("DECISION_WINNER_NOT_ADMISSIBLE")
+    if (
+        snapshot.get("selected_action") != "BUY"
+        or snapshot.get("selected_instrument_id") != winner.get("instrument_id")
+        or competition.get("selected_instrument_id") != winner.get("instrument_id")
+        or competition.get("selected_net_score_bps") != winner.get("net_score_bps")
+    ):
+        raise PortfolioV0Error("DECISION_PROJECTION_MISMATCH")
+
+
 def validate_workspace(
     workspace: Mapping[str, Any], *, allow_uncertified: bool = False
 ) -> None:
@@ -816,6 +865,7 @@ def validate_workspace(
     _validate_capital_competition(
         workspace["decision_snapshot"]["capital_competition"], workspace["reviews"]
     )
+    _validate_decision_projection(workspace["decision_snapshot"])
     workspace_events = list(workspace.get("events") or [])
     workspace_sequences = [event["sequence"] for event in workspace_events]
     if workspace_sequences != list(range(len(workspace_events))):

@@ -176,6 +176,22 @@ def test_ineligible_abstain_candidate_cannot_be_selected_and_certified() -> None
         certify_workspace(tampered)
 
 
+def test_contradictory_decision_projection_cannot_certify() -> None:
+    tampered = build_draft_workspace()
+    snapshot = tampered["decision_snapshot"]
+    abstain = next(
+        review for review in snapshot["reviews"] if review["outcome"] == "ABSTAIN"
+    )
+    snapshot["selected_instrument_id"] = abstain["instrument_id"]
+    snapshot["decision_snapshot_id"] = "DSN_" + domain_hash(
+        "GV-PORTFOLIO-V0:DSN:V1",
+        {key: value for key, value in snapshot.items() if key != "decision_snapshot_id"},
+    )
+
+    with pytest.raises(PortfolioV0Error, match="DECISION_PROJECTION_MISMATCH"):
+        confirm_draft_workspace(tampered)
+
+
 def test_watch_admission_requires_certified_state() -> None:
     with pytest.raises(PortfolioV0Error, match="UNCERTIFIED_WORKSPACE"):
         admit_watch_observation(build_draft_workspace())
