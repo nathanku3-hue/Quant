@@ -1,9 +1,12 @@
 # GodView Portfolio P0 Owner Freeze
 
-Status: Active Canon — High-Confidence Audit Reconciliation Applied
-Date: 2026-07-16
+Status: Frozen Later-Mandate Profile — not the active Slice 0 fixture mandate
+Date: 2026-07-29 authority clarification; 2026-07-16 body retained
 Mode: `APPROVAL_GATE`
-Authority: owner-approved portfolio architecture, owner-decision audit, and 2026-07-16 independent pre-build audit reconciliation
+Primary sequence authority: `godview_v2_frozen_build_learn_roadmap.md`
+Authority: owner-approved later US Russell 1000 mandate profile and 2026-07-16 independent audit reconciliation
+
+> This document remains frozen as a later real-mandate profile. It does not force `GV-MICRO-PORTFOLIO-VERTICAL-0` to implement the full Russell 1000, IWB, SOFR, ICB, tax, FX, or broad-provider stack. Slice 0 uses only the declared fixture mandate needed to prove the operating loop; the broader owner mandate activates through later data and universe gates.
 
 ## Decision
 

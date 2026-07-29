@@ -7538,3 +7538,33 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Stop: narrow independent human review of tip only; do not open next roadmap phase in this round. G08 Attempt-2 remains deferred.
 
 
+## 2026-07-29 — GodView v2 Eight-Slice Architecture Freeze
+
+- Decision: freeze the complete GodView v2 delivery sequence at contract and gate level: `GV-CANON-RESET-0 → GV-MICRO-PORTFOLIO-PROSPECTIVE-0 → GV-DETERMINISTIC-REPLAY-0 → GV-BOUNDED-PORTFOLIO-1 → GV-PORTFOLIO-SCALE-1 → GV-UNIVERSE-SCALE-1 → GV-CHALLENGER-PROMOTION-1 → GV-LIMITED-LIVE-1`.
+- Execution authority: authorize Slices 0–2 only. Slice 2 implementation may begin against Slice 0 contracts, but certification requires actual Slice 1 events. Slice 3 implementation remains blocked until deterministic replay passes.
+- Product recut: Alpha-0 release remains banked substrate at tag `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`) with release-proof tip `93e7a55`; score remains 39, observed remains 0, and no alpha claim is added.
+- Architecture law: use a layered Build × Learn model. Build lanes for authority/custody, data/accounting, strategy/thesis, portfolio/execution, replay/certification, product/operator, and docs/ops may run concurrently behind frozen interfaces. Learn lanes remain shadow-only and cannot mutate certified truth or create competing product authority.
+- Hard gates: M0 contract freeze → M1 prospective book certified → M2 deterministic replay exact → M3 bounded portfolio evidence. Portfolio and universe scaling remain separate gates.
+- Change control: reopen a frozen boundary only for contradictory completed-slice evidence, a P0/P1 custody/accounting/mandate/replay defect, an explicit owner mandate change, or a new legal/operational requirement.
+- Root custody: the source checkout is massively dirty and is not implementation authority. Execute Slice 0 only in a clean isolated worktree; do not clean or revert the root checkout in this round.
+- Forbidden next: provider acquisition, PEAD reopen, legacy Phase 62–80+ queue, broad ontology, optimizer/copula/graph/adaptive-execution programmes, tactical production capital, score uplift, broker, or live capital.
+- Custody correction: the roadmap-freeze diff is uncommitted. Bank and push it as `ROADMAP_FREEZE_COMMIT` before opening Slice 0; `93e7a55` remains released ancestry but is not the direct implementation base unless the freeze commit is already included.
+- Single next action: bank the roadmap-freeze docs, then create a clean Slice 0 implementation branch/worktree from `ROADMAP_FREEZE_COMMIT` and freeze the minimum cross-layer contracts plus one acceptance fixture.
+- Next-orchestrator handover: `docs/handover/gv_v2_frozen_build_learn_roadmap_handover_20260729.md`.
+
+
+## 2026-07-29 — ROUND-20260729-GV-V2-ROADMAP-CUSTODY-REPAIR
+
+- Supersession: the prior “Eight-Slice Architecture Freeze” remains historical rationale but is superseded on authority status, product numbering, parallel mechanics, active-brief selection, and next action.
+- Decision: classify the prior state as `ROADMAP_CANDIDATE_VALIDATED; CUSTODY_NOT_BANKED`; repair and bank one checkoutable authority before product implementation.
+- Decision: remove standalone `GV-CANON-RESET-0` from the product sequence. Its legitimate custody/seam work is absorbed into internal `R0 — ROADMAP-CUSTODY-REPAIR` and the first vertical's minimum exercised seams.
+- Product sequence: `GV-MICRO-PORTFOLIO-VERTICAL-0 → GV-DETERMINISTIC-REPLAY-0 → GV-BOUNDED-PORTFOLIO-1 → GV-PORTFOLIO-SCALE-1 → GV-UNIVERSE-SCALE-1 → GV-CHALLENGER-PROMOTION-1 → GV-LIMITED-LIVE-1`.
+- Execution authority: after independent R0 audit, authorize only the micro-portfolio vertical and deterministic replay. Bounded portfolio remains blocked until exact replay PASS.
+- Custody authority: `docs/context/ACTIVE_BRIEF` explicitly selects `docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md`; default context generation fails closed without a valid pointer. Numeric discovery is migration-only behind `--allow-legacy-discovery`.
+- Historical correction: move the Phase 66 bridge to archive and explicitly supersede both July 29 SAW reports whose direct-base/semantic-closure claims were contradicted by audit.
+- Compatibility decision: preserve released `gv_fs0_v1` and Alpha runtime unchanged. Future portfolio implementation uses a new `gv_portfolio_v0` namespace; no compatibility adapter is required on the first vertical's critical path.
+- Parallelism decision: group B0–B6 conceptual ownership into three mergeable packages—Truth core, Decision vertical, Product closure. Freeze minimum identity/event seams first; freeze detailed fields only when exercised.
+- Score decision: canonical shipped score remains 39/100, observed comparisons remain 0, no alpha claim. Use binary shipment gates operationally; maturity forecasts remain explanatory only.
+- Root custody: leave `E:\Code\Quant` untouched and unusable as execution authority. Future worktree must descend from the exact audited `ROADMAP_FREEZE_COMMIT`, never raw `93e7a55`.
+- Stop: bank and push R0, publish validation evidence, then wait for independent audit. Do not start the micro-portfolio implementation in this round.
+

@@ -1,13 +1,27 @@
-# Multi-Stream Contract - Current
+# Multi-Stream Contract — Current
 
-## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
+## Active — Three-package micro-portfolio execution (2026-07-29)
 
-- Backend/Product: Alpha close vertical **complete on branch**; current decision published (`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`). No further Alpha custody cars.
-- Docs/Ops: Commit C syncs seven current-truth surfaces + `current_context.*`; merge pending.
-- Frontend: broker-free Case Workspace (`launch_alpha.py`) is Alpha product entry; no legacy dashboard coupling required for Alpha.
-- Data/Research/PEAD/FS1/optimizer/broker: held.
-- Next stream after merge: one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison — not another custody/governance/provider phase.
+| Package | Ownership | Parallel boundary | Hard handoff |
+|---|---|---|---|
+| A — Truth core | permanent IDs, evidence, immutable events, book reducer, classified cash, NAV, replay API skeleton | owns disjoint truth/accounting paths after minimum seams freeze | reconciled book and replayable event log |
+| B — Decision vertical | Living Thesis Lite, scenarios, admission, capital competition, aim, transition, paper order/fill | consumes Package A IDs/events; cannot invent alternate lineage | certified portfolio aim and fill events |
+| C — Product closure | launch/review/confirm/persist/reopen, read models, acceptance fixture, later-observation explanation, docs/ops | consumes A/B read models; cannot mutate certified truth directly | operator-complete vertical and synchronized authority |
 
-## Prior — family-two / reconciliation open gates [closed]
+## Minimum frozen seams
 
-Family-two bank, multi-source close, export/replay, dogfood, and publish-current are banked on branch; not open Alpha gates.
+`InstrumentId`, `EventId`, `EvidenceReference`, `PortfolioBookEvent`, `DecisionSnapshotId`, `PortfolioAimId`, `OrderId`, `FillId`, and `CertificationId`.
+
+## Coordination laws
+
+- One product authority only: `GV-MICRO-PORTFOLIO-VERTICAL-0` after independent R0 audit PASS.
+- Maximum parallelism means independent executable work, not maximum worker or branch count.
+- A package may run separately only when it owns disjoint files, uses exercised seams, can merge independently, and does not force global redesign on failure.
+- Detailed fields freeze only when the operator fixture exercises them.
+- Replay builds early from real vertical events; replay certification is the immediate next slice.
+- Learn work remains shadow-only and cannot mutate the certified book or create competing authority.
+- Cross-package blockers are limited to P0/P1 custody, accounting, mandate, mandatory-action, or replay defects.
+
+## Current bottleneck
+
+Independent audit must confirm the banked R0 authority before any implementation worktree is created.

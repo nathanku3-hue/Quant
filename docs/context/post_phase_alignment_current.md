@@ -1,13 +1,22 @@
-# Post-Phase Alignment - Current
+# Post-Phase Alignment — Current
 
-## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
+## Active — R0 repaired and banked; product audit pending (2026-07-29)
 
-- **What changed**: Alpha product shipment is ready on `codex/gv-alpha0-rc2`. Canonical stage is **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**. Current decision is **DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1** (paper NO_POSITION). Score 39; observed 0; no alpha claim.
-- **Streams**: Docs/Ops owns Commit C current-truth sync + merge packaging; Backend holds further Alpha custody work closed; Frontend Alpha entry is `launch_alpha.py`.
-- **Current bottleneck**: **merge Alpha to main** (merge commit; preserve RC2 ancestry). Not family-two, not reconciliation, not provider intake.
-- **Endgame boundary**: Alpha operability is banked. First post-merge product gate is one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison — not another custody/governance/provider phase.
-- **Next active stream**: merge → hosted-green confirmation → final `gv-alpha0-close` tag on accepted main commit (`gv-alpha0-close-rc2` stays immutable).
+- **What changed:** contract-only `GV-CANON-RESET-0` was removed from the product queue; explicit active-brief authority replaced highest-numeric-phase selection.
+- **Product center:** one complete prospective micro-portfolio operator loop followed immediately by exact replay.
+- **Released substrate:** `gv-alpha0-paper-decision-v0.1.0`; score 39, observed 0, no alpha claim; released FS0 unchanged.
+- **Current bottleneck:** independent audit of the banked roadmap authority.
+- **Execution topology:** three mergeable packages—Truth core, Decision vertical, Product closure.
+- **Interface rule:** freeze minimum IDs/events first; freeze detailed fields only when exercised.
+- **Next active scope:** after audit PASS, create a clean isolated worktree from `ROADMAP_FREEZE_COMMIT` and execute `GV-MICRO-PORTFOLIO-VERTICAL-0`.
+- **Next blocked scope:** deterministic replay certifies from real vertical events; bounded portfolio waits for exact replay PASS.
+- **Held scope:** root cleanup, providers, PEAD, legacy phase queue, broad ontology, released FS0 mutation, optimizers, copulas, graph propagation, adaptive execution, tactical capital, broker, live capital.
 
-## Prior — open multi-source bank / dogfood cars [closed on branch]
+## Alignment decision
 
-Historical open-gate language for multi-source bank and dogfood is superseded by banked Alpha close + pending merge.
+```text
+AUDIT BANKED R0
+→ SHIP MICRO-PORTFOLIO VERTICAL
+→ CERTIFY EXACT REPLAY
+→ SCALE ONLY FROM EVIDENCE
+```

@@ -1,8 +1,11 @@
 # GodView Portfolio-First Operating Model
 
-Status: Active Canon — GV-FS0 First
-Date: 2026-07-16
-Authority: `godview_endgame_vision.md`, `top_level_roadmap.md`, `godview_portfolio_p0_owner_freeze.md`, and `gv_fs0_certification_and_data_authority_contract.md`
+Status: Supporting Operating Contract — corrected seven-slice product roadmap wins on sequence
+Date: 2026-07-29 active-authority update; historical body retained
+Primary authority: `godview_v2_frozen_build_learn_roadmap.md` and `top_level_roadmap.md`
+Supporting authority: `godview_endgame_vision.md`, `godview_portfolio_p0_owner_freeze.md`, and `gv_fs0_certification_and_data_authority_contract.md`
+
+> Active execution after independent R0 audit: `GV-MICRO-PORTFOLIO-VERTICAL-0 → GV-DETERMINISTIC-REPLAY-0`. The GV-FS0-specific body below remains valid only for the released substrate and reusable invariants; portfolio implementation uses a new namespace.
 
 ## Product Decision
 

@@ -1,8 +1,10 @@
 # Product Roadmap: Discretionary Augmentation
 
-Status: Phase 65 G7.1 product charter
-Authority: D-365 Phase G7.1 roadmap realignment / product charter
-Date: 2026-05-09
+Status: Historical Product Charter — superseded as active roadmap
+Authority: retained for audit continuity only; `godview_v2_frozen_build_learn_roadmap.md` wins
+Date: 2026-07-29 supersession notice; historical body dated 2026-05-09
+
+> The supercycle/discretionary-augmentation sequence below is not an active implementation queue. Relevant thesis-discovery concepts may re-enter only inside the frozen Strategy/Thesis and Challenger layers after the prospective portfolio and deterministic replay gates pass.
 
 ## Purpose
 

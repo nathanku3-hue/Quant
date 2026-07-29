@@ -1,24 +1,25 @@
 ## What Was Done
-- Alpha close vertical complete on branch `codex/gv-alpha0-rc2` (base `origin/main@06ce68f`).
-- Commit A selective Alpha import (no dashboard/page-registry); Commit B dogfood import + guarded publish-current + truth cut; Commit C docs-only current-truth sync.
-- Stage **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**; current decision **DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1** (paper NO_POSITION); CDR `889cc831…` published.
-- Receipt v3 + human attestation v1 bound to Commit A tip `6747d6a`; tag `gv-alpha0-close-rc2` immutable on RC2 ancestry.
-- Metrics locked: score **39**; observed **0**; no alpha claim.
+- Repaired the roadmap candidate so `R0 — ROADMAP-CUSTODY-REPAIR` is an internal custody step rather than a product slice.
+- Removed standalone `GV-CANON-RESET-0` from the product sequence.
+- Selected this brief explicitly through `docs/context/ACTIVE_BRIEF`; numerically higher historical briefs cannot override it.
+- Preserved released Alpha/FS0 unchanged and defined a new portfolio namespace boundary.
+- Replaced seven independent branches with three mergeable work packages.
 
 ## What Is Locked
-- Alpha product shipment is ready on branch; **merge to main is pending** (merge-commit only; preserve `gv-alpha0-close-rc2` ancestry).
-- `FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`.
-- Current decision authority: `DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1` → paper `NO_POSITION`.
-- Score **39** frozen; observed **0**; formal comparison still deferred; no live capital / score uplift.
-- Broker-free entry: `python launch_alpha.py` (Case Workspace).
+- `ROADMAP_SEQUENCE = GV-MICRO-PORTFOLIO-VERTICAL-0 → GV-DETERMINISTIC-REPLAY-0 → GV-BOUNDED-PORTFOLIO-1 → GV-PORTFOLIO-SCALE-1 → GV-UNIVERSE-SCALE-1 → GV-CHALLENGER-PROMOTION-1 → GV-LIMITED-LIVE-1`.
+- `EXECUTION_AUTHORIZED = GV-MICRO-PORTFOLIO-VERTICAL-0, GV-DETERMINISTIC-REPLAY-0`.
+- `SHIPPED_PRODUCT_SCORE = 39/100`; observed comparisons remain `0`; no alpha or live-capital claim.
+- The root checkout remains untouched and is not execution authority.
+- Bounded portfolio work remains blocked until exact deterministic replay passes.
 
 ## What Is Next
-- immediate gate: merge Alpha to main (merge commit, not squash/rebase)
-- → after hosted green: merge
-- → fresh-clone 25-test + verify/replay/current-receipt smoke
-- → final tag gv-alpha0-close on accepted main commit (RC2 tag stays immutable)
-- → first post-merge product gate: one fresh real ONE_CASE_DECISION_DELTA_OBSERVED comparison
-- (not another custody/governance/provider phase)
+- Wait for independent audit of the banked R0 roadmap repair.
+- After audit PASS, create a clean isolated implementation worktree from `ROADMAP_FREEZE_COMMIT`.
+- Ship the complete micro-portfolio operator loop through the three work packages.
+- Build replay early but certify it only from real vertical events.
+- `GV-MICRO-PORTFOLIO-VERTICAL-0`;
+- `GV-DETERMINISTIC-REPLAY-0`;
+- evidence-gated later slices only.
 
 ## First Command
-`.venv\Scripts\python -m pytest -q tests/gv_fs0_product/test_v2_alpha0_case_close.py tests/gv_fs0_product/test_v2_alpha0_alpha_app.py`
+`git status --short --branch && git rev-parse HEAD && cat docs/context/ACTIVE_BRIEF`

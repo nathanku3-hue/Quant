@@ -1,27 +1,35 @@
-# Impact Packet - Current
+# Impact Packet — Current
 
-## Active Addendum — GV-ALPHA0-SHIP local candidate (2026-07-28)
+## Active — R0 roadmap custody repair (2026-07-29)
 
-- **Runtime boundary:** `core/gv_alpha0_ship_runtime.py`, `alpha_app.py`, `launch_alpha.py` now separate immutable packaged sample bytes from mutable user state.
-- **Workflow:** fresh initialize → verified review → confirm paper `NO_POSITION` → atomic persistence → certified reopen.
-- **Release surface:** deterministic allowlisted ZIP builder, extracted-package smoke, Windows/Linux run wrappers, onboarding, rollback, and hosted matrix/package parity updates.
-- **Tests:** two focused shipment test modules plus existing Alpha product tests; native Windows combined result **39/39 PASS**, including actual Windows junction routing, tampered-package startup refusal, and the hosted custody-path regression.
-- **P1 repair:** all packaged files are checked against `RELEASE_MANIFEST.json` before initialization; package/runtime/seed paths are canonicalized; junction/symlink escapes and runtime routes entering the bundle fail closed.
-- **Hosted result:** run `30346381138` is fully green on Windows and Linux: product suites, clean package builds, isolated extracted-package smokes, uploads, authority parity, and exact archive parity PASS.
-- **Clean artifact:** both hosted builders and an independent local rebuild produced 18,666,047 bytes with SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`, bound to clean commit `a88ed05`.
-- **Browser pilot:** the exact clean package ran behind a fresh Streamlit server and was operated through Chromium from sealed review to `CASE_WORKSPACE_UI` confirmation, certification, server restart, and certified-only reopen. No P0/P1 was found.
-- **Authority unchanged:** score 39, observed 0, `CERTIFIED_MULTI_SOURCE_CASE_OPERABLE`, no alpha or decision-improvement claim. Release readiness is 87/100 planning-only.
-- **Remaining surface:** tag and publication only. No repair, provider, comparison, score-uplift, live-capital, or redesign work is opened.
+### Changed authority surfaces
 
-## Active Addendum — GV-ALPHA0-CLOSE complete on branch (2026-07-25)
+- corrected canonical roadmap and compact top-level roadmap;
+- root product surfaces: `README.md`, `PRD.md`, `PRODUCT_SPEC.md`, `PHASE_QUEUE.md`;
+- explicit active brief pointer: `docs/context/ACTIVE_BRIEF`;
+- new active brief: `docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md`;
+- Phase 66 bridge moved to historical archive;
+- context generator and focused tests updated for explicit selection and fail-closed behavior;
+- current truth, decision/lesson entries, SAW evidence, and handover reconciled.
 
-- **Owned runtime:** `core/gv_v2_alpha0_case_close.py`, `views/gv_alpha0_case_workspace.py`, `alpha_app.py` / `launch_alpha.py`; source families one+two banked substrates.
-- **Custody:** branch tip on `codex/gv-alpha0-rc2` (Commit A–C); base main `06ce68f`; published current decision CDR `889cc831fe405e5aad1f13225f06fe666036390defeff6652b39d0d656225376`.
-- **Public authority:** default current decision is Alpha close certified paper **NO_POSITION** (`DECISION_V2_ALPHA0_CLOSE_MU_G_SUPPLY_1`).
-- **Roadmap impact:** Alpha complete on branch; **merge pending**. Stage **CERTIFIED_MULTI_SOURCE_CASE_OPERABLE**. Immediate gate = merge Alpha. First post-merge product gate = one fresh real **ONE_CASE_DECISION_DELTA_OBSERVED** comparison (not custody/governance/provider phase).
-- **Score/stage:** 39 / CERTIFIED_MULTI_SOURCE_CASE_OPERABLE / observed 0; no alpha claim.
-- **Not performed:** merge to main; formal comparison; score uplift; live capital.
+### Product impact
 
-## Prior — family-two / B0B substrate (banked history)
+- standalone contract-only `GV-CANON-RESET-0` is removed from the product sequence;
+- the first product slice is the complete micro-portfolio operator loop;
+- deterministic replay remains immediately before any bounded portfolio expansion;
+- released FS0 remains immutable and a new portfolio namespace is required.
 
-Source family one (B0B) and source family two remain banked substrates under the closed Alpha vertical; not open gates.
+### Execution impact
+
+- three mergeable packages replace seven automatic independent branches;
+- minimum identity/event seams freeze before parallel implementation;
+- detailed schema fields freeze only when exercised by the vertical fixture;
+- implementation remains stopped pending independent audit of `ROADMAP_FREEZE_COMMIT`.
+
+### Runtime/data impact
+
+No portfolio runtime, provider, data artifact, model, score, broker, or live-capital behavior changed in R0. The only code change is the context-authority selector and its focused tests.
+
+### Open risk
+
+The root source checkout remains unsafe and untouched. Any implementation branch created from raw `93e7a55` or another stale base would omit the corrected authority and is invalid.

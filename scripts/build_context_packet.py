@@ -36,6 +36,7 @@ REQUIRED_MD_HEADERS = (
     "## First Command",
 )
 MAX_CONTEXT_AGE_HOURS = 24.0
+ACTIVE_BRIEF_POINTER = Path("docs/context/ACTIVE_BRIEF")
 
 _PHASE_RE = re.compile(r"phase(\d+)", re.IGNORECASE)
 _SUBPHASE_RE = re.compile(r"phase\d+[_-]g(?P<subphase>[A-Za-z0-9]+)", re.IGNORECASE)
@@ -67,6 +68,7 @@ class ContextPacketError(RuntimeError):
 
 @dataclass(frozen=True)
 class SourceDocs:
+    active_brief: Path | None
     phase_briefs: list[Path]
     phase_handovers: list[Path]
     current_truth_surfaces: list[Path]
@@ -149,8 +151,60 @@ def _subphase_number(path: Path) -> int:
     return (major * 10000) + (minor * 100) + suffix_score
 
 
-def _discover_sources(repo_root: Path) -> SourceDocs:
+def _load_active_brief(repo_root: Path, *, required: bool) -> Path | None:
+    pointer_path = repo_root / ACTIVE_BRIEF_POINTER
+    if not pointer_path.exists():
+        if required:
+            raise ContextPacketError(
+                f"Missing explicit active brief pointer: {ACTIVE_BRIEF_POINTER.as_posix()}"
+            )
+        return None
+
+    resolved_root = repo_root.resolve()
+    resolved_pointer = pointer_path.resolve()
+    try:
+        resolved_pointer.relative_to(resolved_root)
+    except ValueError as exc:
+        raise ContextPacketError("ACTIVE_BRIEF pointer escapes the repository") from exc
+
+    pointer_lines = [
+        line.strip()
+        for line in pointer_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    if len(pointer_lines) != 1:
+        raise ContextPacketError(
+            "ACTIVE_BRIEF must contain exactly one non-empty repository-relative path"
+        )
+
+    relative_path = Path(pointer_lines[0])
+    if relative_path.is_absolute():
+        raise ContextPacketError("ACTIVE_BRIEF path must be repository-relative")
+
+    resolved_path = (repo_root / relative_path).resolve()
+    try:
+        resolved_path.relative_to(resolved_root)
+    except ValueError as exc:
+        raise ContextPacketError("ACTIVE_BRIEF path escapes the repository") from exc
+
+    phase_brief_root = (repo_root / "docs" / "phase_brief").resolve()
+    try:
+        resolved_path.relative_to(phase_brief_root)
+    except ValueError as exc:
+        raise ContextPacketError(
+            "ACTIVE_BRIEF target must be under docs/phase_brief"
+        ) from exc
+
+    if resolved_path.suffix.lower() != ".md" or not resolved_path.is_file():
+        raise ContextPacketError(
+            f"ACTIVE_BRIEF target is not a readable Markdown file: {pointer_lines[0]}"
+        )
+    return resolved_path
+
+
+def _discover_sources(repo_root: Path, *, require_active_brief: bool = False) -> SourceDocs:
     docs_root = repo_root / "docs"
+    active_brief = _load_active_brief(repo_root, required=require_active_brief)
     context_root = docs_root / "context"
     phase_briefs = sorted(
         (docs_root / "phase_brief").glob("phase*-brief.md"),
@@ -195,6 +249,7 @@ def _discover_sources(repo_root: Path) -> SourceDocs:
         raise ContextPacketError(f"Missing required source files: {joined}")
 
     return SourceDocs(
+        active_brief=active_brief,
         phase_briefs=phase_briefs,
         phase_handovers=phase_handovers,
         current_truth_surfaces=current_truth_surfaces,
@@ -290,7 +345,25 @@ def _select_context_source(
     phase_briefs: list[Path],
     phase_handovers: list[Path],
     current_truth_surfaces: list[Path] | None = None,
+    active_brief: Path | None = None,
 ) -> tuple[Path, dict[str, list[str]]]:
+    if active_brief is not None:
+        sections = _parse_context_sections(active_brief.read_text(encoding="utf-8"))
+        first_command = sections["first_command"][0] if sections["first_command"] else ""
+        missing = [
+            key
+            for key in ("what_was_done", "what_is_locked", "what_is_next")
+            if not sections[key]
+        ]
+        if not first_command:
+            missing.append("first_command")
+        if missing:
+            raise ContextPacketError(
+                "Explicit ACTIVE_BRIEF is invalid. "
+                f"Missing required sections: {', '.join(missing)}"
+            )
+        return active_brief, sections
+
     candidates: list[tuple[int, int, Path]] = []
     current_truth_phase = max(
         [_phase_number(path) for path in [*phase_briefs, *phase_handovers]],
@@ -399,13 +472,20 @@ def _validate_markdown_contract(markdown_text: str) -> None:
 
 
 def build_context_packet(
-    repo_root: Path, generated_at_utc: str | None = None
+    repo_root: Path,
+    generated_at_utc: str | None = None,
+    *,
+    require_active_brief: bool = False,
 ) -> dict[str, object]:
-    sources = _discover_sources(repo_root=repo_root)
+    sources = _discover_sources(
+        repo_root=repo_root,
+        require_active_brief=require_active_brief,
+    )
     source_doc, sections = _select_context_source(
         phase_briefs=sources.phase_briefs,
         phase_handovers=sources.phase_handovers,
         current_truth_surfaces=sources.current_truth_surfaces,
+        active_brief=sources.active_brief if require_active_brief else None,
     )
 
     first_command = sections["first_command"][0].strip()
@@ -420,7 +500,12 @@ def build_context_packet(
         {
             path.relative_to(repo_root).as_posix()
             for path in (
-                [*sources.phase_briefs]
+                (
+                    [repo_root / ACTIVE_BRIEF_POINTER, sources.active_brief]
+                    if sources.active_brief is not None
+                    else []
+                )
+                + [*sources.phase_briefs]
                 + [*sources.phase_handovers]
                 + [*sources.current_truth_surfaces]
                 + [sources.decision_log, sources.lessons]
@@ -537,6 +622,14 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Validate existing context artifacts against current sources and schema.",
     )
+    parser.add_argument(
+        "--allow-legacy-discovery",
+        action="store_true",
+        help=(
+            "Migration-only fallback to historical highest-phase discovery when "
+            "docs/context/ACTIVE_BRIEF is absent."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -552,6 +645,7 @@ def validate_existing_outputs(
     json_path: Path,
     md_path: Path,
     generated_at_utc: str | None = None,
+    require_active_brief: bool = False,
 ) -> None:
     if not json_path.exists():
         raise ContextPacketError(f"Missing context JSON artifact: {json_path}")
@@ -561,6 +655,7 @@ def validate_existing_outputs(
     expected_packet = build_context_packet(
         repo_root=repo_root,
         generated_at_utc=generated_at_utc,
+        require_active_brief=require_active_brief,
     )
     try:
         existing_packet = json.loads(json_path.read_text(encoding="utf-8"))
@@ -597,10 +692,13 @@ def main() -> int:
                 json_path=json_out,
                 md_path=md_out,
                 generated_at_utc=args.generated_at_utc,
+                require_active_brief=not args.allow_legacy_discovery,
             )
         else:
             packet = build_context_packet(
-                repo_root=repo_root, generated_at_utc=args.generated_at_utc
+                repo_root=repo_root,
+                generated_at_utc=args.generated_at_utc,
+                require_active_brief=not args.allow_legacy_discovery,
             )
             write_context_outputs(packet=packet, json_path=json_out, md_path=md_out)
     except ContextPacketError as exc:

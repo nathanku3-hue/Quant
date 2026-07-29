@@ -59,7 +59,13 @@ def _make_repo_fixture(root: Path, *, include_locked: bool) -> Path:
             "ConfirmationRequired: YES",
         ]
     )
+    active_brief = repo / "docs/phase_brief/phase7-active-brief.md"
     _write(repo / "docs/handover/phase7_handover.md", "\n".join(handover_lines))
+    _write(active_brief, "\n".join(handover_lines))
+    _write(
+        repo / "docs/context/ACTIVE_BRIEF",
+        "docs/phase_brief/phase7-active-brief.md\n",
+    )
     _write(repo / "docs/decision log.md", "Decision Log\n")
     _write(repo / "docs/lessonss.md", "Lessons\n")
     return repo
@@ -108,6 +114,49 @@ def test_missing_required_section_returns_non_zero(tmp_path: Path) -> None:
     assert "missing required sections" in result.stderr.lower()
 
 
+def test_missing_active_brief_pointer_fails_closed_in_cli(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    (repo / "docs/context/ACTIVE_BRIEF").unlink()
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH), "--repo-root", str(repo)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "missing explicit active brief pointer" in result.stderr.lower()
+
+
+def test_active_brief_path_escape_fails_closed_in_cli(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    _write(repo / "docs/context/ACTIVE_BRIEF", "../outside.md\n")
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH), "--repo-root", str(repo)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "active_brief path escapes the repository" in result.stderr.lower()
+
+
+def test_active_brief_target_must_be_in_phase_brief_directory(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    _write(repo / "README.md", "# Not an active brief\n")
+    _write(repo / "docs/context/ACTIVE_BRIEF", "README.md\n")
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH), "--repo-root", str(repo)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "target must be under docs/phase_brief" in result.stderr.lower()
+
+
 def test_schema_keys_present_and_first_command_non_empty(tmp_path: Path) -> None:
     repo = _make_repo_fixture(tmp_path, include_locked=True)
     packet = build_context_packet(
@@ -135,6 +184,7 @@ def test_active_phase_prefers_selected_context_source(tmp_path: Path) -> None:
     packet = build_context_packet(
         repo_root=repo,
         generated_at_utc=datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        require_active_brief=True,
     )
     assert int(packet["active_phase"]) == 7
 
@@ -855,28 +905,14 @@ def test_context_packet_extraction_prefers_heading_over_preamble_mentions(tmp_pa
     assert packet["what_was_done"] == ["Parsed packet heading, not preamble prose."]
 
 
-def test_validate_mode_fails_when_current_truth_context_changes(tmp_path: Path) -> None:
+def test_validate_mode_fails_when_explicit_active_brief_changes(tmp_path: Path) -> None:
     repo = _make_repo_fixture(tmp_path, include_locked=True)
-    planner_packet = repo / "docs/context/planner_packet_current.md"
-    _write(
-        planner_packet,
-        "\n".join(
-            [
-                "# Planner Packet - Current",
-                "",
-                "## New Context Packet - Replay Coverage Contract Audit Fix",
-                "## What Was Done",
-                "- Current truth v1.",
-                "## What Is Locked",
-                "- Current truth surfaces are authoritative.",
-                "## What Is Next",
-                "- Validate v1.",
-                "## First Command",
-                "```text",
-                ".venv\\Scripts\\python scripts\\build_context_packet.py --validate",
-                "```",
-            ]
+    active_brief = repo / "docs/phase_brief/phase7-active-brief.md"
+    active_brief.write_text(
+        active_brief.read_text(encoding="utf-8").replace(
+            "Implemented context bootstrap.", "Current truth v1."
         ),
+        encoding="utf-8",
     )
     build = subprocess.run(
         [sys.executable, str(SCRIPT_PATH), "--repo-root", str(repo)],
@@ -886,8 +922,8 @@ def test_validate_mode_fails_when_current_truth_context_changes(tmp_path: Path) 
     )
     assert build.returncode == 0, build.stderr
 
-    planner_packet.write_text(
-        planner_packet.read_text(encoding="utf-8").replace(
+    active_brief.write_text(
+        active_brief.read_text(encoding="utf-8").replace(
             "Current truth v1.", "Current truth v2."
         ),
         encoding="utf-8",

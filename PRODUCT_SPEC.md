@@ -1,34 +1,75 @@
 # Product Specification: Terminal Zero / GodView Certified Portfolio OS
 
-## Active Product Header (2026-07-28) — GV-ALPHA0 SHIP
+## Active Product Header (2026-07-29) — R0 Banked, Product Audit Pending
 
 ```text
-PRODUCT = broker-free certified paper-decision workflow
-ACTIVE_BRANCH = codex/gv-alpha0-ship
-BASE = accepted main@48a43b9
+PRODUCT = point-in-time certified portfolio operating system
+RELEASED_SUBSTRATE = gv-alpha0-paper-decision-v0.1.0 @ a88ed05
+RELEASE_PROOF_TIP = 93e7a55
 FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
-SHIPPED_PRODUCT_SCORE = 39/100 (frozen; no alpha)
+SHIPPED_PRODUCT_SCORE = 39/100 (unchanged; no alpha)
 OBSERVED_COMPARISON_COUNT = 0
-RELEASE_READINESS_ESTIMATE = 87/100 (hosted, clean-machine, and browser-pilot proof closed)
-PRIMARY_FLOW = launch → review → confirm NO_POSITION → persist → reopen
-FORBIDDEN = trust anchors, receipts, identities, human comparison, A/B/C release track,
-            providers, score uplift, live capital, experiments, research redesign
+ROADMAP_CUSTODY = BANKED_AUDIT_PENDING
+PRODUCT_SEQUENCE = SLICES_0_TO_6
+EXECUTION_AUTHORIZED_AFTER_AUDIT = SLICES_0_TO_1
+ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0
+NEXT_INTEGRITY_GATE = GV-DETERMINISTIC-REPLAY-0
+ACTIVE_BRIEF = docs/context/ACTIVE_BRIEF
 ```
 
-### Shipment behavior
+### Canonical product unit
 
-- `launch_alpha.py` performs startup diagnostics before Streamlit and accepts `--data-dir <path>`.
-- `core/gv_alpha0_ship_runtime.py` initializes a deterministic sealed sample in platform user storage or `GV_ALPHA0_HOME`.
-- The sample contains only the two fixed source-family authorization inputs, their six raw source objects, and five sealed pre-adjudication case artifacts; it never copies derived family research/results, prior operator confirmation, or certified output.
-- Every packaged startup validates the complete `RELEASE_MANIFEST.json` before initialization, exact-verifies the seed manifest, canonicalizes package/runtime/seed paths, and fails closed on missing/tampered bytes, invalid or missing manifests, junction/symlink escapes, seed-version mismatch, or an unmanaged nonempty root.
-- Confirmation and certification write only to the user workspace. Reopening must display the persisted certified state without resetting it.
-- The release archive is deterministic, versioned, allowlisted, and accompanied by artifact SHA-256 and rollback instructions.
-- Hosted evidence files are written outside the Git checkout so the clean-commit package builder sees exactly the committed tree. Run `30346381138` proves clean Windows/Linux builds, isolated package smokes, and exact archive parity for `a88ed05`; clean artifact SHA-256 is `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`.
-- The clean package also passes a real Chromium-operated Streamlit pilot: sealed review, `PILOT_BROWSER_OPERATOR_001` confirmation, `CASE_WORKSPACE_UI` persistence, server restart, and certified-only reopen. No P0/P1 was found.
+```text
+one declared PIT opportunity set
+→ complete portfolio including classified cash and abstentions
+→ prospective operation
+→ deterministic accounting and replay
+→ lifecycle-based review
+```
 
-Active authority: `docs/phase_brief/gv-alpha0-ship-brief.md`, `PRD.md` Active Build Authority block, and current context surfaces.
+### Product layer stack
 
-**UOE-as-primary, E0A-as-active, and PEAD-as-active-build sections below are historical / superseded as active product authority.** Keep them for audit continuity; do not use them to reopen concurrent research or governance gates.
+1. authority and custody;
+2. accounting and portfolio book;
+3. strategy and Living Thesis;
+4. portfolio and capital competition;
+5. transition and deterministic execution;
+6. replay, attribution, and certification;
+7. portfolio/universe scale and bounded challengers.
+
+Detailed authority: `docs/architecture/godview_v2_frozen_build_learn_roadmap.md` and `docs/architecture/top_level_roadmap.md`.
+
+### R0 custody-repair contract
+
+R0 is an internal repository repair, not a product slice. It must bank one checkoutable authority, explicitly supersede stale instructions, replace highest-numeric-phase selection with `docs/context/ACTIVE_BRIEF`, and preserve released FS0 unchanged.
+
+### Slice 0 product contract
+
+Operate one prospective portfolio containing 3–5 declared securities, one reference benchmark, classified cash, one principal thesis, substitute, competing opportunity, and rejection/abstention. The flow must admit content-addressed evidence, exercise permanent identity and one corporate action, compare capital, certify an aim, execute one paper transition/order/fill, reconcile value, persist, reopen, and process one later prospective update.
+
+### Slice 1 product contract
+
+Reconstruct the exact Slice 0 state from frozen manifests and event logs. Corrections append and restate later books without rewriting prior certifications. Replay must exercise corporate-action correction, partial fill, idempotence, valuation pending, and separation of market-risk actions from economic thesis state.
+
+### Parallel Build × Learn contract
+
+Use three mergeable packages: Truth core, Decision vertical, and Product closure. Freeze only the minimum shared identity/event seams before parallel work; freeze detailed fields when the acceptance fixture exercises them. Strategy and quantitative learning remain shadow-only until deterministic admission and prospective evidence. Replay implementation begins early but certification waits for actual Slice 0 events.
+
+### Alpha-0 substrate behavior
+
+The released Alpha-0 package retains its existing launch, sealed review, paper `NO_POSITION`, persistence, certification, and reopen behavior. Its manifest, confinement, deterministic packaging, and hosted parity remain release evidence. Alpha-0 is a banked substrate, not the active product endpoint.
+
+### Exclusions for the first vertical and replay
+
+- provider acquisition and broad historical data loaders;
+- empirical copulas, MES, optimizers, or Kelly sizing;
+- automated ownership/network propagation;
+- adaptive intraday execution;
+- tactical production capital;
+- shorting, leverage, derivatives, and broker routing;
+- live capital or alpha claims.
+
+**Historical PEAD, UOE, Phase 62–80+, and pre-freeze sections below remain audit history only and cannot reopen competing active gates.**
 
 ---
 

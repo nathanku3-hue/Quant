@@ -1,28 +1,59 @@
 # Product Requirements Document: Terminal Zero / GodView Certified Portfolio OS
 
-## Active Build Authority (2026-07-28) — GV-ALPHA0 SHIP
+## Active Build Authority (2026-07-29) — R0 Banked, Product Audit Pending
 
 ```text
-PRODUCT = usable certified paper-decision product
-ACTIVE_BRANCH = codex/gv-alpha0-ship
-BASE = accepted main@48a43b9
+PRODUCT = point-in-time certified portfolio operating system
+RELEASED_SUBSTRATE = gv-alpha0-paper-decision-v0.1.0 @ a88ed05
+RELEASE_PROOF_TIP = 93e7a55
 FUNCTIONAL_STAGE = CERTIFIED_MULTI_SOURCE_CASE_OPERABLE
-SHIPPED_PRODUCT_SCORE = 39/100 (frozen; no alpha)
+SHIPPED_PRODUCT_SCORE = 39/100 (unchanged; no alpha)
 OBSERVED_COMPARISON_COUNT = 0
-USER_FLOW = launch → review → confirm paper NO_POSITION → persist → reopen
-RELEASE_READINESS_ESTIMATE = 87/100 (hosted, clean-machine, and browser-pilot proof closed; not product score)
-NEXT = tag clean a88ed05 artifact → publish release
-FORBIDDEN = trust anchors, receipts, identity, human comparison, A/B/C release track,
-            experiments, providers, formal score uplift, live capital, research redesign
+ROADMAP_CUSTODY = BANKED_AUDIT_PENDING
+PRODUCT_SEQUENCE = SLICES_0_TO_6
+EXECUTION_AUTHORIZED_AFTER_AUDIT = SLICES_0_TO_1
+ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0
+NEXT_INTEGRITY_GATE = GV-DETERMINISTIC-REPLAY-0
+ACTIVE_BRIEF = docs/context/ACTIVE_BRIEF
+LIVE_CAPITAL = NOT_AUTHORIZED
 ```
 
-- **Authority docs**: `docs/phase_brief/gv-alpha0-ship-brief.md`, `docs/context/planner_packet_current.md`, and `docs/architecture/top_level_roadmap.md` for endgame continuity.
-- **Release requirement**: before initialization, every packaged file must match `RELEASE_MANIFEST.json`; package/runtime/seed paths must be canonical and confined; a deterministic sample must initialize in user-writable storage; operator state must persist outside the installed package.
-- **Package requirement**: versioned allowlisted artifact, exact source commit, artifact SHA-256, clean Windows/Linux smoke, rollback instructions, and no broker/provider dependency.
-- **Claim boundary**: the product supports one certified paper `NO_POSITION` workflow. It does not prove decision improvement, alpha, live-capital readiness, or provider breadth.
-- **Score rule**: keep canonical product score at 39 and observed count at 0 until a separately authorized evidence gate changes them. Shipment-readiness estimates must remain explicitly separate.
+### Product unit
 
-The two audited P1s and hosted-cleanliness repair are committed through `a88ed05`. Hosted run `30346381138` passes Windows/Linux product suites, clean commit-bound builds, isolated extracted-package smokes, uploads, authority parity, and exact byte parity. The clean artifact is 18,666,047 bytes with SHA-256 `67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57`; an independent isolated Windows smoke and clean-package Chromium pilot also pass. The pilot persisted a `CASE_WORKSPACE_UI` confirmation and reopened certified-only after server restart with no P0/P1. Readiness is 87; tag and publication remain open.
+```text
+one declared PIT opportunity set
+→ complete portfolio including classified cash and abstentions
+→ prospective operation
+→ deterministic accounting and replay
+→ lifecycle-based review
+```
+
+### Active authority
+
+- `docs/architecture/godview_v2_frozen_build_learn_roadmap.md` — detailed frozen eight-slice roadmap and parallel layer model;
+- `docs/architecture/top_level_roadmap.md` — compact active canon;
+- `PHASE_QUEUE.md` — active slice status and dependency queue;
+- `docs/context/planner_packet_current.md` — current execution truth.
+
+### Required immediate behavior
+
+R0 repairs and banks one checkoutable roadmap authority. It is not a product slice. It must explicitly supersede stale direct-base instructions, retire numeric Phase 66 as active authority, and make `docs/context/ACTIVE_BRIEF` the fail-closed selector.
+
+Slice 0 must operate one prospective complete portfolio with 3–5 securities, one benchmark, classified cash, one principal thesis, substitute, competitor, rejection/abstention, deterministic capital competition, one paper order/fill, certification, persistence, reopen, and one later prospective evidence update.
+
+Slice 1 must exactly reconstruct the Slice 0 books and thesis state, preserve prior certifications under corrections, and pass corporate-action, partial-fill, idempotence, and valuation-pending fixtures before portfolio expansion.
+
+### Build × Learn rule
+
+Use three mergeable packages: Truth core, Decision vertical, and Product closure. Freeze the minimum shared identity/event seams before parallel work; freeze field-level detail only when the vertical fixture exercises it. Learn work may collect shadow evidence, but cannot mutate certified truth, create a second active authority, or block the product vertical without a P0/P1 correctness finding.
+
+### Claim and scope boundary
+
+Alpha-0 remains released substrate and proves only its narrow fixed paper-decision workflow. It does not prove portfolio operation, decision improvement, alpha, calibrated probability, provider breadth, or live-capital readiness.
+
+Forbidden on the first vertical and replay critical path: provider programmes, broad historical loaders, released FS0 mutation, optimizers, fitted copulas, automated graph contagion, adaptive intraday execution, tactical capital, broad tax/FX frameworks, shorting, leverage, derivatives, broker routing, score uplift, and live capital.
+
+**All historical PEAD, UOE, Phase 62–80+, and pre-freeze notices below are retained for audit continuity only. They do not compete with the active frozen roadmap.**
 
 ---
 

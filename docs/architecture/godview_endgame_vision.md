@@ -1,8 +1,11 @@
 # GodView Endgame Vision
 
-Status: Active Architecture Canon — GV-FS0 First
-Date: 2026-07-16
-Authority: `godview_portfolio_p0_owner_freeze.md`, `top_level_roadmap.md`, `gv_fs0_certification_and_data_authority_contract.md`, and the frozen research contract
+Status: Supporting Endgame Canon — governed by the corrected seven-slice product roadmap
+Date: 2026-07-29 active-authority update; historical body retained
+Primary authority: `godview_v2_frozen_build_learn_roadmap.md` and `top_level_roadmap.md`
+Supporting authority: `godview_portfolio_p0_owner_freeze.md`, `gv_fs0_certification_and_data_authority_contract.md`, and frozen research contracts
+
+> Active authority: R0 roadmap custody repair is banked and awaiting independent audit. After PASS, `GV-MICRO-PORTFOLIO-VERTICAL-0 → GV-DETERMINISTIC-REPLAY-0`; bounded portfolio remains blocked by exact replay. Prior GV-FS naming below is architectural history and reusable substrate, not a competing queue.
 
 ## Product Center
 
