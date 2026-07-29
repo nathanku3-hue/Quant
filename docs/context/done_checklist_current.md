@@ -8,7 +8,7 @@
 - [x] S3 banked locally as isolated commit `3040a77`.
 - [x] S4 banked locally as isolated commit `1f11c0c`.
 - [x] Terminal integration commit banked locally.
-- [ ] Terminal branch pushed and remote-equal.
+- [x] Terminal branch pushed and remote-equal.
 
 ## Functional integration
 

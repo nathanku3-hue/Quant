@@ -7577,5 +7577,5 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Certification decision: require reconciled terminal book, explicit execution costs, zero split and unexplained residual, and a validated execution authority chain.
 - Verification decision: accept 82/82 portfolio and 150/150 frozen protocol as candidate evidence; record legacy product 259/263 with four unrelated frozen-document failures. Do not claim full repository PASS because declared environments cannot collect all existing tests.
 - Score decision: shipped score remains 39/100 and observed remains 0 until exact remote custody and independent audit PASS.
-- Stop: do not open Product feature work or Replay implementation. First retry push, prove remote equality, repair the declared full-suite environment, and audit the exact remote commit.
+- Stop: do not open Product feature work or Replay implementation. First repair the declared full-suite environment and audit the exact remote commit.
 

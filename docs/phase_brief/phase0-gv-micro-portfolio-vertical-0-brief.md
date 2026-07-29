@@ -2,7 +2,7 @@
 
 Date: 2026-07-29
 Mode: `EXECUTION_PACKET`
-Status: `IMPLEMENTATION_COMPLETE_LOCAL; CUSTODY_AND_AUDIT_BLOCKED`
+Status: `IMPLEMENTATION_COMPLETE_REMOTE; FULL_SUITE_AND_AUDIT_BLOCKED`
 Authority: corrected GodView portfolio roadmap and R0 custody-repair acceptance
 
 ## Hierarchy
@@ -16,7 +16,7 @@ Authority: corrected GodView portfolio roadmap and R0 custody-repair acceptance
 
 ## Recommended next action
 
-Push the exact terminal branch tip, prove local/remote equality, and audit that SHA. Do not open Product feature work, Replay implementation, or bounded-portfolio scale work before remote custody and independent audit PASS.
+Repair the declared full-suite environment and audit the exact remote terminal SHA. Do not open Product feature work, Replay implementation, or bounded-portfolio scale work before both gates pass.
 
 ## Product target
 
@@ -94,7 +94,7 @@ Operational gates remain binary:
 ```text
 Roadmap custody banked             1/1
 Micro-portfolio candidate built    1/1
-Terminal remote custody            0/1
+Terminal remote custody            1/1
 Independent candidate audit        0/1
 Exact deterministic replay         0/1
 Bounded repeated portfolio         0/1
@@ -141,7 +141,6 @@ providers · WRDS acquisition · broad historical loaders · optimizer · copula
 
 ## What Is Next
 
-- Retry the authorized push and prove remote equality at the terminal branch tip.
 - Repair the repository dependency declaration/environment before claiming a full pinned-suite PASS.
 - Run independent Reviewer A/B/C audit against the exact remote terminal SHA.
 - Keep Product and Replay read-only until that audit passes.

@@ -29,8 +29,8 @@ The visible product gains explicit transition lineage, classified execution cost
 
 ### Repository impact
 
-The dirty root checkout remains untouched. All work is isolated in `gv-micro-portfolio-v0-repair`, descended from exact base `b3d5092`. Three stream commits and the shared integration are locally banked in required order. Remote custody remains blocked by the connector push gate.
+The dirty root checkout remains untouched. All work is isolated in `gv-micro-portfolio-v0-repair`, descended from exact base `b3d5092`. Three stream commits and the shared integration are banked in required order, pushed, and local/remote-equal.
 
 ### Score impact
 
-Canonical shipped score remains **39/100**. The implementation improves candidate completeness but cannot change the score until the terminal SHA is pushed and independently accepted.
+Canonical shipped score remains **39/100**. The implementation improves candidate completeness but cannot change the score until the full-suite environment and independent audit gates pass.

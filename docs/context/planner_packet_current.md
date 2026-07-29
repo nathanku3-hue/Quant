@@ -17,7 +17,7 @@
 - Frozen GV-FS0 protocol set: **150/150 PASS**.
 - Legacy GV-FS0 product set: **259/263 PASS**; four failures are pre-existing frozen-canon/roadmap status assertions outside this repair scope.
 - Repository-wide collection is blocked because declared environments omit packages imported by existing tests (`psycopg2`, `schedule`, `yaml`; one pinned venv also omits `alpaca`). These packages are not fully represented in the declared lock mirror, so no truthful full-pinned-suite PASS can be claimed.
-- Remote push is blocked by the connector safety gate; the remote branch remains at `b3d5092`.
+- The terminal branch tip is pushed and local/remote-equal.
 
 ### Integration topology
 
@@ -30,8 +30,8 @@ No second product phase may open in parallel.
 
 ### Next valid action
 
-Retry the authorized push, prove local/remote equality, then run an independent audit against that exact SHA. Product may continue read-only compatibility checks. Replay/Certification implementation remains closed until this candidate has remote custody and audit PASS.
+Repair the declared repository-wide test environment, then run an independent audit against the exact remote terminal SHA. Product may continue read-only compatibility checks. Replay/Certification implementation remains closed until the full-suite environment and audit gates pass.
 
 ### Stop conditions
 
-Do not start Product feature work, deterministic Replay implementation, provider/data expansion, optimizer work, broker integration, score uplift, or live-capital scope. Do not claim the phase shipped while push, full-suite environment completeness, or independent audit remains unresolved.
+Do not start Product feature work, deterministic Replay implementation, provider/data expansion, optimizer work, broker integration, score uplift, or live-capital scope. Do not claim the phase shipped while full-suite environment completeness or independent audit remains unresolved.

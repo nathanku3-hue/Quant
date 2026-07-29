@@ -8,9 +8,9 @@ Scope: S2 Accounting → S3 Strategy → S4 Execution → shared Integrator wiri
 
 ## Verdict
 
-`BLOCKED_CUSTODY_AND_ENVIRONMENT`
+`BLOCKED_ENVIRONMENT_AND_INDEPENDENT_AUDIT`
 
-The integrated candidate is functionally complete and clean on its declared slice, but it is not accepted or shipped. Remote push is blocked, the repository-wide pinned environment cannot collect all existing tests, and independent agent separation has not been established against a remote terminal SHA.
+The integrated candidate is functionally complete, pushed, and local/remote-equal, but it is not accepted or shipped. The repository-wide pinned environment cannot collect all existing tests, and independent agent separation has not been established against the remote terminal SHA.
 
 ## Reviewer A — Strategy and product regression
 
@@ -56,8 +56,8 @@ Verdict: `PASS_CANDIDATE`
 ## Blocking closure conditions
 
 1. `[DONE_LOCAL]` Bank one clean terminal integration SHA.
-2. Push that exact SHA and prove local/remote equality.
+2. `[DONE_REMOTE]` Push that exact SHA and prove local/remote equality.
 3. Repair and pin the repository-wide test environment, then run the full suite without collection errors.
 4. Run genuinely independent Reviewer A/B/C checks against the exact remote SHA.
 
-Until conditions 2–4 pass, Replay implementation and new Product feature work remain closed.
+Until conditions 3–4 pass, Replay implementation and new Product feature work remain closed.

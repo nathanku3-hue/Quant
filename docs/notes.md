@@ -6559,6 +6559,6 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Product: review/confirm/certify/persist/reopen/later-WATCH flow remains intact; render-time state is derived; persisted schema is `gv_portfolio_v0_workspace_v2`.
 - Verification: portfolio 82/82 PASS; frozen protocol 150/150 PASS; legacy product 259/263 with four unrelated authority-document failures.
 - Full suite: blocked at collection by incomplete declared environments (`alpaca`, `psycopg2`, `schedule`, `yaml` across available pinned venvs). No full-pinned PASS claim.
-- Custody: connector blocks push; terminal remote SHA and independent audit remain open.
+- Custody: terminal branch is pushed and local/remote-equal; independent audit remains open.
 - Score: canonical shipped 39/100; observed 0; no alpha or live-capital claim.
 

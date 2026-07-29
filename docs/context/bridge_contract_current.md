@@ -6,8 +6,8 @@
 - **PRODUCT_DELTA:** the existing confirm → execute → certify → persist/reopen → later WATCH flow now consumes canonical cross-stream records and a reconciled PortfolioBook.
 - **SCHEMA:** `gv_portfolio_v0_workspace_v2`; no compatibility adapter for superseded bytes.
 - **VERIFICATION:** portfolio 82/82 PASS; frozen protocol 150/150 PASS; legacy product 259/263 PASS with four unrelated frozen-document failures.
-- **BLOCKERS:** connector denies push; full repository collection lacks declared dependencies; independent audit has not run against a remote terminal SHA.
+- **BLOCKERS:** full repository collection lacks declared dependencies; independent audit has not run against the remote terminal SHA.
 - **SCORE:** shipped product score remains **39/100**; observed remains **0**; no alpha or live-capital claim.
 - **OPEN_DECISION:** none. The next action is mechanical custody and audit, not feature selection.
-- **RECOMMENDED_NEXT_STEP:** retry push, prove remote equality, and audit that exact SHA.
+- **RECOMMENDED_NEXT_STEP:** repair the declared full-suite environment and audit the exact remote terminal SHA.
 - **DO_NOT_START:** Product feature work, Replay implementation, providers, WRDS, broad loaders, optimizer/copula/graph/adaptive execution, broker, score uplift, or live capital.
