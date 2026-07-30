@@ -43,10 +43,14 @@ Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 
 ## Slice 2 — `GV-BOUNDED-PORTFOLIO-1`
 
-- **Status:** `OPEN; IMPLEMENTATION_AUTHORIZED`
-- **Replay code pin:** exact `0e4b93fb370f67956502edc02e9c6f56ceb2eba3`
+- **Status:** `IMPLEMENTATION_IN_PROGRESS`
+- **Promotion tip / branch base:** exact `5fc2e4c01aa98ffe6ad9fcce4d1f9299c4aee6e4`
+- **Replay code pin (immutable, not branch point):** exact `0e4b93fb370f67956502edc02e9c6f56ceb2eba3`
+- **Implementation branch:** `codex/gv-bounded-portfolio-1`
+- **Module:** `gv_portfolio_v0/bounded.py` + `tests/gv_portfolio_v0/test_bounded.py`
 - **Brief:** `docs/phase_brief/phase2-gv-bounded-portfolio-1-brief.md`
 - **Objective:** repeated bounded multi-security paper portfolio operation with exact replay remaining green.
+- **Cycle law:** Replay suite excluding `test_bounded.py` stays **105 pass / 1 skip**; stop on Replay drift.
 
 ## Evidence-gated later slices
 
@@ -75,9 +79,10 @@ providers · WRDS · broad historical loaders · optimizer · copula/MES · adap
 ## Immediate next action
 
 ```text
-clean isolated worktree from Bounded Portfolio promotion tip
-→ pin Replay code base 0e4b93f
-→ implement only GV-BOUNDED-PORTFOLIO-1
-→ keep exact replay green on every cycle
-→ do not open Portfolio Scale until bounded PASS
+branch codex/gv-bounded-portfolio-1 from exact 5fc2e4c
+→ pin Replay code base 0e4b93f (immutable)
+→ pytest tests/gv_portfolio_v0 --ignore=test_bounded.py  # expect 105 pass / 1 skip
+→ pytest tests/gv_portfolio_v0/test_bounded.py
+→ stop on any Replay byte/hash/cert drift
+→ do not open Portfolio Scale until bounded PASS + A/B/C
 ```

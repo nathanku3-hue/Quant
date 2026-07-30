@@ -2,8 +2,8 @@
 
 Date: 2026-07-30
 Mode: `EXECUTION_PACKET`
-Status: `OPEN; IMPLEMENTATION_AUTHORIZED`
-Authority: Replay 0 accepted at exact terminal `0e4b93f`; docs-only promotion open
+Status: `IMPLEMENTATION_IN_PROGRESS; BRANCH_FROM_5fc2e4c`
+Authority: Replay 0 accepted at exact terminal `0e4b93f`; implementation branch `codex/gv-bounded-portfolio-1`
 
 ## Immutable pins (do not rewrite)
 
@@ -24,7 +24,7 @@ Ancestry: `85e6601` → … → `03a5c92` → `9bee439` → **`0e4b93f`** (ACCEP
 
 ## Recommended next action
 
-Create a clean isolated implementation worktree from **this promotion tip** (docs open) while treating **`0e4b93f` as the immutable Replay code base**. Implement only bounded repeated portfolio operation on top of exact replay. Do not reopen Replay feature work except to pay explicit Medium debt listed below.
+Continue on branch `codex/gv-bounded-portfolio-1` (from promotion tip `5fc2e4c`). Keep Replay code pin `0e4b93f` frozen. Every cycle: Replay baseline `105 pass / 1 skip` unchanged; bounded tests separate. Stop on any Replay byte/hash/certification drift.
 
 ## Product target
 
