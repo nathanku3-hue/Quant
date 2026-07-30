@@ -1,5 +1,5 @@
 {
-  "artifact_path": "E:\\Code\\Quant\\data\\fixtures\\g4\\prices_tri_real_canonical_tiny_slice.parquet",
+  "artifact_path": "data/fixtures/g4/prices_tri_real_canonical_tiny_slice.parquet",
   "asof_ts": "2026-05-09T08:43:53Z",
   "date_range": {
     "end": "2024-02-29",

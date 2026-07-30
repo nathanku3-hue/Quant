@@ -62,6 +62,7 @@ def load_g4_canonical_slice(
         raise G4ReadinessError(f"G4 manifest failed validation: {exc}") from exc
     _validate_manifest_contract(
         manifest,
+        repo_root=root,
         artifact_path=artifact_path,
         manifest_uri=manifest_uri,
         dataset_name=dataset_name,
@@ -117,13 +118,14 @@ def validate_sidecar_manifest_if_required(
 def _validate_manifest_contract(
     manifest: Mapping[str, Any],
     *,
+    repo_root: Path,
     artifact_path: Path,
     manifest_uri: str | Path,
     dataset_name: str,
 ) -> None:
     _validate_source_is_tier0(manifest)
     declared_path = str(manifest.get("artifact_path") or "").strip()
-    if declared_path and Path(declared_path) != artifact_path:
+    if declared_path and _resolve_path(repo_root, declared_path) != artifact_path:
         raise G4ReadinessError("G4 manifest artifact_path mismatch")
     if str(manifest.get("schema_version") or "").strip() != G4_SCHEMA_VERSION:
         raise G4ReadinessError("G4 schema_version mismatch")
