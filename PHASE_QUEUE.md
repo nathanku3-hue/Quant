@@ -59,11 +59,13 @@ Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 
 ## Slice 4 — `GV-UNIVERSE-SCALE-1`
 
-- **Status:** `OPEN; IMPLEMENTATION_AUTHORIZED`
-- **Promotion tip / branch base:** this docs-only open commit (parent is Scale terminal `c37abf0`)
-- **Scale code pin (immutable, not branch point alone):** exact `c37abf00293937b9b99eb6e560f6b5b77a92ea1f`
+- **Status:** `IMPLEMENTATION_IN_PROGRESS`
+- **Promotion tip / branch base:** exact `133b6326b74af35388730662206a6495125d4474`
+- **Scale code pin (immutable, not branch point):** exact `c37abf00293937b9b99eb6e560f6b5b77a92ea1f`
 - **Bounded code pin:** exact `abaa814ce99ea78afadc33dd40506f4e13a742ef`
 - **Replay code pin:** exact `0e4b93fb370f67956502edc02e9c6f56ceb2eba3`
+- **Implementation branch:** `codex/gv-universe-scale-1`
+- **Module:** `gv_portfolio_v0/universe.py` + `tests/gv_portfolio_v0/test_universe.py`
 - **Brief:** `docs/phase_brief/phase4-gv-universe-scale-1-brief.md`
 - **Objective:** scale paper portfolio operation across a larger declared security universe while keeping exact replay, residual zero, and session custody green.
 - **Gate law:** every cycle re-verify Scale multi-session + Bounded multi-cycle + exact Replay; stop on any event/cert/reopen/book/ledger/hash drift.

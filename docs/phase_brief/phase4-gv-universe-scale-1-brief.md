@@ -2,8 +2,8 @@
 
 Date: 2026-07-30
 Mode: `EXECUTION_PACKET`
-Status: `OPEN; IMPLEMENTATION_AUTHORIZED; BRANCH_FROM_docs_open_after_c37abf0`
-Authority: Portfolio Scale 1 accepted at exact terminal `c37abf0`; only this slice is open
+Status: `IMPLEMENTATION_IN_PROGRESS; BRANCH_FROM_133b632`
+Authority: Portfolio Scale 1 accepted at exact terminal `c37abf0`; implementation branch `codex/gv-universe-scale-1`
 
 ## Immutable pins (do not rewrite)
 
@@ -26,7 +26,7 @@ Ancestry: … → `c37abf0` (ACCEPT_PORTFOLIO_SCALE_1) → this docs-only promot
 
 ## Recommended next action
 
-Branch implementation from this docs-only promotion tip (parent Scale terminal `c37abf0`). Keep Scale pin `c37abf0`, Bounded pin `abaa814`, and Replay pin `0e4b93f` frozen. Every cycle re-run Scale multi-session, Bounded multi-cycle, and exact Replay gates; stop on any event/cert/reopen/book/ledger/hash drift.
+Continue on branch `codex/gv-universe-scale-1` (from promotion tip `133b632`). Keep Scale pin `c37abf0`, Bounded pin `abaa814`, and Replay pin `0e4b93f` frozen. Every cycle re-run Scale multi-session, Bounded multi-cycle, and exact Replay gates; stop on any event/cert/reopen/book/ledger/hash drift.
 
 ## Product target
 
