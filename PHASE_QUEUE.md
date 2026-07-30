@@ -51,11 +51,15 @@ Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 
 ## Slice 3 — `GV-PORTFOLIO-SCALE-1`
 
-- **Status:** `OPEN; IMPLEMENTATION_AUTHORIZED`
-- **Bounded code pin:** exact `abaa814ce99ea78afadc33dd40506f4e13a742ef`
+- **Status:** `IMPLEMENTATION_IN_PROGRESS`
+- **Promotion tip / branch base:** exact `eedf853566d009dc6a5af74397c316013b87a853`
+- **Bounded code pin (immutable, not branch point):** exact `abaa814ce99ea78afadc33dd40506f4e13a742ef`
 - **Replay code pin:** exact `0e4b93fb370f67956502edc02e9c6f56ceb2eba3`
+- **Implementation branch:** `codex/gv-portfolio-scale-1`
+- **Module:** `gv_portfolio_v0/scale.py` + `tests/gv_portfolio_v0/test_scale.py`
 - **Brief:** `docs/phase_brief/phase3-gv-portfolio-scale-1-brief.md`
 - **Objective:** scale repeated paper portfolio operation with custody/replay stability.
+- **Gate law:** every cycle re-verify Bounded multi-cycle + exact Replay; stop on any event/cert/reopen/book/ledger/hash drift.
 
 ## Evidence-gated later slices
 
@@ -84,9 +88,11 @@ providers · WRDS · broad historical loaders · optimizer · copula/MES · adap
 ## Immediate next action
 
 ```text
-clean isolated worktree from Portfolio Scale promotion tip
-→ pin Bounded terminal abaa814 + Replay 0e4b93f
-→ implement only GV-PORTFOLIO-SCALE-1
-→ keep bounded multi-cycle + exact replay green
-→ do not open Universe Scale until portfolio-scale PASS
+branch codex/gv-portfolio-scale-1 from exact eedf853
+→ pin Bounded abaa814 + Replay 0e4b93f (immutable)
+→ pytest tests/gv_portfolio_v0 --ignore=test_bounded.py --ignore=test_scale.py  # Replay freeze
+→ pytest tests/gv_portfolio_v0/test_bounded.py
+→ pytest tests/gv_portfolio_v0/test_scale.py
+→ stop on any Replay/Bounded drift
+→ do not open Universe Scale until portfolio-scale PASS + A/B/C
 ```

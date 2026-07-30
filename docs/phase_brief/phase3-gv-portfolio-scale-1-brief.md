@@ -2,8 +2,8 @@
 
 Date: 2026-07-30
 Mode: `EXECUTION_PACKET`
-Status: `OPEN; IMPLEMENTATION_AUTHORIZED`
-Authority: Bounded Portfolio 1 accepted at exact terminal `abaa814`; docs-only promotion open
+Status: `IMPLEMENTATION_IN_PROGRESS; BRANCH_FROM_eedf853`
+Authority: Bounded Portfolio 1 accepted at exact terminal `abaa814`; implementation branch `codex/gv-portfolio-scale-1`
 
 ## Immutable pins (do not rewrite)
 
@@ -25,7 +25,7 @@ Ancestry: … → `0e4b93f` (Replay) → `5fc2e4c` (open Bounded) → `4f3bc6b` 
 
 ## Recommended next action
 
-Create a clean isolated implementation worktree from **this promotion tip** (docs open) while treating **`abaa814` as the immutable Bounded Portfolio code pin** (and Replay pin `0e4b93f`). Implement only portfolio-scale custody/replay stability. Do not reopen Bounded or Replay feature work except explicit carried Medium debt.
+Continue on branch `codex/gv-portfolio-scale-1` (from promotion tip `eedf853`). Keep Bounded pin `abaa814` and Replay pin `0e4b93f` frozen. Every cycle re-run Bounded multi-cycle and exact Replay gates; stop on any event/cert/reopen/book/ledger/hash drift.
 
 ## Product target
 
