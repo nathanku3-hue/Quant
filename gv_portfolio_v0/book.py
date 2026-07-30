@@ -2,8 +2,10 @@
 
 Accounting consumes the declared canonical PortfolioBookEvent order. Custody
 owns event identity; this module owns economic validation and book projection.
-It deliberately does not reconstruct arbitrary event order, apply corrections,
-or model partial fills. Those behaviours remain Replay 0 scope.
+It applies economic validation and book projection for the declared order.
+Replay 0 owns reconstruction orchestration, correction lineage reports, and
+idempotence proofs. Partial fills are economically legal here when cumulative
+fill quantity never exceeds the order; residual state is projected for Replay.
 """
 
 from __future__ import annotations
@@ -36,6 +38,7 @@ class _Reduction:
     split_value_residual: Decimal
     unexplained_residual: Decimal | None
     valuation_pending: bool
+    partial_fill_residuals: list[dict[str, str]]
 
 
 def _decimal(value: Any, *, field: str) -> Decimal:
@@ -135,6 +138,7 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
     cash: dict[str, Decimal] = {}
     positions: dict[str, dict[str, Decimal | None]] = {}
     orders: dict[str, dict[str, Any]] = {}
+    order_filled: dict[str, Decimal] = {}
     seen_fill_ids: set[str] = set()
     completely_filled_order_ids: set[str] = set()
     split_residuals: list[Decimal] = []
@@ -270,9 +274,14 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
             order_quantity = _whole_quantity(
                 order.get("quantity"), field="order.quantity", positive=True
             )
-            if quantity != order_quantity:
-                raise PortfolioBookError("COMPLETE_FILL_QUANTITY_MISMATCH")
-            completely_filled_order_ids.add(order_id)
+            filled_so_far = order_filled.get(order_id, Decimal("0"))
+            remaining = order_quantity - filled_so_far
+            if quantity > remaining:
+                raise PortfolioBookError("FILL_QUANTITY_EXCEEDS_REMAINING")
+            new_filled = filled_so_far + quantity
+            order_filled[order_id] = new_filled
+            if new_filled == order_quantity:
+                completely_filled_order_ids.add(order_id)
             price = _money(fill.get("price"), field="fill.price")
             fee = _money(fill.get("fee"), field="fill.fee")
             required_cash = quantity * price + fee
@@ -307,6 +316,7 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
             "PORTFOLIO_TRANSITION_PLANNED",
             "LATER_OBSERVATION_ADMITTED",
             "CERTIFICATION_RECORDED",
+            "CORRECTION_RECORDED",
         }:
             continue
         else:
@@ -368,6 +378,26 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
         else terminal_nav - (opening_nav - total_costs)
     )
 
+    partial_fill_residuals: list[dict[str, str]] = []
+    for order_id, order in sorted(orders.items()):
+        order_quantity = _whole_quantity(
+            order.get("quantity"), field="order.quantity", positive=True
+        )
+        filled = order_filled.get(order_id, Decimal("0"))
+        residual = order_quantity - filled
+        if residual > 0:
+            partial_fill_residuals.append(
+                {
+                    "order_id": order_id,
+                    "instrument_id": _required_text(
+                        order.get("instrument_id"), field="order.instrument_id"
+                    ),
+                    "ordered_quantity": _decimal_text(order_quantity),
+                    "filled_quantity": _decimal_text(filled),
+                    "residual_quantity": _decimal_text(residual),
+                }
+            )
+
     return _Reduction(
         positions=position_rows,
         classified_cash=cash_rows,
@@ -380,6 +410,7 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
         split_value_residual=sum(split_residuals, Decimal("0")),
         unexplained_residual=unexplained_residual,
         valuation_pending=valuation_pending,
+        partial_fill_residuals=partial_fill_residuals,
     )
 
 
@@ -466,8 +497,12 @@ def build_portfolio_book(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
         ),
         "execution_relationships_valid": True,
         "declared_precision": DECLARED_PRECISION,
+        "partial_fill_residuals": reduced.partial_fill_residuals,
     }
-    book["book_hash"] = domain_hash(f"{ID_DOMAIN}:BOOK:V2", book)
+    # Hash excludes partial residuals so Slice 0 complete-fill certs stay stable;
+    # residuals are authoritative for Replay reports via explicit field access.
+    hash_body = {key: value for key, value in book.items() if key != "partial_fill_residuals"}
+    book["book_hash"] = domain_hash(f"{ID_DOMAIN}:BOOK:V2", hash_body)
     return book
 
 

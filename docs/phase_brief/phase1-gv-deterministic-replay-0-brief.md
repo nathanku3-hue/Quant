@@ -10,9 +10,10 @@ Authority: Slice 0 accepted; relocatable custody supersede A/B/C PASS
 | Role | Exact SHA | Note |
 |---|---|---|
 | Slice 0 product terminal | `85e6601742710f03e6cced7377b4be426cd4892f` | immutable; do not rewrite |
-| Replay 0 custody base | `03a5c922d250d615380bbd0d60e8fd636e4ec1c6` | Path-1 supersede; remote-equal on `codex/repository-custody-repair` |
+| Replay 0 custody base | `03a5c922d250d615380bbd0d60e8fd636e4ec1c6` | Path-1 supersede; tagged `gv-replay-0-base` |
+| Implementation / promotion tip | `9bee4396502174cfd791809e53de183e1a93bb75` | authority-opening brief + ACTIVE_BRIEF; branch from **this** tip |
 
-Ancestry: `85e6601` → `bd07f61` (relocatable G4/MSFT) → `03a5c92` (restore V2-B0 MU non-binding + explicit G8 MU retirement).
+Ancestry: `85e6601` → `bd07f61` → `03a5c92` (custody) → `9bee439` (docs promote / open Replay 0).
 
 ## Hierarchy
 
@@ -24,7 +25,7 @@ Ancestry: `85e6601` → `bd07f61` (relocatable G4/MSFT) → `03a5c92` (restore V
 
 ## Recommended next action
 
-In a clean isolated worktree descended from exact Replay 0 base `03a5c92`, implement **only** deterministic replay certification for actual Slice 0 portfolio events. Do not open bounded-portfolio scale, provider, optimizer, or live-capital work.
+Create the implementation branch from promotion tip **`9bee439`** (not bare `03a5c92`, which omits the authority-opening brief). Record immutable custody base `03a5c92`. Implement **only** deterministic replay certification for actual Slice 0 portfolio events. Product/Slice 0 remain read-only.
 
 ## Product target
 
@@ -75,7 +76,7 @@ providers · WRDS acquisition · broad historical loaders · optimizer · copula
 
 ## Stop rules
 
-1. Stop if implementation is not descended from exact `03a5c92` (or a later audited Replay-only descendant that preserves the custody pins).
+1. Stop if implementation is not descended from promotion tip `9bee439` (or a later audited Replay-only descendant that preserves custody base `03a5c92` and Slice 0 `85e6601`).
 2. Stop if Slice 0 base `85e6601` is rewritten or force-moved.
 3. Stop if MU historical non-binding is broken without a full V2-B0 product redesign packet.
 4. Stop if work expands into bounded-portfolio scale before exact replay PASS.

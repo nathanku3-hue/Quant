@@ -17,10 +17,10 @@ Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 
 1. `R0 — ROADMAP-CUSTODY-REPAIR` was internal repository repair, not a product slice; closed under Slice 0 + custody supersede.
 2. The seven-slice product sequence is fixed at boundary and gate level.
-3. **Only `GV-DETERMINISTIC-REPLAY-0` is open for implementation** on base `03a5c92`.
+3. **Only `GV-DETERMINISTIC-REPLAY-0` is open for implementation** from promotion tip `9bee439` (custody base `03a5c92` remains the immutable code pin).
 4. Bounded portfolio work remains blocked until exact deterministic replay passes.
 5. Released `gv_fs0_v1` remains immutable; portfolio work uses `gv_portfolio_v0`.
-6. Work occurs only in a clean isolated worktree descended from Replay 0 base `03a5c92`.
+6. Work occurs only in a clean isolated worktree descended from promotion tip `9bee439`.
 7. The dirty root checkout is not execution or publication authority.
 8. Slice 0 at `85e6601` is immutable; do not rewrite it to absorb custody fixes.
 
@@ -46,7 +46,9 @@ Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 ## Slice 1 — `GV-DETERMINISTIC-REPLAY-0`
 
 - **Status:** `OPEN; IMPLEMENTATION_AUTHORIZED`
-- **Base:** exact `03a5c922d250d615380bbd0d60e8fd636e4ec1c6`
+- **Promotion tip / branch base:** exact `9bee4396502174cfd791809e53de183e1a93bb75`
+- **Immutable custody base:** exact `03a5c922d250d615380bbd0d60e8fd636e4ec1c6`
+- **Implementation branch:** `codex/gv-deterministic-replay-0`
 - **Objective:** exactly reconstruct the operated Slice 0 portfolio rather than merely reproduce plausible output.
 - **Acceptance:** exact cash, quantities, costs, NAV, and thesis state; byte-stable prior certification; idempotence; correction lineage; partial-fill residual state; valuation-pending without fabricated prices; one split or equivalent value transfer; zero unexplained residual at declared precision.
 - **Brief:** `docs/phase_brief/phase1-gv-deterministic-replay-0-brief.md`
@@ -79,8 +81,9 @@ providers · WRDS acquisition · broad historical loaders · optimizer · copula
 ## Immediate next action
 
 ```text
-clean isolated worktree from exact 03a5c92
-→ implement only GV-DETERMINISTIC-REPLAY-0
-→ certify exact reconstruction from Slice 0 events
+clean isolated worktree from exact 9bee439 (branch codex/gv-deterministic-replay-0)
+→ record custody base 03a5c92 + Slice 0 85e6601 as immutable pins
+→ implement only GV-DETERMINISTIC-REPLAY-0 (Replay-owned files)
+→ exact reconstruction · idempotence · correction lineage · partial-fill residual · valuation-pending · byte-stable cert/reopen
 → do not open GV-BOUNDED-PORTFOLIO-1 until replay PASS
 ```

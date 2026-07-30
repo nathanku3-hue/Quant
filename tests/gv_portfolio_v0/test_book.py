@@ -108,9 +108,17 @@ def test_nonpositive_fill_quantity_is_rejected_before_mutation(quantity: str) ->
         build_portfolio_book(_mutated_fill_events(quantity=quantity))
 
 
-def test_complete_fill_must_equal_order_quantity() -> None:
-    with pytest.raises(PortfolioBookError, match="COMPLETE_FILL_QUANTITY_MISMATCH"):
-        build_portfolio_book(_mutated_fill_events(quantity="4"))
+def test_partial_fill_below_order_quantity_is_allowed_with_residual() -> None:
+    book = build_portfolio_book(_mutated_fill_events(quantity="4"))
+    assert book["partial_fill_residuals"]
+    residual = book["partial_fill_residuals"][0]
+    assert residual["filled_quantity"] == "4"
+    assert residual["residual_quantity"] == "1"
+
+
+def test_fill_quantity_cannot_exceed_order_quantity() -> None:
+    with pytest.raises(PortfolioBookError, match="FILL_QUANTITY_EXCEEDS_REMAINING"):
+        build_portfolio_book(_mutated_fill_events(quantity="6"))
 
 
 def test_complete_order_cannot_be_filled_twice() -> None:
