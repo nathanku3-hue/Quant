@@ -121,10 +121,10 @@ def _ordered_events(events: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]
         if not isinstance(row.get("payload"), Mapping):
             raise PortfolioBookError("EVENT_PAYLOAD_MAPPING_REQUIRED")
 
-    if sequences[0] != 0 or sequences != sorted(sequences):
-        raise PortfolioBookError("DECLARED_EVENT_ORDER_INVALID")
     if len(sequences) != len(set(sequences)):
         raise PortfolioBookError("DUPLICATE_EVENT_SEQUENCE")
+    if sequences != list(range(len(rows))):
+        raise PortfolioBookError("DECLARED_EVENT_ORDER_INVALID")
     if len(event_ids) != len(set(event_ids)):
         raise PortfolioBookError("DUPLICATE_EVENT_ID")
     return rows

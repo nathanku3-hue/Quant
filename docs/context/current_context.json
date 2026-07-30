@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-29T10:18:00Z",
+  "generated_at_utc": "2026-07-29T19:00:00Z",
   "source_files": [
     "docs/context/ACTIVE_BRIEF",
     "docs/context/bridge_contract_current.md",
@@ -117,29 +117,28 @@
   ],
   "active_phase": 0,
   "what_was_done": [
-    "Repaired the roadmap candidate so `R0 \u2014 ROADMAP-CUSTODY-REPAIR` is an internal custody step rather than a product slice.",
-    "Removed standalone `GV-CANON-RESET-0` from the product sequence.",
-    "Selected this brief explicitly through `docs/context/ACTIVE_BRIEF`; numerically higher historical briefs cannot override it.",
-    "Preserved released Alpha/FS0 unchanged and defined a new portfolio namespace boundary.",
-    "Replaced seven independent branches with three mergeable work packages."
+    "Reproduced the complete Python 3.12 package environment from unchanged requirements.lock and passed pip check.",
+    "Classified and narrowly repaired four stale legacy product authority assertions; legacy product is 263/263.",
+    "Closed certification lineage, registry cross-binding, persisted operator-truth, dangling evidence, status projection, and contiguous event-sequence defects.",
+    "Added LF checkout authority for hash-bound textual data and reduced clean-clone full-suite failures from 111 to 50."
   ],
   "what_is_locked": [
-    "`ROADMAP_SEQUENCE = GV-MICRO-PORTFOLIO-VERTICAL-0 \u2192 GV-DETERMINISTIC-REPLAY-0 \u2192 GV-BOUNDED-PORTFOLIO-1 \u2192 GV-PORTFOLIO-SCALE-1 \u2192 GV-UNIVERSE-SCALE-1 \u2192 GV-CHALLENGER-PROMOTION-1 \u2192 GV-LIMITED-LIVE-1`.",
-    "`EXECUTION_AUTHORIZED = GV-MICRO-PORTFOLIO-VERTICAL-0, GV-DETERMINISTIC-REPLAY-0`.",
-    "`SHIPPED_PRODUCT_SCORE = 39/100`; observed comparisons remain `0`; no alpha or live-capital claim.",
-    "The root checkout remains untouched and is not execution authority.",
-    "Bounded portfolio work remains blocked until exact deterministic replay passes."
+    "ACTIVE_PHASE = GV-MICRO-PORTFOLIO-VERTICAL-0 only.",
+    "Product runtime and Replay implementation remain read-only.",
+    "Affected gates: portfolio 92/92; context plus protocol 175/175; legacy product 263/263.",
+    "Full LF-preserving repository gate: 2598 passed, 16 skipped, 50 failed.",
+    "SHIPPED_PRODUCT_SCORE = 39/100; observed comparisons = 0; no alpha or live-capital claim."
   ],
   "what_is_next": [
-    "Wait for independent audit of the banked R0 roadmap repair.",
-    "After audit PASS, create a clean isolated implementation worktree from `ROADMAP_FREEZE_COMMIT`.",
-    "Ship the complete micro-portfolio operator loop through the three work packages.",
-    "Build replay early but certify it only from real vertical events."
+    "Publish the repaired terminal SHA and verify local/remote equality.",
+    "Run genuinely independent Reviewer A/B/C against that exact SHA.",
+    "Open a separate bounded repository-environment/custody repair for non-relocatable manifests, absent generated artifacts, and stale historical authority.",
+    "Do not open Product features or Replay implementation until both acceptance gates pass."
   ],
-  "first_command": "git status --short --branch && git rev-parse HEAD && cat docs/context/ACTIVE_BRIEF",
+  "first_command": "git status --short --branch && git rev-parse HEAD && git rev-parse @{u}",
   "next_todos": [
-    "`GV-MICRO-PORTFOLIO-VERTICAL-0`;",
-    "`GV-DETERMINISTIC-REPLAY-0`;",
-    "evidence-gated later slices only."
+    "publish terminal repair candidate;",
+    "independent A/B/C on exact SHA;",
+    "separate repository-environment/custody closure."
   ]
 }

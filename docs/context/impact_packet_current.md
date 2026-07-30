@@ -2,35 +2,38 @@
 
 ## Change under review
 
-The Integrator combined the three bounded repair streams into the existing GV Micro-Portfolio V0 operator loop without opening Product or Replay feature scope.
+A terminal repair was applied to the remote-equal GV Micro-Portfolio V0 integration candidate without opening Product or Replay implementation.
 
 ### Functional impact
 
-- Strategy is the sole authority for Living Thesis Lite, ADMIT/REJECT/ABSTAIN/CASH decisions, capital competition, and decision projections.
-- Execution is the sole authority for the planned transition, order, fill, immutable event identities, timestamps, and lineage validation.
-- Accounting is the sole reducer for positions, classified cash, explicit costs, opening/terminal NAV, split preservation, and unexplained residual.
-- Product orchestration persists and reopens those records, renders a derived review state, and certifies the reconciled terminal book.
-- The persisted schema is now `gv_portfolio_v0_workspace_v2`; the prior incompatible shape is rejected rather than translated.
+- Certification now binds prior certification identity, pre-observation recomputation, current/prior linkage, and ordered certification-record events.
+- Persisted explanation, claim boundary, fixture identity, instrument registry, benchmark registry, review labels/roles, and status-specific later-observation projection fail closed on contradiction.
+- Strategy rejects a later observation whose evidence ID is absent from the available evidence set.
+- Accounting requires declared event sequences to be unique, ordered, zero-based, and contiguous.
+- Certification reduces the full immutable ledger while hashing only the certification subject, preserving both ledger continuity and stable certification identity.
 
-### Product impact
+### Test-authority impact
 
-The existing user flow remains bounded and intact:
+The four legacy product failures were not product regressions. Their tests asserted superseded E0A/FS0 status text after the canonical seven-slice roadmap replaced that authority. The narrow assertion repair produces **263/263 PASS** without changing Product runtime.
 
-review four securities and cash → confirm one portfolio aim → emit one transition → create one deterministic paper order and fill → reconcile and certify → persist and reopen → admit one later WATCH observation with unchanged aim.
+### Environment impact
 
-The visible product gains explicit transition lineage, classified execution cost, opening NAV, terminal NAV, reconciliation status, and zero unexplained residual. It gains no provider, broker, alpha, score-uplift, or live-capital capability.
+`requirements.lock` already pins `alpaca-py`, `psycopg2-binary`, `PyYAML`, and `schedule`; no dependency change was required. A fresh Python 3.12 environment installs from the lock and passes `pip check`.
+
+Windows `core.autocrlf=true` changed hash-bound CSV/JSON bytes. Repository `.gitattributes` now requires LF for textual data artifacts and binary treatment for parquet/raw artifacts. In a fresh LF-preserving clone, repository failures fall from 111 to 50.
 
 ### Verification impact
 
-- Slice tests: 82/82 PASS.
-- Frozen protocol tests: 150/150 PASS.
-- Legacy product compatibility: 259/263 PASS; four unrelated frozen authority-document assertions remain red.
-- Full repository collection cannot be certified because existing declared environments are incomplete for existing tests.
+- Portfolio: **92/92 PASS**.
+- Context + frozen protocol: **175/175 PASS**.
+- Legacy product: **263/263 PASS**.
+- Full collection: **2664 tests / 201 files**, PASS.
+- Full LF suite: **2598 passed, 16 skipped, 50 failed**.
 
-### Repository impact
+### Product and score impact
 
-The dirty root checkout remains untouched. All work is isolated in `gv-micro-portfolio-v0-repair`, descended from exact base `b3d5092`. Three stream commits and the shared integration are banked in required order, pushed, and local/remote-equal.
+The user flow remains:
 
-### Score impact
+review four securities and cash → confirm one portfolio aim → emit one transition → create one deterministic paper order and fill → reconcile and certify → persist and reopen → admit one later WATCH observation with unchanged aim.
 
-Canonical shipped score remains **39/100**. The implementation improves candidate completeness but cannot change the score until the full-suite environment and independent audit gates pass.
+The repair makes that flow materially harder to mislabel or forge, but adds no user-facing capability. Canonical shipped score remains **39/100** and observed comparisons remain **0** until full-suite and independent audit gates pass.

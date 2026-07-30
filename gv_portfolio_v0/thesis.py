@@ -175,6 +175,15 @@ def unchanged_aim_watch_observation(
     evidence_id = _require_text(
         evidence_reference_id, code="OBSERVATION_EVIDENCE_REFERENCE_REQUIRED"
     )
+    available_evidence_ids = set(
+        _unique_texts(
+            available_evidence_reference_ids,
+            code="AVAILABLE_EVIDENCE_REFERENCE_INVALID",
+            allow_empty=True,
+        )
+    )
+    if evidence_id not in available_evidence_ids:
+        raise StrategyThesisError("DANGLING_OBSERVATION_EVIDENCE_REFERENCE")
     declared_watches = set(living_thesis["watch_conditions"])
     declared_hard = set(living_thesis["hard_falsifiers"])
     watches = sorted(

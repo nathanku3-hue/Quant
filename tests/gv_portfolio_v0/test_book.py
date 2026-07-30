@@ -241,3 +241,11 @@ def test_declared_event_order_is_required_not_reconstructed() -> None:
 
     with pytest.raises(PortfolioBookError, match="DECLARED_EVENT_ORDER_INVALID"):
         build_portfolio_book(events)
+
+
+def test_declared_event_sequence_must_be_contiguous() -> None:
+    events = _confirmed_events()
+    events[-1]["sequence"] += 1
+
+    with pytest.raises(PortfolioBookError, match="DECLARED_EVENT_ORDER_INVALID"):
+        build_portfolio_book(events)

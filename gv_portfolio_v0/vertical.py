@@ -40,6 +40,21 @@ from gv_portfolio_v0.thesis import (
 SCHEMA_VERSION = "gv_portfolio_v0_workspace_v2"
 ID_DOMAIN = "GV-PORTFOLIO-V0"
 DECLARED_PRECISION = "0.01"
+FIXTURE_ID = "GV_MICRO_PORTFOLIO_VERTICAL_0"
+CLAIM_BOUNDARY = (
+    "Deterministic paper fixture only; no alpha or live-capital claim."
+)
+STATUS_EXPLANATIONS = {
+    "DRAFT_REVIEW": "Awaiting operator confirmation; no order has been created.",
+    "CERTIFIED": (
+        "Harbor won deterministic capital competition; one paper BUY order and fill "
+        "were recorded. Northstar's 2:1 split preserved value exactly."
+    ),
+    "OBSERVED_WATCH_AIM_UNCHANGED": (
+        "The later observation changed the evidence set but not the portfolio aim: "
+        "it remained inside the WATCH band and no hard falsifier fired."
+    ),
+}
 
 
 class PortfolioV0Error(ValueError):
@@ -73,6 +88,19 @@ def _instrument(
         "name": name,
         "role": role,
     }
+
+
+def _fixture_registry() -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    instruments = [
+        _instrument("ISSUER:NORTHSTAR:COMMON", "NSTAR", "Northstar Systems", "PRINCIPAL"),
+        _instrument("ISSUER:HARBOR:COMMON", "HARBOR", "Harbor Automation", "SUBSTITUTE"),
+        _instrument("ISSUER:RIVAL:COMMON", "RIVAL", "Rival Dynamics", "COMPETITOR"),
+        _instrument("ISSUER:ORBIT:COMMON", "ORBIT", "Orbit Networks", "ALTERNATIVE"),
+    ]
+    benchmark = _instrument(
+        "INDEX:BENCH100:TOTAL_RETURN", "BENCH100", "Benchmark 100", "BENCHMARK"
+    )
+    return instruments, benchmark
 
 
 def evidence_reference(
@@ -244,8 +272,9 @@ def _certification_subject_events(events: Iterable[Mapping[str, Any]]) -> list[d
 def certify_workspace(
     workspace: Mapping[str, Any], *, prior_certification_id: str | None = None
 ) -> dict[str, Any]:
-    events = _certification_subject_events(workspace["events"])
-    book = reduce_events(events)
+    workspace_events = [dict(row) for row in workspace["events"]]
+    events = _certification_subject_events(workspace_events)
+    book = reduce_events(workspace_events)
     evidence_ids = [
         row["evidence_reference_id"] for row in workspace["evidence_references"]
     ]
@@ -316,12 +345,8 @@ def certify_workspace(
 
 
 def build_draft_workspace() -> dict[str, Any]:
-    principal = _instrument("ISSUER:NORTHSTAR:COMMON", "NSTAR", "Northstar Systems", "PRINCIPAL")
-    substitute = _instrument("ISSUER:HARBOR:COMMON", "HARBOR", "Harbor Automation", "SUBSTITUTE")
-    competitor = _instrument("ISSUER:RIVAL:COMMON", "RIVAL", "Rival Dynamics", "COMPETITOR")
-    abstain = _instrument("ISSUER:ORBIT:COMMON", "ORBIT", "Orbit Networks", "ALTERNATIVE")
-    benchmark = _instrument("INDEX:BENCH100:TOTAL_RETURN", "BENCH100", "Benchmark 100", "BENCHMARK")
-    instruments = [principal, substitute, competitor, abstain]
+    instruments, benchmark = _fixture_registry()
+    principal, substitute, competitor, abstain = instruments
 
     evidence = [
         evidence_reference(
@@ -444,7 +469,7 @@ def build_draft_workspace() -> dict[str, Any]:
     ]
     workspace = {
         "schema_version": SCHEMA_VERSION,
-        "fixture_id": "GV_MICRO_PORTFOLIO_VERTICAL_0",
+        "fixture_id": FIXTURE_ID,
         "status": "DRAFT_REVIEW",
         "instruments": instruments,
         "benchmark": benchmark,
@@ -462,8 +487,8 @@ def build_draft_workspace() -> dict[str, Any]:
         "certification": None,
         "certification_history": [],
         "later_observation": None,
-        "explanation": "Awaiting operator confirmation; no order has been created.",
-        "claim_boundary": "Deterministic paper fixture only; no alpha or live-capital claim.",
+        "explanation": STATUS_EXPLANATIONS["DRAFT_REVIEW"],
+        "claim_boundary": CLAIM_BOUNDARY,
     }
     validate_workspace(workspace, allow_uncertified=True)
     return workspace
@@ -507,10 +532,7 @@ def confirm_draft_workspace(workspace: Mapping[str, Any]) -> dict[str, Any]:
     result["fill"] = execution["fill"]
     result["book"] = reduce_events(events)
     result["status"] = "CERTIFIED"
-    result["explanation"] = (
-        "Harbor won deterministic capital competition; one paper BUY order and fill "
-        "were recorded. Northstar's 2:1 split preserved value exactly."
-    )
+    result["explanation"] = STATUS_EXPLANATIONS["CERTIFIED"]
     certification = certify_workspace(result)
     result["certification"] = certification
     result["events"].append(
@@ -578,10 +600,7 @@ def admit_watch_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
     result["later_observation"] = observation_state
     result["certification_history"] = [*result["certification_history"], prior]
     result["status"] = "OBSERVED_WATCH_AIM_UNCHANGED"
-    result["explanation"] = (
-        "The later observation changed the evidence set but not the portfolio aim: "
-        "it remained inside the WATCH band and no hard falsifier fired."
-    )
+    result["explanation"] = STATUS_EXPLANATIONS["OBSERVED_WATCH_AIM_UNCHANGED"]
     certification = certify_workspace(
         result, prior_certification_id=prior["certification_id"]
     )
@@ -611,11 +630,80 @@ def _verify_id(record: Mapping[str, Any], *, kind: str, id_key: str) -> None:
         raise PortfolioV0Error(f"IDENTITY_MISMATCH:{id_key}")
 
 
+def _validate_certification_lineage(
+    workspace: Mapping[str, Any],
+    workspace_events: list[dict[str, Any]],
+    certification: Mapping[str, Any],
+) -> None:
+    status = workspace["status"]
+    history = list(workspace.get("certification_history") or [])
+    certification_events = [
+        event
+        for event in workspace_events
+        if event["event_type"] == "CERTIFICATION_RECORDED"
+    ]
+
+    if status == "CERTIFIED":
+        if history:
+            raise PortfolioV0Error("CERTIFIED_HISTORY_MUST_BE_EMPTY")
+        if certification.get("prior_certification_id") is not None:
+            raise PortfolioV0Error("CERTIFIED_PRIOR_CERTIFICATION_PROHIBITED")
+        chain = [certification]
+    else:
+        if len(history) != 1 or not isinstance(history[0], Mapping):
+            raise PortfolioV0Error("PRIOR_CERTIFICATION_HISTORY_REQUIRED")
+        prior = history[0]
+        _verify_id(prior, kind="CRT", id_key="certification_id")
+        if certification.get("prior_certification_id") != prior.get(
+            "certification_id"
+        ):
+            raise PortfolioV0Error("PRIOR_CERTIFICATION_LINK_MISMATCH")
+
+        observation_sequences = [
+            event["sequence"]
+            for event in workspace_events
+            if event["event_type"] == "LATER_OBSERVATION_ADMITTED"
+        ]
+        if len(observation_sequences) != 1:
+            raise PortfolioV0Error("EXACTLY_ONE_LATER_OBSERVATION_REQUIRED")
+        pre_observation_events = [
+            event
+            for event in workspace_events
+            if event["sequence"] < observation_sequences[0]
+        ]
+        prior_workspace = dict(workspace)
+        prior_workspace["events"] = pre_observation_events
+        prior_workspace["book"] = reduce_events(pre_observation_events)
+        expected_prior = certify_workspace(prior_workspace)
+        if canonical_document_bytes(expected_prior) != canonical_document_bytes(prior):
+            raise PortfolioV0Error("PRIOR_CERTIFICATION_MISMATCH")
+        chain = [prior, certification]
+
+    if len(certification_events) != len(chain):
+        raise PortfolioV0Error("CERTIFICATION_EVENT_COUNT_MISMATCH")
+    for event, record in zip(certification_events, chain, strict=True):
+        certification_id = record["certification_id"]
+        if event.get("source_identity") != certification_id:
+            raise PortfolioV0Error("CERTIFICATION_EVENT_SOURCE_MISMATCH")
+        if event.get("payload") != {"certification_id": certification_id}:
+            raise PortfolioV0Error("CERTIFICATION_EVENT_PAYLOAD_MISMATCH")
+
+
 def validate_workspace(
     workspace: Mapping[str, Any], *, allow_uncertified: bool = False
 ) -> None:
     if workspace.get("schema_version") != SCHEMA_VERSION:
         raise PortfolioV0Error("WORKSPACE_SCHEMA_INVALID")
+    if workspace.get("fixture_id") != FIXTURE_ID:
+        raise PortfolioV0Error("WORKSPACE_FIXTURE_ID_INVALID")
+    if workspace.get("claim_boundary") != CLAIM_BOUNDARY:
+        raise PortfolioV0Error("WORKSPACE_CLAIM_BOUNDARY_INVALID")
+    status = workspace.get("status")
+    expected_explanation = STATUS_EXPLANATIONS.get(status)
+    if expected_explanation is None:
+        raise PortfolioV0Error("WORKSPACE_STATUS_INVALID")
+    if workspace.get("explanation") != expected_explanation:
+        raise PortfolioV0Error("WORKSPACE_EXPLANATION_INVALID")
     instruments = list(workspace.get("instruments") or [])
     if len(instruments) != 4:
         raise PortfolioV0Error("FOUR_REVIEWED_SECURITIES_REQUIRED")
@@ -630,7 +718,37 @@ def validate_workspace(
         }
         if row["instrument_id"] != _identifier("INS", identity):
             raise PortfolioV0Error("INSTRUMENT_ID_MISMATCH")
-    outcomes = {row["outcome"] for row in workspace.get("reviews") or []}
+
+    expected_instruments, expected_benchmark = _fixture_registry()
+    if canonical_document_bytes(instruments) != canonical_document_bytes(
+        expected_instruments
+    ):
+        raise PortfolioV0Error("INSTRUMENT_REGISTRY_MISMATCH")
+    if canonical_document_bytes(workspace.get("benchmark")) != canonical_document_bytes(
+        expected_benchmark
+    ):
+        raise PortfolioV0Error("BENCHMARK_REGISTRY_MISMATCH")
+
+    reviews = list(workspace.get("reviews") or [])
+    reviews_by_instrument = {row.get("instrument_id"): row for row in reviews}
+    if set(reviews_by_instrument) != {
+        row["instrument_id"] for row in instruments
+    }:
+        raise PortfolioV0Error("REVIEW_INSTRUMENT_REGISTRY_MISMATCH")
+    expected_relationship_by_role = {
+        "PRINCIPAL": "PRINCIPAL_THESIS",
+        "SUBSTITUTE": "SUBSTITUTE",
+        "COMPETITOR": "COMPETITOR",
+        "ALTERNATIVE": "ALTERNATIVE",
+    }
+    for instrument in instruments:
+        review = reviews_by_instrument[instrument["instrument_id"]]
+        if review.get("symbol") != instrument["symbol"]:
+            raise PortfolioV0Error("REVIEW_SYMBOL_REGISTRY_MISMATCH")
+        if review.get("relationship") != expected_relationship_by_role[instrument["role"]]:
+            raise PortfolioV0Error("REVIEW_ROLE_REGISTRY_MISMATCH")
+
+    outcomes = {row["outcome"] for row in reviews}
     if not {"ADMIT", "REJECT", "ABSTAIN"}.issubset(outcomes):
         raise PortfolioV0Error("DECISION_OUTCOME_COVERAGE_INCOMPLETE")
     if workspace.get("cash_outcome", {}).get("outcome") != "CASH":
@@ -650,6 +768,10 @@ def validate_workspace(
             raise PortfolioV0Error("EVIDENCE_REFERENCE_ID_MISMATCH")
 
     _verify_id(workspace["portfolio_aim"], kind="AIM", id_key="portfolio_aim_id")
+    if workspace["portfolio_aim"].get("benchmark_instrument_id") != workspace[
+        "benchmark"
+    ]["instrument_id"]:
+        raise PortfolioV0Error("PORTFOLIO_AIM_BENCHMARK_MISMATCH")
     evidence_ids = [
         row["evidence_reference_id"] for row in workspace["evidence_references"]
     ]
@@ -672,7 +794,6 @@ def validate_workspace(
     if canonical_document_bytes(rebuilt) != canonical_document_bytes(workspace["book"]):
         raise PortfolioV0Error("BOOK_REDUCTION_MISMATCH")
 
-    status = workspace.get("status")
     if status == "DRAFT_REVIEW":
         if not allow_uncertified:
             raise PortfolioV0Error("UNCERTIFIED_WORKSPACE")
@@ -688,9 +809,33 @@ def validate_workspace(
             raise PortfolioV0Error("DRAFT_HAS_EXECUTION")
         if workspace.get("certification") is not None:
             raise PortfolioV0Error("DRAFT_HAS_CERTIFICATION")
+        if workspace.get("certification_history"):
+            raise PortfolioV0Error("DRAFT_HAS_CERTIFICATION_HISTORY")
+        if workspace.get("later_observation") is not None:
+            raise PortfolioV0Error("DRAFT_HAS_LATER_OBSERVATION")
+        if any(
+            event["event_type"] == "CERTIFICATION_RECORDED"
+            for event in workspace_events
+        ):
+            raise PortfolioV0Error("DRAFT_HAS_CERTIFICATION_EVENT")
+        if any(
+            event["event_type"] == "LATER_OBSERVATION_ADMITTED"
+            for event in workspace_events
+        ):
+            raise PortfolioV0Error("DRAFT_HAS_LATER_OBSERVATION_EVENT")
         return
-    if status not in {"CERTIFIED", "OBSERVED_WATCH_AIM_UNCHANGED"}:
-        raise PortfolioV0Error("WORKSPACE_STATUS_INVALID")
+
+    later_observation_events = [
+        event
+        for event in workspace_events
+        if event["event_type"] == "LATER_OBSERVATION_ADMITTED"
+    ]
+    if status == "CERTIFIED":
+        if workspace.get("later_observation") is not None:
+            raise PortfolioV0Error("CERTIFIED_HAS_LATER_OBSERVATION")
+        if later_observation_events:
+            raise PortfolioV0Error("CERTIFIED_HAS_LATER_OBSERVATION_EVENT")
+
     execution_events = [
         row
         for row in workspace_events
@@ -736,6 +881,7 @@ def validate_workspace(
     )
     if canonical_document_bytes(expected) != canonical_document_bytes(certification):
         raise PortfolioV0Error("CERTIFICATION_MISMATCH")
+    _validate_certification_lineage(workspace, workspace_events, certification)
     if status == "OBSERVED_WATCH_AIM_UNCHANGED":
         observation = workspace.get("later_observation") or {}
         principal_review = next(
@@ -768,5 +914,3 @@ def validate_workspace(
             admitted_events[0]["payload"]
         ) != canonical_document_bytes(expected_observation):
             raise PortfolioV0Error("WATCH_OBSERVATION_EVENT_MISMATCH")
-        if len(workspace.get("certification_history") or []) != 1:
-            raise PortfolioV0Error("PRIOR_CERTIFICATION_HISTORY_REQUIRED")

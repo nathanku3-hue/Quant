@@ -156,3 +156,13 @@ git status --short --branch && git rev-parse HEAD && cat docs/context/ACTIVE_BRI
 - `GV-MICRO-PORTFOLIO-VERTICAL-0`;
 - `GV-DETERMINISTIC-REPLAY-0`;
 - evidence-gated later slices only.
+
+## Terminal repair update — 2026-07-30
+
+The remote-equal integration candidate at `9ebc973a8cc3cfbd4899ed724733cc22c606fbbf` required a bounded terminal repair before independent acceptance.
+
+Closed: certification lineage, persisted operator truth, registry cross-binding, dangling observation evidence, contiguous event order, four stale legacy authority assertions, and cross-platform fixture line-ending custody.
+
+Evidence: portfolio 92/92; context + protocol 175/175; legacy product 263/263; full collection 2664/201. The LF-preserving full suite remains red at 2598 passed, 16 skipped, 50 failed because historical Replay manifests are non-relocatable, generated artifacts are absent, and unrelated historical authority/data tests remain stale or broken.
+
+The phase remains `NOT_ACCEPTED`. Product and Replay implementation stay closed. The next gate is independent A/B/C against the published terminal SHA plus a separate repository-environment/custody repair.

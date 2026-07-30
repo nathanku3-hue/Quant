@@ -21,6 +21,7 @@ from gv_portfolio_v0.vertical import (
     certify_workspace,
     confirm_draft_workspace,
     reduce_events,
+    validate_workspace,
 )
 
 
@@ -216,6 +217,119 @@ def test_contradictory_decision_projection_cannot_certify() -> None:
 
     with pytest.raises(PortfolioV0Error, match="DECISION_SELECTION_MISMATCH"):
         confirm_draft_workspace(tampered)
+
+
+def test_observed_workspace_rejects_forged_certification_history() -> None:
+    observed = admit_watch_observation(confirm_draft_workspace(build_draft_workspace()))
+    observed["certification_history"][0] = {"forged": "history"}
+
+    with pytest.raises(PortfolioV0Error, match="IDENTITY_MISMATCH:certification_id"):
+        validate_workspace(observed)
+
+
+def test_observed_workspace_rejects_forged_certification_event_link() -> None:
+    observed = admit_watch_observation(confirm_draft_workspace(build_draft_workspace()))
+    first_certification_event = next(
+        event
+        for event in observed["events"]
+        if event["event_type"] == "CERTIFICATION_RECORDED"
+    )
+    first_certification_event["source_identity"] = observed["certification"][
+        "certification_id"
+    ]
+    first_certification_event["event_id"] = "EVT_" + domain_hash(
+        "GV-PORTFOLIO-V0:EVT:V1",
+        {
+            key: value
+            for key, value in first_certification_event.items()
+            if key != "event_id"
+        },
+    )
+    observed["book"] = reduce_events(observed["events"])
+
+    with pytest.raises(PortfolioV0Error, match="CERTIFICATION_EVENT_SOURCE_MISMATCH"):
+        validate_workspace(observed)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "error"),
+    [
+        (
+            "explanation",
+            "No trade happened and the aim changed.",
+            "WORKSPACE_EXPLANATION_INVALID",
+        ),
+        ("claim_boundary", "LIVE CAPITAL APPROVED", "WORKSPACE_CLAIM_BOUNDARY_INVALID"),
+    ],
+)
+def test_workspace_rejects_persisted_operator_truth_tampering(
+    field: str, value: str, error: str
+) -> None:
+    observed = admit_watch_observation(confirm_draft_workspace(build_draft_workspace()))
+    observed[field] = value
+
+    with pytest.raises(PortfolioV0Error, match=error):
+        validate_workspace(observed)
+
+
+def _synthetic_instrument(
+    *, permanent_key: str, symbol: str, name: str, role: str
+) -> dict[str, str]:
+    identity = {
+        "namespace": "GV_SYNTHETIC_PERMANENT_V0",
+        "permanent_key": permanent_key,
+        "security_class": "COMMON_STOCK",
+    }
+    return {
+        "instrument_id": "INS_"
+        + domain_hash("GV-PORTFOLIO-V0:INS:V1", identity),
+        **identity,
+        "symbol": symbol,
+        "name": name,
+        "role": role,
+    }
+
+
+def test_certified_workspace_rejects_later_observation_projection() -> None:
+    certified = confirm_draft_workspace(build_draft_workspace())
+    certified["later_observation"] = {"classification": "WATCH"}
+
+    with pytest.raises(PortfolioV0Error, match="CERTIFIED_HAS_LATER_OBSERVATION"):
+        validate_workspace(certified)
+
+
+def test_workspace_rejects_substituted_instrument_registry() -> None:
+    observed = admit_watch_observation(confirm_draft_workspace(build_draft_workspace()))
+    observed["instruments"][1] = _synthetic_instrument(
+        permanent_key="ISSUER:FORGED:COMMON",
+        symbol="FORGED",
+        name="Forged Co",
+        role="SUBSTITUTE",
+    )
+
+    with pytest.raises(PortfolioV0Error, match="INSTRUMENT_REGISTRY_MISMATCH"):
+        validate_workspace(observed)
+
+
+def test_workspace_rejects_substituted_benchmark_registry() -> None:
+    observed = admit_watch_observation(confirm_draft_workspace(build_draft_workspace()))
+    observed["benchmark"] = _synthetic_instrument(
+        permanent_key="INDEX:OTHER:TOTAL_RETURN",
+        symbol="OTHER",
+        name="Other Benchmark",
+        role="BENCHMARK",
+    )
+
+    with pytest.raises(PortfolioV0Error, match="BENCHMARK_REGISTRY_MISMATCH"):
+        validate_workspace(observed)
+
+
+def test_workspace_rejects_review_symbol_registry_mismatch() -> None:
+    observed = admit_watch_observation(confirm_draft_workspace(build_draft_workspace()))
+    observed["reviews"][1]["symbol"] = "MISLABEL"
+
+    with pytest.raises(PortfolioV0Error, match="REVIEW_SYMBOL_REGISTRY_MISMATCH"):
+        validate_workspace(observed)
 
 
 def test_watch_admission_requires_certified_state() -> None:

@@ -16,11 +16,11 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 AUTHORITY_CHAIN = (
-    "DecisionEnvelope",
-    "PortfolioBook",
-    "Fs0PortfolioSnapshot",
-    "Fs0Certification",
-    "Streamlit adapter",
+    "InstrumentId",
+    "PortfolioBookEvent",
+    "DecisionSnapshotId",
+    "PortfolioAimId",
+    "CertificationId",
 )
 
 REQUIRED_PRODUCT_CANON = (
@@ -102,30 +102,23 @@ def _imported_modules(path: Path) -> set[str]:
     return names
 
 
-def test_required_product_canons_are_on_authority_paths() -> None:
+def test_required_product_canons_declare_current_authority_disposition() -> None:
     for rel in REQUIRED_PRODUCT_CANON:
         text = _read(rel)
         assert "Status:" in text
-        assert re.search(r"Active", text[:800]) is not None
+        assert "Primary authority:" in text or "Primary sequence authority:" in text
+    owner_freeze = _read("docs/architecture/godview_portfolio_p0_owner_freeze.md")
+    assert "not the active Slice 0 fixture mandate" in owner_freeze
 
 
-def test_roadmap_declares_gv_fs0_authority_chain() -> None:
+def test_roadmap_declares_current_portfolio_authority_chain() -> None:
     text = _read(ROADMAP_REL)
     for token in AUTHORITY_CHAIN:
         assert token in text, f"roadmap missing authority-chain token {token!r}"
-    # E0A banked as substrate; merge patch E0A-R1 then product slice E0B-DV1.
-    # F1C dual-bundle remains closed substrate (never product default).
-    assert (
-        "ACTIVE_MERGE_PATCH = E0A-R1" in text
-        or "ACTIVE_REPAIR = E0A-R1" in text
-        or "ACTIVE_GATE = GV-E0A-OPERABLE" in text
-        or "EXECUTION_MODEL = GV_FS0_FIRST" in text
-    )
-    assert "SIX_STREAM_CONCURRENT_AUTHORITY = REVOKED" in text
-    assert "BACKWARD_COMPATIBILITY_LAYER = PROHIBITED" in text
-    assert "E0B-DV1" in text or "ACTIVE_GATE = GV-E0A-OPERABLE" in text
+    assert "ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0" in text
+    assert "NEXT_GATE = GV-DETERMINISTIC-REPLAY-0" in text
+    assert "ROOT_CHECKOUT = UNSAFE / DO_NOT_USE" in text
     assert "39/100" in text
-    assert "ONE_CASE_DECISION_DELTA_OBSERVED" in text
 
 
 def test_e0_preregistration_authority_sources_exist_and_are_tracked() -> None:

@@ -2058,3 +2058,10 @@ Application pattern:
 - Fix applied: Banked S2/S3/S4 separately, made Strategy/Execution/Accounting the sole authorities, removed duplicate shared implementations, added the non-economic transition event to Accounting tolerance, bound certification to the reconciled V2 book and execution lineage, and bumped persisted bytes to workspace v2.
 - Guardrail for next time: A parallel stream is complete only when the integrator can delete the superseded shared authority. Any incompatible persisted-shape change must change its schema identifier. A full-suite claim requires a declared, reproducible environment; borrowing an incomplete venv is evidence only for the subset it can execute.
 - Evidence paths: `gv_portfolio_v0/vertical.py`, `gv_portfolio_v0/book.py`, `tests/gv_portfolio_v0/`, `docs/context/done_checklist_current.md`, `docs/saw_reports/saw_gv_micro_portfolio_v0_integration_20260729.md`.
+
+## 2026-07-30 — Hash-bound fixtures and certification lineage
+
+- A dependency lock can be complete while a full suite is still environmentally unclosed; distinguish package closure from tracked-data and generated-artifact custody.
+- Any manifest that hashes repository text requires explicit cross-platform line-ending authority. `core.autocrlf=true` can make a clean checkout byte-invalid without making Git status dirty.
+- Persisting a prior certification is insufficient. Reopen validation must verify its identity, recompute it from the exact pre-observation event prefix, bind the current certification to it, and bind both to immutable certification-record events.
+- Product captions, symbols, benchmark labels, and status explanations are operator truth. If persisted, they must be derived or validated against canonical records rather than treated as harmless display fields.

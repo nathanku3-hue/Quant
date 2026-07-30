@@ -47,7 +47,13 @@ def _thesis(
 
 
 def _fixture() -> dict[str, object]:
-    evidence_ids = ["EVD_NSTAR", "EVD_HARBOR", "EVD_RIVAL", "EVD_ORBIT"]
+    evidence_ids = [
+        "EVD_NSTAR",
+        "EVD_HARBOR",
+        "EVD_RIVAL",
+        "EVD_ORBIT",
+        "EVD_LATER",
+    ]
     reviews = [
         instrument_decision_record(
             instrument_id="INS_NSTAR",
@@ -411,6 +417,25 @@ def test_watch_match_without_hard_falsifier_preserves_aim() -> None:
     assert observation["classification"] == "WATCH"
     assert observation["hard_falsifier_fired"] is False
     assert observation["aim_changed"] is False
+
+
+def test_dangling_observation_evidence_reference_is_rejected() -> None:
+    fixture = _fixture()
+    thesis = fixture["reviews"][0]["living_thesis_lite"]
+    with pytest.raises(
+        StrategyThesisError, match="DANGLING_OBSERVATION_EVIDENCE_REFERENCE"
+    ):
+        unchanged_aim_watch_observation(
+            living_thesis=thesis,
+            available_evidence_reference_ids=fixture["evidence_ids"],
+            evidence_reference_id="EVD_MISSING",
+            watch_condition_matches=[
+                "order_intake_softens_without_covenant_breach"
+            ],
+            hard_falsifier_matches=[],
+            portfolio_aim_id_before="AIM_TEST",
+            portfolio_aim_id_after="AIM_TEST",
+        )
 
 
 def test_watch_matches_are_canonicalized_independent_of_input_order() -> None:

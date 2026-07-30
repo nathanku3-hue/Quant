@@ -61,33 +61,23 @@ def test_canonical_module_is_importable_and_present() -> None:
     assert hasattr(gv_fs0_canonical, "encode_json_string")
 
 
-def test_product_canon_files_exist_with_active_status() -> None:
-    """Fail closed if any of the three product canons is absent."""
+def test_product_canon_files_exist_with_current_authority_status() -> None:
+    """Fail closed if any product canon lacks an explicit current disposition."""
     for rel in REQUIRED_PRODUCT_CANON:
         path = _require_file(rel)
         text = path.read_text(encoding="utf-8")
         assert "Status:" in text
-        assert "Active" in text.splitlines()[2] or "Active" in text[:500]
-        assert "GV-FS0" in text or "Portfolio" in text or "Owner Freeze" in text
+        assert "Primary authority:" in text or "Primary sequence authority:" in text
+        assert "Portfolio" in text or "Owner Freeze" in text
 
 
-def test_top_level_roadmap_is_gv_fs0_first_not_uoe() -> None:
+def test_top_level_roadmap_is_portfolio_slice_first_not_uoe() -> None:
     path = _require_file("docs/architecture/top_level_roadmap.md")
     text = path.read_text(encoding="utf-8")
-    head = "\n".join(text.splitlines()[:20])
-    # E0A operable is the sole active gate; FS0 remains substrate authority language.
-    assert (
-        "GV-E0A-OPERABLE" in head
-        or "GV-FS0-First" in head
-        or "GV-FS0 First" in head
-        or "GodView Certified Portfolio OS" in text.splitlines()[0]
-    )
-    assert (
-        "ACTIVE_GATE = GV-E0A-OPERABLE" in text
-        or "EXECUTION_MODEL = GV_FS0_FIRST" in text
-        or "GodView Certified Portfolio OS" in text.splitlines()[0]
-    )
-    # Obsolete active UOE roadmap title must not remain the H1.
+    assert text.splitlines()[0] == "# GodView Top-Level Roadmap"
+    assert "ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0" in text
+    assert "NEXT_GATE = GV-DETERMINISTIC-REPLAY-0" in text
+    assert "ROOT_CHECKOUT = UNSAFE / DO_NOT_USE" in text
     assert not text.splitlines()[0].startswith("# Top-Level Roadmap: Unified Opportunity Engine")
 
 

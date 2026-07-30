@@ -3,37 +3,35 @@
 ## Repository custody
 
 - [x] Dirty root checkout identified and left untouched.
-- [x] Repair worktree starts from exact remote-equal base `b3d5092`.
-- [x] S2 banked locally as isolated commit `92f587d`.
-- [x] S3 banked locally as isolated commit `3040a77`.
-- [x] S4 banked locally as isolated commit `1f11c0c`.
-- [x] Terminal integration commit banked locally.
-- [x] Terminal branch pushed and remote-equal.
+- [x] Repair worktree starts from remote-equal candidate `9ebc973a8cc3cfbd4899ed724733cc22c606fbbf`.
+- [x] Hash-bound textual data now has explicit LF checkout authority.
+- [x] Fresh LF-preserving clone proves tracked fixture bytes equal Git blobs.
+- [ ] Repaired terminal commit pushed and local/remote-equal.
 
-## Functional integration
+## Functional repair
 
-- [x] S2 ignores non-economic `PORTFOLIO_TRANSITION_PLANNED` while preserving strict economic reduction.
-- [x] S3 canonical thesis shape replaces the stale product-only `state` field.
-- [x] S3 decision snapshot is the sole authority for reviews, cash outcome, competition, and selection.
-- [x] S4 emits and validates aim-confirmation, transition, order, and fill lineage.
-- [x] `vertical.py` contains no duplicate reducer, strategy validator, or order/fill constructor.
-- [x] Certification consumes `build_portfolio_book` and requires explicit costs, reconciled NAV, zero unexplained residual, and valid execution lineage.
-- [x] Persisted workspace schema bumped to `gv_portfolio_v0_workspace_v2`.
-- [x] Product review state is derived at render time rather than persisted as strategy truth.
+- [x] Certification history is identity-checked and recomputed from pre-observation events.
+- [x] Certification-record events are ordered and bound to certification IDs.
+- [x] Persisted explanation, claim boundary, and status projection fail closed.
+- [x] Instrument, benchmark, review, and Portfolio Aim registries are cross-bound.
+- [x] Later observation evidence must exist in the available evidence set.
+- [x] Declared event sequences must be contiguous.
+- [x] Product and Replay implementation remained read-only.
 
 ## Verification
 
-- [x] Python 3.12.10, pytest 9.0.2, Streamlit 1.54.0 confirmed.
-- [x] Portfolio slice: 82/82 PASS.
-- [x] Frozen GV-FS0 protocol set: 150/150 PASS.
-- [x] Legacy product suite executed read-only: 259/263 PASS.
-- [x] Four legacy product failures classified as frozen authority-document drift outside this slice.
-- [ ] Full repository suite PASS; blocked at collection by undeclared/incomplete environment dependencies.
+- [x] Python 3.12.10 environment installed from unchanged `requirements.lock`.
+- [x] `pip check` PASS.
+- [x] Full collection: 2664 tests / 201 files.
+- [x] Portfolio: 92/92 PASS.
+- [x] Context + frozen protocol: 175/175 PASS.
+- [x] Legacy product: 263/263 PASS; four stale authority failures repaired narrowly.
+- [x] Full LF-preserving suite executed: 2598 passed, 16 skipped, 50 failed.
+- [ ] Full repository suite PASS.
 - [ ] Independent Reviewer A/B/C PASS against one terminal SHA.
 
 ## Scope and claims
 
-- [x] Product and Replay remained read-only during shared integration.
-- [x] No provider, optimizer, broker, alpha, score-uplift, or live-capital work added.
+- [x] No dependency, provider, optimizer, broker, alpha, score-uplift, or live-capital work added.
 - [x] Canonical shipped score remains 39/100; observed comparisons remain 0.
 - [ ] Phase accepted and shipped.
