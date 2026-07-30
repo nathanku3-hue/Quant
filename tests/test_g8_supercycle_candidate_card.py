@@ -65,10 +65,35 @@ def test_g8_initial_state_limited_to_thesis_candidate_or_evidence_building():
     assert any("initial_state" in error for error in _errors(card))
 
 
-def test_g8_candidate_card_bundle_hash_validates_against_manifest():
-    result = validate_candidate_card_bundle(CARD_PATH, MANIFEST_PATH)
+def test_g8_mu_live_package_retains_v2b0_intentional_non_binding():
+    """Retire same-path G8 hash-green for the banked V2-B0 MU package.
 
-    assert result.valid, result.errors
+    The live MU candidate-card package is the V2-B0 historical non-binding
+    fixture: declared ``artifact_sha256`` must remain unequal to the actual
+    card bytes so admission can surface
+    ``SOURCE_PACKAGE_MANIFEST_BINDING_INVALID``.
+
+    This assertion is **retired from the relocatable-manifest custody gate**
+    as a hash-match PASS criterion. Do not "fix" the MU package hash to make
+    ``validate_candidate_card_bundle`` green without a product redesign that
+    moves the intentional mismatch off this path.
+
+    Authority: ``docs/architecture/gv_relocatable_custody_gate.md``,
+    ``core/gv_v2_b0_real_block_only.py``.
+    """
+    expected_card_sha = (
+        "f87e7908854791c327b3a04eb46b873fb995283a4b8015c1bca7bd7066f53f2d"
+    )
+    historical_declared_sha = (
+        "368c4fb3f7afc4673f2bbffd3a39a977159a779e8929e0a327db461d1ee05abd"
+    )
+    manifest = _manifest()
+    assert manifest["artifact_sha256"] == historical_declared_sha
+    assert manifest["artifact_sha256"] != expected_card_sha
+
+    result = validate_candidate_card_bundle(CARD_PATH, MANIFEST_PATH)
+    assert result.valid is False
+    assert any("artifact_sha256" in error for error in result.errors)
 
 
 def test_g8_card_cannot_contain_score_or_rank():
