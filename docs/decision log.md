@@ -7611,3 +7611,12 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Decision: open **only** ``GV-PORTFOLIO-SCALE-1`` via docs-only promotion; pin Bounded code base ``abaa814`` and Replay pin ``0e4b93f``; ``ACTIVE_BRIEF`` → ``docs/phase_brief/phase3-gv-portfolio-scale-1-brief.md``.
 - Forbidden: squash of audited terminals; reopening Universe/Live slices; provider/optimizer/live capital.
 
+
+## 2026-07-30 — ACCEPT_PORTFOLIO_SCALE_1 and open GV-UNIVERSE-SCALE-1
+
+- Decision: **ACCEPT_PORTFOLIO_SCALE_1** at exact audited SHA ``c37abf00293937b9b99eb6e560f6b5b77a92ea1f``. No further Portfolio Scale repair required.
+- Proof: multi-session scale above Bounded V1; path-free economic determinism; Bounded/Replay frozen byte-identical; true candidate-only failures = 0; independent A/B/C PASS; PR #13 merged retaining exact SHA (FF ``eedf853 → c37abf0``, no squash/rebase/merge commit).
+- Custody-repair tip fast-forwarded ``eedf853 → c37abf0``; annotated tag ``gv-portfolio-scale-1-terminal`` → ``c37abf0``.
+- Carried Medium debt (not blockers): R0-D1 multi-hop reopen; R0-D2 residual vs ``book_hash``; B1-D1 product single-observation validate vs bounded multi-observe authority.
+- Decision: open **only** ``GV-UNIVERSE-SCALE-1`` via docs-only promotion; pin Scale code base ``c37abf0``, Bounded ``abaa814``, Replay ``0e4b93f``; ``ACTIVE_BRIEF`` → ``docs/phase_brief/phase4-gv-universe-scale-1-brief.md``.
+- Forbidden: squash of audited terminals; reopening Challenger/Live slices; provider/optimizer/live capital.

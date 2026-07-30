@@ -1,6 +1,6 @@
 # Product Requirements Document: Terminal Zero / GodView Certified Portfolio OS
 
-## Active Build Authority (2026-07-30) — Bounded Portfolio 1 Accepted; Portfolio Scale Open
+## Active Build Authority (2026-07-30) — Portfolio Scale 1 Accepted; Universe Scale Open
 
 ```text
 PRODUCT = point-in-time certified portfolio operating system
@@ -15,8 +15,9 @@ REPLAY_0_BASE = 03a5c922d250d615380bbd0d60e8fd636e4ec1c6
 PRODUCT_SEQUENCE = SLICES_0_TO_6
 REPLAY_0_TERMINAL = 0e4b93fb370f67956502edc02e9c6f56ceb2eba3
 BOUNDED_PORTFOLIO_1_TERMINAL = abaa814ce99ea78afadc33dd40506f4e13a742ef
-ACTIVE_SLICE = GV-PORTFOLIO-SCALE-1
-NEXT_INTEGRITY_GATE = PORTFOLIO_SCALE_CUSTODY_REPLAY
+PORTFOLIO_SCALE_1_TERMINAL = c37abf00293937b9b99eb6e560f6b5b77a92ea1f
+ACTIVE_SLICE = GV-UNIVERSE-SCALE-1
+NEXT_INTEGRITY_GATE = UNIVERSE_SCALE_CUSTODY_REPLAY
 ACTIVE_BRIEF = docs/context/ACTIVE_BRIEF
 LIVE_CAPITAL = NOT_AUTHORIZED
 ```
