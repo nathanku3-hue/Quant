@@ -1,76 +1,55 @@
 # PHASE_QUEUE.md — GodView Portfolio Product Queue
 
-Status: `R0_BANKED; INDEPENDENT_AUDIT_PENDING`
-Last updated: 2026-07-29
+Status: `REPLAY_0_BASE_PROMOTED; GV-DETERMINISTIC-REPLAY-0 OPEN`
+Last updated: 2026-07-30
 Authority: `docs/architecture/godview_v2_frozen_build_learn_roadmap.md`
-Active brief: `docs/context/ACTIVE_BRIEF`
+Active brief: `docs/context/ACTIVE_BRIEF` → `docs/phase_brief/phase1-gv-deterministic-replay-0-brief.md`
 Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
+
+## Immutable pins
+
+| Pin | Exact SHA |
+|---|---|
+| Slice 0 product terminal | `85e6601742710f03e6cced7377b4be426cd4892f` |
+| Replay 0 custody base | `03a5c922d250d615380bbd0d60e8fd636e4ec1c6` |
 
 ## Queue law
 
-1. `R0 — ROADMAP-CUSTODY-REPAIR` is an internal repository repair, not a product slice.
+1. `R0 — ROADMAP-CUSTODY-REPAIR` was internal repository repair, not a product slice; closed under Slice 0 + custody supersede.
 2. The seven-slice product sequence is fixed at boundary and gate level.
-3. Only `GV-MICRO-PORTFOLIO-VERTICAL-0` and `GV-DETERMINISTIC-REPLAY-0` are implementation-authorized, and implementation waits for independent R0 audit PASS.
+3. **Only `GV-DETERMINISTIC-REPLAY-0` is open for implementation** on base `03a5c92`.
 4. Bounded portfolio work remains blocked until exact deterministic replay passes.
-5. Released `gv_fs0_v1` remains immutable; portfolio work uses a new namespace.
-6. Work occurs only in a clean isolated worktree descended from `ROADMAP_FREEZE_COMMIT`.
+5. Released `gv_fs0_v1` remains immutable; portfolio work uses `gv_portfolio_v0`.
+6. Work occurs only in a clean isolated worktree descended from Replay 0 base `03a5c92`.
 7. The dirty root checkout is not execution or publication authority.
+8. Slice 0 at `85e6601` is immutable; do not rewrite it to absorb custody fixes.
 
 ## R0 — `ROADMAP-CUSTODY-REPAIR`
 
-- **Status:** `BANKED_AUDIT_PENDING`
+- **Status:** `CLOSED_VIA_SLICE0_AND_CUSTODY_SUPERSEDE`
 - **Product slice:** no
-- **Delivered:** semantic contradiction repair; explicit active-brief selection; Phase 66 bridge retired; stale SAW superseded; three-package topology; minimum seam definition; corrected context and authority chain.
-- **Exit gate:** independent audit confirms exact commit, remote presence, clean worktree, passing selector tests/validation, and untouched root.
 
 ## Slice 0 — `GV-MICRO-PORTFOLIO-VERTICAL-0`
 
-- **Status:** `AUTHORIZED_AFTER_R0_AUDIT`
-- **Objective:** ship one complete prospective multi-security portfolio operator loop.
+- **Status:** `ACCEPTED_IMMUTABLE`
+- **Terminal SHA:** `85e6601742710f03e6cced7377b4be426cd4892f`
+- **Audit:** matched clean-clone comparison — candidate-only failures = 0 vs integration base; independent acceptance banked 2026-07-30.
 
-```text
-launch
-→ review 3–5 securities, benchmark, and classified cash
-→ inspect principal thesis, substitute, competitor, and rejection
-→ confirm portfolio aim
-→ deterministic paper order and fill
-→ certify book
-→ persist and reopen
-→ admit one later observation
-→ explain what changed and why
-```
+## Custody supersede — relocatable manifests (not a product slice)
 
-### Minimum scope
-
-- permanent instrument identity and aliases;
-- content-addressed evidence references and immutable events;
-- one actually exercised corporate action;
-- multi-position book, classified cash, NAV reconciliation;
-- Living Thesis Lite and Bull/Base/Bear ranges;
-- admit/reject/abstain/cash outcomes;
-- deterministic capital competition, aim, transition, order, and fill;
-- immutable original decision snapshot;
-- one operator workspace.
-
-### Work packages
-
-| Package | Owns | Hard output |
-|---|---|---|
-| A — Truth core | identity, evidence, events, book, cash, NAV, replay skeleton | reconciled replayable event log |
-| B — Decision vertical | thesis, scenarios, admission, capital competition, aim, transition, order/fill | certified aim and fill events |
-| C — Product closure | launch/review/confirm/persist/reopen, read models, later observation, docs | operator-complete vertical |
-
-### Minimum frozen seams
-
-`InstrumentId`, `EventId`, `EvidenceReference`, `PortfolioBookEvent`, `DecisionSnapshotId`, `PortfolioAimId`, `OrderId`, `FillId`, `CertificationId`.
-
-Detailed fields freeze only when exercised by the acceptance fixture.
+- **Status:** `PROMOTED_AS_REPLAY_0_BASE`
+- **SHA:** `03a5c922d250d615380bbd0d60e8fd636e4ec1c6`
+- **Parent chain:** `85e6601` → `bd07f61` → `03a5c92`
+- **Delivered:** G4 relative path + `repo_root` resolve; MSFT hash hygiene; V2-B0 MU historical non-binding restored; explicit G8 MU same-path hash-match retirement; gate doc.
+- **Proof:** focused 149/149; full suite candidate-only = 0 vs `85e6601`; independent A/B/C PASS; remote-equal.
 
 ## Slice 1 — `GV-DETERMINISTIC-REPLAY-0`
 
-- **Status:** `AUTHORIZED; CERTIFICATION_REQUIRES_SLICE_0_EVENTS`
-- **Objective:** exactly reconstruct the operated portfolio rather than merely reproduce plausible output.
+- **Status:** `OPEN; IMPLEMENTATION_AUTHORIZED`
+- **Base:** exact `03a5c922d250d615380bbd0d60e8fd636e4ec1c6`
+- **Objective:** exactly reconstruct the operated Slice 0 portfolio rather than merely reproduce plausible output.
 - **Acceptance:** exact cash, quantities, costs, NAV, and thesis state; byte-stable prior certification; idempotence; correction lineage; partial-fill residual state; valuation-pending without fabricated prices; one split or equivalent value transfer; zero unexplained residual at declared precision.
+- **Brief:** `docs/phase_brief/phase1-gv-deterministic-replay-0-brief.md`
 
 ## Evidence-gated later slices
 
@@ -86,21 +65,22 @@ Detailed fields freeze only when exercised by the acceptance fixture.
 
 ```text
 Roadmap custody banked             1/1
-Micro-portfolio operator loop      0/1
-Prospective later observation      0/1
+Micro-portfolio operator loop      1/1
+Independent Slice 0 audit          1/1
+Relocatable Replay 0 base          1/1
 Exact deterministic replay         0/1
 Bounded repeated portfolio         0/1
 ```
 
 ## Forbidden critical-path scope
 
-providers · WRDS acquisition · broad historical loaders · optimizer · copula/MES production · automated graph propagation · adaptive intraday execution · tactical capital · broad tax/FX · shorting · leverage · derivatives · broker · live capital · score uplift · alpha claim
+providers · WRDS acquisition · broad historical loaders · optimizer · copula/MES production · automated graph propagation · adaptive intraday execution · tactical capital · broad tax/FX · shorting · leverage · derivatives · broker · live capital · score uplift · alpha claim · Slice 0 rewrite · MU hash “repair” that breaks V2-B0 non-binding
 
 ## Immediate next action
 
 ```text
-independent audit ROADMAP_FREEZE_COMMIT
-→ create clean isolated worktree from that exact commit
-→ ship GV-MICRO-PORTFOLIO-VERTICAL-0
-→ certify GV-DETERMINISTIC-REPLAY-0
+clean isolated worktree from exact 03a5c92
+→ implement only GV-DETERMINISTIC-REPLAY-0
+→ certify exact reconstruction from Slice 0 events
+→ do not open GV-BOUNDED-PORTFOLIO-1 until replay PASS
 ```

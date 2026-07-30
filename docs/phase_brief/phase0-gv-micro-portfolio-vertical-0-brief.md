@@ -2,21 +2,20 @@
 
 Date: 2026-07-29
 Mode: `EXECUTION_PACKET`
-Status: `IMPLEMENTATION_COMPLETE_REMOTE; FULL_SUITE_AND_AUDIT_BLOCKED`
-Authority: corrected GodView portfolio roadmap and R0 custody-repair acceptance
+Status: `ACCEPTED_IMMUTABLE`
+Authority: corrected GodView portfolio roadmap; clean-clone acceptance 2026-07-30
+Terminal SHA: `85e6601742710f03e6cced7377b4be426cd4892f`
 
 ## Hierarchy
 
 - L1: GodView point-in-time certified portfolio operating system.
-- L2 active phase: `GV-MICRO-PORTFOLIO-VERTICAL-0` only.
-- L2 bounded repair owners: S2 Accounting, S3 Strategy, S4 Execution; only the Integrator may change shared code.
-- L2 read-only: Product compatibility and Replay/Certification.
+- L2 phase: `GV-MICRO-PORTFOLIO-VERTICAL-0` — **accepted immutable** at `85e6601`.
+- L2 active phase: `GV-DETERMINISTIC-REPLAY-0` (see `docs/context/ACTIVE_BRIEF`).
 - L2 deferred: Bounded Portfolio, Portfolio Scale, Universe Scale, Challenger Promotion, Limited Live Capital.
-- L3 stage flow: Local Integration → Terminal Custody → Independent Audit → Slice 1 Replay Certification.
 
 ## Recommended next action
 
-Repair the declared full-suite environment and audit the exact remote terminal SHA. Do not open Product feature work, Replay implementation, or bounded-portfolio scale work before both gates pass.
+Do not reopen Slice 0 product feature work. Execute only `GV-DETERMINISTIC-REPLAY-0` from Replay 0 base `03a5c922d250d615380bbd0d60e8fd636e4ec1c6`.
 
 ## Product target
 
@@ -95,7 +94,8 @@ Operational gates remain binary:
 Roadmap custody banked             1/1
 Micro-portfolio candidate built    1/1
 Terminal remote custody            1/1
-Independent candidate audit        0/1
+Independent candidate audit        1/1
+Relocatable Replay 0 base          1/1
 Exact deterministic replay         0/1
 Bounded repeated portfolio         0/1
 ```

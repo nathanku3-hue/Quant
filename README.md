@@ -1,7 +1,7 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `R0 BANKED — INDEPENDENT AUDIT PENDING`
-Date: 2026-07-29
+Status: `REPLAY_0_BASE_PROMOTED; GV-DETERMINISTIC-REPLAY-0 OPEN`\nDate: 2026-07-30
+Slice 0 immutable: `85e6601`\nReplay 0 base: `03a5c92`
 Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 Release-proof tip: `93e7a55`
 Shipped product score: `39/100` unchanged
@@ -56,8 +56,8 @@ Alpha-0 does **not** prove:
 
 | Slice | Name | Status |
 |---|---|---|
-| 0 | `GV-MICRO-PORTFOLIO-VERTICAL-0` | authorized after independent R0 audit |
-| 1 | `GV-DETERMINISTIC-REPLAY-0` | authorized; certification requires Slice 0 events |
+| 0 | `GV-MICRO-PORTFOLIO-VERTICAL-0` | **accepted immutable** `85e6601` |
+| 1 | `GV-DETERMINISTIC-REPLAY-0` | **OPEN** on base `03a5c92` |
 | 2 | `GV-BOUNDED-PORTFOLIO-1` | blocked by exact replay |
 | 3 | `GV-PORTFOLIO-SCALE-1` | evidence-conditioned |
 | 4 | `GV-UNIVERSE-SCALE-1` | evidence-conditioned |

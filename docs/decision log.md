@@ -7579,3 +7579,15 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Score decision: shipped score remains 39/100 and observed remains 0 until exact remote custody and independent audit PASS.
 - Stop: do not open Product feature work or Replay implementation. First repair the declared full-suite environment and audit the exact remote commit.
 
+
+## 2026-07-30 — Replay 0 base promotion (Path 1 custody supersede)
+
+- Decision: accept Slice 0 terminal `85e6601742710f03e6cced7377b4be426cd4892f` as immutable product base (prior clean-clone acceptance; candidate-only failures = 0).
+- Decision: reject `bd07f61` as Replay 0 base. Independent A/B/C BLOCKED because rewriting MU declared `artifact_sha256` to live card bytes removed banked V2-B0 `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID` (three candidate-only V2-B0 failures).
+- Decision: bank Path-1 custody supersede `03a5c922d250d615380bbd0d60e8fd636e4ec1c6` as immutable **Replay 0 base**.
+- Supersede contents: restore MU historical declared sha `368c4fb3…`; retain G4 relative path + `canonical_slice` `repo_root` resolve + MSFT hash hygiene; explicitly retire G8 MU same-path hash-match PASS via `test_g8_mu_live_package_retains_v2b0_intentional_non_binding` and `docs/architecture/gv_relocatable_custody_gate.md`.
+- Proof: focused 149/149 PASS; full suite 2620 pass / 30 fail / 16 skip; candidate-only failures vs `85e6601` = 0; remote-equal on `origin/codex/repository-custody-repair`.
+- Independent A/B/C on `03a5c92`: PASS / PASS / PASS.
+- Decision: open **only** `GV-DETERMINISTIC-REPLAY-0`; `ACTIVE_BRIEF` → `docs/phase_brief/phase1-gv-deterministic-replay-0-brief.md`.
+- Forbidden: Slice 0 rewrite; MU hash-align that breaks V2-B0 non-binding; bounded-portfolio scale before exact replay PASS; full-repo PASS claim from subset green.
+
