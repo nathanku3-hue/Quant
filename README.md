@@ -1,7 +1,9 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `REPLAY_0_BASE_PROMOTED; GV-DETERMINISTIC-REPLAY-0 OPEN`\nDate: 2026-07-30
-Slice 0 immutable: `85e6601`\nReplay 0 base: `03a5c92`
+Status: `REPLAY_0_ACCEPTED; GV-BOUNDED-PORTFOLIO-1 OPEN`
+Date: 2026-07-30
+Slice 0 immutable: `85e6601`
+Replay 0 terminal: `0e4b93f` (tag `gv-replay-0-terminal`)
 Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 Release-proof tip: `93e7a55`
 Shipped product score: `39/100` unchanged
@@ -57,14 +59,14 @@ Alpha-0 does **not** prove:
 | Slice | Name | Status |
 |---|---|---|
 | 0 | `GV-MICRO-PORTFOLIO-VERTICAL-0` | **accepted immutable** `85e6601` |
-| 1 | `GV-DETERMINISTIC-REPLAY-0` | **OPEN** on base `03a5c92` |
-| 2 | `GV-BOUNDED-PORTFOLIO-1` | blocked by exact replay |
+| 1 | `GV-DETERMINISTIC-REPLAY-0` | **ACCEPTED** `0e4b93f` |
+| 2 | `GV-BOUNDED-PORTFOLIO-1` | **OPEN** (pin Replay `0e4b93f`) |
 | 3 | `GV-PORTFOLIO-SCALE-1` | evidence-conditioned |
 | 4 | `GV-UNIVERSE-SCALE-1` | evidence-conditioned |
 | 5 | `GV-CHALLENGER-PROMOTION-1` | shadow-first |
 | 6 | `GV-LIMITED-LIVE-1` | separate owner gate required |
 
-Only Slices 0–1 are implementation-authorized after audit. Later boundaries remain evidence-gated so delivery does not return to open-ended architecture discovery.
+Only `GV-BOUNDED-PORTFOLIO-1` is implementation-authorized. Later boundaries remain evidence-gated so delivery does not return to open-ended architecture discovery.
 
 ## Build × Learn model
 

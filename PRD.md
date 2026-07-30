@@ -1,6 +1,6 @@
 # Product Requirements Document: Terminal Zero / GodView Certified Portfolio OS
 
-## Active Build Authority (2026-07-30) — Replay 0 Base Promoted
+## Active Build Authority (2026-07-30) — Replay 0 Accepted; Bounded Portfolio Open
 
 ```text
 PRODUCT = point-in-time certified portfolio operating system
@@ -13,8 +13,9 @@ ROADMAP_CUSTODY = CLOSED
 SLICE_0_TERMINAL = 85e6601742710f03e6cced7377b4be426cd4892f
 REPLAY_0_BASE = 03a5c922d250d615380bbd0d60e8fd636e4ec1c6
 PRODUCT_SEQUENCE = SLICES_0_TO_6
-ACTIVE_SLICE = GV-DETERMINISTIC-REPLAY-0
-NEXT_INTEGRITY_GATE = EXACT_DETERMINISTIC_REPLAY_CERTIFICATION
+REPLAY_0_TERMINAL = 0e4b93fb370f67956502edc02e9c6f56ceb2eba3
+ACTIVE_SLICE = GV-BOUNDED-PORTFOLIO-1
+NEXT_INTEGRITY_GATE = BOUNDED_REPEATED_PORTFOLIO
 ACTIVE_BRIEF = docs/context/ACTIVE_BRIEF
 LIVE_CAPITAL = NOT_AUTHORIZED
 ```

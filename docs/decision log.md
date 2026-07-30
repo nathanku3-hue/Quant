@@ -7591,3 +7591,13 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Decision: open **only** `GV-DETERMINISTIC-REPLAY-0`; `ACTIVE_BRIEF` → `docs/phase_brief/phase1-gv-deterministic-replay-0-brief.md`.
 - Forbidden: Slice 0 rewrite; MU hash-align that breaks V2-B0 non-binding; bounded-portfolio scale before exact replay PASS; full-repo PASS claim from subset green.
 
+
+## 2026-07-30 — ACCEPT_REPLAY_0 and open GV-BOUNDED-PORTFOLIO-1
+
+- Decision: **ACCEPT_REPLAY_0** at exact audited SHA ``0e4b93fb370f67956502edc02e9c6f56ceb2eba3``. No further Replay repair required.
+- Proof: clean ancestry/scope; Replay/portfolio suite green; true candidate-only failures vs ``9bee439`` = 0 (serial Alpha0 re-run); independent A/B/C PASS; PR #11 merged retaining exact SHA (FF, no squash/rebase/merge commit).
+- Custody-repair tip fast-forwarded ``9bee439 → 0e4b93f``; annotated tag ``gv-replay-0-terminal`` → ``0e4b93f``.
+- Carried Medium debt (not blockers): **R0-D1** multi-hop ``reopen_with_stable_prior`` parent handling; **R0-D2** ``book_hash`` excludes ``partial_fill_residuals`` (residual field/ledger authoritative).
+- Decision: open **only** ``GV-BOUNDED-PORTFOLIO-1`` via docs-only promotion; pin Replay code base ``0e4b93f``; ``ACTIVE_BRIEF`` → ``docs/phase_brief/phase2-gv-bounded-portfolio-1-brief.md``.
+- Forbidden: squash of audited terminal; reopening Scale slices; product/provider/optimizer/live capital.
+

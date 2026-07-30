@@ -2,30 +2,30 @@
 
 Date: 2026-07-30
 Mode: `EXECUTION_PACKET`
-Status: `OPEN; IMPLEMENTATION_AUTHORIZED_ON_IMMUTABLE_BASE`
-Authority: Slice 0 accepted; relocatable custody supersede A/B/C PASS
+Status: `ACCEPTED_IMMUTABLE`
+Authority: independent A/B/C PASS; PR #11 merged as exact SHA; tag `gv-replay-0-terminal`
+Terminal SHA: `0e4b93fb370f67956502edc02e9c6f56ceb2eba3`
 
 ## Immutable bases
 
 | Role | Exact SHA | Note |
 |---|---|---|
 | Slice 0 product terminal | `85e6601742710f03e6cced7377b4be426cd4892f` | immutable; do not rewrite |
-| Replay 0 custody base | `03a5c922d250d615380bbd0d60e8fd636e4ec1c6` | Path-1 supersede; tagged `gv-replay-0-base` |
-| Implementation / promotion tip | `9bee4396502174cfd791809e53de183e1a93bb75` | authority-opening brief + ACTIVE_BRIEF; branch from **this** tip |
+| Replay 0 custody base | `03a5c922d250d615380bbd0d60e8fd636e4ec1c6` | tag `gv-replay-0-base` |
+| **Replay 0 code terminal** | **`0e4b93fb370f67956502edc02e9c6f56ceb2eba3`** | **tag `gv-replay-0-terminal`; ACCEPTED** |
 
-Ancestry: `85e6601` → `bd07f61` → `03a5c92` (custody) → `9bee439` (docs promote / open Replay 0).
+Ancestry: `85e6601` → … → `03a5c92` → `9bee439` → **`0e4b93f`**.
 
 ## Hierarchy
 
 - L1: GodView point-in-time certified portfolio operating system.
-- L2 active phase: **`GV-DETERMINISTIC-REPLAY-0` only**.
-- L2 closed / immutable: `GV-MICRO-PORTFOLIO-VERTICAL-0` product terminal at `85e6601`.
-- L2 deferred: Bounded Portfolio, Portfolio Scale, Universe Scale, Challenger Promotion, Limited Live Capital.
-- L3 stage flow: Replay skeleton from Slice 0 events → exact reconstruction fixtures → independent audit → certification.
+- L2 phase: `GV-DETERMINISTIC-REPLAY-0` — **accepted immutable** at `0e4b93f`.
+- L2 active phase: `GV-BOUNDED-PORTFOLIO-1` (see `docs/context/ACTIVE_BRIEF`).
+- L2 deferred: Portfolio Scale, Universe Scale, Challenger Promotion, Limited Live Capital.
 
 ## Recommended next action
 
-Create the implementation branch from promotion tip **`9bee439`** (not bare `03a5c92`, which omits the authority-opening brief). Record immutable custody base `03a5c92`. Implement **only** deterministic replay certification for actual Slice 0 portfolio events. Product/Slice 0 remain read-only.
+Do not reopen Replay feature work except explicit Medium debt (R0-D1 multi-hop reopen; R0-D2 residual-vs-`book_hash` consumer docs). Execute only `GV-BOUNDED-PORTFOLIO-1` pinned to Replay code base `0e4b93f`.
 
 ## Product target
 
@@ -66,17 +66,23 @@ Micro-portfolio operator loop      1/1
 Terminal remote Slice 0            1/1
 Independent Slice 0 audit          1/1
 Relocatable Replay 0 base          1/1
-Exact deterministic replay         0/1
+Exact deterministic replay         1/1
 Bounded repeated portfolio         0/1
 ```
 
+## Carried Medium debt
+
+| ID | Item |
+|---|---|
+| R0-D1 | Multi-hop `reopen_with_stable_prior` parent handling |
+| R0-D2 | `book_hash` excludes `partial_fill_residuals` (field/ledger authoritative) |
+
 ## Forbidden scope
 
-providers · WRDS acquisition · broad historical loaders · optimizer · copula/MES production · automated graph propagation · adaptive intraday execution · tactical capital · broad tax · multi-currency · shorting · leverage · derivatives · broker · live capital · score uplift · alpha claim · reopening Slice 0 product feature work · “fixing” MU declared hash to green old G8
+providers · WRDS acquisition · broad historical loaders · optimizer · copula/MES production · automated graph propagation · adaptive intraday execution · tactical capital · broad tax · multi-currency · shorting · leverage · derivatives · broker · live capital · score uplift · alpha claim · reopening Slice 0 product feature work · “fixing” MU declared hash to green old G8 · squash of terminal `0e4b93f`
 
 ## Stop rules
 
-1. Stop if implementation is not descended from promotion tip `9bee439` (or a later audited Replay-only descendant that preserves custody base `03a5c92` and Slice 0 `85e6601`).
+1. Stop if Replay terminal `0e4b93f` is rewritten or force-moved.
 2. Stop if Slice 0 base `85e6601` is rewritten or force-moved.
 3. Stop if MU historical non-binding is broken without a full V2-B0 product redesign packet.
-4. Stop if work expands into bounded-portfolio scale before exact replay PASS.
