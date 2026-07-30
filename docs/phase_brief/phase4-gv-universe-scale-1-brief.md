@@ -2,8 +2,8 @@
 
 Date: 2026-07-30
 Mode: `EXECUTION_PACKET`
-Status: `IMPLEMENTATION_IN_PROGRESS; BRANCH_FROM_133b632`
-Authority: Portfolio Scale 1 accepted at exact terminal `c37abf0`; implementation branch `codex/gv-universe-scale-1`
+Status: `ACCEPTED_IMMUTABLE at dca67e3; tag gv-universe-scale-1-terminal`
+Authority: Universe Scale 1 accepted; next active slice is Challenger Promotion only (Live remains closed)
 
 ## Immutable pins (do not rewrite)
 
@@ -13,39 +13,35 @@ Authority: Portfolio Scale 1 accepted at exact terminal `c37abf0`; implementatio
 | Replay 0 custody base | `03a5c922d250d615380bbd0d60e8fd636e4ec1c6` | `gv-replay-0-base` |
 | Replay 0 code terminal | `0e4b93fb370f67956502edc02e9c6f56ceb2eba3` | `gv-replay-0-terminal` |
 | Bounded Portfolio 1 terminal | `abaa814ce99ea78afadc33dd40506f4e13a742ef` | `gv-bounded-portfolio-1-terminal` |
-| **Portfolio Scale 1 terminal** | **`c37abf00293937b9b99eb6e560f6b5b77a92ea1f`** | **`gv-portfolio-scale-1-terminal`** |
+| Portfolio Scale 1 terminal | `c37abf00293937b9b99eb6e560f6b5b77a92ea1f` | `gv-portfolio-scale-1-terminal` |
+| **Universe Scale 1 terminal** | **`dca67e36edc02dddf8c7ba446ac34f22562ee165`** | **`gv-universe-scale-1-terminal`** |
 
-Ancestry: … → `c37abf0` (ACCEPT_PORTFOLIO_SCALE_1) → this docs-only promotion tip.
+Ancestry: … → `c37abf0` (Scale) → `133b632` (docs open Universe) → **`dca67e3`** (ACCEPT_UNIVERSE_SCALE_1) → docs-only open of Challenger.
 
 ## Hierarchy
 
 - L1: GodView point-in-time certified portfolio operating system.
-- L2 active phase: **`GV-UNIVERSE-SCALE-1` only**.
-- L2 closed / immutable: Slice 0 @ `85e6601`; Replay 0 @ `0e4b93f`; Bounded Portfolio 1 @ `abaa814`; Portfolio Scale 1 @ `c37abf0`.
-- L2 deferred: Challenger Promotion, Limited Live Capital.
+- L2 phase: **`GV-UNIVERSE-SCALE-1` accepted immutable** at `dca67e3`.
+- L2 active phase: **`GV-CHALLENGER-PROMOTION-1` only** (see `docs/context/ACTIVE_BRIEF`).
+- L2 closed / immutable: Slice 0 @ `85e6601`; Replay 0 @ `0e4b93f`; Bounded @ `abaa814`; Scale @ `c37abf0`; Universe @ `dca67e3`.
+- L2 closed (not authorized): **Limited Live Capital**.
 
-## Recommended next action
+## Acceptance proof
 
-Continue on branch `codex/gv-universe-scale-1` (from promotion tip `133b632`). Keep Scale pin `c37abf0`, Bounded pin `abaa814`, and Replay pin `0e4b93f` frozen. Every cycle re-run Scale multi-session, Bounded multi-cycle, and exact Replay gates; stop on any event/cert/reopen/book/ledger/hash drift.
+- Declared universe slots: default 4 cells × 4 securities = 16 (> Scale multi-session baseline 3 × 4 = 12).
+- Embedded Scale control via frozen `run_portfolio_scale` (non-drift).
+- Path-free cross-cell economic determinism; restart/reopen; Replay residual 0.
+- Frozen Scale/Bounded/Replay/book/vertical modules byte-identical to terminals.
+- Replay + Bounded + Scale + Universe suites green.
+- Full-suite failsets tip vs `133b632` identical; true candidate-only = 0.
+- Independent Reviewer A/B/C: PASS / PASS / PASS (0 High).
+- PR #14 merged retaining exact SHA (FF push `133b632 → dca67e3`, no squash/rebase/merge commit).
 
-## Product target
+## Module
 
-```text
-portfolio-scale multi-session paper operation remains green
-→ expand declared security universe above Scale multi-session slot model
-→ keep exact replay and residual zero every cycle
-→ preserve append-only certification lineage under universe scale
-→ prove restart/reopen and session custody at universe scale
-```
-
-## Acceptance (slice gate)
-
-- paper portfolio operation on a declared universe larger than Portfolio Scale 1 multi-session fixture slots;
-- every cycle reconstructible via Replay 0 machinery;
-- prior certifications byte-stable under corrections and reopen;
-- no unexplained residual at declared precision;
-- Scale and Bounded non-drift retained;
-- no optimizer-first allocation, provider programme, alpha claim, broker, or live capital.
+- `gv_portfolio_v0/universe.py`
+- `tests/gv_portfolio_v0/test_universe.py`
+- `docs/architecture/gv_universe_scale_1_branch_pins.md`
 
 ## Carried Medium debt (from prior slices — not blockers)
 
@@ -65,15 +61,13 @@ Relocatable Replay 0 base          1/1
 Exact deterministic replay         1/1
 Bounded repeated portfolio         1/1
 Portfolio scale                    1/1
-Universe scale                     0/1
+Universe scale                     1/1
 ```
 
-## Forbidden scope
+## Forbidden after acceptance
 
-providers · WRDS · broad historical loaders · optimizer · copula/MES · adaptive intraday · tactical capital · shorting · leverage · derivatives · broker · live capital · score uplift · alpha claim · rewriting Slice 0 / Replay 0 / Bounded / Scale terminals · squash of audited `c37abf0` · Challenger/Live before universe-scale PASS
+Rewrite of terminal `dca67e3`; squash of audited terminals; opening Live without explicit owner authorization; providers · optimizer · live capital · alpha claim.
 
-## Stop rules
+## Next
 
-1. Stop if work is not descended from a tip that preserves exact Scale terminal `c37abf0`, Bounded pin `abaa814`, and Replay pin `0e4b93f`.
-2. Stop if Scale multi-session, Bounded multi-cycle, or Replay reconstruction regresses.
-3. Stop if scope expands to Challenger Promotion or live capital before universe-scale PASS.
+See `docs/phase_brief/phase5-gv-challenger-promotion-1-brief.md` — only Challenger is implementation-authorized; Live remains closed.

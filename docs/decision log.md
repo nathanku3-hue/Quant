@@ -7620,3 +7620,13 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Carried Medium debt (not blockers): R0-D1 multi-hop reopen; R0-D2 residual vs ``book_hash``; B1-D1 product single-observation validate vs bounded multi-observe authority.
 - Decision: open **only** ``GV-UNIVERSE-SCALE-1`` via docs-only promotion; pin Scale code base ``c37abf0``, Bounded ``abaa814``, Replay ``0e4b93f``; ``ACTIVE_BRIEF`` → ``docs/phase_brief/phase4-gv-universe-scale-1-brief.md``.
 - Forbidden: squash of audited terminals; reopening Challenger/Live slices; provider/optimizer/live capital.
+
+## 2026-07-30 — ACCEPT_UNIVERSE_SCALE_1 and open GV-CHALLENGER-PROMOTION-1 (Live closed)
+
+- Decision: **ACCEPT_UNIVERSE_SCALE_1** at exact audited SHA ``dca67e36edc02dddf8c7ba446ac34f22562ee165``. No further Universe Scale repair required.
+- Proof: multi-cell universe slots 16 > Scale multi-session 12; embedded Scale control non-drift; path-free cross-cell economic determinism; Scale/Bounded/Replay frozen byte-identical; true candidate-only failures = 0; independent A/B/C PASS; PR #14 merged retaining exact SHA (FF ``133b632 → dca67e3``, no squash/rebase/merge commit).
+- Custody-repair tip fast-forwarded ``133b632 → dca67e3``; annotated tag ``gv-universe-scale-1-terminal`` → ``dca67e3``.
+- Carried Medium debt (not blockers): R0-D1 multi-hop reopen; R0-D2 residual vs ``book_hash``; B1-D1 product single-observation validate vs bounded multi-observe authority.
+- Decision: open **only** ``GV-CHALLENGER-PROMOTION-1`` (shadow-first) via docs-only promotion; pin Universe ``dca67e3``, Scale ``c37abf0``, Bounded ``abaa814``, Replay ``0e4b93f``; ``ACTIVE_BRIEF`` → ``docs/phase_brief/phase5-gv-challenger-promotion-1-brief.md``.
+- **``GV-LIMITED-LIVE-1`` remains CLOSED** until explicit owner authorization.
+- Forbidden: squash of audited terminals; opening Live without owner authorization; provider/optimizer/live capital.

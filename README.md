@@ -1,11 +1,12 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `PORTFOLIO_SCALE_1_ACCEPTED; GV-UNIVERSE-SCALE-1 OPEN`
+Status: `UNIVERSE_SCALE_1_ACCEPTED; GV-CHALLENGER-PROMOTION-1 OPEN; LIVE CLOSED`
 Date: 2026-07-30
 Slice 0 immutable: `85e6601`
 Replay 0 terminal: `0e4b93f` (tag `gv-replay-0-terminal`)
 Bounded Portfolio 1 terminal: `abaa814` (tag `gv-bounded-portfolio-1-terminal`)
 Portfolio Scale 1 terminal: `c37abf0` (tag `gv-portfolio-scale-1-terminal`)
+Universe Scale 1 terminal: `dca67e3` (tag `gv-universe-scale-1-terminal`)
 Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 Release-proof tip: `93e7a55`
 Shipped product score: `39/100` unchanged
@@ -64,11 +65,11 @@ Alpha-0 does **not** prove:
 | 1 | `GV-DETERMINISTIC-REPLAY-0` | **ACCEPTED** `0e4b93f` |
 | 2 | `GV-BOUNDED-PORTFOLIO-1` | **ACCEPTED** `abaa814` |
 | 3 | `GV-PORTFOLIO-SCALE-1` | **ACCEPTED** `c37abf0` |
-| 4 | `GV-UNIVERSE-SCALE-1` | **OPEN** (pin Scale `c37abf0`) |
-| 5 | `GV-CHALLENGER-PROMOTION-1` | shadow-first |
-| 6 | `GV-LIMITED-LIVE-1` | separate owner gate required |
+| 4 | `GV-UNIVERSE-SCALE-1` | **ACCEPTED** `dca67e3` |
+| 5 | `GV-CHALLENGER-PROMOTION-1` | **OPEN** shadow-first (pin Universe `dca67e3`) |
+| 6 | `GV-LIMITED-LIVE-1` | **CLOSED** — explicit owner gate required |
 
-Only `GV-UNIVERSE-SCALE-1` is implementation-authorized. Later boundaries remain evidence-gated so delivery does not return to open-ended architecture discovery.
+Only `GV-CHALLENGER-PROMOTION-1` is implementation-authorized. **Live remains closed.** Later boundaries remain evidence-gated so delivery does not return to open-ended architecture discovery.
 
 ## Build × Learn model
 
