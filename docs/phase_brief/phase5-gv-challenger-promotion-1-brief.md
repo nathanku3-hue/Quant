@@ -2,8 +2,8 @@
 
 Date: 2026-07-30
 Mode: `EXECUTION_PACKET`
-Status: `OPEN; IMPLEMENTATION_AUTHORIZED; SHADOW_FIRST; BRANCH_FROM_docs_open_after_dca67e3`
-Authority: Universe Scale 1 accepted at exact terminal `dca67e3`; only this slice is open; **Live remains CLOSED**
+Status: `IMPLEMENTATION_IN_PROGRESS; SHADOW_FIRST; BRANCH_FROM_cf77110`
+Authority: Universe Scale 1 accepted at exact terminal `dca67e3`; implementation branch `codex/gv-challenger-promotion-1`; **Live remains CLOSED**
 
 ## Immutable pins (do not rewrite)
 
@@ -27,7 +27,7 @@ Ancestry: … → `dca67e3` (ACCEPT_UNIVERSE_SCALE_1) → this docs-only promoti
 
 ## Recommended next action
 
-Branch implementation from this docs-only promotion tip (parent Universe terminal `dca67e3`). Keep Universe pin `dca67e3`, Scale pin `c37abf0`, Bounded pin `abaa814`, and Replay pin `0e4b93f` frozen. Shadow-first only: prospective challenger evidence without live capital, broker, or production capital mutation. Every cycle re-run Universe + Scale + Bounded + exact Replay gates; stop on any event/cert/reopen/book/ledger/hash drift.
+Continue on branch `codex/gv-challenger-promotion-1` (from promotion tip `cf77110`). Keep Universe pin `dca67e3`, Scale pin `c37abf0`, Bounded pin `abaa814`, and Replay pin `0e4b93f` frozen. Shadow-first only: prospective challenger evidence without live capital, broker, or production capital mutation. Every cycle re-run Universe + Scale + Bounded + exact Replay gates; stop on any event/cert/reopen/book/ledger/hash drift.
 
 ## Product target
 

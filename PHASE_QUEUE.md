@@ -67,12 +67,14 @@ Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
 
 ## Slice 5 — `GV-CHALLENGER-PROMOTION-1`
 
-- **Status:** `OPEN; IMPLEMENTATION_AUTHORIZED; SHADOW_FIRST`
-- **Promotion tip / branch base:** this docs-only open commit (parent is Universe terminal `dca67e3`)
-- **Universe code pin (immutable, not branch point alone):** exact `dca67e36edc02dddf8c7ba446ac34f22562ee165`
+- **Status:** `IMPLEMENTATION_IN_PROGRESS; SHADOW_FIRST`
+- **Promotion tip / branch base:** exact `cf771107d726458df6fc956a05337583407c6091`
+- **Universe code pin (immutable, not branch point):** exact `dca67e36edc02dddf8c7ba446ac34f22562ee165`
 - **Scale code pin:** exact `c37abf00293937b9b99eb6e560f6b5b77a92ea1f`
 - **Bounded code pin:** exact `abaa814ce99ea78afadc33dd40506f4e13a742ef`
 - **Replay code pin:** exact `0e4b93fb370f67956502edc02e9c6f56ceb2eba3`
+- **Implementation branch:** `codex/gv-challenger-promotion-1`
+- **Module:** `gv_portfolio_v0/challenger.py` + `tests/gv_portfolio_v0/test_challenger.py`
 - **Brief:** `docs/phase_brief/phase5-gv-challenger-promotion-1-brief.md`
 - **Objective:** shadow-first challenger promotion with prospective evidence; keep Universe/Scale/Bounded/Replay non-drift.
 - **Gate law:** every cycle re-verify Universe + Scale + Bounded + exact Replay; stop on any event/cert/reopen/book/ledger/hash drift; no live capital.
