@@ -251,6 +251,66 @@ def test_observed_workspace_rejects_forged_certification_event_link() -> None:
         validate_workspace(observed)
 
 
+def _rehash_event(event: dict[str, object]) -> None:
+    event["event_id"] = "EVT_" + domain_hash(
+        "GV-PORTFOLIO-V0:EVT:V1",
+        {key: value for key, value in event.items() if key != "event_id"},
+    )
+
+
+def _recertify_observed_workspace(workspace: dict[str, object]) -> None:
+    prior_id = workspace["certification_history"][0]["certification_id"]
+    certification = certify_workspace(
+        workspace, prior_certification_id=prior_id
+    )
+    workspace["certification"] = certification
+    certification_event = [
+        event
+        for event in workspace["events"]
+        if event["event_type"] == "CERTIFICATION_RECORDED"
+    ][-1]
+    certification_event["source_identity"] = certification["certification_id"]
+    certification_event["payload"] = {
+        "certification_id": certification["certification_id"]
+    }
+    _rehash_event(certification_event)
+    workspace["book"] = reduce_events(workspace["events"])
+
+
+def test_observed_workspace_rejects_forged_observation_event_source() -> None:
+    observed = admit_watch_observation(confirm_draft_workspace(build_draft_workspace()))
+    admitted_event = next(
+        event
+        for event in observed["events"]
+        if event["event_type"] == "LATER_OBSERVATION_ADMITTED"
+    )
+    admitted_event["source_identity"] = "EVD_FORGED"
+    _rehash_event(admitted_event)
+    _recertify_observed_workspace(observed)
+
+    with pytest.raises(
+        PortfolioV0Error, match="WATCH_OBSERVATION_EVENT_SOURCE_MISMATCH"
+    ):
+        validate_workspace(observed)
+
+
+def test_observed_workspace_rejects_forged_observation_event_instrument() -> None:
+    observed = admit_watch_observation(confirm_draft_workspace(build_draft_workspace()))
+    admitted_event = next(
+        event
+        for event in observed["events"]
+        if event["event_type"] == "LATER_OBSERVATION_ADMITTED"
+    )
+    admitted_event["instrument_id"] = observed["instruments"][1]["instrument_id"]
+    _rehash_event(admitted_event)
+    _recertify_observed_workspace(observed)
+
+    with pytest.raises(
+        PortfolioV0Error, match="WATCH_OBSERVATION_EVENT_INSTRUMENT_MISMATCH"
+    ):
+        validate_workspace(observed)
+
+
 @pytest.mark.parametrize(
     ("field", "value", "error"),
     [

@@ -6,7 +6,7 @@
 - **Base sentinel:** repair derives from remote-equal `9ebc973a8cc3cfbd4899ed724733cc22c606fbbf`.
 - **Scope sentinel:** Product and Replay implementation are read-only; only Integrator/Accounting/Strategy invariants, stale test authority, and checkout custody changed.
 - **Package sentinel:** unchanged `requirements.lock`, Python 3.12.10, and `pip check` PASS.
-- **Affected-test sentinel:** portfolio 92/92; context + protocol 175/175; legacy product 263/263.
+- **Affected-test sentinel:** portfolio 94/94 after independent Reviewer A repair; context + protocol 175/175; legacy product 263/263.
 - **Collection sentinel:** 2664 tests across 201 files.
 - **Checkout sentinel:** hash-bound text must resolve to LF; parquet/raw artifacts remain binary.
 - **Full-suite sentinel:** LF-preserving clean clone = 2598 passed, 16 skipped, 50 failed.

@@ -119,19 +119,19 @@
   "what_was_done": [
     "Reproduced the complete Python 3.12 package environment from unchanged requirements.lock and passed pip check.",
     "Classified and narrowly repaired four stale legacy product authority assertions; legacy product is 263/263.",
-    "Closed certification lineage, registry cross-binding, persisted operator-truth, dangling evidence, status projection, and contiguous event-sequence defects.",
+    "Closed certification lineage, registry cross-binding, persisted operator-truth, dangling evidence, status projection, contiguous event-sequence defects, and later-observation event source/instrument binding.",
     "Added LF checkout authority for hash-bound textual data and reduced clean-clone full-suite failures from 111 to 50."
   ],
   "what_is_locked": [
     "ACTIVE_PHASE = GV-MICRO-PORTFOLIO-VERTICAL-0 only.",
     "Product runtime and Replay implementation remain read-only.",
-    "Affected gates: portfolio 92/92; context plus protocol 175/175; legacy product 263/263.",
+    "Affected gates: portfolio 94/94 after independent Reviewer A repair; context plus protocol 175/175; legacy product 263/263.",
     "Full LF-preserving repository gate: 2598 passed, 16 skipped, 50 failed.",
     "SHIPPED_PRODUCT_SCORE = 39/100; observed comparisons = 0; no alpha or live-capital claim."
   ],
   "what_is_next": [
-    "Publish the repaired terminal SHA and verify local/remote equality.",
-    "Run genuinely independent Reviewer A/B/C against that exact SHA.",
+    "Publish the superseding terminal SHA and verify local/remote equality.",
+    "Rerun genuinely independent Reviewer A/B/C against that exact superseding SHA.",
     "Open a separate bounded repository-environment/custody repair for non-relocatable manifests, absent generated artifacts, and stale historical authority.",
     "Do not open Product features or Replay implementation until both acceptance gates pass."
   ],

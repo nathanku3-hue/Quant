@@ -15,6 +15,7 @@
 - [x] Persisted explanation, claim boundary, and status projection fail closed.
 - [x] Instrument, benchmark, review, and Portfolio Aim registries are cross-bound.
 - [x] Later observation evidence must exist in the available evidence set.
+- [x] Later-observation event source identity and instrument are bound to the validated observation and principal review.
 - [x] Declared event sequences must be contiguous.
 - [x] Product and Replay implementation remained read-only.
 
@@ -23,12 +24,12 @@
 - [x] Python 3.12.10 environment installed from unchanged `requirements.lock`.
 - [x] `pip check` PASS.
 - [x] Full collection: 2664 tests / 201 files.
-- [x] Portfolio: 92/92 PASS.
+- [x] Portfolio: 94/94 PASS after independent Reviewer A repair.
 - [x] Context + frozen protocol: 175/175 PASS.
 - [x] Legacy product: 263/263 PASS; four stale authority failures repaired narrowly.
 - [x] Full LF-preserving suite executed: 2598 passed, 16 skipped, 50 failed.
 - [ ] Full repository suite PASS.
-- [ ] Independent Reviewer A/B/C PASS against one terminal SHA.
+- [ ] Independent Reviewer A/B/C rerun PASS against the superseding terminal SHA.
 
 ## Scope and claims
 

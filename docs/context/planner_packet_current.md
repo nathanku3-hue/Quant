@@ -14,13 +14,13 @@
 
 - Reproduced the repository environment from unchanged `requirements.lock` on Python 3.12.10; `pip check` passes and all previously reported packages are pinned.
 - Classified the four legacy product failures as stale authority assertions and updated only those assertions; legacy product now passes **263/263**.
-- Closed certification-history/event lineage, persisted operator-truth, instrument/benchmark registry, later-observation evidence, status projection, and contiguous event-sequence defects.
+- Closed certification-history/event lineage, persisted operator-truth, instrument/benchmark registry, later-observation evidence and event-envelope binding, status projection, and contiguous event-sequence defects.
 - Added LF checkout authority for hash-bound textual data artifacts. This reduced repository-wide failures from **111** to **50** in a fresh `core.autocrlf=false` clone.
 
 ### Verification
 
 - Collection: **2664 tests / 201 files**, PASS.
-- Portfolio slice: **92/92 PASS**.
+- Portfolio slice: **94/94 PASS** after independent Reviewer A repair.
 - Context plus frozen protocol: **175/175 PASS** (`25 + 150`).
 - Legacy product: **263/263 PASS**.
 - LF-preserving repository suite: **2598 passed, 16 skipped, 50 failed**.
@@ -32,11 +32,11 @@
 - **7 historical authority failures:** dashboard and Phase 59–61 tests assert superseded product/context authority.
 - **4 feature-store failures:** the historical fixture no longer supplies required declared dependencies such as `roic`.
 - **3 custody/behavior failures:** two candidate-card manifests contain stale hashes; Rule100 historical audit behavior is independently red.
-- Independent Reviewer A/B/C has not run against the repaired terminal SHA; GitHub exposes no status checks for the base candidate.
+- Independent Reviewer A found and triggered repair of the observation event-envelope gap; Reviewer B/C passed the superseded SHA. All A/B/C reviewers must rerun against the superseding terminal SHA.
 
 ### Next valid action
 
-Publish this terminal repair candidate, then run independent A/B/C against its exact SHA. In parallel, open a separate repository-environment/custody repair—not Product or Replay feature work—to make historical manifests relocatable, restore or explicitly retire missing generated artifacts, and reconcile stale historical test authority.
+Publish the superseding terminal repair candidate, rerun the matched base/candidate failure-node comparison, then rerun independent A/B/C against its exact SHA. Continue the separate repository-environment/custody repair—not Product or Replay feature work—in parallel.
 
 ### Stop conditions
 

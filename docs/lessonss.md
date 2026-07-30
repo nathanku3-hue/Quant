@@ -2065,3 +2065,4 @@ Application pattern:
 - Any manifest that hashes repository text requires explicit cross-platform line-ending authority. `core.autocrlf=true` can make a clean checkout byte-invalid without making Git status dirty.
 - Persisting a prior certification is insufficient. Reopen validation must verify its identity, recompute it from the exact pre-observation event prefix, bind the current certification to it, and bind both to immutable certification-record events.
 - Product captions, symbols, benchmark labels, and status explanations are operator truth. If persisted, they must be derived or validated against canonical records rather than treated as harmless display fields.
+- A valid event payload is not sufficient authority. Reopen validation must bind the event envelope source and instrument identities to the payload evidence and principal review; otherwise rehashing and recertification can legitimize a mislabeled event.

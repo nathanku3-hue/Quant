@@ -52,16 +52,27 @@ Remaining blockers discovered:
 - two candidate-card manifests contain stale artifact hashes;
 - historical Feature Store and Rule100 tests remain red.
 
+## Independent review of superseded terminal SHA `4ee0b4a`
+
+- Reviewer A: **BLOCK**. Found that `LATER_OBSERVATION_ADMITTED` validated only its payload; forged `source_identity` and `instrument_id` values were accepted after valid event rehashing and recertification.
+- Reviewer B: **PASS**. No unresolved Critical/High runtime or operational finding.
+- Reviewer C: **PASS**. No unresolved Critical/High data-integrity or checkout-custody finding.
+- Parent reproduction: both forged source and forged instrument were accepted.
+- Repair: bind event source to the validated observation evidence ID and event instrument to the principal review instrument; add two recertified adversarial regressions.
+- Result: portfolio **94/94 PASS**.
+
+Because the repair changes code and tests, the matched full-suite comparison and independent Reviewer A/B/C must rerun against the superseding terminal SHA.
+
 ## Evidence
 
 - `pip check`: PASS.
 - Collection: 2664 tests / 201 files.
-- Portfolio: 92/92 PASS.
+- Portfolio: 94/94 PASS after independent Reviewer A repair.
 - Context + protocol: 175/175 PASS.
 - Legacy product: 263/263 PASS.
-- Full LF suite: 2598 passed, 16 skipped, 50 failed.
+- Matched superseded-SHA comparison: base 54 failures; candidate 50; intersection 50; candidate-only 0; four stale authority failures removed.
 - GitHub status checks on the base candidate: none exposed.
 
 ## Acceptance decision
 
-Do not accept. Publish the repair candidate, then require independent A/B/C on its exact terminal SHA and a separate bounded repository-environment/custody repair. Do not reopen Product or Replay feature work from this branch.
+Do not accept yet. Publish the superseding repair candidate, rerun the matched base/candidate failure-node comparison and independent A/B/C on its exact SHA, and keep repository-environment/custody repair separate. Do not reopen Product or Replay feature work from this branch.

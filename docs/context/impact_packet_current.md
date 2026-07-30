@@ -6,7 +6,7 @@ A terminal repair was applied to the remote-equal GV Micro-Portfolio V0 integrat
 
 ### Functional impact
 
-- Certification now binds prior certification identity, pre-observation recomputation, current/prior linkage, and ordered certification-record events.
+- Certification now binds prior certification identity, pre-observation recomputation, current/prior linkage, ordered certification-record events, and later-observation event source/instrument envelopes.
 - Persisted explanation, claim boundary, fixture identity, instrument registry, benchmark registry, review labels/roles, and status-specific later-observation projection fail closed on contradiction.
 - Strategy rejects a later observation whose evidence ID is absent from the available evidence set.
 - Accounting requires declared event sequences to be unique, ordered, zero-based, and contiguous.
@@ -24,7 +24,7 @@ Windows `core.autocrlf=true` changed hash-bound CSV/JSON bytes. Repository `.git
 
 ### Verification impact
 
-- Portfolio: **92/92 PASS**.
+- Portfolio: **94/94 PASS** after independent Reviewer A repair.
 - Context + frozen protocol: **175/175 PASS**.
 - Legacy product: **263/263 PASS**.
 - Full collection: **2664 tests / 201 files**, PASS.

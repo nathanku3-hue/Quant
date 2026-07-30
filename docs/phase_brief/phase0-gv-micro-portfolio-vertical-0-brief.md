@@ -161,8 +161,8 @@ git status --short --branch && git rev-parse HEAD && cat docs/context/ACTIVE_BRI
 
 The remote-equal integration candidate at `9ebc973a8cc3cfbd4899ed724733cc22c606fbbf` required a bounded terminal repair before independent acceptance.
 
-Closed: certification lineage, persisted operator truth, registry cross-binding, dangling observation evidence, contiguous event order, four stale legacy authority assertions, and cross-platform fixture line-ending custody.
+Closed: certification lineage, persisted operator truth, registry cross-binding, dangling observation evidence, later-observation event source/instrument binding, contiguous event order, four stale legacy authority assertions, and cross-platform fixture line-ending custody.
 
-Evidence: portfolio 92/92; context + protocol 175/175; legacy product 263/263; full collection 2664/201. The LF-preserving full suite remains red at 2598 passed, 16 skipped, 50 failed because historical Replay manifests are non-relocatable, generated artifacts are absent, and unrelated historical authority/data tests remain stale or broken.
+Evidence: portfolio 94/94 after independent Reviewer A repair; context + protocol 175/175; legacy product 263/263. The prior matched full-suite comparison showed base 54 failures, candidate 50, intersection 50, and candidate-only 0; this comparison and independent A/B/C must rerun against the superseding terminal SHA.
 
-The phase remains `NOT_ACCEPTED`. Product and Replay implementation stay closed. The next gate is independent A/B/C against the published terminal SHA plus a separate repository-environment/custody repair.
+The phase remains `NOT_ACCEPTED`. Product and Replay implementation stay closed. The next gate is matched failure-node comparison plus independent A/B/C against the superseding terminal SHA; repository-environment/custody repair remains separate.

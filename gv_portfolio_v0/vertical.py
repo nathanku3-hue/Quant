@@ -910,7 +910,16 @@ def validate_workspace(
             for row in workspace_events
             if row["event_type"] == "LATER_OBSERVATION_ADMITTED"
         ]
-        if len(admitted_events) != 1 or canonical_document_bytes(
-            admitted_events[0]["payload"]
-        ) != canonical_document_bytes(expected_observation):
+        if len(admitted_events) != 1:
+            raise PortfolioV0Error("WATCH_OBSERVATION_EVENT_COUNT_MISMATCH")
+        admitted_event = admitted_events[0]
+        if admitted_event.get("source_identity") != expected_observation[
+            "evidence_reference_id"
+        ]:
+            raise PortfolioV0Error("WATCH_OBSERVATION_EVENT_SOURCE_MISMATCH")
+        if admitted_event.get("instrument_id") != principal_review["instrument_id"]:
+            raise PortfolioV0Error("WATCH_OBSERVATION_EVENT_INSTRUMENT_MISMATCH")
+        if canonical_document_bytes(admitted_event["payload"]) != canonical_document_bytes(
+            expected_observation
+        ):
             raise PortfolioV0Error("WATCH_OBSERVATION_EVENT_MISMATCH")
