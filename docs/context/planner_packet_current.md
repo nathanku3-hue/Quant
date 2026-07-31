@@ -1,20 +1,19 @@
 # Planner Packet — Current
 
-Date: 2026-07-31
+Date: 2026-08-01
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 
 ## Current truth
 
-- One product phase is active: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`.
-- Base authority is immutable Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`.
-- Slice 0 is an accepted product slice; Replay 0 is an accepted integrity slice.
-- Bounded, Portfolio Scale, Universe Scale, and Challenger terminals remain immutable but are reclassified as substrates or validation harnesses with their original roadmap gates incomplete.
-- Limited Live is closed and unauthorized.
-- Accepted endgame progress remains `52/100`.
+- `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` is terminally accepted and shipped; no successor product phase is authorized.
+- Certified executable candidate: `0d15e9c59c6b3ca051b3aa815018889d1e94857f`.
+- Authority base remains immutable Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`.
+- Slice 0 is an accepted product foundation; Replay 0 is an accepted integrity foundation.
+- Bounded, Portfolio Scale, Universe Scale, and Challenger remain substrates or validation harnesses with their original roadmap gates incomplete.
+- Limited Live remains closed and unauthorized.
+- Pre-terminal accepted endgame progress was `52/100`; terminal accepted endgame progress is `62/100`.
 
-## Product delta in the current candidate
-
-The operator path is:
+## Delivered product result
 
 ```text
 review 10 distinct instruments across 2 clusters
@@ -31,48 +30,43 @@ review 10 distinct instruments across 2 clusters
 → fresh-process reopen of corrected state
 ```
 
-The repaired acceptance kernel now makes canonical decisions and events authoritative:
+The acceptance kernel makes canonical decisions and events authoritative:
 
-- deterministic selected funded IDs control initial execution;
-- initial evidence is instrument-owned and cross-instrument rebinding fails closed;
-- orders, fills, authority chains, observations, changed-why, cash, and costs are exact event-derived projections;
+- selected funded IDs control execution;
+- evidence remains instrument-owned;
+- orders, fills, authority chains, observations, changed-why, cash, costs, and certification history are exact event-derived projections;
 - transition legs equal exact target deltas;
-- complete certification history objects are replayed at their original prefixes;
-- correction lineage contains derived links rather than self-asserted stability flags;
+- correction lineage is derived and append-only;
 - persistence rejects symlink and Windows-junction ancestors.
 
-## Verification state
+## Terminal evidence
 
-Windows Python 3.12.10 diagnostic evidence:
-
-- operated domain + black-box AppTest: `15/15 PASS`;
-- book/execution/replay/operated focused set: `70/70 PASS`;
-- context/authority set: `33/33 PASS`;
-- complete `tests/gv_portfolio_v0`: `145/145 PASS`;
-- black-box flow completes correction and fresh-process corrected reopen with network denied.
-
-A clean narrow Windows environment now passes using `requirements-alpha.txt`: Python 3.12.10, pytest 9.0.2, Streamlit 1.54.0, and `pip check` green. The 119-package monorepo `requirements.lock` is outside this product slice and is not an acceptance gate.
-
-The real shipping gap was CI custody: existing workflows did not trigger on operated-product files and did not run the 178-test operated/context gate. `.github/workflows/gv-operated-portfolio.yml` now defines narrow Windows/Linux Python 3.12 parity using `requirements-alpha.txt`, but hosted execution remains pending until one candidate SHA is pushed.
+- local operated/context gate: `178/178 PASS`;
+- hosted exact-head run `30640915560`: Windows PASS and Linux PASS;
+- complete hosted operated + FS0 product package: PASS;
+- controlled full suite: `2718` tests, `19` inherited failures, `0` errors, `16` skips, `0` candidate-only failures;
+- independent Reviewer A/B/C: PASS/PASS/PASS;
+- documentation-only closure: every non-doc byte must equal certified candidate `0d15e9c`;
+- terminal tag: `gv-operated-portfolio-10-transition-1r-terminal`.
 
 ## Current score
 
-| Dimension | Current |
+| Dimension | Terminal |
 |---|---:|
-| Authority alignment | 92/100 |
-| Happy-path product behavior | 85/100 |
-| Semantic authority enforcement | 88/100 |
-| Persistence/custody | 86/100 |
-| Black-box operator proof | 88/100 |
-| Terminal readiness | 50/100 |
-| Accepted endgame progress | 52/100 unchanged |
+| Authority alignment | 96/100 |
+| Happy-path product behavior | 93/100 |
+| Semantic authority enforcement | 94/100 |
+| Persistence/custody | 93/100 |
+| Black-box operator proof | 94/100 |
+| Terminal readiness | 100/100 for this slice |
+| Accepted endgame progress | 62/100 |
 
-After exact-SHA hosted Windows/Linux parity, immutable fresh-checkout proof, full failset comparison, and Reviewer A/B/C, this slice should raise accepted endgame progress to approximately `61–63/100`.
+The prior `52/100` remains preserved as the pre-terminal assessment, not the current accepted score.
 
 ## Next valid action
 
-Push the locally frozen current-HEAD candidate, then run hosted Windows/Linux parity, fresh-checkout correction/reopen AppTest, full repository/failset comparison, and Reviewer A/B/C concurrently against that immutable SHA.
+Verify remote `main` and `gv-operated-portfolio-10-transition-1r-terminal`, preserve all terminal identities, then stop. A new product phase requires one explicit owner-selected result and the exact approval token `approve next phase`.
 
 ## Stop conditions
 
-Do not claim terminal acceptance, uplift the accepted score, fast-forward main, tag, or open Scale, Universe, Challenger, providers, or Live before exact-SHA hosted parity and independent terminal review. Stop on workflow non-trigger, Windows/Linux divergence, any projection mismatch, linked-ancestor escape, replay drift, nonzero residual, candidate mutation, or weakened frozen acceptance.
+Do not reopen Scale, Universe, Challenger compatibility, providers, optimizer, broker, alpha/score uplift, Limited Live, or live capital. Do not rewrite the certified candidate, closure commit, terminal tag, or prior immutable terminals. Do not infer a next phase from this closure.

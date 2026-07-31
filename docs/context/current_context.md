@@ -12,16 +12,15 @@
 - Slice 0 and Replay 0 are accepted; Bounded/Scale/Universe/Challenger are substrates with original semantic gates incomplete.
 - Exactly ten distinct instruments, at least two clusters, one book, at least three funded positions, classified cash, no-change, SELL/REDUCE plus BUY/FUND, replay, correction lineage, persistence/reopen, and changed-why are non-weakenable.
 - Limited Live remains closed and unauthorized.
-- Accepted endgame progress remains `52/100` until terminal evidence passes.
+- Pre-terminal accepted endgame progress was `52/100`; terminal accepted progress is `62/100`.
 
 ## What Is Next
-- Bank the product repair, authority reconciliation, narrow CI workflow, and `.worktree-lifecycle/` exclusion in one immutable candidate SHA.
-- Push that exact SHA and run hosted Windows/Linux parity, fresh-checkout correction/reopen AppTest, full repository regression/failset comparison, and independent Reviewer A/B/C concurrently.
-- Fast-forward `origin/main` and create a terminal tag only after every exact-SHA gate passes.
-- push the locally frozen candidate SHA;
-- prove hosted Windows/Linux parity;
-- run fresh-checkout/full failset/A/B/C against the exact SHA;
-- main fast-forward and tag only after PASS.
+- Preserve executable candidate `0d15e9c`, the documentation-only closure commit, `main`, and `gv-operated-portfolio-10-transition-1r-terminal` as immutable terminal identities.
+- Keep Limited Live, providers, broker, optimizer, alpha/score uplift, and live capital closed.
+- Stop. No successor product phase opens until the owner selects one smallest end-to-end result and explicitly approves it.
+- verify remote `main` and terminal tag equal the closure commit;
+- preserve all terminal identities;
+- await explicit `approve next phase` before any new implementation.
 
 ## First Command
 ```text

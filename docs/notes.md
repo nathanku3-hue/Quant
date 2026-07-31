@@ -6587,3 +6587,15 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - CI custody: `.github/workflows/gv-operated-portfolio.yml` runs the same narrow gate on `ubuntu-latest` and `windows-latest`, triggers on operated product/test/authority paths, validates generated context, and fails on tracked-byte drift.
 - Root-lock boundary: `requirements.lock` is a stale monorepo-wide environment covering unrelated broker/data stacks and is not an acceptance gate for this product slice.
 
+## GV Operated Portfolio 10 terminal closure (2026-08-01)
+
+- Certified executable candidate: `0d15e9c59c6b3ca051b3aa815018889d1e94857f`; tree `4dc013e2b50da8c22456719f8fba75d7de0dfa41`.
+- Transition formula remains `delta_i = target_after_i - target_before_i`; positive delta emits BUY, negative delta emits SELL of the absolute quantity, and zero delta emits no trade.
+- Terminal accounting remains `NAV = classified_cash + Σ(position_quantity_i × deterministic_mark_i)`; terminal NAV is `4988`, explicit costs are `12`, and unexplained residual is `0`.
+- Regression identity formula: `candidate_only = candidate_failset - base_failset`; terminal value is the empty set. Base failures `23`; candidate failures `19`; inherited `19`; fixed `4`; candidate-only `0`.
+- Executable-byte identity formula: compare the complete Git tree entry set outside `docs/` between the certified executable candidate and the closure commit; terminal closure requires exact equality.
+- Hosted proof: run `30640915560` passes exact-head clean-checkout jobs on Windows and Linux with the complete operated + FS0 package.
+- Review proof: Reviewer A/B/C PASS against exact `0d15e9c`.
+- Score: pre-terminal `52/100`; terminal accepted `62/100`.
+- No runtime formula or implementation byte changes in the documentation-only closure commit. Limited Live remains closed.
+

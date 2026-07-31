@@ -1,8 +1,8 @@
 # GodView Endgame Authority — Current
 
-Date: 2026-07-30
+Date: 2026-08-01
 Authority base: Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`
-Active product slice: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`
+Active product slice: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` — `TERMINAL_ACCEPTED; SHIPPED; NO_SUCCESSOR_AUTHORIZED`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 ## Canonical diagnosis
@@ -53,11 +53,11 @@ Acceptance is exactly:
 - fresh-checkout black-box operator execution through Streamlit;
 - no duplicate counting by sessions, cells, runs, or slots.
 
-## Current implementation state
+## Terminal implementation state
 
-One locally frozen candidate commit exists at the current branch HEAD, descended from `3e4dc95` in the isolated Challenger worktree. It is not terminal, not shipped, and not authority for opening Limited Live.
+Executable candidate `0d15e9c59c6b3ca051b3aa815018889d1e94857f` with tree `4dc013e2b50da8c22456719f8fba75d7de0dfa41` is terminally accepted. The documentation-only closure commit must preserve every path outside `docs/` byte-for-byte from that candidate.
 
-The domain path has been executed in the narrow pinned `requirements-alpha.txt` environment:
+The certified domain path is:
 
 ```text
 DRAFT_REVIEW NAV 5000
@@ -67,7 +67,7 @@ DRAFT_REVIEW NAV 5000
 → CORRECTED_CERTIFIED NAV 4988, append-only non-economic correction
 ```
 
-Windows Python 3.12.10 with pytest 9.0.2 and Streamlit 1.54.0 passes the combined operated/context gate `178/178`, including correction and fresh-process corrected reopen AppTest with network denied. Hosted Windows/Linux exact-SHA parity remains pending.
+Windows Python 3.12.10 with pytest 9.0.2 and Streamlit 1.54.0 passes the combined operated/context gate `178/178`, including correction and fresh-process corrected reopen AppTest with network denied. Hosted exact-head `windows-latest` and `ubuntu-latest` both PASS in run `30640915560`. The controlled full suite executed `2718` tests with `19` inherited failures, `0` errors, `16` skips, and `0` candidate-only failures. Independent Reviewer A/B/C all PASS.
 
 ## Execution and review law
 
@@ -90,8 +90,10 @@ Candidate-only zero regressions are necessary, never sufficient.
 
 ## Score and next gate
 
-Pre-candidate endgame progress assessment: `52/100`.
+Pre-terminal endgame progress assessment: `52/100`.
 
-Do not raise the accepted score from local/manual execution alone. Re-score only after focused tests, fresh-checkout AppTest, full terminal regression, and independent A/B/C are bound to one immutable candidate.
+Terminal accepted endgame progress: `62/100`.
 
-Next valid action: provision or locate the pinned Python 3.12 test environment, run the new focused tests, repair failures, freeze one candidate SHA, then perform the terminal-only full regression and A/B/C review. Limited Live remains closed.
+The uplift is bound to exact candidate `0d15e9c`, exact-head hosted Windows/Linux PASS, the controlled candidate-only-zero full-suite comparison, and independent A/B/C PASS. No score, product, or authority claim extends to Portfolio Scale, Universe Scale, Challenger Promotion, providers, broker, optimizer, alpha uplift, Limited Live, or live capital.
+
+Next valid action: preserve the terminal candidate, documentation-only closure, `main`, and `gv-operated-portfolio-10-transition-1r-terminal`; then stop pending explicit owner approval of one next product result. Limited Live remains closed.

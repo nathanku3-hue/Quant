@@ -7672,3 +7672,13 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Evidence boundary: prior `5016201` evidence may establish executable-byte identity only. Terminal failset, hosted Windows/Linux parity, and independent A/B/C must bind to the replacement SHA.
 - Reviewer correction: `a35169c` remains non-terminal because pull-request checkout defaulted to the merge ref and local evidence lacked an explicit clean-tree receipt. The replacement workflow must check out `${{ github.event.pull_request.head.sha || github.sha }}`, fail on SHA mismatch or any untracked/modified byte before dependency installation, and emit the candidate tree.
 - Score remains `52/100`; Limited Live remains closed and unauthorized.
+
+## 2026-08-01 — ACCEPT_GV_OPERATED_PORTFOLIO_10_TRANSITION_1R; SHIP_BY_FAST_FORWARD
+
+- Decision: terminally accept executable candidate `0d15e9c59c6b3ca051b3aa815018889d1e94857f` with tree `4dc013e2b50da8c22456719f8fba75d7de0dfa41` for `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`.
+- Hosted proof: exact-head operated run `30640915560` passes on `windows-latest` and `ubuntu-latest`, including the complete operated, FS0 product, and context package, clean checkout verification, and post-test tracked-byte check.
+- Full-suite proof: one clean exact-SHA run executes `2718` tests with `19` inherited failures, `0` errors, `16` skips, four base failures fixed, and `0` candidate-only failures against retained base `3e4dc95`.
+- Review proof: independent Reviewer A/B/C PASS for product semantics, runtime/CI boundary, and custody/failset reproducibility.
+- Publication law: create exactly one documentation-only closure commit; require every path outside `docs/` to be byte-identical to `0d15e9c`; fast-forward `main` only; create `gv-operated-portfolio-10-transition-1r-terminal` only after remote equality is verified.
+- Score: preserve `52/100` as the pre-terminal assessment and accept `62/100` as terminal endgame progress for this slice.
+- Scope remains closed: no successor phase, Scale, Universe, Challenger compatibility, provider, optimizer, broker, alpha/score uplift, Limited Live, or live capital is authorized.

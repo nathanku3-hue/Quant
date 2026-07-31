@@ -1,29 +1,28 @@
 # Multi-Stream Contract — Current
 
-Date: 2026-07-30
-Active product phase: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` only
+Date: 2026-08-01
+Terminal product phase: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
+Status: `TERMINAL_ACCEPTED; SHIPPED; NO_SUCCESSOR_AUTHORIZED`
 
-## Execution topology
+## Completed execution topology
 
-| Stream | Ownership | Independent output | Hard handoff |
+| Stream | Owned result | Terminal output | Verdict |
 |---|---|---|---|
-| Instrument/thesis | ten permanent identities, two clusters, unique evidence, Living Thesis Lite, dispositions | complete heterogeneous review set | ten validated instrument records and reviews |
-| Allocation | competition across all ten, funded set, changed target quantities, residual cash | deterministic initial and transition decisions | content-addressed decision snapshots |
-| Execution/accounting | BUY, SELL/REDUCE, orders, fills, costs, positions, cash, NAV | one reconciled portfolio event stream | exact book with zero unexplained residual |
-| Persistence/replay | atomic envelope, restart/reopen, replay, idempotence, correction lineage | verified persisted workspace and replay proof | byte-stable certification chain |
-| Product | review, confirm, no-change, transition, changed-why | black-box Streamlit operator flow | fresh-checkout AppTest result |
-| Integrator | one acceptance fixture, focused tests, terminal failset, evidence | one immutable terminal candidate | candidate SHA for A/B/C |
+| Instrument/thesis | ten permanent identities, two clusters, unique evidence and Living Thesis Lite | complete heterogeneous review set | PASS |
+| Allocation | competition across all ten, funded set, changed targets, residual cash | deterministic initial and transition decisions | PASS |
+| Execution/accounting | BUY, SELL/REDUCE, orders, fills, costs, positions, cash, NAV | exact book with zero unexplained residual | PASS |
+| Persistence/replay | atomic envelope, restart/reopen, replay, idempotence, correction lineage | verified persisted workspace and certification chain | PASS |
+| Product | review, confirm, no-change, transition, changed-why | fresh-process Streamlit operator flow | PASS |
+| Integrator | focused gates, hosted parity, full failset, terminal evidence | certified candidate `0d15e9c` | PASS |
 
-## Coordination law
+## Terminal coordination law
 
-- One active product phase; no parallel product phases.
-- Streams may work in parallel only on disjoint ownership with an executable handoff.
-- Every stream inherits the exact product result and quantitative bounds from the active brief.
+- One product phase was active; it is now terminally closed.
+- No parallel or successor product phase is authorized.
 - Sessions, cells, runs, and slots cannot satisfy instrument-count acceptance.
-- Reviewer A may reject product acceptance even when accounting and custody reviewers pass.
-- Focused checks run during implementation; full regression/failset and independent A/B/C run once at the frozen terminal candidate.
-- Existing Scale, Universe, and Challenger APIs are validation harnesses, not compatibility contracts.
+- Exact executable authority is candidate `0d15e9c`; the closure commit changes documentation only.
+- Pre-terminal score `52/100`; terminal accepted score `62/100`.
 - Limited Live remains closed.
 
 ## Frozen seams
@@ -32,4 +31,4 @@ Canonical authority: `docs/context/gv_endgame_authority_current.md`
 
 ## Current bottleneck
 
-The implementation candidate executes under system `python3`, but terminal progress is blocked by the absent pinned Python 3.12 pytest/Streamlit environment. Restore that environment, run focused tests, and repair this slice before freezing the candidate.
+There is no remaining blocker for this terminal slice. The next bottleneck is an owner decision: select exactly one smallest user-visible product result, define quantitative acceptance and forbidden scope, and explicitly approve it. Until then, stop.

@@ -1,7 +1,7 @@
 # Phase Brief — GV-OPERATED-PORTFOLIO-10-TRANSITION-1R
 
 Mode: `EXECUTION_PACKET`
-Status: `IMPLEMENTATION_CANDIDATE; NOT TERMINAL`
+Status: `TERMINAL_ACCEPTED; SHIPPED; NO_SUCCESSOR_AUTHORIZED`
 Date: 2026-07-31
 Base: Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
@@ -75,7 +75,7 @@ review 10 distinct instruments and two clusters
 | Product | review → confirm → no-change → transition → changed-why | `operated_portfolio_app.py`, `views/gv_operated_portfolio_workspace.py`, `launch_operated_portfolio.py` |
 | Integrator | one fixture, focused tests, AppTest, terminal evidence | `tests/gv_portfolio_v0/test_operated.py`, `tests/gv_portfolio_v0/test_operated_app.py` |
 
-## Current candidate evidence
+## Terminal evidence
 
 Windows Python 3.12.10 with diagnostic pytest 9.1.0 and Streamlit 1.58.0 passes the complete domain and persistence flow:
 
@@ -109,16 +109,27 @@ Pinned narrow verification using `requirements-alpha.txt`:
 - combined operated/context gate: `178/178 PASS`;
 - `git diff --check PASS`.
 
-The monorepo `requirements.lock` is not part of this acceptance. It covers unrelated broker/data stacks and is not used by the operated-product workflow.
+The monorepo `requirements.lock` is not part of this acceptance. It covers unrelated broker/data stacks and is not used as the operated-product acceptance authority.
 
-## Open gates
+Terminal evidence is bound to executable candidate `0d15e9c59c6b3ca051b3aa815018889d1e94857f` and tree `4dc013e2b50da8c22456719f8fba75d7de0dfa41`:
 
-- `.github/workflows/gv-operated-portfolio.yml` is added but has not yet run on a pushed immutable SHA.
-- Hosted Windows/Linux parity is not yet proven.
-- Fresh-checkout execution against one immutable candidate SHA is not yet run.
-- Full repository regression/failset comparison is not yet run.
-- Independent Reviewer A/B/C are not yet run against one immutable candidate SHA.
-- One locally frozen candidate commit exists at current branch HEAD; push, hosted parity, `origin/main` fast-forward, and terminal tag remain open.
+- hosted `windows-latest` and `ubuntu-latest` exact-head CI PASS;
+- complete operated, FS0 product, and context package PASS in hosted run `30640915560`;
+- controlled full suite: `2718` tests, `19` inherited failures, `0` errors, `16` skips, `0` candidate-only failures;
+- independent Reviewer A/B/C: PASS/PASS/PASS;
+- documentation-only closure preserves every non-doc byte from `0d15e9c`;
+- terminal tag: `gv-operated-portfolio-10-transition-1r-terminal`.
+
+## Closed gates
+
+- exact immutable candidate: PASS;
+- hosted Windows/Linux parity: PASS;
+- fresh-checkout exact-SHA proof: PASS;
+- complete FS0 package: PASS;
+- full repository failset comparison: PASS with candidate-only zero;
+- independent Reviewer A/B/C: PASS;
+- fast-forward-only publication and terminal tag: authorized by this closure;
+- Limited Live: remains closed and unauthorized.
 
 ## Terminal verification
 
@@ -174,23 +185,22 @@ Stop and repair the current slice if:
 - Slice 0 and Replay 0 are accepted; Bounded/Scale/Universe/Challenger are substrates with original semantic gates incomplete.
 - Exactly ten distinct instruments, at least two clusters, one book, at least three funded positions, classified cash, no-change, SELL/REDUCE plus BUY/FUND, replay, correction lineage, persistence/reopen, and changed-why are non-weakenable.
 - Limited Live remains closed and unauthorized.
-- Accepted endgame progress remains `52/100` until terminal evidence passes.
+- Pre-terminal accepted endgame progress was `52/100`; terminal accepted progress is `62/100`.
 
 ## What Is Next
 
-- Bank the product repair, authority reconciliation, narrow CI workflow, and `.worktree-lifecycle/` exclusion in one immutable candidate SHA.
-- Push that exact SHA and run hosted Windows/Linux parity, fresh-checkout correction/reopen AppTest, full repository regression/failset comparison, and independent Reviewer A/B/C concurrently.
-- Fast-forward `origin/main` and create a terminal tag only after every exact-SHA gate passes.
+- Preserve executable candidate `0d15e9c`, the documentation-only closure commit, `main`, and `gv-operated-portfolio-10-transition-1r-terminal` as immutable terminal identities.
+- Keep Limited Live, providers, broker, optimizer, alpha/score uplift, and live capital closed.
+- Stop. No successor product phase opens until the owner selects one smallest end-to-end result and explicitly approves it.
 
 ## First Command
 
 `.venv\\Scripts\\python -m pytest -q tests/gv_portfolio_v0 tests/test_build_context_packet.py tests/test_phase60_d343_hygiene.py tests/test_phase60_d345_closeout.py tests/test_phase61_context_hygiene.py`
 
-Expected current result: `178/178 PASS` under the narrow pinned environment.
+Expected terminal result: `178/178 PASS` under the narrow pinned environment; hosted exact-head execution also includes the complete FS0 product package.
 
 ## Next Todos
 
-- push the locally frozen candidate SHA;
-- prove hosted Windows/Linux parity;
-- run fresh-checkout/full failset/A/B/C against the exact SHA;
-- main fast-forward and tag only after PASS.
+- verify remote `main` and terminal tag equal the closure commit;
+- preserve all terminal identities;
+- await explicit `approve next phase` before any new implementation.

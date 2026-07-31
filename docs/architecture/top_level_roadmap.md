@@ -1,18 +1,19 @@
 # GodView Top-Level Roadmap
 
-Status: `REPLAN_ACTIVE; ONE OPERATED PORTFOLIO REPAIR; LIVE CLOSED`
-Date: 2026-07-30
+Status: `OPERATED_PORTFOLIO_TERMINAL_ACCEPTED; NO_SUCCESSOR_AUTHORIZED; LIVE_CLOSED`
+Date: 2026-08-01
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Frozen original detail: `docs/architecture/godview_v2_frozen_build_learn_roadmap.md`
 Active brief: `docs/context/ACTIVE_BRIEF`
-Pre-candidate endgame progress: `52/100`
+Pre-terminal endgame progress: `52/100`
+Terminal accepted endgame progress: `62/100`
 
 ## Binding state
 
 ```text
 AUTHORITY_BASE = CHALLENGER_TERMINAL_3e4dc95
 ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R
-ACTIVE_STATUS = IMPLEMENTATION_CANDIDATE; NOT_TERMINAL
+ACTIVE_STATUS = TERMINAL_ACCEPTED; SHIPPED; NO_SUCCESSOR_AUTHORIZED
 ACCEPTED_PRODUCT = SLICE_0
 ACCEPTED_INTEGRITY = REPLAY_0
 BOUNDED_SCALE_UNIVERSE_CHALLENGER = SUBSTRATE; ORIGINAL_GATES_INCOMPLETE
@@ -48,7 +49,7 @@ Active execution authority remains `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`; Rep
 
 No terminal or tag is rewritten. Lower-level acceptance cannot replace instruments with sessions, cells, runs, or slots.
 
-## Active product result
+## Terminal product result
 
 `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`:
 
@@ -66,7 +67,7 @@ review 10 permanent identities across >=2 clusters
 → prove exact replay, idempotence, and correction lineage
 ```
 
-This is the only implementation-authorized product phase. It does not claim Portfolio Scale, Universe Scale, Challenger Promotion, or Live.
+This phase is terminally accepted at executable candidate `0d15e9c` and published under `gv-operated-portfolio-10-transition-1r-terminal`. It does not claim Portfolio Scale, Universe Scale, Challenger Promotion, or Live, and it authorizes no successor phase.
 
 ## Execution topology
 
@@ -79,7 +80,7 @@ One phase, six internal streams:
 5. product/UI;
 6. integrator.
 
-Focused tests run during implementation. Full regression/failset and independent A/B/C run once at a frozen terminal candidate.
+Focused tests ran during implementation. Full regression/failset, exact-head Windows/Linux CI, and independent A/B/C passed once against frozen executable candidate `0d15e9c`.
 
 ## Acceptance kernel
 
@@ -92,17 +93,17 @@ Focused tests run during implementation. Full regression/failset and independent
 - Reviewer C owns custody and reproducibility;
 - candidate-only zero regressions are necessary, never sufficient.
 
-## Immediate next action
+## Terminal closure state
 
 ```text
-restore pinned Python 3.12 + pytest/Streamlit environment
-→ run focused operated/book/execution/replay tests
-→ repair current slice only
-→ freeze one candidate SHA
-→ run fresh-checkout AppTest and full terminal regression/failset once
-→ independent A/B/C against exact SHA
-→ fast-forward main only after all pass
-→ Limited Live remains CLOSED
+executable candidate 0d15e9c
+→ exact-head Windows/Linux PASS
+→ full suite 2718 / 19 inherited / 0 candidate-only / 16 skipped / 0 errors
+→ Reviewer A/B/C PASS
+→ documentation-only closure
+→ fast-forward main
+→ tag gv-operated-portfolio-10-transition-1r-terminal
+→ STOP; Limited Live remains CLOSED
 ```
 
-Do not open another Scale, Universe, Challenger, provider, optimizer, broker, alpha, score-uplift, or Live phase before this product result is terminally accepted.
+Do not automatically open Scale, Universe, Challenger, provider, optimizer, broker, alpha, score-uplift, or Live. A successor requires a separate owner decision and explicit approval.

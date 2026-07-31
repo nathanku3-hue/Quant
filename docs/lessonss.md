@@ -2105,3 +2105,21 @@ Application pattern:
 - Guardrail for next time: every authority test must label each assertion as historical ancestry, accepted foundation, or active state. Any workflow that changes an authority surface must trigger and execute every package that reads it, including the dependencies required by AppTests.
 - Reviewer follow-up: `actions/checkout` on a pull-request event defaults to the synthetic merge ref, so printing `HEAD` is not exact-head proof. Pin the event head SHA, assert it before setup, and assert a clean tree. Also, under Bash/WSL, `2>nul` creates a real file named `nul`; use `/dev/null` rather than Windows device syntax.
 - Evidence paths: `docs/architecture/top_level_roadmap.md`, `tests/gv_fs0_product/test_authority_chain.py`, `tests/gv_fs0_product/test_canonical_integrity_gate.py`, `.github/workflows/gv-operated-portfolio.yml`.
+
+## 2026-08-01 Round Entry (A Background Test Process Must Prove Its Environment Before Producing Evidence)
+
+- Date: 2026-08-01
+- Mistake or miss: the first one-command full-suite rerun was launched through a detached process that did not preserve Windows `PATH`, `COMSPEC`, or `SystemRoot`. The first subprocess-using tests therefore failed to find Git or `cmd.exe`, creating 13 artificial FS0 failures even though the candidate bytes were unchanged.
+- Root cause: process detachment was treated as operationally transparent. The evidence runner verified candidate SHA and cleanliness but did not verify the inherited shell/tool environment before pytest started.
+- Fix applied: discarded the invalid XML; added a preflight receipt for exact SHA, tree, clean status, `PATH`, `COMSPEC`, `SystemRoot`, temp directory, Git executable, Python executable, and Python version; then reran the complete suite once. The corrected result was `2718` tests, `19` inherited failures, `0` errors, `16` skips, and `0` candidate-only failures.
+- Guardrail for next time: every detached or background evidence process must fail before test execution unless repository identity, cleanliness, interpreter identity, temp path, shell, PATH, and required external tools are all proven in a retained receipt. Never classify failures from an environment-invalid run as candidate defects.
+- Evidence paths: `.worktree-lifecycle/gv-operated-0d15e9c-terminal-evidence/full-suite-launch-receipt.txt`, `.worktree-lifecycle/gv-operated-0d15e9c-terminal-evidence/full-suite.xml`, `.worktree-lifecycle/gv-operated-0d15e9c-terminal-evidence/failset-comparison.json`, `docs/context/e2e_evidence/gv_operated_portfolio_terminal_20260801.md`.
+
+## 2026-08-01 Round Entry (Terminal Closure Must Preserve the Tested Executable Tree)
+
+- Date: 2026-08-01
+- Mistake or miss: current-truth reconciliation after terminal review can silently create a second untested executable candidate if closure edits include tests, workflows, runtime, dependencies, or configuration.
+- Root cause: phase closure documentation and executable certification were previously treated as one mutable commit surface.
+- Fix applied: certified executable candidate `0d15e9c` first, required the closure commit to touch `docs/` only, compared every non-doc tree entry to the certified candidate, and allowed only fast-forward publication followed by a new immutable terminal tag.
+- Guardrail for next time: terminal evidence binds to one executable commit. Closure may append documentation, but it must prove byte identity for every executable/non-doc path and must never amend, squash, merge-ref substitute, or rewrite the certified candidate.
+- Evidence paths: `docs/context/e2e_evidence/gv_operated_portfolio_terminal_20260801.md`, `docs/saw_reports/saw_gv_operated_portfolio_terminal_20260801.md`, `docs/handover/gv_operated_portfolio_10_transition_1r_handover_20260801.md`.
