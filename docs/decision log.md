@@ -7670,4 +7670,5 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Test correction: FS0 authority tests must assert accepted Slice 0/Replay 0, `52/100`, unsafe root custody, and Limited Live closed, while rejecting the superseded active Slice 0, Replay-next-gate, `39/100`, and old root wording.
 - CI correction: the operated workflow must trigger on the roadmap authority surface and `tests/gv_fs0_product/**`, execute that package, and install the complete tracked dependency set needed by its dashboard AppTests.
 - Evidence boundary: prior `5016201` evidence may establish executable-byte identity only. Terminal failset, hosted Windows/Linux parity, and independent A/B/C must bind to the replacement SHA.
+- Reviewer correction: `a35169c` remains non-terminal because pull-request checkout defaulted to the merge ref and local evidence lacked an explicit clean-tree receipt. The replacement workflow must check out `${{ github.event.pull_request.head.sha || github.sha }}`, fail on SHA mismatch or any untracked/modified byte before dependency installation, and emit the candidate tree.
 - Score remains `52/100`; Limited Live remains closed and unauthorized.
