@@ -17,8 +17,9 @@ def test_phase60_brief_no_longer_lists_resolved_validator_failures_as_active_blo
     assert "**Status**: CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD" in text
 
 
-def test_bridge_evidence_used_points_to_execution_handover_not_kickoff_memo() -> None:
+def test_current_bridge_does_not_restore_superseded_phase60_authority() -> None:
     text = BRIDGE.read_text(encoding="utf-8")
     assert "docs/handover/phase60_kickoff_memo_20260318.md" not in text
-    assert "docs/phase_brief/phase64-brief.md" in text
-    assert "D-353" in text
+    assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in text
+    assert "docs/context/gv_endgame_authority_current.md" in text
+    assert "LIMITED_LIVE" in text and "CLOSED" in text

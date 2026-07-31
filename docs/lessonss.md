@@ -2068,3 +2068,30 @@ Application pattern:
 - A valid event payload is not sufficient authority. Reopen validation must bind the event envelope source and instrument identities to the payload evidence and principal review; otherwise rehashing and recertification can legitimize a mislabeled event.
 - A repository-relative manifest is only relocatable when the validator resolves the declared path against the same repository root used for the runtime artifact. Replacing an absolute string without changing comparison semantics preserves the defect.
 - A live package path cannot be both G8 hash-green and V2-B0 intentional non-binding. If V2-B0 banks `SOURCE_PACKAGE_MANIFEST_BINDING_INVALID` on the MU candidate-card package, custody must restore the historical declared hash and **explicitly retire** the same-path G8 hash-match PASS from the custody gate (with a replacement truth test), not silently drop the node or "fix" the hash.
+
+## 2026-07-30 Round Entry (Semantic Acceptance Must Dominate Phase Labels)
+
+- Date: 2026-07-30
+- Mistake or miss: Bounded, Portfolio Scale, Universe Scale, and Challenger were treated as completed product phases because their active briefs, tests, tags, and A/B/C packets passed. In reality the implementations repeated the same four-security economics through sessions and cells, prohibited genuine transitions, and exposed no later operator flow.
+- Root cause: lower-level briefs silently weakened higher-level quantities and outcomes; reviewers proved the narrowed briefs with strong custody rigor but did not re-establish the verbatim frozen roadmap. Candidate-only regression success became psychologically close to product acceptance.
+- Fix applied: preserved immutable terminals, corrected their classifications, created one canonical authority record, restored non-weakenable roadmap quantities, closed Limited Live, and opened one real ten-instrument transition slice. The candidate adds heterogeneous identities/evidence/theses, multi-position funding, SELL/REDUCE, explicit no-change, changed-why UI, persistence/reopen, replay, and correction lineage.
+- Guardrail for next time: reviewer A must answer what new operator behavior exists, what materially distinct economic state is exercised, which exact original acceptance sentence is proven, and whether any quantity was weakened. Sessions, cells, runs, and slots never count as distinct instruments. Focused verification runs during implementation; full failset and independent A/B/C run once at the frozen terminal candidate.
+- Evidence paths: `docs/context/gv_endgame_authority_current.md`, `docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md`, `PHASE_QUEUE.md`, `gv_portfolio_v0/operated.py`, `gv_portfolio_v0/book.py`, `gv_portfolio_v0/execution.py`, `operated_portfolio_app.py`, `tests/gv_portfolio_v0/test_operated.py`.
+
+## 2026-07-31 Round Entry (Projections and Stability Flags Are Not Authority)
+
+- Date: 2026-07-31
+- Mistake or miss: the operated candidate recorded deterministic selection, event-ledger trades, changed-why, and certification lineage, but execution independently read review targets; UI projections were only count/side checked; historical certification objects and a self-asserted stability boolean were trusted; persistence checked only the final parent link.
+- Root cause: derived records were treated as parallel authoritative state instead of exact projections from decisions and immutable events, while lexical path locality was mistaken for canonical custody through every ancestor.
+- Fix applied: selected funded IDs now drive execution; evidence ownership is instrument-specific; orders, fills, authority chains, observations, transition deltas, changed-why, books, and correction links are reconstructed or byte-validated from canonical state; every certification is replayed at its original event prefix; linked ancestors and Windows junctions are rejected before creation, replacement, and load; AppTest completes correction and fresh-process corrected reopen.
+- Guardrail for next time: every persisted display or history object must name one upstream authority and be exactly reproducible from it; booleans cannot prove byte stability; path confinement must inspect and canonically resolve every existing ancestor; dependency custody must be scoped to the product acceptance surface rather than inherited from an unrelated monorepo environment.
+- Evidence paths: `gv_portfolio_v0/operated.py`, `gv_portfolio_v0/operated_storage.py`, `views/gv_operated_portfolio_workspace.py`, `tests/gv_portfolio_v0/test_operated.py`, `tests/gv_portfolio_v0/test_operated_app.py`.
+
+## 2026-07-31 Round Entry (Product CI Must Follow the Product Surface)
+
+- Date: 2026-07-31
+- Mistake or miss: after repairing the operated acceptance kernel, the next gate was incorrectly widened to regenerating hashes for a stale 119-package monorepo lock that includes unrelated broker and data stacks. Meanwhile the actual CI did not trigger on operated files and did not run operated tests.
+- Root cause: repository-wide dependency governance was substituted for the original product acceptance, while hosted proof coverage was not checked against the new file surface.
+- Fix applied: made `requirements-alpha.txt` the narrow operated-product dependency authority; proved Python 3.12.10, pytest 9.0.2, Streamlit 1.54.0 and `178/178` locally; added Windows/Linux operated-product CI with exact path triggers; ignored `.worktree-lifecycle/`.
+- Guardrail for next time: derive environment and CI gates from the smallest executable product slice. Before naming an environment blocker, verify that the dependency file is actually required by the acceptance contract and that CI triggers on every new authoritative file.
+- Evidence paths: `requirements-alpha.txt`, `.github/workflows/gv-operated-portfolio.yml`, `.gitignore`, `docs/context/planner_packet_current.md`, `tests/gv_portfolio_v0/test_operated_app.py`.

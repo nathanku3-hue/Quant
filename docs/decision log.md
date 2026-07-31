@@ -7630,3 +7630,35 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Decision: open **only** ``GV-CHALLENGER-PROMOTION-1`` (shadow-first) via docs-only promotion; pin Universe ``dca67e3``, Scale ``c37abf0``, Bounded ``abaa814``, Replay ``0e4b93f``; ``ACTIVE_BRIEF`` → ``docs/phase_brief/phase5-gv-challenger-promotion-1-brief.md``.
 - **``GV-LIMITED-LIVE-1`` remains CLOSED** until explicit owner authorization.
 - Forbidden: squash of audited terminals; opening Live without owner authorization; provider/optimizer/live capital.
+
+## 2026-07-30 — REPLAN_AND_SHIP_ONE_REAL_PORTFOLIO_SLICE
+
+- Decision: stop automatic Bounded → Scale → Universe → Challenger → Live progression. Limited Live remains closed and unauthorized.
+- Authority base: immutable Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`; no commit or tag is rewritten.
+- Classification correction: Slice 0 is an accepted product slice; Replay 0 is an accepted integrity slice; Bounded is persisted multi-cycle substrate; Portfolio Scale is a multi-session harness; Universe Scale is a multi-cell harness; Challenger is a shadow/certified-custody separation primitive.
+- Original gates remain controlling and incomplete: 8–15 distinct operated securities across two clusters; one operated 25–50-security portfolio; 100–300+ distinct universe custody; baseline → shadow → prospective challenger → independent replication → bounded authority.
+- One active product slice: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`.
+- Required result: exactly ten permanent identities, two clusters, unique evidence/theses, one portfolio book, at least three funded positions and classified cash, full capital competition, one explicit no-change, one SELL/REDUCE plus BUY/FUND transition, exact replay, correction lineage, persist/restart/reopen, and changed-why UI.
+- Current state: an uncommitted candidate on top of `3e4dc95` manually executes NAV `5000 → 4992 → 4992 → 4988 → 4988`; atomic save/load equality, legacy Slice 0, oversell rejection, and correction lineage pass under available system `python3`.
+- Verification boundary: pinned `.venv`, pytest, Streamlit AppTest, full terminal regression, independent A/B/C, immutable candidate commit, push, main fast-forward, and terminal tag remain open.
+- Score: accepted endgame progress remains `52/100` pending terminal evidence.
+
+## 2026-07-31 — REPAIR_ACCEPTANCE_KERNEL; DO_NOT_FREEZE
+
+- Decision: keep `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` as the sole active product slice and repair its semantic acceptance kernel before freezing any SHA.
+- Decision authority: deterministic selected funded IDs control execution; reviews cannot independently authorize target-positive trades.
+- Projection authority: orders, fills, trade-authority chains, observations, changed-why, cash, costs, certification history, and correction links must be reconstructed or byte-equal to canonical decisions/events.
+- Evidence authority: every review must retain its instrument-owned initial evidence; cross-instrument rebinding is invalid.
+- Custody authority: persistence rejects symlink and Windows-junction ancestors before create/write/replace/load; persisted schema advances to v2 without compatibility adapters.
+- Local proof: operated/AppTest `15/15`, focused book/execution/replay/operated `70/70`, context/authority `33/33`, complete `gv_portfolio_v0` `145/145` under Windows Python 3.12.10 diagnostic packages.
+- Superseded environment interpretation: the monorepo root lock was incorrectly introduced as an acceptance gate; it is not part of the original operated-product contract.
+- Scope remains closed: no Scale, Universe, Challenger, provider, optimizer, broker, Limited Live, or compatibility work.
+
+## 2026-07-31 — USE_NARROW_PRODUCT_CI; AUTHORIZE_CANDIDATE_FREEZE
+
+- Decision: `requirements-alpha.txt` is the dependency authority for this operated-product acceptance because it pins the required product surface (`streamlit==1.54.0`, `pytest==9.0.2`) and excludes unrelated broker/data stacks.
+- Local proof: clean Windows Python 3.12.10 environment installs from `requirements-alpha.txt`, `pip check` passes, and the combined operated/context gate passes `178/178`, including correction and fresh-process corrected reopen AppTest with network denied.
+- CI repair: add `.github/workflows/gv-operated-portfolio.yml` with operated-file triggers and `ubuntu-latest` / `windows-latest` Python 3.12 jobs using only `requirements-alpha.txt`.
+- Candidate custody: include `.worktree-lifecycle/` in repository ignore, commit the complete current slice, freeze one candidate SHA, and push that exact SHA.
+- Terminal sequence: hosted parity, fresh-checkout proof, full failset comparison, and independent Reviewer A/B/C run concurrently against the pushed SHA; main fast-forward and tag remain prohibited until exact-SHA PASS.
+- Score remains `52/100` until terminal acceptance.

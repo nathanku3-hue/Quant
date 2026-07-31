@@ -1,27 +1,35 @@
 # Multi-Stream Contract — Current
 
-## Active — Three-package micro-portfolio execution (2026-07-29)
+Date: 2026-07-30
+Active product phase: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` only
+Canonical authority: `docs/context/gv_endgame_authority_current.md`
 
-| Package | Ownership | Parallel boundary | Hard handoff |
+## Execution topology
+
+| Stream | Ownership | Independent output | Hard handoff |
 |---|---|---|---|
-| A — Truth core | permanent IDs, evidence, immutable events, book reducer, classified cash, NAV, replay API skeleton | owns disjoint truth/accounting paths after minimum seams freeze | reconciled book and replayable event log |
-| B — Decision vertical | Living Thesis Lite, scenarios, admission, capital competition, aim, transition, paper order/fill | consumes Package A IDs/events; cannot invent alternate lineage | certified portfolio aim and fill events |
-| C — Product closure | launch/review/confirm/persist/reopen, read models, acceptance fixture, later-observation explanation, docs/ops | consumes A/B read models; cannot mutate certified truth directly | operator-complete vertical and synchronized authority |
+| Instrument/thesis | ten permanent identities, two clusters, unique evidence, Living Thesis Lite, dispositions | complete heterogeneous review set | ten validated instrument records and reviews |
+| Allocation | competition across all ten, funded set, changed target quantities, residual cash | deterministic initial and transition decisions | content-addressed decision snapshots |
+| Execution/accounting | BUY, SELL/REDUCE, orders, fills, costs, positions, cash, NAV | one reconciled portfolio event stream | exact book with zero unexplained residual |
+| Persistence/replay | atomic envelope, restart/reopen, replay, idempotence, correction lineage | verified persisted workspace and replay proof | byte-stable certification chain |
+| Product | review, confirm, no-change, transition, changed-why | black-box Streamlit operator flow | fresh-checkout AppTest result |
+| Integrator | one acceptance fixture, focused tests, terminal failset, evidence | one immutable terminal candidate | candidate SHA for A/B/C |
 
-## Minimum frozen seams
+## Coordination law
 
-`InstrumentId`, `EventId`, `EvidenceReference`, `PortfolioBookEvent`, `DecisionSnapshotId`, `PortfolioAimId`, `OrderId`, `FillId`, and `CertificationId`.
+- One active product phase; no parallel product phases.
+- Streams may work in parallel only on disjoint ownership with an executable handoff.
+- Every stream inherits the exact product result and quantitative bounds from the active brief.
+- Sessions, cells, runs, and slots cannot satisfy instrument-count acceptance.
+- Reviewer A may reject product acceptance even when accounting and custody reviewers pass.
+- Focused checks run during implementation; full regression/failset and independent A/B/C run once at the frozen terminal candidate.
+- Existing Scale, Universe, and Challenger APIs are validation harnesses, not compatibility contracts.
+- Limited Live remains closed.
 
-## Coordination laws
+## Frozen seams
 
-- One product authority only: `GV-MICRO-PORTFOLIO-VERTICAL-0` after independent R0 audit PASS.
-- Maximum parallelism means independent executable work, not maximum worker or branch count.
-- A package may run separately only when it owns disjoint files, uses exercised seams, can merge independently, and does not force global redesign on failure.
-- Detailed fields freeze only when the operator fixture exercises them.
-- Replay builds early from real vertical events; replay certification is the immediate next slice.
-- Learn work remains shadow-only and cannot mutate the certified book or create competing authority.
-- Cross-package blockers are limited to P0/P1 custody, accounting, mandate, mandatory-action, or replay defects.
+`InstrumentId`, `EvidenceReferenceId`, `DecisionSnapshotId`, `PortfolioAimId`, `PortfolioBookEvent`, `OrderId`, `FillId`, `CertificationId`, classified cash buckets, declared decimal precision, and content-addressed workspace envelopes.
 
 ## Current bottleneck
 
-Independent audit must confirm the banked R0 authority before any implementation worktree is created.
+The implementation candidate executes under system `python3`, but terminal progress is blocked by the absent pinned Python 3.12 pytest/Streamlit environment. Restore that environment, run focused tests, and repair this slice before freezing the candidate.

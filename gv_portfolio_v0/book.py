@@ -231,12 +231,22 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
             )
             if instrument_id != order_instrument:
                 raise PortfolioBookError("ORDER_EVENT_INSTRUMENT_MISMATCH")
-            if order.get("side") != "BUY":
+            side = order.get("side")
+            if side not in {"BUY", "SELL"}:
                 raise PortfolioBookError("UNSUPPORTED_ORDER_SIDE")
-            _whole_quantity(
+            order_quantity = _whole_quantity(
                 order.get("quantity"), field="order.quantity", positive=True
             )
             _money(order.get("reference_price"), field="order.reference_price")
+            if side == "SELL":
+                position = positions.get(order_instrument)
+                if position is None:
+                    raise PortfolioBookError("SELL_POSITION_MISSING")
+                current_quantity = _whole_quantity(
+                    position["quantity"], field="position.quantity"
+                )
+                if order_quantity > current_quantity:
+                    raise PortfolioBookError("SELL_ORDER_EXCEEDS_POSITION")
             orders[order_id] = dict(order)
 
         elif event_type == "FILL_COMPLETED":
@@ -266,7 +276,8 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
                 raise PortfolioBookError("FILL_ORDER_INSTRUMENT_MISMATCH")
             if fill.get("side") != order.get("side"):
                 raise PortfolioBookError("FILL_ORDER_SIDE_MISMATCH")
-            if fill.get("side") != "BUY":
+            side = fill.get("side")
+            if side not in {"BUY", "SELL"}:
                 raise PortfolioBookError("UNSUPPORTED_FILL_SIDE")
             quantity = _whole_quantity(
                 fill.get("quantity"), field="fill.quantity", positive=True
@@ -284,11 +295,7 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
                 completely_filled_order_ids.add(order_id)
             price = _money(fill.get("price"), field="fill.price")
             fee = _money(fill.get("fee"), field="fill.fee")
-            required_cash = quantity * price + fee
             available = cash.get(bucket, Decimal("0"))
-            if available < required_cash:
-                raise PortfolioBookError("INSUFFICIENT_CLASSIFIED_CASH")
-            cash[bucket] = available - required_cash
             position = positions.setdefault(
                 fill_instrument,
                 {"quantity": Decimal("0"), "valuation_price": None},
@@ -296,7 +303,21 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
             current_quantity = _whole_quantity(
                 position["quantity"], field="position.quantity"
             )
-            resulting_quantity = current_quantity + quantity
+            if side == "BUY":
+                required_cash = quantity * price + fee
+                if available < required_cash:
+                    raise PortfolioBookError("INSUFFICIENT_CLASSIFIED_CASH")
+                cash[bucket] = available - required_cash
+                resulting_quantity = current_quantity + quantity
+            else:
+                if quantity > current_quantity:
+                    raise PortfolioBookError("SELL_FILL_EXCEEDS_POSITION")
+                proceeds_after_fee = quantity * price - fee
+                resulting_cash = available + proceeds_after_fee
+                if resulting_cash < 0:
+                    raise PortfolioBookError("NEGATIVE_CLASSIFIED_CASH_FORBIDDEN")
+                cash[bucket] = resulting_cash
+                resulting_quantity = current_quantity - quantity
             if resulting_quantity < 0:
                 raise PortfolioBookError("NEGATIVE_POSITION_FORBIDDEN")
             position["quantity"] = resulting_quantity

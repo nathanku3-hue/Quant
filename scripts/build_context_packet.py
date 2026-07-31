@@ -408,10 +408,20 @@ def _select_context_source(
     )
 
 
-def _active_phase(phase_briefs: list[Path], selected_source: Path) -> int:
+def _active_phase(
+    phase_briefs: list[Path],
+    selected_source: Path,
+    *,
+    explicit_active_brief: Path | None = None,
+) -> int:
     selected_phase = _phase_number(selected_source)
     if selected_phase >= 0:
         return selected_phase
+    if explicit_active_brief is not None and selected_source == explicit_active_brief:
+        # Named product gates may intentionally abandon numeric phase progression.
+        # Preserve that authority instead of silently promoting an unrelated
+        # historical phase number from the repository archive.
+        return -1
     return max(_phase_number(path) for path in phase_briefs)
 
 
@@ -517,7 +527,13 @@ def build_context_packet(
         "schema_version": SCHEMA_VERSION,
         "generated_at_utc": _generated_at_utc(generated_at_utc),
         "source_files": source_files,
-        "active_phase": _active_phase(sources.phase_briefs, source_doc),
+        "active_phase": _active_phase(
+            sources.phase_briefs,
+            source_doc,
+            explicit_active_brief=(
+                sources.active_brief if require_active_brief else None
+            ),
+        ),
         "what_was_done": sections["what_was_done"],
         "what_is_locked": sections["what_is_locked"],
         "what_is_next": what_is_next,

@@ -6562,3 +6562,28 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Custody: terminal branch is pushed and local/remote-equal; independent audit remains open.
 - Score: canonical shipped 39/100; observed 0; no alpha or live-capital claim.
 
+## GV Operated Portfolio 10 replan checkpoint (2026-07-30)
+
+- Base inspected: clean Challenger terminal worktree at `3e4dc957f475945169ddf33ed359254bd98dc64d`; dirty operator root untouched.
+- Authority: created one canonical endgame record; reclassified Bounded/Scale/Universe/Challenger as substrates while preserving tags and restoring original frozen quantities.
+- Product: exactly ten permanent identities, two clusters, unique evidence/theses, one portfolio book, four funded positions, classified cash, no-change observation, and one Harbor-to-Meridian transition.
+- Accounting: SELL credits proceeds net of fees and reduces positions; oversized SELL is rejected; terminal NAV `4988`, total costs `12`, unexplained residual `0`.
+- Replay: exact reconstruction, idempotence, certification lineage, and append-only non-economic correction execute successfully.
+- Persistence: atomic content-addressed save/load equality verified after funded, no-change, transition, and correction stages.
+- UI: `operated_portfolio_app.py` and `launch_operated_portfolio.py` provide review → confirm → no-change → transition → changed-why → reopen.
+- Manual verification: changed modules compile; legacy Slice 0 still reaches `OBSERVED_WATCH_AIM_UNCHANGED` with NAV `1499`; full operated path reaches `5000 → 4992 → 4992 → 4988 → 4988`.
+- Open: no repository `.venv`, pytest, or Streamlit AppTest environment found; full terminal regression, independent A/B/C, immutable commit/push/main/tag remain open.
+- Score: accepted endgame progress remains `52/100` until terminal evidence passes.
+
+## GV Operated Portfolio 10 acceptance-kernel repair (2026-07-31)
+
+- Decision selection formula: `selected = sort(eligible candidates, -net_score_bps, instrument_id) where target_quantity > 0`; initial orders must equal this ordered set exactly.
+- Transition delta formula: `delta_i = target_after_i - target_before_i`; `delta_i > 0 → BUY abs(delta_i)`, `delta_i < 0 → SELL abs(delta_i)`, `delta_i = 0 → no leg`.
+- Projection rule: persisted `orders`, `fills`, `trade_authority_chains`, `observations`, and `changed_why` must equal deterministic reconstruction from canonical decision snapshots, events, and books.
+- Certification rule: for each `CERTIFICATION_RECORDED` marker, replay the exact prior event prefix with the declared decision snapshot, aim, and prior complete certification object; byte inequality fails closed.
+- Persistence rule: reject any symlink/junction in the lexical ancestor chain, resolve every existing ancestor, require canonical same-or-within-root before directory creation, temp write, replacement, and load.
+- Schema changes: operated workspace `...transition_1r_v2`; persisted envelope `...persisted_v2`; no backward-compatibility adapter.
+- Pinned narrow proof: `requirements-alpha.txt` provisions Windows Python 3.12.10 with pytest 9.0.2 and Streamlit 1.54.0; `pip check` PASS; operated/AppTest `15/15`; focused book/execution/replay/operated `70/70`; context/authority `33/33`; complete `gv_portfolio_v0` `145/145`; combined gate `178/178`.
+- CI custody: `.github/workflows/gv-operated-portfolio.yml` runs the same narrow gate on `ubuntu-latest` and `windows-latest`, triggers on operated product/test/authority paths, validates generated context, and fails on tracked-byte drift.
+- Root-lock boundary: `requirements.lock` is a stale monorepo-wide environment covering unrelated broker/data stacks and is not an acceptance gate for this product slice.
+

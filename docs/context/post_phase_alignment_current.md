@@ -1,22 +1,32 @@
 # Post-Phase Alignment — Current
 
-## Active — terminal repair publishable; acceptance blocked (2026-07-30)
+Date: 2026-07-30
+Decision: `REPLAN_AND_SHIP_ONE_REAL_PORTFOLIO_SLICE`
 
-- **Product center:** one complete prospective micro-portfolio operator loop followed by exact replay.
-- **Current state:** the micro-portfolio integration candidate has a bounded terminal repair; affected gates are green.
-- **Released substrate:** score 39, observed 0, no alpha or live-capital claim; released FS0 remains unchanged.
-- **Environment closure:** Python 3.12 lock/install/import/collection closure is proven; full repository data/custody closure is not.
-- **Current blockers:** 50 historical repository tests remain red in an LF-preserving clean clone, and independent A/B/C has not run against the repaired terminal SHA.
-- **Read-only boundary:** Product runtime and Replay implementation remain closed.
-- **Next active scope:** independent audit of the exact published repair SHA plus a separate repository-environment/custody repair.
-- **Next blocked scope:** deterministic replay feature work and bounded portfolio scaling remain closed until acceptance.
-- **Held scope:** providers, PEAD expansion, optimizers, copulas, graph propagation, adaptive execution, tactical capital, broker, score uplift, and live capital.
+## Alignment
 
-## Alignment decision
+- **Product center:** one operated ten-instrument portfolio, not repeated copies of the four-security fixture.
+- **Active phase:** `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` only.
+- **Accepted prior outcomes:** Slice 0 operator workflow and Replay 0 integrity.
+- **Reclassified prior outcomes:** Bounded persisted substrate; Scale multi-session harness; Universe multi-cell harness; Challenger shadow-custody primitive.
+- **Original gates still incomplete:** 8–15 distinct operated securities, one 25–50-security portfolio, 100–300+ distinct custody, and the challenger promotion chain.
+- **Current candidate delta:** ten identities, two clusters, four funded positions, classified cash, explicit no-change, SELL/REDUCE plus BUY/FUND transition, replay, persistence/reopen, correction lineage, and changed-why UI.
+- **Verification boundary:** manual `python3` execution and persistence probes pass; pytest, AppTest, full regression, independent A/B/C, immutable commit, and shipment remain open.
+- **Live boundary:** Limited Live remains closed and unauthorized.
+
+## Forward gate
 
 ```text
-PUBLISH TERMINAL REPAIR
-→ INDEPENDENT A/B/C ON EXACT SHA
-→ CLOSE REPOSITORY ENVIRONMENT/CUSTODY
-→ ACCEPT MICRO-PORTFOLIO ONLY AFTER BOTH PASS
+RESTORE PINNED TEST ENVIRONMENT
+→ FOCUSED OPERATED + BOOK + EXECUTION + REPLAY TESTS
+→ REPAIR CURRENT SLICE ONLY
+→ FREEZE ONE CANDIDATE SHA
+→ FRESH-CHECKOUT APPTEST
+→ FULL TERMINAL REGRESSION/FAILSET ONCE
+→ REVIEWER A: ORIGINAL PRODUCT RESULT
+→ REVIEWER B: ACCOUNTING/REPLAY
+→ REVIEWER C: CUSTODY/REPRODUCIBILITY
+→ FAST-FORWARD MAIN ONLY AFTER ALL PASS
 ```
+
+Do not reopen Scale, Universe, Challenger, providers, optimizer, broker, score uplift, or Live as the next automatic step. Choose the next smallest end-to-end result only after this operated portfolio is terminally accepted.

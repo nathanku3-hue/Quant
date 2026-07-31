@@ -1,0 +1,123 @@
+name: GV Operated Portfolio
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/gv-operated-portfolio.yml"
+      - "requirements-alpha.txt"
+      - "gv_portfolio_v0/**"
+      - "views/gv_operated_portfolio_workspace.py"
+      - "operated_portfolio_app.py"
+      - "launch_operated_portfolio.py"
+      - "tests/gv_portfolio_v0/**"
+      - "scripts/build_context_packet.py"
+      - "tests/test_build_context_packet.py"
+      - "tests/test_phase60_d343_hygiene.py"
+      - "tests/test_phase60_d345_closeout.py"
+      - "tests/test_phase61_context_hygiene.py"
+      - "docs/context/ACTIVE_BRIEF"
+      - "docs/context/gv_endgame_authority_current.md"
+      - "docs/context/bridge_contract_current.md"
+      - "docs/context/current_context.json"
+      - "docs/context/current_context.md"
+      - "docs/context/done_checklist_current.md"
+      - "docs/context/impact_packet_current.md"
+      - "docs/context/planner_packet_current.md"
+      - "docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md"
+  push:
+    paths:
+      - ".github/workflows/gv-operated-portfolio.yml"
+      - "requirements-alpha.txt"
+      - "gv_portfolio_v0/**"
+      - "views/gv_operated_portfolio_workspace.py"
+      - "operated_portfolio_app.py"
+      - "launch_operated_portfolio.py"
+      - "tests/gv_portfolio_v0/**"
+      - "scripts/build_context_packet.py"
+      - "tests/test_build_context_packet.py"
+      - "tests/test_phase60_d343_hygiene.py"
+      - "tests/test_phase60_d345_closeout.py"
+      - "tests/test_phase61_context_hygiene.py"
+      - "docs/context/ACTIVE_BRIEF"
+      - "docs/context/gv_endgame_authority_current.md"
+      - "docs/context/bridge_contract_current.md"
+      - "docs/context/current_context.json"
+      - "docs/context/current_context.md"
+      - "docs/context/done_checklist_current.md"
+      - "docs/context/impact_packet_current.md"
+      - "docs/context/planner_packet_current.md"
+      - "docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  operated-product-proof:
+    name: Operated product proof (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out exact candidate
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-alpha.txt
+
+      - name: Install narrow operated-product dependencies
+        run: >-
+          python -m pip install --disable-pip-version-check
+          -r requirements-alpha.txt
+
+      - name: Verify dependency surface
+        shell: bash
+        run: |
+          python -m pip check
+          python - <<'PY'
+          import json
+          import platform
+          import subprocess
+          import sys
+
+          import pytest
+          import streamlit
+
+          record = {
+              "python": sys.version.replace("\n", " "),
+              "platform": platform.platform(),
+              "pytest": pytest.__version__,
+              "streamlit": streamlit.__version__,
+              "commit": subprocess.check_output(
+                  ["git", "rev-parse", "HEAD"], text=True
+              ).strip(),
+              "tree": subprocess.check_output(
+                  ["git", "rev-parse", "HEAD^{tree}"], text=True
+              ).strip(),
+          }
+          print(json.dumps(record, indent=2, sort_keys=True))
+          PY
+
+      - name: Run operated kernel and authority tests
+        run: >-
+          python -m pytest -q
+          tests/gv_portfolio_v0
+          tests/test_build_context_packet.py
+          tests/test_phase60_d343_hygiene.py
+          tests/test_phase60_d345_closeout.py
+          tests/test_phase61_context_hygiene.py
+
+      - name: Validate generated current context
+        run: python scripts/build_context_packet.py --validate
+
+      - name: Require test execution to leave tracked bytes unchanged
+        run: git diff --exit-code

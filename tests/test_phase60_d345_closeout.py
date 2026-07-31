@@ -16,10 +16,10 @@ def test_phase60_brief_status_is_formally_closed_blocked_hold() -> None:
     assert "D-345 Outcome" in text
 
 
-def test_bridge_and_handover_reflect_d345_closeout_state() -> None:
+def test_historical_handover_remains_closed_while_current_bridge_moves_forward() -> None:
     bridge_text = BRIDGE.read_text(encoding="utf-8")
     handover_text = HANDOVER.read_text(encoding="utf-8")
-    assert "D-353" in bridge_text
-    assert "provenance" in bridge_text.lower()
+    assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in bridge_text
+    assert "ACTIVE_STATUS" in bridge_text
     assert "BLOCKED_EVIDENCE_ONLY_HOLD" in handover_text or "CLOSED_BLOCKED_EVIDENCE_ONLY_HOLD" in handover_text
     assert "`D-284`..`D-347`" in handover_text

@@ -8,6 +8,7 @@ book, persists workspace state, renders UI, or produces certification.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Mapping
 
 from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
@@ -339,6 +340,142 @@ def create_fill_event(fill: Mapping[str, Any], *, sequence: int) -> dict[str, An
         cash_bucket=fill["cash_bucket"],
         payload={"fill": dict(fill)},
     )
+
+
+def _trade_decimal_text(value: Any, *, field: str, positive: bool = False) -> str:
+    if isinstance(value, bool) or isinstance(value, float):
+        raise ExecutionError(f"{field.upper()}_DECIMAL_TYPE_INVALID")
+    try:
+        parsed = Decimal(str(value))
+    except (InvalidOperation, ValueError, TypeError) as exc:
+        raise ExecutionError(f"{field.upper()}_DECIMAL_INVALID") from exc
+    if not parsed.is_finite():
+        raise ExecutionError(f"{field.upper()}_DECIMAL_FINITE_REQUIRED")
+    if positive and parsed <= 0:
+        raise ExecutionError(f"{field.upper()}_MUST_BE_POSITIVE")
+    if not positive and parsed < 0:
+        raise ExecutionError(f"{field.upper()}_MUST_BE_NONNEGATIVE")
+    text = format(parsed.normalize(), "f")
+    return text.rstrip("0").rstrip(".") if "." in text else text
+
+
+def create_trade_order(
+    *,
+    decision_snapshot_id: str,
+    portfolio_aim_id: str,
+    transition_event_id: str,
+    instrument_id: str,
+    side: str,
+    quantity: Any,
+    reference_price: Any,
+    expected_fee: Any,
+    cash_bucket: str,
+    created_at: str,
+) -> dict[str, Any]:
+    """Create a deterministic BUY or SELL paper order for an operated portfolio."""
+
+    for field, value in {
+        "decision_snapshot_id": decision_snapshot_id,
+        "portfolio_aim_id": portfolio_aim_id,
+        "transition_event_id": transition_event_id,
+        "instrument_id": instrument_id,
+        "cash_bucket": cash_bucket,
+    }.items():
+        if not isinstance(value, str) or not value:
+            raise ExecutionError(f"{field.upper()}_REQUIRED")
+    if side not in {"BUY", "SELL"}:
+        raise ExecutionError("TRADE_SIDE_INVALID")
+    _timestamp(created_at, field="created_at")
+    payload = {
+        "decision_snapshot_id": decision_snapshot_id,
+        "portfolio_aim_id": portfolio_aim_id,
+        "transition_event_id": transition_event_id,
+        "instrument_id": instrument_id,
+        "side": side,
+        "quantity": _trade_decimal_text(quantity, field="quantity", positive=True),
+        "reference_price": _trade_decimal_text(
+            reference_price, field="reference_price", positive=True
+        ),
+        "expected_fee": _trade_decimal_text(expected_fee, field="expected_fee"),
+        "cash_bucket": cash_bucket,
+        "created_at": created_at,
+        "execution_mode": EXECUTION_MODE,
+    }
+    return _record_with_id("ORD", "order_id", payload)
+
+
+def validate_trade_chain(
+    order: Mapping[str, Any],
+    order_event: Mapping[str, Any],
+    fill: Mapping[str, Any],
+    fill_event: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Validate one generic BUY/SELL order and complete-fill event chain."""
+
+    if order.get("side") not in {"BUY", "SELL"}:
+        raise ExecutionError("TRADE_SIDE_INVALID")
+    _verify_order_event(order, order_event)
+    expected_fill = create_fill(order, order_event, filled_at=fill.get("filled_at"))
+    if canonical_document_bytes(dict(fill)) != canonical_document_bytes(expected_fill):
+        raise ExecutionError("TRADE_FILL_PROJECTION_MISMATCH")
+    _verify_fill_event(fill, fill_event)
+    if fill_event["sequence"] <= order_event["sequence"]:
+        raise ExecutionError("TRADE_FILL_NOT_AFTER_ORDER")
+    return {
+        "order_id": order["order_id"],
+        "order_created_event_id": order_event["event_id"],
+        "fill_id": fill["fill_id"],
+        "fill_completed_event_id": fill_event["event_id"],
+        "side": order["side"],
+        "instrument_id": order["instrument_id"],
+    }
+
+
+def emit_trade_chain(
+    *,
+    decision_snapshot_id: str,
+    portfolio_aim_id: str,
+    transition_event_id: str,
+    instrument_id: str,
+    side: str,
+    quantity: Any,
+    reference_price: Any,
+    expected_fee: Any,
+    cash_bucket: str,
+    start_sequence: int,
+    order_created_at: str,
+    filled_at: str,
+) -> dict[str, Any]:
+    """Emit a complete deterministic BUY or SELL paper trade chain."""
+
+    if not isinstance(start_sequence, int) or isinstance(start_sequence, bool):
+        raise ExecutionError("START_SEQUENCE_INVALID")
+    if start_sequence < 0:
+        raise ExecutionError("START_SEQUENCE_INVALID")
+    order = create_trade_order(
+        decision_snapshot_id=decision_snapshot_id,
+        portfolio_aim_id=portfolio_aim_id,
+        transition_event_id=transition_event_id,
+        instrument_id=instrument_id,
+        side=side,
+        quantity=quantity,
+        reference_price=reference_price,
+        expected_fee=expected_fee,
+        cash_bucket=cash_bucket,
+        created_at=order_created_at,
+    )
+    order_event = create_order_event(order, sequence=start_sequence)
+    fill = create_fill(order, order_event, filled_at=filled_at)
+    fill_event = create_fill_event(fill, sequence=start_sequence + 1)
+    authority_chain = validate_trade_chain(order, order_event, fill, fill_event)
+    return {
+        "order": order,
+        "order_created_event": order_event,
+        "fill": fill,
+        "fill_completed_event": fill_event,
+        "events": [order_event, fill_event],
+        "authority_chain": authority_chain,
+    }
 
 
 def _verify_fill_event(fill: Mapping[str, Any], fill_event: Mapping[str, Any]) -> None:

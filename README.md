@@ -1,16 +1,16 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `UNIVERSE_SCALE_1_ACCEPTED; GV-CHALLENGER-PROMOTION-1 OPEN; LIVE CLOSED`
+Status: `REPLAN_ACTIVE; GV-OPERATED-PORTFOLIO-10-TRANSITION-1R IMPLEMENTATION_CANDIDATE; LIVE CLOSED`
 Date: 2026-07-30
-Slice 0 immutable: `85e6601`
-Replay 0 terminal: `0e4b93f` (tag `gv-replay-0-terminal`)
-Bounded Portfolio 1 terminal: `abaa814` (tag `gv-bounded-portfolio-1-terminal`)
-Portfolio Scale 1 terminal: `c37abf0` (tag `gv-portfolio-scale-1-terminal`)
-Universe Scale 1 terminal: `dca67e3` (tag `gv-universe-scale-1-terminal`)
-Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`)
-Release-proof tip: `93e7a55`
-Shipped product score: `39/100` unchanged
-Observed comparisons: `0`
+Authority base: Challenger terminal `3e4dc95` (tag `gv-challenger-promotion-1-terminal`)
+Slice 0: accepted product slice `85e6601`
+Replay 0: accepted integrity slice `0e4b93f`
+Bounded `abaa814`: persisted multi-cycle substrate; original breadth incomplete
+Portfolio Scale `c37abf0`: deterministic multi-session harness; original 25–50-security objective incomplete
+Universe Scale `dca67e3`: deterministic multi-cell harness; original 100–300+ custody objective incomplete
+Challenger `3e4dc95`: shadow-custody separation primitive; original promotion objective incomplete
+Endgame progress assessment before current candidate: `52/100`
+Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 GodView is a local-first, point-in-time certified portfolio operating system. Its product unit is a complete portfolio decision and operating loop, not an isolated stock case and not an optimizer-first research platform.
 
@@ -24,14 +24,14 @@ one declared PIT opportunity set
 
 ## Current authority
 
-- [Corrected Build × Learn roadmap](docs/architecture/godview_v2_frozen_build_learn_roadmap.md) — seven-slice product sequence, R0 custody repair, and three-package execution law
-- [Top-level roadmap](docs/architecture/top_level_roadmap.md) — compact active canon
+- [Canonical endgame authority](docs/context/gv_endgame_authority_current.md) — terminal classifications, non-weakenable acceptance, active result, score, and next gate
+- [Frozen Build × Learn roadmap](docs/architecture/godview_v2_frozen_build_learn_roadmap.md) — controlling original quantities and outcomes
 - [PRD](PRD.md) — current product requirements
-- [Product specification](PRODUCT_SPEC.md) — product contract and historical notices
-- [Phase queue](PHASE_QUEUE.md) — active slice pickup and dependency map
-- [Planner packet](docs/context/planner_packet_current.md) — compact current truth
+- [Phase queue](PHASE_QUEUE.md) — one active product slice
+- [Active brief](docs/context/ACTIVE_BRIEF) — fail-closed selector for the current slice
+- [Planner packet](docs/context/planner_packet_current.md) — compact execution truth
 
-If another document conflicts with these active surfaces, the corrected roadmap and `docs/context/ACTIVE_BRIEF` win.
+If another document conflicts, `docs/context/gv_endgame_authority_current.md`, the frozen roadmap, and `docs/context/ACTIVE_BRIEF` control in that order. A lower-level brief cannot weaken the roadmap without an explicit owner scope decision.
 
 ## Released substrate
 
@@ -59,17 +59,18 @@ Alpha-0 does **not** prove:
 
 `R0 — ROADMAP-CUSTODY-REPAIR` is an internal repository repair, not a product slice.
 
-| Slice | Name | Status |
+| Slice | Name | Truthful current status |
 |---|---|---|
-| 0 | `GV-MICRO-PORTFOLIO-VERTICAL-0` | **accepted immutable** `85e6601` |
-| 1 | `GV-DETERMINISTIC-REPLAY-0` | **ACCEPTED** `0e4b93f` |
-| 2 | `GV-BOUNDED-PORTFOLIO-1` | **ACCEPTED** `abaa814` |
-| 3 | `GV-PORTFOLIO-SCALE-1` | **ACCEPTED** `c37abf0` |
-| 4 | `GV-UNIVERSE-SCALE-1` | **ACCEPTED** `dca67e3` |
-| 5 | `GV-CHALLENGER-PROMOTION-1` | **OPEN** shadow-first (pin Universe `dca67e3`) |
-| 6 | `GV-LIMITED-LIVE-1` | **CLOSED** — explicit owner gate required |
+| 0 | `GV-MICRO-PORTFOLIO-VERTICAL-0` | **accepted product slice** `85e6601` |
+| 1 | `GV-DETERMINISTIC-REPLAY-0` | **accepted integrity slice** `0e4b93f` |
+| 2 | `GV-BOUNDED-PORTFOLIO-1` | **persisted substrate; original gate incomplete** `abaa814` |
+| 3 | `GV-PORTFOLIO-SCALE-1` | **multi-session harness; original gate incomplete** `c37abf0` |
+| 4 | `GV-UNIVERSE-SCALE-1` | **multi-cell harness; original gate incomplete** `dca67e3` |
+| 5 | `GV-CHALLENGER-PROMOTION-1` | **shadow-custody primitive; original gate incomplete** `3e4dc95` |
+| Repair | `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` | **only active product slice; candidate not terminal** |
+| 6 | `GV-LIMITED-LIVE-1` | **CLOSED; NOT_AUTHORIZED** |
 
-Only `GV-CHALLENGER-PROMOTION-1` is implementation-authorized. **Live remains closed.** Later boundaries remain evidence-gated so delivery does not return to open-ended architecture discovery.
+Do not resume automatic phase-label progression. Preserve prior tags as evidence, use their code as substrate, and ship the one active end-to-end result before choosing another gate.
 
 ## Build × Learn model
 
@@ -83,20 +84,21 @@ Freeze minimum identity/event seams first. Freeze detailed fields only when the 
 
 ## Immediate product target
 
-`GV-MICRO-PORTFOLIO-VERTICAL-0` will operate:
+`GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` must ship one operator loop:
 
-- 3–5 declared securities;
-- one reference benchmark;
-- classified cash;
-- one principal thesis, substitute, competing opportunity, and rejection;
-- Living Thesis Lite;
-- Bull/Base/Bear scenarios;
-- conservative dollar capacity;
-- simultaneous capital competition;
-- deterministic paper execution;
-- one later prospective update.
+```text
+review ten distinct permanent identities across two clusters
+→ confirm and fund at least three positions with classified residual cash
+→ persist and reopen
+→ record one explicit no-change observation
+→ persist and reopen
+→ authorize one SELL/REDUCE plus BUY/FUND transition
+→ reconcile positions, cash, costs, NAV, and zero residual
+→ persist, restart, reopen, and explain changed why
+→ prove exact replay, idempotence, and correction lineage
+```
 
-It will then feed `GV-DETERMINISTIC-REPLAY-0`, which must reconstruct the exact book, cash, quantities, corporate actions, fills, and thesis state before portfolio expansion opens.
+The product entrypoint is `operated_portfolio_app.py`; `launch_operated_portfolio.py` launches it. The candidate is not accepted until focused tests, fresh-checkout AppTest, full terminal regression, and independent A/B/C pass on one immutable SHA.
 
 ## Forbidden on the current path
 

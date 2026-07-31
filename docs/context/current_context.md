@@ -1,25 +1,29 @@
 ## What Was Done
-- Repaired the roadmap candidate so `R0 — ROADMAP-CUSTODY-REPAIR` is an internal custody step rather than a product slice.
-- Removed standalone `GV-CANON-RESET-0` from the product sequence.
-- Selected this brief explicitly through `docs/context/ACTIVE_BRIEF`; numerically higher historical briefs cannot override it.
-- Preserved released Alpha/FS0 unchanged and defined a new portfolio namespace boundary.
-- Replaced seven independent branches with three mergeable work packages.
+- Reconciled terminal classifications without rewriting immutable commits or tags.
+- Restored the frozen roadmap's distinct-security quantities and challenger-outcome chain as controlling acceptance.
+- Implemented one ten-instrument, two-cluster portfolio state machine with unique evidence and theses.
+- Added shared deterministic SELL order/fill and accounting semantics.
+- Added multi-position funding, explicit no-change, reduce-and-fund transition, changed-why, exact replay, correction lineage, atomic persistence, reopen, and Streamlit product entrypoints.
+- Added focused domain/persistence tests and a black-box AppTest specification.
 
 ## What Is Locked
-- `ROADMAP_SEQUENCE = GV-MICRO-PORTFOLIO-VERTICAL-0 → GV-DETERMINISTIC-REPLAY-0 → GV-BOUNDED-PORTFOLIO-1 → GV-PORTFOLIO-SCALE-1 → GV-UNIVERSE-SCALE-1 → GV-CHALLENGER-PROMOTION-1 → GV-LIMITED-LIVE-1`.
-- `EXECUTION_AUTHORIZED = GV-MICRO-PORTFOLIO-VERTICAL-0, GV-DETERMINISTIC-REPLAY-0`.
-- `SHIPPED_PRODUCT_SCORE = 39/100`; observed comparisons remain `0`; no alpha or live-capital claim.
-- The root checkout remains untouched and is not execution authority.
-- Bounded portfolio work remains blocked until exact deterministic replay passes.
+- `ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` only.
+- Authority base remains exact Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`.
+- Slice 0 and Replay 0 are accepted; Bounded/Scale/Universe/Challenger are substrates with original semantic gates incomplete.
+- Exactly ten distinct instruments, at least two clusters, one book, at least three funded positions, classified cash, no-change, SELL/REDUCE plus BUY/FUND, replay, correction lineage, persistence/reopen, and changed-why are non-weakenable.
+- Limited Live remains closed and unauthorized.
+- Accepted endgame progress remains `52/100` until terminal evidence passes.
 
 ## What Is Next
-- Wait for independent audit of the banked R0 roadmap repair.
-- After audit PASS, create a clean isolated implementation worktree from `ROADMAP_FREEZE_COMMIT`.
-- Ship the complete micro-portfolio operator loop through the three work packages.
-- Build replay early but certify it only from real vertical events.
-- `GV-MICRO-PORTFOLIO-VERTICAL-0`;
-- `GV-DETERMINISTIC-REPLAY-0`;
-- evidence-gated later slices only.
+- Bank the product repair, authority reconciliation, narrow CI workflow, and `.worktree-lifecycle/` exclusion in one immutable candidate SHA.
+- Push that exact SHA and run hosted Windows/Linux parity, fresh-checkout correction/reopen AppTest, full repository regression/failset comparison, and independent Reviewer A/B/C concurrently.
+- Fast-forward `origin/main` and create a terminal tag only after every exact-SHA gate passes.
+- push the locally frozen candidate SHA;
+- prove hosted Windows/Linux parity;
+- run fresh-checkout/full failset/A/B/C against the exact SHA;
+- main fast-forward and tag only after PASS.
 
 ## First Command
-`git status --short --branch && git rev-parse HEAD && cat docs/context/ACTIVE_BRIEF`
+```text
+`.venv\\Scripts\\python -m pytest -q tests/gv_portfolio_v0 tests/test_build_context_packet.py tests/test_phase60_d343_hygiene.py tests/test_phase60_d345_closeout.py tests/test_phase61_context_hygiene.py`
+```

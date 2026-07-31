@@ -21,20 +21,26 @@ def test_phase61_brief_exposes_new_context_packet() -> None:
     assert "## First Command" in text
 
 
-def test_current_context_promotes_latest_active_phase() -> None:
+def test_current_context_preserves_named_nonsequential_product_gate() -> None:
     payload = json.loads(CURRENT_CONTEXT_JSON.read_text(encoding="utf-8"))
-    assert int(payload["active_phase"]) == 65
-    joined_done = " ".join(str(x) for x in payload["what_was_done"])
-    assert "M4A" in joined_done
+    assert int(payload["active_phase"]) == -1
+    joined = " ".join(
+        str(x)
+        for key in ("what_was_done", "what_is_locked", "what_is_next")
+        for x in payload[key]
+    )
+    assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in joined
+    assert "ten-instrument" in joined.lower()
+    assert "Limited Live remains closed" in joined
 
 
-def test_planner_bridge_and_readme_no_longer_advertise_phase60_hold_as_current() -> None:
+def test_current_surfaces_select_one_operated_portfolio_gate() -> None:
     planner_text = PLANNER.read_text(encoding="utf-8")
     bridge_text = BRIDGE.read_text(encoding="utf-8")
     readme_text = README.read_text(encoding="utf-8")
 
     for text in (planner_text, bridge_text, readme_text):
-        assert "D-353" in text or "Phase 64" in text
-        assert "provenance" in text.lower()
-        assert "Phase 61 bootstrap authorized" not in text
-        assert "not yet publicly executed" not in text
+        assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in text
+        assert "52/100" in text
+        assert "live" in text.lower() and "closed" in text.lower()
+        assert "GV-CHALLENGER-PROMOTION-1 OPEN" not in text

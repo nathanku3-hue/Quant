@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-29T19:00:00Z",
+  "generated_at_utc": "2026-07-31T04:53:41Z",
   "source_files": [
     "docs/context/ACTIVE_BRIEF",
     "docs/context/bridge_contract_current.md",
@@ -57,9 +57,11 @@
     "docs/handover/phase65_optimizer_core_structured_diagnostics_handover.md",
     "docs/handover/phase65_rule100_dynamic_ui_replay_ytd_handover.md",
     "docs/lessonss.md",
+    "docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md",
     "docs/phase_brief/phase-E0-brief.md",
     "docs/phase_brief/phase0-brief.md",
     "docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md",
+    "docs/phase_brief/phase1-gv-deterministic-replay-0-brief.md",
     "docs/phase_brief/phase10-brief.md",
     "docs/phase_brief/phase11-brief.md",
     "docs/phase_brief/phase12-brief.md",
@@ -70,6 +72,7 @@
     "docs/phase_brief/phase17-brief.md",
     "docs/phase_brief/phase18-brief.md",
     "docs/phase_brief/phase19-brief.md",
+    "docs/phase_brief/phase2-gv-bounded-portfolio-1-brief.md",
     "docs/phase_brief/phase20-brief.md",
     "docs/phase_brief/phase21-brief.md",
     "docs/phase_brief/phase23-brief.md",
@@ -78,6 +81,7 @@
     "docs/phase_brief/phase26-brief.md",
     "docs/phase_brief/phase27-brief.md",
     "docs/phase_brief/phase28-brief.md",
+    "docs/phase_brief/phase3-gv-portfolio-scale-1-brief.md",
     "docs/phase_brief/phase30-brief.md",
     "docs/phase_brief/phase31-brief.md",
     "docs/phase_brief/phase32-brief.md",
@@ -89,6 +93,7 @@
     "docs/phase_brief/phase37-brief.md",
     "docs/phase_brief/phase38-brief.md",
     "docs/phase_brief/phase39-brief.md",
+    "docs/phase_brief/phase4-gv-universe-scale-1-brief.md",
     "docs/phase_brief/phase40-brief.md",
     "docs/phase_brief/phase41-brief.md",
     "docs/phase_brief/phase43-brief.md",
@@ -97,6 +102,7 @@
     "docs/phase_brief/phase47-brief.md",
     "docs/phase_brief/phase48-brief.md",
     "docs/phase_brief/phase49-brief.md",
+    "docs/phase_brief/phase5-gv-challenger-promotion-1-brief.md",
     "docs/phase_brief/phase50-brief.md",
     "docs/phase_brief/phase51-supercycle-signal-brief.md",
     "docs/phase_brief/phase52-brief.md",
@@ -115,30 +121,33 @@
     "docs/phase_brief/phase65-brief.md",
     "docs/phase_brief/phase9-brief.md"
   ],
-  "active_phase": 0,
+  "active_phase": -1,
   "what_was_done": [
-    "Reproduced the complete Python 3.12 package environment from unchanged requirements.lock and passed pip check.",
-    "Classified and narrowly repaired four stale legacy product authority assertions; legacy product is 263/263.",
-    "Closed certification lineage, registry cross-binding, persisted operator-truth, dangling evidence, status projection, contiguous event-sequence defects, and later-observation event source/instrument binding.",
-    "Added LF checkout authority for hash-bound textual data and reduced clean-clone full-suite failures from 111 to 50."
+    "Reconciled terminal classifications without rewriting immutable commits or tags.",
+    "Restored the frozen roadmap's distinct-security quantities and challenger-outcome chain as controlling acceptance.",
+    "Implemented one ten-instrument, two-cluster portfolio state machine with unique evidence and theses.",
+    "Added shared deterministic SELL order/fill and accounting semantics.",
+    "Added multi-position funding, explicit no-change, reduce-and-fund transition, changed-why, exact replay, correction lineage, atomic persistence, reopen, and Streamlit product entrypoints.",
+    "Added focused domain/persistence tests and a black-box AppTest specification."
   ],
   "what_is_locked": [
-    "ACTIVE_PHASE = GV-MICRO-PORTFOLIO-VERTICAL-0 only.",
-    "Product runtime and Replay implementation remain read-only.",
-    "Affected gates: portfolio 94/94 after independent Reviewer A repair; context plus protocol 175/175; legacy product 263/263.",
-    "Full LF-preserving repository gate: 2598 passed, 16 skipped, 50 failed.",
-    "SHIPPED_PRODUCT_SCORE = 39/100; observed comparisons = 0; no alpha or live-capital claim."
+    "`ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` only.",
+    "Authority base remains exact Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`.",
+    "Slice 0 and Replay 0 are accepted; Bounded/Scale/Universe/Challenger are substrates with original semantic gates incomplete.",
+    "Exactly ten distinct instruments, at least two clusters, one book, at least three funded positions, classified cash, no-change, SELL/REDUCE plus BUY/FUND, replay, correction lineage, persistence/reopen, and changed-why are non-weakenable.",
+    "Limited Live remains closed and unauthorized.",
+    "Accepted endgame progress remains `52/100` until terminal evidence passes."
   ],
   "what_is_next": [
-    "Publish the superseding terminal SHA and verify local/remote equality.",
-    "Rerun genuinely independent Reviewer A/B/C against that exact superseding SHA.",
-    "Open a separate bounded repository-environment/custody repair for non-relocatable manifests, absent generated artifacts, and stale historical authority.",
-    "Do not open Product features or Replay implementation until both acceptance gates pass."
+    "Bank the product repair, authority reconciliation, narrow CI workflow, and `.worktree-lifecycle/` exclusion in one immutable candidate SHA.",
+    "Push that exact SHA and run hosted Windows/Linux parity, fresh-checkout correction/reopen AppTest, full repository regression/failset comparison, and independent Reviewer A/B/C concurrently.",
+    "Fast-forward `origin/main` and create a terminal tag only after every exact-SHA gate passes."
   ],
-  "first_command": "git status --short --branch && git rev-parse HEAD && git rev-parse @{u}",
+  "first_command": "`.venv\\\\Scripts\\\\python -m pytest -q tests/gv_portfolio_v0 tests/test_build_context_packet.py tests/test_phase60_d343_hygiene.py tests/test_phase60_d345_closeout.py tests/test_phase61_context_hygiene.py`",
   "next_todos": [
-    "publish terminal repair candidate;",
-    "independent A/B/C on exact SHA;",
-    "separate repository-environment/custody closure."
+    "push the locally frozen candidate SHA;",
+    "prove hosted Windows/Linux parity;",
+    "run fresh-checkout/full failset/A/B/C against the exact SHA;",
+    "main fast-forward and tag only after PASS."
   ]
 }

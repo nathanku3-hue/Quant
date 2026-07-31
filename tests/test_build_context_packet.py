@@ -101,6 +101,44 @@ def test_successful_generation_in_temp_repo_fixture(tmp_path: Path) -> None:
     ]
 
 
+def test_named_active_brief_preserves_nonsequential_authority(tmp_path: Path) -> None:
+    repo = _make_repo_fixture(tmp_path, include_locked=True)
+    named_brief = repo / "docs/phase_brief/gv-operated-portfolio-brief.md"
+    _write(
+        named_brief,
+        "\n".join(
+            [
+                "# Named Product Gate",
+                "",
+                "## What Was Done",
+                "- Implemented one named product result.",
+                "",
+                "## What Is Locked",
+                "- Numeric phase progression is intentionally abandoned.",
+                "",
+                "## What Is Next",
+                "- Verify the named result.",
+                "",
+                "## First Command",
+                "`python -m pytest -q`",
+            ]
+        ),
+    )
+    _write(
+        repo / "docs/context/ACTIVE_BRIEF",
+        "docs/phase_brief/gv-operated-portfolio-brief.md\n",
+    )
+
+    packet = build_context_packet(
+        repo,
+        generated_at_utc=datetime.now(timezone.utc).isoformat(),
+        require_active_brief=True,
+    )
+
+    assert packet["active_phase"] == -1
+    assert packet["what_was_done"] == ["Implemented one named product result."]
+
+
 def test_missing_required_section_returns_non_zero(tmp_path: Path) -> None:
     repo = _make_repo_fixture(tmp_path, include_locked=False)
 
