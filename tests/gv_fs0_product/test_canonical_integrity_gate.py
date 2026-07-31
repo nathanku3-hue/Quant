@@ -71,13 +71,19 @@ def test_product_canon_files_exist_with_current_authority_status() -> None:
         assert "Portfolio" in text or "Owner Freeze" in text
 
 
-def test_top_level_roadmap_is_portfolio_slice_first_not_uoe() -> None:
+def test_top_level_roadmap_tracks_operated_phase_and_accepted_foundations() -> None:
     path = _require_file("docs/architecture/top_level_roadmap.md")
     text = path.read_text(encoding="utf-8")
     assert text.splitlines()[0] == "# GodView Top-Level Roadmap"
-    assert "ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0" in text
-    assert "NEXT_GATE = GV-DETERMINISTIC-REPLAY-0" in text
-    assert "ROOT_CHECKOUT = UNSAFE / DO_NOT_USE" in text
+    assert "ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in text
+    assert "ACCEPTED_PRODUCT = SLICE_0" in text
+    assert "ACCEPTED_INTEGRITY = REPLAY_0" in text
+    assert "ROOT_CHECKOUT = UNSAFE; DO_NOT_USE" in text
+    assert "LIMITED_LIVE = CLOSED; NOT_AUTHORIZED" in text
+    assert "52/100" in text
+    assert "ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0" not in text
+    assert "NEXT_GATE = GV-DETERMINISTIC-REPLAY-0" not in text
+    assert "39/100" not in text
     assert not text.splitlines()[0].startswith("# Top-Level Roadmap: Unified Opportunity Engine")
 
 

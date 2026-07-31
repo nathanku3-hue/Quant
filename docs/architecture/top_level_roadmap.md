@@ -20,6 +20,20 @@ LIMITED_LIVE = CLOSED; NOT_AUTHORIZED
 ROOT_CHECKOUT = UNSAFE; DO_NOT_USE
 ```
 
+## Accepted Slice 0 foundation — historical authority seams
+
+The accepted Slice 0 product foundation remains binding as historical interface ancestry, not as the active product phase. Its authority-chain seam names are preserved for compatibility and audit:
+
+```text
+InstrumentId
+→ PortfolioBookEvent
+→ DecisionSnapshotId
+→ PortfolioAimId
+→ CertificationId
+```
+
+Active execution authority remains `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`; Replay 0 remains the accepted integrity foundation. Neither foundation reopens its former implementation gate.
+
 ## Corrected terminal map
 
 | Scope | Immutable terminal | Current classification | Original outcome |

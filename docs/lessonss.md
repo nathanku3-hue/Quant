@@ -2095,3 +2095,12 @@ Application pattern:
 - Fix applied: made `requirements-alpha.txt` the narrow operated-product dependency authority; proved Python 3.12.10, pytest 9.0.2, Streamlit 1.54.0 and `178/178` locally; added Windows/Linux operated-product CI with exact path triggers; ignored `.worktree-lifecycle/`.
 - Guardrail for next time: derive environment and CI gates from the smallest executable product slice. Before naming an environment blocker, verify that the dependency file is actually required by the acceptance contract and that CI triggers on every new authoritative file.
 - Evidence paths: `requirements-alpha.txt`, `.github/workflows/gv-operated-portfolio.yml`, `.gitignore`, `docs/context/planner_packet_current.md`, `tests/gv_portfolio_v0/test_operated_app.py`.
+
+## 2026-07-31 Round Entry (Authority Tests Must Separate Ancestry from Active State)
+
+- Date: 2026-07-31
+- Mistake or miss: the complete full-suite comparison exposed two candidate-only FS0 failures because legacy tests treated accepted Slice 0 seam names, the old active slice, Replay 0 next gate, `39/100`, and obsolete root wording as one indivisible current roadmap contract. The operated workflow omitted the package entirely.
+- Root cause: historical interface ancestry and active product authority were encoded in the same assertions, while CI ownership followed implementation paths rather than every authority surface consumed by the tests.
+- Fix applied: added a clearly historical accepted-foundation roadmap section for the seam names; recut both FS0 tests around the operated phase, accepted Slice 0/Replay 0, `52/100`, unsafe root, and closed Limited Live; added the FS0 package and roadmap to operated workflow triggers and execution with its full tracked dependency set.
+- Guardrail for next time: every authority test must label each assertion as historical ancestry, accepted foundation, or active state. Any workflow that changes an authority surface must trigger and execute every package that reads it, including the dependencies required by AppTests.
+- Evidence paths: `docs/architecture/top_level_roadmap.md`, `tests/gv_fs0_product/test_authority_chain.py`, `tests/gv_fs0_product/test_canonical_integrity_gate.py`, `.github/workflows/gv-operated-portfolio.yml`.

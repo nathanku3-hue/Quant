@@ -7662,3 +7662,12 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Candidate custody: include `.worktree-lifecycle/` in repository ignore, commit the complete current slice, freeze one candidate SHA, and push that exact SHA.
 - Terminal sequence: hosted parity, fresh-checkout proof, full failset comparison, and independent Reviewer A/B/C run concurrently against the pushed SHA; main fast-forward and tag remain prohibited until exact-SHA PASS.
 - Score remains `52/100` until terminal acceptance.
+
+## 2026-07-31 — RECONCILE_FS0_AUTHORITY_TESTS; REPLACE_CANDIDATE
+
+- Decision: keep `5016201c494828d2d79f894681ebb562780687f0` immutable and non-terminal; create one non-product replacement candidate descended from it.
+- Authority distinction: preserve `InstrumentId → PortfolioBookEvent → DecisionSnapshotId → PortfolioAimId → CertificationId` only as accepted Slice 0 foundation ancestry; the sole active product phase is `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`, with Replay 0 accepted as integrity foundation.
+- Test correction: FS0 authority tests must assert accepted Slice 0/Replay 0, `52/100`, unsafe root custody, and Limited Live closed, while rejecting the superseded active Slice 0, Replay-next-gate, `39/100`, and old root wording.
+- CI correction: the operated workflow must trigger on the roadmap authority surface and `tests/gv_fs0_product/**`, execute that package, and install the complete tracked dependency set needed by its dashboard AppTests.
+- Evidence boundary: prior `5016201` evidence may establish executable-byte identity only. Terminal failset, hosted Windows/Linux parity, and independent A/B/C must bind to the replacement SHA.
+- Score remains `52/100`; Limited Live remains closed and unauthorized.
