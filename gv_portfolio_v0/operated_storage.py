@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -42,12 +43,21 @@ def selected_scenario_id(*, env: Mapping[str, str] | None = None) -> str:
     return scenario_id
 
 
+def _scenario_storage_key(scenario_id: str) -> str:
+    try:
+        get_scenario(scenario_id)
+    except ValueError as exc:
+        raise OperatedPortfolioError(str(exc)) from exc
+    return hashlib.sha256(scenario_id.encode("utf-8")).hexdigest()
+
+
 def _workspace_filename(scenario_id: str) -> str:
     if scenario_id == DEFAULT_SCENARIO_ID:
         return "operated_portfolio_10_workspace.json"
     if scenario_id == PORTFOLIO_25_SCENARIO_ID:
         return "operated_portfolio_25_workspace.json"
-    raise OperatedPortfolioError(f"UNKNOWN_OPERATED_SCENARIO:{scenario_id}")
+    storage_key = _scenario_storage_key(scenario_id)
+    return f"operated_portfolio_scenario_{storage_key}.json"
 
 
 def default_workspace_root(
@@ -60,7 +70,12 @@ def default_workspace_root(
     if override:
         return Path(override).expanduser()
     selected = scenario_id or selected_scenario_id(env=values)
-    suffix = "10" if selected == DEFAULT_SCENARIO_ID else "25"
+    if selected == DEFAULT_SCENARIO_ID:
+        suffix = "10"
+    elif selected == PORTFOLIO_25_SCENARIO_ID:
+        suffix = "25"
+    else:
+        suffix = f"scenario_{_scenario_storage_key(selected)}"
     return Path.home() / ".terminal-zero" / f"gv_operated_portfolio_{suffix}"
 
 

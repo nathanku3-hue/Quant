@@ -10,6 +10,7 @@ network, alpha, or live-capital path.
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import datetime, timedelta, timezone
 import hashlib
 from typing import Any, Iterable, Mapping
 
@@ -170,7 +171,10 @@ def _initial_evidence(
                     f"{specification['symbol'].lower()}/"
                     f"{specification['evidence_slug']}-v1"
                 ),
-                observed_at=f"{scenario['timeline']['cash_opened_at'][:11]}12:{index:02d}:00.000000Z",
+                observed_at=_minute_timestamp(
+                    f"{scenario['timeline']['cash_opened_at'][:11]}12:00:00.000000Z",
+                    index,
+                ),
                 owned_instrument_ids=[instrument["instrument_id"]],
             )
         )
@@ -398,8 +402,28 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
         raise OperatedPortfolioError(str(exc)) from exc
 
 
+def _utc_datetime(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(
+        timezone.utc
+    )
+
+
+def _utc_timestamp(value: datetime) -> str:
+    return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+
 def _minute_timestamp(anchor: str, minute: int, second: int = 0) -> str:
-    return f"{anchor[:13]}:{minute:02d}:{second:02d}.000000Z"
+    hour_start = _utc_datetime(anchor).replace(
+        minute=0, second=0, microsecond=0
+    )
+    return _utc_timestamp(
+        hour_start + timedelta(minutes=minute, seconds=second)
+    )
+
+
+def _timestamp_after(configured: str, prior: str) -> str:
+    minimum = _utc_datetime(prior) + timedelta(seconds=1)
+    return _utc_timestamp(max(_utc_datetime(configured), minimum))
 
 
 def _append_certification(
@@ -627,7 +651,11 @@ def confirm_initial_portfolio(workspace: Mapping[str, Any]) -> dict[str, Any]:
         "costs_after": result["book"]["total_costs"],
     }
     _append_certification(
-        result, effective_at=scenario["timeline"]["initial_certified_at"]
+        result,
+        effective_at=_timestamp_after(
+            scenario["timeline"]["initial_certified_at"],
+            result["events"][-1]["effective_at"],
+        ),
     )
     validate_workspace(result)
     return result
