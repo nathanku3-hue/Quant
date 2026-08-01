@@ -9,6 +9,8 @@ from core.gv_fs0_canonical import domain_hash
 
 DEFAULT_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_10_TRANSITION_1R"
 PORTFOLIO_25_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_25_1"
+ENGINE_SCALE_50_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_50"
+ENGINE_SCALE_100_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_100"
 
 
 def _instrument(
@@ -245,9 +247,110 @@ SCENARIO_25: dict[str, Any] = {
 }
 
 
+def _scale_characterization_scenario(size: int) -> dict[str, Any]:
+    """Build synthetic load data without changing the operated engine contract."""
+    if size not in {50, 100}:
+        raise ValueError(f"UNSUPPORTED_SCALE_CHARACTERIZATION:{size}")
+    scenario = deepcopy(SCENARIO_25)
+    scenario_id = (
+        ENGINE_SCALE_50_SCENARIO_ID
+        if size == 50
+        else ENGINE_SCALE_100_SCENARIO_ID
+    )
+    multiplier = size // 25
+    scenario.update(
+        {
+            "scenario_id": scenario_id,
+            "title": f"GV Engine Scale Characterization {size}",
+            "id_domain": f"GV-ENGINE-SCALE-{size}",
+            "claim_boundary": (
+                f"Synthetic {size}-security engine stress evidence only; not Universe "
+                "acceptance, historical membership proof, alpha evidence, or live-capital authority."
+            ),
+            "fixture_namespace": f"engine-scale-{size}",
+            "cash_openings": [
+                {"bucket": "AVAILABLE", "amount": str(10000 * multiplier)},
+                {"bucket": "RESEARCH_RESERVE", "amount": str(1000 * multiplier)},
+            ],
+            "initial_decision_reason": (
+                f"INITIAL_{size}_SECURITY_ENGINE_CHARACTERIZATION"
+            ),
+            "initial_changed_why_reason": (
+                f"One deterministic competition covered all {size} synthetic identities; "
+                "residual cash remained explicit."
+            ),
+        }
+    )
+    scenario["portfolio_aim"]["objective"] = (
+        f"Characterize the existing operated engine with one synthetic {size}-security "
+        "paper portfolio and bounded operator workload."
+    )
+    scenario["status_explanations"] = {
+        "DRAFT_REVIEW": f"{size} synthetic identities await one portfolio confirmation.",
+        "FUNDED_CERTIFIED": (
+            f"One {size}-security stress portfolio was funded through the shared engine."
+        ),
+        "OBSERVED_NO_CHANGE_CERTIFIED": (
+            "A later observation preserved portfolio economics."
+        ),
+        "TRANSITION_CERTIFIED": (
+            "A later observation produced one reduce and one fund leg."
+        ),
+        "CORRECTED_CERTIFIED": (
+            "A non-economic correction preserved economics and certification history."
+        ),
+    }
+    scenario["no_change"]["locator"] = (
+        f"fixture://engine-scale-{size}/nstar/no-change-v1"
+    )
+    scenario["transition"]["locator"] = (
+        f"fixture://engine-scale-{size}/harbor-meridian/transition-v1"
+    )
+    scenario["correction"]["source_identity"] = (
+        f"ENGINE-SCALE-{size}:CORRECTION:MERIDIAN-ANNOTATION"
+    )
+
+    instruments: list[dict[str, Any]] = []
+    for index in range(size):
+        template = deepcopy(SCENARIO_25["instruments"][index % 25])
+        cohort = (index // 25) + 1
+        if cohort > 1:
+            template["symbol"] = f"{template['symbol']}{cohort}"
+            template["name"] = f"{template['name']} Cohort {cohort}"
+            template["permanent_key"] = template["permanent_key"].replace(
+                ":COMMON", f":SCALE_COHORT_{cohort}:COMMON"
+            )
+            template["evidence_content"] = (
+                f"{template['evidence_content']} Synthetic stress cohort {cohort}."
+            )
+            template["evidence_slug"] = (
+                f"{template['evidence_slug']}-cohort-{cohort}"
+            )
+            template["principal_claim"] = (
+                f"{template['principal_claim']} Synthetic stress cohort {cohort}."
+            )
+            template["hard_falsifiers"] = [
+                f"{value}_cohort_{cohort}"
+                for value in template["hard_falsifiers"]
+            ]
+            template["watch_conditions"] = [
+                f"{value}_cohort_{cohort}"
+                for value in template["watch_conditions"]
+            ]
+        instruments.append(template)
+    scenario["instruments"] = instruments
+    return scenario
+
+
+SCENARIO_50 = _scale_characterization_scenario(50)
+SCENARIO_100 = _scale_characterization_scenario(100)
+
+
 _SCENARIOS = {
     DEFAULT_SCENARIO_ID: SCENARIO_10,
     PORTFOLIO_25_SCENARIO_ID: SCENARIO_25,
+    ENGINE_SCALE_50_SCENARIO_ID: SCENARIO_50,
+    ENGINE_SCALE_100_SCENARIO_ID: SCENARIO_100,
 }
 
 
