@@ -1,21 +1,21 @@
 # Product Requirements Document: Terminal Zero / GodView Certified Portfolio OS
 
-## Active Build Authority (2026-07-30) — One Real Operated Portfolio Repair; Live Closed
+## Active Build Authority (2026-08-01) — One Real 25-Security Operated Portfolio; Live Closed
 
 ```text
 PRODUCT = point-in-time certified portfolio operating system
 CANONICAL_AUTHORITY = docs/context/gv_endgame_authority_current.md
-AUTHORITY_BASE = 3e4dc957f475945169ddf33ed359254bd98dc64d
-SLICE_0 = ACCEPTED_PRODUCT_SLICE @ 85e6601742710f03e6cced7377b4be426cd4892f
-REPLAY_0 = ACCEPTED_INTEGRITY_SLICE @ 0e4b93fb370f67956502edc02e9c6f56ceb2eba3
-BOUNDED_PORTFOLIO_1 = PERSISTED_SUBSTRATE; ORIGINAL_GATE_INCOMPLETE @ abaa814ce99ea78afadc33dd40506f4e13a742ef
+AUTHORITY_BASE = TERMINAL_MAIN @ 2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e
+SLICE_0 = ACCEPTED_PRODUCT_FOUNDATION @ 85e6601742710f03e6cced7377b4be426cd4892f
+REPLAY_0 = ACCEPTED_INTEGRITY_FOUNDATION @ 0e4b93fb370f67956502edc02e9c6f56ceb2eba3
+OPERATED_PORTFOLIO_10 = ACCEPTED_TERMINAL_PRODUCT @ 0d15e9c / closure 2349e1b
 PORTFOLIO_SCALE_1 = MULTI_SESSION_HARNESS; ORIGINAL_GATE_INCOMPLETE @ c37abf00293937b9b99eb6e560f6b5b77a92ea1f
 UNIVERSE_SCALE_1 = MULTI_CELL_HARNESS; ORIGINAL_GATE_INCOMPLETE @ dca67e36edc02dddf8c7ba446ac34f22562ee165
 CHALLENGER_PROMOTION_1 = SHADOW_CUSTODY_PRIMITIVE; ORIGINAL_GATE_INCOMPLETE @ 3e4dc957f475945169ddf33ed359254bd98dc64d
-ACTIVE_SLICE = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R
-ACTIVE_STATUS = IMPLEMENTATION_CANDIDATE; NOT_TERMINAL
+ACTIVE_SLICE = GV-OPERATED-PORTFOLIO-25-1
+ACTIVE_STATUS = AUTHORIZED; IMPLEMENTATION_ACTIVE; NOT_FROZEN; NOT_TERMINAL
 ACTIVE_BRIEF = docs/context/ACTIVE_BRIEF
-ENDGAME_PROGRESS_PRE_CANDIDATE = 52/100
+ACCEPTED_ENDGAME_PROGRESS = 62/100
 LIVE_CAPITAL = NOT_AUTHORIZED
 LIMITED_LIVE_SLICE = CLOSED
 ```
@@ -42,23 +42,25 @@ A lower-level brief cannot weaken a frozen quantity, user behavior, or outcome w
 
 ### Required immediate behavior
 
-The operator must be able to complete one ten-instrument, two-cluster portfolio loop through `operated_portfolio_app.py`:
+The operator must be able to complete one real 25-security portfolio loop through the shared `operated_portfolio_app.py` path:
 
-1. review ten permanent identities with instrument-specific evidence and thesis state;
-2. inspect deterministic capital competition across all ten;
-3. confirm one aim and fund at least three simultaneous positions while preserving classified residual cash;
-4. persist, restart, and reopen;
-5. record one explicit no-change observation with no economic mutation;
-6. record one later observation that authorizes SELL/REDUCE of one position and BUY/FUND of another;
-7. reconcile positions, cash, costs, NAV, and zero unexplained residual;
-8. persist, restart, reopen, and display changed why;
-9. prove exact replay, idempotence, and append-only correction lineage.
+1. review exactly 25 permanent identities across at least two meaningful clusters;
+2. inspect individually owned evidence and Living Thesis Lite state;
+3. inspect one deterministic capital competition containing every identity exactly once;
+4. confirm one aim, fund multiple positions, and preserve classified residual cash;
+5. persist, restart, and reopen;
+6. record one explicit no-change observation with no economic mutation;
+7. record one later observation that produces at least one SELL/REDUCE and one BUY/FUND from exact target deltas;
+8. reconcile positions, cash, costs, NAV, and zero unexplained residual;
+9. persist, restart, reopen, append one non-economic correction, and display changed why;
+10. prove exact replay, idempotence, and complete certification lineage;
+11. complete the full black-box flow within four required actions and zero per-security confirmations.
 
-Sessions, cells, runs, and slots cannot count as distinct securities. This slice does not claim Portfolio Scale, Universe Scale, Challenger Promotion, or Live.
+The retained `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` scenario must remain green through the same engine, persistence implementation, application, and view. Sessions, cells, runs, slots, portfolio copies, and repeated executions cannot count as distinct securities. This slice does not claim Universe Scale, Challenger Promotion, or Live.
 
 ### Build × Learn rule
 
-Use three mergeable packages: Truth core, Decision vertical, and Product closure. Freeze the minimum shared identity/event seams before parallel work; freeze field-level detail only when the vertical fixture exercises it. Learn work may collect shadow evidence, but cannot mutate certified truth, create a second active authority, or block the product vertical without a P0/P1 correctness finding.
+Scenario genericization cannot be accepted, reviewed as progress, banked, or frozen independently. Its first admissible proof is the 25-security product running through the shared path while the retained ten-security regression remains green. Streams are logical ownership boundaries, not a requirement for six workers. Learn work may collect shadow evidence, but cannot mutate certified truth, create a second active authority, or block the product vertical without a P0/P1 correctness finding.
 
 ### Claim and scope boundary
 

@@ -1,60 +1,53 @@
 # Impact Packet — Current
 
 Date: 2026-08-01
-Terminal slice: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`
-Certified executable candidate: `0d15e9c59c6b3ca051b3aa815018889d1e94857f`
+Active phase: `GV-OPERATED-PORTFOLIO-25-1`
+Base: terminal `main` at `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`
+Status: `IMPLEMENTATION_CHECKPOINT; NOT_FROZEN; NOT_TERMINAL`
 
 ## Product impact
 
-The terminal slice delivers the first post-Replay operator capability that changes portfolio economics:
+The active checkpoint evolves the accepted operated product from one hard-coded ten-security fixture into one shared scenario-driven path:
 
-- ten permanent instrument identities across two economic clusters;
-- instrument-owned evidence and Living Thesis Lite state;
-- deterministic competition across all ten instruments;
-- one portfolio with four initially funded positions and classified residual cash;
-- one explicit no-change observation;
-- one authorized `SELL/REDUCE HARBOR 4` plus `BUY/FUND MERID 5` transition;
-- operator-visible changed-why derived from decisions and the canonical book;
-- confined atomic persistence, verified reopen, exact replay, and append-only correction lineage.
+- retained ten-security regression scenario;
+- new 25-security product scenario;
+- exactly one portfolio book per workspace;
+- one capital competition covering every scenario identity exactly once;
+- multiple funded positions and classified residual cash;
+- explicit no-change, real SELL/REDUCE plus BUY/FUND transition, correction, persistence, replay, and fresh-process reopen;
+- summary-first and exceptions-first presentation;
+- no more than four required operator actions.
 
-## Execution and accounting impact
+## Architecture impact
 
-The exercised terminal economics are:
+Changed shared paths:
 
-```text
-HARBOR 10 → 6 via SELL 4 @ 40, fee 2
-MERID 0 → 5 via BUY 5 @ 30, fee 2
-NAV 4992 → 4988
-cumulative explicit costs 8 → 12
-unexplained residual 0
-```
+- `gv_portfolio_v0/operated.py`: derives identity, review, transition, validation, and changed-why expectations from a declarative scenario;
+- `gv_portfolio_v0/operated_storage.py`: uses one scenario-bound envelope and shared persistence implementation;
+- `views/gv_operated_portfolio_workspace.py`: renders dynamic counts, cluster summaries, exceptions, and scenario-specific actions;
+- `operated_portfolio_app.py`: selects a declarative scenario through environment configuration;
+- `gv_portfolio_v0/operated_scenarios.py`: owns retained 10- and new 25-security scenario data;
+- `launch_operated_portfolio_25.py`: thin scenario-selecting launcher only.
 
-Cash and positions remain nonnegative. A separate no-change cycle preserves holdings, cash, NAV, orders, fills, and book identity.
+No second domain engine, persistence implementation, schema family, application, or view stack was created. Shared book, execution, and replay primitives remain reused.
 
-## Persistence and custody impact
+## Test impact
 
-Persistence inspects every existing ancestor, rejects symlinks and Windows junctions, enforces lexical and canonical same-or-within-root checks, and repeats confinement checks before creation, temporary write, replacement, and load. Historical certifications are replayed at their exact event prefixes; correction lineage cannot self-assert stability.
+- retained ten-security tests remain the compatibility contract;
+- cloned-text rejection was replaced by the approved ownership rule: cross-instrument rebinding fails, while identical content is legal with explicit ownership and independent canonical identity;
+- `tests/gv_portfolio_v0/test_operated_25.py` proves 25 identities, ownership, one competition, bounded actions, accounting, replay, persistence isolation, correction, and fresh-process AppTest;
+- CI path ownership includes the scenario module, 25-security launcher, new phase brief, and shared changed paths.
 
-## Terminal verification
+## Current evidence
 
-- operated/context gate: `178/178 PASS`;
-- exact-head hosted run `30640915560`: `windows-latest` PASS and `ubuntu-latest` PASS;
-- complete hosted operated and FS0 product package: PASS;
-- controlled full suite: `2718` tests, `19` inherited failures, `0` errors, `16` skips, `0` candidate-only failures;
-- independent Reviewer A/B/C: PASS/PASS/PASS;
-- closure commit: documentation only; all non-doc bytes must equal `0d15e9c`.
+- focused shared 10/25 domain and AppTest: `23/23 PASS`;
+- complete operated package: PASS in bounded groups;
+- complete FS0 product package: PASS in bounded groups;
+- context/authority tests: PASS before regenerated packet validation;
+- manual shared-path flow: 25 draft → 8 funded → no-change → SELL+BUY → correction; residual `0`.
 
-## Changed documentation in closure
+These are local checkpoint results only. No candidate SHA, hosted exact-head run, controlled full failset comparison, or independent terminal review exists yet.
 
-- terminal evidence: `docs/context/e2e_evidence/gv_operated_portfolio_terminal_20260801.md`;
-- terminal SAW: `docs/saw_reports/saw_gv_operated_portfolio_terminal_20260801.md`;
-- PM handover: `docs/handover/gv_operated_portfolio_10_transition_1r_handover_20260801.md`;
-- current roadmap, authority, bridge, planner, done, alignment, observability, context, decision, lesson, and notes surfaces.
+## Boundary
 
-No product, runtime, test, workflow, dependency, data, or configuration byte changes in the closure commit.
-
-## Score and boundary
-
-Pre-terminal accepted endgame progress was `52/100`; terminal accepted endgame progress is `62/100`.
-
-Limited Live remains `CLOSED; NOT_AUTHORIZED`. This closure does not authorize Scale, Universe, Challenger compatibility, providers, optimizer, broker, alpha/score uplift, or live capital. No successor phase is automatically opened.
+Accepted endgame progress remains `62/100`. Providers, optimizer, broker, Universe, Challenger, Limited Live, live capital, historical harness compatibility, and repository-wide dependency repair remain excluded.

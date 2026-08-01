@@ -1,37 +1,54 @@
 # Observability Pack — Current
 
 Date: 2026-08-01
-Terminal slice: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`
-Certified executable candidate: `0d15e9c59c6b3ca051b3aa815018889d1e94857f`
+Active phase: `GV-OPERATED-PORTFOLIO-25-1`
+Status: `IMPLEMENTATION_CHECKPOINT; NOT_FROZEN; NOT_TERMINAL`
 
 ## Product sentinels
 
-- **Authority:** terminal authority is recorded in `docs/context/gv_endgame_authority_current.md`; the phase brief remains selected for historical and handover context.
-- **Identity:** exactly ten unique permanent instrument IDs and permanent keys.
-- **Economic diversity:** at least two cluster values and ten instrument-owned evidence/thesis records.
-- **Portfolio count:** exactly one portfolio book; no session/cell/run/slot breadth metric.
-- **Funding:** four positive positions and classified residual cash.
-- **Competition:** every decision contains one candidate row for each of the ten instruments.
+- **Authority:** `ACTIVE_BRIEF` selects the authorized 25-security phase; accepted score remains `62/100`.
+- **Shared path:** retained 10 and new 25 scenarios import the same operated engine and storage implementation and render through the same app/view stack.
+- **Identity:** exactly 25 unique permanent IDs and keys in the active scenario.
+- **Ownership:** every review retains its instrument-owned evidence; cross-instrument rebinding fails closed.
+- **Breadth:** exactly one book; no session/cell/run/slot or copied portfolio counts as a security.
+- **Competition:** one candidate row per identity, exactly once.
+- **Funding:** multiple positive positions and classified residual cash.
 - **No-change:** orders, fills, holdings, cash, NAV, and book hash remain unchanged.
-- **Transition:** `SELL HARBOR 4` then `BUY MERID 5`.
-- **Accounting:** no negative position or cash; total explicit costs `12`; terminal NAV `4988`; unexplained residual `0`.
-- **Replay/correction:** reconstructed book and certification history match; one append-only non-economic correction preserves economics.
-- **Persistence:** content-addressed atomic envelope rejects linked-ancestor escape and reloads byte-equivalent state.
-- **Product UI:** confirm → no-change → transition → correction → fresh-process reopen passed with network denied.
+- **Transition:** at least one SELL/REDUCE and one BUY/FUND derived from target deltas.
+- **Accounting:** cash and positions nonnegative; unexplained residual `0`.
+- **Replay/correction:** exact reconstruction, certification history replay, and append-only non-economic correction.
+- **Persistence:** scenario-bound atomic envelope rejects linked-ancestor escape and reloads equivalent state.
+- **Product UI:** summary-first and exceptions-first confirm → no-change → transition → correction → fresh-process reopen within four actions.
+- **Regression:** retained ten-security behavior remains green.
 
-## Terminal evidence sentinels
+## Evidence sentinels
 
-- exact-head hosted run `30640915560`: Windows PASS; Linux PASS;
-- complete hosted operated + FS0 package: PASS;
-- full suite: `2718` tests, `19` inherited failures, `0` errors, `16` skips, `0` candidate-only failures;
-- Reviewer A/B/C: PASS/PASS/PASS;
-- closure diff: documentation only; all non-doc bytes equal `0d15e9c`;
-- pre-terminal score `52/100`; terminal accepted score `62/100`;
-- Limited Live remains `CLOSED; NOT_AUTHORIZED`.
+Current local checkpoint:
+
+- focused shared 10/25 domain and AppTest: `23/23 PASS`;
+- complete operated package: PASS in bounded groups;
+- complete FS0 package: PASS in bounded groups;
+- context/authority set: PASS before regenerated context validation.
+
+Required before candidate freeze:
+
+- changed-path/test ownership receipt;
+- complete CI path-trigger review;
+- exact-head checkout review;
+- dependency and `pip check` receipt;
+- base/candidate failset method;
+- evidence destination outside checkout.
+
+Required after freeze:
+
+- exact-head hosted Windows and Linux;
+- one controlled base/candidate full-suite comparison;
+- independent Reviewer A/B/C;
+- documentation-only closure preserving the tested executable tree.
 
 ## Current signal
 
-- **GREEN:** product semantics, accounting, replay, persistence, UI, hosted parity, full failset comparison, terminal review, and closure documentation.
-- **AMBER:** 19 inherited monorepo failures remain outside this slice with existing owners.
-- **RED:** none in current terminal scope.
-- **STOP:** no successor phase, provider, broker, optimizer, alpha uplift, or Live work is authorized.
+- **GREEN:** shared-path architecture, 10/25 focused behavior, bounded actions, accounting, replay, correction, persistence, and local AppTests.
+- **AMBER:** branch/candidate identity, regenerated current context, pre-freeze receipts, hosted parity, full failset, and independent review remain open.
+- **RED:** none currently demonstrated.
+- **STOP:** any parallel engine/storage/view path, weakened ten-security behavior, ownership drift, accounting/replay/restart failure, candidate-only regression, or scope widening.

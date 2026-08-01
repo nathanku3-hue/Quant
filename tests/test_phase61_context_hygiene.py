@@ -21,7 +21,7 @@ def test_phase61_brief_exposes_new_context_packet() -> None:
     assert "## First Command" in text
 
 
-def test_current_context_preserves_named_nonsequential_product_gate() -> None:
+def test_current_context_preserves_terminal_and_active_named_product_gates() -> None:
     payload = json.loads(CURRENT_CONTEXT_JSON.read_text(encoding="utf-8"))
     assert int(payload["active_phase"]) == -1
     joined = " ".join(
@@ -30,17 +30,19 @@ def test_current_context_preserves_named_nonsequential_product_gate() -> None:
         for x in payload[key]
     )
     assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in joined
-    assert "ten-instrument" in joined.lower()
-    assert "Limited Live remains closed" in joined
+    assert "GV-OPERATED-PORTFOLIO-25-1" in joined
+    assert "25-security" in joined.lower()
+    assert "Limited Live" in joined and "closed" in joined.lower()
 
 
-def test_current_surfaces_select_one_operated_portfolio_gate() -> None:
+def test_current_surfaces_select_one_active_operated_portfolio_gate() -> None:
     planner_text = PLANNER.read_text(encoding="utf-8")
     bridge_text = BRIDGE.read_text(encoding="utf-8")
     readme_text = README.read_text(encoding="utf-8")
 
     for text in (planner_text, bridge_text, readme_text):
         assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in text
-        assert "52/100" in text
+        assert "GV-OPERATED-PORTFOLIO-25-1" in text
+        assert "62/100" in text
         assert "live" in text.lower() and "closed" in text.lower()
         assert "GV-CHALLENGER-PROMOTION-1 OPEN" not in text

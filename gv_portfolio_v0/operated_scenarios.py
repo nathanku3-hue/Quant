@@ -1,0 +1,266 @@
+"""Declarative scenarios for the single scalable operated-portfolio engine."""
+
+from __future__ import annotations
+
+from copy import deepcopy
+from typing import Any, Mapping
+
+from core.gv_fs0_canonical import domain_hash
+
+DEFAULT_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_10_TRANSITION_1R"
+PORTFOLIO_25_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_25_1"
+
+
+def _instrument(
+    permanent_key: str,
+    symbol: str,
+    name: str,
+    cluster: str,
+    *,
+    evidence_content: str,
+    evidence_slug: str,
+    outcome: str,
+    score: int,
+    thesis: str,
+    target_quantity: str,
+    reference_price: str,
+) -> dict[str, Any]:
+    return {
+        "permanent_key": permanent_key,
+        "symbol": symbol,
+        "name": name,
+        "economic_cluster": cluster,
+        "evidence_content": evidence_content,
+        "evidence_slug": evidence_slug,
+        "outcome": outcome,
+        "net_score_bps": score,
+        "principal_claim": thesis,
+        "target_quantity": target_quantity,
+        "reference_price": reference_price,
+        "hard_falsifiers": [f"{symbol.lower()}_hard_falsifier"],
+        "watch_conditions": [f"{symbol.lower()}_watch_condition"],
+    }
+
+
+SCENARIO_10: dict[str, Any] = {
+    "scenario_id": DEFAULT_SCENARIO_ID,
+    "title": "GV Operated Portfolio 10",
+    "id_domain": "GV-OPERATED-PORTFOLIO-10",
+    "schema_version": "gv_operated_portfolio_v3",
+    "claim_boundary": (
+        "Deterministic operated paper portfolio only; no alpha or live-capital claim."
+    ),
+    "fixture_namespace": "operated-10",
+    "minimum_funded_positions": 3,
+    "minimum_total_cash_bps": 1000,
+    "cash_openings": [
+        {"bucket": "AVAILABLE", "amount": "4500"},
+        {"bucket": "RESEARCH_RESERVE", "amount": "500"},
+    ],
+    "portfolio_aim": {
+        "objective": "Operate one diversified paper portfolio with explicit residual liquidity.",
+        "allowed_actions": ["BUY", "SELL", "REDUCE", "HOLD", "CASH"],
+        "effective_at": "2026-07-22T09:00:00.000000Z",
+    },
+    "timeline": {
+        "cash_opened_at": "2026-07-22T08:55:00.000000Z",
+        "initial_decision_at": "2026-07-22T09:05:00.000000Z",
+        "aim_confirmed_at": "2026-07-22T09:05:30.000000Z",
+        "initial_transition_at": "2026-07-22T09:06:00.000000Z",
+        "initial_order_start_minute": 7,
+        "initial_certified_at": "2026-07-22T09:12:00.000000Z",
+        "no_change_certified_at": "2026-08-05T12:01:00.000000Z",
+        "transition_decision_at": "2026-08-20T12:01:00.000000Z",
+        "transition_planned_at": "2026-08-20T12:02:00.000000Z",
+        "transition_order_start_minute": 3,
+        "transition_certified_at": "2026-08-20T12:05:00.000000Z",
+        "correction_at": "2026-08-20T12:06:00.000000Z",
+        "correction_recorded_at": "2026-08-20T12:07:00.000000Z",
+    },
+    "status_explanations": {
+        "DRAFT_REVIEW": "Ten distinct instruments and one portfolio aim await operator confirmation.",
+        "FUNDED_CERTIFIED": "The operator confirmed one portfolio; four positions were funded and residual cash remained classified.",
+        "OBSERVED_NO_CHANGE_CERTIFIED": "A later observation was admitted but did not cross a transition threshold, so holdings and cash were preserved.",
+        "TRANSITION_CERTIFIED": "A later observation weakened Harbor and strengthened Meridian; Harbor was reduced and Meridian was funded.",
+        "CORRECTED_CERTIFIED": "A non-economic annotation was corrected append-only; portfolio economics and prior certifications remained stable.",
+    },
+    "initial_decision_reason": "INITIAL_CAPITAL_COMPETITION",
+    "initial_changed_why_reason": (
+        "The four highest-scoring eligible instruments received capital; residual cash remained explicit."
+    ),
+    "no_change": {
+        "instrument_symbol": "NSTAR",
+        "content": "Northstar renewal movement remained inside the declared watch band; no score crossed a funding threshold.",
+        "locator": "fixture://operated-10/nstar/no-change-v1",
+        "observed_at": "2026-08-05T12:00:00.000000Z",
+        "reason": "The observation stayed inside the watch band; no hard falsifier or funding threshold fired.",
+    },
+    "transition": {
+        "content": "Harbor backlog quality weakened below its funding band while Meridian qualification converted into a firm order.",
+        "locator": "fixture://operated-10/harbor-meridian/transition-v1",
+        "observed_at": "2026-08-20T12:00:00.000000Z",
+        "decision_reason": "AUTHORIZED_HARBOR_TO_MERIDIAN_TRANSITION",
+        "transition_kind": "REDUCE_AND_FUND",
+        "reason": "Harbor fell below its prior funding band while Meridian moved above the incremental-capital threshold.",
+        "primary_reduced_symbol": "HARBOR",
+        "primary_funded_symbol": "MERID",
+        "review_updates": {
+            "HARBOR": {
+                "net_score_bps": 260,
+                "target_quantity": "6",
+                "principal_claim": "Backlog quality weakened; retain only a reduced monitoring position.",
+            },
+            "MERID": {
+                "net_score_bps": 590,
+                "target_quantity": "5",
+                "principal_claim": "A firm qualification order now supports bounded funding.",
+            },
+        },
+    },
+    "correction": {
+        "reason": "Clarify that Meridian evidence is a firm qualification order, not a shipment.",
+        "source_identity": "OPERATED10:CORRECTION:MERIDIAN-ANNOTATION",
+    },
+    "instruments": [
+        _instrument("ISSUER:NORTHSTAR:COMMON", "NSTAR", "Northstar Systems", "DIGITAL_INFRASTRUCTURE", evidence_content="Recurring platform renewals remain above the principal-thesis floor.", evidence_slug="renewals", outcome="ADMIT", score=620, thesis="Renewal durability supports a funded principal position.", target_quantity="20", reference_price="25"),
+        _instrument("ISSUER:HARBOR:COMMON", "HARBOR", "Harbor Automation", "DIGITAL_INFRASTRUCTURE", evidence_content="Automation backlog supports near-term cash conversion but concentration risk remains.", evidence_slug="backlog", outcome="ADMIT", score=560, thesis="Backlog quality supports a bounded funded position.", target_quantity="10", reference_price="40"),
+        _instrument("ISSUER:ORBIT:COMMON", "ORBIT", "Orbit Networks", "DIGITAL_INFRASTRUCTURE", evidence_content="Network bookings improved, but customer concentration evidence is incomplete.", evidence_slug="bookings", outcome="ABSTAIN", score=300, thesis="Concentration evidence is insufficient for commitment.", target_quantity="0", reference_price="35"),
+        _instrument("ISSUER:QUANTA:COMMON", "QUANTA", "Quanta Compute", "DIGITAL_INFRASTRUCTURE", evidence_content="Compute demand is strong while power availability constrains the bull case.", evidence_slug="power", outcome="ABSTAIN", score=250, thesis="Power constraints keep the thesis observable but unfunded.", target_quantity="0", reference_price="60"),
+        _instrument("ISSUER:MESH:COMMON", "MESH", "Mesh Security", "DIGITAL_INFRASTRUCTURE", evidence_content="Security growth does not offset a mandate-breaking leverage ratio.", evidence_slug="leverage", outcome="REJECT", score=180, thesis="Leverage violates the mandate screen.", target_quantity="0", reference_price="20"),
+        _instrument("ISSUER:ATLAS:COMMON", "ATLAS", "Atlas Logistics", "REAL_ECONOMY", evidence_content="Freight utilization and contract repricing support resilient base economics.", evidence_slug="utilization", outcome="ADMIT", score=540, thesis="Contract repricing supports a funded real-economy position.", target_quantity="15", reference_price="30"),
+        _instrument("ISSUER:VITAL:COMMON", "VITAL", "Vital Diagnostics", "REAL_ECONOMY", evidence_content="Diagnostic consumables produce stable recurring demand and low balance-sheet risk.", evidence_slug="consumables", outcome="ADMIT", score=520, thesis="Recurring consumables support a funded defensive position.", target_quantity="12", reference_price="50"),
+        _instrument("ISSUER:MERIDIAN:COMMON", "MERID", "Meridian Components", "REAL_ECONOMY", evidence_content="Component qualification is progressing, but the initial order evidence is not yet decisive.", evidence_slug="qualification", outcome="ADMIT", score=470, thesis="Qualification progress makes Meridian eligible but initially unfunded.", target_quantity="0", reference_price="30"),
+        _instrument("ISSUER:FOUNDRY:COMMON", "FNDRY", "Foundry Materials", "REAL_ECONOMY", evidence_content="Materials spreads normalized and remain below the capital-entry threshold.", evidence_slug="spreads", outcome="ABSTAIN", score=350, thesis="Normalized spreads remain below entry threshold.", target_quantity="0", reference_price="45"),
+        _instrument("ISSUER:AGRI:COMMON", "AGRI", "Agri Inputs", "REAL_ECONOMY", evidence_content="Input-volume recovery is offset by adverse working-capital intensity.", evidence_slug="working-capital", outcome="REJECT", score=220, thesis="Working-capital intensity blocks admission.", target_quantity="0", reference_price="25"),
+    ],
+}
+
+
+SCENARIO_25: dict[str, Any] = {
+    "scenario_id": PORTFOLIO_25_SCENARIO_ID,
+    "title": "GV Operated Portfolio 25",
+    "id_domain": "GV-OPERATED-PORTFOLIO-25",
+    "schema_version": "gv_operated_portfolio_v3",
+    "claim_boundary": (
+        "Deterministic operated 25-security paper portfolio only; no alpha or live-capital claim."
+    ),
+    "fixture_namespace": "operated-25",
+    "minimum_funded_positions": 3,
+    "minimum_total_cash_bps": 1000,
+    "cash_openings": [
+        {"bucket": "AVAILABLE", "amount": "10000"},
+        {"bucket": "RESEARCH_RESERVE", "amount": "1000"},
+    ],
+    "portfolio_aim": {
+        "objective": "Operate one 25-security paper portfolio with bounded review and explicit residual liquidity.",
+        "allowed_actions": ["BUY", "SELL", "REDUCE", "HOLD", "CASH"],
+        "effective_at": "2026-09-01T09:00:00.000000Z",
+    },
+    "timeline": {
+        "cash_opened_at": "2026-09-01T08:55:00.000000Z",
+        "initial_decision_at": "2026-09-01T09:05:00.000000Z",
+        "aim_confirmed_at": "2026-09-01T09:05:30.000000Z",
+        "initial_transition_at": "2026-09-01T09:06:00.000000Z",
+        "initial_order_start_minute": 7,
+        "initial_certified_at": "2026-09-01T09:20:00.000000Z",
+        "no_change_certified_at": "2026-09-05T12:01:00.000000Z",
+        "transition_decision_at": "2026-09-20T12:01:00.000000Z",
+        "transition_planned_at": "2026-09-20T12:02:00.000000Z",
+        "transition_order_start_minute": 3,
+        "transition_certified_at": "2026-09-20T12:06:00.000000Z",
+        "correction_at": "2026-09-20T12:07:00.000000Z",
+        "correction_recorded_at": "2026-09-20T12:08:00.000000Z",
+    },
+    "status_explanations": {
+        "DRAFT_REVIEW": "Twenty-five distinct instruments and one portfolio aim await operator confirmation.",
+        "FUNDED_CERTIFIED": "The operator confirmed one 25-security portfolio; multiple positions were funded and residual cash remained classified.",
+        "OBSERVED_NO_CHANGE_CERTIFIED": "A later observation was admitted without crossing a transition threshold, preserving portfolio economics.",
+        "TRANSITION_CERTIFIED": "A later observation changed capital competition; one funded position was reduced and one previously unfunded position received capital.",
+        "CORRECTED_CERTIFIED": "A non-economic annotation was corrected append-only; portfolio economics and prior certifications remained stable.",
+    },
+    "initial_decision_reason": "INITIAL_25_SECURITY_CAPITAL_COMPETITION",
+    "initial_changed_why_reason": (
+        "The selected eligible instruments received capital through one competition across all 25 identities; residual cash remained explicit."
+    ),
+    "no_change": {
+        "instrument_symbol": "NSTAR",
+        "content": "Northstar renewal evidence remained inside the declared watch band; no target quantity changed.",
+        "locator": "fixture://operated-25/nstar/no-change-v1",
+        "observed_at": "2026-09-05T12:00:00.000000Z",
+        "reason": "The admitted observation stayed inside the watch band; no hard falsifier or funding threshold fired.",
+    },
+    "transition": {
+        "content": "Harbor backlog quality weakened below its funding band while Meridian converted qualification into a firm order.",
+        "locator": "fixture://operated-25/harbor-meridian/transition-v1",
+        "observed_at": "2026-09-20T12:00:00.000000Z",
+        "decision_reason": "AUTHORIZED_25_SECURITY_HARBOR_TO_MERIDIAN_TRANSITION",
+        "transition_kind": "REDUCE_AND_FUND",
+        "reason": "Harbor fell below its prior funding band while Meridian moved above the incremental-capital threshold in the 25-security competition.",
+        "primary_reduced_symbol": "HARBOR",
+        "primary_funded_symbol": "MERID",
+        "review_updates": {
+            "HARBOR": {
+                "net_score_bps": 260,
+                "target_quantity": "6",
+                "principal_claim": "Backlog quality weakened; retain only a reduced monitoring position.",
+            },
+            "MERID": {
+                "net_score_bps": 590,
+                "target_quantity": "5",
+                "principal_claim": "A firm qualification order now supports bounded funding.",
+            },
+        },
+    },
+    "correction": {
+        "reason": "Clarify that Meridian evidence is a firm qualification order, not a shipment.",
+        "source_identity": "OPERATED25:CORRECTION:MERIDIAN-ANNOTATION",
+    },
+    "instruments": [
+        _instrument("ISSUER:NORTHSTAR:COMMON", "NSTAR", "Northstar Systems", "DIGITAL_INFRASTRUCTURE", evidence_content="Recurring platform renewals remain above the principal-thesis floor.", evidence_slug="renewals", outcome="ADMIT", score=620, thesis="Renewal durability supports a funded principal position.", target_quantity="20", reference_price="25"),
+        _instrument("ISSUER:HARBOR:COMMON", "HARBOR", "Harbor Automation", "DIGITAL_INFRASTRUCTURE", evidence_content="Automation backlog supports near-term cash conversion but concentration risk remains.", evidence_slug="backlog", outcome="ADMIT", score=560, thesis="Backlog quality supports a bounded funded position.", target_quantity="10", reference_price="40"),
+        _instrument("ISSUER:ORBIT:COMMON", "ORBIT", "Orbit Networks", "DIGITAL_INFRASTRUCTURE", evidence_content="Network bookings improved while customer concentration remained unresolved.", evidence_slug="bookings", outcome="ABSTAIN", score=300, thesis="Concentration evidence is insufficient for commitment.", target_quantity="0", reference_price="35"),
+        _instrument("ISSUER:QUANTA:COMMON", "QUANTA", "Quanta Compute", "DIGITAL_INFRASTRUCTURE", evidence_content="Compute demand is strong while power availability constrains deployment.", evidence_slug="power", outcome="ABSTAIN", score=250, thesis="Power constraints keep the thesis observable but unfunded.", target_quantity="0", reference_price="60"),
+        _instrument("ISSUER:MESH:COMMON", "MESH", "Mesh Security", "DIGITAL_INFRASTRUCTURE", evidence_content="Security growth does not offset a mandate-breaking leverage ratio.", evidence_slug="leverage", outcome="REJECT", score=180, thesis="Leverage violates the mandate screen.", target_quantity="0", reference_price="20"),
+        _instrument("ISSUER:ATLAS:COMMON", "ATLAS", "Atlas Logistics", "INDUSTRIAL_SYSTEMS", evidence_content="Freight utilization and contract repricing support resilient base economics.", evidence_slug="utilization", outcome="ADMIT", score=540, thesis="Contract repricing supports a funded industrial position.", target_quantity="15", reference_price="30"),
+        _instrument("ISSUER:MERIDIAN:COMMON", "MERID", "Meridian Components", "INDUSTRIAL_SYSTEMS", evidence_content="Component qualification is progressing, but the initial order evidence is not decisive.", evidence_slug="qualification", outcome="ADMIT", score=470, thesis="Qualification progress makes Meridian eligible but initially unfunded.", target_quantity="0", reference_price="30"),
+        _instrument("ISSUER:FOUNDRY:COMMON", "FNDRY", "Foundry Materials", "INDUSTRIAL_SYSTEMS", evidence_content="Materials spreads normalized and remain below the capital-entry threshold.", evidence_slug="spreads", outcome="ABSTAIN", score=350, thesis="Normalized spreads remain below entry threshold.", target_quantity="0", reference_price="45"),
+        _instrument("ISSUER:VECTOR:COMMON", "VECTOR", "Vector Controls", "INDUSTRIAL_SYSTEMS", evidence_content="Control-system replacement demand is supported by a multi-year service backlog.", evidence_slug="service-backlog", outcome="ADMIT", score=515, thesis="Service backlog supports bounded initial funding.", target_quantity="8", reference_price="45"),
+        _instrument("ISSUER:FORGE:COMMON", "FORGE", "Forge Robotics", "INDUSTRIAL_SYSTEMS", evidence_content="Robotics bookings improved but free-cash conversion remains below threshold.", evidence_slug="cash-conversion", outcome="ABSTAIN", score=330, thesis="Cash conversion requires another observation before funding.", target_quantity="0", reference_price="38"),
+        _instrument("ISSUER:VITAL:COMMON", "VITAL", "Vital Diagnostics", "HEALTHCARE", evidence_content="Diagnostic consumables produce stable recurring demand and low balance-sheet risk.", evidence_slug="consumables", outcome="ADMIT", score=520, thesis="Recurring consumables support a funded defensive position.", target_quantity="12", reference_price="50"),
+        _instrument("ISSUER:GENOM:COMMON", "GENOM", "Genom Analytics", "HEALTHCARE", evidence_content="Sequencing demand is expanding while reimbursement evidence remains incomplete.", evidence_slug="reimbursement", outcome="ABSTAIN", score=365, thesis="Reimbursement uncertainty blocks initial funding.", target_quantity="0", reference_price="55"),
+        _instrument("ISSUER:CLINIC:COMMON", "CLINIC", "Clinic Systems", "HEALTHCARE", evidence_content="Hospital workflow renewals remain stable but implementation costs are elevated.", evidence_slug="renewals", outcome="ABSTAIN", score=340, thesis="Implementation costs keep the position on watch.", target_quantity="0", reference_price="42"),
+        _instrument("ISSUER:BIOSYN:COMMON", "BIOSYN", "BioSyn Tools", "HEALTHCARE", evidence_content="Research-tool orders recovered but customer concentration remains high.", evidence_slug="orders", outcome="ABSTAIN", score=320, thesis="Order recovery is insufficient without concentration improvement.", target_quantity="0", reference_price="48"),
+        _instrument("ISSUER:MEDICA:COMMON", "MEDICA", "Medica Services", "HEALTHCARE", evidence_content="Procedure volumes are stable while leverage exceeds the mandate ceiling.", evidence_slug="leverage", outcome="REJECT", score=190, thesis="Leverage violates the mandate screen.", target_quantity="0", reference_price="36"),
+        _instrument("ISSUER:LUMEN:COMMON", "LUMEN", "Lumen Retail", "CONSUMER_NETWORKS", evidence_content="Membership retention and unit economics remain above the funding floor.", evidence_slug="retention", outcome="ADMIT", score=505, thesis="Membership durability supports bounded initial funding.", target_quantity="10", reference_price="28"),
+        _instrument("ISSUER:MARKET:COMMON", "MARKET", "Market Hub", "CONSUMER_NETWORKS", evidence_content="Marketplace take rate improved while seller churn remains elevated.", evidence_slug="seller-churn", outcome="ABSTAIN", score=310, thesis="Seller churn prevents initial funding.", target_quantity="0", reference_price="32"),
+        _instrument("ISSUER:TRAVEL:COMMON", "TRAVEL", "Travel Grid", "CONSUMER_NETWORKS", evidence_content="Booking growth remains positive but refund volatility exceeds the watch band.", evidence_slug="refunds", outcome="ABSTAIN", score=295, thesis="Refund volatility keeps the security unfunded.", target_quantity="0", reference_price="27"),
+        _instrument("ISSUER:HOME:COMMON", "HOME", "Home Direct", "CONSUMER_NETWORKS", evidence_content="Repeat purchase evidence weakened and inventory days increased.", evidence_slug="inventory", outcome="REJECT", score=205, thesis="Inventory intensity blocks admission.", target_quantity="0", reference_price="22"),
+        _instrument("ISSUER:FOODCO:COMMON", "FOODCO", "FoodCo Brands", "CONSUMER_NETWORKS", evidence_content="Brand pricing remains resilient but volume evidence is neutral.", evidence_slug="volume", outcome="ABSTAIN", score=355, thesis="Neutral volume evidence does not justify funding.", target_quantity="0", reference_price="31"),
+        _instrument("ISSUER:SOLAR:COMMON", "SOLAR", "Solar Array", "ENERGY_RESOURCES", evidence_content="Contracted solar backlog and balance-sheet liquidity support bounded funding.", evidence_slug="contracted-backlog", outcome="ADMIT", score=500, thesis="Contracted backlog supports an initial funded position.", target_quantity="10", reference_price="32"),
+        _instrument("ISSUER:GRID:COMMON", "GRID", "Grid Storage", "ENERGY_RESOURCES", evidence_content="Storage deployments and service attach rates remain above threshold.", evidence_slug="deployments", outcome="ADMIT", score=510, thesis="Deployment evidence supports bounded initial funding.", target_quantity="12", reference_price="35"),
+        _instrument("ISSUER:DRILL:COMMON", "DRILL", "Drill Services", "ENERGY_RESOURCES", evidence_content="Service pricing improved while cyclicality remains outside the mandate preference.", evidence_slug="pricing", outcome="ABSTAIN", score=285, thesis="Cyclicality keeps the security unfunded.", target_quantity="0", reference_price="29"),
+        _instrument("ISSUER:AGRI:COMMON", "AGRI", "Agri Inputs", "ENERGY_RESOURCES", evidence_content="Input-volume recovery is offset by adverse working-capital intensity.", evidence_slug="working-capital", outcome="REJECT", score=220, thesis="Working-capital intensity blocks admission.", target_quantity="0", reference_price="25"),
+        _instrument("ISSUER:WATER:COMMON", "WATER", "Water Systems", "ENERGY_RESOURCES", evidence_content="Municipal order coverage is stable but margin evidence remains below threshold.", evidence_slug="margins", outcome="ABSTAIN", score=345, thesis="Margin evidence requires another observation before funding.", target_quantity="0", reference_price="34"),
+    ],
+}
+
+
+_SCENARIOS = {
+    DEFAULT_SCENARIO_ID: SCENARIO_10,
+    PORTFOLIO_25_SCENARIO_ID: SCENARIO_25,
+}
+
+
+def get_scenario(scenario_id: str = DEFAULT_SCENARIO_ID) -> dict[str, Any]:
+    try:
+        return deepcopy(_SCENARIOS[scenario_id])
+    except KeyError as exc:
+        raise ValueError(f"UNKNOWN_OPERATED_SCENARIO:{scenario_id}") from exc
+
+
+def scenario_hash(scenario: Mapping[str, Any]) -> str:
+    return domain_hash("GV-OPERATED-SCENARIO:V1", dict(scenario))
+
+
+def available_scenario_ids() -> tuple[str, ...]:
+    return tuple(_SCENARIOS)

@@ -1,34 +1,32 @@
 # Multi-Stream Contract — Current
 
 Date: 2026-08-01
-Terminal product phase: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`
+Active phase: `GV-OPERATED-PORTFOLIO-25-1`
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
-Status: `TERMINAL_ACCEPTED; SHIPPED; NO_SUCCESSOR_AUTHORIZED`
+Status: `AUTHORIZED; IMPLEMENTATION_ACTIVE; NOT_FROZEN`
 
-## Completed execution topology
+## Ownership boundaries
 
-| Stream | Owned result | Terminal output | Verdict |
-|---|---|---|---|
-| Instrument/thesis | ten permanent identities, two clusters, unique evidence and Living Thesis Lite | complete heterogeneous review set | PASS |
-| Allocation | competition across all ten, funded set, changed targets, residual cash | deterministic initial and transition decisions | PASS |
-| Execution/accounting | BUY, SELL/REDUCE, orders, fills, costs, positions, cash, NAV | exact book with zero unexplained residual | PASS |
-| Persistence/replay | atomic envelope, restart/reopen, replay, idempotence, correction lineage | verified persisted workspace and certification chain | PASS |
-| Product | review, confirm, no-change, transition, changed-why | fresh-process Streamlit operator flow | PASS |
-| Integrator | focused gates, hosted parity, full failset, terminal evidence | certified candidate `0d15e9c` | PASS |
+| Logical stream | Owned result | Current state |
+|---|---|---|
+| Scenario and thesis | declarative retained 10- and new 25-security identities, evidence, reviews, observations | implemented; focused tests green |
+| Allocation | dynamic competition over all scenario identities and selected-funded authority | implemented; 10/25 tests green |
+| Execution/accounting | exact target-delta BUY/SELL execution and reconciled book | reused shared primitives; green |
+| Persistence/replay | one scenario-bound envelope, restart, certification, correction | implemented through shared storage; green |
+| Product/UI | dynamic summary-first and exceptions-first four-action flow | implemented through one app/view; AppTests green |
+| Integrator | path ownership, CI, context, pre-freeze evidence, candidate freeze | active; terminal gates open |
 
-## Terminal coordination law
+These are logical boundaries, not a requirement for six workers. Default execution is one implementer. Parallel work is permitted only for genuinely disjoint tasks after shared interfaces are fixed.
 
-- One product phase was active; it is now terminally closed.
-- No parallel or successor product phase is authorized.
-- Sessions, cells, runs, and slots cannot satisfy instrument-count acceptance.
-- Exact executable authority is candidate `0d15e9c`; the closure commit changes documentation only.
-- Pre-terminal score `52/100`; terminal accepted score `62/100`.
+## Coordination law
+
+- Checkpoint genericization has no independent acceptance status.
+- The first admissible proof is the 25-security scenario running through the same path while the retained ten-security regression remains green.
+- One engine, persistence implementation, schema family, app, and view stack only.
+- Sessions, cells, runs, slots, and copied portfolios do not satisfy security breadth.
+- Focused tests run during implementation; terminal full comparison and independent A/B/C run once against one frozen candidate.
 - Limited Live remains closed.
-
-## Frozen seams
-
-`InstrumentId`, `EvidenceReferenceId`, `DecisionSnapshotId`, `PortfolioAimId`, `PortfolioBookEvent`, `OrderId`, `FillId`, `CertificationId`, classified cash buckets, declared decimal precision, and content-addressed workspace envelopes.
 
 ## Current bottleneck
 
-There is no remaining blocker for this terminal slice. The next bottleneck is an owner decision: select exactly one smallest user-visible product result, define quantitative acceptance and forbidden scope, and explicitly approve it. Until then, stop.
+Pre-freeze completeness: reconcile current authority, retain ownership/CI/dependency/evidence receipts, run broad local validation, and freeze exactly one candidate. Hosted exact-head and independent terminal review have not started.

@@ -1,10 +1,10 @@
-"""One real deterministic ten-instrument operated portfolio product slice.
+"""One scalable deterministic operated-portfolio engine.
 
-GV-OPERATED-PORTFOLIO-10-TRANSITION-1R owns one portfolio book across review,
-initial funding, a justified no-change observation, one authorized economic
-transition, exact replay, correction lineage, and changed-why explanation.
-It is paper-only and has no provider, broker, network, alpha, or live-capital
-path.
+The same domain path executes the retained ten-security regression scenario and
+the 25-security Portfolio Scale product scenario. Scenario data is declarative;
+books, execution, replay, certification, correction, and validation remain one
+shared authority path. The engine is paper-only and has no provider, broker,
+network, alpha, or live-capital path.
 """
 
 from __future__ import annotations
@@ -25,6 +25,11 @@ from gv_portfolio_v0.execution import (
     portfolio_book_event,
     validate_trade_chain,
 )
+from gv_portfolio_v0.operated_scenarios import (
+    DEFAULT_SCENARIO_ID,
+    get_scenario,
+    scenario_hash,
+)
 from gv_portfolio_v0.replay import (
     ReplayError,
     append_correction_and_recertify,
@@ -33,12 +38,6 @@ from gv_portfolio_v0.replay import (
     replay_idempotent,
 )
 
-ID_DOMAIN = "GV-OPERATED-PORTFOLIO-10"
-SCHEMA_VERSION = "gv_operated_portfolio_10_transition_1r_v2"
-FIXTURE_ID = "GV_OPERATED_PORTFOLIO_10_TRANSITION_1R"
-CLAIM_BOUNDARY = (
-    "Deterministic operated paper portfolio only; no alpha or live-capital claim."
-)
 AVAILABLE = "AVAILABLE"
 RESEARCH_RESERVE = "RESEARCH_RESERVE"
 
@@ -47,23 +46,12 @@ STATUS_FUNDED = "FUNDED_CERTIFIED"
 STATUS_NO_CHANGE = "OBSERVED_NO_CHANGE_CERTIFIED"
 STATUS_TRANSITION = "TRANSITION_CERTIFIED"
 STATUS_CORRECTED = "CORRECTED_CERTIFIED"
-
-STATUS_EXPLANATIONS = {
-    STATUS_DRAFT: (
-        "Ten distinct instruments and one portfolio aim await operator confirmation."
-    ),
-    STATUS_FUNDED: (
-        "The operator confirmed one portfolio; four positions were funded and residual cash remained classified."
-    ),
-    STATUS_NO_CHANGE: (
-        "A later observation was admitted but did not cross a transition threshold, so holdings and cash were preserved."
-    ),
-    STATUS_TRANSITION: (
-        "A later observation weakened Harbor and strengthened Meridian; Harbor was reduced and Meridian was funded."
-    ),
-    STATUS_CORRECTED: (
-        "A non-economic annotation was corrected append-only; portfolio economics and prior certifications remained stable."
-    ),
+STATUSES = {
+    STATUS_DRAFT,
+    STATUS_FUNDED,
+    STATUS_NO_CHANGE,
+    STATUS_TRANSITION,
+    STATUS_CORRECTED,
 }
 
 
@@ -71,202 +59,257 @@ class OperatedPortfolioError(ValueError):
     """Fail-closed operated-portfolio error."""
 
 
-def _identifier(kind: str, payload: Mapping[str, Any]) -> str:
-    return f"{kind}_" + domain_hash(f"{ID_DOMAIN}:{kind}:V1", dict(payload))
+def _load_scenario(scenario_id: str) -> dict[str, Any]:
+    try:
+        return get_scenario(scenario_id)
+    except ValueError as exc:
+        raise OperatedPortfolioError(str(exc)) from exc
 
 
-def _record(kind: str, id_key: str, payload: Mapping[str, Any]) -> dict[str, Any]:
+def _workspace_scenario(workspace: Mapping[str, Any]) -> dict[str, Any]:
+    scenario_id = workspace.get("scenario_id")
+    if not isinstance(scenario_id, str):
+        raise OperatedPortfolioError("WORKSPACE_SCENARIO_REQUIRED")
+    scenario = _load_scenario(scenario_id)
+    if workspace.get("scenario_hash") != scenario_hash(scenario):
+        raise OperatedPortfolioError("WORKSPACE_SCENARIO_HASH_MISMATCH")
+    return scenario
+
+
+def _identifier(
+    scenario: Mapping[str, Any], kind: str, payload: Mapping[str, Any]
+) -> str:
+    return f"{kind}_" + domain_hash(
+        f"{scenario['id_domain']}:{kind}:V1", dict(payload)
+    )
+
+
+def _record(
+    scenario: Mapping[str, Any],
+    kind: str,
+    id_key: str,
+    payload: Mapping[str, Any],
+) -> dict[str, Any]:
     body = dict(payload)
-    return {id_key: _identifier(kind, body), **body}
+    return {id_key: _identifier(scenario, kind, body), **body}
 
 
-def _verify_id(record: Mapping[str, Any], *, kind: str, id_key: str) -> None:
+def _verify_id(
+    scenario: Mapping[str, Any],
+    record: Mapping[str, Any],
+    *,
+    kind: str,
+    id_key: str,
+) -> None:
     body = {key: value for key, value in record.items() if key != id_key}
-    if record.get(id_key) != _identifier(kind, body):
+    if record.get(id_key) != _identifier(scenario, kind, body):
         raise OperatedPortfolioError(f"IDENTITY_MISMATCH:{id_key}")
 
 
 def _instrument(
-    permanent_key: str,
-    symbol: str,
-    name: str,
-    cluster: str,
+    scenario: Mapping[str, Any], specification: Mapping[str, Any]
 ) -> dict[str, Any]:
     identity = {
         "namespace": "GV_SYNTHETIC_PERMANENT_V1",
-        "permanent_key": permanent_key,
+        "permanent_key": specification["permanent_key"],
         "security_class": "COMMON_STOCK",
     }
     return {
-        "instrument_id": _identifier("INS", identity),
+        "instrument_id": _identifier(scenario, "INS", identity),
         **identity,
-        "symbol": symbol,
-        "name": name,
-        "economic_cluster": cluster,
+        "symbol": specification["symbol"],
+        "name": specification["name"],
+        "economic_cluster": specification["economic_cluster"],
     }
 
 
-def instrument_registry() -> list[dict[str, Any]]:
-    """Return exactly ten permanent identities across two economic clusters."""
-
-    return [
-        _instrument("ISSUER:NORTHSTAR:COMMON", "NSTAR", "Northstar Systems", "DIGITAL_INFRASTRUCTURE"),
-        _instrument("ISSUER:HARBOR:COMMON", "HARBOR", "Harbor Automation", "DIGITAL_INFRASTRUCTURE"),
-        _instrument("ISSUER:ORBIT:COMMON", "ORBIT", "Orbit Networks", "DIGITAL_INFRASTRUCTURE"),
-        _instrument("ISSUER:QUANTA:COMMON", "QUANTA", "Quanta Compute", "DIGITAL_INFRASTRUCTURE"),
-        _instrument("ISSUER:MESH:COMMON", "MESH", "Mesh Security", "DIGITAL_INFRASTRUCTURE"),
-        _instrument("ISSUER:ATLAS:COMMON", "ATLAS", "Atlas Logistics", "REAL_ECONOMY"),
-        _instrument("ISSUER:VITAL:COMMON", "VITAL", "Vital Diagnostics", "REAL_ECONOMY"),
-        _instrument("ISSUER:MERIDIAN:COMMON", "MERID", "Meridian Components", "REAL_ECONOMY"),
-        _instrument("ISSUER:FOUNDRY:COMMON", "FNDRY", "Foundry Materials", "REAL_ECONOMY"),
-        _instrument("ISSUER:AGRI:COMMON", "AGRI", "Agri Inputs", "REAL_ECONOMY"),
-    ]
+def instrument_registry(
+    scenario_id: str = DEFAULT_SCENARIO_ID,
+) -> list[dict[str, Any]]:
+    scenario = _load_scenario(scenario_id)
+    return [_instrument(scenario, row) for row in scenario["instruments"]]
 
 
 def _evidence(
-    *, content: str, locator: str, observed_at: str
+    scenario: Mapping[str, Any],
+    *,
+    content: str,
+    locator: str,
+    observed_at: str,
+    owned_instrument_ids: Iterable[str],
 ) -> dict[str, Any]:
+    owners = sorted(str(value) for value in owned_instrument_ids)
     content_sha256 = hashlib.sha256(content.encode("utf-8")).hexdigest()
     identity = {
         "content_sha256": content_sha256,
         "media_type": "text/plain",
         "locator": locator,
         "observed_at": observed_at,
+        "owned_instrument_ids": owners,
     }
     return {
-        "evidence_reference_id": _identifier("EVD", identity),
+        "evidence_reference_id": _identifier(scenario, "EVD", identity),
         **identity,
         "content": content,
     }
 
 
-def _initial_evidence() -> list[dict[str, Any]]:
-    rows = [
-        ("NSTAR", "Recurring platform renewals remain above the principal-thesis floor.", "renewals"),
-        ("HARBOR", "Automation backlog supports near-term cash conversion but concentration risk remains.", "backlog"),
-        ("ORBIT", "Network bookings improved, but customer concentration evidence is incomplete.", "bookings"),
-        ("QUANTA", "Compute demand is strong while power availability constrains the bull case.", "power"),
-        ("MESH", "Security growth does not offset a mandate-breaking leverage ratio.", "leverage"),
-        ("ATLAS", "Freight utilization and contract repricing support resilient base economics.", "utilization"),
-        ("VITAL", "Diagnostic consumables produce stable recurring demand and low balance-sheet risk.", "consumables"),
-        ("MERID", "Component qualification is progressing, but the initial order evidence is not yet decisive.", "qualification"),
-        ("FNDRY", "Materials spreads normalized and remain below the capital-entry threshold.", "spreads"),
-        ("AGRI", "Input-volume recovery is offset by adverse working-capital intensity.", "working-capital"),
-    ]
-    return [
-        _evidence(
-            content=content,
-            locator=f"fixture://operated-10/{symbol.lower()}/{slug}-v1",
-            observed_at=f"2026-07-21T12:{index:02d}:00.000000Z",
+def _initial_evidence(
+    scenario: Mapping[str, Any], instruments: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for index, (specification, instrument) in enumerate(
+        zip(scenario["instruments"], instruments, strict=True)
+    ):
+        rows.append(
+            _evidence(
+                scenario,
+                content=specification["evidence_content"],
+                locator=(
+                    f"fixture://{scenario['fixture_namespace']}/"
+                    f"{specification['symbol'].lower()}/"
+                    f"{specification['evidence_slug']}-v1"
+                ),
+                observed_at=f"{scenario['timeline']['cash_opened_at'][:11]}12:{index:02d}:00.000000Z",
+                owned_instrument_ids=[instrument["instrument_id"]],
+            )
         )
-        for index, (symbol, content, slug) in enumerate(rows)
-    ]
+    return rows
 
 
-def _no_change_evidence() -> dict[str, Any]:
+def _no_change_evidence(
+    scenario: Mapping[str, Any], instruments: list[dict[str, Any]]
+) -> dict[str, Any]:
+    by_symbol = {row["symbol"]: row for row in instruments}
+    config = scenario["no_change"]
     return _evidence(
-        content="Northstar renewal movement remained inside the declared watch band; no score crossed a funding threshold.",
-        locator="fixture://operated-10/nstar/no-change-v1",
-        observed_at="2026-08-05T12:00:00.000000Z",
+        scenario,
+        content=config["content"],
+        locator=config["locator"],
+        observed_at=config["observed_at"],
+        owned_instrument_ids=[by_symbol[config["instrument_symbol"]]["instrument_id"]],
     )
 
 
-def _transition_evidence() -> dict[str, Any]:
+def _transition_evidence(
+    scenario: Mapping[str, Any], instruments: list[dict[str, Any]]
+) -> dict[str, Any]:
+    by_symbol = {row["symbol"]: row for row in instruments}
+    config = scenario["transition"]
     return _evidence(
-        content="Harbor backlog quality weakened below its funding band while Meridian qualification converted into a firm order.",
-        locator="fixture://operated-10/harbor-meridian/transition-v1",
-        observed_at="2026-08-20T12:00:00.000000Z",
+        scenario,
+        content=config["content"],
+        locator=config["locator"],
+        observed_at=config["observed_at"],
+        owned_instrument_ids=[
+            by_symbol[symbol]["instrument_id"]
+            for symbol in config["review_updates"]
+        ],
     )
+
+
+def _thesis(
+    scenario: Mapping[str, Any],
+    *,
+    instrument_id: str,
+    principal_claim: str,
+    evidence_reference_ids: list[str],
+    hard_falsifiers: list[str],
+    watch_conditions: list[str],
+) -> dict[str, Any]:
+    payload = {
+        "instrument_id": instrument_id,
+        "principal_claim": principal_claim,
+        "evidence_reference_ids": list(evidence_reference_ids),
+        "hard_falsifiers": list(hard_falsifiers),
+        "watch_conditions": list(watch_conditions),
+    }
+    return {
+        "thesis_id": _identifier(scenario, "THS", payload),
+        **payload,
+    }
 
 
 def _initial_reviews(
-    instruments: list[dict[str, Any]], evidence: list[dict[str, Any]]
+    scenario: Mapping[str, Any],
+    instruments: list[dict[str, Any]],
+    evidence: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    specifications = {
-        "NSTAR": ("ADMIT", 620, "Renewal durability supports a funded principal position.", "20", "25"),
-        "HARBOR": ("ADMIT", 560, "Backlog quality supports a bounded funded position.", "10", "40"),
-        "ORBIT": ("ABSTAIN", 300, "Concentration evidence is insufficient for commitment.", "0", "35"),
-        "QUANTA": ("ABSTAIN", 250, "Power constraints keep the thesis observable but unfunded.", "0", "60"),
-        "MESH": ("REJECT", 180, "Leverage violates the mandate screen.", "0", "20"),
-        "ATLAS": ("ADMIT", 540, "Contract repricing supports a funded real-economy position.", "15", "30"),
-        "VITAL": ("ADMIT", 520, "Recurring consumables support a funded defensive position.", "12", "50"),
-        "MERID": ("ADMIT", 470, "Qualification progress makes Meridian eligible but initially unfunded.", "0", "30"),
-        "FNDRY": ("ABSTAIN", 350, "Normalized spreads remain below entry threshold.", "0", "45"),
-        "AGRI": ("REJECT", 220, "Working-capital intensity blocks admission.", "0", "25"),
-    }
-    evidence_by_symbol = {
-        instrument["symbol"]: evidence_row
-        for instrument, evidence_row in zip(instruments, evidence, strict=True)
-    }
     rows: list[dict[str, Any]] = []
-    for instrument in instruments:
-        outcome, score, thesis, target_quantity, price = specifications[instrument["symbol"]]
-        evidence_row = evidence_by_symbol[instrument["symbol"]]
+    for specification, instrument, evidence_row in zip(
+        scenario["instruments"], instruments, evidence, strict=True
+    ):
         rows.append(
             {
                 "instrument_id": instrument["instrument_id"],
                 "symbol": instrument["symbol"],
                 "economic_cluster": instrument["economic_cluster"],
-                "outcome": outcome,
-                "net_score_bps": score,
-                "target_quantity": target_quantity,
-                "reference_price": price,
-                "living_thesis_lite": {
-                    "principal_claim": thesis,
-                    "evidence_reference_ids": [
+                "outcome": specification["outcome"],
+                "net_score_bps": specification["net_score_bps"],
+                "target_quantity": specification["target_quantity"],
+                "reference_price": specification["reference_price"],
+                "living_thesis_lite": _thesis(
+                    scenario,
+                    instrument_id=instrument["instrument_id"],
+                    principal_claim=specification["principal_claim"],
+                    evidence_reference_ids=[
                         evidence_row["evidence_reference_id"]
                     ],
-                    "hard_falsifiers": [f"{instrument['symbol'].lower()}_hard_falsifier"],
-                    "watch_conditions": [f"{instrument['symbol'].lower()}_watch_condition"],
-                },
+                    hard_falsifiers=specification["hard_falsifiers"],
+                    watch_conditions=specification["watch_conditions"],
+                ),
             }
         )
     return rows
 
 
 def _expected_reviews_for_status(
+    scenario: Mapping[str, Any],
     *,
     status: str,
     instruments: list[dict[str, Any]],
     initial_evidence: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    reviews = _initial_reviews(instruments, initial_evidence)
+    reviews = _initial_reviews(scenario, instruments, initial_evidence)
     if status not in {STATUS_TRANSITION, STATUS_CORRECTED}:
         return reviews
-    transition_evidence_id = _transition_evidence()["evidence_reference_id"]
+    transition_evidence_id = _transition_evidence(
+        scenario, instruments
+    )["evidence_reference_id"]
     for review in reviews:
-        if review["symbol"] == "HARBOR":
-            review["net_score_bps"] = 260
-            review["target_quantity"] = "6"
-            review["living_thesis_lite"]["principal_claim"] = (
-                "Backlog quality weakened; retain only a reduced monitoring position."
-            )
-            review["living_thesis_lite"]["evidence_reference_ids"].append(
-                transition_evidence_id
-            )
-        elif review["symbol"] == "MERID":
-            review["net_score_bps"] = 590
-            review["target_quantity"] = "5"
-            review["living_thesis_lite"]["principal_claim"] = (
-                "A firm qualification order now supports bounded funding."
-            )
-            review["living_thesis_lite"]["evidence_reference_ids"].append(
-                transition_evidence_id
-            )
+        update = scenario["transition"]["review_updates"].get(review["symbol"])
+        if update is None:
+            continue
+        old_thesis = review["living_thesis_lite"]
+        review["net_score_bps"] = update["net_score_bps"]
+        review["target_quantity"] = update["target_quantity"]
+        review["living_thesis_lite"] = _thesis(
+            scenario,
+            instrument_id=review["instrument_id"],
+            principal_claim=update["principal_claim"],
+            evidence_reference_ids=[
+                *old_thesis["evidence_reference_ids"],
+                transition_evidence_id,
+            ],
+            hard_falsifiers=old_thesis["hard_falsifiers"],
+            watch_conditions=old_thesis["watch_conditions"],
+        )
     return reviews
 
 
-def _portfolio_aim() -> dict[str, Any]:
+def _portfolio_aim(scenario: Mapping[str, Any]) -> dict[str, Any]:
+    config = scenario["portfolio_aim"]
     return _record(
+        scenario,
         "AIM",
         "portfolio_aim_id",
         {
-            "objective": "Operate one diversified paper portfolio with explicit residual liquidity.",
-            "instrument_count": 10,
-            "minimum_funded_positions": 3,
-            "minimum_total_cash_bps": 1000,
-            "allowed_actions": ["BUY", "SELL", "REDUCE", "HOLD", "CASH"],
-            "effective_at": "2026-07-22T09:00:00.000000Z",
+            "objective": config["objective"],
+            "instrument_count": len(scenario["instruments"]),
+            "minimum_funded_positions": scenario["minimum_funded_positions"],
+            "minimum_total_cash_bps": scenario["minimum_total_cash_bps"],
+            "allowed_actions": config["allowed_actions"],
+            "effective_at": config["effective_at"],
         },
     )
 
@@ -302,6 +345,7 @@ def _selected_funded_ids(candidates: Iterable[Mapping[str, Any]]) -> list[str]:
 
 
 def _decision_snapshot(
+    scenario: Mapping[str, Any],
     *,
     aim_id: str,
     reviews: Iterable[Mapping[str, Any]],
@@ -320,7 +364,7 @@ def _decision_snapshot(
             "selected_funded_instrument_ids": _selected_funded_ids(candidates),
         },
     }
-    return _record("DSN", "decision_snapshot_id", payload)
+    return _record(scenario, "DSN", "decision_snapshot_id", payload)
 
 
 def _event(
@@ -352,6 +396,10 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
         return build_portfolio_book(events)
     except PortfolioBookError as exc:
         raise OperatedPortfolioError(str(exc)) from exc
+
+
+def _minute_timestamp(anchor: str, minute: int, second: int = 0) -> str:
+    return f"{anchor[:13]}:{minute:02d}:{second:02d}.000000Z"
 
 
 def _append_certification(
@@ -387,41 +435,41 @@ def _append_certification(
     workspace["book"] = _reduce(workspace["events"])
 
 
-def build_draft_workspace() -> dict[str, Any]:
-    instruments = instrument_registry()
-    evidence = _initial_evidence()
-    reviews = _initial_reviews(instruments, evidence)
-    aim = _portfolio_aim()
+def build_draft_workspace(
+    scenario_id: str = DEFAULT_SCENARIO_ID,
+) -> dict[str, Any]:
+    scenario = _load_scenario(scenario_id)
+    instruments = instrument_registry(scenario_id)
+    evidence = _initial_evidence(scenario, instruments)
+    reviews = _initial_reviews(scenario, instruments, evidence)
+    aim = _portfolio_aim(scenario)
     snapshot = _decision_snapshot(
+        scenario,
         aim_id=aim["portfolio_aim_id"],
         reviews=reviews,
-        created_at="2026-07-22T09:05:00.000000Z",
-        reason="INITIAL_CAPITAL_COMPETITION",
+        created_at=scenario["timeline"]["initial_decision_at"],
+        reason=scenario["initial_decision_reason"],
     )
-    events = [
-        _event(
-            0,
-            "CASH_OPENING",
-            "2026-07-22T08:55:00.000000Z",
-            "OPERATED10:CASH:AVAILABLE",
-            cash_bucket=AVAILABLE,
-            payload={"amount": "4500"},
-        ),
-        _event(
-            1,
-            "CASH_OPENING",
-            "2026-07-22T08:55:00.000000Z",
-            "OPERATED10:CASH:RESEARCH_RESERVE",
-            cash_bucket=RESEARCH_RESERVE,
-            payload={"amount": "500"},
-        ),
-    ]
+    events: list[dict[str, Any]] = []
+    for opening in scenario["cash_openings"]:
+        events.append(
+            _event(
+                len(events),
+                "CASH_OPENING",
+                scenario["timeline"]["cash_opened_at"],
+                f"{scenario['id_domain']}:CASH:{opening['bucket']}",
+                cash_bucket=opening["bucket"],
+                payload={"amount": opening["amount"]},
+            )
+        )
     workspace = {
-        "schema_version": SCHEMA_VERSION,
-        "fixture_id": FIXTURE_ID,
-        "claim_boundary": CLAIM_BOUNDARY,
+        "schema_version": scenario["schema_version"],
+        "fixture_id": scenario["scenario_id"],
+        "scenario_id": scenario["scenario_id"],
+        "scenario_hash": scenario_hash(scenario),
+        "claim_boundary": scenario["claim_boundary"],
         "status": STATUS_DRAFT,
-        "explanation": STATUS_EXPLANATIONS[STATUS_DRAFT],
+        "explanation": scenario["status_explanations"][STATUS_DRAFT],
         "portfolio_count": 1,
         "instruments": instruments,
         "evidence_references": evidence,
@@ -507,12 +555,13 @@ def confirm_initial_portfolio(workspace: Mapping[str, Any]) -> dict[str, Any]:
     validate_workspace(workspace, allow_draft=True)
     if workspace["status"] != STATUS_DRAFT:
         raise OperatedPortfolioError("DRAFT_CONFIRMATION_REQUIRED")
+    scenario = _workspace_scenario(workspace)
     result = deepcopy(dict(workspace))
     result["events"].append(
         _event(
             len(result["events"]),
             "PORTFOLIO_AIM_CONFIRMED",
-            "2026-07-22T09:05:30.000000Z",
+            scenario["timeline"]["aim_confirmed_at"],
             result["portfolio_aim"]["portfolio_aim_id"],
             payload={
                 "decision_snapshot_id": result["current_decision_snapshot"][
@@ -545,11 +594,12 @@ def confirm_initial_portfolio(workspace: Mapping[str, Any]) -> dict[str, Any]:
     transition = _append_transition_event(
         result,
         transition_kind="INITIAL_FUNDING",
-        effective_at="2026-07-22T09:06:00.000000Z",
+        effective_at=scenario["timeline"]["initial_transition_at"],
         legs=legs,
     )
+    start_minute = int(scenario["timeline"]["initial_order_start_minute"])
     for index, row in enumerate(funded_reviews):
-        minute = 7 + index
+        minute = start_minute + index
         _append_trade(
             result,
             transition_event_id=transition["event_id"],
@@ -558,21 +608,27 @@ def confirm_initial_portfolio(workspace: Mapping[str, Any]) -> dict[str, Any]:
             quantity=row["target_quantity"],
             price=row["reference_price"],
             fee="2",
-            order_created_at=f"2026-07-22T09:{minute:02d}:00.000000Z",
-            filled_at=f"2026-07-22T09:{minute:02d}:01.000000Z",
+            order_created_at=_minute_timestamp(
+                scenario["timeline"]["initial_transition_at"], minute
+            ),
+            filled_at=_minute_timestamp(
+                scenario["timeline"]["initial_transition_at"], minute, 1
+            ),
         )
     result["book"] = _reduce(result["events"])
     result["status"] = STATUS_FUNDED
-    result["explanation"] = STATUS_EXPLANATIONS[STATUS_FUNDED]
+    result["explanation"] = scenario["status_explanations"][STATUS_FUNDED]
     result["changed_why"] = {
         "change_type": "INITIAL_FUNDING",
-        "reason": "The four highest-scoring eligible instruments received capital; residual cash remained explicit.",
+        "reason": scenario["initial_changed_why_reason"],
         "funded_symbols": [row["symbol"] for row in funded_reviews],
-        "position_count_after": 4,
+        "position_count_after": len(funded_reviews),
         "cash_after": result["book"]["total_cash"],
         "costs_after": result["book"]["total_costs"],
     }
-    _append_certification(result, effective_at="2026-07-22T09:12:00.000000Z")
+    _append_certification(
+        result, effective_at=scenario["timeline"]["initial_certified_at"]
+    )
     validate_workspace(result)
     return result
 
@@ -581,17 +637,20 @@ def admit_no_change_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
     validate_workspace(workspace)
     if workspace["status"] != STATUS_FUNDED:
         raise OperatedPortfolioError("FUNDED_WORKSPACE_REQUIRED")
+    scenario = _workspace_scenario(workspace)
     result = deepcopy(dict(workspace))
     prior_book = canonical_document_bytes(result["book"])
-    observation = _no_change_evidence()
+    observation = _no_change_evidence(scenario, result["instruments"])
     result["evidence_references"].append(observation)
+    instrument_id = observation["owned_instrument_ids"][0]
     observation_record = _record(
+        scenario,
         "OBS",
         "observation_id",
         {
             "evidence_reference_id": observation["evidence_reference_id"],
             "disposition": "AIM_UNCHANGED_NO_TRANSITION",
-            "instrument_id": result["instruments"][0]["instrument_id"],
+            "instrument_id": instrument_id,
             "threshold_crossed": False,
             "observed_at": observation["observed_at"],
         },
@@ -603,7 +662,7 @@ def admit_no_change_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
             "LATER_OBSERVATION_ADMITTED",
             observation["observed_at"],
             observation_record["observation_id"],
-            instrument_id=observation_record["instrument_id"],
+            instrument_id=instrument_id,
             payload=dict(observation_record),
         )
     )
@@ -611,72 +670,83 @@ def admit_no_change_observation(workspace: Mapping[str, Any]) -> dict[str, Any]:
     if canonical_document_bytes(result["book"]) != prior_book:
         raise OperatedPortfolioError("NO_CHANGE_OBSERVATION_CHANGED_BOOK")
     result["status"] = STATUS_NO_CHANGE
-    result["explanation"] = STATUS_EXPLANATIONS[STATUS_NO_CHANGE]
+    result["explanation"] = scenario["status_explanations"][STATUS_NO_CHANGE]
     result["changed_why"] = {
         "change_type": "NO_CHANGE",
-        "reason": "The observation stayed inside the watch band; no hard falsifier or funding threshold fired.",
+        "reason": scenario["no_change"]["reason"],
         "holdings_changed": False,
         "cash_changed": False,
         "orders_created": 0,
     }
-    _append_certification(result, effective_at="2026-08-05T12:01:00.000000Z")
+    _append_certification(
+        result, effective_at=scenario["timeline"]["no_change_certified_at"]
+    )
     validate_workspace(result)
     return result
+
+
+def _transition_legs_from_reviews(
+    instruments: list[dict[str, Any]],
+    before_reviews: list[dict[str, Any]],
+    after_reviews: list[dict[str, Any]],
+) -> list[dict[str, str]]:
+    before_by_id = {row["instrument_id"]: row for row in before_reviews}
+    after_by_id = {row["instrument_id"]: row for row in after_reviews}
+    legs: list[dict[str, str]] = []
+    for instrument in instruments:
+        instrument_id = instrument["instrument_id"]
+        before = int(before_by_id[instrument_id]["target_quantity"])
+        after = int(after_by_id[instrument_id]["target_quantity"])
+        delta = after - before
+        if delta == 0:
+            continue
+        legs.append(
+            {
+                "instrument_id": instrument_id,
+                "side": "BUY" if delta > 0 else "SELL",
+                "quantity": str(abs(delta)),
+                "reference_price": after_by_id[instrument_id]["reference_price"],
+            }
+        )
+    return sorted(legs, key=lambda row: (0 if row["side"] == "SELL" else 1))
 
 
 def authorize_portfolio_transition(workspace: Mapping[str, Any]) -> dict[str, Any]:
     validate_workspace(workspace)
     if workspace["status"] != STATUS_NO_CHANGE:
         raise OperatedPortfolioError("NO_CHANGE_OBSERVATION_REQUIRED_BEFORE_TRANSITION")
+    scenario = _workspace_scenario(workspace)
     result = deepcopy(dict(workspace))
-    by_symbol = {row["symbol"]: row for row in result["instruments"]}
-    observation = _transition_evidence()
+    instruments = result["instruments"]
+    before_reviews = deepcopy(result["reviews"])
+    observation = _transition_evidence(scenario, instruments)
     result["evidence_references"].append(observation)
-
-    updated_reviews = deepcopy(result["reviews"])
-    before_scores: dict[str, int] = {}
-    after_scores: dict[str, int] = {}
-    for review in updated_reviews:
-        symbol = review["symbol"]
-        before_scores[symbol] = int(review["net_score_bps"])
-        if symbol == "HARBOR":
-            review["net_score_bps"] = 260
-            review["target_quantity"] = "6"
-            review["living_thesis_lite"]["principal_claim"] = (
-                "Backlog quality weakened; retain only a reduced monitoring position."
-            )
-            review["living_thesis_lite"]["evidence_reference_ids"].append(
-                observation["evidence_reference_id"]
-            )
-        elif symbol == "MERID":
-            review["net_score_bps"] = 590
-            review["target_quantity"] = "5"
-            review["living_thesis_lite"]["principal_claim"] = (
-                "A firm qualification order now supports bounded funding."
-            )
-            review["living_thesis_lite"]["evidence_reference_ids"].append(
-                observation["evidence_reference_id"]
-            )
-        after_scores[symbol] = int(review["net_score_bps"])
+    initial_evidence = result["evidence_references"][: len(instruments)]
+    updated_reviews = _expected_reviews_for_status(
+        scenario,
+        status=STATUS_TRANSITION,
+        instruments=instruments,
+        initial_evidence=initial_evidence,
+    )
     result["reviews"] = updated_reviews
     transition_snapshot = _decision_snapshot(
+        scenario,
         aim_id=result["portfolio_aim"]["portfolio_aim_id"],
         reviews=updated_reviews,
-        created_at="2026-08-20T12:01:00.000000Z",
-        reason="AUTHORIZED_HARBOR_TO_MERIDIAN_TRANSITION",
+        created_at=scenario["timeline"]["transition_decision_at"],
+        reason=scenario["transition"]["decision_reason"],
     )
     result["decision_snapshots"].append(transition_snapshot)
     result["current_decision_snapshot"] = transition_snapshot
+    affected_ids = list(observation["owned_instrument_ids"])
     observation_record = _record(
+        scenario,
         "OBS",
         "observation_id",
         {
             "evidence_reference_id": observation["evidence_reference_id"],
             "disposition": "AUTHORIZED_TRANSITION",
-            "instrument_ids": [
-                by_symbol["HARBOR"]["instrument_id"],
-                by_symbol["MERID"]["instrument_id"],
-            ],
+            "instrument_ids": affected_ids,
             "threshold_crossed": True,
             "observed_at": observation["observed_at"],
             "decision_snapshot_id": transition_snapshot["decision_snapshot_id"],
@@ -692,73 +762,68 @@ def authorize_portfolio_transition(workspace: Mapping[str, Any]) -> dict[str, An
             payload=dict(observation_record),
         )
     )
-    legs = [
-        {
-            "instrument_id": by_symbol["HARBOR"]["instrument_id"],
-            "side": "SELL",
-            "quantity": "4",
-            "reference_price": "40",
-        },
-        {
-            "instrument_id": by_symbol["MERID"]["instrument_id"],
-            "side": "BUY",
-            "quantity": "5",
-            "reference_price": "30",
-        },
-    ]
+    legs = _transition_legs_from_reviews(
+        instruments, before_reviews, updated_reviews
+    )
+    if not any(row["side"] == "SELL" for row in legs):
+        raise OperatedPortfolioError("TRANSITION_SELL_REQUIRED")
+    if not any(row["side"] == "BUY" for row in legs):
+        raise OperatedPortfolioError("TRANSITION_BUY_REQUIRED")
     transition = _append_transition_event(
         result,
-        transition_kind="REDUCE_AND_FUND",
-        effective_at="2026-08-20T12:02:00.000000Z",
+        transition_kind=scenario["transition"]["transition_kind"],
+        effective_at=scenario["timeline"]["transition_planned_at"],
         legs=legs,
     )
-    _append_trade(
-        result,
-        transition_event_id=transition["event_id"],
-        instrument_id=by_symbol["HARBOR"]["instrument_id"],
-        side="SELL",
-        quantity="4",
-        price="40",
-        fee="2",
-        order_created_at="2026-08-20T12:03:00.000000Z",
-        filled_at="2026-08-20T12:03:01.000000Z",
-    )
-    _append_trade(
-        result,
-        transition_event_id=transition["event_id"],
-        instrument_id=by_symbol["MERID"]["instrument_id"],
-        side="BUY",
-        quantity="5",
-        price="30",
-        fee="2",
-        order_created_at="2026-08-20T12:04:00.000000Z",
-        filled_at="2026-08-20T12:04:01.000000Z",
-    )
+    start_minute = int(scenario["timeline"]["transition_order_start_minute"])
+    for index, leg in enumerate(legs):
+        minute = start_minute + index
+        _append_trade(
+            result,
+            transition_event_id=transition["event_id"],
+            instrument_id=leg["instrument_id"],
+            side=leg["side"],
+            quantity=leg["quantity"],
+            price=leg["reference_price"],
+            fee="2",
+            order_created_at=_minute_timestamp(
+                scenario["timeline"]["transition_planned_at"], minute
+            ),
+            filled_at=_minute_timestamp(
+                scenario["timeline"]["transition_planned_at"], minute, 1
+            ),
+        )
     result["book"] = _reduce(result["events"])
     result["status"] = STATUS_TRANSITION
-    result["explanation"] = STATUS_EXPLANATIONS[STATUS_TRANSITION]
+    result["explanation"] = scenario["status_explanations"][STATUS_TRANSITION]
+    initial_by_symbol = {row["symbol"]: row for row in before_reviews}
+    current_by_symbol = {row["symbol"]: row for row in updated_reviews}
+    reduced_symbol = scenario["transition"]["primary_reduced_symbol"]
+    funded_symbol = scenario["transition"]["primary_funded_symbol"]
     result["changed_why"] = {
         "change_type": "AUTHORIZED_TRANSITION",
-        "reason": "Harbor fell below its prior funding band while Meridian moved above the incremental-capital threshold.",
+        "reason": scenario["transition"]["reason"],
         "reduced": {
-            "symbol": "HARBOR",
-            "quantity_before": "10",
-            "quantity_after": "6",
-            "score_before_bps": before_scores["HARBOR"],
-            "score_after_bps": after_scores["HARBOR"],
+            "symbol": reduced_symbol,
+            "quantity_before": initial_by_symbol[reduced_symbol]["target_quantity"],
+            "quantity_after": current_by_symbol[reduced_symbol]["target_quantity"],
+            "score_before_bps": int(initial_by_symbol[reduced_symbol]["net_score_bps"]),
+            "score_after_bps": int(current_by_symbol[reduced_symbol]["net_score_bps"]),
         },
         "funded_or_increased": {
-            "symbol": "MERID",
-            "quantity_before": "0",
-            "quantity_after": "5",
-            "score_before_bps": before_scores["MERID"],
-            "score_after_bps": after_scores["MERID"],
+            "symbol": funded_symbol,
+            "quantity_before": initial_by_symbol[funded_symbol]["target_quantity"],
+            "quantity_after": current_by_symbol[funded_symbol]["target_quantity"],
+            "score_before_bps": int(initial_by_symbol[funded_symbol]["net_score_bps"]),
+            "score_after_bps": int(current_by_symbol[funded_symbol]["net_score_bps"]),
         },
         "cash_after": result["book"]["total_cash"],
         "total_costs_after": result["book"]["total_costs"],
         "unexplained_residual": result["book"]["unexplained_residual"],
     }
-    _append_certification(result, effective_at="2026-08-20T12:05:00.000000Z")
+    _append_certification(
+        result, effective_at=scenario["timeline"]["transition_certified_at"]
+    )
     validate_workspace(result)
     return result
 
@@ -769,6 +834,7 @@ def append_non_economic_correction(workspace: Mapping[str, Any]) -> dict[str, An
         raise OperatedPortfolioError("TRANSITION_CERTIFICATION_REQUIRED")
     if workspace["status"] == STATUS_CORRECTED:
         return deepcopy(dict(workspace))
+    scenario = _workspace_scenario(workspace)
     result = deepcopy(dict(workspace))
     prior = deepcopy(result["certification"])
     try:
@@ -777,15 +843,15 @@ def append_non_economic_correction(workspace: Mapping[str, Any]) -> dict[str, An
             prior_certification=prior,
             correction_payload={
                 "correction_kind": "ANNOTATION",
-                "reason": "Clarify that Meridian evidence is a firm qualification order, not a shipment.",
+                "reason": scenario["correction"]["reason"],
                 "details": {"economic_effect": "NONE"},
             },
             decision_snapshot_id=result["current_decision_snapshot"][
                 "decision_snapshot_id"
             ],
             portfolio_aim_id=result["portfolio_aim"]["portfolio_aim_id"],
-            effective_at="2026-08-20T12:06:00.000000Z",
-            source_identity="OPERATED10:CORRECTION:MERIDIAN-ANNOTATION",
+            effective_at=scenario["timeline"]["correction_at"],
+            source_identity=scenario["correction"]["source_identity"],
         )
     except ReplayError as exc:
         raise OperatedPortfolioError(f"CORRECTION_FAILED:{exc}") from exc
@@ -810,7 +876,7 @@ def append_non_economic_correction(workspace: Mapping[str, Any]) -> dict[str, An
         _event(
             len(result["events"]),
             "CERTIFICATION_RECORDED",
-            "2026-08-20T12:07:00.000000Z",
+            scenario["timeline"]["correction_recorded_at"],
             result["certification"]["certification_id"],
             payload={
                 "certification_id": result["certification"]["certification_id"]
@@ -819,7 +885,7 @@ def append_non_economic_correction(workspace: Mapping[str, Any]) -> dict[str, An
     )
     result["book"] = _reduce(result["events"])
     result["status"] = STATUS_CORRECTED
-    result["explanation"] = STATUS_EXPLANATIONS[STATUS_CORRECTED]
+    result["explanation"] = scenario["status_explanations"][STATUS_CORRECTED]
     validate_workspace(result)
     return result
 
@@ -828,13 +894,8 @@ def _funded_positions(book: Mapping[str, Any]) -> list[dict[str, Any]]:
     return [row for row in book["positions"] if int(row["quantity"]) > 0]
 
 
-def _initial_review_state(
-    instruments: list[dict[str, Any]], initial_evidence: list[dict[str, Any]]
-) -> list[dict[str, Any]]:
-    return _initial_reviews(instruments, initial_evidence)
-
-
 def _expected_snapshots(
+    scenario: Mapping[str, Any],
     *,
     status: str,
     aim_id: str,
@@ -842,22 +903,24 @@ def _expected_snapshots(
     initial_evidence: list[dict[str, Any]],
     current_reviews: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    initial_reviews = _initial_review_state(instruments, initial_evidence)
+    initial_reviews = _initial_reviews(scenario, instruments, initial_evidence)
     snapshots = [
         _decision_snapshot(
+            scenario,
             aim_id=aim_id,
             reviews=initial_reviews,
-            created_at="2026-07-22T09:05:00.000000Z",
-            reason="INITIAL_CAPITAL_COMPETITION",
+            created_at=scenario["timeline"]["initial_decision_at"],
+            reason=scenario["initial_decision_reason"],
         )
     ]
     if status in {STATUS_TRANSITION, STATUS_CORRECTED}:
         snapshots.append(
             _decision_snapshot(
+                scenario,
                 aim_id=aim_id,
                 reviews=current_reviews,
-                created_at="2026-08-20T12:01:00.000000Z",
-                reason="AUTHORIZED_HARBOR_TO_MERIDIAN_TRANSITION",
+                created_at=scenario["timeline"]["transition_decision_at"],
+                reason=scenario["transition"]["decision_reason"],
             )
         )
     return snapshots
@@ -894,30 +957,13 @@ def _expected_transition_legs(
         )
     ]
     if status in {STATUS_TRANSITION, STATUS_CORRECTED}:
-        current_by_id = {row["instrument_id"]: row for row in current_reviews}
-        rebalance_legs: list[dict[str, str]] = []
-        for instrument in instruments:
-            instrument_id = instrument["instrument_id"]
-            before = int(initial_by_id[instrument_id]["target_quantity"])
-            after = int(current_by_id[instrument_id]["target_quantity"])
-            delta = after - before
-            if delta == 0:
-                continue
-            rebalance_legs.append(
-                {
-                    "instrument_id": instrument_id,
-                    "side": "BUY" if delta > 0 else "SELL",
-                    "quantity": str(abs(delta)),
-                    "reference_price": current_by_id[instrument_id][
-                        "reference_price"
-                    ],
-                }
-            )
         expected.append(
             (
                 "REDUCE_AND_FUND",
                 snapshots[-1]["decision_snapshot_id"],
-                rebalance_legs,
+                _transition_legs_from_reviews(
+                    instruments, initial_reviews, current_reviews
+                ),
             )
         )
     return expected
@@ -949,6 +995,7 @@ def _execution_projections(
 
 
 def _expected_changed_why(
+    scenario: Mapping[str, Any],
     *,
     status: str,
     book: Mapping[str, Any],
@@ -959,7 +1006,6 @@ def _expected_changed_why(
 ) -> dict[str, Any] | None:
     if status == STATUS_DRAFT:
         return None
-    initial_by_id = {row["instrument_id"]: row for row in initial_reviews}
     symbol_by_id = {row["instrument_id"]: row["symbol"] for row in instruments}
     if status == STATUS_FUNDED:
         selected_ids = snapshots[0]["capital_competition"][
@@ -967,7 +1013,7 @@ def _expected_changed_why(
         ]
         return {
             "change_type": "INITIAL_FUNDING",
-            "reason": "The four highest-scoring eligible instruments received capital; residual cash remained explicit.",
+            "reason": scenario["initial_changed_why_reason"],
             "funded_symbols": [symbol_by_id[row] for row in selected_ids],
             "position_count_after": len(_funded_positions(book)),
             "cash_after": book["total_cash"],
@@ -976,31 +1022,31 @@ def _expected_changed_why(
     if status == STATUS_NO_CHANGE:
         return {
             "change_type": "NO_CHANGE",
-            "reason": "The observation stayed inside the watch band; no hard falsifier or funding threshold fired.",
+            "reason": scenario["no_change"]["reason"],
             "holdings_changed": False,
             "cash_changed": False,
             "orders_created": 0,
         }
-    current_by_id = {row["instrument_id"]: row for row in current_reviews}
-    by_symbol = {row["symbol"]: row["instrument_id"] for row in instruments}
-    harbor_id = by_symbol["HARBOR"]
-    meridian_id = by_symbol["MERID"]
+    initial_by_symbol = {row["symbol"]: row for row in initial_reviews}
+    current_by_symbol = {row["symbol"]: row for row in current_reviews}
+    reduced_symbol = scenario["transition"]["primary_reduced_symbol"]
+    funded_symbol = scenario["transition"]["primary_funded_symbol"]
     return {
         "change_type": "AUTHORIZED_TRANSITION",
-        "reason": "Harbor fell below its prior funding band while Meridian moved above the incremental-capital threshold.",
+        "reason": scenario["transition"]["reason"],
         "reduced": {
-            "symbol": "HARBOR",
-            "quantity_before": initial_by_id[harbor_id]["target_quantity"],
-            "quantity_after": current_by_id[harbor_id]["target_quantity"],
-            "score_before_bps": int(initial_by_id[harbor_id]["net_score_bps"]),
-            "score_after_bps": int(current_by_id[harbor_id]["net_score_bps"]),
+            "symbol": reduced_symbol,
+            "quantity_before": initial_by_symbol[reduced_symbol]["target_quantity"],
+            "quantity_after": current_by_symbol[reduced_symbol]["target_quantity"],
+            "score_before_bps": int(initial_by_symbol[reduced_symbol]["net_score_bps"]),
+            "score_after_bps": int(current_by_symbol[reduced_symbol]["net_score_bps"]),
         },
         "funded_or_increased": {
-            "symbol": "MERID",
-            "quantity_before": initial_by_id[meridian_id]["target_quantity"],
-            "quantity_after": current_by_id[meridian_id]["target_quantity"],
-            "score_before_bps": int(initial_by_id[meridian_id]["net_score_bps"]),
-            "score_after_bps": int(current_by_id[meridian_id]["net_score_bps"]),
+            "symbol": funded_symbol,
+            "quantity_before": initial_by_symbol[funded_symbol]["target_quantity"],
+            "quantity_after": current_by_symbol[funded_symbol]["target_quantity"],
+            "score_before_bps": int(initial_by_symbol[funded_symbol]["net_score_bps"]),
+            "score_after_bps": int(current_by_symbol[funded_symbol]["net_score_bps"]),
         },
         "cash_after": book["total_cash"],
         "total_costs_after": book["total_costs"],
@@ -1057,30 +1103,36 @@ def _validate_certification_lineage(
 def validate_workspace(
     workspace: Mapping[str, Any], *, allow_draft: bool = False
 ) -> None:
-    if workspace.get("schema_version") != SCHEMA_VERSION:
+    scenario = _workspace_scenario(workspace)
+    if workspace.get("schema_version") != scenario["schema_version"]:
         raise OperatedPortfolioError("WORKSPACE_SCHEMA_INVALID")
-    if workspace.get("fixture_id") != FIXTURE_ID:
+    if workspace.get("fixture_id") != scenario["scenario_id"]:
         raise OperatedPortfolioError("WORKSPACE_FIXTURE_ID_INVALID")
-    if workspace.get("claim_boundary") != CLAIM_BOUNDARY:
+    if workspace.get("claim_boundary") != scenario["claim_boundary"]:
         raise OperatedPortfolioError("WORKSPACE_CLAIM_BOUNDARY_INVALID")
     if workspace.get("portfolio_count") != 1:
         raise OperatedPortfolioError("EXACTLY_ONE_PORTFOLIO_REQUIRED")
     status = workspace.get("status")
-    if status not in STATUS_EXPLANATIONS:
+    if status not in STATUSES:
         raise OperatedPortfolioError("WORKSPACE_STATUS_INVALID")
-    if workspace.get("explanation") != STATUS_EXPLANATIONS[status]:
+    if workspace.get("explanation") != scenario["status_explanations"][status]:
         raise OperatedPortfolioError("WORKSPACE_EXPLANATION_INVALID")
 
+    expected_instruments = instrument_registry(scenario["scenario_id"])
     instruments = list(workspace.get("instruments") or [])
-    if len(instruments) != 10:
-        raise OperatedPortfolioError("EXACTLY_TEN_INSTRUMENTS_REQUIRED")
+    instrument_count = len(expected_instruments)
+    if len(instruments) != instrument_count:
+        raise OperatedPortfolioError("SCENARIO_INSTRUMENT_COUNT_MISMATCH")
     if canonical_document_bytes(instruments) != canonical_document_bytes(
-        instrument_registry()
+        expected_instruments
     ):
         raise OperatedPortfolioError("INSTRUMENT_REGISTRY_MISMATCH")
     instrument_ids = [row["instrument_id"] for row in instruments]
     permanent_keys = [row["permanent_key"] for row in instruments]
-    if len(set(instrument_ids)) != 10 or len(set(permanent_keys)) != 10:
+    if (
+        len(set(instrument_ids)) != instrument_count
+        or len(set(permanent_keys)) != instrument_count
+    ):
         raise OperatedPortfolioError("PERMANENT_IDENTITY_DUPLICATE")
     if len({row["economic_cluster"] for row in instruments}) < 2:
         raise OperatedPortfolioError("TWO_ECONOMIC_CLUSTERS_REQUIRED")
@@ -1090,73 +1142,87 @@ def validate_workspace(
             "permanent_key": row["permanent_key"],
             "security_class": row["security_class"],
         }
-        if row["instrument_id"] != _identifier("INS", identity):
+        if row["instrument_id"] != _identifier(scenario, "INS", identity):
             raise OperatedPortfolioError("INSTRUMENT_ID_MISMATCH")
 
     evidence = list(workspace.get("evidence_references") or [])
+    evidence_ids: set[str] = set()
     for row in evidence:
         raw_hash = hashlib.sha256(row["content"].encode("utf-8")).hexdigest()
         if raw_hash != row["content_sha256"]:
             raise OperatedPortfolioError("EVIDENCE_CONTENT_HASH_MISMATCH")
+        owners = row.get("owned_instrument_ids")
+        if (
+            not isinstance(owners, list)
+            or not owners
+            or len(owners) != len(set(owners))
+            or any(owner not in instrument_ids for owner in owners)
+        ):
+            raise OperatedPortfolioError("EVIDENCE_INSTRUMENT_OWNERSHIP_INVALID")
         identity = {
             "content_sha256": row["content_sha256"],
             "media_type": row["media_type"],
             "locator": row["locator"],
             "observed_at": row["observed_at"],
+            "owned_instrument_ids": sorted(owners),
         }
-        if row["evidence_reference_id"] != _identifier("EVD", identity):
+        if row["evidence_reference_id"] != _identifier(scenario, "EVD", identity):
             raise OperatedPortfolioError("EVIDENCE_ID_MISMATCH")
-    initial_evidence = evidence[:10]
-    if len(initial_evidence) != 10:
-        raise OperatedPortfolioError("INSTRUMENT_SPECIFIC_EVIDENCE_REQUIRED")
+        if row["evidence_reference_id"] in evidence_ids:
+            raise OperatedPortfolioError("EVIDENCE_ID_DUPLICATE")
+        evidence_ids.add(row["evidence_reference_id"])
+    initial_evidence = evidence[:instrument_count]
+    expected_initial_evidence = _initial_evidence(scenario, instruments)
     if canonical_document_bytes(initial_evidence) != canonical_document_bytes(
-        _initial_evidence()
+        expected_initial_evidence
     ):
         raise OperatedPortfolioError("INITIAL_EVIDENCE_REGISTRY_MISMATCH")
-    if len({row["content_sha256"] for row in initial_evidence}) != 10:
-        raise OperatedPortfolioError("COPIED_EVIDENCE_PROHIBITED")
-    expected_evidence = [*initial_evidence]
+    expected_evidence = [*expected_initial_evidence]
     if status in {STATUS_NO_CHANGE, STATUS_TRANSITION, STATUS_CORRECTED}:
-        expected_evidence.append(_no_change_evidence())
+        expected_evidence.append(_no_change_evidence(scenario, instruments))
     if status in {STATUS_TRANSITION, STATUS_CORRECTED}:
-        expected_evidence.append(_transition_evidence())
+        expected_evidence.append(_transition_evidence(scenario, instruments))
     if canonical_document_bytes(evidence) != canonical_document_bytes(
         expected_evidence
     ):
         raise OperatedPortfolioError("EVIDENCE_LINEAGE_MISMATCH")
 
     reviews = list(workspace.get("reviews") or [])
-    if len(reviews) != 10:
-        raise OperatedPortfolioError("TEN_REVIEWS_REQUIRED")
+    if len(reviews) != instrument_count:
+        raise OperatedPortfolioError("REVIEW_INSTRUMENT_COUNT_MISMATCH")
     if {row["instrument_id"] for row in reviews} != set(instrument_ids):
         raise OperatedPortfolioError("REVIEW_INSTRUMENT_COVERAGE_MISMATCH")
-    claims = [row["living_thesis_lite"]["principal_claim"] for row in reviews]
-    if len(set(claims)) != 10:
-        raise OperatedPortfolioError("COPIED_THESIS_PROHIBITED")
-    evidence_ids = {row["evidence_reference_id"] for row in evidence}
-    initial_evidence_ids = {
-        row["evidence_reference_id"] for row in initial_evidence
-    }
-    owned_initial_evidence = {
-        instrument["instrument_id"]: evidence_row["evidence_reference_id"]
-        for instrument, evidence_row in zip(
-            instruments, initial_evidence, strict=True
-        )
+    evidence_by_id = {
+        row["evidence_reference_id"]: row for row in evidence
     }
     for review in reviews:
-        refs = review["living_thesis_lite"]["evidence_reference_ids"]
+        thesis = review.get("living_thesis_lite")
+        if not isinstance(thesis, Mapping):
+            raise OperatedPortfolioError("THESIS_OBJECT_REQUIRED")
+        if thesis.get("instrument_id") != review["instrument_id"]:
+            raise OperatedPortfolioError("THESIS_INSTRUMENT_OWNER_MISMATCH")
+        refs = thesis.get("evidence_reference_ids")
         if (
-            not refs
+            not isinstance(refs, list)
+            or not refs
             or len(refs) != len(set(refs))
-            or any(ref not in evidence_ids for ref in refs)
+            or any(ref not in evidence_by_id for ref in refs)
         ):
             raise OperatedPortfolioError("THESIS_EVIDENCE_BINDING_INVALID")
-        owner_ref = owned_initial_evidence[review["instrument_id"]]
-        if owner_ref not in refs:
-            raise OperatedPortfolioError("THESIS_INSTRUMENT_EVIDENCE_OWNER_MISMATCH")
-        if any(ref in initial_evidence_ids and ref != owner_ref for ref in refs):
-            raise OperatedPortfolioError("THESIS_CROSS_INSTRUMENT_EVIDENCE_PROHIBITED")
+        for ref in refs:
+            if review["instrument_id"] not in evidence_by_id[ref][
+                "owned_instrument_ids"
+            ]:
+                raise OperatedPortfolioError(
+                    "THESIS_INSTRUMENT_EVIDENCE_OWNER_MISMATCH"
+                )
+        thesis_payload = {
+            key: value for key, value in thesis.items() if key != "thesis_id"
+        }
+        if thesis.get("thesis_id") != _identifier(scenario, "THS", thesis_payload):
+            raise OperatedPortfolioError("THESIS_ID_MISMATCH")
     expected_reviews = _expected_reviews_for_status(
+        scenario,
         status=status,
         instruments=instruments,
         initial_evidence=initial_evidence,
@@ -1166,10 +1232,21 @@ def validate_workspace(
     ):
         raise OperatedPortfolioError("REVIEW_DECISION_STATE_MISMATCH")
 
-    _verify_id(workspace["portfolio_aim"], kind="AIM", id_key="portfolio_aim_id")
+    expected_aim = _portfolio_aim(scenario)
+    if canonical_document_bytes(workspace["portfolio_aim"]) != canonical_document_bytes(
+        expected_aim
+    ):
+        raise OperatedPortfolioError("PORTFOLIO_AIM_AUTHORITY_MISMATCH")
+    _verify_id(
+        scenario,
+        workspace["portfolio_aim"],
+        kind="AIM",
+        id_key="portfolio_aim_id",
+    )
     aim_id = workspace["portfolio_aim"]["portfolio_aim_id"]
     snapshots = list(workspace.get("decision_snapshots") or [])
     expected_snapshots = _expected_snapshots(
+        scenario,
         status=status,
         aim_id=aim_id,
         instruments=instruments,
@@ -1181,11 +1258,20 @@ def validate_workspace(
     ):
         raise OperatedPortfolioError("DECISION_SNAPSHOT_AUTHORITY_MISMATCH")
     for snapshot in snapshots:
-        _verify_id(snapshot, kind="DSN", id_key="decision_snapshot_id")
+        _verify_id(
+            scenario,
+            snapshot,
+            kind="DSN",
+            id_key="decision_snapshot_id",
+        )
         candidates = snapshot["capital_competition"]["candidates"]
-        if len(candidates) != 10:
-            raise OperatedPortfolioError("CAPITAL_COMPETITION_TEN_REQUIRED")
-        if {row["instrument_id"] for row in candidates} != set(instrument_ids):
+        if len(candidates) != instrument_count:
+            raise OperatedPortfolioError("CAPITAL_COMPETITION_COUNT_MISMATCH")
+        candidate_ids = [row["instrument_id"] for row in candidates]
+        if (
+            set(candidate_ids) != set(instrument_ids)
+            or len(candidate_ids) != len(set(candidate_ids))
+        ):
             raise OperatedPortfolioError("CAPITAL_COMPETITION_COVERAGE_MISMATCH")
         selected = snapshot["capital_competition"][
             "selected_funded_instrument_ids"
@@ -1236,14 +1322,16 @@ def validate_workspace(
     if len(observation_events) != expected_observation_count:
         raise OperatedPortfolioError("OBSERVATION_COUNT_MISMATCH")
     projected_observations: list[dict[str, Any]] = []
-    evidence_by_id = {
-        row["evidence_reference_id"]: row for row in evidence
-    }
     for observation_event in observation_events:
         observation = observation_event.get("payload")
         if not isinstance(observation, Mapping):
             raise OperatedPortfolioError("OBSERVATION_EVENT_PAYLOAD_REQUIRED")
-        _verify_id(observation, kind="OBS", id_key="observation_id")
+        _verify_id(
+            scenario,
+            observation,
+            kind="OBS",
+            id_key="observation_id",
+        )
         if observation_event.get("source_identity") != observation["observation_id"]:
             raise OperatedPortfolioError("OBSERVATION_EVENT_SOURCE_MISMATCH")
         evidence_row = evidence_by_id.get(observation["evidence_reference_id"])
@@ -1285,7 +1373,7 @@ def validate_workspace(
     ):
         raise OperatedPortfolioError("TRADE_AUTHORITY_CHAIN_PROJECTION_MISMATCH")
 
-    initial_reviews = _initial_review_state(instruments, initial_evidence)
+    initial_reviews = _initial_reviews(scenario, instruments, initial_evidence)
     expected_transitions = _expected_transition_legs(
         status=status,
         instruments=instruments,
@@ -1301,6 +1389,7 @@ def validate_workspace(
     if len(transition_events) != len(expected_transitions):
         raise OperatedPortfolioError("TRANSITION_EVENT_COUNT_MISMATCH")
     known_transition_ids: set[str] = set()
+    expected_order_sides: list[str] = []
     for transition_event, expected_transition in zip(
         transition_events, expected_transitions, strict=True
     ):
@@ -1335,6 +1424,7 @@ def validate_workspace(
             expected_legs
         ):
             raise OperatedPortfolioError("TRANSITION_EXECUTION_DELTA_MISMATCH")
+        expected_order_sides.extend(row["side"] for row in expected_legs)
         for order in transition_orders:
             if order["decision_snapshot_id"] != decision_snapshot_id:
                 raise OperatedPortfolioError("ORDER_DECISION_AUTHORITY_MISMATCH")
@@ -1345,8 +1435,11 @@ def validate_workspace(
         for order in projected_orders
     ):
         raise OperatedPortfolioError("ORDER_TRANSITION_AUTHORITY_MISSING")
+    if [row["side"] for row in orders] != expected_order_sides:
+        raise OperatedPortfolioError("TRADE_SIDE_SEQUENCE_MISMATCH")
 
     expected_changed_why = _expected_changed_why(
+        scenario,
         status=status,
         book=workspace["book"],
         instruments=instruments,
@@ -1364,19 +1457,31 @@ def validate_workspace(
             raise OperatedPortfolioError("UNCERTIFIED_DRAFT")
         if orders or fills or workspace.get("certification") is not None:
             raise OperatedPortfolioError("DRAFT_HAS_EXECUTION_OR_CERTIFICATION")
-        if workspace["book"]["nav"] != "5000":
-            raise OperatedPortfolioError("DRAFT_NAV_INVALID")
         return
 
     if not certification_eligible(workspace["book"]):
         raise OperatedPortfolioError("BOOK_NOT_CERTIFICATION_ELIGIBLE")
     if workspace["book"]["unexplained_residual"] != "0":
         raise OperatedPortfolioError("UNEXPLAINED_RESIDUAL_NONZERO")
-    if len(_funded_positions(workspace["book"])) < 3:
-        raise OperatedPortfolioError("THREE_FUNDED_POSITIONS_REQUIRED")
+    if len(_funded_positions(workspace["book"])) < int(
+        scenario["minimum_funded_positions"]
+    ):
+        raise OperatedPortfolioError("MINIMUM_FUNDED_POSITIONS_REQUIRED")
     cash_buckets = {row["bucket"] for row in workspace["book"]["classified_cash"]}
-    if {AVAILABLE, RESEARCH_RESERVE} - cash_buckets:
+    required_cash_buckets = {row["bucket"] for row in scenario["cash_openings"]}
+    if required_cash_buckets - cash_buckets:
         raise OperatedPortfolioError("CLASSIFIED_RESIDUAL_CASH_REQUIRED")
+
+    expected_quantities = {
+        row["instrument_id"]: row["target_quantity"] for row in reviews
+    }
+    actual_quantities = {
+        row["instrument_id"]: row["quantity"]
+        for row in workspace["book"]["positions"]
+    }
+    for instrument_id, expected_quantity in expected_quantities.items():
+        if actual_quantities.get(instrument_id, "0") != expected_quantity:
+            raise OperatedPortfolioError("POSITION_TARGET_MISMATCH")
 
     certification = workspace.get("certification")
     if not isinstance(certification, Mapping):
@@ -1419,34 +1524,21 @@ def validate_workspace(
     elif correction_events or correction_history:
         raise OperatedPortfolioError("CORRECTION_BEFORE_CORRECTED_STATUS")
 
-    if status == STATUS_FUNDED:
-        if len(orders) != 4 or {row["side"] for row in orders} != {"BUY"}:
-            raise OperatedPortfolioError("INITIAL_FUNDING_TRADES_INVALID")
-        if workspace["book"]["nav"] != "4992":
-            raise OperatedPortfolioError("FUNDED_NAV_INVALID")
-    elif status == STATUS_NO_CHANGE:
-        if len(orders) != 4:
-            raise OperatedPortfolioError("NO_CHANGE_CREATED_TRADE")
-        if workspace["book"]["nav"] != "4992":
-            raise OperatedPortfolioError("NO_CHANGE_NAV_INVALID")
-        if workspace.get("changed_why", {}).get("change_type") != "NO_CHANGE":
-            raise OperatedPortfolioError("NO_CHANGE_EXPLANATION_REQUIRED")
-    else:
-        if len(orders) != 6:
-            raise OperatedPortfolioError("TRANSITION_TRADE_COUNT_INVALID")
-        if [row["side"] for row in orders[-2:]] != ["SELL", "BUY"]:
-            raise OperatedPortfolioError("REDUCE_AND_FUND_SEQUENCE_REQUIRED")
-        positions = {
-            row["instrument_id"]: row["quantity"]
-            for row in workspace["book"]["positions"]
-        }
-        by_symbol = {row["symbol"]: row["instrument_id"] for row in instruments}
-        if positions.get(by_symbol["HARBOR"]) != "6":
-            raise OperatedPortfolioError("HARBOR_REDUCTION_MISSING")
-        if positions.get(by_symbol["MERID"]) != "5":
-            raise OperatedPortfolioError("MERIDIAN_FUNDING_MISSING")
-        if workspace["book"]["nav"] != "4988":
-            raise OperatedPortfolioError("TRANSITION_NAV_INVALID")
+    expected_order_count = sum(
+        len(transition[2]) for transition in expected_transitions
+    )
+    if len(orders) != expected_order_count:
+        raise OperatedPortfolioError("TRADE_COUNT_INVALID")
+    if status == STATUS_NO_CHANGE and workspace.get("changed_why", {}).get(
+        "change_type"
+    ) != "NO_CHANGE":
+        raise OperatedPortfolioError("NO_CHANGE_EXPLANATION_REQUIRED")
+    if status in {STATUS_TRANSITION, STATUS_CORRECTED}:
+        later_legs = expected_transitions[-1][2]
+        if not any(row["side"] == "SELL" for row in later_legs):
+            raise OperatedPortfolioError("REDUCTION_REQUIRED")
+        if not any(row["side"] == "BUY" for row in later_legs):
+            raise OperatedPortfolioError("FUNDING_REQUIRED")
         if workspace.get("changed_why", {}).get("change_type") != "AUTHORIZED_TRANSITION":
             raise OperatedPortfolioError("CHANGED_WHY_REQUIRED")
         if status == STATUS_CORRECTED:

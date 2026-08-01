@@ -1,96 +1,97 @@
 # PHASE_QUEUE.md — GodView Portfolio Product Queue
 
-Status: `REPLAN_ACTIVE; GV-OPERATED-PORTFOLIO-10-TRANSITION-1R ONLY; LIVE CLOSED`
-Last updated: 2026-07-30
+Status: `GV-OPERATED-PORTFOLIO-25-1 ACTIVE; NOT_FROZEN; LIVE CLOSED`
+Last updated: 2026-08-01
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Frozen roadmap: `docs/architecture/godview_v2_frozen_build_learn_roadmap.md`
-Active brief: `docs/context/ACTIVE_BRIEF` → `docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md`
+Active brief: `docs/context/ACTIVE_BRIEF` → `docs/phase_brief/gv-operated-portfolio-25-1-brief.md`
 
 ## Queue law
 
-1. One active product phase only: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`.
-2. Do not resume automatic Bounded → Scale → Universe → Challenger → Live label progression.
-3. Immutable terminals and tags remain unchanged; classifications are corrected below.
-4. Distinct-security quantities may not be replaced by sessions, cells, runs, or slots.
-5. Any weakened quantity, user behavior, or outcome requires an explicit owner scope decision before implementation.
-6. `GV-LIMITED-LIVE-1` remains closed and unauthorized.
-7. The dirty operator root is not execution, test, commit, or publication authority.
+1. One active product phase only: `GV-OPERATED-PORTFOLIO-25-1`.
+2. The accepted ten-security terminal remains immutable custody; current shared source may evolve under regression protection.
+3. The active phase must use one shared engine, persistence implementation, application, and view for retained 10- and new 25-security scenarios.
+4. Genericization cannot be accepted, reviewed as progress, banked, or frozen independently from the executable 25-security checkpoint.
+5. Distinct-security quantities may not be replaced by sessions, cells, runs, slots, portfolio copies, or repeated executions.
+6. Streams are logical ownership boundaries, not a requirement for six workers.
+7. `GV-LIMITED-LIVE-1` remains closed and unauthorized.
+8. The dirty operator root is not execution, test, commit, or publication authority.
 
 ## Immutable custody and truthful classification
 
 | Artifact | Terminal SHA | Tag | Classification | Original gate |
 |---|---|---|---|---|
-| Slice 0 | `85e6601742710f03e6cced7377b4be426cd4892f` | `gv-slice-0-terminal` | Accepted product slice | Accepted |
-| Replay 0 | `0e4b93fb370f67956502edc02e9c6f56ceb2eba3` | `gv-replay-0-terminal` | Accepted integrity slice | Accepted |
-| Bounded Portfolio 1 | `abaa814ce99ea78afadc33dd40506f4e13a742ef` | `gv-bounded-portfolio-1-terminal` | Persisted multi-cycle substrate | Incomplete |
-| Portfolio Scale 1 | `c37abf00293937b9b99eb6e560f6b5b77a92ea1f` | `gv-portfolio-scale-1-terminal` | Deterministic multi-session harness | Incomplete |
+| Slice 0 | `85e6601742710f03e6cced7377b4be426cd4892f` | `gv-slice-0-terminal` | Accepted product foundation | Accepted |
+| Replay 0 | `0e4b93fb370f67956502edc02e9c6f56ceb2eba3` | `gv-replay-0-terminal` | Accepted integrity foundation | Accepted |
+| Bounded Portfolio 1 | `abaa814ce99ea78afadc33dd40506f4e13a742ef` | `gv-bounded-portfolio-1-terminal` | Persisted multi-cycle substrate | Historical lower-level gate |
+| Portfolio Scale 1 | `c37abf00293937b9b99eb6e560f6b5b77a92ea1f` | `gv-portfolio-scale-1-terminal` | Deterministic multi-session harness | One real 25–50-security portfolio incomplete |
 | Universe Scale 1 | `dca67e36edc02dddf8c7ba446ac34f22562ee165` | `gv-universe-scale-1-terminal` | Deterministic multi-cell harness | Incomplete |
-| Challenger Promotion 1 | `3e4dc957f475945169ddf33ed359254bd98dc64d` | `gv-challenger-promotion-1-terminal` | Shadow/certified-custody separation primitive | Incomplete |
+| Challenger Promotion 1 | `3e4dc957f475945169ddf33ed359254bd98dc64d` | `gv-challenger-promotion-1-terminal` | Shadow/certified-custody primitive | Incomplete |
+| Operated Portfolio 10 | `0d15e9c` executable / `2349e1b` closure | `gv-operated-portfolio-10-transition-1r-terminal` | Accepted terminal product | Accepted |
 
-## Original semantic gates still controlling
+## Active product phase — `GV-OPERATED-PORTFOLIO-25-1`
 
-- Bounded: 8–15 distinct securities, at least two economic clusters, repeated operation.
-- Portfolio Scale: one operated 25–50-security portfolio with deterministic books, replay, and bounded operator workload.
-- Universe Scale: custody of 100–300+ distinct securities with survivorship-safe membership, permanent identity, corporate actions, corrections, and reproducible snapshots.
-- Challenger: baseline → shadow → prospective challenger → independent replication → bounded authority.
+- **Status:** `AUTHORIZED; IMPLEMENTATION_ACTIVE; NOT_FROZEN; NOT_TERMINAL`
+- **Base:** terminal `main` `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`
+- **Product result:** one real 25-security portfolio with deterministic books, exact replay, bounded four-action workload, persistence, correction, restart, and summary-first UX.
+- **Shared engine:** `gv_portfolio_v0/operated.py`
+- **Scenarios:** `gv_portfolio_v0/operated_scenarios.py`
+- **Shared persistence:** `gv_portfolio_v0/operated_storage.py`
+- **Shared product:** `operated_portfolio_app.py`, `views/gv_operated_portfolio_workspace.py`
+- **Thin launcher:** `launch_operated_portfolio_25.py`
+- **Tests:** retained `test_operated.py` and `test_operated_app.py`; active `test_operated_25.py`.
 
-## Active product repair — `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`
-
-- **Status:** `IMPLEMENTATION_CANDIDATE; NOT TERMINAL`
-- **Base:** exact Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`
-- **Product result:** one ten-instrument, two-cluster portfolio that funds multiple positions, records a justified no-change cycle, performs one real reduce-and-fund transition, persists, reopens, replays exactly, and explains changed why.
-- **Product entrypoint:** `operated_portfolio_app.py`
-- **Launcher:** `launch_operated_portfolio.py`
-- **Domain:** `gv_portfolio_v0/operated.py`
-- **Persistence:** `gv_portfolio_v0/operated_storage.py`
-- **Shared repaired seams:** `gv_portfolio_v0/execution.py`, `gv_portfolio_v0/book.py`
-- **Focused tests:** `tests/gv_portfolio_v0/test_operated.py`, `tests/gv_portfolio_v0/test_operated_app.py`
-
-### Required terminal gates
+### Non-weakenable acceptance
 
 ```text
-10 distinct permanent identities
-+ >=2 economic clusters
-+ unique evidence and thesis state
-+ one portfolio book
-+ >=3 funded positions and classified residual cash
-+ competition across all 10 instruments
-+ explicit no-change observation
-+ SELL/REDUCE one position and BUY/FUND another
-+ exact replay and idempotence
-+ correction lineage and zero residual
+one portfolio
++ exactly 25 permanent identities
++ >=2 meaningful clusters
++ owned evidence and thesis state
++ one competition covering every identity exactly once
++ multiple funded positions and classified residual cash
++ explicit no-change
++ >=1 SELL/REDUCE and >=1 BUY/FUND
++ deterministic accounting and residual 0
++ exact replay, certification and correction
 + atomic persist/restart/reopen
-+ changed-why UI
-+ fresh-checkout black-box AppTest
-+ full terminal regression
-+ independent A/B/C on exact SHA
++ summary-first and exceptions-first UI
++ <=4 required actions; zero per-security confirmations
++ retained ten-security flow green through the same path
 ```
 
-## Limited Live — `GV-LIMITED-LIVE-1`
+Five clusters, eight funded positions, and transition-leg count are fixture parameters, not product authority.
 
-- **Status:** `CLOSED; NOT_AUTHORIZED`
-- **Reason:** original Bounded, Portfolio Scale, Universe Scale, and Challenger Promotion outcomes remain incomplete.
-- **Opening rule:** separate explicit owner authorization only after repeated prospective paper operation and all frozen prerequisites.
+## Current checkpoint
 
-## Score
+Local focused and package-level tests are green. No candidate SHA, hosted exact-head evidence, controlled failset comparison, or independent terminal A/B/C exists yet. Accepted score remains `62/100`.
 
-Pre-candidate endgame progress assessment: `52/100`.
+## Pre-freeze gate
 
-The current uncommitted candidate does not change accepted score. Re-score only after one immutable candidate passes focused tests, fresh-checkout AppTest, full terminal regression, and independent A/B/C.
+```text
+changed-path test ownership
++ CI path triggers
++ exact-head checkout
++ dependency coverage and pip check
++ base/candidate failset method
++ evidence destination outside checkout
++ broad local validation
+→ freeze exactly one candidate
+```
+
+## Terminal gate
+
+```text
+exact-head Windows/Linux CI
++ controlled full base/candidate comparison with zero candidate-only failures
++ independent Reviewer A/B/C
++ documentation-only closure preserving tested executable tree
+```
 
 ## Forbidden critical-path scope
 
-providers · WRDS · broad loaders · optimizer-first allocation · copied fixture slots · scale/universe/challenger compatibility adapters · shorting · leverage · derivatives · broker · live capital · score uplift · alpha claim · immutable tag rewriting · dirty-root development
+providers · external ingestion · optimizer expansion · broker · Universe · Challenger · Limited Live · live capital · shorting · leverage · derivatives · alpha/score uplift · historical harness compatibility · general frameworks · repository-wide dependency repair · unrelated cleanup
 
 ## Immediate next action
 
-```text
-locate or provision the pinned Python 3.12 + pytest environment
-→ run focused operated/accounting/execution/replay tests
-→ repair current slice only
-→ freeze one candidate SHA
-→ run fresh-checkout AppTest + full regression/failset once
-→ independent A/B/C against exact SHA
-→ reconcile and fast-forward origin/main only after terminal PASS
-→ Limited Live remains CLOSED
-```
+Complete current-context regeneration and pre-freeze receipts, run broad local validation, then freeze one candidate only if all stop rules remain clear.

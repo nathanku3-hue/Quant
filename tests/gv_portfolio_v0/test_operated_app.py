@@ -30,6 +30,7 @@ def test_operated_entrypoints_have_no_provider_or_broker_imports() -> None:
     for path in (
         ROOT / "operated_portfolio_app.py",
         ROOT / "launch_operated_portfolio.py",
+        ROOT / "launch_operated_portfolio_25.py",
     ):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):

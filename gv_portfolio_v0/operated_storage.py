@@ -1,4 +1,4 @@
-"""Confined atomic persistence and verified reopen for the operated portfolio."""
+"""Shared confined atomic persistence for all operated-portfolio scenarios."""
 
 from __future__ import annotations
 
@@ -23,30 +23,70 @@ from gv_portfolio_v0.operated import (
     confirm_initial_portfolio,
     validate_workspace,
 )
+from gv_portfolio_v0.operated_scenarios import (
+    DEFAULT_SCENARIO_ID,
+    PORTFOLIO_25_SCENARIO_ID,
+    get_scenario,
+)
 
-PERSISTED_SCHEMA = "gv_operated_portfolio_10_persisted_v2"
-WORKSPACE_FILENAME = "operated_portfolio_10_workspace.json"
+PERSISTED_SCHEMA = "gv_operated_portfolio_persisted_v3"
 
 
-def default_workspace_root(*, env: Mapping[str, str] | None = None) -> Path:
+def selected_scenario_id(*, env: Mapping[str, str] | None = None) -> str:
+    values = dict(os.environ if env is None else env)
+    scenario_id = values.get("GV_OPERATED_SCENARIO_ID", DEFAULT_SCENARIO_ID)
+    try:
+        get_scenario(scenario_id)
+    except ValueError as exc:
+        raise OperatedPortfolioError(str(exc)) from exc
+    return scenario_id
+
+
+def _workspace_filename(scenario_id: str) -> str:
+    if scenario_id == DEFAULT_SCENARIO_ID:
+        return "operated_portfolio_10_workspace.json"
+    if scenario_id == PORTFOLIO_25_SCENARIO_ID:
+        return "operated_portfolio_25_workspace.json"
+    raise OperatedPortfolioError(f"UNKNOWN_OPERATED_SCENARIO:{scenario_id}")
+
+
+def default_workspace_root(
+    *,
+    env: Mapping[str, str] | None = None,
+    scenario_id: str | None = None,
+) -> Path:
     values = dict(os.environ if env is None else env)
     override = values.get("GV_OPERATED_PORTFOLIO_HOME")
     if override:
         return Path(override).expanduser()
-    return Path.home() / ".terminal-zero" / "gv_operated_portfolio_10"
+    selected = scenario_id or selected_scenario_id(env=values)
+    suffix = "10" if selected == DEFAULT_SCENARIO_ID else "25"
+    return Path.home() / ".terminal-zero" / f"gv_operated_portfolio_{suffix}"
 
 
-def workspace_path(root: Path | None = None) -> Path:
-    base = Path(root) if root is not None else default_workspace_root()
-    return base / WORKSPACE_FILENAME
+def workspace_path(
+    root: Path | None = None, *, scenario_id: str | None = None
+) -> Path:
+    selected = scenario_id or selected_scenario_id()
+    base = (
+        Path(root)
+        if root is not None
+        else default_workspace_root(scenario_id=selected)
+    )
+    return base / _workspace_filename(selected)
 
 
 def _envelope(workspace: Mapping[str, Any]) -> dict[str, Any]:
     payload = dict(workspace)
+    scenario_id = payload.get("scenario_id")
+    if not isinstance(scenario_id, str):
+        raise OperatedPortfolioError("WORKSPACE_SCENARIO_REQUIRED")
     return {
         "schema_version": PERSISTED_SCHEMA,
+        "scenario_id": scenario_id,
+        "scenario_hash": payload.get("scenario_hash"),
         "workspace_hash": domain_hash(
-            "GV-OPERATED-PORTFOLIO-10:WORKSPACE:V2", payload
+            "GV-OPERATED-PORTFOLIO:WORKSPACE:V3", payload
         ),
         "workspace": payload,
     }
@@ -88,8 +128,6 @@ def _reject_linked_ancestors(path: Path) -> None:
 
 
 def _canonical_candidate(path: Path) -> Path:
-    """Resolve every existing ancestor, including Windows junction targets."""
-
     lexical = _absolute_lexical(path)
     cursor = lexical
     missing: list[str] = []
@@ -113,12 +151,15 @@ def _canonical_candidate(path: Path) -> Path:
 def _confined_paths(
     root: Path | None,
     *,
+    scenario_id: str,
     require_workspace_file: bool = False,
 ) -> tuple[Path, Path]:
     lexical_root = _absolute_lexical(
-        Path(root) if root is not None else default_workspace_root()
+        Path(root)
+        if root is not None
+        else default_workspace_root(scenario_id=scenario_id)
     )
-    lexical_path = lexical_root / WORKSPACE_FILENAME
+    lexical_path = lexical_root / _workspace_filename(scenario_id)
     if not _same_or_within(lexical_path, lexical_root):
         raise OperatedPortfolioError("WORKSPACE_PATH_ESCAPE")
 
@@ -143,11 +184,15 @@ def _confined_paths(
     return lexical_root, lexical_path
 
 
-def _atomic_write(path: Path, payload: Mapping[str, Any]) -> None:
+def _atomic_write(
+    path: Path, payload: Mapping[str, Any], *, scenario_id: str
+) -> None:
     root = path.parent
-    _confined_paths(root)
+    _confined_paths(root, scenario_id=scenario_id)
     root.mkdir(parents=True, exist_ok=True)
-    confined_root, confined_path = _confined_paths(root)
+    confined_root, confined_path = _confined_paths(
+        root, scenario_id=scenario_id
+    )
     if confined_path != _absolute_lexical(path):
         raise OperatedPortfolioError("WORKSPACE_PATH_IDENTITY_MISMATCH")
 
@@ -161,11 +206,13 @@ def _atomic_write(path: Path, payload: Mapping[str, Any]) -> None:
             stream.write(raw)
             stream.flush()
             os.fsync(stream.fileno())
-        _confined_paths(root)
+        _confined_paths(root, scenario_id=scenario_id)
         if not _same_or_within(_canonical_candidate(temp_path), confined_root):
             raise OperatedPortfolioError("WORKSPACE_TEMP_PATH_ESCAPE")
         os.replace(temp_path, confined_path)
-        _confined_paths(root, require_workspace_file=True)
+        _confined_paths(
+            root, scenario_id=scenario_id, require_workspace_file=True
+        )
     except Exception:
         temp_path.unlink(missing_ok=True)
         raise
@@ -174,80 +221,109 @@ def _atomic_write(path: Path, payload: Mapping[str, Any]) -> None:
 def persist_workspace(
     workspace: Mapping[str, Any], *, root: Path | None = None
 ) -> Path:
-    validate_workspace(workspace, allow_draft=workspace.get("status") == STATUS_DRAFT)
-    _, path = _confined_paths(root)
-    _atomic_write(path, _envelope(workspace))
+    scenario_id = workspace.get("scenario_id")
+    if not isinstance(scenario_id, str):
+        raise OperatedPortfolioError("WORKSPACE_SCENARIO_REQUIRED")
+    validate_workspace(
+        workspace, allow_draft=workspace.get("status") == STATUS_DRAFT
+    )
+    _, path = _confined_paths(root, scenario_id=scenario_id)
+    _atomic_write(path, _envelope(workspace), scenario_id=scenario_id)
     return path
 
 
-def load_workspace(*, root: Path | None = None) -> dict[str, Any]:
-    _, path = _confined_paths(root, require_workspace_file=True)
+def load_workspace(
+    *, root: Path | None = None, scenario_id: str | None = None
+) -> dict[str, Any]:
+    selected = scenario_id or selected_scenario_id()
+    _, path = _confined_paths(
+        root, scenario_id=selected, require_workspace_file=True
+    )
     try:
         with path.open("r", encoding="utf-8") as stream:
             envelope = json.load(stream)
     except (OSError, json.JSONDecodeError) as exc:
         raise OperatedPortfolioError("WORKSPACE_READ_INVALID") from exc
-    _confined_paths(root, require_workspace_file=True)
+    _confined_paths(
+        root, scenario_id=selected, require_workspace_file=True
+    )
     if envelope.get("schema_version") != PERSISTED_SCHEMA:
         raise OperatedPortfolioError("PERSISTED_SCHEMA_INVALID")
+    if envelope.get("scenario_id") != selected:
+        raise OperatedPortfolioError("PERSISTED_SCENARIO_ID_MISMATCH")
     workspace = envelope.get("workspace")
     if not isinstance(workspace, dict):
         raise OperatedPortfolioError("PERSISTED_WORKSPACE_OBJECT_REQUIRED")
+    if envelope.get("scenario_hash") != workspace.get("scenario_hash"):
+        raise OperatedPortfolioError("PERSISTED_SCENARIO_HASH_MISMATCH")
     expected_hash = domain_hash(
-        "GV-OPERATED-PORTFOLIO-10:WORKSPACE:V2", workspace
+        "GV-OPERATED-PORTFOLIO:WORKSPACE:V3", workspace
     )
     if envelope.get("workspace_hash") != expected_hash:
         raise OperatedPortfolioError("WORKSPACE_HASH_MISMATCH")
-    validate_workspace(workspace, allow_draft=workspace.get("status") == STATUS_DRAFT)
+    validate_workspace(
+        workspace, allow_draft=workspace.get("status") == STATUS_DRAFT
+    )
     return workspace
 
 
-def ensure_workspace(*, root: Path | None = None) -> dict[str, Any]:
-    _, path = _confined_paths(root)
+def ensure_workspace(
+    *, root: Path | None = None, scenario_id: str | None = None
+) -> dict[str, Any]:
+    selected = scenario_id or selected_scenario_id()
+    _, path = _confined_paths(root, scenario_id=selected)
     if path.exists():
-        return load_workspace(root=root)
-    draft = build_draft_workspace()
+        return load_workspace(root=root, scenario_id=selected)
+    draft = build_draft_workspace(selected)
     persist_workspace(draft, root=root)
-    return load_workspace(root=root)
+    return load_workspace(root=root, scenario_id=selected)
 
 
-def confirm_and_persist(*, root: Path | None = None) -> dict[str, Any]:
-    workspace = ensure_workspace(root=root)
+def confirm_and_persist(
+    *, root: Path | None = None, scenario_id: str | None = None
+) -> dict[str, Any]:
+    selected = scenario_id or selected_scenario_id()
+    workspace = ensure_workspace(root=root, scenario_id=selected)
     if workspace["status"] != STATUS_DRAFT:
         return workspace
     result = confirm_initial_portfolio(workspace)
     persist_workspace(result, root=root)
-    return load_workspace(root=root)
+    return load_workspace(root=root, scenario_id=selected)
 
 
-def admit_no_change_and_persist(*, root: Path | None = None) -> dict[str, Any]:
-    workspace = load_workspace(root=root)
+def admit_no_change_and_persist(
+    *, root: Path | None = None, scenario_id: str | None = None
+) -> dict[str, Any]:
+    selected = scenario_id or selected_scenario_id()
+    workspace = load_workspace(root=root, scenario_id=selected)
     if workspace["status"] != STATUS_FUNDED:
         return workspace
     result = admit_no_change_observation(workspace)
     persist_workspace(result, root=root)
-    return load_workspace(root=root)
+    return load_workspace(root=root, scenario_id=selected)
 
 
 def authorize_transition_and_persist(
-    *, root: Path | None = None
+    *, root: Path | None = None, scenario_id: str | None = None
 ) -> dict[str, Any]:
-    workspace = load_workspace(root=root)
+    selected = scenario_id or selected_scenario_id()
+    workspace = load_workspace(root=root, scenario_id=selected)
     if workspace["status"] != STATUS_NO_CHANGE:
         return workspace
     result = authorize_portfolio_transition(workspace)
     persist_workspace(result, root=root)
-    return load_workspace(root=root)
+    return load_workspace(root=root, scenario_id=selected)
 
 
 def append_correction_and_persist(
-    *, root: Path | None = None
+    *, root: Path | None = None, scenario_id: str | None = None
 ) -> dict[str, Any]:
-    workspace = load_workspace(root=root)
+    selected = scenario_id or selected_scenario_id()
+    workspace = load_workspace(root=root, scenario_id=selected)
     if workspace["status"] == STATUS_CORRECTED:
         return workspace
     if workspace["status"] != STATUS_TRANSITION:
         return workspace
     result = append_non_economic_correction(workspace)
     persist_workspace(result, root=root)
-    return load_workspace(root=root)
+    return load_workspace(root=root, scenario_id=selected)

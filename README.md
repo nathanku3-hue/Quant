@@ -1,15 +1,15 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `REPLAN_ACTIVE; GV-OPERATED-PORTFOLIO-10-TRANSITION-1R IMPLEMENTATION_CANDIDATE; LIVE CLOSED`
-Date: 2026-07-30
-Authority base: Challenger terminal `3e4dc95` (tag `gv-challenger-promotion-1-terminal`)
-Slice 0: accepted product slice `85e6601`
-Replay 0: accepted integrity slice `0e4b93f`
-Bounded `abaa814`: persisted multi-cycle substrate; original breadth incomplete
-Portfolio Scale `c37abf0`: deterministic multi-session harness; original 25–50-security objective incomplete
+Status: `GV-OPERATED-PORTFOLIO-25-1 AUTHORIZED; IMPLEMENTATION_ACTIVE; NOT_FROZEN; LIVE CLOSED`
+Date: 2026-08-01
+Authority base: terminal `main` `2349e1b`
+Accepted operated terminal: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` at candidate `0d15e9c`, closure `2349e1b`, terminal tag preserved
+Slice 0: accepted product foundation `85e6601`
+Replay 0: accepted integrity foundation `0e4b93f`
+Portfolio Scale `c37abf0`: deterministic multi-session harness; original 25–50-security objective remains incomplete until the active phase passes terminal review
 Universe Scale `dca67e3`: deterministic multi-cell harness; original 100–300+ custody objective incomplete
 Challenger `3e4dc95`: shadow-custody separation primitive; original promotion objective incomplete
-Endgame progress assessment before current candidate: `52/100`
+Accepted endgame progress: `62/100`; no active-phase uplift claimed
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 GodView is a local-first, point-in-time certified portfolio operating system. Its product unit is a complete portfolio decision and operating loop, not an isolated stock case and not an optimizer-first research platform.
@@ -67,10 +67,11 @@ Alpha-0 does **not** prove:
 | 3 | `GV-PORTFOLIO-SCALE-1` | **multi-session harness; original gate incomplete** `c37abf0` |
 | 4 | `GV-UNIVERSE-SCALE-1` | **multi-cell harness; original gate incomplete** `dca67e3` |
 | 5 | `GV-CHALLENGER-PROMOTION-1` | **shadow-custody primitive; original gate incomplete** `3e4dc95` |
-| Repair | `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` | **only active product slice; candidate not terminal** |
+| Repair | `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` | **accepted terminal product** `0d15e9c` / `2349e1b` |
+| Scale repair | `GV-OPERATED-PORTFOLIO-25-1` | **only active product phase; implementation checkpoint; not frozen** |
 | 6 | `GV-LIMITED-LIVE-1` | **CLOSED; NOT_AUTHORIZED** |
 
-Do not resume automatic phase-label progression. Preserve prior tags as evidence, use their code as substrate, and ship the one active end-to-end result before choosing another gate.
+Do not resume automatic phase-label progression. Preserve prior terminals as immutable evidence and run the active 25-security result through the same operated engine, persistence path, application, and view as the retained ten-security regression scenario.
 
 ## Build × Learn model
 
@@ -84,21 +85,22 @@ Freeze minimum identity/event seams first. Freeze detailed fields only when the 
 
 ## Immediate product target
 
-`GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` must ship one operator loop:
+`GV-OPERATED-PORTFOLIO-25-1` must ship one scalable operator loop:
 
 ```text
-review ten distinct permanent identities across two clusters
-→ confirm and fund at least three positions with classified residual cash
+review exactly 25 distinct permanent identities across at least two meaningful clusters
+→ inspect owned evidence/thesis state and one competition across all 25
+→ confirm one portfolio and fund multiple positions with classified residual cash
 → persist and reopen
 → record one explicit no-change observation
 → persist and reopen
-→ authorize one SELL/REDUCE plus BUY/FUND transition
+→ authorize at least one SELL/REDUCE plus one BUY/FUND from exact target deltas
 → reconcile positions, cash, costs, NAV, and zero residual
-→ persist, restart, reopen, and explain changed why
-→ prove exact replay, idempotence, and correction lineage
+→ persist, restart, reopen, correct append-only, and explain changed why
+→ prove exact replay and complete the flow within four required actions
 ```
 
-The product entrypoint is `operated_portfolio_app.py`; `launch_operated_portfolio.py` launches it. The candidate is not accepted until focused tests, fresh-checkout AppTest, full terminal regression, and independent A/B/C pass on one immutable SHA.
+The shared product entrypoint is `operated_portfolio_app.py`; `launch_operated_portfolio.py` retains the ten-security regression and `launch_operated_portfolio_25.py` selects the 25-security scenario. One engine, storage path, application, and view serve both scenarios. The phase is not accepted until one frozen SHA passes exact-head Windows/Linux, controlled base/candidate comparison, and independent A/B/C.
 
 ## Forbidden on the current path
 

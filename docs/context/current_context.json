@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-31T16:39:21Z",
+  "generated_at_utc": "2026-08-01T09:39:19Z",
   "source_files": [
     "docs/context/ACTIVE_BRIEF",
     "docs/context/bridge_contract_current.md",
@@ -57,7 +57,7 @@
     "docs/handover/phase65_optimizer_core_structured_diagnostics_handover.md",
     "docs/handover/phase65_rule100_dynamic_ui_replay_ytd_handover.md",
     "docs/lessonss.md",
-    "docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md",
+    "docs/phase_brief/gv-operated-portfolio-25-1-brief.md",
     "docs/phase_brief/phase-E0-brief.md",
     "docs/phase_brief/phase0-brief.md",
     "docs/phase_brief/phase0-gv-micro-portfolio-vertical-0-brief.md",
@@ -123,30 +123,38 @@
   ],
   "active_phase": -1,
   "what_was_done": [
-    "Reconciled terminal classifications without rewriting immutable commits or tags.",
-    "Restored the frozen roadmap's distinct-security quantities and challenger-outcome chain as controlling acceptance.",
-    "Implemented one ten-instrument, two-cluster portfolio state machine with unique evidence and theses.",
-    "Added shared deterministic SELL order/fill and accounting semantics.",
-    "Added multi-position funding, explicit no-change, reduce-and-fund transition, changed-why, exact replay, correction lineage, atomic persistence, reopen, and Streamlit product entrypoints.",
-    "Added focused domain/persistence tests and a black-box AppTest specification."
+    "Selected `GV-OPERATED-PORTFOLIO-25-1` through `docs/context/ACTIVE_BRIEF` after explicit owner authorization.",
+    "Added declarative retained ten-security and new 25-security scenarios.",
+    "Evolved the existing operated engine, shared persistence, application, and view to serve both scenarios.",
+    "Exercised the 25-security flow through confirmation, no-change, SELL+BUY transition, correction, persistence, replay, and fresh-process reopen.",
+    "Preserved the complete ten-security flow through the same path.",
+    "Added focused 25-security domain, ownership, persistence, workload, and black-box AppTest coverage.",
+    "Updated operated CI triggers for the new scenario, launcher, tests, and active brief.",
+    "Current evidence is local checkpoint evidence only: seven externally retained JUnit receipts cover `449` tests with `0` failures, `0` errors, and `0` skips; `pip check` and generated-context validation pass. No candidate SHA, hosted exact-head result, controlled full-suite comparison, or independent terminal A/B/C exists yet."
   ],
   "what_is_locked": [
-    "`ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` only.",
-    "Authority base remains exact Challenger terminal `3e4dc957f475945169ddf33ed359254bd98dc64d`.",
-    "Slice 0 and Replay 0 are accepted; Bounded/Scale/Universe/Challenger are substrates with original semantic gates incomplete.",
-    "Exactly ten distinct instruments, at least two clusters, one book, at least three funded positions, classified cash, no-change, SELL/REDUCE plus BUY/FUND, replay, correction lineage, persistence/reopen, and changed-why are non-weakenable.",
-    "Limited Live remains closed and unauthorized.",
-    "Pre-terminal accepted endgame progress was `52/100`; terminal accepted progress is `62/100`."
+    "Exactly one portfolio containing exactly 25 distinct permanent identities.",
+    "At least two meaningful clusters and one competition covering every identity exactly once.",
+    "Instrument-owned evidence and thesis state; cross-instrument rebinding fails closed.",
+    "One shared engine, persistence implementation, application, and view for both scenarios.",
+    "Accepted `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` behavior remains protected by immutable Git custody and regression tests through the shared path.",
+    "Multiple funded positions, classified cash, explicit no-change, SELL/REDUCE plus BUY/FUND, deterministic accounting, replay, correction, and reopen.",
+    "No more than four required operator actions and zero per-security confirmations.",
+    "Accepted endgame progress remains `62/100`; Limited Live remains closed."
   ],
   "what_is_next": [
-    "Preserve executable candidate `0d15e9c`, the documentation-only closure commit, `main`, and `gv-operated-portfolio-10-transition-1r-terminal` as immutable terminal identities.",
-    "Keep Limited Live, providers, broker, optimizer, alpha/score uplift, and live capital closed.",
-    "Stop. No successor product phase opens until the owner selects one smallest end-to-end result and explicitly approves it."
+    "Regenerate and validate current context after authority reconciliation.",
+    "Retain pre-freeze receipts for changed-path ownership, CI triggers, exact-head checkout, dependency coverage, failset method, and evidence destination.",
+    "Run broad local validation and stop on any declared product, architecture, accounting, replay, restart, or regression rule.",
+    "Freeze exactly one candidate only after the pre-freeze gate passes.",
+    "Then run exact-head Windows/Linux CI, controlled base/candidate comparison, and independent Reviewer A/B/C."
   ],
-  "first_command": "`.venv\\\\Scripts\\\\python -m pytest -q tests/gv_portfolio_v0 tests/test_build_context_packet.py tests/test_phase60_d343_hygiene.py tests/test_phase60_d345_closeout.py tests/test_phase61_context_hygiene.py`",
+  "first_command": "C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pytest -q tests/gv_portfolio_v0/test_operated.py tests/gv_portfolio_v0/test_operated_25.py tests/gv_portfolio_v0/test_operated_app.py",
   "next_todos": [
-    "verify remote `main` and terminal tag equal the closure commit;",
-    "preserve all terminal identities;",
-    "await explicit `approve next phase` before any new implementation."
+    "Regenerate and validate current context after authority reconciliation.",
+    "Retain pre-freeze receipts for changed-path ownership, CI triggers, exact-head checkout, dependency coverage, failset method, and evidence destination.",
+    "Run broad local validation and stop on any declared product, architecture, accounting, replay, restart, or regression rule.",
+    "Freeze exactly one candidate only after the pre-freeze gate passes.",
+    "Then run exact-head Windows/Linux CI, controlled base/candidate comparison, and independent Reviewer A/B/C."
   ]
 }

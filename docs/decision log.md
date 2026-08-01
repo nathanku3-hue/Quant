@@ -7682,3 +7682,14 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Publication law: create exactly one documentation-only closure commit; require every path outside `docs/` to be byte-identical to `0d15e9c`; fast-forward `main` only; create `gv-operated-portfolio-10-transition-1r-terminal` only after remote equality is verified.
 - Score: preserve `52/100` as the pre-terminal assessment and accept `62/100` as terminal endgame progress for this slice.
 - Scope remains closed: no successor phase, Scale, Universe, Challenger compatibility, provider, optimizer, broker, alpha/score uplift, Limited Live, or live capital is authorized.
+
+## 2026-08-01 — AUTHORIZE_GV_OPERATED_PORTFOLIO_25_1; PREFREEZE_CHECKPOINT
+
+- Owner authorization: exact token `approve next phase` opens only `GV-OPERATED-PORTFOLIO-25-1` from terminal base `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`.
+- Product result: one real portfolio containing exactly 25 permanent identities, deterministic competition/accounting/replay, bounded four-action workload, persistence, correction, restart, and fresh-process reopen.
+- Architecture decision: retained ten-security and active 25-security scenarios use one operated engine, one persistence implementation, one application, and one view. Genericization has no independent milestone status.
+- Authority decision: scenario data owns fixture identities, evidence, reviews, observations, and transition targets; the shared engine derives execution legs and projections. Cross-instrument evidence/thesis rebinding fails closed; identical content is legal only with explicit ownership and independent canonical identity.
+- Current local checkpoint: 449 operated, substrate, FS0, and context tests pass with zero failures/errors/skips; `pip check` passes under Python 3.12.10, pytest 9.1.0, Streamlit 1.58.0.
+- Evidence custody: JUnit receipts are retained outside the checkout under `%TEMP%`; one-command execution was transport-invalid due DevSpace HTTP 502 and is not counted.
+- Candidate custody remains open: managed worktree creation failed on inaccessible/overlong legacy paths, so current bytes remain uncommitted in the already isolated terminal worktree. `main` and the terminal tag were not moved. Attach bytes to `codex/gv-operated-portfolio-25-1` before freezing any candidate.
+- Score remains `62/100`; no hosted, failset, independent review, terminal, or Live claim is made.

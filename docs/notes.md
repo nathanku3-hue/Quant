@@ -6599,3 +6599,15 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Score: pre-terminal `52/100`; terminal accepted `62/100`.
 - No runtime formula or implementation byte changes in the documentation-only closure commit. Limited Live remains closed.
 
+## GV Operated Portfolio 25 pre-freeze checkpoint (2026-08-01)
+
+- Scenario identity formula: `scenario_definition_hash = domain_hash("GV-OPERATED-SCENARIO:V1", canonical_scenario)`; the persisted envelope binds both `scenario_id` and this hash before workspace validation.
+- Instrument identity formula remains content-derived from namespace, permanent key, and security class; exactly one candidate row per scenario instrument is required in every capital competition.
+- Evidence ownership rule: each review must retain the initial evidence identity owned by its instrument; a reference to another instrument's owned evidence fails even when text is identical.
+- Selection formula remains `selected = sort(eligible candidates, -net_score_bps, instrument_id) where target_quantity > 0`.
+- Transition formula remains `delta_i = target_after_i - target_before_i`; positive delta emits BUY, negative delta emits SELL of absolute quantity, zero emits no leg.
+- Workload acceptance: `required_actions = confirm + no_change + transition + correction <= 4`; per-security confirmations must equal zero.
+- Fixture parameters: 25 identities, five clusters, eight initial positions, and current transition-leg count. Only exactly 25 identities and the semantic acceptance contract are phase authority.
+- Local pre-freeze gate: 449 tests, 0 failures, 0 errors, 0 skips; receipts under `%TEMP%`; combined single-command attempts returning DevSpace HTTP 502 are not evidence.
+- Candidate custody remains open until current bytes are attached to `codex/gv-operated-portfolio-25-1`; no score uplift or terminal claim.
+

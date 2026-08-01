@@ -329,16 +329,18 @@ def test_persisted_workspace_tamper_fails_closed(tmp_path: Path) -> None:
         load_workspace(root=root)
 
 
-def test_validation_rejects_duplicate_identity_and_cloned_thesis() -> None:
+def test_validation_rejects_duplicate_identity_and_cross_instrument_thesis_rebinding() -> None:
     workspace = build_draft_workspace()
     duplicate = deepcopy(workspace)
     duplicate["instruments"][1] = deepcopy(duplicate["instruments"][0])
     with pytest.raises(OperatedPortfolioError):
         validate_workspace(duplicate, allow_draft=True)
 
-    cloned = deepcopy(workspace)
-    cloned["reviews"][1]["living_thesis_lite"]["principal_claim"] = cloned[
-        "reviews"
-    ][0]["living_thesis_lite"]["principal_claim"]
-    with pytest.raises(OperatedPortfolioError, match="COPIED_THESIS_PROHIBITED"):
-        validate_workspace(cloned, allow_draft=True)
+    rebound = deepcopy(workspace)
+    rebound["reviews"][1]["living_thesis_lite"] = deepcopy(
+        rebound["reviews"][0]["living_thesis_lite"]
+    )
+    with pytest.raises(
+        OperatedPortfolioError, match="THESIS_INSTRUMENT_OWNER_MISMATCH"
+    ):
+        validate_workspace(rebound, allow_draft=True)
