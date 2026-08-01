@@ -1,53 +1,44 @@
 # Impact Packet — Current
 
 Date: 2026-08-01
-Active phase: `GV-OPERATED-PORTFOLIO-25-1`
-Base: terminal `main` at `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`
-Status: `IMPLEMENTATION_CHECKPOINT; NOT_FROZEN; NOT_TERMINAL`
+Phase: `GV-OPERATED-PORTFOLIO-25-1`
+Status: `TERMINAL_ACCEPTED`
 
 ## Product impact
 
-The active checkpoint evolves the accepted operated product from one hard-coded ten-security fixture into one shared scenario-driven path:
+The accepted product advances from one terminal ten-security operated portfolio to one terminal 25-security operated portfolio without changing the product architecture. Both scenarios use the same engine, persistence implementation, schema family, application, and view.
 
-- retained ten-security regression scenario;
-- new 25-security product scenario;
-- exactly one portfolio book per workspace;
-- one capital competition covering every scenario identity exactly once;
-- multiple funded positions and classified residual cash;
-- explicit no-change, real SELL/REDUCE plus BUY/FUND transition, correction, persistence, replay, and fresh-process reopen;
-- summary-first and exceptions-first presentation;
-- no more than four required operator actions.
+The accepted 25-security result adds:
+
+- exactly 25 permanent identities with instrument-owned evidence and theses;
+- one deterministic competition across all identities;
+- multiple funded positions plus classified residual cash;
+- explicit no-change with no economic mutation;
+- a real SELL/REDUCE plus BUY/FUND transition derived from target deltas;
+- deterministic positions, cash, costs, NAV, and unexplained residual `0`;
+- exact replay, certification-history replay, append-only correction, restart, and fresh-process reopen;
+- summary-first and exceptions-first operation within four actions and without per-security confirmations.
 
 ## Architecture impact
 
-Changed shared paths:
+- No parallel engine, storage implementation, schema family, application, or view was added.
+- Declarative scenario data owns identities, evidence, reviews, observations, and targets.
+- Shared runtime code owns selection, allocation, execution, accounting, certification, replay, correction, and display projections.
+- Retained ten-security behavior remains a regression contract rather than a frozen implementation limit.
 
-- `gv_portfolio_v0/operated.py`: derives identity, review, transition, validation, and changed-why expectations from a declarative scenario;
-- `gv_portfolio_v0/operated_storage.py`: uses one scenario-bound envelope and shared persistence implementation;
-- `views/gv_operated_portfolio_workspace.py`: renders dynamic counts, cluster summaries, exceptions, and scenario-specific actions;
-- `operated_portfolio_app.py`: selects a declarative scenario through environment configuration;
-- `gv_portfolio_v0/operated_scenarios.py`: owns retained 10- and new 25-security scenario data;
-- `launch_operated_portfolio_25.py`: thin scenario-selecting launcher only.
+## Evidence impact
 
-No second domain engine, persistence implementation, schema family, application, or view stack was created. Shared book, execution, and replay primitives remain reused.
+- Certified executable candidate: `7ce85c41e9c3b6492ec884a69dc7857538386ba2`.
+- Exact-head operated CI: Windows and Ubuntu PASS in runs `30697940370` and `30697901204`.
+- Exact-head FS0 authority CI and byte parity: PASS in runs `30697940369` and `30697901213`.
+- Controlled complete-suite comparison: zero candidate-only failures.
+- Independent terminal Reviewer A/B/C: PASS/PASS/PASS.
+- Earlier fresh-process and terminal-data-integrity blockers are closed.
 
-## Test impact
+## Closure impact
 
-- retained ten-security tests remain the compatibility contract;
-- cloned-text rejection was replaced by the approved ownership rule: cross-instrument rebinding fails, while identical content is legal with explicit ownership and independent canonical identity;
-- `tests/gv_portfolio_v0/test_operated_25.py` proves 25 identities, ownership, one competition, bounded actions, accounting, replay, persistence isolation, correction, and fresh-process AppTest;
-- CI path ownership includes the scenario module, 25-security launcher, new phase brief, and shared changed paths.
+This closure changes documentation and generated context only. Production, test, workflow, dependency, and configuration bytes remain identical to `7ce85c4`. `main` advances only by fast-forward, and `gv-operated-portfolio-25-1-terminal` identifies the documentation-only closure commit.
 
-## Current evidence
+## Scope and score impact
 
-- focused shared 10/25 domain and AppTest: `23/23 PASS`;
-- complete operated package: PASS in bounded groups;
-- complete FS0 product package: PASS in bounded groups;
-- context/authority tests: PASS before regenerated packet validation;
-- manual shared-path flow: 25 draft → 8 funded → no-change → SELL+BUY → correction; residual `0`.
-
-These are local checkpoint results only. No candidate SHA, hosted exact-head run, controlled full failset comparison, or independent terminal review exists yet.
-
-## Boundary
-
-Accepted endgame progress remains `62/100`. Providers, optimizer, broker, Universe, Challenger, Limited Live, live capital, historical harness compatibility, and repository-wide dependency repair remain excluded.
+Accepted endgame progress remains `62/100`. No score uplift, provider acquisition, optimizer work, broker integration, Universe, Challenger compatibility, alpha uplift, Limited Live, or live-capital authority is inferred from terminal closure. Limited Live remains closed.

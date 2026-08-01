@@ -7693,3 +7693,14 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Evidence custody: JUnit receipts are retained outside the checkout under `%TEMP%`; one-command execution was transport-invalid due DevSpace HTTP 502 and is not counted.
 - Candidate custody remains open: managed worktree creation failed on inaccessible/overlong legacy paths, so current bytes remain uncommitted in the already isolated terminal worktree. `main` and the terminal tag were not moved. Attach bytes to `codex/gv-operated-portfolio-25-1` before freezing any candidate.
 - Score remains `62/100`; no hosted, failset, independent review, terminal, or Live claim is made.
+
+## 2026-08-01 — ACCEPT_GV_OPERATED_PORTFOLIO_25_1; TERMINAL_DOCUMENTATION_CLOSURE
+
+- Decision: terminally accept executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2` with tree `548d6365d6355c709186aef00835219bfa30c387` for `GV-OPERATED-PORTFOLIO-25-1`.
+- Product proof: exactly 25 permanent identities operate in one portfolio through the retained shared engine, persistence implementation, schema family, application, and view; evidence/thesis ownership, one competition, multiple funded positions, classified cash, no-change, SELL/REDUCE plus BUY/FUND, accounting residual `0`, replay, correction, restart, fresh-process reopen, changed-why, and four-action maximum all pass.
+- Hosted proof: exact-head operated runs `30697940370` and `30697901204` pass on Windows and Ubuntu; exact-head FS0 runs `30697940369` and `30697901213` pass on Windows and Ubuntu with byte parity.
+- Regression proof: the controlled complete-suite comparison reports zero candidate-only failures.
+- Review proof: independent terminal Reviewer A/B/C PASS against exact `7ce85c4`; earlier fresh-process and terminal-data-integrity blockers are closed.
+- Publication law: create exactly one documentation-only closure commit on `codex/gv-operated-portfolio-25-1-terminal-closure`; require no production, test, workflow, dependency, or configuration diff from `7ce85c4`; fast-forward `main`; create `gv-operated-portfolio-25-1-terminal` only after remote equality is verified.
+- Evidence economy: do not rerun implementation, complete tests, CI, failset comparison, or Reviewer A/B/C unless a later change alters executable, test, workflow, dependency, or configuration bytes.
+- Score remains `62/100`; Limited Live, providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, and live capital remain closed.

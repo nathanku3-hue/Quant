@@ -1,65 +1,58 @@
 # Done Checklist — Current
 
+Date: 2026-08-01
+Phase: `GV-OPERATED-PORTFOLIO-25-1`
+Status: `TERMINAL_ACCEPTED`
+Accepted score: `62/100`
+Limited Live: `CLOSED; NOT_AUTHORIZED`
+
 ## Authority and scope
 
-- [x] Owner issued exact authorization token `approve next phase`.
 - [x] `ACTIVE_BRIEF` selects `GV-OPERATED-PORTFOLIO-25-1`.
-- [x] Base is terminal `main` at `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`.
-- [x] Ten-security candidate, closure, and terminal tag remain immutable custody.
-- [x] Limited Live, providers, optimizer, broker, Universe, and Challenger remain closed.
-- [ ] First candidate frozen on a dedicated phase branch.
+- [x] Prior terminal `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains immutable.
+- [x] Exactly one operated 25-security portfolio is proved; sessions, cells, runs, slots, and copies do not count as securities.
+- [x] One shared engine, persistence implementation, schema family, application, and view serve retained 10 and accepted 25 scenarios.
+- [x] Limited Live, providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, and live capital remain closed.
 
-## Architecture
+## Product result
 
-- [x] One operated engine serves retained 10-security and new 25-security scenarios.
-- [x] One persistence implementation serves both scenarios.
-- [x] One application and one view stack serve both scenarios.
-- [x] Scenario definitions are declarative.
-- [x] Genericization was not accepted or frozen independently.
-- [x] No parallel domain engine, storage implementation, schema family, or view stack was created.
+- [x] Exactly 25 unique permanent instrument identities and keys.
+- [x] Every instrument retains owned evidence and thesis identity; cross-instrument rebinding fails closed.
+- [x] One deterministic candidate row per identity and one all-instrument capital competition.
+- [x] Multiple positive positions plus classified residual cash.
+- [x] Explicit no-change preserves orders, fills, positions, cash, NAV, and book hash.
+- [x] Real SELL/REDUCE and BUY/FUND legs derive from target deltas.
+- [x] Positions and cash remain nonnegative; costs and NAV reconcile; unexplained residual is `0`.
+- [x] Exact replay, idempotence, certification-history replay, append-only correction, and changed-why pass.
+- [x] Scenario-bound atomic persistence, linked-ancestor confinement, restart, and fresh-process reopen pass.
+- [x] Summary-first and exceptions-first flow requires at most four actions and no per-security confirmations.
+- [x] Retained ten-security behavior remains green through the same path.
 
-## Product capability
+## Candidate custody and terminal evidence
 
-- [x] Exactly 25 distinct permanent identities in one portfolio.
-- [x] At least two meaningful clusters; fixture exercises five.
-- [x] Every identity appears exactly once in capital competition.
-- [x] Evidence and thesis state remain instrument-owned.
-- [x] Cross-instrument rebinding fails closed.
-- [x] Multiple positions are funded and residual cash remains classified.
-- [x] One explicit no-change cycle preserves economics.
-- [x] At least one SELL/REDUCE and one BUY/FUND occur from target deltas.
-- [x] Orders, fills, costs, positions, cash, NAV, and zero residual reconcile.
-- [x] Replay, certification history, correction lineage, persistence, and reopen pass locally.
-- [x] Summary-first and exceptions-first UI completes within four required actions.
-- [x] Retained ten-security full flow remains green.
+- [x] Certified executable candidate is `7ce85c41e9c3b6492ec884a69dc7857538386ba2` with tree `548d6365d6355c709186aef00835219bfa30c387`.
+- [x] Candidate branch `codex/gv-operated-portfolio-25-1` is clean, remote-equal, and immutable.
+- [x] Exact-head operated CI passes on Windows and Ubuntu in runs `30697940370` and `30697901204`.
+- [x] Exact-head FS0 authority CI and byte parity pass in runs `30697940369` and `30697901213`.
+- [x] Controlled base/candidate complete-suite comparison has zero candidate-only failures.
+- [x] Reviewer A passes product result, bounded workload, and retained behavior.
+- [x] Reviewer B passes accounting, execution, replay, certification, correction, hosted runtime, and fresh-process reopen.
+- [x] Reviewer C passes custody, reproducibility, failset identity, atomic persistence, and data integrity.
+- [x] No in-scope Critical/High finding remains.
 
-## Local verification
+## Documentation-only closure
 
-- [x] Focused shared 10/25 domain and AppTest: `23/23 PASS`.
-- [x] Complete `tests/gv_portfolio_v0` passed in bounded groups.
-- [x] Complete `tests/gv_fs0_product` passed in bounded groups.
-- [x] Context/authority tests passed before regenerated current-context validation.
-- [x] `pip check` receipt retained for the current pre-freeze environment.
-- [x] Generated current context rebuilt and validated after authority reconciliation.
-- [x] Broad candidate-local logical gate retained as seven external JUnit receipts: `449/449 PASS`.
+- [x] Terminal evidence packet added.
+- [x] SAW closure report added and reconciles existing A/B/C evidence without rerunning it.
+- [x] PM handover added.
+- [x] Current truth surfaces and active phase brief record terminal acceptance.
+- [x] Generated context is rebuilt and validated.
+- [x] Context and authority validation pass.
+- [x] Diff from `7ce85c4` contains no production, test, workflow, dependency, or configuration change.
+- [x] `main` publication is fast-forward only.
+- [x] Terminal tag is `gv-operated-portfolio-25-1-terminal` and targets the documentation-only closure commit.
+- [x] Accepted score was reconsidered and remains `62/100`; closure alone does not authorize uplift.
 
-## Pre-freeze completeness
+## Stop condition
 
-- [x] Changed-path to focused-test ownership recorded.
-- [x] CI triggers cover every changed authoritative path.
-- [x] Exact-head checkout contract reviewed and retained.
-- [x] Dependency coverage recorded.
-- [x] Base/candidate failset method recorded.
-- [x] Evidence-retention destination recorded outside the candidate checkout.
-
-## Terminal verification
-
-- [ ] One candidate SHA frozen.
-- [ ] Exact-head Windows CI passes.
-- [ ] Exact-head Linux CI passes.
-- [ ] Controlled base/candidate full-suite comparison has zero candidate-only failures.
-- [ ] Reviewer A passes product result, bounded workload, and retained behavior.
-- [ ] Reviewer B passes accounting, replay, certification, and correction.
-- [ ] Reviewer C passes custody, restart, reproducibility, and failset identity.
-- [ ] Documentation-only terminal closure preserves the tested executable tree.
-- [ ] Accepted score reconsidered only after all terminal gates pass.
+Hold after publication. No successor phase starts without explicit owner authorization and a new active brief. Do not rerun implementation, complete tests, hosted CI, failset comparison, or Reviewer A/B/C unless later work changes executable, test, workflow, dependency, or configuration bytes.

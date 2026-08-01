@@ -1,57 +1,31 @@
 # Planner Packet — Current
 
 Date: 2026-08-01
-Canonical authority: `docs/context/gv_endgame_authority_current.md`
-Active brief: `docs/phase_brief/gv-operated-portfolio-25-1-brief.md`
+Decision: `ACCEPT_GV_OPERATED_PORTFOLIO_25_1_TERMINALLY`
+Status: `TERMINAL_ACCEPTED; HOLD_AFTER_PUBLICATION`
 
-## Current truth
+## Authority
 
-- `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains terminally accepted and immutable through candidate `0d15e9c`, closure `2349e1b`, and its terminal tag.
-- `GV-OPERATED-PORTFOLIO-25-1` is owner-authorized, implementation-active, unfrozen, and not terminal.
-- Exactly one shared operated engine, persistence path, application, and view now serve retained 10-security and new 25-security declarative scenarios.
-- Limited Live, providers, optimizer, broker, Universe, and Challenger remain closed.
-- Accepted endgame progress remains `62/100`.
+- **Accepted prior terminal:** `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`; candidate `0d15e9c`, closure `2349e1b`, and terminal tag remain immutable.
+- **Accepted current terminal:** `GV-OPERATED-PORTFOLIO-25-1`; executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`, tree `548d6365d6355c709186aef00835219bfa30c387`.
+- **Publication identity:** documentation-only closure commit tagged `gv-operated-portfolio-25-1-terminal` and fast-forwarded to `main`.
+- **Accepted score:** `62/100`; no automatic uplift from closure.
+- **Live boundary:** Limited Live remains closed and unauthorized.
 
-## Executable checkpoint
+## Result
 
-```text
-10-security regression through shared path: green
-25 distinct identities across 5 fixture clusters
-→ one capital competition across all 25
-→ 8 funded positions + classified residual cash
-→ explicit no-change
-→ SELL + BUY transition
-→ deterministic accounting and residual 0
-→ non-economic correction
-→ fresh-process reopen
-```
+The product now operates exactly 25 permanent securities through the same engine, persistence implementation, schema family, application, and view as the retained ten-security phase. It proves instrument-owned evidence/theses, one all-instrument competition, multiple funded positions, classified cash, explicit no-change, a real SELL/REDUCE plus BUY/FUND transition, exact accounting, replay, correction, restart, fresh-process reopen, changed-why, and a four-action maximum operator path.
 
-Fixture counts beyond exactly 25 identities are exercised values, not product authority.
+## Terminal evidence
 
-## Current local evidence
+- Exact-head operated CI: runs `30697940370` and `30697901204`; Windows and Ubuntu PASS.
+- Exact-head FS0 authority CI: runs `30697940369` and `30697901213`; Windows, Ubuntu, and byte parity PASS.
+- Controlled complete-suite comparison: candidate-only failures `0`.
+- Independent terminal Reviewer A/B/C: PASS/PASS/PASS.
+- Closure boundary: documentation and generated context only; no production, test, workflow, dependency, or configuration delta.
 
-- focused shared 10/25 domain and AppTest: `23/23 PASS`;
-- complete `tests/gv_portfolio_v0`: PASS in bounded groups;
-- complete `tests/gv_fs0_product`: PASS in bounded groups;
-- context/authority tests: `33/33 PASS` before current-context regeneration;
-- retained 10-security behavior remains green;
-- no parallel engine, storage implementation, schema family, or view stack exists.
+## Planner decision
 
-## Open terminal gates
-
-- generated current context after authority reconciliation;
-- changed-path/test ownership receipt;
-- CI trigger and dependency preflight;
-- evidence-retention receipt;
-- one frozen candidate SHA;
-- exact-head Windows/Linux CI;
-- controlled base/candidate full-suite comparison;
-- independent Reviewer A/B/C.
-
-## Next valid action
-
-Complete pre-freeze completeness and broad local validation. Freeze exactly one candidate only after those checks pass. Do not claim score uplift or terminal acceptance before hosted, failset, and independent review evidence.
-
-## Stop conditions
-
-Stop on a parallel domain/storage/view path, weakened 10-security behavior, evidence/thesis ownership failure, more than four required actions, accounting/replay/correction/restart failure, or candidate-only regression. Do not widen into providers, optimizer, broker, Universe, Challenger, Limited Live, or unrelated repair.
+- **NEXT_STEP:** hold after terminal publication until explicit owner authorization selects one new bounded product phase.
+- **DO_NOT_REDECIDE:** the candidate, hosted proof, failset comparison, fresh-process proof, and Reviewer A/B/C are terminal evidence for `7ce85c4`; do not rerun them absent an executable/test/workflow/dependency/configuration change.
+- **DO_NOT_START:** providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, Limited Live, live capital, parallel architecture, compatibility work, or unrelated cleanup.

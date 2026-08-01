@@ -1,118 +1,99 @@
 # Phase Brief — GV-OPERATED-PORTFOLIO-25-1
 
-Mode: `EXECUTION_PACKET`
-Status: `AUTHORIZED; IMPLEMENTATION_ACTIVE; NOT_TERMINAL`
 Date: 2026-08-01
-Base: terminal main `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`
-Owner authorization: exact token `approve next phase`
+Status: `TERMINAL_ACCEPTED`
+Certified executable candidate: `7ce85c41e9c3b6492ec884a69dc7857538386ba2`
+Candidate tree: `548d6365d6355c709186aef00835219bfa30c387`
+Terminal tag: `gv-operated-portfolio-25-1-terminal`
+Primary authority: `docs/context/gv_endgame_authority_current.md`
 
-## Product result
+## Objective
 
-Build one scalable operated-portfolio path exercised by one real 25-security scenario. Preserve the certified ten-security behavior through immutable Git custody and regression tests, not permanent source-byte identity.
+Prove one genuinely operated portfolio containing exactly 25 distinct permanent securities while preserving deterministic competition, accounting, replay, bounded operator workload, persistence, restart, correction, fresh-process reopen, and the accepted ten-security behavior through the same product path.
+
+## Accepted product contract
 
 ```text
-review 25 permanent identities across >=2 meaningful clusters
-→ inspect individually owned evidence and Living Thesis Lite state
-→ inspect deterministic competition across all 25
-→ confirm one portfolio and fund multiple positions
-→ retain classified residual cash
-→ persist and reopen
-→ admit one explicit no-change observation
-→ persist and reopen
-→ execute >=1 real SELL/REDUCE and >=1 real BUY/FUND
-→ reconcile orders, fills, positions, cash, costs, NAV, residual
-→ persist, restart, reopen, explain changed why
-→ append one non-economic correction
-→ fresh-process reopen and exact replay
+25 permanent identities with instrument-owned evidence and theses
+→ one all-instrument competition
+→ multiple funded positions and classified residual cash
+→ explicit no-change
+→ SELL/REDUCE plus BUY/FUND transition
+→ deterministic accounting and unexplained residual 0
+→ persist, restart, reopen, and changed-why explanation
+→ append-only correction and fresh-process exact reopen
 ```
 
-## Shared-path architecture
+Acceptance requires:
 
-One operated engine, one persistence implementation, and one presentation stack must serve both declarative scenarios:
+- exactly 25 unique permanent instrument identities;
+- one portfolio book, not 25 sessions, cells, runs, slots, or copied portfolios;
+- one deterministic candidate row per identity and one capital competition;
+- instrument-owned evidence and thesis identity with cross-instrument rebinding rejected;
+- multiple positive positions plus classified residual cash;
+- no-change with no mutation to orders, fills, holdings, cash, NAV, or book hash;
+- at least one real SELL/REDUCE and one real BUY/FUND derived from target deltas;
+- nonnegative positions and cash, explicit costs, exact NAV reconciliation, and unexplained residual `0`;
+- exact replay, idempotence, certification-history replay, correction lineage, atomic persistence, restart, and fresh-process reopen;
+- summary-first and exceptions-first Streamlit flow within four required actions and without per-security confirmations;
+- retained ten-security behavior through the same engine, persistence implementation, application, and view.
 
-- retained ten-security regression scenario;
-- new 25-security product scenario.
+## Architecture boundary
 
-A thin scenario-selecting launcher is allowed. A parallel domain engine, persistence implementation, schema family, or view stack is prohibited unless a demonstrated coupling defect makes the shared path impossible without semantic weakening.
+One engine, one persistence implementation, one schema family, one application, and one view serve the retained ten-security and accepted 25-security scenarios. Scenario declarations own fixture identities, evidence, reviews, observations, and transition targets. The shared engine owns selection, allocation, execution legs, books, certifications, replay, correction, and product projections.
 
-Checkpoint A genericization cannot be accepted, reviewed as progress, banked, or frozen independently. Its first admissible proof is Checkpoint B running the 25-security scenario through the same engine while the ten-security regression remains green.
+Genericization has no independent acceptance status. It earns authority only because the 25-security product executes through it while the ten-security regression remains intact.
 
-## Non-weakenable acceptance
+## Terminal evidence
 
-- exactly one portfolio containing exactly 25 distinct permanent identities;
-- at least two meaningful economic clusters;
-- every identity appears exactly once in capital competition;
-- individually owned evidence and thesis state;
-- cross-instrument evidence or thesis rebinding fails closed;
-- identical content is allowed only with explicit instrument ownership and independent canonical identity;
-- multiple funded positions and classified residual cash;
-- at least one real reduction/sale and one funding/purchase;
-- one explicit no-change cycle;
-- deterministic accounting, replay, certification, correction, persistence and reopen;
-- summary-first, exceptions-first, fully inspectable UX;
-- no more than four required operator actions and zero per-security confirmations;
-- retained ten-security flow remains green through the same engine.
+- Exact candidate custody: branch `codex/gv-operated-portfolio-25-1`, local and remote at `7ce85c4`, clean and immutable.
+- Hosted operated CI: runs `30697940370` and `30697901204`, Windows PASS and Ubuntu PASS.
+- Hosted FS0 authority CI: runs `30697940369` and `30697901213`, Windows PASS, Ubuntu PASS, and byte-parity PASS.
+- Controlled complete-suite comparison: zero candidate-only failures.
+- Fresh-process restart and corrected-state reopen: PASS.
+- Independent terminal Reviewer A/B/C: PASS/PASS/PASS; no remaining in-scope Critical/High finding.
+- Terminal closure: documentation and generated context only; no production, test, workflow, dependency, or configuration change.
 
-Fixture values such as cluster count, funded-position count, or transition-leg count are exercised parameters, not product authority.
+## Terminal disposition
 
-## Execution topology
+`GV-OPERATED-PORTFOLIO-25-1` is accepted at executable candidate `7ce85c4`. The documentation-only closure commit containing this brief is the publication commit. `main` may move only by fast-forward, and `gv-operated-portfolio-25-1-terminal` must resolve to that closure commit.
 
-Streams are logical ownership boundaries, not a requirement for six workers. Default to one implementer; parallelize only genuinely disjoint read-only or additive work after shared interfaces are fixed.
-
-## Pre-freeze gate
-
-Before freezing a candidate, retain one preflight covering changed-path test ownership, CI triggers, exact-head checkout, dependency coverage, base/candidate failset method, and evidence-retention destination. Then run exact-head Windows/Linux CI, full comparison, and independent Reviewer A/B/C concurrently.
-
-## Stop rules
-
-Stop if:
-
-- 25 securities require a parallel engine, persistence implementation, schema family, or view stack;
-- retained ten-security behavior is weakened;
-- any identity lacks exact evidence/thesis ownership or appears other than once in competition;
-- the full flow exceeds four required actions;
-- accounting, replay, certification, correction, confinement, restart, or candidate-only regression fails;
-- the phase widens into providers, optimizer, broker, Universe, Challenger, Limited Live, dependency repair, or unrelated repository repair.
+Accepted endgame progress remains `62/100`; terminal closure does not independently authorize a score uplift. Limited Live remains closed and unauthorized.
 
 ## Forbidden scope
 
-Providers; external ingestion; optimizer expansion; broker routing; shorting; leverage; derivatives; alpha/score uplift; Universe Scale; Challenger Promotion; Limited Live; live capital; historical Scale/Universe compatibility; general workflow frameworks; repository-wide dependency work.
+Do not open provider acquisition, optimizer work, broker integration, Universe, Challenger compatibility, alpha/score uplift, Limited Live, live capital, a parallel engine/storage/view path, compatibility adapters, repository-wide dependency repair, or unrelated cleanup.
+
+## New Context Packet
 
 ## What Was Done
 
-- Selected `GV-OPERATED-PORTFOLIO-25-1` through `docs/context/ACTIVE_BRIEF` after explicit owner authorization.
-- Added declarative retained ten-security and new 25-security scenarios.
-- Evolved the existing operated engine, shared persistence, application, and view to serve both scenarios.
-- Exercised the 25-security flow through confirmation, no-change, SELL+BUY transition, correction, persistence, replay, and fresh-process reopen.
-- Preserved the complete ten-security flow through the same path.
-- Added focused 25-security domain, ownership, persistence, workload, and black-box AppTest coverage.
-- Updated operated CI triggers for the new scenario, launcher, tests, and active brief.
-
-Current evidence is local checkpoint evidence only: seven externally retained JUnit receipts cover `449` tests with `0` failures, `0` errors, and `0` skips; `pip check` and generated-context validation pass. No candidate SHA, hosted exact-head result, controlled full-suite comparison, or independent terminal A/B/C exists yet.
+- Terminally accepted `GV-OPERATED-PORTFOLIO-25-1` at exact executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`.
+- Proved one real 25-security operated portfolio through the shared product path while preserving the accepted ten-security terminal.
+- Bound exact-head Windows/Linux operated CI, FS0 authority CI, byte parity, controlled zero-candidate-only comparison, fresh-process reopen, and independent Reviewer A/B/C to the same SHA.
+- Preserved the accepted `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` terminal and its tag unchanged.
+- Published one documentation-only terminal closure with no production, test, workflow, dependency, or configuration change.
 
 ## What Is Locked
 
-- Exactly one portfolio containing exactly 25 distinct permanent identities.
-- At least two meaningful clusters and one competition covering every identity exactly once.
-- Instrument-owned evidence and thesis state; cross-instrument rebinding fails closed.
-- One shared engine, persistence implementation, application, and view for both scenarios.
-- Accepted `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` behavior remains protected by immutable Git custody and regression tests through the shared path.
-- Multiple funded positions, classified cash, explicit no-change, SELL/REDUCE plus BUY/FUND, deterministic accounting, replay, correction, and reopen.
-- No more than four required operator actions and zero per-security confirmations.
-- Accepted endgame progress remains `62/100`; Limited Live remains closed.
+- `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains an immutable accepted foundation.
+- `GV-OPERATED-PORTFOLIO-25-1` is terminally accepted at `7ce85c4` through one shared product path.
+- Accepted endgame progress remains `62/100`.
+- Limited Live, providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, and live capital remain closed.
 
 ## What Is Next
 
-- Regenerate and validate current context after authority reconciliation.
-- Retain pre-freeze receipts for changed-path ownership, CI triggers, exact-head checkout, dependency coverage, failset method, and evidence destination.
-- Run broad local validation and stop on any declared product, architecture, accounting, replay, restart, or regression rule.
-- Freeze exactly one candidate only after the pre-freeze gate passes.
-- Then run exact-head Windows/Linux CI, controlled base/candidate comparison, and independent Reviewer A/B/C.
+- Hold after terminal publication.
+- Open no successor phase until the owner explicitly authorizes one bounded product result.
+- Do not rerun implementation, complete tests, hosted CI, failset comparison, or Reviewer A/B/C unless a later change alters executable, test, workflow, dependency, or configuration bytes.
 
 ## First Command
 
 ```text
-C:\Users\Lenovo\AppData\Local\Programs\Python\Python312\python.exe -m pytest -q tests/gv_portfolio_v0/test_operated.py tests/gv_portfolio_v0/test_operated_25.py tests/gv_portfolio_v0/test_operated_app.py
+git status --short
 ```
 
-Expected checkpoint result: retained ten-security and active 25-security flows pass through the same operated engine and product surface.
+## Next Todos
+
+- Verify clean custody before any future phase.
+- Require explicit owner authorization and a new active brief before execution resumes.

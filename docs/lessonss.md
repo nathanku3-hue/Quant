@@ -2132,3 +2132,12 @@ Application pattern:
 - Fix applied: retained immutable candidate/closure/tag custody while evolving one shared engine, persistence implementation, app, and view; moved fixture state into declarative 10/25 scenarios; recut authority tests to distinguish accepted foundation from active phase; used Windows-native `%TEMP%` JUnit paths; split one logical gate into externally retained bounded runs.
 - Guardrail for next time: genericization cannot be accepted before the new product runs through it; authority tests must separately assert historical custody, accepted foundations, and active state; evidence paths must be native to the executing interpreter; connector 502 runs are transport-invalid and never count as test results.
 - Evidence paths: `gv_portfolio_v0/operated_scenarios.py`, `gv_portfolio_v0/operated.py`, `tests/gv_portfolio_v0/test_operated_25.py`, `tests/gv_fs0_product/test_authority_chain.py`, `tests/gv_fs0_product/test_canonical_integrity_gate.py`, `docs/context/e2e_evidence/gv_operated_portfolio_25_prefreeze_20260801.md`.
+
+## 2026-08-01 Round Entry (Terminal Evidence Should Not Be Repeated When Closure Cannot Affect It)
+
+- Date: 2026-08-01
+- Mistake or miss: a terminal documentation pass can default to rerunning implementation, complete tests, hosted CI, failset comparison, and independent reviewers even when every product gate already binds to one immutable executable SHA.
+- Root cause: evidence production was treated as a generic closure ritual rather than a response to a specific decision risk. This adds time and can create conflicting receipts without improving the terminal decision.
+- Fix applied: froze `7ce85c4` as the sole executable candidate, reconciled its existing exact-head Windows/Linux, byte-parity, zero-candidate-only, fresh-process, and Reviewer A/B/C evidence, and limited closure to documentation/generated context plus custody publication.
+- Guardrail for next time: rerun a terminal gate only when the proposed closure or successor changes bytes that the gate can observe—production, tests, workflows, dependencies, or executable configuration. Otherwise prove byte identity, publish once by fast-forward, tag, and stop.
+- Evidence paths: `docs/context/e2e_evidence/gv_operated_portfolio_25_1_terminal_20260801.md`, `docs/saw_reports/saw_gv_operated_portfolio_25_1_terminal_20260801.md`, `docs/handover/phase_gv_operated_portfolio_25_1_handover.md`.
