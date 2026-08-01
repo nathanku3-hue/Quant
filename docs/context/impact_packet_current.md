@@ -1,44 +1,32 @@
 # Impact Packet — Current
 
 Date: 2026-08-01
-Phase: `GV-OPERATED-PORTFOLIO-25-1`
-Status: `TERMINAL_ACCEPTED`
+Phase: `GV-ENGINE-SCALE-CHARACTERIZATION-1`
+Status: `FROZEN_FINDING; REVIEW_BLOCKED`
 
 ## Product impact
 
-The accepted product advances from one terminal ten-security operated portfolio to one terminal 25-security operated portfolio without changing the product architecture. Both scenarios use the same engine, persistence implementation, schema family, application, and view.
+No new product capability is accepted. Diagnostic candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283` is frozen and remote-equal. Synthetic 50/100 scenarios execute through the existing engine in memory, but neither can use the existing persistence/product path. Accepted progress remains `62/100`.
 
-The accepted 25-security result adds:
+## Changed implementation surfaces
 
-- exactly 25 permanent identities with instrument-owned evidence and theses;
-- one deterministic competition across all identities;
-- multiple funded positions plus classified residual cash;
-- explicit no-change with no economic mutation;
-- a real SELL/REDUCE plus BUY/FUND transition derived from target deltas;
-- deterministic positions, cash, costs, NAV, and unexplained residual `0`;
-- exact replay, certification-history replay, append-only correction, restart, and fresh-process reopen;
-- summary-first and exceptions-first operation within four actions and without per-security confirmations.
+- `gv_portfolio_v0/operated_scenarios.py` — adds declarative 50/100 synthetic diagnostic inputs only.
+- `scripts/characterize_gv_engine_scale.py` — fresh-process measurement and unchanged-persistence probe.
+- `tests/gv_portfolio_v0/test_engine_scale_characterization.py` — scenario identity, existing-engine operation, deterministic repeat, persistence stop, timestamp stop, and accepted-25 non-mutation checks.
 
-## Architecture impact
-
-- No parallel engine, storage implementation, schema family, application, or view was added.
-- Declarative scenario data owns identities, evidence, reviews, observations, and targets.
-- Shared runtime code owns selection, allocation, execution, accounting, certification, replay, correction, and display projections.
-- Retained ten-security behavior remains a regression contract rather than a frozen implementation limit.
+No engine selection, execution, accounting, replay, certification, correction, storage, application, view, workflow, dependency, broker, provider, or live-capital logic is changed.
 
 ## Evidence impact
 
-- Certified executable candidate: `7ce85c41e9c3b6492ec884a69dc7857538386ba2`.
-- Exact-head operated CI: Windows and Ubuntu PASS in runs `30697940370` and `30697901204`.
-- Exact-head FS0 authority CI and byte parity: PASS in runs `30697940369` and `30697901213`.
-- Controlled complete-suite comparison: zero candidate-only failures.
-- Independent terminal Reviewer A/B/C: PASS/PASS/PASS.
-- Earlier fresh-process and terminal-data-integrity blockers are closed.
+- 50: 6.43–6.45 seconds, 30.1–30.3 MB peak working set, 48 events, 18 orders/fills, residual `0`, repeat hashes equal.
+- 100: 11.77–11.96 seconds, 32.3–32.4 MB peak working set, 80 events, 34 orders/fills, residual `0`, repeat hashes equal.
+- Both: existing persistence rejects the scenario ID before write.
+- 100: 40 malformed timestamps from `12:60` to `12:99`.
 
-## Closure impact
+## Documentation impact
 
-This closure changes documentation and generated context only. Production, test, workflow, dependency, and configuration bytes remain identical to `7ce85c4`. `main` advances only by fast-forward, and `gv-operated-portfolio-25-1-terminal` identifies the documentation-only closure commit.
+The active brief, top-level roadmap, current truth surfaces, evidence packet, custody decision, handover, decision log, lesson log, and SAW report classify P1 as a frozen diagnostic finding with SAW BLOCK because independent Reviewer A/B/C and current hierarchy confirmation are unavailable. P0 terminal custody and score remain unchanged.
 
-## Scope and score impact
+## Open impact
 
-Accepted endgame progress remains `62/100`. No score uplift, provider acquisition, optimizer work, broker integration, Universe, Challenger compatibility, alpha uplift, Limited Live, or live-capital authority is inferred from terminal closure. Limited Live remains closed.
+A later bounded repair would touch shared persistence naming/root selection and initial evidence timestamp generation. That repair is not included here. P2, Universe acceptance, Challenger, broker integration, and Limited Live remain closed.

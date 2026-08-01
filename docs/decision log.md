@@ -7704,3 +7704,18 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Publication law: create exactly one documentation-only closure commit on `codex/gv-operated-portfolio-25-1-terminal-closure`; require no production, test, workflow, dependency, or configuration diff from `7ce85c4`; fast-forward `main`; create `gv-operated-portfolio-25-1-terminal` only after remote equality is verified.
 - Evidence economy: do not rerun implementation, complete tests, CI, failset comparison, or Reviewer A/B/C unless a later change alters executable, test, workflow, dependency, or configuration bytes.
 - Score remains `62/100`; Limited Live, providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, and live capital remain closed.
+
+## 2026-08-01 — FREEZE_GV_ENGINE_SCALE_CHARACTERIZATION_1_WITH_FINDINGS
+
+- Harness authority: begin P1 directly from immutable terminal closure `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`; no owner authorization token is required by the current harness system.
+- Scope: declarative 50-security characterization, declarative 100-security stress, two fresh-process domain runs each, external timing/memory measurement, unchanged-persistence probe, timestamp-validity probe, and a parallel custody/handoff decision. No feature development or repair is authorized inside the spike.
+- 50 result: both runs reach `CORRECTED_CERTIFIED`; scenario/state/event/book hashes are equal; residual is `0`; 48 events and 18 orders/fills; 6.43–6.45 seconds; 30.1–30.3 MB peak working set.
+- 100 result: both runs reach `CORRECTED_CERTIFIED`; hashes are equal; residual is `0`; 80 events and 34 orders/fills; 11.77–11.96 seconds; 32.3–32.4 MB peak working set.
+- Stop finding 1: existing shared persistence accepts only the retained 10- and accepted 25-security IDs, so both scale scenarios fail before save/reopen or product UI operation.
+- Stop finding 2: initial evidence timestamp generation treats the instrument index as a minute in one fixed hour; 100 securities produce 40 invalid timestamps from `12:60` through `12:99`.
+- Acceptance: deterministic in-memory engine behavior and accounting pass; persistence, reopen, correction-after-reopen, and operational workload fail or are not reached. The 100-security run is diagnostic and does not accept Universe Scale.
+- Custody decision: provisionally select one owner-controlled proprietary account with broker custody and human order submission; Terminal Zero holds no client assets, broker credentials, or autonomous order authority. Qualified Australian legal review remains open.
+- Prospective baseline: not started; repeating the same fixture is replay evidence, not prospective operation.
+- Diagnostic custody: implementation/test candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283`, tree `e048f2483c64fcf7a9cae58e8454b70d7e993e78`, is immutable and remote-equal on `codex/gv-engine-scale-characterization-1`; never move `gv-operated-portfolio-25-1-terminal`.
+- Review disposition: local implementation, regression, authority, context, and measurement checks pass, but independent Reviewer A/B/C and a current scale/custody hierarchy confirmation are unavailable. SAW is BLOCKED; no reviewed or accepted product claim is made.
+- Score remains `62/100`; P2 Challenger and P3 Limited Live remain closed.

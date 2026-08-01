@@ -1,58 +1,53 @@
 # Done Checklist — Current
 
 Date: 2026-08-01
-Phase: `GV-OPERATED-PORTFOLIO-25-1`
-Status: `TERMINAL_ACCEPTED`
+Phase: `GV-ENGINE-SCALE-CHARACTERIZATION-1`
+Status: `FROZEN_FINDING; REVIEW_BLOCKED`
 Accepted score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
-## Authority and scope
+## Scope and custody
 
-- [x] `ACTIVE_BRIEF` selects `GV-OPERATED-PORTFOLIO-25-1`.
-- [x] Prior terminal `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains immutable.
-- [x] Exactly one operated 25-security portfolio is proved; sessions, cells, runs, slots, and copies do not count as securities.
-- [x] One shared engine, persistence implementation, schema family, application, and view serve retained 10 and accepted 25 scenarios.
-- [x] Limited Live, providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, and live capital remain closed.
+- [x] P0 terminal closure `e564cd9` remains immutable.
+- [x] `gv-operated-portfolio-25-1-terminal` remains unchanged.
+- [x] Diagnostic candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283` is immutable and remote-equal.
+- [x] P1 uses the existing engine and probes the existing persistence implementation.
+- [x] No parallel engine, storage path, schema family, application, or view was added.
+- [x] The 100-security run is explicitly diagnostic and not Universe acceptance.
 
-## Product result
+## Characterization
 
-- [x] Exactly 25 unique permanent instrument identities and keys.
-- [x] Every instrument retains owned evidence and thesis identity; cross-instrument rebinding fails closed.
-- [x] One deterministic candidate row per identity and one all-instrument capital competition.
-- [x] Multiple positive positions plus classified residual cash.
-- [x] Explicit no-change preserves orders, fills, positions, cash, NAV, and book hash.
-- [x] Real SELL/REDUCE and BUY/FUND legs derive from target deltas.
-- [x] Positions and cash remain nonnegative; costs and NAV reconcile; unexplained residual is `0`.
-- [x] Exact replay, idempotence, certification-history replay, append-only correction, and changed-why pass.
-- [x] Scenario-bound atomic persistence, linked-ancestor confinement, restart, and fresh-process reopen pass.
-- [x] Summary-first and exceptions-first flow requires at most four actions and no per-security confirmations.
-- [x] Retained ten-security behavior remains green through the same path.
+- [x] Declarative 50-security scenario contains 50 unique permanent keys and symbols.
+- [x] Declarative 100-security scenario contains 100 unique permanent keys and symbols.
+- [x] Each size completed two fresh-process in-memory flows through correction.
+- [x] Scenario, canonical state, canonical events, and book hashes match across repeats.
+- [x] Accounting residual is `0` for both sizes.
+- [x] Wall-clock, peak working set, funded positions, events, orders, fills, NAV, and hashes are recorded.
+- [x] Existing persistence was probed unchanged.
+- [x] Persistence rejection for both diagnostic scenario IDs is recorded as a stop finding.
+- [x] Forty malformed 100-security evidence timestamps are recorded as a stop finding.
+- [ ] Exact persistence and reopen at 50/100 — blocked by finding.
+- [ ] Fresh-process product UI workload at 50/100 — blocked before first executable action.
+- [ ] Repeated prospective paper baseline — not started; fixture replay is not prospective evidence.
 
-## Candidate custody and terminal evidence
+## Custody decision
 
-- [x] Certified executable candidate is `7ce85c41e9c3b6492ec884a69dc7857538386ba2` with tree `548d6365d6355c709186aef00835219bfa30c387`.
-- [x] Candidate branch `codex/gv-operated-portfolio-25-1` is clean, remote-equal, and immutable.
-- [x] Exact-head operated CI passes on Windows and Ubuntu in runs `30697940370` and `30697901204`.
-- [x] Exact-head FS0 authority CI and byte parity pass in runs `30697940369` and `30697901213`.
-- [x] Controlled base/candidate complete-suite comparison has zero candidate-only failures.
-- [x] Reviewer A passes product result, bounded workload, and retained behavior.
-- [x] Reviewer B passes accounting, execution, replay, certification, correction, hosted runtime, and fresh-process reopen.
-- [x] Reviewer C passes custody, reproducibility, failset identity, atomic persistence, and data integrity.
-- [x] No in-scope Critical/High finding remains.
+- [x] Who, what, when, where, how, and exposure are recorded.
+- [x] Credible proprietary-human, proprietary-automated, and client/advisory options are compared.
+- [x] Owner-controlled proprietary account with broker custody and human submission is selected provisionally.
+- [x] Unresolved Australian legal questions and explicit stop rules are recorded.
+- [x] The record states that it is not legal advice or licence clearance.
 
-## Documentation-only closure
+## Validation
 
-- [x] Terminal evidence packet added.
-- [x] SAW closure report added and reconciles existing A/B/C evidence without rerunning it.
-- [x] PM handover added.
-- [x] Current truth surfaces and active phase brief record terminal acceptance.
-- [x] Generated context is rebuilt and validated.
-- [x] Context and authority validation pass.
-- [x] Diff from `7ce85c4` contains no production, test, workflow, dependency, or configuration change.
-- [x] `main` publication is fast-forward only.
-- [x] Terminal tag is `gv-operated-portfolio-25-1-terminal` and targets the documentation-only closure commit.
-- [x] Accepted score was reconsidered and remains `62/100`; closure alone does not authorize uplift.
+- [x] Focused characterization tests pass.
+- [x] Retained 25-security regression tests pass.
+- [x] Characterization script reproduces both findings.
+- [x] Roadmap and current truth surfaces preserve the accepted score `62/100`.
+- [x] P2 Challenger and P3 Limited Live remain closed.
+- [ ] Independent Reviewer A/B/C — unavailable in the current execution environment.
+- [ ] Current hierarchy confirmation — persisted fallback is stale for this scale/custody scope.
 
 ## Stop condition
 
-Hold after publication. No successor phase starts without explicit owner authorization and a new active brief. Do not rerun implementation, complete tests, hosted CI, failset comparison, or Reviewer A/B/C unless later work changes executable, test, workflow, dependency, or configuration bytes.
+Preserve P1 as a frozen diagnostic finding with SAW BLOCK. Do not repair storage or timestamp generation inside this spike. Any repair is a separate bounded round and must preserve accepted 10/25 behavior; it must not be represented as reviewed until independent A/B/C and hierarchy closure exist or their risks are explicitly accepted.

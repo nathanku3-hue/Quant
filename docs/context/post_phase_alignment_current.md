@@ -1,34 +1,37 @@
 # Post-Phase Alignment — Current
 
 Date: 2026-08-01
-Decision: `ACCEPT_GV_OPERATED_PORTFOLIO_25_1_TERMINALLY`
-Status: `TERMINAL_ACCEPTED; HOLD`
+Decision: `FREEZE_GV_ENGINE_SCALE_CHARACTERIZATION_1_WITH_FINDINGS`
+Status: `P1_FROZEN_FINDING; REVIEW_BLOCKED; P2_P3_CLOSED`
 
 ## Alignment
 
-- **Accepted prior terminal preserved:** ten-security candidate `0d15e9c`, closure `2349e1b`, and terminal tag remain immutable.
-- **Accepted current terminal:** `GV-OPERATED-PORTFOLIO-25-1` at executable candidate `7ce85c4`.
-- **Architecture:** retained 10-security and accepted 25-security scenarios use one engine, persistence implementation, schema family, application, and view.
-- **Product result:** exactly 25 permanent identities, instrument-owned evidence/theses, one competition, multiple funding, classified cash, no-change, SELL+BUY transition, replay, correction, restart, fresh-process reopen, and summary-first UX.
-- **Workload:** at most four required actions; zero per-security confirmations.
-- **Terminal proof:** exact-head Windows/Linux operated CI, FS0 authority CI, byte parity, zero candidate-only regressions, and independent Reviewer A/B/C all pass against `7ce85c4`.
-- **Closure:** documentation and generated context only; executable, test, workflow, dependency, and configuration bytes are unchanged.
+- **P0 terminal preserved:** 25-security candidate `7ce85c4`, closure `e564cd9`, and terminal tag remain immutable.
+- **Scale characterization:** candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283` is frozen and remote-equal; 50/100 run deterministically through the existing engine in memory with residual `0` and repeat-equal hashes.
+- **Persistence finding:** existing storage accepts only 10/25 scenario IDs, blocking save, reopen, correction-after-reopen, and the product UI path.
+- **Timestamp finding:** 100 securities produce 40 invalid initial-evidence timestamps from minute `60` through `99`.
+- **Architecture:** no parallel engine, persistence implementation, schema, application, or view was added; no repair occurred inside the spike.
+- **Custody:** owner-controlled proprietary account, broker custody, and human order submission selected provisionally; qualified legal review remains open.
+- **Prospective evidence:** not started because deterministic fixture replay is not prospective operation and the scale path cannot persist.
 - **Score:** accepted progress remains `62/100`.
+- **Review boundary:** independent Reviewer A/B/C and a current hierarchy confirmation are unavailable, so SAW is BLOCKED.
 - **Live boundary:** Limited Live remains closed and unauthorized.
 
 ## Closed flow
 
 ```text
-OWNER AUTHORIZATION
-→ SHARED 10/25 PRODUCT IMPLEMENTATION
-→ FROZEN CANDIDATE 7ce85c4
-→ EXACT-HEAD WINDOWS/LINUX
-→ CONTROLLED ZERO-CANDIDATE-ONLY COMPARISON
-→ INDEPENDENT REVIEWER A/B/C PASS
-→ DOCUMENTATION-ONLY TERMINAL CLOSURE
-→ FAST-FORWARD MAIN
-→ TERMINAL TAG
-→ HOLD
+IMMUTABLE P0 TERMINAL
+→ DECLARATIVE 50 STRESS
+→ FRESH-PROCESS DOMAIN EQUALITY
+→ PERSISTENCE STOP
+→ DECLARATIVE 100 STRESS
+→ FRESH-PROCESS DOMAIN EQUALITY
+→ PERSISTENCE + TIMESTAMP STOPS
+→ CUSTODY MODEL DECISION
+→ FREEZE CANDIDATE f9d271d
+→ SAW BLOCK: INDEPENDENT REVIEW + HIERARCHY MISSING
 ```
 
-No preservation, Meta-Harness, architecture, dependency, planning, provider, optimizer, broker, Universe, Challenger compatibility, or Limited Live phase is opened by this closure. A successor requires explicit owner authorization and a new active brief.
+## Next boundary
+
+First close the procedural review gap for frozen candidate `f9d271d`, or explicitly accept it. A separate bounded repair decision may then address only scenario-safe shared persistence and valid monotonic evidence timestamps. It must preserve accepted 10/25 behavior. P2 waits for repaired persistent operation, fresh-process reopen, repeated genuinely prospective paper episodes, and legal review of the exact custody arrangement.

@@ -1,35 +1,31 @@
 # Multi-Stream Contract — Current
 
 Date: 2026-08-01
-Phase: `GV-OPERATED-PORTFOLIO-25-1`
+Phase: `GV-ENGINE-SCALE-CHARACTERIZATION-1`
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
-Status: `TERMINAL_ACCEPTED; STREAMS_CLOSED`
+Status: `P1_FROZEN_FINDING; REVIEW_BLOCKED`
 Accepted score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
-## Closed ownership results
+## Parallel track results
 
-| Logical stream | Owned result | Terminal state |
+| Track | Owned result | State |
 |---|---|---|
-| Scenario and thesis | declarative retained 10- and accepted 25-security identities, evidence, reviews, observations | PASS |
-| Allocation | dynamic competition over all 25 identities and selected-funded authority | PASS |
-| Execution/accounting | exact target-delta BUY/SELL execution and reconciled book | PASS |
-| Persistence/replay | one scenario-bound atomic envelope, restart, certification, correction, fresh-process reopen | PASS |
-| Product/UI | dynamic summary-first and exceptions-first four-action flow | PASS |
-| Integrator | exact-SHA custody, hosted parity, failset identity, terminal A/B/C, documentation-only publication | PASS |
+| Engine characterization | declarative 50/100 stress inputs, fresh-process measurements, unchanged persistence probe; candidate `f9d271d` | FROZEN_FINDING |
+| Custody and handoff | who/what/when/where/how/exposure decision with options, discriminator, legal questions, stop rules | PROVISIONALLY_SELECTED |
+| Accepted product regression | retained 25-security scenario through the same scenario registry and engine | PASS |
+| P2 Challenger | waits for persistent prospective baseline and legally reviewed custody model | CLOSED |
+| P3 Limited Live | waits for separate legal, custody, paper-operation, liquidity, and pilot gates | CLOSED |
 
-These were logical ownership boundaries, not a requirement for six workers. Terminal review evidence is already complete against exact candidate `7ce85c4`; it is not rerun by closure.
+## Coordination law
 
-## Locked coordination law
-
-- Genericization has no independent acceptance status.
-- The accepted proof is the 25-security scenario running through the same path while retained ten-security behavior remains green.
-- One engine, persistence implementation, schema family, application, and view only.
-- Sessions, cells, runs, slots, and copied portfolios do not satisfy security breadth.
-- Terminal full comparison and independent A/B/C run once against one frozen executable candidate.
-- Closure changes documentation and generated context only.
-- Limited Live remains closed.
+- P1 diagnostic inputs do not become accepted product or Universe authority.
+- No parallel engine, storage implementation, schema family, application, or view.
+- Storage and timestamp repair are excluded from the characterization round.
+- The provisional custody model cannot authorize broker integration or real orders.
+- A static fixture repeat is replay evidence, not prospective evidence.
+- The accepted P0 terminal tag remains immutable.
 
 ## Current bottleneck
 
-None inside this phase. Hold after fast-forward publication and terminal tag creation. A successor requires explicit owner authorization, one bounded product objective, and a new active brief; no stream may self-open.
+The existing product path cannot persist either scale scenario, and the 100-security engine path emits invalid timestamps. Candidate `f9d271d` is frozen; SAW remains BLOCKED pending independent Reviewer A/B/C and current hierarchy confirmation. Any repair is a separate bounded round; P2 and P3 remain closed.

@@ -1,22 +1,22 @@
 ## What Was Done
-- Terminally accepted `GV-OPERATED-PORTFOLIO-25-1` at exact executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`.
-- Proved one real 25-security operated portfolio through the shared product path while preserving the accepted ten-security terminal.
-- Bound exact-head Windows/Linux operated CI, FS0 authority CI, byte parity, controlled zero-candidate-only comparison, fresh-process reopen, and independent Reviewer A/B/C to the same SHA.
-- Preserved the accepted `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` terminal and its tag unchanged.
-- Published one documentation-only terminal closure with no production, test, workflow, dependency, or configuration change.
+- Characterized synthetic 50- and 100-security scenarios through the existing engine in two fresh processes each.
+- Recorded deterministic hashes, accounting, timing, peak working set, event/order/fill counts, and timestamp validity.
+- Probed existing persistence unchanged and stopped when both scale scenarios were rejected before write.
+- Recorded the 100-security malformed timestamp boundary.
+- Selected a provisional owner-controlled proprietary custody model with broker custody and human order submission.
 
 ## What Is Locked
-- `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains an immutable accepted foundation.
-- `GV-OPERATED-PORTFOLIO-25-1` is terminally accepted at `7ce85c4` through one shared product path.
-- Accepted endgame progress remains `62/100`.
-- Limited Live, providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, and live capital remain closed.
+- Prior terminal `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains immutable.
+- P0 25-security terminal `GV-OPERATED-PORTFOLIO-25-1`, its candidate, closure, terminal tag, and accepted score `62/100` remain immutable.
+- P1 is a diagnostic finding, not Portfolio Scale or Universe acceptance.
+- No repair is included in this phase.
+- P2 Challenger and P3 Limited Live remain closed.
 
 ## What Is Next
-- Hold after terminal publication.
-- Open no successor phase until the owner explicitly authorizes one bounded product result.
-- Do not rerun implementation, complete tests, hosted CI, failset comparison, or Reviewer A/B/C unless a later change alters executable, test, workflow, dependency, or configuration bytes.
-- Verify clean custody before any future phase.
-- Require explicit owner authorization and a new active brief before execution resumes.
+- Preserve diagnostic candidate `f9d271d`; do not amend or recut it.
+- Complete independent Reviewer A/B/C and current hierarchy confirmation, or record explicit acceptance of those procedural risks.
+- Separately select one bounded repair for scenario-safe shared persistence and valid monotonic timestamps.
+- Require retained 10/25 regression plus 50/100 persistence, reopen, correction, product workload, and prospective paper evidence before P2.
 
 ## First Command
 `git status --short`
