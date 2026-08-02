@@ -1,3 +1,11 @@
+## 2026-08-02 Round Entry (Synthetic Operation Is a Fixture; Real Evidence Must Reach the Portfolio)
+- Date: 2026-08-02
+- Mistake or miss: the roadmap over-weighted three synthetic human episodes and immutable-SHA ceremony after runtime authority, persistence, and replay already existed, while the missing real-source-to-real-identity decision seam remained unbuilt.
+- Root cause: operability evidence was conflated with market-facing prospective research, and Build and Learn were serialized even though the Learn lane could not mutate certified portfolio authority.
+- Fix applied: retained one machine-executed synthetic no-change smoke as usability evidence only; reconciled banked MU and NVDA sources to bounded `HOLD_FOR_EVIDENCE`/`NO_POSITION`; bound the result to a real MU identity and classified cash; exercised `ABSTAIN/NO_POSITION` through the existing preview, explicit-confirmation, persistence, certification, and replay path; kept the accepted score at `62/100` while recording only a nonbinding `66–68/100` reassessment range. No genuine human episode is claimed.
+- Guardrail for next time: once substrate authority is proven, the next milestone must cross the highest-value missing seam with real inputs; run non-mutating Learn work concurrently; reserve full governance for immutable publication boundaries; never count repeated synthetic entry as research quality or score-bearing product progress.
+- Evidence paths: `core/gv_v2_mu_nvda_reconciliation.py`, `data/gv_v2_reconciliation/mu_nvda_supply_1/`, `gv_portfolio_v0/operated_scenarios.py`, `tests/gv_portfolio_v0/test_real_evidence_mu.py`, and `docs/context/e2e_evidence/gv_prospective_paper_baseline_1_20260802.md`.
+
 ## 2026-07-21 Round Entry (Observation Is Not Product Value; Mutable Bytes Are Not Evidence)
 - Date: 2026-07-21
 - Mistake or miss: the E0B repair correctly hardened publication authority, but repeated concurrent writes meant passing tests were not bound to one candidate; generated context and SAW counts drifted; an unreported remote push advanced PR #5 to hosted-green `b7a24d3`; and `e0b_close_eligible` silently conflated a methodologically valid observed comparison with successful decision-value proof.

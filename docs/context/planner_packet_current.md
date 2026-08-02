@@ -2,7 +2,7 @@
 
 Date: 2026-08-02
 Decision: `USE_147397F_AS_EXECUTABLE_AUTHORITY_AND_REPLACE_THREE_SYNTHETIC_EPISODES`
-Status: `EXECUTABLE_REMOTE_CANDIDATE; DATE_REPAIR_PRESENT; HOSTED_CI_AND_REAL_EVIDENCE_SEAM_PENDING`
+Status: `REAL_EVIDENCE_CANDIDATE_PUSHED; DERIVED_CONTEXT_HUMAN_SMOKE_AND_INDEPENDENT_REVIEW_PENDING`
 
 ## Authority
 
@@ -10,8 +10,11 @@ Status: `EXECUTABLE_REMOTE_CANDIDATE; DATE_REPAIR_PRESENT; HOSTED_CI_AND_REAL_EV
 - **Accepted terminal:** `GV-OPERATED-PORTFOLIO-25-1`; executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`, closure `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`, and terminal tag remain immutable.
 - **Accepted repair base:** `5687a2c2ae61ef8b5de676cffad5b19df9224b01`; scale persistence and UTC timestamp rollover are repaired without score uplift.
 - **Capability candidate:** `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`; its broader local receipts remain historical evidence.
-- **Executable candidate:** `147397f669c81eb2ab3bfd5054d676d9d0c9c77f`, tree `a43a6a83549c7824b99f3db171451075a871f289`, remote-equal on `repair/gv-prospective-paper-baseline-1-r1`; the September bootstrap defect is repaired.
-- **Accepted score:** `62/100`; test-injected episodes prove capability, not genuine prospective evidence.
+- **Executable candidate:** `147397f669c81eb2ab3bfd5054d676d9d0c9c77f`, tree `a43a6a83549c7824b99f3db171451075a871f289`; the September bootstrap defect is repaired.
+- **Authority synchronization:** documentation-only descendant `dc6b022639a1fc8198c6a1b4109c80a700e2a609`, tree `a9735c2bcc9d2b2012a47b7f1ffbe0058c2293cf`, records the roadmap reset. Its hosted suite recorded `484 passed, 2 skipped` but failed stale generated-context validation.
+- **Real-evidence candidate:** `ae615a237a2b5d62547d983b040ca8dd88248b98`, tree `4bc827abf504d063b41053e11e4ed6f192cb52c7`, is pushed and immutable on `repair/gv-prospective-paper-baseline-1-r1`.
+- **Accepted score:** `62/100`; unchanged.
+- **Nonbinding expected score:** `66–68/100` after completion of the real MU evidence → portfolio outcome → replay seam; not accepted until generated-context closure, full hosted green, genuine human operation, and independent review exist.
 - **Live boundary:** Limited Live remains closed and unauthorized.
 
 ## Current product result
@@ -24,23 +27,30 @@ Status: `EXECUTABLE_REMOTE_CANDIDATE; DATE_REPAIR_PRESENT; HOSTED_CI_AND_REAL_EV
 - One append-only event/state projector reconstructs repeated no-change, transition, and rejected episodes after fresh-process reopen.
 - `CASH` remains a portfolio capital candidate; per-security outcomes are only `ADMIT`, `REJECT`, or `ABSTAIN`.
 - Non-`ADMIT` target quantity must be `0`.
+- A bounded MU/NVDA reconciliation now returns `PARTIAL_INDIRECT`, no direct contradiction, `HOLD_FOR_EVIDENCE`, `NO_POSITION`, and one Micron-specific physical-supply discriminator.
+- Reconciliation hash `89cc062783ae367c1bf259cfb7b355e0812ca162995b7ce05743a39e99592017` is bound to real identity `SEC_CIK:0000723125:NASDAQ:MU:COMMON_STOCK`.
+- A fresh machine-executed real-MU product path previews and confirms `ABSTAIN/NO_POSITION` with all `11000` NAV retained as classified cash, zero positions/orders/fills, residual `0`, and exact replay hash `59f75a10875add2dcd8d4018f6c3952955a33da4c20da56e9769b3df1abec980`. It is not human evidence.
 
 ## Validation truth
 
 - Historical broader receipts belong to `9c7e75a`: retained operated/25/App `23/23`, scale repair `13/13`, shared accounting/allocation/execution/replay/strategy/vertical `104/104`, and historical bounded/scale/universe/challenger `24/24`.
 - The current-tip prospective subset is reported `15/15 PASS` on `147397f` (`12` core and `3` UI).
-- Hosted Windows/Linux checks are not attached to `147397f`; terminal publication remains blocked on exact-SHA hosted proof.
-- No persisted operator episode was present when `147397f` was selected as executable authority.
+- Exact-SHA `147397f` hosted proof passes on Windows and Ubuntu in runs `30740333853` and `30748842695`.
+- No persisted human operator episode was present when `147397f` was selected, and none has been banked in this round.
+- A machine-executed synthetic fresh-home smoke passes as operability evidence only: preview bytes unchanged, one episode, two authorization actions, unchanged economics/book hash, exact source/rationale reconstruction, and fresh-process exact replay.
+- Local post-`147397f` verification: targeted real/reconciliation/prospective/UI `24/24`; full operated-portfolio package `185/185`; full FS0 package `268/268`; context/hygiene `33/33`; static compilation and `git diff --check` pass.
+- Hosted run `30749002860` for `dc6b022` and run `30750230766` for `ae615a2` pass the full product/test step and fail only because generated current-context artifacts are stale. A derived-context closure descendant is required.
 
 ## Planner decision
 
-- **NEXT_STEP:** use `147397f` as executable authority; perform the six-file authority correction, bank one fresh-home synthetic no-change smoke, and run MU/NVDA reconciliation concurrently.
-- **FORWARD_MILESTONE:** real MU evidence → real MU identity → explicit thesis/review → deterministic portfolio outcome → operator confirmation → append-only persistence → fresh-process exact replay.
+- **COMPLETED_SLICE:** authority correction, machine operability smoke, bounded MU/NVDA reconciliation, and immutable real-MU candidate `ae615a2` with a replayable `ABSTAIN/NO_POSITION` path.
+- **NEXT_STEP:** close the two generated current-context artifacts on a documentation descendant, obtain one fully green exact-SHA Windows/Linux run, then bank one genuine human smoke episode and perform independent terminal review.
+- **FORWARD_MILESTONE:** independent shadow proposal on the exact same MU/NVDA evidence, followed by repeated 3–5 real-security prospective operation.
 - **SYNTHETIC_BOUNDARY:** the 25-security profile remains a regression/usability fixture. One smoke strengthens evidence but does not change the `62/100` score; three synthetic episodes are withdrawn as a milestone.
 - **LEARN_LANE:** compare the banked MU filing and NVDA facts without network/provider work, score/rank output, portfolio mutation, alpha claim, or pressure for a positive result. `HOLD_FOR_EVIDENCE` is valid.
 - **CHALLENGER_GATE:** delete the old slot/cell concept; after the real-evidence seam works, build an independent shadow proposal over the exact same evidence with no adapter or backward compatibility.
-- **CI_GATE:** launch exact-SHA Windows/Linux proof concurrently; require it before terminal publication, not before product learning.
+- **CI_GATE:** exact-SHA `147397f` proof is complete. Candidate `ae615a2` has hosted product/test success but not an overall green workflow because generated context is stale; the closure descendant must pass both operating systems before publication.
 - **UNIVERSE_GATE:** broader Universe custody is deferred until multiple real identities require it.
 - **LEGAL_BOUNDARY:** Australian legal review is not a blocker for paper work. It remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
 - **DO_NOT_REDECIDE:** accepted 10/25 terminals, repair base `5687a2c`, accepted score `62/100`, shared engine/storage/replay boundaries, or Limited Live closure.
-- **DO_NOT_START:** provider ingestion, optimizer framework, broker/API execution, client assets, advice services, autonomous orders, live capital, broad governance synchronization, or score uplift without the real-evidence seam.
+- **DO_NOT_START:** provider ingestion, optimizer framework, broker/API execution, client assets, advice services, autonomous orders, live capital, broad governance synchronization, old Challenger compatibility, or accepted-score uplift before immutable/hosted/independent proof.

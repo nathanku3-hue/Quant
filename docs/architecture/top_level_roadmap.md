@@ -1,11 +1,12 @@
 # GodView Top-Level Roadmap
 
-Status: `P0 TERMINAL; PROSPECTIVE EXECUTABLE REPAIR; REAL-EVIDENCE SEAM NEXT; CHALLENGER/LIVE CLOSED`
+Status: `P0 TERMINAL; REAL-EVIDENCE MU CANDIDATE PUSHED; DERIVED-CONTEXT CLOSURE AND INDEPENDENT REVIEW PENDING; CHALLENGER/LIVE CLOSED`
 Date: 2026-08-02
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Frozen original detail: `docs/architecture/godview_v2_frozen_build_learn_roadmap.md`
 Active brief: `docs/context/ACTIVE_BRIEF`
 Accepted endgame progress: `62/100`
+Nonbinding expected progress after local real-evidence seam: `66–68/100`
 
 ## Binding state
 
@@ -14,6 +15,9 @@ BASE = REPAIR_5687a2c_FROM_TERMINAL_MAIN_e564cd9
 ACCEPTED_TERMINAL_PRODUCT = GV-OPERATED-PORTFOLIO-25-1
 ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-25-1
 ACTIVE_IMPLEMENTATION_PHASE = GV-REAL-EVIDENCE-MU-PORTFOLIO-1
+EXECUTABLE_DATE_REPAIR = 147397f669c81eb2ab3bfd5054d676d9d0c9c77f
+AUTHORITY_SYNC = dc6b022639a1fc8198c6a1b4109c80a700e2a609
+REAL_EVIDENCE_CANDIDATE = ae615a237a2b5d62547d983b040ca8dd88248b98
 HISTORICAL_DIAGNOSTIC_PHASE = GV-ENGINE-SCALE-CHARACTERIZATION-1
 DIAGNOSTIC_CANDIDATE = f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283
 DIAGNOSTIC_STATUS = HISTORICAL_FROZEN_FINDING; REPAIR_COMPLETED_AT_5687a2c
@@ -25,7 +29,7 @@ LIMITED_LIVE = CLOSED; NOT_AUTHORIZED
 ROOT_CHECKOUT = UNSAFE; DO_NOT_USE
 ```
 
-The accepted 25-security product remains terminal and immutable. The scale characterization is historical diagnostic custody; its two defects are repaired at `5687a2c`. `GV-PROSPECTIVE-PAPER-BASELINE-1` capability candidate `9c7e75a` is superseded for execution by remote-equal date repair `147397f`; neither is score-bearing prospective evidence. The synthetic 25-security path is now a regression/usability fixture. The active forward slice is the real-evidence MU source-to-portfolio seam. The terminal tag `gv-operated-portfolio-25-1-terminal` remains fixed at closure commit `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`.
+The accepted 25-security product remains terminal and immutable. The scale characterization is historical diagnostic custody; its two defects are repaired at `5687a2c`. `GV-PROSPECTIVE-PAPER-BASELINE-1` capability candidate `9c7e75a` is superseded for execution by date repair `147397f`; exact-SHA Windows/Linux runs `30740333853` and `30748842695` pass. Documentation-only descendant `dc6b022` records the roadmap reset but its workflow failed only because generated current-context artifacts were stale. Real-evidence candidate `ae615a2`, tree `4bc827abf504d063b41053e11e4ed6f192cb52c7`, is pushed and immutable; its hosted product/test step passes while derived-context closure remains open. The synthetic 25-security path is now a regression/usability fixture. The terminal tag `gv-operated-portfolio-25-1-terminal` remains fixed at closure commit `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`.
 
 ## Accepted Slice 0 foundation — historical authority seams
 
@@ -113,7 +117,15 @@ runtime no-change confirmation
 → exact full-state reconstruction
 ```
 
-Automated tests inject runtime values and prove the capability path, not genuine prospective evidence. Accepted score remains `62/100`.
+Automated tests inject runtime values and prove the capability path, not genuine prospective evidence. One machine-executed synthetic smoke proves operability only; the genuine human smoke remains open. Accepted score remains `62/100`.
+
+## Immutable candidate — GV-REAL-EVIDENCE-MU-PORTFOLIO-1
+
+The banked MU filing and independent NVDA facts now reconcile deterministically to `PARTIAL_INDIRECT`, no direct contradiction, `HOLD_FOR_EVIDENCE`, and `NO_POSITION`. The output contains no score, rank, alpha, investability, provider, or portfolio-mutation authority and names one missing discriminator: independent Micron-specific physical supply persistence across periods.
+
+The reconciliation hash `89cc062783ae367c1bf259cfb7b355e0812ca162995b7ce05743a39e99592017` is bound to real identity `SEC_CIK:0000723125:NASDAQ:MU:COMMON_STOCK`. A fresh machine-executed product-path receipt previews and confirms `ABSTAIN/NO_POSITION`, retains NAV `11000` as classified cash, creates zero positions/orders/fills, preserves residual `0`, and reconstructs exactly with workspace hash `59f75a10875add2dcd8d4018f6c3952955a33da4c20da56e9769b3df1abec980`. This proves the seam and restartability, not human authorship or research quality.
+
+Local verification passes: targeted real/reconciliation/prospective/UI `24/24`; full operated-portfolio package `185/185`; full FS0 product package `268/268`; context/hygiene `33/33`; static compilation and diff check pass. Candidate `ae615a2` is immutable and pushed. Hosted product/tests pass, but the workflow remains non-green until generated context is closed; independent review and a genuine human smoke episode are also absent. Accepted progress remains `62/100`; `66–68/100` is only a nonbinding reassessment range.
 
 ## Parallel custody decision
 
@@ -156,17 +168,14 @@ No responsible score forecast is recorded for Limited Live.
 ## Next boundary
 
 ```text
-use executable candidate `147397f`
-→ six-file authority correction
-→ one fresh-home synthetic no-change smoke
-→ concurrent MU/NVDA reconciliation
-→ one real MU identity plus classified cash
-→ deterministic ABSTAIN/NO_POSITION or ADMIT preview and confirmation
-→ append-only persistence and fresh-process exact replay
-→ independent shadow proposal on the same evidence
+close generated context on immutable candidate `ae615a2`
+→ obtain one fully green exact-SHA Windows/Linux descendant
+→ bank one genuine human smoke episode
+→ independent terminal review
+→ independent shadow proposal on the exact same MU/NVDA evidence
 → repeated 3–5 real-security prospective operation
 → Universe custody when broader membership is required
 → separately authorized Limited Live
 ```
 
-Exact-SHA hosted CI runs concurrently and is required before terminal publication, not before learning from the paper product. Provider acquisition, optimizer frameworks, broker integration, client assets, autonomous orders, alpha claims, accepted-score uplift, old Challenger compatibility, and Limited Live remain prohibited until separately authorized.
+Exact-SHA Windows/Linux proof for `147397f` is green in runs `30740333853` and `30748842695`. Run `30749002860` for `dc6b022` recorded `484 passed, 2 skipped` and failed only stale generated-context validation. Run `30750230766` for `ae615a2` likewise passes the product/test step and requires the same derived-context closure. Provider acquisition, optimizer frameworks, broker integration, client assets, autonomous orders, alpha claims, accepted-score uplift, old Challenger compatibility, and Limited Live remain prohibited until separately authorized.

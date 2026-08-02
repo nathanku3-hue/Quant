@@ -8,9 +8,13 @@ Mode: `EXECUTION_PACKET`
 - Capability candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`; historical broader test receipts remain bound to this SHA.
 - Executable candidate: `147397f669c81eb2ab3bfd5054d676d9d0c9c77f`
 - Executable tree: `a43a6a83549c7824b99f3db171451075a871f289`
-- Branch: `repair/gv-prospective-paper-baseline-1-r1`; local and remote equal at the executable SHA.
+- Authority synchronization: `dc6b022639a1fc8198c6a1b4109c80a700e2a609`, tree `a9735c2bcc9d2b2012a47b7f1ffbe0058c2293cf`.
+- Real-evidence candidate: `ae615a237a2b5d62547d983b040ca8dd88248b98`, tree `4bc827abf504d063b41053e11e4ed6f192cb52c7`.
+- Branch: `repair/gv-prospective-paper-baseline-1-r1`; local and remote equal at `ae615a2`. Date-repair authority remains ancestor `147397f`.
 - Repair: prospective bootstrap moved from future September dates to `2026-08-01`, allowing current-date operation.
 - Accepted score before and after this implementation round: `62/100`
+- Nonbinding expected score after local real-evidence seam: `66–68/100`
+- Real-evidence bytes are committed and pushed at `ae615a2`. Hosted product/tests pass; generated-context closure and independent acceptance remain open.
 - Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 ## Product capability
@@ -53,34 +57,80 @@ Confirmed episodes append evidence, review/thesis state, observation, decision s
 - Runtime observation content is absent from scenario code.
 - Repeated state is reconstructed from one append-only event log rather than fixed scenario-authored status/count branches.
 
+## Local execution receipts
+
+### Machine-executed synthetic operability smoke
+
+- Fresh `GV_OPERATED_PORTFOLIO_HOME`.
+- Preview persisted bytes unchanged: `true`.
+- Episode count: `1`; operator actions: `2`.
+- Holdings, orders, fills, economics, and book hash unchanged.
+- Event tail: `LATER_OBSERVATION_ADMITTED`, `CERTIFICATION_RECORDED`.
+- Source locator and operator rationale reconstruct exactly.
+- Separate-process exact workspace reconstruction: `true`.
+- Classification: machine-executed usability, custody, and restartability only; not a genuine human episode and no product-score uplift.
+
+### MU/NVDA Learn-lane reconciliation
+
+- Source families: MU official filing `SEC:0000723125-26-000015`; NVDA independent filing `SEC:0001045810-26-000052`.
+- Corroboration: `PARTIAL_INDIRECT` for a broad memory-price and supply-constrained environment.
+- Contradiction: `NO_DIRECT_CONTRADICTION_IDENTIFIED`.
+- Disposition: `HOLD`; research action: `HOLD_FOR_EVIDENCE`; portfolio action: `NO_POSITION`.
+- Missing discriminator: independent Micron-specific physical supply evidence with point-in-time custody across more than one period.
+- Reconciliation hash: `89cc062783ae367c1bf259cfb7b355e0812ca162995b7ce05743a39e99592017`.
+- Boundary: no network/provider work, score, rank, alpha, investability, trade recommendation, or portfolio mutation.
+
+### Machine-executed real MU evidence-to-portfolio receipt
+
+- Real identity namespace: `SEC_CIK_LISTING_V1`.
+- Permanent key: `SEC_CIK:0000723125:NASDAQ:MU:COMMON_STOCK`.
+- Outcome: `ABSTAIN`; target quantity: `0`; portfolio action: `NO_POSITION`.
+- Preview persisted bytes unchanged: `true`; preview authoritative: `false`.
+- Episode count: `1`; operator actions: `2`.
+- Classified cash: AVAILABLE `10000`, RESEARCH_RESERVE `1000`.
+- Positions: `0`; orders: `0`; fills: `0`; NAV: `11000`; residual: `0`.
+- Book hash before and after: `074a47c7cdb7755a34c1d257e4e2ff99552cf9419033828b304cc5cf16016c22`.
+- Certification: `CRT_c8e44e6fc1c18de406eefd5f076b4bdc2a5e14d2424306a0a2df456b80153ada`.
+- Separate-process exact reconstruction: `true`.
+- Workspace/reconstructed SHA-256: `59f75a10875add2dcd8d4018f6c3952955a33da4c20da56e9769b3df1abec980`.
+- Classification: product-seam capability and deterministic restart evidence; not human operation, research-quality proof, or market-facing prospective evidence.
+
 ## Validation receipts
 
-| Scope | Bound SHA | Result |
+| Scope | Identity | Result |
 |---|---|---:|
 | Current-tip prospective core + Streamlit product | `147397f` | reported `15/15 PASS` (`12` core, `3` UI) |
+| Local reconciliation + real MU + retained prospective/UI | `ae615a2` candidate tree | `24/24 PASS` |
+| Full operated-portfolio package | `ae615a2` candidate tree | `185/185 PASS` |
+| Full FS0 product package | `ae615a2` candidate tree | `268/268 PASS` |
+| Context and hygiene tests | documentation working tree | `33/33 PASS` |
+| MU official-source + NVDA independent-source + reconciliation | `ae615a2` candidate tree | `32/32 PASS` |
+| Static compilation and whitespace check | `ae615a2` candidate tree | `PASS` |
 | Retained operated/25/App | `9c7e75a` | historical `23/23 PASS` |
 | Scale persistence/timestamp repair | `9c7e75a` | historical `13/13 PASS` |
 | Book/allocation/execution/replay/strategy/vertical | `9c7e75a` | historical `104/104 PASS` |
 | Historical bounded/scale/universe/challenger | `9c7e75a` | historical `24/24 PASS` |
-| Exact-SHA Windows/Linux hosted proof | `147397f` | `ABSENT` |
+| Exact-SHA Windows/Linux proof | `147397f`; runs `30740333853`, `30748842695` | `PASS` |
+| Authority-sync hosted suite | `dc6b022`; run `30749002860` | `484 passed, 2 skipped`; generated context stale |
+| Real-evidence hosted suite | `ae615a2`; run `30750230766` | product/tests pass; generated context stale |
+| Genuine human smoke episode | not run | `ABSENT` |
+| Independent terminal review for new slice | not run | `ABSENT` |
 
-No broader current-tip rerun is claimed. Hosted proof is required before terminal publication, not before a bounded paper-product smoke or non-authoritative Learn-lane reconciliation.
+Hosted and independent proof remain required before terminal publication or accepted-score movement.
 
 ## Evidence boundary
 
-Automated tests inject runtime values. They prove software capability and deterministic authority boundaries, but they are not genuine prospective evidence. A manually operated episode on the synthetic 25-security profile proves usability, custody, and restartability only. No score uplift is claimed. The forward evidence gate is one real source set entering one real instrument decision and surviving confirmation, persistence, and replay.
+Automated tests and machine-executed receipts prove software capability and deterministic authority boundaries. No genuine human episode has been banked. The real MU receipt proves that already-banked real source evidence can enter a real identity, reach the explicit confirmation boundary for a cash-only decision, persist, and replay exactly. It does not prove human operability, research quality beyond bounded `HOLD_FOR_EVIDENCE`, repeated prospective performance, alpha, investability, or live readiness. Accepted score remains `62/100`; the evidence supports only a nonbinding `66–68/100` reassessment range.
 
 ## Roadmap disposition
 
 ```text
-executable candidate `147397f`
-→ minimal six-file authority correction
-→ one fresh-home synthetic no-change smoke
-→ concurrent MU/NVDA reconciliation
-→ one real MU identity and classified cash
-→ deterministic ABSTAIN/NO_POSITION or ADMIT preview/confirmation
-→ append-only persistence and fresh-process exact replay
-→ independent shadow proposal on the same evidence
+immutable real-evidence candidate `ae615a2`
+→ generated-context closure descendant
+→ fully green exact-SHA Windows/Linux CI
+→ genuine human smoke episode
+→ independent terminal review
+→ independent shadow proposal on the exact same evidence
 → repeated 3–5 real-security prospective operation
 → Universe custody when broader membership is required
 → separately authorized Limited Live
