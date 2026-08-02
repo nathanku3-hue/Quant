@@ -370,6 +370,15 @@ def _prospective_25_scenario() -> dict[str, Any]:
             ),
         }
     )
+    scenario["timeline"] = {
+        "cash_opened_at": "2026-08-01T08:55:00.000000Z",
+        "initial_decision_at": "2026-08-01T09:05:00.000000Z",
+        "aim_confirmed_at": "2026-08-01T09:05:30.000000Z",
+        "initial_transition_at": "2026-08-01T09:06:00.000000Z",
+        "initial_order_start_minute": 7,
+        "initial_certified_at": "2026-08-01T09:20:00.000000Z",
+    }
+    scenario["portfolio_aim"]["effective_at"] = "2026-08-01T09:00:00.000000Z"
     scenario["portfolio_aim"]["objective"] = (
         "Operate the accepted 25-security paper portfolio through human-supplied "
         "prospective observations and explicit confirmation."

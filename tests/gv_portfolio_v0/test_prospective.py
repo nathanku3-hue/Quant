@@ -198,6 +198,8 @@ def test_prospective_profile_derives_accepted_25_catalogue_without_authored_epis
     assert canonical_document_bytes(scenario["instruments"]) == canonical_document_bytes(
         SCENARIO_25["instruments"]
     )
+    assert scenario["portfolio_aim"]["effective_at"] == "2026-08-01T09:00:00.000000Z"
+    assert scenario["timeline"]["initial_certified_at"] == "2026-08-01T09:20:00.000000Z"
     assert "no_change" not in scenario
     assert "transition" not in scenario
     assert "correction" not in scenario
@@ -263,11 +265,22 @@ def test_non_admit_review_cannot_retain_funded_quantity() -> None:
 def test_observation_timestamp_must_follow_current_authority() -> None:
     workspace = build_prospective_workspace()
     request = _request(workspace)
-    request["observed_at"] = "2026-09-01T09:20:00.000000Z"
+    request["observed_at"] = "2026-08-01T09:20:00.000000Z"
     with pytest.raises(
         ProspectiveOperationError, match="OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY"
     ):
         preview_runtime_observation(workspace, request)
+
+
+def test_current_date_observation_can_follow_prospective_bootstrap() -> None:
+    workspace = build_prospective_workspace()
+    request = _request(workspace)
+    request["observed_at"] = "2026-08-02T00:00:00.000000Z"
+
+    proposal = preview_runtime_observation(workspace, request)
+
+    assert proposal["request"]["observed_at"] == "2026-08-02T00:00:00.000000Z"
+    assert proposal["economics_changed"] is False
 
 
 def test_single_sided_transition_is_rejected() -> None:
