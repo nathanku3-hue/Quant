@@ -1,13 +1,14 @@
 # Phase Brief — GV-PROSPECTIVE-PAPER-BASELINE-1
 
 Date: 2026-08-02
-Status: `REAL_EVIDENCE_CANDIDATE_AE615A2_PUSHED; DERIVED_CONTEXT_HUMAN_SMOKE_AND_INDEPENDENT_REVIEW_PENDING`
+Status: `REAL_EVIDENCE_HOSTED_GREEN_D84C675; HUMAN_SMOKE_AND_INDEPENDENT_REVIEW_PENDING`
 Base capability candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`
 Executable candidate: `147397f669c81eb2ab3bfd5054d676d9d0c9c77f`
 Executable tree: `a43a6a83549c7824b99f3db171451075a871f289`
 Authority synchronization: `dc6b022639a1fc8198c6a1b4109c80a700e2a609`, tree `a9735c2bcc9d2b2012a47b7f1ffbe0058c2293cf`
 Real-evidence candidate: `ae615a237a2b5d62547d983b040ca8dd88248b98`, tree `4bc827abf504d063b41053e11e4ed6f192cb52c7`
-Branch: `repair/gv-prospective-paper-baseline-1-r1`; local and remote equal at `ae615a2`. Date-repair authority remains ancestor `147397f`.
+Hosted-green closure: `d84c67557bf57a0a40b59a2a63b3ef2de2544261`, tree `63206de348c30584b8e8dbe5ddc7e41c5032567b`, run `30750709296`
+Branch: `repair/gv-prospective-paper-baseline-1-r1`. Date-repair authority remains ancestor `147397f`; real-evidence code remains `ae615a2`; `d84c675` closes documentation and generated context.
 Accepted product score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
@@ -15,7 +16,7 @@ Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 Add one genuine runtime portfolio-operating path to the accepted 25-security substrate. An operator supplies new observation content, source locator, UTC timestamp, instrument ownership, explicit review proposals, and rationale. The system produces a deterministic mutation-free preview; only explicit confirmation grants authority. Rejection is append-only and cannot mutate evidence, reviews, decisions, holdings, cash, orders, fills, or the certified book.
 
-This implementation proves capability. Automated tests and machine-executed receipts inject runtime values and therefore do not constitute genuine human or market-facing prospective evidence. The synthetic 25-security profile is a regression and usability fixture, not the forward product milestone. Real source evidence now enters one real MU decision and survives preview, explicit confirmation, persistence, and replay at immutable candidate `ae615a2`; the accepted score remains `62/100` pending generated-context closure, full hosted green, genuine human operation, and independent review.
+This implementation proves capability. Automated tests and machine-executed receipts inject runtime values and therefore do not constitute genuine human or market-facing prospective evidence. The synthetic 25-security profile is a regression and usability fixture, not the forward product milestone. Real source evidence now enters one real MU decision and survives preview, explicit confirmation, persistence, and replay at immutable candidate `ae615a2`; closure `d84c675` is fully hosted-green. The accepted score remains `62/100` pending genuine human operation and independent review.
 
 ## Endgame alignment
 
@@ -99,14 +100,15 @@ Field entry is not counted as a separate authorization action. No per-security c
 - MU official-source intake, NVDA independent-source intake, and reconciliation tests pass `32/32`.
 - Static compilation and `git diff --check` pass.
 - Run `30749002860` for `dc6b022` and run `30750230766` for `ae615a2` record successful product/test steps (`484 passed, 2 skipped`) and fail only stale generated-context validation.
+- Descendant `d84c675` closes generated context and passes Ubuntu and Windows in run `30750709296`, including tracked-byte immutability.
 
-Hosted CI is not a prerequisite for operating the paper product or running the non-authoritative Learn lane. No independent terminal-acceptance claim is made. A narrow generated-context closure descendant must become fully green before publication.
+Hosted CI is not a prerequisite for operating the paper product or running the non-authoritative Learn lane. Hosted proof is now complete for this slice. No independent terminal-acceptance claim is made.
 
 ## Product disposition
 
 Immutable candidate `ae615a2` closes the central source-to-portfolio seam: banked real evidence enters a real MU identity, reaches an explicit cash-only `ABSTAIN/NO_POSITION`, survives machine-executed preview and confirmation, persists append-only, and reconstructs exactly after a fresh-process reopen.
 
-Accepted score remains `62/100` because generated-context closure, a fully green candidate workflow, genuine human operation, and independent terminal review are absent. The nonbinding expected score is now `66–68/100`, matching the audit gate for real MU evidence → portfolio outcome → replay. Repeated 3–5 real-identity operation plus an independent same-evidence comparison is still required for `70+`.
+Accepted score remains `62/100` because genuine human operation and independent terminal review are absent. The nonbinding expected score is now `66–68/100`, matching the audit gate for real MU evidence → portfolio outcome → replay. Repeated 3–5 real-identity operation plus an independent same-evidence comparison is still required for `70+`.
 
 ## Revised roadmap
 
@@ -131,8 +133,8 @@ Do not add providers, optimizer frameworks, broker credentials, autonomous submi
 ## Remaining acceptance gate
 
 1. Preserve date-repair authority `147397f` and immutable real-evidence candidate `ae615a2`; do not rewrite historical test claims.
-2. Close only the stale generated current-context artifacts on a documentation descendant.
-3. Obtain a fully green exact-SHA Windows/Linux run, bank one genuine human smoke episode, and complete independent terminal review before publication or accepted-score movement.
+2. Preserve hosted-green closure `d84c675`; do not reopen generated-context work.
+3. Bank one genuine human smoke episode and complete independent terminal review before publication or accepted-score movement.
 4. Build one independent shadow proposal over the exact same MU/NVDA evidence; do not adapt the obsolete slot/cell Challenger.
 5. Repeat the same real-identity path across 3–5 securities before considering `70+`.
 6. Keep Limited Live closed until separately authorized.
@@ -151,15 +153,15 @@ Do not add providers, optimizer frameworks, broker credentials, autonomous submi
 - Accepted terminal `GV-OPERATED-PORTFOLIO-25-1` and its 25-security identity remain unchanged.
 - Base repair `5687a2c` remains immutable and remote-equal.
 - Capability candidate `9c7e75a` retains its historical broader receipts.
-- Date-repair candidate `147397f`, tree `a43a6a8`, is Windows/Linux green; documentation sync `dc6b022`, tree `a9735c2`, records the roadmap reset; real-evidence candidate `ae615a2`, tree `4bc827a`, is immutable and pushed.
+- Date-repair candidate `147397f`, tree `a43a6a8`, is Windows/Linux green; documentation sync `dc6b022`, tree `a9735c2`, records the roadmap reset; real-evidence candidate `ae615a2`, tree `4bc827a`, is immutable; closure `d84c675`, tree `63206de`, is fully hosted-green.
 - Accepted score remains `62/100`.
 - Test-injected runtime data proves capability only, not prospective evidence.
 - Limited Live remains closed.
 
 ## What Is Next
 
-- Close the two stale generated current-context artifacts on a documentation descendant.
-- Obtain fully green exact-SHA Windows/Linux CI, bank one genuine human smoke, and complete independent terminal review.
+- Bank one genuine human smoke against hosted-green closure `d84c675`.
+- Complete independent terminal review.
 - Build a clean independent shadow proposal on the exact same MU/NVDA evidence, with no old Challenger adapter.
 - Expand only after the same path works across 3–5 real identities.
 
@@ -171,7 +173,7 @@ git status --short
 
 ## Next Todos
 
-- Create and push the narrow generated-context closure descendant.
-- Complete fully green hosted CI, genuine human smoke, and independent review before publication.
+- Preserve hosted-green closure `d84c675`.
+- Complete genuine human smoke and independent review before publication.
 - Open an independent shadow proposal on the exact same evidence; no adapter or backward compatibility.
 - Repeat prospective operation across 3–5 real identities before any `70+` claim.

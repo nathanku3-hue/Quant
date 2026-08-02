@@ -10,11 +10,12 @@ Mode: `EXECUTION_PACKET`
 - Executable tree: `a43a6a83549c7824b99f3db171451075a871f289`
 - Authority synchronization: `dc6b022639a1fc8198c6a1b4109c80a700e2a609`, tree `a9735c2bcc9d2b2012a47b7f1ffbe0058c2293cf`.
 - Real-evidence candidate: `ae615a237a2b5d62547d983b040ca8dd88248b98`, tree `4bc827abf504d063b41053e11e4ed6f192cb52c7`.
-- Branch: `repair/gv-prospective-paper-baseline-1-r1`; local and remote equal at `ae615a2`. Date-repair authority remains ancestor `147397f`.
+- Hosted-green closure: `d84c67557bf57a0a40b59a2a63b3ef2de2544261`, tree `63206de348c30584b8e8dbe5ddc7e41c5032567b`.
+- Branch: `repair/gv-prospective-paper-baseline-1-r1`. Date-repair authority remains ancestor `147397f`; real-evidence code remains `ae615a2`; `d84c675` closes authority and generated context.
 - Repair: prospective bootstrap moved from future September dates to `2026-08-01`, allowing current-date operation.
 - Accepted score before and after this implementation round: `62/100`
 - Nonbinding expected score after local real-evidence seam: `66–68/100`
-- Real-evidence bytes are committed and pushed at `ae615a2`. Hosted product/tests pass; generated-context closure and independent acceptance remain open.
+- Real-evidence bytes are committed and pushed at `ae615a2`. Closure `d84c675` is fully green on Ubuntu and Windows in run `30750709296`. Genuine human operation and independent acceptance remain open.
 - Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 ## Product capability
@@ -113,6 +114,7 @@ Confirmed episodes append evidence, review/thesis state, observation, decision s
 | Exact-SHA Windows/Linux proof | `147397f`; runs `30740333853`, `30748842695` | `PASS` |
 | Authority-sync hosted suite | `dc6b022`; run `30749002860` | `484 passed, 2 skipped`; generated context stale |
 | Real-evidence hosted suite | `ae615a2`; run `30750230766` | product/tests pass; generated context stale |
+| Hosted-green closure | `d84c675`; run `30750709296` | Ubuntu/Windows `PASS`; context valid; tracked bytes unchanged |
 | Genuine human smoke episode | not run | `ABSENT` |
 | Independent terminal review for new slice | not run | `ABSENT` |
 
@@ -125,9 +127,7 @@ Automated tests and machine-executed receipts prove software capability and dete
 ## Roadmap disposition
 
 ```text
-immutable real-evidence candidate `ae615a2`
-→ generated-context closure descendant
-→ fully green exact-SHA Windows/Linux CI
+hosted-green real-evidence closure `d84c675`
 → genuine human smoke episode
 → independent terminal review
 → independent shadow proposal on the exact same evidence

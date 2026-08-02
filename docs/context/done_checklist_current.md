@@ -2,7 +2,7 @@
 
 Date: 2026-08-02
 Phase: `GV-REAL-EVIDENCE-MU-PORTFOLIO-1`
-Status: `CANDIDATE_AE615A2_PUSHED; DERIVED_CONTEXT_HUMAN_SMOKE_AND_INDEPENDENT_REVIEW_PENDING`
+Status: `HOSTED_GREEN_D84C675; HUMAN_SMOKE_AND_INDEPENDENT_REVIEW_PENDING`
 Accepted score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
@@ -42,7 +42,7 @@ Limited Live: `CLOSED; NOT_AUTHORIZED`
 - [x] Documentation-only authority synchronization `dc6b022`, tree `a9735c2`, preserves `147397f` as date-repair authority and keeps historical broader receipts bound to `9c7e75a`; its hosted tests pass, but generated-context validation is stale.
 - [x] Exact-SHA `147397f` Windows/Linux proof passes in runs `30740333853` and `30748842695`.
 - [x] Real-evidence candidate `ae615a2`, tree `4bc827a`, is immutable and pushed; hosted product/tests pass in run `30750230766`.
-- [ ] Fully green Windows/Linux workflow for the generated-context closure descendant.
+- [x] Generated-context closure `d84c675`, tree `63206de`, is fully green on Ubuntu and Windows in run `30750709296`, including tracked-byte immutability.
 - [x] One machine-executed fresh-home synthetic no-change smoke with preview-byte immutability, episode count `1`, authorization actions `2`, unchanged economics/book hash, exact source/rationale reconstruction, and fresh-process reopen.
 - [ ] One genuine human-operated synthetic smoke episode; no machine or assistant execution may satisfy this item.
 - [x] Bounded MU/NVDA reconciliation with `PARTIAL_INDIRECT` corroboration, no direct contradiction, `HOLD_FOR_EVIDENCE`, `NO_POSITION`, and one explicit missing discriminator.
@@ -61,11 +61,11 @@ Limited Live: `CLOSED; NOT_AUTHORIZED`
 - [x] Three synthetic human episodes are withdrawn as the forward milestone.
 - [x] The forward milestone is real evidence entering a real instrument decision and surviving the certified portfolio/replay path.
 - [x] Accepted score remains `62/100`.
-- [x] Nonbinding expected score is updated to `66–68/100` after completion of the real-evidence seam; no accepted uplift before generated-context closure, full hosted green, genuine human operation, and independent review.
+- [x] Nonbinding expected score is updated to `66–68/100` after completion of the real-evidence seam; no accepted uplift before genuine human operation and independent review.
 - [x] Australian legal review is removed as a paper Challenger blocker and preserved before broker credentials, automated submission, client assets, advice activity, or real capital.
 - [x] Universe custody is removed as a mandatory predecessor to paper Challenger comparison.
 - [x] Limited Live remains closed.
 
 ## Stop condition
 
-Do not claim accepted score uplift from automated fixtures, machine-executed smoke, or candidate bytes alone. The real MU evidence-to-portfolio-and-replay seam is immutable at `ae615a2`; the next boundary is generated-context closure, full hosted green, one genuine human smoke, and independent review. Keep the accepted score at `62/100`, the nonbinding expectation at `66–68/100`, old Challenger compatibility prohibited, and Limited Live closed.
+Do not claim accepted score uplift from automated fixtures, machine-executed smoke, or hosted-green bytes alone. The real MU evidence-to-portfolio-and-replay seam is immutable at `ae615a2` and hosted-green through `d84c675`; the next boundary is one genuine human smoke and independent review. Keep the accepted score at `62/100`, the nonbinding expectation at `66–68/100`, old Challenger compatibility prohibited, and Limited Live closed.
