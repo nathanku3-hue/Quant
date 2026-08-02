@@ -1,4 +1,4 @@
-"""Append-only prospective paper operation on the accepted 25-security baseline.
+"""Append-only prospective paper operation for certified portfolio profiles.
 
 Runtime observations and review changes are operator proposals until deterministic
 preview validation and explicit confirmation. Confirmed episodes are reconstructed
@@ -9,9 +9,14 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any, Mapping
 
 from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
+from core.gv_v2_mu_nvda_reconciliation import (
+    MuNvdaReconciliationError,
+    load_verified_mu_nvda_reconciliation,
+)
 from gv_portfolio_v0.execution import ExecutionError, portfolio_book_event
 from gv_portfolio_v0.operated import (
     OperatedPortfolioError,
@@ -27,7 +32,6 @@ from gv_portfolio_v0.operated import (
     confirm_initial_portfolio,
 )
 from gv_portfolio_v0.operated_scenarios import (
-    PORTFOLIO_25_SCENARIO_ID,
     PROSPECTIVE_25_SCENARIO_ID,
     get_scenario,
 )
@@ -97,15 +101,57 @@ def _score(value: Any) -> int:
     return score
 
 
-def _baseline_workspace() -> dict[str, Any]:
-    scenario = get_scenario(PROSPECTIVE_25_SCENARIO_ID)
-    if scenario.get("source_scenario_id") != PORTFOLIO_25_SCENARIO_ID:
+def _verify_source_authority(scenario: Mapping[str, Any]) -> None:
+    authority = scenario.get("source_authority")
+    if authority is None:
+        return
+    if not isinstance(authority, Mapping):
+        raise ProspectiveOperationError("PROSPECTIVE_SOURCE_AUTHORITY_INVALID")
+    if authority.get("verification_mode") != "REBUILD_FROM_BANKED_SOURCES":
+        raise ProspectiveOperationError("PROSPECTIVE_SOURCE_VERIFICATION_MODE_INVALID")
+    result_path_text = _required_text(
+        authority.get("result_path"), field="source_result_path"
+    )
+    relative_path = Path(result_path_text)
+    if relative_path.is_absolute() or ".." in relative_path.parts:
+        raise ProspectiveOperationError("PROSPECTIVE_SOURCE_PATH_INVALID")
+    repository_root = Path(__file__).resolve().parents[1]
+    result_path = (repository_root / relative_path).resolve()
+    if not result_path.is_relative_to(repository_root.resolve()):
+        raise ProspectiveOperationError("PROSPECTIVE_SOURCE_PATH_ESCAPE")
+    try:
+        result = load_verified_mu_nvda_reconciliation(result_path=result_path)
+    except MuNvdaReconciliationError as exc:
+        raise ProspectiveOperationError(
+            f"PROSPECTIVE_SOURCE_AUTHORITY_INVALID:{exc}"
+        ) from exc
+    required = {
+        "schema_version": authority.get("schema_version"),
+        "case_id": authority.get("case_id"),
+        "reconciliation_hash": authority.get("reconciliation_hash"),
+        "research_action": "HOLD_FOR_EVIDENCE",
+        "portfolio_action": "NO_POSITION",
+        "portfolio_mutation_authorized": False,
+    }
+    for key, expected in required.items():
+        if result.get(key) != expected:
+            raise ProspectiveOperationError(
+                f"PROSPECTIVE_SOURCE_AUTHORITY_MISMATCH:{key}"
+            )
+
+
+def _baseline_workspace(
+    scenario_id: str = PROSPECTIVE_25_SCENARIO_ID,
+) -> dict[str, Any]:
+    scenario = get_scenario(scenario_id)
+    _verify_source_authority(scenario)
+    if scenario.get("runtime_observation_mode") is not True:
+        raise ProspectiveOperationError("PROSPECTIVE_RUNTIME_MODE_REQUIRED")
+    if not isinstance(scenario.get("source_scenario_id"), str):
         raise ProspectiveOperationError("PROSPECTIVE_SOURCE_SCENARIO_INVALID")
     if "no_change" in scenario or "transition" in scenario:
         raise ProspectiveOperationError("SCENARIO_AUTHORED_EPISODE_PROHIBITED")
-    workspace = confirm_initial_portfolio(
-        build_draft_workspace(PROSPECTIVE_25_SCENARIO_ID)
-    )
+    workspace = confirm_initial_portfolio(build_draft_workspace(scenario_id))
     if workspace["status"] != STATUS_FUNDED:
         raise ProspectiveOperationError("CERTIFIED_FUNDED_BASELINE_REQUIRED")
     return workspace
@@ -123,7 +169,10 @@ def _decorate(
     result = deepcopy(dict(workspace))
     result["operation_schema_version"] = PROSPECTIVE_SCHEMA
     result["operation_mode"] = "PROSPECTIVE_PAPER"
-    result["source_scenario_id"] = PORTFOLIO_25_SCENARIO_ID
+    scenario = get_scenario(str(result["scenario_id"]))
+    result["source_scenario_id"] = scenario["source_scenario_id"]
+    if "source_authority" in scenario:
+        result["source_authority"] = deepcopy(scenario["source_authority"])
     result["baseline_workspace_hash"] = baseline_hash
     result["baseline_event_count"] = baseline_event_count
     result["prospective_episode_count"] = len(episode_history)
@@ -134,10 +183,12 @@ def _decorate(
     return result
 
 
-def build_prospective_workspace() -> dict[str, Any]:
-    """Bootstrap the accepted 25-security certified initial portfolio."""
+def build_prospective_workspace(
+    scenario_id: str = PROSPECTIVE_25_SCENARIO_ID,
+) -> dict[str, Any]:
+    """Bootstrap one certified runtime-observation portfolio profile."""
 
-    baseline = _baseline_workspace()
+    baseline = _baseline_workspace(scenario_id)
     baseline_hash = domain_hash("GV-PROSPECTIVE-PAPER:BASELINE:V1", baseline)
     return _decorate(
         baseline,
@@ -273,7 +324,7 @@ def _build_proposal(
     workspace: Mapping[str, Any], request: Mapping[str, Any]
 ) -> dict[str, Any]:
     normalized = _normalize_request(workspace, request)
-    scenario = get_scenario(PROSPECTIVE_25_SCENARIO_ID)
+    scenario = get_scenario(str(workspace["scenario_id"]))
     reviews_by_id = _review_by_id(workspace)
     before_reviews = deepcopy(workspace["reviews"])
     owned_ids = [row["instrument_id"] for row in normalized["review_updates"]]
@@ -651,10 +702,12 @@ def _rejected_episode_workspace(
 
 def reconstruct_prospective_workspace(
     events: list[Mapping[str, Any]],
+    *,
+    scenario_id: str = PROSPECTIVE_25_SCENARIO_ID,
 ) -> dict[str, Any]:
     """Project full decision and economic state from the append-only event log."""
 
-    baseline = _baseline_workspace()
+    baseline = _baseline_workspace(scenario_id)
     baseline_hash = domain_hash("GV-PROSPECTIVE-PAPER:BASELINE:V1", baseline)
     rows = [deepcopy(dict(row)) for row in events]
     baseline_count = len(baseline["events"])
@@ -773,14 +826,21 @@ def reconstruct_prospective_workspace(
 
 
 def validate_prospective_workspace(workspace: Mapping[str, Any]) -> None:
-    if workspace.get("scenario_id") != PROSPECTIVE_25_SCENARIO_ID:
+    scenario_id = workspace.get("scenario_id")
+    if not isinstance(scenario_id, str):
         raise ProspectiveOperationError("PROSPECTIVE_SCENARIO_REQUIRED")
+    try:
+        scenario = get_scenario(scenario_id)
+    except ValueError as exc:
+        raise ProspectiveOperationError("PROSPECTIVE_SCENARIO_REQUIRED") from exc
+    if scenario.get("runtime_observation_mode") is not True:
+        raise ProspectiveOperationError("PROSPECTIVE_RUNTIME_MODE_REQUIRED")
     if workspace.get("operation_schema_version") != PROSPECTIVE_SCHEMA:
         raise ProspectiveOperationError("PROSPECTIVE_SCHEMA_INVALID")
     events = workspace.get("events")
     if not isinstance(events, list):
         raise ProspectiveOperationError("PROSPECTIVE_EVENTS_REQUIRED")
-    projected = reconstruct_prospective_workspace(events)
+    projected = reconstruct_prospective_workspace(events, scenario_id=scenario_id)
     if canonical_document_bytes(dict(workspace)) != canonical_document_bytes(projected):
         raise ProspectiveOperationError("PROSPECTIVE_WORKSPACE_PROJECTION_MISMATCH")
 
@@ -797,7 +857,9 @@ def confirm_runtime_observation(
     if canonical_document_bytes(dict(proposal)) != canonical_document_bytes(expected):
         raise ProspectiveOperationError("STALE_OR_MUTATED_PROPOSAL")
     episode = _episode_workspace(workspace, expected)
-    result = reconstruct_prospective_workspace(episode["events"])
+    result = reconstruct_prospective_workspace(
+        episode["events"], scenario_id=str(workspace["scenario_id"])
+    )
     validate_prospective_workspace(result)
     return result
 
@@ -816,6 +878,8 @@ def reject_runtime_observation(
     if canonical_document_bytes(dict(proposal)) != canonical_document_bytes(expected):
         raise ProspectiveOperationError("STALE_OR_MUTATED_PROPOSAL")
     episode = _rejected_episode_workspace(workspace, expected, rejection_reason)
-    result = reconstruct_prospective_workspace(episode["events"])
+    result = reconstruct_prospective_workspace(
+        episode["events"], scenario_id=str(workspace["scenario_id"])
+    )
     validate_prospective_workspace(result)
     return result

@@ -5,10 +5,7 @@ from __future__ import annotations
 import streamlit as st
 
 from gv_portfolio_v0.operated import OperatedPortfolioError
-from gv_portfolio_v0.operated_scenarios import (
-    PROSPECTIVE_25_SCENARIO_ID,
-    get_scenario,
-)
+from gv_portfolio_v0.operated_scenarios import get_scenario
 from gv_portfolio_v0.operated_storage import (
     default_workspace_root,
     selected_scenario_id,
@@ -34,7 +31,7 @@ st.sidebar.caption(f"Scenario: `{scenario_id}`")
 st.sidebar.caption(f"Workspace: `{workspace_root}`")
 
 try:
-    if scenario_id == PROSPECTIVE_25_SCENARIO_ID:
+    if scenario.get("runtime_observation_mode") is True:
         render_prospective_paper_workspace(
             st, root=workspace_root, scenario_id=scenario_id
         )

@@ -12,6 +12,7 @@ PORTFOLIO_25_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_25_1"
 ENGINE_SCALE_50_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_50"
 ENGINE_SCALE_100_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_100"
 PROSPECTIVE_25_SCENARIO_ID = "GV_PROSPECTIVE_PAPER_BASELINE_1"
+REAL_MU_PROSPECTIVE_SCENARIO_ID = "GV_REAL_EVIDENCE_MU_PORTFOLIO_1"
 
 
 def _instrument(
@@ -400,12 +401,121 @@ def _prospective_25_scenario() -> dict[str, Any]:
 SCENARIO_PROSPECTIVE_25 = _prospective_25_scenario()
 
 
+def _real_mu_prospective_scenario() -> dict[str, Any]:
+    """One real MU identity driven by the banked MU/NVDA reconciliation."""
+
+    reconciliation_hash = (
+        "89cc062783ae367c1bf259cfb7b355e0812ca162995b7ce05743a39e99592017"
+    )
+    return {
+        "scenario_id": REAL_MU_PROSPECTIVE_SCENARIO_ID,
+        "title": "GV Real Evidence — MU Paper Decision",
+        "id_domain": "GV-REAL-EVIDENCE-MU-PORTFOLIO-1",
+        "schema_version": "gv_operated_portfolio_v3",
+        "claim_boundary": (
+            "One real MU identity and classified cash driven by already-banked MU/NVDA "
+            "evidence. Paper ABSTAIN/NO_POSITION authority only; no score, alpha, "
+            "investability, provider, broker, or live-capital claim."
+        ),
+        "fixture_namespace": "real-evidence-mu",
+        "identity_namespace": "SEC_CIK_LISTING_V1",
+        "minimum_funded_positions": 0,
+        "minimum_economic_clusters": 1,
+        "minimum_total_cash_bps": 10000,
+        "cash_openings": [
+            {"bucket": "AVAILABLE", "amount": "10000"},
+            {"bucket": "RESEARCH_RESERVE", "amount": "1000"},
+        ],
+        "portfolio_aim": {
+            "objective": (
+                "Operate one real MU paper decision with explicit classified cash and "
+                "no position unless source evidence advances."
+            ),
+            "allowed_actions": ["HOLD", "CASH"],
+            "effective_at": "2026-08-02T12:00:00.000000Z",
+        },
+        "timeline": {
+            "cash_opened_at": "2026-08-02T11:55:00.000000Z",
+            "initial_decision_at": "2026-08-02T12:05:00.000000Z",
+            "aim_confirmed_at": "2026-08-02T12:05:30.000000Z",
+            "initial_transition_at": "2026-08-02T12:06:00.000000Z",
+            "initial_order_start_minute": 7,
+            "initial_certified_at": "2026-08-02T12:08:00.000000Z",
+        },
+        "status_explanations": {
+            "DRAFT_REVIEW": (
+                "The real MU evidence decision and classified cash await operator confirmation."
+            ),
+            "FUNDED_CERTIFIED": (
+                "The operator certified a cash-only MU ABSTAIN/NO_POSITION decision; "
+                "no security position or execution authority exists."
+            ),
+        },
+        "initial_decision_reason": "MU_NVDA_RECONCILIATION_HOLD_FOR_EVIDENCE",
+        "initial_changed_why_reason": (
+            "The banked reconciliation did not establish Micron-specific physical "
+            "supply persistence, so MU remained ABSTAIN and all capital stayed classified cash."
+        ),
+        "source_scenario_id": "GV_MU_NVDA_RECONCILED_EVIDENCE_1",
+        "source_authority": {
+            "schema_version": "gv_v2_mu_nvda_reconciliation_v1",
+            "case_id": "GV_V2_MU_NVDA_G_SUPPLY_RECONCILIATION_1",
+            "reconciliation_hash": reconciliation_hash,
+            "verification_mode": "REBUILD_FROM_BANKED_SOURCES",
+            "result_path": (
+                "data/gv_v2_reconciliation/mu_nvda_supply_1/"
+                "reconciliation_result.json"
+            ),
+        },
+        "runtime_observation_mode": True,
+        "instruments": [
+            {
+                "identity_namespace": "SEC_CIK_LISTING_V1",
+                "permanent_key": "SEC_CIK:0000723125:NASDAQ:MU:COMMON_STOCK",
+                "security_class": "COMMON_STOCK",
+                "symbol": "MU",
+                "name": "Micron Technology, Inc.",
+                "economic_cluster": "SEMICONDUCTOR_MEMORY",
+                "evidence_content": (
+                    "The banked MU filing and independent NVDA facts partially corroborate "
+                    "a broad memory-price and supply-constrained environment, but do not "
+                    "establish Micron-specific physical supply persistence."
+                ),
+                "evidence_slug": "mu-nvda-reconciliation",
+                "evidence_locator": (
+                    "repo://data/gv_v2_reconciliation/mu_nvda_supply_1/"
+                    f"reconciliation_result.json#reconciliation_hash={reconciliation_hash}"
+                ),
+                "outcome": "ABSTAIN",
+                "net_score_bps": 0,
+                "target_quantity": "0",
+                "reference_price": "1",
+                "principal_claim": (
+                    "Micron-specific physical supply persistence remains unestablished; "
+                    "retain NO_POSITION pending the missing discriminator."
+                ),
+                "hard_falsifiers": [
+                    "banked source hash or source-family linkage fails verification"
+                ],
+                "watch_conditions": [
+                    "independent point-in-time Micron shipment, allocation, inventory, "
+                    "utilization, capacity-ramp, or channel evidence persists across periods"
+                ],
+            }
+        ],
+    }
+
+
+SCENARIO_REAL_MU_PROSPECTIVE = _real_mu_prospective_scenario()
+
+
 _SCENARIOS = {
     DEFAULT_SCENARIO_ID: SCENARIO_10,
     PORTFOLIO_25_SCENARIO_ID: SCENARIO_25,
     ENGINE_SCALE_50_SCENARIO_ID: SCENARIO_50,
     ENGINE_SCALE_100_SCENARIO_ID: SCENARIO_100,
     PROSPECTIVE_25_SCENARIO_ID: SCENARIO_PROSPECTIVE_25,
+    REAL_MU_PROSPECTIVE_SCENARIO_ID: SCENARIO_REAL_MU_PROSPECTIVE,
 }
 
 

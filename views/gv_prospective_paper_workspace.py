@@ -5,7 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from gv_portfolio_v0.operated_scenarios import PROSPECTIVE_25_SCENARIO_ID
+from gv_portfolio_v0.operated_scenarios import (
+    PROSPECTIVE_25_SCENARIO_ID,
+    get_scenario,
+)
 from gv_portfolio_v0.operated_storage import (
     confirm_prospective_observation_and_persist,
     ensure_prospective_workspace,
@@ -101,14 +104,13 @@ def render_prospective_paper_workspace(
         workspace = ensure_prospective_workspace(
             root=root, scenario_id=scenario_id
         )
-        st.header("GV Prospective Paper Baseline 25")
+        scenario = get_scenario(scenario_id)
+        st.header(scenario["title"])
         st.caption(
-            "Accepted 25-security certified baseline · operator-supplied observations · "
-            "mutation-free preview · explicit confirmation · no provider, broker, or live capital."
+            f"{scenario['claim_boundary']} · operator-supplied observations · "
+            "mutation-free preview · explicit confirmation."
         )
-        st.success(
-            "Certified initial portfolio ready for runtime observation."
-        )
+        st.success("Certified paper decision ready for runtime observation.")
         st.caption(
             f"status=`{workspace['status']}` · instruments={len(workspace['instruments'])} · "
             f"episodes={workspace['prospective_episode_count']} · "

@@ -389,7 +389,7 @@ def ensure_prospective_workspace(
     _, path = _confined_paths(root, scenario_id=selected)
     if path.exists():
         return load_prospective_workspace(root=root, scenario_id=selected)
-    workspace = build_prospective_workspace()
+    workspace = build_prospective_workspace(selected)
     if workspace["scenario_id"] != selected:
         raise OperatedPortfolioError("PROSPECTIVE_SCENARIO_MISMATCH")
     persist_prospective_workspace(workspace, root=root)

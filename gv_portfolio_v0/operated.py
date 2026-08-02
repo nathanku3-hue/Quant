@@ -111,9 +111,12 @@ def _instrument(
     scenario: Mapping[str, Any], specification: Mapping[str, Any]
 ) -> dict[str, Any]:
     identity = {
-        "namespace": "GV_SYNTHETIC_PERMANENT_V1",
+        "namespace": specification.get(
+            "identity_namespace",
+            scenario.get("identity_namespace", "GV_SYNTHETIC_PERMANENT_V1"),
+        ),
         "permanent_key": specification["permanent_key"],
-        "security_class": "COMMON_STOCK",
+        "security_class": specification.get("security_class", "COMMON_STOCK"),
     }
     return {
         "instrument_id": _identifier(scenario, "INS", identity),
@@ -166,10 +169,13 @@ def _initial_evidence(
             _evidence(
                 scenario,
                 content=specification["evidence_content"],
-                locator=(
-                    f"fixture://{scenario['fixture_namespace']}/"
-                    f"{specification['symbol'].lower()}/"
-                    f"{specification['evidence_slug']}-v1"
+                locator=specification.get(
+                    "evidence_locator",
+                    (
+                        f"fixture://{scenario['fixture_namespace']}/"
+                        f"{specification['symbol'].lower()}/"
+                        f"{specification['evidence_slug']}-v1"
+                    ),
                 ),
                 observed_at=_minute_timestamp(
                     f"{scenario['timeline']['cash_opened_at'][:11]}12:00:00.000000Z",
@@ -1162,8 +1168,9 @@ def validate_workspace(
         or len(set(permanent_keys)) != instrument_count
     ):
         raise OperatedPortfolioError("PERMANENT_IDENTITY_DUPLICATE")
-    if len({row["economic_cluster"] for row in instruments}) < 2:
-        raise OperatedPortfolioError("TWO_ECONOMIC_CLUSTERS_REQUIRED")
+    minimum_clusters = int(scenario.get("minimum_economic_clusters", 2))
+    if len({row["economic_cluster"] for row in instruments}) < minimum_clusters:
+        raise OperatedPortfolioError("MINIMUM_ECONOMIC_CLUSTERS_REQUIRED")
     for row in instruments:
         identity = {
             "namespace": row["namespace"],
