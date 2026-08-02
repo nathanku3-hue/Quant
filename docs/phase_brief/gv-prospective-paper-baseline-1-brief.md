@@ -1,11 +1,11 @@
 # Phase Brief — GV-PROSPECTIVE-PAPER-BASELINE-1
 
 Date: 2026-08-02
-Status: `FROZEN_REMOTE_CANDIDATE; LOCAL_GATES_PASS; HOSTED_CI_AND_REAL_PROSPECTIVE_EVIDENCE_PENDING`
-Base: `5687a2c2ae61ef8b5de676cffad5b19df9224b01`
-Candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`
-Candidate tree: `20d5eb712799555003b2efcf6aed96ca89db9f67`
-Branch: `product/gv-prospective-paper-baseline-1`; local and remote equal at the candidate SHA.
+Status: `EXECUTABLE_REMOTE_CANDIDATE; DATE_REPAIR_PRESENT; HOSTED_CI_AND_REAL_EVIDENCE_SEAM_PENDING`
+Base capability candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`
+Executable candidate: `147397f669c81eb2ab3bfd5054d676d9d0c9c77f`
+Executable tree: `a43a6a83549c7824b99f3db171451075a871f289`
+Branch: `repair/gv-prospective-paper-baseline-1-r1`; local and remote equal at the executable SHA.
 Accepted product score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
@@ -13,7 +13,7 @@ Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 Add one genuine runtime portfolio-operating path to the accepted 25-security substrate. An operator supplies new observation content, source locator, UTC timestamp, instrument ownership, explicit review proposals, and rationale. The system produces a deterministic mutation-free preview; only explicit confirmation grants authority. Rejection is append-only and cannot mutate evidence, reviews, decisions, holdings, cash, orders, fills, or the certified book.
 
-This implementation proves capability. Automated tests inject runtime values and therefore do not by themselves constitute prospective evidence. Score remains `62/100` until real operator-supplied episodes are executed and retained.
+This implementation proves capability. Automated tests inject runtime values and therefore do not by themselves constitute prospective evidence. The synthetic 25-security profile is a regression and usability fixture, not the forward product milestone. Score remains `62/100` until real source evidence enters a real instrument decision and survives operator confirmation, persistence, and replay.
 
 ## Endgame alignment
 
@@ -78,31 +78,30 @@ Field entry is not counted as a separate authorization action. No per-security c
 
 ## Validation evidence
 
-- Prospective core tests: `11/11 PASS`.
-- Prospective Streamlit product tests: `3/3 PASS`.
-- Retained operated/25/App tests: `23/23 PASS`.
-- Scale persistence/timestamp repair tests: `13/13 PASS`.
-- Shared book/allocation/execution/replay/strategy/vertical tests: `104/104 PASS`.
-- Historical bounded/scale/universe/challenger tests: `24/24 PASS`.
-- `git diff --check`: PASS before authority synchronization.
+- Historical broader test receipts belong to capability candidate `9c7e75a`: retained operated/25/App `23/23`, scale repair `13/13`, shared book/allocation/execution/replay/strategy/vertical `104/104`, and historical bounded/scale/universe/challenger `24/24`.
+- Executable candidate `147397f` repairs the future-dated September bootstrap and has a reported current-tip prospective subset result of `15/15 PASS` (`12` core plus `3` Streamlit product tests).
+- This authority correction does not relabel the historical broader receipts as current-tip execution.
+- Exact-SHA hosted Windows/Linux proof is absent and remains required before terminal publication.
 
-Exact-SHA hosted Windows/Linux CI is publication evidence, not a prerequisite for continuing implementation. Independent Reviewer A/B/C is unavailable and was explicitly waived as a blocking prerequisite for this candidate; no claim of independent terminal acceptance is made.
+Hosted CI is not a prerequisite for operating the paper product or running the non-authoritative Learn lane. No independent terminal-acceptance claim is made.
 
 ## Product disposition
 
 The implementation candidate closes the main software capability gap: the product can now accept unscripted runtime observations and convert confirmed proposals into deterministic certified portfolio state. It does not yet prove genuine prospective operation because the passing episodes are test-injected.
 
-Accepted score remains `62/100`. A score uplift to approximately `69–72/100` requires retained real operator-supplied episodes under the same flow.
+Accepted score remains `62/100`. One synthetic operator smoke episode strengthens operability evidence but adds no capability and therefore adds no score. A real MU evidence → real identity → portfolio outcome → confirmation → replay slice would support a nonbinding `66–68/100` reassessment; repeated real-identity operation plus an independent comparison is required for `70+`.
 
 ## Revised roadmap
 
 ```text
-25-security operated terminal
-→ scale persistence/timestamp repair
-→ prospective paper capability candidate
-→ real operator-supplied prospective episodes
-→ real shadow challenger on the same certified 25-security opportunity set
-→ Universe custody only when broader membership is required
+147397f executable date repair
+→ minimal authority synchronization
+→ one synthetic operator smoke episode
+→ concurrent MU/NVDA reconciliation in a non-authoritative lane
+→ one real-source, real-MU-identity, replayable ABSTAIN/NO_POSITION or ADMIT decision
+→ independent shadow proposal on the same evidence
+→ repeated 3–5 real-security prospective operation
+→ broader Universe custody only when required
 → separately authorized Limited Live
 ```
 
@@ -114,11 +113,12 @@ Do not add providers, optimizer frameworks, broker credentials, autonomous submi
 
 ## Remaining acceptance gate
 
-1. Preserve exact remote candidate `9c7e75a`; do not amend or recut it.
-2. Run exact-SHA Windows/Linux CI.
-3. Execute three real operator-supplied episodes through the product flow, including at least one justified no-change and one real target transition.
-4. Retain fresh-process reopen and full reconstruction evidence after every episode.
-5. Only then reconsider score uplift and open the real shadow Challenger.
+1. Preserve executable candidate `147397f`; do not rewrite its test history.
+2. Bank one fresh-home synthetic no-change smoke proving preview immutability, confirmation, append-only lineage, and fresh-process reconstruction. This proves operability only.
+3. Reconcile the banked MU and NVDA packages without network access, score/rank output, portfolio mutation, or alpha/investability claims.
+4. Route that reconciliation into one real MU identity with classified cash, deterministic `ABSTAIN/NO_POSITION` or `ADMIT`, explicit preview/confirmation, append-only persistence, and fresh-process replay.
+5. Collect exact-SHA Windows/Linux proof before terminal publication.
+6. Open a replacement shadow proposal only after the real-evidence seam works; do not adapt the obsolete slot/cell Challenger.
 
 ## What Was Done
 
@@ -131,16 +131,18 @@ Do not add providers, optimizer frameworks, broker credentials, autonomous submi
 - Accepted foundation `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains immutable.
 - Accepted terminal `GV-OPERATED-PORTFOLIO-25-1` and its 25-security identity remain unchanged.
 - Base repair `5687a2c` remains immutable and remote-equal.
-- Frozen candidate `9c7e75a`, tree `20d5eb7`, is remote-equal on `product/gv-prospective-paper-baseline-1`.
+- Capability candidate `9c7e75a` retains its historical broader receipts.
+- Executable candidate `147397f`, tree `a43a6a8`, is remote-equal on `repair/gv-prospective-paper-baseline-1-r1` and repairs the September bootstrap defect.
 - Accepted score remains `62/100`.
 - Test-injected runtime data proves capability only, not prospective evidence.
 - Limited Live remains closed.
 
 ## What Is Next
 
-- Preserve remote-equal candidate `9c7e75a` and collect hosted CI evidence.
-- Collect genuine operator-supplied prospective episodes.
-- Replace the obsolete Challenger harness only after prospective baseline evidence is banked.
+- Use `147397f` as executable authority and collect hosted CI concurrently.
+- Bank one synthetic operator smoke, then stop treating repeated synthetic episodes as the product milestone.
+- Reconcile MU/NVDA evidence and ship the one-real-identity source-to-portfolio seam.
+- Replace the obsolete Challenger harness only after that seam works.
 
 ## First Command
 
@@ -150,6 +152,7 @@ git status --short
 
 ## Next Todos
 
-- Complete exact-SHA hosted CI.
-- Execute and retain three real operator-supplied episodes.
-- Open a real independent shadow Challenger on the same 25-security opportunity set.
+- Complete exact-SHA hosted CI for `147397f` before publication.
+- Retain one synthetic no-change smoke as usability evidence only.
+- Produce a bounded MU/NVDA reconciliation and one real-MU-identity replayable portfolio decision.
+- Open an independent shadow proposal on the exact same evidence only after the real-evidence seam passes.

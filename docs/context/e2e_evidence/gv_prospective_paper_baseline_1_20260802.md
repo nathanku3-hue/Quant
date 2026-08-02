@@ -5,9 +5,11 @@ Mode: `EXECUTION_PACKET`
 ## Identity
 
 - Base: `5687a2c2ae61ef8b5de676cffad5b19df9224b01`
-- Candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`
-- Candidate tree: `20d5eb712799555003b2efcf6aed96ca89db9f67`
-- Branch: `product/gv-prospective-paper-baseline-1`; local and remote equal at the candidate SHA.
+- Capability candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`; historical broader test receipts remain bound to this SHA.
+- Executable candidate: `147397f669c81eb2ab3bfd5054d676d9d0c9c77f`
+- Executable tree: `a43a6a83549c7824b99f3db171451075a871f289`
+- Branch: `repair/gv-prospective-paper-baseline-1-r1`; local and remote equal at the executable SHA.
+- Repair: prospective bootstrap moved from future September dates to `2026-08-01`, allowing current-date operation.
 - Accepted score before and after this implementation round: `62/100`
 - Limited Live: `CLOSED; NOT_AUTHORIZED`
 
@@ -53,30 +55,35 @@ Confirmed episodes append evidence, review/thesis state, observation, decision s
 
 ## Validation receipts
 
-| Scope | Result |
-|---|---:|
-| Prospective core | `11/11 PASS` |
-| Prospective Streamlit product | `3/3 PASS` |
-| Retained operated/25/App | `23/23 PASS` |
-| Scale persistence/timestamp repair | `13/13 PASS` |
-| Book/allocation/execution/replay/strategy/vertical | `104/104 PASS` |
-| Historical bounded/scale/universe/challenger | `24/24 PASS` |
+| Scope | Bound SHA | Result |
+|---|---|---:|
+| Current-tip prospective core + Streamlit product | `147397f` | reported `15/15 PASS` (`12` core, `3` UI) |
+| Retained operated/25/App | `9c7e75a` | historical `23/23 PASS` |
+| Scale persistence/timestamp repair | `9c7e75a` | historical `13/13 PASS` |
+| Book/allocation/execution/replay/strategy/vertical | `9c7e75a` | historical `104/104 PASS` |
+| Historical bounded/scale/universe/challenger | `9c7e75a` | historical `24/24 PASS` |
+| Exact-SHA Windows/Linux hosted proof | `147397f` | `ABSENT` |
 
-All reported runs used Python 3.12. The repository emits an inherited `PytestConfigWarning` for unknown `cache_dir`; it does not affect test outcomes.
+No broader current-tip rerun is claimed. Hosted proof is required before terminal publication, not before a bounded paper-product smoke or non-authoritative Learn-lane reconciliation.
 
 ## Evidence boundary
 
-Automated tests inject runtime values. They prove the software capability and deterministic authority boundaries, but they are not genuine prospective evidence. No score uplift is claimed. Three real operator-supplied episodes remain required before prospective baseline acceptance and real shadow Challenger opening.
+Automated tests inject runtime values. They prove software capability and deterministic authority boundaries, but they are not genuine prospective evidence. A manually operated episode on the synthetic 25-security profile proves usability, custody, and restartability only. No score uplift is claimed. The forward evidence gate is one real source set entering one real instrument decision and surviving confirmation, persistence, and replay.
 
 ## Roadmap disposition
 
 ```text
-frozen remote candidate `9c7e75a`
-→ exact-SHA hosted CI
-→ three genuine operator-supplied episodes
-→ real shadow Challenger on the same certified 25-security set
+executable candidate `147397f`
+→ minimal six-file authority correction
+→ one fresh-home synthetic no-change smoke
+→ concurrent MU/NVDA reconciliation
+→ one real MU identity and classified cash
+→ deterministic ABSTAIN/NO_POSITION or ADMIT preview/confirmation
+→ append-only persistence and fresh-process exact replay
+→ independent shadow proposal on the same evidence
+→ repeated 3–5 real-security prospective operation
 → Universe custody when broader membership is required
 → separately authorized Limited Live
 ```
 
-Australian legal review is not a blocker for paper baseline or paper Challenger work. It remains mandatory before broker credentials, automated submission, client assets, advice activity, or real-capital operation.
+The obsolete slot/cell Challenger is not adapted; its replacement begins only after the real-evidence seam works. Australian legal review is not a blocker for paper baseline or paper shadow work. It remains mandatory before broker credentials, automated submission, client assets, advice activity, or real-capital operation.

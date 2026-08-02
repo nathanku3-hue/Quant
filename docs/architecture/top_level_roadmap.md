@@ -1,6 +1,6 @@
 # GodView Top-Level Roadmap
 
-Status: `P0 TERMINAL; SCALE REPAIR BANKED; PROSPECTIVE IMPLEMENTATION CANDIDATE; CHALLENGER/LIVE CLOSED`
+Status: `P0 TERMINAL; PROSPECTIVE EXECUTABLE REPAIR; REAL-EVIDENCE SEAM NEXT; CHALLENGER/LIVE CLOSED`
 Date: 2026-08-02
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Frozen original detail: `docs/architecture/godview_v2_frozen_build_learn_roadmap.md`
@@ -13,7 +13,7 @@ Accepted endgame progress: `62/100`
 BASE = REPAIR_5687a2c_FROM_TERMINAL_MAIN_e564cd9
 ACCEPTED_TERMINAL_PRODUCT = GV-OPERATED-PORTFOLIO-25-1
 ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-25-1
-ACTIVE_IMPLEMENTATION_PHASE = GV-PROSPECTIVE-PAPER-BASELINE-1
+ACTIVE_IMPLEMENTATION_PHASE = GV-REAL-EVIDENCE-MU-PORTFOLIO-1
 HISTORICAL_DIAGNOSTIC_PHASE = GV-ENGINE-SCALE-CHARACTERIZATION-1
 DIAGNOSTIC_CANDIDATE = f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283
 DIAGNOSTIC_STATUS = HISTORICAL_FROZEN_FINDING; REPAIR_COMPLETED_AT_5687a2c
@@ -25,7 +25,7 @@ LIMITED_LIVE = CLOSED; NOT_AUTHORIZED
 ROOT_CHECKOUT = UNSAFE; DO_NOT_USE
 ```
 
-The accepted 25-security product remains terminal and immutable. The scale characterization is historical diagnostic custody; its two defects are repaired at `5687a2c`. `GV-PROSPECTIVE-PAPER-BASELINE-1` is the active implementation candidate and is not yet score-bearing prospective evidence. The terminal tag `gv-operated-portfolio-25-1-terminal` remains fixed at closure commit `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`.
+The accepted 25-security product remains terminal and immutable. The scale characterization is historical diagnostic custody; its two defects are repaired at `5687a2c`. `GV-PROSPECTIVE-PAPER-BASELINE-1` capability candidate `9c7e75a` is superseded for execution by remote-equal date repair `147397f`; neither is score-bearing prospective evidence. The synthetic 25-security path is now a regression/usability fixture. The active forward slice is the real-evidence MU source-to-portfolio seam. The terminal tag `gv-operated-portfolio-25-1-terminal` remains fixed at closure commit `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`.
 
 ## Accepted Slice 0 foundation — historical authority seams
 
@@ -96,9 +96,9 @@ existing accepted 25-security engine
 - Registered 50/100 scenarios now persist, reopen, correct, replay, and retain residual `0`; UTC timestamps roll over correctly.
 - The repair remains infrastructure evidence and does not change the accepted score.
 
-## Active implementation — GV-PROSPECTIVE-PAPER-BASELINE-1
+## Banked implementation — GV-PROSPECTIVE-PAPER-BASELINE-1
 
-`ACTIVE_IMPLEMENTATION_PHASE = GV-PROSPECTIVE-PAPER-BASELINE-1`
+`BANKED_IMPLEMENTATION_PHASE = GV-PROSPECTIVE-PAPER-BASELINE-1`
 
 The prospective candidate derives from the accepted 25-security catalogue and bootstraps the certified funded portfolio. It accepts runtime observation content, source locator, UTC timestamp, owned instruments, explicit outcome/score/quantity/thesis proposals, and operator rationale. Preview is mutation-free; only explicit confirmation grants authority. Explicit rejection is append-only and cannot mutate evidence, reviews, snapshots, holdings, cash, orders, fills, or book economics.
 
@@ -132,19 +132,20 @@ No client assets, pooled capital, discretionary activity for another person, pub
 
 ## P2 — Challenger comparison
 
-P2 opens only after genuine operator-supplied prospective baseline evidence exists on the certified 25-security opportunity set. Universe custody and legal review are not mandatory predecessors to paper Challenger comparison.
+P2 opens only after one real source set has produced a real instrument decision through preview, confirmation, persistence, and exact replay. Universe custody and legal review are not mandatory predecessors to a paper shadow comparison.
 
 The comparison sequence is:
 
 ```text
-certified prospective baseline
-→ independent shadow challenger proposal
-→ prospective challenger
+real MU evidence and reconciliation
+→ certified baseline portfolio outcome
+→ independent shadow proposal on the exact same evidence
+→ repeated prospective comparison
 → independent replication
 → bounded authority decision
 ```
 
-The challenger must consume the same runtime observation envelope and share the baseline custody boundary, costs, workload measurement, and operating conditions. The obsolete slot/cell Challenger harness is historical only and must be replaced rather than adapted.
+The obsolete slot/cell Challenger harness is deleted conceptually. No adapter or backward compatibility is permitted. Its replacement must consume the exact same evidence set and share custody, costs, workload measurement, and operating conditions.
 
 ## P3 — Limited Live
 
@@ -155,12 +156,17 @@ No responsible score forecast is recorded for Limited Live.
 ## Next boundary
 
 ```text
-preserve frozen remote candidate `9c7e75a`
-→ exact-SHA hosted CI
-→ three genuine operator-supplied prospective episodes
-→ real shadow Challenger on the same 25-security set
+use executable candidate `147397f`
+→ six-file authority correction
+→ one fresh-home synthetic no-change smoke
+→ concurrent MU/NVDA reconciliation
+→ one real MU identity plus classified cash
+→ deterministic ABSTAIN/NO_POSITION or ADMIT preview and confirmation
+→ append-only persistence and fresh-process exact replay
+→ independent shadow proposal on the same evidence
+→ repeated 3–5 real-security prospective operation
 → Universe custody when broader membership is required
 → separately authorized Limited Live
 ```
 
-Provider acquisition, optimizer frameworks, broker integration, client assets, autonomous orders, alpha claims, score uplift, and Limited Live remain prohibited until separately authorized.
+Exact-SHA hosted CI runs concurrently and is required before terminal publication, not before learning from the paper product. Provider acquisition, optimizer frameworks, broker integration, client assets, autonomous orders, alpha claims, accepted-score uplift, old Challenger compatibility, and Limited Live remain prohibited until separately authorized.
