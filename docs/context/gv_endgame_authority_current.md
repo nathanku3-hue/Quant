@@ -1,13 +1,14 @@
 # Godview Endgame Authority — Current
 
-Date: 2026-08-01
-Decision: `ACCEPT_GV_OPERATED_PORTFOLIO_25_1_TERMINALLY`
-Status: `TERMINAL_ACCEPTED; PUBLICATION_BY_DOCUMENTATION_ONLY_CLOSURE`
+Date: 2026-08-02
+Decision: `PRESERVE_GV_OPERATED_PORTFOLIO_25_1_TERMINAL_AND_OPEN_PROSPECTIVE_IMPLEMENTATION`
+Status: `TERMINAL_ACCEPTED; PROSPECTIVE_IMPLEMENTATION_CANDIDATE_ACTIVE`
 
 ## Current disposition
 
 - `ACCEPTED_FOUNDATION = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`; executable candidate `0d15e9c59c6b3ca051b3aa815018889d1e94857f`, closure `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`, and tag `gv-operated-portfolio-10-transition-1r-terminal` remain immutable.
-- `ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-25-1`; terminal executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`, tree `548d6365d6355c709186aef00835219bfa30c387`.
+- `ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-25-1`; terminal executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`, tree `548d6365d6355c709186aef00835219bfa30c387`, remains the accepted product terminal.
+- `ACTIVE_IMPLEMENTATION_PHASE = GV-PROSPECTIVE-PAPER-BASELINE-1`; base repair `5687a2c2ae61ef8b5de676cffad5b19df9224b01`; implementation candidate is not yet accepted prospective evidence.
 - `TERMINAL_TAG = gv-operated-portfolio-25-1-terminal`; it must resolve to the first documentation-only closure commit containing this authority packet.
 - `PUBLICATION = FAST_FORWARD_ONLY`; `main` may advance from `2349e1b` through `7ce85c4` to the documentation-only closure commit, with no squash, rebase, merge commit, amendment, or executable recut.
 - Accepted endgame progress remains `62/100`. Terminal closure does not itself authorize a score uplift.
@@ -55,4 +56,4 @@ The required operator workload remains bounded to at most four actions and requi
 
 The closure commit may modify documentation and generated context only. Before publication, the diff from `7ce85c4` must contain no production, test, workflow, dependency, or configuration path. After fast-forward publication, remote `main` and `gv-operated-portfolio-25-1-terminal^{}` must resolve to the same closure commit.
 
-No successor phase is opened by this terminal. Provider acquisition, optimizer work, broker integration, Universe, Challenger compatibility, alpha/score uplift, Limited Live, and live capital remain closed pending explicit owner authorization.
+The owner has explicitly opened `GV-PROSPECTIVE-PAPER-BASELINE-1` while preserving this terminal. The successor may add runtime prospective observations through the same engine, persistence, application, book, replay, and certification paths. Automated fixtures prove capability only; score uplift and real Challenger opening require genuine operator-supplied prospective episodes. Provider acquisition, optimizer work, broker integration, alpha/score uplift, Limited Live, and live capital remain closed. Universe custody is deferred until broader membership is actually required.

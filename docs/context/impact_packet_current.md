@@ -1,32 +1,62 @@
 # Impact Packet — Current
 
-Date: 2026-08-01
-Phase: `GV-ENGINE-SCALE-CHARACTERIZATION-1`
-Status: `FROZEN_FINDING; REVIEW_BLOCKED`
+Date: 2026-08-02
+Phase: `GV-PROSPECTIVE-PAPER-BASELINE-1`
+Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS`
 
 ## Product impact
 
-No new product capability is accepted. Diagnostic candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283` is frozen and remote-equal. Synthetic 50/100 scenarios execute through the existing engine in memory, but neither can use the existing persistence/product path. Accepted progress remains `62/100`.
+The accepted 25-security certified portfolio now has a runtime prospective operating path. An operator can supply unscripted observation content, source locator, UTC timestamp, owned instruments, explicit review proposals, and rationale; preview deterministic consequences; and confirm or reject. Confirmed episodes persist and reconstruct exactly after fresh-process reopen. Rejected proposals remain append-only evidence but cannot mutate authoritative portfolio state.
+
+This is capability evidence only. Automated tests inject runtime values, so accepted progress remains `62/100` pending real operator-supplied episodes.
 
 ## Changed implementation surfaces
 
-- `gv_portfolio_v0/operated_scenarios.py` — adds declarative 50/100 synthetic diagnostic inputs only.
-- `scripts/characterize_gv_engine_scale.py` — fresh-process measurement and unchanged-persistence probe.
-- `tests/gv_portfolio_v0/test_engine_scale_characterization.py` — scenario identity, existing-engine operation, deterministic repeat, persistence stop, timestamp stop, and accepted-25 non-mutation checks.
+- `gv_portfolio_v0/operated_scenarios.py` — registers one prospective profile derived from the accepted 25-security catalogue without copying the catalogue or authoring later episodes.
+- `gv_portfolio_v0/prospective.py` — runtime request validation, mutation-free preview, explicit confirmation/rejection, append-only event/state projection, transition execution, and full-state reconstruction.
+- `gv_portfolio_v0/operated_storage.py` — reuses the confined atomic persistence path for prospective workspaces and dispositions.
+- `gv_portfolio_v0/book.py` — treats prospective rejection as a non-economic event.
+- `views/gv_prospective_paper_workspace.py` — two-action operator flow for preview and confirm/reject.
+- `operated_portfolio_app.py` — routes the environment-selected prospective scenario through the existing app.
+- `tests/gv_portfolio_v0/test_prospective.py` — core authority, projection, transition, rejection, persistence, and fresh-process reconstruction coverage.
+- `tests/gv_portfolio_v0/test_prospective_app.py` — black-box Streamlit no-change, transition, and rejection flows.
+- `.github/workflows/gv-operated-portfolio.yml` — prospective view and active brief path ownership.
 
-No engine selection, execution, accounting, replay, certification, correction, storage, application, view, workflow, dependency, broker, provider, or live-capital logic is changed.
+## Interface impact
 
-## Evidence impact
+- Runtime observation envelope becomes the only source of later prospective episode content.
+- Per-security outcomes remain `ADMIT`, `REJECT`, or `ABSTAIN`; `CASH` remains portfolio-level.
+- Non-`ADMIT` target quantity is constrained to `0`.
+- Preview remains non-authoritative; confirmation or rejection is required.
+- Repeated episode state is projected from the append-only event log rather than fixed scenario status/count branches.
+- Existing operated 10/25 and 50/100 storage identities remain unchanged.
 
-- 50: 6.43–6.45 seconds, 30.1–30.3 MB peak working set, 48 events, 18 orders/fills, residual `0`, repeat hashes equal.
-- 100: 11.77–11.96 seconds, 32.3–32.4 MB peak working set, 80 events, 34 orders/fills, residual `0`, repeat hashes equal.
-- Both: existing persistence rejects the scenario ID before write.
-- 100: 40 malformed timestamps from `12:60` to `12:99`.
+## Validation impact
 
-## Documentation impact
+- Prospective core: `11/11 PASS`.
+- Prospective UI: `3/3 PASS`.
+- Retained operated/25/App: `23/23 PASS`.
+- Scale repair: `13/13 PASS`.
+- Shared accounting/allocation/execution/replay/strategy/vertical: `104/104 PASS`.
+- Historical bounded/scale/universe/challenger: `24/24 PASS`.
 
-The active brief, top-level roadmap, current truth surfaces, evidence packet, custody decision, handover, decision log, lesson log, and SAW report classify P1 as a frozen diagnostic finding with SAW BLOCK because independent Reviewer A/B/C and current hierarchy confirmation are unavailable. P0 terminal custody and score remain unchanged.
+## Roadmap impact
+
+The sequence is intentionally amended to:
+
+```text
+prospective baseline capability
+→ real operator-supplied prospective evidence
+→ real shadow Challenger on the same certified 25-security set
+→ Universe custody when broader membership is required
+→ separately authorized Limited Live
+```
+
+Legal review is not a blocker for paper Challenger work. It remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
 
 ## Open impact
 
-A later bounded repair would touch shared persistence naming/root selection and initial evidence timestamp generation. That repair is not included here. P2, Universe acceptance, Challenger, broker integration, and Limited Live remain closed.
+- FS0/context validation and exact candidate custody remain open.
+- Hosted exact-SHA Windows/Linux evidence remains open.
+- Genuine prospective evidence remains open.
+- Old Challenger remains a historical custody primitive and must be replaced, not adapted.

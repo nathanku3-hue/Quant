@@ -5,12 +5,16 @@ from __future__ import annotations
 import streamlit as st
 
 from gv_portfolio_v0.operated import OperatedPortfolioError
-from gv_portfolio_v0.operated_scenarios import get_scenario
+from gv_portfolio_v0.operated_scenarios import (
+    PROSPECTIVE_25_SCENARIO_ID,
+    get_scenario,
+)
 from gv_portfolio_v0.operated_storage import (
     default_workspace_root,
     selected_scenario_id,
 )
 from views.gv_operated_portfolio_workspace import render_operated_portfolio_workspace
+from views.gv_prospective_paper_workspace import render_prospective_paper_workspace
 
 scenario_id = selected_scenario_id()
 scenario = get_scenario(scenario_id)
@@ -30,8 +34,13 @@ st.sidebar.caption(f"Scenario: `{scenario_id}`")
 st.sidebar.caption(f"Workspace: `{workspace_root}`")
 
 try:
-    render_operated_portfolio_workspace(
-        st, root=workspace_root, scenario_id=scenario_id
-    )
+    if scenario_id == PROSPECTIVE_25_SCENARIO_ID:
+        render_prospective_paper_workspace(
+            st, root=workspace_root, scenario_id=scenario_id
+        )
+    else:
+        render_operated_portfolio_workspace(
+            st, root=workspace_root, scenario_id=scenario_id
+        )
 except OperatedPortfolioError:
     pass

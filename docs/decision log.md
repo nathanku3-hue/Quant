@@ -7719,3 +7719,16 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Diagnostic custody: implementation/test candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283`, tree `e048f2483c64fcf7a9cae58e8454b70d7e993e78`, is immutable and remote-equal on `codex/gv-engine-scale-characterization-1`; never move `gv-operated-portfolio-25-1-terminal`.
 - Review disposition: local implementation, regression, authority, context, and measurement checks pass, but independent Reviewer A/B/C and a current scale/custody hierarchy confirmation are unavailable. SAW is BLOCKED; no reviewed or accepted product claim is made.
 - Score remains `62/100`; P2 Challenger and P3 Limited Live remain closed.
+
+## 2026-08-02 — IMPLEMENT_GV_PROSPECTIVE_PAPER_BASELINE_1; CAPABILITY_NOT_EVIDENCE
+
+- Owner authorization: start `GV-PROSPECTIVE-PAPER-BASELINE-1` immediately from repair base `5687a2c`; do not wait for hosted CI or unavailable independent Reviewer A/B/C; execute Slice A, then B, then C automatically when each gate passes.
+- Product decision: derive one prospective profile from the accepted 25-security catalogue without copying the instrument catalogue; bootstrap the certified funded portfolio; accept runtime observation content, locator, observed-at, owned instruments, explicit review proposals, and rationale.
+- Authority decision: score, target quantity, thesis, and outcome remain proposals until deterministic mutation-free preview validation and explicit confirmation. Rejection is append-only custody and cannot admit evidence or mutate authoritative reviews, snapshots, holdings, cash, orders, fills, or book economics.
+- Semantic correction: per-security review outcomes are only `ADMIT`, `REJECT`, or `ABSTAIN`; `CASH` remains a portfolio-level capital candidate; non-`ADMIT` target quantity must be `0`.
+- Projection decision: repeated prospective episodes use one append-only event/state projector. Do not extend the scenario-authored status/count validation branches in `operated.py`.
+- Delivered flow: confirmed no-change, confirmed SELL/REDUCE plus BUY/FUND transition, and rejected proposal each run through the existing environment-selected app, atomic storage, replay, certification, and fresh-process full-state reconstruction.
+- Evidence boundary: automated tests inject runtime values and prove capability only. Three genuine operator-supplied episodes remain required before prospective baseline acceptance or score uplift.
+- Roadmap amendment: paper Challenger follows genuine prospective baseline evidence on the same certified 25-security opportunity set; Universe custody is deferred until broader membership is required; Australian legal review is not a paper Challenger blocker and remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
+- Local evidence: prospective `14/14`, retained operated/25/App `23/23`, scale repair `13/13`, shared accounting/replay `104/104`, and historical harnesses `24/24` pass.
+- Score remains `62/100`; Limited Live remains closed and unauthorized.

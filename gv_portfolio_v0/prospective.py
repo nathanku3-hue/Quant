@@ -1,0 +1,821 @@
+"""Append-only prospective paper operation on the accepted 25-security baseline.
+
+Runtime observations and review changes are operator proposals until deterministic
+preview validation and explicit confirmation. Confirmed episodes are reconstructed
+from one canonical event log; scenario-authored later observations are prohibited.
+"""
+
+from __future__ import annotations
+
+from copy import deepcopy
+from datetime import datetime, timedelta, timezone
+from typing import Any, Mapping
+
+from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
+from gv_portfolio_v0.execution import ExecutionError, portfolio_book_event
+from gv_portfolio_v0.operated import (
+    OperatedPortfolioError,
+    STATUS_FUNDED,
+    _append_trade,
+    _append_transition_event,
+    _decision_snapshot,
+    _evidence,
+    _record,
+    _thesis,
+    _transition_legs_from_reviews,
+    build_draft_workspace,
+    confirm_initial_portfolio,
+)
+from gv_portfolio_v0.operated_scenarios import (
+    PORTFOLIO_25_SCENARIO_ID,
+    PROSPECTIVE_25_SCENARIO_ID,
+    get_scenario,
+)
+from gv_portfolio_v0.replay import (
+    ReplayError,
+    certify_replay_prefix,
+    reconstruct_book,
+    reconstruct_exact,
+    replay_idempotent,
+)
+
+PROSPECTIVE_SCHEMA = "gv_prospective_paper_workspace_v1"
+PROPOSAL_SCHEMA = "gv_prospective_observation_proposal_v2"
+EPISODE_SCHEMA = "gv_prospective_confirmed_episode_v1"
+REJECTED_EPISODE_SCHEMA = "gv_prospective_rejected_episode_v1"
+INSTRUMENT_OUTCOMES = frozenset({"ADMIT", "REJECT", "ABSTAIN"})
+
+
+class ProspectiveOperationError(OperatedPortfolioError):
+    """Fail-closed prospective paper operation error."""
+
+
+def _utc_datetime(value: str, *, field: str) -> datetime:
+    if not isinstance(value, str) or not value:
+        raise ProspectiveOperationError(f"{field.upper()}_REQUIRED")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ProspectiveOperationError(f"{field.upper()}_INVALID") from exc
+    if parsed.tzinfo is None:
+        raise ProspectiveOperationError(f"{field.upper()}_UTC_REQUIRED")
+    return parsed.astimezone(timezone.utc)
+
+
+def _utc_timestamp(value: datetime) -> str:
+    return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+
+def _required_text(value: Any, *, field: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ProspectiveOperationError(f"{field.upper()}_REQUIRED")
+    return value.strip()
+
+
+def _whole_quantity(value: Any) -> str:
+    if isinstance(value, bool):
+        raise ProspectiveOperationError("TARGET_QUANTITY_INVALID")
+    text = str(value).strip()
+    try:
+        quantity = int(text)
+    except (TypeError, ValueError) as exc:
+        raise ProspectiveOperationError("TARGET_QUANTITY_INVALID") from exc
+    if quantity < 0 or str(quantity) != text:
+        raise ProspectiveOperationError("TARGET_QUANTITY_INVALID")
+    return text
+
+
+def _score(value: Any) -> int:
+    if isinstance(value, bool):
+        raise ProspectiveOperationError("NET_SCORE_BPS_INVALID")
+    try:
+        score = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ProspectiveOperationError("NET_SCORE_BPS_INVALID") from exc
+    if score < -100000 or score > 100000:
+        raise ProspectiveOperationError("NET_SCORE_BPS_OUT_OF_RANGE")
+    return score
+
+
+def _baseline_workspace() -> dict[str, Any]:
+    scenario = get_scenario(PROSPECTIVE_25_SCENARIO_ID)
+    if scenario.get("source_scenario_id") != PORTFOLIO_25_SCENARIO_ID:
+        raise ProspectiveOperationError("PROSPECTIVE_SOURCE_SCENARIO_INVALID")
+    if "no_change" in scenario or "transition" in scenario:
+        raise ProspectiveOperationError("SCENARIO_AUTHORED_EPISODE_PROHIBITED")
+    workspace = confirm_initial_portfolio(
+        build_draft_workspace(PROSPECTIVE_25_SCENARIO_ID)
+    )
+    if workspace["status"] != STATUS_FUNDED:
+        raise ProspectiveOperationError("CERTIFIED_FUNDED_BASELINE_REQUIRED")
+    return workspace
+
+
+def _decorate(
+    workspace: Mapping[str, Any],
+    *,
+    baseline_hash: str,
+    baseline_event_count: int,
+    proposals: list[dict[str, Any]],
+    rejected_proposals: list[dict[str, Any]],
+    episode_history: list[dict[str, Any]],
+) -> dict[str, Any]:
+    result = deepcopy(dict(workspace))
+    result["operation_schema_version"] = PROSPECTIVE_SCHEMA
+    result["operation_mode"] = "PROSPECTIVE_PAPER"
+    result["source_scenario_id"] = PORTFOLIO_25_SCENARIO_ID
+    result["baseline_workspace_hash"] = baseline_hash
+    result["baseline_event_count"] = baseline_event_count
+    result["prospective_episode_count"] = len(episode_history)
+    result["operator_action_count"] = len(episode_history) * 2
+    result["prospective_proposals"] = deepcopy(proposals)
+    result["rejected_proposals"] = deepcopy(rejected_proposals)
+    result["prospective_episode_history"] = deepcopy(episode_history)
+    return result
+
+
+def build_prospective_workspace() -> dict[str, Any]:
+    """Bootstrap the accepted 25-security certified initial portfolio."""
+
+    baseline = _baseline_workspace()
+    baseline_hash = domain_hash("GV-PROSPECTIVE-PAPER:BASELINE:V1", baseline)
+    return _decorate(
+        baseline,
+        baseline_hash=baseline_hash,
+        baseline_event_count=len(baseline["events"]),
+        proposals=[],
+        rejected_proposals=[],
+        episode_history=[],
+    )
+
+
+def _normalize_review_update(
+    workspace: Mapping[str, Any], update: Mapping[str, Any]
+) -> dict[str, Any]:
+    if not isinstance(update, Mapping):
+        raise ProspectiveOperationError("REVIEW_UPDATE_MAPPING_REQUIRED")
+    instrument_id = _required_text(update.get("instrument_id"), field="instrument_id")
+    known_ids = {row["instrument_id"] for row in workspace["instruments"]}
+    if instrument_id not in known_ids:
+        raise ProspectiveOperationError("OBSERVATION_INSTRUMENT_UNKNOWN")
+    outcome = _required_text(update.get("outcome"), field="outcome").upper()
+    if outcome == "CASH":
+        raise ProspectiveOperationError("CASH_IS_PORTFOLIO_CANDIDATE")
+    if outcome not in INSTRUMENT_OUTCOMES:
+        raise ProspectiveOperationError("INSTRUMENT_OUTCOME_INVALID")
+    target_quantity = _whole_quantity(update.get("target_quantity"))
+    if outcome != "ADMIT" and target_quantity != "0":
+        raise ProspectiveOperationError("NON_ADMIT_TARGET_QUANTITY_MUST_BE_ZERO")
+    return {
+        "instrument_id": instrument_id,
+        "outcome": outcome,
+        "net_score_bps": _score(update.get("net_score_bps")),
+        "target_quantity": target_quantity,
+        "principal_claim": _required_text(
+            update.get("principal_claim"), field="principal_claim"
+        ),
+    }
+
+
+def _normalize_request(
+    workspace: Mapping[str, Any], request: Mapping[str, Any]
+) -> dict[str, Any]:
+    if not isinstance(request, Mapping):
+        raise ProspectiveOperationError("OBSERVATION_REQUEST_MAPPING_REQUIRED")
+    observed_at = _required_text(request.get("observed_at"), field="observed_at")
+    observed_time = _utc_datetime(observed_at, field="observed_at")
+    latest_time = max(
+        _utc_datetime(row["effective_at"], field="effective_at")
+        for row in workspace["events"]
+    )
+    if observed_time <= latest_time:
+        raise ProspectiveOperationError("OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY")
+    raw_updates = request.get("review_updates")
+    if not isinstance(raw_updates, list) or not raw_updates:
+        raise ProspectiveOperationError("REVIEW_UPDATES_REQUIRED")
+    updates = [_normalize_review_update(workspace, row) for row in raw_updates]
+    ids = [row["instrument_id"] for row in updates]
+    if len(ids) != len(set(ids)):
+        raise ProspectiveOperationError("REVIEW_UPDATE_INSTRUMENT_DUPLICATE")
+    return {
+        "content": _required_text(request.get("content"), field="content"),
+        "locator": _required_text(request.get("locator"), field="locator"),
+        "observed_at": _utc_timestamp(observed_time),
+        "review_updates": updates,
+        "operator_rationale": _required_text(
+            request.get("operator_rationale"), field="operator_rationale"
+        ),
+    }
+
+
+def _review_by_id(workspace: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
+    return {row["instrument_id"]: deepcopy(row) for row in workspace["reviews"]}
+
+
+def _transition_preview(
+    workspace: Mapping[str, Any],
+    *,
+    decision_snapshot: Mapping[str, Any],
+    legs: list[dict[str, str]],
+    observed_at: str,
+    observation_id: str,
+) -> dict[str, Any]:
+    result = deepcopy(dict(workspace))
+    result["current_decision_snapshot"] = deepcopy(dict(decision_snapshot))
+    result["events"] = [
+        *deepcopy(workspace["events"]),
+        portfolio_book_event(
+            len(workspace["events"]),
+            "LATER_OBSERVATION_ADMITTED",
+            observed_at,
+            observation_id,
+            payload={"preview_only": True},
+        ),
+    ]
+    transition_at = _utc_timestamp(
+        _utc_datetime(observed_at, field="observed_at") + timedelta(seconds=2)
+    )
+    transition = _append_transition_event(
+        result,
+        transition_kind="PROSPECTIVE_REBALANCE",
+        effective_at=transition_at,
+        legs=legs,
+    )
+    anchor = _utc_datetime(observed_at, field="observed_at")
+    for index, leg in enumerate(legs):
+        created_at = _utc_timestamp(anchor + timedelta(seconds=3 + (index * 2)))
+        filled_at = _utc_timestamp(anchor + timedelta(seconds=4 + (index * 2)))
+        _append_trade(
+            result,
+            transition_event_id=transition["event_id"],
+            instrument_id=leg["instrument_id"],
+            side=leg["side"],
+            quantity=leg["quantity"],
+            price=leg["reference_price"],
+            fee="2",
+            order_created_at=created_at,
+            filled_at=filled_at,
+        )
+    result["book"] = reconstruct_book(result["events"])
+    return {
+        "transition_kind": "PROSPECTIVE_REBALANCE",
+        "legs": deepcopy(legs),
+        "order_count": len(legs),
+        "book_hash_after": result["book"]["book_hash"],
+        "nav_after": result["book"]["nav"],
+        "cash_after": result["book"]["total_cash"],
+        "costs_after": result["book"]["total_costs"],
+        "unexplained_residual": result["book"]["unexplained_residual"],
+    }
+
+
+def _build_proposal(
+    workspace: Mapping[str, Any], request: Mapping[str, Any]
+) -> dict[str, Any]:
+    normalized = _normalize_request(workspace, request)
+    scenario = get_scenario(PROSPECTIVE_25_SCENARIO_ID)
+    reviews_by_id = _review_by_id(workspace)
+    before_reviews = deepcopy(workspace["reviews"])
+    owned_ids = [row["instrument_id"] for row in normalized["review_updates"]]
+    evidence = _evidence(
+        scenario,
+        content=normalized["content"],
+        locator=normalized["locator"],
+        observed_at=normalized["observed_at"],
+        owned_instrument_ids=owned_ids,
+    )
+
+    review_changes: list[dict[str, Any]] = []
+    for update in normalized["review_updates"]:
+        before = reviews_by_id[update["instrument_id"]]
+        prior_thesis = before["living_thesis_lite"]
+        after = deepcopy(before)
+        after["outcome"] = update["outcome"]
+        after["net_score_bps"] = update["net_score_bps"]
+        after["target_quantity"] = update["target_quantity"]
+        after["living_thesis_lite"] = _thesis(
+            scenario,
+            instrument_id=update["instrument_id"],
+            principal_claim=update["principal_claim"],
+            evidence_reference_ids=[
+                *prior_thesis["evidence_reference_ids"],
+                evidence["evidence_reference_id"],
+            ],
+            hard_falsifiers=list(prior_thesis["hard_falsifiers"]),
+            watch_conditions=list(prior_thesis["watch_conditions"]),
+        )
+        reviews_by_id[update["instrument_id"]] = after
+        review_changes.append({"before": before, "after": after})
+
+    ordered_reviews = [reviews_by_id[row["instrument_id"]] for row in workspace["reviews"]]
+    decision_created_at = _utc_timestamp(
+        _utc_datetime(normalized["observed_at"], field="observed_at")
+        + timedelta(seconds=1)
+    )
+    decision_snapshot = _decision_snapshot(
+        scenario,
+        aim_id=workspace["portfolio_aim"]["portfolio_aim_id"],
+        reviews=ordered_reviews,
+        created_at=decision_created_at,
+        reason="OPERATOR_PROPOSED_PROSPECTIVE_CAPITAL_DECISION",
+    )
+    legs = _transition_legs_from_reviews(
+        workspace["instruments"], before_reviews, ordered_reviews
+    )
+    economics_changed = bool(legs)
+    if economics_changed:
+        if not any(row["side"] == "SELL" for row in legs):
+            raise ProspectiveOperationError("PROSPECTIVE_TRANSITION_SELL_REQUIRED")
+        if not any(row["side"] == "BUY" for row in legs):
+            raise ProspectiveOperationError("PROSPECTIVE_TRANSITION_BUY_REQUIRED")
+
+    observation = _record(
+        scenario,
+        "OBS",
+        "observation_id",
+        {
+            "evidence_reference_id": evidence["evidence_reference_id"],
+            "disposition": (
+                "PROPOSED_PROSPECTIVE_TRANSITION"
+                if economics_changed
+                else "PROPOSED_PROSPECTIVE_NO_CHANGE"
+            ),
+            "instrument_ids": sorted(owned_ids),
+            "threshold_crossed": economics_changed,
+            "observed_at": normalized["observed_at"],
+            "decision_snapshot_id": decision_snapshot["decision_snapshot_id"],
+            "operator_rationale": normalized["operator_rationale"],
+        },
+    )
+    transition = (
+        _transition_preview(
+            workspace,
+            decision_snapshot=decision_snapshot,
+            legs=legs,
+            observed_at=normalized["observed_at"],
+            observation_id=observation["observation_id"],
+        )
+        if economics_changed
+        else None
+    )
+    changed_why = {
+        "change_type": (
+            "PROSPECTIVE_TRANSITION"
+            if economics_changed
+            else "PROSPECTIVE_NO_CHANGE"
+        ),
+        "reason": normalized["operator_rationale"],
+        "review_changes": [
+            {
+                "symbol": row["before"]["symbol"],
+                "outcome_before": row["before"]["outcome"],
+                "outcome_after": row["after"]["outcome"],
+                "score_before_bps": int(row["before"]["net_score_bps"]),
+                "score_after_bps": int(row["after"]["net_score_bps"]),
+                "quantity_before": str(row["before"]["target_quantity"]),
+                "quantity_after": str(row["after"]["target_quantity"]),
+                "thesis_changed": canonical_document_bytes(
+                    row["before"]["living_thesis_lite"]
+                )
+                != canonical_document_bytes(row["after"]["living_thesis_lite"]),
+            }
+            for row in review_changes
+        ],
+        "holdings_changed": economics_changed,
+        "cash_changed": economics_changed,
+        "orders_created": len(legs),
+        "transition_legs": deepcopy(legs),
+        "book_hash_before": workspace["book"]["book_hash"],
+        "book_hash_after": (
+            transition["book_hash_after"]
+            if transition is not None
+            else workspace["book"]["book_hash"]
+        ),
+    }
+    body = {
+        "schema_version": PROPOSAL_SCHEMA,
+        "request": normalized,
+        "evidence": evidence,
+        "review_changes": review_changes,
+        "decision_snapshot": decision_snapshot,
+        "observation": observation,
+        "changed_why": changed_why,
+        "economics_changed": economics_changed,
+        "transition": transition,
+        "prior_decision_snapshot_id": workspace["current_decision_snapshot"][
+            "decision_snapshot_id"
+        ],
+        "prior_certification_id": workspace["certification"]["certification_id"],
+        "prior_book_hash": workspace["book"]["book_hash"],
+        "prior_event_count": len(workspace["events"]),
+    }
+    return {
+        "proposal_id": "PRP_"
+        + domain_hash(f"{scenario['id_domain']}:PROSPECTIVE_PROPOSAL:V2", body),
+        **body,
+    }
+
+
+def preview_runtime_observation(
+    workspace: Mapping[str, Any], request: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Return a deterministic proposal without mutating memory or persistence."""
+
+    validate_prospective_workspace(workspace)
+    before = canonical_document_bytes(dict(workspace))
+    proposal = _build_proposal(workspace, request)
+    if canonical_document_bytes(dict(workspace)) != before:
+        raise ProspectiveOperationError("PREVIEW_MUTATED_WORKSPACE")
+    return proposal
+
+
+def _validate_event(event: Mapping[str, Any]) -> None:
+    try:
+        expected = portfolio_book_event(
+            event["sequence"],
+            event["event_type"],
+            event["effective_at"],
+            event["source_identity"],
+            instrument_id=event.get("instrument_id"),
+            cash_bucket=event.get("cash_bucket"),
+            payload=event.get("payload") or {},
+        )
+    except (KeyError, ExecutionError) as exc:
+        raise ProspectiveOperationError("PROSPECTIVE_EVENT_INVALID") from exc
+    if canonical_document_bytes(expected) != canonical_document_bytes(dict(event)):
+        raise ProspectiveOperationError("PROSPECTIVE_EVENT_ID_MISMATCH")
+
+
+def _apply_proposal_projection(
+    workspace: Mapping[str, Any], proposal: Mapping[str, Any]
+) -> dict[str, Any]:
+    result = deepcopy(dict(workspace))
+    result["evidence_references"] = [
+        *result["evidence_references"],
+        deepcopy(proposal["evidence"]),
+    ]
+    after_by_id = {
+        row["after"]["instrument_id"]: deepcopy(row["after"])
+        for row in proposal["review_changes"]
+    }
+    result["reviews"] = [
+        after_by_id.get(row["instrument_id"], deepcopy(row))
+        for row in result["reviews"]
+    ]
+    result["decision_snapshots"] = [
+        *result["decision_snapshots"],
+        deepcopy(proposal["decision_snapshot"]),
+    ]
+    result["current_decision_snapshot"] = deepcopy(proposal["decision_snapshot"])
+    result["observations"] = [
+        *result["observations"],
+        deepcopy(proposal["observation"]),
+    ]
+    result["changed_why"] = deepcopy(proposal["changed_why"])
+    return result
+
+
+def _episode_workspace(
+    workspace: Mapping[str, Any], proposal: Mapping[str, Any]
+) -> dict[str, Any]:
+    result = _apply_proposal_projection(workspace, proposal)
+    observation = proposal["observation"]
+    try:
+        observation_event = portfolio_book_event(
+            len(workspace["events"]),
+            "LATER_OBSERVATION_ADMITTED",
+            observation["observed_at"],
+            observation["observation_id"],
+            instrument_id=(
+                observation["instrument_ids"][0]
+                if len(observation["instrument_ids"]) == 1
+                else None
+            ),
+            payload={
+                "schema_version": EPISODE_SCHEMA,
+                "prospective_proposal": deepcopy(dict(proposal)),
+            },
+        )
+    except ExecutionError as exc:
+        raise ProspectiveOperationError(str(exc)) from exc
+    result["events"] = [*deepcopy(workspace["events"]), observation_event]
+
+    if proposal["economics_changed"]:
+        legs = deepcopy(proposal["transition"]["legs"])
+        anchor = _utc_datetime(observation["observed_at"], field="observed_at")
+        transition = _append_transition_event(
+            result,
+            transition_kind=proposal["transition"]["transition_kind"],
+            effective_at=_utc_timestamp(anchor + timedelta(seconds=2)),
+            legs=legs,
+        )
+        for index, leg in enumerate(legs):
+            _append_trade(
+                result,
+                transition_event_id=transition["event_id"],
+                instrument_id=leg["instrument_id"],
+                side=leg["side"],
+                quantity=leg["quantity"],
+                price=leg["reference_price"],
+                fee="2",
+                order_created_at=_utc_timestamp(
+                    anchor + timedelta(seconds=3 + (index * 2))
+                ),
+                filled_at=_utc_timestamp(
+                    anchor + timedelta(seconds=4 + (index * 2))
+                ),
+            )
+        result["book"] = reconstruct_book(result["events"])
+        if result["book"]["book_hash"] != proposal["transition"]["book_hash_after"]:
+            raise ProspectiveOperationError("TRANSITION_PREVIEW_BOOK_MISMATCH")
+        result["changed_why"]["book_hash_after"] = result["book"]["book_hash"]
+        result["changed_why"]["cash_after"] = result["book"]["total_cash"]
+        result["changed_why"]["costs_after"] = result["book"]["total_costs"]
+        result["changed_why"]["unexplained_residual"] = result["book"][
+            "unexplained_residual"
+        ]
+    else:
+        result["book"] = reconstruct_book(result["events"])
+        if canonical_document_bytes(result["book"]) != canonical_document_bytes(
+            workspace["book"]
+        ):
+            raise ProspectiveOperationError("PROSPECTIVE_NO_CHANGE_BOOK_DRIFT")
+
+    try:
+        certification = certify_replay_prefix(
+            result["events"],
+            decision_snapshot_id=result["current_decision_snapshot"][
+                "decision_snapshot_id"
+            ],
+            portfolio_aim_id=result["portfolio_aim"]["portfolio_aim_id"],
+            prior_certification=workspace["certification"],
+        )
+    except ReplayError as exc:
+        raise ProspectiveOperationError(
+            f"PROSPECTIVE_CERTIFICATION_FAILED:{exc}"
+        ) from exc
+    last_time = max(
+        _utc_datetime(row["effective_at"], field="effective_at")
+        for row in result["events"]
+    )
+    try:
+        certification_event = portfolio_book_event(
+            len(result["events"]),
+            "CERTIFICATION_RECORDED",
+            _utc_timestamp(last_time + timedelta(seconds=1)),
+            certification["certification_id"],
+            payload={"certification_id": certification["certification_id"]},
+        )
+    except ExecutionError as exc:
+        raise ProspectiveOperationError(str(exc)) from exc
+    result["events"].append(certification_event)
+    result["book"] = reconstruct_book(result["events"])
+    result["certification_history"] = [
+        *result["certification_history"],
+        deepcopy(workspace["certification"]),
+    ]
+    result["certification"] = certification
+    return result
+
+
+def _rejected_episode_workspace(
+    workspace: Mapping[str, Any],
+    proposal: Mapping[str, Any],
+    rejection_reason: str,
+) -> dict[str, Any]:
+    """Append a rejected proposal without granting evidence, review, or capital authority."""
+
+    reason = _required_text(rejection_reason, field="rejection_reason")
+    result = deepcopy(dict(workspace))
+    observed_at = proposal["request"]["observed_at"]
+    rejection_record = {
+        "proposal_id": proposal["proposal_id"],
+        "rejection_reason": reason,
+        "rejected_at": observed_at,
+        "prospective_proposal": deepcopy(dict(proposal)),
+    }
+    try:
+        rejection_event = portfolio_book_event(
+            len(workspace["events"]),
+            "PROSPECTIVE_PROPOSAL_REJECTED",
+            observed_at,
+            proposal["proposal_id"],
+            payload={
+                "schema_version": REJECTED_EPISODE_SCHEMA,
+                **deepcopy(rejection_record),
+            },
+        )
+    except ExecutionError as exc:
+        raise ProspectiveOperationError(str(exc)) from exc
+    result["events"] = [*deepcopy(workspace["events"]), rejection_event]
+    result["book"] = reconstruct_book(result["events"])
+    if canonical_document_bytes(result["book"]) != canonical_document_bytes(
+        workspace["book"]
+    ):
+        raise ProspectiveOperationError("REJECTED_PROPOSAL_CHANGED_BOOK")
+    try:
+        certification = certify_replay_prefix(
+            result["events"],
+            decision_snapshot_id=workspace["current_decision_snapshot"][
+                "decision_snapshot_id"
+            ],
+            portfolio_aim_id=workspace["portfolio_aim"]["portfolio_aim_id"],
+            prior_certification=workspace["certification"],
+        )
+    except ReplayError as exc:
+        raise ProspectiveOperationError(
+            f"PROSPECTIVE_REJECTION_CERTIFICATION_FAILED:{exc}"
+        ) from exc
+    try:
+        certification_event = portfolio_book_event(
+            len(result["events"]),
+            "CERTIFICATION_RECORDED",
+            _utc_timestamp(
+                _utc_datetime(observed_at, field="observed_at")
+                + timedelta(seconds=1)
+            ),
+            certification["certification_id"],
+            payload={"certification_id": certification["certification_id"]},
+        )
+    except ExecutionError as exc:
+        raise ProspectiveOperationError(str(exc)) from exc
+    result["events"].append(certification_event)
+    result["book"] = reconstruct_book(result["events"])
+    result["certification_history"] = [
+        *result["certification_history"],
+        deepcopy(workspace["certification"]),
+    ]
+    result["certification"] = certification
+    return result
+
+
+def reconstruct_prospective_workspace(
+    events: list[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Project full decision and economic state from the append-only event log."""
+
+    baseline = _baseline_workspace()
+    baseline_hash = domain_hash("GV-PROSPECTIVE-PAPER:BASELINE:V1", baseline)
+    rows = [deepcopy(dict(row)) for row in events]
+    baseline_count = len(baseline["events"])
+    if len(rows) < baseline_count:
+        raise ProspectiveOperationError("BASELINE_EVENT_PREFIX_MISSING")
+    if canonical_document_bytes(rows[:baseline_count]) != canonical_document_bytes(
+        baseline["events"]
+    ):
+        raise ProspectiveOperationError("BASELINE_EVENT_PREFIX_MISMATCH")
+
+    result = deepcopy(baseline)
+    proposals: list[dict[str, Any]] = []
+    rejected_proposals: list[dict[str, Any]] = []
+    episode_history: list[dict[str, Any]] = []
+    cursor = baseline_count
+    while cursor < len(rows):
+        episode_event = rows[cursor]
+        _validate_event(episode_event)
+        payload = episode_event.get("payload") or {}
+
+        if episode_event["event_type"] == "LATER_OBSERVATION_ADMITTED":
+            if payload.get("schema_version") != EPISODE_SCHEMA:
+                raise ProspectiveOperationError("PROSPECTIVE_EPISODE_SCHEMA_INVALID")
+            stored = payload.get("prospective_proposal")
+            if not isinstance(stored, Mapping):
+                raise ProspectiveOperationError("PROSPECTIVE_PROPOSAL_REQUIRED")
+            expected_proposal = _build_proposal(result, stored.get("request") or {})
+            if canonical_document_bytes(dict(stored)) != canonical_document_bytes(
+                expected_proposal
+            ):
+                raise ProspectiveOperationError(
+                    "PROSPECTIVE_PROPOSAL_PROJECTION_MISMATCH"
+                )
+            expected_workspace = _episode_workspace(result, expected_proposal)
+            disposition = "CONFIRMED"
+            proposals.append(deepcopy(expected_proposal))
+            episode_history.append(
+                {
+                    "disposition": disposition,
+                    "proposal_id": expected_proposal["proposal_id"],
+                    "observed_at": expected_proposal["request"]["observed_at"],
+                    "economics_changed": expected_proposal["economics_changed"],
+                }
+            )
+        elif episode_event["event_type"] == "PROSPECTIVE_PROPOSAL_REJECTED":
+            if payload.get("schema_version") != REJECTED_EPISODE_SCHEMA:
+                raise ProspectiveOperationError(
+                    "PROSPECTIVE_REJECTED_EPISODE_SCHEMA_INVALID"
+                )
+            stored = payload.get("prospective_proposal")
+            if not isinstance(stored, Mapping):
+                raise ProspectiveOperationError("PROSPECTIVE_PROPOSAL_REQUIRED")
+            expected_proposal = _build_proposal(result, stored.get("request") or {})
+            if canonical_document_bytes(dict(stored)) != canonical_document_bytes(
+                expected_proposal
+            ):
+                raise ProspectiveOperationError(
+                    "PROSPECTIVE_PROPOSAL_PROJECTION_MISMATCH"
+                )
+            rejection_reason = _required_text(
+                payload.get("rejection_reason"), field="rejection_reason"
+            )
+            expected_workspace = _rejected_episode_workspace(
+                result, expected_proposal, rejection_reason
+            )
+            rejection_record = {
+                "proposal_id": expected_proposal["proposal_id"],
+                "rejection_reason": rejection_reason,
+                "rejected_at": expected_proposal["request"]["observed_at"],
+                "prospective_proposal": deepcopy(expected_proposal),
+            }
+            rejected_proposals.append(rejection_record)
+            episode_history.append(
+                {
+                    "disposition": "REJECTED",
+                    "proposal_id": expected_proposal["proposal_id"],
+                    "observed_at": expected_proposal["request"]["observed_at"],
+                    "economics_changed": False,
+                    "rejection_reason": rejection_reason,
+                }
+            )
+        else:
+            raise ProspectiveOperationError("PROSPECTIVE_EPISODE_EVENT_REQUIRED")
+
+        expected_tail = expected_workspace["events"][len(result["events"]):]
+        actual_tail = rows[cursor : cursor + len(expected_tail)]
+        if len(actual_tail) != len(expected_tail):
+            raise ProspectiveOperationError("PROSPECTIVE_EPISODE_EVENT_TAIL_MISSING")
+        for row in actual_tail:
+            _validate_event(row)
+        if canonical_document_bytes(actual_tail) != canonical_document_bytes(
+            expected_tail
+        ):
+            raise ProspectiveOperationError("PROSPECTIVE_EPISODE_EVENT_TAIL_MISMATCH")
+        expected_workspace["events"] = rows[: cursor + len(expected_tail)]
+        result = expected_workspace
+        cursor += len(expected_tail)
+
+    try:
+        reconstructed = reconstruct_exact(rows, expected_book=result["book"])
+        replayed = replay_idempotent(rows)
+    except ReplayError as exc:
+        raise ProspectiveOperationError(f"PROSPECTIVE_REPLAY_FAILED:{exc}") from exc
+    if reconstructed["book_hash"] != result["book"]["book_hash"]:
+        raise ProspectiveOperationError("PROSPECTIVE_BOOK_RECONSTRUCTION_MISMATCH")
+    if replayed["book_hash"] != result["book"]["book_hash"]:
+        raise ProspectiveOperationError("PROSPECTIVE_BOOK_IDEMPOTENCE_MISMATCH")
+    return _decorate(
+        result,
+        baseline_hash=baseline_hash,
+        baseline_event_count=baseline_count,
+        proposals=proposals,
+        rejected_proposals=rejected_proposals,
+        episode_history=episode_history,
+    )
+
+
+def validate_prospective_workspace(workspace: Mapping[str, Any]) -> None:
+    if workspace.get("scenario_id") != PROSPECTIVE_25_SCENARIO_ID:
+        raise ProspectiveOperationError("PROSPECTIVE_SCENARIO_REQUIRED")
+    if workspace.get("operation_schema_version") != PROSPECTIVE_SCHEMA:
+        raise ProspectiveOperationError("PROSPECTIVE_SCHEMA_INVALID")
+    events = workspace.get("events")
+    if not isinstance(events, list):
+        raise ProspectiveOperationError("PROSPECTIVE_EVENTS_REQUIRED")
+    projected = reconstruct_prospective_workspace(events)
+    if canonical_document_bytes(dict(workspace)) != canonical_document_bytes(projected):
+        raise ProspectiveOperationError("PROSPECTIVE_WORKSPACE_PROJECTION_MISMATCH")
+
+
+def confirm_runtime_observation(
+    workspace: Mapping[str, Any], proposal: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Append one confirmed episode and its replay certification."""
+
+    validate_prospective_workspace(workspace)
+    if not isinstance(proposal, Mapping):
+        raise ProspectiveOperationError("PROSPECTIVE_PROPOSAL_MAPPING_REQUIRED")
+    expected = _build_proposal(workspace, proposal.get("request") or {})
+    if canonical_document_bytes(dict(proposal)) != canonical_document_bytes(expected):
+        raise ProspectiveOperationError("STALE_OR_MUTATED_PROPOSAL")
+    episode = _episode_workspace(workspace, expected)
+    result = reconstruct_prospective_workspace(episode["events"])
+    validate_prospective_workspace(result)
+    return result
+
+
+def reject_runtime_observation(
+    workspace: Mapping[str, Any],
+    proposal: Mapping[str, Any],
+    rejection_reason: str,
+) -> dict[str, Any]:
+    """Append a certified rejection while preserving all current decision authority."""
+
+    validate_prospective_workspace(workspace)
+    if not isinstance(proposal, Mapping):
+        raise ProspectiveOperationError("PROSPECTIVE_PROPOSAL_MAPPING_REQUIRED")
+    expected = _build_proposal(workspace, proposal.get("request") or {})
+    if canonical_document_bytes(dict(proposal)) != canonical_document_bytes(expected):
+        raise ProspectiveOperationError("STALE_OR_MUTATED_PROPOSAL")
+    episode = _rejected_episode_workspace(workspace, expected, rejection_reason)
+    result = reconstruct_prospective_workspace(episode["events"])
+    validate_prospective_workspace(result)
+    return result

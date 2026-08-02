@@ -1,35 +1,46 @@
 # Planner Packet — Current
 
-Date: 2026-08-01
-Decision: `FREEZE_GV_ENGINE_SCALE_CHARACTERIZATION_1_WITH_FINDINGS`
-Status: `P1_FROZEN_FINDING; REVIEW_BLOCKED; P2_P3_CLOSED`
+Date: 2026-08-02
+Decision: `FREEZE_GV_PROSPECTIVE_PAPER_BASELINE_1_IMPLEMENTATION_CANDIDATE`
+Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS; REAL_PROSPECTIVE_EVIDENCE_PENDING`
 
 ## Authority
 
 - **Accepted prior terminal:** `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`; immutable historical custody remains preserved.
-- **Accepted terminal:** `GV-OPERATED-PORTFOLIO-25-1`; executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`, closure `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`, terminal tag unchanged.
-- **Frozen diagnostic candidate:** `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283`, tree `e048f2483c64fcf7a9cae58e8454b70d7e993e78`, remote-equal on `codex/gv-engine-scale-characterization-1`.
-- **Active diagnostic brief:** `docs/phase_brief/gv-engine-scale-characterization-1-brief.md`.
-- **Accepted score:** `62/100`; the spike and custody decision do not raise it.
+- **Accepted terminal:** `GV-OPERATED-PORTFOLIO-25-1`; executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`, closure `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`, and terminal tag remain immutable.
+- **Accepted repair base:** `5687a2c2ae61ef8b5de676cffad5b19df9224b01`; scale persistence and UTC timestamp rollover are repaired without score uplift.
+- **Active implementation phase:** `GV-PROSPECTIVE-PAPER-BASELINE-1` on `product/gv-prospective-paper-baseline-1`.
+- **Accepted score:** `62/100`; test-injected episodes prove capability, not genuine prospective evidence.
 - **Live boundary:** Limited Live remains closed and unauthorized.
 
-## Diagnostic result
+## Current product result
 
-- 50 securities complete twice in fresh processes through correction with identical scenario/state/event/book hashes, residual `0`, 48 events, and 18 orders/fills.
-- 100 securities complete twice in fresh processes through correction with identical hashes, residual `0`, 80 events, and 34 orders/fills.
-- Shared persistence rejects both diagnostic scenario IDs before writing; save/reopen and the product operator path are unavailable.
-- At 100 securities the engine creates 40 invalid evidence timestamps from minute `60` through `99`.
-- These are required-repair findings. No repair was implemented inside the spike.
-- The 100-security run is not Universe acceptance.
+- The environment-selected operated app can bootstrap the accepted certified 25-security portfolio and accept operator-supplied runtime observations.
+- Observation content, locator, UTC timestamp, owned instruments, outcome, score, target quantity, thesis update, and rationale enter through the runtime product flow rather than scenario code.
+- Preview is mutation-free and non-authoritative.
+- Confirmation appends the observation, review/thesis state, decision snapshot, transition and execution when required, certification, and persisted workspace.
+- Rejection appends a rejection record and recertification without admitting evidence or mutating decision/economic authority.
+- One append-only event/state projector reconstructs repeated no-change, transition, and rejected episodes after fresh-process reopen.
+- `CASH` remains a portfolio capital candidate; per-security outcomes are only `ADMIT`, `REJECT`, or `ABSTAIN`.
+- Non-`ADMIT` target quantity must be `0`.
 
-## Custody result
+## Validation truth
 
-The provisional selected model is one owner-controlled proprietary account with broker/custodian control of cash and securities and human order approval/submission. Terminal Zero remains a paper decision and certified-record system with no client assets, broker credentials, or autonomous submission authority. Qualified Australian legal review remains open.
+- Prospective core: `11/11 PASS`.
+- Prospective UI: `3/3 PASS`.
+- Retained operated/25/App: `23/23 PASS`.
+- Scale repair: `13/13 PASS`.
+- Shared accounting/allocation/execution/replay/strategy/vertical: `104/104 PASS`.
+- Historical bounded/scale/universe/challenger: `24/24 PASS`.
+- Final FS0/context validation and exact candidate custody remain to be completed.
 
 ## Planner decision
 
-- **NEXT_STEP:** complete independent Reviewer A/B/C and hierarchy closure for frozen candidate `f9d271d`, or explicitly accept those procedural risks; only then select one bounded repair round for scenario-safe shared persistence and valid timestamps beyond 60 instruments.
-- **BLOCKED_AFTER_REPAIR:** prospective paper baseline must use new observations rather than fixture replay; P2 waits for persistent/reopenable scale operation plus the legally reviewed custody model.
-- **REVIEW_STATUS:** SAW BLOCK because independent Reviewer A/B/C and a current scale/custody hierarchy confirmation are unavailable; local checks are not a substitute.
-- **DO_NOT_REDECIDE:** P0 terminal identity, tag, exact-head evidence, failset comparison, accepted score `62/100`, or the immutable P1 diagnostic candidate.
-- **DO_NOT_START:** Universe acceptance, Challenger, providers, optimizer, broker integration, automated orders, Limited Live, live capital, or score uplift.
+- **NEXT_STEP:** complete authority/context validation, terminal diff review, freeze one exact commit, and push it for exact-SHA Windows/Linux CI.
+- **AFTER_CANDIDATE:** execute three genuine operator-supplied episodes; test-injected runtime values are not prospective evidence.
+- **CHALLENGER_GATE:** after genuine prospective baseline evidence, replace the obsolete Challenger harness with an independent shadow proposal on the same certified 25-security opportunity set.
+- **UNIVERSE_GATE:** broader Universe custody is deferred until broader membership is actually required; it is not a mandatory predecessor to paper Challenger comparison.
+- **LEGAL_BOUNDARY:** Australian legal review is not a blocker for paper baseline or paper Challenger work. It remains mandatory before broker credentials, automated submission, client assets, advice activity, or real-capital operation.
+- **REVIEW_STATUS:** independent Reviewer A/B/C is unavailable and was explicitly waived as a blocking prerequisite for this implementation candidate. No independent terminal-acceptance claim is made.
+- **DO_NOT_REDECIDE:** accepted 10/25 terminal identities, repair base `5687a2c`, score `62/100`, one shared engine/storage/app boundary, or Limited Live closure.
+- **DO_NOT_START:** provider ingestion, optimizer framework, broker/API execution, client assets, advice services, autonomous orders, live capital, or score uplift.

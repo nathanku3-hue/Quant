@@ -8,6 +8,7 @@ on:
       - "requirements.txt"
       - "gv_portfolio_v0/**"
       - "views/gv_operated_portfolio_workspace.py"
+      - "views/gv_prospective_paper_workspace.py"
       - "operated_portfolio_app.py"
       - "launch_operated_portfolio.py"
       - "launch_operated_portfolio_25.py"
@@ -29,6 +30,7 @@ on:
       - "docs/context/planner_packet_current.md"
       - "docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md"
       - "docs/phase_brief/gv-operated-portfolio-25-1-brief.md"
+      - "docs/phase_brief/gv-prospective-paper-baseline-1-brief.md"
   push:
     paths:
       - ".github/workflows/gv-operated-portfolio.yml"
@@ -36,6 +38,7 @@ on:
       - "requirements.txt"
       - "gv_portfolio_v0/**"
       - "views/gv_operated_portfolio_workspace.py"
+      - "views/gv_prospective_paper_workspace.py"
       - "operated_portfolio_app.py"
       - "launch_operated_portfolio.py"
       - "launch_operated_portfolio_25.py"
@@ -57,6 +60,7 @@ on:
       - "docs/context/planner_packet_current.md"
       - "docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md"
       - "docs/phase_brief/gv-operated-portfolio-25-1-brief.md"
+      - "docs/phase_brief/gv-prospective-paper-baseline-1-brief.md"
   workflow_dispatch:
 
 permissions:

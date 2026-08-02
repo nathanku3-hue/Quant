@@ -1,37 +1,46 @@
 # Post-Phase Alignment — Current
 
-Date: 2026-08-01
-Decision: `FREEZE_GV_ENGINE_SCALE_CHARACTERIZATION_1_WITH_FINDINGS`
-Status: `P1_FROZEN_FINDING; REVIEW_BLOCKED; P2_P3_CLOSED`
+Date: 2026-08-02
+Decision: `FREEZE_GV_PROSPECTIVE_PAPER_BASELINE_1_IMPLEMENTATION_CANDIDATE`
+Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS; REAL_PROSPECTIVE_EVIDENCE_PENDING`
 
 ## Alignment
 
-- **P0 terminal preserved:** 25-security candidate `7ce85c4`, closure `e564cd9`, and terminal tag remain immutable.
-- **Scale characterization:** candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283` is frozen and remote-equal; 50/100 run deterministically through the existing engine in memory with residual `0` and repeat-equal hashes.
-- **Persistence finding:** existing storage accepts only 10/25 scenario IDs, blocking save, reopen, correction-after-reopen, and the product UI path.
-- **Timestamp finding:** 100 securities produce 40 invalid initial-evidence timestamps from minute `60` through `99`.
-- **Architecture:** no parallel engine, persistence implementation, schema, application, or view was added; no repair occurred inside the spike.
-- **Custody:** owner-controlled proprietary account, broker custody, and human order submission selected provisionally; qualified legal review remains open.
-- **Prospective evidence:** not started because deterministic fixture replay is not prospective operation and the scale path cannot persist.
+- **Accepted terminal preserved:** 25-security candidate `7ce85c4`, closure `e564cd9`, and terminal tag remain immutable.
+- **Repair base preserved:** `5687a2c` repairs scenario-safe persistence and UTC timestamp rollover; no score uplift is attached to the repair.
+- **Prospective profile:** derives from the accepted 25-security catalogue without copying the instrument catalogue or embedding later episode content.
+- **Runtime product:** operator enters observation content, locator, observed-at, owned instruments, explicit review proposals, and rationale through the existing app.
+- **Authority:** preview is mutation-free; confirmation grants authority; rejection appends custody without mutating evidence, reviews, decisions, holdings, cash, orders, fills, or book economics.
+- **Projection:** one append-only event/state projector reconstructs no-change, transition, and rejected episodes after fresh-process reopen.
+- **Decision semantics:** instrument outcomes are `ADMIT/REJECT/ABSTAIN`; `CASH` is portfolio-level; non-`ADMIT` target quantity is `0`.
+- **Validation:** prospective `14/14`, retained operated/25/App `23/23`, scale repair `13/13`, shared accounting/replay `104/104`, and historical harnesses `24/24` pass.
+- **Evidence boundary:** automated fixtures prove capability, not genuine prospective evidence.
 - **Score:** accepted progress remains `62/100`.
-- **Review boundary:** independent Reviewer A/B/C and a current hierarchy confirmation are unavailable, so SAW is BLOCKED.
+- **Review boundary:** independent Reviewer A/B/C remains unavailable and was explicitly waived as a blocking prerequisite for candidate publication; no independent terminal-acceptance claim is made.
 - **Live boundary:** Limited Live remains closed and unauthorized.
 
-## Closed flow
+## Completed implementation flow
 
 ```text
-IMMUTABLE P0 TERMINAL
-→ DECLARATIVE 50 STRESS
-→ FRESH-PROCESS DOMAIN EQUALITY
-→ PERSISTENCE STOP
-→ DECLARATIVE 100 STRESS
-→ FRESH-PROCESS DOMAIN EQUALITY
-→ PERSISTENCE + TIMESTAMP STOPS
-→ CUSTODY MODEL DECISION
-→ FREEZE CANDIDATE f9d271d
-→ SAW BLOCK: INDEPENDENT REVIEW + HIERARCHY MISSING
+CERTIFIED 25-SECURITY BASELINE
+→ RUNTIME OBSERVATION + EXPLICIT PROPOSALS
+→ MUTATION-FREE PREVIEW
+→ CONFIRM NO-CHANGE
+→ CONFIRM SELL/REDUCE + BUY/FUND TRANSITION
+→ REJECT THIRD PROPOSAL WITHOUT AUTHORITY MUTATION
+→ ATOMIC PERSIST
+→ FRESH-PROCESS FULL-STATE RECONSTRUCTION
 ```
 
 ## Next boundary
 
-First close the procedural review gap for frozen candidate `f9d271d`, or explicitly accept it. A separate bounded repair decision may then address only scenario-safe shared persistence and valid monotonic evidence timestamps. It must preserve accepted 10/25 behavior. P2 waits for repaired persistent operation, fresh-process reopen, repeated genuinely prospective paper episodes, and legal review of the exact custody arrangement.
+```text
+FS0 + CONTEXT VALIDATION
+→ EXACT DIFF REVIEW
+→ FREEZE + PUSH CANDIDATE
+→ HOSTED WINDOWS/LINUX CI
+→ THREE GENUINE OPERATOR-SUPPLIED EPISODES
+→ REAL SHADOW CHALLENGER ON SAME 25-SECURITY SET
+```
+
+Universe custody is deferred until broader membership is required. Australian legal review is not a paper Challenger blocker; it remains required before broker credentials, automated submission, client assets, advice activity, or real capital.

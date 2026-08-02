@@ -1,40 +1,66 @@
 # Observability Pack — Current
 
-Date: 2026-08-01
-Phase: `GV-ENGINE-SCALE-CHARACTERIZATION-1`
-Status: `FROZEN_FINDING; REVIEW_BLOCKED`
+Date: 2026-08-02
+Phase: `GV-PROSPECTIVE-PAPER-BASELINE-1`
+Status: `IMPLEMENTED_CANDIDATE; REAL_PROSPECTIVE_EVIDENCE_PENDING`
 Accepted score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 ## Immutable sentinels
 
-- P0 terminal closure and `gv-operated-portfolio-25-1-terminal` must remain at `e564cd9`.
-- Accepted score remains `62/100`.
-- Retained 10/25 scenarios must continue through one engine, persistence implementation, app, and view.
-- Diagnostic candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283` is immutable and remote-equal.
-- The scale scenarios are synthetic diagnostics, not accepted securities custody.
+- Accepted 25-security closure and terminal tag remain immutable.
+- Repair base `5687a2c` remains immutable and remote-equal.
+- Accepted score remains `62/100` until genuine prospective evidence is banked.
+- Retained 10/25 and scale 50/100 scenarios continue through one engine, persistence implementation, app, and view.
+- Existing 10/25 storage filenames and roots remain exact.
 
-## Characterization sentinels
+## Prospective authority sentinels
 
-- 50 identities and permanent keys are unique; two fresh-process state/event/book/scenario hash sets are equal.
-- 100 identities and permanent keys are unique; two fresh-process state/event/book/scenario hash sets are equal.
-- Accounting residual remains `0` at both sizes.
-- Peak working set remains externally measured, not inferred from object size.
-- Persistence rejection occurs before write for both diagnostic IDs.
-- 100-security timestamp issue count is exactly 40, beginning at `12:60`.
-- Product workload must not be reported as accepted while persistence prevents the product path from starting.
+- Runtime observation content must not appear in scenario code.
+- Evidence content hash is derived from the supplied content, never trusted from UI input.
+- Observation timestamps must be valid UTC and strictly after current authority.
+- Owned instrument IDs must exist and cannot repeat within one request.
+- Per-security outcomes are exactly `ADMIT`, `REJECT`, or `ABSTAIN`.
+- `CASH` is a portfolio capital candidate only.
+- Non-`ADMIT` target quantity must be `0`.
+- Preview cannot modify workspace bytes or event count.
+- Confirm/reject proposal identity must be recomputed and byte-equal; stale or mutated proposals fail closed.
+- Confirmed evidence must bind only to owned instruments.
+- Rejected proposal evidence must not enter authoritative evidence or thesis state.
 
-## Custody sentinels
+## Projection sentinels
 
-- One beneficial owner only.
-- Broker/custodian retains cash, securities, account ledger, and executed-order authority.
-- Human owner approves and submits every real order.
-- Terminal Zero stores no broker credentials and submits no real order.
-- Any client/advisory/discretionary/pooled/public-recommendation use triggers legal and scope stop.
+- The baseline event prefix remains byte-identical.
+- Every episode is represented by an append-only event tail.
+- Reconstructed evidence, reviews, observations, snapshots, orders, fills, certifications, rejection history, and book must match persisted bytes.
+- No-change episodes preserve book bytes.
+- Transition episodes require at least one SELL and one BUY leg.
+- Accounting residual remains `0`.
+- Rejected episodes preserve authoritative evidence/reviews/snapshots/orders/fills/book and append only rejection custody plus certification.
+
+## Product sentinels
+
+- Existing environment-selected app is the product entry point.
+- Each episode requires at most two authorization actions: preview and confirm/reject.
+- No per-security confirmation loop is introduced.
+- No provider, broker, optimizer, autonomous-order, client-asset, or live-capital path is imported.
+- Automated fixtures are capability evidence only; do not label them prospective evidence.
+
+## Roadmap sentinels
+
+- Real operator-supplied prospective episodes precede real shadow Challenger opening.
+- Challenger uses the same certified 25-security opportunity set and runtime observation envelope.
+- Old Challenger slot/cell harness is historical only and must not become a compatibility contract.
+- Universe custody is deferred until broader membership is required.
+- Legal review is not a paper Challenger blocker and remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
+- Limited Live requires separate authorization.
 
 ## Current signal
 
-- **GREEN:** declarative scenario uniqueness, existing-engine in-memory completion, repeat equality, residual `0`, accepted-25 regression, no parallel architecture.
-- **AMBER:** custody direction is selected but qualified legal review and exact broker terms remain open; independent Reviewer A/B/C and current hierarchy confirmation are unavailable.
-- **RED:** scale persistence/reopen unavailable; 100-security timestamps invalid; prospective paper evidence absent.
-- **STOP:** representing P1 as reviewed or accepted, amending `f9d271d`, repair inside this spike, Universe/Challenger claims, score uplift, broker integration, automated orders, client assets, Limited Live, or terminal-tag movement.
+- Prospective core `11/11 PASS`.
+- Prospective UI `3/3 PASS`.
+- Retained operated/25/App `23/23 PASS`.
+- Scale repair `13/13 PASS`.
+- Shared accounting/replay `104/104 PASS`.
+- Historical harnesses `24/24 PASS`.
+- Final FS0/context validation, exact candidate custody, hosted CI, and genuine prospective evidence remain open.

@@ -1,31 +1,38 @@
 # Multi-Stream Contract — Current
 
-Date: 2026-08-01
-Phase: `GV-ENGINE-SCALE-CHARACTERIZATION-1`
+Date: 2026-08-02
+Phase: `GV-PROSPECTIVE-PAPER-BASELINE-1`
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
-Status: `P1_FROZEN_FINDING; REVIEW_BLOCKED`
+Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS; REAL_PROSPECTIVE_EVIDENCE_PENDING`
 Accepted score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
-## Parallel track results
+## Stream results
 
-| Track | Owned result | State |
+| Stream | Owned result | State |
 |---|---|---|
-| Engine characterization | declarative 50/100 stress inputs, fresh-process measurements, unchanged persistence probe; candidate `f9d271d` | FROZEN_FINDING |
-| Custody and handoff | who/what/when/where/how/exposure decision with options, discriminator, legal questions, stop rules | PROVISIONALLY_SELECTED |
-| Accepted product regression | retained 25-security scenario through the same scenario registry and engine | PASS |
-| P2 Challenger | waits for persistent prospective baseline and legally reviewed custody model | CLOSED |
-| P3 Limited Live | waits for separate legal, custody, paper-operation, liquidity, and pilot gates | CLOSED |
+| Product/runtime | existing app accepts runtime observation, preview, confirm, and reject | PASS |
+| Decision authority | explicit outcome/score/quantity/thesis proposals become authority only after confirmation | PASS |
+| Event/replay | one append-only projector reconstructs confirmed and rejected episodes | PASS |
+| Persistence | existing confined atomic storage persists and fresh-process reopens full state | PASS |
+| Accounting/execution | no-change preserves economics; transition produces SELL/REDUCE plus BUY/FUND and residual `0` | PASS |
+| Docs/ops | roadmap, active brief, current truth, workflow ownership, evidence, decision, and lesson records synchronized | IN PROGRESS |
+| Real prospective evidence | three genuine operator-supplied episodes | PENDING |
+| Challenger | real independent shadow proposal on same 25-security set | CLOSED UNTIL EVIDENCE |
+| Limited Live | separate legal, custody, paper-operation, liquidity, and authorization gates | CLOSED |
 
 ## Coordination law
 
-- P1 diagnostic inputs do not become accepted product or Universe authority.
-- No parallel engine, storage implementation, schema family, application, or view.
-- Storage and timestamp repair are excluded from the characterization round.
-- The provisional custody model cannot authorize broker integration or real orders.
-- A static fixture repeat is replay evidence, not prospective evidence.
-- The accepted P0 terminal tag remains immutable.
+- The accepted 25-security terminal and repair base remain immutable.
+- Runtime episode content cannot enter scenario code.
+- Per-security outcomes are `ADMIT`, `REJECT`, or `ABSTAIN`; `CASH` is portfolio-level.
+- Non-`ADMIT` target quantity is `0`.
+- Preview cannot persist or mutate authority.
+- Confirmation or rejection appends through one projector and one storage path.
+- Test-injected runtime values prove capability only, not prospective evidence.
+- Universe custody and legal review do not block paper Challenger comparison.
+- Legal review remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
 
 ## Current bottleneck
 
-The existing product path cannot persist either scale scenario, and the 100-security engine path emits invalid timestamps. Candidate `f9d271d` is frozen; SAW remains BLOCKED pending independent Reviewer A/B/C and current hierarchy confirmation. Any repair is a separate bounded round; P2 and P3 remain closed.
+The software capability is implemented. The next product bottleneck is evidence, not architecture: freeze the exact candidate, run hosted CI, then execute and retain three genuine operator-supplied episodes before score uplift or real shadow Challenger opening.

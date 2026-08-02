@@ -11,6 +11,7 @@ DEFAULT_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_10_TRANSITION_1R"
 PORTFOLIO_25_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_25_1"
 ENGINE_SCALE_50_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_50"
 ENGINE_SCALE_100_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_100"
+PROSPECTIVE_25_SCENARIO_ID = "GV_PROSPECTIVE_PAPER_BASELINE_1"
 
 
 def _instrument(
@@ -346,11 +347,56 @@ SCENARIO_50 = _scale_characterization_scenario(50)
 SCENARIO_100 = _scale_characterization_scenario(100)
 
 
+def _prospective_25_scenario() -> dict[str, Any]:
+    """Derive the runtime-observation profile from the accepted 25-security baseline."""
+
+    scenario = deepcopy(SCENARIO_25)
+    scenario.update(
+        {
+            "scenario_id": PROSPECTIVE_25_SCENARIO_ID,
+            "title": "GV Prospective Paper Baseline 25",
+            "id_domain": "GV-PROSPECTIVE-PAPER-BASELINE-25",
+            "claim_boundary": (
+                "Human-confirmed prospective paper observations on the accepted "
+                "25-security opportunity set; no provider, broker, alpha, or live-capital claim."
+            ),
+            "fixture_namespace": "prospective-paper-25",
+            "source_scenario_id": PORTFOLIO_25_SCENARIO_ID,
+            "runtime_observation_mode": True,
+            "initial_decision_reason": "BOOTSTRAP_ACCEPTED_25_SECURITY_BASELINE",
+            "initial_changed_why_reason": (
+                "The prospective profile bootstraps the accepted 25-security certified "
+                "initial portfolio before any operator-supplied observation."
+            ),
+        }
+    )
+    scenario["portfolio_aim"]["objective"] = (
+        "Operate the accepted 25-security paper portfolio through human-supplied "
+        "prospective observations and explicit confirmation."
+    )
+    scenario["status_explanations"] = {
+        "DRAFT_REVIEW": "The accepted 25-security baseline awaits bootstrap confirmation.",
+        "FUNDED_CERTIFIED": (
+            "The accepted 25-security initial portfolio is certified and ready for "
+            "operator-supplied prospective observations."
+        ),
+    }
+    # Later observations are runtime authority. Scenario-authored episodes are absent.
+    scenario.pop("no_change", None)
+    scenario.pop("transition", None)
+    scenario.pop("correction", None)
+    return scenario
+
+
+SCENARIO_PROSPECTIVE_25 = _prospective_25_scenario()
+
+
 _SCENARIOS = {
     DEFAULT_SCENARIO_ID: SCENARIO_10,
     PORTFOLIO_25_SCENARIO_ID: SCENARIO_25,
     ENGINE_SCALE_50_SCENARIO_ID: SCENARIO_50,
     ENGINE_SCALE_100_SCENARIO_ID: SCENARIO_100,
+    PROSPECTIVE_25_SCENARIO_ID: SCENARIO_PROSPECTIVE_25,
 }
 
 

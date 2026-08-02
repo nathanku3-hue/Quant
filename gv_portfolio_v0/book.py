@@ -336,6 +336,7 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
             "PORTFOLIO_AIM_CONFIRMED",
             "PORTFOLIO_TRANSITION_PLANNED",
             "LATER_OBSERVATION_ADMITTED",
+            "PROSPECTIVE_PROPOSAL_REJECTED",
             "CERTIFICATION_RECORDED",
             "CORRECTION_RECORDED",
         }:

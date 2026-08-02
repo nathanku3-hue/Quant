@@ -1,21 +1,26 @@
 # Bridge Contract — Current
 
-Date: 2026-08-01
-Status: `P1_FROZEN_FINDING; REVIEW_BLOCKED`
+Date: 2026-08-02
+Status: `GV_PROSPECTIVE_PAPER_BASELINE_1_IMPLEMENTED_CANDIDATE`
+Canonical authority: `docs/context/gv_endgame_authority_current.md`
+ACTIVE_STATUS: `GV-PROSPECTIVE-PAPER-BASELINE-1 IMPLEMENTED_CANDIDATE`
+LIMITED_LIVE: `CLOSED; NOT_AUTHORIZED`
 
 - **ACCEPTED_PRIOR_TERMINAL:** `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`; immutable historical custody remains preserved.
-- **ACCEPTED_TERMINAL:** `GV-OPERATED-PORTFOLIO-25-1`; candidate `7ce85c4`, closure `e564cd9`, and `gv-operated-portfolio-25-1-terminal` remain immutable.
-- **FROZEN_DIAGNOSTIC:** `GV-ENGINE-SCALE-CHARACTERIZATION-1` candidate `f9d271d2a67eca9d08bcc01fb3a5bf342bd8d283`, tree `e048f2483c64fcf7a9cae58e8454b70d7e993e78`, is remote-equal and not accepted product capability.
-- **SYSTEM_DELTA:** the existing scenario registry now declares synthetic 50/100 stress inputs and one diagnostic script measures fresh-process domain behavior without a parallel engine, storage path, schema, app, or view.
-- **PRODUCT_DELTA:** none accepted. In-memory 50/100 operation is deterministic with residual `0`, but the existing product path cannot persist or reopen either scenario.
-- **FINDING_1:** shared persistence hard-codes only the 10- and 25-security scenario IDs.
-- **FINDING_2:** initial evidence timestamps become invalid at instrument index 60; 100 securities produce 40 malformed timestamps.
-- **CUSTODY_DELTA:** provisionally select one owner-controlled proprietary account, broker custody, and human order submission; legal clearance remains open.
-- **PROSPECTIVE_EVIDENCE:** not started; deterministic fixture replay is not prospective operation.
+- **ACCEPTED_TERMINAL:** `GV-OPERATED-PORTFOLIO-25-1`; candidate `7ce85c4`, closure `e564cd9`, and terminal tag remain immutable.
+- **ACCEPTED_REPAIR_BASE:** `5687a2c`; scenario-safe persistence and valid UTC timestamp rollover are implemented and locally verified. This is infrastructure evidence, not product score uplift.
+- **ACTIVE_IMPLEMENTATION:** `GV-PROSPECTIVE-PAPER-BASELINE-1` on `product/gv-prospective-paper-baseline-1`.
+- **SYSTEM_DELTA:** one prospective profile derives from the accepted 25-security catalogue; one runtime observation envelope, mutation-free preview, append-only projector, atomic persistence path, and existing app support confirmed no-change, real transition, and rejected episodes.
+- **PRODUCT_DELTA:** the operator can now supply observation content, source locator, observed-at, instrument ownership, explicit review proposals, and rationale at runtime. Confirmation grants authority; rejection preserves proposal custody without mutating authoritative state.
+- **DATA_AUTHORITY:** per-security outcomes are `ADMIT`, `REJECT`, or `ABSTAIN`; `CASH` is a portfolio capital candidate; non-`ADMIT` target quantity is `0`.
+- **REPLAY_DELTA:** evidence, reviews, observations, decision snapshots, execution, certification, rejection history, and book are reconstructed from the append-only event log after fresh-process reopen.
+- **PROSPECTIVE_EVIDENCE:** software capability is implemented and test-injected episodes pass; genuine operator-supplied prospective evidence remains pending.
 - **ACCEPTED_SCORE:** `62/100`; no uplift claimed.
 - **LIVE_BOUNDARY:** Limited Live remains closed and unauthorized.
-- **OPEN_DECISION:** separately select a bounded repair for shared persistence naming/root selection and monotonic timestamp generation.
-- **REVIEW_STATUS:** SAW BLOCK; independent Reviewer A/B/C and a current hierarchy confirmation are unavailable.
-- **RECOMMENDED_NEXT_STEP:** close the procedural review gap for `f9d271d` before any repair; P2 waits for repaired scale operation, fresh-process persistence/reopen, prospective paper episodes, and a legally reviewed custody model.
-- **DO_NOT_REDECIDE:** P0 terminal candidate, closure, tag, score, and evidence, or the immutable P1 diagnostic candidate.
-- **DO_NOT_START:** Universe acceptance, Challenger, providers, optimizer, broker/API execution, client assets, advice services, Limited Live, or live capital.
+- **OPEN_DECISION:** freeze and push one exact implementation candidate, then collect three genuine operator-supplied episodes.
+- **REVIEW_STATUS:** independent Reviewer A/B/C is unavailable and explicitly waived as a blocking prerequisite for candidate publication; no independent terminal-acceptance claim is inferred.
+- **RECOMMENDED_NEXT_STEP:** complete FS0/context validation and exact candidate custody, push for hosted CI, then execute real operator-supplied prospective episodes before opening the real shadow Challenger.
+- **ROADMAP_ORDER:** prospective baseline → real shadow Challenger on the same 25-security set → Universe custody when broader membership is required → separately authorized Limited Live.
+- **LEGAL_BOUNDARY:** legal review is not a paper Challenger blocker; it remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
+- **DO_NOT_REDECIDE:** accepted 10/25 terminal identities, repair base, score, one shared engine/storage/app boundary, or Limited Live closure.
+- **DO_NOT_START:** providers, optimizer framework, broker/API execution, client assets, advice services, autonomous orders, live capital, or score uplift.
