@@ -5,7 +5,9 @@ Mode: `EXECUTION_PACKET`
 ## Identity
 
 - Base: `5687a2c2ae61ef8b5de676cffad5b19df9224b01`
-- Branch: `product/gv-prospective-paper-baseline-1`
+- Candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`
+- Candidate tree: `20d5eb712799555003b2efcf6aed96ca89db9f67`
+- Branch: `product/gv-prospective-paper-baseline-1`; local and remote equal at the candidate SHA.
 - Accepted score before and after this implementation round: `62/100`
 - Limited Live: `CLOSED; NOT_AUTHORIZED`
 
@@ -69,7 +71,7 @@ Automated tests inject runtime values. They prove the software capability and de
 ## Roadmap disposition
 
 ```text
-prospective implementation candidate
+frozen remote candidate `9c7e75a`
 → exact-SHA hosted CI
 → three genuine operator-supplied episodes
 → real shadow Challenger on the same certified 25-security set

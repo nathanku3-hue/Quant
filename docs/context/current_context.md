@@ -7,12 +7,13 @@
 - Accepted foundation `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains immutable.
 - Accepted terminal `GV-OPERATED-PORTFOLIO-25-1` and its 25-security identity remain unchanged.
 - Base repair `5687a2c` remains immutable and remote-equal.
+- Frozen candidate `9c7e75a`, tree `20d5eb7`, is remote-equal on `product/gv-prospective-paper-baseline-1`.
 - Accepted score remains `62/100`.
 - Test-injected runtime data proves capability only, not prospective evidence.
 - Limited Live remains closed.
 
 ## What Is Next
-- Freeze and push the implementation candidate after final authority/context validation.
+- Preserve remote-equal candidate `9c7e75a` and collect hosted CI evidence.
 - Collect genuine operator-supplied prospective episodes.
 - Replace the obsolete Challenger harness only after prospective baseline evidence is banked.
 - Complete exact-SHA hosted CI.

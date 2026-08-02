@@ -35,4 +35,4 @@ Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 ## Current bottleneck
 
-The software capability is implemented. The next product bottleneck is evidence, not architecture: freeze the exact candidate, run hosted CI, then execute and retain three genuine operator-supplied episodes before score uplift or real shadow Challenger opening.
+The software capability is frozen and remote-equal at candidate `9c7e75a`. The next product bottleneck is evidence, not architecture: collect hosted CI, then execute and retain three genuine operator-supplied episodes before score uplift or real shadow Challenger opening.

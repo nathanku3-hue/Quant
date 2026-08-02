@@ -1,9 +1,11 @@
 # Phase Brief — GV-PROSPECTIVE-PAPER-BASELINE-1
 
 Date: 2026-08-02
-Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS; REAL_PROSPECTIVE_EVIDENCE_PENDING`
+Status: `FROZEN_REMOTE_CANDIDATE; LOCAL_GATES_PASS; HOSTED_CI_AND_REAL_PROSPECTIVE_EVIDENCE_PENDING`
 Base: `5687a2c2ae61ef8b5de676cffad5b19df9224b01`
-Branch: `product/gv-prospective-paper-baseline-1`
+Candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`
+Candidate tree: `20d5eb712799555003b2efcf6aed96ca89db9f67`
+Branch: `product/gv-prospective-paper-baseline-1`; local and remote equal at the candidate SHA.
 Accepted product score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
@@ -112,7 +114,7 @@ Do not add providers, optimizer frameworks, broker credentials, autonomous submi
 
 ## Remaining acceptance gate
 
-1. Freeze and push one exact candidate after final FS0/context validation and terminal diff review.
+1. Preserve exact remote candidate `9c7e75a`; do not amend or recut it.
 2. Run exact-SHA Windows/Linux CI.
 3. Execute three real operator-supplied episodes through the product flow, including at least one justified no-change and one real target transition.
 4. Retain fresh-process reopen and full reconstruction evidence after every episode.
@@ -129,13 +131,14 @@ Do not add providers, optimizer frameworks, broker credentials, autonomous submi
 - Accepted foundation `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains immutable.
 - Accepted terminal `GV-OPERATED-PORTFOLIO-25-1` and its 25-security identity remain unchanged.
 - Base repair `5687a2c` remains immutable and remote-equal.
+- Frozen candidate `9c7e75a`, tree `20d5eb7`, is remote-equal on `product/gv-prospective-paper-baseline-1`.
 - Accepted score remains `62/100`.
 - Test-injected runtime data proves capability only, not prospective evidence.
 - Limited Live remains closed.
 
 ## What Is Next
 
-- Freeze and push the implementation candidate after final authority/context validation.
+- Preserve remote-equal candidate `9c7e75a` and collect hosted CI evidence.
 - Collect genuine operator-supplied prospective episodes.
 - Replace the obsolete Challenger harness only after prospective baseline evidence is banked.
 

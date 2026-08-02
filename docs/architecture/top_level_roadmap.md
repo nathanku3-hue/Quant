@@ -155,7 +155,7 @@ No responsible score forecast is recorded for Limited Live.
 ## Next boundary
 
 ```text
-freeze and push prospective implementation candidate
+preserve frozen remote candidate `9c7e75a`
 → exact-SHA hosted CI
 → three genuine operator-supplied prospective episodes
 → real shadow Challenger on the same 25-security set

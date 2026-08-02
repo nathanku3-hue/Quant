@@ -2,7 +2,7 @@
 
 Date: 2026-08-02
 Phase: `GV-PROSPECTIVE-PAPER-BASELINE-1`
-Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS`
+Status: `FROZEN_REMOTE_CANDIDATE; LOCAL_GATES_PASS`
 
 ## Product impact
 
@@ -56,7 +56,7 @@ Legal review is not a blocker for paper Challenger work. It remains mandatory be
 
 ## Open impact
 
-- FS0/context validation and exact candidate custody remain open.
+- Candidate `9c7e75a`, tree `20d5eb7`, is frozen and remote-equal.
 - Hosted exact-SHA Windows/Linux evidence remains open.
 - Genuine prospective evidence remains open.
 - Old Challenger remains a historical custody primitive and must be replaced, not adapted.

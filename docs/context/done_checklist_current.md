@@ -2,7 +2,7 @@
 
 Date: 2026-08-02
 Phase: `GV-PROSPECTIVE-PAPER-BASELINE-1`
-Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS; REAL_PROSPECTIVE_EVIDENCE_PENDING`
+Status: `FROZEN_REMOTE_CANDIDATE; LOCAL_GATES_PASS; HOSTED_CI_AND_REAL_PROSPECTIVE_EVIDENCE_PENDING`
 Accepted score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
@@ -43,8 +43,8 @@ Limited Live: `CLOSED; NOT_AUTHORIZED`
 - [x] Scale repair tests: `13/13 PASS`.
 - [x] Shared accounting/allocation/execution/replay/strategy/vertical tests: `104/104 PASS`.
 - [x] Historical bounded/scale/universe/challenger tests: `24/24 PASS`.
-- [ ] FS0 authority and generated-context validation after documentation synchronization.
-- [ ] Exact candidate commit and remote branch publication.
+- [x] FS0 authority and generated-context validation after documentation synchronization.
+- [x] Exact candidate `9c7e75a`, tree `20d5eb7`, and remote branch equality.
 - [ ] Exact-SHA Windows/Linux hosted CI.
 - [ ] Three genuine operator-supplied prospective episodes.
 
@@ -59,4 +59,4 @@ Limited Live: `CLOSED; NOT_AUTHORIZED`
 
 ## Stop condition
 
-Do not claim prospective product acceptance or score uplift from automated fixtures. Freeze and push the implementation candidate only after FS0/context validation and exact diff review. Then collect three genuine operator-supplied episodes before opening the real shadow Challenger or changing the score.
+Do not claim prospective product acceptance or score uplift from automated fixtures. Preserve remote-equal candidate `9c7e75a`, collect hosted CI, and then collect three genuine operator-supplied episodes before opening the real shadow Challenger or changing the score.

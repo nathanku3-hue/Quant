@@ -2,7 +2,7 @@
 
 Date: 2026-08-02
 Phase: `GV-PROSPECTIVE-PAPER-BASELINE-1`
-Status: `IMPLEMENTED_CANDIDATE; REAL_PROSPECTIVE_EVIDENCE_PENDING`
+Status: `FROZEN_REMOTE_CANDIDATE; HOSTED_CI_AND_REAL_PROSPECTIVE_EVIDENCE_PENDING`
 Accepted score: `62/100`
 Limited Live: `CLOSED; NOT_AUTHORIZED`
 
@@ -63,4 +63,4 @@ Limited Live: `CLOSED; NOT_AUTHORIZED`
 - Scale repair `13/13 PASS`.
 - Shared accounting/replay `104/104 PASS`.
 - Historical harnesses `24/24 PASS`.
-- Final FS0/context validation, exact candidate custody, hosted CI, and genuine prospective evidence remain open.
+- Candidate `9c7e75a`, tree `20d5eb7`, is frozen and remote-equal; hosted CI and genuine prospective evidence remain open.

@@ -7,7 +7,9 @@ Hierarchy Confirmation: Approved | Session: current-thread | Trigger: change-sco
 RoundID: `GV-PROSPECTIVE-PAPER-BASELINE-1-20260802`
 ScopeID: `GV-PROSPECTIVE-PAPER-BASELINE-1`
 Base: `5687a2c2ae61ef8b5de676cffad5b19df9224b01`
-Branch: `product/gv-prospective-paper-baseline-1`
+Candidate: `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`
+Candidate tree: `20d5eb712799555003b2efcf6aed96ca89db9f67`
+Branch: `product/gv-prospective-paper-baseline-1`; local and remote equal at the candidate SHA.
 
 ## Verdict
 
@@ -118,9 +120,9 @@ Open Risks: genuine operator-supplied prospective evidence remains unexecuted; i
 
 ## Next action
 
-Next action: complete FS0/context validation, freeze and push the exact implementation candidate, then execute three genuine operator-supplied episodes before score uplift or real shadow Challenger opening.
+Next action: preserve candidate `9c7e75a`, collect hosted exact-SHA CI, then execute three genuine operator-supplied episodes before score uplift or real shadow Challenger opening.
 
-ClosurePacket: RoundID=GV-PROSPECTIVE-PAPER-BASELINE-1-20260802; ScopeID=GV-PROSPECTIVE-PAPER-BASELINE-1; ChecksTotal=13; ChecksPassed=11; ChecksFailed=2; Verdict=BLOCK; OpenRisks=independent_review_waived_and_real_operator_prospective_evidence_pending; NextAction=freeze_candidate_then_execute_three_real_operator_episodes
+ClosurePacket: RoundID=GV-PROSPECTIVE-PAPER-BASELINE-1-20260802; ScopeID=GV-PROSPECTIVE-PAPER-BASELINE-1; ChecksTotal=13; ChecksPassed=11; ChecksFailed=2; Verdict=BLOCK; OpenRisks=independent_review_waived_and_real_operator_prospective_evidence_pending; NextAction=preserve_9c7e75a_collect_ci_then_execute_three_real_operator_episodes
 
 ClosureValidation: PASS
 SAWBlockValidation: PASS

@@ -7730,5 +7730,6 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Delivered flow: confirmed no-change, confirmed SELL/REDUCE plus BUY/FUND transition, and rejected proposal each run through the existing environment-selected app, atomic storage, replay, certification, and fresh-process full-state reconstruction.
 - Evidence boundary: automated tests inject runtime values and prove capability only. Three genuine operator-supplied episodes remain required before prospective baseline acceptance or score uplift.
 - Roadmap amendment: paper Challenger follows genuine prospective baseline evidence on the same certified 25-security opportunity set; Universe custody is deferred until broader membership is required; Australian legal review is not a paper Challenger blocker and remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
-- Local evidence: prospective `14/14`, retained operated/25/App `23/23`, scale repair `13/13`, shared accounting/replay `104/104`, and historical harnesses `24/24` pass.
+- Local evidence: prospective `14/14`, retained operated/25/App `23/23`, scale repair `13/13`, shared accounting/replay `104/104`, historical harnesses `24/24`, FS0 product `263/263`, and context/hygiene `33/33` pass.
+- Candidate custody: commit `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`, tree `20d5eb712799555003b2efcf6aed96ca89db9f67`, is clean and remote-equal on `product/gv-prospective-paper-baseline-1`.
 - Score remains `62/100`; Limited Live remains closed and unauthorized.
