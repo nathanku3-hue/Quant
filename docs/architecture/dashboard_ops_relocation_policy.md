@@ -1,83 +1,43 @@
-# Dashboard Ops Relocation Policy
+# Dashboard Operations and Replay Policy
 
-Status: DASH-0 planning-only ops policy
-Authority: Phase 65 DASH-0
-Date: 2026-05-10
+Status: `ACTIVE — FINAL PLANNING ROUND`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`
 
-## Purpose
+## Operations & Replay owns in Slice 1
 
-Move operational diagnostics out of the main dashboard workflow in the future redesign. DASH-0 does not move runtime code.
+- exact source/evidence/market/book identity status;
+- verified adapter mapping receipts and unavailable-field reasons;
+- proposal-submission command lineage;
+- governance stream ID, sequence, schema, correlation, causation, and digest chain;
+- duplicate/gap/idempotence validation;
+- accepted and identity-rejected proposal events;
+- deterministic projector and canonical-order replay;
+- AST scan for raw session-state governance authority;
+- proof of zero production mock rows;
+- proof of zero selection, optimization, risk math, preview, mutation, certification change, or deletion.
 
-## Ops Page
-
-Target page:
-
-```text
-Settings & Ops
-```
-
-Contains:
-
-- Data Health;
-- Drift Monitor;
-- diagnostics;
-- refresh controls;
-- runtime status;
-- provenance/context checks;
-- provider-gap reminders.
-
-## Main-Cockpit Badges
-
-Command Center may show compact badges only:
+## Command Center may show only compact summaries
 
 ```text
-Data Health: healthy/degraded
-Drift: clear/yellow/red
-Source Freshness: fresh/stale/unknown
-Provider Gaps: count
+five-field PIT identity health
+adapter/source health
+eligible and identity-rejected counts
+current capital and classified cash
+stream head sequence/digest
+projection/replay status
+open evidence gaps
 ```
 
-Badges are navigation hints, not full workflows.
+Full event traces, digest receipts, adapter mappings, drift history, reconstruction traces, and dependency scans belong in Operations & Replay.
 
-## Drift Monitor Relocation
+## Authority boundary
 
-Future runtime work should move the full Drift Monitor workflow to Settings & Ops.
+Operations & Replay diagnoses and reconstructs. It does not select proposals, calculate targets, authorize capital, or mutate the certified book.
 
-Allowed outside Settings & Ops:
+Ephemeral UI state may use Streamlit session state. Portfolio, proposal, episode, preview, authorization, and certification authority may not.
 
-- one status badge;
-- active issue count;
-- link/navigation affordance to Settings & Ops.
+## Later slices
 
-Not allowed outside Settings & Ops:
-
-- force drift check workflow;
-- acknowledge/resolve controls;
-- historical drift timeline;
-- allocation drift heatmap.
-
-## Data Health Relocation
-
-Future runtime work should move full Data Health tables to Settings & Ops.
-
-Allowed outside Settings & Ops:
-
-- compact status badge;
-- degraded signal count;
-- stale-source count.
-
-## Refresh Controls
-
-Future runtime work should move broad refresh/diagnostic controls into Settings & Ops unless they are required for the current page's primary workflow.
-
-## Boundary
-
-Ops relocation does not authorize:
-
-- alerts;
-- broker calls;
-- provider ingestion;
-- source registry implementation;
-- score/rank displays;
-- buy/sell/hold outputs;
-- action-state promotion.
+After authority exists, this page adds target-conflict receipts, preview expiry/staleness, multi-model risk disagreement, authorization/application/certification lineage, and deletion proof.

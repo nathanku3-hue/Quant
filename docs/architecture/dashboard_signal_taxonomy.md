@@ -1,137 +1,109 @@
-# Dashboard Signal Taxonomy
+# Dashboard Proposal, Event, and Diagnostic Taxonomy
 
-Status: Phase 65 G7.1 product taxonomy
-Authority: D-365 Phase G7.1 roadmap realignment / product charter
-Date: 2026-05-09
+Status: `ACTIVE — FINAL PLANNING ROUND`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`
 
-## Purpose
+## Primary Slice 1 objects
 
-The future dashboard is a decision cockpit for discretionary augmentation. It should show state, evidence, freshness, and uncertainty. It must not present automatic buy/sell orders, strategy rankings, broker instructions, or promotion verdicts.
+The active dashboard projects governed objects, not loose signal tiles:
 
-## Five Panels
+```text
+PointInTimeIdentity
+EvidenceReference
+CapitalProposal
+SubmitProposalCommand
+Accepted / Identity-Rejected Governance Event
+ProposalRecordReadModel
+DecisionEpisodeReadModel
+EventStreamHealth
+ProjectionReplayReceipt
+```
 
-### 1. Thesis Health
+`TransitionCandidate`, `TransitionPreview`, authorization, application, and certification objects are later-slice types and are not simulated in Slice 1.
 
-Question: is the supercycle thesis strengthening or weakening?
+## Proposal-facing categories
 
-Allowed future evidence categories:
+Every proposal row exposes:
 
-- fundamental thesis milestones;
-- revenue or adoption inflection evidence;
-- margin, capacity, or supply-chain evidence;
-- governance/source-quality badges;
-- contradiction log.
+- module, version, sleeve, and proposal identity;
+- exact certified book/head, evidence set, market snapshot, and as-of identity;
+- typed outcome;
+- target intent and unit;
+- normalization summary;
+- principal claim;
+- supporting and contradicting evidence references;
+- missing discriminator and reason not to act;
+- extension schema ID/version/digests;
+- governance status: eligible or identity rejected.
 
-Decision-support state examples:
+## Evidence categories
 
-- `thesis_strengthening`
-- `thesis_uncertain`
-- `thesis_weakening`
-- `evidence_stale`
+Evidence references are content-addressed. Dashboard categories may include:
 
-### 2. Entry Discipline
+- supporting evidence;
+- contradicting evidence;
+- missing discriminator;
+- stale/unavailable source field;
+- source identity mismatch;
+- extension schema or payload digest mismatch.
 
-Question: is this still left-side / falling-knife risk, or is confirmation improving?
+No loose text string becomes replay authority without a typed evidence reference.
 
-Allowed future evidence categories:
+## Target categories
 
-- trend stabilization;
-- volatility contraction or expansion;
-- failed-breakdown / reclaim behavior;
-- liquidity and spread sanity;
-- regime compatibility.
+### Intent
 
-Decision-support state examples:
+```text
+TARGET_FINAL
+DELTA
+OVERLAY
+```
 
-- `left_side_risk_high`
-- `confirmation_improving`
-- `entry_range_watch`
-- `entry_blocked_by_freshness`
+### Instrument unit
 
-### 3. Hold Discipline
+```text
+QUANTITY
+NOTIONAL
+WEIGHT
+```
 
-Question: is momentum still healthy enough to avoid selling too early?
+### Risk measure and unit
 
-Allowed future evidence categories:
+```text
+measure: VAR | VOL | GROSS | MARGIN | DELTA
+unit:    BPS | PERCENT | USD | NOTIONAL
+```
 
-- trend continuation;
-- relative strength persistence;
-- drawdown versus expected volatility;
-- thesis-health alignment;
-- deterioration and invalidation markers.
+`RISK_BPS` is neither an instrument unit nor a risk measure.
 
-Decision-support state examples:
+## Governance event categories in Slice 1
 
-- `hold_thesis_intact`
-- `momentum_constructive`
-- `trim_review_needed`
-- `invalidated_or_stale`
+- episode opened;
+- proposal submitted/ingested with complete proposal;
+- proposal accepted;
+- proposal rejected for PIT identity mismatch;
+- episode aborted.
 
-### 4. Flow and Positioning
+The exact class names may align with repository conventions. Every visible status must be reconstructable from the implemented event vocabulary.
 
-Question: are flow and positioning conditions supportive, crowded, stale, or squeeze-prone?
+## Operational diagnostic categories
 
-Allowed future evidence categories:
+- source adapter health;
+- missing/unavailable field receipt;
+- stream sequence and digest-chain health;
+- duplicate/gap/idempotence failure;
+- projector replay equality;
+- canonical row-order status;
+- session-state authority scan;
+- production mock-row scan;
+- negative-authority proof.
 
-- short-interest context;
-- options or volume behavior;
-- futures positioning context;
-- trend-following pressure proxies;
-- liquidity and borrow-quality warnings.
+## Forbidden taxonomy drift
 
-Important boundary:
-
-- short-squeeze and CTA-type signals are dashboard context, not automatic triggers.
-- FINRA short interest is lagged because firms report twice monthly, around mid-month and month-end.
-- CFTC Traders in Financial Futures data can inform broad positioning context, but CFTC notes that trader classifications do not encode the specific reason for each position.
-- CFTC Leveraged Funds includes hedge funds and money managers such as registered CTAs/CPOs and unregistered funds identified by CFTC; this supports regime/flow context, not precise single-stock triggers.
-
-Decision-support state examples:
-
-- `positioning_supportive`
-- `positioning_crowded`
-- `squeeze_context_present`
-- `positioning_lagged_or_stale`
-
-### 5. Regime
-
-Question: is the market rewarding this type of setup now?
-
-Allowed future evidence categories:
-
-- market trend and breadth;
-- liquidity regime;
-- volatility regime;
-- sector leadership;
-- factor/risk appetite context.
-
-Decision-support state examples:
-
-- `regime_supportive`
-- `regime_neutral`
-- `regime_hostile`
-- `regime_data_stale`
-
-## Source-Quality Policy
-
-- Tier 0 canonical sources are required for promotion evidence.
-- Tier 2, yfinance, OpenBB, public web, and operational Alpaca sources may not become promotion evidence.
-- Operational/paper data can support monitoring only when labeled by source quality and freshness.
-- Lagged sources must show their reporting frequency and latest available timestamp.
-
-## Forbidden Dashboard Behavior
-
-- No automatic buy/sell signal.
-- No candidate ranking.
-- No best-parameter selection.
-- No Sharpe, CAGR, alpha, drawdown, score, or rank in G7.1.
-- No alert emission.
-- No broker, Alpaca, OpenClaw, or notifier action.
-- No promotion packet or human-reviewed approval claim.
-
-## External Reference Anchors
-
-- FINRA short interest reporting schedule: https://www.finra.org/filing-reporting/regulatory-filing-systems/short-interest
-- FINRA short interest explainer: https://www.finra.org/investors/insights/short-interest
-- CFTC Commitments of Traders: https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm
-- CFTC Traders in Financial Futures explanatory notes: https://www.cftc.gov/sites/default/files/idc/groups/public/%40commitmentsoftraders/documents/file/tfmexplanatorynotes.pdf
+- no standalone signal strength becomes capital authority;
+- no UI-only status becomes lifecycle truth;
+- no unsupported stale/boundary/selected state appears without its events;
+- no pipeline-health metric implies alpha, recommendation, or live readiness;
+- no future risk model is presented as solitary truth.

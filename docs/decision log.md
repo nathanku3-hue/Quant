@@ -1,3 +1,14 @@
+## 2026-08-03 — ROUND-20260803-GV-DASHBOARD-ALL-CAPITAL-PIT-1
+
+- Decision: replace the MU-centric next gate with one portfolio-wide all-proposal PIT decision loop operated through `dashboard.py`.
+- Decision: retain six visible pages—Command Center, Discovery & Analysis, Decisions & Thesis, Portfolio & Rotation, Strategy Modules, Operations & Replay—as read projections rather than architecture; Command Center becomes default.
+- Boundary: strategy modules emit immutable evidence-bound proposals; DecisionEpisode owns identity eligibility, disagreement, and selection; PortfolioAuthority owns target resolution, calculation-only preview, stale-bound authorization, application, certification, and replay; dashboard owns no strategy or capital math.
+- Capital semantics: separate `TARGET_FINAL`, `DELTA`, and `OVERLAY` from unit type; never linearly sum multiple absolute targets; keep `RISK_BPS` as risk intent until a domain model emits resolved quantity/notional; make cash `CASH_BASELINE_V1`.
+- Preview law: preview carries zero authority; confirmation binds preview digest, episode, current book/head, and expiry; authorization and applied/certified events remain distinct.
+- Immediate order: verify and bank the current five-path same-evidence shadow baseline, then execute the exact seven-file Slice 1 without another planning round.
+- Score/live: accepted score remains `62/100`; no documentation/refactor uplift; Limited Live remains closed.
+- Evidence: `docs/architecture/dashboard_all_capital_pit_contract.md`, `docs/architecture/top_level_roadmap.md`, and `docs/phase_brief/gv-dashboard-all-capital-pit-1-brief.md`.
+
 
 ## 2026-07-23 — ROUND-20260723-GV-ALPHA0-SOURCE-FAMILY-TWO-BANKED
 
@@ -7733,3 +7744,23 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Local evidence: prospective `14/14`, retained operated/25/App `23/23`, scale repair `13/13`, shared accounting/replay `104/104`, historical harnesses `24/24`, FS0 product `263/263`, and context/hygiene `33/33` pass.
 - Candidate custody: commit `9c7e75ac3a7b87f85d505a53e759594dd1d07b9d`, tree `20d5eb712799555003b2efcf6aed96ca89db9f67`, is clean and remote-equal on `product/gv-prospective-paper-baseline-1`.
 - Score remains `62/100`; Limited Live remains closed and unauthorized.
+
+## 2026-08-03 — FREEZE_GV_DASHBOARD_ALL_CAPITAL_PIT_FINAL_PLANNING_ROUND
+
+- Product unit: replace every MU-centric or proposal-by-proposal workflow with one portfolio-wide PIT episode over `CapitalProposal[0..N]`; MU is the first real populated case only.
+- Product surface: retain `dashboard.py` as the sole future GodView application with six pages in fixed order: Command Center, Discovery & Analysis, Decisions & Thesis, Portfolio & Rotation, Strategy Modules, Operations & Replay.
+- Layer-first delivery: Slice 1 executes as one functional transaction in dependency order—immutable contracts → verified adapters → governance command handler → ordered append-only event authority → pure projector/read models → six-page read-only Command Center. These layers are not independently bankable frameworks.
+- PIT identity: freeze one exact five-field `PointInTimeIdentity` containing certified book ID, exact book head event/version identity, evidence set ID, market snapshot ID, and certified as-of timestamp. Wall-clock episode identity and partial warning-based matching are rejected.
+- Proposal authority: `CapitalProposal` remains immutable evidence with typed outcome, cryptographic evidence references, explicit target intent, explicit normalization, strict discriminated extension envelope, and separate evidence/schema/payload digests. Lifecycle state remains outside strategy output.
+- Target semantics: separate `TARGET_FINAL`, `DELTA`, and `OVERLAY` intent from `QUANTITY`, `NOTIONAL`, and `WEIGHT` units. `RISK_BPS` is neither an instrument unit nor a risk measure; risk measure and unit are orthogonal. Multiple absolute targets are never summed.
+- Numeric authority: canonical prices, quantities, notionals, and targets use exact decimal/integer representations with explicit quantum, rounding mode, currency, price identity, contract multiplier, and lot policy. Blanket cross-asset defaults are rejected.
+- Command authority: adapters and dashboard translate/initiate only; the governance command handler decides exact identity acceptance or rejection and emits immutable facts containing enough proposal information for replay.
+- Event authority: event classes alone are insufficient. Freeze stream ID, sequence number, event/schema identity, correlation/causation, previous digest, event digest, canonical ordering, duplicate/gap rejection, and idempotent append/read semantics. Existing custody should be adapted rather than replaced by a second durable authority.
+- Projection authority: `ProposalRecordReadModel` and `DecisionEpisodeReadModel` are pure event-derived projections. Slice 1 supports only `ELIGIBLE` and `REJECTED_IDENTITY_MISMATCH`, episode `OPEN` or `ABORTED`, and canonical row order by event sequence then record ID. No staged/selected state exists.
+- Repository grounding: `views/command_center.py` is new; operated MU comes from the existing prospective workspace/proposal object path; shadow MU comes from `core/gv_v2_mu_nvda_shadow_decision.py`; cash comes from certified workspace/book cash; no new JSON/Parquet production path or fabricated cash yield/market identity is authorized.
+- UI boundary: Streamlit session state remains valid for ephemeral controls but cannot hold or supply certified book, proposal, episode, preview, authorization, or certification authority.
+- Slice 1 hard stop: zero selection, target composition, optimizer/risk math, preview, authorization, book mutation, certification change, or deletion.
+- Risk boundary: future authority uses a visibly multi-model receipt; historical simulation, delta-normal diagnostics, deterministic stresses, concentration, liquidity, and model disagreement may coexist. No estimator is solitary allocation truth.
+- Deletion boundary: no deletion in Slice 1. `operated_portfolio_app.py` is the verified standalone candidate; every deletion requires verified path existence, zero callers/imports, behavior parity, regression proof, and rollback.
+- Baseline custody: test and commit exactly the five current MU operated/shadow code/test paths as one focused pre-refactor commit; create no tag and include no documentation/unrelated files.
+- Claim boundary: architecture protects and exposes potential portfolio alpha by reducing structural leakage; it is not itself an alpha claim. Accepted score remains `62/100`; Limited Live remains closed.

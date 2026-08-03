@@ -1,3 +1,9 @@
+# Supersession Notice — 2026-08-03
+
+This phase remains accepted capability/history at score `62/100`, including hosted-green closure `d84c675`. Its former human-smoke-first next sequence is superseded. Active work is `GV-DASHBOARD-ALL-CAPITAL-PIT-1`: test and commit the exact five-path MU operated/shadow baseline without a tag, then execute one layer-first real read-only transaction—immutable contracts → verified operated/shadow/book-cash adapters → governance identity handler → ordered digest-chained events → pure projector/read models → six-page Command Center. Selection, optimizer/risk math, preview, authorization, book mutation, certification change, and deletion remain outside Slice 1. See `docs/context/ACTIVE_BRIEF`, `docs/architecture/dashboard_all_capital_pit_contract.md`, and `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`.
+
+---
+
 # Phase Brief — GV-PROSPECTIVE-PAPER-BASELINE-1
 
 Date: 2026-08-02

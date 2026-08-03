@@ -1,5 +1,27 @@
 # Product Requirements Document: Terminal Zero / GodView Certified Portfolio OS
 
+## Active All-Capital PIT Product Cutover (2026-08-03)
+
+This section supersedes every active-gate statement below. Historical sections remain for audit continuity only.
+
+```text
+PRODUCT = point-in-time certified portfolio operating system
+ACTIVE_GATE = GV-DASHBOARD-ALL-CAPITAL-PIT-1
+ACTIVE_STATUS = FINAL_PLANNING_FROZEN; SLICE_0_BASELINE_BANK_PENDING; IMPLEMENTATION_NOT_STARTED
+ACTIVE_BRIEF = docs/context/ACTIVE_BRIEF
+CANONICAL_ARCHITECTURE = docs/architecture/dashboard_all_capital_pit_contract.md
+PLANNING_CHECKLIST = docs/architecture/dashboard_all_capital_pit_planning_checklist.md
+ACCEPTED_PRODUCT_SCORE = 62/100
+LIMITED_LIVE = CLOSED; NOT_AUTHORIZED
+```
+
+Product flow: certified five-field PIT identity → verified real adapters → immutable proposals → typed command handler → ordered append-only governance events → deterministic read projections → dashboard comparison → later intent-aware selection → later calculation-only preview and explicit authorization → applied/certified events → exact replay.
+
+The dashboard is the sole strategy-consumer/comparator/operator surface and contains no strategy logic, identity decision, event acceptance, or direct capital mutation. MU is the first real case, not the workflow boundary. Immediate order: test and commit the exact five-file shadow baseline without a tag, then execute Slice 1 layer-first as one real read-only product transaction: contracts → adapters → handler → events → projector → six-page Command Center. Slice 1 stops before selection, optimizer/risk math, preview, authorization, book mutation, certification change, or deletion. CTA/macro/provider/broker/live work remains closed.
+
+---
+
+
 ## Active Build Authority (2026-08-01) — One Real 25-Security Operated Portfolio; Live Closed
 
 ```text

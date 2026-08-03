@@ -1,131 +1,68 @@
 # Dashboard Information Architecture
 
-Status: DASH-0 approved planning-only IA
-Authority: Phase 65 DASH-0
-Date: 2026-05-10
+Status: `ACTIVE — FINAL PLANNING ROUND`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`
+Planning checklist: `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`
 
-## Purpose
+## Decision
 
-DASH-0 approves the target information architecture for the GodView dashboard redesign. It does not rewrite `dashboard.py`, `views/`, navigation shell code, Streamlit callbacks, data flows, backtests, alerts, broker code, provider code, factor-scout code, candidate cards, or discovery intake output.
+The dashboard is organized around one all-capital PIT operator loop. Pages are read projections, not architectural or authority boundaries.
 
-## Current Problem
-
-The live dashboard is still the older Sovereign Cockpit. Its top-level tabs are crowded and tool-oriented:
-
-```text
-Ticker Pool & Proxies
-Data Health
-Drift Monitor
-Daily Scan
-Backtest Lab
-Modular Strategies
-Portfolio Builder
-Shadow Portfolio
-```
-
-The newer product specs require a state-first operator cockpit that answers:
+## Active page map
 
 ```text
-What state is this opportunity in?
-Why?
-What changed?
-What is blocked?
-What should the operator monitor next?
+Command Center                 default
+Discovery & Analysis
+Decisions & Thesis
+Portfolio & Rotation
+Strategy Modules
+Operations & Replay
 ```
 
-## Target Page Map
+`dashboard.py` remains the sole future GodView application.
 
-| New Page | Contains | Legacy Movement |
-| --- | --- | --- |
-| Command Center | State distribution, freshness, risks, next monitoring focus | New top page |
-| Opportunities | Intake/candidate cards with origin/status labels | Ticker Pool partially maps here |
-| Thesis Card | MU/current candidate thesis, evidence, contradictions, blockers | New |
-| Market Behavior | GodView signal families, observed/estimated/inferred labels | New |
-| Entry & Hold Discipline | Why not buy yet / why not sell yet | New |
-| Portfolio & Allocation | Risk limits, allocation, shadow portfolio | Portfolio Builder + Shadow Portfolio |
-| Research Lab | Backtests, modular strategies, daily scan, experiments | Backtest Lab + Modular Strategies + Daily Scan |
-| Settings & Ops | Data health, drift monitor, diagnostics, refresh | Data Health + Drift Monitor |
-
-## Page Semantics
+## Page responsibilities
 
 ### Command Center
 
-Default landing page. Shows state distribution, source-quality/freshness summary, open risks, blocked actions, and next monitoring focus. It may show small ops badges, but not full ops workflows.
+Slice 1 owns a read-only view of:
 
-### Opportunities
+- exact five-field PIT identity;
+- certified capital and cash;
+- real MU-operated, MU-shadow, and cash-baseline proposal rows;
+- accepted/identity-rejected status;
+- target intent/unit/normalization summary;
+- disagreement and evidence gaps;
+- compact event/projection/system health.
 
-Shows watched opportunities and intake/candidate-card status. It must expose `discovery_origin`, source-quality, freshness, and blocked-action labels. It must not rank opportunities.
+Selection, preview, confirmation, mutation, and certification are not available in Slice 1.
 
-### Thesis Card
+### Discovery & Analysis
 
-Shows the current candidate thesis, evidence present/missing, contradiction log, and thesis breakers. `MU` may be shown as the only current candidate card, but not as validated or actionable.
+Owns opportunity/evidence intake, source identity, reconciliation, and confluence analysis. It creates no proposal or portfolio authority merely by displaying evidence.
 
-### Market Behavior
+### Decisions & Thesis
 
-Shows GodView signal families with observed/estimated/inferred labels, source class, freshness, provider/feed or provider gap, allowed influence, and forbidden influence.
+Owns proposal claims, supporting/contradicting evidence, missing discriminators, falsifiers/boundaries, and decision history. In Slice 1 it is read-only.
 
-### Entry & Hold Discipline
+### Portfolio & Rotation
 
-Combines "why not buy yet" and "why not sell yet" so the operator sees entry blockers and hold discipline in one review surface. State labels remain paper-only prompts.
+Slice 1 owns certified-book and historical transition display only. Later slices add transition candidate, risk/cost preview, explicit authorization, and applied/certified history.
 
-### Portfolio & Allocation
+### Strategy Modules
 
-Contains allocation review, risk limits, optimizer output, and shadow portfolio comparison. Future runtime redesign should align `Max weight` and `Max sector weight` together as a single "Risk limits" control group.
+Owns module registry, proposal diagnostics, bounded research replay, backtests, and optimizer research. Outputs are non-authoritative until admitted through the canonical proposal/command/event boundary.
 
-### Research Lab
+### Operations & Replay
 
-Contains backtests, modular strategies, daily scan, and experiments. This is where legacy score/rank-like research tooling can be quarantined from the main state-first cockpit.
+Owns source freshness, adapter receipts, event stream integrity, digest chain, projection/replay, AST authority-state checks, and later preview/certification replay.
 
-### Settings & Ops
+## Cross-page law
 
-Contains Data Health, Drift Monitor, diagnostics, refresh controls, and operational status. Drift Monitor should have a small status badge outside this page, but the full workflow belongs here.
-
-## Non-Goals
-
-DASH-0 does not authorize:
-
-- `dashboard.py` edits;
-- `views/` edits;
-- `optimizer_view.py` edits;
-- Streamlit runtime navigation shell;
-- new data or metrics;
-- factor-scout code or use of `phase34_factor_scores.parquet`;
-- discovery-intake output changes;
-- candidate-card changes;
-- provider ingestion;
-- backtest implementation;
-- alerts;
-- broker calls;
-- buy/sell/hold labels;
-- candidate ranking or scoring.
-
-## Streamlit Basis
-
-Official Streamlit docs describe `st.Page` and `st.navigation` as the flexible way to define multipage apps. The entrypoint acts as a shared router/frame around pages, while the older `pages/` directory method is simpler and automatic. DASH-0 therefore plans a future page registry/sidebar shell instead of continuing the crowded flat-tab design.
-
-Sources:
-
-- `https://docs.streamlit.io/develop/concepts/multipage-apps/overview`
-- `https://docs.streamlit.io/develop/api-reference/navigation/st.navigation`
-- `https://docs.streamlit.io/develop/api-reference/navigation/st.page`
-
-## Locked Decision
-
-Target IA is approved as:
-
-```text
-Command Center
-Opportunities
-Thesis Card
-Market Behavior
-Entry & Hold Discipline
-Portfolio & Allocation
-Research Lab
-Settings & Ops
-```
-
-Next action:
-
-```text
-approve_dash_1_page_registry_shell_or_hold
-```
+- No page reads canonical governance authority from raw `st.session_state`.
+- Ephemeral UI state remains permitted.
+- No page validates proposal identity or emits accepted/rejected facts directly.
+- No page calculates strategy signals or portfolio authority.
+- Useful content is relocated before broad extraction; deletion follows dependency and behavior proof.

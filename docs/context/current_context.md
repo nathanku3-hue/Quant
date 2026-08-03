@@ -1,29 +1,30 @@
 ## What Was Done
-- Added runtime observation preview, confirmation, transition, rejection, persistence, UI, and exact full-state reconstruction.
-- Derived the synthetic prospective profile from the accepted 25-security catalogue without duplicating it.
-- Added one deterministic MU/NVDA reconciliation result with explicit `HOLD_FOR_EVIDENCE`, `NO_POSITION`, and missing discriminator.
-- Added one real MU identity and classified-cash prospective profile through the same engine, storage, book, replay, certification, and app boundaries.
-- Banked machine-executed synthetic and real-source receipts with separate-process exact replay; no genuine human episode is claimed.
+- Completed the planning-round reconciliation.
+- Replaced the earlier seven-file shell-first Slice 1 with a layer-first real product transaction.
+- Added explicit command-handler, ordered event-envelope/store, and pure projector authority.
+- Grounded adapters in current repository objects and book cash.
+- Separated evidence, schema, and payload digests.
+- Restricted Slice 1 lifecycle states to its event vocabulary.
+- Corrected session-state, risk, normalization, cash-yield, and deletion semantics.
+- Published a complete planning checklist of locked and pending items.
 
 ## What Is Locked
-- Accepted foundation `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains immutable.
-- Accepted terminal `GV-OPERATED-PORTFOLIO-25-1` and its 25-security identity remain unchanged.
-- Base repair `5687a2c` remains immutable and remote-equal.
-- Capability candidate `9c7e75a` retains its historical broader receipts.
-- Date-repair candidate `147397f`, tree `a43a6a8`, is Windows/Linux green; documentation sync `dc6b022`, tree `a9735c2`, records the roadmap reset; real-evidence candidate `ae615a2`, tree `4bc827a`, is immutable; closure `d84c675`, tree `63206de`, is fully hosted-green.
+- Accepted terminals and hosted-green evidence remain immutable.
 - Accepted score remains `62/100`.
-- Test-injected runtime data proves capability only, not prospective evidence.
+- The five-path shadow baseline is banked at `a520f475bfa4fca42a68a22165ab3ad8960c0bc9`.
+- `dashboard.py` remains the sole future application.
+- Slice 1 ends at the read-only Command Center.
 - Limited Live remains closed.
 
 ## What Is Next
-- Bank one genuine human smoke against hosted-green closure `d84c675`.
-- Complete independent terminal review.
-- Build a clean independent shadow proposal on the exact same MU/NVDA evidence, with no old Challenger adapter.
-- Expand only after the same path works across 3–5 real identities.
-- Preserve hosted-green closure `d84c675`.
-- Complete genuine human smoke and independent review before publication.
-- Open an independent shadow proposal on the exact same evidence; no adapter or backward compatibility.
-- Repeat prospective operation across 3–5 real identities before any `70+` claim.
+- Regenerate context and bank this planning authority as a separate docs-only commit.
+- Verify a fully clean worktree.
+- Freeze exact operated, shadow, certified cash, certified-prefix head, evidence, no-market proof, and as-of mappings.
+- Execute the exact ten-file Layers 1–6 transaction and stop at the read-only Command Center.
+- Bank the final planning authority separately as docs-only and verify a clean tree.
+- Freeze exact adapter, certified-prefix head, evidence, and no-market proof mappings.
+- Implement the exact ten-file real read-only PIT episode using bounded in-memory governance.
+- Stop before selection, durable governance persistence, preview, mutation, risk math, certification, or deletion.
 
 ## First Command
-`git status --short`
+`python scripts/build_context_packet.py`

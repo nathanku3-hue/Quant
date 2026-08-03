@@ -1,46 +1,70 @@
 # Post-Phase Alignment — Current
 
-Date: 2026-08-02
-Decision: `FREEZE_GV_PROSPECTIVE_PAPER_BASELINE_1_IMPLEMENTATION_CANDIDATE`
-Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS; REAL_PROSPECTIVE_EVIDENCE_PENDING`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Status: `FINAL PLANNING ALIGNMENT`
 
 ## Alignment
 
-- **Accepted terminal preserved:** 25-security candidate `7ce85c4`, closure `e564cd9`, and terminal tag remain immutable.
-- **Repair base preserved:** `5687a2c` repairs scenario-safe persistence and UTC timestamp rollover; no score uplift is attached to the repair.
-- **Prospective profile:** derives from the accepted 25-security catalogue without copying the instrument catalogue or embedding later episode content.
-- **Runtime product:** operator enters observation content, locator, observed-at, owned instruments, explicit review proposals, and rationale through the existing app.
-- **Authority:** preview is mutation-free; confirmation grants authority; rejection appends custody without mutating evidence, reviews, decisions, holdings, cash, orders, fills, or book economics.
-- **Projection:** one append-only event/state projector reconstructs no-change, transition, and rejected episodes after fresh-process reopen.
-- **Decision semantics:** instrument outcomes are `ADMIT/REJECT/ABSTAIN`; `CASH` is portfolio-level; non-`ADMIT` target quantity is `0`.
-- **Validation:** prospective `14/14`, retained operated/25/App `23/23`, scale repair `13/13`, shared accounting/replay `104/104`, and historical harnesses `24/24` pass.
-- **Evidence boundary:** automated fixtures prove capability, not genuine prospective evidence.
-- **Score:** accepted progress remains `62/100`.
-- **Review boundary:** independent Reviewer A/B/C remains unavailable and was explicitly waived as a blocking prerequisite for candidate publication; no independent terminal-acceptance claim is made.
-- **Live boundary:** Limited Live remains closed and unauthorized.
+The accepted portfolio substrate and real-MU evidence work remain useful. The next product gap is not another isolated human episode; it is the absence of one governed portfolio-wide dashboard decision loop.
 
-## Completed implementation flow
+## Preserved
+
+- accepted 10/25 operated portfolio and replay substrate;
+- date repair and real-evidence identities;
+- hosted-green closure and accepted score `62/100`;
+- current same-evidence MU shadow implementation as a baseline to bank;
+- `dashboard.py` as the future sole GodView app;
+- no live-capital authority.
+
+## Replaced during the planning round
+
+- MU-centric workflow sizing;
+- one-proposal lifecycle as supreme portfolio governance;
+- three-page dashboard as endgame;
+- dashboard pages as architecture;
+- untyped extension dictionaries;
+- identity fields duplicated inconsistently across contracts;
+- wall-clock episode identity;
+- target unit used as target intent;
+- generic summation of absolute targets;
+- winner-take-all selection;
+- proposal lifecycle embedded in immutable strategy evidence;
+- UI transition methods as authority;
+- preview/authorization conflation;
+- authorization/application/certification conflation;
+- unrestricted float authority and naive four-decimal rounding;
+- `RISK_BPS` as instrument unit or risk measure;
+- production mock proposal rows;
+- adapters based on assumed JSON/Parquet files;
+- standalone cash-file and cash-yield assumptions;
+- projector-side business decisions;
+- event classes without stream ordering/digest authority;
+- identity rejection that could project `None` proposal;
+- nondeterministic read-model row ordering;
+- blanket prohibition on all Streamlit session state;
+- singular historical-simulation risk authority;
+- “architecture is alpha” overclaim;
+- transient baseline tag ceremony;
+- hallucinated deletion filenames and unconditional deletion;
+- one oversized Slice 1 containing selection/risk/preview/mutation/deletion;
+- seven-file shell-first Slice 1 that deferred the real proposal boundary.
+
+## Final alignment
+
+Slice 1 is one layer-first real product transaction:
 
 ```text
-CERTIFIED 25-SECURITY BASELINE
-→ RUNTIME OBSERVATION + EXPLICIT PROPOSALS
-→ MUTATION-FREE PREVIEW
-→ CONFIRM NO-CHANGE
-→ CONFIRM SELL/REDUCE + BUY/FUND TRANSITION
-→ REJECT THIRD PROPOSAL WITHOUT AUTHORITY MUTATION
-→ ATOMIC PERSIST
-→ FRESH-PROCESS FULL-STATE RECONSTRUCTION
+contracts
+→ verified adapters
+→ command handler
+→ ordered events
+→ pure projector/read models
+→ six-page read-only Command Center
 ```
 
-## Next boundary
+It stops before selection, optimizer/risk math, preview, authorization, book mutation, certification change, or deletion.
 
-```text
-FS0 + CONTEXT VALIDATION
-→ EXACT DIFF REVIEW
-→ FREEZE + PUSH CANDIDATE
-→ HOSTED WINDOWS/LINUX CI
-→ THREE GENUINE OPERATOR-SUPPLIED EPISODES
-→ REAL SHADOW CHALLENGER ON SAME 25-SECURITY SET
-```
+## Next alignment point
 
-Universe custody is deferred until broader membership is required. Australian legal review is not a paper Challenger blocker; it remains required before broker credentials, automated submission, client assets, advice activity, or real capital.
+After Slice 1 operates, assess only whether the real multi-proposal PIT read model, identity rejection, event replay, and user-facing comparison are correct and usable. Do not reopen the architecture or begin CTA/macro work.

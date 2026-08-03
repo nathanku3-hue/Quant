@@ -1,3 +1,13 @@
+# Active PRD Cutover — All-Capital PIT Dashboard
+
+Active product authority: 2026-08-03. Final planning round frozen.
+
+Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`. Planning checklist: `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`. Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`. Accepted score remains `62/100`; Limited Live remains closed.
+
+The immediate product slice is a real read-only all-proposal PIT transaction: one certified five-field identity, verified MU-operated/MU-shadow/book-cash adapters, immutable typed proposals, command-handler identity acceptance, ordered digest-chained governance events, deterministic read projections, and the six-page Command Center through `dashboard.py`. Slice 1 contains no selection, optimizer/risk math, preview, authorization, book mutation, certification change, or deletion. MU is the first real case, not the pipeline model. Historical material below is retained but does not compete with this authority.
+
+---
+
 V2 PEAD Alpha Interpretation Gate Notice (2026-06-24)
 
 - The top-level PEAD next step is now a docs-only Alpha Interpretation Gate before any dashboard expansion.

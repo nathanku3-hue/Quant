@@ -6611,3 +6611,82 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Local pre-freeze gate: 449 tests, 0 failures, 0 errors, 0 skips; receipts under `%TEMP%`; combined single-command attempts returning DevSpace HTTP 502 are not evidence.
 - Candidate custody remains open until current bytes are attached to `codex/gv-operated-portfolio-25-1`; no score uplift or terminal claim.
 
+## GV Dashboard All-Capital PIT Final Contract Register (2026-08-03)
+
+Source paths: `docs/architecture/dashboard_all_capital_pit_contract.md`, `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`, future `core/gv_pit/` contract/governance/adapter modules.
+
+### Canonical PIT identity
+
+- `PIT := (certified_book_id, certified_book_head_event_id, evidence_set_id, market_snapshot_id, as_of_utc)`.
+- `as_of_utc := certified_snapshot.as_of_utc`; authoritative episode identity must not use wall-clock `now()`.
+- `identity_match(proposal, episode) := canonical_equal(proposal.pit_identity, episode.pit_identity)`.
+- `identity_match = false` is decided by the governance command handler and emits an immutable identity-rejection event; it is not a projector warning or UI mutation.
+
+### Canonical evidence and payload identities
+
+- `evidence_digest := SHA256(exact_upstream_evidence_bytes)`.
+- `schema_digest := DomainHash("GV-PIT-SCHEMA:V1", canonical_schema_definition_bytes)`.
+- `canonical_payload_digest := DomainHash("GV-PIT-EXTENSION-PAYLOAD:V1", canonical_extension_payload_bytes)`.
+- The evidence, schema, and payload digests are distinct and must never be populated from the same source payload by convenience.
+
+### Target intent and unit
+
+- `intent ∈ {TARGET_FINAL, DELTA, OVERLAY}`.
+- `instrument_unit ∈ {QUANTITY, NOTIONAL, WEIGHT}`.
+- `risk_measure ∈ {VAR, VOL, GROSS, MARGIN, DELTA}`.
+- `risk_unit ∈ {BPS, PERCENT, USD, NOTIONAL}`.
+- `RISK_BPS` is neither an instrument unit nor a risk measure.
+- `TARGET_FINAL` is absolute desired final exposure; `DELTA` is incremental movement relative to the certified book; `OVERLAY` is bounded additive exposure in an explicit overlay sleeve.
+
+### Numeric normalization
+
+- Canonical prices, quantities, notionals, and target values use `Decimal` or exact integer minor units.
+- Authoritative basis-point values use integers.
+- `normalize(value, policy) := quantize(value, policy.unit_quantum, rounding=policy.rounding_mode)` under explicit `currency`, `price_identity`, `contract_multiplier`, and `lot_size_policy`.
+- No cross-asset default may silently assign USD, multiplier `1`, canonical close, or fractional lots.
+- Contract multiplier has one canonical home in target normalization; strategy diagnostic payloads do not duplicate it as economic authority.
+
+### Initial composition grammar — Slice 2
+
+- `base_count(candidate) := |{p in candidate | intent(p) = TARGET_FINAL}|`.
+- Valid candidate requires `base_count(candidate) <= 1`.
+- `candidate := optional_one_base_TARGET_FINAL + compatible_DELTA_or_OVERLAY_legs + explicit_target_acceptance_or_override_records`.
+- Two selected absolute targets are `CONFLICT_REQUIRES_ARBITRATION`; repeated subtraction of the current book and linear summation are forbidden.
+
+### Governance command and event authority — Slice 1
+
+- `verified_adapter → SubmitProposalCommand(full_proposal) → governance_handler`.
+- `governance_handler` performs exact identity comparison and emits accepted or identity-rejected facts.
+- The rejection path retains the complete immutable proposal or a preceding submission fact sufficient to project it; a rejected row can never contain fabricated `None` proposal data.
+- Event envelope minimum: `(stream_id, sequence_number, event_id, event_schema_version, timestamp_utc, correlation_id, causation_id, previous_event_digest, event_digest, payload)`.
+- `expected_sequence := current_head_sequence + 1`.
+- Append fails on duplicate event ID, duplicate sequence, sequence gap, previous-digest mismatch, or conflicting idempotent replay.
+- `event_digest := DomainHash("GV-PIT-GOVERNANCE-EVENT:V1", canonical_event_envelope_without_event_digest_bytes)`.
+- Canonical reads return ascending sequence order.
+
+### Projection authority — Slice 1
+
+- `read_model := fold(valid_events_in_canonical_order, initial_state, pure_projector)`.
+- Slice 1 proposal status is only `ELIGIBLE | REJECTED_IDENTITY_MISMATCH`.
+- Slice 1 episode status is only `OPEN | ABORTED`.
+- Canonical proposal-row ordering is `(event_sequence, record_id)`.
+- Equivalent canonical streams must produce byte-identical read models.
+- Projectors perform no identity decision, event emission, provider call, wall-clock read, storage mutation, selection, or portfolio calculation.
+
+### Preview and authorization — Slice 3
+
+- `TransitionPreview` is immutable calculation output with zero mutation authority.
+- `authorize_allowed := digest_matches AND episode_matches AND certified_book_head_matches AND not_expired AND not_blocked`.
+- Authorization, application, and certification are distinct authoritative facts unless a separately approved product definition changes the meaning of a certified book.
+
+### UI and page authority
+
+- Six dashboard pages are read projections over one loop and cannot create strategy, event, preview, or portfolio authority.
+- Raw Streamlit session-state reads of certified book, proposals, episode, preview, authorization, or certification are forbidden.
+- Ephemeral tab, pagination, sort/filter, expansion, and form state remain permitted.
+
+### Risk boundary
+
+- Slice 1 implements no VaR, Sortino, optimizer, or risk model.
+- A future risk receipt may combine historical simulation, delta-normal diagnostic control, deterministic stress scenarios, concentration, liquidity, and visible model disagreement.
+- No single estimator is allocation truth.

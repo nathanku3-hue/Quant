@@ -1,3 +1,9 @@
+# Active Endgame Update — 2026-08-03
+
+The endgame is one all-capital PIT proposal-to-book loop through `dashboard.py`, implemented layer first: certified five-field identity → verified real adapters → immutable proposals → command-handler identity decision → ordered digest-chained governance events → pure read projections → dashboard comparison → later intent-aware selection → later calculation-only preview and explicit authorization → applied/certified events → exact replay. Six pages are read projections only. MU remains the first research patient, not the product boundary. Architecture protects potential portfolio alpha by reducing structural leakage; it is not itself an alpha claim. Active contract: `docs/architecture/dashboard_all_capital_pit_contract.md`. Complete planning reconciliation: `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`.
+
+---
+
 # GodView Endgame Vision
 
 Status: Supporting Endgame Canon — governed by the corrected seven-slice product roadmap

@@ -1,88 +1,68 @@
 # Dashboard Redesign Migration Plan
 
-Status: DASH-0 planning-only migration plan
-Authority: Phase 65 DASH-0
-Date: 2026-05-10
+Status: `ACTIVE — FINAL PLANNING ROUND`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`
 
-## Purpose
+## Migration law
 
-Define the migration sequence from the crowded Sovereign Cockpit tabs to the state-first GodView IA. This is a plan only.
+Place real product content before broad extraction. Build lower authority layers only as needed to operate the real read-only episode. Do not split `dashboard.py` into speculative frameworks and do not ship disconnected contracts as product progress.
 
-## Migration Principles
+## Ordered migration
 
-1. Sort information before changing visuals.
-2. Preserve existing runtime behavior until DASH-1 or later approval.
-3. Move operational diagnostics out of the main cockpit.
-4. Quarantine research/lab tooling away from operator state pages.
-5. Keep all product claims state-first, source-labeled, and non-actionable.
+### 0. Bank current shadow baseline
 
-## Legacy-To-New Mapping
+Run the focused real-MU/same-evidence tests and commit exactly the current five code/test paths. No documentation, unrelated files, release ceremony, or tag.
 
-| Legacy Tab / Area | New Page | Migration Notes |
-| --- | --- | --- |
-| Ticker Pool & Proxies | Opportunities | Split watchlist/intake status from proxy mechanics. |
-| Data Health | Settings & Ops | Keep summary badge on Command Center. |
-| Drift Monitor | Settings & Ops | Keep small drift badge on Command Center. |
-| Daily Scan | Research Lab | Treat as research workflow, not main cockpit state. |
-| Backtest Lab | Research Lab | Keep behind research boundary. |
-| Modular Strategies | Research Lab | Keep behind research boundary. |
-| Portfolio Builder | Portfolio & Allocation | Move allocation/risk controls here. |
-| Shadow Portfolio | Portfolio & Allocation | Combine with allocation review. |
-| Hedge Harvester sidebar | Research Lab or Settings & Ops | Remove from persistent sidebar in future runtime work. |
-| FR-041 Governor banner | Command Center | Keep as top-level context, not per-tool ornament. |
+### 1. Freeze minimum contracts
 
-## DASH-0
+Add exact five-field PIT identity, evidence/digest contracts, explicit target intent/unit/normalization, strict extension envelopes, and immutable proposal.
 
-Planning-only deliverables:
+### 2. Adapt verified real sources
 
-- approve target IA;
-- document page registry plan;
-- document migration map;
-- document ops relocation policy;
-- update handover and SAW.
+Map the active MU-operated workspace/proposal object, independent MU-shadow object, and certified-book cash. Do not invent JSON/Parquet sources, market identity, or cash yield.
 
-No runtime files are touched.
+### 3. Add governance command authority
 
-## DASH-1 Preview
+Introduce typed proposal submission and a handler that decides exact identity acceptance/rejection. Adapters, dashboard, event store, and projector do not make this decision.
 
-DASH-1 can implement the page registry/sidebar shell.
+### 4. Add ordered event authority
 
-Allowed in DASH-1:
+Adapt existing custody or introduce the minimum event-store protocol for stream/sequence ordering, digest chaining, duplicate/gap rejection, canonical reads, and idempotence. Do not create a second competing durable authority.
 
-- create shell/page registry;
-- relocate legacy page blocks;
-- keep existing calculations and data unchanged;
-- add no new metrics;
-- add no new product claims.
+### 5. Add deterministic projections
 
-Forbidden in DASH-1:
+Purely fold valid events into read-only proposal/episode models. Restrict Slice 1 statuses to its event vocabulary. Order rows by event sequence then record ID.
 
-- provider ingestion;
-- factor-scout output;
-- discovery-intake changes;
-- candidate-card changes;
-- backtest logic changes;
-- alerts;
-- broker calls;
-- rankings;
-- scores;
-- buy/sell/hold signals.
+### 6. Ship six-page read-only product surface
 
-## Future Redesign Sequence
+Create Command Center, make it default, preserve Discovery & Analysis, and render the real three-row PIT episode through `dashboard.py`. Move full event/replay details to Operations & Replay.
 
-1. DASH-1: page registry/sidebar shell.
-2. DASH-2: Command Center layout.
-3. DASH-3: Opportunities + Thesis Card layouts.
-4. DASH-4: Market Behavior + Entry/Hold pages.
-5. DASH-5: Portfolio & Allocation page, including Risk limits control-group alignment.
-6. DASH-6: Research Lab containment.
-7. DASH-7: Settings & Ops consolidation.
-8. DASH-8: visual QA, smoke, and user review pass.
+### 7. Stop Slice 1
 
-## Acceptance Criteria For DASH-0
+Prove zero selection, target composition, optimizer/risk math, preview, authorization, book mutation, certification change, and deletion.
 
-- IA page map is documented.
-- Legacy movement is documented.
-- `st.Page` / `st.navigation` rationale is documented.
-- Ops relocation policy is documented.
-- Runtime implementation is explicitly held.
+### 8. Add selection/composition in Slice 2
+
+Add reject-all, one base target, compatible delta/overlay legs, target collision handling, and replayable selection events.
+
+### 9. Add preview/authority in Slice 3
+
+Add deterministic target resolution, costs/limits/multi-model risk, immutable preview, stale-bound authorization, application, certification, and exact replay.
+
+### 10. Place, extract, and delete after proof
+
+Relocate useful content, extract only exercised boundaries, then delete verified displaced paths after import/caller, behavior, regression, and rollback proof.
+
+## Repository-grounded migration facts
+
+- `views/command_center.py` is new.
+- `operated_portfolio_app.py` is the existing standalone app path.
+- operated MU comes from the prospective workspace/proposal object path.
+- shadow MU comes from `core/gv_v2_mu_nvda_shadow_decision.py`.
+- cash comes from the certified workspace/book.
+
+## Stop rules
+
+Stop and report rather than filling assumptions when exact book head, market snapshot, evidence digest, cash yield, lifecycle source, or event authority cannot be mapped from repository truth.

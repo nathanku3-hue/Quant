@@ -1,195 +1,72 @@
-# Dashboard Product Spec: Unified Opportunity Engine
+# Dashboard Product Spec — All-Capital PIT Operator Surface
 
-Status: Phase 65 G7.1A dashboard product spec
-Date: 2026-05-09
-Authority: G7.1A starter docs / product-spec rewrite
+Status: `ACTIVE — FINAL PLANNING ROUND`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`
+Planning checklist: `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`
 
 ## Purpose
 
-The dashboard is the operator cockpit for the Unified Opportunity Engine.
+The dashboard is the strategy consumer, comparator, and operator surface for one certified point-in-time capital decision. It does not own strategy logic, proposal identity decisions, event acceptance, portfolio calculation, or mutation.
 
-It should help the user understand:
-
-- what opportunity is being watched;
-- whether the thesis is intact;
-- whether market behavior is supportive or hostile;
-- whether entry is premature or improving;
-- whether holding is still justified;
-- whether trimming or thesis-break review is needed.
-
-The dashboard is not a trading terminal, broker interface, or automatic alert engine in G7.1A.
-
-## DASH-0 Information Architecture Update
-
-Phase 65 DASH-0 approves a future state-first page map:
+## Product questions
 
 ```text
-Command Center
-Opportunities
-Thesis Card
-Market Behavior
-Entry & Hold Discipline
-Portfolio & Allocation
-Research Lab
-Settings & Ops
+What exact book/evidence/market state is being evaluated?
+Which real proposals entered that same PIT?
+Which were accepted or identity rejected, and why?
+Where do proposals disagree?
+What evidence or discriminator is missing?
+What capital and classified cash are currently certified?
+Can the governance event stream and read model replay exactly?
+What later operator action is unavailable or pending?
 ```
 
-The current Sovereign Cockpit runtime remains unchanged in DASH-0. The redo sequence starts with planning, then a later DASH-1 may implement a page registry/sidebar shell with no new data, metrics, product claims, alerts, providers, broker calls, rankings, or scores.
-
-## First-Class Dashboard States
+## Slice 1 product flow
 
 ```text
-wait
-watch
-accumulation
-confirmation
-buying range
-let winner run
-trim optional
-exit risk
-thesis broken
+real MU operated object
++ real MU shadow object
++ certified-book cash
+→ verified adapters
+→ immutable proposals
+→ typed submission handler
+→ accepted/rejected ordered events
+→ deterministic read projection
+→ read-only Command Center
 ```
 
-These states are future product vocabulary only until a later implementation phase.
+## Required Slice 1 behaviors
 
-## Legacy Future Dashboard Areas Superseded By DASH-0
+- one exact five-field PIT identity is visible;
+- MU-operated, MU-shadow, and cash-baseline rows are real production-adapter outputs;
+- identity rejection is event-backed;
+- proposal rows are canonically ordered;
+- current capital, disagreement, evidence gaps, and compact health are visible;
+- full event/projection diagnostics are accessible through Operations & Replay;
+- session state is limited to ephemeral UI controls;
+- existing research/replay/optimizer surfaces are visibly non-authoritative.
 
-The section below is retained for historical continuity. DASH-0 supersedes it as the first-class dashboard structure with:
+## Explicitly unavailable in Slice 1
 
 ```text
-Command Center
-Opportunities
-Thesis Card
-Market Behavior
-Entry & Hold Discipline
-Portfolio & Allocation
-Research Lab
-Settings & Ops
+proposal selection
+composite target resolution
+optimizer or risk engine
+transition preview
+authorization
+book mutation
+certification change
+path deletion
 ```
 
-Any runtime implementation must follow the DASH-0 IA unless a later signed decision changes it.
+The UI must represent these as unavailable future capabilities rather than simulated controls.
 
-### 1. Opportunity Watchlist
+## Later product flow
 
-Shows watched opportunities and their current dashboard state.
+Slice 2 adds intent-aware selection and target conflict handling. Slice 3 adds calculation-only preview, stale-bound authorization, application, certification, and exact authority replay.
 
-Expected future fields:
+## Product quality bar
 
-- ticker/name;
-- thesis label;
-- current state;
-- source-quality badge;
-- freshness badge;
-- last reviewed time;
-- open contradiction count.
-
-### 2. Thesis Card
-
-Shows the supercycle thesis.
-
-Expected future fields:
-
-- thesis summary;
-- structural driver;
-- catalyst path;
-- evidence log;
-- contradiction log;
-- operator notes;
-- source-quality state.
-
-### 3. GodView Market Behavior Panel
-
-Shows market-behavior context:
-
-- IV / volatility surface;
-- options whales;
-- gamma / dealer map;
-- short squeeze;
-- CTA/systematic pressure;
-- sector rotation;
-- ETF/passive flows;
-- dark-pool / block activity;
-- ownership whales;
-- microstructure;
-- catalysts/news/narrative;
-- regime.
-
-Each tile must label observed vs estimated status and freshness.
-
-### 4. Entry Discipline Panel
-
-Answers:
-
-```text
-Is buying now premature, acceptable, or improving?
-```
-
-Future context:
-
-- left-side risk;
-- stabilization;
-- confirmation;
-- buying range;
-- liquidity/spread sanity;
-- source freshness.
-
-### 5. Hold Discipline Panel
-
-Answers:
-
-```text
-Is the operator at risk of selling a winner too early?
-```
-
-Future context:
-
-- thesis intact or weakening;
-- momentum supportive or deteriorating;
-- flows supportive or crowded;
-- trim optional vs exit risk;
-- thesis broken markers.
-
-### 6. Source-Quality Rail
-
-Every future dashboard state must expose:
-
-```text
-source_quality
-provider
-provider_feed
-freshness
-latency
-confidence
-observed_vs_estimated
-allowed_use
-forbidden_use
-manifest_uri
-```
-
-## Forbidden Dashboard Behavior
-
-G7.1A does not add or authorize:
-
-- new runtime dashboard behavior;
-- automatic buy/sell signals;
-- live alerts;
-- broker buttons;
-- Alpaca live behavior;
-- OpenClaw notifications;
-- candidate rankings;
-- strategy search results;
-- backtest rankings;
-- provider ingestion status promises that do not exist.
-
-## Relationship To Existing Dashboard
-
-The already-completed dashboard drift-monitor dependency fix/test remains valid. G7.1A does not expand that code path.
-
-This document describes future product structure only.
-
-## Future Implementation Sequence
-
-- G7.2: define Unified Opportunity Engine state machine.
-- G7.3: define GodView signal source policy.
-- G10: build dashboard prototype for watchlist state view.
-- Future signed decision only: consider paper-only buying-range / hold-discipline review prompts after source and state gates are ready. This is not authorized by DASH-0.
+The slice is not complete when contracts or pages compile independently. It completes only when the real three-proposal episode renders through `dashboard.py`, identity rejection replays from ordered events, and negative-authority checks prove no hidden selection/mutation path.

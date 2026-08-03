@@ -1,62 +1,74 @@
 # Impact Packet — Current
 
-Date: 2026-08-02
-Phase: `GV-PROSPECTIVE-PAPER-BASELINE-1`
-Status: `FROZEN_REMOTE_CANDIDATE; LOCAL_GATES_PASS`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Status: `BASELINE BANKED; DOCS CUSTODY PENDING; IMPLEMENTATION NOT STARTED`
 
 ## Product impact
 
-The accepted 25-security certified portfolio now has a runtime prospective operating path. An operator can supply unscripted observation content, source locator, UTC timestamp, owned instruments, explicit review proposals, and rationale; preview deterministic consequences; and confirm or reject. Confirmed episodes persist and reconstruct exactly after fresh-process reopen. Rejected proposals remain append-only evidence but cannot mutate authoritative portfolio state.
+The active unit changes from one MU approval flow to one portfolio-wide PIT decision episode. MU operated, MU shadow, book-derived cash, and future modules become peer proposals against one certified book.
 
-This is capability evidence only. Automated tests inject runtime values, so accepted progress remains `62/100` pending real operator-supplied episodes.
+## User-flow impact
 
-## Changed implementation surfaces
-
-- `gv_portfolio_v0/operated_scenarios.py` — registers one prospective profile derived from the accepted 25-security catalogue without copying the catalogue or authoring later episodes.
-- `gv_portfolio_v0/prospective.py` — runtime request validation, mutation-free preview, explicit confirmation/rejection, append-only event/state projection, transition execution, and full-state reconstruction.
-- `gv_portfolio_v0/operated_storage.py` — reuses the confined atomic persistence path for prospective workspaces and dispositions.
-- `gv_portfolio_v0/book.py` — treats prospective rejection as a non-economic event.
-- `views/gv_prospective_paper_workspace.py` — two-action operator flow for preview and confirm/reject.
-- `operated_portfolio_app.py` — routes the environment-selected prospective scenario through the existing app.
-- `tests/gv_portfolio_v0/test_prospective.py` — core authority, projection, transition, rejection, persistence, and fresh-process reconstruction coverage.
-- `tests/gv_portfolio_v0/test_prospective_app.py` — black-box Streamlit no-change, transition, and rejection flows.
-- `.github/workflows/gv-operated-portfolio.yml` — prospective view and active brief path ownership.
-
-## Interface impact
-
-- Runtime observation envelope becomes the only source of later prospective episode content.
-- Per-security outcomes remain `ADMIT`, `REJECT`, or `ABSTAIN`; `CASH` remains portfolio-level.
-- Non-`ADMIT` target quantity is constrained to `0`.
-- Preview remains non-authoritative; confirmation or rejection is required.
-- Repeated episode state is projected from the append-only event log rather than fixed scenario status/count branches.
-- Existing operated 10/25 and 50/100 storage identities remain unchanged.
-
-## Validation impact
-
-- Prospective core: `11/11 PASS`.
-- Prospective UI: `3/3 PASS`.
-- Retained operated/25/App: `23/23 PASS`.
-- Scale repair: `13/13 PASS`.
-- Shared accounting/allocation/execution/replay/strategy/vertical: `104/104 PASS`.
-- Historical bounded/scale/universe/challenger: `24/24 PASS`.
-
-## Roadmap impact
-
-The sequence is intentionally amended to:
+Slice 1 default experience:
 
 ```text
-prospective baseline capability
-→ real operator-supplied prospective evidence
-→ real shadow Challenger on the same certified 25-security set
-→ Universe custody when broader membership is required
-→ separately authorized Limited Live
+Command Center
+→ inspect one exact five-field PIT identity
+→ inspect real MU-operated, MU-shadow, and cash proposal rows
+→ inspect identity acceptance/rejection, disagreement, evidence gaps, and current capital
+→ navigate to evidence, portfolio history, strategy research, or operational replay
 ```
 
-Legal review is not a blocker for paper Challenger work. It remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
+Selection, preview, confirmation, and certification remain visibly unavailable until later slices.
 
-## Open impact
+## Architecture impact
 
-- Candidate `9c7e75a`, tree `20d5eb7`, is frozen and remote-equal.
-- Hosted exact-SHA Windows/Linux evidence remains open.
-- Genuine prospective evidence remains open.
-- Old Challenger remains a historical custody primitive and must be replaced, not adapted.
+- `dashboard.py` remains the sole future app.
+- Six pages replace the current three-page endgame.
+- Strategy output becomes immutable proposal evidence.
+- Verified adapters translate active repository objects without new serialization paths.
+- Identity acceptance occurs in a typed command handler.
+- Governance facts use one bounded ordered digest-chained in-memory stream; Slice 1 adds no durable persistence.
+- Proposal/episode state is projected deterministically from events.
+- Portfolio calculation and mutation remain outside dashboard and Slice 1.
+- Standalone paths are deleted only after repository-grounded proof.
+
+## Repository-grounded findings
+
+- `views/command_center.py` does not exist and is a new file.
+- The operated source is the active prospective workspace/proposal path.
+- The shadow source is `core/gv_v2_mu_nvda_shadow_decision.py`.
+- Cash is present in the certified workspace/book; a standalone cash artifact is not assumed.
+- The five-file same-evidence baseline is banked at `a520f475bfa4fca42a68a22165ab3ad8960c0bc9` after 9 focused tests passed.
+- No production `market_snapshot_id` exists; Slice 1 must use the approved proof-carrying cash-only no-market identity or fail closed.
+- Certified head must resolve to the final authoritative event in the exact certified prefix, not merely the last event array element.
+- The verified standalone application path is `operated_portfolio_app.py`.
+
+## Touched interfaces expected next
+
+- current operated workspace/proposal schema;
+- independent shadow decision schema;
+- certified book/head/cash identity;
+- decision-free evidence identity and proof-carrying cash-only no-market identity;
+- bounded in-memory event ordering/digest conventions;
+- dashboard registry and Streamlit composition root.
+
+## Exact Slice 1 files
+
+```text
+core/gv_pit/__init__.py
+core/gv_pit/contracts.py
+core/gv_pit/adapters.py
+core/gv_pit/governance.py
+core/gv_pit/read_models.py
+views/command_center.py
+views/page_registry.py
+dashboard.py
+tests/test_dash_1_page_registry_shell.py
+tests/test_gv_pit_transaction.py
+```
+
+## Score impact
+
+Accepted score remains `62/100`. Documentation, contracts, and read-only shell work do not earn uplift. Repeated real operation and independent evidence remain required.

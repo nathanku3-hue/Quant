@@ -1,38 +1,64 @@
 # Multi-Stream Contract — Current
 
-Date: 2026-08-02
-Phase: `GV-PROSPECTIVE-PAPER-BASELINE-1`
-Canonical authority: `docs/context/gv_endgame_authority_current.md`
-Status: `IMPLEMENTED_CANDIDATE; LOCAL_GATES_PASS; REAL_PROSPECTIVE_EVIDENCE_PENDING`
-Accepted score: `62/100`
-Limited Live: `CLOSED; NOT_AUTHORIZED`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Status: `ONE SERIAL PRODUCT TRANSACTION; BOUNDED PARALLELISM ONLY`
 
-## Stream results
+## Active layers and ownership
 
-| Stream | Owned result | State |
-|---|---|---|
-| Product/runtime | existing app accepts runtime observation, preview, confirm, and reject | PASS |
-| Decision authority | explicit outcome/score/quantity/thesis proposals become authority only after confirmation | PASS |
-| Event/replay | one append-only projector reconstructs confirmed and rejected episodes | PASS |
-| Persistence | existing confined atomic storage persists and fresh-process reopens full state | PASS |
-| Accounting/execution | no-change preserves economics; transition produces SELL/REDUCE plus BUY/FUND and residual `0` | PASS |
-| Docs/ops | roadmap, active brief, current truth, workflow ownership, evidence, decision, and lesson records synchronized | IN PROGRESS |
-| Real prospective evidence | three genuine operator-supplied episodes | PENDING |
-| Challenger | real independent shadow proposal on same 25-security set | CLOSED UNTIL EVIDENCE |
-| Limited Live | separate legal, custody, paper-operation, liquidity, and authorization gates | CLOSED |
+### Layer 0 — baseline custody
 
-## Coordination law
+Owns the exact five current code/test paths and focused test/commit evidence.
 
-- The accepted 25-security terminal and repair base remain immutable.
-- Runtime episode content cannot enter scenario code.
-- Per-security outcomes are `ADMIT`, `REJECT`, or `ABSTAIN`; `CASH` is portfolio-level.
-- Non-`ADMIT` target quantity is `0`.
-- Preview cannot persist or mutate authority.
-- Confirmation or rejection appends through one projector and one storage path.
-- Test-injected runtime values prove capability only, not prospective evidence.
-- Universe custody and legal review do not block paper Challenger comparison.
-- Legal review remains mandatory before broker credentials, automated submission, client assets, advice activity, or real capital.
+### Layer 1 — contracts
 
-## Current bottleneck
+Owns PIT identity, evidence/digests, targets/normalization, strict extensions, and proposal.
 
-The software capability is frozen and remote-equal at candidate `9c7e75a`. The next product bottleneck is evidence, not architecture: collect hosted CI, then execute and retain three genuine operator-supplied episodes before score uplift or real shadow Challenger opening.
+### Layer 2 — adapters
+
+Owns mapping from verified operated, shadow, and certified-book cash sources. It owns no business decisions.
+
+### Layer 3 — governance commands
+
+Owns proposal submission, five-field identity decision, and accepted/rejected event emission.
+
+### Layer 4 — event authority
+
+Owns stream ordering, digest chain, append/read, duplicate/gap rejection, and idempotence.
+
+### Layer 5 — projections
+
+Owns pure deterministic read-model folding and canonical ordering.
+
+### Layer 6 — product surface
+
+Owns six-page registry, Command Center, read rendering, AppTest, and session-state authority scan.
+
+## Deferred streams
+
+- selection and intent-aware composition;
+- portfolio risk/cost preview and stale-bound authorization;
+- application/certification replay changes;
+- content deletion;
+- CTA/macro/provider expansion;
+- broker/live work.
+
+## Parallelism law
+
+Layers are acceptance dependencies and execute in order. Parallel implementation is allowed only after the shared lower-layer contract is frozen, files are disjoint, and each lane can merge without creating a second event, persistence, identity, or dashboard authority.
+
+No layer may be reviewed or banked as standalone product progress. Slice 1 passes only when the real three-row episode renders through `dashboard.py`.
+
+## Handoffs
+
+```text
+contracts → adapters: exact typed inputs and canonical digests
+adapters → handler: full immutable proposal
+handler → event authority: accepted/rejected fact
+ordered events → projector: valid canonical stream
+projector → dashboard: immutable read model
+```
+
+## Stop condition
+
+Any ambiguity in book head, market snapshot, cash yield, evidence digest, event ordering, or lifecycle source is surfaced and resolved against repository truth; it is never filled by assumption.

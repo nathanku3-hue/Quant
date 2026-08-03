@@ -1,3 +1,15 @@
+# Active Specification Cutover — All-Capital PIT Dashboard
+
+Active specification authority: 2026-08-03. Final planning round frozen.
+
+Hierarchy: L1 GodView certified portfolio OS; L2 active layers Custody, Contracts, Verified Adapters, Governance Commands, Ordered Events, Read Projections, Product Surface; L2 deferred layers Selection/Composition, Portfolio Authority, Strategy Expansion, and Limited Live; L3 current flow Baseline Bank → Contracts → Adapters → Handler → Events → Projector → Read-Only Command Center.
+
+Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`. Planning checklist: `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`. Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`. Accepted score remains `62/100`; Limited Live remains closed.
+
+Slice 1 compares real MU-operated, MU-shadow, and certified-book cash proposals under one five-field PIT identity using typed immutable contracts, command-handler acceptance, an ordered digest-chained event stream, and deterministic read projections. It ends at the read-only six-page Command Center and includes no selection, optimizer/risk math, preview, authorization, book mutation, certification change, or deletion. Historical material below is retained but does not compete with this authority.
+
+---
+
 V2 PEAD Alpha Interpretation Gate Contract (2026-06-24)
 
 - Gate file: `docs/phase_brief/v2-pead-alpha-interpretation-gate.md`.

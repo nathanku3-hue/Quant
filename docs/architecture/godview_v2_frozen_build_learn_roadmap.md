@@ -1,3 +1,9 @@
+# Active Supersession Notice — 2026-08-03
+
+The accepted historical slices and custody below remain immutable evidence. Active forward authority is now `docs/architecture/top_level_roadmap.md`, `docs/architecture/dashboard_all_capital_pit_contract.md`, and `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`. The next gate is `GV-DASHBOARD-ALL-CAPITAL-PIT-1`, executed layer first as one real read-only transaction: baseline bank → contracts → verified adapters → command-handler identity decision → ordered events → pure projector/read models → six-page Command Center. Selection, risk/preview authority, mutation, certification change, deletion, strategy expansion, and Live remain later or closed. Accepted score remains `62/100`; Limited Live remains closed.
+
+---
+
 # GodView v2 Corrected Build × Learn Roadmap
 
 Status: `R0_BANKED; INDEPENDENT_AUDIT_PENDING`

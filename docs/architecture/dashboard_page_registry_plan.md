@@ -1,100 +1,66 @@
 # Dashboard Page Registry Plan
 
-Status: DASH-0 planning-only registry plan
-Authority: Phase 65 DASH-0
-Date: 2026-05-10
+Status: `ACTIVE SLICE-1 PRODUCT CONTRACT`
+Date: 2026-08-03
+Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
+Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`
 
-## Purpose
+## Runtime mechanism
 
-Plan the future dashboard page registry/sidebar shell. No runtime code is implemented in DASH-0.
-
-## Preferred Future Mechanism
-
-Use Streamlit `st.Page` and `st.navigation` in a later DASH-1 runtime phase.
-
-Rationale:
-
-- It lets the entrypoint become a shared router/frame.
-- It supports explicit page labels, icons, URL paths, and grouping.
-- It is more flexible than relying on filename ordering in a `pages/` directory.
-
-## Candidate Registry Shape
-
-Future DASH-1 can implement a page registry shaped like:
+Keep Streamlit `st.Page` and `st.navigation`. `dashboard.py` remains the shared frame and sole future application. `views/page_registry.py` owns exactly this order:
 
 ```text
-app shell
-  common frame
-  shared status badges
-  shared governance footer
-  st.navigation(page_groups)
+Command Center                 default
+Discovery & Analysis
+Decisions & Thesis
+Portfolio & Rotation
+Strategy Modules
+Operations & Replay
 ```
 
-Planned page groups:
+Repository grounding: `views/command_center.py` does not currently exist and is a new Slice 1 file.
+
+## Registry law
+
+- Registration fails closed when any required page is missing or duplicated.
+- Command Center owns the default URL path.
+- Page renderers consume typed read models or bounded existing renderers.
+- Navigation creates no proposal, identity, event, portfolio, or certification authority.
+- Discovery & Analysis remains functional during the migration.
+- Existing research/replay surfaces are labeled non-authoritative.
+
+## Slice 1 composition root
 
 ```text
-Operate
-  Command Center
-  Opportunities
-  Thesis Card
-  Market Behavior
-  Entry & Hold Discipline
-
-Portfolio
-  Portfolio & Allocation
-
-Research
-  Research Lab
-
-System
-  Settings & Ops
+verified source objects
+→ adapters
+→ proposal submission handler
+→ ordered governance events
+→ deterministic projector
+→ DecisionEpisodeReadModel
+→ dashboard.py composition root
+→ views.command_center renderer
 ```
 
-## Future Page Modules
+The registry never builds proposals, validates identity, appends events, or reads canonical state from raw session state.
 
-Suggested future module names:
+## Expected product-surface files
 
 ```text
-views/dashboard_pages/command_center.py
-views/dashboard_pages/opportunities.py
-views/dashboard_pages/thesis_card.py
-views/dashboard_pages/market_behavior.py
-views/dashboard_pages/entry_hold_discipline.py
-views/dashboard_pages/portfolio_allocation.py
-views/dashboard_pages/research_lab.py
-views/dashboard_pages/settings_ops.py
+M  dashboard.py
+M  views/page_registry.py
+A  views/command_center.py
+M  existing page-registry tests
+A/M Command Center AppTest and authority-state tests
 ```
 
-These are planning names only. DASH-0 does not create them.
+Contract/adapter/event/projector files are required lower layers of the same Slice 1 transaction and are governed by the canonical contract. The earlier exact seven-file shell scope is superseded.
 
-## Shared Frame Contract
+## Acceptance
 
-Future shell should provide:
-
-- app title and state-only boundary;
-- data freshness badge;
-- drift status badge only, not full drift workflow;
-- source-quality badge;
-- disabled footer facts:
-  - `orders_enabled = false`
-  - `alerts_enabled = false`
-  - `rankings_enabled = false`
-  - `scores_enabled = false`
-  - `providers_enabled = false`
-
-## Migration Guardrails
-
-- DASH-1 may relocate legacy content into the new shell.
-- DASH-1 may not add new data, metrics, claims, providers, alerts, broker calls, ranking, scoring, or buy/sell/hold behavior.
-- DASH-1 must keep all page labels state-first and operator-readable.
-- DASH-1 must run Streamlit smoke and visual QA before closeout.
-
-## Held Runtime Task
-
-The optimizer UX fix is held for a later runtime task:
-
-```text
-Align Max weight and Max sector weight as one Risk limits control group in optimizer_view.py.
-```
-
-No `optimizer_view.py` change is authorized by DASH-0.
+- six pages render in the frozen order;
+- Command Center is default;
+- real MU-operated, MU-shadow, and book-cash rows render through projected state;
+- no static production proposal rows exist;
+- no raw session-state governance authority is read;
+- no selection, risk, preview, mutation, certification change, or deletion occurs.
