@@ -1,24 +1,14 @@
 {
   "schema_version": "2.0.0",
-  "generated_at": "2026-06-21T12:10:37.862Z",
-  "template_count": 29,
+  "generated_at": "2026-08-03T00:37:06.410Z",
+  "template_count": 27,
   "hash_algorithm": "sha256",
   "line_ending_normalization": "LF",
   "templates": [
     {
-      "source_path": "templates/contracts/clean-code-contract.json",
-      "installed_path": ".meta-harness/templates/contracts/clean-code-contract.json",
-      "content_hash": "51fba75ed9c73328299e1beca30432ed94e142c1aae50d6862e33861b7ce2b52"
-    },
-    {
       "source_path": "templates/contracts/context-adoption-contract.md",
       "installed_path": ".meta-harness/templates/contracts/context-adoption-contract.md",
       "content_hash": "30349e7e38dd036ca5ed82a83c45d388c3ade04d7e4d14e208efec24552767c0"
-    },
-    {
-      "source_path": "templates/contracts/context-gate-schema.json",
-      "installed_path": ".meta-harness/templates/contracts/context-gate-schema.json",
-      "content_hash": "2fc46a40692fbad5c1b39feef5630b4e28bf4dd1693b51a7b0e6fb2fc1f4a886"
     },
     {
       "source_path": "templates/contracts/decision-inbox-contract.md",
@@ -53,7 +43,7 @@
     {
       "source_path": "templates/contracts/ship-fast-decision-gate.md",
       "installed_path": ".meta-harness/templates/contracts/ship-fast-decision-gate.md",
-      "content_hash": "286b4273ceb1df93c1af35c4738ae070c53a1aff974ed274575633abee615afb"
+      "content_hash": "adcc09f5e8eb2dcc5254eeadaf23ac7b31644754e6ace19d20ff6d43d63851cd"
     },
     {
       "source_path": "templates/contracts/skill-distillation-contract.md",
@@ -83,7 +73,7 @@
     {
       "source_path": "templates/contracts/worker-done-contract.md",
       "installed_path": ".meta-harness/templates/contracts/worker-done-contract.md",
-      "content_hash": "cd5596592b8092b7bac219fa8112b72f8976399af448931614dbaccd5bf4f37a"
+      "content_hash": "c26c6aa13e5fbb4b4619cc8cff2aa92766445f3dbd3f1deca5b477c439f7b0d5"
     },
     {
       "source_path": "templates/skills/boundary-gate.md",
@@ -93,7 +83,7 @@
     {
       "source_path": "templates/skills/build-vs-borrow-router.md",
       "installed_path": ".meta-harness/templates/skills/build-vs-borrow-router.md",
-      "content_hash": "fe4516833c1bd15cd7fee523a4d3b215469682135069cc16f3422c6adf8ad3a8"
+      "content_hash": "eca68a464d7b0c1b6c86235380317173341564a7342c0fb35385f0efe16e1506"
     },
     {
       "source_path": "templates/skills/context-packet.md",
@@ -118,7 +108,7 @@
     {
       "source_path": "templates/skills/expert-context-packer.md",
       "installed_path": ".meta-harness/templates/skills/expert-context-packer.md",
-      "content_hash": "696c96a13ccb853341acda13634a6f8b98afe25960262674051eb1d70659c340"
+      "content_hash": "b4984b3d58915a9840af12d04a1241672823f031d7b84b7a405f30ba19e63e8b"
     },
     {
       "source_path": "templates/skills/expert-front-card.md",
@@ -133,17 +123,17 @@
     {
       "source_path": "templates/skills/post-worker-github-actions.md",
       "installed_path": ".meta-harness/templates/skills/post-worker-github-actions.md",
-      "content_hash": "7f09e840e9b5cdafc886d07339b902ce2246a93b99fc19e8b9bd2d7888554b0b"
+      "content_hash": "a4aab715255ae65334fd8ac98e24c3bfe6f99d8fff34bc5eab53b926c3b342b7"
     },
     {
       "source_path": "templates/skills/scope-selector.md",
       "installed_path": ".meta-harness/templates/skills/scope-selector.md",
-      "content_hash": "3a2e86c26488a1859d413707b0409ed5ccecc439c1f1efdb103e0fa31e17d9aa"
+      "content_hash": "9841ccb833811896ea37401581797dfce423f580b270df288bbb6da5e18e1f63"
     },
     {
       "source_path": "templates/skills/ship-fast-decision-router.md",
       "installed_path": ".meta-harness/templates/skills/ship-fast-decision-router.md",
-      "content_hash": "f1869ebde3bce0a32383a4453d405323e8c96b6aa11d3e658b884763177afe55"
+      "content_hash": "578969e0ae8f63ca8811db24d5d9839e9b4d2d2f7dc28c147ae71cf867a92a61"
     },
     {
       "source_path": "templates/skills/subagent-workcell.md",
@@ -151,5 +141,5 @@
       "content_hash": "44debb09279b9da8ef7ed2c1697a9d966ce4d5d703b54008a0c0744b2978e4df"
     }
   ],
-  "manifest_hash": "011fdbd2c99edae6c80658e6b21b104abe13f0851fb294a1208d76c2b382878c"
+  "manifest_hash": "f125b9e1531498d0bc3db060a8add6436701a633df689e69693f8436774d2c30"
 }
