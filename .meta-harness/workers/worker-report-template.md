@@ -1,3 +1,8 @@
+User journey executed: <complete journey actually run>
+Observable result produced: <user-visible result>
+User accomplished or learned: <practical outcome>
+Product blocker: <demonstrated blocker or none>
+Next executable product action: <nearest action, USE_PRODUCT, or none>
 Outcome: <DONE|PARTIAL_WITH_EXPLICIT_SCOPE|REJECTED>
 Round: not recorded
 Progress: not recorded
@@ -57,12 +62,16 @@ ship_gate_tier: <FAST|REVIEW|SLOW|BLOCK>
 task_resolution: <ship|blocked|decision-needed|follow-up-queued>
 
 Rules:
-- The first non-empty line must be Outcome: <DONE|PARTIAL_WITH_EXPLICIT_SCOPE|REJECTED>.
-- The first visible fields must be Outcome, Round, Progress, and Confidence, with no title before them.
+- The first five non-empty lines must be User journey executed, Observable result produced, User accomplished or learned, Product blocker, and Next executable product action.
+- Outcome and internal metadata appear only after those five product fields, with no title before them.
 - Ship gate tier and Task resolution must appear immediately after Updated.
 - The Ship-Fast Decision Gate concept is visible in top metadata and folded into What decision is needed.
-- This template is an artifact, not the default final chat answer.
-- Final chat answers must compress this report into Status, Why, Next, and Decision needed, at most four short lines, unless the user asks for evidence.
+- This template is a WORKER_REPORT evidence surface, not the default final chat answer or an ORCHESTRATOR_HANDOVER.
+- Final chat answers must use the shortest adaptive PM_CLOSURE that preserves result, useful reason or nearest evidence, remaining next action, and the highest-priority real user decision. Omit empty or none items; labels are optional.
+- The four-item budget applies only to normal human-facing closure. Requested audits, reviews, safety evidence, and orchestrator handover state are separate surfaces and do not convert PM_CLOSURE into an audit packet.
+- Decision-needed questions use exactly one owner tag: human: taste/acceptance, expert: domain knowledge, or expert: system methodology.
+- Authority, credentials, publishing, provider access, execution permission, protected-boundary access, and commit or rollout permission remain Approval needed or Blocked, not expert-decision tags.
+- SLOW and tier metadata may remain in WORKER_REPORT accountability and evidence fields, but do not appear in normal chat or PM_CLOSURE output.
 - Hide internal labels, hashes, absolute paths, allowlists, command logs, and accountability booleans from final chat unless the user asks for them.
 - If the user asks for approval text, emit only the pasteable approval block and do not add an audit recap.
 - Do not use # Worker PM Brief, # Worker Report, numbered reviewer logs, command logs, SAW internals, or ClosurePacket lines as the primary report structure.

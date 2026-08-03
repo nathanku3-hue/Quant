@@ -1,53 +1,43 @@
 ---
 name: scope-selector
-description: Choose one bounded repo scope from current truth before execution.
+description: Select the nearest complete product action from authority-ordered truth.
 ---
 
-# Scope Selector
+# Outcome-First Scope Selector
 
-Use this when a run has multiple plausible next steps, unclear ownership, handoff risk, or budget pressure.
+## Authority-ordered inputs
 
-## Inputs
+1. Locked product intent and owner-signed acceptance.
+2. Immutable product, closure, package, proof, and mechanics evidence.
+3. Git facts and changed dependency surfaces.
+4. Status, roadmaps, reports, and summaries last.
 
-1. Read the current harness state first:
-   - `.meta-harness/status.md`
-   - `.meta-harness/events.jsonl`
-   - relevant `.meta-harness/streams/*.md`
-   - recent `.meta-harness/workers/*.md`
-2. Run the build-vs-borrow router when the task may be unnecessary, already solved, platform-native, or authority-boundary work.
-3. Read wider repo docs only when the harness state conflicts or does not name the active bottleneck.
+Resolve conflicts in favor of the higher source. Status cannot create work when higher authority says the product is closed.
 
-## Output Contract
+## Selection
 
-This schema is an internal planning artifact. Do not paste it into normal chat unless the user explicitly asks for a formal scope artifact or full plan. In normal chat, state only the recommended next action, one reason, the operative boundary, and any decision needed.
+Name:
 
 ```text
-Pre-route Decision: <NO_BUILD|USE_EXISTING_REPO_PATTERN|USE_PLATFORM_NATIVE|MINIMAL_PATCH|HUMAN_TASTE|EXPERT_PACKET|AUTHORITY_BLOCK>
-Chosen Scope: <one bounded scope>
-Why Now: <one line>
-Why Not Alternatives: <one line per rejected alternative>
-Low-Confidence Items: <item or none>
-Out-of-Boundary Items: <item or none>
-Stop Rules: <conditions that halt execution>
-Demo Target: <smallest proof target>
-File Budget: <max files and owned paths/categories>
+Product result: <observable user outcome>
+Journey state: <not run|partial|complete>
+Primary action: <nearest complete action>
+Affected evidence: <only gates whose inputs changed>
+Demonstrated blockers: <list or none>
 ```
 
-## Selection Rules
+When the journey has not run, allow at most one audit/repair round and then execute it. Select one functional slice that owns implementation through terminal closure; do not create acceptance-only, integration-only, packaging-only, review-only, documentation-only, or evidence-refresh product slices.
 
-1. Prefer the smallest scope that unlocks the active bottleneck.
-2. Prefer no-build, existing repo patterns, platform-native behavior, and installed templates before new implementation.
-3. Preserve explicit non-goals, blocked actions, and stop criteria.
-4. Do not pick a scope that requires unapproved production-impacting operations or authority expansion.
-5. If no safe bounded scope exists, output `Chosen Scope: BLOCKED` and name the missing approval or evidence.
+A blocker requires evidence of journey prevention, material conclusion invalidation, credible irreversible loss, or supported-platform unusability. Everything else is non-blocking residue.
 
-## Stop Rules
+Reuse passed evidence when its declared input surface is unchanged. Rerun only the affected gate unless new concrete evidence demonstrates a product-relevant defect.
 
-Stop before execution when:
+## Terminal stop
 
-- owned files cannot be named;
-- acceptance checks cannot be named;
-- required approval is absent;
-- current truth surfaces disagree on the active bottleneck;
-- the build-vs-borrow pre-route is `NO_BUILD`, `HUMAN_TASTE`, `EXPERT_PACKET`, or `AUTHORITY_BLOCK`;
-- the file budget would cross an explicit boundary.
+For shipped, value-confirmed, maintenance, or no-active-slice state:
+
+- no warrant or incomplete defect warrant → `NO_BUILD`, `USE_PRODUCT`;
+- explicit owner scope change → `OWNER_DECISION_REQUIRED`, `REQUEST_OWNER_AUTHORIZATION`;
+- complete observed supported-use defect warrant → `BUILD_RECOMMENDED`, `SELECT_SMALLEST_REPAIR`.
+
+Never claim successor activation after closure. Never queue follow-up work after `NO_BUILD`.
