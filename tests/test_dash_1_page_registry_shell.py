@@ -3,7 +3,6 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-import pandas as pd
 from streamlit.testing.v1 import AppTest
 
 from core.gv_e0a_operable import publish_e0a_current_decision
@@ -13,8 +12,12 @@ from core.gv_fs0_publish import (
 )
 from views.page_registry import (
     APPROVED_PAGE_TITLES,
+    COMMAND_CENTER_PAGE_ROUTE,
+    COMMAND_CENTER_PAGE_TITLE,
+    DECISIONS_THESIS_PAGE_TITLE,
     DISCOVERY_PAGE_TITLE,
     LEGACY_PAGE_MOVEMENT,
+    OPERATIONS_REPLAY_PAGE_TITLE,
     PAGE_GROUPS,
     PORTFOLIO_PAGE_ROUTE,
     PORTFOLIO_PAGE_TITLE,
@@ -23,19 +26,6 @@ from views.page_registry import (
 
 
 DASHBOARD = Path("dashboard.py")
-
-
-def _app_dataframe_values(app: AppTest) -> list[pd.DataFrame]:
-    frames: list[pd.DataFrame] = []
-    for element in app.dataframe:
-        value = element.value
-        if isinstance(value, pd.DataFrame):
-            frames.append(value)
-            continue
-        data = getattr(value, "data", None)
-        if isinstance(data, pd.DataFrame):
-            frames.append(data)
-    return frames
 
 
 def _app_status_text(app: AppTest) -> str:
@@ -48,46 +38,46 @@ def _app_status_text(app: AppTest) -> str:
     return "\n".join(values)
 
 
-def test_dash_1_approved_pages_are_registered() -> None:
+def test_dash_1_approved_pages_are_registered_in_frozen_order() -> None:
     assert APPROVED_PAGE_TITLES == (
-        PORTFOLIO_PAGE_TITLE,
+        COMMAND_CENTER_PAGE_TITLE,
         DISCOVERY_PAGE_TITLE,
+        DECISIONS_THESIS_PAGE_TITLE,
+        PORTFOLIO_PAGE_TITLE,
         STRATEGY_PAGE_TITLE,
+        OPERATIONS_REPLAY_PAGE_TITLE,
     )
-
     grouped_pages = tuple(page for pages in PAGE_GROUPS.values() for page in pages)
     assert grouped_pages == APPROVED_PAGE_TITLES
 
 
-def test_dash_1_legacy_content_maps_to_approved_pages() -> None:
+def test_dash_1_legacy_content_maps_to_final_pages() -> None:
+    assert LEGACY_PAGE_MOVEMENT["Command Center"] == COMMAND_CENTER_PAGE_TITLE
     assert LEGACY_PAGE_MOVEMENT["Opportunities"] == DISCOVERY_PAGE_TITLE
-    assert LEGACY_PAGE_MOVEMENT["Data Health"] == PORTFOLIO_PAGE_TITLE
-    assert LEGACY_PAGE_MOVEMENT["Drift Monitor"] == PORTFOLIO_PAGE_TITLE
+    assert LEGACY_PAGE_MOVEMENT["Thesis Card"] == DECISIONS_THESIS_PAGE_TITLE
+    assert LEGACY_PAGE_MOVEMENT["Data Health"] == OPERATIONS_REPLAY_PAGE_TITLE
+    assert LEGACY_PAGE_MOVEMENT["Drift Monitor"] == OPERATIONS_REPLAY_PAGE_TITLE
     assert LEGACY_PAGE_MOVEMENT["Daily Scan"] == DISCOVERY_PAGE_TITLE
     assert LEGACY_PAGE_MOVEMENT["Backtest Lab"] == STRATEGY_PAGE_TITLE
     assert LEGACY_PAGE_MOVEMENT["Modular Strategies"] == STRATEGY_PAGE_TITLE
     assert LEGACY_PAGE_MOVEMENT["Portfolio Builder"] == PORTFOLIO_PAGE_TITLE
     assert LEGACY_PAGE_MOVEMENT["Options Scenario Research"] == STRATEGY_PAGE_TITLE
-    assert LEGACY_PAGE_MOVEMENT["Command Center"] == PORTFOLIO_PAGE_TITLE
     assert LEGACY_PAGE_MOVEMENT["Entry & Hold Discipline"] == STRATEGY_PAGE_TITLE
-    # Shadow Portfolio removed from live page; must not be in registry
     assert "Shadow Portfolio" not in LEGACY_PAGE_MOVEMENT
 
 
 def test_dash_1_uses_page_registry_not_flat_tabs() -> None:
     source = DASHBOARD.read_text(encoding="utf-8")
-
     assert "build_dashboard_navigation(" in source
     assert "page.run()" in source
     assert "st.tabs(" not in source
 
 
-def test_dash_1_old_tabs_are_not_top_level_navigation_labels() -> None:
+def test_dash_1_old_tools_are_not_top_level_navigation_labels() -> None:
     source = DASHBOARD.read_text(encoding="utf-8")
     navigation_start = source.index("page = build_dashboard_navigation(")
     navigation_source = source[navigation_start:]
-
-    forbidden_top_level = [
+    forbidden_top_level = (
         "Ticker Pool & Proxies",
         "Data Health",
         "Drift Monitor",
@@ -97,34 +87,56 @@ def test_dash_1_old_tabs_are_not_top_level_navigation_labels() -> None:
         "Portfolio Builder",
         "Shadow Portfolio",
         "Hedge Harvester",
-        "Command Center",
         "Research Lab",
         "Settings & Ops",
-    ]
+    )
     for label in forbidden_top_level:
         assert label not in navigation_source
 
 
-def test_dash_1_three_page_renderers_wired() -> None:
+def test_dash_1_six_page_renderers_are_wired() -> None:
     source = DASHBOARD.read_text(encoding="utf-8")
+    expected = (
+        "COMMAND_CENTER_PAGE_TITLE: _render_command_center_page",
+        "DISCOVERY_PAGE_TITLE: _render_discovery_page",
+        "DECISIONS_THESIS_PAGE_TITLE: _render_decisions_thesis_page",
+        "PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page",
+        "STRATEGY_PAGE_TITLE: _render_strategy_page",
+        "OPERATIONS_REPLAY_PAGE_TITLE: _render_settings_ops_page",
+    )
+    for binding in expected:
+        assert binding in source
 
-    assert "PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page" in source
-    assert "DISCOVERY_PAGE_TITLE: _render_discovery_page" in source
-    assert "STRATEGY_PAGE_TITLE: _render_strategy_page" in source
 
-
-def test_dash_1_portfolio_route_has_explicit_default_path() -> None:
-    source = Path("views/page_registry.py").read_text(encoding="utf-8")
-
-    assert "title=PORTFOLIO_PAGE_TITLE" in source
-    assert 'default=True' in source
-    assert "url_path=PORTFOLIO_PAGE_ROUTE" in source
-    assert "renderers[PORTFOLIO_PAGE_TITLE]" in source
-    assert PORTFOLIO_PAGE_TITLE == "Certified Portfolio"
+def test_dash_1_command_center_is_default_and_portfolio_route_is_preserved() -> None:
+    assert APPROVED_PAGE_TITLES[0] == COMMAND_CENTER_PAGE_TITLE
+    assert COMMAND_CENTER_PAGE_ROUTE == "command-center"
     assert PORTFOLIO_PAGE_ROUTE == "portfolio"
+    source = Path("views/page_registry.py").read_text(encoding="utf-8")
+    assert "COMMAND_CENTER_PAGE_TITLE" in source
+    assert "requested_title" in source
+    assert "default=title == requested_title" in source
 
 
-def test_dash_1_default_portfolio_route_renders_current_decision() -> None:
+def test_dash_1_default_route_renders_real_command_center() -> None:
+    app = AppTest.from_file("dashboard.py").run(timeout=120)
+    assert not app.exception, app.exception
+    assert any(header.value == COMMAND_CENTER_PAGE_TITLE for header in app.header)
+
+    identity_table = app.table[0].value
+    proposal_table = app.table[1].value
+    assert identity_table.loc[0, "market_context"] == (
+        "NO_MARKET_DEPENDENCY_CASH_ONLY_V1"
+    )
+    assert set(proposal_table["module"]) == {
+        "GV_REAL_MU_OPERATED",
+        "GV_MU_NVDA_SHADOW",
+        "GV_CERTIFIED_CASH_BASELINE",
+    }
+    assert any(metric.label == "Proposal rows" and metric.value == "3" for metric in app.metric)
+
+
+def test_dash_1_legacy_portfolio_route_renders_current_decision() -> None:
     prior_target = (
         DEFAULT_CURRENT_DECISION_TARGET.read_bytes()
         if DEFAULT_CURRENT_DECISION_TARGET.exists()
@@ -164,7 +176,7 @@ def test_dash_1_default_portfolio_route_renders_current_decision() -> None:
             DEFAULT_CURRENT_DECISION_LOCK.write_bytes(prior_lock)
 
 
-def test_dash_1_legacy_portfolio_sections_are_not_default_authority() -> None:
+def test_dash_1_portfolio_rotation_keeps_legacy_tools_non_authoritative() -> None:
     source = DASHBOARD.read_text(encoding="utf-8")
     tree = ast.parse(source)
     function = next(
@@ -192,14 +204,16 @@ def test_dash_1_legacy_portfolio_sections_are_not_default_authority() -> None:
 
 
 def test_dash_1_forbidden_runtime_scope_is_not_added() -> None:
-    source = DASHBOARD.read_text(encoding="utf-8") + "\n" + Path("views/page_registry.py").read_text(encoding="utf-8")
-    forbidden_tokens = [
+    source = DASHBOARD.read_text(encoding="utf-8") + "\n" + Path(
+        "views/page_registry.py"
+    ).read_text(encoding="utf-8")
+    forbidden_tokens = (
         "submit_order",
         "buy_sell_hold",
         "factor_scout",
         "local_factor_scout",
         "phase34_factor_scores",
-    ]
+    )
     lowered = source.lower()
     for token in forbidden_tokens:
         assert token not in lowered

@@ -43,9 +43,13 @@ from views.optimizer_view import (
 from views.drift_monitor_view import render_drift_monitor_view
 
 from views.page_registry import build_dashboard_navigation
+from views.page_registry import COMMAND_CENTER_PAGE_TITLE
+from views.page_registry import DECISIONS_THESIS_PAGE_TITLE
 from views.page_registry import DISCOVERY_PAGE_TITLE
+from views.page_registry import OPERATIONS_REPLAY_PAGE_TITLE
 from views.page_registry import PORTFOLIO_PAGE_TITLE
 from views.page_registry import STRATEGY_PAGE_TITLE
+from views.command_center import render_command_center, render_decisions_and_thesis
 from views.discovery_view import render_discovery_page
 from views.gv_fs0_portfolio_adapter import (
     GvFs0PresentationError,
@@ -4733,7 +4737,11 @@ def _render_portfolio_builder_placeholder():
 
 
 def _render_command_center_page() -> None:
-    _render_placeholder_page("Command Center")
+    render_command_center(st)
+
+
+def _render_decisions_thesis_page() -> None:
+    render_decisions_and_thesis(st)
 
 
 def _render_placeholder_page(title: str) -> None:
@@ -4803,7 +4811,7 @@ def _render_research_lab_page() -> None:
 
 
 def _render_settings_ops_page() -> None:
-    st.header("Settings & Ops")
+    st.header(OPERATIONS_REPLAY_PAGE_TITLE)
     selected_section = st.radio(
         "Ops workflow",
         ["Data Health", "Drift Monitor"],
@@ -4818,9 +4826,12 @@ def _render_settings_ops_page() -> None:
 
 page = build_dashboard_navigation(
     {
-        PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page,
+        COMMAND_CENTER_PAGE_TITLE: _render_command_center_page,
         DISCOVERY_PAGE_TITLE: _render_discovery_page,
+        DECISIONS_THESIS_PAGE_TITLE: _render_decisions_thesis_page,
+        PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page,
         STRATEGY_PAGE_TITLE: _render_strategy_page,
+        OPERATIONS_REPLAY_PAGE_TITLE: _render_settings_ops_page,
     }
 )
 page.run()
