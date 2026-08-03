@@ -49,13 +49,10 @@ def _app_blob(app: object) -> str:
 
 def _request(workspace: dict[str, object]) -> dict[str, object]:
     review = workspace["reviews"][0]
+    source_evidence = workspace["evidence_references"][0]
     return {
-        "content": (
-            "The verified MU/NVDA reconciliation remains HOLD_FOR_EVIDENCE: NVDA "
-            "partially corroborates a broad constrained-memory environment but does not "
-            "establish Micron-specific physical supply persistence."
-        ),
-        "locator": RECONCILIATION_LOCATOR,
+        "content": source_evidence["content"],
+        "locator": source_evidence["locator"],
         "observed_at": "2026-08-02T12:30:00.000000Z",
         "review_updates": [
             {
@@ -207,4 +204,11 @@ def test_real_mu_app_routes_to_runtime_observation_product(
     assert "MU" in blob
     assert "ABSTAIN" in blob
     assert "NO_POSITION" in blob
+    assert "Immutable source evidence" in blob
+    assert "Instrument identity" in blob
+    assert "Same-evidence decision comparison" in blob
+    assert "same_immutable_evidence=true" in blob
+    assert "shadow_reads_portfolio_decision=false" in blob
+    assert "shadow_mutation_authorized=false" in blob
+    assert "NOT_YET_RECORDED" in blob
     assert "residual=0" in blob

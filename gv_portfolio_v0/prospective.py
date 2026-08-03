@@ -33,6 +33,7 @@ from gv_portfolio_v0.operated import (
 )
 from gv_portfolio_v0.operated_scenarios import (
     PROSPECTIVE_25_SCENARIO_ID,
+    REAL_MU_PROSPECTIVE_SCENARIO_ID,
     get_scenario,
 )
 from gv_portfolio_v0.replay import (
@@ -241,6 +242,17 @@ def _normalize_request(
     )
     if observed_time <= latest_time:
         raise ProspectiveOperationError("OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY")
+    content = _required_text(request.get("content"), field="content")
+    locator = _required_text(request.get("locator"), field="locator")
+    if workspace.get("scenario_id") == REAL_MU_PROSPECTIVE_SCENARIO_ID:
+        initial_evidence = workspace.get("evidence_references", [None])[0]
+        if not isinstance(initial_evidence, Mapping):
+            raise ProspectiveOperationError("REAL_MU_SOURCE_EVIDENCE_REQUIRED")
+        if content != initial_evidence.get("content"):
+            raise ProspectiveOperationError("REAL_MU_EXACT_EVIDENCE_CONTENT_REQUIRED")
+        if locator != initial_evidence.get("locator"):
+            raise ProspectiveOperationError("REAL_MU_EXACT_EVIDENCE_LOCATOR_REQUIRED")
+
     raw_updates = request.get("review_updates")
     if not isinstance(raw_updates, list) or not raw_updates:
         raise ProspectiveOperationError("REVIEW_UPDATES_REQUIRED")
@@ -249,8 +261,8 @@ def _normalize_request(
     if len(ids) != len(set(ids)):
         raise ProspectiveOperationError("REVIEW_UPDATE_INSTRUMENT_DUPLICATE")
     return {
-        "content": _required_text(request.get("content"), field="content"),
-        "locator": _required_text(request.get("locator"), field="locator"),
+        "content": content,
+        "locator": locator,
         "observed_at": _utc_timestamp(observed_time),
         "review_updates": updates,
         "operator_rationale": _required_text(
