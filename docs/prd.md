@@ -8,6 +8,8 @@ The immediate product slice is a real read-only all-proposal PIT transaction: on
 
 Research exception, 2026-08-04: `GV-FINANCIAL-CASCADE-SHADOW-0` adds an isolated, non-authoritative Leningrad bundle adapter and same-engine gross-exposure-cap challenger. It does not alter the active dashboard gate, `RegimeManager`, stock selection, entry/exit logic, certified portfolio state, or live capital. Promotion requires two distinct PIT stress windows and the frozen drawdown, expected-shortfall, alpha-drag, turnover, and replay checks in `docs/phase_brief/gv-financial-cascade-shadow-0-brief.md`; no real promotion evidence or score uplift currently exists.
 
+The immediate alpha-critical slice is four-arm attribution on the existing nonzero G5 canonical portfolio, independent of Command Center custody: A uncapped, B existing regime, C cascade-only, D combined. Combined gross is the minimum of uncapped, regime-permitted, and cascade-permitted gross. Every run emits a prospective receipt and complete manual exit rule. The first operated result uses synthetic Leningrad network evidence and is therefore `ENGINEERING_ONLY`; it proves mechanics and records a falsifiable negative/neutral D-versus-B result, not alpha or paper authority.
+
 ---
 
 V2 PEAD Alpha Interpretation Gate Notice (2026-06-24)

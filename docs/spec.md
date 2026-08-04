@@ -10,6 +10,8 @@ Slice 1 compares real MU-operated, MU-shadow, and certified-book cash proposals 
 
 Shadow challenger addendum, 2026-08-04: `GV-FINANCIAL-CASCADE-SHADOW-0` may consume only an externally verified Leningrad four-file finance bundle and may act only by proportionally capping gross exposure in a copy of existing target weights for same-engine research comparison. It cannot change names, ranks, entry/exit rules, baseline weights, proposal authority, certified books, or live capital. Daily observations become effective only after their UTC availability date. The layer remains deferred from product authority until two distinct PIT stress windows satisfy the frozen promotion checks; otherwise it is deferred or killed.
 
+Four-arm contract: `A=uncapped`, `B=RegimeManager only`, `C=cascade only`, `D=RegimeManager+cascade`; `D_cap_t=min(G_t,R_t,C_t)`. Sequential scalar multiplication is invalid. D-versus-B attribution must include compounded net return, maximum drawdown, expected shortfall, turnover, missed upside, avoided loss, reduced-exposure sessions, and re-entry delay. A receipt binds the bundle/scenario identities, PIT timestamps, portfolio-row digest, regime/cascade/combined caps, incremental-information status, and exit rule. `ENGINEERING_ONLY` evidence blocks score, alpha, integration, preview authority, mutation, and live operation.
+
 ---
 
 V2 PEAD Alpha Interpretation Gate Contract (2026-06-24)

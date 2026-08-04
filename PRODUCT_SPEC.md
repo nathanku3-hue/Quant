@@ -21,6 +21,8 @@ The dashboard is the sole strategy-consumer/comparator/operator surface and cont
 
 Shadow-module specification, 2026-08-04: `GV-FINANCIAL-CASCADE-SHADOW-0` accepts only a Leningrad v2 four-file finance bundle whose exact identity is supplied by the independent source verifier. Quant validates custody and accounting invariants but does not reconstruct or copy the solver. The only permitted transform is a PIT-aligned proportional gross-exposure cap on a shadow copy of existing target weights; security membership, signs, ranks, entries, exits, baseline authority, and certified state remain unchanged. Promotion is limited to later portfolio-preview challenger eligibility after two distinct stress-window identities pass the documented risk/cost/replay contract.
 
+Four-arm specification: run A uncapped, B existing `RegimeManager`, C cascade-only, and D combined through the same `core.engine.run_simulation` path. Freeze `D_cap_t = min(G_t, R_t, C_t)`; never multiply regime and cascade scalars. Attribute D versus B as a vector covering net return, drawdown, expected shortfall, turnover, missed upside, avoided loss, reduced-exposure days, and re-entry delay. The mandatory product evidence is an immutable prospective receipt plus a frozen exit rule; any synthetic network observation is labelled `ENGINEERING_ONLY` and cannot authorize alpha, score uplift, portfolio mutation, integration, or live capital.
+
 ---
 
 

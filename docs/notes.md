@@ -1,3 +1,14 @@
+## 2026-08-04 GV Financial Cascade Four-Arm Formula Registry
+
+- Runtime paths: `research/financial_cascade_four_arm.py` and `scripts/run_financial_cascade_four_arm.py`; existing seams remain `strategies/regime_manager.py`, `strategies/financial_cascade.py`, and `core.engine.run_simulation`.
+- Existing portfolio: the banked G5 Tier-0 canonical equal-weight portfolio, 41 sessions × 3 names; target and return matrices retain artifact/manifest SHA-256 and frame digests.
+- Arms: `A_t=W_t`; `B_t=cap(W_t,R_t)`; `C_t=cap(W_t,C_t)`; `D_t=cap(W_t,min(G_t,R_t,C_t))`, where `G_t=Σ_i|W_i,t|`, `R_t=RegimeManager.target_exposure_t`, and `C_t=cascade permitted gross`. Sequential multiplication `R_t×C_t` is forbidden.
+- Incremental attribution: compare D versus B as a vector: `ΔNet=Net_D-Net_B`; `ΔMDD=MDD_D-MDD_B`; `ΔES=ES_D-ES_B`; `ΔTurnover=Turnover_D-Turnover_B`; `missed_upside=Σ max(Net_B,t-Net_D,t,0)`; `avoided_loss=Σ max(Net_D,t-Net_B,t,0)`; reduced-exposure days count `gross_D<gross_B`; re-entry delay is sessions from manual review to first `gross_D=gross_B`.
+- Receipt identity: SHA-256 of canonical receipt body binding evidence classification, bundle/scenario identities, source/availability/effective times, target-weight row digest, regime state/reason/cap, cascade state/cap, combined cap, incremental-information status, and the complete exit rule.
+- Exit rule: bind overlay effective date, evaluation horizon, maximum holding sessions, manual review date, terminal disposition `RESTORE_FROZEN_BASELINE_TARGET|REMAIN_REDUCED`, and reconciliation date before any confirmation.
+- Evidence classes: `ENGINEERING_ONLY` proves plumbing and falsifiable attribution only; `GOVERNED_PIT` additionally requires exact institutional-network, liabilities, shock, source-time, and availability-time authority for every bundle. Neither class itself grants capital authority.
+- First engineering result: Leningrad bundle `88b9ff3…` on the G5 portfolio, regime gross `0.75`, cascade gross `0.50`, nine reduced sessions, D−B compounded net return `-0.02185748`, MDD delta approximately zero, ES delta `0`, turnover delta `+0.50`, missed upside `0.02051325`, avoided loss `0.00176342`, manual restore on `2024-01-29`, exact replay PASS. Classification remains `ENGINEERING_ONLY`; score `62/100` unchanged.
+
 ## 2026-08-04 GV Financial Cascade Shadow Formula Registry
 
 - Runtime paths: `strategies/financial_cascade.py`, `research/financial_cascade_shadow.py`, and `scripts/run_financial_cascade_shadow.py`.

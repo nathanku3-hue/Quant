@@ -530,6 +530,13 @@ def build_financial_cascade_overlay(
         return overlay
 
     source = pd.DataFrame(rows).sort_values("effective_date", kind="mergesort")
+    # Pandas may construct scalar observation dates at microsecond precision while
+    # a canonical portfolio calendar remains nanosecond precision. merge_asof
+    # requires exact dtype equality, so bind observations to the admitted calendar
+    # dtype before projection rather than weakening the date comparison.
+    source["effective_date"] = pd.to_datetime(source["effective_date"]).astype(
+        dates.dtype
+    )
     projected = pd.merge_asof(
         pd.DataFrame({"date": dates}),
         source,

@@ -1,16 +1,16 @@
 # Phase Brief — GV-FINANCIAL-CASCADE-SHADOW-0
 
 Date: 2026-08-04
-Status: `IMPLEMENTED LOCALLY; SHADOW RESEARCH ONLY; TERMINAL REVIEW UNAVAILABLE`
+Status: `CASCADE BANKED; FOUR-ARM ENGINEERING RESULT COMPLETE; REAL PIT EVIDENCE BLOCKED`
 Accepted product score: `62/100 — unchanged`
 Limited Live: `CLOSED; NOT AUTHORIZED`
 Active product gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1 — unchanged`
 
 ## Decision
 
-Do not defer the adapter and simulation harness. Defer only capital authority.
+Do not defer the adapter, attribution experiment, or prospective receipt. Defer integration and capital authority until the observation is governed and actionable.
 
-Leningrad's financial-clearing output is useful to Quant as a counterparty-payment cascade challenger at the macro/regime and portfolio-exposure layers. It is not an alpha generator, stock selector, entry signal, exit signal, bailout trade, or current critical-path module.
+Leningrad's financial-clearing output is useful to Quant as a counterparty-payment cascade challenger at the macro/regime and portfolio-exposure layers. It is not an alpha generator, stock selector, entry signal, exit signal, bailout trade, or current capital authority. The cascade research lineage is the alpha-critical path; Command Center custody is independent and non-blocking.
 
 ## Module-by-module boundary
 
@@ -84,6 +84,24 @@ CLEAR/UNAVAILABLE = no cascade cap
 
 These are explicit challenger parameters, not calibrated truths.
 
+## Four-arm attribution and receipt
+
+The immediate experiment reuses Quant's existing G5 Tier-0 canonical nonzero portfolio and runs all four arms through `core.engine.run_simulation`:
+
+```text
+A = uncapped portfolio
+B = existing RegimeManager only
+C = cascade only
+D = existing RegimeManager + cascade
+D permitted gross = min(uncapped gross, regime permitted gross, cascade permitted gross)
+```
+
+Sequential multiplication of regime and cascade scalars is prohibited. D versus B reports compounded net return, maximum drawdown, expected shortfall, turnover, missed upside, avoided loss, reduced-exposure days, and re-entry delay.
+
+Every effective observation emits a prospective receipt binding bundle/scenario identity, source/availability/effective times, target-weight digest, regime state/reason/cap, cascade state/cap, combined cap, incremental-information status, and the frozen exit rule. The exit rule contains evaluation horizon, maximum holding sessions, manual review date, terminal remain-reduced/restore-baseline disposition, and reconciliation date.
+
+The first operated engineering result used verified Leningrad bundle `88b9ff3e…`, regime gross `0.75`, cascade gross `0.50`, and manual baseline restoration on `2024-01-29`. D reduced exposure for nine sessions. Versus B it produced net-return delta `-0.02185748`, MDD and ES deltas approximately zero, turnover delta `+0.50`, missed upside `0.02051325`, avoided loss `0.00176342`, and exact replay PASS. Because the financial network and shock are synthetic, the result is `ENGINEERING_ONLY`: no alpha, score, integration, paper, or capital authority.
+
 ## Promotion / kill contract
 
 Promotion requires all of the following in one same-engine comparison:
@@ -114,7 +132,12 @@ A  strategies/financial_cascade.py
 A  research/financial_cascade_shadow.py
 A  scripts/run_financial_cascade_shadow.py
 A  tests/test_financial_cascade_shadow.py
+A  research/financial_cascade_four_arm.py
+A  scripts/run_financial_cascade_four_arm.py
+A  tests/test_financial_cascade_four_arm.py
+A  docs/context/e2e_evidence/gv_financial_cascade_four_arm_engineering_20260804.json
 M  docs/prd.md
+M  docs/spec.md
 M  PRD.md
 M  PRODUCT_SPEC.md
 M  docs/notes.md
@@ -124,13 +147,14 @@ M  docs/decision log.md
 
 ## Validation
 
-- New cascade tests: `6 passed`.
-- Pinned Quant regression: `78 passed` across engine, RegimeManager, AlphaEngine, stop-loss, research runner, and cascade tests.
+- Cascade custody commit: `00481ac8803497d48e70451816524115ffb3ceaf`, pushed on `codex/gv-financial-cascade-shadow-0-r2`.
+- Focused cascade and four-arm tests: `11 passed` before the broader regression matrix.
 - Real interoperability: a bundle generated and independently verified by Leningrad's v0.4 finance code loaded successfully in Quant; observed sample identity `88b9ff3e3634c2a533e84476198c0eacb3b1aaa2b46cfcd88ac8e84c9b14b0b9`, state `SEVERE`, defaults `3`, unpaid fraction `217/440`.
-- The CLI writes one atomic JSON report with input hashes, report identity, and execution identity.
+- Four-arm evidence: `docs/context/e2e_evidence/gv_financial_cascade_four_arm_engineering_20260804.json`; exact replay PASS; prospective receipt identity `e18509fc9e692a34e13ec2c03049b3e8064bdc312cb54a9711351e891884527b`.
+- Both CLIs write atomic JSON reports with input hashes, report identity, and execution identity.
 
 ## Current blocker
 
-No real Quant promotion result exists. Quant still lacks a governed PIT bilateral-exposure history with at least two independent stress windows and a financial/credit-sensitive paper portfolio evaluated under this layer. Synthetic tests prove mechanics only.
+No score-bearing paper decision exists. The nonzero Quant portfolio and four-arm attribution now exist, but Quant still lacks one governed PIT cascade observation binding the real institutional network, liabilities, shock, source time, and availability time. The current result is `ENGINEERING_ONLY` and cannot authorize integration or paper confirmation.
 
-Independent Reviewer A/B/C capacity is unavailable in the current tool surface, so this local implementation is not a terminally reviewed or publishable milestone. No commit, push, dashboard wiring, portfolio authority, or score uplift is claimed.
+Independent Reviewer A/B/C capacity remains unavailable. The cascade substrate is committed and pushed; the four-arm candidate is locally validated pending its own immutable commit. No dashboard integration, overlay confirmation, portfolio mutation, score uplift, or live authority is claimed.

@@ -21,6 +21,8 @@ The dashboard is the sole strategy-consumer/comparator/operator surface and cont
 
 `GV-FINANCIAL-CASCADE-SHADOW-0` is a bounded research exception, not an active product gate. It verifies and ingests Leningrad finance bundles without copying the solver, projects PIT cascade states, and tests proportional gross-exposure caps through the same Quant engine. It cannot select securities, alter entries/exits, interpret bailout allocations as trades, mutate certified authority, or authorize live capital. No product score or roadmap authority changes until real two-window PIT evidence satisfies the frozen challenger contract.
 
+Four-arm attribution addendum, 2026-08-04: the alpha-critical research path compares A uncapped, B existing `RegimeManager`, C cascade-only, and D regime-plus-cascade on Quant's existing nonzero G5 canonical portfolio. D uses the order-independent cap `min(uncapped gross, regime permitted gross, cascade permitted gross)`; sequential scalar multiplication is forbidden. Every observation emits an ex-ante receipt with source/availability times, target digest, regime/cascade states, incremental-information classification, and a frozen exit rule. Synthetic Leningrad evidence is `ENGINEERING_ONLY`, carries no alpha/score/capital authority, and cannot trigger Command Center integration.
+
 ---
 
 

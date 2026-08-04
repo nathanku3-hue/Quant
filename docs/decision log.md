@@ -1,3 +1,15 @@
+## 2026-08-04 — ROUND-20260804-GV-FINANCIAL-CASCADE-FOUR-ARM-1
+
+- Decision: move integration and UI off the pre-evidence critical path. Bank the cascade lineage independently, run four-arm attribution and receipts there, and defer Command Center integration until a governed PIT observation and actionable nonzero paper book exist.
+- Portfolio: reuse the existing G5 Tier-0 canonical 41-session, three-name equal-weight portfolio; do not create a Leningrad-specific portfolio.
+- Arms: A uncapped, B existing `RegimeManager`, C cascade-only, D combined. Freeze `D_cap=min(uncapped gross, regime permitted gross, cascade permitted gross)`; sequential multiplication is prohibited.
+- Attribution: D versus B is a vector covering compounded net return, maximum drawdown, expected shortfall, turnover, missed upside, avoided loss, reduced-exposure days, and re-entry delay.
+- Receipt/exit: every observation emits an ex-ante identity-bound receipt. Before any future confirmation, bind effective date, horizon, maximum holding sessions, manual review date, terminal remain-reduced/restore-baseline disposition, and reconciliation date.
+- Evidence result: the verified Leningrad example bundle `88b9ff3…` produced `SEVERE` and a 0.50 cap against regime 0.75. Over nine reduced sessions, D versus B had net-return delta `-0.02185748`, MDD and ES deltas approximately zero, turnover delta `+0.50`, missed upside `0.02051325`, avoided loss `0.00176342`, and exact replay PASS.
+- Classification: `ENGINEERING_ONLY`. The synthetic network proves the four-arm mechanics and prospective receipt only. It grants no alpha claim, score uplift, paper authority, integration authority, book mutation, broker, or live-capital action.
+- Current blocker: one governed PIT observation binding real institutional network, liabilities, shock, source time, and availability time. Product score remains `62/100`.
+- Evidence: `research/financial_cascade_four_arm.py`, `scripts/run_financial_cascade_four_arm.py`, `tests/test_financial_cascade_four_arm.py`, and `docs/context/e2e_evidence/gv_financial_cascade_four_arm_engineering_20260804.json`.
+
 ## 2026-08-04 — ROUND-20260804-GV-FINANCIAL-CASCADE-SHADOW-0
 
 - Decision: reject blanket implementation deferral. Implement the verified adapter, PIT projection, proportional gross-exposure challenger, and same-engine comparison now; defer only product/capital authority.
