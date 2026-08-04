@@ -1,66 +1,48 @@
 # Planner Packet — Current
 
-Date: 2026-08-03
-Status: `ACTIVE PLANNING AUTHORITY — FINAL ROUND FROZEN`
-Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
-Accepted score: `62/100`
-Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`
-Planning checklist: `docs/architecture/dashboard_all_capital_pit_planning_checklist.md`
+Date: 2026-08-05
+Active slice: `GV-OPERATED-ROTATION-1`
+Status: `DONE — PUBLICATION PENDING`
+Accepted product score: `62/100`
+Post-PASS assessment: `69–71/100` (non-canonical)
+Canonical brief: `docs/phase_brief/gv-operated-rotation-1-brief.md`
 
 ## Current truth
 
-- Hosted-green closure `d84c675` and all accepted 10/25, repair, date-repair, and real-evidence identities remain immutable.
-- The same-evidence MU shadow baseline passed 9 focused tests under Python 3.12.10 / pytest 9.1.0 and is banked at `a520f475bfa4fca42a68a22165ab3ad8960c0bc9`.
-- Repository inspection confirms `views/command_center.py` is absent and will be new.
-- Repository inspection confirms the real operated source is the existing prospective workspace/proposal object path; the shadow source is `core/gv_v2_mu_nvda_shadow_decision.py`.
-- Cash baseline must derive from certified workspace/book cash; no standalone cash file is assumed.
-- The former human-smoke-first and seven-file shell-first sequences are superseded.
-- Limited Live remains closed.
+- Base `b98dab62e175716755b33eda0205b93bf98b0007` proves one operated MU paper entry.
+- Episode one remains MU `7 @ 101.25`, classified cash, cost `2`, and residual `0`.
+- The completed adjacent proof repeats operation from the displayed proposal path.
+- The default Command Center now composes the eligible `GV_REAL_MU_OPERATED` proposal with a governed MERID companion and existing capital authority.
+- Exact sealed validation passed all 31 declared tests; retained native task outcome is `DONE`.
 
-## Active decision
-
-Build the all-capital PIT dashboard pipeline now, layer first, as one functional Slice 1 transaction:
+## Delivered path
 
 ```text
-compact contracts
-→ verified adapters
-→ bounded in-memory governance
-→ pure projector/read models
-→ six-page registry
-→ read-only Command Center
+certified episode-one book
+→ displayed proposal binding
+→ owner evidence + two market identities
+→ MU reduction + MERID funding targets
+→ SELL then BUY preview
+→ confirm or reject-all
+→ persistence + certification + replay
+→ separate-process exact reopen
 ```
 
-The dashboard is the strategy consumer/comparator/operator surface. It does not make identity decisions, accept events, calculate strategy logic, or mutate capital.
+## Frozen decisions
 
-## Frozen visible pages
-
-```text
-Command Center
-Discovery & Analysis
-Decisions & Thesis
-Portfolio & Rotation
-Strategy Modules
-Operations & Replay
-```
+- Preserve source price `101.25`; do not fabricate mark-to-market P&L.
+- Companion is exact MERID substrate from the accepted operated-10 model.
+- Rotation requires explicit displayed-proposal and dual-market bindings.
+- Legacy one-update post-entry requests retain their sell-required failure.
+- Dashboard owns request composition and display only.
+- No scenario-registry expansion, optimizer, provider, strategy target generator, broker, or live-capital work.
 
 ## Immediate sequence
 
-1. Regenerate context and commit the planning authority separately as docs-only.
-2. Verify a fully clean worktree.
-3. Freeze exact operated, shadow, certified cash, certified event-prefix head, evidence, no-market proof, and as-of mappings.
-4. Execute the exact ten-file Slice 1 transaction.
-5. Stop at the read-only Command Center.
+1. Commit and push the exact pre-authorized path set once to `origin/codex/gv-operated-rotation-1`.
+2. Preserve canonical score `62/100`; record only the non-canonical `69–71/100` assessment.
+3. Stop this slice.
 
-## P0/P1 risks
+## Next product question
 
-- P0: treating `events[-1]` as the certified book head instead of the final authoritative event in the certified prefix.
-- P0: assigning the cash-only no-market identity without proving empty positions/orders/fills, zero residual/targets, and zero market-data consumption.
-- P0: inventing a conventional market snapshot, cash yield, or source artifact to satisfy the contract.
-- P0: allowing adapter/dashboard/projector code to decide accepted versus rejected authority.
-- P0: creating any durable governance persistence in Slice 1 instead of the approved bounded digest-chained in-memory stream.
-- P1: mixing proposal, decision snapshot, and lifecycle state in the MU-operated adapter.
-- P1: disconnected contract/event framework work that does not reach the real Command Center.
-
-## Boundary
-
-No selection, target composition, CTA/macro formulas, provider acquisition, optimizer/risk authority, preview, authorization, book mutation, certification change, deletion, broker behavior, live capital, backward compatibility, or score uplift in Slice 1.
+The next value-bearing uncertainty is trustworthy source/market data quality, not more operation plumbing. That lane requires separate authorization and must not be inferred from this repeatability proof.

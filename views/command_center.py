@@ -23,7 +23,10 @@ from gv_portfolio_v0.operated_storage import (
     reject_prospective_observation_and_persist,
     workspace_path,
 )
-from gv_portfolio_v0.prospective import preview_runtime_observation
+from gv_portfolio_v0.prospective import (
+    operated_rotation_companion,
+    preview_runtime_observation,
+)
 from views.gv_operated_portfolio_workspace import build_book_rows, build_trade_rows
 
 
@@ -120,6 +123,176 @@ def _active_cost_rows(workspace: Mapping[str, Any]) -> list[dict[str, str]]:
     ]
 
 
+def _displayed_operated_proposal_binding(
+    model: DecisionEpisodeReadModel,
+    workspace: Mapping[str, Any],
+) -> dict[str, Any]:
+    matching = [
+        row
+        for row in model.proposal_records
+        if row.module_id == "GV_REAL_MU_OPERATED" and row.status == "ELIGIBLE"
+    ]
+    if len(matching) != 1:
+        raise ValueError("DISPLAYED_ELIGIBLE_OPERATED_PROPOSAL_REQUIRED")
+    row = matching[0]
+    return {
+        "episode_id": model.episode_id,
+        "record_id": row.record_id,
+        "proposal_id": row.proposal_id,
+        "module_id": row.module_id,
+        "module_version": row.module_version,
+        "sleeve_id": row.sleeve_id,
+        "status": row.status,
+        "pit_identity": canonical_value(model.pit_identity),
+        "active_book_hash": workspace["book"]["book_hash"],
+        "active_certification_id": workspace["certification"]["certification_id"],
+        "active_event_count": len(workspace["events"]),
+    }
+
+
+def _render_operated_preview_flow(
+    st: Any,
+    *,
+    workspace: dict[str, Any],
+    root: Path | None,
+    request: dict[str, Any],
+) -> None:
+    session = st.session_state
+    if st.button("Preview paper-capital decision", key="gv_command_center_preview"):
+        try:
+            session[_ACTIVE_PREVIEW_KEY] = preview_runtime_observation(
+                workspace, request
+            )
+            session[_ACTIVE_PREVIEW_REQUEST_KEY] = dict(request)
+            session[_ACTIVE_PREVIEW_WORKSPACE_KEY] = str(
+                workspace_path(
+                    root, scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID
+                ).absolute()
+            )
+        except Exception as exc:
+            session.pop(_ACTIVE_PREVIEW_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
+            st.error(f"Preview rejected: {type(exc).__name__}: {exc}")
+
+    preview = session.get(_ACTIVE_PREVIEW_KEY)
+    current_workspace_path = str(
+        workspace_path(
+            root, scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID
+        ).absolute()
+    )
+    preview_request = session.get(_ACTIVE_PREVIEW_REQUEST_KEY)
+    try:
+        request_changed = not isinstance(preview_request, Mapping) or (
+            canonical_document_bytes(dict(preview_request))
+            != canonical_document_bytes(request)
+        )
+    except (TypeError, ValueError):
+        request_changed = True
+    preview_is_stale = isinstance(preview, dict) and (
+        preview.get("prior_book_hash") != workspace["book"]["book_hash"]
+        or preview.get("prior_certification_id")
+        != workspace["certification"]["certification_id"]
+        or preview.get("prior_event_count") != len(workspace["events"])
+        or preview.get("prior_decision_snapshot_id")
+        != workspace["current_decision_snapshot"]["decision_snapshot_id"]
+        or session.get(_ACTIVE_PREVIEW_WORKSPACE_KEY)
+        != current_workspace_path
+        or request_changed
+    )
+    if preview_is_stale:
+        session.pop(_ACTIVE_PREVIEW_KEY, None)
+        session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
+        session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
+        preview = None
+        st.warning("The prior preview is stale and was discarded.")
+    if not isinstance(preview, dict):
+        return
+
+    transition = preview["transition"]
+    st.subheader("Mutation-free paper-capital preview")
+    forward_packet = preview["request"].get("forward_operated_packet")
+    if isinstance(forward_packet, Mapping):
+        st.table(
+            [
+                {
+                    "proposal_id": preview["proposal_id"],
+                    "transition_kind": transition["transition_kind"],
+                    "instrument_id": forward_packet["instrument_id"],
+                    "target_quantity": forward_packet["target_quantity"],
+                    "market_price": forward_packet["market_price"],
+                    "market_observed_at": forward_packet["market_observed_at"],
+                    "market_source_identity": forward_packet[
+                        "market_source_identity"
+                    ],
+                    "authoritative": False,
+                }
+            ]
+        )
+    else:
+        binding = preview["request"]["displayed_proposal_binding"]
+        st.table(
+            [
+                {
+                    "proposal_id": preview["proposal_id"],
+                    "transition_kind": transition["transition_kind"],
+                    "displayed_record_id": binding["record_id"],
+                    "displayed_proposal_id": binding["proposal_id"],
+                    "displayed_module": binding["module_id"],
+                    "active_book_hash": binding["active_book_hash"],
+                    "authoritative": False,
+                }
+            ]
+        )
+        st.table(preview["request"]["forward_operated_market_packets"])
+    st.table(transition["legs"])
+    st.subheader("Resulting book preview")
+    st.table(transition["positions_after"])
+    st.table(transition["classified_cash_after"])
+    st.table(transition["classified_costs_after"])
+    st.caption(
+        f"book_hash_after=`{transition['book_hash_after']}` · "
+        f"cash_after={transition['cash_after']} · costs_after={transition['costs_after']} · "
+        f"residual={transition['unexplained_residual']} · authoritative=false"
+    )
+
+    if st.button("Confirm paper-capital decision", key="gv_command_center_confirm"):
+        try:
+            confirm_prospective_observation_and_persist(
+                preview,
+                root=root,
+                scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+            )
+        except Exception as exc:
+            st.error(f"Confirmation rejected: {type(exc).__name__}: {exc}")
+        else:
+            session.pop(_ACTIVE_PREVIEW_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
+            st.rerun()
+
+    rejection_reason = st.text_area(
+        "Rejection rationale",
+        key="gv_command_center_rejection_reason",
+        placeholder="Explain why this validated proposal must not receive capital authority.",
+    )
+    if st.button("Reject paper-capital decision", key="gv_command_center_reject"):
+        try:
+            reject_prospective_observation_and_persist(
+                preview,
+                rejection_reason,
+                root=root,
+                scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+            )
+        except Exception as exc:
+            st.error(f"Rejection failed: {type(exc).__name__}: {exc}")
+        else:
+            session.pop(_ACTIVE_PREVIEW_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
+            st.rerun()
+
+
 def _render_operated_paper_action(
     st: Any,
     *,
@@ -127,7 +300,6 @@ def _render_operated_paper_action(
     root: Path | None,
     pit_identity: Mapping[str, Any],
 ) -> None:
-    session = st.session_state
     st.subheader("Operate one paper-capital decision")
     st.caption(
         "Owner assertions are content-addressed and bound to the preview. They are not "
@@ -221,121 +393,213 @@ def _render_operated_paper_action(
         ],
         "operator_rationale": operator_rationale,
     }
-
-    if st.button("Preview paper-capital decision", key="gv_command_center_preview"):
-        try:
-            st.session_state[_ACTIVE_PREVIEW_KEY] = preview_runtime_observation(
-                workspace, request
-            )
-            session[_ACTIVE_PREVIEW_REQUEST_KEY] = dict(request)
-            session[_ACTIVE_PREVIEW_WORKSPACE_KEY] = str(
-                workspace_path(
-                    root, scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID
-                ).absolute()
-            )
-        except Exception as exc:
-            st.session_state.pop(_ACTIVE_PREVIEW_KEY, None)
-            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
-            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
-            st.error(f"Preview rejected: {type(exc).__name__}: {exc}")
-
-    preview = st.session_state.get(_ACTIVE_PREVIEW_KEY)
-    current_workspace_path = str(
-        workspace_path(
-            root, scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID
-        ).absolute()
+    _render_operated_preview_flow(
+        st,
+        workspace=workspace,
+        root=root,
+        request=request,
     )
-    preview_request = session.get(_ACTIVE_PREVIEW_REQUEST_KEY)
-    try:
-        request_changed = not isinstance(preview_request, Mapping) or (
-            canonical_document_bytes(dict(preview_request))
-            != canonical_document_bytes(request)
-        )
-    except (TypeError, ValueError):
-        request_changed = True
-    preview_is_stale = isinstance(preview, dict) and (
-        preview.get("prior_book_hash") != workspace["book"]["book_hash"]
-        or preview.get("prior_certification_id")
-        != workspace["certification"]["certification_id"]
-        or preview.get("prior_event_count") != len(workspace["events"])
-        or preview.get("prior_decision_snapshot_id")
-        != workspace["current_decision_snapshot"]["decision_snapshot_id"]
-        or session.get(_ACTIVE_PREVIEW_WORKSPACE_KEY)
-        != current_workspace_path
-        or request_changed
-    )
-    if preview_is_stale:
-        st.session_state.pop(_ACTIVE_PREVIEW_KEY, None)
-        session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
-        session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
-        preview = None
-        st.warning("The prior preview is stale and was discarded.")
-    if not isinstance(preview, dict):
+
+
+def _render_operated_rotation_action(
+    st: Any,
+    *,
+    workspace: dict[str, Any],
+    root: Path | None,
+    model: DecisionEpisodeReadModel,
+) -> None:
+    funded_positions = [
+        row for row in workspace["book"]["positions"] if int(row["quantity"]) > 0
+    ]
+    if len(funded_positions) != 1:
+        st.error("Rotation requires exactly one certified funded source position.")
         return
+    source_position = funded_positions[0]
+    source_review = next(
+        row
+        for row in workspace["reviews"]
+        if row["instrument_id"] == source_position["instrument_id"]
+    )
+    source_instrument = next(
+        row
+        for row in workspace["instruments"]
+        if row["instrument_id"] == source_position["instrument_id"]
+    )
+    companion = operated_rotation_companion(workspace)
+    companion_review = companion["review"]
+    companion_instrument = companion["instrument"]
+    binding = _displayed_operated_proposal_binding(model, workspace)
 
-    transition = preview["transition"]
-    packet = preview["request"]["forward_operated_packet"]
-    st.subheader("Mutation-free paper-capital preview")
+    st.subheader("Operate one proposal-bound SELL+BUY rotation")
+    st.caption(
+        "This repeatability action uses one displayed eligible proposal, the certified "
+        "active book, and two owner-identified market observations. It proves operation "
+        "and replay only; it does not prove provider quality, alpha, or realized value."
+    )
     st.table(
         [
             {
-                "proposal_id": preview["proposal_id"],
-                "transition_kind": transition["transition_kind"],
-                "instrument_id": packet["instrument_id"],
-                "target_quantity": packet["target_quantity"],
-                "market_price": packet["market_price"],
-                "market_observed_at": packet["market_observed_at"],
-                "market_source_identity": packet["market_source_identity"],
-                "authoritative": False,
+                "displayed_record_id": binding["record_id"],
+                "displayed_proposal_id": binding["proposal_id"],
+                "module": binding["module_id"],
+                "status": binding["status"],
+                "active_book_hash": binding["active_book_hash"],
             }
         ]
     )
-    st.table(transition["legs"])
-    st.subheader("Resulting book preview")
-    st.table(transition["positions_after"])
-    st.table(transition["classified_cash_after"])
-    st.table(transition["classified_costs_after"])
-    st.caption(
-        f"book_hash_after=`{transition['book_hash_after']}` · "
-        f"cash_after={transition['cash_after']} · costs_after={transition['costs_after']} · "
-        f"residual={transition['unexplained_residual']} · authoritative=false"
+    st.table(
+        [
+            {
+                "role": "REDUCE",
+                "symbol": source_instrument["symbol"],
+                "instrument_id": source_instrument["instrument_id"],
+                "current_quantity": source_position["quantity"],
+                "current_price": source_position["valuation_price"],
+            },
+            {
+                "role": "FUND",
+                "symbol": companion_instrument["symbol"],
+                "instrument_id": companion_instrument["instrument_id"],
+                "current_quantity": "0",
+                "current_price": companion_review["reference_price"],
+            },
+        ]
     )
 
-    if st.button("Confirm paper-capital decision", key="gv_command_center_confirm"):
-        try:
-            confirm_prospective_observation_and_persist(
-                preview,
-                root=root,
-                scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-            )
-        except Exception as exc:
-            st.error(f"Confirmation rejected: {type(exc).__name__}: {exc}")
-        else:
-            st.session_state.pop(_ACTIVE_PREVIEW_KEY, None)
-            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
-            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
-            st.rerun()
-
-    rejection_reason = st.text_area(
-        "Rejection rationale",
-        key="gv_command_center_rejection_reason",
-        placeholder="Explain why this validated proposal must not receive capital authority.",
+    evidence_content = st.text_area(
+        "Rotation evidence content",
+        key="gv_command_center_rotation_evidence_content",
+        placeholder="State the owner-reviewed evidence for this bounded rotation.",
     )
-    if st.button("Reject paper-capital decision", key="gv_command_center_reject"):
-        try:
-            reject_prospective_observation_and_persist(
-                preview,
-                rejection_reason,
-                root=root,
-                scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-            )
-        except Exception as exc:
-            st.error(f"Rejection failed: {type(exc).__name__}: {exc}")
-        else:
-            session.pop(_ACTIVE_PREVIEW_KEY, None)
-            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
-            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
-            st.rerun()
+    source_locator = st.text_input(
+        "Rotation evidence source locator",
+        key="gv_command_center_rotation_source_locator",
+        placeholder="operator://date/mu-merid/rotation",
+    )
+    evidence_observed_at = st.text_input(
+        "Rotation evidence observed at UTC",
+        key="gv_command_center_rotation_evidence_observed_at",
+        placeholder="2026-08-04T13:01:00.000000Z",
+    )
+
+    source_market_price = st.text_input(
+        f"{source_instrument['symbol']} market price",
+        key="gv_command_center_rotation_source_market_price",
+        value=str(source_position["valuation_price"]),
+    )
+    source_market_observed_at = st.text_input(
+        f"{source_instrument['symbol']} market observed at UTC",
+        key="gv_command_center_rotation_source_market_observed_at",
+        placeholder="2026-08-04T13:00:00.000000Z",
+    )
+    source_market_source_identity = st.text_input(
+        f"{source_instrument['symbol']} market source identity",
+        key="gv_command_center_rotation_source_market_source_identity",
+        placeholder="operator://date/mu/rotation-market",
+    )
+    source_target_quantity = st.number_input(
+        f"{source_instrument['symbol']} reduced target quantity",
+        min_value=0,
+        max_value=max(int(source_position["quantity"]) - 1, 0),
+        value=max(int(source_position["quantity"]) - 1, 0),
+        step=1,
+        key="gv_command_center_rotation_source_target_quantity",
+    )
+    source_net_score_bps = st.number_input(
+        f"{source_instrument['symbol']} owner net score (bps)",
+        step=1,
+        value=int(source_review["net_score_bps"]),
+        key="gv_command_center_rotation_source_net_score_bps",
+    )
+    source_principal_claim = st.text_area(
+        f"{source_instrument['symbol']} principal claim",
+        key="gv_command_center_rotation_source_principal_claim",
+        placeholder="State why the certified source position should be reduced.",
+    )
+
+    companion_market_price = st.text_input(
+        f"{companion_instrument['symbol']} market price",
+        key="gv_command_center_rotation_companion_market_price",
+        value=str(companion_review["reference_price"]),
+    )
+    companion_market_observed_at = st.text_input(
+        f"{companion_instrument['symbol']} market observed at UTC",
+        key="gv_command_center_rotation_companion_market_observed_at",
+        placeholder="2026-08-04T13:00:00.000000Z",
+    )
+    companion_market_source_identity = st.text_input(
+        f"{companion_instrument['symbol']} market source identity",
+        key="gv_command_center_rotation_companion_market_source_identity",
+        placeholder="operator://date/merid/rotation-market",
+    )
+    companion_target_quantity = st.number_input(
+        f"{companion_instrument['symbol']} funded target quantity",
+        min_value=1,
+        value=1,
+        step=1,
+        key="gv_command_center_rotation_companion_target_quantity",
+    )
+    companion_net_score_bps = st.number_input(
+        f"{companion_instrument['symbol']} owner net score (bps)",
+        step=1,
+        value=int(companion_review["net_score_bps"]),
+        key="gv_command_center_rotation_companion_net_score_bps",
+    )
+    companion_principal_claim = st.text_area(
+        f"{companion_instrument['symbol']} principal claim",
+        key="gv_command_center_rotation_companion_principal_claim",
+        placeholder="State why the governed companion should receive bounded funding.",
+    )
+    operator_rationale = st.text_area(
+        "Rotation operator rationale",
+        key="gv_command_center_rotation_operator_rationale",
+        placeholder="Explain why this exact SELL+BUY transition should be previewed.",
+    )
+
+    request = {
+        "content": evidence_content,
+        "locator": source_locator,
+        "observed_at": evidence_observed_at,
+        "pit_identity": dict(binding["pit_identity"]),
+        "displayed_proposal_binding": dict(binding),
+        "forward_operated_market_packets": [
+            {
+                "instrument_id": source_review["instrument_id"],
+                "market_price": source_market_price,
+                "market_observed_at": source_market_observed_at,
+                "market_source_identity": source_market_source_identity,
+            },
+            {
+                "instrument_id": companion_review["instrument_id"],
+                "market_price": companion_market_price,
+                "market_observed_at": companion_market_observed_at,
+                "market_source_identity": companion_market_source_identity,
+            },
+        ],
+        "review_updates": [
+            {
+                "instrument_id": source_review["instrument_id"],
+                "outcome": "ADMIT",
+                "net_score_bps": int(source_net_score_bps),
+                "target_quantity": str(int(source_target_quantity)),
+                "principal_claim": source_principal_claim,
+            },
+            {
+                "instrument_id": companion_review["instrument_id"],
+                "outcome": "ADMIT",
+                "net_score_bps": int(companion_net_score_bps),
+                "target_quantity": str(int(companion_target_quantity)),
+                "principal_claim": companion_principal_claim,
+            },
+        ],
+        "operator_rationale": operator_rationale,
+    }
+    _render_operated_preview_flow(
+        st,
+        workspace=workspace,
+        root=root,
+        request=request,
+    )
 
 
 def render_command_center(
@@ -358,8 +622,8 @@ def render_command_center(
     st.header("Command Center")
     st.caption(
         "Active persisted paper authority first; banked no-market comparison second. "
-        "One bounded cash-funded entry reuses the existing preview, disposition, atomic "
-        "persistence, certification, and exact replay path."
+        "The bounded entry and one proposal-bound SELL+BUY rotation reuse the existing "
+        "preview, disposition, atomic persistence, certification, and exact replay path."
     )
 
     st.subheader("Active certified paper workspace")
@@ -409,17 +673,28 @@ def render_command_center(
     funded_positions = [
         row for row in workspace["book"]["positions"] if int(row["quantity"]) > 0
     ]
-    if funded_positions:
-        st.success(
-            "The bounded cash-funded entry has been operated, persisted, certified, "
-            "and reopened from active authority."
-        )
-    else:
+    if not funded_positions:
         _render_operated_paper_action(
             st,
             workspace=workspace,
             root=root,
             pit_identity=canonical_value(identity),
+        )
+    elif len(funded_positions) == 1 and workspace["prospective_episode_count"] == 1:
+        st.success(
+            "The bounded cash-funded entry has been operated, persisted, certified, "
+            "and reopened from active authority."
+        )
+        _render_operated_rotation_action(
+            st,
+            workspace=workspace,
+            root=root,
+            model=model,
+        )
+    else:
+        st.success(
+            "The proposal-bound SELL+BUY rotation has been operated, persisted, "
+            "certified, and reopened from active authority."
         )
 
     st.subheader("Banked no-market comparison baseline")

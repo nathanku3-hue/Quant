@@ -1,3 +1,11 @@
+## 2026-08-05 Round Entry (Zero-Residual Rotation Must Not Smuggle Mark-to-Market P&L)
+- Date: 2026-08-05
+- Mistake or miss: the first rotation draft repriced retained MU from the certified `101.25` mark to `102`, which created an unexplained residual and obscured the legacy post-entry sell-required failure behind new rotation-specific checks.
+- Root cause: a market observation was treated as both execution price and implicit valuation/P&L authority, while rotation detection was keyed too broadly to any funded operated request.
+- Fix applied: keep the source packet at the certified `101.25` mark for this bounded accounting proof; identify the new rotation only when displayed-proposal or dual-market bindings are present; preserve the legacy one-update `PROSPECTIVE_TRANSITION_SELL_REQUIRED` path; add core, negative, Command Center AppTest, and fresh-process replay coverage.
+- Guardrail for next time: when an accounting reducer requires unexplained residual `0`, do not change retained-position valuation without an explicit economic/P&L event; new specialized validation must be gated by an unambiguous request contract so legacy failure semantics remain stable.
+- Evidence paths: `gv_portfolio_v0/prospective.py`, `views/command_center.py`, `tests/test_gv_pit_operated_rotation.py`, `tests/test_gv_pit_operated_capital.py`, and `docs/phase_brief/gv-operated-rotation-1-brief.md`.
+
 ## 2026-08-04 Round Entry (Custody, Review, and Owner Operation Must Close Together)
 - Date: 2026-08-04
 - Mistake or miss: the candidate was locally green but left the isolated custody, independent review, and owner-operated episode as unverified ceremony.

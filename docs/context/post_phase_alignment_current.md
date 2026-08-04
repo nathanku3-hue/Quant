@@ -1,70 +1,42 @@
 # Post-Phase Alignment — Current
 
-Date: 2026-08-03
-Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
-Status: `FINAL PLANNING ALIGNMENT`
+Date: 2026-08-05
+Active slice: `GV-OPERATED-ROTATION-1`
+Status: `VALIDATED — TERMINAL PUBLICATION PENDING`
 
 ## Alignment
 
-The accepted portfolio substrate and real-MU evidence work remain useful. The next product gap is not another isolated human episode; it is the absence of one governed portfolio-wide dashboard decision loop.
+The fastest endgame-aligned move was repeat operation through the product, not another governance or architecture milestone. This slice connects the displayed proposal surface to one post-entry paper-capital transition while preserving the existing authority substrate.
 
 ## Preserved
 
-- accepted 10/25 operated portfolio and replay substrate;
-- date repair and real-evidence identities;
-- hosted-green closure and accepted score `62/100`;
-- current same-evidence MU shadow implementation as a baseline to bank;
-- `dashboard.py` as the future sole GodView app;
-- no live-capital authority.
+- canonical accepted product score `62/100`;
+- episode-one MU `7 @ 101.25` authority and exact replay;
+- default `dashboard.py` Command Center;
+- existing preview, confirm, reject, persistence, certification, and replay machinery;
+- real five-field PIT identity and displayed eligible proposal model;
+- no provider, alpha, broker, or live-capital claim.
 
-## Replaced during the planning round
+## Advanced and validated
 
-- MU-centric workflow sizing;
-- one-proposal lifecycle as supreme portfolio governance;
-- three-page dashboard as endgame;
-- dashboard pages as architecture;
-- untyped extension dictionaries;
-- identity fields duplicated inconsistently across contracts;
-- wall-clock episode identity;
-- target unit used as target intent;
-- generic summation of absolute targets;
-- winner-take-all selection;
-- proposal lifecycle embedded in immutable strategy evidence;
-- UI transition methods as authority;
-- preview/authorization conflation;
-- authorization/application/certification conflation;
-- unrestricted float authority and naive four-decimal rounding;
-- `RISK_BPS` as instrument unit or risk measure;
-- production mock proposal rows;
-- adapters based on assumed JSON/Parquet files;
-- standalone cash-file and cash-yield assumptions;
-- projector-side business decisions;
-- event classes without stream ordering/digest authority;
-- identity rejection that could project `None` proposal;
-- nondeterministic read-model row ordering;
-- blanket prohibition on all Streamlit session state;
-- singular historical-simulation risk authority;
-- “architecture is alpha” overclaim;
-- transient baseline tag ceremony;
-- hallucinated deletion filenames and unconditional deletion;
-- one oversized Slice 1 containing selection/risk/preview/mutation/deletion;
-- seven-file shell-first Slice 1 that deferred the real proposal boundary.
+- one governed companion instrument is available only for the bounded rotation;
+- displayed proposal identity is bound to current book, certification, event count, and PIT identity;
+- two market observations bind SELL and BUY prices;
+- Command Center exposes one complete post-entry rotation journey;
+- core and AppTest evidence prove preview, confirmation, rejection, tamper resistance, replay, and reopened authority;
+- exact sealed validation passed 31/31 tests.
 
-## Final alignment
+## Not advanced
 
-Slice 1 is one layer-first real product transaction:
+- source data remains owner asserted rather than provider verified;
+- targets remain owner authored rather than strategy generated;
+- no optimality, sizing quality, alpha, return, or realized-value evidence exists;
+- no live capital or broker authority exists.
 
-```text
-contracts
-→ verified adapters
-→ command handler
-→ ordered events
-→ pure projector/read models
-→ six-page read-only Command Center
-```
+## Score alignment
 
-It stops before selection, optimizer/risk math, preview, authorization, book mutation, certification change, or deletion.
+Keep `62/100` canonical. Record `69–71/100` only as a non-canonical post-PASS assessment for repeatability, SELL+BUY accounting, proposal-to-capital integration, persistence, replay, and operator usability. Do not describe that assessment as alpha or economic-value proof.
 
-## Next alignment point
+## Terminal action
 
-After Slice 1 operates, assess only whether the real multi-proposal PIT read model, identity rejection, event replay, and user-facing comparison are correct and usable. Do not reopen the architecture or begin CTA/macro work.
+Publish the exact pre-authorized paths once to `origin/codex/gv-operated-rotation-1`, then stop the slice. Any data-quality or strategy-generated-target lane requires separate authorization.

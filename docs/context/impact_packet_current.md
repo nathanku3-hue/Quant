@@ -1,74 +1,51 @@
 # Impact Packet — Current
 
-Date: 2026-08-03
-Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
-Status: `BASELINE BANKED; DOCS CUSTODY PENDING; IMPLEMENTATION NOT STARTED`
+Date: 2026-08-05
+Active slice: `GV-OPERATED-ROTATION-1`
+Status: `VALIDATED — PUBLICATION PENDING`
 
 ## Product impact
 
-The active unit changes from one MU approval flow to one portfolio-wide PIT decision episode. MU operated, MU shadow, book-derived cash, and future modules become peer proposals against one certified book.
+GodView advances from one successful cash-funded paper entry to a repeatable proposal-to-capital journey. After episode one, the default Command Center exposes one displayed eligible proposal and one bounded rotation action rather than stopping at a static success state.
 
 ## User-flow impact
 
-Slice 1 default experience:
-
 ```text
-Command Center
-→ inspect one exact five-field PIT identity
-→ inspect real MU-operated, MU-shadow, and cash proposal rows
-→ inspect identity acceptance/rejection, disagreement, evidence gaps, and current capital
-→ navigate to evidence, portfolio history, strategy research, or operational replay
+open Command Center
+→ inspect certified MU entry and displayed eligible proposal
+→ enter bounded evidence and two identified market observations
+→ reduce MU target and fund governed MERID companion
+→ inspect mutation-free SELL+BUY preview and resulting book
+→ explicitly confirm or reject-all
+→ reopen certified changed authority
 ```
 
-Selection, preview, confirmation, and certification remain visibly unavailable until later slices.
+Confirmed acceptance book: MU `4`, MERID `5`, three cumulative orders/fills (`BUY`, `SELL`, `BUY`), two prospective episodes, certification lineage depth `2`, and unexplained residual `0`.
 
-## Architecture impact
+## Domain impact
 
-- `dashboard.py` remains the sole future app.
-- Six pages replace the current three-page endgame.
-- Strategy output becomes immutable proposal evidence.
-- Verified adapters translate active repository objects without new serialization paths.
-- Identity acceptance occurs in a typed command handler.
-- Governance facts use one bounded ordered digest-chained in-memory stream; Slice 1 adds no durable persistence.
-- Proposal/episode state is projected deterministically from events.
-- Portfolio calculation and mutation remain outside dashboard and Slice 1.
-- Standalone paths are deleted only after repository-grounded proof.
+- Adds a governed companion adapter from the accepted operated-10 substrate without changing the scenario registry.
+- Adds strict displayed-proposal binding against the real PIT read model.
+- Adds active-book hash, certification ID, event-count, and dual-price packet validation.
+- Preserves the legacy single-instrument entry and post-entry sell-required behavior.
+- Uses the existing deterministic reducer, execution events, persistence, certification, and replay path.
+- Reject path remains an economic no-op and does not admit the companion into authority.
 
-## Repository-grounded findings
+## Accounting decision
 
-- `views/command_center.py` does not exist and is a new file.
-- The operated source is the active prospective workspace/proposal path.
-- The shadow source is `core/gv_v2_mu_nvda_shadow_decision.py`.
-- Cash is present in the certified workspace/book; a standalone cash artifact is not assumed.
-- The five-file same-evidence baseline is banked at `a520f475bfa4fca42a68a22165ab3ad8960c0bc9` after 9 focused tests passed.
-- No production `market_snapshot_id` exists; Slice 1 must use the approved proof-carrying cash-only no-market identity or fail closed.
-- Certified head must resolve to the final authoritative event in the exact certified prefix, not merely the last event array element.
-- The verified standalone application path is `operated_portfolio_app.py`.
+The proof uses MU `101.25`, equal to the certified episode-one valuation, for the source rotation packet. Repricing retained MU to `102` would introduce an unclassified mark-to-market gain under the existing accounting model and correctly fail the zero-residual invariant. This slice does not invent a P&L event or widen accounting authority.
 
-## Touched interfaces expected next
+## Validation
 
-- current operated workspace/proposal schema;
-- independent shadow decision schema;
-- certified book/head/cash identity;
-- decision-free evidence identity and proof-carrying cash-only no-market identity;
-- bounded in-memory event ordering/digest conventions;
-- dashboard registry and Streamlit composition root.
+The exact sealed four-file pytest transaction passed 31/31 tests in 203.929 seconds. Coverage includes core transition behavior, legacy operated-capital regressions, prospective regressions, both Streamlit app paths, and separate-process replay.
 
-## Exact Slice 1 files
+## Risk and rollback
 
-```text
-core/gv_pit/__init__.py
-core/gv_pit/contracts.py
-core/gv_pit/adapters.py
-core/gv_pit/governance.py
-core/gv_pit/read_models.py
-views/command_center.py
-views/page_registry.py
-dashboard.py
-tests/test_dash_1_page_registry_shell.py
-tests/test_gv_pit_transaction.py
-```
+- Stale or tampered proposal/book/certification/event bindings fail closed.
+- Buy-only top-up is rejected; both SELL and BUY are required.
+- Companion admission occurs only on confirmed proposal projection.
+- Rollback is bounded to the exact authorized code/test/docs paths.
 
 ## Score impact
 
-Accepted score remains `62/100`. Documentation, contracts, and read-only shell work do not earn uplift. Repeated real operation and independent evidence remain required.
+Canonical accepted score remains `62/100`. The validated repeatability and proposal-to-capital integration support a non-canonical `69–71/100` assessment only. Provider quality, strategy target generation, advantageous sizing, alpha, and realized economic value remain unproven.

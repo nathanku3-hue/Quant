@@ -1,51 +1,48 @@
 # Bridge Contract — Current
 
-Date: 2026-08-03
-Active gate: `GV-DASHBOARD-ALL-CAPITAL-PIT-1`
-Status: `ACTIVE — FINAL PLANNING FROZEN`
+Date: 2026-08-05
+Active slice: `GV-OPERATED-ROTATION-1`
+Status: `VALIDATED — READY TO PUBLISH`
+Accepted score: `62/100`
+Post-PASS assessment: `69–71/100` (non-canonical)
 
 ## FROM
 
-A hosted-green real-MU prospective capability at accepted score `62/100`, plus the banked same-evidence MU operated-versus-shadow baseline at `a520f475bfa4fca42a68a22165ab3ad8960c0bc9`.
+A certified, persisted, fresh-process-replayable episode-one paper book with MU `7 @ 101.25`, plus the default Command Center’s displayed eligible `GV_REAL_MU_OPERATED` proposal.
 
 ## TO
 
-One dashboard-operated all-capital PIT decision loop:
+One repeatable proposal-to-capital operation:
 
 ```text
-certified five-field PIT identity
-→ verified real adapters
-→ immutable proposals
-→ typed identity command
-→ ordered governance events
-→ deterministic read projections
-→ dashboard comparison
-→ later intent-aware selection
-→ later preview/authorization/application/certification/replay
+displayed eligible proposal
+→ exact PIT + active book/certification/event binding
+→ two identified market packets
+→ mutation-free SELL+BUY preview
+→ explicit confirm or reject-all
+→ atomic persistence
+→ certification lineage
+→ exact fresh-process reopen
 ```
 
-## Bridge steps
+## Frozen product behavior
 
-```text
-bank final planning authority separately as docs-only
-→ verify a fully clean worktree
-→ freeze certified-prefix head and proof-carrying cash-only no-market identity
-→ implement compact contracts and real MU operated/shadow/book-cash adapters
-→ validate exact identity in command handler
-→ append ordered digest-chained in-memory events
-→ project canonical read models
-→ render six-page read-only Command Center
-→ stop
-```
+- The funded source is the single certified MU position.
+- The governed companion is MERID derived from the accepted operated-10 substrate.
+- Rotation requires exactly two ADMIT targets: reduce MU and fund MERID.
+- The source market mark remains certified `101.25`, avoiding invented mark-to-market P&L.
+- SELL executes before BUY; both use complete fills and the existing deterministic fee path.
+- Reject-all records a certified rejection without adding MERID or changing economics.
+- Stale proposal/book/certification/event bindings, mismatched prices, tampering, and buy-only top-ups fail closed.
 
-## Non-negotiable boundary
+## Validation truth
 
-- MU is the first populated case, not the workflow unit.
-- The dashboard cannot own strategy logic, identity decisions, event acceptance, or capital math.
-- The projector cannot decide or emit events.
-- Certified head is the final authoritative event in the exact certified prefix, never merely `events[-1]`.
-- Cash-only no-market identity must carry and validate its proof; `reference_price = "1"` is not market evidence.
-- Cash yield or a conventional market snapshot cannot be invented.
-- Slice 1 creates no durable governance persistence.
-- Slice 1 contains no selection, optimizer/risk math, preview, authorization, mutation, certification change, or deletion.
-- Limited Live remains closed.
+The sealed native validation passed all 31 declared tests, including the default Command Center AppTest and separate-process exact reopen. The retained task outcome is `DONE`.
+
+## Authority boundary
+
+The Command Center composes the request and displays the result. Proposal validation, transition construction, accounting, persistence, certification, and replay remain in existing domain authorities. No strategy calculation or optimizer logic moves into the dashboard.
+
+## Next step
+
+Commit and push the exact pre-authorized slice once to `origin/codex/gv-operated-rotation-1`. Alpha, provider-quality, sizing-quality, and realized-value claims remain closed.

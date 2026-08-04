@@ -1,3 +1,15 @@
+## 2026-08-05 — ROUND-20260805-GV-OPERATED-ROTATION-1
+
+- Decision: close the adjacent repeatability gap by operating one displayed-proposal-bound post-entry paper SELL+BUY rotation through the default Command Center.
+- Product result: preserve episode one at MU `7 @ 101.25`; preview and confirm SELL `3 MU` plus BUY `5 MERID`; reopen exact MU `4` / MERID `5` authority with residual `0` and certification lineage depth `2`.
+- Binding: require the displayed eligible `GV_REAL_MU_OPERATED` proposal, full PIT identity, active book hash, certification ID, event count, and two owner-identified market packets.
+- Accounting: retain MU source price `101.25` for this proof; do not invent an unclassified mark-to-market P&L event. SELL executes before BUY through the existing deterministic complete-fill and fee path.
+- Negative authority: reject stale/tampered bindings and buy-only top-ups; reject-all records certification without admitting MERID or changing economics.
+- Evidence: exact sealed validation passed 31/31 declared tests, including Command Center AppTest and separate-process exact replay; native task outcome retained as `DONE`.
+- Score/claims: canonical accepted score remains `62/100`; `69–71/100` is a non-canonical post-PASS assessment for repeatability only. Provider quality, strategy-generated targets, sizing quality, alpha, realized value, broker, and live capital remain unproven.
+- Publication: commit and push only the exact pre-authorized path set once to `origin/codex/gv-operated-rotation-1`.
+
+
 ## 2026-08-03 — ROUND-20260803-GV-DASHBOARD-ALL-CAPITAL-PIT-1
 
 - Decision: replace the MU-centric next gate with one portfolio-wide all-proposal PIT decision loop operated through `dashboard.py`.

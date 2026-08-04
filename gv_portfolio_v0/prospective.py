@@ -28,13 +28,17 @@ from gv_portfolio_v0.operated import (
     _append_transition_event,
     _decision_snapshot,
     _evidence,
+    _initial_evidence,
+    _initial_reviews,
     _record,
     _thesis,
     _transition_legs_from_reviews,
     build_draft_workspace,
     confirm_initial_portfolio,
+    instrument_registry,
 )
 from gv_portfolio_v0.operated_scenarios import (
+    DEFAULT_SCENARIO_ID,
     OPERATED_PAPER_CAPITAL_SCENARIO_ID,
     PROSPECTIVE_25_SCENARIO_ID,
     REAL_MU_PROSPECTIVE_SCENARIO_ID,
@@ -61,6 +65,7 @@ MAX_PROSPECTIVE_REQUEST_BYTES = 256_000
 MAX_PROSPECTIVE_DECIMAL_INTEGER_DIGITS = 18
 MAX_PROSPECTIVE_DECIMAL_FRACTION_DIGITS = 18
 MAX_PROSPECTIVE_QUANTITY_DIGITS = 18
+OPERATED_ROTATION_COMPANION_SYMBOL = "MERID"
 
 
 class ProspectiveOperationError(OperatedPortfolioError):
@@ -82,6 +87,185 @@ class ForwardOperatedDecisionPacket:
     principal_claim: str
     operator_rationale: str
     pit_identity: dict[str, Any]
+
+
+@lru_cache(maxsize=1)
+def _rotation_companion_template() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Return the exact accepted operated-10 MERID identity, evidence, and review."""
+
+    source_scenario = get_scenario(DEFAULT_SCENARIO_ID)
+    instruments = instrument_registry(DEFAULT_SCENARIO_ID)
+    evidence = _initial_evidence(source_scenario, instruments)
+    reviews = _initial_reviews(source_scenario, instruments, evidence)
+    matching = [
+        index
+        for index, instrument in enumerate(instruments)
+        if instrument["symbol"] == OPERATED_ROTATION_COMPANION_SYMBOL
+    ]
+    if len(matching) != 1:
+        raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_UNAVAILABLE")
+    index = matching[0]
+    companion_review = deepcopy(reviews[index])
+    companion_review["target_quantity"] = "0"
+    return (
+        deepcopy(instruments[index]),
+        deepcopy(evidence[index]),
+        companion_review,
+    )
+
+
+def operated_rotation_companion(workspace: Mapping[str, Any]) -> dict[str, Any]:
+    """Expose the bounded governed companion used by the post-entry rotation UI."""
+
+    if workspace.get("scenario_id") != OPERATED_PAPER_CAPITAL_SCENARIO_ID:
+        raise ProspectiveOperationError("OPERATED_ROTATION_PROFILE_REQUIRED")
+    if not any(int(row["quantity"]) > 0 for row in workspace["book"]["positions"]):
+        raise ProspectiveOperationError("OPERATED_ROTATION_FUNDED_BOOK_REQUIRED")
+    instrument, evidence, review = _rotation_companion_template()
+    return {
+        "source_scenario_id": DEFAULT_SCENARIO_ID,
+        "instrument": deepcopy(instrument),
+        "source_evidence": deepcopy(evidence),
+        "review": deepcopy(review),
+    }
+
+
+def _workspace_with_rotation_companion(
+    workspace: Mapping[str, Any],
+) -> dict[str, Any]:
+    result = deepcopy(dict(workspace))
+    instrument, evidence, review = _rotation_companion_template()
+    instrument_rows = [
+        row
+        for row in result["instruments"]
+        if row["instrument_id"] == instrument["instrument_id"]
+    ]
+    review_rows = [
+        row
+        for row in result["reviews"]
+        if row["instrument_id"] == instrument["instrument_id"]
+    ]
+    evidence_rows = [
+        row
+        for row in result["evidence_references"]
+        if row["evidence_reference_id"] == evidence["evidence_reference_id"]
+    ]
+    counts = (len(instrument_rows), len(review_rows), len(evidence_rows))
+    if counts == (0, 0, 0):
+        result["instruments"].append(deepcopy(instrument))
+        result["evidence_references"].append(deepcopy(evidence))
+        result["reviews"].append(deepcopy(review))
+        return result
+    if counts != (1, 1, 1):
+        raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_STATE_INVALID")
+    if canonical_document_bytes(instrument_rows[0]) != canonical_document_bytes(instrument):
+        raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_IDENTITY_DRIFT")
+    if canonical_document_bytes(evidence_rows[0]) != canonical_document_bytes(evidence):
+        raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_EVIDENCE_DRIFT")
+    return result
+
+
+def displayed_proposal_binding(
+    workspace: Mapping[str, Any], record_id: str
+) -> dict[str, Any]:
+    """Build the exact visible proposal-to-active-book binding for the operator UI."""
+
+    try:
+        from core.gv_pit.adapters import build_real_pit_source_bundle
+        from core.gv_pit.contracts import canonical_value
+        from core.gv_pit.governance import govern_real_pit_bundle
+        from core.gv_pit.read_models import project_decision_episode
+
+        model = project_decision_episode(
+            govern_real_pit_bundle(build_real_pit_source_bundle()).read()
+        )
+    except Exception as exc:
+        raise ProspectiveOperationError("DISPLAYED_PROPOSAL_MODEL_UNAVAILABLE") from exc
+    matching = [row for row in model.proposal_records if row.record_id == record_id]
+    if len(matching) != 1 or matching[0].status != "ELIGIBLE":
+        raise ProspectiveOperationError("DISPLAYED_PROPOSAL_RECORD_UNKNOWN")
+    row = matching[0]
+    return {
+        "episode_id": model.episode_id,
+        "record_id": row.record_id,
+        "proposal_id": row.proposal_id,
+        "module_id": row.module_id,
+        "module_version": row.module_version,
+        "sleeve_id": row.sleeve_id,
+        "status": row.status,
+        "pit_identity": canonical_value(model.pit_identity),
+        "active_book_hash": workspace["book"]["book_hash"],
+        "active_certification_id": workspace["certification"]["certification_id"],
+        "active_event_count": len(workspace["events"]),
+    }
+
+
+@lru_cache(maxsize=1)
+def _displayed_proposal_model() -> Any:
+    """Build the immutable banked proposal projection once per process."""
+
+    try:
+        from core.gv_pit.adapters import build_real_pit_source_bundle
+        from core.gv_pit.governance import govern_real_pit_bundle
+        from core.gv_pit.read_models import project_decision_episode
+
+        return project_decision_episode(
+            govern_real_pit_bundle(build_real_pit_source_bundle()).read()
+        )
+    except Exception as exc:
+        raise ProspectiveOperationError("DISPLAYED_PROPOSAL_MODEL_UNAVAILABLE") from exc
+
+
+def _normalize_displayed_proposal_binding(
+    workspace: Mapping[str, Any], value: Any
+) -> dict[str, Any]:
+    if not isinstance(value, Mapping):
+        raise ProspectiveOperationError("DISPLAYED_PROPOSAL_BINDING_REQUIRED")
+    from core.gv_pit.contracts import canonical_value
+
+    model = _displayed_proposal_model()
+    record_id = _required_text(value.get("record_id"), field="displayed_record_id")
+    matching = [row for row in model.proposal_records if row.record_id == record_id]
+    if len(matching) != 1:
+        raise ProspectiveOperationError("DISPLAYED_PROPOSAL_RECORD_UNKNOWN")
+    row = matching[0]
+    if row.status != "ELIGIBLE":
+        raise ProspectiveOperationError("DISPLAYED_PROPOSAL_NOT_ELIGIBLE")
+    expected_fields = {
+        "proposal_id": row.proposal_id,
+        "module_id": row.module_id,
+        "module_version": row.module_version,
+        "sleeve_id": row.sleeve_id,
+        "status": row.status,
+        "episode_id": model.episode_id,
+    }
+    for field, expected in expected_fields.items():
+        if value.get(field) != expected:
+            raise ProspectiveOperationError("DISPLAYED_PROPOSAL_BINDING_MISMATCH")
+    pit_identity = _normalize_pit_identity(value.get("pit_identity"))
+    model_identity = _normalize_pit_identity(canonical_value(model.pit_identity))
+    workspace_identity = _normalize_pit_identity(workspace.get("pit_identity"))
+    if pit_identity != model_identity or pit_identity != workspace_identity:
+        raise ProspectiveOperationError("DISPLAYED_PROPOSAL_PIT_IDENTITY_MISMATCH")
+    active_bindings = {
+        "active_book_hash": workspace["book"]["book_hash"],
+        "active_certification_id": workspace["certification"]["certification_id"],
+        "active_event_count": len(workspace["events"]),
+    }
+    for field, expected in active_bindings.items():
+        if value.get(field) != expected:
+            raise ProspectiveOperationError("DISPLAYED_PROPOSAL_ACTIVE_BOOK_MISMATCH")
+    return {
+        "episode_id": model.episode_id,
+        "record_id": row.record_id,
+        "proposal_id": row.proposal_id,
+        "module_id": row.module_id,
+        "module_version": row.module_version,
+        "sleeve_id": row.sleeve_id,
+        "status": row.status,
+        "pit_identity": deepcopy(pit_identity),
+        **active_bindings,
+    }
 
 
 def _utc_datetime(value: str, *, field: str) -> datetime:
@@ -402,6 +586,53 @@ def _normalize_review_update(
     }
 
 
+def _normalize_rotation_market_packets(
+    value: Any,
+    *,
+    expected_instrument_ids: list[str],
+    latest_time: datetime,
+    observed_time: datetime,
+) -> list[dict[str, str]]:
+    if not isinstance(value, list) or len(value) != len(expected_instrument_ids):
+        raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_PACKETS_REQUIRED")
+    packets_by_id: dict[str, dict[str, str]] = {}
+    expected_ids = set(expected_instrument_ids)
+    for raw in value:
+        if not isinstance(raw, Mapping):
+            raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_PACKET_MAPPING_REQUIRED")
+        instrument_id = _required_text(
+            raw.get("instrument_id"), field="rotation_market_instrument_id"
+        )
+        if instrument_id not in expected_ids:
+            raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_INSTRUMENT_UNKNOWN")
+        if instrument_id in packets_by_id:
+            raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_INSTRUMENT_DUPLICATE")
+        market_observed_at = _required_text(
+            raw.get("market_observed_at"), field="rotation_market_observed_at"
+        )
+        market_observed_time = _utc_datetime(
+            market_observed_at, field="rotation_market_observed_at"
+        )
+        if market_observed_time <= latest_time:
+            raise ProspectiveOperationError(
+                "MARKET_OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY"
+            )
+        if market_observed_time > observed_time:
+            raise ProspectiveOperationError("MARKET_OBSERVATION_AFTER_EVIDENCE_DECISION")
+        packets_by_id[instrument_id] = {
+            "instrument_id": instrument_id,
+            "market_price": _positive_decimal_text(
+                raw.get("market_price"), field="rotation_market_price"
+            ),
+            "market_observed_at": _utc_timestamp(market_observed_time),
+            "market_source_identity": _required_text(
+                raw.get("market_source_identity"),
+                field="rotation_market_source_identity",
+            ),
+        }
+    return [packets_by_id[instrument_id] for instrument_id in expected_instrument_ids]
+
+
 def _normalize_request(
     workspace: Mapping[str, Any], request: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -432,12 +663,32 @@ def _normalize_request(
         if locator != initial_evidence.get("locator"):
             raise ProspectiveOperationError("REAL_MU_EXACT_EVIDENCE_LOCATOR_REQUIRED")
 
+    is_operated_profile = (
+        workspace.get("scenario_id") == OPERATED_PAPER_CAPITAL_SCENARIO_ID
+    )
+    funded_positions = [
+        row for row in workspace["book"]["positions"] if int(row["quantity"]) > 0
+    ]
+    is_operated_rotation = (
+        is_operated_profile
+        and bool(funded_positions)
+        and (
+            request.get("displayed_proposal_binding") is not None
+            or request.get("forward_operated_market_packets") is not None
+        )
+    )
+    request_workspace = (
+        _workspace_with_rotation_companion(workspace)
+        if is_operated_rotation
+        else workspace
+    )
+
     raw_updates = request.get("review_updates")
     if not isinstance(raw_updates, list) or not raw_updates:
         raise ProspectiveOperationError("REVIEW_UPDATES_REQUIRED")
     if len(raw_updates) > MAX_PROSPECTIVE_REVIEW_UPDATES:
         raise ProspectiveOperationError("REVIEW_UPDATES_TOO_MANY")
-    updates = [_normalize_review_update(workspace, row) for row in raw_updates]
+    updates = [_normalize_review_update(request_workspace, row) for row in raw_updates]
     ids = [row["instrument_id"] for row in updates]
     if len(ids) != len(set(ids)):
         raise ProspectiveOperationError("REVIEW_UPDATE_INSTRUMENT_DUPLICATE")
@@ -452,103 +703,143 @@ def _normalize_request(
         "operator_rationale": operator_rationale,
     }
 
-    if workspace.get("scenario_id") == OPERATED_PAPER_CAPITAL_SCENARIO_ID:
-        if len(updates) != 1:
-            raise ProspectiveOperationError("FORWARD_OPERATED_SINGLE_INSTRUMENT_REQUIRED")
-        update = updates[0]
-        if update["outcome"] != "ADMIT" or update["target_quantity"] == "0":
-            raise ProspectiveOperationError("FORWARD_OPERATED_NONZERO_ADMIT_REQUIRED")
-        if (
-            "forward_operated_packet" in request
-            and request.get("forward_operated_packet") is not None
-            and not isinstance(request.get("forward_operated_packet"), Mapping)
-        ):
-            raise ProspectiveOperationError(
-                "FORWARD_OPERATED_PACKET_MAPPING_REQUIRED"
+    if not is_operated_profile:
+        return normalized
+
+    requested_pit_identity = _normalize_pit_identity(request.get("pit_identity"))
+    workspace_pit_identity = _normalize_pit_identity(workspace.get("pit_identity"))
+    if requested_pit_identity != workspace_pit_identity:
+        raise ProspectiveOperationError(
+            "FORWARD_OPERATED_PIT_IDENTITY_WORKSPACE_MISMATCH"
+        )
+    pit_identity = workspace_pit_identity
+    if pit_identity != _validated_forward_pit_identity():
+        raise ProspectiveOperationError("FORWARD_OPERATED_PIT_IDENTITY_MISMATCH")
+    normalized["pit_identity"] = deepcopy(pit_identity)
+
+    if is_operated_rotation:
+        companion = operated_rotation_companion(workspace)
+        companion_id = companion["instrument"]["instrument_id"]
+        funded_ids = {row["instrument_id"] for row in funded_positions}
+        if len(funded_ids) != 1:
+            raise ProspectiveOperationError("OPERATED_ROTATION_SINGLE_FUNDED_SOURCE_REQUIRED")
+        source_id = next(iter(funded_ids))
+        expected_ids = [
+            row["instrument_id"]
+            for row in request_workspace["instruments"]
+            if row["instrument_id"] in {source_id, companion_id}
+        ]
+        if len(updates) != 2 or set(ids) != {source_id, companion_id}:
+            raise ProspectiveOperationError("OPERATED_ROTATION_TWO_INSTRUMENT_TARGET_REQUIRED")
+        update_by_id = {row["instrument_id"]: row for row in updates}
+        if any(row["outcome"] != "ADMIT" for row in updates):
+            raise ProspectiveOperationError("OPERATED_ROTATION_ADMIT_TARGETS_REQUIRED")
+        current_source_quantity = next(
+            int(row["quantity"])
+            for row in funded_positions
+            if row["instrument_id"] == source_id
+        )
+        if int(update_by_id[source_id]["target_quantity"]) >= current_source_quantity:
+            raise ProspectiveOperationError("OPERATED_ROTATION_SOURCE_REDUCTION_REQUIRED")
+        if update_by_id[companion_id]["target_quantity"] == "0":
+            raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_FUNDING_REQUIRED")
+        normalized["displayed_proposal_binding"] = (
+            _normalize_displayed_proposal_binding(
+                workspace, request.get("displayed_proposal_binding")
             )
-        stored_packet = request.get("forward_operated_packet")
-        packet_source = stored_packet if isinstance(stored_packet, Mapping) else request
-        requested_pit_identity = _normalize_pit_identity(request.get("pit_identity"))
-        workspace_pit_identity = _normalize_pit_identity(
-            workspace.get("pit_identity")
         )
-        if requested_pit_identity != workspace_pit_identity:
-            raise ProspectiveOperationError(
-                "FORWARD_OPERATED_PIT_IDENTITY_WORKSPACE_MISMATCH"
+        normalized["forward_operated_market_packets"] = (
+            _normalize_rotation_market_packets(
+                request.get("forward_operated_market_packets"),
+                expected_instrument_ids=expected_ids,
+                latest_time=latest_time,
+                observed_time=observed_time,
             )
-        pit_identity = workspace_pit_identity
-        if pit_identity != _validated_forward_pit_identity():
-            raise ProspectiveOperationError("FORWARD_OPERATED_PIT_IDENTITY_MISMATCH")
-        instrument_id = _required_text(
-            (
-                packet_source.get("instrument_id")
-                if isinstance(stored_packet, Mapping)
-                else packet_source.get("market_instrument_id")
-            ),
-            field="market_instrument_id",
         )
-        if instrument_id != update["instrument_id"]:
-            raise ProspectiveOperationError("FORWARD_OPERATED_MARKET_INSTRUMENT_MISMATCH")
-        market_observed_at = _required_text(
-            packet_source.get("market_observed_at"), field="market_observed_at"
+        return normalized
+
+    if len(updates) != 1:
+        raise ProspectiveOperationError("FORWARD_OPERATED_SINGLE_INSTRUMENT_REQUIRED")
+    update = updates[0]
+    if update["outcome"] != "ADMIT" or update["target_quantity"] == "0":
+        raise ProspectiveOperationError("FORWARD_OPERATED_NONZERO_ADMIT_REQUIRED")
+    if (
+        "forward_operated_packet" in request
+        and request.get("forward_operated_packet") is not None
+        and not isinstance(request.get("forward_operated_packet"), Mapping)
+    ):
+        raise ProspectiveOperationError("FORWARD_OPERATED_PACKET_MAPPING_REQUIRED")
+    stored_packet = request.get("forward_operated_packet")
+    packet_source = stored_packet if isinstance(stored_packet, Mapping) else request
+    instrument_id = _required_text(
+        (
+            packet_source.get("instrument_id")
+            if isinstance(stored_packet, Mapping)
+            else packet_source.get("market_instrument_id")
+        ),
+        field="market_instrument_id",
+    )
+    if instrument_id != update["instrument_id"]:
+        raise ProspectiveOperationError("FORWARD_OPERATED_MARKET_INSTRUMENT_MISMATCH")
+    market_observed_at = _required_text(
+        packet_source.get("market_observed_at"), field="market_observed_at"
+    )
+    market_observed_time = _utc_datetime(
+        market_observed_at, field="market_observed_at"
+    )
+    if market_observed_time <= latest_time:
+        raise ProspectiveOperationError(
+            "MARKET_OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY"
         )
-        market_observed_time = _utc_datetime(
-            market_observed_at, field="market_observed_at"
-        )
-        if market_observed_time <= latest_time:
-            raise ProspectiveOperationError(
-                "MARKET_OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY"
-            )
-        if market_observed_time > observed_time:
-            raise ProspectiveOperationError("MARKET_OBSERVATION_AFTER_EVIDENCE_DECISION")
-        if isinstance(stored_packet, Mapping):
-            expected_packet_bindings = {
-                "instrument_id": update["instrument_id"],
-                "evidence_content": content,
-                "source_locator": locator,
-                "evidence_observed_at": _utc_timestamp(observed_time),
-                "target_quantity": update["target_quantity"],
-                "principal_claim": update["principal_claim"],
-                "operator_rationale": operator_rationale,
-                "pit_identity": pit_identity,
-            }
-            for field, expected_value in expected_packet_bindings.items():
-                if stored_packet.get(field) != expected_value:
-                    raise ProspectiveOperationError(
-                        "FORWARD_OPERATED_PACKET_BINDING_MISMATCH"
-                    )
-        packet = ForwardOperatedDecisionPacket(
-            instrument_id=instrument_id,
-            evidence_content=content,
-            source_locator=locator,
-            evidence_observed_at=_utc_timestamp(observed_time),
-            market_price=_positive_decimal_text(
-                packet_source.get("market_price"), field="market_price"
-            ),
-            market_observed_at=_utc_timestamp(market_observed_time),
-            market_source_identity=_required_text(
-                packet_source.get("market_source_identity"),
-                field="market_source_identity",
-            ),
-            target_quantity=update["target_quantity"],
-            principal_claim=update["principal_claim"],
-            operator_rationale=operator_rationale,
-            pit_identity=pit_identity,
-        )
-        normalized["forward_operated_packet"] = {
-            "instrument_id": packet.instrument_id,
-            "evidence_content": packet.evidence_content,
-            "source_locator": packet.source_locator,
-            "evidence_observed_at": packet.evidence_observed_at,
-            "market_price": packet.market_price,
-            "market_observed_at": packet.market_observed_at,
-            "market_source_identity": packet.market_source_identity,
-            "target_quantity": packet.target_quantity,
-            "principal_claim": packet.principal_claim,
-            "operator_rationale": packet.operator_rationale,
-            "pit_identity": deepcopy(packet.pit_identity),
+    if market_observed_time > observed_time:
+        raise ProspectiveOperationError("MARKET_OBSERVATION_AFTER_EVIDENCE_DECISION")
+    if isinstance(stored_packet, Mapping):
+        expected_packet_bindings = {
+            "instrument_id": update["instrument_id"],
+            "evidence_content": content,
+            "source_locator": locator,
+            "evidence_observed_at": _utc_timestamp(observed_time),
+            "target_quantity": update["target_quantity"],
+            "principal_claim": update["principal_claim"],
+            "operator_rationale": operator_rationale,
+            "pit_identity": pit_identity,
         }
-        normalized["pit_identity"] = deepcopy(pit_identity)
+        for field, expected_value in expected_packet_bindings.items():
+            if stored_packet.get(field) != expected_value:
+                raise ProspectiveOperationError(
+                    "FORWARD_OPERATED_PACKET_BINDING_MISMATCH"
+                )
+    packet = ForwardOperatedDecisionPacket(
+        instrument_id=instrument_id,
+        evidence_content=content,
+        source_locator=locator,
+        evidence_observed_at=_utc_timestamp(observed_time),
+        market_price=_positive_decimal_text(
+            packet_source.get("market_price"), field="market_price"
+        ),
+        market_observed_at=_utc_timestamp(market_observed_time),
+        market_source_identity=_required_text(
+            packet_source.get("market_source_identity"),
+            field="market_source_identity",
+        ),
+        target_quantity=update["target_quantity"],
+        principal_claim=update["principal_claim"],
+        operator_rationale=operator_rationale,
+        pit_identity=pit_identity,
+    )
+    normalized["forward_operated_packet"] = {
+        "instrument_id": packet.instrument_id,
+        "evidence_content": packet.evidence_content,
+        "source_locator": packet.source_locator,
+        "evidence_observed_at": packet.evidence_observed_at,
+        "market_price": packet.market_price,
+        "market_observed_at": packet.market_observed_at,
+        "market_source_identity": packet.market_source_identity,
+        "target_quantity": packet.target_quantity,
+        "principal_claim": packet.principal_claim,
+        "operator_rationale": packet.operator_rationale,
+        "pit_identity": deepcopy(packet.pit_identity),
+    }
     return normalized
 
 
@@ -636,9 +927,14 @@ def _build_proposal(
     workspace: Mapping[str, Any], request: Mapping[str, Any]
 ) -> dict[str, Any]:
     normalized = _normalize_request(workspace, request)
+    working_workspace = (
+        _workspace_with_rotation_companion(workspace)
+        if "displayed_proposal_binding" in normalized
+        else deepcopy(dict(workspace))
+    )
     scenario = get_scenario(str(workspace["scenario_id"]))
-    reviews_by_id = _review_by_id(workspace)
-    before_reviews = deepcopy(workspace["reviews"])
+    reviews_by_id = _review_by_id(working_workspace)
+    before_reviews = deepcopy(working_workspace["reviews"])
     owned_ids = [row["instrument_id"] for row in normalized["review_updates"]]
     evidence = _evidence(
         scenario,
@@ -657,11 +953,23 @@ def _build_proposal(
         after["net_score_bps"] = update["net_score_bps"]
         after["target_quantity"] = update["target_quantity"]
         forward_packet = normalized.get("forward_operated_packet")
+        rotation_packets = normalized.get("forward_operated_market_packets")
         if (
             isinstance(forward_packet, Mapping)
             and forward_packet.get("instrument_id") == update["instrument_id"]
         ):
             after["reference_price"] = forward_packet["market_price"]
+        elif isinstance(rotation_packets, list):
+            matching_packets = [
+                row
+                for row in rotation_packets
+                if row.get("instrument_id") == update["instrument_id"]
+            ]
+            if len(matching_packets) != 1:
+                raise ProspectiveOperationError(
+                    "OPERATED_ROTATION_MARKET_PACKET_BINDING_MISMATCH"
+                )
+            after["reference_price"] = matching_packets[0]["market_price"]
         after["living_thesis_lite"] = _thesis(
             scenario,
             instrument_id=update["instrument_id"],
@@ -676,20 +984,22 @@ def _build_proposal(
         reviews_by_id[update["instrument_id"]] = after
         review_changes.append({"before": before, "after": after})
 
-    ordered_reviews = [reviews_by_id[row["instrument_id"]] for row in workspace["reviews"]]
+    ordered_reviews = [
+        reviews_by_id[row["instrument_id"]] for row in working_workspace["reviews"]
+    ]
     decision_created_at = _utc_timestamp(
         _utc_datetime(normalized["observed_at"], field="observed_at")
         + timedelta(seconds=1)
     )
     decision_snapshot = _decision_snapshot(
         scenario,
-        aim_id=workspace["portfolio_aim"]["portfolio_aim_id"],
+        aim_id=working_workspace["portfolio_aim"]["portfolio_aim_id"],
         reviews=ordered_reviews,
         created_at=decision_created_at,
         reason="OPERATOR_PROPOSED_PROSPECTIVE_CAPITAL_DECISION",
     )
     legs = _transition_legs_from_reviews(
-        workspace["instruments"], before_reviews, ordered_reviews
+        working_workspace["instruments"], before_reviews, ordered_reviews
     )
     economics_changed = bool(legs)
     transition_kind = "PROSPECTIVE_REBALANCE"
@@ -697,7 +1007,7 @@ def _build_proposal(
         sides = {row["side"] for row in legs}
         funded_positions = [
             row
-            for row in workspace["book"]["positions"]
+            for row in working_workspace["book"]["positions"]
             if int(row["quantity"]) > 0
         ]
         cash_funded_entry = (
@@ -747,7 +1057,7 @@ def _build_proposal(
     )
     transition = (
         _transition_preview(
-            workspace,
+            working_workspace,
             decision_snapshot=decision_snapshot,
             legs=legs,
             observed_at=normalized["observed_at"],
@@ -852,7 +1162,11 @@ def _validate_event(event: Mapping[str, Any]) -> None:
 def _apply_proposal_projection(
     workspace: Mapping[str, Any], proposal: Mapping[str, Any]
 ) -> dict[str, Any]:
-    result = deepcopy(dict(workspace))
+    result = (
+        _workspace_with_rotation_companion(workspace)
+        if "displayed_proposal_binding" in proposal.get("request", {})
+        else deepcopy(dict(workspace))
+    )
     result["evidence_references"] = [
         *result["evidence_references"],
         deepcopy(proposal["evidence"]),
