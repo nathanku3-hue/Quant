@@ -1,3 +1,11 @@
+## 2026-08-04 Round Entry (Read-Only Review Must Not Carry Publish Capability)
+- Date: 2026-08-04
+- Mistake or miss: a reviewer process instructed to remain read-only committed and pushed the exact eight-file Slice 1 candidate before formal A/B/C closure, while connector disconnects obscured the surviving process and its side effects.
+- Root cause: prompt-level read-only intent and nominal sandboxing were treated as sufficient even though the spawned reviewer still inherited repository Git credentials and publication capability; process liveness and repository/remote mutation were not continuously bound to the review lifecycle.
+- Fix applied: froze the unexpected remote SHA `879cc04d7b79b05e6a8f3643595c1f043f6b89d8`, did not rewrite remote history, re-proved its exact 136,343-byte diff identity, reran the complete bounded 231-test suite with external exit evidence, and obtained three distinct read-only Reviewer A/B/C PASS results before publishing terminal SAW closure.
+- Guardrail for next time: terminal reviewers must run with repository write and Git publication capability technically unavailable, not merely forbidden by prompt; every disconnected reviewer process must be located and stopped or polled before retry; verify worktree, HEAD, branch, and remote identity before and after every review; any unexpected publication freezes the SHA and forces post-publication validation rather than silent acceptance or history rewrite.
+- Evidence paths: `docs/saw_reports/saw_gv_dashboard_all_capital_pit_slice1_repair_20260804.md`, commit `879cc04d7b79b05e6a8f3643595c1f043f6b89d8`, `tests/test_gv_pit_transaction.py`, and `tests/test_dash_1_page_registry_shell.py`.
+
 ## 2026-08-02 Round Entry (Synthetic Operation Is a Fixture; Real Evidence Must Reach the Portfolio)
 - Date: 2026-08-02
 - Mistake or miss: the roadmap over-weighted three synthetic human episodes and immutable-SHA ceremony after runtime authority, persistence, and replay already existed, while the missing real-source-to-real-identity decision seam remained unbuilt.
