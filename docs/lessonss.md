@@ -1,3 +1,11 @@
+## 2026-08-04 Round Entry (Defer Authority, Not the Cheap Falsifiable Challenger)
+- Date: 2026-08-04
+- Mistake or miss: the initial recommendation deferred all Quant implementation until Leningrad publication, real bilateral-exposure data, and a financial paper portfolio existed. That protected against false precision but also postponed the low-cost adapter, PIT contract, same-engine comparison, and kill criteria needed to learn whether the idea is worth future data work.
+- Root cause: production authority, predictive validity, data readiness, and research-harness readiness were treated as one gate. The recommendation also risked discussing Leningrad's equal-budget `inject-A`/`inject-B` result near investor decisions even though those are clearing interventions, not security trades.
+- Fix applied: isolated a clean Quant branch; consumed only an externally verified four-file bundle; copied no solver; classified exact shock severity without using intervention ranking; imposed next-day PIT availability; applied only a proportional gross-exposure cap to shadow weights; ran baseline and challenger through the same engine/cost path; encoded explicit defer/promote/kill rules; proved compatibility with a real Leningrad-generated and oracle-verified bundle.
+- Guardrail for next time: separate `can safely research now` from `can authorize capital now`. Build the smallest reversible falsification harness when it is cheaper than continued debate, but keep identity-level outputs out of security selection unless a governed economic mapping exists. Cross-platform canonical contracts must distinguish semantic newline normalization from exact raw-file custody hashes.
+- Evidence paths: `strategies/financial_cascade.py`, `research/financial_cascade_shadow.py`, `scripts/run_financial_cascade_shadow.py`, `tests/test_financial_cascade_shadow.py`, and `docs/phase_brief/gv-financial-cascade-shadow-0-brief.md`.
+
 ## 2026-08-02 Round Entry (Synthetic Operation Is a Fixture; Real Evidence Must Reach the Portfolio)
 - Date: 2026-08-02
 - Mistake or miss: the roadmap over-weighted three synthetic human episodes and immutable-SHA ceremony after runtime authority, persistence, and replay already existed, while the missing real-source-to-real-identity decision seam remained unbuilt.

@@ -1,3 +1,15 @@
+## 2026-08-04 — ROUND-20260804-GV-FINANCIAL-CASCADE-SHADOW-0
+
+- Decision: reject blanket implementation deferral. Implement the verified adapter, PIT projection, proportional gross-exposure challenger, and same-engine comparison now; defer only product/capital authority.
+- Module decision: cascade evidence is relevant to macro/regime interpretation and portfolio gross exposure. It is not admitted into stock selection, security ranking, entry, exit, stops, bailout trades, or per-name hedge instructions.
+- Architecture: consume only Leningrad's independently verified four-file v2 finance bundle through `strategies/financial_cascade.py`; require the exact external verifier bundle identity; verify custody, schemas, scenario/bundle identities, candidate coverage, and accounting invariants; do not import or copy the solver.
+- PIT rule: daily observations take effect strictly after their UTC availability date. Same-day use and historical backfill fail closed.
+- Research action: scale a shadow copy of existing target weights proportionally to a discrete WATCH/SEVERE gross cap, preserving security membership, signs, proportions, and all existing entry/exit support; compare baseline and challenger through the same `core.engine.run_simulation` path and cost rate.
+- Promotion/kill: require at least two non-overlapping stress windows and two distinct bundle identities, per-window relative max-drawdown improvement `>=15%`, expected-shortfall improvement `>=10%`, annualized net-return drag `<=1%`, relative turnover increase `<=20%`, PIT lineage, and exact replay. PASS grants later portfolio-preview challenger eligibility only; failure with adequate evidence kills the challenger.
+- Current evidence: 6 new tests and 78-test pinned regression pass; an actual Leningrad-generated/oracle-verified bundle loads successfully. These prove mechanics and interoperability, not predictive validity or promotion.
+- Authority: active dashboard gate and accepted score remain unchanged at `62/100`; Limited Live remains closed. No real two-window PIT bilateral-exposure evidence, commit, push, dashboard wiring, or terminal Reviewer A/B/C acceptance is claimed.
+- Evidence: `docs/phase_brief/gv-financial-cascade-shadow-0-brief.md`, `strategies/financial_cascade.py`, `research/financial_cascade_shadow.py`, `scripts/run_financial_cascade_shadow.py`, and `tests/test_financial_cascade_shadow.py`.
+
 ## 2026-08-03 — ROUND-20260803-GV-DASHBOARD-ALL-CAPITAL-PIT-1
 
 - Decision: replace the MU-centric next gate with one portfolio-wide all-proposal PIT decision loop operated through `dashboard.py`.

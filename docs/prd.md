@@ -6,6 +6,8 @@ Canonical contract: `docs/architecture/dashboard_all_capital_pit_contract.md`. P
 
 The immediate product slice is a real read-only all-proposal PIT transaction: one certified five-field identity, verified MU-operated/MU-shadow/book-cash adapters, immutable typed proposals, command-handler identity acceptance, ordered digest-chained governance events, deterministic read projections, and the six-page Command Center through `dashboard.py`. Slice 1 contains no selection, optimizer/risk math, preview, authorization, book mutation, certification change, or deletion. MU is the first real case, not the pipeline model. Historical material below is retained but does not compete with this authority.
 
+Research exception, 2026-08-04: `GV-FINANCIAL-CASCADE-SHADOW-0` adds an isolated, non-authoritative Leningrad bundle adapter and same-engine gross-exposure-cap challenger. It does not alter the active dashboard gate, `RegimeManager`, stock selection, entry/exit logic, certified portfolio state, or live capital. Promotion requires two distinct PIT stress windows and the frozen drawdown, expected-shortfall, alpha-drag, turnover, and replay checks in `docs/phase_brief/gv-financial-cascade-shadow-0-brief.md`; no real promotion evidence or score uplift currently exists.
+
 ---
 
 V2 PEAD Alpha Interpretation Gate Notice (2026-06-24)

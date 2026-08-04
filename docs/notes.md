@@ -1,3 +1,20 @@
+## 2026-08-04 GV Financial Cascade Shadow Formula Registry
+
+- Runtime paths: `strategies/financial_cascade.py`, `research/financial_cascade_shadow.py`, and `scripts/run_financial_cascade_shadow.py`.
+- Source custody: `bundle_identity := SHA256(canonical_json({kind="finance-intervention-choice-bundle-identity-v2", payload_hashes=raw_file_sha256s}))`; the required identity is supplied by Leningrad's independent verifier receipt. Quant verifies exact raw file hashes, schemas, reconstructed identities, and accounting-invariant PASS but does not copy or rerun the clearing solver.
+- Shock default fraction: `D := shock_default_count / institution_count`.
+- Shock unpaid fraction: `U := shock_total_unpaid_obligations / total_nominal_obligations`, using exact rational values from the bundle.
+- Cascade state: `SEVERE iff non_unique_states != empty OR D >= 1/3 OR U >= 1/10`; else `WATCH iff shock_default_count > 0 OR shock_total_unpaid_obligations > 0`; else `CLEAR`. No continuous cascade score is claimed.
+- PIT availability: for daily weights, `effective_date > UTC_date(available_at_utc)`; same-day use fails closed. Overlay projection uses backward as-of matching only after `effective_date`.
+- Gross exposure: `G_t := Σ_i |w_i,t|`.
+- Cap scale: `s_t := min(1, cap_t / G_t)` when a WATCH/SEVERE cap exists and `G_t > 0`; otherwise `s_t := 1`.
+- Challenger weights: `w'_i,t := s_t × w_i,t`. This preserves names, signs, relative weights, and entry/exit support; it only increases residual cash in the shadow copy.
+- Expected shortfall: `ES_q := mean(-r_t | -r_t >= quantile_q(-r))`, with default `q=0.95`; reported as a non-negative tail loss.
+- Relative risk improvement: `I(x) := (x_baseline - x_challenger) / x_baseline` for positive baseline risk.
+- Promotion contract: at least two non-overlapping windows and two distinct bundle identities; every window requires `I(max_drawdown_abs) >= 0.15` and `I(ES_0.95) >= 0.10`; aggregate annualized mean-net-return drag `<= 0.01`; relative turnover increase `<= 0.20`; PIT lineage and exact replay PASS.
+- Disposition: insufficient independent evidence → `DEFER_INSUFFICIENT_EVIDENCE`; all gates PASS → `PROMOTE_TO_LATER_PORTFOLIO_PREVIEW_CHALLENGER`; adequate evidence with any failed performance/cost/replay gate → `KILL_CHALLENGER`.
+- Claim boundary: no alpha, stock selection, entry/exit signal, bailout trade, hedge instruction, current capital authority, score uplift, or live readiness.
+
 ## 2026-07-21 E0B Observation / Decision-Value Formula Registry
 
 - Runtime: `core/gv_e0b_dv1_contradiction.py::decision_value_disposition_from_comparison`.

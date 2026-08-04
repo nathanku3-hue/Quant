@@ -19,6 +19,8 @@ Product flow: certified five-field PIT identity → verified real adapters → i
 
 The dashboard is the sole strategy-consumer/comparator/operator surface and contains no strategy logic, identity decision, event acceptance, or direct capital mutation. MU is the first real case, not the workflow boundary. Immediate order: test and commit the exact five-file shadow baseline without a tag, then execute Slice 1 layer-first as one real read-only product transaction: contracts → adapters → handler → events → projector → six-page Command Center. Slice 1 stops before selection, optimizer/risk math, preview, authorization, book mutation, certification change, or deletion. CTA/macro/provider/broker/live work remains closed.
 
+`GV-FINANCIAL-CASCADE-SHADOW-0` is a bounded research exception, not an active product gate. It verifies and ingests Leningrad finance bundles without copying the solver, projects PIT cascade states, and tests proportional gross-exposure caps through the same Quant engine. It cannot select securities, alter entries/exits, interpret bailout allocations as trades, mutate certified authority, or authorize live capital. No product score or roadmap authority changes until real two-window PIT evidence satisfies the frozen challenger contract.
+
 ---
 
 
