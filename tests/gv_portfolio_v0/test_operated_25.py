@@ -7,6 +7,7 @@ import socket
 
 import pytest
 
+from core.gv_fs0_canonical import canonical_document_bytes
 from gv_portfolio_v0.operated import (
     OperatedPortfolioError,
     STATUS_CORRECTED,
@@ -152,7 +153,7 @@ def test_scenario_definition_and_persisted_binding_fail_closed(
     path = workspace_path(root, scenario_id=PORTFOLIO_25_SCENARIO_ID)
     envelope = json.loads(path.read_text(encoding="utf-8"))
     envelope["scenario_hash"] = "FORGED"
-    path.write_text(json.dumps(envelope), encoding="utf-8")
+    path.write_bytes(canonical_document_bytes(envelope))
     with pytest.raises(
         OperatedPortfolioError, match="PERSISTED_SCENARIO_HASH_MISMATCH"
     ):

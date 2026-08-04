@@ -7,10 +7,16 @@ persist workspaces, render product views, or certify replay.
 
 from __future__ import annotations
 
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, DecimalException, InvalidOperation
 from typing import Any, Mapping
 
 from core.gv_fs0_canonical import domain_hash
+from gv_portfolio_v0.decimal_utils import (
+    MAX_DECIMAL_FRACTION_DIGITS,
+    MAX_DECIMAL_INTEGER_DIGITS,
+    decimal_text,
+    deterministic_decimal_context,
+)
 
 ID_DOMAIN = "GV-PORTFOLIO-V0"
 ELIGIBLE_OUTCOMES = frozenset({"ADMIT", "CASH"})
@@ -32,10 +38,29 @@ def _decimal(value: Any, *, field: str) -> Decimal:
 
 def _decimal_text(value: Any, *, field: str) -> str:
     parsed = _decimal(value, field=field)
-    if parsed == 0:
-        return "0"
-    text = format(parsed.normalize(), "f")
-    return text.rstrip("0").rstrip(".") if "." in text else text
+    try:
+        return decimal_text(parsed)
+    except ValueError as exc:
+        raise AllocationError(f"{field.upper()}_OUT_OF_BOUNDS") from exc
+
+
+def _money(value: Any, *, field: str) -> Decimal:
+    parsed = _decimal(value, field=field)
+    _, digits, exponent = parsed.as_tuple()
+    effective_digits = list(digits)
+    while len(effective_digits) > 1 and effective_digits[-1] == 0:
+        effective_digits.pop()
+        exponent += 1
+    integer_digits = len(effective_digits) + max(exponent, 0)
+    fraction_digits = max(-exponent, 0)
+    if (
+        integer_digits > MAX_DECIMAL_INTEGER_DIGITS
+        or fraction_digits > MAX_DECIMAL_FRACTION_DIGITS
+    ):
+        raise AllocationError(f"{field.upper()}_OUT_OF_BOUNDS")
+    if exponent < -2:
+        raise AllocationError(f"DECLARED_PRECISION_EXCEEDED:{field}")
+    return parsed
 
 
 def _identifier(kind: str, payload: Mapping[str, Any]) -> str:
@@ -112,10 +137,10 @@ def validate_execution_handoff(
         quantity = _decimal(
             decision_snapshot.get("selected_quantity"), field="selected_quantity"
         )
-        reference_price = _decimal(
+        reference_price = _money(
             decision_snapshot.get("reference_price"), field="reference_price"
         )
-        fee = _decimal(decision_snapshot.get("fee"), field="fee")
+        fee = _money(decision_snapshot.get("fee"), field="fee")
         if quantity <= 0:
             raise AllocationError("SELECTED_QUANTITY_MUST_BE_POSITIVE")
         if reference_price <= 0:
@@ -133,10 +158,10 @@ def validate_execution_handoff(
             decision_snapshot.get("selected_quantity", "0"),
             field="selected_quantity",
         )
-        reference_price = _decimal(
+        reference_price = _money(
             decision_snapshot.get("reference_price", "0"), field="reference_price"
         )
-        fee = _decimal(decision_snapshot.get("fee", "0"), field="fee")
+        fee = _money(decision_snapshot.get("fee", "0"), field="fee")
         if any(value != 0 for value in (quantity, reference_price, fee)):
             raise AllocationError("CASH_DECISION_ECONOMICS_MUST_BE_ZERO")
         instrument_id = None
@@ -172,12 +197,16 @@ def plan_transition(
     if not isinstance(cash_bucket, str) or not cash_bucket:
         raise AllocationError("CASH_BUCKET_REQUIRED")
 
-    delta = _decimal(selection["quantity"], field="selected_quantity")
-    if selection["action"] == "BUY":
-        target = current + delta
-    else:
-        delta = Decimal("0")
-        target = current
+    try:
+        with deterministic_decimal_context():
+            delta = _decimal(selection["quantity"], field="selected_quantity")
+            if selection["action"] == "BUY":
+                target = current + delta
+            else:
+                delta = Decimal("0")
+                target = current
+    except DecimalException as exc:
+        raise AllocationError("DECIMAL_ARITHMETIC_INVALID") from exc
 
     return {
         "decision_snapshot_id": selection["decision_snapshot_id"],

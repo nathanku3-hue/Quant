@@ -13,6 +13,7 @@ ENGINE_SCALE_50_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_50"
 ENGINE_SCALE_100_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_100"
 PROSPECTIVE_25_SCENARIO_ID = "GV_PROSPECTIVE_PAPER_BASELINE_1"
 REAL_MU_PROSPECTIVE_SCENARIO_ID = "GV_REAL_EVIDENCE_MU_PORTFOLIO_1"
+OPERATED_PAPER_CAPITAL_SCENARIO_ID = "GV_OPERATED_PAPER_CAPITAL_1"
 
 
 def _instrument(
@@ -509,6 +510,54 @@ def _real_mu_prospective_scenario() -> dict[str, Any]:
 SCENARIO_REAL_MU_PROSPECTIVE = _real_mu_prospective_scenario()
 
 
+def _operated_paper_capital_scenario() -> dict[str, Any]:
+    """Forward-operated MU paper authority without rewriting the banked specimen."""
+
+    scenario = deepcopy(SCENARIO_REAL_MU_PROSPECTIVE)
+    scenario.update(
+        {
+            "scenario_id": OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+            "title": "GV Operated Paper Capital — MU",
+            "id_domain": "GV-OPERATED-PAPER-CAPITAL-1",
+            "claim_boundary": (
+                "One owner-supplied, market-identified MU paper-capital decision using "
+                "the certified cash baseline. Operator assertions are content-addressed "
+                "but are not provider-verified, alpha evidence, investment advice, broker "
+                "authority, or live-capital authority."
+            ),
+            "fixture_namespace": "operated-paper-capital-mu",
+            "source_scenario_id": REAL_MU_PROSPECTIVE_SCENARIO_ID,
+            "forward_operated_market_packet": True,
+        }
+    )
+    scenario["portfolio_aim"] = {
+        **scenario["portfolio_aim"],
+        "objective": (
+            "Operate one bounded owner-authored MU paper decision from certified cash "
+            "through preview, explicit disposition, persistence, certification, and replay."
+        ),
+        "allowed_actions": ["BUY", "HOLD", "CASH"],
+    }
+    scenario["status_explanations"] = {
+        "DRAFT_REVIEW": (
+            "The forward-operated MU paper workspace awaits bootstrap confirmation."
+        ),
+        "FUNDED_CERTIFIED": (
+            "The certified MU workspace is ready for one owner-supplied evidence and "
+            "market packet; no paper position exists until explicit confirmation."
+        ),
+    }
+    scenario["initial_decision_reason"] = "BOOTSTRAP_BANKED_MU_CASH_BASELINE"
+    scenario["initial_changed_why_reason"] = (
+        "The forward-operated workspace starts from the certified banked MU cash-only "
+        "baseline without modifying its historical evidence contract."
+    )
+    return scenario
+
+
+SCENARIO_OPERATED_PAPER_CAPITAL = _operated_paper_capital_scenario()
+
+
 _SCENARIOS = {
     DEFAULT_SCENARIO_ID: SCENARIO_10,
     PORTFOLIO_25_SCENARIO_ID: SCENARIO_25,
@@ -516,6 +565,7 @@ _SCENARIOS = {
     ENGINE_SCALE_100_SCENARIO_ID: SCENARIO_100,
     PROSPECTIVE_25_SCENARIO_ID: SCENARIO_PROSPECTIVE_25,
     REAL_MU_PROSPECTIVE_SCENARIO_ID: SCENARIO_REAL_MU_PROSPECTIVE,
+    OPERATED_PAPER_CAPITAL_SCENARIO_ID: SCENARIO_OPERATED_PAPER_CAPITAL,
 }
 
 

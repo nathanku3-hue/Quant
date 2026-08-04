@@ -2,13 +2,37 @@
 
 from __future__ import annotations
 
-from typing import Any
+from pathlib import Path
+from typing import Any, Mapping
 
+from core.gv_fs0_canonical import canonical_document_bytes
 from core.gv_pit.adapters import build_real_pit_source_bundle
+from core.gv_pit.contracts import canonical_value
 from core.gv_pit.governance import govern_real_pit_bundle
 from core.gv_pit.read_models import (
     DecisionEpisodeReadModel,
     project_decision_episode,
+)
+from gv_portfolio_v0.operated_scenarios import (
+    OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+    get_scenario,
+)
+from gv_portfolio_v0.operated_storage import (
+    confirm_prospective_observation_and_persist,
+    ensure_prospective_workspace,
+    reject_prospective_observation_and_persist,
+    workspace_path,
+)
+from gv_portfolio_v0.prospective import preview_runtime_observation
+from views.gv_operated_portfolio_workspace import build_book_rows, build_trade_rows
+
+
+_ACTIVE_PREVIEW_KEY = "gv_command_center_operated_paper_capital_preview"
+_ACTIVE_PREVIEW_REQUEST_KEY = (
+    "gv_command_center_operated_paper_capital_preview_request"
+)
+_ACTIVE_PREVIEW_WORKSPACE_KEY = (
+    "gv_command_center_operated_paper_capital_preview_workspace"
 )
 
 
@@ -60,24 +84,349 @@ def _render_fail_closed(st: Any, *, title: str, error: Exception) -> None:
     )
 
 
-def render_command_center(st: Any) -> DecisionEpisodeReadModel | None:
-    """Render the default read-only all-capital operator surface."""
+def build_active_command_center_workspace(
+    *, root: Path | None = None
+) -> dict[str, Any]:
+    """Load or bootstrap the single persisted forward-operated paper workspace."""
+
+    return ensure_prospective_workspace(
+        root=root,
+        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+    )
+
+
+def _active_book_rows(workspace: Mapping[str, Any]) -> list[dict[str, str]]:
+    rows = build_book_rows(workspace)
+    return rows or [
+        {
+            "symbol": "CASH_ONLY",
+            "quantity": "0",
+            "valuation_price": "N/A",
+            "market_value": "0",
+        }
+    ]
+
+
+def _active_cost_rows(workspace: Mapping[str, Any]) -> list[dict[str, str]]:
+    rows = [dict(row) for row in workspace["book"]["classified_costs"]]
+    return rows or [
+        {
+            "classification": "NONE",
+            "fill_id": "",
+            "order_id": "",
+            "cash_bucket": "",
+            "amount": "0",
+        }
+    ]
+
+
+def _render_operated_paper_action(
+    st: Any,
+    *,
+    workspace: dict[str, Any],
+    root: Path | None,
+    pit_identity: Mapping[str, Any],
+) -> None:
+    session = st.session_state
+    st.subheader("Operate one paper-capital decision")
+    st.caption(
+        "Owner assertions are content-addressed and bound to the preview. They are not "
+        "provider-verified evidence, investment advice, broker authority, or live capital."
+    )
+    review = workspace["reviews"][0]
+    instrument = workspace["instruments"][0]
+    st.table(
+        [
+            {
+                "instrument_id": instrument["instrument_id"],
+                "symbol": instrument["symbol"],
+                "permanent_key": instrument["permanent_key"],
+                "current_outcome": review["outcome"],
+                "current_target_quantity": review["target_quantity"],
+            }
+        ]
+    )
+
+    evidence_content = st.text_area(
+        "Owner evidence content",
+        key="gv_command_center_evidence_content",
+        placeholder="Enter the evidence exactly as reviewed by the owner.",
+    )
+    source_locator = st.text_input(
+        "Evidence source locator",
+        key="gv_command_center_source_locator",
+        placeholder="operator://date/source-reference",
+    )
+    evidence_observed_at = st.text_input(
+        "Evidence observed at UTC",
+        key="gv_command_center_evidence_observed_at",
+        placeholder="2026-08-04T12:01:00.000000Z",
+    )
+    market_price = st.text_input(
+        "Identified market price",
+        key="gv_command_center_market_price",
+        placeholder="100.00",
+    )
+    market_observed_at = st.text_input(
+        "Market observed at UTC",
+        key="gv_command_center_market_observed_at",
+        placeholder="2026-08-04T12:00:00.000000Z",
+    )
+    market_source_identity = st.text_input(
+        "Market source identity",
+        key="gv_command_center_market_source_identity",
+        placeholder="operator://date/market-observation",
+    )
+    target_quantity = st.number_input(
+        "Paper target quantity",
+        min_value=1,
+        step=1,
+        value=1,
+        key="gv_command_center_target_quantity",
+    )
+    net_score_bps = st.number_input(
+        "Owner net score (bps)",
+        step=1,
+        value=0,
+        key="gv_command_center_net_score_bps",
+    )
+    principal_claim = st.text_area(
+        "Principal claim",
+        key="gv_command_center_principal_claim",
+        placeholder="State the bounded claim supporting this paper target.",
+    )
+    operator_rationale = st.text_area(
+        "Operator rationale",
+        key="gv_command_center_operator_rationale",
+        placeholder="Explain why this exact target should be previewed.",
+    )
+
+    request = {
+        "content": evidence_content,
+        "locator": source_locator,
+        "observed_at": evidence_observed_at,
+        "pit_identity": dict(pit_identity),
+        "market_instrument_id": review["instrument_id"],
+        "market_price": market_price,
+        "market_observed_at": market_observed_at,
+        "market_source_identity": market_source_identity,
+        "review_updates": [
+            {
+                "instrument_id": review["instrument_id"],
+                "outcome": "ADMIT",
+                "net_score_bps": int(net_score_bps),
+                "target_quantity": str(int(target_quantity)),
+                "principal_claim": principal_claim,
+            }
+        ],
+        "operator_rationale": operator_rationale,
+    }
+
+    if st.button("Preview paper-capital decision", key="gv_command_center_preview"):
+        try:
+            st.session_state[_ACTIVE_PREVIEW_KEY] = preview_runtime_observation(
+                workspace, request
+            )
+            session[_ACTIVE_PREVIEW_REQUEST_KEY] = dict(request)
+            session[_ACTIVE_PREVIEW_WORKSPACE_KEY] = str(
+                workspace_path(
+                    root, scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID
+                ).absolute()
+            )
+        except Exception as exc:
+            st.session_state.pop(_ACTIVE_PREVIEW_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
+            st.error(f"Preview rejected: {type(exc).__name__}: {exc}")
+
+    preview = st.session_state.get(_ACTIVE_PREVIEW_KEY)
+    current_workspace_path = str(
+        workspace_path(
+            root, scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID
+        ).absolute()
+    )
+    preview_request = session.get(_ACTIVE_PREVIEW_REQUEST_KEY)
+    try:
+        request_changed = not isinstance(preview_request, Mapping) or (
+            canonical_document_bytes(dict(preview_request))
+            != canonical_document_bytes(request)
+        )
+    except (TypeError, ValueError):
+        request_changed = True
+    preview_is_stale = isinstance(preview, dict) and (
+        preview.get("prior_book_hash") != workspace["book"]["book_hash"]
+        or preview.get("prior_certification_id")
+        != workspace["certification"]["certification_id"]
+        or preview.get("prior_event_count") != len(workspace["events"])
+        or preview.get("prior_decision_snapshot_id")
+        != workspace["current_decision_snapshot"]["decision_snapshot_id"]
+        or session.get(_ACTIVE_PREVIEW_WORKSPACE_KEY)
+        != current_workspace_path
+        or request_changed
+    )
+    if preview_is_stale:
+        st.session_state.pop(_ACTIVE_PREVIEW_KEY, None)
+        session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
+        session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
+        preview = None
+        st.warning("The prior preview is stale and was discarded.")
+    if not isinstance(preview, dict):
+        return
+
+    transition = preview["transition"]
+    packet = preview["request"]["forward_operated_packet"]
+    st.subheader("Mutation-free paper-capital preview")
+    st.table(
+        [
+            {
+                "proposal_id": preview["proposal_id"],
+                "transition_kind": transition["transition_kind"],
+                "instrument_id": packet["instrument_id"],
+                "target_quantity": packet["target_quantity"],
+                "market_price": packet["market_price"],
+                "market_observed_at": packet["market_observed_at"],
+                "market_source_identity": packet["market_source_identity"],
+                "authoritative": False,
+            }
+        ]
+    )
+    st.table(transition["legs"])
+    st.subheader("Resulting book preview")
+    st.table(transition["positions_after"])
+    st.table(transition["classified_cash_after"])
+    st.table(transition["classified_costs_after"])
+    st.caption(
+        f"book_hash_after=`{transition['book_hash_after']}` · "
+        f"cash_after={transition['cash_after']} · costs_after={transition['costs_after']} · "
+        f"residual={transition['unexplained_residual']} · authoritative=false"
+    )
+
+    if st.button("Confirm paper-capital decision", key="gv_command_center_confirm"):
+        try:
+            confirm_prospective_observation_and_persist(
+                preview,
+                root=root,
+                scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+            )
+        except Exception as exc:
+            st.error(f"Confirmation rejected: {type(exc).__name__}: {exc}")
+        else:
+            st.session_state.pop(_ACTIVE_PREVIEW_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
+            st.rerun()
+
+    rejection_reason = st.text_area(
+        "Rejection rationale",
+        key="gv_command_center_rejection_reason",
+        placeholder="Explain why this validated proposal must not receive capital authority.",
+    )
+    if st.button("Reject paper-capital decision", key="gv_command_center_reject"):
+        try:
+            reject_prospective_observation_and_persist(
+                preview,
+                rejection_reason,
+                root=root,
+                scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+            )
+        except Exception as exc:
+            st.error(f"Rejection failed: {type(exc).__name__}: {exc}")
+        else:
+            session.pop(_ACTIVE_PREVIEW_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_REQUEST_KEY, None)
+            session.pop(_ACTIVE_PREVIEW_WORKSPACE_KEY, None)
+            st.rerun()
+
+
+def render_command_center(
+    st: Any,
+    *,
+    root: Path | None = None,
+) -> DecisionEpisodeReadModel | None:
+    """Render persisted paper authority plus the banked read-only PIT comparison."""
 
     try:
         model = build_command_center_read_model()
+        workspace = build_active_command_center_workspace(root=root)
     except Exception as exc:
         _render_fail_closed(st, title="Command Center", error=exc)
         return None
     identity = model.pit_identity
     market_context = identity.market_snapshot_id
+    scenario = get_scenario(OPERATED_PAPER_CAPITAL_SCENARIO_ID)
 
     st.header("Command Center")
     st.caption(
-        "One certified book, one exact point-in-time identity, and every real "
-        "eligible capital proposal. Read-only Slice 1: no selection, preview, "
-        "authorization, persistence, or portfolio mutation."
+        "Active persisted paper authority first; banked no-market comparison second. "
+        "One bounded cash-funded entry reuses the existing preview, disposition, atomic "
+        "persistence, certification, and exact replay path."
     )
 
+    st.subheader("Active certified paper workspace")
+    st.caption(scenario["claim_boundary"])
+    nav_col, cash_col, position_col, cost_col = st.columns(4)
+    nav_col.metric("Active NAV", workspace["book"]["nav"])
+    cash_col.metric("Active cash", workspace["book"]["total_cash"])
+    position_col.metric(
+        "Active positions",
+        sum(int(row["quantity"]) > 0 for row in workspace["book"]["positions"]),
+    )
+    cost_col.metric("Active costs", workspace["book"]["total_costs"])
+    st.table(_active_book_rows(workspace))
+    st.table(workspace["book"]["classified_cash"])
+    st.table(_active_cost_rows(workspace))
+    st.table(
+        [
+            {
+                "scenario_id": workspace["scenario_id"],
+                "status": workspace["status"],
+                "book_hash": workspace["book"]["book_hash"],
+                "certification_id": workspace["certification"]["certification_id"],
+                "prior_certification_id": workspace["certification"].get(
+                    "prior_certification_id"
+                )
+                or "GENESIS",
+                "event_count": len(workspace["events"]),
+                "certification_lineage_depth": len(
+                    workspace["certification_history"]
+                ),
+                "prospective_episode_count": workspace[
+                    "prospective_episode_count"
+                ],
+                "unexplained_residual": workspace["book"][
+                    "unexplained_residual"
+                ],
+            }
+        ]
+    )
+    if workspace["prospective_episode_history"]:
+        st.subheader("Operated episode lineage")
+        st.table(workspace["prospective_episode_history"])
+    if workspace["fills"]:
+        st.subheader("Certified paper fills")
+        st.table(build_trade_rows(workspace))
+
+    funded_positions = [
+        row for row in workspace["book"]["positions"] if int(row["quantity"]) > 0
+    ]
+    if funded_positions:
+        st.success(
+            "The bounded cash-funded entry has been operated, persisted, certified, "
+            "and reopened from active authority."
+        )
+    else:
+        _render_operated_paper_action(
+            st,
+            workspace=workspace,
+            root=root,
+            pit_identity=canonical_value(identity),
+        )
+
+    st.subheader("Banked no-market comparison baseline")
+    st.caption(
+        "This closed Slice 1 comparison remains immutable historical evidence. It is "
+        "not projected as the current market-aware active book."
+    )
     st.subheader("Point-in-time identity")
     st.table(
         [
@@ -95,10 +444,10 @@ def render_command_center(st: Any) -> DecisionEpisodeReadModel | None:
         "prefix. The later certification marker is not the book head."
     )
 
-    capital_col, cash_col, proposal_col = st.columns(3)
-    capital_col.metric("Certified NAV", format(model.certified_nav, "f"))
-    cash_col.metric(
-        "Classified cash",
+    baseline_capital_col, baseline_cash_col, proposal_col = st.columns(3)
+    baseline_capital_col.metric("Baseline NAV", format(model.certified_nav, "f"))
+    baseline_cash_col.metric(
+        "Baseline classified cash",
         format(sum((row.amount for row in model.classified_cash), start=0), "f"),
     )
     proposal_col.metric("Proposal rows", len(model.proposal_records))
@@ -136,7 +485,7 @@ def render_command_center(st: Any) -> DecisionEpisodeReadModel | None:
                     for row in model.proposal_records
                 ),
                 "selected_rows": len(model.selected_record_ids),
-                "durable_governance_persistence": "NONE",
+                "durable_governance_persistence": "NONE_FOR_BANKED_BASELINE",
             }
         ]
     )

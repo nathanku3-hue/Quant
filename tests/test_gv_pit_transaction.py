@@ -549,13 +549,12 @@ def test_real_governance_replay_and_projection_are_byte_identical() -> None:
     assert first_model.terminal_event_digest == first_events[-1].event_digest
 
 
-def test_slice_1_new_modules_have_no_storage_or_session_state_authority() -> None:
+def test_slice_1_core_modules_have_no_storage_or_session_state_authority() -> None:
     source_paths = (
         Path("core/gv_pit/contracts.py"),
         Path("core/gv_pit/adapters.py"),
         Path("core/gv_pit/governance.py"),
         Path("core/gv_pit/read_models.py"),
-        Path("views/command_center.py"),
     )
     forbidden_imports = {
         "gv_portfolio_v0.operated_storage",
@@ -586,6 +585,12 @@ def test_slice_1_new_modules_have_no_storage_or_session_state_authority() -> Non
     assert "GV_REAL_MU_OPERATED" not in view_source
     assert "GV_MU_NVDA_SHADOW" not in view_source
     assert "GV_CERTIFIED_CASH_BASELINE" not in view_source
+    assert "gv_portfolio_v0.operated_storage" in view_source
+    assert view_source.count("st.session_state") == 6
+    assert "st.session_state[_ACTIVE_PREVIEW_KEY]" in view_source
+    assert "st.session_state[\"workspace\"]" not in view_source
+    assert "st.session_state[\"book\"]" not in view_source
+    assert "st.session_state[\"certification\"]" not in view_source
 
 
 def test_fresh_process_runtime_blocks_transitive_side_effects() -> None:

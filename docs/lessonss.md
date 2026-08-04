@@ -1,3 +1,19 @@
+## 2026-08-04 Round Entry (Custody, Review, and Owner Operation Must Close Together)
+- Date: 2026-08-04
+- Mistake or miss: the candidate was locally green but left the isolated custody, independent review, and owner-operated episode as unverified ceremony.
+- Root cause: atomic file replacement was mistaken for concurrency-safe persistence; the active forward packet did not carry the typed PIT identity tuple; and fixture/AppTest readiness was allowed to stand in for a fresh owner packet.
+- Fix applied: created `codex/gv-operated-paper-capital-1-custody` from `2d95cdf`, transferred exact candidate bytes, added per-workspace locking plus packet/PIT cross-binding and bounded request/event/episode/workspace sizes, reran 70 focused tests, operated a fresh seven-unit MU owner packet through the Command Center surface, and verified separate-process replay.
+- Guardrail for next time: prove branch/ref/worktree custody before implementation, require distinct A/B/C review on final bytes, bind every active forward episode to the typed identity tuple, and record preview-unchanged, explicit-confirmation, fresh-reopen, certification, cash, cost, and residual evidence before publishing.
+- Evidence paths: `docs/context/e2e_evidence/gv_operated_paper_capital_1_owner_operation_20260804.md`, the isolated custody branch, and the closure SAW report for this round.
+
+## 2026-08-04 Round Entry (Branch Isolation Must Be Verified, Not Assumed)
+- Date: 2026-08-04
+- Mistake or miss: implementation began as dirty bytes on the already-closed Slice 1 branch, with a plan to move them onto a new product branch later. Repeated DevSpace `open_workspace(mode=worktree, createBranch=true)` requests returned without an error but created no branch or worktree object.
+- Root cause: managed-worktree creation was treated as successful based on request completion rather than verified Git state; custody isolation was deferred until after substantial implementation instead of being a precondition.
+- Fix applied: repeatedly verified `git worktree list --porcelain`, `git show-ref --verify`, branch HEAD, remote equality, and the exact dirty path set; refused to commit or push the candidate onto `repair/gv-prospective-paper-baseline-1-r1`; recorded isolation as an explicit acceptance blocker while continuing reversible validation and documentation only.
+- Guardrail for next time: before the first implementation edit, require a returned managed workspace ID plus independent proof that the requested branch ref and worktree path exist at the intended base SHA. A silent no-op is a failed isolation attempt. Never use a closed authority branch as publication custody merely because its working tree contains the candidate bytes.
+- Evidence paths: `docs/phase_brief/gv-operated-paper-capital-1-brief.md`, `docs/context/done_checklist_current.md`, `docs/context/impact_packet_current.md`, and Git worktree/ref inspection recorded in the execution session.
+
 ## 2026-08-04 Round Entry (Read-Only Review Must Not Carry Publish Capability)
 - Date: 2026-08-04
 - Mistake or miss: a reviewer process instructed to remain read-only committed and pushed the exact eight-file Slice 1 candidate before formal A/B/C closure, while connector disconnects obscured the surviving process and its side effects.

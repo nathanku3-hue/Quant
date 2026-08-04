@@ -119,13 +119,22 @@ def test_dash_1_command_center_is_default_and_portfolio_route_is_preserved() -> 
     assert "default=title == requested_title" in source
 
 
-def test_dash_1_default_route_renders_real_command_center() -> None:
+def test_dash_1_default_route_renders_real_command_center(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setenv("GV_OPERATED_PORTFOLIO_HOME", str(tmp_path / "workspace"))
     app = AppTest.from_file("dashboard.py").run(timeout=120)
     assert not app.exception, app.exception
     assert any(header.value == COMMAND_CENTER_PAGE_TITLE for header in app.header)
 
-    identity_table = app.table[0].value
-    proposal_table = app.table[1].value
+    tables = [element.value for element in app.table]
+    active_authority = next(
+        table for table in tables if "certification_lineage_depth" in table.columns
+    )
+    identity_table = next(table for table in tables if "market_context" in table.columns)
+    proposal_table = next(table for table in tables if "module" in table.columns)
+    assert active_authority.loc[0, "scenario_id"] == "GV_OPERATED_PAPER_CAPITAL_1"
+    assert active_authority.loc[0, "unexplained_residual"] == "0"
     assert identity_table.loc[0, "market_context"] == (
         "NO_MARKET_DEPENDENCY_CASH_ONLY_V1"
     )
@@ -241,7 +250,10 @@ def test_dash_1_safe_routes_run_before_legacy_provider_or_write_startup() -> Non
         assert legacy_import not in safe_prefix
 
 
-def test_dash_1_default_route_does_not_render_legacy_startup_surface() -> None:
+def test_dash_1_default_route_does_not_render_legacy_startup_surface(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setenv("GV_OPERATED_PORTFOLIO_HOME", str(tmp_path / "workspace"))
     app = AppTest.from_file("dashboard.py").run(timeout=120)
     assert not app.exception, app.exception
     assert not app.title

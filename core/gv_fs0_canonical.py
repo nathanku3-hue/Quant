@@ -268,8 +268,21 @@ def canonical_decimal(raw: str, *, quantum_places: int = 6) -> str:
             raise CanonicalizationError("DECIMAL_EXCESS_PRECISION")
     if value == 0:
         return "0"
-    normalized = format(value.normalize(), "f")
-    return normalized.rstrip("0").rstrip(".") if "." in normalized else normalized
+    sign, digits, exponent = value.as_tuple()
+    coefficient_digits = list(digits)
+    while len(coefficient_digits) > 1 and coefficient_digits[-1] == 0:
+        coefficient_digits.pop()
+        exponent += 1
+    coefficient = "".join(str(digit) for digit in coefficient_digits)
+    if exponent >= 0:
+        normalized = coefficient + ("0" * exponent)
+    else:
+        split = len(coefficient) + exponent
+        if split <= 0:
+            normalized = "0." + ("0" * -split) + coefficient
+        else:
+            normalized = coefficient[:split] + "." + coefficient[split:]
+    return f"-{normalized}" if sign else normalized
 
 
 def canonical_timestamp(raw: str) -> str:

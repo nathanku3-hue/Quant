@@ -11,14 +11,19 @@ fill quantity never exceeds the order; residual state is projected for Replay.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, DecimalException, InvalidOperation
 from typing import Any, Iterable, Mapping
 
 from core.gv_fs0_canonical import domain_hash
+from gv_portfolio_v0.decimal_utils import (
+    MAX_DECIMAL_FRACTION_DIGITS,
+    MAX_DECIMAL_INTEGER_DIGITS,
+    decimal_text,
+    deterministic_decimal_context,
+)
 
 ID_DOMAIN = "GV-PORTFOLIO-V0"
 DECLARED_PRECISION = "0.01"
-_PRECISION = Decimal(DECLARED_PRECISION)
 
 
 class PortfolioBookError(ValueError):
@@ -52,16 +57,29 @@ def _decimal(value: Any, *, field: str) -> Decimal:
         raise PortfolioBookError(f"DECIMAL_INVALID:{field}") from exc
     if not parsed.is_finite():
         raise PortfolioBookError(f"DECIMAL_FINITE_REQUIRED:{field}")
+    _, digits, exponent = parsed.as_tuple()
+    effective_digits = list(digits)
+    while len(effective_digits) > 1 and effective_digits[-1] == 0:
+        effective_digits.pop()
+        exponent += 1
+    integer_digits = len(effective_digits) + max(exponent, 0)
+    fraction_digits = max(-exponent, 0)
+    if (
+        integer_digits > MAX_DECIMAL_INTEGER_DIGITS
+        or fraction_digits > MAX_DECIMAL_FRACTION_DIGITS
+    ):
+        raise PortfolioBookError(f"DECIMAL_OUT_OF_BOUNDS:{field}")
     return parsed
 
 
 def _money(value: Any, *, field: str, nonnegative: bool = True) -> Decimal:
     parsed = _decimal(value, field=field)
-    try:
-        quantized = parsed.quantize(_PRECISION)
-    except InvalidOperation as exc:
-        raise PortfolioBookError(f"DECLARED_PRECISION_EXCEEDED:{field}") from exc
-    if quantized != parsed:
+    _, digits, exponent = parsed.as_tuple()
+    effective_digits = list(digits)
+    while len(effective_digits) > 1 and effective_digits[-1] == 0:
+        effective_digits.pop()
+        exponent += 1
+    if exponent < -2:
         raise PortfolioBookError(f"DECLARED_PRECISION_EXCEEDED:{field}")
     if nonnegative and parsed < 0:
         raise PortfolioBookError(f"NONNEGATIVE_REQUIRED:{field}")
@@ -94,12 +112,7 @@ def _positive_ratio(value: Any, *, field: str) -> Decimal:
 
 def _decimal_text(value: Decimal | str | int) -> str:
     parsed = _decimal(value, field="canonical_decimal")
-    if parsed == 0:
-        return "0"
-    text = format(parsed.normalize(), "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text
+    return decimal_text(parsed)
 
 
 def _required_text(value: Any, *, field: str) -> str:
@@ -133,7 +146,7 @@ def _ordered_events(events: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]
     return rows
 
 
-def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
+def _reduce_with_context(events: Iterable[Mapping[str, Any]]) -> _Reduction:
     rows = _ordered_events(events)
     cash: dict[str, Decimal] = {}
     positions: dict[str, dict[str, Decimal | None]] = {}
@@ -206,11 +219,15 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
             if after_quantity != after_quantity.to_integral_value():
                 raise PortfolioBookError("SPLIT_FRACTIONAL_SHARE_UNSUPPORTED")
             after_price = before_price * denominator / numerator
-            try:
-                quantized_after_price = after_price.quantize(_PRECISION)
-            except InvalidOperation as exc:
-                raise PortfolioBookError("SPLIT_PRICE_PRECISION_EXCEEDED") from exc
-            if quantized_after_price != after_price:
+            _, split_digits, split_exponent = after_price.as_tuple()
+            effective_split_digits = list(split_digits)
+            while (
+                len(effective_split_digits) > 1
+                and effective_split_digits[-1] == 0
+            ):
+                effective_split_digits.pop()
+                split_exponent += 1
+            if split_exponent < -2:
                 raise PortfolioBookError("SPLIT_PRICE_PRECISION_EXCEEDED")
             residual = after_quantity * after_price - before_quantity * before_price
             if residual != 0:
@@ -434,6 +451,16 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
         valuation_pending=valuation_pending,
         partial_fill_residuals=partial_fill_residuals,
     )
+
+
+def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
+    """Reduce with enough precision that ambient caller context cannot alter it."""
+
+    try:
+        with deterministic_decimal_context():
+            return _reduce_with_context(events)
+    except DecimalException as exc:
+        raise PortfolioBookError("DECIMAL_ARITHMETIC_INVALID") from exc
 
 
 def reduce_events(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
