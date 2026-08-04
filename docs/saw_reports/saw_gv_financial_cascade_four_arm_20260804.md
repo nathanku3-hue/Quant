@@ -7,7 +7,7 @@ Hierarchy Confirmation: Approved | Session: current-thread | Trigger: explicit G
 RoundID: `GV-FINANCIAL-CASCADE-FOUR-ARM-1-20260804`
 ScopeID: `GV-FINANCIAL-CASCADE-FOUR-ARM-1`
 Parent candidate: `00481ac8803497d48e70451816524115ffb3ceaf`
-Candidate status: engineering-only four-arm implementation and evidence; no Command Center integration, paper confirmation, portfolio mutation, score uplift, or live authority.
+Candidate status: banked and pushed at `2c318f17b8563e21cfe5cfbdf43b32a514fe0f79`; engineering-only four-arm implementation and evidence; no Command Center integration, paper confirmation, portfolio mutation, score uplift, or live authority.
 
 ## Verdict
 
@@ -82,6 +82,12 @@ Local non-independent review: PASS. G5 artifact/manifest identities are retained
 
 Independent status: NOT RUN.
 
+### Bounded PRODUCT review
+
+REVIEW-RETURN-2: PASS for the explicitly bounded `ENGINEERING_ONLY` slice. Review ID `f6ef90e03b3affeb986c167f4027f52a6d724492c1e9fbcdeaba41fa65c44b5c`; candidate manifest digest `c2d60266aea7b010060f2f5f5c3d21eadbce8c5e6d89f1e3180b3ab343e4f730`; evidence manifest digest `96fca446843b16d3d148cc491d2abbf88edd917510e69272298e57b5bf743b9b`; conversation identity `6d67a3300bd1da326d2e98af63d4d8d251560a141eaf523389d82703554829b7`.
+
+The reviewer accepted the scope clarity, deterministic replay, atomic CLI, tests, and identity custody. It independently confirmed that the negative economics provide no alpha, score, or capital basis and that governed PIT evidence plus independent A/B/C remain promotion blockers.
+
 ## Findings
 
 | Severity | Finding | Impact | Fix | Owner | Status |
@@ -110,6 +116,7 @@ Independent status: NOT RUN.
 - `git diff --check`: PASS.
 - Leningrad v0.4 bundle generation and independent verification: PASS; bundle `88b9ff3…`, scenario `4415a158…`.
 - Engineering evidence: report `357656049f7f…`; execution `e463d2f2a7aa…`; receipt `e18509fc9e69…`; exact replay PASS.
+- Bounded PRODUCT review: PASS on exact candidate/evidence manifests; promotion blockers retained.
 - Economic result versus regime-only: compounded net `-0.02185748`; MDD approximately unchanged; ES unchanged; turnover `+0.50`; missed upside `0.02051325`; avoided loss `0.00176342`; reduced sessions `9`; re-entry delay `0`.
 
 ## Rollback
