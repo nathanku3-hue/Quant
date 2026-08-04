@@ -76,7 +76,8 @@ def test_dash_1_uses_page_registry_not_flat_tabs() -> None:
 def test_dash_1_old_tools_are_not_top_level_navigation_labels() -> None:
     source = DASHBOARD.read_text(encoding="utf-8")
     navigation_start = source.index("page = build_dashboard_navigation(")
-    navigation_source = source[navigation_start:]
+    navigation_end = source.index("page.run()", navigation_start)
+    navigation_source = source[navigation_start:navigation_end]
     forbidden_top_level = (
         "Ticker Pool & Proxies",
         "Data Health",
@@ -97,12 +98,12 @@ def test_dash_1_old_tools_are_not_top_level_navigation_labels() -> None:
 def test_dash_1_six_page_renderers_are_wired() -> None:
     source = DASHBOARD.read_text(encoding="utf-8")
     expected = (
-        "COMMAND_CENTER_PAGE_TITLE: _render_command_center_page",
-        "DISCOVERY_PAGE_TITLE: _render_discovery_page",
-        "DECISIONS_THESIS_PAGE_TITLE: _render_decisions_thesis_page",
-        "PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page",
-        "STRATEGY_PAGE_TITLE: _render_strategy_page",
-        "OPERATIONS_REPLAY_PAGE_TITLE: _render_settings_ops_page",
+        "COMMAND_CENTER_PAGE_TITLE: _render_command_center_bootstrap",
+        "DISCOVERY_PAGE_TITLE: _render_discovery_bootstrap",
+        "DECISIONS_THESIS_PAGE_TITLE: _render_decisions_thesis_bootstrap",
+        "PORTFOLIO_PAGE_TITLE: _render_portfolio_bootstrap",
+        "STRATEGY_PAGE_TITLE: _render_strategy_bootstrap",
+        "OPERATIONS_REPLAY_PAGE_TITLE: _render_operations_bootstrap",
     )
     for binding in expected:
         assert binding in source
@@ -217,3 +218,105 @@ def test_dash_1_forbidden_runtime_scope_is_not_added() -> None:
     lowered = source.lower()
     for token in forbidden_tokens:
         assert token not in lowered
+
+
+def test_dash_1_safe_routes_run_before_legacy_provider_or_write_startup() -> None:
+    source = DASHBOARD.read_text(encoding="utf-8")
+    navigation = source.index("page = build_dashboard_navigation(")
+    page_run = source.index("page.run()", navigation)
+    safe_stop = source.index("if _selected_legacy_page_title is None:", page_run)
+    provider_import = source.index("from scripts.alpha_quad_scanner", safe_stop)
+    cache_write_path = source.index("os.makedirs(CACHE_DIR", provider_import)
+    cache_load = source.index("payload = _load_cached_scan_payload", cache_write_path)
+    safe_prefix = source[:safe_stop]
+
+    assert navigation < page_run < safe_stop < provider_import < cache_write_path < cache_load
+    for legacy_import in (
+        "import yfinance",
+        "from core.data_orchestrator",
+        "from views.optimizer_view",
+        "from strategies.",
+        "from core.drift_",
+    ):
+        assert legacy_import not in safe_prefix
+
+
+def test_dash_1_default_route_does_not_render_legacy_startup_surface() -> None:
+    app = AppTest.from_file("dashboard.py").run(timeout=120)
+    assert not app.exception, app.exception
+    assert not app.title
+    assert all("FR-041 Governor" not in value.value for value in app.warning)
+    assert all("Last Sync" not in value.value for value in app.markdown)
+
+
+def test_command_center_runtime_failure_is_rendered_fail_closed() -> None:
+    app = AppTest.from_string(
+        """
+import streamlit as st
+import views.command_center as command_center
+
+def fail():
+    raise RuntimeError("synthetic-runtime-failure")
+
+original = command_center.build_command_center_read_model
+try:
+    command_center.build_command_center_read_model = fail
+    command_center.render_command_center(st)
+finally:
+    command_center.build_command_center_read_model = original
+"""
+    ).run(timeout=30)
+    assert not app.exception, app.exception
+    assert any(header.value == COMMAND_CENTER_PAGE_TITLE for header in app.header)
+    assert any("authority unavailable" in element.value for element in app.error)
+    assert "FAILED_CLOSED" in app.table[0].value.to_string()
+    assert "synthetic-runtime-failure" in "\n".join(
+        element.value for element in app.caption
+    )
+
+
+def test_decisions_page_renders_evidence_digest_and_source_provenance() -> None:
+    app = AppTest.from_string(
+        """
+import streamlit as st
+from views.command_center import render_decisions_and_thesis
+render_decisions_and_thesis(st)
+"""
+    ).run(timeout=30)
+    assert not app.exception, app.exception
+    table = app.table[0].value
+    operated = table.loc[table["module"] == "GV_REAL_MU_OPERATED"].iloc[0]
+    provenance = operated["supporting_evidence"]
+    assert "MU_CLAIM_EVALUATION | sha256=" in provenance
+    assert "NVDA_FACT_SET | sha256=" in provenance
+    assert "repo://data/gv_v2_b0b/" in provenance
+    assert "repo://data/gv_v2_alpha0/" in provenance
+
+
+def test_operations_route_defaults_to_safe_pit_replay_before_legacy_startup() -> None:
+    app = AppTest.from_file("dashboard.py")
+    app.query_params["page"] = "operations-and-replay"
+    app = app.run(timeout=60)
+    assert not app.exception, app.exception
+    assert any(header.value == OPERATIONS_REPLAY_PAGE_TITLE for header in app.header)
+    assert not app.title
+    assert all("FR-041 Governor" not in value.value for value in app.warning)
+    assert app.table[0].value.loc[0, "event_count"] == 7
+
+
+def test_operations_replay_renders_full_event_lineage() -> None:
+    app = AppTest.from_string(
+        """
+import streamlit as st
+from views.command_center import render_operations_and_replay
+render_operations_and_replay(st)
+"""
+    ).run(timeout=30)
+    assert not app.exception, app.exception
+    assert any(header.value == OPERATIONS_REPLAY_PAGE_TITLE for header in app.header)
+    replay_identity = app.table[0].value
+    lineage = app.table[1].value
+    assert replay_identity.loc[0, "event_count"] == 7
+    assert replay_identity.loc[0, "head_sequence"] == 6
+    assert list(lineage["sequence"]) == list(range(7))
+    assert lineage.loc[0, "type"] == "DECISION_EPISODE_OPENED"

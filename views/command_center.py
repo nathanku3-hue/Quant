@@ -20,6 +20,15 @@ def build_command_center_read_model() -> DecisionEpisodeReadModel:
     return project_decision_episode(stream.read())
 
 
+def _evidence_provenance(rows: tuple[object, ...]) -> str:
+    if not rows:
+        return "NONE"
+    return "; ".join(
+        f"{row.evidence_id} | sha256={row.sha256_digest} | source={row.source_identity}"
+        for row in rows
+    )
+
+
 def _proposal_rows(model: DecisionEpisodeReadModel) -> list[dict[str, object]]:
     return [
         {
@@ -35,10 +44,30 @@ def _proposal_rows(model: DecisionEpisodeReadModel) -> list[dict[str, object]]:
     ]
 
 
-def render_command_center(st: Any) -> DecisionEpisodeReadModel:
+def _render_fail_closed(st: Any, *, title: str, error: Exception) -> None:
+    st.header(title)
+    st.error("PIT authority unavailable — no proposal state was rendered.")
+    st.caption(f"Fail-closed reason: {type(error).__name__}: {error}")
+    st.table(
+        [
+            {
+                "episode_status": "UNAVAILABLE",
+                "replay_status": "FAILED_CLOSED",
+                "selection_available": False,
+                "portfolio_mutation_available": False,
+            }
+        ]
+    )
+
+
+def render_command_center(st: Any) -> DecisionEpisodeReadModel | None:
     """Render the default read-only all-capital operator surface."""
 
-    model = build_command_center_read_model()
+    try:
+        model = build_command_center_read_model()
+    except Exception as exc:
+        _render_fail_closed(st, title="Command Center", error=exc)
+        return None
     identity = model.pit_identity
     market_context = identity.market_snapshot_id
 
@@ -96,7 +125,9 @@ def render_command_center(st: Any) -> DecisionEpisodeReadModel:
             {
                 "episode_status": model.status,
                 "replay_status": model.replay_status,
+                "governance_stream": model.stream_id,
                 "governance_events": model.event_count,
+                "head_sequence": model.head_sequence_number,
                 "eligible_rows": sum(
                     row.status == "ELIGIBLE" for row in model.proposal_records
                 ),
@@ -112,10 +143,14 @@ def render_command_center(st: Any) -> DecisionEpisodeReadModel:
     return model
 
 
-def render_decisions_and_thesis(st: Any) -> DecisionEpisodeReadModel:
+def render_decisions_and_thesis(st: Any) -> DecisionEpisodeReadModel | None:
     """Render read-only proposal claims and evidence custody."""
 
-    model = build_command_center_read_model()
+    try:
+        model = build_command_center_read_model()
+    except Exception as exc:
+        _render_fail_closed(st, title="Decisions & Thesis", error=exc)
+        return None
     st.header("Decisions & Thesis")
     st.caption(
         "Immutable proposal evidence and thesis detail. This page owns no signal "
@@ -128,13 +163,76 @@ def render_decisions_and_thesis(st: Any) -> DecisionEpisodeReadModel:
                 "outcome": row.outcome,
                 "status": row.status,
                 "principal_claim": row.principal_claim,
-                "supporting_evidence": ", ".join(row.supporting_evidence_ids),
-                "contradicting_evidence": (
-                    ", ".join(row.contradicting_evidence_ids) or "NONE"
+                "supporting_evidence": _evidence_provenance(
+                    row.supporting_evidence
+                ),
+                "contradicting_evidence": _evidence_provenance(
+                    row.contradicting_evidence
                 ),
                 "missing_discriminator": row.missing_discriminator,
             }
             for row in model.proposal_records
+        ]
+    )
+    return model
+
+
+def render_operations_and_replay(st: Any) -> DecisionEpisodeReadModel | None:
+    """Render full Slice 1 source, event-lineage, and projection diagnostics."""
+
+    try:
+        model = build_command_center_read_model()
+    except Exception as exc:
+        _render_fail_closed(st, title="Operations & Replay", error=exc)
+        return None
+
+    st.header("Operations & Replay")
+    st.caption(
+        "Read-only governance lineage. Every row is reconstructed from the bounded "
+        "digest-chained stream; no durable governance write occurs in Slice 1."
+    )
+    st.subheader("Replay identity")
+    st.table(
+        [
+            {
+                "stream_id": model.stream_id,
+                "event_count": model.event_count,
+                "head_sequence": model.head_sequence_number,
+                "terminal_event_digest": model.terminal_event_digest,
+                "replay_status": model.replay_status,
+            }
+        ]
+    )
+    st.subheader("Governance event lineage")
+    st.table(
+        [
+            {
+                "sequence": event.sequence_number,
+                "type": event.event_type,
+                "event_id": event.event_id,
+                "timestamp_utc": event.timestamp_utc,
+                "correlation_id": event.correlation_id,
+                "causation_id": event.causation_id,
+                "previous_digest": event.previous_event_digest,
+                "event_digest": event.event_digest,
+                "record_id": event.record_id or "",
+                "proposal_id": event.proposal_id or "",
+            }
+            for event in model.governance_events
+        ]
+    )
+    st.subheader("Authority boundary")
+    st.table(
+        [
+            {
+                "durable_governance_persistence": "NONE",
+                "proposal_selection": "UNAVAILABLE",
+                "optimizer_or_risk_math": "UNAVAILABLE",
+                "transition_preview": "UNAVAILABLE",
+                "authorization": "UNAVAILABLE",
+                "book_mutation": "UNAVAILABLE",
+                "certification_change": "UNAVAILABLE",
+            }
         ]
     )
     return model

@@ -1,4 +1,81 @@
 import streamlit as st
+
+from views.command_center import (
+    render_command_center,
+    render_decisions_and_thesis,
+    render_operations_and_replay,
+)
+from views.page_registry import (
+    COMMAND_CENTER_PAGE_TITLE,
+    DECISIONS_THESIS_PAGE_TITLE,
+    DISCOVERY_PAGE_TITLE,
+    OPERATIONS_REPLAY_PAGE_TITLE,
+    PORTFOLIO_PAGE_TITLE,
+    STRATEGY_PAGE_TITLE,
+    build_dashboard_navigation,
+)
+
+st.set_page_config(page_title="Terminal Zero GodView", layout="wide", page_icon="🎯")
+
+# Safe product routes execute before importing any legacy provider, cache, replay,
+# optimizer, or mutation-capable dashboard module.
+_selected_legacy_page_title: str | None = None
+_selected_operations_section: str | None = None
+
+
+def _defer_legacy_page(title: str) -> None:
+    global _selected_legacy_page_title
+    _selected_legacy_page_title = title
+
+
+def _render_command_center_bootstrap() -> None:
+    render_command_center(st)
+
+
+def _render_decisions_thesis_bootstrap() -> None:
+    render_decisions_and_thesis(st)
+
+
+def _render_discovery_bootstrap() -> None:
+    _defer_legacy_page(DISCOVERY_PAGE_TITLE)
+
+
+def _render_portfolio_bootstrap() -> None:
+    _defer_legacy_page(PORTFOLIO_PAGE_TITLE)
+
+
+def _render_strategy_bootstrap() -> None:
+    _defer_legacy_page(STRATEGY_PAGE_TITLE)
+
+
+def _render_operations_bootstrap() -> None:
+    global _selected_operations_section
+    _selected_operations_section = st.radio(
+        "Ops workflow",
+        ["PIT Governance", "Data Health", "Drift Monitor"],
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    if _selected_operations_section == "PIT Governance":
+        render_operations_and_replay(st)
+    else:
+        _defer_legacy_page(OPERATIONS_REPLAY_PAGE_TITLE)
+
+
+page = build_dashboard_navigation(
+    {
+        COMMAND_CENTER_PAGE_TITLE: _render_command_center_bootstrap,
+        DISCOVERY_PAGE_TITLE: _render_discovery_bootstrap,
+        DECISIONS_THESIS_PAGE_TITLE: _render_decisions_thesis_bootstrap,
+        PORTFOLIO_PAGE_TITLE: _render_portfolio_bootstrap,
+        STRATEGY_PAGE_TITLE: _render_strategy_bootstrap,
+        OPERATIONS_REPLAY_PAGE_TITLE: _render_operations_bootstrap,
+    }
+)
+page.run()
+if _selected_legacy_page_title is None:
+    st.stop()
+
 import pandas as pd
 import yfinance as yf
 import plotly.express as px
@@ -42,14 +119,6 @@ from views.optimizer_view import (
 )
 from views.drift_monitor_view import render_drift_monitor_view
 
-from views.page_registry import build_dashboard_navigation
-from views.page_registry import COMMAND_CENTER_PAGE_TITLE
-from views.page_registry import DECISIONS_THESIS_PAGE_TITLE
-from views.page_registry import DISCOVERY_PAGE_TITLE
-from views.page_registry import OPERATIONS_REPLAY_PAGE_TITLE
-from views.page_registry import PORTFOLIO_PAGE_TITLE
-from views.page_registry import STRATEGY_PAGE_TITLE
-from views.command_center import render_command_center, render_decisions_and_thesis
 from views.discovery_view import render_discovery_page
 from views.gv_fs0_portfolio_adapter import (
     GvFs0PresentationError,
@@ -238,8 +307,6 @@ try:
 except ImportError:
     st.error("Engine modules not found. Please run from the root directory.")
     st.stop()
-
-st.set_page_config(page_title="Terminal Zero GodView", layout="wide", page_icon="🎯")
 
 # --- Persistence Layer ---
 CACHE_DIR = "data"
@@ -4754,12 +4821,14 @@ def _render_portfolio_allocation_page() -> None:
 
     st.header(PORTFOLIO_PAGE_TITLE)
     st.caption(
+        "One active certified decision is authoritative on this page. "
         "V2-B0B official-source intake is the active product gate on this tip. "
         "One certified decision path. Default current is ADMITTED official SEC "
         "package + CLAIM_INSUFFICIENT → HOLD_FOR_EVIDENCE → paper NO_POSITION "
         "(one issuer filing is not independent corroboration). "
         "B0A remains banked substrate. E0B G08 remains invalidated observation "
-        "smoke (count 0). Score 39 frozen. Legacy replay/optimizer non-certifying; "
+        "smoke (count 0). Score 39 frozen. Legacy replay/optimizer are "
+        "non-certifying research surfaces; "
         "F1C dual bundle evidence-only."
     )
     try:
@@ -4811,28 +4880,24 @@ def _render_research_lab_page() -> None:
 
 
 def _render_settings_ops_page() -> None:
-    st.header(OPERATIONS_REPLAY_PAGE_TITLE)
-    selected_section = st.radio(
-        "Ops workflow",
-        ["Data Health", "Drift Monitor"],
-        horizontal=True,
-        label_visibility="collapsed",
-    )
-    if selected_section == "Data Health":
+    if _selected_operations_section == "Data Health":
+        st.header(OPERATIONS_REPLAY_PAGE_TITLE)
         _render_data_health_section()
-    else:
+    elif _selected_operations_section == "Drift Monitor":
+        st.header(OPERATIONS_REPLAY_PAGE_TITLE)
         _render_drift_monitor_section()
+    else:
+        st.error("Requested operations workflow is unavailable.")
 
 
-page = build_dashboard_navigation(
-    {
-        COMMAND_CENTER_PAGE_TITLE: _render_command_center_page,
-        DISCOVERY_PAGE_TITLE: _render_discovery_page,
-        DECISIONS_THESIS_PAGE_TITLE: _render_decisions_thesis_page,
-        PORTFOLIO_PAGE_TITLE: _render_portfolio_allocation_page,
-        STRATEGY_PAGE_TITLE: _render_strategy_page,
-        OPERATIONS_REPLAY_PAGE_TITLE: _render_settings_ops_page,
-    }
-)
-page.run()
+if _selected_legacy_page_title == DISCOVERY_PAGE_TITLE:
+    _render_discovery_page()
+elif _selected_legacy_page_title == PORTFOLIO_PAGE_TITLE:
+    _render_portfolio_allocation_page()
+elif _selected_legacy_page_title == STRATEGY_PAGE_TITLE:
+    _render_strategy_page()
+elif _selected_legacy_page_title == OPERATIONS_REPLAY_PAGE_TITLE:
+    _render_settings_ops_page()
+else:
+    st.error("Requested dashboard route is unavailable.")
 

@@ -26,6 +26,8 @@ from gv_portfolio_v0.prospective import (
 from gv_portfolio_v0.replay import certify_replay_prefix
 
 from core.gv_pit.contracts import (
+    AUTHORITATIVE_PORTFOLIO_EVENT_TYPES,
+    NON_AUTHORITATIVE_PORTFOLIO_EVENT_TYPES,
     CapitalProposal,
     CashBaselinePayloadV1,
     CashBucketAmount,
@@ -41,9 +43,12 @@ from core.gv_pit.contracts import (
     RoundingMode,
     TargetIntent,
     build_cash_extension,
+    build_certified_source_prefix_proof,
     build_equity_extension,
     build_no_market_identity,
+    build_no_market_source_state_digest,
     build_pit_identity,
+    validate_portfolio_source_event,
     with_proposal_id,
 )
 
@@ -108,9 +113,78 @@ def _decision_free_evidence_identity(
     }
 
 
+def _decision_free_evidence_references(
+    evidence_identity: Mapping[str, Any],
+) -> tuple[EvidenceReference, EvidenceReference]:
+    source_families = _required_list(
+        evidence_identity.get("source_families"),
+        code="PIT_EVIDENCE_SOURCE_FAMILIES_REQUIRED",
+    )
+    bindings = _required_mapping(
+        evidence_identity.get("source_bindings"),
+        code="PIT_EVIDENCE_BINDINGS_REQUIRED",
+    )
+    mu_statement_ids = tuple(
+        str(value)
+        for value in _required_list(
+            evidence_identity.get("mu_statement_ids"),
+            code="PIT_MU_STATEMENT_IDS_REQUIRED",
+        )
+    )
+    nvda_fact_ids = tuple(
+        str(value)
+        for value in _required_list(
+            evidence_identity.get("nvda_fact_ids"),
+            code="PIT_NVDA_FACT_IDS_REQUIRED",
+        )
+    )
+    source_family_by_accession = {
+        str(source_family).removeprefix("SEC:"): str(source_family)
+        for source_family in source_families
+    }
+    mu_source_family = source_family_by_accession.get("0000723125-26-000015")
+    nvda_source_family = source_family_by_accession.get("0001045810-26-000052")
+    if (
+        len(source_families) != 2
+        or len(source_family_by_accession) != 2
+        or mu_source_family is None
+        or nvda_source_family is None
+        or not mu_statement_ids
+        or not nvda_fact_ids
+    ):
+        raise PitAdapterError("PIT_DECISION_FREE_EVIDENCE_PROVENANCE_INCOMPLETE")
+    mu_digest = str(bindings.get("mu_claim_evaluation_hash") or "")
+    nvda_digest = str(bindings.get("nvda_fact_set_hash") or "")
+    return (
+        EvidenceReference(
+            evidence_id="MU_CLAIM_EVALUATION",
+            sha256_digest=mu_digest,
+            source_identity=(
+                f"repo://data/gv_v2_b0b/mu_0000723125-26-000015/"
+                f"claim_evaluation.json#source_family={mu_source_family}"
+                f"&statement_ids={','.join(mu_statement_ids)}"
+            ),
+        ),
+        EvidenceReference(
+            evidence_id="NVDA_FACT_SET",
+            sha256_digest=nvda_digest,
+            source_identity=(
+                f"repo://data/gv_v2_alpha0/"
+                f"family_two_nvda_0001045810-26-000052/fact_set.json"
+                f"#source_family={nvda_source_family}"
+                f"&fact_ids={','.join(nvda_fact_ids)}"
+            ),
+        ),
+    )
+
+
 def _certified_prefix(
     workspace: Mapping[str, Any],
-) -> tuple[Mapping[str, Any], list[Mapping[str, Any]], Mapping[str, Any]]:
+) -> tuple[
+    Mapping[str, Any],
+    list[Mapping[str, Any]],
+    Mapping[str, Any] | None,
+]:
     events = _required_list(workspace.get("events"), code="PIT_EVENTS_REQUIRED")
     certification = _required_mapping(
         workspace.get("certification"), code="PIT_CERTIFICATION_REQUIRED"
@@ -162,7 +236,32 @@ def _certified_prefix(
     )
     if canonical_document_bytes(expected) != canonical_document_bytes(dict(certification)):
         raise PitAdapterError("PIT_CERTIFICATION_PREFIX_MISMATCH")
-    return certification, prefix, marker
+    return certification, prefix, prior
+
+
+def _validated_authoritative_head(
+    certified_prefix: list[Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Validate exact source-event bytes and return the final economic/decision fact."""
+
+    allowed_types = (
+        AUTHORITATIVE_PORTFOLIO_EVENT_TYPES
+        | NON_AUTHORITATIVE_PORTFOLIO_EVENT_TYPES
+    )
+    authoritative_head: Mapping[str, Any] | None = None
+    for row in certified_prefix:
+        event_type = row.get("event_type")
+        if event_type not in allowed_types:
+            raise PitAdapterError("PIT_CERTIFIED_PREFIX_EVENT_TYPE_UNRECOGNIZED")
+        try:
+            validate_portfolio_source_event(row)
+        except (TypeError, ValueError) as exc:
+            raise PitAdapterError("PIT_CERTIFIED_PREFIX_EVENT_INVALID") from exc
+        if event_type in AUTHORITATIVE_PORTFOLIO_EVENT_TYPES:
+            authoritative_head = row
+    if authoritative_head is None:
+        raise PitAdapterError("PIT_CERTIFIED_PREFIX_AUTHORITATIVE_HEAD_REQUIRED")
+    return authoritative_head
 
 
 def _equity_target(
@@ -198,8 +297,18 @@ def build_real_pit_source_bundle(
     validate_prospective_workspace(source_workspace)
 
     book = _required_mapping(source_workspace.get("book"), code="PIT_BOOK_REQUIRED")
-    certification, certified_prefix, _marker = _certified_prefix(source_workspace)
-    certified_head = certified_prefix[-1]
+    certification, certified_prefix, prior_certification = _certified_prefix(
+        source_workspace
+    )
+    certified_head = _validated_authoritative_head(certified_prefix)
+    source_proof = build_certified_source_prefix_proof(
+        source_workspace=source_workspace,
+        certified_prefix=certified_prefix,
+        certification=certification,
+        prior_certification=prior_certification,
+        decision_snapshot_id=str(certification.get("decision_snapshot_id") or ""),
+        portfolio_aim_id=str(certification.get("portfolio_aim_id") or ""),
+    )
     certified_book_hash = str(book.get("book_hash") or "")
     certified_book_id = str(certification.get("terminal_book_hash") or "")
     if not certified_book_hash or certified_book_id != certified_book_hash:
@@ -213,6 +322,9 @@ def build_real_pit_source_bundle(
         shadow["evidence_identity"]
     ):
         raise PitAdapterError("PIT_OPERATED_SHADOW_EVIDENCE_MISMATCH")
+    direct_source_evidence = _decision_free_evidence_references(
+        operated_evidence_identity
+    )
     evidence_set_id = str(shadow.get("evidence_hash") or "")
     if not evidence_set_id:
         raise PitAdapterError("PIT_EVIDENCE_SET_ID_REQUIRED")
@@ -268,32 +380,57 @@ def build_real_pit_source_bundle(
         Decimal(str(review.get("target_quantity"))),
         Decimal("0"),
     )
-    facts = NoMarketValidationFacts(
+    positions = _required_list(book.get("positions"), code="PIT_POSITIONS_REQUIRED")
+    orders = _required_list(source_workspace.get("orders"), code="PIT_ORDERS_REQUIRED")
+    fills = _required_list(source_workspace.get("fills"), code="PIT_FILLS_REQUIRED")
+    certified_head_event_id = str(certified_head.get("event_id") or "")
+    certified_head_timestamp_utc = str(certified_head.get("effective_at") or "")
+    residual = Decimal(str(book.get("unexplained_residual")))
+    source_state_digest = build_no_market_source_state_digest(
+        source_proof=source_proof,
         certified_book_id=certified_book_id,
-        certified_book_head_event_id=str(certified_head.get("event_id") or ""),
+        certified_book_head_event_id=certified_head_event_id,
+        certified_book_head_timestamp_utc=certified_head_timestamp_utc,
         certified_book_hash=certified_book_hash,
-        positions_count=len(_required_list(book.get("positions"), code="PIT_POSITIONS_REQUIRED")),
-        orders_count=len(
-            _required_list(source_workspace.get("orders"), code="PIT_ORDERS_REQUIRED")
-        ),
-        fills_count=len(
-            _required_list(source_workspace.get("fills"), code="PIT_FILLS_REQUIRED")
-        ),
-        unexplained_residual=Decimal(str(book.get("unexplained_residual"))),
+        positions_count=len(positions),
+        orders_count=len(orders),
+        fills_count=len(fills),
+        unexplained_residual=residual,
         proposal_target_quantities=target_quantities,
         consumes_notional_conversion=False,
         consumes_weight_conversion=False,
         consumes_price_data=False,
+        consumes_reference_price=False,
         claims_yield=False,
         claims_market_return=False,
+    )
+    facts = NoMarketValidationFacts(
+        source_proof=source_proof,
+        certified_book_id=certified_book_id,
+        certified_book_head_event_id=certified_head_event_id,
+        certified_book_head_timestamp_utc=certified_head_timestamp_utc,
+        certified_book_hash=certified_book_hash,
+        positions_count=len(positions),
+        orders_count=len(orders),
+        fills_count=len(fills),
+        unexplained_residual=residual,
+        proposal_target_quantities=target_quantities,
+        consumes_notional_conversion=False,
+        consumes_weight_conversion=False,
+        consumes_price_data=False,
+        consumes_reference_price=False,
+        claims_yield=False,
+        claims_market_return=False,
+        source_state_digest=source_state_digest,
     )
     no_market_identity = build_no_market_identity(facts)
     pit_identity = build_pit_identity(
         certified_book_id=certified_book_id,
         certified_book_head_event_id=facts.certified_book_head_event_id,
+        certified_book_head_timestamp_utc=certified_head_timestamp_utc,
         evidence_set_id=evidence_set_id,
         market_snapshot_id=no_market_identity,
-        as_of_utc=str(certified_head.get("effective_at") or ""),
+        as_of_utc=certified_head_timestamp_utc,
     )
 
     instrument_id = str(instrument.get("instrument_id") or "")
@@ -325,7 +462,7 @@ def build_real_pit_source_bundle(
             "portfolio_mutation_authorized=false",
         ),
         principal_claim=str(thesis.get("principal_claim") or ""),
-        supporting_evidence=(common_evidence,),
+        supporting_evidence=(common_evidence, *direct_source_evidence),
         contradicting_evidence=(),
         missing_discriminator=missing_discriminator,
         reason_not_to_act=(
@@ -354,7 +491,7 @@ def build_real_pit_source_bundle(
             "portfolio_mutation_authorized=false",
         ),
         principal_claim=str(shadow.get("principal_claim") or ""),
-        supporting_evidence=(common_evidence,),
+        supporting_evidence=(common_evidence, *direct_source_evidence),
         contradicting_evidence=(),
         missing_discriminator=str(shadow.get("missing_discriminator") or ""),
         reason_not_to_act=str(shadow.get("missing_discriminator") or ""),
