@@ -1,3 +1,11 @@
+## 2026-08-05 Round Entry (Preservation Must Not Serialize Product Authority)
+- Date: 2026-08-05
+- Mistake or miss: the first authority-cut plan made archival completion block clean-lane construction and candidate publication, expanded 35 comparisons and 41 receipts into separate artifacts, and preserved a standalone operator application beside the canonical dashboard.
+- Root cause: preservation evidence was treated as the product critical path, while donor final state was copied too literally instead of being judged against the endgame’s one-product and no-compatibility rules.
+- Fix applied: run F, C, and P concurrently; reduce preservation to two named tars plus one 35-row report and one 41-row manifest; allow fresh-clone-proven candidate publication before F_PASS; gate only merge/tag/main on F; delete the standalone app, launchers, prospective workspace, AppTests, and workflow routes; keep Command Center as sole product.
+- Guardrail for next time: preservation blocks destructive canonical advancement, not reversible candidate construction; transplant product capability, not obsolete presentation topology; every authority cut must run a positive-reference scan for duplicate launch surfaces before publication.
+- Evidence paths: `docs/phase_brief/pit-alpha-authority-cut-1-brief.md`, `.github/workflows/gv-operated-portfolio.yml`, `tests/test_gv_pit_operated_capital.py`, `tests/test_gv_pit_operated_rotation.py`, and commit `a927451`.
+
 ## 2026-07-21 Round Entry (Observation Is Not Product Value; Mutable Bytes Are Not Evidence)
 - Date: 2026-07-21
 - Mistake or miss: the E0B repair correctly hardened publication authority, but repeated concurrent writes meant passing tests were not bound to one candidate; generated context and SAW counts drifted; an unreported remote push advanced PR #5 to hosted-green `b7a24d3`; and `e0b_close_eligible` silently conflated a methodologically valid observed comparison with successful decision-value proof.

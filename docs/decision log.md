@@ -1,4 +1,15 @@
 
+## 2026-08-05 — PIT-ALPHA-AUTHORITY-CUT-1
+
+- Decision: install the final functional state represented by `a36a436` on advertised main ancestry as C cleanup plus one P authority commit; do not replay seventeen historical commits.
+- C: `a92745118aab1a857a0251ce747cab247ba94605` deletes exactly 50 tracked residue blobs and 41 nested-repository gitlinks.
+- Product: `dashboard.py` and its default Command Center are the sole operator product. Delete `operated_portfolio_app.py`, both launchers, `views/gv_prospective_paper_workspace.py`, standalone AppTests, and positive workflow references without compatibility.
+- Validation: candidate publication requires focused dashboard/PIT tests and byte-equivalent fresh-clone proof. F preservation runs concurrently and gates only merge, terminal tag, and main advancement.
+- Preservation: recreate `Quant_clickable_nav_apptest.tar` and `Quant_current_public_review.tar`; publish one 35-row comparison report and one 41-row receipt manifest.
+- Score: hold canonical `62/100` until exact fresh-clone P proof passes. Cleanup and archival redundancy do not earn score.
+- Next: `PIT-SOURCE-AUTHORITY-1`, one independently traceable bitemporal market packet through the existing loop; no new engine.
+- Closed: cascade integration, broad provider expansion, optimizer, historical-suite repair, backward compatibility, broker, alpha, advice, and Limited Live.
+
 ## 2026-07-23 — ROUND-20260723-GV-ALPHA0-SOURCE-FAMILY-TWO-BANKED
 
 - Decision: bank exact authorized independent **source family two** before reconciliation machinery.

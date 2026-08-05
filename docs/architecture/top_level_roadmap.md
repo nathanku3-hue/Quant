@@ -1,102 +1,86 @@
 # GodView Top-Level Roadmap
 
-Status: `GV-OPERATED-PORTFOLIO-25-1 AUTHORIZED; IMPLEMENTATION_ACTIVE; LIVE_CLOSED`
-Date: 2026-08-01
+Status: `PIT-ALPHA-AUTHORITY-CUT-1 ACTIVE; LIVE CLOSED`
+Date: 2026-08-05
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
-Frozen original detail: `docs/architecture/godview_v2_frozen_build_learn_roadmap.md`
 Active brief: `docs/context/ACTIVE_BRIEF`
-Accepted endgame progress: `62/100`
+Canonical score: `62/100`
 
-## Binding state
+## Endgame
 
-```text
-BASE = TERMINAL_MAIN_2349e1b
-ACCEPTED_TERMINAL_PRODUCT = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R
-ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-25-1
-ACTIVE_STATUS = AUTHORIZED; IMPLEMENTATION_ACTIVE; NOT_FROZEN; NOT_TERMINAL
-ACCEPTED_PRODUCT = SLICE_0
-ACCEPTED_INTEGRITY = REPLAY_0
-UNIVERSE_CHALLENGER = ORIGINAL_GATES_INCOMPLETE
-LIMITED_LIVE = CLOSED; NOT_AUTHORIZED
-ROOT_CHECKOUT = UNSAFE; DO_NOT_USE
-```
-
-## Accepted Slice 0 foundation — historical authority seams
-
-The accepted Slice 0 product foundation remains binding as historical interface ancestry, not as the active product phase:
+GodView is one all-capital point-in-time certified portfolio operating system:
 
 ```text
-InstrumentId
-→ PortfolioBookEvent
-→ DecisionSnapshotId
-→ PortfolioAimId
-→ CertificationId
+certified book + evidence + market identity
+→ verified immutable proposals
+→ governed comparison
+→ bounded operator decision
+→ calculation-only preview
+→ explicit confirm or reject-all
+→ deterministic accounting
+→ atomic persistence
+→ certification lineage
+→ exact replay and prospective learning
 ```
 
-`GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` remains the accepted operated terminal. `GV-OPERATED-PORTFOLIO-25-1` is the only active product phase. Replay 0 remains the accepted integrity foundation.
+`dashboard.py` is the sole operator product. Strategy and evidence logic remain in modules; accounting, persistence, certification, and replay remain domain authorities; the dashboard owns no independent capital math.
 
-## Immutable accepted custody
-
-The ten-security product remains historically certified by:
-
-- executable candidate `0d15e9c59c6b3ca051b3aa815018889d1e94857f`;
-- documentation-only closure `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`;
-- tag `gv-operated-portfolio-10-transition-1r-terminal`.
-
-Current `main` may evolve the shared implementation. The accepted behavior is preserved through immutable Git history and regression tests, not permanent source-byte identity.
-
-## Truthful prior classification
-
-| Scope | Immutable terminal | Current classification | Original outcome |
-|---|---|---|---|
-| Slice 0 | `85e6601` | accepted product foundation | accepted |
-| Replay 0 | `0e4b93f` | accepted integrity foundation | accepted |
-| Bounded | `abaa814` | persisted multi-cycle substrate | original breadth gate superseded by accepted operated-10 repair |
-| Portfolio Scale | `c37abf0` | deterministic multi-session harness | one operated 25–50-security portfolio still incomplete |
-| Universe Scale | `dca67e3` | deterministic multi-cell harness | 100–300+ distinct custody incomplete |
-| Challenger | `3e4dc95` | shadow-custody separation primitive | promotion chain incomplete |
-| Limited Live | none | closed | unauthorized |
-
-Sessions, cells, runs, slots, copied portfolios, and repeated executions never count as distinct securities.
-
-## Active product result
-
-`GV-OPERATED-PORTFOLIO-25-1` must prove:
+## Current authority cut
 
 ```text
-review exactly 25 permanent identities across >=2 meaningful clusters
-→ inspect individually owned evidence and thesis state
-→ run one deterministic competition across all 25
-→ confirm one portfolio and fund multiple positions
-→ retain classified residual cash
-→ persist and reopen
-→ admit one explicit no-change observation
-→ persist and reopen
-→ execute >=1 SELL/REDUCE and >=1 BUY/FUND from exact target deltas
-→ reconcile cash, costs, positions, NAV, and zero residual
-→ correct append-only, restart, reopen, and explain changed why
-→ prove exact replay and bounded four-action operator flow
+e4cf949 advertised main
+→ C a927451: delete 50 residue blobs + 41 gitlinks
+→ P: one reviewed final-state transplant from e564cd9..a36a436
+→ fresh-clone product proof
+→ one candidate push containing C+P
+→ F_PASS
+→ merge/tag/main
 ```
 
-Exactly 25 identities is controlling. Five clusters, eight funded positions, and the current transition-leg count are fixture parameters only.
+P installs:
 
-## Architecture law
+- real all-capital PIT adapters and immutable proposals;
+- ordered governance events and deterministic read models;
+- default Command Center;
+- bounded paper BUY entry;
+- displayed-proposal-bound SELL+BUY rotation;
+- explicit confirmation and reject-all;
+- atomic persistence, certification, and fresh-process replay.
 
-One shared operated engine, persistence implementation, application, and view stack serve:
+P removes without compatibility:
 
-- retained ten-security regression scenario;
-- active 25-security product scenario.
+- standalone operated application;
+- both standalone launchers;
+- prospective workspace view;
+- standalone AppTests and workflow routes.
 
-A separately accepted genericization milestone is prohibited. Its first valid proof is the running 25-security product while the ten-security regression remains green. A parallel domain engine, persistence implementation, schema family, or view stack is a stop condition.
+## Concurrent preservation
 
-Streams are logical ownership boundaries, not a requirement for six workers. Default to one implementer; parallelize only genuinely disjoint tasks after shared interfaces are fixed.
+F recreates `Quant_clickable_nav_apptest.tar` and `Quant_current_public_review.tar`, one 35-row comparison report, and one 41-row gitlink receipt manifest. F does not block candidate construction or publication. It blocks merge, tag, and main advancement.
 
-## Current checkpoint and terminal law
+## Score law
 
-Local checkpoint evidence is green, but no candidate is frozen and no terminal claim exists.
+Keep `62/100` through local construction. Exact fresh-clone proof may support a later canonical reassessment to `70/100`; no archival count or cleanup action changes the score.
 
-Before freeze: changed-path ownership, CI triggers, exact-head checkout, dependency coverage, failset method, and evidence destination must be retained.
+## Next product slice — PIT-SOURCE-AUTHORITY-1
 
-After one candidate freeze: exact-head Windows/Linux CI, one controlled base/candidate comparison, and independent Reviewer A/B/C run concurrently where possible. Candidate-only zero regressions are necessary, never sufficient.
+Pass one independently traceable bitemporal market packet through the existing loop:
 
-Do not insert a preservation, Meta-Harness, architecture, dependency, or planning phase before the executable 25-security checkpoint. Do not open providers, optimizer, broker, Universe, Challenger, Limited Live, or live capital.
+```text
+immutable source bytes
++ source/permission identity
++ valid/effective time
++ retrieval/knowledge time
++ instrument identity
++ observed value
++ content hash
+→ existing PIT proposal
+→ existing preview/confirm/reject
+→ existing persistence/certification/replay
+```
+
+No new engine, provider programme, optimizer, broker, alpha claim, or live-capital path.
+
+## Closed scope
+
+Cascade integration, broad provider expansion, historical-suite repair, backward compatibility, duplicate authority paths, individual historical commit replay, score inflation, advice activity, broker routing, and Limited Live remain closed.

@@ -9,6 +9,11 @@ from core.gv_fs0_canonical import domain_hash
 
 DEFAULT_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_10_TRANSITION_1R"
 PORTFOLIO_25_SCENARIO_ID = "GV_OPERATED_PORTFOLIO_25_1"
+ENGINE_SCALE_50_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_50"
+ENGINE_SCALE_100_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_100"
+PROSPECTIVE_25_SCENARIO_ID = "GV_PROSPECTIVE_PAPER_BASELINE_1"
+REAL_MU_PROSPECTIVE_SCENARIO_ID = "GV_REAL_EVIDENCE_MU_PORTFOLIO_1"
+OPERATED_PAPER_CAPITAL_SCENARIO_ID = "GV_OPERATED_PAPER_CAPITAL_1"
 
 
 def _instrument(
@@ -245,9 +250,322 @@ SCENARIO_25: dict[str, Any] = {
 }
 
 
+def _scale_characterization_scenario(size: int) -> dict[str, Any]:
+    """Build synthetic load data without changing the operated engine contract."""
+    if size not in {50, 100}:
+        raise ValueError(f"UNSUPPORTED_SCALE_CHARACTERIZATION:{size}")
+    scenario = deepcopy(SCENARIO_25)
+    scenario_id = (
+        ENGINE_SCALE_50_SCENARIO_ID
+        if size == 50
+        else ENGINE_SCALE_100_SCENARIO_ID
+    )
+    multiplier = size // 25
+    scenario.update(
+        {
+            "scenario_id": scenario_id,
+            "title": f"GV Engine Scale Characterization {size}",
+            "id_domain": f"GV-ENGINE-SCALE-{size}",
+            "claim_boundary": (
+                f"Synthetic {size}-security engine stress evidence only; not Universe "
+                "acceptance, historical membership proof, alpha evidence, or live-capital authority."
+            ),
+            "fixture_namespace": f"engine-scale-{size}",
+            "cash_openings": [
+                {"bucket": "AVAILABLE", "amount": str(10000 * multiplier)},
+                {"bucket": "RESEARCH_RESERVE", "amount": str(1000 * multiplier)},
+            ],
+            "initial_decision_reason": (
+                f"INITIAL_{size}_SECURITY_ENGINE_CHARACTERIZATION"
+            ),
+            "initial_changed_why_reason": (
+                f"One deterministic competition covered all {size} synthetic identities; "
+                "residual cash remained explicit."
+            ),
+        }
+    )
+    scenario["portfolio_aim"]["objective"] = (
+        f"Characterize the existing operated engine with one synthetic {size}-security "
+        "paper portfolio and bounded operator workload."
+    )
+    scenario["status_explanations"] = {
+        "DRAFT_REVIEW": f"{size} synthetic identities await one portfolio confirmation.",
+        "FUNDED_CERTIFIED": (
+            f"One {size}-security stress portfolio was funded through the shared engine."
+        ),
+        "OBSERVED_NO_CHANGE_CERTIFIED": (
+            "A later observation preserved portfolio economics."
+        ),
+        "TRANSITION_CERTIFIED": (
+            "A later observation produced one reduce and one fund leg."
+        ),
+        "CORRECTED_CERTIFIED": (
+            "A non-economic correction preserved economics and certification history."
+        ),
+    }
+    scenario["no_change"]["locator"] = (
+        f"fixture://engine-scale-{size}/nstar/no-change-v1"
+    )
+    scenario["transition"]["locator"] = (
+        f"fixture://engine-scale-{size}/harbor-meridian/transition-v1"
+    )
+    scenario["correction"]["source_identity"] = (
+        f"ENGINE-SCALE-{size}:CORRECTION:MERIDIAN-ANNOTATION"
+    )
+
+    instruments: list[dict[str, Any]] = []
+    for index in range(size):
+        template = deepcopy(SCENARIO_25["instruments"][index % 25])
+        cohort = (index // 25) + 1
+        if cohort > 1:
+            template["symbol"] = f"{template['symbol']}{cohort}"
+            template["name"] = f"{template['name']} Cohort {cohort}"
+            template["permanent_key"] = template["permanent_key"].replace(
+                ":COMMON", f":SCALE_COHORT_{cohort}:COMMON"
+            )
+            template["evidence_content"] = (
+                f"{template['evidence_content']} Synthetic stress cohort {cohort}."
+            )
+            template["evidence_slug"] = (
+                f"{template['evidence_slug']}-cohort-{cohort}"
+            )
+            template["principal_claim"] = (
+                f"{template['principal_claim']} Synthetic stress cohort {cohort}."
+            )
+            template["hard_falsifiers"] = [
+                f"{value}_cohort_{cohort}"
+                for value in template["hard_falsifiers"]
+            ]
+            template["watch_conditions"] = [
+                f"{value}_cohort_{cohort}"
+                for value in template["watch_conditions"]
+            ]
+        instruments.append(template)
+    scenario["instruments"] = instruments
+    return scenario
+
+
+SCENARIO_50 = _scale_characterization_scenario(50)
+SCENARIO_100 = _scale_characterization_scenario(100)
+
+
+def _prospective_25_scenario() -> dict[str, Any]:
+    """Derive the runtime-observation profile from the accepted 25-security baseline."""
+
+    scenario = deepcopy(SCENARIO_25)
+    scenario.update(
+        {
+            "scenario_id": PROSPECTIVE_25_SCENARIO_ID,
+            "title": "GV Prospective Paper Baseline 25",
+            "id_domain": "GV-PROSPECTIVE-PAPER-BASELINE-25",
+            "claim_boundary": (
+                "Human-confirmed prospective paper observations on the accepted "
+                "25-security opportunity set; no provider, broker, alpha, or live-capital claim."
+            ),
+            "fixture_namespace": "prospective-paper-25",
+            "source_scenario_id": PORTFOLIO_25_SCENARIO_ID,
+            "runtime_observation_mode": True,
+            "initial_decision_reason": "BOOTSTRAP_ACCEPTED_25_SECURITY_BASELINE",
+            "initial_changed_why_reason": (
+                "The prospective profile bootstraps the accepted 25-security certified "
+                "initial portfolio before any operator-supplied observation."
+            ),
+        }
+    )
+    scenario["timeline"] = {
+        "cash_opened_at": "2026-08-01T08:55:00.000000Z",
+        "initial_decision_at": "2026-08-01T09:05:00.000000Z",
+        "aim_confirmed_at": "2026-08-01T09:05:30.000000Z",
+        "initial_transition_at": "2026-08-01T09:06:00.000000Z",
+        "initial_order_start_minute": 7,
+        "initial_certified_at": "2026-08-01T09:20:00.000000Z",
+    }
+    scenario["portfolio_aim"]["effective_at"] = "2026-08-01T09:00:00.000000Z"
+    scenario["portfolio_aim"]["objective"] = (
+        "Operate the accepted 25-security paper portfolio through human-supplied "
+        "prospective observations and explicit confirmation."
+    )
+    scenario["status_explanations"] = {
+        "DRAFT_REVIEW": "The accepted 25-security baseline awaits bootstrap confirmation.",
+        "FUNDED_CERTIFIED": (
+            "The accepted 25-security initial portfolio is certified and ready for "
+            "operator-supplied prospective observations."
+        ),
+    }
+    # Later observations are runtime authority. Scenario-authored episodes are absent.
+    scenario.pop("no_change", None)
+    scenario.pop("transition", None)
+    scenario.pop("correction", None)
+    return scenario
+
+
+SCENARIO_PROSPECTIVE_25 = _prospective_25_scenario()
+
+
+def _real_mu_prospective_scenario() -> dict[str, Any]:
+    """One real MU identity driven by the banked MU/NVDA reconciliation."""
+
+    reconciliation_hash = (
+        "89cc062783ae367c1bf259cfb7b355e0812ca162995b7ce05743a39e99592017"
+    )
+    return {
+        "scenario_id": REAL_MU_PROSPECTIVE_SCENARIO_ID,
+        "title": "GV Real Evidence — MU Paper Decision",
+        "id_domain": "GV-REAL-EVIDENCE-MU-PORTFOLIO-1",
+        "schema_version": "gv_operated_portfolio_v3",
+        "claim_boundary": (
+            "One real MU identity and classified cash driven by already-banked MU/NVDA "
+            "evidence. Paper ABSTAIN/NO_POSITION authority only; no score, alpha, "
+            "investability, provider, broker, or live-capital claim."
+        ),
+        "fixture_namespace": "real-evidence-mu",
+        "identity_namespace": "SEC_CIK_LISTING_V1",
+        "minimum_funded_positions": 0,
+        "minimum_economic_clusters": 1,
+        "minimum_total_cash_bps": 10000,
+        "cash_openings": [
+            {"bucket": "AVAILABLE", "amount": "10000"},
+            {"bucket": "RESEARCH_RESERVE", "amount": "1000"},
+        ],
+        "portfolio_aim": {
+            "objective": (
+                "Operate one real MU paper decision with explicit classified cash and "
+                "no position unless source evidence advances."
+            ),
+            "allowed_actions": ["HOLD", "CASH"],
+            "effective_at": "2026-08-02T12:00:00.000000Z",
+        },
+        "timeline": {
+            "cash_opened_at": "2026-08-02T11:55:00.000000Z",
+            "initial_decision_at": "2026-08-02T12:05:00.000000Z",
+            "aim_confirmed_at": "2026-08-02T12:05:30.000000Z",
+            "initial_transition_at": "2026-08-02T12:06:00.000000Z",
+            "initial_order_start_minute": 7,
+            "initial_certified_at": "2026-08-02T12:08:00.000000Z",
+        },
+        "status_explanations": {
+            "DRAFT_REVIEW": (
+                "The real MU evidence decision and classified cash await operator confirmation."
+            ),
+            "FUNDED_CERTIFIED": (
+                "The operator certified a cash-only MU ABSTAIN/NO_POSITION decision; "
+                "no security position or execution authority exists."
+            ),
+        },
+        "initial_decision_reason": "MU_NVDA_RECONCILIATION_HOLD_FOR_EVIDENCE",
+        "initial_changed_why_reason": (
+            "The banked reconciliation did not establish Micron-specific physical "
+            "supply persistence, so MU remained ABSTAIN and all capital stayed classified cash."
+        ),
+        "source_scenario_id": "GV_MU_NVDA_RECONCILED_EVIDENCE_1",
+        "source_authority": {
+            "schema_version": "gv_v2_mu_nvda_reconciliation_v1",
+            "case_id": "GV_V2_MU_NVDA_G_SUPPLY_RECONCILIATION_1",
+            "reconciliation_hash": reconciliation_hash,
+            "verification_mode": "REBUILD_FROM_BANKED_SOURCES",
+            "result_path": (
+                "data/gv_v2_reconciliation/mu_nvda_supply_1/"
+                "reconciliation_result.json"
+            ),
+        },
+        "runtime_observation_mode": True,
+        "instruments": [
+            {
+                "identity_namespace": "SEC_CIK_LISTING_V1",
+                "permanent_key": "SEC_CIK:0000723125:NASDAQ:MU:COMMON_STOCK",
+                "security_class": "COMMON_STOCK",
+                "symbol": "MU",
+                "name": "Micron Technology, Inc.",
+                "economic_cluster": "SEMICONDUCTOR_MEMORY",
+                "evidence_content": (
+                    "The banked MU filing and independent NVDA facts partially corroborate "
+                    "a broad memory-price and supply-constrained environment, but do not "
+                    "establish Micron-specific physical supply persistence."
+                ),
+                "evidence_slug": "mu-nvda-reconciliation",
+                "evidence_locator": (
+                    "repo://data/gv_v2_reconciliation/mu_nvda_supply_1/"
+                    f"reconciliation_result.json#reconciliation_hash={reconciliation_hash}"
+                ),
+                "outcome": "ABSTAIN",
+                "net_score_bps": 0,
+                "target_quantity": "0",
+                "reference_price": "1",
+                "principal_claim": (
+                    "Micron-specific physical supply persistence remains unestablished; "
+                    "retain NO_POSITION pending the missing discriminator."
+                ),
+                "hard_falsifiers": [
+                    "banked source hash or source-family linkage fails verification"
+                ],
+                "watch_conditions": [
+                    "independent point-in-time Micron shipment, allocation, inventory, "
+                    "utilization, capacity-ramp, or channel evidence persists across periods"
+                ],
+            }
+        ],
+    }
+
+
+SCENARIO_REAL_MU_PROSPECTIVE = _real_mu_prospective_scenario()
+
+
+def _operated_paper_capital_scenario() -> dict[str, Any]:
+    """Forward-operated MU paper authority without rewriting the banked specimen."""
+
+    scenario = deepcopy(SCENARIO_REAL_MU_PROSPECTIVE)
+    scenario.update(
+        {
+            "scenario_id": OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+            "title": "GV Operated Paper Capital — MU",
+            "id_domain": "GV-OPERATED-PAPER-CAPITAL-1",
+            "claim_boundary": (
+                "One owner-supplied, market-identified MU paper-capital decision using "
+                "the certified cash baseline. Operator assertions are content-addressed "
+                "but are not provider-verified, alpha evidence, investment advice, broker "
+                "authority, or live-capital authority."
+            ),
+            "fixture_namespace": "operated-paper-capital-mu",
+            "source_scenario_id": REAL_MU_PROSPECTIVE_SCENARIO_ID,
+            "forward_operated_market_packet": True,
+        }
+    )
+    scenario["portfolio_aim"] = {
+        **scenario["portfolio_aim"],
+        "objective": (
+            "Operate one bounded owner-authored MU paper decision from certified cash "
+            "through preview, explicit disposition, persistence, certification, and replay."
+        ),
+        "allowed_actions": ["BUY", "HOLD", "CASH"],
+    }
+    scenario["status_explanations"] = {
+        "DRAFT_REVIEW": (
+            "The forward-operated MU paper workspace awaits bootstrap confirmation."
+        ),
+        "FUNDED_CERTIFIED": (
+            "The certified MU workspace is ready for one owner-supplied evidence and "
+            "market packet; no paper position exists until explicit confirmation."
+        ),
+    }
+    scenario["initial_decision_reason"] = "BOOTSTRAP_BANKED_MU_CASH_BASELINE"
+    scenario["initial_changed_why_reason"] = (
+        "The forward-operated workspace starts from the certified banked MU cash-only "
+        "baseline without modifying its historical evidence contract."
+    )
+    return scenario
+
+
+SCENARIO_OPERATED_PAPER_CAPITAL = _operated_paper_capital_scenario()
+
+
 _SCENARIOS = {
     DEFAULT_SCENARIO_ID: SCENARIO_10,
     PORTFOLIO_25_SCENARIO_ID: SCENARIO_25,
+    ENGINE_SCALE_50_SCENARIO_ID: SCENARIO_50,
+    ENGINE_SCALE_100_SCENARIO_ID: SCENARIO_100,
+    PROSPECTIVE_25_SCENARIO_ID: SCENARIO_PROSPECTIVE_25,
+    REAL_MU_PROSPECTIVE_SCENARIO_ID: SCENARIO_REAL_MU_PROSPECTIVE,
+    OPERATED_PAPER_CAPITAL_SCENARIO_ID: SCENARIO_OPERATED_PAPER_CAPITAL,
 }
 
 

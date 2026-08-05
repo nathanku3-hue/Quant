@@ -8,7 +8,7 @@ import subprocess
 
 import pytest
 
-from core.gv_fs0_canonical import domain_hash
+from core.gv_fs0_canonical import canonical_document_bytes, domain_hash
 from gv_portfolio_v0.book import PortfolioBookError, build_portfolio_book
 from gv_portfolio_v0.operated import (
     OperatedPortfolioError,
@@ -324,7 +324,7 @@ def test_persisted_workspace_tamper_fails_closed(tmp_path: Path) -> None:
     path = workspace_path(root)
     envelope = json.loads(path.read_text(encoding="utf-8"))
     envelope["workspace"]["book"]["nav"] = "999999"
-    path.write_text(json.dumps(envelope), encoding="utf-8")
+    path.write_bytes(canonical_document_bytes(envelope))
     with pytest.raises(OperatedPortfolioError, match="WORKSPACE_HASH_MISMATCH"):
         load_workspace(root=root)
 

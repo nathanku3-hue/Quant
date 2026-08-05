@@ -17,9 +17,12 @@ from gv_portfolio_v0.allocation import (
     plan_transition,
     validate_execution_handoff,
 )
+from gv_portfolio_v0.decimal_utils import decimal_text
 
 ID_DOMAIN = "GV-PORTFOLIO-V0"
 EXECUTION_MODE = "DETERMINISTIC_PAPER"
+MAX_TRADE_DECIMAL_INTEGER_DIGITS = 64
+MAX_TRADE_DECIMAL_FRACTION_DIGITS = 64
 
 
 class ExecutionError(ValueError):
@@ -342,7 +345,13 @@ def create_fill_event(fill: Mapping[str, Any], *, sequence: int) -> dict[str, An
     )
 
 
-def _trade_decimal_text(value: Any, *, field: str, positive: bool = False) -> str:
+def _trade_decimal_text(
+    value: Any,
+    *,
+    field: str,
+    positive: bool = False,
+    money: bool = False,
+) -> str:
     if isinstance(value, bool) or isinstance(value, float):
         raise ExecutionError(f"{field.upper()}_DECIMAL_TYPE_INVALID")
     try:
@@ -355,8 +364,21 @@ def _trade_decimal_text(value: Any, *, field: str, positive: bool = False) -> st
         raise ExecutionError(f"{field.upper()}_MUST_BE_POSITIVE")
     if not positive and parsed < 0:
         raise ExecutionError(f"{field.upper()}_MUST_BE_NONNEGATIVE")
-    text = format(parsed.normalize(), "f")
-    return text.rstrip("0").rstrip(".") if "." in text else text
+    _, digits, exponent = parsed.as_tuple()
+    effective_digits = list(digits)
+    while len(effective_digits) > 1 and effective_digits[-1] == 0:
+        effective_digits.pop()
+        exponent += 1
+    integer_digits = len(effective_digits) + max(exponent, 0)
+    fraction_digits = max(-exponent, 0)
+    if (
+        integer_digits > MAX_TRADE_DECIMAL_INTEGER_DIGITS
+        or fraction_digits > MAX_TRADE_DECIMAL_FRACTION_DIGITS
+    ):
+        raise ExecutionError(f"{field.upper()}_DECIMAL_OUT_OF_BOUNDS")
+    if money and exponent < -2:
+        raise ExecutionError(f"{field.upper()}_PRECISION_EXCEEDED")
+    return decimal_text(parsed)
 
 
 def create_trade_order(
@@ -394,9 +416,11 @@ def create_trade_order(
         "side": side,
         "quantity": _trade_decimal_text(quantity, field="quantity", positive=True),
         "reference_price": _trade_decimal_text(
-            reference_price, field="reference_price", positive=True
+            reference_price, field="reference_price", positive=True, money=True
         ),
-        "expected_fee": _trade_decimal_text(expected_fee, field="expected_fee"),
+        "expected_fee": _trade_decimal_text(
+            expected_fee, field="expected_fee", money=True
+        ),
         "cash_bucket": cash_bucket,
         "created_at": created_at,
         "execution_mode": EXECUTION_MODE,

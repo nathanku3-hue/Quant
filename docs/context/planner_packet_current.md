@@ -1,31 +1,41 @@
 # Planner Packet — Current
 
-Date: 2026-08-01
-Decision: `ACCEPT_GV_OPERATED_PORTFOLIO_25_1_TERMINALLY`
-Status: `TERMINAL_ACCEPTED; HOLD_AFTER_PUBLICATION`
+Date: 2026-08-05
+Active gate: `PIT-ALPHA-AUTHORITY-CUT-1`
+Status: `C COMMITTED; P FRESH-CLONE + REVIEW PASS; PUBLICATION AUTHORIZED`
+Canonical score: `62/100`
 
-## Authority
+## Current truth
 
-- **Accepted prior terminal:** `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`; candidate `0d15e9c`, closure `2349e1b`, and terminal tag remain immutable.
-- **Accepted current terminal:** `GV-OPERATED-PORTFOLIO-25-1`; executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`, tree `548d6365d6355c709186aef00835219bfa30c387`.
-- **Publication identity:** documentation-only closure commit tagged `gv-operated-portfolio-25-1-terminal` and fast-forwarded to `main`.
-- **Accepted score:** `62/100`; no automatic uplift from closure.
-- **Live boundary:** Limited Live remains closed and unauthorized.
+- Candidate branch starts from advertised main `e4cf949`.
+- Cleanup commit `a927451` deletes exactly 50 blobs and 41 gitlinks.
+- P installs the final runtime/test state represented by `a36a436` without replaying historical commits.
+- `dashboard.py` is the sole product; standalone app, launchers, prospective workspace, and standalone AppTests are removed.
+- Local dashboard/PIT proof passes 97/97; context packet tests pass 26/26 and validation passes.
+- Exact fresh-clone product/context proof passes 123/123 with byte/status equality.
+- Three independent focus reviews pass on the exact candidate hash manifest.
+- F preservation is complete with `F_PASS=true`.
 
-## Result
+## Product proof target
 
-The product now operates exactly 25 permanent securities through the same engine, persistence implementation, schema family, application, and view as the retained ten-security phase. It proves instrument-owned evidence/theses, one all-instrument competition, multiple funded positions, classified cash, explicit no-change, a real SELL/REDUCE plus BUY/FUND transition, exact accounting, replay, correction, restart, fresh-process reopen, changed-why, and a four-action maximum operator path.
+```text
+open Command Center
+→ inspect real all-capital PIT proposals and certified cash
+→ operate bounded MU paper entry
+→ operate proposal-bound SELL MU 3 plus BUY MERID 5
+→ explicitly confirm or reject-all
+→ persist atomically
+→ certify lineage
+→ reopen in a fresh process with MU 4 / MERID 5 and residual 0
+```
 
-## Terminal evidence
+## Immediate sequence
 
-- Exact-head operated CI: runs `30697940370` and `30697901204`; Windows and Ubuntu PASS.
-- Exact-head FS0 authority CI: runs `30697940369` and `30697901213`; Windows, Ubuntu, and byte parity PASS.
-- Controlled complete-suite comparison: candidate-only failures `0`.
-- Independent terminal Reviewer A/B/C: PASS/PASS/PASS.
-- Closure boundary: documentation and generated context only; no production, test, workflow, dependency, or configuration delta.
+1. Create P from the validated working tree.
+2. Push C+P once to the candidate branch.
+3. Verify remote equality and hosted workflow dispatch.
+4. Stop before merge, tag, or main advancement.
 
-## Planner decision
+## Next product question
 
-- **NEXT_STEP:** hold after terminal publication until explicit owner authorization selects one new bounded product phase.
-- **DO_NOT_REDECIDE:** the candidate, hosted proof, failset comparison, fresh-process proof, and Reviewer A/B/C are terminal evidence for `7ce85c4`; do not rerun them absent an executable/test/workflow/dependency/configuration change.
-- **DO_NOT_START:** providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, Limited Live, live capital, parallel architecture, compatibility work, or unrelated cleanup.
+`PIT-SOURCE-AUTHORITY-1`: one independently traceable bitemporal market packet through the existing authority loop. Provider expansion, optimizer work, broker integration, alpha claims, and Limited Live remain closed.

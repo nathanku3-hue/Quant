@@ -1,35 +1,29 @@
 # Multi-Stream Contract — Current
 
-Date: 2026-08-01
-Phase: `GV-OPERATED-PORTFOLIO-25-1`
-Canonical authority: `docs/context/gv_endgame_authority_current.md`
-Status: `TERMINAL_ACCEPTED; STREAMS_CLOSED`
-Accepted score: `62/100`
-Limited Live: `CLOSED; NOT_AUTHORIZED`
+Date: 2026-08-05
+Gate: `PIT-ALPHA-AUTHORITY-CUT-1`
+Status: `THREE CONCURRENT LANES`
 
-## Closed ownership results
+## Lane C — canonical cleanup
 
-| Logical stream | Owned result | Terminal state |
-|---|---|---|
-| Scenario and thesis | declarative retained 10- and accepted 25-security identities, evidence, reviews, observations | PASS |
-| Allocation | dynamic competition over all 25 identities and selected-funded authority | PASS |
-| Execution/accounting | exact target-delta BUY/SELL execution and reconciled book | PASS |
-| Persistence/replay | one scenario-bound atomic envelope, restart, certification, correction, fresh-process reopen | PASS |
-| Product/UI | dynamic summary-first and exceptions-first four-action flow | PASS |
-| Integrator | exact-SHA custody, hosted parity, failset identity, terminal A/B/C, documentation-only publication | PASS |
+Owner: repository custody. Result: exact 91-path deletion commit `a927451`. State: complete and unpushed.
 
-These were logical ownership boundaries, not a requirement for six workers. Terminal review evidence is already complete against exact candidate `7ce85c4`; it is not rerun by closure.
+## Lane P — product authority
 
-## Locked coordination law
+Owner: product/runtime. Result: one final-state PIT-to-paper-capital transplant on C. `dashboard.py` is the only application; domain modules own accounting/persistence/certification/replay. State: validation active.
 
-- Genericization has no independent acceptance status.
-- The accepted proof is the 25-security scenario running through the same path while retained ten-security behavior remains green.
-- One engine, persistence implementation, schema family, application, and view only.
-- Sessions, cells, runs, slots, and copied portfolios do not satisfy security breadth.
-- Terminal full comparison and independent A/B/C run once against one frozen executable candidate.
-- Closure changes documentation and generated context only.
-- Limited Live remains closed.
+## Lane F — preservation
 
-## Current bottleneck
+Owner: preservation. Result: two named tars, one 35-row comparison report, and one 41-row receipt manifest. State: concurrent. It gates merge/tag/main only.
 
-None inside this phase. Hold after fast-forward publication and terminal tag creation. A successor requires explicit owner authorization, one bounded product objective, and a new active brief; no stream may self-open.
+## Integration law
+
+- P may not reintroduce a standalone application, launcher, compatibility route, or second view authority.
+- C and P publish together after fresh-clone proof.
+- F does not block candidate preparation or publication.
+- Main movement may be rebased automatically only when the 91-path manifest is unchanged and overlap with C/P remains zero.
+- Merge, tag, and main advancement require F_PASS.
+
+## Deferred
+
+Provider expansion, cascade integration, optimizer work, historical-suite repair, broker integration, alpha claims, and Limited Live.

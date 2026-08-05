@@ -1,5 +1,26 @@
 # Product Specification: Terminal Zero / GodView Certified Portfolio OS
 
+## Active Authority Cut Specification (2026-08-05)
+
+This section supersedes every active product header below.
+
+```text
+AUTHORITY_CUT = PIT-ALPHA-AUTHORITY-CUT-1
+BASE = e4cf949a895a5f987502328631ebac28af7d154f
+C = a92745118aab1a857a0251ce747cab247ba94605
+P_DONOR = a36a436e3253a939871299bed12a75eccdad05bb
+PRODUCT_ENTRY = dashboard.py / Command Center
+DUPLICATE_OPERATOR_SURFACE = DELETED_WITHOUT_COMPATIBILITY
+SCORE = 62/100 UNTIL EXACT_FRESH_CLONE_PROOF
+F_GATES = MERGE + TAG + MAIN ONLY
+NEXT = PIT-SOURCE-AUTHORITY-1
+LIVE = CLOSED
+```
+
+P must preserve one immutable PIT identity across operated MU, independent shadow MU, and certified cash; bind entry/rotation requests to displayed proposal, active book, certification, event count, and market packets; execute deterministic SELL-before-BUY accounting; persist and certify atomically; reject stale/tampered or buy-only requests; and reopen exact authority in a fresh process. Historical specifications below remain non-active audit history.
+
+---
+
 ## Active Product Header (2026-07-29) — R0 Banked, Product Audit Pending
 
 ```text

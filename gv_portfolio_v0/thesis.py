@@ -10,6 +10,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Mapping
 
 from core.gv_fs0_canonical import canonical_document_bytes
+from gv_portfolio_v0.decimal_utils import decimal_text
 
 
 class StrategyThesisError(ValueError):
@@ -46,12 +47,10 @@ def _decimal(value: Any, *, field: str) -> Decimal:
 
 def _decimal_text(value: Any, *, field: str) -> str:
     parsed = _decimal(value, field=field)
-    if parsed == 0:
-        return "0"
-    text = format(parsed.normalize(), "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text
+    try:
+        return decimal_text(parsed)
+    except ValueError as exc:
+        raise StrategyThesisError(f"{field.upper()}_OUT_OF_BOUNDS") from exc
 
 
 def scenario_range(*, bear_value: Any, base_value: Any, bull_value: Any) -> dict[str, str]:

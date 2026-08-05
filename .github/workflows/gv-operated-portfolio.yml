@@ -1,70 +1,60 @@
-name: GV Operated Portfolio
+name: GodView PIT Product Proof
 
 on:
   pull_request:
     paths:
       - ".github/workflows/gv-operated-portfolio.yml"
-      - "requirements-alpha.txt"
-      - "requirements.txt"
+      - "dashboard.py"
+      - "core/gv_pit/**"
+      - "core/gv_v2_mu_nvda_*.py"
+      - "data/gv_v2_reconciliation/**"
       - "gv_portfolio_v0/**"
-      - "views/gv_operated_portfolio_workspace.py"
-      - "operated_portfolio_app.py"
-      - "launch_operated_portfolio.py"
-      - "launch_operated_portfolio_25.py"
-      - "tests/gv_portfolio_v0/**"
-      - "tests/gv_fs0_product/**"
-      - "scripts/build_context_packet.py"
-      - "tests/test_build_context_packet.py"
-      - "tests/test_phase60_d343_hygiene.py"
-      - "tests/test_phase60_d345_closeout.py"
-      - "tests/test_phase61_context_hygiene.py"
-      - "docs/context/ACTIVE_BRIEF"
-      - "docs/context/gv_endgame_authority_current.md"
+      - "views/command_center.py"
+      - "views/page_registry.py"
+      - "tests/test_gv_pit_*.py"
+      - "tests/test_dash_1_page_registry_shell.py"
+      - "tests/gv_portfolio_v0/test_operated*.py"
+      - "tests/gv_portfolio_v0/test_prospective.py"
+      - "tests/gv_portfolio_v0/test_real_evidence_mu.py"
+      - "tests/gv_portfolio_v0/test_same_evidence_shadow.py"
+      - "docs/context/**"
       - "docs/architecture/top_level_roadmap.md"
-      - "docs/context/bridge_contract_current.md"
-      - "docs/context/current_context.json"
-      - "docs/context/current_context.md"
-      - "docs/context/done_checklist_current.md"
-      - "docs/context/impact_packet_current.md"
-      - "docs/context/planner_packet_current.md"
-      - "docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md"
-      - "docs/phase_brief/gv-operated-portfolio-25-1-brief.md"
+      - "README.md"
+      - "PHASE_QUEUE.md"
+      - "PRD.md"
+      - "PRODUCT_SPEC.md"
   push:
+    branches:
+      - "codex/pit-alpha-authority-cut-1"
     paths:
       - ".github/workflows/gv-operated-portfolio.yml"
-      - "requirements-alpha.txt"
-      - "requirements.txt"
+      - "dashboard.py"
+      - "core/gv_pit/**"
+      - "core/gv_v2_mu_nvda_*.py"
+      - "data/gv_v2_reconciliation/**"
       - "gv_portfolio_v0/**"
-      - "views/gv_operated_portfolio_workspace.py"
-      - "operated_portfolio_app.py"
-      - "launch_operated_portfolio.py"
-      - "launch_operated_portfolio_25.py"
-      - "tests/gv_portfolio_v0/**"
-      - "tests/gv_fs0_product/**"
-      - "scripts/build_context_packet.py"
-      - "tests/test_build_context_packet.py"
-      - "tests/test_phase60_d343_hygiene.py"
-      - "tests/test_phase60_d345_closeout.py"
-      - "tests/test_phase61_context_hygiene.py"
-      - "docs/context/ACTIVE_BRIEF"
-      - "docs/context/gv_endgame_authority_current.md"
+      - "views/command_center.py"
+      - "views/page_registry.py"
+      - "tests/test_gv_pit_*.py"
+      - "tests/test_dash_1_page_registry_shell.py"
+      - "tests/gv_portfolio_v0/test_operated*.py"
+      - "tests/gv_portfolio_v0/test_prospective.py"
+      - "tests/gv_portfolio_v0/test_real_evidence_mu.py"
+      - "tests/gv_portfolio_v0/test_same_evidence_shadow.py"
+      - "docs/context/**"
       - "docs/architecture/top_level_roadmap.md"
-      - "docs/context/bridge_contract_current.md"
-      - "docs/context/current_context.json"
-      - "docs/context/current_context.md"
-      - "docs/context/done_checklist_current.md"
-      - "docs/context/impact_packet_current.md"
-      - "docs/context/planner_packet_current.md"
-      - "docs/phase_brief/gv-operated-portfolio-10-transition-1r-brief.md"
-      - "docs/phase_brief/gv-operated-portfolio-25-1-brief.md"
+      - "README.md"
+      - "PHASE_QUEUE.md"
+      - "PRD.md"
+      - "PRODUCT_SPEC.md"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  operated-product-proof:
-    name: Operated product proof (${{ matrix.os }})
+  pit-product-proof:
+    name: PIT product proof (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -83,66 +73,41 @@ jobs:
         env:
           EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          actual_sha="$(git rev-parse HEAD)"
-          actual_tree="$(git rev-parse HEAD^{tree})"
-          test "$actual_sha" = "$EXPECTED_SHA"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
-          printf 'candidate_sha=%s\ncandidate_tree=%s\n' "$actual_sha" "$actual_tree"
+          test ! -e operated_portfolio_app.py
+          test ! -e launch_operated_portfolio.py
+          test ! -e launch_operated_portfolio_25.py
+          test ! -e views/gv_prospective_paper_workspace.py
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: |
-            requirements-alpha.txt
-            requirements.txt
+          cache-dependency-path: requirements.txt
 
-      - name: Install operated and FS0 test dependencies
-        run: >-
-          python -m pip install --disable-pip-version-check
-          -r requirements.txt
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
 
       - name: Verify dependency surface
-        shell: bash
-        run: |
-          python -m pip check
-          python - <<'PY'
-          import json
-          import platform
-          import subprocess
-          import sys
+        run: python -m pip check
 
-          import pytest
-          import streamlit
-
-          record = {
-              "python": sys.version.replace("\n", " "),
-              "platform": platform.platform(),
-              "pytest": pytest.__version__,
-              "streamlit": streamlit.__version__,
-              "commit": subprocess.check_output(
-                  ["git", "rev-parse", "HEAD"], text=True
-              ).strip(),
-              "tree": subprocess.check_output(
-                  ["git", "rev-parse", "HEAD^{tree}"], text=True
-              ).strip(),
-          }
-          print(json.dumps(record, indent=2, sort_keys=True))
-          PY
-
-      - name: Run operated kernel, FS0 authority, and context tests
+      - name: Run PIT domain and Command Center product proof
         run: >-
           python -m pytest -q
-          tests/gv_portfolio_v0
-          tests/gv_fs0_product
-          tests/test_build_context_packet.py
-          tests/test_phase60_d343_hygiene.py
-          tests/test_phase60_d345_closeout.py
-          tests/test_phase61_context_hygiene.py
+          tests/test_gv_pit_transaction.py
+          tests/test_gv_pit_operated_capital.py
+          tests/test_gv_pit_operated_rotation.py
+          tests/test_dash_1_page_registry_shell.py
+          tests/gv_portfolio_v0/test_operated.py
+          tests/gv_portfolio_v0/test_operated_25.py
+          tests/gv_portfolio_v0/test_prospective.py
+          tests/gv_portfolio_v0/test_real_evidence_mu.py
+          tests/gv_portfolio_v0/test_same_evidence_shadow.py
 
       - name: Validate generated current context
         run: python scripts/build_context_packet.py --validate
 
-      - name: Require test execution to leave tracked bytes unchanged
+      - name: Require tests to leave tracked bytes unchanged
         run: git diff --exit-code

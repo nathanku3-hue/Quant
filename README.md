@@ -1,16 +1,16 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `GV-OPERATED-PORTFOLIO-25-1 AUTHORIZED; IMPLEMENTATION_ACTIVE; NOT_FROZEN; LIVE CLOSED`
-Date: 2026-08-01
-Authority base: terminal `main` `2349e1b`
-Accepted operated terminal: `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` at candidate `0d15e9c`, closure `2349e1b`, terminal tag preserved
-Slice 0: accepted product foundation `85e6601`
-Replay 0: accepted integrity foundation `0e4b93f`
-Portfolio Scale `c37abf0`: deterministic multi-session harness; original 25–50-security objective remains incomplete until the active phase passes terminal review
-Universe Scale `dca67e3`: deterministic multi-cell harness; original 100–300+ custody objective incomplete
-Challenger `3e4dc95`: shadow-custody separation primitive; original promotion objective incomplete
-Accepted endgame progress: `62/100`; no active-phase uplift claimed
-Limited Live: `CLOSED; NOT_AUTHORIZED`
+Status: `PIT-ALPHA-AUTHORITY-CUT-1 — C COMMITTED; P FRESH-CLONE + REVIEW PASS; PUBLICATION AUTHORIZED; LIVE CLOSED`
+Date: 2026-08-05
+Advertised main base: `e4cf949a895a5f987502328631ebac28af7d154f`
+Cleanup commit: `a92745118aab1a857a0251ce747cab247ba94605`
+Functional donor: `a36a436e3253a939871299bed12a75eccdad05bb`
+Canonical score: `62/100` until exact fresh-clone proof
+Sole product application: `dashboard.py`
+Next product direction: `PIT-SOURCE-AUTHORITY-1`
+Limited Live: `CLOSED; NOT AUTHORIZED`
+
+> This authority-cut header supersedes historical active-gate language below. Historical sections remain audit context only.
 
 GodView is a local-first, point-in-time certified portfolio operating system. Its product unit is a complete portfolio decision and operating loop, not an isolated stock case and not an optimizer-first research platform.
 

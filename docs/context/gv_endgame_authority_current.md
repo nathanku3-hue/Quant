@@ -1,58 +1,46 @@
-# Godview Endgame Authority — Current
+# GodView Endgame Authority — Current
 
-Date: 2026-08-01
-Decision: `ACCEPT_GV_OPERATED_PORTFOLIO_25_1_TERMINALLY`
-Status: `TERMINAL_ACCEPTED; PUBLICATION_BY_DOCUMENTATION_ONLY_CLOSURE`
+Date: 2026-08-05
+Active gate: `PIT-ALPHA-AUTHORITY-CUT-1`
+Status: `C COMMITTED; P FRESH-CLONE + REVIEW PASS; PUBLICATION AUTHORIZED`
+Canonical score: `62/100`
+Limited Live: `CLOSED; NOT AUTHORIZED`
 
-## Current disposition
+## Canonical direction
 
-- `ACCEPTED_FOUNDATION = GV-OPERATED-PORTFOLIO-10-TRANSITION-1R`; executable candidate `0d15e9c59c6b3ca051b3aa815018889d1e94857f`, closure `2349e1bd91d9b4036f3956c52ce7bbf66a9c2c1e`, and tag `gv-operated-portfolio-10-transition-1r-terminal` remain immutable.
-- `ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-25-1`; terminal executable candidate `7ce85c41e9c3b6492ec884a69dc7857538386ba2`, tree `548d6365d6355c709186aef00835219bfa30c387`.
-- `TERMINAL_TAG = gv-operated-portfolio-25-1-terminal`; it must resolve to the first documentation-only closure commit containing this authority packet.
-- `PUBLICATION = FAST_FORWARD_ONLY`; `main` may advance from `2349e1b` through `7ce85c4` to the documentation-only closure commit, with no squash, rebase, merge commit, amendment, or executable recut.
-- Accepted endgame progress remains `62/100`. Terminal closure does not itself authorize a score uplift.
-- `LIMITED_LIVE = CLOSED; NOT_AUTHORIZED`.
+GodView is one point-in-time certified portfolio operating system operated through `dashboard.py`. The sole product path is the default Command Center. Strategy adapters emit immutable evidence-bound proposals; domain authorities own preview, accounting, persistence, certification, and replay; the dashboard owns request composition and display only.
 
-## Terminal product result
+## Authority cut
 
-One genuinely operated portfolio contains exactly 25 distinct permanent securities and preserves the accepted ten-security behavior through one shared engine, persistence implementation, schema family, application, and view.
+- Advertised main base: `e4cf949a895a5f987502328631ebac28af7d154f`.
+- Functional donor: `a36a436e3253a939871299bed12a75eccdad05bb`.
+- Divergence base: `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`.
+- Cleanup commit C: `a92745118aab1a857a0251ce747cab247ba94605`.
+- P is one reviewed final-state transplant, not seventeen commit replays.
 
-The accepted operator path is:
+C removes exactly 50 preserved residue blobs and 41 nested-repository gitlinks. P installs all-capital PIT, operated paper entry, proposal-bound SELL+BUY rotation, atomic persistence, certification, and fresh-process replay on canonical ancestry.
+
+## Sole operator product
+
+The following obsolete launch surface is removed without compatibility:
 
 ```text
-25 permanent identities with instrument-owned evidence and theses
-→ one deterministic all-instrument competition
-→ multiple funded positions plus classified residual cash
-→ explicit no-change observation
-→ real SELL/REDUCE plus BUY/FUND transition
-→ deterministic accounting with unexplained residual 0
-→ persist, restart, reopen, explain changed why
-→ correction and fresh-process exact reopen
+operated_portfolio_app.py
+launch_operated_portfolio.py
+launch_operated_portfolio_25.py
+views/gv_prospective_paper_workspace.py
 ```
 
-The required operator workload remains bounded to at most four actions and requires no per-security confirmations.
+The Command Center owns the product journey and its AppTests. Shared portfolio modules remain internal domain substrate, not a second application.
 
-## Terminal evidence bound to `7ce85c4`
+## Publication and preservation
 
-- Candidate branch `codex/gv-operated-portfolio-25-1` is clean and remote-equal at the exact SHA.
-- Exact-head `GV Operated Portfolio` runs `30697940370` and `30697901204` pass on Windows and Ubuntu.
-- Exact-head `GV-FS0 Product` runs `30697940369` and `30697901213` pass on Windows and Ubuntu; byte-parity jobs pass.
-- The controlled base/candidate complete-suite comparison reports zero candidate-only failures.
-- Fresh-process restart/reopen evidence closes the earlier in-process-only concern.
-- Independent terminal Reviewer A, Reviewer B, and Reviewer C each return PASS with no remaining in-scope Critical/High finding.
-- No implementation, test, workflow, dependency, or configuration byte is changed by terminal closure.
+Fresh-clone proof passed with 58 byte-equivalent P paths and 123/123 combined checks. Three independent focus reviews passed. Preservation F passed with both named tars, 35 comparison rows, 41 receipt rows, and mirrored hashes. Candidate publication is authorized; merge, terminal tag, and main advancement remain outside this round.
 
-## Locked architecture and semantics
+## Score and claim boundary
 
-- One engine, one persistence implementation, one schema family, one application, and one view serve both retained ten-security and accepted 25-security scenarios.
-- Scenario data owns identities, evidence, reviews, observations, and transition targets; the engine derives selections, execution legs, books, certification, replay, and changed-why projections.
-- Every review retains instrument-owned evidence. Cross-instrument evidence or thesis rebinding fails closed.
-- Sessions, cells, runs, slots, and copied portfolios never count as distinct securities.
-- No-change is economically immutable; transition legs derive from target deltas; accounting is nonnegative and reconciled; replay and correction are deterministic and append-only.
-- Persistence remains scenario-bound, atomic, and linked-ancestor confined.
+Keep `62/100` until exact fresh-clone P proof passes. No source-quality, alpha, realized-value, broker, advice, or live-capital claim follows from authority cleanup or runtime transplantation.
 
-## Closure and next-decision boundary
+## Next product direction
 
-The closure commit may modify documentation and generated context only. Before publication, the diff from `7ce85c4` must contain no production, test, workflow, dependency, or configuration path. After fast-forward publication, remote `main` and `gv-operated-portfolio-25-1-terminal^{}` must resolve to the same closure commit.
-
-No successor phase is opened by this terminal. Provider acquisition, optimizer work, broker integration, Universe, Challenger compatibility, alpha/score uplift, Limited Live, and live capital remain closed pending explicit owner authorization.
+After candidate publication, `PIT-SOURCE-AUTHORITY-1` is the sole next functional slice: one independently traceable bitemporal market packet through the existing loop. It adds no new engine.

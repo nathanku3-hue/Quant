@@ -3,10 +3,10 @@ from __future__ import annotations
 from copy import deepcopy
 import json
 from pathlib import Path
-import socket
 
 import pytest
 
+from core.gv_fs0_canonical import canonical_document_bytes
 from gv_portfolio_v0.operated import (
     OperatedPortfolioError,
     STATUS_CORRECTED,
@@ -37,22 +37,6 @@ from gv_portfolio_v0.operated_storage import (
 from gv_portfolio_v0.replay import reconstruct_exact, replay_idempotent
 
 ROOT = Path(__file__).resolve().parents[2]
-
-
-def _page_blob(app: object) -> str:
-    parts: list[str] = []
-    for collection_name in (
-        "header",
-        "subheader",
-        "caption",
-        "info",
-        "warning",
-        "success",
-        "table",
-    ):
-        for element in getattr(app, collection_name):
-            parts.append(str(getattr(element, "value", element)))
-    return "\n".join(parts)
 
 
 def _full_25_flow() -> dict[str, object]:
@@ -121,7 +105,6 @@ def test_shared_engine_has_no_fixture_symbol_authority_or_parallel_stack() -> No
         "gv_portfolio_v0/operated.py",
         "gv_portfolio_v0/operated_storage.py",
         "views/gv_operated_portfolio_workspace.py",
-        "operated_portfolio_app.py",
     ):
         text = (ROOT / relative).read_text(encoding="utf-8")
         assert '"HARBOR"' not in text
@@ -152,7 +135,7 @@ def test_scenario_definition_and_persisted_binding_fail_closed(
     path = workspace_path(root, scenario_id=PORTFOLIO_25_SCENARIO_ID)
     envelope = json.loads(path.read_text(encoding="utf-8"))
     envelope["scenario_hash"] = "FORGED"
-    path.write_text(json.dumps(envelope), encoding="utf-8")
+    path.write_bytes(canonical_document_bytes(envelope))
     with pytest.raises(
         OperatedPortfolioError, match="PERSISTED_SCENARIO_HASH_MISMATCH"
     ):
@@ -267,79 +250,3 @@ def test_shared_storage_is_scenario_isolated_and_restartable(tmp_path: Path) -> 
         root=root, scenario_id=PORTFOLIO_25_SCENARIO_ID
     ) == corrected
     assert load_workspace(root=root, scenario_id=DEFAULT_SCENARIO_ID) == ten
-
-
-def test_25_black_box_flow_is_summary_first_and_four_actions(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    pytest.importorskip("streamlit")
-    from streamlit.testing.v1 import AppTest
-
-    def _denied(*_args: object, **_kwargs: object) -> None:
-        raise OSError("GV_OPERATED_PORTFOLIO_NETWORK_DENIED")
-
-    monkeypatch.setattr(socket, "create_connection", _denied)
-    monkeypatch.setenv("GV_OPERATED_SCENARIO_ID", PORTFOLIO_25_SCENARIO_ID)
-    monkeypatch.setenv("GV_OPERATED_PORTFOLIO_HOME", str(tmp_path / "workspace"))
-    monkeypatch.chdir(ROOT)
-
-    app = AppTest.from_file(str(ROOT / "operated_portfolio_app.py")).run(timeout=90)
-    assert not app.exception, app.exception
-    initial = _page_blob(app)
-    assert "GV Operated Portfolio 25" in initial
-    assert "instruments=25" in initial
-    assert "portfolio_count=1" in initial
-    assert "required_operator_actions<=4" in initial
-    assert "per_security_confirmations=0" in initial
-    assert "DRAFT_REVIEW" in initial
-    subheaders = [str(element.value) for element in app.subheader]
-    assert subheaders[:3] == [
-        "Portfolio and cluster summary",
-        "Exceptions and funded priorities",
-        "Full instrument-specific review",
-    ]
-
-    action_keys: list[str] = []
-    for expected_key, expected_status in (
-        ("gv_operated_confirm", "FUNDED_CERTIFIED"),
-        ("gv_operated_no_change", "OBSERVED_NO_CHANGE_CERTIFIED"),
-        ("gv_operated_transition", "TRANSITION_CERTIFIED"),
-        ("gv_operated_correction", "CORRECTED_CERTIFIED"),
-    ):
-        button = next(
-            row
-            for row in app.button
-            if getattr(row, "key", None) == expected_key
-        )
-        action_keys.append(expected_key)
-        button.click()
-        app = app.run(timeout=90)
-        assert not app.exception, app.exception
-        assert expected_status in _page_blob(app)
-        app = app.run(timeout=90)
-
-    assert len(action_keys) == 4
-    final_blob = _page_blob(app)
-    assert "SELL" in final_blob
-    assert "BUY" in final_blob
-    assert "NAV=10980" in final_blob
-    assert "residual=0" in final_blob
-    assert "lineage_depth=3" in final_blob
-
-    fresh = AppTest.from_file(str(ROOT / "operated_portfolio_app.py")).run(timeout=90)
-    assert not fresh.exception, fresh.exception
-    reopened = _page_blob(fresh)
-    assert "GV Operated Portfolio 25" in reopened
-    assert "CORRECTED_CERTIFIED" in reopened
-    assert "NAV=10980" in reopened
-    assert "lineage_depth=3" in reopened
-    assert not any(
-        getattr(button, "key", None)
-        in {
-            "gv_operated_confirm",
-            "gv_operated_no_change",
-            "gv_operated_transition",
-            "gv_operated_correction",
-        }
-        for button in fresh.button
-    )

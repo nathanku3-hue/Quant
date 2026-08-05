@@ -1,5 +1,27 @@
 # Product Requirements Document: Terminal Zero / GodView Certified Portfolio OS
 
+## Active Authority Cut (2026-08-05)
+
+This section supersedes every active-gate statement below.
+
+```text
+PRODUCT = point-in-time certified portfolio operating system
+ACTIVE_GATE = PIT-ALPHA-AUTHORITY-CUT-1
+ADVERTISED_MAIN_BASE = e4cf949a895a5f987502328631ebac28af7d154f
+CLEANUP_COMMIT = a92745118aab1a857a0251ce747cab247ba94605
+FUNCTIONAL_DONOR = a36a436e3253a939871299bed12a75eccdad05bb
+SOLE_APPLICATION = dashboard.py
+CANONICAL_SCORE = 62/100 UNTIL FRESH_CLONE_PROOF
+CANDIDATE_PUSH = ALLOWED_AFTER_FRESH_CLONE_PROOF
+MERGE_MAIN_TAG = BLOCKED_UNTIL_F_PASS
+NEXT_PRODUCT_SLICE = PIT-SOURCE-AUTHORITY-1
+LIMITED_LIVE = CLOSED
+```
+
+Required product flow: all-capital PIT proposals → bounded paper entry → displayed-proposal-bound SELL+BUY rotation → explicit confirm or reject-all → atomic persistence → certification lineage → fresh-process exact reopen. The standalone operated app, both launchers, prospective workspace view, standalone AppTests, and compatibility routes are removed. Historical requirements below remain audit continuity only unless re-authorized.
+
+---
+
 ## Active Build Authority (2026-08-01) — One Real 25-Security Operated Portfolio; Live Closed
 
 ```text
