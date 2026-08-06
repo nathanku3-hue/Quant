@@ -1,4 +1,4 @@
-"""Sole Command Center for source-bound pair decision episode 1."""
+"""Sole Command Center for source-bound pair decision series."""
 
 from __future__ import annotations
 
@@ -12,6 +12,8 @@ from core.gv_pit.read_models import DecisionEpisodeReadModel, project_decision_e
 from gv_portfolio_v0.market_source_adapter import (
     load_source_derived_market_packets,
     load_verified_episode_contract,
+    max_registered_episode_number,
+    next_open_episode_number,
     verified_pair_summary,
 )
 from gv_portfolio_v0.operated_scenarios import (
@@ -131,7 +133,12 @@ def _render_pair_preview_flow(
     request: dict[str, Any],
 ) -> None:
     session = st.session_state
-    if st.button("Preview pair episode 1", key="gv_command_center_preview"):
+    series = request["decision_series_contract"]
+    episode_number = int(series["episode_number"])
+    if st.button(
+        f"Preview pair episode {episode_number}",
+        key="gv_command_center_preview",
+    ):
         try:
             session[_ACTIVE_PREVIEW_KEY] = preview_runtime_observation(
                 workspace, request
@@ -179,7 +186,9 @@ def _render_pair_preview_flow(
 
     series = preview["request"]["decision_series_contract"]
     packets = preview["request"]["source_derived_market_packets"]
-    st.subheader("Mutation-free PAIR-DECISION-SERIES-1 episode 1 preview")
+    st.subheader(
+        f"Mutation-free PAIR-DECISION-SERIES-1 episode {series['episode_number']} preview"
+    )
     st.table(
         [
             {
@@ -259,17 +268,20 @@ def _render_pair_episode_action(
     *,
     workspace: dict[str, Any],
     root: Path | None,
+    episode_number: int,
 ) -> None:
-    st.subheader("Seal real MU / NVDA / cash episode 1")
+    st.subheader(f"Seal real MU / NVDA / cash episode {episode_number}")
     st.caption(
         "Market authority is derived from one pinned Cboe BZX source capture, one "
-        "permission manifest, one parser, and one common PIT cut. The operator cannot "
-        "edit price, source identity, parser, permission, or timestamps."
+        "permission manifest, one parser, and one common PIT cut for this episode. "
+        "The operator cannot edit price, source identity, parser, permission, or timestamps."
     )
     try:
-        source = verified_pair_summary()
-        contract = load_verified_episode_contract()
-        packets = load_source_derived_market_packets(workspace["instruments"])
+        source = verified_pair_summary(episode_number)
+        contract = load_verified_episode_contract(episode_number)
+        packets = load_source_derived_market_packets(
+            workspace["instruments"], episode_number=episode_number
+        )
     except Exception as exc:
         st.error(f"Pair source authority unavailable: {type(exc).__name__}: {exc}")
         return
@@ -314,7 +326,8 @@ def _render_pair_episode_action(
     )
     st.info(
         "Banked evidence does not authorize a position in either security. Cash / "
-        "abstention is the only confirmable episode-1 disposition; reject-all remains available."
+        f"abstention is the only confirmable episode-{episode_number} disposition; "
+        "reject-all remains available."
     )
     rationale = st.text_area(
         "Operator rationale",
@@ -408,12 +421,29 @@ def render_command_center(
         st.subheader("Certified paper fills")
         st.table(build_trade_rows(workspace))
 
-    if workspace["prospective_episode_count"] == 0:
-        _render_pair_episode_action(st, workspace=workspace, root=root)
+    next_episode = next_open_episode_number(
+        int(workspace["prospective_episode_count"])
+    )
+    if next_episode is not None:
+        if workspace["prospective_episode_count"] > 0:
+            st.success(
+                "PAIR-DECISION-SERIES-1 has "
+                f"{workspace['prospective_episode_count']} sealed episode(s) "
+                "persisted, certified, and reopened exactly. Outcome data remains "
+                f"closed; episode {next_episode} is open."
+            )
+        _render_pair_episode_action(
+            st,
+            workspace=workspace,
+            root=root,
+            episode_number=next_episode,
+        )
     else:
         st.success(
-            "PAIR-DECISION-SERIES-1 episode 1 is sealed, persisted, certified, and "
-            "reopened exactly. Outcome data remains closed; episode 2 is the next gate."
+            "PAIR-DECISION-SERIES-1 has sealed all registered episodes "
+            f"(1–{max_registered_episode_number()}), persisted, certified, and "
+            "reopened exactly. Outcome data remains closed until each "
+            "preregistered open rule permits."
         )
 
     st.subheader("Banked no-market comparison baseline")

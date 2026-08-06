@@ -1,4 +1,4 @@
-"""PAIR-DECISION-SERIES-1 episode 1 product operation."""
+"""PAIR-DECISION-SERIES-1 temporal pair product operation."""
 
 from __future__ import annotations
 
@@ -60,7 +60,12 @@ _FRESH_PROCESS_SCRIPT = textwrap.dedent(
         "reconstructed_hash": hashlib.sha256(canonical_document_bytes(reconstructed)).hexdigest(),
         "certification_id": workspace["certification"]["certification_id"],
         "series": workspace["decision_series_contract"]["decision_series_id"],
-        "episode": workspace["decision_series_contract"]["episode_number"],
+        "next_episode": workspace.get("next_series_episode_number"),
+        "last_sealed_episode": (
+            workspace["prospective_episode_history"][-1]["episode_number"]
+            if workspace["prospective_episode_history"]
+            else None
+        ),
         "sealed": workspace["sealed_series_episode_count"],
         "opened": workspace["opened_outcome_episode_count"],
         "positions": workspace["book"]["positions"],
@@ -124,7 +129,7 @@ def test_pair_preview_is_mutation_free_and_seals_cash_abstention(tmp_path: Path)
     assert proposal["economics_changed"] is False
     assert proposal["transition"] is None
     assert proposal["changed_why"]["change_type"] == (
-        "PAIR_DECISION_SERIES_EPISODE_1_CASH_ABSTAIN"
+        "PAIR_DECISION_SERIES_CASH_ABSTAIN"
     )
     assert proposal["request"]["selected_disposition"] == "CASH_ABSTAIN"
     assert len(proposal["request"]["source_derived_market_packets"]) == 2
@@ -144,6 +149,8 @@ def test_confirm_persists_certifies_and_reopens_exactly(tmp_path: Path) -> None:
     assert confirmed["prospective_episode_count"] == 1
     assert confirmed["sealed_series_episode_count"] == 1
     assert confirmed["opened_outcome_episode_count"] == 0
+    assert confirmed["next_series_episode_number"] == 2
+    assert confirmed["decision_series_contract"]["episode_number"] == 2
     assert confirmed["certification"]["prior_certification_id"] == prior_certification
     assert confirmed["book"]["positions"] == []
     assert confirmed["orders"] == []
@@ -178,7 +185,8 @@ def test_confirm_persists_certifies_and_reopens_exactly(tmp_path: Path) -> None:
     assert receipt["workspace_hash"] == expected_hash
     assert receipt["reconstructed_hash"] == expected_hash
     assert receipt["series"] == "PAIR_DECISION_SERIES_1"
-    assert receipt["episode"] == 1
+    assert receipt["last_sealed_episode"] == 1
+    assert receipt["next_episode"] == 2
     assert receipt["sealed"] == 1
     assert receipt["opened"] == 0
     assert receipt["positions"] == []
@@ -250,16 +258,71 @@ def test_pit_identity_and_subject_decision_drift_fail_closed(tmp_path: Path) -> 
         preview_runtime_observation(workspace, request)
 
 
-def test_second_episode_cannot_be_retrofitted_into_episode_one_profile(tmp_path: Path) -> None:
+def test_episode_two_seals_later_cut_and_exact_reopen(tmp_path: Path) -> None:
     workspace = _workspace(tmp_path)
-    proposal = preview_runtime_observation(workspace, _request(workspace))
-    confirmed = confirm_prospective_observation_and_persist(
-        proposal, root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
+    first = confirm_prospective_observation_and_persist(
+        preview_runtime_observation(workspace, _request(workspace)),
+        root=tmp_path,
+        scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID,
     )
-    with pytest.raises(ProspectiveOperationError, match="EPISODE_ONE_ALREADY_SEALED"):
+    second_request = build_pair_episode_request(
+        first,
+        operator_rationale=(
+            "A later common market cut is verified under unchanged series contracts; "
+            "banked subject evidence still does not authorize capital. Retain cash."
+        ),
+    )
+    assert second_request["decision_series_contract"]["episode_number"] == 2
+    assert second_request["observed_at"] == "2026-08-06T12:00:00.000000Z"
+    values = {
+        packet["value"] for packet in second_request["source_derived_market_packets"]
+    }
+    assert values == {"852.19", "221.71"}
+    second = confirm_prospective_observation_and_persist(
+        preview_runtime_observation(first, second_request),
+        root=tmp_path,
+        scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID,
+    )
+    assert second["sealed_series_episode_count"] == 2
+    assert second["next_series_episode_number"] is None
+    assert [row["episode_number"] for row in second["prospective_episode_history"]] == [
+        1,
+        2,
+    ]
+    assert second["book"]["positions"] == []
+    assert second["book"]["total_cash"] == "11000"
+    assert second["book"]["total_costs"] == "0"
+    assert second["book"]["unexplained_residual"] == "0"
+    reopened = load_prospective_workspace(
+        root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
+    )
+    reconstructed = reconstruct_prospective_workspace(
+        reopened["events"], scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
+    )
+    assert canonical_document_bytes(reopened) == canonical_document_bytes(reconstructed)
+    with pytest.raises(ProspectiveOperationError, match="PAIR_SERIES_NO_OPEN_EPISODE"):
         build_pair_episode_request(
-            confirmed, operator_rationale="Attempted duplicate episode one."
+            second, operator_rationale="No third registered episode."
         )
+
+
+def test_episode_one_contract_cannot_be_resealed_after_episode_one(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    first_request = _request(workspace)
+    confirmed = confirm_prospective_observation_and_persist(
+        preview_runtime_observation(workspace, first_request),
+        root=tmp_path,
+        scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID,
+    )
+    with pytest.raises(
+        ProspectiveOperationError,
+        match=(
+            "OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY|"
+            "PAIR_DECISION_SERIES_CONTRACT_MISMATCH|"
+            "PAIR_EPISODE_SEQUENCE_MISMATCH"
+        ),
+    ):
+        preview_runtime_observation(confirmed, first_request)
 
 
 def test_concurrent_confirm_allows_one_episode_only(tmp_path: Path) -> None:
@@ -360,11 +423,20 @@ def test_command_center_operates_and_reopens_episode_one(
     app = app.run(timeout=120)
     assert not app.exception, app.exception
     confirmed = _app_blob(app)
-    assert "episode 1 is sealed, persisted, certified" in confirmed
+    assert "1 sealed episode" in confirmed
+    assert "episode 2 is open" in confirmed
+    assert "Seal real MU / NVDA / cash episode 2" in confirmed
     assert "CASH_ONLY" in confirmed
+    source_table_e2 = next(
+        element.value
+        for element in app.table
+        if "source_value" in element.value.columns
+    )
+    assert set(source_table_e2["source_value"].astype(str)) == {"852.19", "221.71"}
 
     fresh = AppTest.from_file(str(ROOT / "dashboard.py")).run(timeout=120)
     assert not fresh.exception, fresh.exception
     reopened = _app_blob(fresh)
-    assert "episode 1 is sealed, persisted, certified" in reopened
+    assert "1 sealed episode" in reopened
+    assert "episode 2 is open" in reopened
     assert "CASH_ONLY" in reopened

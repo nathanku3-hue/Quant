@@ -1,0 +1,37 @@
+{
+  "allowed_uses": [
+    "internal_research_validation",
+    "source_derived_market_packet",
+    "certified_paper_decision_episode"
+  ],
+  "attribution_required": "Cboe Global Markets",
+  "authorized_fields": [
+    "last"
+  ],
+  "authorized_symbols": [
+    "MU",
+    "NVDA"
+  ],
+  "claim_boundary": "One common source cut for MU/NVDA paper episode 2 only. No provider quality, tradability, consolidated-market, best-execution, alpha, advice, broker, or live-capital claim.",
+  "forbidden_uses": [
+    "raw_source_redistribution",
+    "provider_framework",
+    "historical_loader",
+    "investment_advice",
+    "broker_routing",
+    "live_capital",
+    "alpha_claim"
+  ],
+  "owner_authorization": "market=one-common-object-with-hard-failure-fallback; evidence=banked-only",
+  "owner_authorized_at": "2026-08-06T11:50:00.000000Z",
+  "permission_basis": "Public Cboe BZX symbol-data service plus explicit owner authorization for one bounded internal paper-research capture.",
+  "permission_manifest_id": "CBOE_BZX_MU_NVDA_PAIR_EPISODE_2",
+  "provider_identity": "CBOE_GLOBAL_MARKETS_BZX",
+  "retrieval_limit": "ONE_CAPTURE_FOR_EPISODE_2; service requests remain at least 30 seconds apart",
+  "schema_version": "gv_market_permission_manifest_v1",
+  "source_capture_path": "data/gv_pair_decision_series/mu_nvda_episode_2/common_market_source_capture.json",
+  "source_capture_sha256": "ec97dcd678bb099d598ab5b2a97fe0a01df023fa5e05b57221238fdac7123e05",
+  "source_url": "https://www.cboe.com/us/equities/market_statistics/symbol_data/xml/?mkt=bzx",
+  "technical_spec_url": "https://cdn.cboe.com/resources/membership/BATS_Secure_Web_API.pdf",
+  "website_terms_url": "https://www.cboe.com/terms/"
+}

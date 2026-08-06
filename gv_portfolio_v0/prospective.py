@@ -42,9 +42,12 @@ from gv_portfolio_v0.market_packet import (
 )
 from gv_portfolio_v0.market_source_adapter import (
     MarketSourceAdapterError,
+    episode_preregistration_locator,
     load_source_derived_market_packets,
     load_verified_episode_contract,
     load_verified_pair_source,
+    max_registered_episode_number,
+    next_open_episode_number,
 )
 from gv_portfolio_v0.operated_scenarios import (
     PAIR_DECISION_SERIES_SCENARIO_ID,
@@ -73,7 +76,6 @@ MAX_PROSPECTIVE_REQUEST_BYTES = 256_000
 MAX_PROSPECTIVE_DECIMAL_INTEGER_DIGITS = 18
 MAX_PROSPECTIVE_DECIMAL_FRACTION_DIGITS = 18
 MAX_PROSPECTIVE_QUANTITY_DIGITS = 18
-PAIR_EPISODE_OBSERVED_AT = "2026-08-06T09:05:00.000000Z"
 PAIR_EVIDENCE_CONTENT = (
     "Banked MU and NVDA subject evidence plus one common source-derived market cut "
     "support a governed MU/NVDA/cash comparison; neither security clears the "
@@ -425,7 +427,8 @@ def _baseline_workspace(
         raise ProspectiveOperationError("CERTIFIED_FUNDED_BASELINE_REQUIRED")
     if scenario_id == PAIR_DECISION_SERIES_SCENARIO_ID:
         try:
-            source = load_verified_pair_source()
+            # Bootstrap authority remains episode 1; later cuts are sequential seals.
+            source = load_verified_pair_source(1)
         except MarketSourceAdapterError as exc:
             raise ProspectiveOperationError(str(exc)) from exc
         if scenario.get("episode_preregistration_sha256") != source["episode"].get(
@@ -457,13 +460,21 @@ def _decorate(
         expected_pit_identity = _validated_forward_pit_identity()
         if result.get("baseline_book_hash") != expected_pit_identity["certified_book_id"]:
             raise ProspectiveOperationError("PAIR_PIT_BASELINE_BOOK_MISMATCH")
+        sealed_count = len(episode_history)
+        next_episode = next_open_episode_number(sealed_count)
         try:
-            series_contract = load_verified_episode_contract()
+            if next_episode is None:
+                series_contract = load_verified_episode_contract(
+                    max_registered_episode_number()
+                )
+            else:
+                series_contract = load_verified_episode_contract(next_episode)
         except MarketSourceAdapterError as exc:
             raise ProspectiveOperationError(str(exc)) from exc
         result["pit_identity"] = deepcopy(expected_pit_identity)
         result["decision_series_contract"] = deepcopy(series_contract)
-        result["sealed_series_episode_count"] = len(episode_history)
+        result["next_series_episode_number"] = next_episode
+        result["sealed_series_episode_count"] = sealed_count
         result["opened_outcome_episode_count"] = 0
     result["baseline_workspace_hash"] = baseline_hash
     result["baseline_event_count"] = baseline_event_count
@@ -533,6 +544,7 @@ def _normalize_source_derived_pair_packets(
     workspace: Mapping[str, Any],
     value: Any,
     *,
+    episode_number: int,
     latest_time: datetime,
     observed_time: datetime,
 ) -> list[dict[str, str]]:
@@ -540,7 +552,8 @@ def _normalize_source_derived_pair_packets(
         raise ProspectiveOperationError("PAIR_SOURCE_DERIVED_PACKETS_REQUIRED")
     try:
         expected_packets = load_source_derived_market_packets(
-            list(workspace["instruments"])
+            list(workspace["instruments"]),
+            episode_number=episode_number,
         )
     except (KeyError, MarketSourceAdapterError) as exc:
         raise ProspectiveOperationError(str(exc)) from exc
@@ -587,11 +600,12 @@ def _normalize_request(
         raise ProspectiveOperationError("OBSERVATION_REQUEST_CANONICAL_INVALID") from exc
     if request_size > MAX_PROSPECTIVE_REQUEST_BYTES:
         raise ProspectiveOperationError("OBSERVATION_REQUEST_BYTES_OUT_OF_BOUNDS")
-    if (
-        workspace.get("scenario_id") == PAIR_DECISION_SERIES_SCENARIO_ID
-        and int(workspace.get("prospective_episode_count", 0)) != 0
-    ):
-        raise ProspectiveOperationError("PAIR_EPISODE_ONE_ALREADY_SEALED")
+    sealed_count = int(workspace.get("prospective_episode_count", 0))
+    pair_episode_number: int | None = None
+    if workspace.get("scenario_id") == PAIR_DECISION_SERIES_SCENARIO_ID:
+        pair_episode_number = next_open_episode_number(sealed_count)
+        if pair_episode_number is None:
+            raise ProspectiveOperationError("PAIR_SERIES_NO_OPEN_EPISODE")
     observed_at = _required_text(request.get("observed_at"), field="observed_at")
     observed_time = _utc_datetime(observed_at, field="observed_at")
     latest_time = max(
@@ -634,6 +648,7 @@ def _normalize_request(
     if workspace.get("scenario_id") != PAIR_DECISION_SERIES_SCENARIO_ID:
         return normalized
 
+    assert pair_episode_number is not None
     prohibited = {
         "market_packet",
         "market_instrument_id",
@@ -647,10 +662,8 @@ def _normalize_request(
     }
     if prohibited.intersection(request):
         raise ProspectiveOperationError("PAIR_MANUAL_MARKET_AUTHORITY_PROHIBITED")
-    if observed_at != PAIR_EPISODE_OBSERVED_AT:
-        raise ProspectiveOperationError("PAIR_EPISODE_OBSERVED_AT_MISMATCH")
     if any(int(row["quantity"]) > 0 for row in workspace["book"]["positions"]):
-        raise ProspectiveOperationError("PAIR_EPISODE_ONE_CASH_BASELINE_REQUIRED")
+        raise ProspectiveOperationError("PAIR_CASH_BASELINE_REQUIRED")
 
     requested_pit_identity = _normalize_pit_identity(request.get("pit_identity"))
     workspace_pit_identity = _normalize_pit_identity(workspace.get("pit_identity"))
@@ -661,7 +674,7 @@ def _normalize_request(
     normalized["pit_identity"] = deepcopy(workspace_pit_identity)
 
     try:
-        expected_contract = load_verified_episode_contract()
+        expected_contract = load_verified_episode_contract(pair_episode_number)
     except MarketSourceAdapterError as exc:
         raise ProspectiveOperationError(str(exc)) from exc
     supplied_contract = request.get("decision_series_contract")
@@ -669,18 +682,19 @@ def _normalize_request(
         dict(supplied_contract)
     ) != canonical_document_bytes(expected_contract):
         raise ProspectiveOperationError("PAIR_DECISION_SERIES_CONTRACT_MISMATCH")
+    if int(expected_contract["episode_number"]) != pair_episode_number:
+        raise ProspectiveOperationError("PAIR_EPISODE_SEQUENCE_MISMATCH")
     if expected_contract["outcome_data_loaded"] is not False:
         raise ProspectiveOperationError("PAIR_OUTCOME_DATA_MUST_REMAIN_CLOSED")
+    expected_observed_at = str(expected_contract["decision_observed_at"])
+    if observed_at != expected_observed_at:
+        raise ProspectiveOperationError("PAIR_EPISODE_OBSERVED_AT_MISMATCH")
     if observed_time <= _utc_datetime(
         str(expected_contract["decision_cut_knowledge_at"]),
         field="decision_cut_knowledge_at",
     ):
         raise ProspectiveOperationError("PAIR_DECISION_NOT_AFTER_KNOWLEDGE_CUT")
-    expected_locator = (
-        "repo://data/gv_pair_decision_series/mu_nvda_episode_1/"
-        "episode_preregistration.json#sha256="
-        + str(expected_contract["episode_preregistration_sha256"])
-    )
+    expected_locator = episode_preregistration_locator(expected_contract)
     if content != PAIR_EVIDENCE_CONTENT or locator != expected_locator:
         raise ProspectiveOperationError("PAIR_EPISODE_EVIDENCE_BINDING_MISMATCH")
     if request.get("selected_disposition") != "CASH_ABSTAIN":
@@ -710,6 +724,7 @@ def _normalize_request(
         _normalize_source_derived_pair_packets(
             workspace,
             request.get("source_derived_market_packets"),
+            episode_number=pair_episode_number,
             latest_time=latest_time,
             observed_time=observed_time,
         )
@@ -720,24 +735,26 @@ def _normalize_request(
 def build_pair_episode_request(
     workspace: Mapping[str, Any], *, operator_rationale: str
 ) -> dict[str, Any]:
-    """Compose episode 1 from verified repository authority and one rationale only."""
+    """Compose the next open series episode from verified authority and one rationale."""
 
     if workspace.get("scenario_id") != PAIR_DECISION_SERIES_SCENARIO_ID:
         raise ProspectiveOperationError("PAIR_DECISION_SERIES_PROFILE_REQUIRED")
+    sealed_count = int(workspace.get("prospective_episode_count", 0))
+    episode_number = next_open_episode_number(sealed_count)
+    if episode_number is None:
+        raise ProspectiveOperationError("PAIR_SERIES_NO_OPEN_EPISODE")
     try:
-        contract = load_verified_episode_contract()
-        packets = load_source_derived_market_packets(list(workspace["instruments"]))
+        contract = load_verified_episode_contract(episode_number)
+        packets = load_source_derived_market_packets(
+            list(workspace["instruments"]),
+            episode_number=episode_number,
+        )
     except (KeyError, MarketSourceAdapterError) as exc:
         raise ProspectiveOperationError(str(exc)) from exc
-    locator = (
-        "repo://data/gv_pair_decision_series/mu_nvda_episode_1/"
-        "episode_preregistration.json#sha256="
-        + str(contract["episode_preregistration_sha256"])
-    )
     request = {
         "content": PAIR_EVIDENCE_CONTENT,
-        "locator": locator,
-        "observed_at": PAIR_EPISODE_OBSERVED_AT,
+        "locator": episode_preregistration_locator(contract),
+        "observed_at": str(contract["decision_observed_at"]),
         "pit_identity": deepcopy(workspace["pit_identity"]),
         "decision_series_contract": deepcopy(contract),
         "selected_disposition": "CASH_ABSTAIN",
@@ -910,7 +927,7 @@ def _build_proposal(
     is_pair_episode = workspace.get("scenario_id") == PAIR_DECISION_SERIES_SCENARIO_ID
     if is_pair_episode:
         if economics_changed:
-            raise ProspectiveOperationError("PAIR_EPISODE_ONE_ECONOMIC_MUTATION_PROHIBITED")
+            raise ProspectiveOperationError("PAIR_ECONOMIC_MUTATION_PROHIBITED")
         transition_kind = "PAIR_CASH_ABSTAIN"
     elif economics_changed:
         sides = {row["side"] for row in legs}
@@ -922,7 +939,7 @@ def _build_proposal(
     observation_payload: dict[str, Any] = {
         "evidence_reference_id": evidence["evidence_reference_id"],
         "disposition": (
-            "PAIR_EPISODE_ONE_CASH_ABSTAIN"
+            "PAIR_EPISODE_CASH_ABSTAIN"
             if is_pair_episode
             else "PROPOSED_PROSPECTIVE_TRANSITION"
             if economics_changed
@@ -970,7 +987,7 @@ def _build_proposal(
     )
     changed_why = {
         "change_type": (
-            "PAIR_DECISION_SERIES_EPISODE_1_CASH_ABSTAIN"
+            "PAIR_DECISION_SERIES_CASH_ABSTAIN"
             if is_pair_episode
             else "PROSPECTIVE_TRANSITION"
             if economics_changed
@@ -1416,6 +1433,24 @@ def _reconstruct_prospective_workspace(
             raise ProspectiveOperationError("PROSPECTIVE_EPISODE_EVENT_TAIL_MISMATCH")
         expected_workspace["events"] = rows[: cursor + len(expected_tail)]
         result = expected_workspace
+        # Intermediate reconstruction state must expose sealed count so the next
+        # pair episode normalizes against the correct open preregistration.
+        result["prospective_episode_count"] = len(episode_history)
+        result["sealed_series_episode_count"] = len(episode_history)
+        result["opened_outcome_episode_count"] = 0
+        next_episode = next_open_episode_number(len(episode_history))
+        result["next_series_episode_number"] = next_episode
+        if result.get("scenario_id") == PAIR_DECISION_SERIES_SCENARIO_ID:
+            try:
+                if next_episode is None:
+                    active_contract = load_verified_episode_contract(
+                        max_registered_episode_number()
+                    )
+                else:
+                    active_contract = load_verified_episode_contract(next_episode)
+            except MarketSourceAdapterError as exc:
+                raise ProspectiveOperationError(str(exc)) from exc
+            result["decision_series_contract"] = deepcopy(active_contract)
         cursor += len(expected_tail)
 
     try:

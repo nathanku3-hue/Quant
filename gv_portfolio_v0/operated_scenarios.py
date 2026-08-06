@@ -511,23 +511,26 @@ SCENARIO_REAL_MU_PROSPECTIVE = _real_mu_prospective_scenario()
 
 
 def _pair_decision_series_scenario() -> dict[str, Any]:
-    """Real MU/NVDA/cash episode 1 from banked subject evidence only."""
+    """Real MU/NVDA/cash temporal series from banked subject evidence only."""
 
     scenario = deepcopy(SCENARIO_REAL_MU_PROSPECTIVE)
     scenario.update(
         {
             "scenario_id": PAIR_DECISION_SERIES_SCENARIO_ID,
-            "title": "PAIR-DECISION-SERIES-1 — MU / NVDA Episode 1",
-            "id_domain": "GV-PAIR-DECISION-SERIES-1-E1",
+            "title": "PAIR-DECISION-SERIES-1 — MU / NVDA Temporal Series",
+            "id_domain": "GV-PAIR-DECISION-SERIES-1",
             "claim_boundary": (
-                "One source-bound MU/NVDA/cash paper comparison at a common PIT cut. "
-                "Both subject packages remain ABSTAIN/NO_POSITION; episode 1 seals "
-                "forward comparator, cost, horizon, and policy terms without opening "
-                "outcomes, claiming alpha, giving advice, routing orders, or authorizing live capital."
+                "Sequential source-bound MU/NVDA/cash paper comparisons at distinct "
+                "common PIT cuts. Both subject packages remain ABSTAIN/NO_POSITION; "
+                "each episode seals forward comparator, cost, horizon, and policy "
+                "terms without opening outcomes, claiming alpha, giving advice, "
+                "routing orders, or authorizing live capital."
             ),
-            "fixture_namespace": "pair-decision-series-1-e1",
+            "fixture_namespace": "pair-decision-series-1",
             "source_scenario_id": "GV_REAL_EVIDENCE_MU_NVDA_PAIR_1",
             "source_bound_pair_market_packets": True,
+            # Bootstrap identity remains episode-1 preregistration; later episodes
+            # are sequential seals under the same series profile.
             "episode_preregistration_path": (
                 "data/gv_pair_decision_series/mu_nvda_episode_1/"
                 "episode_preregistration.json"
@@ -541,8 +544,9 @@ def _pair_decision_series_scenario() -> dict[str, Any]:
     scenario["portfolio_aim"] = {
         **scenario["portfolio_aim"],
         "objective": (
-            "Compare real MU, real NVDA, and certified cash from one source-derived "
-            "market cut, then explicitly confirm cash/abstention or reject-all."
+            "Compare real MU, real NVDA, and certified cash from successive "
+            "source-derived market cuts, then explicitly confirm cash/abstention "
+            "or reject-all for each open episode."
         ),
         "allowed_actions": ["HOLD", "CASH"],
     }
@@ -551,7 +555,7 @@ def _pair_decision_series_scenario() -> dict[str, Any]:
             "The real MU/NVDA/cash baseline awaits bootstrap certification."
         ),
         "FUNDED_CERTIFIED": (
-            "The certified cash baseline is ready for source-bound pair episode 1; "
+            "The certified cash baseline is ready for source-bound pair episodes; "
             "neither security has positive capital authority."
         ),
     }

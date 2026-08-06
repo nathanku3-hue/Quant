@@ -1,0 +1,40 @@
+{
+  "extraction_method": "Exact XML <symbol> OuterXml selected by unique @name from one response; full response identity retained by byte length and SHA-256.",
+  "full_response_byte_length": 1720299,
+  "full_response_sha256": "daddd04987c7108080be0241e9b22ec874c5fe4a9367d58f010827983cbb31c6",
+  "http_date_utc": "2026-08-06T11:59:56.000000Z",
+  "provider_identity": "CBOE_BZX_SYMBOL_DATA",
+  "request_started_utc": "2026-08-06T11:59:53.807145Z",
+  "response_content_type": "text/xml",
+  "response_status": 200,
+  "retrieval_knowledge_at": "2026-08-06T11:59:57.584409Z",
+  "rows": [
+    {
+      "currency": "USD",
+      "permanent_instrument_identity": "SEC_CIK:0000723125:NASDAQ:MU:COMMON_STOCK",
+      "raw_xml": "<symbol name=\"MU\" vol=\"22531\" asksz=\"70\" askpx=\"853.74000000\" bidsz=\"1\" bidpx=\"851.89000000\" last=\"852.19000000\" matched=\"22462\" routed=\"69\" />",
+      "row_locator": "/bats/symbols/symbol[@name='MU']",
+      "row_sha256": "b565165c5dddfa900e5135898a678c9e2864d0b4ce16f5a78b5bc80e6b899638",
+      "symbol": "MU",
+      "unit": "price",
+      "value_field": "last"
+    },
+    {
+      "currency": "USD",
+      "permanent_instrument_identity": "SEC_CIK:0001045810:NASDAQ:NVDA:COMMON_STOCK",
+      "raw_xml": "<symbol name=\"NVDA\" vol=\"28035\" asksz=\"54\" askpx=\"221.96000000\" bidsz=\"54\" bidpx=\"221.67000000\" last=\"221.71000000\" matched=\"27976\" routed=\"59\" />",
+      "row_locator": "/bats/symbols/symbol[@name='NVDA']",
+      "row_sha256": "fe15c680a500adfdd7401eb38a787cac96402c77c2ecdd18a4ff421268b941c1",
+      "symbol": "NVDA",
+      "unit": "price",
+      "value_field": "last"
+    }
+  ],
+  "schema_version": "gv_common_market_source_capture_v1",
+  "source_contract_version": "CBOE_BZX_TWO_ROW_CAPTURE_V1",
+  "source_symbol_count": 12881,
+  "source_timestamp_raw": "2026-08-06 07:52:08 EDT",
+  "source_timestamp_utc": "2026-08-06T11:52:08.000000Z",
+  "source_url": "https://www.cboe.com/us/equities/market_statistics/symbol_data/xml/?mkt=bzx",
+  "technical_spec_url": "https://cdn.cboe.com/resources/membership/BATS_Secure_Web_API.pdf"
+}

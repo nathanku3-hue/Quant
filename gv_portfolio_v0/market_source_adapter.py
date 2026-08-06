@@ -1,13 +1,15 @@
-"""Verified adapter for PAIR-DECISION-SERIES-1 episode 1.
+"""Verified adapter for PAIR-DECISION-SERIES-1 temporal episodes.
 
 One pinned Cboe BZX source capture, one permission manifest, and one XML-row
-parser derive the MU and NVDA market packets at one common point-in-time cut.
-Subject evidence is repository-banked only; this module performs no network I/O.
+parser derive the MU and NVDA market packets at one common point-in-time cut per
+episode. Subject evidence is repository-banked only; this module performs no
+network I/O.
 """
 
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
 import json
@@ -20,29 +22,51 @@ from core.gv_v2_mu_nvda_reconciliation import load_verified_mu_nvda_reconciliati
 from gv_portfolio_v0.market_packet import build_immutable_market_packet
 
 PAIR_SYMBOLS = ("MU", "NVDA")
+DECISION_SERIES_ID = "PAIR_DECISION_SERIES_1"
 PARSER_IDENTITY = "GV_CBOE_BZX_SYMBOL_XML_ROW"
 PARSER_VERSION = "1.0.0"
-CAPTURE_PATH = Path(
-    "data/gv_pair_decision_series/mu_nvda_episode_1/common_market_source_capture.json"
-)
-PERMISSION_PATH = Path(
-    "data/gv_pair_decision_series/mu_nvda_episode_1/permission_manifest.json"
-)
-EPISODE_PATH = Path(
-    "data/gv_pair_decision_series/mu_nvda_episode_1/episode_preregistration.json"
-)
-NVDA_DECISION_PATH = Path(
-    "data/gv_pair_decision_series/mu_nvda_episode_1/nvda_subject_decision.json"
-)
+SOURCE_CONTRACT_VERSION = "CBOE_BZX_TWO_ROW_CAPTURE_V1"
 MU_RECONCILIATION_PATH = Path(
     "data/gv_v2_reconciliation/mu_nvda_supply_1/reconciliation_result.json"
 )
 NVDA_FACT_SET_PATH = Path(
     "data/gv_v2_alpha0/family_two_nvda_0001045810-26-000052/fact_set.json"
 )
-EPISODE_PREREGISTRATION_SHA256 = (
-    "1c2c93832e46be815cfa3875628448960286fcd3e4a8620d1388ff16bd8ad058"
+SERIES_INVARIANT_FIELDS = (
+    "decision_series_id",
+    "comparator_spec",
+    "cost_model_id",
+    "decision_policy_version",
+    "source_contract_version",
+    "outcome_horizon_spec",
+    "subject_evidence_policy",
+    "mu_subject_evidence_path",
+    "mu_subject_evidence_file_sha256",
+    "nvda_subject_decision_path",
+    "nvda_subject_decision_sha256",
 )
+
+# Preregistered episode registry: path + immutable content hash only.
+EPISODE_REGISTRY: dict[int, dict[str, Any]] = {
+    1: {
+        "episode_path": Path(
+            "data/gv_pair_decision_series/mu_nvda_episode_1/"
+            "episode_preregistration.json"
+        ),
+        "episode_preregistration_sha256": (
+            "1c2c93832e46be815cfa3875628448960286fcd3e4a8620d1388ff16bd8ad058"
+        ),
+    },
+    2: {
+        "episode_path": Path(
+            "data/gv_pair_decision_series/mu_nvda_episode_2/"
+            "episode_preregistration.json"
+        ),
+        "episode_preregistration_sha256": (
+            "130feb1d7f6657e07bbf1158bd5f36ee979d20a6aef90fae28cd2b4d19502210"
+        ),
+    },
+}
 
 
 class MarketSourceAdapterError(ValueError):
@@ -106,9 +130,61 @@ def _exact_keys(mapping: Mapping[str, Any], expected: set[str], *, code: str) ->
         raise MarketSourceAdapterError(code)
 
 
-def load_verified_episode_contract() -> dict[str, Any]:
+def available_episode_numbers() -> tuple[int, ...]:
+    return tuple(sorted(EPISODE_REGISTRY))
+
+
+def max_registered_episode_number() -> int:
+    return max(EPISODE_REGISTRY)
+
+
+def next_open_episode_number(sealed_episode_count: int) -> int | None:
+    if sealed_episode_count < 0:
+        raise MarketSourceAdapterError("PAIR_SEALED_COUNT_INVALID")
+    candidate = sealed_episode_count + 1
+    if candidate in EPISODE_REGISTRY:
+        return candidate
+    return None
+
+
+def _parse_utc(value: str, *, field: str) -> datetime:
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+            tzinfo=timezone.utc
+        )
+    except ValueError as exc:
+        raise MarketSourceAdapterError(f"PAIR_SOURCE_{field.upper()}_INVALID") from exc
+    return parsed
+
+
+def decision_observed_at_for_knowledge(knowledge_at: str) -> str:
+    """Map knowledge time to the first whole minute strictly after the cut."""
+
+    knowledge = _parse_utc(knowledge_at, field="decision_cut_knowledge_at")
+    observed = knowledge.replace(second=0, microsecond=0) + timedelta(minutes=1)
+    return observed.strftime("%Y-%m-%dT%H:%M:%S.000000Z")
+
+
+def episode_preregistration_locator(episode: Mapping[str, Any]) -> str:
+    number = int(episode["episode_number"])
+    try:
+        relative = EPISODE_REGISTRY[number]["episode_path"]
+    except KeyError as exc:
+        raise MarketSourceAdapterError("PAIR_EPISODE_NUMBER_UNKNOWN") from exc
+    return (
+        f"repo://{Path(relative).as_posix()}"
+        f"#sha256={episode['episode_preregistration_sha256']}"
+    )
+
+
+def load_verified_episode_contract(episode_number: int = 1) -> dict[str, Any]:
+    try:
+        entry = EPISODE_REGISTRY[int(episode_number)]
+    except (KeyError, TypeError, ValueError) as exc:
+        raise MarketSourceAdapterError("PAIR_EPISODE_NUMBER_UNKNOWN") from exc
+    episode_path = Path(entry["episode_path"])
     episode, episode_sha = _load_json(
-        EPISODE_PATH, expected_sha256=EPISODE_PREREGISTRATION_SHA256
+        episode_path, expected_sha256=str(entry["episode_preregistration_sha256"])
     )
     required = {
         "schema_version",
@@ -138,9 +214,9 @@ def load_verified_episode_contract() -> dict[str, Any]:
     _exact_keys(episode, required, code="PAIR_EPISODE_FIELD_SET_INVALID")
     if episode["schema_version"] != "gv_pair_decision_series_episode_v1":
         raise MarketSourceAdapterError("PAIR_EPISODE_SCHEMA_INVALID")
-    if episode["decision_series_id"] != "PAIR_DECISION_SERIES_1":
+    if episode["decision_series_id"] != DECISION_SERIES_ID:
         raise MarketSourceAdapterError("PAIR_EPISODE_SERIES_ID_INVALID")
-    if episode["episode_number"] != 1:
+    if episode["episode_number"] != int(episode_number):
         raise MarketSourceAdapterError("PAIR_EPISODE_NUMBER_INVALID")
     if episode["subject_evidence_policy"] != "BANKED_ONLY":
         raise MarketSourceAdapterError("PAIR_EPISODE_SUBJECT_POLICY_INVALID")
@@ -148,10 +224,49 @@ def load_verified_episode_contract() -> dict[str, Any]:
         raise MarketSourceAdapterError("PAIR_EPISODE_OUTCOME_STATUS_INVALID")
     if episode["outcome_data_loaded"] is not False:
         raise MarketSourceAdapterError("PAIR_EPISODE_OUTCOME_DATA_PROHIBITED")
-    if episode["source_contract_version"] != "CBOE_BZX_TWO_ROW_CAPTURE_V1":
+    if episode["source_contract_version"] != SOURCE_CONTRACT_VERSION:
         raise MarketSourceAdapterError("PAIR_EPISODE_SOURCE_CONTRACT_INVALID")
+    episode_knowledge = _parse_utc(
+        str(episode["decision_cut_knowledge_at"]),
+        field="decision_cut_knowledge_at",
+    )
+    horizon = episode.get("outcome_horizon_spec")
+    if not isinstance(horizon, Mapping):
+        raise MarketSourceAdapterError("PAIR_EPISODE_OUTCOME_HORIZON_INVALID")
+    minimum_days = horizon.get("minimum_elapsed_calendar_days")
+    if (
+        isinstance(minimum_days, bool)
+        or not isinstance(minimum_days, int)
+        or minimum_days <= 0
+    ):
+        raise MarketSourceAdapterError("PAIR_EPISODE_OUTCOME_HORIZON_INVALID")
+    expected_outcome_open = episode_knowledge + timedelta(days=minimum_days)
+    if episode.get("outcome_open_not_before") != expected_outcome_open.strftime(
+        "%Y-%m-%dT%H:%M:%S.%fZ"
+    ):
+        raise MarketSourceAdapterError("PAIR_EPISODE_OUTCOME_OPEN_RULE_INVALID")
+    if int(episode_number) > 1:
+        baseline = load_verified_episode_contract(1)
+        for field in SERIES_INVARIANT_FIELDS:
+            if episode[field] != baseline[field]:
+                raise MarketSourceAdapterError(
+                    f"PAIR_SERIES_INVARIANT_MISMATCH:{field}"
+                )
+        prior = load_verified_episode_contract(int(episode_number) - 1)
+        prior_knowledge = _parse_utc(
+            str(prior["decision_cut_knowledge_at"]),
+            field="decision_cut_knowledge_at",
+        )
+        if episode_knowledge <= prior_knowledge:
+            raise MarketSourceAdapterError("PAIR_EPISODE_NOT_AFTER_PRIOR_CUT")
+        if episode["decision_cut_id"] == prior["decision_cut_id"]:
+            raise MarketSourceAdapterError("PAIR_EPISODE_DECISION_CUT_NOT_DISTINCT")
     result = deepcopy(episode)
     result["episode_preregistration_sha256"] = episode_sha
+    result["decision_observed_at"] = decision_observed_at_for_knowledge(
+        str(episode["decision_cut_knowledge_at"])
+    )
+    result["episode_preregistration_path"] = episode_path.as_posix()
     return result
 
 
@@ -172,10 +287,9 @@ def _verify_subject_evidence(episode: Mapping[str, Any]) -> dict[str, dict[str, 
     ) is not False:
         raise MarketSourceAdapterError("PAIR_MU_POSITIVE_AUTHORITY_PROHIBITED")
 
-    if episode["nvda_subject_decision_path"] != NVDA_DECISION_PATH.as_posix():
-        raise MarketSourceAdapterError("PAIR_NVDA_DECISION_PATH_INVALID")
+    nvda_path = Path(_required_text(episode, "nvda_subject_decision_path"))
     nvda, _ = _load_json(
-        NVDA_DECISION_PATH,
+        nvda_path,
         expected_sha256=_required_text(episode, "nvda_subject_decision_sha256"),
     )
     fact_set, fact_set_sha = _load_json(NVDA_FACT_SET_PATH)
@@ -244,22 +358,30 @@ def _parse_source_row(row: Mapping[str, Any]) -> dict[str, str]:
     }
 
 
-def load_verified_pair_source() -> dict[str, Any]:
-    episode = load_verified_episode_contract()
+def load_verified_pair_source(episode_number: int = 1) -> dict[str, Any]:
+    episode = load_verified_episode_contract(episode_number)
     permission_path = Path(_required_text(episode, "permission_manifest_path"))
-    if permission_path != PERMISSION_PATH:
-        raise MarketSourceAdapterError("PAIR_PERMISSION_PATH_INVALID")
     permission, permission_sha = _load_json(
         permission_path,
         expected_sha256=_required_text(episode, "permission_manifest_sha256"),
     )
     capture_path = Path(_required_text(episode, "source_capture_path"))
-    if capture_path != CAPTURE_PATH:
-        raise MarketSourceAdapterError("PAIR_CAPTURE_PATH_INVALID")
     capture, capture_sha = _load_json(
         capture_path,
         expected_sha256=_required_text(episode, "source_capture_sha256"),
     )
+    if capture.get("retrieval_knowledge_at") != episode["decision_cut_knowledge_at"]:
+        raise MarketSourceAdapterError("PAIR_CAPTURE_KNOWLEDGE_CUT_MISMATCH")
+    source_timestamp = _parse_utc(
+        _required_text(capture, "source_timestamp_utc"),
+        field="source_timestamp_utc",
+    )
+    retrieval_knowledge = _parse_utc(
+        _required_text(capture, "retrieval_knowledge_at"),
+        field="retrieval_knowledge_at",
+    )
+    if source_timestamp > retrieval_knowledge:
+        raise MarketSourceAdapterError("PAIR_CAPTURE_TIME_ORDER_INVALID")
     if permission.get("source_capture_path") != capture_path.as_posix():
         raise MarketSourceAdapterError("PAIR_PERMISSION_CAPTURE_PATH_MISMATCH")
     if permission.get("source_capture_sha256") != capture_sha:
@@ -291,6 +413,21 @@ def load_verified_pair_source() -> dict[str, Any]:
     parsed_rows = [_parse_source_row(row) for row in rows if isinstance(row, Mapping)]
     if len(parsed_rows) != 2 or tuple(row["symbol"] for row in parsed_rows) != PAIR_SYMBOLS:
         raise MarketSourceAdapterError("PAIR_CAPTURE_SYMBOL_ORDER_INVALID")
+    if int(episode_number) > 1:
+        prior = load_verified_pair_source(int(episode_number) - 1)
+        prior_ts = _parse_utc(
+            str(prior["capture"]["source_timestamp_utc"]),
+            field="source_timestamp_utc",
+        )
+        this_ts = _parse_utc(
+            str(capture["source_timestamp_utc"]), field="source_timestamp_utc"
+        )
+        if this_ts <= prior_ts:
+            raise MarketSourceAdapterError("PAIR_CAPTURE_NOT_AFTER_PRIOR_CUT")
+        if capture.get("full_response_sha256") == prior["capture"].get(
+            "full_response_sha256"
+        ):
+            raise MarketSourceAdapterError("PAIR_CAPTURE_NOT_DISTINCT")
     subjects = _verify_subject_evidence(episode)
     return {
         "episode": episode,
@@ -298,6 +435,8 @@ def load_verified_pair_source() -> dict[str, Any]:
         "capture_sha256": capture_sha,
         "permission": deepcopy(permission),
         "permission_sha256": permission_sha,
+        "permission_path": permission_path.as_posix(),
+        "capture_path": capture_path.as_posix(),
         "rows": parsed_rows,
         "subjects": subjects,
     }
@@ -305,8 +444,10 @@ def load_verified_pair_source() -> dict[str, Any]:
 
 def load_source_derived_market_packets(
     instruments: list[Mapping[str, Any]],
+    *,
+    episode_number: int = 1,
 ) -> list[dict[str, str]]:
-    source = load_verified_pair_source()
+    source = load_verified_pair_source(episode_number)
     by_symbol: dict[str, Mapping[str, Any]] = {}
     for instrument in instruments:
         symbol = str(instrument.get("symbol") or "")
@@ -318,6 +459,8 @@ def load_source_derived_market_packets(
 
     rows_by_symbol = {row["symbol"]: row for row in source["rows"]}
     episode = source["episode"]
+    capture_path = Path(str(source["capture_path"]))
+    permission_path = Path(str(source["permission_path"]))
     packets: list[dict[str, str]] = []
     for symbol in PAIR_SYMBOLS:
         instrument = by_symbol[symbol]
@@ -332,11 +475,11 @@ def load_source_derived_market_packets(
             build_immutable_market_packet(
                 source_contract_version=str(episode["source_contract_version"]),
                 source_object_identity=(
-                    f"repo://{CAPTURE_PATH.as_posix()}"
+                    f"repo://{capture_path.as_posix()}"
                     f"#upstream_response_sha256={source['capture']['full_response_sha256']}"
                 ),
                 source_object_sha256=str(source["capture_sha256"]),
-                permission_manifest_identity=f"repo://{PERMISSION_PATH.as_posix()}",
+                permission_manifest_identity=f"repo://{permission_path.as_posix()}",
                 permission_manifest_sha256=str(source["permission_sha256"]),
                 parser_identity=PARSER_IDENTITY,
                 parser_version=PARSER_VERSION,
@@ -357,14 +500,16 @@ def load_source_derived_market_packets(
     return packets
 
 
-def verified_pair_summary() -> dict[str, Any]:
-    source = load_verified_pair_source()
+def verified_pair_summary(episode_number: int = 1) -> dict[str, Any]:
+    source = load_verified_pair_source(episode_number)
     return {
         "provider_identity": source["capture"]["provider_identity"],
         "source_contract_version": source["episode"]["source_contract_version"],
         "decision_cut_id": source["episode"]["decision_cut_id"],
+        "episode_number": source["episode"]["episode_number"],
         "valid_effective_at": source["capture"]["source_timestamp_utc"],
         "retrieval_knowledge_at": source["capture"]["retrieval_knowledge_at"],
+        "decision_observed_at": source["episode"]["decision_observed_at"],
         "source_object_sha256": source["capture_sha256"],
         "permission_manifest_sha256": source["permission_sha256"],
         "episode_preregistration_sha256": source["episode"][
