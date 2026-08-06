@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - ".github/workflows/gv-operated-portfolio.yml"
+      - ".github/workflows/gv-fs0-product.yml"
       - "dashboard.py"
       - "core/gv_pit/**"
       - "core/gv_v2_mu_nvda_*.py"
@@ -30,6 +31,7 @@ on:
       - "codex/pit-source-authority-1"
     paths:
       - ".github/workflows/gv-operated-portfolio.yml"
+      - ".github/workflows/gv-fs0-product.yml"
       - "dashboard.py"
       - "core/gv_pit/**"
       - "core/gv_v2_mu_nvda_*.py"

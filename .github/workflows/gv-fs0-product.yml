@@ -188,7 +188,7 @@ jobs:
             '-q',
             'tests/gv_fs0_product',
             *glob.glob('tests/test_gv_fs0_*.py'),
-            'tests/test_dash_1_page_registry_shell.py::test_dash_1_default_portfolio_route_renders_current_decision',
+            'tests/test_dash_1_page_registry_shell.py::test_dash_1_default_route_renders_real_command_center',
           ]))"
 
       - name: Build deterministic GV-ALPHA0 release
