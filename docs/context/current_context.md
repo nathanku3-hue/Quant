@@ -1,22 +1,20 @@
 ## What Was Done
-- Created isolated candidate custody from advertised main `e4cf949`.
-- Committed C at `a927451`, deleting exactly 50 tracked blobs and 41 gitlinks.
-- Applied the reviewed `a36a436` runtime/test final state as one P candidate.
-- Removed the standalone application, launchers, prospective workspace, standalone AppTests, and positive workflow references.
-- Passed the final local dashboard/PIT matrix 97/97 and context packet tests 26/26.
-- Completed F with two validated tars, 35 comparison rows, 41 receipt rows, mirrored hashes, and `F_PASS=true`.
+- Fast-forwarded `main` from `e4cf949` to exact `9af5259` (C+P only).
+- Verified remote `main == 9af5259`.
+- Tagged `pit-alpha-authority-cut-1-terminal` at that exact SHA.
+- Opened `codex/pit-source-authority-1` from `9af5259`.
+- Reassessed canonical maturity to `70/100` for operability/custody/replay only.
 
 ## What Is Locked
-- `dashboard.py` is the sole product application.
-- Canonical score remains `62/100` until exact fresh-clone proof passes.
-- C and P publish together once after fresh-clone proof.
-- F gates merge, tag, and main only.
-- No compatibility route, provider expansion, optimizer, broker, alpha, or Limited Live.
+- `dashboard.py` sole product.
+- Published tip `9af5259` and terminal tag must not be rewritten.
+- Score claim boundary: operability/custody/replay only.
+- Limited Live closed.
+- No provider, optimizer, broker, historical repair, or compatibility work.
 
 ## What Is Next
-- Create P and push C plus P once to `origin/codex/pit-alpha-authority-cut-1`.
-- Verify the remote branch equals local P.
-- Stop before merge, tag, or main advancement.
+- Ship one narrow functional slice: immutable market packet through the existing operated loop.
+- Keep all other programmes closed.
 
 ## First Command
 ```text

@@ -1,16 +1,16 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `PIT-ALPHA-AUTHORITY-CUT-1 — C COMMITTED; P FRESH-CLONE + REVIEW PASS; PUBLICATION AUTHORIZED; LIVE CLOSED`
-Date: 2026-08-05
-Advertised main base: `e4cf949a895a5f987502328631ebac28af7d154f`
+Status: `PIT-SOURCE-AUTHORITY-1 ACTIVE; PIT-ALPHA-AUTHORITY-CUT-1 PUBLISHED; LIVE CLOSED`
+Date: 2026-08-06
+Published main / terminal tip: `9af5259d49969ba00db1fb3f4b3323ffb1d49205`
+Terminal tag: `pit-alpha-authority-cut-1-terminal` → exact `9af5259`
 Cleanup commit: `a92745118aab1a857a0251ce747cab247ba94605`
-Functional donor: `a36a436e3253a939871299bed12a75eccdad05bb`
-Canonical score: `62/100` until exact fresh-clone proof
+Canonical score: `70/100` (product operability, custody, and replay only — not alpha, source quality, realized value, broker, or live readiness)
 Sole product application: `dashboard.py`
-Next product direction: `PIT-SOURCE-AUTHORITY-1`
+Active product slice: `PIT-SOURCE-AUTHORITY-1`
 Limited Live: `CLOSED; NOT AUTHORIZED`
 
-> This authority-cut header supersedes historical active-gate language below. Historical sections remain audit context only.
+> This header supersedes historical active-gate language below. Historical sections remain audit context only.
 
 GodView is a local-first, point-in-time certified portfolio operating system. Its product unit is a complete portfolio decision and operating loop, not an isolated stock case and not an optimizer-first research platform.
 

@@ -1,3 +1,11 @@
+## 2026-08-06 Round Entry (Publish The Converged Tip; Reconcile Truth After, Not Before)
+
+- Date: 2026-08-06
+- Mistake or miss: truth surfaces can remain pre-publication (`62/100`, merge blocked language) while the candidate is already clean, remote-equal, two commits ahead, reviewed, and F-passed — creating false decision latency.
+- Root cause: score and queue text were treated as gates on publication rather than as post-publication receipts of already-proven product operability and custody.
+- Fix applied: authorize exact fast-forward of immutable `9af5259`; verify remote equality; tag that SHA; branch the next slice; only then reconcile brief/score/context/queue/roadmap/closure to `70/100` operability/custody/replay and open `PIT-SOURCE-AUTHORITY-1`.
+- Guardrail for next time: when a candidate is clean, remote-equal, ancestor-complete, and proof-complete, further candidate review has negligible decision value — publish by FF, tag exact SHA, then reconcile truth on the successor branch without rewriting the published tip.
+- Evidence paths: `docs/phase_brief/pit-source-authority-1-brief.md`, `docs/context/gv_endgame_authority_current.md`, tag `pit-alpha-authority-cut-1-terminal`, commits `a927451` and `9af5259`.
 ## 2026-08-05 Round Entry (Preservation Must Not Serialize Product Authority)
 - Date: 2026-08-05
 - Mistake or miss: the first authority-cut plan made archival completion block clean-lane construction and candidate publication, expanded 35 comparisons and 41 receipts into separate artifacts, and preserved a standalone operator application beside the canonical dashboard.
@@ -2149,3 +2157,4 @@ Application pattern:
 - Fix applied: froze `7ce85c4` as the sole executable candidate, reconciled its existing exact-head Windows/Linux, byte-parity, zero-candidate-only, fresh-process, and Reviewer A/B/C evidence, and limited closure to documentation/generated context plus custody publication.
 - Guardrail for next time: rerun a terminal gate only when the proposed closure or successor changes bytes that the gate can observe—production, tests, workflows, dependencies, or executable configuration. Otherwise prove byte identity, publish once by fast-forward, tag, and stop.
 - Evidence paths: `docs/context/e2e_evidence/gv_operated_portfolio_25_1_terminal_20260801.md`, `docs/saw_reports/saw_gv_operated_portfolio_25_1_terminal_20260801.md`, `docs/handover/phase_gv_operated_portfolio_25_1_handover.md`.
+

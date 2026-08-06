@@ -1,34 +1,28 @@
 # Impact Packet — Current
 
-Date: 2026-08-05
-Gate: `PIT-ALPHA-AUTHORITY-CUT-1`
-Status: `C COMMITTED; P FRESH-CLONE + REVIEW PASS; PUBLICATION AUTHORIZED`
+Date: 2026-08-06
+Gate: `PIT-SOURCE-AUTHORITY-1`
+Status: `ALPHA CUT PUBLISHED; SOURCE AUTHORITY IMPLEMENTATION OPEN`
 
 ## Repository impact
 
-- C commit `a927451` deletes exactly 91 paths under `root repo/`: 50 blobs and 41 gitlinks.
-- The advertised 11-path Meta-Harness main delta remains untouched.
-- P changes only the reviewed PIT/domain/dashboard/test set plus minimal current truth.
+- Main tip is exact `9af5259d49969ba00db1fb3f4b3323ffb1d49205` via pure fast-forward from `e4cf949`.
+- Annotated terminal tag `pit-alpha-authority-cut-1-terminal` binds that SHA.
+- Branch `codex/pit-source-authority-1` starts from the published tip.
+- First post-publication commit reconciles truth surfaces only; executable product bytes of `9af5259` remain the published baseline until the functional packet slice lands.
 
 ## Product impact
 
 - `dashboard.py` remains the sole application.
-- Command Center exposes all-capital PIT proposals, certified cash, paper entry, and proposal-bound rotation.
-- Confirmation reuses deterministic accounting, atomic persistence, certification, and replay.
-- Reject-all preserves economics.
-- Stale/tampered proposal, book, certification, event, and price bindings fail closed.
-
-## Removed duplicate surface
-
-The standalone app, both launchers, prospective workspace view, standalone AppTests, and positive workflow references are deleted. Shared operated modules remain internal reusable substrate only.
+- Published operated loop is the substrate for the next slice.
+- Active replacement target: manually entered `operator://` market authority → immutable bitemporal market packet.
 
 ## Validation impact
 
-The target matrix covers PIT contracts/adapters/governance/read models, Command Center registry and AppTests, paper entry, rotation, prospective persistence/replay, real MU evidence, and independent shadow evidence. Local proof passed 97/97; context proof passed 26/26; fresh-clone proof passed 123/123; three independent focus reviews passed.
+Prior cut proof remains banked and is not reopened: dashboard/PIT, context, fresh-clone `123/123`, independent reviews, `F_PASS`, hosted Windows/Ubuntu. The source-authority slice adds focused packet identity and loop tests only.
 
 ## Risk and rollback
 
-- C and P are separate commits for rollback.
-- Candidate push is permitted after fresh-clone proof.
-- Merge/tag/main remain blocked until F_PASS.
-- Score remains `62/100` until proof, not preservation ceremony, earns reassessment.
+- Published tip and tag are immutable receipts; do not rewrite history.
+- Functional work stays on `codex/pit-source-authority-1` until reviewed.
+- Score `70/100` is operability/custody/replay only; no claim inflation beyond that boundary.

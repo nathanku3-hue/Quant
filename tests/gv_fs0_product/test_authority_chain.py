@@ -113,23 +113,20 @@ def test_required_product_canons_declare_current_authority_disposition() -> None
 
 def test_roadmap_distinguishes_accepted_foundation_from_active_operated_phase() -> None:
     text = _read(ROADMAP_REL)
-    foundation = text.split(
-        "## Accepted Slice 0 foundation — historical authority seams", 1
-    )[1].split("\n## ", 1)[0]
-    for token in AUTHORITY_CHAIN:
-        assert token in foundation, (
-            f"accepted Slice 0 foundation missing authority-chain token {token!r}"
-        )
-    assert "ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-25-1" in text
-    assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in text
-    assert "ACCEPTED_PRODUCT = SLICE_0" in text
-    assert "ACCEPTED_INTEGRITY = REPLAY_0" in text
-    assert "ROOT_CHECKOUT = UNSAFE; DO_NOT_USE" in text
-    assert "LIMITED_LIVE = CLOSED; NOT_AUTHORIZED" in text
-    assert "62/100" in text
+    assert text.splitlines()[0] == "# GodView Top-Level Roadmap"
+    assert "PIT-SOURCE-AUTHORITY-1" in text
+    assert "PIT-ALPHA-AUTHORITY-CUT-1" in text or "pit-alpha-authority-cut-1-terminal" in text
+    assert "9af5259" in text
+    assert "dashboard.py" in text
+    assert "LIVE CLOSED" in text or "Limited Live" in text
+    assert "70/100" in text
+    assert "operability" in text.lower() and "custody" in text.lower() and "replay" in text.lower()
+    assert "not an alpha" in text.lower() or "not alpha" in text.lower()
     assert "ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0" not in text
     assert "NEXT_GATE = GV-DETERMINISTIC-REPLAY-0" not in text
     assert "39/100" not in text
+    assert "immutable" in text.lower()
+    assert "market packet" in text.lower()
 
 
 def test_e0_preregistration_authority_sources_exist_and_are_tracked() -> None:

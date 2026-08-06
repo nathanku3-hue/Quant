@@ -1,11 +1,14 @@
 # PIT-ALPHA-AUTHORITY-CUT-1 Brief
 
 Date: 2026-08-05
+Published: 2026-08-06
 Branch: `codex/pit-alpha-authority-cut-1`
 Base: advertised `origin/main` `e4cf949a895a5f987502328631ebac28af7d154f`
 Functional donor: `a36a436e3253a939871299bed12a75eccdad05bb`
-Status: `C COMMITTED; P FRESH-CLONE + REVIEW PASS; CANDIDATE PUBLICATION AUTHORIZED`
-Canonical score: `62/100`
+Status: `PUBLISHED AND CLOSED ON MAIN; SUPERSEDED BY PIT-SOURCE-AUTHORITY-1`
+Product tip: `9af5259d49969ba00db1fb3f4b3323ffb1d49205`
+Terminal tag: `pit-alpha-authority-cut-1-terminal` → exact `9af5259`
+Canonical score after publication: `70/100` (operability / custody / replay only)
 Limited Live: `CLOSED; NOT AUTHORIZED`
 
 ## Product result
@@ -97,10 +100,12 @@ After authority-cut publication, the sole next product direction is `PIT-SOURCE-
 
 ## What Is Next
 
-- Create P and push C plus P once to `origin/codex/pit-alpha-authority-cut-1`.
-- Verify the remote branch equals local P.
-- Stop before merge, tag, or main advancement.
+- Closed. Active work continues on `codex/pit-source-authority-1` under `docs/phase_brief/pit-source-authority-1-brief.md`.
 
-## First Command
+## Publication receipt (2026-08-06)
 
-`python -m pytest -q tests/test_gv_pit_transaction.py tests/test_gv_pit_operated_capital.py tests/test_gv_pit_operated_rotation.py tests/test_dash_1_page_registry_shell.py`
+- Fast-forward main `e4cf949..9af5259` only.
+- Verified remote `main == 9af5259`.
+- Tagged `pit-alpha-authority-cut-1-terminal` at exact `9af5259`.
+- Opened `codex/pit-source-authority-1` from that tip.
+- Canonical maturity reassessed to `70/100` for product operability, custody, and replay only.

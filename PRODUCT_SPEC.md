@@ -1,23 +1,22 @@
 # Product Specification: Terminal Zero / GodView Certified Portfolio OS
 
-## Active Authority Cut Specification (2026-08-05)
+## Active Product Specification (2026-08-06)
 
 This section supersedes every active product header below.
 
 ```text
-AUTHORITY_CUT = PIT-ALPHA-AUTHORITY-CUT-1
-BASE = e4cf949a895a5f987502328631ebac28af7d154f
-C = a92745118aab1a857a0251ce747cab247ba94605
-P_DONOR = a36a436e3253a939871299bed12a75eccdad05bb
+PUBLISHED_CUT = PIT-ALPHA-AUTHORITY-CUT-1 @ 9af5259
+TERMINAL_TAG = pit-alpha-authority-cut-1-terminal → 9af5259
+ACTIVE_SLICE = PIT-SOURCE-AUTHORITY-1
 PRODUCT_ENTRY = dashboard.py / Command Center
 DUPLICATE_OPERATOR_SURFACE = DELETED_WITHOUT_COMPATIBILITY
-SCORE = 62/100 UNTIL EXACT_FRESH_CLONE_PROOF
-F_GATES = MERGE + TAG + MAIN ONLY
-NEXT = PIT-SOURCE-AUTHORITY-1
+SCORE = 70/100 OPERABILITY_CUSTODY_REPLAY_ONLY
+SCORE_NOT = ALPHA | SOURCE_QUALITY | REALIZED_VALUE | BROKER | LIVE_READINESS
+NEXT = IMMUTABLE_BITEMPORAL_MARKET_PACKET_THROUGH_EXISTING_LOOP
 LIVE = CLOSED
 ```
 
-P must preserve one immutable PIT identity across operated MU, independent shadow MU, and certified cash; bind entry/rotation requests to displayed proposal, active book, certification, event count, and market packets; execute deterministic SELL-before-BUY accounting; persist and certify atomically; reject stale/tampered or buy-only requests; and reopen exact authority in a fresh process. Historical specifications below remain non-active audit history.
+Published cut preserves one immutable PIT identity across operated MU, independent shadow MU, and certified cash; binds entry/rotation to displayed proposal, active book, certification, event count, and market packets; executes deterministic SELL-before-BUY accounting; persists and certifies atomically; rejects stale/tampered or buy-only requests; and reopens exact authority in a fresh process. The active slice replaces free-text `operator://` market authority with an immutable packet (source/permission identity, raw bytes or receipt, valid/effective time, retrieval/knowledge time, permanent instrument identity, value/unit/currency, schema version, SHA-256) through that same loop. Historical specifications below remain non-active audit history.
 
 ---
 

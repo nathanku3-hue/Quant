@@ -10,6 +10,7 @@ CURRENT_CONTEXT_JSON = ROOT / "docs" / "context" / "current_context.json"
 PLANNER = ROOT / "docs" / "context" / "planner_packet_current.md"
 BRIDGE = ROOT / "docs" / "context" / "bridge_contract_current.md"
 README = ROOT / "README.md"
+ACTIVE_BRIEF = ROOT / "docs" / "context" / "ACTIVE_BRIEF"
 
 
 def test_phase61_brief_exposes_new_context_packet() -> None:
@@ -29,9 +30,10 @@ def test_current_context_preserves_terminal_and_active_named_product_gates() -> 
         for key in ("what_was_done", "what_is_locked", "what_is_next")
         for x in payload[key]
     )
-    assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in joined
-    assert "GV-OPERATED-PORTFOLIO-25-1" in joined
-    assert "25-security" in joined.lower()
+    assert "9af5259" in joined
+    assert "pit-alpha-authority-cut-1-terminal" in joined
+    assert "70/100" in joined
+    assert "market packet" in joined.lower()
     assert "Limited Live" in joined and "closed" in joined.lower()
 
 
@@ -39,10 +41,12 @@ def test_current_surfaces_select_one_active_operated_portfolio_gate() -> None:
     planner_text = PLANNER.read_text(encoding="utf-8")
     bridge_text = BRIDGE.read_text(encoding="utf-8")
     readme_text = README.read_text(encoding="utf-8")
+    active_brief = ACTIVE_BRIEF.read_text(encoding="utf-8").strip()
 
+    assert active_brief == "docs/phase_brief/pit-source-authority-1-brief.md"
     for text in (planner_text, bridge_text, readme_text):
-        assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in text
-        assert "GV-OPERATED-PORTFOLIO-25-1" in text
-        assert "62/100" in text
+        assert "PIT-SOURCE-AUTHORITY-1" in text
+        assert "9af5259" in text
+        assert "70/100" in text
         assert "live" in text.lower() and "closed" in text.lower()
         assert "GV-CHALLENGER-PROMOTION-1 OPEN" not in text

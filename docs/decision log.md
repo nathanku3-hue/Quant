@@ -7715,3 +7715,14 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Publication law: create exactly one documentation-only closure commit on `codex/gv-operated-portfolio-25-1-terminal-closure`; require no production, test, workflow, dependency, or configuration diff from `7ce85c4`; fast-forward `main`; create `gv-operated-portfolio-25-1-terminal` only after remote equality is verified.
 - Evidence economy: do not rerun implementation, complete tests, CI, failset comparison, or Reviewer A/B/C unless a later change alters executable, test, workflow, dependency, or configuration bytes.
 - Score remains `62/100`; Limited Live, providers, optimizer, broker, Universe, Challenger compatibility, alpha/score uplift, and live capital remain closed.
+
+## 2026-08-06 — PUBLISH_PIT_ALPHA_AUTHORITY_CUT_1; OPEN_PIT_SOURCE_AUTHORITY_1
+
+- Decision: approve exact fast-forward main advancement of candidate `9af5259d49969ba00db1fb3f4b3323ffb1d49205`. Candidate was clean, remote-equal on its branch, exactly two commits ahead of remote main `e4cf949`, with no divergence.
+- Publication: pure fast-forward `e4cf949..9af5259`; verified remote `main == 9af5259`; annotated tag `pit-alpha-authority-cut-1-terminal` peels to exact `9af5259`; no squash, rebase, merge commit, or tip rewrite.
+- Score: raise canonical maturity `62 → 70/100` for product operability, custody, and replay only. Explicit non-claims: not alpha, not source quality, not realized value, not broker readiness, not live readiness.
+- Why: authority cut completed the highest-value convergence — one `dashboard.py` Command Center; bounded BUY entry; proposal/book/certification-bound SELL+BUY rotation; explicit confirm/reject; atomic persistence; certification lineage; exact fresh-process reopen; residual `0`; fresh-clone `123/123`; independent reviews; preservation PASS; hosted Windows/Ubuntu proof.
+- Roadmap deviation (explicit, beneficial): automatic Scale→Universe→Challenger progression abandoned; seventeen-commit replay replaced by two-commit final-state transplant; duplicate operator product deleted without compatibility.
+- Next: branch `codex/pit-source-authority-1`; first commit reconciles active brief, score, current context, queue, roadmap, and closure truth; then ship one immutable bitemporal market packet through the existing preview→confirm→persist→certify→reopen loop. No new engine, provider programme, optimizer, broker, historical repair, compatibility layer, or Limited Live.
+
+

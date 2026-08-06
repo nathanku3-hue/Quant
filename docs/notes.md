@@ -6611,3 +6611,11 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Local pre-freeze gate: 449 tests, 0 failures, 0 errors, 0 skips; receipts under `%TEMP%`; combined single-command attempts returning DevSpace HTTP 502 are not evidence.
 - Candidate custody remains open until current bytes are attached to `codex/gv-operated-portfolio-25-1`; no score uplift or terminal claim.
 
+## PIT Alpha Authority Cut publication (2026-08-06)
+
+- Tip: `9af5259`; tag: `pit-alpha-authority-cut-1-terminal`; remote main equality verified.
+- Score: terminal accepted operability/custody/replay maturity `70/100`; prior construction held `62/100` until publication.
+- Active gate after publication: `PIT-SOURCE-AUTHORITY-1` on branch `codex/pit-source-authority-1`.
+- Non-claims: alpha, source quality, realized value, broker, live readiness remain closed.
+
+

@@ -1,46 +1,42 @@
 # GodView Endgame Authority — Current
 
-Date: 2026-08-05
-Active gate: `PIT-ALPHA-AUTHORITY-CUT-1`
-Status: `C COMMITTED; P FRESH-CLONE + REVIEW PASS; PUBLICATION AUTHORIZED`
-Canonical score: `62/100`
+Date: 2026-08-06
+Active gate: `PIT-SOURCE-AUTHORITY-1`
+Status: `AUTHORIZED; IMPLEMENTATION ACTIVE; ALPHA CUT PUBLISHED ON MAIN; LIVE CLOSED`
+Canonical score: `70/100` (product operability, custody, and replay only)
 Limited Live: `CLOSED; NOT AUTHORIZED`
 
 ## Canonical direction
 
 GodView is one point-in-time certified portfolio operating system operated through `dashboard.py`. The sole product path is the default Command Center. Strategy adapters emit immutable evidence-bound proposals; domain authorities own preview, accounting, persistence, certification, and replay; the dashboard owns request composition and display only.
 
-## Authority cut
+## Published authority cut (closed)
 
-- Advertised main base: `e4cf949a895a5f987502328631ebac28af7d154f`.
-- Functional donor: `a36a436e3253a939871299bed12a75eccdad05bb`.
-- Divergence base: `e564cd9dfa45eb02ef8d7eb94b662543fb3776c9`.
-- Cleanup commit C: `a92745118aab1a857a0251ce747cab247ba94605`.
-- P is one reviewed final-state transplant, not seventeen commit replays.
+`PIT-ALPHA-AUTHORITY-CUT-1` is published and closed on main:
 
-C removes exactly 50 preserved residue blobs and 41 nested-repository gitlinks. P installs all-capital PIT, operated paper entry, proposal-bound SELL+BUY rotation, atomic persistence, certification, and fresh-process replay on canonical ancestry.
+- Pre-cut advertised main: `e4cf949a895a5f987502328631ebac28af7d154f`.
+- Cleanup C: `a92745118aab1a857a0251ce747cab247ba94605`.
+- Product P / terminal tip: `9af5259d49969ba00db1fb3f4b3323ffb1d49205`.
+- Terminal tag: `pit-alpha-authority-cut-1-terminal` → exact `9af5259`.
+- Publication mode: fast-forward only; no squash, rebase, or merge commit.
+- Remote equality: `origin/main == 9af5259`.
+
+Banked result: one Command Center; bounded BUY entry; proposal/book/certification-bound SELL+BUY rotation; explicit confirm/reject; atomic persistence; certification lineage; exact fresh-process reopen; residual `0`; fresh-clone `123/123`; independent reviews; preservation `F_PASS`; hosted Windows/Ubuntu proof.
+
+Explicit beneficial roadmap deviation: automatic Scale→Universe→Challenger progression abandoned; seventeen-commit replay replaced by two-commit final-state transplant; duplicate operator product deleted without compatibility.
+
+## Active product slice
+
+`PIT-SOURCE-AUTHORITY-1` replaces manually entered `operator://` market authority with one independently traceable immutable bitemporal market packet through the existing preview→confirm→persist→certify→reopen loop. Packet fields: source/permission identity, raw bytes or receipt, valid/effective time, retrieval/knowledge time, permanent instrument identity, value/unit/currency, schema version, and SHA-256.
 
 ## Sole operator product
 
-The following obsolete launch surface is removed without compatibility:
-
-```text
-operated_portfolio_app.py
-launch_operated_portfolio.py
-launch_operated_portfolio_25.py
-views/gv_prospective_paper_workspace.py
-```
-
-The Command Center owns the product journey and its AppTests. Shared portfolio modules remain internal domain substrate, not a second application.
-
-## Publication and preservation
-
-Fresh-clone proof passed with 58 byte-equivalent P paths and 123/123 combined checks. Three independent focus reviews passed. Preservation F passed with both named tars, 35 comparison rows, 41 receipt rows, and mirrored hashes. Candidate publication is authorized; merge, terminal tag, and main advancement remain outside this round.
+`dashboard.py` remains the only launchable GodView operator product. Shared portfolio modules remain internal domain substrate, not a second application.
 
 ## Score and claim boundary
 
-Keep `62/100` until exact fresh-clone P proof passes. No source-quality, alpha, realized-value, broker, advice, or live-capital claim follows from authority cleanup or runtime transplantation.
+Canonical score is `70/100` for product operability, custody, and replay only. This is not an alpha, source-quality, realized-value, broker, or live-readiness score. No advice activity, provider programme, or live capital is authorized.
 
-## Next product direction
+## Closed scope
 
-After candidate publication, `PIT-SOURCE-AUTHORITY-1` is the sole next functional slice: one independently traceable bitemporal market packet through the existing loop. It adds no new engine.
+No new engine, provider programme, optimizer, broker, historical repair, compatibility layer, alpha claim, or Limited Live.

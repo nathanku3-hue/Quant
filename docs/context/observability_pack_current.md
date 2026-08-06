@@ -1,7 +1,7 @@
 # Observability Pack — Current
 
-Date: 2026-08-05
-Gate: `PIT-ALPHA-AUTHORITY-CUT-1`
+Date: 2026-08-06
+Gate: `PIT-SOURCE-AUTHORITY-1`
 Status: `ACTIVE`
 
 ## Product sentinels
@@ -9,28 +9,22 @@ Status: `ACTIVE`
 - Default application is `dashboard.py`.
 - Command Center is the default page.
 - Production tree contains no standalone operated app or launcher.
-- Real PIT episode contains operated MU, independent shadow MU, and certified cash.
-- Paper entry binds PIT, market, book, certification, and event identities.
-- Rotation requires genuine MU reduction and non-zero MERID funding; SELL precedes BUY.
-- Preview is mutation-free; confirm and reject-all are explicit.
-- Stale/tampered bindings fail closed.
-- Persisted authority reopens exactly in a fresh process with unexplained residual `0`.
+- Published loop still proves entry, rotation, persistence, certification, residual `0`, and fresh reopen.
+- Active gap: market authority still uses free-text `operator://` fields; must become immutable packets with SHA-256 identity.
 
 ## Repository sentinels
 
-- Branch parent is advertised main `e4cf949`.
-- C commit is `a927451` with exactly 91 deletions.
-- Meta-Harness 11-path main delta is preserved.
-- P may change only the reviewed runtime/test/current-truth allowlist.
-- No positive source or workflow reference may name the deleted standalone route.
+- Remote `main` equals `9af5259`.
+- Tag `pit-alpha-authority-cut-1-terminal` peels to `9af5259`.
+- Active brief points at `docs/phase_brief/pit-source-authority-1-brief.md`.
+- Canonical score is `70/100` for operability/custody/replay only.
 
 ## Publication sentinels
 
-- Candidate publication requires focused and fresh-clone proof.
-- Score remains `62/100` until proof passes.
-- F_PASS is not a candidate-push dependency.
-- Merge/tag/main require both exact candidate review and F_PASS.
+- Authority-cut publication is complete; do not re-open C/P tip identity.
+- Source-authority work ships on `codex/pit-source-authority-1`.
+- No alpha, source-quality, realized-value, broker, or live-readiness claim from score uplift.
 
 ## Stop signals
 
-Any duplicate application authority, unexpected cleanup path, C/P overlap with newly advertised main, failed accounting/replay proof, score inflation, or attempt to merge before F_PASS stops advancement.
+Any duplicate application authority, tip rewrite of `9af5259`, score claim beyond operability/custody/replay, new engine/provider/optimizer/broker programme, or Limited Live attempt stops advancement.

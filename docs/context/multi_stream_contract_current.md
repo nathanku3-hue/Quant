@@ -1,28 +1,29 @@
 # Multi-Stream Contract — Current
 
-Date: 2026-08-05
-Gate: `PIT-ALPHA-AUTHORITY-CUT-1`
-Status: `THREE CONCURRENT LANES`
+Date: 2026-08-06
+Gate: `PIT-SOURCE-AUTHORITY-1`
+Status: `SINGLE ACTIVE PRODUCT SLICE`
 
-## Lane C — canonical cleanup
+## Closed lanes (authority cut)
 
-Owner: repository custody. Result: exact 91-path deletion commit `a927451`. State: complete and unpushed.
+| Lane | Result | State |
+|---|---|---|
+| C — cleanup | `a927451` exact 91-path deletion | published on main |
+| P — product authority | `9af5259` sole Command Center transplant | published on main |
+| F — preservation | two tars + 35-row report + 41-row manifest | `F_PASS` banked; gated publication |
 
-## Lane P — product authority
+## Active lane
 
-Owner: product/runtime. Result: one final-state PIT-to-paper-capital transplant on C. `dashboard.py` is the only application; domain modules own accounting/persistence/certification/replay. State: validation active.
-
-## Lane F — preservation
-
-Owner: preservation. Result: two named tars, one 35-row comparison report, and one 41-row receipt manifest. State: concurrent. It gates merge/tag/main only.
+| Lane | Owner | Result |
+|---|---|---|
+| S — source authority | product/runtime | one immutable bitemporal market packet through existing loop |
 
 ## Integration law
 
-- P may not reintroduce a standalone application, launcher, compatibility route, or second view authority.
-- C and P publish together after fresh-clone proof.
-- F does not block candidate preparation or publication.
-- Main movement may be rebased automatically only when the 91-path manifest is unchanged and overlap with C/P remains zero.
-- Merge, tag, and main advancement require F_PASS.
+- S may not reintroduce a standalone application, launcher, compatibility route, or second view authority.
+- S may not open a new engine, provider programme, optimizer, broker, or Limited Live path.
+- Published tip `9af5259` and terminal tag remain immutable.
+- Main movement for S requires reviewed candidate commits only; no tip rewrite of the closed cut.
 
 ## Deferred
 

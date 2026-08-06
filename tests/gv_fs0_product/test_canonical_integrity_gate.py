@@ -75,13 +75,12 @@ def test_top_level_roadmap_tracks_operated_phase_and_accepted_foundations() -> N
     path = _require_file("docs/architecture/top_level_roadmap.md")
     text = path.read_text(encoding="utf-8")
     assert text.splitlines()[0] == "# GodView Top-Level Roadmap"
-    assert "ACTIVE_PRODUCT_PHASE = GV-OPERATED-PORTFOLIO-25-1" in text
-    assert "GV-OPERATED-PORTFOLIO-10-TRANSITION-1R" in text
-    assert "ACCEPTED_PRODUCT = SLICE_0" in text
-    assert "ACCEPTED_INTEGRITY = REPLAY_0" in text
-    assert "ROOT_CHECKOUT = UNSAFE; DO_NOT_USE" in text
-    assert "LIMITED_LIVE = CLOSED; NOT_AUTHORIZED" in text
-    assert "62/100" in text
+    assert "PIT-SOURCE-AUTHORITY-1" in text
+    assert "9af5259" in text
+    assert "dashboard.py" in text
+    assert "LIVE CLOSED" in text or "Limited Live" in text
+    assert "70/100" in text
+    assert "operability" in text.lower()
     assert "ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0" not in text
     assert "NEXT_GATE = GV-DETERMINISTIC-REPLAY-0" not in text
     assert "39/100" not in text

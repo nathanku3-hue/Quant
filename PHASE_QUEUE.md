@@ -1,64 +1,43 @@
 # PHASE_QUEUE.md — GodView Product Queue
 
-Status: `ONE ACTIVE AUTHORITY CUT; LIVE CLOSED`
-Last updated: 2026-08-05
+Status: `ONE ACTIVE PRODUCT SLICE; ALPHA CUT PUBLISHED; LIVE CLOSED`
+Last updated: 2026-08-06
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
-Active brief: `docs/context/ACTIVE_BRIEF` → `docs/phase_brief/pit-alpha-authority-cut-1-brief.md`
-Canonical score: `62/100`
+Active brief: `docs/context/ACTIVE_BRIEF` → `docs/phase_brief/pit-source-authority-1-brief.md`
+Canonical score: `70/100` (product operability, custody, and replay only)
 
 ## Queue law
 
 1. One product application: `dashboard.py`.
-2. One active gate: `PIT-ALPHA-AUTHORITY-CUT-1`.
-3. C and P are separate commits but publish together once after fresh-clone proof.
-4. F preservation runs concurrently and gates merge/tag/main only.
-5. No backward compatibility or duplicate operator route.
-6. No individual replay of the seventeen functional commits.
-7. Limited Live remains closed.
+2. One active gate: `PIT-SOURCE-AUTHORITY-1`.
+3. Published tip `9af5259` and tag `pit-alpha-authority-cut-1-terminal` are immutable.
+4. No backward compatibility or duplicate operator route.
+5. Limited Live remains closed.
+6. Score is not alpha, source-quality, realized-value, broker, or live-readiness.
 
-## Active lanes
+## Closed — PIT-ALPHA-AUTHORITY-CUT-1
 
-| Lane | Status | Exit result |
-|---|---|---|
-| C — cleanup | COMPLETE at `a927451` | exactly 50 blobs + 41 gitlinks deleted |
-| P — authority transplant | FRESH-CLONE + REVIEW PASS | sole Command Center product proves entry, rotation, persistence, certification, replay |
-| F — preservation | PASS | two named tars + 35-row comparison + 41-row receipt manifest, mirrored |
+| Item | Result |
+|---|---|
+| C | `a927451` — 50 blobs + 41 gitlinks deleted |
+| P | `9af5259` — sole Command Center authority |
+| Main | fast-forward `e4cf949..9af5259` |
+| Tag | `pit-alpha-authority-cut-1-terminal` → `9af5259` |
+| Proof | fresh-clone 123/123; reviews; F_PASS; residual 0; hosted Windows/Ubuntu |
 
-## P product gate
+## Active — PIT-SOURCE-AUTHORITY-1
 
 ```text
-real all-capital PIT proposals
-→ default Command Center
-→ bounded MU paper entry
-→ displayed-proposal-bound SELL MU 3
-→ BUY MERID 5
-→ explicit confirm or reject-all
+immutable market packet
+→ existing PIT proposal
+→ preview → confirm/reject
 → atomic persistence
-→ certification lineage depth 2
-→ fresh-process reopen
-→ MU 4 / MERID 5
-→ residual 0
+→ certification lineage
+→ exact reopen
 ```
 
-The standalone app, launchers, prospective workspace view, and standalone AppTests are deleted. Internal portfolio modules remain reusable domain substrate.
+Required fields: source/permission identity; raw bytes or receipt; valid/effective time; retrieval/knowledge time; permanent instrument identity; value/unit/currency; schema version; SHA-256.
 
-## Publication gate
+## Closed scope
 
-```text
-focused dashboard/PIT tests pass 97/97
-+ generated context validates and context tests pass 26/26
-+ byte-equivalent fresh clone passes 123/123
-+ three independent focus reviews pass
-→ commit P
-→ push branch once with C+P
-```
-
-F_PASS is not required for the candidate push. It is required before merge, terminal tag, or main advancement.
-
-## Next product slice
-
-`PIT-SOURCE-AUTHORITY-1`: one independently traceable bitemporal market packet through the existing loop. No new engine.
-
-## Closed
-
-Cascade integration · broad providers · optimizer expansion · historical-suite repair · broker · alpha · advice · live capital · Limited Live.
+Cascade integration · broad providers · optimizer expansion · historical-suite repair · broker · alpha · advice · live capital · Limited Live · new engine.
