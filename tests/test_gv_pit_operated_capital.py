@@ -36,6 +36,7 @@ from gv_portfolio_v0.operated_storage import (
     reject_prospective_observation_and_persist,
     workspace_path,
 )
+from gv_portfolio_v0.market_packet import build_immutable_market_packet
 from gv_portfolio_v0.operated import OperatedPortfolioError
 from gv_portfolio_v0.prospective import (
     MAX_PROSPECTIVE_EVENT_COUNT,
@@ -105,6 +106,35 @@ def _request(
     market_observed_at: str = "2026-08-04T12:00:00.000000Z",
 ) -> dict[str, object]:
     review = workspace["reviews"][0]
+    instrument = workspace["instruments"][0]
+    receipt = (
+        f"RECEIPT instrument={instrument['symbol']} value={price} "
+        f"valid={market_observed_at}"
+    )
+    try:
+        market_packet = build_immutable_market_packet(
+            source_permission_identity="owner-local/permission/manual-v1",
+            raw_bytes_or_receipt=receipt,
+            valid_effective_at=market_observed_at,
+            retrieval_knowledge_at=market_observed_at,
+            permanent_instrument_identity=str(instrument["permanent_key"]),
+            instrument_id=str(review["instrument_id"]),
+            value=price,
+        )
+    except Exception:
+        # Leave invalid field material for domain normalization to fail closed.
+        market_packet = {
+            "schema_version": "gv_immutable_market_packet_v1",
+            "source_permission_identity": "owner-local/permission/manual-v1",
+            "raw_bytes_or_receipt": receipt,
+            "valid_effective_at": market_observed_at,
+            "retrieval_knowledge_at": market_observed_at,
+            "permanent_instrument_identity": str(instrument["permanent_key"]),
+            "instrument_id": str(review["instrument_id"]),
+            "value": price,
+            "unit": "price",
+            "currency": "USD",
+        }
     return {
         "content": (
             "Owner-reviewed evidence establishes a bounded Micron-specific supply "
@@ -114,9 +144,7 @@ def _request(
         "observed_at": observed_at,
         "pit_identity": _pit_identity(),
         "market_instrument_id": review["instrument_id"],
-        "market_price": price,
-        "market_observed_at": market_observed_at,
-        "market_source_identity": "operator://2026-08-04/mu/market-observation-1",
+        "market_packet": market_packet,
         "review_updates": [
             {
                 "instrument_id": review["instrument_id"],
@@ -287,7 +315,15 @@ def test_cash_funded_buy_preview_is_mutation_free_and_fully_reconciled(
     ]
     packet = proposal["request"]["forward_operated_packet"]
     assert packet["market_price"] == "100"
-    assert packet["market_source_identity"].startswith("operator://")
+    market_packet = packet["market_packet"]
+    assert market_packet["value"] == "100"
+    assert market_packet["schema_version"] == "gv_immutable_market_packet_v1"
+    assert market_packet["source_permission_identity"].startswith("owner-local/")
+    assert not market_packet["source_permission_identity"].startswith("operator://")
+    assert len(market_packet["content_sha256"]) == 64
+    assert market_packet["permanent_instrument_identity"] == workspace["instruments"][0][
+        "permanent_key"
+    ]
     assert packet["target_quantity"] == "10"
     assert packet["pit_identity"] == _pit_identity()
 
@@ -400,7 +436,7 @@ def test_cash_funded_entry_fails_closed_on_cash_market_or_stale_drift(
 
     with pytest.raises(
         ProspectiveOperationError,
-        match="MARKET_PRICE_OUT_OF_BOUNDS",
+        match="MARKET_PACKET_VALUE_TOO_LONG|MARKET_PRICE_OUT_OF_BOUNDS",
     ):
         preview_runtime_observation(
             workspace,
@@ -422,7 +458,11 @@ def test_cash_funded_entry_fails_closed_on_cash_market_or_stale_drift(
     )
     with pytest.raises(
         ProspectiveOperationError,
-        match="MARKET_OBSERVATION_AFTER_EVIDENCE_DECISION",
+        match=(
+            "MARKET_PACKET_VALID_AFTER_EVIDENCE|"
+            "MARKET_PACKET_KNOWLEDGE_AFTER_EVIDENCE|"
+            "MARKET_OBSERVATION_AFTER_EVIDENCE_DECISION"
+        ),
     ):
         preview_runtime_observation(workspace, after_evidence)
 
@@ -549,8 +589,14 @@ def test_command_center_operates_and_reopens_the_changed_certified_book(
         app.text_input, "gv_command_center_market_observed_at"
     ).set_value("2026-08-04T12:00:00.000000Z")
     _element_by_key(
+        app.text_input, "gv_command_center_market_knowledge_at"
+    ).set_value("2026-08-04T12:00:30.000000Z")
+    _element_by_key(
         app.text_input, "gv_command_center_market_source_identity"
-    ).set_value("operator://2026-08-04/mu/market-observation-1")
+    ).set_value("owner-local/permission/manual-v1")
+    _element_by_key(
+        app.text_area, "gv_command_center_market_receipt"
+    ).set_value("RECEIPT instrument=MU value=100 valid=2026-08-04T12:00:00.000000Z")
     _element_by_key(
         app.number_input, "gv_command_center_target_quantity"
     ).set_value(10)

@@ -77,11 +77,11 @@ No new engine, provider programme, optimizer, broker, historical repair, compati
 
 ## Acceptance target
 
-- [ ] Immutable market packet schema and SHA-256 identity are fail-closed.
-- [ ] Entry and rotation accept the packet in place of free-text `operator://` market authority.
-- [ ] Preview → confirm → persist → certify → reopen preserves packet identity exactly.
-- [ ] Tamper/stale/missing fields fail closed.
-- [ ] Focused dashboard/PIT tests pass; no second application path.
+- [x] Immutable market packet schema and SHA-256 identity are fail-closed.
+- [x] Entry and rotation accept the packet in place of free-text `operator://` market authority.
+- [x] Preview → confirm → persist → certify → reopen preserves packet identity exactly.
+- [x] Tamper/stale/missing fields fail closed.
+- [x] Focused dashboard/PIT tests pass; no second application path.
 
 ## What Was Done
 

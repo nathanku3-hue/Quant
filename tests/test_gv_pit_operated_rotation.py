@@ -18,6 +18,7 @@ from core.gv_pit.adapters import build_real_pit_source_bundle
 from core.gv_pit.contracts import canonical_value
 from core.gv_pit.governance import govern_real_pit_bundle
 from core.gv_pit.read_models import project_decision_episode
+from gv_portfolio_v0.market_packet import build_immutable_market_packet
 from gv_portfolio_v0.operated_scenarios import OPERATED_PAPER_CAPITAL_SCENARIO_ID
 from gv_portfolio_v0.operated_storage import (
     confirm_prospective_observation_and_persist,
@@ -125,6 +126,34 @@ def _displayed_binding(workspace: dict[str, object]) -> dict[str, object]:
     }
 
 
+def _market_packet(
+    workspace: dict[str, object],
+    *,
+    instrument_id: str,
+    value: str,
+    valid_at: str,
+    receipt: str,
+) -> dict[str, str]:
+    instruments = list(workspace["instruments"])
+    try:
+        companion = operated_rotation_companion(workspace)
+        instruments.append(companion["instrument"])
+    except Exception:
+        pass
+    instrument = next(
+        row for row in instruments if row["instrument_id"] == instrument_id
+    )
+    return build_immutable_market_packet(
+        source_permission_identity="owner-local/permission/manual-v1",
+        raw_bytes_or_receipt=receipt,
+        valid_effective_at=valid_at,
+        retrieval_knowledge_at=valid_at,
+        permanent_instrument_identity=str(instrument["permanent_key"]),
+        instrument_id=str(instrument_id),
+        value=value,
+    )
+
+
 def _entry_request(workspace: dict[str, object]) -> dict[str, object]:
     review = workspace["reviews"][0]
     return {
@@ -133,9 +162,13 @@ def _entry_request(workspace: dict[str, object]) -> dict[str, object]:
         "observed_at": "2026-08-04T12:01:00.000000Z",
         "pit_identity": _pit_identity(),
         "market_instrument_id": review["instrument_id"],
-        "market_price": "101.25",
-        "market_observed_at": "2026-08-04T12:00:00.000000Z",
-        "market_source_identity": "operator://2026-08-04/mu/market",
+        "market_packet": _market_packet(
+            workspace,
+            instrument_id=str(review["instrument_id"]),
+            value="101.25",
+            valid_at="2026-08-04T12:00:00.000000Z",
+            receipt="RECEIPT instrument=MU value=101.25",
+        ),
         "review_updates": [
             {
                 "instrument_id": review["instrument_id"],
@@ -175,18 +208,20 @@ def _rotation_request(workspace: dict[str, object]) -> dict[str, object]:
         "pit_identity": _pit_identity(),
         "displayed_proposal_binding": _displayed_binding(workspace),
         "forward_operated_market_packets": [
-            {
-                "instrument_id": source_review["instrument_id"],
-                "market_price": "101.25",
-                "market_observed_at": "2026-08-04T13:00:00.000000Z",
-                "market_source_identity": "operator://2026-08-04/mu/rotation-market",
-            },
-            {
-                "instrument_id": companion_review["instrument_id"],
-                "market_price": "30",
-                "market_observed_at": "2026-08-04T13:00:00.000000Z",
-                "market_source_identity": "operator://2026-08-04/merid/rotation-market",
-            },
+            _market_packet(
+                workspace,
+                instrument_id=str(source_review["instrument_id"]),
+                value="101.25",
+                valid_at="2026-08-04T13:00:00.000000Z",
+                receipt="RECEIPT instrument=MU value=101.25 rotation",
+            ),
+            _market_packet(
+                workspace,
+                instrument_id=str(companion_review["instrument_id"]),
+                value="30",
+                valid_at="2026-08-04T13:00:00.000000Z",
+                receipt="RECEIPT instrument=MERID value=30 rotation",
+            ),
         ],
         "review_updates": [
             {
@@ -227,7 +262,8 @@ def test_rotation_preview_binds_displayed_proposal_and_is_mutation_free(
     )
     assert proposal["request"]["pit_identity"] == _pit_identity()
     assert len(proposal["request"]["forward_operated_market_packets"]) == 2
-    assert proposal["request"]["forward_operated_market_packets"][0]["market_price"] == "101.25"
+    assert proposal["request"]["forward_operated_market_packets"][0]["value"] == "101.25"
+    assert len(proposal["request"]["forward_operated_market_packets"][0]["content_sha256"]) == 64
     assert proposal["transition"]["transition_kind"] == "PROSPECTIVE_REBALANCE"
     assert [row["side"] for row in proposal["transition"]["legs"]] == ["SELL", "BUY"]
     assert [row["quantity"] for row in proposal["transition"]["legs"]] == ["3", "5"]
@@ -348,8 +384,14 @@ def test_command_center_operates_displayed_proposal_rotation(
         app.text_input, "gv_command_center_rotation_source_market_observed_at"
     ).set_value("2026-08-04T13:00:00.000000Z")
     _element_by_key(
+        app.text_input, "gv_command_center_rotation_source_market_knowledge_at"
+    ).set_value("2026-08-04T13:00:30.000000Z")
+    _element_by_key(
         app.text_input, "gv_command_center_rotation_source_market_source_identity"
-    ).set_value("operator://2026-08-04/mu/rotation-market")
+    ).set_value("owner-local/permission/manual-v1")
+    _element_by_key(
+        app.text_area, "gv_command_center_rotation_source_market_receipt"
+    ).set_value("RECEIPT instrument=MU value=101.25 rotation")
     _element_by_key(
         app.number_input, "gv_command_center_rotation_source_target_quantity"
     ).set_value(4)
@@ -363,8 +405,14 @@ def test_command_center_operates_displayed_proposal_rotation(
         app.text_input, "gv_command_center_rotation_companion_market_observed_at"
     ).set_value("2026-08-04T13:00:00.000000Z")
     _element_by_key(
+        app.text_input, "gv_command_center_rotation_companion_market_knowledge_at"
+    ).set_value("2026-08-04T13:00:30.000000Z")
+    _element_by_key(
         app.text_input, "gv_command_center_rotation_companion_market_source_identity"
-    ).set_value("operator://2026-08-04/merid/rotation-market")
+    ).set_value("owner-local/permission/manual-v1")
+    _element_by_key(
+        app.text_area, "gv_command_center_rotation_companion_market_receipt"
+    ).set_value("RECEIPT instrument=MERID value=30 rotation")
     _element_by_key(
         app.number_input, "gv_command_center_rotation_companion_target_quantity"
     ).set_value(5)

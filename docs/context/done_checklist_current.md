@@ -23,11 +23,11 @@ Canonical score: `70/100` (operability / custody / replay only)
 
 ## Open — PIT-SOURCE-AUTHORITY-1
 
-- [ ] Immutable bitemporal market packet schema with SHA-256 identity.
-- [ ] Replace free-text `operator://` market authority in entry and rotation.
-- [ ] Packet survives preview → confirm → persist → certify → reopen exactly.
-- [ ] Tamper/stale/missing fields fail closed.
-- [ ] Focused dashboard/PIT tests green; no second application path.
+- [x] Immutable bitemporal market packet schema with SHA-256 identity.
+- [x] Replace free-text `operator://` market authority in entry and rotation.
+- [x] Packet survives preview → confirm → persist → certify → reopen exactly.
+- [x] Tamper/stale/missing fields fail closed.
+- [x] Focused dashboard/PIT tests green; no second application path.
 
 ## Claim boundary
 

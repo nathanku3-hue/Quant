@@ -26,6 +26,7 @@ from gv_portfolio_v0.operated_storage import (
     reject_prospective_observation_and_persist,
     workspace_path,
 )
+from gv_portfolio_v0.market_packet import build_immutable_market_packet
 from gv_portfolio_v0.prospective import (
     operated_rotation_companion,
     preview_runtime_observation,
@@ -216,6 +217,7 @@ def _render_operated_preview_flow(
     st.subheader("Mutation-free paper-capital preview")
     forward_packet = preview["request"].get("forward_operated_packet")
     if isinstance(forward_packet, Mapping):
+        market_packet = forward_packet.get("market_packet", {})
         st.table(
             [
                 {
@@ -223,11 +225,12 @@ def _render_operated_preview_flow(
                     "transition_kind": transition["transition_kind"],
                     "instrument_id": forward_packet["instrument_id"],
                     "target_quantity": forward_packet["target_quantity"],
-                    "market_price": forward_packet["market_price"],
-                    "market_observed_at": forward_packet["market_observed_at"],
-                    "market_source_identity": forward_packet[
-                        "market_source_identity"
-                    ],
+                    "market_value": market_packet.get("value"),
+                    "valid_effective_at": market_packet.get("valid_effective_at"),
+                    "content_sha256": market_packet.get("content_sha256"),
+                    "source_permission_identity": market_packet.get(
+                        "source_permission_identity"
+                    ),
                     "authoritative": False,
                 }
             ]
@@ -337,20 +340,40 @@ def _render_operated_paper_action(
         key="gv_command_center_evidence_observed_at",
         placeholder="2026-08-04T12:01:00.000000Z",
     )
-    market_price = st.text_input(
-        "Identified market price",
+    market_value = st.text_input(
+        "Market packet value",
         key="gv_command_center_market_price",
         placeholder="100.00",
     )
-    market_observed_at = st.text_input(
-        "Market observed at UTC",
+    market_valid_at = st.text_input(
+        "Market valid/effective at UTC",
         key="gv_command_center_market_observed_at",
         placeholder="2026-08-04T12:00:00.000000Z",
     )
-    market_source_identity = st.text_input(
-        "Market source identity",
+    market_knowledge_at = st.text_input(
+        "Market retrieval/knowledge at UTC",
+        key="gv_command_center_market_knowledge_at",
+        placeholder="2026-08-04T12:00:30.000000Z",
+    )
+    market_source_permission = st.text_input(
+        "Market source/permission identity",
         key="gv_command_center_market_source_identity",
-        placeholder="operator://date/market-observation",
+        placeholder="owner-local/permission/manual-v1",
+    )
+    market_receipt = st.text_area(
+        "Market raw bytes or receipt",
+        key="gv_command_center_market_receipt",
+        placeholder="Immutable receipt or raw observation bytes for this market packet.",
+    )
+    market_unit = st.text_input(
+        "Market unit",
+        key="gv_command_center_market_unit",
+        value="price",
+    )
+    market_currency = st.text_input(
+        "Market currency",
+        key="gv_command_center_market_currency",
+        value="USD",
     )
     target_quantity = st.number_input(
         "Paper target quantity",
@@ -376,15 +399,38 @@ def _render_operated_paper_action(
         placeholder="Explain why this exact target should be previewed.",
     )
 
+    try:
+        market_packet = build_immutable_market_packet(
+            source_permission_identity=market_source_permission,
+            raw_bytes_or_receipt=market_receipt,
+            valid_effective_at=market_valid_at,
+            retrieval_knowledge_at=market_knowledge_at,
+            permanent_instrument_identity=str(instrument["permanent_key"]),
+            instrument_id=str(review["instrument_id"]),
+            value=market_value,
+            unit=market_unit,
+            currency=market_currency,
+        )
+    except Exception:
+        market_packet = {
+            "instrument_id": review["instrument_id"],
+            "permanent_instrument_identity": instrument["permanent_key"],
+            "value": market_value,
+            "valid_effective_at": market_valid_at,
+            "retrieval_knowledge_at": market_knowledge_at,
+            "source_permission_identity": market_source_permission,
+            "raw_bytes_or_receipt": market_receipt,
+            "unit": market_unit,
+            "currency": market_currency,
+        }
+
     request = {
         "content": evidence_content,
         "locator": source_locator,
         "observed_at": evidence_observed_at,
         "pit_identity": dict(pit_identity),
         "market_instrument_id": review["instrument_id"],
-        "market_price": market_price,
-        "market_observed_at": market_observed_at,
-        "market_source_identity": market_source_identity,
+        "market_packet": market_packet,
         "review_updates": [
             {
                 "instrument_id": review["instrument_id"],
@@ -486,19 +532,29 @@ def _render_operated_rotation_action(
     )
 
     source_market_price = st.text_input(
-        f"{source_instrument['symbol']} market price",
+        f"{source_instrument['symbol']} market packet value",
         key="gv_command_center_rotation_source_market_price",
         value=str(source_position["valuation_price"]),
     )
     source_market_observed_at = st.text_input(
-        f"{source_instrument['symbol']} market observed at UTC",
+        f"{source_instrument['symbol']} market valid/effective at UTC",
         key="gv_command_center_rotation_source_market_observed_at",
         placeholder="2026-08-04T13:00:00.000000Z",
     )
+    source_market_knowledge_at = st.text_input(
+        f"{source_instrument['symbol']} market retrieval/knowledge at UTC",
+        key="gv_command_center_rotation_source_market_knowledge_at",
+        placeholder="2026-08-04T13:00:30.000000Z",
+    )
     source_market_source_identity = st.text_input(
-        f"{source_instrument['symbol']} market source identity",
+        f"{source_instrument['symbol']} market source/permission identity",
         key="gv_command_center_rotation_source_market_source_identity",
-        placeholder="operator://date/mu/rotation-market",
+        placeholder="owner-local/permission/manual-v1",
+    )
+    source_market_receipt = st.text_area(
+        f"{source_instrument['symbol']} market raw bytes or receipt",
+        key="gv_command_center_rotation_source_market_receipt",
+        placeholder="Immutable receipt for the source market packet.",
     )
     source_target_quantity = st.number_input(
         f"{source_instrument['symbol']} reduced target quantity",
@@ -521,19 +577,29 @@ def _render_operated_rotation_action(
     )
 
     companion_market_price = st.text_input(
-        f"{companion_instrument['symbol']} market price",
+        f"{companion_instrument['symbol']} market packet value",
         key="gv_command_center_rotation_companion_market_price",
         value=str(companion_review["reference_price"]),
     )
     companion_market_observed_at = st.text_input(
-        f"{companion_instrument['symbol']} market observed at UTC",
+        f"{companion_instrument['symbol']} market valid/effective at UTC",
         key="gv_command_center_rotation_companion_market_observed_at",
         placeholder="2026-08-04T13:00:00.000000Z",
     )
+    companion_market_knowledge_at = st.text_input(
+        f"{companion_instrument['symbol']} market retrieval/knowledge at UTC",
+        key="gv_command_center_rotation_companion_market_knowledge_at",
+        placeholder="2026-08-04T13:00:30.000000Z",
+    )
     companion_market_source_identity = st.text_input(
-        f"{companion_instrument['symbol']} market source identity",
+        f"{companion_instrument['symbol']} market source/permission identity",
         key="gv_command_center_rotation_companion_market_source_identity",
-        placeholder="operator://date/merid/rotation-market",
+        placeholder="owner-local/permission/manual-v1",
+    )
+    companion_market_receipt = st.text_area(
+        f"{companion_instrument['symbol']} market raw bytes or receipt",
+        key="gv_command_center_rotation_companion_market_receipt",
+        placeholder="Immutable receipt for the companion market packet.",
     )
     companion_target_quantity = st.number_input(
         f"{companion_instrument['symbol']} funded target quantity",
@@ -559,6 +625,38 @@ def _render_operated_rotation_action(
         placeholder="Explain why this exact SELL+BUY transition should be previewed.",
     )
 
+    def _rotation_packet(
+        *,
+        instrument: Mapping[str, Any],
+        value: str,
+        valid_at: str,
+        knowledge_at: str,
+        source_permission: str,
+        receipt: str,
+    ) -> dict[str, str]:
+        try:
+            return build_immutable_market_packet(
+                source_permission_identity=source_permission,
+                raw_bytes_or_receipt=receipt,
+                valid_effective_at=valid_at,
+                retrieval_knowledge_at=knowledge_at,
+                permanent_instrument_identity=str(instrument["permanent_key"]),
+                instrument_id=str(instrument["instrument_id"]),
+                value=value,
+            )
+        except Exception:
+            return {
+                "instrument_id": str(instrument["instrument_id"]),
+                "permanent_instrument_identity": str(instrument["permanent_key"]),
+                "value": value,
+                "valid_effective_at": valid_at,
+                "retrieval_knowledge_at": knowledge_at,
+                "source_permission_identity": source_permission,
+                "raw_bytes_or_receipt": receipt,
+                "unit": "price",
+                "currency": "USD",
+            }
+
     request = {
         "content": evidence_content,
         "locator": source_locator,
@@ -566,18 +664,22 @@ def _render_operated_rotation_action(
         "pit_identity": dict(binding["pit_identity"]),
         "displayed_proposal_binding": dict(binding),
         "forward_operated_market_packets": [
-            {
-                "instrument_id": source_review["instrument_id"],
-                "market_price": source_market_price,
-                "market_observed_at": source_market_observed_at,
-                "market_source_identity": source_market_source_identity,
-            },
-            {
-                "instrument_id": companion_review["instrument_id"],
-                "market_price": companion_market_price,
-                "market_observed_at": companion_market_observed_at,
-                "market_source_identity": companion_market_source_identity,
-            },
+            _rotation_packet(
+                instrument=source_instrument,
+                value=source_market_price,
+                valid_at=source_market_observed_at,
+                knowledge_at=source_market_knowledge_at,
+                source_permission=source_market_source_identity,
+                receipt=source_market_receipt,
+            ),
+            _rotation_packet(
+                instrument=companion_instrument,
+                value=companion_market_price,
+                valid_at=companion_market_observed_at,
+                knowledge_at=companion_market_knowledge_at,
+                source_permission=companion_market_source_identity,
+                receipt=companion_market_receipt,
+            ),
         ],
         "review_updates": [
             {

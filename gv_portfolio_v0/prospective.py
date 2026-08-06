@@ -37,6 +37,12 @@ from gv_portfolio_v0.operated import (
     confirm_initial_portfolio,
     instrument_registry,
 )
+from gv_portfolio_v0.market_packet import (
+    MarketPacketError,
+    build_immutable_market_packet,
+    market_packet_price,
+    normalize_immutable_market_packet,
+)
 from gv_portfolio_v0.operated_scenarios import (
     DEFAULT_SCENARIO_ID,
     OPERATED_PAPER_CAPITAL_SCENARIO_ID,
@@ -80,13 +86,19 @@ class ForwardOperatedDecisionPacket:
     evidence_content: str
     source_locator: str
     evidence_observed_at: str
-    market_price: str
-    market_observed_at: str
-    market_source_identity: str
+    market_packet: dict[str, str]
     target_quantity: str
     principal_claim: str
     operator_rationale: str
     pit_identity: dict[str, Any]
+
+    @property
+    def market_price(self) -> str:
+        return market_packet_price(self.market_packet)
+
+    @property
+    def market_observed_at(self) -> str:
+        return self.market_packet["valid_effective_at"]
 
 
 @lru_cache(maxsize=1)
@@ -586,7 +598,17 @@ def _normalize_review_update(
     }
 
 
+def _instrument_permanent_key(
+    workspace: Mapping[str, Any], instrument_id: str
+) -> str:
+    for row in workspace["instruments"]:
+        if row["instrument_id"] == instrument_id:
+            return _required_text(row.get("permanent_key"), field="permanent_key")
+    raise ProspectiveOperationError("MARKET_PACKET_INSTRUMENT_UNKNOWN")
+
+
 def _normalize_rotation_market_packets(
+    workspace: Mapping[str, Any],
     value: Any,
     *,
     expected_instrument_ids: list[str],
@@ -607,29 +629,20 @@ def _normalize_rotation_market_packets(
             raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_INSTRUMENT_UNKNOWN")
         if instrument_id in packets_by_id:
             raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_INSTRUMENT_DUPLICATE")
-        market_observed_at = _required_text(
-            raw.get("market_observed_at"), field="rotation_market_observed_at"
-        )
-        market_observed_time = _utc_datetime(
-            market_observed_at, field="rotation_market_observed_at"
-        )
-        if market_observed_time <= latest_time:
-            raise ProspectiveOperationError(
-                "MARKET_OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY"
+        try:
+            packet = normalize_immutable_market_packet(
+                raw,
+                expected_instrument_id=instrument_id,
+                expected_permanent_key=_instrument_permanent_key(
+                    workspace, instrument_id
+                ),
+                latest_time=latest_time,
+                observed_time=observed_time,
+                utc_datetime=_utc_datetime,
             )
-        if market_observed_time > observed_time:
-            raise ProspectiveOperationError("MARKET_OBSERVATION_AFTER_EVIDENCE_DECISION")
-        packets_by_id[instrument_id] = {
-            "instrument_id": instrument_id,
-            "market_price": _positive_decimal_text(
-                raw.get("market_price"), field="rotation_market_price"
-            ),
-            "market_observed_at": _utc_timestamp(market_observed_time),
-            "market_source_identity": _required_text(
-                raw.get("market_source_identity"),
-                field="rotation_market_source_identity",
-            ),
-        }
+        except MarketPacketError as exc:
+            raise ProspectiveOperationError(str(exc)) from exc
+        packets_by_id[instrument_id] = packet
     return [packets_by_id[instrument_id] for instrument_id in expected_instrument_ids]
 
 
@@ -750,6 +763,7 @@ def _normalize_request(
         )
         normalized["forward_operated_market_packets"] = (
             _normalize_rotation_market_packets(
+                request_workspace,
                 request.get("forward_operated_market_packets"),
                 expected_instrument_ids=expected_ids,
                 latest_time=latest_time,
@@ -776,23 +790,33 @@ def _normalize_request(
             packet_source.get("instrument_id")
             if isinstance(stored_packet, Mapping)
             else packet_source.get("market_instrument_id")
+            or (
+                packet_source.get("market_packet", {}).get("instrument_id")
+                if isinstance(packet_source.get("market_packet"), Mapping)
+                else None
+            )
         ),
         field="market_instrument_id",
     )
     if instrument_id != update["instrument_id"]:
         raise ProspectiveOperationError("FORWARD_OPERATED_MARKET_INSTRUMENT_MISMATCH")
-    market_observed_at = _required_text(
-        packet_source.get("market_observed_at"), field="market_observed_at"
-    )
-    market_observed_time = _utc_datetime(
-        market_observed_at, field="market_observed_at"
-    )
-    if market_observed_time <= latest_time:
-        raise ProspectiveOperationError(
-            "MARKET_OBSERVATION_TIMESTAMP_NOT_AFTER_AUTHORITY"
+    raw_market_packet = packet_source.get("market_packet")
+    if raw_market_packet is None and not isinstance(stored_packet, Mapping):
+        # Allow top-level market_packet on the observation request.
+        raw_market_packet = request.get("market_packet")
+    if not isinstance(raw_market_packet, Mapping):
+        raise ProspectiveOperationError("MARKET_PACKET_REQUIRED")
+    try:
+        market_packet = normalize_immutable_market_packet(
+            raw_market_packet,
+            expected_instrument_id=instrument_id,
+            expected_permanent_key=_instrument_permanent_key(workspace, instrument_id),
+            latest_time=latest_time,
+            observed_time=observed_time,
+            utc_datetime=_utc_datetime,
         )
-    if market_observed_time > observed_time:
-        raise ProspectiveOperationError("MARKET_OBSERVATION_AFTER_EVIDENCE_DECISION")
+    except MarketPacketError as exc:
+        raise ProspectiveOperationError(str(exc)) from exc
     if isinstance(stored_packet, Mapping):
         expected_packet_bindings = {
             "instrument_id": update["instrument_id"],
@@ -803,6 +827,7 @@ def _normalize_request(
             "principal_claim": update["principal_claim"],
             "operator_rationale": operator_rationale,
             "pit_identity": pit_identity,
+            "market_packet": market_packet,
         }
         for field, expected_value in expected_packet_bindings.items():
             if stored_packet.get(field) != expected_value:
@@ -814,14 +839,7 @@ def _normalize_request(
         evidence_content=content,
         source_locator=locator,
         evidence_observed_at=_utc_timestamp(observed_time),
-        market_price=_positive_decimal_text(
-            packet_source.get("market_price"), field="market_price"
-        ),
-        market_observed_at=_utc_timestamp(market_observed_time),
-        market_source_identity=_required_text(
-            packet_source.get("market_source_identity"),
-            field="market_source_identity",
-        ),
+        market_packet=market_packet,
         target_quantity=update["target_quantity"],
         principal_claim=update["principal_claim"],
         operator_rationale=operator_rationale,
@@ -832,9 +850,9 @@ def _normalize_request(
         "evidence_content": packet.evidence_content,
         "source_locator": packet.source_locator,
         "evidence_observed_at": packet.evidence_observed_at,
+        "market_packet": deepcopy(packet.market_packet),
         "market_price": packet.market_price,
         "market_observed_at": packet.market_observed_at,
-        "market_source_identity": packet.market_source_identity,
         "target_quantity": packet.target_quantity,
         "principal_claim": packet.principal_claim,
         "operator_rationale": packet.operator_rationale,
@@ -958,7 +976,11 @@ def _build_proposal(
             isinstance(forward_packet, Mapping)
             and forward_packet.get("instrument_id") == update["instrument_id"]
         ):
-            after["reference_price"] = forward_packet["market_price"]
+            after["reference_price"] = market_packet_price(
+                forward_packet["market_packet"]
+                if isinstance(forward_packet.get("market_packet"), Mapping)
+                else forward_packet
+            )
         elif isinstance(rotation_packets, list):
             matching_packets = [
                 row
@@ -969,7 +991,7 @@ def _build_proposal(
                 raise ProspectiveOperationError(
                     "OPERATED_ROTATION_MARKET_PACKET_BINDING_MISMATCH"
                 )
-            after["reference_price"] = matching_packets[0]["market_price"]
+            after["reference_price"] = market_packet_price(matching_packets[0])
         after["living_thesis_lite"] = _thesis(
             scenario,
             instrument_id=update["instrument_id"],
@@ -1024,7 +1046,12 @@ def _build_proposal(
             leg = legs[0]
             if leg["instrument_id"] != packet.get("instrument_id"):
                 raise ProspectiveOperationError("CASH_FUNDED_ENTRY_INSTRUMENT_MISMATCH")
-            if leg["reference_price"] != packet.get("market_price"):
+            packet_price = (
+                market_packet_price(packet["market_packet"])
+                if isinstance(packet.get("market_packet"), Mapping)
+                else packet.get("market_price")
+            )
+            if leg["reference_price"] != packet_price:
                 raise ProspectiveOperationError("CASH_FUNDED_ENTRY_PRICE_MISMATCH")
             if int(leg["quantity"]) <= 0:
                 raise ProspectiveOperationError("CASH_FUNDED_ENTRY_QUANTITY_REQUIRED")
