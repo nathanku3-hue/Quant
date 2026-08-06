@@ -1,137 +1,122 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `PAIR-DECISION-SERIES-1 EPISODE 1 IMPLEMENTED; AUDIT/PUBLICATION PENDING; LIVE CLOSED`
+Status: `E2 LOCAL FREEZE COMPLETE; AOV-0 MECHANICAL VERTICAL LOCAL; FIRST REAL SEAL BLOCKED; LIVE CLOSED`
 Date: 2026-08-06
 Published main / terminal tip: `9af5259d49969ba00db1fb3f4b3323ffb1d49205`
-Current candidate base: `7191613f6e3bb00ac2f19eb1201f8723d9d695fe`
-Canonical product maturity: `70/100` (operability, custody, and replay only)
+Episode-1 release-ready tip: `ab258c3b0f1e734a1d0c9d4d8c7f529dfb2e0cbb`
+Episode-2 local immutable candidate: `39f7be3894623c095994066b8f0ea2895b968643`
+AOV-0 local executable tip: `dca69fc72dd3192913aa921323ff48f68610a925`
+Canonical product maturity: `70/100` (accepted operability/custody/replay only)
 Portfolio-alpha evidence: `0`
-Sole product application: `dashboard.py` / Command Center
-Active product slice: `PAIR-DECISION-SERIES-1 — EPISODE 1`
-Real pair: `MU / NVDA / cash`
-Outcome status: `SEALED_NOT_OPENED`
+Sole current application: `launch.py` → `dashboard.py` / Command Center
 Limited Live: `CLOSED; NOT AUTHORIZED`
 
-> This header supersedes historical active-gate language below. Historical sections remain audit context only.
-
-GodView is a local-first, point-in-time certified portfolio operating system. Its product unit is a complete portfolio decision and operating loop, not an isolated stock case and not an optimizer-first research platform.
+GodView is a local-first, point-in-time certified portfolio operating system. The endgame is a recurring experiment-and-review organism, not a larger dashboard or a single optimized backtest:
 
 ```text
-one declared PIT opportunity set
-→ complete portfolio including classified cash and abstentions
-→ prospective operation
-→ deterministic accounting and replay
-→ lifecycle-based review
+immutable PIT reality
+→ deterministic market-state organism
+→ controlled capital policy
+→ same-cut prospective experiment
+→ exact deterministic review
+→ bounded AI mutation
+→ retained positive/negative/neutral/cash evidence
+→ replicated prospective evidence
+→ bounded live authority
 ```
 
 ## Current authority
 
-- [Canonical endgame authority](docs/context/gv_endgame_authority_current.md) — terminal classifications, non-weakenable acceptance, active result, score, and next gate
-- [Frozen Build × Learn roadmap](docs/architecture/godview_v2_frozen_build_learn_roadmap.md) — controlling original quantities and outcomes
-- [PRD](PRD.md) — current product requirements
-- [Phase queue](PHASE_QUEUE.md) — one active product slice
-- [Active brief](docs/context/ACTIVE_BRIEF) — fail-closed selector for the current slice
-- [Planner packet](docs/context/planner_packet_current.md) — compact execution truth
+Read in this order:
 
-If another document conflicts, `docs/context/gv_endgame_authority_current.md`, the frozen roadmap, and `docs/context/ACTIVE_BRIEF` control in that order. A lower-level brief cannot weaken the roadmap without an explicit owner scope decision.
+1. `docs/context/planner_packet_current.md`
+2. `docs/context/gv_endgame_authority_current.md`
+3. `docs/phase_brief/alpha-organism-vertical-0-brief.md`
+4. `docs/architecture/alpha_organism_endgame_current.md`
+5. `docs/checklists/aov0_working_alpha_system_checklist.md`
+6. `docs/architecture/top_level_roadmap.md`
+7. `PRD.md`
 
-## Released substrate
+`docs/context/ACTIVE_BRIEF` is the fail-closed active selector. Historical phase/runtime material is audit evidence only.
 
-Alpha-0 proves one narrow broker-free workflow:
+## Gate A — Episode 2
 
-```text
-launch
-→ review sealed multi-source case
-→ confirm paper NO_POSITION
-→ persist certified result
-→ reopen certified state
-```
+Episode 2 is no longer mutable locally. Exact executable/data/test bytes are committed at `39f7be3` and were reconstructed through `git archive`; the exact selected matrix collects and passes **115/115** tests. The earlier `142/142` receipt is stale and superseded.
 
-The deterministic package passed hosted Windows/Linux builds, extracted-package smoke, exact archive parity, an independent Windows rebuild, and a browser-operated restart pilot. It remains banked substrate.
+Still not performed: branch push, hosted Windows/Linux exact-head proof, independent cross-domain audit, main fast-forward, tag/publication.
 
-Alpha-0 does **not** prove:
+## Gate B — hard cut + AOV vertical
 
-- portfolio operation;
-- decision improvement;
-- alpha;
-- calibrated probabilities;
-- live-capital readiness.
+Local executable tip `dca69fc` implements the hard-cut AOV path:
 
-## Delivery sequence
+- duplicate root app/launch surfaces removed;
+- historical Alpha release preserved as frozen receipt, not a current-root rebuild contract;
+- `dashboard.py` reduced to one canonical authority shell;
+- no legacy book projection;
+- permanent-ID-only Rule100 adapter;
+- immutable content-hash research evidence manifest;
+- named mandatory benchmark contracts;
+- PIT equal weight matched to strategy decision schedule;
+- finite cost policy only;
+- minimal `Q/M/F_proxy/C_proxy/L/R/U` PIT cube;
+- deterministic Rule100 control, Parent, one risk-reducing Child, and hash DAG;
+- five-arm experiment/seal mechanism;
+- deterministic Parent–Child review core;
+- ZERO-COMPAT acceptance scan = zero on all six counters.
 
-`R0 — ROADMAP-CUSTODY-REPAIR` is an internal repository repair, not a product slice.
+The AOV test suite passes `17/17`; hardened research, dashboard/book/receipt, and Episode-2 regression suites also pass locally.
 
-| Slice | Name | Truthful current status |
-|---|---|---|
-| 0 | `GV-MICRO-PORTFOLIO-VERTICAL-0` | **accepted product slice** `85e6601` |
-| 1 | `GV-DETERMINISTIC-REPLAY-0` | **accepted integrity slice** `0e4b93f` |
-| 2 | `GV-BOUNDED-PORTFOLIO-1` | **persisted substrate; original gate incomplete** `abaa814` |
-| 3 | `GV-PORTFOLIO-SCALE-1` | **multi-session harness; original gate incomplete** `c37abf0` |
-| 4 | `GV-UNIVERSE-SCALE-1` | **multi-cell harness; original gate incomplete** `dca67e3` |
-| 5 | `GV-CHALLENGER-PROMOTION-1` | **shadow-custody primitive; original gate incomplete** `3e4dc95` |
-| Repair | `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` | **accepted terminal product** `0d15e9c` / `2349e1b` |
-| Scale repair | `GV-OPERATED-PORTFOLIO-25-1` | **only active product phase; implementation checkpoint; not frozen** |
-| 6 | `GV-LIMITED-LIVE-1` | **CLOSED; NOT_AUTHORIZED** |
+## Executable P0 status
 
-Do not resume automatic phase-label progression. Preserve prior terminals as immutable evidence and run the active 25-security result through the same operated engine, persistence path, application, and view as the retained ten-security regression scenario.
+Frozen in code:
 
-## Build × Learn model
+- permanent ID = `permno`;
+- date-local Rule100 eligible universe;
+- PIT total-return matrix is sole P&L authority;
+- corporate actions are reconciliation-only;
+- `F_proxy = robust_z(sign(return) × min(abs(return)/realized_vol,3) × dollar_volume/ADV20)`;
+- `C_proxy = EWMA20(abs(F_proxy))`;
+- Rule100 equivalence tolerance and retained budget/cap/cash semantics;
+- one frozen V0 engineering configuration with no result-driven calibration;
+- one-bar execution, weekly attempts, fixed 30-calendar-day horizon;
+- dependence-aware weekly inference contract;
+- economic cash follows the pre-existing owner mandate: official SOFR minus 25 bp, ACT/360, no zero floor, only after publication, no proxy substitution;
+- insurance endpoint = CVaR/Expected Shortfall.
 
-Use three mergeable packages rather than seven automatic branches:
+Still owner-open and deliberately `None` in the production contract:
 
-- Truth core — identity, evidence, immutable events, book, cash, NAV, replay skeleton;
-- Decision vertical — thesis, scenarios, admission, capital competition, aim, transition, order/fill;
-- Product closure — launch/review/confirm/persist/reopen, read models, later observation, docs/ops.
+- insurance materiality floor;
+- annual insurance-premium ceiling.
 
-Freeze minimum identity/event seams first. Freeze detailed fields only when the operator fixture exercises them. Learning remains shadow-only and cannot mutate certified history or block the vertical without a P0/P1 correctness failure.
+## First real seal blocker
 
-## Immediate product target
+`python scripts/aov0_first_seal.py` currently returns `BLOCKED_OWNER_DECISION_AND_ADMITTED_INPUTS`, `prospective_clock_started=false`, `alpha_evidence=0`.
 
-`GV-OPERATED-PORTFOLIO-25-1` must ship one scalable operator loop:
-
-```text
-review exactly 25 distinct permanent identities across at least two meaningful clusters
-→ inspect owned evidence/thesis state and one competition across all 25
-→ confirm one portfolio and fund multiple positions with classified residual cash
-→ persist and reopen
-→ record one explicit no-change observation
-→ persist and reopen
-→ authorize at least one SELL/REDUCE plus one BUY/FUND from exact target deltas
-→ reconcile positions, cash, costs, NAV, and zero residual
-→ persist, restart, reopen, correct append-only, and explain changed why
-→ prove exact replay and complete the flow within four required actions
-```
-
-The shared product entrypoint is `operated_portfolio_app.py`; `launch_operated_portfolio.py` retains the ten-security regression and `launch_operated_portfolio_25.py` selects the 25-security scenario. One engine, storage path, application, and view serve both scenarios. The phase is not accepted until one frozen SHA passes exact-head Windows/Linux, controlled base/candidate comparison, and independent A/B/C.
-
-## Forbidden on the current path
-
-- provider acquisition programmes;
-- broad historical loaders;
-- optimizer-first allocation;
-- empirical copula or MES production authority;
-- automated graph contagion;
-- adaptive intraday execution;
-- tactical production capital;
-- shorting, leverage, derivatives, or broker routing;
-- live capital;
-- alpha claims.
-
-## Existing local entry points
-
-Alpha-0 released product:
+It requires the two insurance owner values plus these admitted current artifacts:
 
 ```text
-python launch_alpha.py
+data/aov0/current/rule100_targets.parquet
+data/aov0/current/vertical_primitives.parquet
+data/aov0/current/total_returns.parquet
+data/aov0/current/official_sofr.parquet
+data/aov0/current/decision_cut.json
 ```
 
-Legacy development console:
+The repository has historical canonical data, but no current admitted permanent-ID Rule100 target package and no admitted current official-SOFR package for this seal. Provider access was not authorized, so no substitute was fetched or invented.
+
+## North star
+
+The next product result is **the first immutable real five-arm prospective seal**, not another architecture phase. Once sealed, prospective calendar time runs while deterministic review lineage/fixtures are finished. After a matured ReviewPacket, the minimum AI loop is:
 
 ```text
-.venv\Scripts\python -m pytest
-.venv\Scripts\python launch.py
-# or
-.venv\Scripts\streamlit run app.py
+ReviewPacket
+→ one bounded MutationManifest
+→ deterministic compile
+→ development run
 ```
 
-Use Python 3.12+ and the project `.venv`.
+The model portfolio then grows toward Safety Parent, Champion, 1–3 Challengers, Negative Control, and Sentinel.
+
+## Claims and forbidden scope
+
+Portfolio-alpha evidence remains exactly `0`; no A1 empirical AOV result or A3 prospective outcome is claimed. No provider programme, broad source-app sweep, event/pattern authority, optimizer/RL-first path, broker, live capital, leverage, shorting, derivatives, compatibility restoration, or score uplift is authorized.

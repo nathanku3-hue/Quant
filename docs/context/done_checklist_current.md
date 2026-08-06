@@ -1,36 +1,83 @@
 # Done Checklist — Current
 
 Date: 2026-08-06
-Gate: `PIT-SOURCE-AUTHORITY-1`
-Prior gate: `PIT-ALPHA-AUTHORITY-CUT-1` published and closed
-Status: `ALPHA CUT ON MAIN; SOURCE AUTHORITY SLICE OPEN`
-Canonical score: `70/100` (operability / custody / replay only)
+Active gate: `FIRST REAL AOV-0 FIVE-ARM PROSPECTIVE SEAL`
+Canonical score: `70/100`
+Portfolio-alpha evidence: `0`
 
-## Closed — PIT-ALPHA-AUTHORITY-CUT-1 publication
+## Closed locally
 
-- [x] Candidate starts from exact advertised main `e4cf949`.
-- [x] Cleanup C `a927451` deletes exactly 91 residue paths.
-- [x] Product P `9af5259` installs sole Command Center operated loop.
-- [x] Fresh-clone product/context proof `123/123`.
-- [x] Three independent focus reviews PASS.
-- [x] Preservation `F_PASS` (two tars, 35 comparisons, 41 receipts, mirrored).
-- [x] Hosted Windows/Ubuntu proof banked with the cut.
-- [x] Main advanced by fast-forward only: `e4cf949..9af5259`.
-- [x] Remote `main == 9af5259`.
-- [x] Terminal tag `pit-alpha-authority-cut-1-terminal` → exact `9af5259`.
-- [x] No squash, rebase, merge commit, or tip rewrite.
-- [x] Canonical score reassessed to `70/100` for operability/custody/replay only.
+- [x] Published prior authority remains `9af5259`; untouched this round.
+- [x] `launch.py` → `dashboard.py` is the sole current root product application.
+- [x] Episode 1 remains banked at `ab258c3`.
+- [x] Episode 2 immutable local candidate exists at `39f7be3`.
+- [x] Episode 2 exact archived selected matrix passes `115/115`.
+- [x] Stale `142/142` receipt superseded.
+- [x] AOV hard-cut/mechanical executable is locally committed through `dca69fc`.
+- [x] Root duplicate Alpha/Portfolio app launch surfaces removed.
+- [x] Current-root legacy Alpha rebuild contract removed; historical release is receipt-only.
+- [x] ZERO-COMPAT scan all zero.
+- [x] Hardened research runner/benchmarks/evidence/Rule100 semantics.
+- [x] Minimal PIT AOV cube.
+- [x] Rule100 control / deterministic Parent / one frozen Child.
+- [x] Hash DAG and selective recomputation.
+- [x] Five-arm evidence and seal/reopen mechanics.
+- [x] Economic cash constructor follows official SOFR−25bp owner mandate.
+- [x] Deterministic Parent–Child review core.
 
-## Open — PIT-SOURCE-AUTHORITY-1
+## Open — external Episode-2 custody
 
-- [x] Immutable bitemporal market packet schema with SHA-256 identity.
-- [x] Replace free-text `operator://` market authority in entry and rotation.
-- [x] Packet survives preview → confirm → persist → certify → reopen exactly.
-- [x] Tamper/stale/missing fields fail closed.
-- [x] Focused dashboard/PIT tests green; no second application path.
+- [ ] Push exact `39f7be3` candidate.
+- [ ] Hosted Windows exact-head proof.
+- [ ] Hosted Ubuntu exact-head proof.
+- [ ] Independent cross-domain audit.
+- [ ] Owner-authorized FF/tag publication if sought.
+
+These are external and were explicitly outside this local authorization.
+
+## Open — owner P0
+
+- [ ] Insurance materiality floor ratio.
+- [ ] Annual insurance-premium ceiling.
+
+The production AOV contract leaves both unresolved; no silent numeric default is allowed.
+
+## Open — admitted current first-seal inputs
+
+- [ ] `data/aov0/current/rule100_targets.parquet`.
+- [ ] `data/aov0/current/vertical_primitives.parquet`.
+- [ ] `data/aov0/current/total_returns.parquet`.
+- [ ] `data/aov0/current/official_sofr.parquet`.
+- [ ] `data/aov0/current/decision_cut.json`.
+
+## Open — first real seal / evidence
+
+- [ ] First real five-arm same-cut prospective seal.
+- [ ] Exact real-seal reopen.
+- [ ] Prospective clock starts.
+- [ ] Recurring weekly attempts.
+- [ ] `A1` admitted real exploratory AOV evidence.
+- [ ] `A3` matured prospective evidence.
+
+## Open — review closure while clock runs
+
+- [ ] score→target→executed-weight→P&L lineage artifact.
+- [ ] global-redistribution fixture.
+- [ ] regime-transition fixture.
+- [ ] corporate-action/total-return reconciliation fixture.
+- [ ] cohort/regime packet and complete deterministic B0 ontology.
+
+## Open — after matured ReviewPacket
+
+- [ ] first bounded AI MutationManifest.
+- [ ] deterministic compile and development run.
+- [ ] model portfolio: Safety Parent / Champion / 1–3 Challengers / Negative Control / Sentinel.
+- [ ] hidden OOS.
+- [ ] independent future replication.
 
 ## Claim boundary
 
-- [x] Score is not alpha, source-quality, realized-value, broker, or live-readiness.
+- [x] Mechanical/test seals are not A1/A3 evidence.
+- [x] Portfolio-alpha evidence remains `0`.
 - [x] Limited Live remains closed.
-- [x] No provider programme, optimizer, broker, historical repair, or compatibility layer.
+- [x] No compatibility restoration, second app/engine, provider breadth, AOV-2/event authority, optimizer/RL-first path, broker, or live capital.

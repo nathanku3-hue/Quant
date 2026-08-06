@@ -1,108 +1,130 @@
 # GodView Endgame Authority — Current
 
 Date: 2026-08-06
-Active gate: `PAIR-DECISION-SERIES-1 — EPISODE 1`
-Status: `IMPLEMENTED LOCALLY; AUDIT/PUBLICATION PENDING; LIVE CLOSED`
-Canonical product maturity: `70/100` (operability, custody, and replay only)
+Active product gate: `FIRST REAL AOV-0 FIVE-ARM PROSPECTIVE SEAL`
+Status: `E2 LOCAL IMMUTABLE; AOV HARD CUT + MECHANICAL VERTICAL LOCAL; REAL SEAL BLOCKED OWNER + DATA; LIVE CLOSED`
+Canonical product maturity: `70/100`
 Portfolio-alpha evidence: `0`
 Limited Live: `CLOSED; NOT AUTHORIZED`
 
-## Canonical direction
+## Canonical product direction
 
-GodView is one point-in-time certified portfolio operating system operated through `dashboard.py` / Command Center. Strategy and evidence packages emit immutable decisions; domain authorities own accounting, persistence, certification, and replay; the dashboard owns request composition and display only.
-
-The shortest endgame path is temporal evidence, not another engine or immediate security breadth:
+GodView is one local-first PIT-certified portfolio operating system operated through `launch.py` → `dashboard.py` / Command Center. Deterministic systems own admitted data, permanent identity, formulas, target weights, accounting, evidence, review classification, and risk authority. AI begins only from validated ReviewPackets and may propose bounded mutations; it does not own truth or risk.
 
 ```text
-source-bound real pair
-→ sealed forward episode 1
-→ episode 2
-→ episode 3+
-→ preregistered outcome opening
-→ retained positive, neutral, negative, and abstention evidence
+immutable PIT reality
+→ deterministic model organism
+→ real immutable prospective experiment
+→ matured deterministic review
+→ bounded AI mutation
+→ model-portfolio research-capital allocation
+→ hidden/future prospective replication
+→ bounded live authority
 ```
 
-## Published substrate
+## Banked / local custody
 
-`PIT-ALPHA-AUTHORITY-CUT-1` remains published and closed:
+- Published prior authority remains `9af5259`; unchanged.
+- Episode 1 remains banked at `ab258c3`.
+- Episode 2 local immutable candidate = `39f7be3894623c095994066b8f0ea2895b968643`.
+- Exact `39f7be3` archived-byte selected matrix = `115/115 PASS`; `142/142` is superseded.
+- Episode-2 push, hosted Windows/Linux, independent audit, FF/tag publication remain external/unperformed.
 
-- main / terminal tip `9af5259d49969ba00db1fb3f4b3323ffb1d49205`;
-- terminal tag `pit-alpha-authority-cut-1-terminal` → exact `9af5259`;
-- one Command Center, atomic persistence, certification lineage, exact reopen, residual `0`;
-- no rewrite of that terminal identity.
+## AOV local executable authority
 
-`7191613f6e3bb00ac2f19eb1201f8723d9d695fe` is the clean remote-equal source-packet candidate base. It proved immutable custody of supplied assertions but still allowed the UI to author price, source, permission, receipt, and market timestamps. That overclaim is repaired inside the integrated pair episode, not terminalized separately.
-
-## Active product result
-
-`PAIR-DECISION-SERIES-1` episode 1 uses:
-
-- one pinned Cboe BZX MU/NVDA market-source capture;
-- one permission manifest;
-- one XML-row parser;
-- one common PIT cut;
-- instrument-bound MU and NVDA rows;
-- independently hashed MU and NVDA packets;
-- banked-only MU and NVDA subject packages;
-- a real MU / real NVDA / cash comparison;
-- a sealed forward cash/abstention decision.
-
-The operator cannot author market authority. Manual market price, source, permission, receipt, and time controls are removed without compatibility. Synthetic `MERID` is absent from acceptance.
-
-Both subject packages remain `ABSTAIN / NO_POSITION`; episode 1 honestly retains certified cash. The result has no orders, fills, costs, or unexplained residual and opens no outcome data.
-
-## Series authority
-
-Episode 1 seals into proposal, event, certification, persistence, and replay identity:
-
-- `decision_series_id`;
-- `episode_number = 1`;
-- `decision_cut_id`;
-- `outcome_horizon_spec`;
-- `outcome_open_not_before`;
-- `comparator_spec`;
-- `cost_model_id`;
-- `decision_policy_version`;
-- `source_contract_version`.
-
-Outcome data remains `SEALED_NOT_OPENED` until the preregistered rule permits opening.
-
-## Current evidence
-
-- Focused integrated local matrix: `71/71 PASS`.
-- Mutation-free preview: PASS.
-- Confirm cash/abstention and reject-all: PASS.
-- Atomic persistence and certification lineage: PASS.
-- Fresh-process exact reconstruction: PASS.
-- Cash `11000`, costs `0`, positions empty, residual `0`.
-- One inherited non-blocking `websockets.legacy` deprecation warning.
-- Independent cross-domain audit: pending against immutable candidate SHA.
-- Hosted exact-head proof: pending candidate push.
-
-## Publication law
-
-Publication is fail-closed:
+Local lineage:
 
 ```text
-candidate push
-→ review-only PR / hosted exact-head checks
-→ one independent cross-domain audit
-→ audit PASS
-→ owner-authorized git merge --ff-only
-→ push main
-→ annotated pair-decision-series-1-e1-terminal tag
-→ local main == origin/main == peeled tag
+39f7be3 Episode-2 freeze
+→ 4b14846 hard cut + AOV vertical
+→ dca69fc explicit owner-insurance boundary
 ```
 
-No publication occurs unless the owner can perform or authorize the exact fast-forward and any protected-branch bypass. No squash, rebase, merge commit, force push, or tag rewrite.
+`dca69fc72dd3192913aa921323ff48f68610a925` is the current local AOV executable tip before documentation closure.
 
-## Claim and scope boundary
+Current AOV path has one app/engine/permanent-ID/return/evidence/benchmark semantics and zero compatibility aliases under the machine scan.
 
-- Canonical product maturity remains `70/100`; fixing an overclaim earns no score uplift.
-- Portfolio-alpha evidence remains exactly `0`.
-- No provider framework, new engine, optimizer, broker, advice, live capital, compatibility path, outcome opening, or 5/25-security expansion.
+## Frozen executable contract
+
+Frozen:
+
+- permanent ID `permno`;
+- date-local Rule100 universe;
+- PIT total-return matrix sole P&L authority;
+- corporate actions reconciliation-only;
+- coherent `F_proxy/C_proxy` formulas;
+- Rule100 equivalence + inherited gross-budget/cap/schedule/cash semantics;
+- one frozen V0 engineering configuration;
+- one risk-reducing Child mutation;
+- one-bar execution, weekly attempts, 30-calendar-day horizon;
+- paired weekly dependence-aware inference;
+- official SOFR − 25 bp economic cash, ACT/360, no zero floor, after publication only, no proxy substitution;
+- Expected Shortfall / CVaR insurance endpoint.
+
+Owner-open and deliberately unresolved in production:
+
+- insurance materiality floor ratio;
+- annual insurance-premium ceiling.
+
+## Mechanical capability
+
+Implemented and locally validated:
+
+- hardened canonical research spine;
+- minimal PIT vertical cube;
+- Rule100 / Parent / Child;
+- hash DAG and selective recomputation;
+- five-arm experiment/evidence machinery;
+- immutable prospective seal/reopen machinery;
+- deterministic review core;
+- ZERO-COMPAT six-count all-zero gate.
+
+Mechanical/test seals are not empirical or prospective evidence.
+
+## First real seal blocker
+
+Owner decisions above plus these admitted current files:
+
+```text
+data/aov0/current/rule100_targets.parquet
+data/aov0/current/vertical_primitives.parquet
+data/aov0/current/total_returns.parquet
+data/aov0/current/official_sofr.parquet
+data/aov0/current/decision_cut.json
+```
+
+`python scripts/aov0_first_seal.py` currently returns `BLOCKED_OWNER_DECISION_AND_ADMITTED_INPUTS`, `prospective_clock_started=false`, `alpha_evidence=0`.
+
+No historical equal-weight replay or synthetic fixture may be relabeled to satisfy this gate.
+
+## Review / AI boundary
+
+Deterministic review core exists. Finish full score→target→executed-weight→P&L lineage plus redistribution/regime/corporate-action fixtures while the first real clock runs. A single episode cannot authorize structural mutation.
+
+After the first matured valid ReviewPacket, the earliest AI loop is:
+
+```text
+ReviewPacket → one MutationManifest → deterministic compile → development run
+```
+
+## Model portfolio direction
+
+After real review evidence begins:
+
+- Safety Parent;
+- Champion;
+- 1–3 Challengers;
+- Negative Control;
+- Sentinel.
+
+## Claim boundary
+
+- Canonical maturity remains `70/100`.
+- Portfolio-alpha evidence remains `0`.
+- No admitted real A1 result or real prospective A3 evidence is claimed.
+- No provider programme, AOV-2/event authority, optimizer/RL-first path, compatibility restoration, broker, live capital, leverage, shorting, derivatives, or alpha claim.
 - Limited Live remains closed.
 
-## Next gate
+## Next action
 
-After terminal equality is proved, execute episode 2 under the unchanged pair, comparator, cost, policy, outcome-horizon, and source contracts. Expand breadth only if the sequential series proves breadth is the actual constraint.
+Freeze the two insurance budget values, admit the five current AOV input artifacts, and execute the first real immutable five-arm seal immediately.

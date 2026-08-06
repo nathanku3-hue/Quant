@@ -2,7 +2,55 @@
 
 Date: 2026-05-26
 Scope: Terminal Zero / Quant research, replay, backtest, optimizer, candidate-card, and dashboard promotion boundaries.
-Status: Draft decision record for implementation.
+Status: `CANONICAL RESEARCH SPINE HARDENED LOCALLY; AOV MECHANICS GREEN; REAL SEAL INPUT/OWNER AUTHORITY OPEN`
+
+## 2026-08-06 AOV-0 Hard-Cut Research Validity Addendum
+
+Local hardening through executable tip `dca69fc` makes these current non-negotiable validity rules:
+
+- evidence/frame signatures hash actual cell content;
+- evidence run identity is immutable and final `evidence_manifest.json` binds exact component bytes;
+- costs must be finite;
+- benchmark contracts are named/closed and require implicit cash, PIT equal-weight eligible universe, and economic cash;
+- primary benchmark selection is explicit, never list/dict-order dependent;
+- PIT equal weight uses the same decision/rebalance schedule as the strategy;
+- AOV Rule100 input requires permanent `permno`, exact `daily_portfolio` semantics, and reconciled residual cash; ticker/asset aliases are invalid;
+- economic cash is official SOFR minus 25 bp, ACT/360, post-publication only, no proxy substitution;
+- production insurance materiality/premium values remain owner-open, so prospective seal/review classification fails closed until supplied;
+- historical/synthetic/equal-weight artifacts cannot be relabeled as admitted current Rule100/PIT inputs.
+
+The local mechanical AOV path passes its tests, but no admitted real A1 result or real prospective A3 evidence exists. The first real seal remains the active validity boundary.
+
+## 2026-08-06 AOV-0 Research Validity Addendum
+
+The existing `research/` runner, strategy cartridge, benchmarks, evidence schema, metrics, status vocabulary, and Rule100 replay adapter are the canonical substrate for `ALPHA-ORGANISM-VERTICAL-0`. AOV-0 must extend this spine rather than create another backtester or evidence authority.
+
+AOV-0 validity law:
+
+```text
+one PIT cube/version
++ one eligible-universe identity
++ one total-return matrix authority
++ one execution lag and cost contract
++ Rule100 / Parent / Child / PIT-EW / Economic-Cash arms
++ one experiment identity
++ one prospective seal/opening contract
+= one comparable evidence family
+```
+
+Required corrections before implementation is research-valid:
+
+- `F_proxy` and `C_proxy` must be dimensionally coherent;
+- Parent must inherit the existing Rule100 budget/cap/lifecycle/cash semantics rather than force full investment through an independent softmax;
+- dynamic terms disabled must reproduce Rule100 target weights within the frozen tolerance;
+- Reversal Hazard is a bounded insurance overlay and is evaluated by a preregistered safety endpoint subject to an insurance-premium ceiling, not by a contradictory positive-return requirement;
+- PIT total-return data is the sole P&L authority; corporate-action records are reconciliation-only;
+- engine cash, economic cash, and future broker cash remain distinct;
+- sleeve overlap and formal inference use one preregistered dependence-aware policy derived from the actual decision frequency and holding horizon;
+- development success may nominate a prospective candidate but cannot promote a champion;
+- seals are not alpha evidence; A3 begins only when outcomes mature and open.
+
+`docs/checklists/aov0_working_alpha_system_checklist.md` controls the unresolved decisions and evidence gates.
 
 ## 2026-06-02 V2-D0.1 Follow-Up Validity Addendum
 

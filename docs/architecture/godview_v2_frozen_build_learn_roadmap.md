@@ -1,360 +1,173 @@
-# GodView v2 Corrected Build × Learn Roadmap
+# GodView Frozen Build × Learn Roadmap
 
-Status: `R0_BANKED; INDEPENDENT_AUDIT_PENDING`
-Date: 2026-07-29
-Released substrate: `gv-alpha0-paper-decision-v0.1.0` (`a88ed05`), release-proof tip `93e7a55`
-Current shipped truth: score `39/100`, observed comparisons `0`, no alpha claim
-Roadmap authority: branch tip containing this R0 repair, designated `ROADMAP_FREEZE_COMMIT`
+Status: `SUPERSEDED SEQUENTIAL SLICE ROADMAP; CURRENT AOV ROADMAP FROZEN`
+Date: 2026-08-06
+Canonical authority: `docs/context/gv_endgame_authority_current.md`
+Current roadmap: `docs/architecture/top_level_roadmap.md`
+Method authority: `docs/architecture/alpha_organism_endgame_current.md`
 Active brief selector: `docs/context/ACTIVE_BRIEF`
+Canonical product maturity: `70/100`
+Portfolio-alpha evidence: `0`
 
-## 1. Corrected decision
+## 2026-08-06 Local execution addendum
 
-The prior roadmap was a validated but unbanked candidate. It incorrectly treated a contract catalogue as the first product slice and retained highest-numeric-phase tooling as active authority.
-
-R0 repairs that once, then the product sequence begins with the missing user capability: one complete multi-security portfolio operating loop.
-
-```text
-R0 ROADMAP-CUSTODY-REPAIR                  = INTERNAL / BANKED / AUDIT_PENDING
-PRODUCT_SEQUENCE                           = SLICES_0_TO_6
-EXECUTION_AUTHORIZED_AFTER_R0_AUDIT        = SLICES_0_TO_1
-ACTIVE_PRODUCT_SLICE                       = GV-MICRO-PORTFOLIO-VERTICAL-0
-NEXT_INTEGRITY_GATE                        = GV-DETERMINISTIC-REPLAY-0
-OPEN_ENDED_ARCHITECTURE_DISCOVERY          = CLOSED
-```
-
-Binding sequence:
+The prior staged wording below is now implementation history. Current execution is two-gate and first-seal-first:
 
 ```text
-R0 ROADMAP-CUSTODY-REPAIR
-→ GV-MICRO-PORTFOLIO-VERTICAL-0
-→ GV-DETERMINISTIC-REPLAY-0
-→ GV-BOUNDED-PORTFOLIO-1
-→ GV-PORTFOLIO-SCALE-1
-→ GV-UNIVERSE-SCALE-1
-→ GV-CHALLENGER-PROMOTION-1
-→ GV-LIMITED-LIVE-1
+Gate A: Episode-2 local freeze @ 39f7be3 -> exact 115/115 PASS
+Gate B: hard cut + AOV mechanical vertical through dca69fc
+→ owner insurance budget + five admitted current inputs
+→ FIRST REAL FIVE-ARM PROSPECTIVE SEAL
+→ clock runs while deterministic review closure finishes
+→ matured ReviewPacket
+→ bounded AI MutationManifest
+→ model portfolio
 ```
+
+AOV-0's hard cut is already implemented locally: one root app, one engine, permanent IDs only, no legacy book projection, no current-root legacy release rebuild contract, immutable evidence manifests, named benchmarks, schedule-consistent PIT-EW, minimal cube, Rule100/Parent/Child/DAG, seal/reopen mechanics, and deterministic review core. ZERO-COMPAT is all zero.
+
+Production insurance materiality floor and annual premium ceiling remain owner-open. Economic cash is resolved by prior owner authority: official SOFR minus 25 bp, ACT/360, no zero floor, post-publication only, no proxy substitution. No real A1/A3 evidence has been earned.
+
+Sections below remain methodological/historical context where they do not conflict with this addendum.
+
+## 1. Supersession decision
+
+The earlier automatic sequence of micro-portfolio, replay, bounded portfolio, scale, universe scale, challenger promotion, and limited live is retained as historical architecture context only. Its useful deterministic custody, book, replay, and product seams remain banked, but numeric slice progression no longer controls the product roadmap.
+
+The current Build × Learn sequence is:
+
+```text
+Episode-2 custody closeout
+→ ALPHA-ORGANISM-VERTICAL-0
+→ AOV-0.5 deterministic review
+→ controlled sibling experiments
+→ AI bounded mutations
+→ prospective replication
+→ bounded live consideration
+```
+
+Episode 3 and a universal PIT data platform are removed from the critical path.
 
 ## 2. Product law
 
-The canonical product unit is:
+The product unit is now a complete **experiment-and-review portfolio loop**:
 
 ```text
 one declared PIT opportunity set
-→ complete portfolio including classified cash, rejection, and abstention
+→ one frozen multi-arm portfolio decision
 → prospective operation
-→ deterministic accounting and replay
-→ lifecycle-based review
+→ deterministic accounting and exact reopen
+→ mature outcome review
+→ one bounded next experiment
 ```
 
-GodView is not an optimizer-first research platform. It is a point-in-time portfolio operating system in which research earns bounded capital authority through prospective operation and replayable evidence.
+The product does not earn progress from isolated schemas, infrastructure, security count, or model count. Progress is earned by complete vertical loops that generate decision-relevant prospective evidence.
 
-## 3. R0 — Roadmap custody repair
+## 3. Authority separation
 
-R0 is not marketed, scored, or accepted as a product slice.
+### Deterministic authority
 
-Required outcomes:
+- PIT source, identity, timing, and total-return authority;
+- feature formulas and parameter contracts;
+- target weights, cash, capacity, and risk limits;
+- accounting, costs, persistence, certification, and replay;
+- evidence status, search debt, promotion, demotion, and kill switches.
 
-- explicitly supersede stale instructions that branch implementation from raw `93e7a55`;
-- remove standalone `GV-CANON-RESET-0` from the product sequence;
-- preserve released `gv_fs0_v1` unchanged;
-- require a new `gv_portfolio_v0` namespace for portfolio work;
-- replace highest-numeric-phase authority with `docs/context/ACTIVE_BRIEF`;
-- fail closed when the active pointer is absent or invalid;
-- retain numeric discovery only behind explicit migration flag `--allow-legacy-discovery`;
-- retire the Phase 66 bridge from active authority;
-- reconcile root product docs, current truth, decision log, lessons, SAW evidence, and handover;
-- bank and push one checkoutable `ROADMAP_FREEZE_COMMIT`;
-- leave the dirty root checkout untouched.
+### AI authority
 
-R0 acceptance is independent-audit evidence, not self-declaration.
+- interpret admitted evidence;
+- map events or derived patterns into candidate state updates;
+- summarize deterministic review artifacts;
+- propose one bounded experiment or MutationManifest;
+- allocate approved research/compute budgets.
 
-## 4. Authority separation
+AI cannot write market truth, silently change formulas, create unrestricted executable strategy code, query unlimited hidden OOS, promote itself, increase risk, or hold broker credentials.
 
-Deterministic pipelines own admitted facts, calculations, official thesis state, portfolio aims, capital, orders, fills, accounting, attribution, and authority decisions.
+## 4. Seven-plane architecture
 
-Agents may extract, normalize, propose hypotheses, find contradictions, propose analogies, and interpret deterministic outputs. Agents may not directly assign canonical probabilities, weights, orders, official falsification, promotion, or demotion.
+1. Truth — immutable PIT data, identity, events, return authority, outcomes.
+2. Interpretation — deterministic transforms plus bounded event/pattern interpretation.
+3. Theory — state model, model genome, MutationManifest, deterministic compiler.
+4. Experiment — canonical runner, benchmarks, DAG, vaults, prospective seals.
+5. Review — exact attribution, failure ontology, epistemic memory.
+6. Policy — eligibility, cash, weights, capacity, risk, paper execution.
+7. Governance — experiment identity, search debt, promotion/demotion, sentinel authority.
 
-Historical model output may generate present-day research proposals. It cannot be projected backward as historical decision authority.
+## 5. AOV-0
 
-## 5. Layered architecture
-
-### L0 — Authority and custody
-
-Immutable evidence versions, raw objects, admission timestamps, frozen decision manifests, permanent instrument identity, corporate-action events, and invocation custody.
-
-### L1 — Accounting and portfolio book
-
-Positions, quantities, classified cash, receivables, liabilities, fixture-required lots, raw marks, NAV, and reconciliation.
-
-### L2 — Strategy and thesis
-
-Candidate admission, Living Thesis state, milestones, economic falsifiers, scenarios, reference evidence, and bounded proposals.
-
-### L3 — Portfolio and capital
-
-Opportunity floors, candidate-specific capacity, simultaneous capital competition, cash classification, concentration, dependency, liquidity, and simple stress limits.
-
-### L4 — Transition and execution
-
-Current-versus-aim comparison, deterministic hysteresis, mandatory-action overrides, authorized transition, paper orders/fills, and cost custody.
-
-### L5 — Replay and certification
-
-Exact state reconstruction, correction lineage, corporate-action and partial-fill fixtures, accounting attribution, thesis-state replay, and certification.
-
-### L6 — Scale and bounded challengers
-
-Repeated portfolio operation, portfolio throughput, universe custody, challenger promotion, and separately authorized limited-live eligibility.
-
-## 6. Minimum seams and parallelism law
-
-Freeze these cross-layer seams before parallel implementation:
-
-- `InstrumentId`;
-- `EventId`;
-- `EvidenceReference`;
-- `PortfolioBookEvent`;
-- `DecisionSnapshotId`;
-- `PortfolioAimId`;
-- `OrderId`;
-- `FillId`;
-- `CertificationId`.
-
-Corrected interface rule:
+Purpose: prove the first persistent alpha organism through one canonical stack.
 
 ```text
-freeze minimum cross-layer seams before parallel work
-freeze field-level detail only when the operator fixture exercises it
+VERTICAL-CUBE-SLICE-V0
+→ Rule100 control
+→ deterministic Parent
+→ one frozen Child mutation
+→ five-arm comparison
+→ prospective seal
+→ exact reopen
 ```
 
-Maximum parallelism means maximum independent executable work, not maximum branch or worker count.
+AOV-0 reuses the existing canonical research runner and `core.engine.run_simulation`. It does not create a second engine, a second app, or a universal data framework.
 
-A package may run separately only when:
+### P0 contract closure
 
-- it owns disjoint files;
-- its seam is exercised by the shared fixture;
-- it can merge independently;
-- its failure does not force redesign of every package.
+Before AOV-0 implementation is considered complete, explicitly freeze:
 
-## 7. Three mergeable work packages
+- `F_proxy/C_proxy` mathematics;
+- Rule100 equivalence and Parent policy;
+- insurance endpoint and premium budget;
+- total-return and cash authority;
+- sleeve execution/horizon;
+- PIT universe;
+- V0 parameters;
+- inference policy.
 
-### Package A — Truth core
+## 6. AOV-0.5
 
-Combines conceptual lanes B0 Authority/Custody, B1 Book/Accounting, and B4 Replay skeleton.
-
-Owns:
-
-- permanent IDs and aliases;
-- immutable events;
-- content-addressed evidence references;
-- book reducer;
-- classified cash and NAV reconciliation;
-- replay API skeleton.
-
-### Package B — Decision vertical
-
-Combines conceptual lanes B2 Strategy/Thesis and B3 Portfolio/Execution.
-
-Owns:
-
-- Living Thesis Lite;
-- Bull/Base/Bear ranges;
-- candidate outcomes: admit, reject, abstain, cash;
-- deterministic capital competition;
-- portfolio aim and transition;
-- paper order and fill.
-
-### Package C — Product closure
-
-Combines conceptual lanes B5 Operator and B6 Docs/Ops.
-
-Owns:
-
-- launch/review/confirm/persist/reopen;
-- read models;
-- acceptance-fixture orchestration;
-- later-observation explanation;
-- authority synchronization.
-
-Learn work may run in shadow only when it cannot mutate the prospective book, cannot create competing authority, and cannot block delivery without a P0/P1 correctness finding.
-
-## 8. Slice 0 — `GV-MICRO-PORTFOLIO-VERTICAL-0`
-
-Purpose: ship one complete prospective portfolio operating loop, not a schema catalogue.
-
-Demo target:
+AOV-0.5A is deterministic and should be built before real outcomes mature:
 
 ```text
-launch
-→ review 3–5 securities, benchmark, and classified cash
-→ inspect principal thesis, substitute, competitor, and rejection
-→ confirm portfolio aim
-→ generate deterministic paper order and fill
-→ certify book
-→ persist
-→ reopen
-→ admit one later observation
-→ explain what changed and why
+observed arm returns
+→ exact gross/cost/net reconciliation
+→ node-to-P&L lineage
+→ zero-residual/fail-closed verdict
 ```
 
-Minimum custody scope:
+AOV-0.5B0 adds a deterministic closed failure ontology. AI review is layered only after the mechanical artifact is validated.
 
-- content-addressed evidence references;
-- permanent instrument IDs plus aliases;
-- immutable event identity;
-- one core corporate-action path actually exercised.
+## 7. Controlled learning
 
-Minimum book scope:
+A single episode cannot trigger structural mutation. Cohort/regime evidence may open one fixed sibling family. Development success means nomination for a new prospective seal, not promotion.
 
-- positions by permanent instrument ID;
-- classified cash;
-- receivables and costs only when exercised;
-- NAV reconciliation;
-- immutable original decision snapshot.
+Search debt records raw variants, mutation families, degrees of freedom, hidden queries, and prospective nominations. Failed, neutral, cash, and blocked experiments remain permanent memory.
 
-Minimum strategy scope:
+## 8. Evidence ladder
 
-- Living Thesis Lite;
-- Bull/Base/Bear ranges;
-- one hard economic falsifier;
-- admit, reject, abstain, and cash outcomes.
+- `A0`: pipeline efficiency and mechanical lineage;
+- `A1`: exploratory canonical historical evidence;
+- `A2`: query-metered hidden OOS;
+- `A3`: matured prospective paper evidence;
+- `A4`: independent future replication;
+- `A5`: limited-live operational parity.
 
-Minimum portfolio/execution scope:
+The current portfolio-alpha evidence count is `0`.
 
-- deterministic capital competition;
-- target quantities or weights;
-- one transition;
-- one paper order and fill;
-- no optimizer.
+## 9. Enrichment after the base organism
 
-Minimum product scope:
+Only after AOV-0 works:
 
-- new portfolio entry point;
-- released `alpha_app.py` and `gv_fs0_v1` remain unchanged;
-- one complete operator workspace;
-- later prospective observation explains changed or preserved state.
+- one event family at a time;
+- technical patterns as derived views only;
+- bounded identified-flow readiness and later IV-supported components;
+- portfolio/systemic state and sentinel models;
+- one paper broker after replicated prospective evidence.
 
-Namespace:
+## 10. Repair-phase cap
 
-```text
-contracts/gv_portfolio/v0/
-core/gv_portfolio_v0/
-tests/gv_portfolio_v0/
-```
+Earlier repair phases were needed to consolidate product, source, timing, evidence, publication, and replay authority. They are not the ongoing roadmap.
 
-Do not design unused tax, FX, derivatives, shorting, broad corporate-action, provider, or historical-loader frameworks.
+Episode 2 is the final standalone custody repair on the critical path. Subsequent repairs are acceptance work inside the active AOV vertical unless a new P0 authority defect prevents trustworthy evidence production.
 
-## 9. Slice 1 — `GV-DETERMINISTIC-REPLAY-0`
+## 11. Claim boundary
 
-Purpose: prove that the operated product is exactly reconstructable.
-
-Acceptance:
-
-- exact cash, quantities, costs, NAV, and thesis state;
-- byte-stable prior certified decision;
-- idempotent rerun;
-- correction lineage;
-- partial-fill residual state;
-- valuation-pending without fabricated price;
-- at least one split or equivalent value-transfer event;
-- zero unexplained reconciliation residual within declared precision.
-
-No bounded-portfolio expansion before this passes.
-
-## 10. Later evidence-gated slices
-
-### Slice 2 — `GV-BOUNDED-PORTFOLIO-1`
-
-Operate 8–15 securities across at least two economic clusters repeatedly without custody, accounting, or review collapse.
-
-### Slice 3 — `GV-PORTFOLIO-SCALE-1`
-
-Scale the operated portfolio to 25–50 securities while preserving deterministic books, replay, and bounded operator workload.
-
-### Slice 4 — `GV-UNIVERSE-SCALE-1`
-
-Scale candidate custody to 100–300+ securities with survivorship-safe membership, permanent identity, corporate actions, corrections, and reproducible universe snapshots.
-
-### Slice 5 — `GV-CHALLENGER-PROMOTION-1`
-
-Promote challengers only through baseline → shadow → prospective challenger → independent replication → bounded authority.
-
-### Slice 6 — `GV-LIMITED-LIVE-1`
-
-Consider only a small, liquid, long-only, unleveraged, supervised, reversible pilot after repeated prospective paper operation, exact replay, stable custody, realistic cost/liquidity evidence, and separate owner authorization.
-
-## 11. Gate score and planning forecast
-
-Canonical shipped score remains `39/100` until accepted product evidence is banked.
-
-Binary operational gates:
-
-```text
-Roadmap custody banked             1/1
-Micro-portfolio operator loop      0/1
-Prospective later observation      0/1
-Exact deterministic replay         0/1
-Bounded repeated portfolio         0/1
-```
-
-Nonbinding forecast after Slice 0 acceptance:
-
-| Dimension | Current | After Slice 0 | After Slice 1 |
-|---|---:|---:|---:|
-| Product capability | 28 | 60–65 | 65–70 |
-| User flow | 42 | 70–75 | 72–78 |
-| Portfolio completeness | 18 | 65–70 | 70–75 |
-| Integrity and replay | 64 | 70–75 | 90–95 |
-| Prospective evidence | 10 | 20–30 | 30–40 |
-| Shipping and custody | 78 | 85–90 | 90–95 |
-| Weighted audit maturity | ≈39 | 62–66 | 70–74 |
-
-These forecasts are explanatory only. They are not shipment or alpha evidence.
-
-## 12. Anti-governance and velocity law
-
-A gate may block delivery only when it prevents:
-
-- look-ahead or invalid evidence;
-- identity or corporate-action corruption;
-- unauthorized or unreconciled capital;
-- legal, mandate, solvency, or mandatory-action failure;
-- irreversible operational harm;
-- loss of deterministic replay.
-
-The following do not block the first vertical and replay:
-
-- complete ontology design;
-- broad reference-class automation;
-- factor-model perfection;
-- fitted copulas or optimizers;
-- ownership-network models;
-- adaptive intraday control;
-- tactical capital;
-- broad provider acquisition;
-- comprehensive tax optimization;
-- live-capital machinery.
-
-## 13. Change-control law
-
-The sequence may be amended only when:
-
-1. a completed slice exposes an impossible or contradictory boundary;
-2. a P0/P1 custody, accounting, mandate, or replay defect requires a boundary change;
-3. the owner explicitly changes the end mandate;
-4. external legal or operational requirements invalidate a constraint.
-
-Thresholds, vendors, models, and implementation techniques may evolve inside a slice without reopening the product architecture.
-
-## 14. Immediate directive
-
-```text
-1. Independently audit ROADMAP_FREEZE_COMMIT.
-2. After PASS, create a clean isolated worktree from that exact commit.
-3. Ship GV-MICRO-PORTFOLIO-VERTICAL-0 through Packages A/B/C.
-4. Certify GV-DETERMINISTIC-REPLAY-0 from real vertical events.
-5. Keep the dirty root checkout untouched.
-```
-
-`93e7a55` is released ancestry, not a valid direct implementation base for the corrected product sequence.
+No automatic phase progression, second app/engine, universal PIT platform, optimizer/RL-first route, unrestricted agent execution, broad provider expansion, broker/live capital, or alpha claim is authorized. Limited Live remains closed.

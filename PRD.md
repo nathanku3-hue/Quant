@@ -7,24 +7,32 @@ This section supersedes every active-gate statement below.
 ```text
 PRODUCT = point-in-time certified portfolio operating system
 PUBLISHED_CUT = PIT-ALPHA-AUTHORITY-CUT-1 @ 9af5259
-ACTIVE_GATE = PAIR-DECISION-SERIES-1 EPISODE 1
-ACTIVE_STATUS = IMPLEMENTED_LOCALLY; AUDIT_AND_PUBLICATION_PENDING
-SOLE_APPLICATION = dashboard.py / Command Center
-REAL_IDENTITIES = MU | NVDA
-MARKET_AUTHORITY = ONE_COMMON_SOURCE_OBJECT | ONE_PERMISSION_MANIFEST | ONE_PARSER | ONE_PIT_CUT
-SUBJECT_EVIDENCE = BANKED_ONLY
-EPISODE_DISPOSITION = CASH_ABSTAIN | REJECT_ALL
-OUTCOME_STATUS = SEALED_NOT_OPENED
+E2_LOCAL_CANDIDATE = 39f7be3894623c095994066b8f0ea2895b968643
+AOV_LOCAL_EXECUTABLE_TIP = dca69fc72dd3192913aa921323ff48f68610a925
+ACTIVE_GATE = FIRST_REAL_AOV0_FIVE_ARM_PROSPECTIVE_SEAL
+ACTIVE_STATUS = E2_LOCAL_FREEZE_PASS_115_OF_115; AOV_MECHANICAL_VERTICAL_LOCAL; REAL_SEAL_BLOCKED_OWNER_AND_INPUTS
+SOLE_APPLICATION = launch.py -> dashboard.py / Command Center
+MODEL_CONTROL = RULE100_DEGENERATE_CONTROL
+MODEL_ORGANISM = CFTD_Q_M_FPROXY_CPROXY_L_R_U
+FIRST_MUTATION = ONE_FROZEN_REVERSAL_RISK_EDGE
+EXPERIMENT = RULE100 | PARENT | CHILD | PIT_EQUAL_WEIGHT | ECONOMIC_CASH
+PROSPECTIVE_CLOCK_STARTED = FALSE
 CANONICAL_SCORE = 70/100 OPERABILITY_CUSTODY_REPLAY_ONLY
 PORTFOLIO_ALPHA_EVIDENCE = 0
 LIMITED_LIVE = CLOSED
 ```
 
-The active product requirement is one source-bound real MU/NVDA/cash episode through the existing preview, explicit disposition, atomic persistence, certification, and fresh-process replay path. The Command Center cannot author market price, source, permission, parser, receipt, row identity, or market timestamps. Episode 1 seals its outcome horizon, opening rule, comparator, cost model, decision policy, and source contract before any outcome data is visible. Both subject packages remain ABSTAIN/NO_POSITION, so the valid confirmation retains certified cash without fabricated orders, costs, or alpha. Historical requirements below remain audit continuity only unless re-authorized.
+Gate A is locally complete: exact Episode-2 bytes are committed at `39f7be3`, reconstruct from `git archive`, and pass the exact selected `115/115` matrix. The old `142/142` receipt is stale. Push, hosted Windows/Linux, independent audit, and FF/tag publication remain external and unperformed.
+
+Gate B is one implementation vertical, not separate P0/control/cube/model/seal phases. Local tip `dca69fc` hard-cuts compatibility, hardens the canonical research spine, implements the AOV cube/Rule100/Parent/Child/DAG/five-arm/seal machinery and deterministic review core, and passes the all-zero ZERO-COMPAT gate.
+
+The active blocker is no longer architecture. The first real seal requires owner values for the insurance materiality floor and annual premium ceiling plus five admitted current artifacts: permanent-ID Rule100 targets, vertical primitives, PIT total returns, official SOFR, and a decision-cut receipt. Economic cash itself is already governed by the existing owner mandate: official SOFR minus 25 bp, ACT/360, no zero floor, after publication only, no proxy substitution.
+
+A development/test seal is not A1/A3 evidence. Portfolio-alpha evidence remains zero until real sealed outcomes mature under preregistered contracts. Historical requirements below remain audit continuity only unless explicitly re-authorized.
 
 ---
 
-## Active Build Authority (2026-08-01) — One Real 25-Security Operated Portfolio; Live Closed
+## History — Superseded Build Authority (2026-08-01) — One Real 25-Security Operated Portfolio
 
 ```text
 PRODUCT = point-in-time certified portfolio operating system
@@ -36,8 +44,8 @@ OPERATED_PORTFOLIO_10 = ACCEPTED_TERMINAL_PRODUCT @ 0d15e9c / closure 2349e1b
 PORTFOLIO_SCALE_1 = MULTI_SESSION_HARNESS; ORIGINAL_GATE_INCOMPLETE @ c37abf00293937b9b99eb6e560f6b5b77a92ea1f
 UNIVERSE_SCALE_1 = MULTI_CELL_HARNESS; ORIGINAL_GATE_INCOMPLETE @ dca67e36edc02dddf8c7ba446ac34f22562ee165
 CHALLENGER_PROMOTION_1 = SHADOW_CUSTODY_PRIMITIVE; ORIGINAL_GATE_INCOMPLETE @ 3e4dc957f475945169ddf33ed359254bd98dc64d
-ACTIVE_SLICE = GV-OPERATED-PORTFOLIO-25-1
-ACTIVE_STATUS = AUTHORIZED; IMPLEMENTATION_ACTIVE; NOT_FROZEN; NOT_TERMINAL
+HISTORICAL_SLICE = GV-OPERATED-PORTFOLIO-25-1
+HISTORICAL_STATUS = SUPERSEDED_BY_2026_08_06_AOV_AUTHORITY
 ACTIVE_BRIEF = docs/context/ACTIVE_BRIEF
 ACCEPTED_ENDGAME_PROGRESS = 62/100
 LIVE_CAPITAL = NOT_AUTHORIZED

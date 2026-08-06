@@ -1,3 +1,21 @@
+GodView AOV-0 Active Contract (2026-08-06)
+
+- Canonical authority: `docs/context/gv_endgame_authority_current.md`.
+- Active product gate: first real immutable AOV-0 five-arm prospective seal.
+- Gate-A local candidate: `39f7be3894623c095994066b8f0ea2895b968643`, exact archived-byte `115/115 PASS`; external hosted/audit/publication custody remains open.
+- Gate-B local executable tip before docs closure: `dca69fc72dd3192913aa921323ff48f68610a925`.
+- Current product path: `launch.py` → `dashboard.py`; no second app/engine and no current compatibility aliases.
+- AOV hard cut, hardened `research/` spine, minimal cube, Rule100/Parent/Child, hash DAG, five-arm/seal mechanics, official-SOFR cash, and deterministic review core are implemented locally.
+- Required arms: Rule100 control, CFTD Parent, one frozen Child, PIT equal weight, economic cash.
+- Production owner-open P0 fields are only `insurance_materiality_floor_ratio` and `insurance_premium_ceiling_annual_return`; they remain unresolved and block real seal/review authority.
+- First real seal additionally requires admitted current Rule100 targets, vertical primitives, PIT total returns, official SOFR, and decision-cut receipt under `data/aov0/current/`.
+- Economic cash authority is official SOFR minus 25 bp, ACT/360, no zero floor, post-publication only, no proxy substitution.
+- ZERO-COMPAT six-count scan must remain all zero.
+- Episode 3 and a universal PIT platform remain off the critical path.
+- Mechanical/test seals are not financial-alpha evidence. Portfolio-alpha evidence remains `0`; prospective clock is false; Limited Live remains closed.
+
+All contracts below are retained as historical or component-specific audit context unless the current authority set explicitly reactivates them.
+
 V2 PEAD Alpha Interpretation Gate Contract (2026-06-24)
 
 - Gate file: `docs/phase_brief/v2-pead-alpha-interpretation-gate.md`.

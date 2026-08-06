@@ -1,33 +1,25 @@
 ## What Was Done
-- Replaced operator-authored market authority with one pinned multi-security source capture, one permission manifest, one parser, and two source-derived packets.
-- Added a banked-only NVDA subject decision beside the existing MU authority and removed synthetic companion acceptance.
-- Implemented real MU / real NVDA / cash episode 1 with sealed horizon, comparator, cost, policy, and source terms.
-- Removed all manual market price, source, permission, receipt, and market-time controls without compatibility.
-- Proved mutation-free preview, cash/abstention confirmation, reject-all, atomic persistence, certification lineage, residual `0`, and exact fresh-process reconstruction.
-- Passed the focused integrated matrix `71/71`; the only warning is the inherited `websockets.legacy` deprecation.
+- Froze Episode-2 locally at exact `39f7be3894623c095994066b8f0ea2895b968643` and proved the exact archived-byte selected matrix `115/115`.
+- Performed the destructive AOV hard cut: removed duplicate root app/launcher authority, legacy book projection, current-root Alpha rebuild compatibility, ticker/asset aliases, transitional authority fallbacks, mutable evidence-manifest bypass, and unnamed benchmark selection.
+- Hardened the canonical research spine and implemented the minimal AOV cube, Rule100 control, deterministic Parent, one risk-reducing Child, hash DAG, five-arm experiment/seal machinery, and official-SOFR economic cash.
+- Built the deterministic Parent–Child review core with reconciliation, CVaR helped/hurt, cost-dominated/insufficient/accounting statuses, packet hashing, and single-episode no-mutation authority.
+- Preserved the owner boundary by leaving insurance materiality floor and annual premium ceiling unresolved in the production contract.
+- Created local commits only; no push, hosted CI execution, publication, provider access, outcome opening, or live-capital action occurred.
 
 ## What Is Locked
-- Active product gate is `PAIR-DECISION-SERIES-1 — EPISODE 1`.
-- Published main `9af5259` and `pit-alpha-authority-cut-1-terminal` remain immutable prior receipts.
-- `dashboard.py` / Command Center remains the sole operator product.
-- Episode 1 uses real MU, real NVDA, and cash only; no synthetic companion is accepted.
-- Subject evidence is banked-only; the bounded acquisition covered one market observation object only.
-- Outcomes remain sealed and unopened until the preregistered date and rule.
-- Canonical product maturity remains `70/100`; portfolio-alpha evidence remains `0`.
-- Limited Live remains closed.
-- Publication requires audit PASS plus owner authority for exact fast-forward and protected-branch bypass.
+- The next product milestone is the first **real immutable five-arm prospective seal**, not another architecture or repair phase.
+- `launch.py` → `dashboard.py` is the sole current application and `core.engine.run_simulation` through the hardened `research/` runner is the sole simulation authority.
+- Gate-A local candidate is `39f7be3`; Gate-B local executable lineage ends at `dca69fc` before documentation closure.
+- Economic cash is official SOFR minus 25 bp, ACT/360, no zero floor, post-publication only, with no proxy substitution.
+- Production insurance materiality floor and annual premium ceiling are owner-open and may not be silently chosen.
+- Portfolio-alpha evidence remains `0`; the prospective clock has not started; Limited Live remains closed.
 
 ## What Is Next
-- Freeze one immutable candidate SHA and run the exact focused/hosted matrix plus one independent cross-domain audit.
-- On audit PASS, push the candidate and execute the named owner fast-forward/tag publication route only if authority exists.
-- After terminal equality is proved, immediately execute episode 2 under the unchanged pair, comparator, cost, policy, horizon, and source contracts.
-- run the complete candidate matrix from a clean exact checkout;
-- run one independent cross-domain audit;
-- push candidate branch and collect hosted exact-head proof;
-- publish only through owner-authorized fast-forward and tag equality;
-- begin episode 2 without widening security breadth.
+- Owner freezes `insurance_materiality_floor_ratio` and `insurance_premium_ceiling_annual_return`.
+- Admit the five current AOV artifacts: permanent-ID Rule100 targets, vertical primitives, PIT total returns, official SOFR, and decision-cut receipt.
+- Run the first real immutable five-arm seal immediately and require exact reopen before starting the prospective clock.
+- While the clock runs, finish score→target→executed-weight→P&L lineage and redistribution/regime/corporate-action review fixtures.
+- After a matured validated ReviewPacket, allow one bounded AI MutationManifest and deterministic development run, then begin model-portfolio expansion.
 
 ## First Command
-```text
-`E:\code\quant\tmp\gv25env\Scripts\python.exe -m pytest -q tests/test_gv_immutable_market_packet.py tests/test_gv_pit_transaction.py tests/test_gv_pit_operated_capital.py tests/test_gv_pit_operated_rotation.py tests/test_dash_1_page_registry_shell.py tests/gv_portfolio_v0/test_operated.py tests/gv_portfolio_v0/test_operated_25.py tests/gv_portfolio_v0/test_prospective.py tests/gv_portfolio_v0/test_real_evidence_mu.py tests/gv_portfolio_v0/test_same_evidence_shadow.py`
-```
+`E:\code\quant\tmp\gv25env\Scripts\python.exe scripts\aov0_first_seal.py`

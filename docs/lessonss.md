@@ -1,3 +1,30 @@
+## 2026-08-06 Round Entry (Repair Sequences Must Terminate in an Evidence-Producing Vertical)
+
+- Date: 2026-08-06
+- Mistake or miss: the repository accumulated necessary source, custody, replay, publication, and temporal repairs, but the roadmap continued to select another temporal episode rather than the first reusable experiment-and-review alpha organism. Current truth surfaces also retained older source-authority and 25-security active-gate language.
+- Root cause: infrastructure correctness was repeatedly treated as a roadmap unit, while the endgame product unit—one recurring prospective experiment that can review and improve itself—was never made the controlling gate.
+- Fix applied: explicit roadmap recut to Episode-2 custody closeout → AOV-0; remove Episode 3 and universal PIT platform from the critical path; freeze AI/deterministic authority; add an executable-decision checklist; pull AOV-0.5A review readiness before outcome maturity; reconcile root/current authority docs.
+- Guardrail for next time: standalone repair phases end once one trustworthy substrate exists. Every later repair must be absorbed into the smallest evidence-producing vertical unless a new P0 authority defect makes the vertical untrustworthy. Never let current docs silently select a superseded gate.
+- Evidence paths: `docs/architecture/alpha_organism_endgame_current.md`, `docs/phase_brief/alpha-organism-vertical-0-brief.md`, `docs/checklists/aov0_working_alpha_system_checklist.md`, `PHASE_QUEUE.md`, and current truth surfaces.
+
+## 2026-08-06 Round Entry (A Multi-Episode Registry Still Needs Adjacent-Cut Law)
+
+- Date: 2026-08-06
+- Mistake or miss: the Episode-2 generalization removed path and constant hardcoding, but later contract chronology was checked only against Episode 1, an exactly-on-the-minute knowledge cut produced a non-strict decision timestamp, and the outcome-open date was not derived from the sealed horizon rule.
+- Root cause: registry availability was treated as sufficient temporal sequencing; adjacent episode order and derived time formulas were not made explicit acceptance invariants.
+- Fix applied: compare every episode to its immediate predecessor; require a distinct cut ID; bind contract knowledge time to capture retrieval time; require source time not after retrieval; always seal at the first whole minute strictly after knowledge; derive `outcome_open_not_before` from knowledge plus the preregistered minimum calendar days; add three focused regressions.
+- Guardrail for next time: every new episode registration must pass adjacent-cut chronology, strict decision-after-knowledge, capture/contract time equality, and mechanically derived outcome-open checks before it can enter the series.
+- Evidence paths: `gv_portfolio_v0/market_source_adapter.py`, `tests/test_gv_immutable_market_packet.py`, `docs/notes.md`, and the bounded `142/142` local candidate matrix.
+
+## 2026-08-06 Round Entry (Temporal Episode Hardcoding Blocks Alpha Path)
+
+- Date: 2026-08-06
+- Mistake or miss: episode 1 sealed correctly, but paths, observed_at, sealed-count=1 rejection, and Command Center copy were hardcoded to episode 1, so episode 2 could not open without a retrofit.
+- Root cause: the first evidence vertical optimized for a single cut instead of a preregistered series registry.
+- Fix applied: episode registry with immutable preregistration hashes; next-open selection by sealed count; later distinct market cut for episode 2; series-invariant checks; reconstruction stamps sealed counts between episodes.
+- Guardrail for next time: any sealed temporal episode must leave the next open episode selectable from banked preregistrations without code edits to paths or constants.
+- Evidence paths: `gv_portfolio_v0/market_source_adapter.py`, `gv_portfolio_v0/prospective.py`, `views/command_center.py`, `data/gv_pair_decision_series/mu_nvda_episode_2/`, `tests/test_gv_pit_operated_capital.py`.
+
 ## 2026-08-06 Round Entry (Repair Plumbing Inside the First Evidence-Producing Slice)
 
 - Date: 2026-08-06
@@ -2166,4 +2193,22 @@ Application pattern:
 - Fix applied: froze `7ce85c4` as the sole executable candidate, reconciled its existing exact-head Windows/Linux, byte-parity, zero-candidate-only, fresh-process, and Reviewer A/B/C evidence, and limited closure to documentation/generated context plus custody publication.
 - Guardrail for next time: rerun a terminal gate only when the proposed closure or successor changes bytes that the gate can observe—production, tests, workflows, dependencies, or executable configuration. Otherwise prove byte identity, publish once by fast-forward, tag, and stop.
 - Evidence paths: `docs/context/e2e_evidence/gv_operated_portfolio_25_1_terminal_20260801.md`, `docs/saw_reports/saw_gv_operated_portfolio_25_1_terminal_20260801.md`, `docs/handover/phase_gv_operated_portfolio_25_1_handover.md`.
+
+## 2026-08-06 Round Entry (Preserve Historical Evidence, Not Historical Runtime Compatibility)
+
+- Date: 2026-08-06
+- Mistake or miss: the roadmap declared one app/no compatibility while current root source, CI, release rebuilding, dashboard fallbacks, ticker aliases, and a legacy book projection still actively preserved superseded runtime behavior.
+- Root cause: historical reproducibility was conflated with present-source compatibility. The repo preserved old callers and fallback authority instead of preserving immutable receipts and forcing the new authority contract to stand alone.
+- Fix applied: froze Episode-2 first, then hard-cut duplicate root runtimes and compatibility-only tests/build paths; archived historical source; converted Alpha release truth to receipt integrity; removed legacy book projection and dashboard fallback authority; hardened research identity/benchmarks/evidence/Rule100 semantics; added a six-count ZERO-COMPAT gate; built the AOV vertical only after the break.
+- Guardrail for next time: when a new authority is approved, preserve historical bytes/receipts but do not keep source-level aliases or fallback behavior solely to satisfy history. Break first, migrate only current consumers, and make the absence of compatibility machine-checkable.
+- Evidence paths: `scripts/aov_zero_compat_scan.py`, `release/gv-alpha0/RECEIPT.json`, `docs/archive/legacy_runtime_source/`, `dashboard.py`, `research/adapters/rule100_replay_adapter.py`, `research/evidence_schema.py`, `gv_portfolio_v0/book.py`.
+
+## 2026-08-06 Round Entry (Owner Decisions Must Stay Visibly Unresolved in Production Contracts)
+
+- Date: 2026-08-06
+- Mistake or miss: during the fast AOV implementation, example insurance thresholds (5% materiality / 50 bp annual premium) were briefly encoded as production defaults even though the user authorized only the eight defaultable P0s and left the insurance budget to owner judgment.
+- Root cause: executable completeness pressure caused development-fixture values to cross the product-authority boundary.
+- Fix applied: production `DEFAULT_CONTRACT` now stores both insurance owner fields as `None`; `validate_prospective_contract()` blocks real seal/review authority until they are supplied; development tests inject example values explicitly via a test-only contract.
+- Guardrail for next time: any owner/product judgment must be represented as unresolved state in production code, not as a convenient engineering default. Test fixtures may carry example values only when the call site explicitly opts into a non-authoritative development contract.
+- Evidence paths: `research/aov0/contracts.py`, `research/aov0/experiment.py`, `research/aov0/review.py`, `scripts/aov0_first_seal.py`, `tests/aov0/conftest.py`.
 

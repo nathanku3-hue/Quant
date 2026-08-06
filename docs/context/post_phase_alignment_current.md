@@ -1,28 +1,63 @@
 # Post-Phase Alignment — Current
 
 Date: 2026-08-06
-Status: `ALPHA CUT PUBLISHED; SOURCE AUTHORITY OPEN`
+Status: `GATE-A LOCAL COMPLETE; GATE-B MECHANICAL LOCAL; FIRST REAL SEAL BLOCKED`
 
 ## Preserved
 
-- Product intent: one all-capital point-in-time certified portfolio operating system.
-- Sole application: `dashboard.py` / Command Center.
-- Deterministic book, execution, persistence, certification, and replay authorities.
-- Broker, advice, alpha, provider-quality, and Limited Live boundaries remain closed.
-- Published tip `9af5259` and tag `pit-alpha-authority-cut-1-terminal` are immutable publication receipts.
+- Published `9af5259` authority receipt is untouched.
+- Episode-1 banked evidence remains intact.
+- Episode-2 source/time/outcome-open invariants remain intact.
+- One canonical simulation engine and deterministic accounting/replay authority remain.
+- Portfolio-alpha evidence remains `0`; Limited Live remains closed.
 
-## Advanced
+## Deliberate breakage
 
-- Main fast-forwarded to exact `9af5259` (C+P only).
-- Terminal tag peels to that SHA; remote main equals that SHA.
-- Canonical score `70/100` for product operability, custody, and replay only.
-- Active gate is `PIT-SOURCE-AUTHORITY-1`.
-- Explicit roadmap deviation banked: Scale→Universe→Challenger auto-progression abandoned; two-commit transplant replaced seventeen-commit replay; duplicate operator product deleted without compatibility.
+The repo no longer preserves current-root runtime compatibility for superseded Alpha/Portfolio applications. Historical evidence survives as archive/release receipts. Current product authority is one launcher/application and one fail-closed AOV path.
 
-## Current bottleneck
+ZERO-COMPAT acceptance is now machine checked.
 
-Implement one immutable market packet in place of manually entered `operator://` market authority, through the existing operated loop only.
+## Gate alignment
+
+### Gate A — local complete
+
+- immutable E2 SHA: `39f7be3`;
+- exact archived-byte selected matrix: `115/115 PASS`;
+- external push/hosted/audit/publication remains parallel/open.
+
+### Gate B — mechanical local complete
+
+- hard cut complete;
+- five research defects repaired;
+- minimal cube/Rule100/Parent/Child/DAG complete;
+- five-arm/seal mechanism complete;
+- deterministic review core complete;
+- executable local lineage through `dca69fc`.
+
+### Real seal — active blocker
+
+- owner insurance materiality floor;
+- owner annual premium ceiling;
+- admitted current Rule100 targets;
+- admitted current vertical primitives;
+- admitted current total returns;
+- admitted current official SOFR;
+- admitted decision-cut receipt.
+
+No other architecture phase is authorized before trying the real seal.
+
+## Parallel work after seal
+
+Once the clock starts, review lineage/fixtures may finish while calendar time accrues. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
+
+## Model portfolio direction
+
+Move from serial replacement toward Safety Parent / Champion / 1–3 Challengers / Negative Control / Sentinel as real evidence accumulates.
+
+## Deferred
+
+Provider breadth, AOV-2/event state, hidden-OOS platform breadth, search-debt automation beyond immediate need, broker/live integration, optimizer/RL-first work.
 
 ## Next alignment
 
-Ship the packet fields (source/permission identity, raw bytes or receipt, valid/effective time, retrieval/knowledge time, permanent instrument identity, value/unit/currency, schema version, SHA-256) without opening a new engine or provider programme.
+Close the owner + data-admission blocker and write the first real immutable five-arm seal. Do not reopen compatibility or architecture expansion to avoid that decision.

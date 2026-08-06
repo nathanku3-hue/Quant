@@ -1,4 +1,35 @@
 
+## 2026-08-06 — AOV-2 / IDENTIFICATION CANDIDATE SOURCE POOL RETAINED
+
+- Decision: retain the user-supplied finance-app inventory at `docs/research/aov2_identification_candidate_source_pool.md` as a discovery-only candidate source pool for AOV-2 event-state integration and `IDENTIFICATION-READINESS-PROBE-0`.
+- First bounded batch: `Massive`, `Fiscal.ai`, `MetricDuck`, `Quartr`, `FactorWeave`, and `CoinGecko`.
+- Authentication boundary: public catalog presence or a Connect action does not prove zero external login/OAuth, subscription access, entitlement, region availability, or workspace approval.
+- Data boundary: every source begins with authentication, provenance, PIT, permanent identity, export/custody, terms, reliability, coverage, and cost unverified.
+- Admission law: a source may first become `DISCOVERY_SOURCE` or `INTERPRETATION_SOURCE`; PIT Truth Plane authority requires a separate per-source executable admission and review gate.
+- Critical-path boundary: the pool cannot block Episode-2 closeout or AOV-0, populate `VERTICAL-CUBE-SLICE-V0`, trigger a broad provider programme, or support alpha/PIT/no-login claims.
+
+## 2026-08-06 — ALPHA-ORGANISM ROADMAP RECUT
+
+- Decision: freeze the top-down alpha-organism mental model and stop broad architecture iteration. GodView's durable objective is pipeline alpha: immutable PIT reality → persistent market-state organism → controlled prospective experiment → exact review → bounded model evolution.
+- Authority split: deterministic systems own truth, formulas, weights, accounting, evidence, promotion, and risk; AI may interpret admitted evidence and propose bounded experiments/mutations only.
+- Roadmap deviation: remove Episode 3 and a universal PIT platform from the product critical path. Preserve the pair-series registry as future prospective custody substrate, not as a separately scored milestone.
+- Active sequence: close Episode-2 immutable custody, then execute `ALPHA-ORGANISM-VERTICAL-0`; build AOV-0.5A deterministic review readiness in parallel.
+- AOV-0 result: one PIT vertical cube slice; Rule100 control; deterministic CFTD Parent; one frozen Child; one canonical five-arm comparison; one same-cut prospective seal; exact reopen.
+- Rule100/Hazard: Rule100 is a degenerate control and regression fixture. Reversal Hazard is a bounded risk-insurance overlay, not an independent alpha source.
+- Open P0: coherent `F_proxy/C_proxy`, Rule100 equivalence, Parent policy, insurance endpoint/premium, total-return authority, economic cash, sleeve semantics, PIT universe, V0 parameters, and inference.
+- Repair cap: Episode 2 is the final standalone custody repair on the critical path. Future repairs belong inside evidence-producing AOV acceptance unless a new P0 authority defect is discovered.
+- Evidence boundary: current portfolio-alpha evidence remains `0`; a seal is not evidence; A3 begins only after outcomes mature and open. Limited Live remains closed.
+
+## 2026-08-06 — PAIR-DECISION-SERIES-1 EPISODE 2 OPENED
+
+- Decision: remove episode-1 hardcoding and open sequential episode 2 on the same MU/NVDA series profile immediately after episode 1 release-ready tip `ab258c3`.
+- Bottleneck fixed: `market_source_adapter.py`, `prospective.py`, `operated_scenarios.py`, and `command_center.py` now select the next open registered episode by sealed count.
+- Episode 2 cut: later distinct common Cboe BZX MU/NVDA capture under `data/gv_pair_decision_series/mu_nvda_episode_2/`; source contract, comparator, cost, policy, horizon, and banked subject evidence unchanged.
+- Economic disposition: both subjects remain ABSTAIN/NO_POSITION; confirmation retains certified cash with residual `0`.
+- Replay: multi-episode ledger reconstructs exactly; resealing episode 1 after it is sealed fails closed.
+- Score/claim: canonical product maturity remains `70/100`; portfolio-alpha evidence remains `0`; Limited Live remains closed.
+- Next: freeze the exact Episode-2 candidate and complete audit/hosted proof; then transfer the product gate to AOV-0. Episode 3 is removed from the critical path, while preregistered outcomes remain unopened until eligible.
+
 ## 2026-08-06 — PAIR-DECISION-SERIES-1 EPISODE 1 INTEGRATED CANDIDATE
 
 - Decision: do not terminalize source-authority repair separately. Absorb it into the first real cross-sectional episode and publish one candidate, one audit, and one terminal receipt.
@@ -7738,5 +7769,18 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - Why: authority cut completed the highest-value convergence — one `dashboard.py` Command Center; bounded BUY entry; proposal/book/certification-bound SELL+BUY rotation; explicit confirm/reject; atomic persistence; certification lineage; exact fresh-process reopen; residual `0`; fresh-clone `123/123`; independent reviews; preservation PASS; hosted Windows/Ubuntu proof.
 - Roadmap deviation (explicit, beneficial): automatic Scale→Universe→Challenger progression abandoned; seventeen-commit replay replaced by two-commit final-state transplant; duplicate operator product deleted without compatibility.
 - Next: branch `codex/pit-source-authority-1`; first commit reconciles active brief, score, current context, queue, roadmap, and closure truth; then ship one immutable bitemporal market packet through the existing preview→confirm→persist→certify→reopen loop. No new engine, provider programme, optimizer, broker, historical repair, compatibility layer, or Limited Live.
+
+## 2026-08-06 — FULL_LOCAL_E2_FREEZE_AND_AOV_HARD_CUT_VERTICAL
+
+- Decision: execute the user-authorized two-gate local plan end-to-end without push, hosted CI execution, publication, provider access, outcome opening, or live-capital actions.
+- Gate A: freeze exact Episode-2 executable/data/test bytes at `39f7be3894623c095994066b8f0ea2895b968643`; reconstruct exact commit through `git archive`; exact selected matrix is `115/115 PASS`; supersede stale `142/142` receipt.
+- Gate B: hard cut compatibility before building AOV. Remove four duplicate root app/launcher surfaces, legacy book projection, current-root Alpha rebuild compatibility, ticker/asset Rule100 aliases, transitional dashboard authority, mutable evidence reuse, and positional benchmark selection. Preserve historical source/release evidence as archive/receipt only.
+- Executable lineage: `39f7be3 → 4b14846015c952242d4bf17819bc615435bda091 → dca69fc72dd3192913aa921323ff48f68610a925`; all are local only and unpushed.
+- AOV result: hardened canonical research spine; minimal permanent-ID PIT cube; Rule100 control; deterministic Parent; one risk-reducing Child; hash DAG/selective recomputation; five-arm experiment/seal/reopen machinery; official-SOFR economic cash; deterministic Parent–Child review core; ZERO-COMPAT six-count gate all zero.
+- Owner boundary correction: production insurance materiality floor and annual premium ceiling remain unresolved (`None`). Test-only development contracts may inject example values, but real prospective seal/review authority refuses them until owner approval.
+- Economic cash decision: reuse existing owner freeze — official SOFR minus 25 bp, ACT/360, no zero floor, usable only after official publication, no proxy substitution.
+- First real seal is the sole next product gate. It currently fails closed because the two owner insurance values plus admitted current Rule100 targets, vertical primitives, PIT total returns, official SOFR, and decision-cut receipt are missing.
+- Evidence boundary: AOV mechanics are locally green, but no admitted real A1 result and no real A3 prospective evidence is claimed; prospective clock remains false; portfolio-alpha evidence remains `0`; canonical accepted maturity remains `70/100`.
+- SAW boundary: local deterministic validation is strong, but independent Reviewer A/B/C and external hosted custody were not performed; milestone SAW remains BLOCK rather than overstating closure.
 
 

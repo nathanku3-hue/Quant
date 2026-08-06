@@ -6,25 +6,34 @@ This section supersedes every active product header below.
 
 ```text
 PUBLISHED_CUT = PIT-ALPHA-AUTHORITY-CUT-1 @ 9af5259
-ACTIVE_SLICE = PAIR-DECISION-SERIES-1 EPISODE 1
-ACTIVE_STATUS = IMPLEMENTED_LOCALLY; AUDIT_AND_PUBLICATION_PENDING
-PRODUCT_ENTRY = dashboard.py / Command Center
-REAL_PAIR = MU | NVDA
-MARKET_SOURCE = ONE_PINNED_CBOE_BZX_CAPTURE
-MARKET_DERIVATION = ONE_PERMISSION_MANIFEST | ONE_XML_ROW_PARSER | ONE_COMMON_PIT_CUT
-MANUAL_MARKET_AUTHORITY = DELETED_WITHOUT_COMPATIBILITY
-SERIES_CONTRACT = HORIZON | OPEN_DATE | COMPARATOR | COST | POLICY | SOURCE_VERSION
-OUTCOME_DATA = SEALED_NOT_OPENED
+E2_LOCAL_CANDIDATE = 39f7be3894623c095994066b8f0ea2895b968643
+AOV_LOCAL_EXECUTABLE_TIP = dca69fc72dd3192913aa921323ff48f68610a925
+ACTIVE_GATE = FIRST_REAL_AOV0_FIVE_ARM_PROSPECTIVE_SEAL
+ACTIVE_STATUS = MECHANICAL_VERTICAL_LOCAL; OWNER_INSURANCE_BUDGET_OPEN; FIVE_CURRENT_INPUTS_MISSING
+PRODUCT_ENTRY = launch.py -> dashboard.py / Command Center
+CONTROL_MODEL = RULE100_DEGENERATE_CONTROL
+STATE_MODEL = Q | M | F_PROXY | C_PROXY | L | R | U
+FIRST_CHILD = ONE_FROZEN_REVERSAL_RISK_MUTATION
+EXPERIMENT_ARMS = RULE100 | PARENT | CHILD | PIT_EQUAL_WEIGHT | ECONOMIC_CASH
+RESEARCH_ENGINE = core.engine.run_simulation VIA hardened research/ runner
+ZERO_COMPAT = PASS_ALL_SIX_COUNTS_ZERO
+PROSPECTIVE_CLOCK_STARTED = FALSE
 SCORE = 70/100 OPERABILITY_CUSTODY_REPLAY_ONLY
 PORTFOLIO_ALPHA_EVIDENCE = 0
 LIVE = CLOSED
 ```
 
-The active slice derives separate MU and NVDA packets from one pinned common source object, verifies banked-only subject decisions, compares real MU / real NVDA / cash, and seals episode 1 before outcomes. The only confirmable episode-1 disposition is cash/abstention; reject-all remains available. Preview is calculation-only, persistence is atomic, certification binds the packet and series contracts, and fresh-process reconstruction is exact. No synthetic companion, provider framework, compatibility route, positive position claim, score uplift, alpha, broker, or live authority is added. Historical specifications below remain non-active audit history.
+Episode-2 local custody is immutable and exact-local-green at `39f7be3` (`115/115`). Gate-B mechanics are implemented at local tip `dca69fc`: hard-cut app authority, hardened research identity/benchmark/evidence semantics, minimal PIT cube, deterministic Rule100/Parent/Child, selective DAG, five-arm experiment/seal machinery, official-SOFR economic cash, and deterministic review core.
+
+The production AOV contract deliberately leaves `insurance_materiality_floor_ratio` and `insurance_premium_ceiling_annual_return` unresolved; real prospective seal/review authority fails closed until the owner supplies them. The seal also requires admitted current Rule100 targets, vertical primitives, PIT total returns, official SOFR, and a decision-cut receipt.
+
+No backward compatibility is required on the AOV path. Historical runtime evidence is preserved as immutable/archive receipts; removed root runtimes, ticker aliases, mutable evidence folders, unnamed benchmarks, and transitional authority fallbacks are invalid current contracts.
+
+A test fixture seal is mechanical proof only. Portfolio-alpha evidence remains `0` until real prospective outcomes mature. Historical specifications below remain non-active audit history.
 
 ---
 
-## Active Product Header (2026-07-29) — R0 Banked, Product Audit Pending
+## History — Superseded Product Header (2026-07-29) — R0 Banked
 
 ```text
 PRODUCT = point-in-time certified portfolio operating system
@@ -36,8 +45,8 @@ OBSERVED_COMPARISON_COUNT = 0
 ROADMAP_CUSTODY = BANKED_AUDIT_PENDING
 PRODUCT_SEQUENCE = SLICES_0_TO_6
 EXECUTION_AUTHORIZED_AFTER_AUDIT = SLICES_0_TO_1
-ACTIVE_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0
-NEXT_INTEGRITY_GATE = GV-DETERMINISTIC-REPLAY-0
+HISTORICAL_SLICE = GV-MICRO-PORTFOLIO-VERTICAL-0
+HISTORICAL_NEXT_GATE = GV-DETERMINISTIC-REPLAY-0
 ACTIVE_BRIEF = docs/context/ACTIVE_BRIEF
 ```
 

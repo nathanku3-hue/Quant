@@ -1,20 +1,21 @@
 # Bridge Contract — Current
 
 Date: 2026-08-06
-ACTIVE_STATUS: `PAIR-DECISION-SERIES-1 EPISODE 1 IMPLEMENTED; AUDIT/PUBLICATION PENDING`
+ACTIVE_STATUS: `E2 LOCAL FREEZE PASS; AOV MECHANICAL VERTICAL LOCAL; FIRST REAL SEAL BLOCKED`
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 
-- **SYSTEM_DELTA:** published main remains exact `9af5259`; the integrated candidate descends from clean remote-equal `7191613` on `codex/pit-source-authority-1`.
-- **PRODUCT_DELTA:** Command Center now compares real MU, real NVDA, and cash using two packets derived from one pinned common market source. Manual market-authority controls and synthetic companion acceptance are removed without compatibility.
-- **SOURCE_DELTA:** one source object + one permission manifest + one parser + one common PIT cut → instrument-bound MU/NVDA rows → separately hashed packets.
-- **EVIDENCE_DELTA:** subject evidence remains banked-only; MU and NVDA are both `ABSTAIN / NO_POSITION`.
-- **SERIES_DELTA:** episode 1 seals decision series, cut, horizon/open date, comparator, cost, policy, and source contract before outcomes. Outcome status is `SEALED_NOT_OPENED`.
-- **ECONOMIC_DELTA:** valid confirmation retains certified cash; cash `11000`, positions empty, costs `0`, residual `0`. Reject-all is also certified without economic mutation.
-- **VALIDATION_DELTA:** focused integrated matrix `71/71 PASS`; fresh-process reconstruction byte equality PASS; inherited non-blocking `websockets.legacy` warning only.
-- **SCORE:** canonical product maturity remains `70/100`; portfolio-alpha evidence remains `0`.
-- **PRIOR_SUBSTRATE:** `GV-OPERATED-PORTFOLIO-10-TRANSITION-1R` and 25-security operation remain banked regression evidence; they do not replace temporal episode evidence.
-- **OPEN_DECISION:** none on product direction. Terminal publication is mechanically blocked until immutable candidate audit/hosted PASS and owner authority for exact fast-forward plus protected-branch bypass.
-- **RECOMMENDED_NEXT_STEP:** freeze candidate, run one cross-domain audit and hosted exact-head checks, then publish by owner-authorized fast-forward/tag equality or stop fail-closed.
-- **DO_NOT_REDECIDE:** one Command Center, real pair first, episode-series before breadth, no compatibility, no new engine.
+- **SYSTEM_DELTA:** Episode 2 is locally immutable at `39f7be3` with exact archived-byte `115/115 PASS`; the former `142/142` statement is stale. External hosted/audit/publication custody remains open.
+- **PRODUCT_DELTA:** AOV hard cut + mechanical vertical is locally committed through `dca69fc`. The next product result is one real immutable five-arm prospective seal, not another architecture phase.
+- **BREAKAGE_DELTA:** four duplicate root app/launcher surfaces and legacy book projection are removed; old Alpha current-root rebuild/test authority is replaced by historical receipt integrity; ZERO-COMPAT is all zero.
+- **RESEARCH_DELTA:** content-sensitive identity, named mandatory benchmarks, finite-cost policy, schedule-consistent PIT-EW, strict permanent-ID Rule100 adapter, and immutable evidence manifests are implemented.
+- **MODEL_DELTA:** minimal `Q/M/F/C/L/R/U` cube, Rule100, Parent, one risk-reducing Child, and hash DAG are implemented.
+- **CASH_DELTA:** economic cash inherits existing owner authority: official SOFR − 25 bp, ACT/360, no zero floor, post-publication only, no proxy substitution.
+- **REVIEW_DELTA:** deterministic gross/cost/net reconciliation, CVaR helped/hurt, cost-dominated/insufficient/accounting statuses, packet hashing, and single-episode no-mutation authority are implemented; full lineage/fixture closure remains open.
+- **OWNER_OPEN:** insurance materiality floor and annual insurance-premium ceiling only. Production defaults remain unresolved.
+- **DATA_OPEN:** admitted current Rule100 targets, vertical primitives, PIT total returns, official SOFR, and decision-cut receipt.
+- **EVIDENCE_DELTA:** no admitted real A1 AOV result and no real prospective seal; prospective clock is false; portfolio-alpha evidence remains `0`.
+- **SCORE:** canonical accepted maturity remains `70/100`; local mechanical completion does not earn alpha/live uplift.
+- **RECOMMENDED_NEXT_STEP:** owner freezes the two insurance budget values and admit the five current AOV artifacts, then run `scripts/aov0_first_seal.py` immediately.
+- **DO_NOT_REDECIDE:** one app, one engine, permanent IDs only, PIT total-return authority, official SOFR cash, Rule100 control, risk-reducing Child, no compatibility.
+- **DO_NOT_START:** provider breadth, full source-app sweep, AOV-2/event authority, hidden-OOS platformization before need, optimizer/RL-first path, broker/live capital, outcome opening, alpha claim.
 - **LIMITED_LIVE:** `CLOSED; NOT AUTHORIZED`.
-- **DO_NOT_START:** provider framework, optimizer, broker, live capital, score uplift, alpha claim, premature outcome opening, or 5/25-security expansion.

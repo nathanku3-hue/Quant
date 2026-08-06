@@ -1,3 +1,29 @@
+## 2026-08-06 AOV-0 Formula and Decision Registry
+
+- Method authority: `docs/architecture/alpha_organism_endgame_current.md`; active brief: `docs/phase_brief/alpha-organism-vertical-0-brief.md`; detailed checklist: `docs/checklists/aov0_working_alpha_system_checklist.md`.
+- State vector: `x_(i,t) := (Q, M, F_proxy, C_proxy, L, R, U)`.
+- Control law: `dynamic_deltas = 0 => AOV target weights numerically equal Rule100 target weights within the frozen tolerance`; canonical serialized evidence is byte-identical after sorting and formatting.
+- Parent/Child law: Parent and Child use one PIT cube, universe, return matrix, execution lag, cost policy, and Rule100 budget/cap/lifecycle/cash harness. Child differs by exactly one declared mutation.
+- Hazard mandate: `ReversalHazard` is a bounded risk-insurance overlay. Its promotion objective is safety improvement subject to a frozen premium budget; no positive-average-return requirement may be silently added.
+- P&L authority: PIT total-return matrix is the sole return authority; corporate-action records are reconciliation-only and cannot inject a second P&L path.
+- Cash separation: engine residual cash, economic cash benchmark, and future broker cash are distinct authorities.
+- Seal semantics: a prospective seal binds model/data/universe/cost/endpoint/execution/horizon identities and starts the clock; it contributes zero financial-alpha evidence until outcome maturity.
+- Review identity: `delta_net := delta_gross - delta_cost`; `abs(observed_delta_net - calculated_delta_net) <= frozen_tolerance` before ontology. Contribution partitions are realized accounting partitions, not causal components.
+- Search-debt separation: search debt reduces promotion confidence, not current target weights.
+- Current P0 decisions still open: dimensionally coherent `F_proxy/C_proxy`; Rule100 equivalence implementation; Parent policy; insurance endpoint/materiality/premium; total-return source; economic-cash total-return convention; sleeve execution/horizon; PIT universe; V0 parameters; dependence-aware inference.
+- Current claim boundary: AOV implementation not started; AOV evidence `0`; Limited Live closed.
+
+## 2026-08-06 PAIR-DECISION-SERIES-1 Temporal Contract Formula Registry
+
+- Runtime: `gv_portfolio_v0/market_source_adapter.py`; execution/replay binding: `gv_portfolio_v0/prospective.py`.
+- Strict decision timestamp: `decision_observed_at_n := floor_to_minute(decision_cut_knowledge_at_n) + 1 minute`; therefore `decision_observed_at_n > decision_cut_knowledge_at_n`, including knowledge cuts exactly on a minute boundary.
+- Adjacent-cut sequence: for every `n > 1`, `decision_cut_knowledge_at_n > decision_cut_knowledge_at_(n-1)` and `decision_cut_id_n != decision_cut_id_(n-1)`.
+- Capture binding: `episode.decision_cut_knowledge_at == capture.retrieval_knowledge_at` and `capture.source_timestamp_utc <= capture.retrieval_knowledge_at`.
+- Outcome opening: `outcome_open_not_before_n := decision_cut_knowledge_at_n + minimum_elapsed_calendar_days`; the current invariant horizon uses 30 calendar days.
+- Series invariants: pair, comparator, cost model, decision policy, source contract, outcome-horizon specification, and banked subject-evidence identities remain byte-equivalent to episode 1.
+- Current evidence: Episode 1 and Episode 2 remain `ABSTAIN / NO_POSITION`; cash `11000`, costs `0`, unexplained residual `0`; local bounded matrix `142/142 PASS` after adjacent-cut, exact-minute, and outcome-open regressions.
+- Claim boundary: sealed forward paper episodes only; opened outcomes `0`, portfolio-alpha evidence `0`, Limited Live closed.
+
 ## 2026-07-21 E0B Observation / Decision-Value Formula Registry
 
 - Runtime: `core/gv_e0b_dv1_contradiction.py::decision_value_disposition_from_comparison`.
@@ -6617,5 +6643,24 @@ Focused tests: `tests/gv_fs0_product/test_open_vertical.py`.
 - Score: terminal accepted operability/custody/replay maturity `70/100`; prior construction held `62/100` until publication.
 - Active gate after publication: `PIT-SOURCE-AUTHORITY-1` on branch `codex/pit-source-authority-1`.
 - Non-claims: alpha, source quality, realized value, broker, live readiness remain closed.
+
+## AOV-0 Full Local Hard Cut + Vertical Formula Registry (2026-08-06)
+
+Implementation paths: `research/aov0/contracts.py`, `cube.py`, `policy.py`, `dag.py`, `cash.py`, `experiment.py`, `review.py`; research hardening in `research/backtest_runner.py`, `benchmarks.py`, `evidence_schema.py`, `strategy_cartridge.py`, and `research/adapters/rule100_replay_adapter.py`.
+
+- Local immutable Episode-2 candidate: `39f7be3894623c095994066b8f0ea2895b968643`; exact archived selected matrix `115/115 PASS`; old `142/142` count superseded.
+- AOV local executable lineage before docs closure: `39f7be3 → 4b14846015c952242d4bf17819bc615435bda091 → dca69fc72dd3192913aa921323ff48f68610a925`.
+- Capital-pressure proxy: `F_proxy = robust_z(sign(total_return) * min(abs(total_return) / realized_vol, 3) * dollar_volume / adv20)`.
+- Crowding proxy: `C_proxy = EWMA20(abs(F_proxy))`; no second ADV division.
+- Parent policy: preserve Rule100 date-local eligibility, risky gross budget, target-change schedule, single-name cap, and residual cash; state deltas redistribute only inside that budget.
+- Child policy: `child_weight_i,t <= parent_weight_i,t`; the one frozen reversal-insurance mutation may only reduce risky exposure and increase residual cash.
+- Economic cash: `annual_rate = SOFR_percent / 100 - 0.0025`; interval return `= annual_rate * calendar_days / 360`; no zero floor; rate usable only after official publication; missing official SOFR blocks.
+- Research identity: frame/evidence signatures include actual cell bytes/content rather than shape/date metadata only; final `evidence_manifest.json` hashes every component and the run directory is immutable.
+- Benchmark contract: required named arms are implicit cash, PIT equal-weight eligible universe, and economic cash; headline primary benchmark is explicit; PIT-EW changes only when the strategy target schedule changes and forward-fills otherwise.
+- Rule100 adapter: `permno` mandatory; `daily_portfolio` mandatory; ticker/asset fallback forbidden; replay residual cash must equal `1 - sum(risky_target_weights)` within tolerance.
+- Review reconciliation: `net_delta = gross_delta - cost_delta`; max absolute residual must be `<= 1e-12`; otherwise status `ACCOUNTING_FAILURE` and no review authority.
+- Insurance endpoint: Expected Shortfall/CVaR with frozen level `0.95`; production materiality floor and annual premium ceiling are intentionally unresolved (`None`) until owner approval.
+- First real seal input contract: `data/aov0/current/{rule100_targets.parquet,vertical_primitives.parquet,total_returns.parquet,official_sofr.parquet,decision_cut.json}` plus the two owner insurance values. Current status is fail-closed with `prospective_clock_started=false` and `alpha_evidence=0`.
+- ZERO-COMPAT gate: root duplicate apps, AOV ticker/asset aliases, legacy book projection, transitional authority fallback, mutable evidence-manifest bypass, and unnamed benchmark selection must all equal zero.
 
 
