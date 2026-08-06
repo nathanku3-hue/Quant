@@ -7,16 +7,20 @@ This section supersedes every active-gate statement below.
 ```text
 PRODUCT = point-in-time certified portfolio operating system
 PUBLISHED_CUT = PIT-ALPHA-AUTHORITY-CUT-1 @ 9af5259
-TERMINAL_TAG = pit-alpha-authority-cut-1-terminal
-ACTIVE_GATE = PIT-SOURCE-AUTHORITY-1
-SOLE_APPLICATION = dashboard.py
+ACTIVE_GATE = PAIR-DECISION-SERIES-1 EPISODE 1
+ACTIVE_STATUS = IMPLEMENTED_LOCALLY; AUDIT_AND_PUBLICATION_PENDING
+SOLE_APPLICATION = dashboard.py / Command Center
+REAL_IDENTITIES = MU | NVDA
+MARKET_AUTHORITY = ONE_COMMON_SOURCE_OBJECT | ONE_PERMISSION_MANIFEST | ONE_PARSER | ONE_PIT_CUT
+SUBJECT_EVIDENCE = BANKED_ONLY
+EPISODE_DISPOSITION = CASH_ABSTAIN | REJECT_ALL
+OUTCOME_STATUS = SEALED_NOT_OPENED
 CANONICAL_SCORE = 70/100 OPERABILITY_CUSTODY_REPLAY_ONLY
-SCORE_NOT = ALPHA | SOURCE_QUALITY | REALIZED_VALUE | BROKER | LIVE_READINESS
-ACTIVE_REQUIREMENT = IMMUTABLE_BITEMPORAL_MARKET_PACKET
+PORTFOLIO_ALPHA_EVIDENCE = 0
 LIMITED_LIVE = CLOSED
 ```
 
-Published product flow remains: all-capital PIT proposals → bounded paper entry → displayed-proposal-bound SELL+BUY rotation → explicit confirm or reject-all → atomic persistence → certification lineage → fresh-process exact reopen. Active requirement: replace free-text `operator://` market authority with an immutable packet carrying source/permission identity, raw bytes or receipt, valid/effective time, retrieval/knowledge time, permanent instrument identity, value/unit/currency, schema version, and SHA-256 through that same loop. Historical requirements below remain audit continuity only unless re-authorized.
+The active product requirement is one source-bound real MU/NVDA/cash episode through the existing preview, explicit disposition, atomic persistence, certification, and fresh-process replay path. The Command Center cannot author market price, source, permission, parser, receipt, row identity, or market timestamps. Episode 1 seals its outcome horizon, opening rule, comparator, cost model, decision policy, and source contract before any outcome data is visible. Both subject packages remain ABSTAIN/NO_POSITION, so the valid confirmation retains certified cash without fabricated orders, costs, or alpha. Historical requirements below remain audit continuity only unless re-authorized.
 
 ---
 

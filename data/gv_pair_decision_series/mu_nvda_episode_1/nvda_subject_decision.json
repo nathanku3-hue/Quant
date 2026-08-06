@@ -1,0 +1,32 @@
+{
+  "bounded_interpretation": "The banked issuer evidence identifies real supply-chain constraints but does not establish a valuation-adjusted expected-return edge, calibrated probability, or investable alpha for NVDA.",
+  "claim_boundary": "Subject-specific NVDA paper decision from already-banked evidence only. No new subject evidence, recommendation, alpha, broker, or live-capital authority.",
+  "decision_package_id": "PAIR1_NVDA_SUBJECT_DECISION",
+  "evidence_fact_ids": [
+    "SF2_FACT_MEMORY_PRICES_001",
+    "SF2_FACT_FOUNDRY_CAPACITY_001",
+    "SF2_FACT_SCARCE_INPUTS_001",
+    "SF2_FACT_SUPPLY_SHORTFALL_001",
+    "SF2_FACT_NCNR_ORDERS_001"
+  ],
+  "hard_falsifiers": [
+    "fact_set file hash, fact_set_hash, source object hash, or fact locator fails verification",
+    "market packet permanent identity or source cut does not match NVDA"
+  ],
+  "missing_discriminator": "Point-in-time evidence that connects the disclosed constraints to an independently valued, cost-aware NVDA return opportunity at the decision cut.",
+  "net_score_bps": 0,
+  "outcome": "ABSTAIN",
+  "permanent_instrument_identity": "SEC_CIK:0001045810:NASDAQ:NVDA:COMMON_STOCK",
+  "portfolio_action": "NO_POSITION",
+  "principal_claim": "NVIDIA disclosed elevated memory and systems prices, scarce inputs, foundry-capacity constraints, possible supply shortfalls, and non-cancellable purchase commitments.",
+  "schema_version": "gv_pair_subject_decision_v1",
+  "source_evidence_file_sha256": "619cffd785ae8a97d6bb45406660ce4f23f5e4d3a6cf4f3dcb3bce1265b94a62",
+  "source_evidence_identity": "7a90e429bd2f52e83a2cf67b51d2173363a7a115d4a2b949c8c31d6e4f4265dd",
+  "source_evidence_path": "data/gv_v2_alpha0/family_two_nvda_0001045810-26-000052/fact_set.json",
+  "source_family_id": "SEC:0001045810-26-000052",
+  "subject": "NVDA",
+  "target_quantity": "0",
+  "watch_conditions": [
+    "new banked NVDA-specific evidence changes the valuation-adjusted opportunity while preserving point-in-time custody"
+  ]
+}

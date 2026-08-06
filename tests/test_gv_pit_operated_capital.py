@@ -1,11 +1,9 @@
-"""One bounded non-zero paper-capital operation through existing authority."""
+"""PAIR-DECISION-SERIES-1 episode 1 product operation."""
 
 from __future__ import annotations
 
-from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
-from decimal import localcontext
-from functools import lru_cache
+from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
@@ -16,17 +14,11 @@ import textwrap
 
 import pytest
 
-from core.gv_fs0_canonical import (
-    canonical_decimal,
-    canonical_document_bytes,
-    domain_hash,
-    parse_canonical_document_bytes,
-)
-from core.gv_pit.adapters import build_real_pit_source_bundle
-from core.gv_pit.contracts import canonical_value
+from core.gv_fs0_canonical import canonical_document_bytes, parse_canonical_document_bytes, domain_hash
+from gv_portfolio_v0.market_packet import content_sha256_for_market_packet
+from gv_portfolio_v0.operated import OperatedPortfolioError
 from gv_portfolio_v0.operated_scenarios import (
-    OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    REAL_MU_PROSPECTIVE_SCENARIO_ID,
+    PAIR_DECISION_SERIES_SCENARIO_ID,
     get_scenario,
 )
 from gv_portfolio_v0.operated_storage import (
@@ -36,22 +28,14 @@ from gv_portfolio_v0.operated_storage import (
     reject_prospective_observation_and_persist,
     workspace_path,
 )
-from gv_portfolio_v0.market_packet import build_immutable_market_packet
-from gv_portfolio_v0.operated import OperatedPortfolioError
 from gv_portfolio_v0.prospective import (
-    MAX_PROSPECTIVE_EVENT_COUNT,
     ProspectiveOperationError,
-    _positive_decimal_text,
+    build_pair_episode_request,
     preview_runtime_observation,
     reconstruct_prospective_workspace,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-
-
-@lru_cache(maxsize=1)
-def _pit_identity() -> dict[str, object]:
-    return canonical_value(build_real_pit_source_bundle().pit_identity)  # type: ignore[return-value]
 
 _FRESH_PROCESS_SCRIPT = textwrap.dedent(
     """
@@ -59,319 +43,128 @@ _FRESH_PROCESS_SCRIPT = textwrap.dedent(
     import json
     from pathlib import Path
     import sys
-
     from core.gv_fs0_canonical import canonical_document_bytes
-    from gv_portfolio_v0.operated_scenarios import OPERATED_PAPER_CAPITAL_SCENARIO_ID
+    from gv_portfolio_v0.operated_scenarios import PAIR_DECISION_SERIES_SCENARIO_ID
     from gv_portfolio_v0.operated_storage import load_prospective_workspace
     from gv_portfolio_v0.prospective import reconstruct_prospective_workspace
 
     root = Path(sys.argv[1])
     workspace = load_prospective_workspace(
-        root=root,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+        root=root, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
     reconstructed = reconstruct_prospective_workspace(
-        workspace["events"],
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+        workspace["events"], scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
-    print(
-        json.dumps(
-            {
-                "workspace_hash": hashlib.sha256(
-                    canonical_document_bytes(workspace)
-                ).hexdigest(),
-                "reconstructed_hash": hashlib.sha256(
-                    canonical_document_bytes(reconstructed)
-                ).hexdigest(),
-                "certification_id": workspace["certification"]["certification_id"],
-                "book_hash": workspace["book"]["book_hash"],
-                "positions": workspace["book"]["positions"],
-                "classified_cash": workspace["book"]["classified_cash"],
-                "costs": workspace["book"]["classified_costs"],
-                "residual": workspace["book"]["unexplained_residual"],
-            },
-            sort_keys=True,
-        )
-    )
+    print(json.dumps({
+        "workspace_hash": hashlib.sha256(canonical_document_bytes(workspace)).hexdigest(),
+        "reconstructed_hash": hashlib.sha256(canonical_document_bytes(reconstructed)).hexdigest(),
+        "certification_id": workspace["certification"]["certification_id"],
+        "series": workspace["decision_series_contract"]["decision_series_id"],
+        "episode": workspace["decision_series_contract"]["episode_number"],
+        "sealed": workspace["sealed_series_episode_count"],
+        "opened": workspace["opened_outcome_episode_count"],
+        "positions": workspace["book"]["positions"],
+        "cash": workspace["book"]["total_cash"],
+        "costs": workspace["book"]["total_costs"],
+        "residual": workspace["book"]["unexplained_residual"],
+    }, sort_keys=True))
     """
 )
 
 
-def _request(
-    workspace: dict[str, object],
-    *,
-    quantity: str = "10",
-    price: str = "100",
-    observed_at: str = "2026-08-04T12:01:00.000000Z",
-    market_observed_at: str = "2026-08-04T12:00:00.000000Z",
-) -> dict[str, object]:
-    review = workspace["reviews"][0]
-    instrument = workspace["instruments"][0]
-    receipt = (
-        f"RECEIPT instrument={instrument['symbol']} value={price} "
-        f"valid={market_observed_at}"
+def _workspace(tmp_path: Path) -> dict[str, object]:
+    return ensure_prospective_workspace(
+        root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
-    try:
-        market_packet = build_immutable_market_packet(
-            source_permission_identity="owner-local/permission/manual-v1",
-            raw_bytes_or_receipt=receipt,
-            valid_effective_at=market_observed_at,
-            retrieval_knowledge_at=market_observed_at,
-            permanent_instrument_identity=str(instrument["permanent_key"]),
-            instrument_id=str(review["instrument_id"]),
-            value=price,
-        )
-    except Exception:
-        # Leave invalid field material for domain normalization to fail closed.
-        market_packet = {
-            "schema_version": "gv_immutable_market_packet_v1",
-            "source_permission_identity": "owner-local/permission/manual-v1",
-            "raw_bytes_or_receipt": receipt,
-            "valid_effective_at": market_observed_at,
-            "retrieval_knowledge_at": market_observed_at,
-            "permanent_instrument_identity": str(instrument["permanent_key"]),
-            "instrument_id": str(review["instrument_id"]),
-            "value": price,
-            "unit": "price",
-            "currency": "USD",
-        }
-    return {
-        "content": (
-            "Owner-reviewed evidence establishes a bounded Micron-specific supply "
-            "persistence claim for this paper episode."
+
+
+def _request(workspace: dict[str, object]) -> dict[str, object]:
+    return build_pair_episode_request(
+        workspace,
+        operator_rationale=(
+            "The common source cut is valid, but banked evidence does not establish a "
+            "cost-aware expected-return edge for either security. Retain certified cash."
         ),
-        "locator": "operator://2026-08-04/mu/supply-persistence-1",
-        "observed_at": observed_at,
-        "pit_identity": _pit_identity(),
-        "market_instrument_id": review["instrument_id"],
-        "market_packet": market_packet,
-        "review_updates": [
-            {
-                "instrument_id": review["instrument_id"],
-                "outcome": "ADMIT",
-                "net_score_bps": 500,
-                "target_quantity": quantity,
-                "principal_claim": (
-                    "The admitted evidence supports one bounded paper position in MU."
-                ),
-            }
-        ],
-        "operator_rationale": (
-            "Fund the explicit paper target from AVAILABLE certified cash at the "
-            "identified owner-supplied market observation."
-        ),
-    }
-
-
-def _available_cash(workspace_or_transition: dict[str, object], key: str) -> str:
-    rows = workspace_or_transition[key]
-    return next(row["amount"] for row in rows if row["bucket"] == "AVAILABLE")
-
-
-def _app_blob(app: object) -> str:
-    parts: list[str] = []
-    for collection_name in (
-        "header",
-        "subheader",
-        "caption",
-        "info",
-        "warning",
-        "success",
-        "error",
-        "table",
-    ):
-        for element in getattr(app, collection_name):
-            parts.append(str(getattr(element, "value", element)))
-    return "\n".join(parts)
+    )
 
 
 def _element_by_key(collection: object, key: str) -> object:
-    return next(
-        element for element in collection if getattr(element, "key", None) == key
-    )
+    return next(element for element in collection if getattr(element, "key", None) == key)
 
 
-def test_forward_profile_is_distinct_from_banked_real_mu_specimen(tmp_path: Path) -> None:
-    historical = get_scenario(REAL_MU_PROSPECTIVE_SCENARIO_ID)
-    forward = get_scenario(OPERATED_PAPER_CAPITAL_SCENARIO_ID)
+def _app_blob(app: object) -> str:
+    values: list[str] = []
+    for name in ("header", "subheader", "caption", "info", "warning", "success", "error", "table"):
+        for element in getattr(app, name):
+            values.append(str(getattr(element, "value", element)))
+    return "\n".join(values)
 
-    assert historical["portfolio_aim"]["allowed_actions"] == ["HOLD", "CASH"]
-    assert historical.get("forward_operated_market_packet") is None
-    assert forward["portfolio_aim"]["allowed_actions"] == ["BUY", "HOLD", "CASH"]
-    assert forward["forward_operated_market_packet"] is True
-    assert forward["source_scenario_id"] == REAL_MU_PROSPECTIVE_SCENARIO_ID
 
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
+def test_pair_profile_has_two_real_identities_and_cash_only_baseline(tmp_path: Path) -> None:
+    scenario = get_scenario(PAIR_DECISION_SERIES_SCENARIO_ID)
+    assert [row["symbol"] for row in scenario["instruments"]] == ["MU", "NVDA"]
+    assert len({row["permanent_key"] for row in scenario["instruments"]}) == 2
+    assert len({row["economic_cluster"] for row in scenario["instruments"]}) == 2
+    assert all(row["target_quantity"] == "0" for row in scenario["instruments"])
+    assert all(row["outcome"] == "ABSTAIN" for row in scenario["instruments"])
+    workspace = _workspace(tmp_path)
     assert workspace["book"]["positions"] == []
     assert workspace["book"]["total_cash"] == "11000"
+    assert workspace["book"]["total_costs"] == "0"
     assert workspace["book"]["unexplained_residual"] == "0"
-    assert workspace["pit_identity"] == _pit_identity()
+    assert workspace["sealed_series_episode_count"] == 0
+    assert workspace["opened_outcome_episode_count"] == 0
 
 
-def test_persisted_workspace_requires_canonical_json_bytes(tmp_path: Path) -> None:
-    ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
-    path = workspace_path(tmp_path, scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID)
-    original = path.read_bytes()
-    path.write_bytes(original.replace(b"\n", b" \n", 1))
-    try:
-        with pytest.raises(OperatedPortfolioError, match="WORKSPACE_CANONICAL_INVALID"):
-            load_prospective_workspace(
-                root=tmp_path,
-                scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-            )
-    finally:
-        path.write_bytes(original)
-
-    envelope = parse_canonical_document_bytes(original)
-    envelope["workspace"]["scenario_id"] = "GV_PROSPECTIVE_PAPER_BASELINE_1"
-    envelope["workspace_hash"] = domain_hash(
-        "GV-OPERATED-PORTFOLIO:WORKSPACE:V3", envelope["workspace"]
-    )
-    path.write_bytes(canonical_document_bytes(envelope))
-    try:
-        with pytest.raises(
-            OperatedPortfolioError,
-            match="PERSISTED_WORKSPACE_SCENARIO_ID_MISMATCH",
-        ):
-            load_prospective_workspace(
-                root=tmp_path,
-                scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-            )
-    finally:
-        path.write_bytes(original)
-
-
-def test_forward_pit_identity_is_source_bound_and_fails_closed(tmp_path: Path) -> None:
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
-    request = _request(workspace)
-    forged = deepcopy(request)
-    forged_identity = forged["pit_identity"]
-    forged_identity["certified_book_id"] = "0" * 64
-    forged_identity["evidence_set_id"] = "0" * 64
-    forged_identity["market_snapshot_id"]["certified_book_id"] = "0" * 64
-    forged_identity["market_snapshot_id"]["certified_book_hash"] = "0" * 64
-    forged_identity["market_snapshot_id"]["validation_digest"] = "0" * 64
-
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="FORWARD_OPERATED_PIT_IDENTITY_(?:WORKSPACE_)?MISMATCH",
-    ):
-        preview_runtime_observation(workspace, forged)
-
-
-def test_cash_funded_buy_preview_is_mutation_free_and_fully_reconciled(
-    tmp_path: Path,
-) -> None:
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
-    path = workspace_path(
-        tmp_path, scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID
-    )
-    persisted_before = path.read_bytes()
-    memory_before = canonical_document_bytes(workspace)
-
+def test_pair_preview_is_mutation_free_and_seals_cash_abstention(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    before = canonical_document_bytes(workspace)
     proposal = preview_runtime_observation(workspace, _request(workspace))
-
-    assert path.read_bytes() == persisted_before
-    assert canonical_document_bytes(workspace) == memory_before
-    assert proposal["economics_changed"] is True
+    assert canonical_document_bytes(workspace) == before
+    assert proposal["economics_changed"] is False
+    assert proposal["transition"] is None
     assert proposal["changed_why"]["change_type"] == (
-        "PROSPECTIVE_CASH_FUNDED_ENTRY"
+        "PAIR_DECISION_SERIES_EPISODE_1_CASH_ABSTAIN"
     )
-    assert proposal["transition"]["transition_kind"] == (
-        "PROSPECTIVE_CASH_FUNDED_ENTRY"
-    )
-    assert proposal["transition"]["order_count"] == 1
-    assert proposal["transition"]["legs"] == [
-        {
-            "instrument_id": workspace["reviews"][0]["instrument_id"],
-            "side": "BUY",
-            "quantity": "10",
-            "reference_price": "100",
-        }
-    ]
-    assert _available_cash(proposal["transition"], "classified_cash_after") == "8998"
-    assert proposal["transition"]["cash_after"] == "9998"
-    assert proposal["transition"]["costs_after"] == "2"
-    assert proposal["transition"]["unexplained_residual"] == "0"
-    assert proposal["transition"]["positions_after"] == [
-        {
-            "instrument_id": workspace["reviews"][0]["instrument_id"],
-            "quantity": "10",
-            "valuation_price": "100",
-            "market_value": "1000",
-        }
-    ]
-    packet = proposal["request"]["forward_operated_packet"]
-    assert packet["market_price"] == "100"
-    market_packet = packet["market_packet"]
-    assert market_packet["value"] == "100"
-    assert market_packet["schema_version"] == "gv_immutable_market_packet_v1"
-    assert market_packet["source_permission_identity"].startswith("owner-local/")
-    assert not market_packet["source_permission_identity"].startswith("operator://")
-    assert len(market_packet["content_sha256"]) == 64
-    assert market_packet["permanent_instrument_identity"] == workspace["instruments"][0][
-        "permanent_key"
-    ]
-    assert packet["target_quantity"] == "10"
-    assert packet["pit_identity"] == _pit_identity()
+    assert proposal["request"]["selected_disposition"] == "CASH_ABSTAIN"
+    assert len(proposal["request"]["source_derived_market_packets"]) == 2
+    contract = proposal["request"]["decision_series_contract"]
+    assert contract["episode_number"] == 1
+    assert contract["outcome_status"] == "SEALED_NOT_OPENED"
+    assert contract["outcome_data_loaded"] is False
 
 
-def test_cash_funded_buy_confirm_persists_certifies_and_reopens_exactly(
-    tmp_path: Path,
-) -> None:
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
+def test_confirm_persists_certifies_and_reopens_exactly(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
     prior_certification = workspace["certification"]["certification_id"]
     proposal = preview_runtime_observation(workspace, _request(workspace))
-
     confirmed = confirm_prospective_observation_and_persist(
-        proposal,
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+        proposal, root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
-
     assert confirmed["prospective_episode_count"] == 1
-    assert confirmed["operator_action_count"] == 2
-    assert confirmed["certification"]["certification_id"] != prior_certification
+    assert confirmed["sealed_series_episode_count"] == 1
+    assert confirmed["opened_outcome_episode_count"] == 0
     assert confirmed["certification"]["prior_certification_id"] == prior_certification
-    assert len(confirmed["orders"]) == 1
-    assert len(confirmed["fills"]) == 1
-    assert confirmed["orders"][0]["side"] == "BUY"
-    assert confirmed["orders"][0]["reference_price"] == "100"
-    assert confirmed["fills"][0]["price"] == "100"
-    assert confirmed["book"]["positions"][0]["quantity"] == "10"
-    assert _available_cash(confirmed["book"], "classified_cash") == "8998"
-    assert confirmed["book"]["total_costs"] == "2"
+    assert confirmed["book"]["positions"] == []
+    assert confirmed["orders"] == []
+    assert confirmed["fills"] == []
+    assert confirmed["book"]["total_cash"] == "11000"
+    assert confirmed["book"]["total_costs"] == "0"
     assert confirmed["book"]["unexplained_residual"] == "0"
-    assert confirmed["book"]["book_hash"] == proposal["transition"][
-        "book_hash_after"
-    ]
+    history = confirmed["prospective_episode_history"][0]
+    assert history["decision_series_id"] == "PAIR_DECISION_SERIES_1"
+    assert history["episode_number"] == 1
+    assert history["outcome_status"] == "SEALED_NOT_OPENED"
 
     reopened = load_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+        root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
     reconstructed = reconstruct_prospective_workspace(
-        reopened["events"],
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+        reopened["events"], scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
     assert canonical_document_bytes(reopened) == canonical_document_bytes(reconstructed)
-    expected_hash = hashlib.sha256(canonical_document_bytes(confirmed)).hexdigest()
 
+    expected_hash = hashlib.sha256(canonical_document_bytes(confirmed)).hexdigest()
     completed = subprocess.run(
         [sys.executable, "-c", _FRESH_PROCESS_SCRIPT, str(tmp_path)],
         cwd=ROOT,
@@ -384,301 +177,194 @@ def test_cash_funded_buy_confirm_persists_certifies_and_reopens_exactly(
     receipt = json.loads(completed.stdout)
     assert receipt["workspace_hash"] == expected_hash
     assert receipt["reconstructed_hash"] == expected_hash
-    assert receipt["positions"][0]["quantity"] == "10"
-    assert next(
-        row["amount"]
-        for row in receipt["classified_cash"]
-        if row["bucket"] == "AVAILABLE"
-    ) == "8998"
-    assert receipt["costs"][0]["amount"] == "2"
+    assert receipt["series"] == "PAIR_DECISION_SERIES_1"
+    assert receipt["episode"] == 1
+    assert receipt["sealed"] == 1
+    assert receipt["opened"] == 0
+    assert receipt["positions"] == []
+    assert receipt["cash"] == "11000"
+    assert receipt["costs"] == "0"
     assert receipt["residual"] == "0"
 
 
-def test_rejection_certifies_without_changing_economic_authority(tmp_path: Path) -> None:
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
+def test_reject_all_certifies_without_granting_subject_or_capital_authority(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
     proposal = preview_runtime_observation(workspace, _request(workspace))
-
     rejected = reject_prospective_observation_and_persist(
         proposal,
-        "The evidence is identified but not strong enough for capital authority.",
+        "The pair cut is valid but the combined package remains insufficient for capital authority.",
         root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+        scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID,
     )
-
-    assert rejected["prospective_episode_history"][-1]["disposition"] == "REJECTED"
-    assert canonical_document_bytes(rejected["book"]) == canonical_document_bytes(
-        workspace["book"]
-    )
+    assert rejected["prospective_episode_count"] == 1
+    assert rejected["prospective_episode_history"][0]["disposition"] == "REJECTED"
+    assert rejected["prospective_episode_history"][0]["episode_number"] == 1
+    assert rejected["book"]["positions"] == []
     assert rejected["orders"] == []
     assert rejected["fills"] == []
-    assert rejected["book"]["positions"] == []
-    assert rejected["certification"]["certification_id"] != workspace[
-        "certification"
-    ]["certification_id"]
+    assert rejected["book"]["total_cash"] == "11000"
+    assert rejected["book"]["unexplained_residual"] == "0"
 
 
-def test_cash_funded_entry_fails_closed_on_cash_market_or_stale_drift(
-    tmp_path: Path,
-) -> None:
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
+def test_manual_market_authority_fields_are_rejected(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    request = _request(workspace)
+    request["market_price"] = "999"
+    with pytest.raises(ProspectiveOperationError, match="MANUAL_MARKET_AUTHORITY_PROHIBITED"):
+        preview_runtime_observation(workspace, request)
 
-    with pytest.raises(Exception, match="INSUFFICIENT_CLASSIFIED_CASH"):
-        preview_runtime_observation(
-            workspace,
-            _request(workspace, quantity="1000", price="100"),
-        )
 
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="MARKET_PACKET_VALUE_TOO_LONG|MARKET_PRICE_OUT_OF_BOUNDS",
-    ):
-        preview_runtime_observation(
-            workspace,
-            _request(workspace, price="1e5000"),
-        )
+def test_packet_substitution_fails_even_with_recomputed_packet_hash(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    request = _request(workspace)
+    packet = request["source_derived_market_packets"][0]
+    packet["value"] = "1"
+    packet["content_sha256"] = content_sha256_for_market_packet(packet)
+    with pytest.raises(ProspectiveOperationError, match="NOT_SOURCE_DERIVED"):
+        preview_runtime_observation(workspace, request)
 
-    wrong_instrument = _request(workspace)
-    wrong_instrument["market_instrument_id"] = "SEC_CIK:WRONG"
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="FORWARD_OPERATED_MARKET_INSTRUMENT_MISMATCH",
-    ):
-        preview_runtime_observation(workspace, wrong_instrument)
 
-    after_evidence = _request(
-        workspace,
-        observed_at="2026-08-04T12:00:00.000000Z",
-        market_observed_at="2026-08-04T12:01:00.000000Z",
-    )
-    with pytest.raises(
-        ProspectiveOperationError,
-        match=(
-            "MARKET_PACKET_VALID_AFTER_EVIDENCE|"
-            "MARKET_PACKET_KNOWLEDGE_AFTER_EVIDENCE|"
-            "MARKET_OBSERVATION_AFTER_EVIDENCE_DECISION"
-        ),
-    ):
-        preview_runtime_observation(workspace, after_evidence)
+def test_series_contract_and_outcome_opening_tamper_fail_closed(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    request = _request(workspace)
+    request["decision_series_contract"]["outcome_data_loaded"] = True
+    with pytest.raises(ProspectiveOperationError, match="SERIES_CONTRACT_MISMATCH"):
+        preview_runtime_observation(workspace, request)
+    request = _request(workspace)
+    request["decision_series_contract"]["comparator_spec"]["primary"] = "AFTER_THE_FACT"
+    with pytest.raises(ProspectiveOperationError, match="SERIES_CONTRACT_MISMATCH"):
+        preview_runtime_observation(workspace, request)
 
+
+def test_pit_identity_and_subject_decision_drift_fail_closed(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    request = _request(workspace)
+    request["pit_identity"]["certified_book_id"] = "0" * 64
+    request["pit_identity"]["market_snapshot_id"]["certified_book_id"] = "0" * 64
+    with pytest.raises(ProspectiveOperationError, match="PIT_IDENTITY"):
+        preview_runtime_observation(workspace, request)
+    request = _request(workspace)
+    request["review_updates"][1]["outcome"] = "ADMIT"
+    request["review_updates"][1]["target_quantity"] = "1"
+    with pytest.raises(ProspectiveOperationError, match="SUBJECT_DECISION_DRIFT"):
+        preview_runtime_observation(workspace, request)
+
+
+def test_second_episode_cannot_be_retrofitted_into_episode_one_profile(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
     proposal = preview_runtime_observation(workspace, _request(workspace))
-    tampered = deepcopy(proposal)
-    tampered["request"]["forward_operated_packet"]["market_price"] = "101"
-    with pytest.raises(ProspectiveOperationError, match="STALE_OR_MUTATED_PROPOSAL"):
-        confirm_prospective_observation_and_persist(
-            tampered,
-            root=tmp_path,
-            scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-        )
-
-    binding_tampered = deepcopy(proposal)
-    binding_tampered["request"]["forward_operated_packet"]["principal_claim"] = (
-        "A different claim that is not bound to the reviewed update."
+    confirmed = confirm_prospective_observation_and_persist(
+        proposal, root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="FORWARD_OPERATED_PACKET_BINDING_MISMATCH",
-    ):
-        confirm_prospective_observation_and_persist(
-            binding_tampered,
-            root=tmp_path,
-            scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+    with pytest.raises(ProspectiveOperationError, match="EPISODE_ONE_ALREADY_SEALED"):
+        build_pair_episode_request(
+            confirmed, operator_rationale="Attempted duplicate episode one."
         )
 
 
-def test_forward_request_and_replay_bounds_fail_closed(tmp_path: Path) -> None:
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+def test_concurrent_confirm_allows_one_episode_only(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    proposal = preview_runtime_observation(workspace, _request(workspace))
+
+    def confirm() -> str:
+        try:
+            result = confirm_prospective_observation_and_persist(
+                proposal, root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
+            )
+            return f"ok:{result['prospective_episode_count']}"
+        except Exception as exc:  # noqa: BLE001 - assertion captures fail-closed result
+            return f"error:{type(exc).__name__}:{exc}"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        outcomes = list(executor.map(lambda _: confirm(), range(2)))
+    assert outcomes.count("ok:1") == 1
+    assert sum(value.startswith("error:ProspectiveOperationError") for value in outcomes) == 1
+    reopened = load_prospective_workspace(
+        root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
-
-    oversized = _request(workspace)
-    oversized["content"] = "x" * 4097
-    with pytest.raises(ProspectiveOperationError, match="CONTENT_TOO_LONG"):
-        preview_runtime_observation(workspace, oversized)
-
-    too_many_updates = _request(workspace)
-    too_many_updates["review_updates"] = [
-        too_many_updates["review_updates"][0]
-    ] * 65
-    with pytest.raises(ProspectiveOperationError, match="REVIEW_UPDATES_TOO_MANY"):
-        preview_runtime_observation(workspace, too_many_updates)
-
-    too_many_quantity_digits = _request(workspace, quantity="1" * 19)
-    with pytest.raises(
-        ProspectiveOperationError, match="TARGET_QUANTITY_OUT_OF_BOUNDS"
-    ):
-        preview_runtime_observation(workspace, too_many_quantity_digits)
-
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="PROSPECTIVE_EVENT_LIMIT_EXCEEDED",
-    ):
-        reconstruct_prospective_workspace([{}] * (MAX_PROSPECTIVE_EVENT_COUNT + 1))
-    with pytest.raises(
-        ProspectiveOperationError, match="PROSPECTIVE_EVENT_MAPPING_REQUIRED"
-    ):
-        reconstruct_prospective_workspace([object()])  # type: ignore[list-item]
+    assert reopened["prospective_episode_count"] == 1
 
 
-def test_market_price_and_book_replay_are_context_independent(tmp_path: Path) -> None:
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+def test_persisted_workspace_tamper_fails_closed(tmp_path: Path) -> None:
+    _workspace(tmp_path)
+    path = workspace_path(tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID)
+    original = path.read_bytes()
+    envelope = parse_canonical_document_bytes(original)
+    envelope["workspace"]["decision_series_contract"]["episode_number"] = 2
+    envelope["workspace_hash"] = domain_hash(
+        "GV-OPERATED-PORTFOLIO:WORKSPACE:V3", envelope["workspace"]
     )
-    request = _request(workspace, quantity="7", price="101.25")
-    with localcontext() as context:
-        context.prec = 2
-        context.Emin = -2
-        context.Emax = 2
-        for signal in context.traps:
-            context.traps[signal] = True
-        low_precision = _positive_decimal_text("101.25", field="market_price")
-        low_precision_canonical = canonical_decimal("101.25")
-        low_precision_proposal = preview_runtime_observation(workspace, request)
-    with localcontext() as context:
-        context.prec = 28
-        normal_precision = _positive_decimal_text("101.25", field="market_price")
-        normal_precision_proposal = preview_runtime_observation(workspace, request)
-    assert low_precision == normal_precision == low_precision_canonical == "101.25"
-    assert canonical_document_bytes(low_precision_proposal) == canonical_document_bytes(
-        normal_precision_proposal
-    )
+    path.write_bytes(canonical_document_bytes(envelope))
+    try:
+        with pytest.raises(
+            (OperatedPortfolioError, ProspectiveOperationError),
+            match="WORKSPACE_PROJECTION_MISMATCH|EPISODE",
+        ):
+            load_prospective_workspace(
+                root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
+            )
+    finally:
+        path.write_bytes(original)
 
 
-def test_command_center_operates_and_reopens_the_changed_certified_book(
+def test_command_center_operates_and_reopens_episode_one(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     pytest.importorskip("streamlit")
     from streamlit.testing.v1 import AppTest
 
-    def _denied(*_args: object, **_kwargs: object) -> None:
+    def denied(*_args: object, **_kwargs: object) -> None:
         raise OSError("GV_COMMAND_CENTER_NETWORK_DENIED")
 
-    monkeypatch.setattr(socket, "create_connection", _denied)
+    monkeypatch.setattr(socket, "create_connection", denied)
     monkeypatch.setenv("GV_OPERATED_PORTFOLIO_HOME", str(tmp_path / "workspace"))
     monkeypatch.chdir(ROOT)
 
     app = AppTest.from_file(str(ROOT / "dashboard.py")).run(timeout=120)
     assert not app.exception, app.exception
     initial = _app_blob(app)
-    assert "Active certified paper workspace" in initial
+    assert "Active certified pair-series workspace" in initial
+    assert "Seal real MU / NVDA / cash episode 1" in initial
     assert "CASH_ONLY" in initial
-    assert "Banked no-market comparison baseline" in initial
+    source_table = next(
+        element.value
+        for element in app.table
+        if "source_value" in element.value.columns
+    )
+    assert set(source_table["symbol"]) == {"MU", "NVDA"}
+    assert set(source_table["source_value"].astype(str)) == {"866.15", "219.77"}
+    all_keys = {
+        getattr(element, "key", None)
+        for collection in (app.text_input, app.number_input, app.text_area)
+        for element in collection
+    }
+    assert "gv_command_center_market_price" not in all_keys
+    assert "gv_command_center_market_source_identity" not in all_keys
+    assert "gv_command_center_market_receipt" not in all_keys
 
-    _element_by_key(
-        app.text_area, "gv_command_center_evidence_content"
-    ).set_value(
-        "Owner-reviewed evidence establishes a bounded Micron-specific supply persistence claim."
-    )
-    _element_by_key(
-        app.text_input, "gv_command_center_source_locator"
-    ).set_value("operator://2026-08-04/mu/supply-persistence-1")
-    _element_by_key(
-        app.text_input, "gv_command_center_evidence_observed_at"
-    ).set_value("2026-08-04T12:01:00.000000Z")
-    _element_by_key(app.text_input, "gv_command_center_market_price").set_value(
-        "100"
-    )
-    _element_by_key(
-        app.text_input, "gv_command_center_market_observed_at"
-    ).set_value("2026-08-04T12:00:00.000000Z")
-    _element_by_key(
-        app.text_input, "gv_command_center_market_knowledge_at"
-    ).set_value("2026-08-04T12:00:30.000000Z")
-    _element_by_key(
-        app.text_input, "gv_command_center_market_source_identity"
-    ).set_value("owner-local/permission/manual-v1")
-    _element_by_key(
-        app.text_area, "gv_command_center_market_receipt"
-    ).set_value("RECEIPT instrument=MU value=100 valid=2026-08-04T12:00:00.000000Z")
-    _element_by_key(
-        app.number_input, "gv_command_center_target_quantity"
-    ).set_value(10)
-    _element_by_key(
-        app.number_input, "gv_command_center_net_score_bps"
-    ).set_value(500)
-    _element_by_key(
-        app.text_area, "gv_command_center_principal_claim"
-    ).set_value("The admitted evidence supports one bounded paper position in MU.")
-    _element_by_key(
-        app.text_area, "gv_command_center_operator_rationale"
-    ).set_value(
-        "Fund the explicit target from AVAILABLE certified cash at the identified market observation."
-    )
     _element_by_key(app.button, "gv_command_center_preview").click()
     app = app.run(timeout=120)
     assert not app.exception, app.exception
     preview = _app_blob(app)
-    assert "Mutation-free paper-capital preview" in preview
-    preview_tables = [element.value for element in app.table]
+    assert "Mutation-free PAIR-DECISION-SERIES-1 episode 1 preview" in preview
     preview_summary = next(
-        table for table in preview_tables if "transition_kind" in table.columns
+        element.value
+        for element in app.table
+        if "outcome_status" in element.value.columns
     )
-    assert preview_summary.loc[0, "transition_kind"] == (
-        "PROSPECTIVE_CASH_FUNDED_ENTRY"
-    )
-    assert bool(preview_summary.loc[0, "authoritative"]) is False
-    assert any(
-        "bucket" in table.columns
-        and "8998" in set(table["amount"].astype(str))
-        for table in preview_tables
-    )
+    assert preview_summary.loc[0, "outcome_status"] == "SEALED_NOT_OPENED"
+    assert bool(preview_summary.loc[0, "economics_changed"]) is False
     assert "residual=0" in preview
 
     _element_by_key(app.button, "gv_command_center_confirm").click()
     app = app.run(timeout=120)
     assert not app.exception, app.exception
     confirmed = _app_blob(app)
-    assert "bounded cash-funded entry has been operated" in confirmed
-    assert "Certified paper fills" in confirmed
-    assert "BUY" in confirmed
-    assert "8998" in confirmed
-    confirmed_tables = [element.value for element in app.table]
-    authority = next(
-        table
-        for table in confirmed_tables
-        if "certification_lineage_depth" in table.columns
-    )
-    assert int(authority.loc[0, "certification_lineage_depth"]) == 1
-    assert int(authority.loc[0, "prospective_episode_count"]) == 1
+    assert "episode 1 is sealed, persisted, certified" in confirmed
+    assert "CASH_ONLY" in confirmed
 
     fresh = AppTest.from_file(str(ROOT / "dashboard.py")).run(timeout=120)
     assert not fresh.exception, fresh.exception
     reopened = _app_blob(fresh)
-    assert "bounded cash-funded entry has been operated" in reopened
-    assert "Certified paper fills" in reopened
-    assert "BUY" in reopened
-    assert "8998" in reopened
-    assert "CASH_ONLY" not in reopened
-
-
-def test_forward_profile_does_not_weaken_rebalance_rules_after_entry(
-    tmp_path: Path,
-) -> None:
-    workspace = ensure_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
-    confirmed = confirm_prospective_observation_and_persist(
-        preview_runtime_observation(workspace, _request(workspace)),
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
-    later = _request(
-        confirmed,
-        quantity="11",
-        observed_at="2026-08-04T13:01:00.000000Z",
-        market_observed_at="2026-08-04T13:00:00.000000Z",
-    )
-
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="PROSPECTIVE_TRANSITION_SELL_REQUIRED",
-    ):
-        preview_runtime_observation(confirmed, later)
+    assert "episode 1 is sealed, persisted, certified" in reopened
+    assert "CASH_ONLY" in reopened

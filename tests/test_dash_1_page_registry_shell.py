@@ -133,7 +133,11 @@ def test_dash_1_default_route_renders_real_command_center(
     )
     identity_table = next(table for table in tables if "market_context" in table.columns)
     proposal_table = next(table for table in tables if "module" in table.columns)
-    assert active_authority.loc[0, "scenario_id"] == "GV_OPERATED_PAPER_CAPITAL_1"
+    assert active_authority.loc[0, "scenario_id"] == (
+        "GV_PAIR_DECISION_SERIES_1_EPISODE_1"
+    )
+    assert int(active_authority.loc[0, "sealed_series_episode_count"]) == 0
+    assert int(active_authority.loc[0, "opened_outcome_episode_count"]) == 0
     assert active_authority.loc[0, "unexplained_residual"] == "0"
     assert identity_table.loc[0, "market_context"] == (
         "NO_MARKET_DEPENDENCY_CASH_ONLY_V1"

@@ -114,7 +114,7 @@ def test_required_product_canons_declare_current_authority_disposition() -> None
 def test_roadmap_distinguishes_accepted_foundation_from_active_operated_phase() -> None:
     text = _read(ROADMAP_REL)
     assert text.splitlines()[0] == "# GodView Top-Level Roadmap"
-    assert "PIT-SOURCE-AUTHORITY-1" in text
+    assert "PAIR-DECISION-SERIES-1" in text
     assert "PIT-ALPHA-AUTHORITY-CUT-1" in text or "pit-alpha-authority-cut-1-terminal" in text
     assert "9af5259" in text
     assert "dashboard.py" in text
@@ -126,7 +126,9 @@ def test_roadmap_distinguishes_accepted_foundation_from_active_operated_phase() 
     assert "NEXT_GATE = GV-DETERMINISTIC-REPLAY-0" not in text
     assert "39/100" not in text
     assert "immutable" in text.lower()
-    assert "market packet" in text.lower()
+    assert "market" in text.lower() and "packet" in text.lower()
+    assert "episode 1" in text.lower()
+    assert "portfolio-alpha evidence" in text.lower()
 
 
 def test_e0_preregistration_authority_sources_exist_and_are_tracked() -> None:

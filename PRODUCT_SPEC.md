@@ -6,17 +6,21 @@ This section supersedes every active product header below.
 
 ```text
 PUBLISHED_CUT = PIT-ALPHA-AUTHORITY-CUT-1 @ 9af5259
-TERMINAL_TAG = pit-alpha-authority-cut-1-terminal → 9af5259
-ACTIVE_SLICE = PIT-SOURCE-AUTHORITY-1
+ACTIVE_SLICE = PAIR-DECISION-SERIES-1 EPISODE 1
+ACTIVE_STATUS = IMPLEMENTED_LOCALLY; AUDIT_AND_PUBLICATION_PENDING
 PRODUCT_ENTRY = dashboard.py / Command Center
-DUPLICATE_OPERATOR_SURFACE = DELETED_WITHOUT_COMPATIBILITY
+REAL_PAIR = MU | NVDA
+MARKET_SOURCE = ONE_PINNED_CBOE_BZX_CAPTURE
+MARKET_DERIVATION = ONE_PERMISSION_MANIFEST | ONE_XML_ROW_PARSER | ONE_COMMON_PIT_CUT
+MANUAL_MARKET_AUTHORITY = DELETED_WITHOUT_COMPATIBILITY
+SERIES_CONTRACT = HORIZON | OPEN_DATE | COMPARATOR | COST | POLICY | SOURCE_VERSION
+OUTCOME_DATA = SEALED_NOT_OPENED
 SCORE = 70/100 OPERABILITY_CUSTODY_REPLAY_ONLY
-SCORE_NOT = ALPHA | SOURCE_QUALITY | REALIZED_VALUE | BROKER | LIVE_READINESS
-NEXT = IMMUTABLE_BITEMPORAL_MARKET_PACKET_THROUGH_EXISTING_LOOP
+PORTFOLIO_ALPHA_EVIDENCE = 0
 LIVE = CLOSED
 ```
 
-Published cut preserves one immutable PIT identity across operated MU, independent shadow MU, and certified cash; binds entry/rotation to displayed proposal, active book, certification, event count, and market packets; executes deterministic SELL-before-BUY accounting; persists and certifies atomically; rejects stale/tampered or buy-only requests; and reopens exact authority in a fresh process. The active slice replaces free-text `operator://` market authority with an immutable packet (source/permission identity, raw bytes or receipt, valid/effective time, retrieval/knowledge time, permanent instrument identity, value/unit/currency, schema version, SHA-256) through that same loop. Historical specifications below remain non-active audit history.
+The active slice derives separate MU and NVDA packets from one pinned common source object, verifies banked-only subject decisions, compares real MU / real NVDA / cash, and seals episode 1 before outcomes. The only confirmable episode-1 disposition is cash/abstention; reject-all remains available. Preview is calculation-only, persistence is atomic, certification binds the packet and series contracts, and fresh-process reconstruction is exact. No synthetic companion, provider framework, compatibility route, positive position claim, score uplift, alpha, broker, or live authority is added. Historical specifications below remain non-active audit history.
 
 ---
 

@@ -8,10 +8,12 @@ on:
       - "core/gv_pit/**"
       - "core/gv_v2_mu_nvda_*.py"
       - "data/gv_v2_reconciliation/**"
+      - "data/gv_pair_decision_series/**"
       - "gv_portfolio_v0/**"
       - "views/command_center.py"
       - "views/page_registry.py"
       - "tests/test_gv_pit_*.py"
+      - "tests/test_gv_immutable_market_packet.py"
       - "tests/test_dash_1_page_registry_shell.py"
       - "tests/gv_portfolio_v0/test_operated*.py"
       - "tests/gv_portfolio_v0/test_prospective.py"
@@ -25,17 +27,19 @@ on:
       - "PRODUCT_SPEC.md"
   push:
     branches:
-      - "codex/pit-alpha-authority-cut-1"
+      - "codex/pit-source-authority-1"
     paths:
       - ".github/workflows/gv-operated-portfolio.yml"
       - "dashboard.py"
       - "core/gv_pit/**"
       - "core/gv_v2_mu_nvda_*.py"
       - "data/gv_v2_reconciliation/**"
+      - "data/gv_pair_decision_series/**"
       - "gv_portfolio_v0/**"
       - "views/command_center.py"
       - "views/page_registry.py"
       - "tests/test_gv_pit_*.py"
+      - "tests/test_gv_immutable_market_packet.py"
       - "tests/test_dash_1_page_registry_shell.py"
       - "tests/gv_portfolio_v0/test_operated*.py"
       - "tests/gv_portfolio_v0/test_prospective.py"
@@ -96,6 +100,7 @@ jobs:
       - name: Run PIT domain and Command Center product proof
         run: >-
           python -m pytest -q
+          tests/test_gv_immutable_market_packet.py
           tests/test_gv_pit_transaction.py
           tests/test_gv_pit_operated_capital.py
           tests/test_gv_pit_operated_rotation.py

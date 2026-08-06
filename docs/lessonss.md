@@ -1,3 +1,12 @@
+## 2026-08-06 Round Entry (Repair Plumbing Inside the First Evidence-Producing Slice)
+
+- Date: 2026-08-06
+- Mistake or miss: the first plan treated source-authority honesty as its own terminal product release, duplicated review/publication/context work, assumed two separate market objects, and left episode-1 outcome/comparator terms for a later retrofit.
+- Root cause: a trust-substrate repair was sequenced as a milestone instead of as an internal acceptance gate of the first real cross-sectional and temporal evidence unit.
+- Fix applied: integrated source repair with MU/NVDA/cash episode 1; used one common Cboe BZX source capture, one permission manifest, one parser, and one PIT cut; removed manual authority and synthetic acceptance without compatibility; used banked-only subject evidence; sealed horizon, comparator, cost, policy, and source contracts before outcomes; retained honest cash/abstention; reduced review to one cross-domain audit and publication to one candidate/receipt.
+- Guardrail for next time: trust repairs that add no economic decision capability must be absorbed into the smallest evidence-producing vertical; prefer one multi-security source object; first valid pair wins; preregister episode 1 before outcome visibility; do not add breadth before repeated temporal evidence identifies breadth as the constraint.
+- Evidence paths: `gv_portfolio_v0/market_source_adapter.py`, `gv_portfolio_v0/market_packet.py`, `gv_portfolio_v0/prospective.py`, `views/command_center.py`, `data/gv_pair_decision_series/mu_nvda_episode_1/`, `tests/test_gv_immutable_market_packet.py`, `tests/test_gv_pit_operated_capital.py`, `tests/test_gv_pit_operated_rotation.py`, and `docs/phase_brief/pair-decision-series-1-brief.md`.
+
 ## 2026-08-06 Round Entry (Publish The Converged Tip; Reconcile Truth After, Not Before)
 
 - Date: 2026-08-06

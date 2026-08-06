@@ -1,13 +1,15 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `PIT-SOURCE-AUTHORITY-1 ACTIVE; PIT-ALPHA-AUTHORITY-CUT-1 PUBLISHED; LIVE CLOSED`
+Status: `PAIR-DECISION-SERIES-1 EPISODE 1 IMPLEMENTED; AUDIT/PUBLICATION PENDING; LIVE CLOSED`
 Date: 2026-08-06
 Published main / terminal tip: `9af5259d49969ba00db1fb3f4b3323ffb1d49205`
-Terminal tag: `pit-alpha-authority-cut-1-terminal` → exact `9af5259`
-Cleanup commit: `a92745118aab1a857a0251ce747cab247ba94605`
-Canonical score: `70/100` (product operability, custody, and replay only — not alpha, source quality, realized value, broker, or live readiness)
-Sole product application: `dashboard.py`
-Active product slice: `PIT-SOURCE-AUTHORITY-1`
+Current candidate base: `7191613f6e3bb00ac2f19eb1201f8723d9d695fe`
+Canonical product maturity: `70/100` (operability, custody, and replay only)
+Portfolio-alpha evidence: `0`
+Sole product application: `dashboard.py` / Command Center
+Active product slice: `PAIR-DECISION-SERIES-1 — EPISODE 1`
+Real pair: `MU / NVDA / cash`
+Outcome status: `SEALED_NOT_OPENED`
 Limited Live: `CLOSED; NOT AUTHORIZED`
 
 > This header supersedes historical active-gate language below. Historical sections remain audit context only.

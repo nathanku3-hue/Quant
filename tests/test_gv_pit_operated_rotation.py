@@ -1,502 +1,213 @@
-"""Proposal-bound post-entry SELL+BUY paper rotation acceptance."""
+"""Adversarial source, pair, and episode-1 certification acceptance."""
 
 from __future__ import annotations
 
+import ast
 from copy import deepcopy
-import hashlib
-import json
 from pathlib import Path
-import socket
-import subprocess
-import sys
-import textwrap
 
 import pytest
 
 from core.gv_fs0_canonical import canonical_document_bytes
-from core.gv_pit.adapters import build_real_pit_source_bundle
-from core.gv_pit.contracts import canonical_value
-from core.gv_pit.governance import govern_real_pit_bundle
-from core.gv_pit.read_models import project_decision_episode
-from gv_portfolio_v0.market_packet import build_immutable_market_packet
-from gv_portfolio_v0.operated_scenarios import OPERATED_PAPER_CAPITAL_SCENARIO_ID
+from gv_portfolio_v0.market_packet import content_sha256_for_market_packet
+from gv_portfolio_v0.market_source_adapter import (
+    load_source_derived_market_packets,
+    load_verified_episode_contract,
+    load_verified_pair_source,
+)
+from gv_portfolio_v0.operated_scenarios import PAIR_DECISION_SERIES_SCENARIO_ID
 from gv_portfolio_v0.operated_storage import (
     confirm_prospective_observation_and_persist,
     ensure_prospective_workspace,
-    load_prospective_workspace,
-    reject_prospective_observation_and_persist,
 )
 from gv_portfolio_v0.prospective import (
     ProspectiveOperationError,
-    operated_rotation_companion,
+    build_pair_episode_request,
     preview_runtime_observation,
-    reconstruct_prospective_workspace,
-)
-
-ROOT = Path(__file__).resolve().parents[1]
-
-
-def _app_blob(app: object) -> str:
-    parts: list[str] = []
-    for collection_name in (
-        "header",
-        "subheader",
-        "caption",
-        "info",
-        "warning",
-        "success",
-        "error",
-        "table",
-    ):
-        for element in getattr(app, collection_name):
-            parts.append(str(getattr(element, "value", element)))
-    return "\n".join(parts)
-
-
-def _element_by_key(collection: object, key: str) -> object:
-    return next(
-        element for element in collection if getattr(element, "key", None) == key
-    )
-
-
-_FRESH_PROCESS_SCRIPT = textwrap.dedent(
-    """
-    import hashlib
-    import json
-    from pathlib import Path
-    import sys
-
-    from core.gv_fs0_canonical import canonical_document_bytes
-    from gv_portfolio_v0.operated_scenarios import OPERATED_PAPER_CAPITAL_SCENARIO_ID
-    from gv_portfolio_v0.operated_storage import load_prospective_workspace
-    from gv_portfolio_v0.prospective import reconstruct_prospective_workspace
-
-    root = Path(sys.argv[1])
-    workspace = load_prospective_workspace(
-        root=root,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
-    reconstructed = reconstruct_prospective_workspace(
-        workspace["events"],
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
-    print(json.dumps({
-        "workspace_hash": hashlib.sha256(canonical_document_bytes(workspace)).hexdigest(),
-        "reconstructed_hash": hashlib.sha256(canonical_document_bytes(reconstructed)).hexdigest(),
-        "book_hash": workspace["book"]["book_hash"],
-        "positions": workspace["book"]["positions"],
-        "orders": workspace["orders"],
-        "fills": workspace["fills"],
-        "cash": workspace["book"]["classified_cash"],
-        "costs": workspace["book"]["classified_costs"],
-        "residual": workspace["book"]["unexplained_residual"],
-        "episode_count": workspace["prospective_episode_count"],
-        "lineage_depth": len(workspace["certification_history"]),
-    }, sort_keys=True))
-    """
 )
 
 
-def _pit_identity() -> dict[str, object]:
-    return canonical_value(build_real_pit_source_bundle().pit_identity)  # type: ignore[return-value]
-
-
-def _displayed_binding(workspace: dict[str, object]) -> dict[str, object]:
-    model = project_decision_episode(
-        govern_real_pit_bundle(build_real_pit_source_bundle()).read()
-    )
-    row = next(
-        proposal
-        for proposal in model.proposal_records
-        if proposal.module_id == "GV_REAL_MU_OPERATED"
-        and proposal.status == "ELIGIBLE"
-    )
-    return {
-        "episode_id": model.episode_id,
-        "record_id": row.record_id,
-        "proposal_id": row.proposal_id,
-        "module_id": row.module_id,
-        "module_version": row.module_version,
-        "sleeve_id": row.sleeve_id,
-        "status": row.status,
-        "pit_identity": _pit_identity(),
-        "active_book_hash": workspace["book"]["book_hash"],
-        "active_certification_id": workspace["certification"]["certification_id"],
-        "active_event_count": len(workspace["events"]),
-    }
-
-
-def _market_packet(
-    workspace: dict[str, object],
-    *,
-    instrument_id: str,
-    value: str,
-    valid_at: str,
-    receipt: str,
-) -> dict[str, str]:
-    instruments = list(workspace["instruments"])
-    try:
-        companion = operated_rotation_companion(workspace)
-        instruments.append(companion["instrument"])
-    except Exception:
-        pass
-    instrument = next(
-        row for row in instruments if row["instrument_id"] == instrument_id
-    )
-    return build_immutable_market_packet(
-        source_permission_identity="owner-local/permission/manual-v1",
-        raw_bytes_or_receipt=receipt,
-        valid_effective_at=valid_at,
-        retrieval_knowledge_at=valid_at,
-        permanent_instrument_identity=str(instrument["permanent_key"]),
-        instrument_id=str(instrument_id),
-        value=value,
+def _workspace(tmp_path: Path) -> dict[str, object]:
+    return ensure_prospective_workspace(
+        root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
     )
 
 
-def _entry_request(workspace: dict[str, object]) -> dict[str, object]:
-    review = workspace["reviews"][0]
-    return {
-        "content": "Owner-reviewed evidence supports one bounded MU paper entry.",
-        "locator": "operator://2026-08-04/mu/entry",
-        "observed_at": "2026-08-04T12:01:00.000000Z",
-        "pit_identity": _pit_identity(),
-        "market_instrument_id": review["instrument_id"],
-        "market_packet": _market_packet(
-            workspace,
-            instrument_id=str(review["instrument_id"]),
-            value="101.25",
-            valid_at="2026-08-04T12:00:00.000000Z",
-            receipt="RECEIPT instrument=MU value=101.25",
+def _request(workspace: dict[str, object]) -> dict[str, object]:
+    return build_pair_episode_request(
+        workspace,
+        operator_rationale=(
+            "Both real subjects remain below the banked-evidence capital threshold; "
+            "retain certified cash and seal the forward episode."
         ),
-        "review_updates": [
-            {
-                "instrument_id": review["instrument_id"],
-                "outcome": "ADMIT",
-                "net_score_bps": 500,
-                "target_quantity": "7",
-                "principal_claim": "The bounded owner assertion supports seven MU paper units.",
-            }
-        ],
-        "operator_rationale": "Operate the first bounded MU paper-capital entry.",
-    }
-
-
-def _episode_one(root: Path) -> dict[str, object]:
-    workspace = ensure_prospective_workspace(
-        root=root,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-    )
-    return confirm_prospective_observation_and_persist(
-        preview_runtime_observation(workspace, _entry_request(workspace)),
-        root=root,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
     )
 
 
-def _rotation_request(workspace: dict[str, object]) -> dict[str, object]:
-    source_review = workspace["reviews"][0]
-    companion = operated_rotation_companion(workspace)
-    companion_review = companion["review"]
-    return {
-        "content": (
-            "Owner-reviewed evidence reduces the bounded MU target and admits one "
-            "governed Meridian companion target for repeatability proof."
-        ),
-        "locator": "operator://2026-08-04/mu-merid/rotation",
-        "observed_at": "2026-08-04T13:01:00.000000Z",
-        "pit_identity": _pit_identity(),
-        "displayed_proposal_binding": _displayed_binding(workspace),
-        "forward_operated_market_packets": [
-            _market_packet(
-                workspace,
-                instrument_id=str(source_review["instrument_id"]),
-                value="101.25",
-                valid_at="2026-08-04T13:00:00.000000Z",
-                receipt="RECEIPT instrument=MU value=101.25 rotation",
-            ),
-            _market_packet(
-                workspace,
-                instrument_id=str(companion_review["instrument_id"]),
-                value="30",
-                valid_at="2026-08-04T13:00:00.000000Z",
-                receipt="RECEIPT instrument=MERID value=30 rotation",
-            ),
-        ],
-        "review_updates": [
-            {
-                "instrument_id": source_review["instrument_id"],
-                "outcome": "ADMIT",
-                "net_score_bps": 420,
-                "target_quantity": "4",
-                "principal_claim": "Retain four MU units after the bounded reduction.",
-            },
-            {
-                "instrument_id": companion_review["instrument_id"],
-                "outcome": "ADMIT",
-                "net_score_bps": 470,
-                "target_quantity": "5",
-                "principal_claim": "Fund five Meridian units from the accepted companion substrate.",
-            },
-        ],
-        "operator_rationale": (
-            "Reduce MU and fund Meridian to prove the displayed-proposal-to-capital "
-            "rotation loop; this is not an alpha claim."
-        ),
-    }
+def _rehash(packet: dict[str, str]) -> None:
+    packet["content_sha256"] = content_sha256_for_market_packet(packet)
 
 
-def test_rotation_preview_binds_displayed_proposal_and_is_mutation_free(
-    tmp_path: Path,
-) -> None:
-    workspace = _episode_one(tmp_path)
-    before = canonical_document_bytes(workspace)
-    proposal = preview_runtime_observation(workspace, _rotation_request(workspace))
-
-    assert canonical_document_bytes(workspace) == before
-    assert proposal["request"]["displayed_proposal_binding"]["module_id"] == (
-        "GV_REAL_MU_OPERATED"
+def test_acceptance_path_contains_no_synthetic_merid_or_companion() -> None:
+    scenario_source = Path("gv_portfolio_v0/operated_scenarios.py").read_text(
+        encoding="utf-8"
     )
-    assert proposal["request"]["displayed_proposal_binding"]["active_book_hash"] == (
-        workspace["book"]["book_hash"]
+    prospective_source = Path("gv_portfolio_v0/prospective.py").read_text(
+        encoding="utf-8"
     )
-    assert proposal["request"]["pit_identity"] == _pit_identity()
-    assert len(proposal["request"]["forward_operated_market_packets"]) == 2
-    assert proposal["request"]["forward_operated_market_packets"][0]["value"] == "101.25"
-    assert len(proposal["request"]["forward_operated_market_packets"][0]["content_sha256"]) == 64
-    assert proposal["transition"]["transition_kind"] == "PROSPECTIVE_REBALANCE"
-    assert [row["side"] for row in proposal["transition"]["legs"]] == ["SELL", "BUY"]
-    assert [row["quantity"] for row in proposal["transition"]["legs"]] == ["3", "5"]
-    assert proposal["transition"]["unexplained_residual"] == "0"
-    assert proposal["transition"]["order_count"] == 2
-    quantities = {
-        row["instrument_id"]: row["quantity"]
-        for row in proposal["transition"]["positions_after"]
-    }
-    source_id = workspace["reviews"][0]["instrument_id"]
-    companion_id = operated_rotation_companion(workspace)["review"]["instrument_id"]
-    assert quantities == {source_id: "4", companion_id: "5"}
-
-
-def test_rotation_confirm_persists_certifies_and_reopens_exactly(tmp_path: Path) -> None:
-    workspace = _episode_one(tmp_path)
-    proposal = preview_runtime_observation(workspace, _rotation_request(workspace))
-    confirmed = confirm_prospective_observation_and_persist(
-        proposal,
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+    command_center_source = Path("views/command_center.py").read_text(
+        encoding="utf-8"
     )
+    scenario = __import__(
+        "gv_portfolio_v0.operated_scenarios", fromlist=["get_scenario"]
+    ).get_scenario(PAIR_DECISION_SERIES_SCENARIO_ID)
+    assert [row["symbol"] for row in scenario["instruments"]] == ["MU", "NVDA"]
+    for source in (prospective_source, command_center_source):
+        assert "operated_rotation_companion" not in source
+        assert '"MERID"' not in source
+    assert "SELL+BUY rotation" not in command_center_source
 
-    assert confirmed["prospective_episode_count"] == 2
-    assert confirmed["operator_action_count"] == 4
-    assert len(confirmed["orders"]) == 3
-    assert len(confirmed["fills"]) == 3
-    assert [row["side"] for row in confirmed["orders"]] == ["BUY", "SELL", "BUY"]
-    assert len(confirmed["book"]["positions"]) == 2
-    assert confirmed["book"]["unexplained_residual"] == "0"
-    assert confirmed["book"]["book_hash"] == proposal["transition"]["book_hash_after"]
-    assert len(confirmed["certification_history"]) == 2
 
-    reopened = load_prospective_workspace(
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+def test_command_center_contains_no_manual_market_authority_controls() -> None:
+    source = Path("views/command_center.py").read_text(encoding="utf-8")
+    forbidden = (
+        "gv_command_center_market_price",
+        "gv_command_center_market_observed_at",
+        "gv_command_center_market_knowledge_at",
+        "gv_command_center_market_source_identity",
+        "gv_command_center_market_receipt",
+        "Market packet value",
+        "Market raw bytes or receipt",
+        "owner-local/permission/manual-v1",
     )
-    reconstructed = reconstruct_prospective_workspace(
-        reopened["events"],
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+    for value in forbidden:
+        assert value not in source
+    assert "build_pair_episode_request" in source
+    assert "source_derived_market_packets" in source
+
+
+def test_market_source_adapter_has_no_network_or_provider_framework_authority() -> None:
+    path = Path("gv_portfolio_v0/market_source_adapter.py")
+    source = path.read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    imported: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module)
+    assert imported.isdisjoint(
+        {"requests", "urllib", "httpx", "aiohttp", "yfinance", "socket"}
     )
-    assert canonical_document_bytes(reopened) == canonical_document_bytes(reconstructed)
-    expected_hash = hashlib.sha256(canonical_document_bytes(confirmed)).hexdigest()
-    completed = subprocess.run(
-        [sys.executable, "-c", _FRESH_PROCESS_SCRIPT, str(tmp_path)],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        timeout=240,
-        check=False,
+    assert "Invoke-WebRequest" not in source
+    assert "http_get" not in source
+    assert "data.providers" not in source
+
+
+def test_parser_permission_and_row_substitution_fail_closed(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    mutators = (
+        ("parser_identity", "UNAUTHORIZED_PARSER"),
+        ("parser_version", "999"),
+        ("permission_manifest_sha256", "0" * 64),
+        ("row_locator", "/wrong/row"),
+        ("row_sha256", "1" * 64),
     )
-    assert completed.returncode == 0, completed.stderr
-    receipt = json.loads(completed.stdout)
-    assert receipt["workspace_hash"] == receipt["reconstructed_hash"] == expected_hash
-    assert receipt["episode_count"] == 2
-    assert receipt["lineage_depth"] == 2
-    assert [row["side"] for row in receipt["orders"]] == ["BUY", "SELL", "BUY"]
-    assert receipt["residual"] == "0"
+    for field, value in mutators:
+        request = _request(workspace)
+        packet = request["source_derived_market_packets"][0]
+        packet[field] = value
+        _rehash(packet)
+        with pytest.raises(ProspectiveOperationError, match="NOT_SOURCE_DERIVED"):
+            preview_runtime_observation(workspace, request)
 
 
-def test_rotation_reject_all_preserves_book_and_does_not_add_companion(
-    tmp_path: Path,
-) -> None:
-    workspace = _episode_one(tmp_path)
-    proposal = preview_runtime_observation(workspace, _rotation_request(workspace))
-    rejected = reject_prospective_observation_and_persist(
-        proposal,
-        "The bounded rotation is valid but the operator rejects capital authority.",
-        root=tmp_path,
-        scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+def test_packet_instrument_swap_and_duplicate_fail_closed(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    request = _request(workspace)
+    first, second = request["source_derived_market_packets"]
+    first["instrument_id"], second["instrument_id"] = (
+        second["instrument_id"],
+        first["instrument_id"],
     )
+    _rehash(first)
+    _rehash(second)
+    with pytest.raises(ProspectiveOperationError, match="PERMANENT_IDENTITY_MISMATCH"):
+        preview_runtime_observation(workspace, request)
 
-    assert canonical_document_bytes(rejected["book"]) == canonical_document_bytes(
-        workspace["book"]
+    request = _request(workspace)
+    request["source_derived_market_packets"][1] = deepcopy(
+        request["source_derived_market_packets"][0]
     )
-    assert rejected["prospective_episode_count"] == 2
-    assert rejected["prospective_episode_history"][-1]["disposition"] == "REJECTED"
-    assert len(rejected["instruments"]) == len(workspace["instruments"]) == 1
-    assert len(rejected["orders"]) == 1
-    assert rejected["orders"][0]["side"] == "BUY"
+    with pytest.raises(ProspectiveOperationError, match="INSTRUMENT_DUPLICATE"):
+        preview_runtime_observation(workspace, request)
 
 
-def test_command_center_operates_displayed_proposal_rotation(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    pytest.importorskip("streamlit")
-    from streamlit.testing.v1 import AppTest
+def test_common_cut_time_drift_fails_closed(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    request = _request(workspace)
+    packet = request["source_derived_market_packets"][0]
+    packet["retrieval_knowledge_at"] = "2026-08-06T09:06:00.000000Z"
+    _rehash(packet)
+    with pytest.raises(ProspectiveOperationError, match="KNOWLEDGE_AFTER_DECISION"):
+        preview_runtime_observation(workspace, request)
 
-    def _denied(*_args: object, **_kwargs: object) -> None:
-        raise OSError("GV_COMMAND_CENTER_NETWORK_DENIED")
-
-    workspace_root = tmp_path / "workspace"
-    episode_one = _episode_one(workspace_root)
-    assert episode_one["prospective_episode_count"] == 1
-    monkeypatch.setattr(socket, "create_connection", _denied)
-    monkeypatch.setenv("GV_OPERATED_PORTFOLIO_HOME", str(workspace_root))
-    monkeypatch.chdir(ROOT)
-
-    app = AppTest.from_file(str(ROOT / "dashboard.py")).run(timeout=120)
-    assert not app.exception, app.exception
-    initial = _app_blob(app)
-    assert "Operate one proposal-bound SELL+BUY rotation" in initial
-    assert "GV_REAL_MU_OPERATED" in initial
-    assert "MERID" in initial
-
-    _element_by_key(
-        app.text_area, "gv_command_center_rotation_evidence_content"
-    ).set_value(
-        "Owner-reviewed evidence reduces the bounded MU target and admits one governed Meridian companion target."
-    )
-    _element_by_key(
-        app.text_input, "gv_command_center_rotation_source_locator"
-    ).set_value("operator://2026-08-04/mu-merid/rotation")
-    _element_by_key(
-        app.text_input, "gv_command_center_rotation_evidence_observed_at"
-    ).set_value("2026-08-04T13:01:00.000000Z")
-    _element_by_key(
-        app.text_input, "gv_command_center_rotation_source_market_observed_at"
-    ).set_value("2026-08-04T13:00:00.000000Z")
-    _element_by_key(
-        app.text_input, "gv_command_center_rotation_source_market_knowledge_at"
-    ).set_value("2026-08-04T13:00:30.000000Z")
-    _element_by_key(
-        app.text_input, "gv_command_center_rotation_source_market_source_identity"
-    ).set_value("owner-local/permission/manual-v1")
-    _element_by_key(
-        app.text_area, "gv_command_center_rotation_source_market_receipt"
-    ).set_value("RECEIPT instrument=MU value=101.25 rotation")
-    _element_by_key(
-        app.number_input, "gv_command_center_rotation_source_target_quantity"
-    ).set_value(4)
-    _element_by_key(
-        app.number_input, "gv_command_center_rotation_source_net_score_bps"
-    ).set_value(420)
-    _element_by_key(
-        app.text_area, "gv_command_center_rotation_source_principal_claim"
-    ).set_value("Retain four MU units after the bounded reduction.")
-    _element_by_key(
-        app.text_input, "gv_command_center_rotation_companion_market_observed_at"
-    ).set_value("2026-08-04T13:00:00.000000Z")
-    _element_by_key(
-        app.text_input, "gv_command_center_rotation_companion_market_knowledge_at"
-    ).set_value("2026-08-04T13:00:30.000000Z")
-    _element_by_key(
-        app.text_input, "gv_command_center_rotation_companion_market_source_identity"
-    ).set_value("owner-local/permission/manual-v1")
-    _element_by_key(
-        app.text_area, "gv_command_center_rotation_companion_market_receipt"
-    ).set_value("RECEIPT instrument=MERID value=30 rotation")
-    _element_by_key(
-        app.number_input, "gv_command_center_rotation_companion_target_quantity"
-    ).set_value(5)
-    _element_by_key(
-        app.number_input, "gv_command_center_rotation_companion_net_score_bps"
-    ).set_value(470)
-    _element_by_key(
-        app.text_area, "gv_command_center_rotation_companion_principal_claim"
-    ).set_value("Fund five Meridian units from the accepted companion substrate.")
-    _element_by_key(
-        app.text_area, "gv_command_center_rotation_operator_rationale"
-    ).set_value(
-        "Reduce MU and fund Meridian to prove the displayed-proposal-to-capital rotation loop; this is not an alpha claim."
-    )
-    _element_by_key(app.button, "gv_command_center_preview").click()
-    app = app.run(timeout=120)
-    assert not app.exception, app.exception
-    preview = _app_blob(app)
-    assert "Mutation-free paper-capital preview" in preview
-    assert "GV_REAL_MU_OPERATED" in preview
-    assert "SELL" in preview and "BUY" in preview
-    assert "residual=0" in preview
-    preview_tables = [element.value for element in app.table]
-    preview_summary = next(
-        table
-        for table in preview_tables
-        if "displayed_module" in table.columns
-    )
-    assert preview_summary.loc[0, "displayed_module"] == "GV_REAL_MU_OPERATED"
-    assert bool(preview_summary.loc[0, "authoritative"]) is False
-
-    _element_by_key(app.button, "gv_command_center_confirm").click()
-    app = app.run(timeout=120)
-    assert not app.exception, app.exception
-    confirmed = _app_blob(app)
-    assert "proposal-bound SELL+BUY rotation has been operated" in confirmed
-    assert "Certified paper fills" in confirmed
-    assert "SELL" in confirmed and "BUY" in confirmed
-    assert "MERID" in confirmed
-    confirmed_tables = [element.value for element in app.table]
-    authority = next(
-        table
-        for table in confirmed_tables
-        if "prospective_episode_count" in table.columns
-    )
-    assert int(authority.loc[0, "prospective_episode_count"]) == 2
-    assert int(authority.loc[0, "certification_lineage_depth"]) == 2
-    active_book = next(
-        table
-        for table in confirmed_tables
-        if "symbol" in table.columns and "quantity" in table.columns
-    )
-    quantities = dict(zip(active_book["symbol"], active_book["quantity"].astype(str)))
-    assert quantities["MU"] == "4"
-    assert quantities["MERID"] == "5"
+    request = _request(workspace)
+    packet = request["source_derived_market_packets"][1]
+    packet["valid_effective_at"] = "2026-08-02T12:06:00.000000Z"
+    _rehash(packet)
+    with pytest.raises(ProspectiveOperationError, match="VALID_NOT_AFTER_AUTHORITY"):
+        preview_runtime_observation(workspace, request)
 
 
-def test_rotation_rejects_stale_binding_and_buy_only_top_up(tmp_path: Path) -> None:
-    workspace = _episode_one(tmp_path)
-    stale = _rotation_request(workspace)
-    stale["displayed_proposal_binding"]["active_book_hash"] = "0" * 64
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="DISPLAYED_PROPOSAL_ACTIVE_BOOK_MISMATCH",
+def test_one_source_permission_parser_and_cut_bind_two_unique_packets(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    packets = load_source_derived_market_packets(workspace["instruments"])
+    contract = load_verified_episode_contract()
+    source = load_verified_pair_source()
+    assert len(packets) == 2
+    for field in (
+        "source_contract_version",
+        "source_object_identity",
+        "source_object_sha256",
+        "permission_manifest_identity",
+        "permission_manifest_sha256",
+        "parser_identity",
+        "parser_version",
+        "decision_cut_id",
+        "valid_effective_at",
+        "retrieval_knowledge_at",
     ):
-        preview_runtime_observation(workspace, stale)
+        assert packets[0][field] == packets[1][field]
+    assert packets[0]["decision_cut_id"] == contract["decision_cut_id"]
+    assert packets[0]["source_object_sha256"] == source["capture_sha256"]
+    assert packets[0]["permission_manifest_sha256"] == source["permission_sha256"]
+    assert packets[0]["row_locator"] != packets[1]["row_locator"]
+    assert packets[0]["row_sha256"] != packets[1]["row_sha256"]
+    assert packets[0]["content_sha256"] != packets[1]["content_sha256"]
 
-    buy_only = _rotation_request(workspace)
-    buy_only["review_updates"][0]["target_quantity"] = "8"
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="OPERATED_ROTATION_SOURCE_REDUCTION_REQUIRED",
-    ):
-        preview_runtime_observation(workspace, buy_only)
 
-    proposal = preview_runtime_observation(workspace, _rotation_request(workspace))
+def test_confirmed_event_and_certification_bind_series_and_packets(tmp_path: Path) -> None:
+    workspace = _workspace(tmp_path)
+    request = _request(workspace)
+    proposal = preview_runtime_observation(workspace, request)
     tampered = deepcopy(proposal)
-    tampered["request"]["displayed_proposal_binding"]["proposal_id"] = "PRP_TAMPERED"
-    with pytest.raises(
-        ProspectiveOperationError,
-        match="DISPLAYED_PROPOSAL_BINDING_MISMATCH",
-    ):
+    tampered["changed_why"]["reason"] = "Mutated after preview."
+    with pytest.raises(ProspectiveOperationError, match="STALE_OR_MUTATED_PROPOSAL"):
         confirm_prospective_observation_and_persist(
-            tampered,
-            root=tmp_path,
-            scenario_id=OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+            tampered, root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
         )
+    confirmed = confirm_prospective_observation_and_persist(
+        proposal, root=tmp_path, scenario_id=PAIR_DECISION_SERIES_SCENARIO_ID
+    )
+    episode_events = [
+        row for row in confirmed["events"] if row["event_type"] == "LATER_OBSERVATION_ADMITTED"
+    ]
+    assert len(episode_events) == 1
+    stored = episode_events[0]["payload"]["prospective_proposal"]
+    assert stored["request"]["decision_series_contract"]["episode_number"] == 1
+    assert stored["request"]["decision_series_contract"]["outcome_data_loaded"] is False
+    assert len(stored["request"]["source_derived_market_packets"]) == 2
+    assert canonical_document_bytes(stored) == canonical_document_bytes(proposal)
+    assert confirmed["certification"]["subject_event_ledger_hash"] != workspace[
+        "certification"
+    ]["subject_event_ledger_hash"]

@@ -33,7 +33,10 @@ def test_current_context_preserves_terminal_and_active_named_product_gates() -> 
     assert "9af5259" in joined
     assert "pit-alpha-authority-cut-1-terminal" in joined
     assert "70/100" in joined
-    assert "market packet" in joined.lower()
+    assert "market" in joined.lower() and "packet" in joined.lower()
+    assert "PAIR-DECISION-SERIES-1" in joined
+    assert "episode 1" in joined.lower()
+    assert "portfolio-alpha evidence" in joined.lower() and "0" in joined
     assert "Limited Live" in joined and "closed" in joined.lower()
 
 
@@ -43,10 +46,11 @@ def test_current_surfaces_select_one_active_operated_portfolio_gate() -> None:
     readme_text = README.read_text(encoding="utf-8")
     active_brief = ACTIVE_BRIEF.read_text(encoding="utf-8").strip()
 
-    assert active_brief == "docs/phase_brief/pit-source-authority-1-brief.md"
+    assert active_brief == "docs/phase_brief/pair-decision-series-1-brief.md"
     for text in (planner_text, bridge_text, readme_text):
-        assert "PIT-SOURCE-AUTHORITY-1" in text
+        assert "PAIR-DECISION-SERIES-1" in text
         assert "9af5259" in text
         assert "70/100" in text
+        assert "portfolio-alpha evidence" in text.lower() and "0" in text
         assert "live" in text.lower() and "closed" in text.lower()
         assert "GV-CHALLENGER-PROMOTION-1 OPEN" not in text

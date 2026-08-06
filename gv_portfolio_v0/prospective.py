@@ -8,7 +8,6 @@ from one canonical event log; scenario-authored later observations are prohibite
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, DecimalException, InvalidOperation
 from functools import lru_cache
@@ -35,17 +34,20 @@ from gv_portfolio_v0.operated import (
     _transition_legs_from_reviews,
     build_draft_workspace,
     confirm_initial_portfolio,
-    instrument_registry,
 )
 from gv_portfolio_v0.market_packet import (
     MarketPacketError,
-    build_immutable_market_packet,
     market_packet_price,
     normalize_immutable_market_packet,
 )
+from gv_portfolio_v0.market_source_adapter import (
+    MarketSourceAdapterError,
+    load_source_derived_market_packets,
+    load_verified_episode_contract,
+    load_verified_pair_source,
+)
 from gv_portfolio_v0.operated_scenarios import (
-    DEFAULT_SCENARIO_ID,
-    OPERATED_PAPER_CAPITAL_SCENARIO_ID,
+    PAIR_DECISION_SERIES_SCENARIO_ID,
     PROSPECTIVE_25_SCENARIO_ID,
     REAL_MU_PROSPECTIVE_SCENARIO_ID,
     get_scenario,
@@ -71,110 +73,17 @@ MAX_PROSPECTIVE_REQUEST_BYTES = 256_000
 MAX_PROSPECTIVE_DECIMAL_INTEGER_DIGITS = 18
 MAX_PROSPECTIVE_DECIMAL_FRACTION_DIGITS = 18
 MAX_PROSPECTIVE_QUANTITY_DIGITS = 18
-OPERATED_ROTATION_COMPANION_SYMBOL = "MERID"
+PAIR_EPISODE_OBSERVED_AT = "2026-08-06T09:05:00.000000Z"
+PAIR_EVIDENCE_CONTENT = (
+    "Banked MU and NVDA subject evidence plus one common source-derived market cut "
+    "support a governed MU/NVDA/cash comparison; neither security clears the "
+    "banked-evidence threshold for positive capital authority."
+)
 
 
 class ProspectiveOperationError(OperatedPortfolioError):
     """Fail-closed prospective paper operation error."""
 
-
-@dataclass(frozen=True, slots=True)
-class ForwardOperatedDecisionPacket:
-    """Typed owner assertion admitted only by the bounded forward-operated profile."""
-
-    instrument_id: str
-    evidence_content: str
-    source_locator: str
-    evidence_observed_at: str
-    market_packet: dict[str, str]
-    target_quantity: str
-    principal_claim: str
-    operator_rationale: str
-    pit_identity: dict[str, Any]
-
-    @property
-    def market_price(self) -> str:
-        return market_packet_price(self.market_packet)
-
-    @property
-    def market_observed_at(self) -> str:
-        return self.market_packet["valid_effective_at"]
-
-
-@lru_cache(maxsize=1)
-def _rotation_companion_template() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    """Return the exact accepted operated-10 MERID identity, evidence, and review."""
-
-    source_scenario = get_scenario(DEFAULT_SCENARIO_ID)
-    instruments = instrument_registry(DEFAULT_SCENARIO_ID)
-    evidence = _initial_evidence(source_scenario, instruments)
-    reviews = _initial_reviews(source_scenario, instruments, evidence)
-    matching = [
-        index
-        for index, instrument in enumerate(instruments)
-        if instrument["symbol"] == OPERATED_ROTATION_COMPANION_SYMBOL
-    ]
-    if len(matching) != 1:
-        raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_UNAVAILABLE")
-    index = matching[0]
-    companion_review = deepcopy(reviews[index])
-    companion_review["target_quantity"] = "0"
-    return (
-        deepcopy(instruments[index]),
-        deepcopy(evidence[index]),
-        companion_review,
-    )
-
-
-def operated_rotation_companion(workspace: Mapping[str, Any]) -> dict[str, Any]:
-    """Expose the bounded governed companion used by the post-entry rotation UI."""
-
-    if workspace.get("scenario_id") != OPERATED_PAPER_CAPITAL_SCENARIO_ID:
-        raise ProspectiveOperationError("OPERATED_ROTATION_PROFILE_REQUIRED")
-    if not any(int(row["quantity"]) > 0 for row in workspace["book"]["positions"]):
-        raise ProspectiveOperationError("OPERATED_ROTATION_FUNDED_BOOK_REQUIRED")
-    instrument, evidence, review = _rotation_companion_template()
-    return {
-        "source_scenario_id": DEFAULT_SCENARIO_ID,
-        "instrument": deepcopy(instrument),
-        "source_evidence": deepcopy(evidence),
-        "review": deepcopy(review),
-    }
-
-
-def _workspace_with_rotation_companion(
-    workspace: Mapping[str, Any],
-) -> dict[str, Any]:
-    result = deepcopy(dict(workspace))
-    instrument, evidence, review = _rotation_companion_template()
-    instrument_rows = [
-        row
-        for row in result["instruments"]
-        if row["instrument_id"] == instrument["instrument_id"]
-    ]
-    review_rows = [
-        row
-        for row in result["reviews"]
-        if row["instrument_id"] == instrument["instrument_id"]
-    ]
-    evidence_rows = [
-        row
-        for row in result["evidence_references"]
-        if row["evidence_reference_id"] == evidence["evidence_reference_id"]
-    ]
-    counts = (len(instrument_rows), len(review_rows), len(evidence_rows))
-    if counts == (0, 0, 0):
-        result["instruments"].append(deepcopy(instrument))
-        result["evidence_references"].append(deepcopy(evidence))
-        result["reviews"].append(deepcopy(review))
-        return result
-    if counts != (1, 1, 1):
-        raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_STATE_INVALID")
-    if canonical_document_bytes(instrument_rows[0]) != canonical_document_bytes(instrument):
-        raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_IDENTITY_DRIFT")
-    if canonical_document_bytes(evidence_rows[0]) != canonical_document_bytes(evidence):
-        raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_EVIDENCE_DRIFT")
-    return result
 
 
 def displayed_proposal_binding(
@@ -514,7 +423,15 @@ def _baseline_workspace(
     workspace = confirm_initial_portfolio(build_draft_workspace(scenario_id))
     if workspace["status"] != STATUS_FUNDED:
         raise ProspectiveOperationError("CERTIFIED_FUNDED_BASELINE_REQUIRED")
-    if scenario_id == OPERATED_PAPER_CAPITAL_SCENARIO_ID:
+    if scenario_id == PAIR_DECISION_SERIES_SCENARIO_ID:
+        try:
+            source = load_verified_pair_source()
+        except MarketSourceAdapterError as exc:
+            raise ProspectiveOperationError(str(exc)) from exc
+        if scenario.get("episode_preregistration_sha256") != source["episode"].get(
+            "episode_preregistration_sha256"
+        ):
+            raise ProspectiveOperationError("PAIR_EPISODE_PREREGISTRATION_MISMATCH")
         workspace["baseline_book_hash"] = workspace["book"]["book_hash"]
         workspace["pit_identity"] = _validated_forward_pit_identity()
     return workspace
@@ -536,13 +453,18 @@ def _decorate(
     result["source_scenario_id"] = scenario["source_scenario_id"]
     if "source_authority" in scenario:
         result["source_authority"] = deepcopy(scenario["source_authority"])
-    if result["scenario_id"] == OPERATED_PAPER_CAPITAL_SCENARIO_ID:
+    if result["scenario_id"] == PAIR_DECISION_SERIES_SCENARIO_ID:
         expected_pit_identity = _validated_forward_pit_identity()
         if result.get("baseline_book_hash") != expected_pit_identity["certified_book_id"]:
-            raise ProspectiveOperationError(
-                "FORWARD_OPERATED_PIT_BASELINE_BOOK_MISMATCH"
-            )
+            raise ProspectiveOperationError("PAIR_PIT_BASELINE_BOOK_MISMATCH")
+        try:
+            series_contract = load_verified_episode_contract()
+        except MarketSourceAdapterError as exc:
+            raise ProspectiveOperationError(str(exc)) from exc
         result["pit_identity"] = deepcopy(expected_pit_identity)
+        result["decision_series_contract"] = deepcopy(series_contract)
+        result["sealed_series_episode_count"] = len(episode_history)
+        result["opened_outcome_episode_count"] = 0
     result["baseline_workspace_hash"] = baseline_hash
     result["baseline_event_count"] = baseline_event_count
     result["prospective_episode_count"] = len(episode_history)
@@ -607,28 +529,31 @@ def _instrument_permanent_key(
     raise ProspectiveOperationError("MARKET_PACKET_INSTRUMENT_UNKNOWN")
 
 
-def _normalize_rotation_market_packets(
+def _normalize_source_derived_pair_packets(
     workspace: Mapping[str, Any],
     value: Any,
     *,
-    expected_instrument_ids: list[str],
     latest_time: datetime,
     observed_time: datetime,
 ) -> list[dict[str, str]]:
-    if not isinstance(value, list) or len(value) != len(expected_instrument_ids):
-        raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_PACKETS_REQUIRED")
+    if not isinstance(value, list) or len(value) != 2:
+        raise ProspectiveOperationError("PAIR_SOURCE_DERIVED_PACKETS_REQUIRED")
+    try:
+        expected_packets = load_source_derived_market_packets(
+            list(workspace["instruments"])
+        )
+    except (KeyError, MarketSourceAdapterError) as exc:
+        raise ProspectiveOperationError(str(exc)) from exc
+    expected_by_id = {row["instrument_id"]: row for row in expected_packets}
     packets_by_id: dict[str, dict[str, str]] = {}
-    expected_ids = set(expected_instrument_ids)
     for raw in value:
         if not isinstance(raw, Mapping):
-            raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_PACKET_MAPPING_REQUIRED")
-        instrument_id = _required_text(
-            raw.get("instrument_id"), field="rotation_market_instrument_id"
-        )
-        if instrument_id not in expected_ids:
-            raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_INSTRUMENT_UNKNOWN")
+            raise ProspectiveOperationError("PAIR_MARKET_PACKET_MAPPING_REQUIRED")
+        instrument_id = _required_text(raw.get("instrument_id"), field="instrument_id")
+        if instrument_id not in expected_by_id:
+            raise ProspectiveOperationError("PAIR_MARKET_PACKET_INSTRUMENT_UNKNOWN")
         if instrument_id in packets_by_id:
-            raise ProspectiveOperationError("OPERATED_ROTATION_MARKET_INSTRUMENT_DUPLICATE")
+            raise ProspectiveOperationError("PAIR_MARKET_PACKET_INSTRUMENT_DUPLICATE")
         try:
             packet = normalize_immutable_market_packet(
                 raw,
@@ -642,8 +567,13 @@ def _normalize_rotation_market_packets(
             )
         except MarketPacketError as exc:
             raise ProspectiveOperationError(str(exc)) from exc
+        if canonical_document_bytes(packet) != canonical_document_bytes(
+            expected_by_id[instrument_id]
+        ):
+            raise ProspectiveOperationError("PAIR_MARKET_PACKET_NOT_SOURCE_DERIVED")
         packets_by_id[instrument_id] = packet
-    return [packets_by_id[instrument_id] for instrument_id in expected_instrument_ids]
+    ordered_ids = [row["instrument_id"] for row in workspace["instruments"]]
+    return [packets_by_id[instrument_id] for instrument_id in ordered_ids]
 
 
 def _normalize_request(
@@ -657,6 +587,11 @@ def _normalize_request(
         raise ProspectiveOperationError("OBSERVATION_REQUEST_CANONICAL_INVALID") from exc
     if request_size > MAX_PROSPECTIVE_REQUEST_BYTES:
         raise ProspectiveOperationError("OBSERVATION_REQUEST_BYTES_OUT_OF_BOUNDS")
+    if (
+        workspace.get("scenario_id") == PAIR_DECISION_SERIES_SCENARIO_ID
+        and int(workspace.get("prospective_episode_count", 0)) != 0
+    ):
+        raise ProspectiveOperationError("PAIR_EPISODE_ONE_ALREADY_SEALED")
     observed_at = _required_text(request.get("observed_at"), field="observed_at")
     observed_time = _utc_datetime(observed_at, field="observed_at")
     latest_time = max(
@@ -676,32 +611,12 @@ def _normalize_request(
         if locator != initial_evidence.get("locator"):
             raise ProspectiveOperationError("REAL_MU_EXACT_EVIDENCE_LOCATOR_REQUIRED")
 
-    is_operated_profile = (
-        workspace.get("scenario_id") == OPERATED_PAPER_CAPITAL_SCENARIO_ID
-    )
-    funded_positions = [
-        row for row in workspace["book"]["positions"] if int(row["quantity"]) > 0
-    ]
-    is_operated_rotation = (
-        is_operated_profile
-        and bool(funded_positions)
-        and (
-            request.get("displayed_proposal_binding") is not None
-            or request.get("forward_operated_market_packets") is not None
-        )
-    )
-    request_workspace = (
-        _workspace_with_rotation_companion(workspace)
-        if is_operated_rotation
-        else workspace
-    )
-
     raw_updates = request.get("review_updates")
     if not isinstance(raw_updates, list) or not raw_updates:
         raise ProspectiveOperationError("REVIEW_UPDATES_REQUIRED")
     if len(raw_updates) > MAX_PROSPECTIVE_REVIEW_UPDATES:
         raise ProspectiveOperationError("REVIEW_UPDATES_TOO_MANY")
-    updates = [_normalize_review_update(request_workspace, row) for row in raw_updates]
+    updates = [_normalize_review_update(workspace, row) for row in raw_updates]
     ids = [row["instrument_id"] for row in updates]
     if len(ids) != len(set(ids)):
         raise ProspectiveOperationError("REVIEW_UPDATE_INSTRUMENT_DUPLICATE")
@@ -716,149 +631,132 @@ def _normalize_request(
         "operator_rationale": operator_rationale,
     }
 
-    if not is_operated_profile:
+    if workspace.get("scenario_id") != PAIR_DECISION_SERIES_SCENARIO_ID:
         return normalized
+
+    prohibited = {
+        "market_packet",
+        "market_instrument_id",
+        "forward_operated_packet",
+        "forward_operated_market_packets",
+        "displayed_proposal_binding",
+        "source_permission_identity",
+        "raw_bytes_or_receipt",
+        "market_price",
+        "market_observed_at",
+    }
+    if prohibited.intersection(request):
+        raise ProspectiveOperationError("PAIR_MANUAL_MARKET_AUTHORITY_PROHIBITED")
+    if observed_at != PAIR_EPISODE_OBSERVED_AT:
+        raise ProspectiveOperationError("PAIR_EPISODE_OBSERVED_AT_MISMATCH")
+    if any(int(row["quantity"]) > 0 for row in workspace["book"]["positions"]):
+        raise ProspectiveOperationError("PAIR_EPISODE_ONE_CASH_BASELINE_REQUIRED")
 
     requested_pit_identity = _normalize_pit_identity(request.get("pit_identity"))
     workspace_pit_identity = _normalize_pit_identity(workspace.get("pit_identity"))
     if requested_pit_identity != workspace_pit_identity:
-        raise ProspectiveOperationError(
-            "FORWARD_OPERATED_PIT_IDENTITY_WORKSPACE_MISMATCH"
-        )
-    pit_identity = workspace_pit_identity
-    if pit_identity != _validated_forward_pit_identity():
-        raise ProspectiveOperationError("FORWARD_OPERATED_PIT_IDENTITY_MISMATCH")
-    normalized["pit_identity"] = deepcopy(pit_identity)
+        raise ProspectiveOperationError("PAIR_PIT_IDENTITY_WORKSPACE_MISMATCH")
+    if workspace_pit_identity != _validated_forward_pit_identity():
+        raise ProspectiveOperationError("PAIR_PIT_IDENTITY_MISMATCH")
+    normalized["pit_identity"] = deepcopy(workspace_pit_identity)
 
-    if is_operated_rotation:
-        companion = operated_rotation_companion(workspace)
-        companion_id = companion["instrument"]["instrument_id"]
-        funded_ids = {row["instrument_id"] for row in funded_positions}
-        if len(funded_ids) != 1:
-            raise ProspectiveOperationError("OPERATED_ROTATION_SINGLE_FUNDED_SOURCE_REQUIRED")
-        source_id = next(iter(funded_ids))
-        expected_ids = [
-            row["instrument_id"]
-            for row in request_workspace["instruments"]
-            if row["instrument_id"] in {source_id, companion_id}
-        ]
-        if len(updates) != 2 or set(ids) != {source_id, companion_id}:
-            raise ProspectiveOperationError("OPERATED_ROTATION_TWO_INSTRUMENT_TARGET_REQUIRED")
-        update_by_id = {row["instrument_id"]: row for row in updates}
-        if any(row["outcome"] != "ADMIT" for row in updates):
-            raise ProspectiveOperationError("OPERATED_ROTATION_ADMIT_TARGETS_REQUIRED")
-        current_source_quantity = next(
-            int(row["quantity"])
-            for row in funded_positions
-            if row["instrument_id"] == source_id
-        )
-        if int(update_by_id[source_id]["target_quantity"]) >= current_source_quantity:
-            raise ProspectiveOperationError("OPERATED_ROTATION_SOURCE_REDUCTION_REQUIRED")
-        if update_by_id[companion_id]["target_quantity"] == "0":
-            raise ProspectiveOperationError("OPERATED_ROTATION_COMPANION_FUNDING_REQUIRED")
-        normalized["displayed_proposal_binding"] = (
-            _normalize_displayed_proposal_binding(
-                workspace, request.get("displayed_proposal_binding")
-            )
-        )
-        normalized["forward_operated_market_packets"] = (
-            _normalize_rotation_market_packets(
-                request_workspace,
-                request.get("forward_operated_market_packets"),
-                expected_instrument_ids=expected_ids,
-                latest_time=latest_time,
-                observed_time=observed_time,
-            )
-        )
-        return normalized
-
-    if len(updates) != 1:
-        raise ProspectiveOperationError("FORWARD_OPERATED_SINGLE_INSTRUMENT_REQUIRED")
-    update = updates[0]
-    if update["outcome"] != "ADMIT" or update["target_quantity"] == "0":
-        raise ProspectiveOperationError("FORWARD_OPERATED_NONZERO_ADMIT_REQUIRED")
-    if (
-        "forward_operated_packet" in request
-        and request.get("forward_operated_packet") is not None
-        and not isinstance(request.get("forward_operated_packet"), Mapping)
-    ):
-        raise ProspectiveOperationError("FORWARD_OPERATED_PACKET_MAPPING_REQUIRED")
-    stored_packet = request.get("forward_operated_packet")
-    packet_source = stored_packet if isinstance(stored_packet, Mapping) else request
-    instrument_id = _required_text(
-        (
-            packet_source.get("instrument_id")
-            if isinstance(stored_packet, Mapping)
-            else packet_source.get("market_instrument_id")
-            or (
-                packet_source.get("market_packet", {}).get("instrument_id")
-                if isinstance(packet_source.get("market_packet"), Mapping)
-                else None
-            )
-        ),
-        field="market_instrument_id",
-    )
-    if instrument_id != update["instrument_id"]:
-        raise ProspectiveOperationError("FORWARD_OPERATED_MARKET_INSTRUMENT_MISMATCH")
-    raw_market_packet = packet_source.get("market_packet")
-    if raw_market_packet is None and not isinstance(stored_packet, Mapping):
-        # Allow top-level market_packet on the observation request.
-        raw_market_packet = request.get("market_packet")
-    if not isinstance(raw_market_packet, Mapping):
-        raise ProspectiveOperationError("MARKET_PACKET_REQUIRED")
     try:
-        market_packet = normalize_immutable_market_packet(
-            raw_market_packet,
-            expected_instrument_id=instrument_id,
-            expected_permanent_key=_instrument_permanent_key(workspace, instrument_id),
+        expected_contract = load_verified_episode_contract()
+    except MarketSourceAdapterError as exc:
+        raise ProspectiveOperationError(str(exc)) from exc
+    supplied_contract = request.get("decision_series_contract")
+    if not isinstance(supplied_contract, Mapping) or canonical_document_bytes(
+        dict(supplied_contract)
+    ) != canonical_document_bytes(expected_contract):
+        raise ProspectiveOperationError("PAIR_DECISION_SERIES_CONTRACT_MISMATCH")
+    if expected_contract["outcome_data_loaded"] is not False:
+        raise ProspectiveOperationError("PAIR_OUTCOME_DATA_MUST_REMAIN_CLOSED")
+    if observed_time <= _utc_datetime(
+        str(expected_contract["decision_cut_knowledge_at"]),
+        field="decision_cut_knowledge_at",
+    ):
+        raise ProspectiveOperationError("PAIR_DECISION_NOT_AFTER_KNOWLEDGE_CUT")
+    expected_locator = (
+        "repo://data/gv_pair_decision_series/mu_nvda_episode_1/"
+        "episode_preregistration.json#sha256="
+        + str(expected_contract["episode_preregistration_sha256"])
+    )
+    if content != PAIR_EVIDENCE_CONTENT or locator != expected_locator:
+        raise ProspectiveOperationError("PAIR_EPISODE_EVIDENCE_BINDING_MISMATCH")
+    if request.get("selected_disposition") != "CASH_ABSTAIN":
+        raise ProspectiveOperationError("PAIR_EPISODE_DISPOSITION_INVALID")
+
+    expected_ids = [row["instrument_id"] for row in workspace["instruments"]]
+    if ids != expected_ids or len(updates) != 2:
+        raise ProspectiveOperationError("PAIR_TWO_REAL_INSTRUMENT_UPDATES_REQUIRED")
+    current_by_id = {row["instrument_id"]: row for row in workspace["reviews"]}
+    for update in updates:
+        current = current_by_id[update["instrument_id"]]
+        expected = {
+            "outcome": current["outcome"],
+            "net_score_bps": int(current["net_score_bps"]),
+            "target_quantity": str(current["target_quantity"]),
+            "principal_claim": current["living_thesis_lite"]["principal_claim"],
+        }
+        for field, expected_value in expected.items():
+            if update[field] != expected_value:
+                raise ProspectiveOperationError("PAIR_SUBJECT_DECISION_DRIFT")
+        if update["outcome"] != "ABSTAIN" or update["target_quantity"] != "0":
+            raise ProspectiveOperationError("PAIR_POSITIVE_CAPITAL_AUTHORITY_PROHIBITED")
+
+    normalized["decision_series_contract"] = deepcopy(expected_contract)
+    normalized["selected_disposition"] = "CASH_ABSTAIN"
+    normalized["source_derived_market_packets"] = (
+        _normalize_source_derived_pair_packets(
+            workspace,
+            request.get("source_derived_market_packets"),
             latest_time=latest_time,
             observed_time=observed_time,
-            utc_datetime=_utc_datetime,
         )
-    except MarketPacketError as exc:
-        raise ProspectiveOperationError(str(exc)) from exc
-    if isinstance(stored_packet, Mapping):
-        expected_packet_bindings = {
-            "instrument_id": update["instrument_id"],
-            "evidence_content": content,
-            "source_locator": locator,
-            "evidence_observed_at": _utc_timestamp(observed_time),
-            "target_quantity": update["target_quantity"],
-            "principal_claim": update["principal_claim"],
-            "operator_rationale": operator_rationale,
-            "pit_identity": pit_identity,
-            "market_packet": market_packet,
-        }
-        for field, expected_value in expected_packet_bindings.items():
-            if stored_packet.get(field) != expected_value:
-                raise ProspectiveOperationError(
-                    "FORWARD_OPERATED_PACKET_BINDING_MISMATCH"
-                )
-    packet = ForwardOperatedDecisionPacket(
-        instrument_id=instrument_id,
-        evidence_content=content,
-        source_locator=locator,
-        evidence_observed_at=_utc_timestamp(observed_time),
-        market_packet=market_packet,
-        target_quantity=update["target_quantity"],
-        principal_claim=update["principal_claim"],
-        operator_rationale=operator_rationale,
-        pit_identity=pit_identity,
     )
-    normalized["forward_operated_packet"] = {
-        "instrument_id": packet.instrument_id,
-        "evidence_content": packet.evidence_content,
-        "source_locator": packet.source_locator,
-        "evidence_observed_at": packet.evidence_observed_at,
-        "market_packet": deepcopy(packet.market_packet),
-        "market_price": packet.market_price,
-        "market_observed_at": packet.market_observed_at,
-        "target_quantity": packet.target_quantity,
-        "principal_claim": packet.principal_claim,
-        "operator_rationale": packet.operator_rationale,
-        "pit_identity": deepcopy(packet.pit_identity),
-    }
     return normalized
+
+
+def build_pair_episode_request(
+    workspace: Mapping[str, Any], *, operator_rationale: str
+) -> dict[str, Any]:
+    """Compose episode 1 from verified repository authority and one rationale only."""
+
+    if workspace.get("scenario_id") != PAIR_DECISION_SERIES_SCENARIO_ID:
+        raise ProspectiveOperationError("PAIR_DECISION_SERIES_PROFILE_REQUIRED")
+    try:
+        contract = load_verified_episode_contract()
+        packets = load_source_derived_market_packets(list(workspace["instruments"]))
+    except (KeyError, MarketSourceAdapterError) as exc:
+        raise ProspectiveOperationError(str(exc)) from exc
+    locator = (
+        "repo://data/gv_pair_decision_series/mu_nvda_episode_1/"
+        "episode_preregistration.json#sha256="
+        + str(contract["episode_preregistration_sha256"])
+    )
+    request = {
+        "content": PAIR_EVIDENCE_CONTENT,
+        "locator": locator,
+        "observed_at": PAIR_EPISODE_OBSERVED_AT,
+        "pit_identity": deepcopy(workspace["pit_identity"]),
+        "decision_series_contract": deepcopy(contract),
+        "selected_disposition": "CASH_ABSTAIN",
+        "source_derived_market_packets": packets,
+        "review_updates": [
+            {
+                "instrument_id": row["instrument_id"],
+                "outcome": row["outcome"],
+                "net_score_bps": int(row["net_score_bps"]),
+                "target_quantity": str(row["target_quantity"]),
+                "principal_claim": row["living_thesis_lite"]["principal_claim"],
+            }
+            for row in workspace["reviews"]
+        ],
+        "operator_rationale": _required_text(
+            operator_rationale, field="operator_rationale"
+        ),
+    }
+    return _normalize_request(workspace, request)
 
 
 def _review_by_id(workspace: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
@@ -945,11 +843,7 @@ def _build_proposal(
     workspace: Mapping[str, Any], request: Mapping[str, Any]
 ) -> dict[str, Any]:
     normalized = _normalize_request(workspace, request)
-    working_workspace = (
-        _workspace_with_rotation_companion(workspace)
-        if "displayed_proposal_binding" in normalized
-        else deepcopy(dict(workspace))
-    )
+    working_workspace = deepcopy(dict(workspace))
     scenario = get_scenario(str(workspace["scenario_id"]))
     reviews_by_id = _review_by_id(working_workspace)
     before_reviews = deepcopy(working_workspace["reviews"])
@@ -970,27 +864,15 @@ def _build_proposal(
         after["outcome"] = update["outcome"]
         after["net_score_bps"] = update["net_score_bps"]
         after["target_quantity"] = update["target_quantity"]
-        forward_packet = normalized.get("forward_operated_packet")
-        rotation_packets = normalized.get("forward_operated_market_packets")
-        if (
-            isinstance(forward_packet, Mapping)
-            and forward_packet.get("instrument_id") == update["instrument_id"]
-        ):
-            after["reference_price"] = market_packet_price(
-                forward_packet["market_packet"]
-                if isinstance(forward_packet.get("market_packet"), Mapping)
-                else forward_packet
-            )
-        elif isinstance(rotation_packets, list):
+        pair_packets = normalized.get("source_derived_market_packets")
+        if isinstance(pair_packets, list):
             matching_packets = [
                 row
-                for row in rotation_packets
+                for row in pair_packets
                 if row.get("instrument_id") == update["instrument_id"]
             ]
             if len(matching_packets) != 1:
-                raise ProspectiveOperationError(
-                    "OPERATED_ROTATION_MARKET_PACKET_BINDING_MISMATCH"
-                )
+                raise ProspectiveOperationError("PAIR_MARKET_PACKET_BINDING_MISMATCH")
             after["reference_price"] = market_packet_price(matching_packets[0])
         after["living_thesis_lite"] = _thesis(
             scenario,
@@ -1025,62 +907,54 @@ def _build_proposal(
     )
     economics_changed = bool(legs)
     transition_kind = "PROSPECTIVE_REBALANCE"
-    if economics_changed:
+    is_pair_episode = workspace.get("scenario_id") == PAIR_DECISION_SERIES_SCENARIO_ID
+    if is_pair_episode:
+        if economics_changed:
+            raise ProspectiveOperationError("PAIR_EPISODE_ONE_ECONOMIC_MUTATION_PROHIBITED")
+        transition_kind = "PAIR_CASH_ABSTAIN"
+    elif economics_changed:
         sides = {row["side"] for row in legs}
-        funded_positions = [
-            row
-            for row in working_workspace["book"]["positions"]
-            if int(row["quantity"]) > 0
-        ]
-        cash_funded_entry = (
-            scenario.get("forward_operated_market_packet") is True
-            and not funded_positions
-            and sides == {"BUY"}
-        )
-        if cash_funded_entry:
-            packet = normalized.get("forward_operated_packet")
-            if not isinstance(packet, Mapping):
-                raise ProspectiveOperationError("FORWARD_OPERATED_PACKET_REQUIRED")
-            if len(legs) != 1:
-                raise ProspectiveOperationError("CASH_FUNDED_ENTRY_SINGLE_LEG_REQUIRED")
-            leg = legs[0]
-            if leg["instrument_id"] != packet.get("instrument_id"):
-                raise ProspectiveOperationError("CASH_FUNDED_ENTRY_INSTRUMENT_MISMATCH")
-            packet_price = (
-                market_packet_price(packet["market_packet"])
-                if isinstance(packet.get("market_packet"), Mapping)
-                else packet.get("market_price")
-            )
-            if leg["reference_price"] != packet_price:
-                raise ProspectiveOperationError("CASH_FUNDED_ENTRY_PRICE_MISMATCH")
-            if int(leg["quantity"]) <= 0:
-                raise ProspectiveOperationError("CASH_FUNDED_ENTRY_QUANTITY_REQUIRED")
-            if "BUY" not in scenario["portfolio_aim"]["allowed_actions"]:
-                raise ProspectiveOperationError("CASH_FUNDED_ENTRY_BUY_NOT_ALLOWED")
-            transition_kind = "PROSPECTIVE_CASH_FUNDED_ENTRY"
-        else:
-            if "SELL" not in sides:
-                raise ProspectiveOperationError("PROSPECTIVE_TRANSITION_SELL_REQUIRED")
-            if "BUY" not in sides:
-                raise ProspectiveOperationError("PROSPECTIVE_TRANSITION_BUY_REQUIRED")
+        if "SELL" not in sides:
+            raise ProspectiveOperationError("PROSPECTIVE_TRANSITION_SELL_REQUIRED")
+        if "BUY" not in sides:
+            raise ProspectiveOperationError("PROSPECTIVE_TRANSITION_BUY_REQUIRED")
 
+    observation_payload: dict[str, Any] = {
+        "evidence_reference_id": evidence["evidence_reference_id"],
+        "disposition": (
+            "PAIR_EPISODE_ONE_CASH_ABSTAIN"
+            if is_pair_episode
+            else "PROPOSED_PROSPECTIVE_TRANSITION"
+            if economics_changed
+            else "PROPOSED_PROSPECTIVE_NO_CHANGE"
+        ),
+        "instrument_ids": sorted(owned_ids),
+        "threshold_crossed": economics_changed,
+        "observed_at": normalized["observed_at"],
+        "decision_snapshot_id": decision_snapshot["decision_snapshot_id"],
+        "operator_rationale": normalized["operator_rationale"],
+    }
+    if is_pair_episode:
+        series = normalized["decision_series_contract"]
+        observation_payload.update(
+            {
+                "decision_series_id": series["decision_series_id"],
+                "episode_number": series["episode_number"],
+                "decision_cut_id": series["decision_cut_id"],
+                "outcome_open_not_before": series["outcome_open_not_before"],
+                "cost_model_id": series["cost_model_id"],
+                "decision_policy_version": series["decision_policy_version"],
+                "source_contract_version": series["source_contract_version"],
+                "episode_preregistration_sha256": series[
+                    "episode_preregistration_sha256"
+                ],
+            }
+        )
     observation = _record(
         scenario,
         "OBS",
         "observation_id",
-        {
-            "evidence_reference_id": evidence["evidence_reference_id"],
-            "disposition": (
-                "PROPOSED_PROSPECTIVE_TRANSITION"
-                if economics_changed
-                else "PROPOSED_PROSPECTIVE_NO_CHANGE"
-            ),
-            "instrument_ids": sorted(owned_ids),
-            "threshold_crossed": economics_changed,
-            "observed_at": normalized["observed_at"],
-            "decision_snapshot_id": decision_snapshot["decision_snapshot_id"],
-            "operator_rationale": normalized["operator_rationale"],
-        },
+        observation_payload,
     )
     transition = (
         _transition_preview(
@@ -1096,8 +970,8 @@ def _build_proposal(
     )
     changed_why = {
         "change_type": (
-            transition_kind
-            if transition_kind == "PROSPECTIVE_CASH_FUNDED_ENTRY"
+            "PAIR_DECISION_SERIES_EPISODE_1_CASH_ABSTAIN"
+            if is_pair_episode
             else "PROSPECTIVE_TRANSITION"
             if economics_changed
             else "PROSPECTIVE_NO_CHANGE"
@@ -1189,11 +1063,7 @@ def _validate_event(event: Mapping[str, Any]) -> None:
 def _apply_proposal_projection(
     workspace: Mapping[str, Any], proposal: Mapping[str, Any]
 ) -> dict[str, Any]:
-    result = (
-        _workspace_with_rotation_companion(workspace)
-        if "displayed_proposal_binding" in proposal.get("request", {})
-        else deepcopy(dict(workspace))
-    )
+    result = deepcopy(dict(workspace))
     result["evidence_references"] = [
         *result["evidence_references"],
         deepcopy(proposal["evidence"]),
@@ -1462,14 +1332,26 @@ def _reconstruct_prospective_workspace(
             expected_workspace = _episode_workspace(result, expected_proposal)
             disposition = "CONFIRMED"
             proposals.append(deepcopy(expected_proposal))
-            episode_history.append(
-                {
-                    "disposition": disposition,
-                    "proposal_id": expected_proposal["proposal_id"],
-                    "observed_at": expected_proposal["request"]["observed_at"],
-                    "economics_changed": expected_proposal["economics_changed"],
-                }
-            )
+            history_row = {
+                "disposition": disposition,
+                "proposal_id": expected_proposal["proposal_id"],
+                "observed_at": expected_proposal["request"]["observed_at"],
+                "economics_changed": expected_proposal["economics_changed"],
+            }
+            series = expected_proposal["request"].get("decision_series_contract")
+            if isinstance(series, Mapping):
+                history_row.update(
+                    {
+                        "decision_series_id": series["decision_series_id"],
+                        "episode_number": series["episode_number"],
+                        "decision_cut_id": series["decision_cut_id"],
+                        "outcome_status": series["outcome_status"],
+                        "outcome_open_not_before": series[
+                            "outcome_open_not_before"
+                        ],
+                    }
+                )
+            episode_history.append(history_row)
         elif episode_event["event_type"] == "PROSPECTIVE_PROPOSAL_REJECTED":
             if payload.get("schema_version") != REJECTED_EPISODE_SCHEMA:
                 raise ProspectiveOperationError(
@@ -1498,15 +1380,27 @@ def _reconstruct_prospective_workspace(
                 "prospective_proposal": deepcopy(expected_proposal),
             }
             rejected_proposals.append(rejection_record)
-            episode_history.append(
-                {
-                    "disposition": "REJECTED",
-                    "proposal_id": expected_proposal["proposal_id"],
-                    "observed_at": expected_proposal["request"]["observed_at"],
-                    "economics_changed": False,
-                    "rejection_reason": rejection_reason,
-                }
-            )
+            history_row = {
+                "disposition": "REJECTED",
+                "proposal_id": expected_proposal["proposal_id"],
+                "observed_at": expected_proposal["request"]["observed_at"],
+                "economics_changed": False,
+                "rejection_reason": rejection_reason,
+            }
+            series = expected_proposal["request"].get("decision_series_contract")
+            if isinstance(series, Mapping):
+                history_row.update(
+                    {
+                        "decision_series_id": series["decision_series_id"],
+                        "episode_number": series["episode_number"],
+                        "decision_cut_id": series["decision_cut_id"],
+                        "outcome_status": series["outcome_status"],
+                        "outcome_open_not_before": series[
+                            "outcome_open_not_before"
+                        ],
+                    }
+                )
+            episode_history.append(history_row)
         else:
             raise ProspectiveOperationError("PROSPECTIVE_EPISODE_EVENT_REQUIRED")
 

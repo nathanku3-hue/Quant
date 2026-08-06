@@ -1,0 +1,37 @@
+{
+  "claim_boundary": "Forward paper evidence episode only. No outcome interpretation, alpha claim, advice, broker, or live capital.",
+  "comparator_spec": {
+    "pair": "EQUAL_NOTIONAL_MU_NVDA_FROM_PACKET_VALUES",
+    "primary": "CERTIFIED_CASH_BASELINE_ZERO_MARKET_RETURN_NO_YIELD_CLAIM",
+    "retain_all_dispositions": true,
+    "security_A": "BUY_AND_HOLD_MU_FROM_PACKET_VALUE",
+    "security_B": "BUY_AND_HOLD_NVDA_FROM_PACKET_VALUE"
+  },
+  "cost_model_id": "GV_PAPER_FIXED_FEE_USD_2_PER_ORDER_V1",
+  "decision_cut_id": "CUT_2932bebf6dbfc422d39a57577d6850283d28c63455d01c5eecfc536b28a305d3",
+  "decision_cut_knowledge_at": "2026-08-06T09:04:14.959920Z",
+  "decision_policy_version": "PAIR_BANKED_EVIDENCE_ABSTAIN_OR_CASH_V1",
+  "decision_series_id": "PAIR_DECISION_SERIES_1",
+  "episode_number": 1,
+  "mu_subject_evidence_file_sha256": "9416674451e9654689beb6f6a4e7290677bdf7d7f048010cc498efa3f3542770",
+  "mu_subject_evidence_path": "data/gv_v2_reconciliation/mu_nvda_supply_1/reconciliation_result.json",
+  "nvda_subject_decision_path": "data/gv_pair_decision_series/mu_nvda_episode_1/nvda_subject_decision.json",
+  "nvda_subject_decision_sha256": "1fef7f4035e708c2aa17783730cf01aef87d8458c9d2239bfae1ca050be54ac3",
+  "outcome_data_loaded": false,
+  "outcome_horizon_spec": {
+    "currency": "USD",
+    "kind": "COMMON_SOURCE_CUT_TO_COMMON_SOURCE_CUT",
+    "minimum_elapsed_calendar_days": 30,
+    "outcome_cut_rule": "FIRST_VALID_COMMON_PAIR_SOURCE_CUT_AT_OR_AFTER_OUTCOME_OPEN_NOT_BEFORE",
+    "valuation_field": "last"
+  },
+  "outcome_open_not_before": "2026-09-05T09:04:14.959920Z",
+  "outcome_status": "SEALED_NOT_OPENED",
+  "permission_manifest_path": "data/gv_pair_decision_series/mu_nvda_episode_1/permission_manifest.json",
+  "permission_manifest_sha256": "7dee7c3f5e2616b6fd88e6476a3ec2070d3a9971f6d31f9bee6ad2b5832fc7ff",
+  "schema_version": "gv_pair_decision_series_episode_v1",
+  "source_capture_path": "data/gv_pair_decision_series/mu_nvda_episode_1/common_market_source_capture.json",
+  "source_capture_sha256": "74d0ce66e8e62465989499c4ddd718ee9c6574181df86e7cf6b86117a90fd6f4",
+  "source_contract_version": "CBOE_BZX_TWO_ROW_CAPTURE_V1",
+  "subject_evidence_policy": "BANKED_ONLY"
+}

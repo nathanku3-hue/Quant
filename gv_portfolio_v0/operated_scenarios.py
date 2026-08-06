@@ -13,7 +13,7 @@ ENGINE_SCALE_50_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_50"
 ENGINE_SCALE_100_SCENARIO_ID = "GV_ENGINE_SCALE_CHARACTERIZATION_100"
 PROSPECTIVE_25_SCENARIO_ID = "GV_PROSPECTIVE_PAPER_BASELINE_1"
 REAL_MU_PROSPECTIVE_SCENARIO_ID = "GV_REAL_EVIDENCE_MU_PORTFOLIO_1"
-OPERATED_PAPER_CAPITAL_SCENARIO_ID = "GV_OPERATED_PAPER_CAPITAL_1"
+PAIR_DECISION_SERIES_SCENARIO_ID = "GV_PAIR_DECISION_SERIES_1_EPISODE_1"
 
 
 def _instrument(
@@ -510,52 +510,96 @@ def _real_mu_prospective_scenario() -> dict[str, Any]:
 SCENARIO_REAL_MU_PROSPECTIVE = _real_mu_prospective_scenario()
 
 
-def _operated_paper_capital_scenario() -> dict[str, Any]:
-    """Forward-operated MU paper authority without rewriting the banked specimen."""
+def _pair_decision_series_scenario() -> dict[str, Any]:
+    """Real MU/NVDA/cash episode 1 from banked subject evidence only."""
 
     scenario = deepcopy(SCENARIO_REAL_MU_PROSPECTIVE)
     scenario.update(
         {
-            "scenario_id": OPERATED_PAPER_CAPITAL_SCENARIO_ID,
-            "title": "GV Operated Paper Capital — MU",
-            "id_domain": "GV-OPERATED-PAPER-CAPITAL-1",
+            "scenario_id": PAIR_DECISION_SERIES_SCENARIO_ID,
+            "title": "PAIR-DECISION-SERIES-1 — MU / NVDA Episode 1",
+            "id_domain": "GV-PAIR-DECISION-SERIES-1-E1",
             "claim_boundary": (
-                "One owner-supplied, market-identified MU paper-capital decision using "
-                "the certified cash baseline. Operator assertions are content-addressed "
-                "but are not provider-verified, alpha evidence, investment advice, broker "
-                "authority, or live-capital authority."
+                "One source-bound MU/NVDA/cash paper comparison at a common PIT cut. "
+                "Both subject packages remain ABSTAIN/NO_POSITION; episode 1 seals "
+                "forward comparator, cost, horizon, and policy terms without opening "
+                "outcomes, claiming alpha, giving advice, routing orders, or authorizing live capital."
             ),
-            "fixture_namespace": "operated-paper-capital-mu",
-            "source_scenario_id": REAL_MU_PROSPECTIVE_SCENARIO_ID,
-            "forward_operated_market_packet": True,
+            "fixture_namespace": "pair-decision-series-1-e1",
+            "source_scenario_id": "GV_REAL_EVIDENCE_MU_NVDA_PAIR_1",
+            "source_bound_pair_market_packets": True,
+            "episode_preregistration_path": (
+                "data/gv_pair_decision_series/mu_nvda_episode_1/"
+                "episode_preregistration.json"
+            ),
+            "episode_preregistration_sha256": (
+                "1c2c93832e46be815cfa3875628448960286fcd3e4a8620d1388ff16bd8ad058"
+            ),
+            "minimum_economic_clusters": 2,
         }
     )
     scenario["portfolio_aim"] = {
         **scenario["portfolio_aim"],
         "objective": (
-            "Operate one bounded owner-authored MU paper decision from certified cash "
-            "through preview, explicit disposition, persistence, certification, and replay."
+            "Compare real MU, real NVDA, and certified cash from one source-derived "
+            "market cut, then explicitly confirm cash/abstention or reject-all."
         ),
-        "allowed_actions": ["BUY", "HOLD", "CASH"],
+        "allowed_actions": ["HOLD", "CASH"],
     }
     scenario["status_explanations"] = {
         "DRAFT_REVIEW": (
-            "The forward-operated MU paper workspace awaits bootstrap confirmation."
+            "The real MU/NVDA/cash baseline awaits bootstrap certification."
         ),
         "FUNDED_CERTIFIED": (
-            "The certified MU workspace is ready for one owner-supplied evidence and "
-            "market packet; no paper position exists until explicit confirmation."
+            "The certified cash baseline is ready for source-bound pair episode 1; "
+            "neither security has positive capital authority."
         ),
     }
-    scenario["initial_decision_reason"] = "BOOTSTRAP_BANKED_MU_CASH_BASELINE"
+    scenario["initial_decision_reason"] = "BOOTSTRAP_BANKED_MU_NVDA_CASH_BASELINE"
     scenario["initial_changed_why_reason"] = (
-        "The forward-operated workspace starts from the certified banked MU cash-only "
-        "baseline without modifying its historical evidence contract."
+        "Banked subject evidence leaves MU and NVDA at ABSTAIN/NO_POSITION, so all "
+        "capital remains classified cash before the common market cut is sealed."
+    )
+    scenario["instruments"].append(
+        {
+            "identity_namespace": "SEC_CIK_LISTING_V1",
+            "permanent_key": "SEC_CIK:0001045810:NASDAQ:NVDA:COMMON_STOCK",
+            "security_class": "COMMON_STOCK",
+            "symbol": "NVDA",
+            "name": "NVIDIA Corporation",
+            "economic_cluster": "ACCELERATED_COMPUTE",
+            "evidence_content": (
+                "Banked NVIDIA disclosures identify elevated memory and systems prices, "
+                "scarce inputs, foundry-capacity constraints, possible supply shortfalls, "
+                "and non-cancellable commitments, but do not establish a valuation-adjusted return edge."
+            ),
+            "evidence_slug": "nvda-subject-decision",
+            "evidence_locator": (
+                "repo://data/gv_pair_decision_series/mu_nvda_episode_1/"
+                "nvda_subject_decision.json#sha256="
+                "1fef7f4035e708c2aa17783730cf01aef87d8458c9d2239bfae1ca050be54ac3"
+            ),
+            "outcome": "ABSTAIN",
+            "net_score_bps": 0,
+            "target_quantity": "0",
+            "reference_price": "1",
+            "principal_claim": (
+                "The banked evidence does not establish an independently valued, "
+                "cost-aware NVDA return opportunity at this decision cut."
+            ),
+            "hard_falsifiers": [
+                "NVDA fact-set or subject-decision identity fails verification"
+            ],
+            "watch_conditions": [
+                "new banked NVDA-specific evidence changes the valuation-adjusted "
+                "opportunity while preserving point-in-time custody"
+            ],
+        }
     )
     return scenario
 
 
-SCENARIO_OPERATED_PAPER_CAPITAL = _operated_paper_capital_scenario()
+SCENARIO_PAIR_DECISION_SERIES = _pair_decision_series_scenario()
 
 
 _SCENARIOS = {
@@ -565,7 +609,7 @@ _SCENARIOS = {
     ENGINE_SCALE_100_SCENARIO_ID: SCENARIO_100,
     PROSPECTIVE_25_SCENARIO_ID: SCENARIO_PROSPECTIVE_25,
     REAL_MU_PROSPECTIVE_SCENARIO_ID: SCENARIO_REAL_MU_PROSPECTIVE,
-    OPERATED_PAPER_CAPITAL_SCENARIO_ID: SCENARIO_OPERATED_PAPER_CAPITAL,
+    PAIR_DECISION_SERIES_SCENARIO_ID: SCENARIO_PAIR_DECISION_SERIES,
 }
 
 

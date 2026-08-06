@@ -1,4 +1,18 @@
 
+## 2026-08-06 — PAIR-DECISION-SERIES-1 EPISODE 1 INTEGRATED CANDIDATE
+
+- Decision: do not terminalize source-authority repair separately. Absorb it into the first real cross-sectional episode and publish one candidate, one audit, and one terminal receipt.
+- Pair rule: MU/NVDA first because both have banked subject evidence; first valid real pair wins. MU/NVDA passed using one common Cboe BZX symbol-data capture. No roadmap reselection occurred.
+- Source contract: one pinned common source capture, one permission manifest, one XML-row parser, one common PIT cut, then separately instrument-bound MU and NVDA rows and packets. Each packet carries its own permanent identity, row locator/hash, and packet hash.
+- Evidence boundary: subject evidence is banked-only. The bounded acquisition covered market observations only. The new NVDA subject decision remains ABSTAIN/NO_POSITION and cannot inherit MU-context investability authority.
+- Product: delete all manual market price, source, permission, receipt, parser, and market-time authority without compatibility; remove synthetic MERID from acceptance; compare real MU, real NVDA, and cash in the sole Command Center.
+- Series law: episode 1 seals `decision_series_id`, episode number, cut, outcome horizon/open date, comparator, cost model, policy version, and source contract before outcomes are available. Outcome data remains SEALED_NOT_OPENED.
+- Economic disposition: both subject decisions remain ABSTAIN/NO_POSITION, so the valid episode-1 confirmation retains certified cash. No orders, fills, costs, alpha, or positive position authority are fabricated.
+- Evidence: focused integrated matrix `71/71 PASS`; cash `11000`; positions empty; costs `0`; residual `0`; exact persistence/reconstruction PASS; inherited `websockets.legacy` warning only.
+- Publication: candidate push → review-only PR/hosted exact-head proof → one independent cross-domain audit → audit PASS → owner-authorized `git merge --ff-only` → annotated `pair-decision-series-1-e1-terminal` tag → local main = origin/main = peeled tag. Publication fails closed without owner authority or protected-branch bypass.
+- Score/claim: canonical product maturity remains `70/100`; portfolio-alpha evidence remains `0`; Limited Live remains closed.
+- Next: after terminal equality, immediately execute episode 2 under unchanged pair, comparator, cost, policy, horizon, and source contracts. No 5/25-security expansion before sequential temporal evidence.
+
 ## 2026-08-05 — PIT-ALPHA-AUTHORITY-CUT-1
 
 - Decision: install the final functional state represented by `a36a436` on advertised main ancestry as C cleanup plus one P authority commit; do not replay seventeen historical commits.

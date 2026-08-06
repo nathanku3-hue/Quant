@@ -1,74 +1,129 @@
 # GodView Top-Level Roadmap
 
-Status: `PIT-SOURCE-AUTHORITY-1 ACTIVE; ALPHA CUT PUBLISHED; LIVE CLOSED`
+Status: `PAIR-DECISION-SERIES-1 EPISODE 1 IMPLEMENTED; AUDIT/PUBLICATION PENDING; LIVE CLOSED`
 Date: 2026-08-06
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Active brief: `docs/context/ACTIVE_BRIEF`
-Canonical score: `70/100` (product operability, custody, and replay only)
+Canonical product maturity: `70/100` (operability, custody, replay only)
+Portfolio-alpha evidence: `0`
 
 ## Endgame
 
 GodView is one all-capital point-in-time certified portfolio operating system:
 
 ```text
-certified book + evidence + market identity
-→ verified immutable proposals
-→ governed comparison
-→ bounded operator decision
+certified book + banked evidence + source-derived market identity
+→ verified immutable security decisions
+→ governed real-security/cash comparison
+→ bounded operator disposition
 → calculation-only preview
 → explicit confirm or reject-all
 → deterministic accounting
 → atomic persistence
 → certification lineage
-→ exact replay and prospective learning
+→ exact replay
+→ sequential prospective outcome evidence
 ```
 
-`dashboard.py` is the sole operator product. Strategy and evidence logic remain in modules; accounting, persistence, certification, and replay remain domain authorities; the dashboard owns no independent capital math.
+`dashboard.py` is the sole operator product. Domain modules own evidence verification, packet derivation, accounting, persistence, certification, and replay. The dashboard owns no independent market or capital math.
 
-## Published authority cut
+## Banked substrate
+
+- Published authority cut: `9af5259`, tagged `pit-alpha-authority-cut-1-terminal`.
+- Source-packet candidate base: `7191613`, clean and remote-equal.
+- Existing loop: preview, explicit disposition, persistence, certification, exact reopen, residual `0`.
+- Existing scale substrate remains reusable but is not the next gate.
+
+The operator-entered source-authority overclaim at `7191613` is repaired inside the first real pair episode. It is not a separate product milestone.
+
+## Active result — PAIR-DECISION-SERIES-1 Episode 1
 
 ```text
-e4cf949 advertised main
-→ C a927451: delete 50 residue blobs + 41 gitlinks
-→ P 9af5259: one reviewed final-state transplant
-→ fresh-clone product proof 123/123
-→ independent reviews + F_PASS + hosted Windows/Ubuntu
-→ fast-forward main to 9af5259
-→ tag pit-alpha-authority-cut-1-terminal → 9af5259
+one pinned Cboe BZX MU/NVDA source capture
++ one bounded permission manifest
++ one XML-row parser
++ one common PIT cut
+→ MU row / packet
+→ NVDA row / packet
+→ banked MU subject decision
+→ banked-only NVDA subject decision
+→ MU / NVDA / cash comparison
+→ sealed episode 1 cash/abstention
+→ preview / confirm or reject-all
+→ persist / certify / exact reopen
 ```
 
-Banked product: real all-capital PIT; ordered governance; default Command Center; bounded paper BUY entry; displayed-proposal-bound SELL+BUY rotation; explicit confirmation and reject-all; atomic persistence; certification; fresh-process replay with residual `0`.
+Each packet has a separate permanent identity, instrument ID, row locator, row hash, and packet hash. Both share the exact source object, permission manifest, parser, valid time, knowledge time, and decision cut.
 
-Removed without compatibility: standalone operated application; both standalone launchers; prospective workspace view; standalone AppTests and workflow routes.
+Manual price, source, permission, receipt, parser, and market-time authority is deleted without compatibility. Synthetic `MERID` is excluded from acceptance.
 
-## Explicit roadmap deviation (banked)
+## Episode-1 forward evidence contract
 
-Automatic Scale→Universe→Challenger progression was abandoned. Seventeen-commit historical replay was replaced by a two-commit final-state transplant. The duplicate operator product was deleted without compatibility. These are endgame convergence choices, not silent drift.
-
-## Score law
-
-Canonical score is `70/100` for product operability, custody, and replay after publication of the authority cut. This is not an alpha, source-quality, realized-value, broker, or live-readiness score. No archival count alone earns score; the published operable loop and custody receipts do.
-
-## Active product slice — PIT-SOURCE-AUTHORITY-1
-
-Pass one independently traceable bitemporal market packet through the existing loop:
+Before outcomes are visible, episode 1 seals:
 
 ```text
-immutable source bytes or receipt
-+ source/permission identity
-+ valid/effective time
-+ retrieval/knowledge time
-+ permanent instrument identity
-+ observed value / unit / currency
-+ schema version
-+ content SHA-256
-→ existing PIT proposal
-→ existing preview/confirm/reject
-→ existing persistence/certification/replay
+decision_series_id
++ episode_number = 1
++ decision_cut_id
++ outcome_horizon_spec
++ outcome_open_not_before
++ comparator_spec
++ cost_model_id
++ decision_policy_version
++ source_contract_version
 ```
 
-No new engine, provider programme, optimizer, broker, alpha claim, or live-capital path.
+Those terms are bound into proposal, event ledger, certification, persistence, and reconstruction. Outcome data remains unopened.
 
-## Closed scope
+Both securities remain `ABSTAIN / NO_POSITION`; the accepted capital disposition is certified cash. This is valid negative/neutral evidence, not a failed demonstration and not alpha.
 
-Cascade integration, broad provider expansion, historical-suite repair, backward compatibility, duplicate authority paths, individual historical commit replay, score inflation beyond the operability/custody/replay boundary, advice activity, broker routing, and Limited Live remain closed.
+## Evidence state
+
+| Measure | Current |
+|---|---:|
+| Source-derived packet path | PASS locally |
+| Real investable identities | 2 |
+| Real cross-sectional episodes | 1 on confirmation |
+| Sealed sequential episodes | 1 on confirmation |
+| Opened outcome episodes | 0 |
+| Unexplained residual | 0 |
+| Fresh-process equality | PASS locally |
+| Canonical product maturity | 70/100 |
+| Portfolio-alpha evidence | 0 |
+
+Focused integrated matrix: `71/71 PASS`; inherited non-blocking `websockets.legacy` warning only.
+
+## Publication gate
+
+One candidate, one audit, one publication:
+
+```text
+immutable candidate SHA
+→ review-only PR and hosted exact-head proof
+→ one independent cross-domain audit
+→ audit PASS
+→ owner-authorized fast-forward-only main update
+→ annotated pair-decision-series-1-e1-terminal tag
+→ local main == origin/main == peeled tag
+```
+
+Publication fails closed without authority to perform or authorize the exact fast-forward and protected-branch bypass. No squash, rebase, merge commit, force push, or tag rewrite.
+
+## Next — temporal evidence, not breadth
+
+After episode 1 is terminally published:
+
+```text
+episode 2
+→ episode 3+
+→ open each preregistered outcome only when eligible
+→ apply fixed costs and comparators
+→ retain wins, losses, neutral results, abstentions, and rejects
+→ evaluate repeated out-of-sample decision evidence
+```
+
+Do not expand to 5 or 25 real securities until the sequential series demonstrates that security breadth—not time-series evidence—is the limiting constraint.
+
+## Claim and scope boundary
+
+No new portfolio engine, provider framework, optimizer, broker, advice, live capital, compatibility route, score uplift, alpha claim, premature outcome opening, or Limited Live. Canonical product maturity remains `70/100`; portfolio-alpha evidence remains `0`.
