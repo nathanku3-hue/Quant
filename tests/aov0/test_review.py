@@ -1,11 +1,20 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 
 import pandas as pd
 import pytest
 
+from research.aov0.contracts import DEFAULT_CONTRACT
 from research.aov0.review import build_review_packet, verify_review_packet
+
+
+DEVELOPMENT_CONTRACT = replace(
+    DEFAULT_CONTRACT,
+    insurance_materiality_floor_ratio=0.05,
+    insurance_premium_ceiling_annual_return=0.005,
+)
 
 
 def _simulation(gross: list[float], cost: list[float], net: list[float] | None = None) -> pd.DataFrame:
@@ -31,6 +40,7 @@ def _review(parent: pd.DataFrame, child: pd.DataFrame) -> dict[str, object]:
         experiment_id="e" * 64,
         parent_node_hash="p" * 64,
         child_node_hash="c" * 64,
+        contract=DEVELOPMENT_CONTRACT,
     )
 
 

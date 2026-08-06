@@ -31,8 +31,8 @@ class AOV0Contract:
     child_eta: float = 0.50
     child_hazard_cap: float = 0.50
     cvar_level: float = 0.95
-    insurance_materiality_floor_ratio: float = 0.05
-    insurance_premium_ceiling_annual_return: float = 0.0050
+    insurance_materiality_floor_ratio: float | None = None
+    insurance_premium_ceiling_annual_return: float | None = None
     economic_cash_source: str = "OFFICIAL_SOFR"
     economic_cash_quote_convention: str = "SOFR_PERCENT_MINUS_25BP_ACT_360_SIMPLE_ACCRUAL"
     economic_cash_roll_policy: str = "OVERNIGHT_ACCRUAL_NO_PROXY_SUBSTITUTION"
@@ -61,6 +61,12 @@ class AOV0Contract:
 DEFAULT_CONTRACT = AOV0Contract()
 
 
+OWNER_INSURANCE_DECISION_FIELDS = (
+    "insurance_materiality_floor_ratio",
+    "insurance_premium_ceiling_annual_return",
+)
+
+
 def validate_contract(contract: AOV0Contract) -> None:
     if contract.schema_version != CONTRACT_SCHEMA:
         raise ValueError("aov0_contract_schema_invalid")
@@ -78,3 +84,26 @@ def validate_contract(contract: AOV0Contract) -> None:
         raise ValueError("aov0_horizon_invalid")
     if contract.inference_hac_lag_weekly < 0:
         raise ValueError("aov0_hac_lag_invalid")
+    if (
+        contract.insurance_materiality_floor_ratio is not None
+        and not (0.0 <= contract.insurance_materiality_floor_ratio <= 1.0)
+    ):
+        raise ValueError("aov0_insurance_materiality_invalid")
+    if (
+        contract.insurance_premium_ceiling_annual_return is not None
+        and contract.insurance_premium_ceiling_annual_return < 0.0
+    ):
+        raise ValueError("aov0_insurance_premium_invalid")
+
+
+def validate_prospective_contract(contract: AOV0Contract) -> None:
+    validate_contract(contract)
+    unresolved = [
+        field
+        for field in OWNER_INSURANCE_DECISION_FIELDS
+        if getattr(contract, field) is None
+    ]
+    if unresolved:
+        raise ValueError(
+            "aov0_owner_insurance_decisions_required:" + ",".join(unresolved)
+        )

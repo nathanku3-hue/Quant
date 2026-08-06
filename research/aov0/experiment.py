@@ -14,7 +14,11 @@ from uuid import uuid4
 import pandas as pd
 
 from core.gv_fs0_canonical import domain_hash
-from research.aov0.contracts import AOV0Contract, DEFAULT_CONTRACT
+from research.aov0.contracts import (
+    AOV0Contract,
+    DEFAULT_CONTRACT,
+    validate_prospective_contract,
+)
 from research.aov0.cube import VerticalCube
 from research.aov0.dag import DagRunResult, HashDagCache, run_policy_dag
 from research.aov0.policy import DEFAULT_MUTATION, MutationManifest, assert_rule100_equivalence
@@ -209,6 +213,7 @@ def seal_prospective_experiment(
     contract: AOV0Contract = DEFAULT_CONTRACT,
     mutation: MutationManifest = DEFAULT_MUTATION,
 ) -> ProspectiveSeal:
+    validate_prospective_contract(contract)
     sealed_ts = _utc(sealed_at)
     payload = {
         "schema_version": SEAL_SCHEMA,

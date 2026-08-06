@@ -13,6 +13,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from research.aov0.cash import build_economic_cash_returns
+from research.aov0.contracts import (
+    AOV0Contract,
+    DEFAULT_CONTRACT,
+    OWNER_INSURANCE_DECISION_FIELDS,
+)
 from research.aov0.cube import build_vertical_cube
 from research.aov0.experiment import run_five_arm_experiment, seal_prospective_experiment
 
@@ -46,15 +51,28 @@ def run_first_seal(
     *,
     input_root: Path = DEFAULT_INPUT_ROOT,
     output_root: Path = DEFAULT_OUTPUT_ROOT,
+    contract: AOV0Contract = DEFAULT_CONTRACT,
 ) -> dict[str, object]:
     input_root = Path(input_root)
     paths = {name: input_root / filename for name, filename in REQUIRED_INPUTS.items()}
     missing = [name for name, path in paths.items() if not path.is_file()]
-    if missing:
+    owner_decisions = [
+        field
+        for field in OWNER_INSURANCE_DECISION_FIELDS
+        if getattr(contract, field) is None
+    ]
+    if owner_decisions or missing:
+        if owner_decisions and missing:
+            status = "BLOCKED_OWNER_DECISION_AND_ADMITTED_INPUTS"
+        elif owner_decisions:
+            status = "BLOCKED_OWNER_DECISION"
+        else:
+            status = "BLOCKED_MISSING_ADMITTED_INPUTS"
         return {
-            "status": "BLOCKED_MISSING_ADMITTED_INPUTS",
+            "status": status,
             "alpha_evidence": 0,
             "prospective_clock_started": False,
+            "owner_decisions_required": owner_decisions,
             "missing": missing,
             "required_paths": {name: path.as_posix() for name, path in paths.items()},
         }
@@ -71,7 +89,7 @@ def run_first_seal(
     if not rule100.index.equals(returns.index):
         raise ValueError("aov0_first_seal_rule100_return_calendar_mismatch")
 
-    cube = build_vertical_cube(primitives, computed_at=sealed_at)
+    cube = build_vertical_cube(primitives, computed_at=sealed_at, contract=contract)
     economic_cash = build_economic_cash_returns(rule100.index, sofr)
     eligible_by_date = {
         date: tuple(sorted(group["permno"].astype(int).unique().tolist()))
@@ -85,6 +103,7 @@ def run_first_seal(
         cube=cube,
         pit_eligibility_provider=lambda date: eligible_by_date.get(pd.Timestamp(date).normalize(), ()),
         output_root=Path(output_root) / "evidence",
+        contract=contract,
     )
     seal = seal_prospective_experiment(
         experiment,
@@ -92,6 +111,7 @@ def run_first_seal(
         decision_cut_id=decision_cut_id,
         sealed_at=sealed_at,
         output_dir=Path(output_root) / "prospective_seals",
+        contract=contract,
     )
     return {
         "status": "SEALED_NOT_OPENED",

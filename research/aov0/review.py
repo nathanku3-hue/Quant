@@ -8,7 +8,11 @@ import numpy as np
 import pandas as pd
 
 from core.gv_fs0_canonical import domain_hash
-from research.aov0.contracts import AOV0Contract, DEFAULT_CONTRACT
+from research.aov0.contracts import (
+    AOV0Contract,
+    DEFAULT_CONTRACT,
+    validate_prospective_contract,
+)
 
 
 REVIEW_SCHEMA = "aov0_review_packet_v1"
@@ -24,6 +28,7 @@ def build_review_packet(
     child_node_hash: str,
     contract: AOV0Contract = DEFAULT_CONTRACT,
 ) -> dict[str, Any]:
+    validate_prospective_contract(contract)
     required = {"gross_ret", "net_ret", "turnover", "cost"}
     for name, frame in (("parent", parent_simulation), ("child", child_simulation)):
         if not required.issubset(frame.columns):

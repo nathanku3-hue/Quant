@@ -1,7 +1,20 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pandas as pd
 import pytest
+
+from research.aov0.contracts import DEFAULT_CONTRACT
+
+
+@pytest.fixture
+def development_contract():
+    return replace(
+        DEFAULT_CONTRACT,
+        insurance_materiality_floor_ratio=0.05,
+        insurance_premium_ceiling_annual_return=0.005,
+    )
 
 
 @pytest.fixture

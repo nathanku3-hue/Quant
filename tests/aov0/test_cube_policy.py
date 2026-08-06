@@ -6,7 +6,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from research.aov0.contracts import DEFAULT_CONTRACT, validate_contract
+from research.aov0.contracts import (
+    DEFAULT_CONTRACT,
+    validate_contract,
+    validate_prospective_contract,
+)
 from research.aov0.cube import build_vertical_cube
 from research.aov0.dag import HashDagCache, run_policy_dag
 from research.aov0.policy import (
@@ -28,8 +32,10 @@ def test_frozen_contract_closes_p0_defaults() -> None:
     assert DEFAULT_CONTRACT.f_proxy_formula.startswith("robust_z(")
     assert DEFAULT_CONTRACT.c_proxy_formula == "ewma20(abs(F_proxy))"
     assert DEFAULT_CONTRACT.cvar_level == 0.95
-    assert DEFAULT_CONTRACT.insurance_materiality_floor_ratio == 0.05
-    assert DEFAULT_CONTRACT.insurance_premium_ceiling_annual_return == 0.005
+    assert DEFAULT_CONTRACT.insurance_materiality_floor_ratio is None
+    assert DEFAULT_CONTRACT.insurance_premium_ceiling_annual_return is None
+    with pytest.raises(ValueError, match="owner_insurance_decisions_required"):
+        validate_prospective_contract(DEFAULT_CONTRACT)
     assert DEFAULT_CONTRACT.economic_cash_source == "OFFICIAL_SOFR"
     assert DEFAULT_CONTRACT.economic_cash_quote_convention == "SOFR_PERCENT_MINUS_25BP_ACT_360_SIMPLE_ACCRUAL"
     assert DEFAULT_CONTRACT.sleeve_horizon_calendar_days == 30

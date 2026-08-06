@@ -20,6 +20,7 @@ def test_five_arm_experiment_emits_hash_bound_evidence_and_seals_exactly(
     rule100_weights,
     aov_returns,
     economic_cash_returns,
+    development_contract,
 ) -> None:
     cube = build_vertical_cube(aov_primitives, computed_at=COMPUTED_AT)
     result = run_five_arm_experiment(
@@ -29,6 +30,7 @@ def test_five_arm_experiment_emits_hash_bound_evidence_and_seals_exactly(
         cube=cube,
         pit_eligibility_provider=lambda _date: (101, 202),
         output_root=tmp_path / "evidence",
+        contract=development_contract,
     )
     assert set(result.arm_metrics) == {
         "rule100",
@@ -58,6 +60,7 @@ def test_five_arm_experiment_emits_hash_bound_evidence_and_seals_exactly(
         decision_cut_id="AOV0_LOCAL_CUT_20260806",
         sealed_at="2026-08-06T18:30:00Z",
         output_dir=tmp_path / "seals",
+        contract=development_contract,
     )
     reopened = reopen_prospective_seal(seal.path)
     assert reopened == seal.payload
@@ -74,6 +77,7 @@ def test_seal_hash_tamper_fails_closed(
     rule100_weights,
     aov_returns,
     economic_cash_returns,
+    development_contract,
 ) -> None:
     cube = build_vertical_cube(aov_primitives, computed_at=COMPUTED_AT)
     result = run_five_arm_experiment(
@@ -83,6 +87,7 @@ def test_seal_hash_tamper_fails_closed(
         cube=cube,
         pit_eligibility_provider=lambda _date: (101, 202),
         output_root=tmp_path / "evidence",
+        contract=development_contract,
     )
     seal = seal_prospective_experiment(
         result,
@@ -90,6 +95,7 @@ def test_seal_hash_tamper_fails_closed(
         decision_cut_id="AOV0_LOCAL_CUT_TAMPER",
         sealed_at="2026-08-06T18:30:00Z",
         output_dir=tmp_path / "seals",
+        contract=development_contract,
     )
     payload = json.loads(seal.path.read_text(encoding="utf-8"))
     payload["decision_cut_id"] = "TAMPERED"

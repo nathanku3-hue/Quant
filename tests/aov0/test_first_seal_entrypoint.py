@@ -8,9 +8,13 @@ from scripts.aov0_first_seal import run_first_seal
 def test_first_real_seal_blocks_on_missing_admitted_inputs(tmp_path: Path) -> None:
     result = run_first_seal(input_root=tmp_path / "missing", output_root=tmp_path / "out")
     assert result == {
-        "status": "BLOCKED_MISSING_ADMITTED_INPUTS",
+        "status": "BLOCKED_OWNER_DECISION_AND_ADMITTED_INPUTS",
         "alpha_evidence": 0,
         "prospective_clock_started": False,
+        "owner_decisions_required": [
+            "insurance_materiality_floor_ratio",
+            "insurance_premium_ceiling_annual_return",
+        ],
         "missing": [
             "rule100_targets",
             "vertical_primitives",
