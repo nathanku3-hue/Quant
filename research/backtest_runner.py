@@ -14,7 +14,11 @@ import numpy as np
 import pandas as pd
 
 from core import engine
-from research.benchmarks import PITEligibilityProvider, build_required_benchmark_weights
+from research.benchmarks import (
+    PITEligibilityProvider,
+    build_economic_cash_frames,
+    build_required_risky_benchmark_weights,
+)
 from research.evidence_schema import EvidencePacket, write_evidence_packet
 from research.metrics import build_equity_curve, compute_metrics
 from research.status import ResearchStatus
@@ -53,6 +57,7 @@ def run_research_backtest(
     pit_membership_proof: Mapping[str, Any] | None = None,
     leakage_checks: Mapping[str, Any] | None = None,
     pit_eligibility_provider: PITEligibilityProvider | None = None,
+    economic_cash_returns: pd.Series | None = None,
     run_id: str | None = None,
     emit_artifacts: bool = True,
 ) -> ResearchBacktestResult:
@@ -115,18 +120,25 @@ def run_research_backtest(
                 target_weights=target_weights,
                 returns_df=returns_df,
                 pit_eligibility_provider=pit_eligibility_provider,
+                economic_cash_returns=economic_cash_returns,
             )
             gate_failures.extend(benchmark_gate_failures)
             if gate_failures:
                 status = ResearchStatus.BLOCKED
             else:
-                first_benchmark_result = next(iter(benchmark_results.values()), None)
-                metrics = compute_metrics(
-                    simulation_result,
-                    executed_weights,
-                    target_weights,
-                    benchmark_result=first_benchmark_result,
-                )
+                primary_name = str((normalized_cartridge.benchmark_policy or {}).get("primary"))
+                primary_benchmark_result = benchmark_results.get(primary_name)
+                if primary_benchmark_result is None:
+                    gate_failures.append("primary_benchmark_result_missing")
+                    status = ResearchStatus.BLOCKED
+                    metrics = _empty_metrics()
+                else:
+                    metrics = compute_metrics(
+                        simulation_result,
+                        executed_weights,
+                        target_weights,
+                        benchmark_result=primary_benchmark_result,
+                    )
                 for benchmark_name, benchmark_result in benchmark_results.items():
                     weights = benchmark_weights[benchmark_name]
                     benchmark_metrics[benchmark_name] = compute_metrics(
@@ -135,7 +147,8 @@ def run_research_backtest(
                         weights,
                     )
                     benchmark_curves[benchmark_name] = build_equity_curve(benchmark_result["net_ret"])
-                status = _status_from_completed_run(normalized_cartridge, metrics)
+                if not gate_failures:
+                    status = _status_from_completed_run(normalized_cartridge, metrics)
 
     data_quality_report = _build_data_quality_report(target_weights, returns_df, executed_weights)
     if gate_failures:
@@ -158,6 +171,7 @@ def run_research_backtest(
         normalized_cartridge,
         target_weights,
         returns_df,
+        economic_cash_returns=economic_cash_returns,
     )
 
     if status == ResearchStatus.BLOCKED and not metrics:
@@ -326,24 +340,36 @@ def _run_required_benchmarks(
     target_weights: pd.DataFrame,
     returns_df: pd.DataFrame,
     pit_eligibility_provider: PITEligibilityProvider | None,
+    economic_cash_returns: pd.Series | None,
 ) -> tuple[dict[str, pd.DataFrame], dict[str, pd.DataFrame], list[str]]:
     failures: list[str] = []
     results: dict[str, pd.DataFrame] = {}
+    benchmark_weights: dict[str, pd.DataFrame] = {}
     try:
-        benchmark_weights = build_required_benchmark_weights(
-            target_weights,
-            cartridge.benchmark_policy or {},
-            pit_eligibility_provider=pit_eligibility_provider,
+        benchmark_weights.update(
+            build_required_risky_benchmark_weights(
+                target_weights,
+                cartridge.benchmark_policy or {},
+                pit_eligibility_provider=pit_eligibility_provider,
+            )
         )
+        if economic_cash_returns is None:
+            raise ValueError("missing_economic_cash_returns")
+        economic_weights, economic_returns = build_economic_cash_frames(
+            target_weights.index,
+            economic_cash_returns,
+        )
+        benchmark_weights["economic_cash"] = economic_weights
     except ValueError as exc:
         failures.append(str(exc))
-        return results, {}, failures
+        return results, benchmark_weights, failures
 
     for benchmark_name, weights in benchmark_weights.items():
+        benchmark_returns = economic_returns if benchmark_name == "economic_cash" else returns_df
         try:
             results[benchmark_name] = engine.run_simulation(
                 target_weights=weights,
-                returns_df=returns_df,
+                returns_df=benchmark_returns,
                 cost_bps=float(cartridge.turnover_cost_rate),
                 strict_missing_returns=True,
             )
@@ -403,6 +429,8 @@ def _build_run_metadata(
     cartridge: StrategyCartridge,
     target_weights: pd.DataFrame,
     returns_df: pd.DataFrame,
+    *,
+    economic_cash_returns: pd.Series | None,
 ) -> dict[str, Any]:
     return {
         "run_id": run_id,
@@ -418,6 +446,12 @@ def _build_run_metadata(
         "cash_policy": "implicit_residual_cash",
         "target_weight_signature": _frame_signature(target_weights),
         "returns_signature": _frame_signature(returns_df),
+        "economic_cash_signature": (
+            _series_signature(economic_cash_returns)
+            if economic_cash_returns is not None
+            else None
+        ),
+        "primary_benchmark": (cartridge.benchmark_policy or {}).get("primary"),
     }
 
 
@@ -428,17 +462,24 @@ def _coerce_datetime_index(index: Any) -> pd.DatetimeIndex:
 
 
 def _frame_signature(frame: pd.DataFrame) -> dict[str, Any]:
-    columns = tuple(str(column) for column in frame.columns)
-    index_min = str(frame.index.min()) if len(frame.index) else None
-    index_max = str(frame.index.max()) if len(frame.index) else None
-    payload = f"{frame.shape}|{columns}|{index_min}|{index_max}"
+    digest = hashlib.sha256()
+    digest.update(str(frame.shape).encode("utf-8"))
+    digest.update("|".join(str(column) for column in frame.columns).encode("utf-8"))
+    digest.update("|".join(str(dtype) for dtype in frame.dtypes).encode("utf-8"))
+    digest.update(pd.util.hash_pandas_object(frame.index, index=False).to_numpy(dtype="uint64").tobytes())
+    digest.update(pd.util.hash_pandas_object(frame, index=False).to_numpy(dtype="uint64").tobytes())
     return {
         "rows": int(frame.shape[0]),
-        "columns": list(columns),
-        "index_min": index_min,
-        "index_max": index_max,
-        "sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
+        "columns": [str(column) for column in frame.columns],
+        "index_min": str(frame.index.min()) if len(frame.index) else None,
+        "index_max": str(frame.index.max()) if len(frame.index) else None,
+        "sha256": digest.hexdigest(),
     }
+
+
+def _series_signature(series: pd.Series) -> dict[str, Any]:
+    frame = pd.DataFrame({str(series.name or "value"): series})
+    return _frame_signature(frame)
 
 
 def _default_run_id(strategy_id: str) -> str:

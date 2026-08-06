@@ -1,7 +1,8 @@
-"""Evidence packet schema helpers for research backtest v0."""
+"""Immutable evidence packet writer for canonical AOV research runs."""
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from contextlib import suppress
@@ -15,13 +16,12 @@ import pandas as pd
 from research.status import ResearchStatus
 
 
-EVIDENCE_SCHEMA_VERSION = "research_evidence_v0"
+EVIDENCE_SCHEMA_VERSION = "research_evidence_v1"
+EVIDENCE_MANIFEST_VERSION = "research_evidence_manifest_v1"
 
 
 @dataclass(frozen=True)
 class EvidencePacket:
-    """In-memory representation of the mandatory v0 evidence packet."""
-
     run_id: str
     status: ResearchStatus
     output_dir: Path
@@ -64,11 +64,12 @@ def write_evidence_packet(
     benchmark_curves: Mapping[str, pd.Series] | None = None,
     simulation_result: pd.DataFrame | None = None,
 ) -> dict[str, str]:
-    """Write a stable CSV/JSON evidence directory and return artifact paths."""
+    """Write one immutable run directory and seal every component by SHA-256."""
 
     output_dir = packet.output_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
-    _clear_previous_final_manifest(output_dir)
+    if output_dir.exists():
+        raise FileExistsError(f"evidence_run_directory_already_exists:{output_dir}")
+    output_dir.mkdir(parents=True, exist_ok=False)
     artifacts: dict[str, str] = {}
 
     json_payloads: dict[str, Mapping[str, Any]] = {
@@ -85,7 +86,7 @@ def write_evidence_packet(
     }
     for filename, payload in json_payloads.items():
         path = output_dir / filename
-        _write_text_atomic(path, json.dumps(payload, indent=2, sort_keys=True, default=str))
+        _write_text_atomic(path, json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n")
         artifacts[filename] = str(path)
 
     if target_weights is not None:
@@ -110,16 +111,33 @@ def write_evidence_packet(
         artifacts["exposure.csv"] = _write_frame(output_dir / "exposure.csv", exposure)
 
     packet_path = output_dir / "evidence_packet.json"
-    _write_text_atomic(packet_path, json.dumps(packet.to_dict(), indent=2, sort_keys=True, default=str))
+    _write_text_atomic(packet_path, json.dumps(packet.to_dict(), indent=2, sort_keys=True, default=str) + "\n")
     artifacts["evidence_packet.json"] = str(packet_path)
 
+    manifest_payload = {
+        "schema_version": EVIDENCE_MANIFEST_VERSION,
+        "run_id": packet.run_id,
+        "files": {
+            name: {
+                "bytes": Path(path).stat().st_size,
+                "sha256": _sha256_file(Path(path)),
+            }
+            for name, path in sorted(artifacts.items())
+        },
+    }
+    manifest_path = output_dir / "evidence_manifest.json"
+    _write_text_atomic(
+        manifest_path,
+        json.dumps(manifest_payload, indent=2, sort_keys=True) + "\n",
+    )
+    artifacts["evidence_manifest.json"] = str(manifest_path)
     return artifacts
 
 
 def _write_frame(path: Path, frame: pd.DataFrame) -> str:
     tmp_path = _tmp_path_for(path)
     try:
-        frame.to_csv(tmp_path, index_label="date")
+        frame.to_csv(tmp_path, index_label="date", lineterminator="\n")
         os.replace(tmp_path, path)
     finally:
         with suppress(FileNotFoundError):
@@ -130,7 +148,7 @@ def _write_frame(path: Path, frame: pd.DataFrame) -> str:
 def _write_text_atomic(path: Path, text: str) -> None:
     tmp_path = _tmp_path_for(path)
     try:
-        tmp_path.write_text(text, encoding="utf-8")
+        tmp_path.write_text(text, encoding="utf-8", newline="\n")
         os.replace(tmp_path, path)
     finally:
         with suppress(FileNotFoundError):
@@ -141,6 +159,9 @@ def _tmp_path_for(path: Path) -> Path:
     return path.with_name(f".{path.name}.{uuid4().hex}.tmp")
 
 
-def _clear_previous_final_manifest(output_dir: Path) -> None:
-    with suppress(FileNotFoundError):
-        (output_dir / "evidence_packet.json").unlink()
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()

@@ -463,38 +463,6 @@ def _reduce(events: Iterable[Mapping[str, Any]]) -> _Reduction:
         raise PortfolioBookError("DECIMAL_ARITHMETIC_INVALID") from exc
 
 
-def reduce_events(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
-    """Return the strict byte-compatible Slice 0 legacy book projection.
-
-    This is the extraction checkpoint consumed by parity tests. It applies the
-    new fail-closed accounting invariants while preserving valid fixture bytes.
-    Integrator wiring should use :func:`build_portfolio_book` for the richer
-    reconciliation projection.
-    """
-
-    reduced = _reduce(events)
-    book = {
-        "positions": reduced.positions,
-        "classified_cash": reduced.classified_cash,
-        "total_cash": _decimal_text(reduced.total_cash),
-        "position_value": (
-            None
-            if reduced.position_value is None
-            else _decimal_text(reduced.position_value)
-        ),
-        "nav": (
-            None if reduced.terminal_nav is None else _decimal_text(reduced.terminal_nav)
-        ),
-        "valuation_status": (
-            "VALUATION_PENDING" if reduced.valuation_pending else "COMPLETE"
-        ),
-        "split_value_residual": _decimal_text(reduced.split_value_residual),
-        "declared_precision": DECLARED_PRECISION,
-    }
-    book["book_hash"] = domain_hash(f"{ID_DOMAIN}:BOOK:V1", book)
-    return book
-
-
 def build_portfolio_book(events: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
     """Return the reconciled deterministic PortfolioBook projection."""
 

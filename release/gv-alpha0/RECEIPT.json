@@ -1,0 +1,16 @@
+{
+  "schema_version": "gv_alpha0_historical_release_receipt_v1",
+  "status": "FROZEN_HISTORICAL_RECEIPT_NO_CURRENT_ROOT_REBUILD_CONTRACT",
+  "release_tag": "gv-alpha0-paper-decision-v0.1.0",
+  "source_commit": "a88ed05bbd360d8cc053f9ed835992c48958e7f5",
+  "release_proof_tip": "93e7a55",
+  "artifact_bytes": 18666047,
+  "artifact_sha256": "67f5b154182be5d9cecf050934a81b107a8d38e9ea072f0df565dd6b24fe2d57",
+  "claim_boundary": "Historical broker-free certified paper-decision release receipt only; current root source is not required to rebuild this release.",
+  "tracked_receipt_files": {
+    "README.md": "3209c441bc05f1ad36815902c530b7634d1f50631a42118bbee907f420426ce9",
+    "ROLLBACK.md": "0784f408e24b4736b240fc3e5a077e705effaeaa87fb09f9598fce92184850a2",
+    "run-linux.sh": "ac89f81d2c3dba02338577374e1b58ef1536996ff81f7129f1e871143f8cd382",
+    "run-windows.cmd": "9b0541e7daa5d1dd1fb034a252c2748984ebe735a3cda40f9c399cabcba0500c"
+  }
+}

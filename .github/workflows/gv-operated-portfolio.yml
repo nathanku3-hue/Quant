@@ -1,29 +1,28 @@
-name: GodView PIT Product Proof
+name: GodView AOV Product Proof
 
 on:
   pull_request:
     paths:
       - ".github/workflows/gv-operated-portfolio.yml"
-      - ".github/workflows/gv-fs0-product.yml"
       - "dashboard.py"
-      - "core/gv_pit/**"
-      - "core/gv_v2_mu_nvda_*.py"
-      - "data/gv_v2_reconciliation/**"
-      - "data/gv_pair_decision_series/**"
+      - "launch.py"
+      - "research/**"
+      - "scripts/aov_zero_compat_scan.py"
+      - "release/gv-alpha0/**"
       - "gv_portfolio_v0/**"
       - "views/command_center.py"
       - "views/page_registry.py"
-      - "tests/test_gv_pit_*.py"
-      - "tests/test_gv_immutable_market_packet.py"
+      - "data/gv_pair_decision_series/**"
+      - "tests/aov0/**"
+      - "tests/test_research_*.py"
+      - "tests/test_gv_*.py"
       - "tests/test_dash_1_page_registry_shell.py"
-      - "tests/gv_portfolio_v0/test_operated*.py"
-      - "tests/gv_portfolio_v0/test_prospective.py"
-      - "tests/gv_portfolio_v0/test_real_evidence_mu.py"
-      - "tests/gv_portfolio_v0/test_same_evidence_shadow.py"
+      - "tests/gv_fs0_product/test_gv_alpha0_historical_receipt.py"
       - "docs/context/**"
-      - "docs/architecture/top_level_roadmap.md"
-      - "README.md"
+      - "docs/architecture/**"
+      - "docs/phase_brief/alpha-organism-vertical-0-brief.md"
       - "PHASE_QUEUE.md"
+      - "README.md"
       - "PRD.md"
       - "PRODUCT_SPEC.md"
   push:
@@ -31,26 +30,25 @@ on:
       - "codex/pit-source-authority-1"
     paths:
       - ".github/workflows/gv-operated-portfolio.yml"
-      - ".github/workflows/gv-fs0-product.yml"
       - "dashboard.py"
-      - "core/gv_pit/**"
-      - "core/gv_v2_mu_nvda_*.py"
-      - "data/gv_v2_reconciliation/**"
-      - "data/gv_pair_decision_series/**"
+      - "launch.py"
+      - "research/**"
+      - "scripts/aov_zero_compat_scan.py"
+      - "release/gv-alpha0/**"
       - "gv_portfolio_v0/**"
       - "views/command_center.py"
       - "views/page_registry.py"
-      - "tests/test_gv_pit_*.py"
-      - "tests/test_gv_immutable_market_packet.py"
+      - "data/gv_pair_decision_series/**"
+      - "tests/aov0/**"
+      - "tests/test_research_*.py"
+      - "tests/test_gv_*.py"
       - "tests/test_dash_1_page_registry_shell.py"
-      - "tests/gv_portfolio_v0/test_operated*.py"
-      - "tests/gv_portfolio_v0/test_prospective.py"
-      - "tests/gv_portfolio_v0/test_real_evidence_mu.py"
-      - "tests/gv_portfolio_v0/test_same_evidence_shadow.py"
+      - "tests/gv_fs0_product/test_gv_alpha0_historical_receipt.py"
       - "docs/context/**"
-      - "docs/architecture/top_level_roadmap.md"
-      - "README.md"
+      - "docs/architecture/**"
+      - "docs/phase_brief/alpha-organism-vertical-0-brief.md"
       - "PHASE_QUEUE.md"
+      - "README.md"
       - "PRD.md"
       - "PRODUCT_SPEC.md"
   workflow_dispatch:
@@ -59,8 +57,8 @@ permissions:
   contents: read
 
 jobs:
-  pit-product-proof:
-    name: PIT product proof (${{ matrix.os }})
+  aov-proof:
+    name: AOV proof (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -74,17 +72,19 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: Verify exact clean candidate checkout
+      - name: Verify exact clean candidate and hard cut
         shell: bash
         env:
           EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
-          test ! -e operated_portfolio_app.py
-          test ! -e launch_operated_portfolio.py
-          test ! -e launch_operated_portfolio_25.py
-          test ! -e views/gv_prospective_paper_workspace.py
+          test ! -e alpha_app.py
+          test ! -e launch_alpha.py
+          test ! -e portfolio_app.py
+          test ! -e launch_portfolio.py
+          test ! -e scripts/build_gv_alpha0_release.py
+          test ! -e scripts/smoke_gv_alpha0_release.py
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -99,21 +99,34 @@ jobs:
       - name: Verify dependency surface
         run: python -m pip check
 
-      - name: Run PIT domain and Command Center product proof
+      - name: Zero-compat AOV scan
+        run: python scripts/aov_zero_compat_scan.py
+
+      - name: Run AOV and hardened research proof
+        run: >-
+          python -m pytest -q
+          tests/aov0
+          tests/test_research_backtest_runner.py
+          tests/test_research_benchmarks.py
+          tests/test_research_evidence_schema.py
+          tests/test_research_rule100_adapter.py
+          tests/test_dash_1_page_registry_shell.py
+          tests/gv_fs0_product/test_gv_alpha0_historical_receipt.py
+
+      - name: Run Episode-2 custody regression
         run: >-
           python -m pytest -q
           tests/test_gv_immutable_market_packet.py
           tests/test_gv_pit_transaction.py
           tests/test_gv_pit_operated_capital.py
           tests/test_gv_pit_operated_rotation.py
-          tests/test_dash_1_page_registry_shell.py
           tests/gv_portfolio_v0/test_operated.py
           tests/gv_portfolio_v0/test_operated_25.py
           tests/gv_portfolio_v0/test_prospective.py
           tests/gv_portfolio_v0/test_real_evidence_mu.py
           tests/gv_portfolio_v0/test_same_evidence_shadow.py
 
-      - name: Validate generated current context
+      - name: Validate current context
         run: python scripts/build_context_packet.py --validate
 
       - name: Require tests to leave tracked bytes unchanged

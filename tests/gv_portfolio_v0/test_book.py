@@ -10,7 +10,6 @@ from gv_portfolio_v0.book import (
     PortfolioBookError,
     build_portfolio_book,
     certification_eligible,
-    reduce_events,
 )
 from gv_portfolio_v0.vertical import build_draft_workspace, confirm_draft_workspace
 
@@ -35,29 +34,9 @@ def _mutated_fill_events(**changes: Any) -> list[dict[str, Any]]:
     return events
 
 
-def test_vertical_uses_reconciled_book_while_legacy_projection_remains_compatible() -> None:
-    draft = build_draft_workspace()
-    certified = confirm_draft_workspace(draft)
-    legacy_keys = {
-        "positions",
-        "classified_cash",
-        "total_cash",
-        "position_value",
-        "nav",
-        "valuation_status",
-        "split_value_residual",
-        "declared_precision",
-    }
-
-    for workspace in (draft, certified):
-        rich = build_portfolio_book(workspace["events"])
-        legacy = reduce_events(workspace["events"])
-        assert canonical_document_bytes(rich) == canonical_document_bytes(
-            workspace["book"]
-        )
-        assert {key: legacy[key] for key in legacy_keys} == {
-            key: rich[key] for key in legacy_keys
-        }
+def test_vertical_uses_only_reconciled_book_projection() -> None:
+    for workspace in (build_draft_workspace(), confirm_draft_workspace(build_draft_workspace())):
+        assert build_portfolio_book(workspace["events"]) == workspace["book"]
 
 
 def test_transition_plan_is_non_economic_for_accounting() -> None:
