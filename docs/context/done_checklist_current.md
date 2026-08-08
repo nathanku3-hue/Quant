@@ -19,6 +19,20 @@ Portfolio-alpha evidence: `0`
 - [x] Restored repository `.venv` on Python 3.12; `pip check` PASS; AOV suite `75/75 PASS`.
 - [ ] Repository-wide pytest phase-close gate is not green: nine unrelated/inherited collection errors remain (stale `views.page_registry` imports; missing `psycopg2`, `schedule`, `yaml`).
 
+## Lane 1 prospective slice 1 — 2026-08-08
+
+- [x] Weekly preflight fixes candidate membership to the original 109 entities and rejects membership drift.
+- [x] Weekly preflight requires fresh post-prior-cut receipts for fundamentals, primary-security/status, completed market data, and SOFR; missing/stale/future source state fails closed.
+- [x] Weekly preflight cannot rerun the growth screen, open outcomes, mutate Parent/Child, or create financial-alpha evidence.
+- [x] `alpha_pit_data_api_v1` mechanical interface + deterministic fixtures implemented with `CIQSEC:` identity, availability timestamps, source/hash binding, and explicit coverage/missingness.
+- [x] CONFIRMATORY and PROSPECTIVE Alpha PIT capability objects have no `outcomes` method; discovery outcomes are lazy/import-separated.
+- [x] `CYCLE_RESONANCE_v1` provider-blind fixture consumer implemented; it binds the risk-set/observation/claim/expectation manifests and keeps `financial_alpha_evidence=0`.
+- [x] Lane-1 focused matrix `13/13 PASS`; AOV regression `79/79 PASS`; ZERO-COMPAT contract test PASS asserting seven zero counters; selected modules compile PASS.
+- [ ] First recurring post-Clock weekly provider refresh / next v3 Seal Candidate; preflight mechanics do not substitute for fresh provider bytes.
+- [ ] Real narrow Alpha PIT producer/adapters integrated behind the frozen API; current deterministic fixtures have zero PIT/OOS/prospective authority.
+- [ ] Frozen empirical CRV1 candidate from real PIT data.
+- [ ] Matured, reconciled, validated ReviewPacket; no real outcome-informed MutationManifest before this gate.
+
 ## Closed locally
 
 - [x] Published prior authority remains `9af5259`; untouched this round.
@@ -70,6 +84,18 @@ Portfolio-alpha evidence: `0`
 - [x] Added `RESONANCE_LEVERAGE_POLICY_v1` as downstream Capital Policy, not Core Alpha. Market de-risk is distinct from operational kill; `not long != short`; desired/allowable/feasible/actual capital remain distinct; leverage/short/options authority stays disabled.
 - [x] External repositories remain references/future bounded consumers only; no external repo code, dependency, AI SDK, second runner, second OMS, universal data layer or universal agent platform was introduced.
 - [x] Pre-Clock path was unchanged by the velocity recut and is now closed: real CIQ custody/admission → `decision_cut_v3` → Seal Candidate → fresh-process verification → Clock-Start Receipt. No new pre-Seal gate was introduced.
+
+## Closed — Owner A1→A2 second-critical-lane recut (docs/research governance)
+
+- [x] Owner execution review=`9.77/10`; roadmap/philosophy approved with one material execution recut=`A1_A2_SECOND_CRITICAL_LANE`.
+- [x] Programme objective frozen to `EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE`, not architecture completeness.
+- [x] Lane 1 remains Future Truth: weekly prospective tape + Alpha PIT/CRV1 + matured ReviewPacket→bounded mutation + prospective Challenger/replication.
+- [x] Lane 2 is first-class Compressed Learning: legitimate historical PIT CIQ → exact frozen-AOV replay → A1 → freeze immutable A2 contract → untouched/query-metered historical PIT OOS → A2 → incumbent loss/missed-winner diagnosis.
+- [x] Lane 2 cannot open Clock #1 outcomes, tune Parent/Child between A1 and A2, or relabel current-screen-conditioned/PIT-insufficient history as A1/A2.
+- [x] A2 may inform `CONTINUE / PIVOT / HOLD`, but once used to design a challenger it is not untouched evidence for that challenger; frozen CRV1 is not rescued in place.
+- [x] Destructive shipping is explicitly aimed at obsolete active readers/writers/fallbacks/aliases/dual-writes/old-authority feature flags/compatibility adapters; immutable receipts, PIT timing, prospective seals, Trial/Search custody, exact accounting and hidden-OOS discipline remain protected.
+- [x] Unrelated inherited full-repository failures remain phase-close blockers only; they do not automatically serialize an owned deterministic Alpha/Lane-2 slice whose scoped gates pass.
+- [x] Broad second-family/AI/data/provider/UI/options/leverage/universal-Atlas/optimizer/external-strategy/execution-platform work stays suppressed until evidence makes it the nearest economic blocker.
 
 ## Open — external Episode-2 custody
 
@@ -164,7 +190,9 @@ Current AOV v3 suite is `75/75 PASS`; ZERO-COMPAT remains seven zeros.
 - [x] Immutable Clock-Start Receipt issued.
 - [x] Prospective clock starts only from the receipt.
 - [ ] Recurring weekly attempts.
-- [ ] `A1` admitted real exploratory AOV evidence classification, if/when the deterministic evidence contract permits it.
+- [ ] `A1` exact frozen-AOV historical PIT replay admitted under a legitimate historical universe/source/availability contract, or explicitly downgraded to diagnostic scope.
+- [ ] A2 split/query budget/metrics/executable hashes frozen before hidden historical outcome inspection.
+- [ ] `A2` query-metered untouched historical PIT OOS evaluated once under the frozen contract and retained append-only.
 - [ ] `A3` matured prospective evidence; unavailable before `2026-09-09T20:00:00Z`.
 
 ## Open — review closure while clock runs
@@ -179,6 +207,7 @@ Current AOV v3 suite is `75/75 PASS`; ZERO-COMPAT remains seven zeros.
 
 Always-on / active:
 - [ ] prospective weekly AOV tape.
+- [ ] **LANE 2 HISTORICAL COMPRESSION:** historical PIT CIQ reconstruction → exact frozen-AOV replay → A1 → freeze A2 contract → query-metered untouched PIT A2 → Parent/Child economics + incumbent loss/missed-winner diagnosis. Lane 2 may not open Clock #1 outcomes or tune Parent/Child between A1 and A2.
 - [ ] weekly fresh-data contract: same frozen 109 candidate entities; fresh fundamentals + identity/status + completed market + benchmark/rate + staleness validation; no weekly rerun of the growth screen.
 - [ ] deterministic review + custody/replay closure.
 - [ ] `ALPHA_PIT_PIPELINE` WIP slot: one narrow `alpha_pit_data_api_v1` incumbent; only first-family-required fields/sources; no generic provider platform.

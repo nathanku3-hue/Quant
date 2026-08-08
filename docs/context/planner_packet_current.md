@@ -7,6 +7,22 @@ Canonical product maturity: `70/100`
 Portfolio-alpha evidence: `0`
 Limited Live: `CLOSED`
 
+## Lane 1 implementation update — 2026-08-08
+
+- Weekly-tape preflight is implemented independently of Alpha PIT/CRV1. It fixes the candidate laboratory to the original 109 entities and fails closed unless all four required current source receipts are newly retrieved after the prior cut. It does not acquire data, build a cut/seal, rerun the growth screen, open outcomes, or mutate Parent/Child.
+- `alpha_pit_data_api_v1` mechanical capability is now implemented with deterministic fixture artifacts: permanent `CIQSEC:` identity, `available_at <= as_of`, source-receipt/hash bindings, explicit coverage/missingness, and lazily imported discovery-only outcomes. CONFIRMATORY/PROSPECTIVE objects expose no `outcomes` method.
+- `CYCLE_RESONANCE_v1` mechanical fixture consumer is now implemented against the provider-blind Alpha PIT interface and emits a deterministic input-packet hash with `financial_alpha_evidence=0`. Real PIT integration and a frozen empirical CRV1 candidate remain open; fixture output has zero PIT/OOS/prospective/financial-alpha authority.
+- Validation for this slice: Lane-1 focused `13/13 PASS`; AOV `79/79 PASS`; ZERO-COMPAT contract test PASS asserting all seven counters are zero; selected Lane-1 modules compile PASS. Direct ZERO-COMPAT CLI execution was blocked by the tool host before execution and is not separately claimed.
+- Current P0 is now dual-lane: keep weekly fresh-data acquisition/sealing on its own cadence **and** make historical PIT A1→A2 measurement of the frozen incumbent a first-class critical lane. Alpha PIT/CRV1 mechanics may continue behind their frozen interface, but no outcome-informed mutation is legal before a matured, reconciled, validated ReviewPacket.
+
+## Owner execution recut — Lane 2 Historical Compression — 2026-08-08
+
+- Owner rating=`9.77/10`; philosophy/roadmap approved with one execution recut: `A1_A2_SECOND_CRITICAL_LANE`.
+- Lane 2 sequence: legitimate historical PIT CIQ reconstruction → exact frozen-AOV replay → A1 → freeze immutable A2 split/query/metric/executable contract → query-metered untouched historical PIT OOS → A2 → Parent/Child incremental economics + loss/missed-winner diagnosis.
+- Lane 2 does not open Clock #1 outcomes, tune Parent/Child between A1 and A2, or grant prospective/capital authority. If historical universe/source/availability semantics are insufficient, fail closed to a bounded diagnostic rather than claiming A1/A2.
+- A2 may drive `CONTINUE / PIVOT / HOLD` for future challenger research, but once A2 is used to design a challenger it is not untouched evidence for that challenger. Material changes to a frozen CRV1 object require a new version/family rather than in-place rescue.
+- Operating objective=`EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE`. Broad second-family/AI/data/provider/UI/options/leverage/optimizer/platform work remains suppressed until evidence makes it the nearest economic blocker.
+
 ## Clock #1 completion update — 2026-08-08
 
 - Exact-primary-SPT parts `004..033` supplied sufficient history. Final market raw object: `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.csv`, 21,345 rows, zero duplicate-key conflicts, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`. The 109-name primary master reverified at SHA-256 `8aefbbd751a714b8689402ccbf8fa2b776c6388d4bbc3870ec4f8b975306eca4`.
@@ -51,11 +67,11 @@ CLOCK #1 CUSTODY                                      [CLOSED / RUNNING]
 → outcome_open_not_before = 2026-09-09T20:00:00Z
 
 ACTIVE SHIP-FAST BOTTLENECK
-→ start the post-Clock producer/consumer path without leaving legal lanes idle:
-   Alpha PIT Pipeline + CYCLE_RESONANCE_v1 first
-   while weekly AOV/review custody stays always-on
+→ LANE 1 FUTURE TRUTH: weekly AOV/review custody stays always-on; Alpha PIT + CRV1 mechanics advance behind frozen joins
+→ LANE 2 COMPRESSED LEARNING: historical PIT CIQ → exact frozen-AOV A1 → freeze → untouched/query-metered A2
+→ use A1/A2 economics to identify where Parent/Child lose money or miss/clip winners
 
-PARALLEL ONLY WITH INDEPENDENT OWNERSHIP
+PARALLEL ONLY WITH INDEPENDENT OWNERSHIP / NON-CRITICAL
 → bounded AI Research Tooling
 → thin PAPER Capitalization
 → Market Transition discovery incubator
@@ -65,19 +81,18 @@ Architecture is closed. The active P0 is now **time-to-first-honest prospective 
 
 ## Immediate sequence
 
-1. Reverify/preserve the immutable Clock #1 chain and keep `evaluation_started=false` until `2026-08-10T20:00:00Z`; do not open outcome authority before `2026-09-09T20:00:00Z`.
-2. Start the frozen-109 weekly refresh/tape contract: fresh fundamentals, primary-security/status, completed market, benchmark/rate and staleness validation; do not rerun the growth screen.
-3. Activate the critical producer/consumer pair in parallel: implement one narrow `alpha_pit_data_api_v1` producer while `CYCLE_RESONANCE_v1` builds packet/clock/resonance/model mechanics against deterministic contract fixtures. Cross to real PIT only at the immutable integration join; fixtures never count as PIT/OOS/prospective evidence.
-4. Keep deterministic review/custody closure ahead of first outcome maturity. Use separate ownership for the thin PAPER Capitalization Vertical; bounded AI receipt/schema/fixture/source-claim tooling may also start only if it does not steal throughput from Alpha PIT + CRV1. Market Transition may run Crisis/false-crisis discovery and source-gap inventory only; no second confirmatory Alpha build beside CRV1.
-7. After Clock #1, enforce **domain-scoped WIP** rather than one global engineering queue. Weekly AOV tape + deterministic review/custody remain always-on. In parallel where ownership is independent: (a) one narrow `alpha_pit_data_api_v1` pipeline incumbent; (b) one confirmatory Alpha-family build, first=`CYCLE_RESONANCE_v1`; (c) one bounded AI research-tooling vertical using frozen contracts/fixtures, with real outcome-informed mutation still blocked until a matured validated ReviewPacket; and (d) the thin PAPER Capitalization Vertical. One writer per authority domain; integration crosses deterministic immutable join gates. If ownership is constrained, Alpha PIT + CRV1 are the critical producer/consumer pair and AI waits rather than stealing their throughput.
-8. Release `CYCLE_RESONANCE_v1` first in the Alpha-family slot: Alpha PIT and CRV1 may implement concurrently against the frozen API contract, with CRV1 using deterministic contract fixtures until real PIT integration. Build only enough legitimate PIT history for honest discovery/contemporaneous controls → freeze family/implementation/falsifiers/search budget → untouched PIT test where available → seal prospectively as soon as honest. Deeper historical work remains discovery-only and retains false-winner, missed-right-tail, matched-control, incumbent winner-blindness, and entry/continuation/exit decompositions. `MARKET_TRANSITION_ALPHA_v1` may start after Clock #1 as a registered discovery incubator (Crisis Transition Atlas + false-crisis controls + PIT source-gap inventory) but does not get a second confirmatory Alpha-family build beside CRV1; it enters that slot only after CRV1 seals or explicit PM/CEO `PIVOT`.
-9. Start external/operational lead-time clocks as soon as dependencies permit: borrow/locate feasibility from Clock #1; independent-replication data/identity/PIT preparation after the first Challenger seal; and independent Ops/Engineering starts the thin Alpaca PAPER Capitalization Vertical immediately after Clock #1 using current frozen AOV targets for operational learning only (`financial_alpha_evidence=0`).
-10. Capitalization Vertical scope: initial execution incumbent=`MOC_CLOSE_AUCTION_V1`; exactly one promoted policy/seal → one `live_rebalance_id`; hash-bound `CIQSEC`↔broker instrument/account map; signed account-bound intent; full broker lifecycle/open-orders → canonical live authority; broker positions/cash/open-orders/recent execution reconciliation plus rebalance fencing before new risk on restart; implementation-shortfall/fees/timing/cash-drag bridge between research and actual broker P&L. LOC/close-window/actual-fill variants are challengers only; reuse existing execution substrate; do not build a second OMS.
-11. AI post-Clock scope: first build `AIInvocationReceipt` + role/visibility firewall + one source-claim/discovery schema and ReviewPacket→Mutation fixture mechanics. One provider/orchestration incumbent; external repos are reference patterns only. Fixture mechanics may build before AOV maturity, but real outcome-informed `MutationManifestDraft` remains blocked until deterministic reconciliation and a matured validated ReviewPacket. No generic agent platform or AI financial authority.
-12. `RESONANCE_LEVERAGE_POLICY_v1` remains downstream capital-policy design, not Core Alpha. Do not implement leverage/short/options policy merely because Market Transition discovery starts. It becomes eligible only after upstream stock + market/timing evidence/calibration exists and PM/CRO identify it as the nearest capital-value blocker. `not long != short`; options remain incremental challenger data/insurance.
-13. Treat simple deterministic allocation as incumbent and optimizer as a portfolio-construction challenger that must prove incremental net utility. Bounded long/cash requires prospective edge evidence + genuinely independent replication + Capitalization Vertical authority; it does not wait for true L/S. PIT-borrow-backed L/S is a separate optional extension.
-14. At major matured-evidence checkpoints classify the Alpha Program `CONTINUE`, `PIVOT`, or `STOP / HOLD`; absent alpha does not automatically authorize more architecture/data/optimizer/L-S complexity.
-15. Code-quality debt is post-Seal only: central authority validators first, then `ciq_market.py` split, schema registry, structured errors, policy-comment cleanup as capacity permits. No pre-Seal cleanup refactor.
+1. Preserve/reverify the immutable Clock #1 chain; keep the frozen-109 weekly prospective tape alive and do not open outcome authority before `2026-09-09T20:00:00Z`.
+2. Open **Lane 2 Historical Compression** immediately under separate writer custody: define the legitimate historical universe/source/availability/identity contract and capture/reconstruct PIT CIQ inputs without touching Clock #1 outcome authority.
+3. Run exact frozen-AOV historical replay with the current Rule100/Parent/Child/insurance/cash/cost/execution semantics. Admit A1 only if the historical contract actually supports the claim; otherwise record the strongest honest diagnostic scope.
+4. Before any hidden historical OOS inspection, freeze the A2 split/query budget/metrics/executable hashes and outcome-access contract. Then perform the query-metered untouched A2 evaluation once and retain the result append-only.
+5. Put the incumbent economics on the board: Parent, Child, Child-minus-Parent, compounding, drawdown, turnover/cost/cash drag, loss concentration, missed winners, under-sizing, premature reductions/exits, and right-tail clipping. This is the primary near-term research decision input.
+6. Continue Alpha PIT + CRV1 **mechanical** producer/consumer work in its independent authority domain against frozen contracts/fixtures. A1/A2 may determine `CONTINUE / PIVOT / HOLD`, but may not silently retune a frozen CRV1 v1; a material change requires a new version/family.
+7. Keep deterministic review/custody closure ahead of first prospective outcome maturity. Real outcome-informed AI mutation remains blocked until a matured, reconciled, validated ReviewPacket.
+8. Supporting work may run only with independent ownership and without slowing Lane 1/Lane 2: bounded AI receipt/schema/fixture/source-claim tooling; thin PAPER Capitalization; Market Transition Crisis/false-crisis discovery only; async borrow/replication preparation.
+9. Suppress a second confirmatory Alpha family, generic AI/data/provider platform, elaborate research UI, options infrastructure, leverage system, universal Right-Tail Atlas, optimizer-first work, generalized external-strategy ingestion, and generic execution architecture until measured evidence identifies one as the nearest economic blocker.
+10. Preserve the destructive-authority law: new current authority deletes old active reader/writer/fallback/alias/dual-write/old-authority feature flag/compatibility adapter in the same slice; immutable historical evidence remains replayable only with pinned historical code/schema.
+11. Do **not** make unrelated inherited repository-wide pytest/SAW failures an Alpha research critical-path dependency. They still block a repository phase-close claim, but an owned deterministic Lane-1/Lane-2 slice may ship when its scoped gates pass and the unrelated failures are recorded.
+12. Bounded long/cash remains downstream of prospective edge + genuinely independent replication + PAPER capturability + owner/risk approval. Leverage/short/options remain disabled until separately evidenced and authorized.
 
 ## Validation already banked locally
 

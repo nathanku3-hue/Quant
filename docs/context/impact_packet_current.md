@@ -4,6 +4,20 @@ Date: 2026-08-08
 State: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
 Status: `REAL CIQ ADMITTED; V3 TEMPORAL + ADVERSARIAL AUTHORITY CLOSED; REAL SEAL FULL-CHAIN VERIFIED; IMMUTABLE CLOCK-START RECEIPT ISSUED; FINANCIAL_ALPHA_EVIDENCE_0`
 
+## Lane 1 implementation impact — 2026-08-08
+
+New executable surfaces: `research/aov0/weekly_tape.py`, `research/alpha_pit_v1/*`, and `research/cycle_resonance_v1/*`, with focused tests under the matching test directories. Weekly preflight is authority-minimal: it validates exact frozen-109 membership plus fresh required receipts and stops before decision-cut construction. Alpha PIT/CRV1 fixtures are deterministic, content-hashed mechanics with zero empirical authority; outcome access is structurally absent from confirmatory/prospective session objects and CRV1 imports no provider/discovery-outcome surface.
+
+Validation advanced from the prior AOV baseline to `79/79 PASS`; the joined Lane-1 matrix is `13/13 PASS`; ZERO-COMPAT's contract test passes and asserts all seven counters are zero; selected Lane-1 modules compile. No provider refresh, Seal #2, outcome open, Parent/Child mutation, strategy capital, commit, push, or publication was performed by this slice.
+
+## Owner A1→A2 execution-recut impact — 2026-08-08
+
+Owner approved the roadmap/philosophy at `9.77/10` with one additional execution recut: make historical PIT `A1 → freeze → A2` a first-class second critical lane beside Future Truth. The operating objective becomes `EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE`.
+
+This recut is documentation/research-governance authority only. It does **not** claim that any currently uncommitted historical-PIT capture/admission prototype has earned A1/A2. Lane 2 must prove a legitimate historical universe/source/availability/identity contract, replay the exact frozen AOV incumbent, freeze the A2 hidden split/query/metric/executable contract before inspection, and retain the query-metered A2 result append-only. Current-screen-conditioned or otherwise PIT-insufficient history is diagnostic only.
+
+No Parent/Child mutation, Clock #1 outcome opening, CRV1 in-place rescue, prospective evidence, capital authority, provider-platform authority, leverage/short/options authority, or generic AI/data/UI/execution platform is created by this recut. Unrelated repository-wide legacy-suite failures remain repository phase-close blockers but do not automatically block an owned deterministic Lane-1/Lane-2 slice whose scoped gates pass.
+
 ## Clock #1 completion impact — 2026-08-08
 
 Real provider custody and the destructive v3 path are now complete. Final CIQ market raw object: `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.csv`, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`, 21,345 rows, zero duplicate-key conflicts. The builder admitted 99 canonical securities from 109 frozen companies and wrote 10 mechanical exclusions; no alternate listing or compatibility backfill was used.
@@ -84,7 +98,7 @@ After Clock #1 the first confirmatory Alpha family remains `CYCLE_RESONANCE_v1`:
 
 ## Documentation impact — 2026-08-08 Velocity / AI / Market Transition recut
 
-Council verdict=`APPROVED_WITH_VELOCITY_PARALLELISM_RECUT` after CEO/Quant/PM/Risk/Architecture/Engineering review. This is a docs/research-governance recut only and creates no executable, provider, broker or capital authority. The pre-Clock critical path remains exactly real CIQ custody/admission → `decision_cut_v3` → Seal Candidate → fresh-process verification → Clock-Start Receipt.
+Council verdict=`APPROVED_WITH_VELOCITY_PARALLELISM_RECUT` after CEO/Quant/PM/Risk/Architecture/Engineering review; owner subsequently ratified the roadmap at `9.77/10` with execution recut=`A1_A2_SECOND_CRITICAL_LANE`. This is a docs/research-governance recut only and creates no executable, provider, broker or capital authority. The pre-Clock critical path remains exactly real CIQ custody/admission → `decision_cut_v3` → Seal Candidate → fresh-process verification → Clock-Start Receipt.
 
 The post-Clock global one-engineering-lane rule is replaced by **parallelize work / serialize authority**: one incumbent writer per authority domain with deterministic immutable join gates. Alpha PIT Pipeline and `CYCLE_RESONANCE_v1` may implement concurrently against their frozen API contract; CRV1 uses contract fixtures until real PIT integration. A bounded AI Research Tooling lane may also build post-Clock under independent ownership using `AIInvocationReceipt`, role/visibility firewall, source-claim/discovery drafts and ReviewPacket/Mutation fixtures, while **real outcome-informed mutation remains blocked until a matured reconciled ReviewPacket**. `MARKET_TRANSITION_ALPHA_v1` may run historical crisis/false-crisis discovery and preregistration in parallel but does not receive a second confirmatory Alpha-family build beside CRV1; `RESONANCE_LEVERAGE_POLICY_v1` remains downstream evidence/CRO-gated capital-policy design with leverage/short/options authority disabled.
 
@@ -92,4 +106,4 @@ New architecture records: `docs/architecture/aov_velocity_council_20260808.md`, 
 
 ## Claim boundary
 
-Canonical maturity remains `70/100`; portfolio-alpha evidence remains `0`. Prior architecture/scientific-bar, strategic, sim-to-real and Winner/authority approvals remain valid; latest roadmap verdict=`APPROVED_WITH_VELOCITY_PARALLELISM_RECUT`, top-level design effectively closed. Current execution state is `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`: real CIQ admission, destructive v3, fresh-process verification and the immutable Clock-Start Receipt are complete. `CYCLE_RESONANCE_v1`, AI tooling and Market Transition specs create no alpha evidence by themselves. Calibration=`INSUFFICIENT` (one historical row), not `DRIFT`. Compute performance is non-blocking. No matured A3, broker strategy execution, or live-capital claim.
+Canonical maturity remains `70/100`; portfolio-alpha evidence remains `0`. Prior architecture/scientific-bar, strategic, sim-to-real and Winner/authority approvals remain valid; latest roadmap verdict=`APPROVED_WITH_VELOCITY_PARALLELISM_RECUT` plus owner execution recut=`A1_A2_SECOND_CRITICAL_LANE`; top-level design effectively closed. Current execution state is `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`: real CIQ admission, destructive v3, fresh-process verification and the immutable Clock-Start Receipt are complete. `CYCLE_RESONANCE_v1`, AI tooling and Market Transition specs create no alpha evidence by themselves. Calibration=`INSUFFICIENT` (one historical row), not `DRIFT`. Compute performance is non-blocking. No matured A3, broker strategy execution, or live-capital claim.

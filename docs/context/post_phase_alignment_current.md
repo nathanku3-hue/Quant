@@ -1,7 +1,11 @@
 # Post-Phase Alignment — Current
 
-Date: 2026-08-07
-Status: `GATE-A LOCAL COMPLETE; GATE-B CIQ AUTHORITY RECUT LOCAL; FIRST REAL SEAL BLOCKED CIQ SECURITY/MARKET DATA`
+Date: 2026-08-08
+Status: `CLOCK_1_RUNNING; LANE_1_SLICE_1_MECHANICS_GREEN; LANE_2_A1_A2_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## 2026-08-08 supersession
+
+The older real-seal blocker language below is retained as audit history but is no longer current: Clock #1 is already running. Lane 1 keeps the frozen-109 weekly tape independent from Alpha PIT/CRV1 engineering. Owner additionally authorized **Lane 2 Historical Compression** as a first-class critical lane: legitimate historical PIT CIQ → exact frozen-AOV replay → A1 → freeze hidden A2 contract → query-metered untouched historical PIT OOS → A2 → incumbent Parent/Child economics. This authorization does not claim A1/A2 and does not open Clock #1 outcomes. Weekly preflight mechanics are implemented; Alpha PIT v1 deterministic fixtures and the provider-blind CRV1 input packet are implemented; real PIT integration, recurring weekly seals, A1/A2, and matured ReviewPackets remain open. Validation: Lane-1 `13/13 PASS`, AOV `79/79 PASS`, ZERO-COMPAT contract test seven zeros, selected compile PASS. No outcome open, Parent/Child mutation, strategy capital, push, or publication occurred.
 
 ## Preserved
 
@@ -48,7 +52,7 @@ No other architecture phase is authorized before trying the real seal.
 
 ## Parallel work after seal
 
-Once the clock starts, review lineage/fixtures may finish while calendar time accrues. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
+Once the clock starts, run two critical evidence lanes: Lane 1 Future Truth preserves weekly prospective time and the Alpha PIT/CRV1 path; Lane 2 Historical Compression consumes historical provider/compute capacity to measure the frozen incumbent through A1→frozen A2. Review lineage/fixtures may finish while both progress. Supporting AI/PAPER/discovery work may run only with independent ownership. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
 
 ## Model portfolio direction
 
@@ -60,4 +64,4 @@ Provider breadth, AOV-2/event state, hidden-OOS platform breadth, search-debt au
 
 ## Next alignment
 
-Close the CIQ security-identity/market-data admission blocker and write the first real immutable five-arm seal. The CRSP/PERMNO active route is superseded because entitlement is unavailable; do not restore it as compatibility, reopen insurance methodology, or broaden architecture to avoid the CIQ admission task.
+Preserve Clock #1 and the frozen-109 weekly tape; execute Lane 2 A1→A2 historical compression in parallel; put Parent/Child incremental economics and loss/missed-winner attribution on the board before broadening alpha architecture. Continue CRV1 mechanics behind frozen contracts, but use A1/A2 only for explicit `CONTINUE / PIVOT / HOLD` decisions rather than in-place rescue. Do not restore compatibility or broaden AI/data/options/leverage/UI/platform work to avoid the evidence task.

@@ -1,8 +1,29 @@
 # Observability Pack — Current
 
-Date: 2026-08-07
-Gate: `FIRST REAL AOV-0 FIVE-ARM PROSPECTIVE SEAL`
-Status: `ACTIVE`
+Date: 2026-08-08
+Gate: `CLOCK_1_RUNNING / DUAL_CRITICAL_EVIDENCE_LANES`
+Status: `LANE_1_FUTURE_TRUTH + LANE_2_HISTORICAL_COMPRESSION; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## Lane 1 sentinels — current
+
+- Weekly candidate laboratory must equal the original frozen 109 entities exactly; growth-screen rerun is forbidden.
+- Every weekly cut attempt requires fresh fundamentals, primary-security/status, completed market, and SOFR receipts after the prior cut; stale/missing required data fails closed.
+- Weekly collection is independent of Alpha PIT/CRV1 engineering and must not wait for that producer/consumer pair.
+- CONFIRMATORY/PROSPECTIVE Alpha PIT capability objects must have no outcome surface; CRV1 must not import provider adapters or discovery outcomes.
+- Deterministic fixtures and CRV1 fixture packets must retain zero PIT/OOS/prospective/financial-alpha authority.
+- Outcome-informed mutation remains blocked until a matured, reconciled, validated ReviewPacket exists.
+- Current local evidence: Lane-1 `13/13 PASS`; AOV `79/79 PASS`; ZERO-COMPAT contract test asserts seven zeros; selected compile PASS.
+
+## Lane 2 sentinels — historical compression
+
+- Historical PIT universe/source/availability/identity semantics must be explicit before A1 admission; current-screen-conditioned or otherwise PIT-insufficient output is diagnostic only.
+- A1 must replay the exact frozen AOV incumbent; no Parent/Child tuning authority is granted by historical results.
+- A2 split/query budget/primary metrics/executable hashes must be frozen before hidden historical outcome inspection.
+- A2 is query-metered, append-only and cannot be rescued by threshold/universe/cost/timing changes under the same version.
+- Lane 2 cannot open or depend on Clock #1 prospective outcomes.
+- A2 used to design a challenger is no longer untouched evidence for that challenger.
+- Required economic output separates Parent, Child and Child-minus-Parent and attributes losses, costs/cash drag, missed winners, under-sizing and winner clipping.
+- No A1/A2 evidence is currently claimed merely because a capture/admission prototype exists in the working tree.
 
 ## Product / custody sentinels
 
@@ -56,7 +77,8 @@ financial_alpha_evidence = 0
 
 - Accounting residual outside tolerance blocks review authority.
 - Single-episode review has no structural mutation authority.
-- Test-fixture experiment/seal/review output is mechanical evidence only, not A1/A3.
+- Test-fixture experiment/seal/review output is mechanical evidence only, not A1/A2/A3.
+- Historical A1/A2 admission must satisfy the Lane-2 PIT/universe/hidden-query authority contract; roadmap authorization is not evidence.
 - Full score→target→executed-weight→P&L lineage remains an explicit next review deliverable.
 
 ## Stop signals

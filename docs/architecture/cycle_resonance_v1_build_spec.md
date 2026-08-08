@@ -1,10 +1,10 @@
 # CYCLE_RESONANCE_v1 — Thin Build Specification
 
 **Date:** 2026-08-08
-**Status:** `BUILD_SPEC / PREREGISTERED / NOT_IMPLEMENTED`
+**Status:** `BUILD_SPEC / PREREGISTERED / CLOCK_1_RELEASED / NOT_IMPLEMENTED`
 **Family ID:** `CYCLE_RESONANCE_v1`
-**First implementation authority:** post-Clock #1 only
-**Current execution effect:** **NONE** — `PRE_SEAL_REAL_CIQ_ADMISSION` remains unchanged
+**First implementation authority:** **RELEASED AFTER CLOCK #1; NOT YET IMPLEMENTED**
+**Current execution effect:** **NO RUNTIME EFFECT YET** — Clock #1 is running and the Alpha-family build slot is released
 **Data dependency:** `docs/architecture/alpha_pit_data_api_v1.md` only
 
 ---
@@ -549,9 +549,52 @@ within-company non-resonance periods
 
 Discovery output is hypothesis-generation evidence only.
 
+The canonical forensic unit is a **right-tail episode**, not a famous winner company. When legitimate coverage permits, discovery should enumerate all qualifying episodes under the frozen `CRV1_RIGHT_TAIL_252D_TOP5_V1` label inside the covered date-local risk set; one company may contribute multiple episodes, and incomplete reconstruction coverage must remain explicit rather than silently dropping difficult cases.
+
+For every candidate resonance precursor / mechanism, discovery should deliberately retain four contrast populations:
+
+```text
+TRUE_RIGHT_TAIL
+precursor present + frozen right-tail outcome
+
+FALSE_WINNER
+precursor present + no frozen right-tail outcome
+
+MISSED_RIGHT_TAIL
+frozen right-tail outcome + precursor absent / model miss
+
+MATCHED_ORDINARY_OR_LEFT_CONTROL
+PIT ex-ante lookalike + no right-tail outcome
+```
+
+Matching variables may include declared PIT-available sector/industry, size, valuation, regime, and other preregistered controls. Matched reconstruction is an analyst-efficiency device; final evaluation still uses the full risk set and frozen base rates.
+
 Discovery may compare LEVEL/DELTA/INFLECTION/ORDERED_SEQUENCE implementations, but every material variant is a Trial Ledger entry.
 
-The system SHOULD actively prioritize informative controls, especially cases that looked like a clean cycle resonance ex ante but failed.
+The system SHOULD actively prioritize informative controls, especially cases that looked like a clean cycle resonance ex ante but failed, plus missed winners that expose incumbent/candidate blind spots.
+
+Discovery also produces a diagnostic **winner-blindness audit** for the frozen incumbent organism without tuning it from outcomes:
+
+```text
+universe admitted in time?
+Rule100 / Parent / Child detected before most payoff?
+frozen cap/sizing owned meaningful exposure?
+missingness / identity / staleness rules excluded it?
+time-to-first-legitimate-detection
+premature exit / insurance clipping of an intact winner?
+```
+
+This audit has no authority to mutate Rule100/Parent/Child and cannot be cited as financial-alpha evidence.
+
+Finally, treat winner capture as three separable research objects:
+
+```text
+DISCOVERY_ENTRY
+CONTINUATION_HOLD
+EXIT_FALSIFIER
+```
+
+A model that discovers an episode does not automatically own hold/exit skill. Any continuation component must consume only PIT thesis-continuation evidence and frozen falsifier state; unrealized P&L is not an alpha input.
 
 ---
 
@@ -630,7 +673,10 @@ PR-AUC / Average Precision
 Brier score / calibration diagnostics when probability exists
 Conviction Monotonicity
 False-Winner Rate
+Missed-Right-Tail Rate / Recall@K
 Catastrophic-False-Winner Rate
+Time-to-First-Legitimate-Detection
+Premature-Exit / Continuation-Capture diagnostics
 Right-Tail Wealth Capture
 Capital-Weighted Wealth Capture [shadow diagnostic only]
 Right-Tail Capture Efficiency [shadow diagnostic only]
@@ -663,18 +709,21 @@ HAC/cluster-aware inference/block bootstrap may be used as appropriate; the meth
 
 The first prospective seal SHALL NOT wait for exhaustive historical reconstruction.
 
+The programme also has a separate first-class **Lane 2 Historical Compression** for the frozen incumbent: legitimate historical PIT CIQ → exact frozen-AOV replay → A1 → freeze hidden A2 contract → query-metered untouched A2. Lane-2 A1/A2 measures Parent/Child economics and may inform a PM/CEO `CONTINUE / PIVOT / HOLD` decision; it does **not** become untouched CRV1 evidence. If A1/A2 causes a material CRV1 hypothesis/implementation change, create a new CRV1 version/family/search charge rather than rescue v1 in place.
+
 Minimum approved sequence:
 
 ```text
 1. Alpha PIT API sufficient for declared first-family sources
 2. legitimate date-local risk set
 3. enough historical PIT observations/claims/expectations for honest discovery
-4. contemporaneous controls + near-winner / failure contrasts
-5. freeze one implementation manifest
-6. untouched historical test where legitimate untouched data exists
-7. if no legitimate untouched history exists, record that fact rather than fabricate it
-8. seal prospective Challenger as soon as the evidence contract is honest
-9. deepen historical risk set / false-winner library / replication while tape runs
+4. contemporaneous controls + near-winner / failure contrasts, including false-winner and missed-right-tail cases
+5. diagnostic incumbent winner-blindness review; no Parent/Child tuning authority
+6. freeze one implementation manifest
+7. untouched historical test where legitimate untouched data exists
+8. if no legitimate untouched history exists, record that fact rather than fabricate it
+9. seal prospective Challenger as soon as the evidence contract is honest
+10. deepen historical risk set / false-winner / missed-winner / matched-control library and replication while tape runs
 ```
 
 There is no requirement to reconstruct a universal ten-year text/capacity history before the first prospective seal.
@@ -762,22 +811,35 @@ Before the first prospective seal, test at least:
 
 ---
 
-# 25. Build order after Clock #1
+# 25. Build order after Clock #1 — parallel producer / consumer construction
+
+`alpha_pit_data_api_v1` remains the sole real data dependency, but CRV1 engineering does not wait for every concrete adapter to finish. The frozen API contract is the integration seam.
 
 ```text
-1. implement alpha_pit_data_api_v1 read capability
-2. build pit_packet.py closure
+J1 CONTRACT
+1. consume deterministic alpha_pit_data_api_v1 contract fixtures
+2. build pit_packet.py closure against fixture ArtifactRefs
+
+PARALLEL CRV1 WORK
 3. implement structured clock transforms
 4. implement narrow source-claim interpretation seam
 5. implement resonance state / ordered sequence
-6. run discovery under explicit outcomes capability
-7. freeze one implementation manifest
-8. run confirmatory prediction process with outcome capability absent
-9. evaluate separately
-10. seal prospectively as soon as honest
+6. implement prediction/model/manifest/Trial-Ledger mechanics
+
+PARALLEL ALPHA PIT PRODUCER WORK
+alpha_pit_data_api_v1 builds real CIQ/SEC adapters, content-addressed manifests,
+coverage/missingness and capability-firewall tests in its own authority domain
+
+J3 REAL PIT INTEGRATION
+7. substitute real API artifacts for fixtures without changing CRV1 provider boundaries
+8. run discovery under explicit outcomes capability
+9. freeze one implementation manifest
+10. run confirmatory prediction process with outcome capability absent
+11. evaluate separately
+12. seal prospectively as soon as honest
 ```
 
-Historical Atlas breadth, more providers, a second family, and shared platform abstractions remain downstream.
+A fixture cannot count as historical PIT evidence, untouched evidence or prospective evidence. Lane 2 A1/A2 may run concurrently under separate writer/evidence custody because it evaluates the frozen incumbent rather than writing CRV1 authority. The confirmatory Alpha-family WIP slot remains singular: Market Transition may run discovery in parallel but cannot build a second confirmatory family beside CRV1. Historical Atlas breadth beyond the A1/A2 economic question, more providers, a second confirmatory family, and shared platform abstractions remain downstream until evidence demands them.
 
 ---
 
@@ -804,12 +866,12 @@ This does **not** mean the Alpha Family has proven alpha.
 # 27. Current authority statement
 
 ```text
-ACTIVE_GATE = PRE_SEAL_REAL_CIQ_ADMISSION
-CLOCK_1_STARTED = FALSE
-CYCLE_RESONANCE_v1 = PREREGISTERED / NOT IMPLEMENTED
-ALPHA_PIT_DATA_API_V1 = SPECIFIED / NOT IMPLEMENTED
+ACTIVE_PRODUCT_STATE = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
+CLOCK_1_STARTED = TRUE
+CYCLE_RESONANCE_v1 = PREREGISTERED / IMPLEMENTATION_LANE_RELEASED / NOT IMPLEMENTED
+ALPHA_PIT_DATA_API_V1 = SPECIFIED / IMPLEMENTATION_LANE_RELEASED / NOT IMPLEMENTED
 financial_alpha_evidence = 0
 LIVE = CLOSED
 ```
 
-No implementation action in this specification is authorized before Clock #1. The current executable next step remains the existing real CIQ Security/Trading Item + completed market admission path.
+Clock #1 has released the first confirmatory Alpha-family build slot. `CYCLE_RESONANCE_v1` may now implement concurrently with the Alpha PIT producer against the frozen contract, using deterministic fixtures until real PIT artifacts cross the integration join. Discovery/outcome visibility remains quarantined, no prospective prediction is yet sealed for this family, and financial-alpha evidence remains `0`.

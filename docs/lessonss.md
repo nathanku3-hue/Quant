@@ -1,3 +1,21 @@
+## 2026-08-08 Round Entry (Historical Compute and Future Time Are Different Resources)
+
+- Date: 2026-08-08
+- Mistake or miss: the velocity recut correctly parallelized authority domains, but A1→A2 historical PIT measurement was still embedded inside broader Minimum-Viable-Atlas work. That treated historical provider/compute capacity as if it were the same scarce resource as prospective calendar time and delayed the simplest economic question: does frozen AOV compound, and does Child improve Parent?
+- Root cause: “historical research” was represented mainly as challenger discovery/Atlas depth rather than as an independent incumbent-measurement clock with its own evidence ladder.
+- Fix applied: create a first-class Lane 2 Historical Compression path beside Lane 1 Future Truth: legitimate historical PIT CIQ → exact frozen-AOV replay → A1 → freeze hidden A2 contract → query-metered untouched historical PIT OOS → A2 → Parent/Child incremental economics + loss/missed-winner diagnosis. Preserve Lane 1 prospective tape and CRV1 mechanics concurrently where writer custody is independent.
+- Guardrail: optimize `EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE`. Do not build a broader alpha/AI/data/options/platform surface before measuring the incumbent. Do not let speed weaken PIT timing, immutable receipts, prospective seals, Trial/Search custody, exact accounting or hidden-OOS discipline. Unrelated repository-wide failures block phase-close claims, not an otherwise-green owned Alpha research slice.
+- Evidence boundary: the roadmap authorization does not itself earn A1/A2, and any current-screen-conditioned or PIT-insufficient historical result must remain diagnostic. A2 used to design a challenger is no longer untouched evidence for that challenger.
+
+## 2026-08-08 Round Entry (Parallel Lanes Still Need One Local Writer Per Authority Surface)
+
+- Date: 2026-08-08
+- Mistake or miss: while Lane 1 correctly parallelizes the always-on weekly tape with Alpha PIT + CRV1 engineering, two local writers touched the same `research/alpha_pit_v1` / `research/cycle_resonance_v1` authority surface. Function signatures and imports changed between read and test, producing collection/signature failures even though each partial design was individually reasonable.
+- Root cause: authority-domain WIP was separated conceptually, but the shared worktree did not enforce exclusive writer custody inside the Alpha-PIT/CRV1 domain. Parallelism at the programme level was mistaken for permission to have overlapping local writers on the same files/interface.
+- Fix applied: stop overwriting newer same-domain bytes, re-read the live interface after each collision, preserve the coherent provider-blind session/CRV1 boundary, and reconcile only missing contract/manifest/fixture glue. Keep weekly-tape files independent. Final focused tests cover the joined interface rather than either abandoned intermediate signature.
+- Guardrail for next time: parallelize different authority domains, but assign exactly one local writer to each mutable interface/file set. If bytes change unexpectedly between read and validation, classify it as writer-custody collision, re-read before editing, never revert the other writer, and validate the final joined bytes before claiming progress.
+- Evidence paths: `research/aov0/weekly_tape.py`, `research/alpha_pit_v1/`, `research/cycle_resonance_v1/`, `tests/aov0/test_weekly_tape.py`, `tests/alpha_pit_v1/test_session.py`, `tests/cycle_resonance_v1/test_pit_packet.py`. Lane-1 focused matrix `13/13 PASS`; AOV `79/79 PASS`; `financial_alpha_evidence=0`.
+
 ## 2026-08-08 Round Entry (Parallelize Work, Serialize Authority)
 
 - Date: 2026-08-08

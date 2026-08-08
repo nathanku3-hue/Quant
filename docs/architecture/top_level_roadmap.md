@@ -1,7 +1,7 @@
 # GodView Top-Level Roadmap
 
-Status: `GATE-A LOCAL COMPLETE; GATE-B MECHANICAL LOCAL; FIRST REAL SEAL BLOCKED; LIVE CLOSED`
-Date: 2026-08-06
+Status: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; LIVE CLOSED`
+Date: 2026-08-08
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Active brief: `docs/context/ACTIVE_BRIEF`
 Method authority: `docs/architecture/alpha_organism_endgame_current.md`
@@ -22,7 +22,7 @@ immutable PIT reality
 → bounded live authority
 ```
 
-Prospective calendar time is the scarce asset. The product is optimized for time-to-first-valid-seal, not infrastructure completeness.
+Prospective calendar time is the scarce asset. Historical provider/compute capacity is a separate resource. The product is optimized for **evidence velocity × economic relevance**, not infrastructure completeness. Owner execution review=`9.77/10`, approved with one recut: A1→A2 historical PIT backtesting is a first-class second critical lane.
 
 ## Gate A — Episode-2 freeze
 
@@ -73,73 +73,89 @@ Gate-B internal checkpoints are **not separate product phases**. In one vertical
 - deterministic Parent–Child review core;
 - ZERO-COMPAT all-zero scan.
 
-## Gate-B blocker — first real seal
+## Gate-B blocker — CLOSED
 
-The architecture is no longer the blocker. The next action is a **single product boundary**:
-
-### Owner input
-
-Freeze:
-
-1. insurance materiality floor ratio;
-2. annual insurance-premium ceiling.
-
-### Admitted current experiment inputs
-
-Provide:
-
-```text
-data/aov0/current/rule100_targets.parquet
-data/aov0/current/vertical_primitives.parquet
-data/aov0/current/total_returns.parquet
-data/aov0/current/official_sofr.parquet
-data/aov0/current/decision_cut.json
-```
-
-The real seal command fails closed until both owner and data inputs exist. No historical equal-weight replay or synthetic fixture may be substituted.
+The first real-seal boundary is complete. Insurance V0 is frozen at `0.05 / 0.0015`; official SOFR and the real CIQ current inputs are admitted; no historical equal-weight, ticker, alternate-listing, or synthetic substitute entered the chain.
 
 ## P0 authority now
 
-All defaultable executable decisions are frozen. Economic cash is also resolved by a prior owner freeze: official SOFR − 25 bp, ACT/360, no zero floor, post-publication only, no proxy substitution.
+Preserve the immutable Clock #1 chain and do not open future outcomes early:
 
-Only the insurance materiality/premium budget remains product-owner-open.
+```text
+decision_cut_v3 = AOV0_CIQ_20260807_ad2faf0533cec19c
+seal_candidate = c78088ace7819170cd0064154fba138da4b4f8183dbd4ec48c347a942985ba88
+fresh_process_verification = 55ba4e2f3670d4fc01839bd22bb164cfd0755efb1ce47f3641b9ca88d61c344c
+clock_start_receipt = eabd645382424f559286045a4980412db9a02a4ad0d594850f93675443cd1b78
+clock_started_at = 2026-08-08T19:48:52.440503Z
+evaluation_start = 2026-08-10T20:00:00Z
+outcome_open_not_before = 2026-09-09T20:00:00Z
+```
 
 ## First real seal
 
-As soon as the blocker closes:
+**Complete.** The Seal Candidate was clock-false, a distinct Python process returned `FULL_CHAIN_REOPEN_VERIFIED`, and only the separate immutable receipt started the prospective clock.
 
-```text
-same permanent-ID universe
-+ same PIT total-return matrix
-+ same costs
-+ same one-bar execution
-+ Rule100 / Parent / Child / PIT-EW / economic cash
-→ one immutable decision cut
-→ exact seal
-→ exact reopen
-→ prospective clock starts
-```
-
-A seal is still not alpha evidence.
+A seal/clock-start receipt is still not financial-alpha evidence; `financial_alpha_evidence=0` until legitimate matured outcomes exist.
 
 ## Work while the clock runs
 
-Finish deterministic review closure, not another platform phase:
+Finish deterministic review closure, not another platform phase, while post-Clock construction uses the active velocity law: **parallelize work; serialize authority**.
+
+Always-on closure:
 
 - score→target→executed-weight→P&L lineage;
 - redistribution/regime/corporate-action fixtures;
 - cohort/regime aggregation and closed B0 failure ontology.
 
-Then, after the first matured valid ReviewPacket:
+Two critical evidence lanes run concurrently:
 
 ```text
-ReviewPacket
-→ one bounded AI MutationManifest
-→ deterministic compiler
-→ development run
+LANE 1 — FUTURE TRUTH                    LANE 2 — COMPRESSED LEARNING
+─────────────────────                    ─────────────────────────────
+weekly prospective tape                  historical PIT CIQ reconstruction
+        │                                         │
+Alpha PIT + CRV1                         exact frozen-AOV replay
+        │                                         │
+matured ReviewPackets                           A1
+        │                                         │
+bounded mutation                               FREEZE A2 CONTRACT
+        │                                         │
+hidden/OOS validation                    untouched historical PIT OOS
+        │                                         │
+prospective Challenger                          A2
+        │                                         │
+independent replication                 Parent/Child economics + loss/winner diagnosis
+        │
+bounded capital
 ```
 
-Search-debt automation, broad state machines, hidden-OOS platformization, AOV-2, and provider breadth may follow rather than blocking the first mutation loop.
+Lane 2 may not open Clock #1 outcomes and may not tune Parent/Child between A1 and A2. A1/A2 admission requires a legitimate historical universe/source/availability/identity contract; otherwise the result is explicitly diagnostic rather than promoted.
+
+Supporting authority-domain work may run concurrently only with independent ownership:
+
+```text
+AI Research Tooling
+→ receipt / role firewall / source-claim + ReviewPacket fixture mechanics
+→ real outcome-informed mutation remains blocked until mature validated ReviewPacket
+
+Discovery Incubator
+→ MARKET_TRANSITION_ALPHA_v1 historical crisis/false-crisis discovery only
+→ no second confirmatory family beside CRV1
+
+PAPER Capitalization
+→ independently owned operational vertical
+```
+
+After the first matured valid ReviewPacket, real outcome-informed AI may cross its maturity gate:
+
+```text
+validated ReviewPacket
+→ one bounded MutationManifestDraft
+→ deterministic validator/compiler
+→ development Trial
+```
+
+Search-debt automation, second confirmatory Alpha families, generic AI/data/provider platforms, elaborate research UI, universal Right-Tail Atlas work, generalized external-strategy ingestion, generic execution architecture, optimizer-first work, leverage/short/options policy, AOV-2, and provider breadth remain evidence-gated rather than blocking A1/A2/A3 economics.
 
 ## Model portfolio direction
 
@@ -156,15 +172,15 @@ No model gains live authority from development results alone.
 ## Evidence ladder
 
 1. `A0` mechanical lineage / immutable experiment substrate — local substrate exists.
-2. `A1` admitted real exploratory AOV result — open.
-3. `A2` hidden OOS — open.
+2. `A1` admitted real exploratory **exact frozen-AOV historical PIT replay** — open; first-class Lane 2 milestone.
+3. `A2` query-metered untouched historical PIT OOS under a pre-frozen contract — open; first-class Lane 2 milestone.
 4. `A3` matured prospective paper evidence — `0`.
 5. `A4` independent future replication — `0`.
 6. `A5` bounded live parity — closed.
 
 ## Deferred
 
-Episode-3 milestone · universal PIT platform · broad provider/source-app programme · event/pattern authority · 13F/options/ownership expansion · optimizer/RL-first development · unrestricted generated Python · second app/engine · compatibility restoration · broker/live capital · leverage/shorting/derivatives.
+Episode-3 milestone · second confirmatory Alpha family before evidence demands it · universal PIT/data/provider platform · generic AI/agent platform · elaborate research UI · universal Right-Tail Atlas · generalized external-strategy ingestion · generic execution architecture · event/pattern authority · 13F/options/ownership expansion · optimizer/RL-first development · unrestricted generated Python · second app/engine · compatibility restoration · broker/live capital · leverage/shorting/derivatives.
 
 ## Current validation
 
