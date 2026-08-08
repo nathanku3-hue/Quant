@@ -82,6 +82,7 @@ Open Risks:
 - Full repository regression is not green; inherited collection errors must be owned before any phase-close PASS claim.
 - Independent Reviewer A/B/C evidence is absent in this environment; full SAW cannot pass without it.
 - Git phase-close custody remains open after the local handover commit because push/tag/publication are not authorized and unrelated pre-existing dirty files remain. The commit containing this memo is the intended local takeover point; resolve its exact SHA with `git rev-parse HEAD`.
+- Provider/raw/seal custody under `data/aov0/` is intentionally local and untracked by this source commit. A fresh clone alone will not contain the raw market object, Parquets, seal, verification proof, or Clock-Start Receipt; the next worker must continue in this local worktree/custody context or receive those exact bytes separately before claiming full-chain authority.
 
 Assumptions:
 
