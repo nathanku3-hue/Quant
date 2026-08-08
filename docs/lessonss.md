@@ -1,3 +1,31 @@
+## 2026-08-08 Round Entry (Provider Identity Layers Must Be Proved With Cross-Listing Invariants)
+
+- Date: 2026-08-08
+- Mistake or miss: Capital IQ exposes several identifier surfaces whose names can be mistaken for one another. Identifier Lookup `MI ID`, a provider security identifier, and a company/entity key are not interchangeable, and inventing a generic `SP_SECURITY_ID` semantic would silently poison canonical AOV identity.
+- Root cause: provider UI labels, formula-builder mnemonics, workbook parser column names, and canonical research identity use different vocabularies. A single-listing probe cannot establish which layer an identifier belongs to.
+- Fix applied: selected the exact `COE` company row, exposed primary `SPT344984472` and alternate `SPT364472819`, and compared both listings. `SP_CIQ_ID=IQ337968870` remains invariant across the two listings while `SP_TRADING_ITEM_ID` changes (`344984472` vs `364472819`), proving security-level vs listing-level identity. Direct company-key `SPGTable` returned the same primary pair, then materialized all 109 frozen entities into `data/aov0/raw/ciq_primary_security_master_20260808T162322Z.csv`, retrieval `2026-08-08T16:23:22.0736860Z`, SHA-256 `8aefbbd751a714b8689402ccbf8fa2b776c6388d4bbc3870ec4f8b975306eca4`.
+- Guardrail for next time: prove provider identifier layers with a cross-listing invariant before promoting them into permanent identity. Distinguish provider source metric from internal parser column names. Never claim a provider field exists merely because an internal schema uses that label. Once identity is mechanically solved and hash-bound, do not reopen UI traversal as the incumbent path.
+- Evidence paths: `docs/context/ciq_provider_acquisition_findings_20260808.md`, `data/aov0/raw/ciq_primary_security_master_20260808T162322Z.csv`, `tmp/ciq_capture_primary_security_master_csv.ps1`. Primary master is raw custody only until admitted; Parent/Child remain frozen.
+
+## 2026-08-08 Round Entry (External Office Extraction Needs a Proven Atomic Width, Not Ever-Larger Queries)
+
+- Date: 2026-08-08
+- Mistake or miss: once market field semantics were solved, widening one Office `SPGTable` query looked like the fastest path to 200+ days, but large worksheet payloads detached/hung and could lose the entire unit of work.
+- Root cause: provider capability and bulk-throughput reliability were conflated. Excel/Office cell load has an operational width boundary independent of identity correctness; process existence is not evidence of progress.
+- Fix applied: moved to one fresh Office process per atomic chunk with temp→final atomic landing and formula clearing before workbook close. For 109 names × 3 exact fields, 5/6/7 weekdays are stable while 8/10 weekdays fail at the bounded window. Exact-primary-SPT 6-day results equal company-primary results after excluding retrieval timestamps, so 7-day exact-SPT chunks are the incumbent. Nine earlier 5-day parts plus validated target-week exact-SPT `part_033_20260730_20260807.csv` (SHA-256 `81779d8ed04b80a5b79298821f9ff5d89c96abf025e8bb06d9a67f864cd744aa`) are already custody.
+- Guardrail for next time: once the largest stable atomic width is empirically established, stop tuning width and finish the job. Land each part atomically, verify files rather than processes, dedupe the final raw object on (`SPT_DATE`,`SP_CIQ_ID`,`SP_TRADING_ITEM_ID`), retain provider source/retrieval metadata, and gate on actual completed observations rather than requested weekdays. Do not backfill short-history names from alternate listings. Do not leave background workers running across handover.
+- Environment note: the `.venv` directory exists at this handover, but `.venv/Scripts/python.exe` is absent. Repo policy requires `.venv` for Python, so raw custody can continue with the Office/PowerShell path, but admission/build must not silently switch to system Python.
+- Evidence paths: `tmp/ciq_capture_market_chunk.ps1`, `data/aov0/raw/ciq_market_parts_v3_20260808/`, `data/aov0/raw/ciq_market_parts_spt_7d_test_20260808/`, `research/aov0/ciq_market.py`, `docs/context/ciq_provider_acquisition_findings_20260808.md`.
+
+## 2026-08-08 Round Entry (Reverse-Engineer the Right Tail Without Turning Survivors Into Evidence)
+
+- Date: 2026-08-08
+- Mistake or miss: a winner-seeking mandate can correctly motivate historical right-tail study yet still create hindsight alpha if famous winner companies are reverse-engineered without explicit false-positive, missed-winner, matched-control, and full-risk-set discipline. It can also conflate finding a winner with knowing how long to hold it or when to exit.
+- Root cause: outcome-visible forensic discovery, confirmatory alpha evidence, incumbent-policy diagnosis, and lifecycle attribution were adjacent ideas but not explicitly separated in the Winner/Core-Alpha docs.
+- Fix applied (docs only): make the Atlas forensic unit a right-tail episode under the frozen outcome definition; enumerate all qualifying episodes inside legitimately covered history rather than selecting famous survivors; retain `TRUE_RIGHT_TAIL`, `FALSE_WINNER`, `MISSED_RIGHT_TAIL`, and matched ordinary/left-tail controls; make Rule100/Parent/Child winner-blindness diagnostic-only with no tuning authority; and separate discovery/entry, continuation/hold, and exit/falsifier alpha. Outcome-visible patterns remain hypothesis/search-debt evidence only until a frozen hypothesis survives untouched/PIT/prospective testing.
+- Guardrail for next time: never infer alpha from characteristics common among winners alone. Every right-tail forensic claim must name the relevant non-winner/missed-winner control population, reconstruction coverage, and the firewall that prevents survivor inspection from entering confirmatory authority. Never credit an entry model with hold/exit skill without separate evidence.
+- Evidence paths: `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/architecture/cycle_resonance_v1_build_spec.md`, `docs/spec.md`, active context/brief surfaces, and `docs/decision log.md`. No executable/provider/data/model/broker behavior changed; current gate remains `PRE_SEAL_REAL_CIQ_ADMISSION`, `financial_alpha_evidence=0`.
+
 ## 2026-08-08 Round Entry (Bank Executable Truth Before Specs That Describe Future Truth)
 
 - Date: 2026-08-08
