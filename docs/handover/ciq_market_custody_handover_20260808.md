@@ -1,11 +1,19 @@
 # CIQ Market Custody Handover — 2026-08-08
 
-Status: `READY_FOR_NEXT_WORKER / IDENTITY_SOLVED / MARKET_CUSTODY_INCOMPLETE`
-Active gate: `PRE_SEAL_REAL_CIQ_ADMISSION`
+Status: `COMPLETED / SUPERSEDED_BY_CLOCK_1_AUTHORITY`
+Active state: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
 Target date: `2026-08-07`
-Claim boundary: `prospective_clock_started=false`; `financial_alpha_evidence=0`; Parent/Child remain frozen
+Claim boundary: `prospective_clock_started=true`; `evaluation_started=false`; `financial_alpha_evidence=0`; Parent/Child remain frozen
 
-## Mission
+## Completion receipt — 2026-08-08
+
+This handover mission is complete. The master hash reverified exactly at `8aefbbd751a714b8689402ccbf8fa2b776c6388d4bbc3870ec4f8b975306eca4`. Exact-primary-SPT parts `004..033` were sufficient; the final raw market object is `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.csv`, 21,345 rows, zero duplicate-key conflicts, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`. Per-security counts are recorded in `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.counts.csv` (SHA-256 `deffc13cf7364d628e1ecd879d8280c75d490cde4098327d0de0da49c074c9fe`).
+
+CIQ admission produced 99 canonical securities and 10 mechanical exclusions; five genuine short histories were never backfilled. `decision_cut_v3`=`AOV0_CIQ_20260807_ad2faf0533cec19c`; real Seal Candidate=`c78088ace7819170cd0064154fba138da4b4f8183dbd4ec48c347a942985ba88`; fresh-process verification=`55ba4e2f3670d4fc01839bd22bb164cfd0755efb1ce47f3641b9ca88d61c344c`; immutable Clock-Start Receipt=`eabd645382424f559286045a4980412db9a02a4ad0d594850f93675443cd1b78`. Clock #1 started `2026-08-08T19:48:52.440503Z`; evaluation begins `2026-08-10T20:00:00Z`; outcomes remain sealed until `2026-09-09T20:00:00Z`.
+
+The `.venv` was restored with Python 3.12; `pip check` and AOV `75/75` pass. Repository-wide pytest has nine unrelated/inherited collection errors and is not claimed green. No commit or push was performed. The remaining sections are preserved as the acquisition-time contract/lessons and are historical where they describe work as still open.
+
+## Mission — historical
 
 Complete the remaining exact-primary-SPT historical market chunks until every name that survives the existing factor-coverage gate has at least 200 completed close observations through `2026-08-07`; combine and hash the real raw market object; then run the existing fail-closed CIQ admission builder → `decision_cut_v3` → real Seal Candidate → fresh-process verification → immutable Clock-Start Receipt.
 

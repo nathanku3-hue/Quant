@@ -1,9 +1,15 @@
 # CIQ Provider Acquisition Findings — 2026-08-08
 
-Status: `PROVIDER_CAPABILITY_PROVEN / PRIMARY_IDENTITY_RAW_CUSTODY_CAPTURED / MARKET_CUSTODY_INCOMPLETE`
-Active gate: `PRE_SEAL_REAL_CIQ_ADMISSION`
+Status: `PROVIDER_CAPABILITY_PROVEN / PRIMARY_IDENTITY_CAPTURED / MARKET_CUSTODY_COMPLETE / CLOCK_1_STARTED`
+Active state: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
 Scope: S&P Capital IQ Pro Office acquisition only
-Claim boundary: `prospective_clock_started=false`; `financial_alpha_evidence=0`; Parent/Child parameters remain frozen
+Claim boundary: `prospective_clock_started=true`; `evaluation_started=false`; `financial_alpha_evidence=0`; Parent/Child parameters remain frozen
+
+## Completion update — 2026-08-08
+
+The acquisition mission described below is complete. Exact-primary-SPT parts `004..033` supplied a sufficient continuous market window; the deterministic combined object is `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.csv`, 21,345 rows, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`, with zero duplicate-key conflicts. 104 names have 201 completed closes; five genuine short-history names have 189/90/76/59/27 observations and were not backfilled.
+
+The fail-closed CIQ builder admitted 99 canonical securities and recorded 10 mechanical exclusions. `decision_cut_v3`=`AOV0_CIQ_20260807_ad2faf0533cec19c`; real Seal Candidate=`c78088ace7819170cd0064154fba138da4b4f8183dbd4ec48c347a942985ba88`; fresh-process verification=`55ba4e2f3670d4fc01839bd22bb164cfd0755efb1ce47f3641b9ca88d61c344c`; Clock-Start Receipt=`eabd645382424f559286045a4980412db9a02a4ad0d594850f93675443cd1b78`. Clock #1 started `2026-08-08T19:48:52.440503Z`. The remaining sections preserve acquisition-time evidence and failed-path lessons; any statement that market custody or the first clock is still open is superseded by this update.
 
 ## Executive result
 

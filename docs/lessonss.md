@@ -1,3 +1,18 @@
+## 2026-08-08 Round Entry (Parallelize Work, Serialize Authority)
+
+- Date: 2026-08-08
+- Mistake or miss: the roadmap correctly separated running evidence clocks from engineering WIP, but the remaining global one-build-lane rule still serialized independent producer, consumer, AI-tooling and operational work after Clock #1. Conversely, simply removing the cap would have risked multiple writers, hidden search expansion and authority ambiguity.
+- Root cause: engineering concurrency and authority concurrency were represented by one WIP concept. A producer (`alpha_pit_data_api_v1`), its consumer (`CYCLE_RESONANCE_v1`), bounded AI research tooling, discovery-only market research and PAPER operations have different mutable authority surfaces and can progress safely at different joins.
+- Fix applied (docs/research governance only): replace the global cap with authority-domain-scoped WIP. Allow Alpha PIT + CRV1 to implement concurrently against a frozen contract; allow bounded AI receipt/schema/fixture work only under independent ownership; allow Market Transition as discovery-only incubation; keep PAPER Capitalization independent. Require one writer per authority domain and immutable deterministic join gates before PIT integration, evidence sealing, mature review or capital promotion.
+- Guardrail for next time: ask two separate questions before serializing work: **does this task write the same authority surface?** and **does this task need the other lane's mutable output?** If both are no and the interface is frozen, parallelize. If either is yes, serialize at the join. Never let fixture concurrency, outcome-visible discovery or AI proposal throughput imply evidence/capital authority.
+- Evidence paths: `docs/architecture/aov_velocity_council_20260808.md`, `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/architecture/alpha_pit_data_api_v1.md`, `docs/architecture/cycle_resonance_v1_build_spec.md`, `docs/architecture/ai_research_pipeline_v0_spec.md`, `docs/architecture/market_transition_alpha_v1_spec.md`, `docs/architecture/resonance_leverage_policy_v1_spec.md`. Clock #1 is running; `financial_alpha_evidence=0`.
+
+## 2026-08-08 Round Entry (Let Landed Bytes and the Actual Gate Own Completion)
+
+- Date: 2026-08-08
+- Lesson: requested weekdays, running Office processes, and completed-close admission are different layers. Use atomically landed CSV bytes as progress authority and measure the executable coverage predicate before fetching more history.
+- Result: parts `004..033` were sufficient; 104 names reached 201 closes and five genuine short histories remained below 200 without backfill. Final raw object: 21,345 rows, zero duplicate-key conflicts, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`.
+
 ## 2026-08-08 Round Entry (Provider Identity Layers Must Be Proved With Cross-Listing Invariants)
 
 - Date: 2026-08-08

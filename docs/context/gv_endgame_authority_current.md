@@ -1,15 +1,23 @@
 # GodView Endgame Authority — Current
 
 Date: 2026-08-08
-Active product gate: `PRE_SEAL_REAL_CIQ_ADMISSION`
-Status: `WINNER/AUTHORITY RECUT APPROVED ~99/100; TOP-LEVEL DESIGN EFFECTIVELY CLOSED; PRIOR STRATEGIC + SIM-TO-REAL RECUTS RETAINED; V3 TEMPORAL + ADVERSARIAL AUTHORITY CLOSED LOCALLY; REAL CLOCK BLOCKED ONLY ON REAL CIQ BYTES; LIVE CLOSED`
+Active product state: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
+Status: `VELOCITY/PARALLELISM RECUT APPROVED; TOP-LEVEL DESIGN EFFECTIVELY CLOSED; REAL CIQ ADMITTED; V3 SEAL FULL-CHAIN VERIFIED; IMMUTABLE CLOCK-START RECEIPT ISSUED; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
 Canonical product maturity: `70/100`
 Portfolio-alpha evidence: `0`
 Limited Live: `CLOSED; NOT AUTHORIZED`
 
+## Clock #1 authority update — 2026-08-08
+
+The former real-CIQ pre-Seal blocker is closed. Final raw market authority is `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.csv`, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`, 21,345 deterministic rows, zero duplicate-key conflicts. CIQ admission yields 99 canonical securities and 10 explicit exclusions; 26 names are Rule100 sizing-eligible at target `2026-08-07`.
+
+The real decision cut is `AOV0_CIQ_20260807_ad2faf0533cec19c`. Seal Candidate `c78088ace7819170cd0064154fba138da4b4f8183dbd4ec48c347a942985ba88` is immutable and clock-false by itself; fresh-process verification `55ba4e2f3670d4fc01839bd22bb164cfd0755efb1ce47f3641b9ca88d61c344c` succeeded; Clock-Start Receipt `eabd645382424f559286045a4980412db9a02a4ad0d594850f93675443cd1b78` started Clock #1 at `2026-08-08T19:48:52.440503Z`. Evaluation begins `2026-08-10T20:00:00Z`; outcome authority remains sealed until `2026-09-09T20:00:00Z`. `financial_alpha_evidence=0`; strategy live capital remains closed.
+
+Any later statement in this document that describes real CIQ admission or Clock #1 as still open is historical and superseded by this authority update.
+
 ## Canonical product direction
 
-GodView is one local-first PIT-certified portfolio operating system operated through `launch.py` → `dashboard.py` / Command Center. Deterministic systems own admitted data, permanent identity, formulas, target weights, accounting, evidence, review classification, and risk authority. AI begins from validated ReviewPackets for **outcome-informed mutation** and does not own truth or risk; separately, an independently pre-registered Forecast Challenger may be built after Seal #1 without inspecting AOV outcomes. Roadmap/change authority is `docs/architecture/aov_endgame_generalization_spec_current.md`; current runtime meaning remains owned by the frozen executable contract + exact code bytes + admitted receipts.
+GodView is one local-first PIT-certified portfolio operating system operated through `launch.py` → `dashboard.py` / Command Center. Deterministic systems own admitted data, permanent identity, formulas, target weights, accounting, evidence, review classification, promotion, and risk authority. After Clock #1, bounded AI receipt/schema/fixture and discovery-only source-claim tooling may be engineered in its own authority domain, but real **outcome-informed mutation** still begins only from matured validated ReviewPackets and AI never owns truth or risk. `CYCLE_RESONANCE_v1` remains the first confirmatory Forecast Challenger; `MARKET_TRANSITION_ALPHA_v1` may run only as a parallel discovery incubator until the Alpha-family slot opens. Roadmap/change authority is `docs/architecture/aov_endgame_generalization_spec_current.md`; current runtime meaning remains owned by the frozen executable contract + exact code bytes + admitted receipts.
 
 ```text
 immutable PIT reality
@@ -93,33 +101,29 @@ Mechanical/test seals are not empirical or prospective evidence.
 
 ## Roadmap re-audit status
 
-`docs/architecture/aov_endgame_generalization_spec_current.md` is **ROADMAP / CHANGE AUTHORITY**. Prior architecture/scientific-bar, strategic-reorder and sim-to-real approvals remain valid on their scopes. The latest 2026-08-08 owner alignment is `~99/100` after recuts with verdict `APPROVED_WITH_WINNER_AND_AUTHORITY_RECUT`; top-level design is effectively closed. `CYCLE_RESONANCE_v1` is preregistered as the first post-Clock Alpha Discovery Lane but `NOT IMPLEMENTED`; Minimum-Viable-Atlas-first, six owner constitutions, one-incumbent policy, and system-wide Destructive Authority Replacement are roadmap authority only. Current execution state remains `PRE_SEAL_REAL_CIQ_ADMISSION` unchanged.
+`docs/architecture/aov_endgame_generalization_spec_current.md` is **ROADMAP / CHANGE AUTHORITY**. Prior architecture/scientific-bar, strategic-reorder, sim-to-real and Winner/authority approvals remain valid on their scopes. The latest 2026-08-08 verdict is `APPROVED_WITH_VELOCITY_PARALLELISM_RECUT`; top-level design is effectively closed. The topology law is now **parallelize work / serialize authority**: one incumbent writer per post-Clock authority domain, immutable deterministic joins, and serial/destructive authority promotion. `CYCLE_RESONANCE_v1` remains the first confirmatory Alpha Family; `AI Research Pipeline v0`, `MARKET_TRANSITION_ALPHA_v1`, and `RESONANCE_LEVERAGE_POLICY_v1` are specified but `NOT IMPLEMENTED`. Current execution state is `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`; Clock #1 releases only the explicitly declared post-Clock work domains.
 
 Arm 5 is closed from executable truth: `ECONOMIC_CASH = official SOFR - 25 bp, ACT/360, no proxy substitution`. PIT equal-weight remains the risky-asset performance comparator.
 
-## First real seal blocker
+## First real seal blocker — CLOSED / historical
 
-Real CIQ admission is now the **only local pre-clock dependency still open**. Required current files remain:
+Real CIQ admission and the full destructive-v3 authority chain are complete. The current paths contain the admitted Rule100 targets, vertical primitives, total returns, official SOFR and `decision_cut_v3`. Final market custody is `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.csv`, 21,345 rows, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`; CIQ admission yielded 99 canonical securities and 10 explicit mechanical exclusions with no alternate-listing backfill.
 
-```text
-data/aov0/current/rule100_targets.parquet
-data/aov0/current/vertical_primitives.parquet
-data/aov0/current/total_returns.parquet
-data/aov0/current/decision_cut.json
-```
-
-`data/aov0/current/official_sofr.parquet` is already admitted. With the four files missing, `scripts/aov0_first_seal.py` correctly reports no clock start. The real frozen-universe CIQ primary Security/Trading Item raw export is now captured at `data/aov0/raw/ciq_primary_security_master_20260808T162322Z.csv`, retrieval `2026-08-08T16:23:22.0736860Z`, SHA-256 `8aefbbd751a714b8689402ccbf8fa2b776c6388d4bbc3870ec4f8b975306eca4`, but it has not yet been admitted. Market custody is partial: nine earlier 5-day parts plus a validated exact-SPT 7-day target-week part exist, while no combined >=200-completed-observation market raw object has been admitted. Therefore no risky-asset artifacts, real v3 cut, real Seal Candidate, or real Clock-Start Receipt were fabricated.
-
-No historical equal-weight replay or synthetic fixture may be relabeled to satisfy this gate. Existing v2 artifacts are historical/mechanical evidence only. Active authority is v3 with no active v2 compatibility reader/writer. Seal Candidate cannot start the clock; fresh-process verification proof must succeed before the immutable Clock-Start Receipt is issued. Daily-return attribution begins only at/after next eligible close; maturity = evaluation_start + 30 calendar days.
+The real decision cut is `AOV0_CIQ_20260807_ad2faf0533cec19c`; Seal Candidate `c78088ace7819170cd0064154fba138da4b4f8183dbd4ec48c347a942985ba88` remained clock-false; fresh-process verification `55ba4e2f3670d4fc01839bd22bb164cfd0755efb1ce47f3641b9ca88d61c344c` succeeded; immutable Clock-Start Receipt `eabd645382424f559286045a4980412db9a02a4ad0d594850f93675443cd1b78` started Clock #1 at `2026-08-08T19:48:52.440503Z`. Evaluation begins `2026-08-10T20:00:00Z`; outcome authority remains unavailable before `2026-09-09T20:00:00Z`. Existing v2 artifacts remain historical/mechanical evidence only; active authority is v3 with no compatibility reader/writer. Financial-alpha evidence remains `0`.
 
 ## Review / AI boundary
 
-Deterministic review core exists. The pre-Clock v3 adversarial authority gate passes locally: byte mutation, target 1bp mutation, Security-ID authority mutation, SOFR substitution, fresh-process-only promotion, session/close chronology including legacy 09:30 rejection, pre-evaluation return, early maturity, and nothing-happened temporal availability all fail closed. After Clock #1 apply the final WIP law: weekly AOV tape + review/custody stay active; exactly one Alpha **build** lane starts with `CYCLE_RESONANCE_v1`, while sealed Challengers keep running. Its research path is Minimum-Viable-Atlas-first: enough legitimate PIT history for honest discovery/controls → freeze → untouched test where available → seal prospectively, then deepen historical coverage underneath. The deeper Atlas is explicitly a discovery-only right-tail forensic census: use qualifying **episodes** under the frozen label rather than famous-company selection; retain true-right-tail, false-winner, missed-right-tail and matched ordinary/left-tail contrasts; audit Rule100/Parent/Child winner-blindness without tuning; and keep discovery/entry, continuation/hold and exit/falsifier skill separate. Outcome-visible forensic results are hypothesis/search-debt evidence only and never OOS/prospective authority. Borrow/replication lead time stays async. Independent Ops/Engineering starts the thin Alpaca PAPER Capitalization Vertical immediately with initial execution incumbent `MOC_CLOSE_AUCTION_V1 = market + cls`; it must bind one promoted policy/seal→one `live_rebalance_id`, PIT `CIQSEC`↔broker account/instrument identity, full broker lifecycle/open-orders canonical projection, broker-first restart reconciliation + rebalance fencing + persistent `FREEZE_NEW_RISK`, and research↔actual-broker implementation-shortfall attribution. Existing broker/recovery/signed-replay/event-book primitives are reused; no second OMS. Generalization follows the Rule of Two; simple allocation remains incumbent and optimizer challenger.
+Deterministic review core exists. The pre-Clock v3 adversarial authority gate passes locally: byte mutation, target 1bp mutation, Security-ID authority mutation, SOFR substitution, fresh-process-only promotion, session/close chronology including legacy 09:30 rejection, pre-evaluation return, early maturity, and nothing-happened temporal availability all fail closed. After Clock #1 apply the domain WIP law: weekly AOV tape + review/custody stay active; one narrow Alpha PIT Pipeline incumbent and one confirmatory Alpha-family implementation (`CYCLE_RESONANCE_v1` first) may build concurrently against their frozen interface; CRV1 uses deterministic contract fixtures until real PIT artifacts cross the integration join. One bounded AI Research Tooling vertical may also build under independent ownership using `AIInvocationReceipt`, role/visibility firewalls and immutable fixtures/source-bound claims; real outcome-informed mutation cannot cross the matured-ReviewPacket gate early. `MARKET_TRANSITION_ALPHA_v1` may run historical crisis/false-crisis discovery and preregistration in parallel but has zero confirmatory/capital authority until CRV1 seals or an explicit PM/CEO `PIVOT` opens the Alpha-family slot. The deeper Right-Tail Atlas remains discovery-only and episode-based with false-winner/missed-winner/matched controls, winner-blindness without tuning and entry/hold/exit separation. Borrow/replication lead time stays async. Independent Ops/Engineering starts the thin Alpaca PAPER Capitalization Vertical immediately with initial execution incumbent `MOC_CLOSE_AUCTION_V1 = market + cls`; it must bind one promoted policy/seal→one `live_rebalance_id`, PIT `CIQSEC`↔broker account/instrument identity, full broker lifecycle/open-orders canonical projection, broker-first restart reconciliation + rebalance fencing + persistent `FREEZE_NEW_RISK`, and research↔actual-broker implementation-shortfall attribution. Existing broker/recovery/signed-replay/event-book primitives are reused; no second OMS. Generalization follows Rule of Two; simple allocation remains incumbent and optimizer challenger. `RESONANCE_LEVERAGE_POLICY_v1` stays evidence/CRO-gated with leverage/short/options authority disabled.
 
-After the first matured valid ReviewPacket, the earliest AI loop is:
+AI activation is split:
 
 ```text
-ReviewPacket → one MutationManifest → deterministic compile → development run
+post-Clock engineering on immutable fixtures/source-bound packets
+→ AIInvocationReceipt + role firewall + deterministic validator
+
+real outcome-informed activation only after
+matured + reconciled + validated ReviewPacket
+→ one MutationManifestDraft → deterministic compile → development Trial
 ```
 
 ## Model portfolio direction
@@ -138,9 +142,9 @@ Add additional Challengers and Sentinel only when real evidence creates the need
 - Canonical maturity remains `70/100`.
 - Portfolio-alpha evidence remains `0`.
 - No admitted real A1 result or real prospective A3 evidence is claimed.
-- Before Clock #1: no provider programme, AOV-2/event authority, optimizer/RL-first path, compatibility restoration, broker/order execution work, live capital, leverage, shorting, derivatives, or alpha claim. After Clock #1, only the thin PAPER Capitalization Vertical is roadmap-approved; strategy live capital remains closed.
+- Before Clock #1: no AI/source pipeline implementation, Market Transition implementation, provider programme, AOV-2/event authority, optimizer/RL-first path, compatibility restoration, broker/order execution work, live capital, leverage, shorting, options/derivatives, or alpha claim. After Clock #1, domain-parallel research engineering and the thin PAPER Capitalization Vertical are roadmap-approved only within their frozen authority boundaries; strategy live capital remains closed.
 - Limited Live remains closed.
 
 ## Next action
 
-Do not widen implementation before Clock #1. The next action remains data admission only: verify/reuse the captured 109-name primary master; complete exact-primary-SPT `SP_TOTAL_RETURN`/`SP_PRICE_CLOSE`/`SP_VOLUME` history in 7-weekday atomic chunks until each admissible name has >=200 actual completed closes through `2026-08-07`; combine/dedupe/hash the real provider parts; restore/use the repo-approved `.venv`; admit through the existing builder; build `decision_cut_v3`; then execute the real Seal Candidate→fresh-process proof→Clock-Start Receipt path. `CYCLE_RESONANCE_v1` preregistration creates no implementation authority. After Clock #1, weekly AOV cuts keep the original 109 candidate entities frozen while refreshing current measurements; the first Alpha lane uses Minimum-Viable-Atlas-first and seals prospectively as soon as honest; independent replication/borrow lead times run early; and independent Ops/Engineering starts the thin Alpaca PAPER Capitalization Vertical with `MOC_CLOSE_AUCTION_V1`. PAPER must close account/instrument mapping, one-policy→one-rebalance identity, full lifecycle/open-orders, restart reconciliation/fencing/FREEZE_NEW_RISK, and dual-ledger IS attribution before strategy capital. Optional micro-live is owner/risk exception only and remains `financial_alpha_evidence=0`. Only the Clock-Start Receipt starts prospective authority; financial-alpha evidence remains `0` until outcomes mature.
+Preserve and reverify the immutable Clock #1 chain; keep the frozen 109 candidate entities and refresh current measurements weekly without rerunning the growth screen. Do not open outcomes before `2026-09-09T20:00:00Z`. Post-Clock work may now begin only within the already-approved domain boundaries: Alpha PIT Pipeline + `CYCLE_RESONANCE_v1` first, bounded AI tooling under independent ownership, Market Transition discovery-only incubation, asynchronous replication/borrow preparation, and independent thin Alpaca PAPER Capitalization with `MOC_CLOSE_AUCTION_V1`. Parent/Child remain frozen; `financial_alpha_evidence=0`; strategy live capital remains closed.

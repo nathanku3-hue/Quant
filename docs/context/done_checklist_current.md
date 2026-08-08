@@ -1,9 +1,23 @@
 # Done Checklist — Current
 
 Date: 2026-08-08
-Active gate: `PRE_SEAL_REAL_CIQ_ADMISSION`
+Active state: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
 Canonical score: `70/100`
 Portfolio-alpha evidence: `0`
+
+## Clock #1 completion — 2026-08-08
+
+- [x] Final exact-primary-SPT market object written deterministically: `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.csv`, 21,345 rows, zero duplicate-key conflicts, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`.
+- [x] Primary-master SHA-256 reverified exactly at `8aefbbd751a714b8689402ccbf8fa2b776c6388d4bbc3870ec4f8b975306eca4`.
+- [x] CIQ fail-closed admission completed: 99 canonical securities, 10 mechanical exclusions, 26 Rule100 sizing-eligible names, risky gross `1.0`; no alternate-listing backfill.
+- [x] Real `rule100_targets.parquet`, `vertical_primitives.parquet`, `total_returns.parquet`, and `decision_cut.json` produced from admitted provider bytes plus official SOFR.
+- [x] `decision_cut_v3`=`AOV0_CIQ_20260807_ad2faf0533cec19c`, SHA-256 `81926aa896485a4a646228920ae0769283f143328ff8fe1f6671929136cd9b80`.
+- [x] Real Seal Candidate `c78088ace7819170cd0064154fba138da4b4f8183dbd4ec48c347a942985ba88` written clock-false and re-opened successfully.
+- [x] Fresh-process full-chain verification `55ba4e2f3670d4fc01839bd22bb164cfd0755efb1ce47f3641b9ca88d61c344c` succeeded.
+- [x] Immutable Clock-Start Receipt `eabd645382424f559286045a4980412db9a02a4ad0d594850f93675443cd1b78` issued; Clock #1 started `2026-08-08T19:48:52.440503Z`.
+- [x] Current authority check: `prospective_clock_started=true`, `evaluation_started=false`, `outcome_open_authorized=false`, `financial_alpha_evidence=0`.
+- [x] Restored repository `.venv` on Python 3.12; `pip check` PASS; AOV suite `75/75 PASS`.
+- [ ] Repository-wide pytest phase-close gate is not green: nine unrelated/inherited collection errors remain (stale `views.page_registry` imports; missing `psycopg2`, `schedule`, `yaml`).
 
 ## Closed locally
 
@@ -23,7 +37,7 @@ Portfolio-alpha evidence: `0`
 - [x] Rule100 control / deterministic Parent / one frozen Child.
 - [x] Hash DAG and selective recomputation.
 - [x] Five-arm evidence and baseline seal/reopen mechanics.
-- [x] Prior architecture/scientific-bar, strategic-reorder and sim-to-real approvals remain valid. Latest owner alignment=`~99/100` after recuts, verdict=`APPROVED_WITH_WINNER_AND_AUTHORITY_RECUT`; top-level design effectively closed. `CYCLE_RESONANCE_v1` is preregistered as `PREREGISTERED / NOT IMPLEMENTED`; Minimum-Viable-Atlas-first, six owner constitutions, one-incumbent policy, and system-wide Destructive Authority Replacement are frozen roadmap semantics. Current execution gate remains `PRE_SEAL_REAL_CIQ_ADMISSION`; `financial_alpha_evidence=0`.
+- [x] Prior architecture/scientific-bar, strategic-reorder, sim-to-real and Winner/authority approvals remain valid. Latest roadmap verdict=`APPROVED_WITH_VELOCITY_PARALLELISM_RECUT`; top-level design remains effectively closed. `CYCLE_RESONANCE_v1` is preregistered as `PREREGISTERED / NOT IMPLEMENTED`; Minimum-Viable-Atlas-first, six owner constitutions, one-incumbent policy, Destructive Authority Replacement, and post-Clock `PARALLELIZE_WORK / SERIALIZE_AUTHORITY` are frozen roadmap semantics. Current execution state is `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`; `financial_alpha_evidence=0`.
 - [x] Decision-cut/seal v2 custody fixes are locally closed: actual seal time separation, NYSE-session validation, exact executable-byte manifest, and fresh-process full-chain reopen.
 - [x] First-seal path rejects post-cut target/return history, future primitive knowledge/SOFR publication, input byte drift, and target/execution timing inconsistency.
 - [x] Seal binds current decision target-vector hashes for all five arms.
@@ -44,6 +58,18 @@ Portfolio-alpha evidence: `0`
 - [x] Incumbent winner-blindness audit is diagnostic only: test whether universe/Rule100/Parent/Child/caps/missingness/exit logic would have found and held historical winners in time, but do not tune Parent/Child or award financial-alpha evidence from survivor inspection.
 - [x] Winner capture is decomposed into discovery/entry, continuation/hold, and exit/falsifier alpha; a successful entry implementation does not automatically own hold/exit skill, and unrealized P&L is not an alpha input.
 - [x] No historical Atlas, SEC/text/AI pipeline, provider acquisition, or broker implementation starts before Clock #1; preregistration creates no financial-alpha evidence.
+
+## Closed — Velocity / AI / Market Transition roadmap recut (docs/research governance only)
+
+- [x] CEO / Quant / PM / Risk / Architecture / Engineering council = `6/6 APPROVE_WITH_MODIFICATIONS`; canonical record=`docs/architecture/aov_velocity_council_20260808.md`.
+- [x] Replaced one **global** post-Clock engineering build queue with domain-scoped WIP: one narrow Alpha PIT Pipeline incumbent, one confirmatory Alpha-family implementation, one bounded AI Research Tooling vertical under independent ownership, and independently owned PAPER Capitalization; one writer per authority domain.
+- [x] Frozen deterministic join gates: Clock → contract/visibility freeze → lane-local fixture proof → real PIT integration → immutable seal → matured deterministic ReviewPacket → replicated/capturable owner-risk promotion.
+- [x] `alpha_pit_data_api_v1` and `CYCLE_RESONANCE_v1` may implement concurrently after Clock #1 against their frozen contract; CRV1 fixtures prove mechanics only and never PIT/OOS/prospective evidence.
+- [x] Added `AI Research Pipeline v0`: `AIInvocationReceipt`, role/visibility firewall, non-authoritative drafts, Trial/Search accounting, hostile-source boundary, one-incumbent tooling policy, and external-repo quarantine. Post-Clock fixture/source-claim engineering may start with independent ownership; **real outcome-informed mutation still requires a matured reconciled ReviewPacket**.
+- [x] Added `MARKET_TRANSITION_ALPHA_v1` as a separate forecast family and `ENTRY_TIMING_COMPONENT_v1` as a separate Alpha Component. After Clock #1 Market Transition may run only as a registered discovery incubator beside CRV1; confirmatory implementation waits for CRV1 seal or explicit PM/CEO `PIVOT`.
+- [x] Added `RESONANCE_LEVERAGE_POLICY_v1` as downstream Capital Policy, not Core Alpha. Market de-risk is distinct from operational kill; `not long != short`; desired/allowable/feasible/actual capital remain distinct; leverage/short/options authority stays disabled.
+- [x] External repositories remain references/future bounded consumers only; no external repo code, dependency, AI SDK, second runner, second OMS, universal data layer or universal agent platform was introduced.
+- [x] Pre-Clock path was unchanged by the velocity recut and is now closed: real CIQ custody/admission → `decision_cut_v3` → Seal Candidate → fresh-process verification → Clock-Start Receipt. No new pre-Seal gate was introduced.
 
 ## Open — external Episode-2 custody
 
@@ -87,15 +113,15 @@ These values are frozen for AOV-0 V0. Changing either creates a new contract/mod
 - [x] Legacy/rejected acquisition paths classified: embedded SNLQuery/synthetic-provider execution hangs; `SNLPrice` compatibility market history stalled and was cancelled; direct raw Genix `SPGTable` metric normalization is unnecessary; widening beyond the proven 7-day Office chunk is not the incumbent; ticker fallback remains forbidden.
 - [x] Detailed acquisition findings frozen in `docs/context/ciq_provider_acquisition_findings_20260808.md` so failed approaches and solved identity work are not retried as incumbents.
 
-## Open — admitted current first-seal inputs
+## Closed — admitted current first-seal inputs
 
-- [ ] Admit the already captured frozen-universe primary Security ID / Trading Item ID master after verifying raw SHA-256 `8aefbbd751a714b8689402ccbf8fa2b776c6388d4bbc3870ec4f8b975306eca4`. Do not rerun Identifier Lookup as the production path unless auditing the mapping.
-- [ ] Complete, combine, hash, and admit exact-primary-SPT market history using `SP_TOTAL_RETURN` + `SP_PRICE_CLOSE` + `SP_VOLUME`, with at least 200 completed daily close observations per admissible name through target `2026-08-07`. Use 7-weekday atomic chunks; requested weekday count is not the gate. Dedupe final raw custody on (`SPT_DATE`,`SP_CIQ_ID`,`SP_TRADING_ITEM_ID`) and retain provider metric/source/retrieval metadata.
-- [ ] `data/aov0/current/rule100_targets.parquet`.
-- [ ] `data/aov0/current/vertical_primitives.parquet`.
-- [ ] `data/aov0/current/total_returns.parquet`.
+- [x] Frozen-universe primary Security ID / Trading Item ID master admitted after exact SHA-256 verification.
+- [x] Exact-primary-SPT market history combined, conflict-checked, hash-bound, and admitted without alternate-listing backfill.
+- [x] `data/aov0/current/rule100_targets.parquet`.
+- [x] `data/aov0/current/vertical_primitives.parquet`.
+- [x] `data/aov0/current/total_returns.parquet`.
 - [x] `data/aov0/current/official_sofr.parquet` admitted directly from NY Fed after the 15:00 ET gate.
-- [ ] `data/aov0/current/decision_cut.json` using `aov0_ciq_decision_cut_v3` after the destructive temporal recut.
+- [x] `data/aov0/current/decision_cut.json` using `aov0_ciq_decision_cut_v3`.
 
 ## Closed — pre-seal custody fixes from re-audit
 
@@ -131,15 +157,15 @@ These values are frozen for AOV-0 V0. Changing either creates a new contract/mod
 
 Current AOV v3 suite is `75/75 PASS`; ZERO-COMPAT remains seven zeros.
 
-## Open — first real seal / evidence
+## Active — first real prospective evidence
 
-- [ ] First real five-arm same-cut Seal Candidate from admitted CIQ bytes.
-- [ ] Fresh-process full-closure real-seal verification.
-- [ ] Immutable Clock-Start Receipt issued.
-- [ ] Prospective clock starts only from the receipt.
+- [x] First real five-arm same-cut Seal Candidate from admitted CIQ bytes.
+- [x] Fresh-process full-closure real-seal verification.
+- [x] Immutable Clock-Start Receipt issued.
+- [x] Prospective clock starts only from the receipt.
 - [ ] Recurring weekly attempts.
-- [ ] `A1` admitted real exploratory AOV evidence.
-- [ ] `A3` matured prospective evidence.
+- [ ] `A1` admitted real exploratory AOV evidence classification, if/when the deterministic evidence contract permits it.
+- [ ] `A3` matured prospective evidence; unavailable before `2026-09-09T20:00:00Z`.
 
 ## Open — review closure while clock runs
 
@@ -155,9 +181,13 @@ Always-on / active:
 - [ ] prospective weekly AOV tape.
 - [ ] weekly fresh-data contract: same frozen 109 candidate entities; fresh fundamentals + identity/status + completed market + benchmark/rate + staleness validation; no weekly rerun of the growth screen.
 - [ ] deterministic review + custody/replay closure.
-- [ ] exactly one active capital-value **build** lane; first lane=`CYCLE_RESONANCE_v1`, already preregistered with frozen family identity / primary 252-trading-day top-5% date-local right-tail outcome / mechanism class / falsifier / search-budget law, but not implemented before Clock #1.
+- [ ] `ALPHA_PIT_PIPELINE` WIP slot: one narrow `alpha_pit_data_api_v1` incumbent; only first-family-required fields/sources; no generic provider platform.
+- [ ] `ALPHA_FAMILY_BUILD` WIP slot: exactly one confirmatory family implementation at a time; first=`CYCLE_RESONANCE_v1`, with frozen family identity / primary 252-trading-day top-5% date-local right-tail outcome / mechanism class / falsifier / search-budget law.
+- [ ] Alpha PIT + CRV1 may build concurrently against the frozen interface; deterministic API fixtures are allowed for engineering but have zero PIT/OOS/prospective evidence authority until real integration.
+- [ ] `AI_RESEARCH_TOOLING` WIP slot may run only with independent ownership and without slowing the critical PIT+CRV1 pair; first scope=`AIInvocationReceipt` + role firewall + source-claim/discovery schema + ReviewPacket/Mutation fixture mechanics.
+- [ ] registered discovery incubators may run with explicit Trial/Search budgets and zero confirmatory/capital authority; first additional incubator=`MARKET_TRANSITION_ALPHA_v1`.
 - [ ] Minimum Viable Atlas first: enough legitimate PIT history for honest discovery/contemporaneous controls → freeze implementation → untouched PIT test where available → seal prospectively as soon as honest; deepen full risk-set/false-winner/replication coverage underneath the running clock.
-- [ ] once a Challenger is sealed, it leaves build WIP and continues as an immutable running tape while the build lane may move only to the next evidence-justified preregistered family/component; Trial Ledger retains all attempts/failures.
+- [ ] once a Challenger is sealed, it leaves Alpha-family build WIP and continues as an immutable running tape while the family slot may move only to the next evidence-justified preregistered family/component; Trial Ledger retains all attempts/failures.
 
 Async external lead-time:
 - [ ] borrow/locate entitlement feasibility + forward-capture plan from Clock #1; true short authority remains closed.
@@ -186,9 +216,16 @@ Queued until nearest blocker or independent ownership:
 - [ ] CQ3: typed status/schema registry; CQ4: structured authority error taxonomy; CQ5: move governance-history comments to decision/ADR docs.
 - [ ] S2 exact-recompute runtime/package manifest hash before claiming complete environment-reproducible replay; shared abstractions follow the Rule of Two rather than a standalone generalization milestone.
 
+## Open — post-Clock AI tooling before outcome maturity
+
+- [ ] implement one `AIInvocationReceipt` format and deterministic authority/schema validator.
+- [ ] implement one bounded discovery/source-claim AI schema against immutable source-bound packets or fixtures; exact model/prompt/procedure hash-bound.
+- [ ] implement ReviewPacket→ReviewExplanationDraft/MutationManifestDraft fixture path; fixture results remain mechanical only.
+- [ ] one AI/provider incumbent + one orchestration approach; no generic agent platform.
+
 ## Open — after matured ReviewPacket
 
-- [ ] first outcome-informed bounded AI MutationManifest.
+- [ ] first **real outcome-informed** bounded AI `MutationManifestDraft` from a matured reconciled validated ReviewPacket.
 - [ ] deterministic compile and development run.
 - [ ] model portfolio: Safety Parent / Champion / 1–3 Challengers / Negative Control / Sentinel as evidence requires.
 - [ ] Trial Ledger/search-family accounting retains all attempts/failures plus trial count, preregistered/actual search budget, feature/target/horizon variants, OOS/prospective failures and data/compute/research cost.
