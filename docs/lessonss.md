@@ -1,3 +1,12 @@
+## 2026-08-08 Round Entry (Bank Executable Truth Before Specs That Describe Future Truth)
+
+- Date: 2026-08-08
+- Mistake or miss: the worktree had reached a state where current docs described locally implemented v3/CIQ authority while the corresponding source/tests were still uncommitted, so a docs-only Git revision would have let prose outrun executable truth.
+- Root cause: implementation, synchronized authority docs, generated/vendor data, temporary provider probes, and future post-Clock specs accumulated in one dirty worktree even though they belong to different custody classes.
+- Fix applied: banked the current AOV v3/CIQ executable authority + tests + synchronized current-authority docs/evidence together at `408f6efd16a3ede3d0e112a290631638334f6d4f`; excluded `data/aov0/*`, `tmp_wrds_*`, `NUL`, and non-source artifacts; then banked only the post-Clock `alpha_pit_data_api_v1` / `cycle_resonance_v1` specs and their research-governance evidence at `b474f963f9b0252e31b97b359d6f37cd30e649d5`.
+- Guardrail for next time: a Git revision claiming executable authority must contain the executable bytes/tests that make the claim true; generated/provider data stays outside source custody; future preregistration/spec authority should be a separate commit from current runtime authority; do not start future implementation merely because its spec is committed.
+- Validation: ZERO-COMPAT remains all seven zero; current-context validation passes; source/tests compile with the available system Python; Git whitespace checks pass. The mounted worktree lacks `pytest`, so no new pytest rerun is claimed; previously banked AOV `75/75 PASS` remains the test evidence for the committed implementation.
+
 ## 2026-08-08 Round Entry (A Research Data API Must Make Future Access Structurally Impossible, Not Merely Discouraged)
 
 - Date: 2026-08-08
