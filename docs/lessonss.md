@@ -1,3 +1,148 @@
+## 2026-08-08 Round Entry (A Research Data API Must Make Future Access Structurally Impossible, Not Merely Discouraged)
+
+- Date: 2026-08-08
+- Mistake or miss: the Winner/Authority roadmap froze `CYCLE_RESONANCE_v1` scientifically, but post-Clock coding still lacked exact module/API seams. Reusing the old API availability/readiness/provenance surfaces would have reintroduced legacy `permno`/route/provider semantics by compatibility, while a simple runtime `mode == CONFIRMATORY` check would leave future/outcome access present in the process.
+- Root cause: provider acquisition, PIT canonicalization, discovery outcome access, qualitative claim extraction, and Alpha-family logic had been described as architecture concepts rather than capability-separated implementation contracts.
+- Fix applied (docs only): add exactly two post-Clock build specs. `alpha_pit_data_api_v1.md` defines one narrow content-addressed PIT interface (`risk_set`, `observations`, `source_claims`, `expectations`, discovery-only `outcomes`) with explicit CIQ/SEC adapters, permanent identity, availability timestamps, coverage/missingness, receipt hashes, license/retention metadata, and no legacy fallback. `cycle_resonance_v1_build_spec.md` makes that API the sole data dependency; separates observed claims from inferred AI features; defines clock/resonance/prediction artifacts; freezes a mode state machine; and requires confirmatory/prospective capability objects and dependency manifests to omit outcome access entirely.
+- Guardrail for next time: do not implement historical-blindness as a convention when it can be an interface property. Provider adapters terminate at canonical PIT boundaries; Alpha packages never import providers. Scientific parameters have no code defaults after preregistration. New families earn shared infrastructure only after a second genuine consumer.
+- Evidence paths: `docs/architecture/alpha_pit_data_api_v1.md`, `docs/architecture/cycle_resonance_v1_build_spec.md`. No code/data/provider/broker implementation changed; `PRE_SEAL_REAL_CIQ_ADMISSION`, `financial_alpha_evidence=0`, and the existing real-CIQ next action remain unchanged.
+
+## 2026-08-08 Round Entry (Future Time Beats Historical Completeness; New Authority Must Destroy Active Ambiguity)
+
+- Date: 2026-08-08
+- Mistake or miss: after the sim-to-real recut, two forms of latency remained possible: a Right-Tail Atlas could become a full-history PIT reconstruction megaproject before the first prospective alpha family was allowed to seal, and future authority changes could preserve compatibility readers/writers/fallbacks that reintroduced ambiguity the AOV hard cut had already taught us to avoid.
+- Root cause: scientific completeness, prospective evidence urgency, owner governance, and implementation fork selection were still described separately instead of one ship-fast law: **freeze one family, build the minimum honest evidence needed, seal, then deepen history underneath the running clock; when current authority changes, replace it destructively.**
+- Fix applied (docs only): preregister `CYCLE_RESONANCE_v1` now as `PREREGISTERED / NOT IMPLEMENTED`; freeze primary 252-trading-day / top-5% date-local right-tail outcome and ordered cycle-resonance hypothesis; recut the Atlas to Minimum-Viable-Atlas-first; make capital-weighted right-tail capture per unit capital-time the deeper CIO objective; collapse owner governance to six constitutions; add system-wide Destructive Authority Replacement; choose one incumbent at each fork (`CYCLE_RESONANCE_v1`, narrow family-demanded source pipeline, simple allocation, Alpaca PAPER, `MOC_CLOSE_AUCTION_V1`); and add the missing hazard/dependence/search/robust-sizing/wrong-winner/research-option/AI-firewall/coverage/alpha-half-life methods as toolkits rather than projects.
+- Guardrail for next time: no historical-completeness project may delay a legally startable prospective evidence clock; no new current schema/contract may coexist with an old active reader/writer/fallback/alias/dual-write/feature flag in the same authority slice; old artifacts stay historical evidence only. Owner review should decide constitutions, not implementation menus.
+- Evidence paths: `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/spec.md`, `docs/phase_brief/alpha-organism-vertical-0-brief.md`, current context packets, `docs/decision log.md`, and `docs/saw_reports/saw_aov_endgame_winner_authority_recut_docs_20260808.md`. No executable/provider/data/broker behavior changed; current gate remains `PRE_SEAL_REAL_CIQ_ADMISSION`, `financial_alpha_evidence=0`.
+
+## 2026-08-08 Round Entry (Do Not Let Operational Lead Time Become the Next Waterfall Tail)
+
+- Date: 2026-08-08
+- Mistake or miss: after correctly parallelizing evidence clocks and decoupling bounded long/cash from true L/S, the roadmap still treated broker/account/reconciliation readiness as a late operational-parity concern. That would simply move the waterfall tail from research architecture to capitalization once alpha matured.
+- Root cause: research economics, broker execution identity, account truth, order lifecycle, restart reconciliation, and actual-P&L attribution were grouped under a generic future OMS label instead of separated into one thin lead-time vertical that can run safely in PAPER without strategy authority.
+- Fix applied (docs only): retain the strategic reorder and add a post-Clock #1 Capitalization Vertical. Freeze one promoted policy/seal → one `live_rebalance_id`; add PIT `CIQSEC`↔broker instrument/account mapping; bind explicit close-execution/actual-fill semantics; project broker lifecycle/open-orders into canonical live authority; require broker-first restart reconciliation with persistent `FREEZE_NEW_RISK`; and keep research vs broker P&L as dual ledgers bridged by implementation shortfall/fees/timing/cash drag. Reuse existing submit/recovery/quarantine/signed-replay/event-book primitives; no second OMS.
+- Important correction: do not confuse an end-to-end authority gap with a broker capability gap. Alpaca supports `cls` closing-auction semantics and the low-level adapter accepts TIF; the current promoted rebalancer path simply does not propagate/bind that policy. Fix the binding before inventing infrastructure.
+- Guardrail for next time: every capital-readiness roadmap must start externally or operationally dominated clocks as soon as they are safe and independently owned; every research→capital transition must name the promoted policy identity, account/instrument mapping, lifecycle authority, restart truth source, and counterfactual-vs-actual P&L bridge.
+- Evidence paths: `scripts/aov0_first_seal.py`, `execution/broker_api.py`, `execution/rebalancer.py`, `main_bot_orchestrator.py`, `execution/signed_envelope.py`, `gv_portfolio_v0/execution.py`, `gv_portfolio_v0/book.py`, `gv_portfolio_v0/replay.py`, `docs/architecture/aov_endgame_generalization_spec_current.md`. No executable behavior changed; `PRE_SEAL_REAL_CIQ_ADMISSION` remains current.
+
+## 2026-08-08 Round Entry (A Seal Candidate Must Not Be Able to Self-Promote)
+
+- Date: 2026-08-08
+- Mistake or miss: the historical v2 path could still collapse seal construction and clock authority, while daily-return economics were anchored to a 09:30 timestamp that the daily total-return series did not actually identify. Positive reopen tests alone also did not prove resistance to self-consistent tampering or authority substitution.
+- Root cause: custody verification, process independence, clock promotion, return-interval support, maturity, identity authority, and cash authority were adjacent checks instead of one destructive authority boundary.
+- Fix applied: destructively recut active code to `decision_cut_v3` / `seal_v3` / `clock_start_receipt_v1` with `NYSE_2026_CORE_CLOSE_1600_ET`; make seal construction clock-false; require a fresh child process to emit a bound verification proof; issue a separate immutable clock receipt; derive maturity from evaluation start; enforce interval-left-endpoint >= evaluation start; explicitly validate official-SOFR cash authority; and add adversarial byte/target/identity/cash/process/calendar/interval/maturity/availability tests.
+- Guardrail for next time: any artifact that can grant a new authority level must require evidence from a distinct immutable authority object; test semantic tampering even when hashes are recomputed; bind market-time claims to the actual observation interval supported by the data source; never infer provider bytes or retrieval time from filesystem presence/mtime.
+- Evidence paths: `research/aov0/contracts.py`, `research/aov0/experiment.py`, `scripts/aov0_build_decision_cut.py`, `scripts/aov0_first_seal.py`, `scripts/aov0_reopen_seal.py`, `tests/aov0/`. Validation: AOV `75/75 PASS`; ZERO-COMPAT seven-zero. Real CIQ Security/Trading Item + completed market raw bytes remain absent from active repo-local intake, so no real seal/clock was created.
+
+## 2026-08-08 Round Entry (Do Not Serialize Future Evidence Behind Engineering WIP)
+
+- Date: 2026-08-08
+- Mistake or miss: the roadmap prioritized prospective time but still made one build lane look like one running experiment and visually placed generalization, optimizer, true L/S, and bounded capital in a serial chain.
+- Root cause: engineering construction capacity, immutable running experiments, external lead time, operational-parity learning, and capitalization authority were modeled as one milestone sequence instead of separate dependency clocks.
+- Fix applied (docs only): split bounded long/cash from the optional L/S extension; freeze one active build lane plus multiple running Challenger tapes; replace the serial chain with Evidence, Alpha Discovery, External Lead Time, and Operational/Capitalization clocks; apply the Rule of Two to shared abstractions; treat optimizer as a challenger to simple sizing; start independent-replication lead time after the first Forecast Challenger seal; allow an independently owned Operational Parity Tape after Clock #1; and add program-level CONTINUE / PIVOT / STOP-HOLD gates.
+- Guardrail for next time: never equate one build lane with one evidence clock; every new architecture, data, optimizer, or L/S expansion must name the second real consumer or the incremental information/capital utility it buys.
+- Evidence paths: `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/spec.md`, `docs/phase_brief/alpha-organism-vertical-0-brief.md`, current context packets, and `docs/decision log.md`. No executable authority changed; `PRE_SEAL_TEMPORAL_AUTHORITY_FIX` remains unchanged pending re-audit.
+
+## 2026-08-07 Round Entry (Freeze the Laboratory, Refresh Measurements, and Test Failure More Than Success)
+
+- Date: 2026-08-07
+- Mistake or miss: a strong 61/61 positive test matrix and carefully versioned seal custody can still leave three future failure modes: silently changing v2 economic semantics in place, accumulating weekly cohorts from a stale current-cut fundamental snapshot or rerun screener, and overinvesting in code/compute cleanliness while the irreversible prospective clock is still off.
+- Root cause: implementation correctness, authority-version semantics, recurring-data policy, adversarial failure coverage, and shipping economics were reviewed as separate concerns rather than one evidence-production operating contract.
+- Fix applied (docs/re-audit only): freeze destructive v3 authority (`decision_cut_v3`, `seal_v3`, `clock_start_receipt_v1`, close-based evaluation); require adversarial tamper/identity/SOFR/calendar/maturity/nothing-happened tests before Clock #1; freeze original 109 candidate entities while refreshing their current measurements weekly; impose post-Seal WIP cap; defer authority/module/error refactors and all compute optimization until the tape runs and a demonstrated blocker exists; add S2 environment manifest and Trial/Search-budget accounting requirements.
+- Guardrail for next time: never reinterpret a frozen schema in place; recurring prospective experiments must distinguish fixed candidate membership from fresh state; before publication authority, prioritize negative/adversarial tests over more happy-path formula tests; no refactor/performance project may displace an irreversible evidence clock without measured necessity.
+- Evidence paths: `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/spec.md`, `docs/context/planner_packet_current.md`, `docs/context/done_checklist_current.md`, `docs/context/gv_endgame_authority_current.md`, `docs/decision log.md`. Current banked mechanics: AOV `61/61 PASS`, ZERO-COMPAT seven-zero; v3 gate remains intentionally pending.
+
+## 2026-08-07 Round Entry (A Verified Seal Is Still Not Clock Authority Until Promotion Is Atomic)
+
+- Date: 2026-08-07
+- Mistake or miss: after closing timestamp/session/executable/reopen custody, the public seal callable could still return `prospective_clock_started=True` before the mandatory fresh-process verifier had completed, and the sealed artifact itself already carried a clock-start evidence label. Separately, next-open execution, daily total-return attribution, and 30-day maturity were not bound to one economic interval.
+- Root cause: construction custody, verification authority, economic execution time, return-observation interval, and maturity were treated as adjacent checks rather than one atomic prospective-authority contract.
+- Fix applied (architecture-only): freeze a two-phase promotion model—immutable Seal Candidate → fresh-process verification → separate immutable `PROSPECTIVE_CLOCK_START_RECEIPT`; no receipt means no clock authority. Freeze fastest daily-data timing contract to next eligible close, only post-execution return intervals, and maturity from evaluation start + 30 calendar days. After Seal #1 enforce a WIP cap rather than activating eight engineering lanes at once.
+- Guardrail for next time: never encode a prospective evidence level inside a candidate artifact before the authority-producing verification receipt exists; never claim an execution timestamp unless the P&L return interval starts at or after that execution; derive holding-horizon maturity from the economic evaluation start, not publication/seal time.
+- Evidence paths: `scripts/aov0_first_seal.py`, `research/aov0/experiment.py`, `core/engine.py`, `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/context/gv_endgame_authority_current.md`, `docs/decision log.md`. Independent validation this round: AOV `61/61 PASS`; ZERO-COMPAT all seven zero.
+
+## 2026-08-07 Round Entry (A Decision-Cut Timestamp Is Not the Prospective Seal Timestamp)
+
+- Date: 2026-08-07
+- Mistake or miss: the first-seal design could reuse the decision-cut `sealed_at` value as the later prospective seal timestamp, and the reopen path could validate only the seal object/hash in-process rather than prove the full artifact closure from a fresh process.
+- Root cause: decision construction custody and prospective publication custody were treated as one temporal event; contract/formula/target hashes were also stronger than the custody of the actual dirty-worktree implementation bytes.
+- Fix applied: executable authority is now destructively recut to `aov0_ciq_decision_cut_v2` + `aov0_prospective_seal_v2`. The cut binds distinct `cut_built_at`; the seal independently system-stamps actual `sealed_at` and enforces `knowledge_cutoff <= cut_built_at <= sealed_at < first_eligible_execution_bar`; execution is validated against the frozen `NYSE_2026_CORE_OPEN_0930_ET` next-session bar; `aov0_executable_byte_manifest_v1` hashes exact repo/interpreter bytes; and a separate Python process verifies the complete executable/seal/cut/Parquet/experiment/evidence/target-vector closure before returning `FULL_CHAIN_REOPEN_VERIFIED`.
+- Guardrail for next time: every prospective artifact must separately prove when the decision was constructed, when the immutable seal was actually written, what executable bytes created it, and what first market event could legally act on it. Same-process reopen and later-clock timestamps are mechanical tests, not prospective custody proof.
+- Evidence paths: `scripts/aov0_build_decision_cut.py`, `scripts/aov0_first_seal.py`, `scripts/aov0_reopen_seal.py`, `research/aov0/experiment.py`, `tests/aov0/test_decision_cut_builder.py`, `tests/aov0/test_first_seal_entrypoint.py`, `tests/aov0/test_experiment_seal.py`, `tests/aov0/test_ciq_market.py`, `docs/context/gv_endgame_authority_current.md`, `docs/decision log.md`; full AOV `61/61 PASS`.
+
+## 2026-08-07 Round Entry (Collapse Duplicate Raw Authority Instead of Carrying a Timestamp Dependency)
+
+- Date: 2026-08-07
+- Mistake or miss: after `run_4.xlsx` was admitted as the complete current-cut company/fundamentals export, the active cut still carried a separate `run_2.xlsx` screen receipt and therefore inherited a retrieval-time blocker from an older, narrower capture.
+- Root cause: historical custody roles were preserved in the active contract after a later raw object fully subsumed the same 109-company universe while also supplying the required fundamental state. Preserving evidence was conflated with preserving an operational dependency.
+- Fix applied: owner confirmed 109/109 Entity IDs are identical and ordered identically; active authority was destructively collapsed to one hash-bound `run_4` object with `COMPANY_UNIVERSE` + `QUARTERLY_FUNDAMENTALS` roles. `screen_source`, screen receipt/timestamp parameters, and `ciq_screen_universe` were removed from active code/tests/cut validation. Historical `run_2` evidence remains untouched.
+- Guardrail for next time: when a later authoritative raw object mechanically subsumes an older source role, keep the older bytes for audit history but delete the redundant runtime dependency unless it proves a distinct invariant. Do not preserve a compatibility receipt merely because it existed first.
+- Evidence paths: `research/aov0/contracts.py`, `research/aov0/ciq_fundamentals.py`, `scripts/aov0_build_ciq_fundamentals.py`, `scripts/aov0_build_decision_cut.py`, `scripts/aov0_first_seal.py`, `data/aov0/source_receipts/ciq_quarterly_fundamentals_run_4_20260807.json`, `tests/aov0/`.
+
+## 2026-08-07 Round Entry (A Same-Day Daily Market Row Is Not Complete Before the Close)
+
+- Date: 2026-08-07
+- Mistake or miss: the first Security/market admission design validated target date, market row presence, and source retrieval time, but a same-day daily close/volume/return export could still be captured before the U.S. market close and look structurally valid while containing a partial daily bar.
+- Root cause: date-level chronology was enforced without proving that the daily observation interval itself had completed. A timestamp after data retrieval is necessary but does not make an unfinished daily bar final.
+- Fix applied: for the frozen U.S.-listed universe, if the decision target date equals the CIQ market retrieval date, require retrieval at/after 16:00 America/New_York; reject future-stamped source retrieval times against the system-stamped build instant; recheck the same 16:00 rule in the decision-cut builder so a fabricated/modified receipt cannot bypass the builder gate.
+- Guardrail for next time: every bar-frequency authority must prove the bar interval has completed, not merely that a row with the target date exists. Carry the completion law into both admission and final cut validation.
+- Evidence paths: `scripts/aov0_build_ciq_market.py`, `scripts/aov0_build_decision_cut.py`, `tests/aov0/test_ciq_market.py`, `tests/aov0/test_decision_cut_builder.py`.
+
+## 2026-08-07 Round Entry (Current-Cut Factors Must Not Be Backcast Through Market History)
+
+- Date: 2026-08-07
+- Mistake or miss: the remaining Security/market slice initially looked like a normal historical feature build, but the admitted `run_4` factor state is known only at the current local admission time. Repeating that state across historical market dates would create a technically well-formed but scientifically false Rule100 history.
+- Root cause: rolling market warmup history and factor information-time authority were easy to collapse into one dataframe because the seal machinery accepts a full primitive history while the first decision target is current.
+- Fix applied: separate warmup from decision authority. Historical CIQ market rows may derive 20d/200d technical/AOV state, but the Security/market builder emits exactly one current Rule100 target row and one matching current risky-asset return row; target date before the `run_4` admission date blocks. Ambiguous identity, `<3` factor coverage, short market history, and invalid current state exclude the name without fallback. The synthetic current-cut package then passed the actual seal/reopen path.
+- Guardrail for next time: whenever source legs have different PIT strength, the weakest information-time leg controls decision-history authority. Never expand a current-cut factor state backward merely because market history is available; use history only for deterministic warmup until real historical factor availability exists.
+- Evidence paths: `research/aov0/ciq_market.py`, `scripts/aov0_build_ciq_market.py`, `scripts/aov0_fetch_nyfed_sofr.py`, `scripts/aov0_build_decision_cut.py`, `tests/aov0/test_ciq_market.py`, `tests/aov0/test_nyfed_sofr_intake.py`, `tests/aov0/test_decision_cut_builder.py`.
+
+## 2026-08-07 Round Entry (Receipt Time Is Authority, File Mtime Is Not)
+
+- Date: 2026-08-07
+- Mistake or miss: the frozen `run_2.xlsx` screen receipt records local file mtime and requested cutoff but has no explicit provider retrieval timestamp, while the hardened `aov0_ciq_decision_cut_v1` requires every raw-source receipt to bind a retrieval time.
+- Root cause: the screen was frozen before the stricter prospective receipt law was installed, so filesystem custody metadata was sufficient for the earlier screen receipt but insufficient for the first real cut.
+- Fix applied: do not rewrite or infer the historical receipt. The new decision-cut builder requires an explicit actual `run_2` retrieval time and blocks otherwise; the new CIQ/SOFR intake paths require explicit/actual retrieval times at admission. File mtime is never promoted to provider retrieval authority.
+- Guardrail for next time: every provider capture that may enter a prospective cut must record actual retrieval time at capture, alongside raw hash, before downstream processing. Treat missing time as an input gap, not a value to reconstruct from filesystem metadata.
+- Evidence paths: `data/aov0/source_receipts/ciq_screen_run_2_20260807.json`, `scripts/aov0_build_decision_cut.py`, `tests/aov0/test_decision_cut_builder.py`.
+
+## 2026-08-07 Round Entry (Relative Quarter Labels Are Not Historical Quarter Keys)
+
+- Date: 2026-08-07
+- Mistake or miss: the first `run_4.xlsx` normalizer attempted to collapse relative `FQ0` and absolute `FQqYYYY` cells by matching `IQ_PERIOD_END`; real bytes showed same-date value conflicts, and one company had only relative `FQ0` with no absolute-quarter history.
+- Root cause: Capital IQ relative-period semantics were treated as interchangeable with fixed absolute fiscal-quarter references. `FQ0/IQ_FQ` moves with the as-of date and can reflect a different retrieval/restatement state than an absolute `FQqYYYY` cell.
+- Fix applied: fail closed on the conflict, verify the Capital IQ period semantics, normalize historical rows from absolute `FQqYYYY` columns only, retain the 109-company source universe, and mark the one no-absolute-history entity explicitly instead of synthesizing quarterly history. Because complete per-quarter publication timestamps are absent, bind all rows to conservative local admission-time `known_at` and prohibit historical PIT replay claims.
+- Guardrail for next time: never dedupe relative and absolute vendor period references solely by period-end date. Freeze one period-reference family for history, expose no-history/missingness explicitly, and separate accounting period end from information-availability time.
+- Evidence paths: `research/aov0/ciq_fundamentals.py`, `tests/aov0/test_ciq_fundamentals.py`, `scripts/aov0_build_ciq_fundamentals.py`, `data/aov0/source_receipts/ciq_quarterly_fundamentals_run_4_20260807.json`.
+
+## 2026-08-07 Round Entry (Entitlement Truth Must Precede Source-Contract Freeze)
+
+- Date: 2026-08-07
+- Mistake or miss: the active first-seal source contract was narrowed to CRSP/PERMNO after network/authentication debugging, but the decisive operational fact was different: the available WRDS account lacks CRSP entitlement. Continuing to repair login would never produce the authorized bytes.
+- Root cause: connectivity/authentication reachability was treated as a proxy for dataset entitlement, and source authority was frozen before entitlement truth was explicitly closed.
+- Fix applied: owner explicitly selected Path B; active AOV was destructively recut to one S&P Capital IQ Pro security/fundamental/market-data family with canonical `CIQSEC:<Capital IQ Security ID>` identity; ticker, company `SP_ENTITY_ID`, legacy PERMNO, and dual-provider compatibility are rejected; direct NY Fed SOFR and all prospective-cut integrity invariants remain unchanged. The current 109-company `run_2.xlsx` bytes are frozen as screen evidence only, not upgraded to security/return authority.
+- Guardrail for next time: prove dataset entitlement—not merely login, host reachability, or provider account existence—before freezing a source family. If entitlement is absent, recut the authority contract explicitly and destructively while preserving scientific invariants; never create a convenience identity/provider compatibility layer.
+- Evidence paths: `research/aov0/contracts.py`, `research/aov0/cube.py`, `research/aov0/policy.py`, `scripts/aov0_first_seal.py`, `data/aov0/source_receipts/ciq_screen_run_2_20260807.json`, `docs/decision log.md`.
+
+## 2026-08-06 Round Entry (A Sealed Forecast Is Readiness, Not Financial Evidence)
+
+- Date: 2026-08-06
+- Mistake or miss: planning language could imply that prospective evidence itself rises when seal #1 is written, even though the seal only starts the clock and no future outcome has matured.
+- Root cause: prospective-machine readiness and prospective financial evidence were collapsed into one score dimension.
+- Fix applied: freeze terminology so seal #1 may increase `prospective_machine_readiness` and set `prospective_clock_started=true`, while `financial_alpha_evidence` remains exactly `0` until an eligible matured outcome opens; freeze insurance V0 at `0.05 / 0.0015`; narrow source authority to direct New York Fed SOFR plus one bounded CRSP/PERMNO cut.
+- Guardrail for next time: never award financial-evidence uplift for preregistration, sealing, elapsed calendar time, hidden-OOS infrastructure, or machinery readiness alone; only admitted matured outcomes can begin A3.
+- Evidence paths: `research/aov0/contracts.py`, `PRD.md`, `PRODUCT_SPEC.md`, `docs/context/gv_endgame_authority_current.md`, `docs/decision log.md`.
+
+## 2026-08-06 Round Entry (Prospective Receipts Must Bind the Exact Decision-Time Bytes)
+
+- Date: 2026-08-06
+- Mistake or miss: the first-seal entrypoint required five files and primitive PIT checks, but `decision_cut.json` carried only a cut ID and seal time; the four Parquet bytes, allowed history endpoint, first execution bar, and current five-arm target vectors were not mechanically bound to the prospective cut.
+- Root cause: immutable experiment/seal hashing was treated as sufficient even though the admission boundary itself did not prove which exact current source bytes and decision-time horizon entered the experiment.
+- Fix applied: make `decision_cut.json` bind all four Parquet SHA-256 values, frozen contract hash, mechanically recomputed date-local universe hash, raw-source receipts/retrieval times/hashes for the required CRSP/Compustat + direct NY Fed objects, knowledge cutoff, decision target date, seal timestamp, and first eligible execution bar; require NY Fed retrieval at/after 15:00 ET; re-hash inputs before and after execution; reject contract/universe/source-receipt drift, post-cut history/future knowledge/publication; seal current target-vector hashes for all five arms; add an archived/release executable-source ZERO-COMPAT guard.
+- Guardrail for next time: a prospective clock may start only when the cut object binds exact source bytes, source custody/retrieval time, frozen model contract, date-local universe, allowed information time, target date, and execution chronology; whole-history model hashes do not substitute for a current decision-vector binding. Preserve historical receipts, never executable compatibility.
+- Evidence paths: `scripts/aov0_first_seal.py`, `research/aov0/experiment.py`, `scripts/aov_zero_compat_scan.py`, `tests/aov0/test_first_seal_entrypoint.py`, `tests/aov0/test_experiment_seal.py`, `tests/aov0/test_zero_compat.py`.
+
 ## 2026-08-06 Round Entry (Repair Sequences Must Terminate in an Evidence-Producing Vertical)
 
 - Date: 2026-08-06
