@@ -99,7 +99,7 @@ def build_review_packet(
         },
         "status": status,
         "mutation_authority": "NONE_SINGLE_EPISODE_CANNOT_TRIGGER_STRUCTURAL_MUTATION",
-        "alpha_evidence": 0,
+        "financial_alpha_evidence": 0,
     }
     payload["review_packet_hash"] = domain_hash(
         "AOV0:REVIEW_PACKET:V1", _canonical_hash_value(payload)

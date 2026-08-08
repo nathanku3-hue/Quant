@@ -1,7 +1,7 @@
 # PHASE_QUEUE.md — GodView Product Queue
 
-Status: `E2 LOCAL FREEZE COMPLETE; AOV-0 MECHANICAL VERTICAL LOCAL; FIRST REAL SEAL BLOCKED; LIVE CLOSED`
-Last updated: 2026-08-06
+Status: `E2 LOCAL FREEZE COMPLETE; AOV-0 CIQ AUTHORITY RECUT LOCAL; INSURANCE V0 FROZEN; FIRST REAL SEAL BLOCKED CIQ SECURITY/MARKET DATA ADMISSION; LIVE CLOSED`
+Last updated: 2026-08-07
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Active brief: `docs/context/ACTIVE_BRIEF` → `docs/phase_brief/alpha-organism-vertical-0-brief.md`
 Canonical product maturity: `70/100` (accepted operability, custody, replay only)
@@ -48,43 +48,35 @@ Completed locally:
 - historical Alpha runtime/build sources moved under `docs/archive/legacy_runtime_source/` and release truth converted to receipt integrity;
 - `dashboard.py` reduced to the canonical three-page authority shell;
 - legacy book projection deleted;
-- Rule100 adapter is permanent-ID-only and fails closed on cash/role/identity drift;
+- active AOV permanent identity is Capital IQ Security ID namespaced as `CIQSEC:<id>`; ticker, company `SP_ENTITY_ID`, legacy PERMNO, and dual-provider compatibility fail closed;
 - research evidence is content-hashed, immutable-manifest-bound, named-benchmark-only, finite-cost-only, and schedule-consistent;
 - `research/aov0/` implements the executable contract, vertical cube, Parent, Child, DAG, economic cash, five-arm experiment/seal machinery, and deterministic review core;
-- ZERO-COMPAT scan is exactly zero across all six acceptance counters;
-- AOV local test suite passes `17/17`.
+- ZERO-COMPAT scan is exactly zero across all seven acceptance counters, including the archived/release executable-source import guard;
+- pre-recut AOV local test suite passed `27/27`; after the CIQ identity/source-family recut the AOV suite passes `29/29`; AOV + hardened research selected matrix passes `62/62`.
 
 ## Active blocker — first real prospective seal
 
-`python scripts/aov0_first_seal.py` currently fails closed with `alpha_evidence=0` and `prospective_clock_started=false` because:
-
-Owner decision still required:
-
-- insurance materiality floor;
-- annual insurance-premium ceiling.
-
-Admitted current artifacts still required:
+`python scripts/aov0_first_seal.py` currently fails closed with `financial_alpha_evidence=0` and `prospective_clock_started=false`. Insurance V0 is closed at materiality `0.05` and annual premium ceiling `0.0015`; changing either creates a new contract/model family. Direct official SOFR is already admitted, so the remaining current-file blocker is:
 
 - `data/aov0/current/rule100_targets.parquet`;
 - `data/aov0/current/vertical_primitives.parquet`;
 - `data/aov0/current/total_returns.parquet`;
-- `data/aov0/current/official_sofr.parquet`;
 - `data/aov0/current/decision_cut.json`.
 
-Economic cash itself is no longer open: existing owner authority controls `official SOFR − 25 bp`, ACT/360, no zero floor, known only after publication, and no proxy substitution.
+Economic cash itself is closed: existing owner authority controls `official SOFR − 25 bp`, ACT/360, no zero floor, known only after publication, and no proxy substitution. Equity authority is one destructive S&P Capital IQ Pro family: the hash-bound `run_4.xlsx` object is the frozen 109-company universe plus current-cut fundamentals receipt; `run_2.xlsx` is historical evidence only. The v2 prospective-custody path is locally closed at `61/61 PASS`: cut build and seal-write time are distinct, first execution must equal the frozen next NYSE 09:30 ET core-open bar, Seal #1 binds exact executable bytes/current target vectors, and a fresh Python process must return `FULL_CHAIN_REOPEN_VERIFIED`. Admission still needs real Capital IQ Security/Trading Item IDs plus the completed post-16:00 ET primary-security total-return/price/volume export.
 
 ## Next product sequence
 
 ```text
-owner freezes insurance materiality/premium
-+ admit five current AOV input artifacts
+admit five current AOV input artifacts from S&P Capital IQ Pro CIQ Security ID/fundamental/market-data + direct New York Fed SOFR authority
 → first immutable five-arm prospective seal
 → prospective clock runs
 → finish deterministic review lineage/fixture closure
 → matured ReviewPacket
 → first bounded AI MutationManifest
 → deterministic development run
-→ Safety Parent / Champion / 1–3 Challengers / Negative Control / Sentinel
+→ Safety Parent / Incumbent / Challenger / Negative Control
+→ add more Challengers / Sentinel only when evidence requires them
 → hidden OOS
 → prospective replication
 → limited-live consideration

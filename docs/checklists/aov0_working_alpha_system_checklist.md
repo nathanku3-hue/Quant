@@ -1,6 +1,6 @@
 # AOV-0 Working Alpha System Checklist
 
-Date: 2026-08-06
+Date: 2026-08-07
 Purpose: current executable/evidence truth after Gate-A local freeze and Gate-B hard cut.
 
 Legend: `[x]` locally implemented/proven; `[ ]` open; `OWNER OPEN` needs owner product judgment; `EVIDENCE OPEN` cannot be earned from code alone.
@@ -34,13 +34,13 @@ Legend: `[x]` locally implemented/proven; `[ ]` open; `OWNER OPEN` needs owner p
 - [x] Legacy book projection removed from `gv_portfolio_v0/book.py`.
 - [x] Current dashboard has no legacy provider/optimizer/backtest/replay fallback authority.
 - [x] Rule100 AOV adapter has no ticker/asset fallback.
-- [x] ZERO-COMPAT scan reports zero for all six acceptance counters.
+- [x] ZERO-COMPAT scan reports zero for all seven acceptance counters, including archived/release executable-source imports.
 
 ## C. AOV executable P0 contract
 
 ### C1. Data/time/identity
 
-- [x] Permanent identity = `permno`; missing permanent ID blocks.
+- [x] Permanent active AOV identity = `CIQSEC:<Capital IQ Security ID>`; ticker/company `SP_ENTITY_ID`/legacy PERMNO/un-namespaced identity blocks.
 - [x] PIT universe = date-local Rule100 eligible universe.
 - [x] Required primitive time fields: `valid_at`, `known_at`, `computed_at`, `model_available_at`.
 - [x] Total-return matrix is sole P&L authority.
@@ -72,10 +72,10 @@ Legend: `[x]` locally implemented/proven; `[ ]` open; `OWNER OPEN` needs owner p
 
 - [x] Reversal Hazard classified as bounded risk insurance, not standalone alpha.
 - [x] Primary safety endpoint = Expected Shortfall / CVaR.
-- [ ] `OWNER OPEN` Insurance materiality floor ratio.
-- [ ] `OWNER OPEN` Annual insurance-premium ceiling.
-- [x] Production `DEFAULT_CONTRACT` leaves both owner values unresolved (`None`).
-- [x] Prospective seal and deterministic review classification fail closed while owner values are unresolved.
+- [x] Insurance materiality floor ratio = `0.05`.
+- [x] Annual insurance-premium ceiling = `0.0015`.
+- [x] Production `DEFAULT_CONTRACT` freezes both V0 values; changing either creates a new contract/model family.
+- [x] Prospective seal and deterministic review classification use the exact frozen V0 budget; no result-driven calibration in place.
 
 ### C5. Economic cash
 
@@ -104,7 +104,7 @@ Legend: `[x]` locally implemented/proven; `[ ]` open; `OWNER OPEN` needs owner p
 - [x] Mandatory benchmarks: implicit cash, PIT equal-weight eligible universe, economic cash.
 - [x] Headline benchmark is explicitly named and list/dict order independent.
 - [x] PIT equal-weight changes only on the strategy decision schedule and forward-fills between decisions.
-- [x] Rule100 adapter requires `daily_portfolio`, permanent `permno`, exact duplicate handling, and cash reconciliation.
+- [x] Active AOV Rule100/cube/seal path requires canonical `CIQSEC:` security identity. The historical Rule100 replay adapter remains PERMNO-specific audit/component code but is not active first-seal authority.
 - [x] Evidence output uses immutable run directory plus hash-bound `evidence_manifest.json`.
 
 ## E. Vertical cube / DAG / model mechanics
@@ -122,17 +122,28 @@ Legend: `[x]` locally implemented/proven; `[ ]` open; `OWNER OPEN` needs owner p
 
 ## F. First real five-arm prospective operation
 
-- [x] Prospective seal schema/identity/hashing implemented.
-- [x] Seal exact-reopen and tamper tests implemented.
-- [x] `scripts/aov0_first_seal.py` fail-closes instead of substituting historical/synthetic inputs.
-- [ ] Owner insurance materiality/premium values supplied.
+- [x] Destructive v3 cut/seal/clock identity and hashing implemented; active runtime has no v2/open reader or writer.
+- [x] `scripts/aov0_first_seal.py` fail-closes instead of substituting historical/synthetic inputs and produces a clock-false Seal Candidate only.
+- [x] `decision_cut.json` active schema is `aov0_ciq_decision_cut_v3`; it hash-binds all four Parquet inputs, frozen CIQ contract hash, mechanically recomputed date-local CIQ-security universe hash, four required source receipts/retrieval times/raw hashes, `knowledge_cutoff`, `cut_built_at`, target date, `execution_calendar_id=NYSE_2026_CORE_CLOSE_1600_ET`, and the exact next eligible close `evaluation_start`.
+- [x] First-seal/cut validation rejects input-byte drift, contract/universe drift, missing/invalid/future source receipts, NY Fed retrieval before 15:00 ET, same-day U.S. daily market retrieval before 16:00 ET, post-cut target/return history, future primitive knowledge/SOFR publication, target-date drift, weekend/non-session/wrong-close/legacy-09:30 evaluation, cut build before knowledge, evaluation<=cut, and actual seal write at/after evaluation start.
+- [x] Seal v3 binds current target-vector hashes plus serialized target vectors, `evaluation_start`, return-interval policy, maturity from evaluation start + 30 calendar days, and `aov0_executable_byte_manifest_v1`; it cannot claim clock start.
+- [x] Fresh child-process full-chain verification emits a bound immutable proof; only a separate `aov0_prospective_clock_start_receipt_v1` may set clock authority.
+- [x] Owner insurance materiality/premium values supplied and frozen at `0.05 / 0.0015`.
+- [x] `run_4.xlsx` is the single frozen 109-company universe + current-cut quarterly-fundamentals receipt, SHA-256 `17f356e47c9e3ecf9600ad21db153338f4941272e0a1ffb9fd7b872c6636f056`; `run_2.xlsx` is historical evidence only and not an active cut dependency.
+- [x] Local primary-security/market admission path implemented: unique `CIQSEC:` + Trading Item identity, explicit exclusion rather than fallback, factor coverage gate, 200-day market warmup, ADV20/realized-vol/SMA20/SMA200 technical state, product/AOV Rule100 v1 `0.35` max-weight path, current-only Rule100 target/return emission, atomic source/output receipts, same-day U.S. daily-bar retrieval at/after 16:00 ET, and future-timestamp rejection.
+- [x] Direct NY Fed SOFR intake implemented with hard pre-network 15:00 ET gate; direct raw bytes + actual retrieval time + raw hash are required.
+- [x] Decision-cut builder implemented and parsed by the real first-seal validator; it consumes only the four active source receipts and has no legacy screen-retrieval parameter; target-date Rule100/return/primitive asset sets must match and primitive `total_return` must equal the P&L return matrix; first-seal admission independently rechecks that equality.
+- [x] Synthetic current-cut CIQ→SOFR→v3 decision-cut package passes Seal Candidate + fresh-process `FULL_CHAIN_REOPEN_VERIFIED` proof + separate immutable Clock-Start Receipt with `financial_alpha_evidence=0`.
+- [x] Mandatory adversarial v3 gate passes: bound market byte flip, +1bp serialized target mutation, Security-ID/ticker mutation, SOFR substitution, same-process promotion denial, calendar/timing mutation, pre-evaluation return interval, early maturity, and pre-receipt/pre-evaluation/pre-maturity authority unavailability.
+- [ ] Real Capital IQ Security/Trading Item IDs + same-cut primary-security daily total-return/price/volume bytes are admitted with actual retrieval timestamps; for the current U.S. same-day target the daily market export must be retrieved at/after 16:00 ET. No real 109-name master/market exports are currently present.
 - [ ] `data/aov0/current/rule100_targets.parquet` admitted.
 - [ ] `data/aov0/current/vertical_primitives.parquet` admitted.
 - [ ] `data/aov0/current/total_returns.parquet` admitted.
-- [ ] `data/aov0/current/official_sofr.parquet` admitted.
+- [x] `data/aov0/current/official_sofr.parquet` admitted directly from NY Fed after the real 15:00 ET gate.
 - [ ] `data/aov0/current/decision_cut.json` admitted.
-- [ ] First real same-cut five-arm prospective seal written.
-- [ ] Exact real seal reopened.
+- [ ] First real same-cut five-arm v3 Seal Candidate written.
+- [ ] Exact real seal verified in a fresh process and verification proof retained.
+- [ ] Immutable real Clock-Start Receipt issued.
 - [ ] Recurring weekly prospective attempts started.
 - [x] `EVIDENCE OPEN` Alpha evidence remains `0` before mature outcome opening.
 
@@ -163,13 +174,13 @@ Legend: `[x]` locally implemented/proven; `[ ]` open; `OWNER OPEN` needs owner p
 
 ## I. Model portfolio direction
 
-Not a prerequisite for first seal. After matured review evidence:
+Not a prerequisite for first seal. As soon as the first evidence-backed mutation exists, establish the minimal structural roles:
 
 - [ ] Safety Parent.
-- [ ] Champion.
-- [ ] 1–3 Challengers.
+- [ ] Incumbent.
+- [ ] Challenger.
 - [ ] Negative Control.
-- [ ] Sentinel.
+- [ ] Additional Challengers / Sentinel only when real evidence creates the need.
 
 ## J. Evidence ladder
 
@@ -198,20 +209,22 @@ Not a prerequisite for first seal. After matured review evidence:
 ## Validation snapshot
 
 - Gate-A exact `39f7be3`: `115/115 PASS`.
-- AOV: `17/17 PASS`.
-- Hardened research: `33/33 PASS`.
+- AOV: `75/75 PASS` including current-cut CIQ Security/market admission + SOFR/v3 cut tooling + Seal Candidate/fresh-process proof/Clock-Start Receipt promotion + adversarial authority suite; prior v2 mechanics remain historical evidence only.
+- Hardened research selected suite: `33/33 PASS`.
 - Current dashboard/book/historical receipt: `33/33 PASS`.
 - Hard-cut Episode-2 regression: `107/107 PASS`.
 - Historical Alpha ship-runtime live checkout: `7/7 PASS`.
-- ZERO-COMPAT: all six counts `0`.
+- ZERO-COMPAT: all seven counts `0`.
 - Compile, YAML parse, `pip check`, `git diff --check`: PASS.
 
 ## Fastest critical path
 
 ```text
-OWNER: freeze insurance materiality + premium ceiling
-+ DATA: admit five current AOV artifacts
-→ FIRST REAL IMMUTABLE FIVE-ARM SEAL
+DATA: admit real CIQ Security/Trading Item mapping + completed post-close market bytes; direct New York Fed SOFR is already admitted
+→ build real decision_cut_v3
+→ FIRST REAL IMMUTABLE FIVE-ARM SEAL CANDIDATE
+→ fresh-process verification proof
+→ immutable Clock-Start Receipt
 → clock runs
 → finish review lineage/fixture closure
 → matured ReviewPacket

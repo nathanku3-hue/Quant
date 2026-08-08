@@ -51,6 +51,8 @@ def test_review_classifies_material_insurance_help() -> None:
     assert packet["status"] == "HAZARD_HELPED_THIS_EPISODE"
     assert packet["accounting"]["status"] == "PASS"
     assert packet["mutation_authority"] == "NONE_SINGLE_EPISODE_CANNOT_TRIGGER_STRUCTURAL_MUTATION"
+    assert packet["financial_alpha_evidence"] == 0
+    assert "alpha_evidence" not in packet
     verify_review_packet(packet)
 
 

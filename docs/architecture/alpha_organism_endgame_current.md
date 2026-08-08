@@ -1,7 +1,7 @@
 # GodView Alpha-Organism Endgame — Current
 
-Date: 2026-08-06
-Status: `MECHANICAL AOV LOCAL; FIRST REAL PROSPECTIVE SEAL BLOCKED; ALPHA EVIDENCE 0`
+Date: 2026-08-07
+Status: `CIQ-AUTHORITY AOV LOCAL; FIRST REAL PROSPECTIVE SEAL BLOCKED CIQ SECURITY/MARKET DATA; ALPHA EVIDENCE 0`
 Canonical product maturity: `70/100` (accepted operability/custody/replay only)
 Portfolio-alpha evidence: `0`
 Limited Live: `CLOSED`
@@ -44,13 +44,13 @@ Rule100 is a degenerate control/regression fixture. Reversal Hazard is risk insu
 
 ## Current executable planes
 
-1. **Truth** — permanent `permno`, PIT times, total-return authority, official cash source.
+1. **Truth** — permanent `CIQSEC:<Capital IQ Security ID>` active security identity, PIT times, S&P Capital IQ Pro primary-security total-return authority, official cash source.
 2. **Interpretation** — deterministic AOV cube transforms.
 3. **Theory** — frozen contract + one mutation manifest.
 4. **Experiment** — hardened canonical runner, named benchmarks, hash DAG, immutable evidence manifest, seal schema.
 5. **Review** — deterministic gross/cost/net reconciliation and CVaR insurance classification core.
 6. **Policy** — Rule100 budget/cap/schedule/cash semantics preserved; Parent/Child deterministic.
-7. **Governance** — owner-open insurance budget fails closed; no compatibility aliases.
+7. **Governance** — insurance V0 is frozen at `0.05 / 0.0015`; any change creates a new contract/model family; no compatibility aliases.
 
 ## Hard-cut law
 
@@ -60,7 +60,7 @@ Current AOV authority has:
 
 - one root launcher/application (`launch.py` → `dashboard.py`);
 - one engine (`core.engine.run_simulation` through the canonical research runner);
-- one permanent-ID contract (`permno`);
+- one permanent-ID contract (`CIQSEC:<Capital IQ Security ID>`); company `SP_ENTITY_ID`, ticker, legacy PERMNO, and dual-provider aliases are invalid;
 - one P&L return authority;
 - one named benchmark policy;
 - one immutable evidence-manifest policy;
@@ -101,25 +101,25 @@ Frozen defaults/authority include:
 
 - `F_proxy = robust_z(sign(return) × min(abs(return)/realized_vol,3) × dollar_volume/ADV20)`;
 - `C_proxy = EWMA20(abs(F_proxy))`;
-- date-local Rule100 universe, permanent `permno` identity;
+- date-local Rule100 universe, permanent `CIQSEC:<Capital IQ Security ID>` identity;
 - Rule100 budget/cap/schedule/residual-cash inheritance;
 - one frozen V0 engineering configuration;
-- PIT total-return matrix only; corporate actions reconciliation-only;
+- S&P Capital IQ Pro primary-security total-return matrix only; corporate actions reconciliation-only;
 - one-bar execution, weekly attempts, fixed 30-calendar-day horizon;
 - paired weekly dependence-aware inference;
 - economic cash from existing owner authority: official SOFR − 25 bp, ACT/360, no zero floor, after publication only, no proxy substitution;
 - insurance primary endpoint = Expected Shortfall/CVaR.
 
-Owner-open production values:
+Frozen production insurance V0:
 
-- insurance materiality floor ratio;
-- annual insurance-premium ceiling.
+- insurance materiality floor ratio = `0.05`;
+- annual insurance-premium ceiling = `0.0015`.
 
-The production contract leaves these as `None`; prospective sealing/review classification refuses to proceed until they are supplied.
+These values require at least 5% relative CVaR/Expected-Shortfall improvement and allow at most 15 bp/year expected net-return sacrifice. Subsequent outcomes cannot calibrate them in place.
 
 ## First real seal blocker
 
-The real seal entrypoint requires the owner insurance values plus:
+The real seal entrypoint now requires only:
 
 ```text
 data/aov0/current/rule100_targets.parquet
@@ -129,7 +129,9 @@ data/aov0/current/official_sofr.parquet
 data/aov0/current/decision_cut.json
 ```
 
-No current admitted permanent-ID Rule100 package or official-SOFR package exists at those paths. Existing historical equal-weight data is not Rule100 authority and cannot be relabeled. Provider access was not authorized, so no data was fetched or substituted.
+No current admitted CIQ-security Rule100 package or official-SOFR package exists at those paths. Existing historical equal-weight data is not Rule100 authority and cannot be relabeled. The earlier CRSP/PERMNO admission plan is superseded for active AOV because the available WRDS account lacks CRSP entitlement. Approved equity authority is one destructive S&P Capital IQ Pro family: one hash-bound `run_4.xlsx` object for the frozen 109-company universe + quarterly Rule100 fundamentals, plus primary-security master + primary-security market/total-return data, with canonical `CIQSEC:<id>` identity. Direct Federal Reserve Bank of New York SOFR retrieval after 15:00 America/New_York remains unchanged; WRDS-mirrored SOFR is not official cash authority. `run_2.xlsx` is historical evidence only. `run_4.xlsx` is the bounded current-cut company-universe/fundamental leg: 1,203 absolute `FQqYYYY` entity-quarter rows and 109 current factor states with canonical Rule100 V1.1 `factor_positive_count`; relative `FQ0` is excluded and all values are conservatively known only at local admission because complete historical publication timestamps are absent. This does not create `CIQSEC:` identity or historical PIT replay authority. Primary-security master/market history is still required for canonical identity, `technical_quality`, final Rule100 targets, AOV primitives, and total returns.
+
+The seal slice hard-binds the prospective cut: `aov0_ciq_decision_cut_v1` must carry SHA-256 for the four Parquets, frozen CIQ contract hash, mechanically recomputed date-local CIQ-security universe hash, and four raw-source receipts/retrieval times for `SPCIQPRO:QUARTERLY_FUNDAMENTALS` (dual-role `run_4` universe/fundamentals), `SPCIQPRO:PRIMARY_SECURITY_MASTER`, `SPCIQPRO:PRIMARY_SECURITY_MARKET_DATA`, and direct NY Fed SOFR, plus knowledge cutoff, decision target date, seal timestamp, and first eligible execution bar. NY Fed retrieval before 15:00 America/New_York is invalid. The entrypoint re-hashes before and after experiment execution, rejects unnamespaced/non-CIQ identity and post-cut/future data or receipt drift, and the seal records the current target-vector hash for all five arms in addition to whole-history DAG hashes.
 
 ## Alpha evidence ladder
 
@@ -159,17 +161,16 @@ Do not wait for broad governance infrastructure first.
 
 ## Model portfolio direction
 
-After real review evidence begins accumulating, research capital shifts from one serial Parent→Child chain toward:
+As soon as the first evidence-backed mutation exists, research capital leaves the single serial Parent→Child abstraction and establishes the minimum structural roles:
 
 ```text
 Safety Parent
-Champion
-1–3 Challengers
+Incumbent
+Challenger
 Negative Control
-Sentinel
 ```
 
-The durable endgame is allocation of research/prospective budget across organisms, not repeated wholesale replacement of one model.
+Additional Challengers and Sentinel are added only when real evidence creates a decision need. The durable endgame is allocation of research/prospective budget across organisms, not repeated wholesale replacement of one model or premature model-governance platformization.
 
 ## Deferred / forbidden before first seal
 

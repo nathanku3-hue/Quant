@@ -1,7 +1,7 @@
 # Post-Phase Alignment — Current
 
-Date: 2026-08-06
-Status: `GATE-A LOCAL COMPLETE; GATE-B MECHANICAL LOCAL; FIRST REAL SEAL BLOCKED`
+Date: 2026-08-07
+Status: `GATE-A LOCAL COMPLETE; GATE-B CIQ AUTHORITY RECUT LOCAL; FIRST REAL SEAL BLOCKED CIQ SECURITY/MARKET DATA`
 
 ## Preserved
 
@@ -36,8 +36,8 @@ ZERO-COMPAT acceptance is now machine checked.
 
 ### Real seal — active blocker
 
-- owner insurance materiality floor;
-- owner annual premium ceiling;
+- insurance V0 owner decision is closed at materiality `0.05` and annual premium ceiling `0.0015`;
+- canonical Capital IQ Security IDs and same-cut primary-security market data for the frozen 109-company candidate screen;
 - admitted current Rule100 targets;
 - admitted current vertical primitives;
 - admitted current total returns;
@@ -60,4 +60,4 @@ Provider breadth, AOV-2/event state, hidden-OOS platform breadth, search-debt au
 
 ## Next alignment
 
-Close the owner + data-admission blocker and write the first real immutable five-arm seal. Do not reopen compatibility or architecture expansion to avoid that decision.
+Close the CIQ security-identity/market-data admission blocker and write the first real immutable five-arm seal. The CRSP/PERMNO active route is superseded because entitlement is unavailable; do not restore it as compatibility, reopen insurance methodology, or broaden architecture to avoid the CIQ admission task.

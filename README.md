@@ -1,7 +1,7 @@
 # Terminal Zero / GodView Certified Portfolio OS
 
-Status: `E2 LOCAL FREEZE COMPLETE; AOV-0 MECHANICAL VERTICAL LOCAL; FIRST REAL SEAL BLOCKED; LIVE CLOSED`
-Date: 2026-08-06
+Status: `E2 LOCAL FREEZE COMPLETE; AOV-0 CIQ AUTHORITY RECUT LOCAL; FIRST REAL SEAL BLOCKED CIQ SECURITY/MARKET DATA; LIVE CLOSED`
+Date: 2026-08-07
 Published main / terminal tip: `9af5259d49969ba00db1fb3f4b3323ffb1d49205`
 Episode-1 release-ready tip: `ab258c3b0f1e734a1d0c9d4d8c7f529dfb2e0cbb`
 Episode-2 local immutable candidate: `39f7be3894623c095994066b8f0ea2895b968643`
@@ -53,7 +53,7 @@ Local executable tip `dca69fc` implements the hard-cut AOV path:
 - historical Alpha release preserved as frozen receipt, not a current-root rebuild contract;
 - `dashboard.py` reduced to one canonical authority shell;
 - no legacy book projection;
-- permanent-ID-only Rule100 adapter;
+- active AOV identity = Capital IQ Security ID namespaced `CIQSEC:<id>`; no ticker, company-entity, PERMNO, or dual-provider fallback;
 - immutable content-hash research evidence manifest;
 - named mandatory benchmark contracts;
 - PIT equal weight matched to strategy decision schedule;
@@ -62,17 +62,17 @@ Local executable tip `dca69fc` implements the hard-cut AOV path:
 - deterministic Rule100 control, Parent, one risk-reducing Child, and hash DAG;
 - five-arm experiment/seal mechanism;
 - deterministic Parent–Child review core;
-- ZERO-COMPAT acceptance scan = zero on all six counters.
+- ZERO-COMPAT acceptance scan = zero on all seven counters.
 
-The AOV test suite passes `17/17`; hardened research, dashboard/book/receipt, and Episode-2 regression suites also pass locally.
+After the CIQ authority recut, the AOV test suite passes `29/29`; AOV + hardened research selected matrix passes `62/62`. Dashboard/book/receipt and Episode-2 regression evidence remain banked from the prior hard-cut round.
 
 ## Executable P0 status
 
 Frozen in code:
 
-- permanent ID = `permno`;
+- permanent ID = S&P Capital IQ Security ID, canonical `CIQSEC:<id>`;
 - date-local Rule100 eligible universe;
-- PIT total-return matrix is sole P&L authority;
+- S&P Capital IQ Pro primary-security total-return matrix is sole risky-asset P&L authority;
 - corporate actions are reconciliation-only;
 - `F_proxy = robust_z(sign(return) × min(abs(return)/realized_vol,3) × dollar_volume/ADV20)`;
 - `C_proxy = EWMA20(abs(F_proxy))`;
@@ -83,16 +83,18 @@ Frozen in code:
 - economic cash follows the pre-existing owner mandate: official SOFR minus 25 bp, ACT/360, no zero floor, only after publication, no proxy substitution;
 - insurance endpoint = CVaR/Expected Shortfall.
 
-Still owner-open and deliberately `None` in the production contract:
+Frozen production insurance V0:
 
-- insurance materiality floor;
-- annual insurance-premium ceiling.
+- insurance materiality floor = `0.05`;
+- annual insurance-premium ceiling = `0.0015`.
+
+Changing either creates a new contract/model family; subsequent results do not calibrate V0 in place.
 
 ## First real seal blocker
 
-`python scripts/aov0_first_seal.py` currently returns `BLOCKED_OWNER_DECISION_AND_ADMITTED_INPUTS`, `prospective_clock_started=false`, `alpha_evidence=0`.
+`python scripts/aov0_first_seal.py` currently returns `BLOCKED_MISSING_ADMITTED_INPUTS`, `prospective_clock_started=false`, `financial_alpha_evidence=0`.
 
-It requires the two insurance owner values plus these admitted current artifacts:
+It now requires only these admitted current artifacts:
 
 ```text
 data/aov0/current/rule100_targets.parquet
@@ -102,7 +104,7 @@ data/aov0/current/official_sofr.parquet
 data/aov0/current/decision_cut.json
 ```
 
-The repository has historical canonical data, but no current admitted permanent-ID Rule100 target package and no admitted current official-SOFR package for this seal. Provider access was not authorized, so no substitute was fetched or invented.
+The active AOV equity authority was destructively recut on 2026-08-07 because the available WRDS account has no CRSP entitlement. There is no active CRSP/PERMNO fallback. S&P Capital IQ Pro now owns one hash-bound `run_4.xlsx` object for both the frozen 109-company universe and quarterly Rule100 fundamentals, plus primary-security identity and primary-security total-return inputs; direct Federal Reserve Bank of New York SOFR remains the cash authority and is already admitted after the 15:00 America/New_York gate. `run_2.xlsx` is historical evidence only and is not an active cut dependency. `aov0_ciq_decision_cut_v2` binds the four active source receipts—run4 fundamentals/universe, security master, market data, and direct NY Fed SOFR—plus all four Parquet hashes, frozen contract/universe identities, `cut_built_at`, and the exact frozen NYSE next-core-open execution bar. Seal #1 independently stamps its real `sealed_at`, binds the exact executable-byte manifest and five serialized target vectors, and must pass a separate-process full-chain reopen before the prospective clock starts. Canonical Rule100 V1 still requires PIT-derived `factor_positive_count` and `technical_quality`; the primary-security master/market leg remains mandatory.
 
 ## North star
 
@@ -115,7 +117,7 @@ ReviewPacket
 → development run
 ```
 
-The model portfolio then grows toward Safety Parent, Champion, 1–3 Challengers, Negative Control, and Sentinel.
+The model portfolio first establishes Safety Parent, Incumbent, Challenger, and Negative Control; additional Challengers and Sentinel are added only when evidence creates the need.
 
 ## Claims and forbidden scope
 

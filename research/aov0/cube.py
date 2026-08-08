@@ -9,13 +9,18 @@ import numpy as np
 import pandas as pd
 
 from core.gv_fs0_canonical import domain_hash
-from research.aov0.contracts import AOV0Contract, DEFAULT_CONTRACT, validate_contract
+from research.aov0.contracts import (
+    AOV0Contract,
+    DEFAULT_CONTRACT,
+    normalize_security_id,
+    validate_contract,
+)
 
 
 CUBE_SCHEMA = "vertical_cube_slice_v0"
 REQUIRED_COLUMNS = (
     "date",
-    "permno",
+    "security_id",
     "valid_at",
     "known_at",
     "total_return",
@@ -63,14 +68,12 @@ def build_vertical_cube(
     else:
         computed_ts = computed_ts.tz_convert("UTC")
 
-    permno = pd.to_numeric(working["permno"], errors="coerce")
-    if permno.isna().any() or not np.isfinite(permno.to_numpy(dtype=float)).all():
-        raise ValueError("aov0_cube_permno_required")
-    if not np.allclose(permno.to_numpy(dtype=float), np.round(permno.to_numpy(dtype=float))):
-        raise ValueError("aov0_cube_permno_integer_required")
-    working["permno"] = permno.astype("int64")
-    if working.duplicated(["date", "permno"]).any():
-        raise ValueError("aov0_cube_duplicate_date_permno")
+    try:
+        working["security_id"] = working["security_id"].map(normalize_security_id)
+    except ValueError as exc:
+        raise ValueError("aov0_cube_ciq_security_id_required") from exc
+    if working.duplicated(["date", "security_id"]).any():
+        raise ValueError("aov0_cube_duplicate_date_security_id")
 
     numeric_columns = (
         "total_return",
@@ -115,9 +118,9 @@ def build_vertical_cube(
         .transform(_robust_z)
         .clip(-8.0, 8.0)
     )
-    working = working.sort_values(["permno", "date"]).reset_index(drop=True)
+    working = working.sort_values(["security_id", "date"]).reset_index(drop=True)
     working["C_proxy"] = (
-        working.groupby("permno", sort=False)["F_proxy"]
+        working.groupby("security_id", sort=False)["F_proxy"]
         .transform(lambda values: values.abs().ewm(span=20, adjust=False, min_periods=1).mean())
     )
     working["Q"] = working["quality"].clip(-3.0, 3.0) / 3.0
@@ -144,7 +147,7 @@ def build_vertical_cube(
     working["contract_hash"] = contract.contract_hash
     output_columns = [
         "date",
-        "permno",
+        "security_id",
         "valid_at",
         "known_at",
         "computed_at",
@@ -160,7 +163,7 @@ def build_vertical_cube(
         "formula_hash",
         "contract_hash",
     ]
-    output = working[output_columns].sort_values(["date", "permno"]).reset_index(drop=True)
+    output = working[output_columns].sort_values(["date", "security_id"]).reset_index(drop=True)
     cube_hash = _frame_sha256(output)
     return VerticalCube(
         frame=output,

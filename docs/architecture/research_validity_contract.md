@@ -2,7 +2,23 @@
 
 Date: 2026-05-26
 Scope: Terminal Zero / Quant research, replay, backtest, optimizer, candidate-card, and dashboard promotion boundaries.
-Status: `CANONICAL RESEARCH SPINE HARDENED LOCALLY; AOV MECHANICS GREEN; REAL SEAL INPUT/OWNER AUTHORITY OPEN`
+Status: `CANONICAL RESEARCH SPINE HARDENED LOCALLY; AOV CIQ AUTHORITY RECUT GREEN; REAL SEAL DATA ADMISSION OPEN`
+
+## 2026-08-07 AOV-0 Capital IQ Authority Addendum
+
+This addendum supersedes the **active AOV identity/source clauses only** in the 2026-08-06 addendum below. The available WRDS account lacks CRSP entitlement, and the owner explicitly authorized a destructive source-family recut rather than a compatibility bridge.
+
+Current AOV research-validity law therefore requires:
+
+- permanent active AOV security identity = `CIQSEC:<Capital IQ Security ID>`; company `SP_ENTITY_ID`, ticker, legacy PERMNO, and unnamespaced IDs are invalid active aliases;
+- candidate universe source = `SPCIQPRO:COMPANIES_SCREENER_RESULT`;
+- Rule100 PIT fundamental source = `SPCIQPRO:QUARTERLY_FUNDAMENTALS`;
+- risky-asset return authority = `SPCIQPRO:PRIMARY_SECURITY_MARKET_DATA` under one primary-security identity map;
+- canonical Rule100 V1 scores remain derived, not hand-entered: runtime requires `factor_positive_count` and `technical_quality`; the three-year revenue screen alone is not a Rule100 score source;
+- direct New York Fed SOFR remains the economic-cash source, with the existing after-15:00 America/New_York retrieval gate;
+- `aov0_ciq_decision_cut_v1` must bind screen-result, quarterly-fundamental, security-master, market-data, and NY Fed raw-source receipts plus the four derived Parquet hashes, contract hash, CIQ-security universe hash, and cut chronology.
+
+The historical PERMNO-specific Rule100 replay adapter may remain for audit/component history but is not active AOV first-seal authority. No dual CRSP/CIQ compatibility path is permitted.
 
 ## 2026-08-06 AOV-0 Hard-Cut Research Validity Addendum
 

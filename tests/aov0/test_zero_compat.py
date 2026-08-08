@@ -11,4 +11,5 @@ def test_aov_zero_compat_scan_is_all_zero() -> None:
         "aov_transitional_authority_fallback_count": 0,
         "mutable_evidence_manifest_bypass_count": 0,
         "unnamed_benchmark_selection_count": 0,
+        "archived_executable_source_import_count": 0,
     }

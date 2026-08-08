@@ -8,7 +8,12 @@ import numpy as np
 import pandas as pd
 
 from core.gv_fs0_canonical import domain_hash
-from research.aov0.contracts import AOV0Contract, DEFAULT_CONTRACT, validate_contract
+from research.aov0.contracts import (
+    AOV0Contract,
+    DEFAULT_CONTRACT,
+    normalize_security_id,
+    validate_contract,
+)
 from research.aov0.cube import VerticalCube
 
 
@@ -40,11 +45,15 @@ def normalize_rule100_control(target_weights: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("aov0_rule100_control_missing")
     out = target_weights.copy().astype(float)
     try:
-        columns = pd.Index([int(column) for column in out.columns], dtype="int64", name="permno")
-    except (TypeError, ValueError) as exc:
-        raise ValueError("aov0_rule100_permno_columns_required") from exc
+        columns = pd.Index(
+            [normalize_security_id(column) for column in out.columns],
+            dtype="object",
+            name="security_id",
+        )
+    except ValueError as exc:
+        raise ValueError("aov0_rule100_ciq_security_id_columns_required") from exc
     if len(set(columns)) != len(columns):
-        raise ValueError("aov0_rule100_duplicate_permno_columns")
+        raise ValueError("aov0_rule100_duplicate_security_id_columns")
     out.columns = columns
     out.index = pd.DatetimeIndex(pd.to_datetime(out.index)).normalize()
     if not out.index.is_monotonic_increasing or not out.index.is_unique:
@@ -140,7 +149,7 @@ def _aligned_state(weights: pd.DataFrame, cube: VerticalCube) -> dict[str, pd.Da
     frame["date"] = pd.DatetimeIndex(pd.to_datetime(frame["date"])).normalize()
     result: dict[str, pd.DataFrame] = {}
     for column in ("Q", "M", "F_proxy", "C_proxy", "L", "R", "U"):
-        pivot = frame.pivot(index="date", columns="permno", values=column)
+        pivot = frame.pivot(index="date", columns="security_id", values=column)
         pivot = pivot.reindex(index=weights.index, columns=weights.columns)
         if pivot.isna().any().any():
             raise ValueError(f"aov0_cube_state_missing:{column}")

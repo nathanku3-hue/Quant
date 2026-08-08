@@ -18,6 +18,7 @@ from research.aov0.policy import (
     assert_rule100_equivalence,
     build_child_weights,
     build_parent_weights,
+    normalize_rule100_control,
 )
 
 
@@ -26,16 +27,21 @@ COMPUTED_AT = "2026-08-06T18:00:00Z"
 
 def test_frozen_contract_closes_p0_defaults() -> None:
     validate_contract(DEFAULT_CONTRACT)
-    assert DEFAULT_CONTRACT.permanent_id_type == "permno"
+    assert DEFAULT_CONTRACT.permanent_id_type == "ciq_security_id"
+    assert DEFAULT_CONTRACT.identity_column == "security_id"
+    assert DEFAULT_CONTRACT.security_id_namespace == "CIQSEC"
     assert DEFAULT_CONTRACT.universe_rule == "RULE100_DATE_LOCAL_ELIGIBLE_UNIVERSE"
-    assert DEFAULT_CONTRACT.total_return_authority == "PIT_TOTAL_RETURN_MATRIX_ONLY"
+    assert DEFAULT_CONTRACT.equity_data_authority == "SPCIQPRO"
+    assert DEFAULT_CONTRACT.fundamental_source == "SPCIQPRO_QUARTERLY_FUNDAMENTALS"
+    assert DEFAULT_CONTRACT.security_master_source == "SPCIQPRO_PRIMARY_SECURITY_MASTER"
+    assert DEFAULT_CONTRACT.market_data_source == "SPCIQPRO_PRIMARY_SECURITY_MARKET_DATA"
+    assert DEFAULT_CONTRACT.total_return_authority == "SPCIQPRO_PRIMARY_SECURITY_TOTAL_RETURN_MATRIX_ONLY"
     assert DEFAULT_CONTRACT.f_proxy_formula.startswith("robust_z(")
     assert DEFAULT_CONTRACT.c_proxy_formula == "ewma20(abs(F_proxy))"
     assert DEFAULT_CONTRACT.cvar_level == 0.95
-    assert DEFAULT_CONTRACT.insurance_materiality_floor_ratio is None
-    assert DEFAULT_CONTRACT.insurance_premium_ceiling_annual_return is None
-    with pytest.raises(ValueError, match="owner_insurance_decisions_required"):
-        validate_prospective_contract(DEFAULT_CONTRACT)
+    assert DEFAULT_CONTRACT.insurance_materiality_floor_ratio == 0.05
+    assert DEFAULT_CONTRACT.insurance_premium_ceiling_annual_return == 0.0015
+    validate_prospective_contract(DEFAULT_CONTRACT)
     assert DEFAULT_CONTRACT.economic_cash_source == "OFFICIAL_SOFR"
     assert DEFAULT_CONTRACT.economic_cash_quote_convention == "SOFR_PERCENT_MINUS_25BP_ACT_360_SIMPLE_ACCRUAL"
     assert DEFAULT_CONTRACT.sleeve_horizon_calendar_days == 30
@@ -66,9 +72,23 @@ def test_cube_rejects_future_knowledge_and_missing_permanent_id(aov_primitives: 
         build_vertical_cube(future, computed_at=COMPUTED_AT)
 
     missing_id = aov_primitives.copy()
-    missing_id.loc[0, "permno"] = None
-    with pytest.raises(ValueError, match="aov0_cube_permno_required"):
+    missing_id.loc[0, "security_id"] = None
+    with pytest.raises(ValueError, match="aov0_cube_ciq_security_id_required"):
         build_vertical_cube(missing_id, computed_at=COMPUTED_AT)
+
+
+def test_active_identity_contract_rejects_legacy_permno_and_unnamespaced_columns(
+    aov_primitives: pd.DataFrame,
+    rule100_weights: pd.DataFrame,
+) -> None:
+    legacy_primitives = aov_primitives.rename(columns={"security_id": "permno"})
+    with pytest.raises(ValueError, match="aov0_cube_missing_columns:security_id"):
+        build_vertical_cube(legacy_primitives, computed_at=COMPUTED_AT)
+
+    legacy_weights = rule100_weights.copy()
+    legacy_weights.columns = [101, 202]
+    with pytest.raises(ValueError, match="aov0_rule100_ciq_security_id_columns_required"):
+        normalize_rule100_control(legacy_weights)
 
 
 def test_rule100_parent_child_preserve_budget_and_child_only_reduces_risk(aov_primitives, rule100_weights) -> None:
