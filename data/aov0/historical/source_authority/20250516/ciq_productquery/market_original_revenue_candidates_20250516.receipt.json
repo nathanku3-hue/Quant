@@ -1,0 +1,110 @@
+{
+  "schema_version": "aov0_ciq_historical_market_original_revenue_candidate_receipt_v1",
+  "source_id": "SPCIQPRO:SECURITIES_PRODUCTQUERY+COMPANIES_PRODUCTQUERY",
+  "capture_scope": "HISTORICAL_MARKET_ORIGINAL_REVENUE_CANDIDATES_ONLY_NOT_A1_RISK_SET",
+  "captured_at_utc": "2026-08-09T18:15:19.0620396+00:00",
+  "as_of_date": "2025-05-16",
+  "screen_law_hash": "81e8cba8ebbda5de695d87ab321d15ebc3cf3f1c1158d3c94633dee7a3b78381",
+  "run_4_current_cut_baseline": {
+    "path": "../../../../../../../run_4.xlsx",
+    "sha256": "17f356e47c9e3ecf9600ad21db153338f4941272e0a1ffb9fd7b872c6636f056",
+    "frozen_result_count": 109,
+    "authority_role": "CURRENT_CUT_BASELINE_ONLY_NOT_HISTORICAL_A1_AUTHORITY"
+  },
+  "run_2_authority_role": "DIAGNOSTIC_OLDER_SCREEN_EXPORT_ONLY",
+  "market_component": {
+    "source_id": "SPCIQPRO:SECURITIES_PRODUCTQUERY",
+    "market_perspective": "321247",
+    "historical_market_date_mechanically_bound": true,
+    "price_field_key": "324251",
+    "price_field_alias": "SPT_PRICE_CLOSE",
+    "price_date_secondary_key": "sk_557",
+    "price_date_value": "05/16/2025",
+    "price_predicate": "NotNa",
+    "exchange_group_field_key": "406718",
+    "exchange_group_value": "-1,-4",
+    "funding_type_field_key": "321268",
+    "funding_type_values": ["1", "16"],
+    "source_security_row_count": 5394,
+    "source_entity_count": 5329,
+    "current_company_state_filters_used": false,
+    "major_us_exchange_group_parity": {
+      "as_of_date": "2025-05-16",
+      "exact_match": true,
+      "group_security_row_count": 5394,
+      "explicit_union_security_row_count": 5394,
+      "group_only_count": 0,
+      "explicit_only_count": 0,
+      "explicit_exchange_codes": {
+        "NYSE": "0",
+        "NYSEAM": "1",
+        "NASDAQGM": "2",
+        "NASDAQCM": "211",
+        "NASDAQGS": "212"
+      },
+      "excluded_arca_code": "33",
+      "arca_inclusive_security_row_count": 5402
+    }
+  },
+  "revenue_component": {
+    "source_id": "SPCIQPRO:COMPANIES_PRODUCTQUERY",
+    "companies_perspective": "266637",
+    "field_key": "329288",
+    "field_alias": "IQ_TOTAL_REV",
+    "filing_version": "Original",
+    "reporting_basis": "Originally Reported",
+    "historical_as_of_mechanically_bound": true,
+    "as_of_secondary_key": "sk_860",
+    "as_of_value": "05/16/2025",
+    "period_secondary_key": "sk_854",
+    "periods": ["FY0", "FY-1", "FY-2", "FY-3"],
+    "provider_generated_token_example": "{IQ_TOTAL_REV(FY0|Originally Reported|05/16/2025|0)}",
+    "growth_multiplier": 1.3,
+    "validated_formulas": [
+      "{IQ_TOTAL_REV(FY0|Originally Reported|05/16/2025|0)} >= {IQ_TOTAL_REV(FY-1|Originally Reported|05/16/2025|0)} * 1.3",
+      "{IQ_TOTAL_REV(FY-1|Originally Reported|05/16/2025|0)} >= {IQ_TOTAL_REV(FY-2|Originally Reported|05/16/2025|0)} * 1.3",
+      "{IQ_TOTAL_REV(FY-2|Originally Reported|05/16/2025|0)} >= {IQ_TOTAL_REV(FY-3|Originally Reported|05/16/2025|0)} * 1.3"
+    ],
+    "provider_formula_validation_passed": true,
+    "global_revenue_growth_result_count": 4381
+  },
+  "intersection": {
+    "candidate_csv_name": "market_original_revenue_candidates_20250516.csv",
+    "candidate_csv_sha256": "02a7daa757cfbaeae6cf37e70509e787f4705d54f9bd2d234074e5ee61b946ae",
+    "candidate_csv_bytes": 4547,
+    "candidate_count": 104,
+    "candidate_entity_membership_sha256": "de5c7c83a87a7e8af1cdb54ac792bd91e95ee8edf69facd4c2a13c9be679f751"
+  },
+  "historical_company_state": {
+    "applied_to_candidate_membership": false,
+    "historical_company_type_authority": "OPEN",
+    "historical_company_status_authority": "OPEN",
+    "current_company_type_status_values_forbidden_as_historical_authority": true,
+    "diagnostic_current_type_count_public_company": 101,
+    "diagnostic_current_type_count_private_company": 3,
+    "diagnostic_current_status_count_operating": 98,
+    "diagnostic_current_status_count_operating_subsidiary": 6,
+    "known_post_cutoff_event_proof": {
+      "SP_ENTITY_ID": "10976234",
+      "company": "Global Blue Group Holding AG",
+      "deal_key": "2132460",
+      "deal_status": "Completion",
+      "announcement_date": "2025-02-18",
+      "completion_date": "2025-07-02",
+      "evidence_meaning": "CURRENT_PRIVATE_LABEL_IS_POST_CUTOFF_FOR_THIS_ENTITY"
+    }
+  },
+  "historical_primary_identity": {
+    "authority": "OPEN",
+    "candidate_entities_with_exactly_one_target_date_major_us_security_row": 104,
+    "candidate_rows_currently_marked_primary_issue_yes": 104,
+    "current_primary_flag_is_historical_authority": false,
+    "reason": "SPT_PRIMARY_ISSUE_HAS_NO_EFFECTIVE_DATE_AND_WAS_PROVED_CURRENT_CONDITIONED_OUTSIDE_THE_FINAL_COHORT"
+  },
+  "historical_risk_set_admission_authority": "NONE",
+  "a1_authority": "NONE",
+  "a2_authority": "NONE",
+  "financial_alpha_evidence": 0,
+  "prospective_clock_authority": "NONE",
+  "parent_child_mutation_authority": "NONE"
+}

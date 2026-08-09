@@ -1,11 +1,11 @@
 # Historical Fundamental Vintage Authority
 
 **Date:** 2026-08-09  
-**Status:** `REQUIRED / UNRESOLVED / A1_A2_HARD_BLOCK`  
+**Status:** `RESOLVED / OPTION_A_ORIGINAL / PARITY_CLOSED`
 **Strategic lock:** `docs/architecture/aov_strategic_direction_lock_20260809.md`  
 **Roadmap authority:** `docs/architecture/aov_endgame_generalization_spec_current.md`  
 **Runtime effect of this document alone:** `NONE`  
-**A1 / A2 admission:** `BLOCKED UNTIL VINTAGE + PARITY CLOSE`  
+**A1 / A2 admission:** `VINTAGE + PARITY CLOSED; A1 STILL BLOCKED BY HISTORICAL RISK-SET + PRIMARY-IDENTITY AUTHORITY`
 **financial_alpha_evidence:** `0`
 
 ---
@@ -18,23 +18,29 @@ This is an **evidence gate**, not an architecture reopen.
 
 ---
 
-## 1. Verified contradiction (current working tree)
+## 1. Resolved authority (current working tree)
+
+The prior contradiction is closed. The one active A1/A2 fundamental-vintage path is:
 
 ```text
-research/aov0/historical_pit.py
-→ requires FilingVer = Original
-→ rejects non-Original filing version
-
-scripts/aov0_capture_ciq_historical_pit_fundamentals.ps1
-scripts/aov0_capture_ciq_historical_pit_fundamental_chunk.ps1
-→ request FilingVer = Current/Restated
-→ emit filing_version = Current/Restated
-
-scripts/aov0_historical_pit_replay.py
-→ A1 report currently writes historical_spg_asof_original = true
+Capital IQ SPG historical as-of date
++ FilingVer = Original
+→ provider-captured raw rows retain as_of_date + retrieved_at_utc
+→ research/aov0/historical_pit.py rejects any non-Original row
+→ exact frozen current-cut AOV builder
+→ historical replay only
 ```
 
-This combination is **non-authoritative**. No A1/A2 economic claim may be admitted while it stands.
+Active historical fundamental capture paths all request and emit `Original`:
+
+```text
+scripts/aov0_capture_ciq_historical_pit_fundamentals.ps1
+scripts/aov0_capture_ciq_historical_pit_fundamental_chunk.ps1
+scripts/aov0_capture_ciq_historical_pit_period_matrix_chunk.ps1
+scripts/aov0_capture_ciq_historical_pit_transition_batch.ps1
+```
+
+`research/aov0/ciq_historical_pit.py` is retained only as an explicitly labeled legacy diagnostic fixture normalizer and emits `LEGACY_DIAGNOSTIC_ONLY_NOT_A1_A2_AUTHORITY`; it is not an A1/A2 reader or alternate vintage authority.
 
 ---
 
@@ -55,22 +61,24 @@ The leadership group approves the **rule** above, not a preferred label without 
 
 ---
 
-## 3. Allowed resolutions (choose exactly one)
+## 3. Frozen resolution
 
-### Option A — Original-filing historical PIT
+### WINNER — Option A: Original-filing historical PIT
 
 ```text
-historical PIT authority = FilingVer = Original
+historical PIT authority = CIQ SPG historical as-of + FilingVer = Original
 ```
 
-Then:
+Required and now enforced:
 
-- all active historical fundamental capture must request Original
-- receipts must state Original
-- provider semantics must be verified
-- Current/Restated active acquisition path removed
+- all active historical fundamental capture requests `Original`
+- raw rows / receipts state `Original`
+- replay source-semantic validation rejects non-Original rows
+- the as-of cutoff and current retrieval timestamp are both retained
+- the legacy generic historical normalizer is diagnostic-only and cannot admit A1/A2
+- no active Current/Restated fundamental acquisition path exists for Lane 2
 
-### Option B — Explicit as-of Current/Restated historical authority
+### Rejected active alternative — Option B: Explicit as-of Current/Restated historical authority
 
 If Capital IQ as-of / Current/Restated semantics are intentionally selected:
 
@@ -96,37 +104,48 @@ When the winning authority becomes current, remove the losing active reader/writ
 
 ---
 
-## 4. What the authority must answer
+## 4. Frozen semantic contract
 
-Any frozen vintage contract must document:
+The authority is deliberately narrow:
 
 ```text
-what was observable at decision time
-what could change later (revisions)
-what is revision information vs contemporaneous fact
-what is permitted in A1 / A2 feature construction
-what labels/receipts must carry
+observable at decision cut
+= values returned by CIQ SPG for that historical as-of date under FilingVer=Original
+
+later revisions / restatements
+= later information; forbidden from the A1/A2 feature state under this authority
+
+current retrieval timestamp
+= custody timestamp only; never economic availability time
+
+historical as-of date
+= provider information cutoff, conservatively activated only after the decision cut
+
+permitted A1/A2 features
+= only factor state reconstructed from the admitted Original/as-of rows and then passed through the frozen AOV policy path
 ```
+
+S&P's retained provider capability probe demonstrates that the SPG fourth argument genuinely gates historical availability: for entity `4094286`, FQ0 moved from `2024-01-28` at the `2024-04-30` cutoff to `2024-04-28` at the `2024-06-30` cutoff, while fixed `FQ12025` revenue was unavailable at the earlier cutoff and populated only at the later one. The installed client also accepts `FilingVer=Original`. This is the local provider-semantic proof bank for the frozen authority.
 
 ---
 
-## 5. Exact-replay parity gate (with vintage)
+## 5. Exact-replay parity gate — CLOSED
 
-After vintage authority freezes, current and historical AOV implementations must prove same-input parity for shared economics before A1 may claim `exact frozen-AOV historical replay`.
-
-Minimum parity surfaces:
+Historical decisions now call the exact frozen current-cut builder (`research.aov0.ciq_market.build_ciq_market_slice`) rather than reimplementing its policy logic. Tests prove same-input parity for:
 
 ```text
-identity
-ADV20
+security + trading-item identity
+ADV20 / dollar volume
 realized volatility
-SMA / trend state
-Q / U and technical state
+SMA20 / SMA200 / distance / trend veto / trend state
+Q / U inputs and technical state
+exit capacity / regime
 sizing eligibility
 Rule100 weights
+Q / M / F_proxy / C_proxy / L / R / U cube state
 ```
 
-Only explicitly declared temporal-activation differences are allowed. Extract the smallest pure feature/policy kernel justified by this real Rule-of-Two reuse; do not rewrite the already-running Clock #1 organism.
+The only declared temporal difference is mechanical: a completed-week decision state activates on the next observed close. `activate_decision_cube_states` freezes the decision-cut cube state onto that activation calendar, so no activation-day information enters the decision. A canonical five-arm test passes on the activated historical cube.
 
 ---
 
@@ -166,11 +185,14 @@ legitimate historical PIT CIQ (winning vintage only)
 
 | Item | Status |
 |---|---|
-| Winning vintage authority chosen | **OPEN** |
-| Provider-semantic proof banked | **OPEN** |
-| Losing path/label removed | **OPEN** |
-| Current↔historical AOV parity proof | **OPEN** |
-| A1 admission | **BLOCKED** |
-| A2 admission | **BLOCKED** |
+| Winning vintage authority chosen | **CLOSED — Option A / Original** |
+| Provider-semantic proof banked | **CLOSED — retained SPG as-of availability probe + Original callable** |
+| Losing active fundamental-vintage path removed | **CLOSED — no active Current/Restated Lane-2 fundamental writer/reader** |
+| Legacy generic historical normalizer | **DIAGNOSTIC ONLY / NOT A1_A2 AUTHORITY** |
+| Current↔historical AOV parity proof | **CLOSED — exact current-cut builder + activation-cube test** |
+| Historical high-growth start risk set | **OPEN / A1 HARD BLOCK** |
+| Historical primary security/trading-item identity at A1 start | **OPEN / A1 HARD BLOCK** |
+| A1 admission | **BLOCKED ON THE TWO SOURCE-AUTHORITY ITEMS ABOVE** |
+| A2 admission | **BLOCKED BEHIND ADMITTED A1 + FREEZE + ONE QUERY-METERED OOS READ** |
 
-Until the open rows close, any Lane-2 capture/prototype work is **instrumentation only** and creates no A1/A2 economic authority.
+The vintage/parity gate itself no longer blocks Lane 2. No current-screen-conditioned cohort, current-primary mapping, diagnostic provider probe, or backtest result may substitute for the two remaining historical source-authority objects. `financial_alpha_evidence` remains `0`.

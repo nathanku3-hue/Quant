@@ -85,7 +85,8 @@ Portfolio-alpha evidence: `0`
 - [x] Initial active family WIP default=`2`, ceiling=`3` until explicit ownership/search-budget/risk-capacity review.
 - [x] PAPER-0 implementation authorized behind minimum `ExecutionIntentV1` / `market+cls` / broker canonical state / restart / fencing / `FREEZE_NEW_RISK` / session-close gates; strategy live capital remains closed. Authority surface=`docs/architecture/paper_0_authority.md`.
 - [x] Replication-readiness entitlement/identity/PIT/license quarantine starts now; replication outcomes stay inaccessible to research.
-- [x] A1/A2 is hard-blocked until one historical CIQ filing-vintage semantic wins destructively and current-vs-historical AOV semantics pass same-input parity. Authority surface=`docs/architecture/historical_fundamental_vintage_authority.md`.
+- [x] Historical fundamental vintage authority closed destructively on `CIQ SPG historical as-of + FilingVer=Original`; legacy generic historical normalization is diagnostic-only / not A1_A2 authority. Authority surface=`docs/architecture/historical_fundamental_vintage_authority.md`.
+- [x] Current↔historical exact-replay parity closed through the frozen current-cut builder plus next-observed-close cube activation; tests cover identity, technicals, Q/U, sizing, Rule100 weights and canonical five-arm execution.
 - [x] Method endgame view `docs/architecture/alpha_organism_endgame_current.md` recut to post-lock multi-clock / PAPER-0 / vintage-hard-block language.
 - [x] No generic data/agent/model/event platform, second OMS, optimizer programme, L2/L3 acquisition or broad UI response is authorized by these recuts.
 
@@ -206,9 +207,13 @@ Current AOV v3 suite is `75/75 PASS`; ZERO-COMPAT remains seven zeros.
 - [x] Immutable Clock-Start Receipt issued.
 - [x] Prospective clock starts only from the receipt.
 - [ ] Recurring weekly attempts.
-- [ ] **P0 A1 BLOCKER:** freeze exactly one legitimate CIQ historical fundamental vintage semantic. Current replay requires `FilingVer=Original` while capture scripts request/emit `Current/Restated`; no A1/A2 claim until the contradiction is removed destructively.
-- [ ] **P0 A1 PARITY GATE:** same provider snapshot through current AOV and historical AOV semantics reconciles identity, ADV20, realized vol, SMA/trend, Q/U, technical state, sizing eligibility and Rule100 weights, except explicitly declared activation-lag differences.
-- [ ] `A1` exact frozen-AOV historical PIT replay admitted only after vintage + parity gates, or explicitly downgraded to diagnostic scope.
+- [x] **P0 A1 VINTAGE GATE:** one legitimate CIQ historical fundamental vintage semantic is frozen as `FilingVer=Original`; active historical fundamental writers and replay validator agree.
+- [x] **P0 A1 PARITY GATE:** same-input current/historical economics reconcile identity, ADV20, realized vol, SMA/trend, Q/U, technical state, sizing eligibility, Rule100 weights and activated cube state.
+- [x] **P0 A1 MARKET COMPONENT:** authenticated CIQ Securities ProductQuery proves the 2025-05-16 date-qualified market set with `SPT_PRICE_CLOSE[sk_557=05/16/2025]`; provider `Major US Exchanges` group `406718=-1,-4` exactly equals NYSE/NYSEAM/NASDAQGM/NASDAQCM/NASDAQGS at the target date (5,394 vs 5,394, zero differences; ARCA excluded). Xpress remains optional/alternate, not required for this component.
+- [x] **P0 A1 ORIGINAL-REVENUE COMPONENT:** Companies perspective `266637`, `IQ_TOTAL_REV` field `329288`, Original Reporting Basis + `sk_860=05/16/2025`; provider-generated FY0/FY-1/FY-2/FY-3 tokens validate the exact three `>=1.3x` formulas. Market intersection freezes 104 candidates at SHA-256 `02a7daa757cfbaeae6cf37e70509e787f4705d54f9bd2d234074e5ee61b946ae`, explicitly `NOT_A1_RISK_SET`.
+- [ ] **P0 A1 SOURCE BLOCKER — NARROWED:** exact historical Company Type / Company Status semantics for those 104 candidates. Current profile labels and SPG profile fields with an as-of argument are proved current-conditioned and cannot be substituted. `run_4` is current-cut baseline only; `run_2` is diagnostic-only.
+- [ ] **P0 A1 IDENTITY BLOCKER — NARROWED:** exact historical-effective provider-primary CIQ Security ID + Trading Item mapping for exactly the final historical risk set. All 104 partial candidates have one qualifying dated security row and all 104 exact rows are currently primary, but `SPT_PRIMARY_ISSUE` has no effective-date key and current-primary corroboration cannot substitute for historical-primary authority.
+- [ ] `A1` exact frozen-AOV historical PIT replay admitted only after the two source-authority blockers above + ≥252 trading-day / canonical arm gates.
 - [ ] A2 split/query budget/metrics/executable hashes frozen before hidden historical outcome inspection.
 - [ ] `A2` query-metered untouched historical PIT OOS evaluated once under the frozen contract and retained append-only.
 - [ ] `A3` matured prospective evidence; unavailable before `2026-09-09T20:00:00Z`.

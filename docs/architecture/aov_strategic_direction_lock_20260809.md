@@ -212,7 +212,7 @@ Clock #1 Parent/Child, identity, source authority, execution/evaluation boundary
 
 ---
 
-## 7. Lane 2 — Historical Compression and hard A1/A2 block
+## 7. Lane 2 — Historical Compression and hard A1/A2 source-authority block
 
 Target sequence:
 
@@ -228,34 +228,29 @@ legitimate historical PIT CIQ
 
 A1/A2 do not increment `financial_alpha_evidence` under the current prospective-evidence law.
 
-### Historical-vintage truth gate
+### Historical-vintage truth gate — CLOSED
 
-The current working tree contains a material contradiction:
-
-```text
-research/aov0/historical_pit.py
-→ requires FilingVer=Original
-
-historical CIQ fundamental capture scripts
-→ request / emit FilingVer=Current/Restated
-
-scripts/aov0_historical_pit_replay.py
-→ currently reports historical_spg_asof_original = true
-```
-
-Therefore:
+The one active A1/A2 historical fundamental authority is now frozen as:
 
 ```text
-HISTORICAL_A1_A2 = BLOCKED UNTIL VINTAGE + PARITY CLOSE
+CIQ SPG historical as-of date + FilingVer=Original
 ```
 
-Quant/Data must prove provider semantics and freeze exactly one economically legitimate historical-vintage authority. The winning authority destructively replaces the competing current path; misleading labels/fallbacks/compatibility bridges are removed. Current/Restated bytes may never be relabeled as Original.
+All active Lane-2 fundamental capture writers emit `Original`, replay rejects non-Original rows, and the older generic historical normalizer is explicitly diagnostic-only / not A1_A2 authority. Provider probing already banked that the SPG as-of argument gates observable filings across historical cutoffs. Current/Restated fundamental bytes may never be relabeled into this authority.
 
-### Exact-replay parity gate
+### Exact-replay parity gate — CLOSED
 
-Current and historical AOV implementations must prove same-input parity for shared economics. The next authority version should extract the smallest pure feature/policy kernel justified by this real Rule-of-Two reuse, without rewriting the already-running Clock #1 organism.
+Historical weekly decisions now execute through the exact frozen current-cut builder rather than a duplicated policy implementation. Same-input tests reconcile permanent security/listing identity, ADV20, realized volatility, SMA/trend state, Q/U inputs, technical state, exit capacity/regime, sizing eligibility, Rule100 weights and the Q/M/F/C/L/R/U cube state. The declared temporal difference is only next-observed-close activation; the decision-cut cube is frozen onto that activation calendar and the canonical five-arm engine passes.
 
-A1 cannot claim `exact frozen-AOV historical replay` until a frozen parity test reconciles identity, ADV20, realized volatility, SMA/trend state, Q/U, technical state, sizing eligibility and Rule100 weights, with only explicitly declared temporal activation differences allowed.
+### Remaining hard A1 source-authority gate
+
+```text
+HISTORICAL_A1_A2 = BLOCKED UNTIL
+  exact historical high-growth start risk set
++ exact historical primary security/trading-item mapping at the same start date
+```
+
+The current frozen 109 and the 2026 primary-security master are not substitutes. Both historical source objects must be provider-verifiable, hash-bound and membership-consistent before A1 can be admitted. A2 remains behind admitted A1 + immutable freeze + one query-metered untouched OOS read.
 
 ---
 
@@ -428,7 +423,7 @@ FAST_ALPHA_CLOCK = AUTHORIZE_PREREGISTRATION_NOW
 INITIAL_ACTIVE_ALPHA_WIP = 2
 INITIAL_ALPHA_WIP_CEILING = 3 UNTIL EXPLICIT WIP REVIEW
 PAPER_0 = AUTHORIZE_IMPLEMENTATION; FIRST ORDER REQUIRES MINIMUM GATES
-HISTORICAL_A1_A2 = BLOCKED UNTIL VINTAGE + PARITY CLOSE
+HISTORICAL_A1_A2 = BLOCKED UNTIL HISTORICAL START RISK-SET + PRIMARY-IDENTITY AUTHORITY CLOSE
 REPLICATION_READINESS = START NOW
 FINANCIAL_ALPHA_EVIDENCE = 0
 STRATEGY_LIVE_CAPITAL = CLOSED
