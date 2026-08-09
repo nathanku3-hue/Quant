@@ -7,6 +7,8 @@
 **Financial-alpha evidence:** `0` — **UNCHANGED**
 **Limited Live:** `CLOSED` — **UNCHANGED**
 
+> **Superseded on strategic authorization status by `docs/architecture/aov_strategic_direction_lock_20260809.md`.** This 2026-08-08 record remains valid as historical reasoning/guardrails, but its single-confirmatory-family sequencing and `9.77/10` finality are superseded. Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; evidence qualification may run across multiple isolated family clocks; only current portfolio/capital-policy commits remain singular.
+
 ## 0. Council verdict
 
 The current roadmap is directionally correct but **too conservative in one post-Clock dimension**: its global “one active capital-value engineering build lane” can serialize work that belongs to independent authority domains.

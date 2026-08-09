@@ -1,8 +1,8 @@
 # ALPHA-ORGANISM-VERTICAL-0 — Active Brief
 
-Date: 2026-08-08
+Date: 2026-08-09
 Branch: `codex/pit-source-authority-1`
-Status: `CLOCK_1_STARTED / PRE_EVALUATION / OUTCOME_SEALED; REAL CIQ ADMITTED; V3 FULL-CHAIN VERIFIED; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
+Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MANDATORY_RECUTS_AUTHORIZED; CLOCK_1_STARTED / PRE_EVALUATION / OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
 Episode-2 local immutable candidate: `39f7be3894623c095994066b8f0ea2895b968643`
 AOV local executable tip: `dca69fc72dd3192913aa921323ff48f68610a925`
 Canonical product maturity: `70/100` (accepted operability/custody/replay only)
@@ -26,6 +26,14 @@ admitted PIT vertical cube
 ```
 
 Architecture completion, a Seal Candidate, test fixtures, or historical mechanics do not start the prospective clock and do not earn financial-alpha evidence.
+
+## 2026-08-09 final strategic direction lock
+
+Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; canonical meeting record=`docs/architecture/aov_strategic_direction_lock_20260809.md`; broad architecture reopen=`NO`.
+
+The active recuts are execution gates: preserve Clock #1; retain CRV1's `252d` primary horizon as the slow business-cycle family; preregister one fast multi-week family; allow parallel family evidence qualification under default WIP=`2`, initial ceiling=`3`; keep current portfolio/capital-policy authority singular; implement PAPER-0 behind minimum execution/restart/calendar gates; start replication readiness now; and block A1/A2 until historical filing-vintage + current/historical AOV parity close.
+
+This docs synchronization does not itself bank the worktree's uncommitted Lane-1/Lane-2 executable bytes or create any new alpha/live claim.
 
 ## Gate A — Episode-2 local predecessor
 
@@ -171,10 +179,12 @@ v3 temporal authority [CLOSED LOCAL]
 │
 ├─ ALPHA PIT PIPELINE domain
 │  one narrow alpha_pit_data_api_v1 incumbent; real producer artifacts + capability firewall
-├─ ALPHA FAMILY domain
-│  one confirmatory family build; first = CYCLE_RESONANCE_v1 [PREREGISTERED / NOT IMPLEMENTED]
+├─ ALPHA FAMILY clocks
+│  Clock A = CYCLE_RESONANCE_v1 [252d primary unchanged]
+│  Clock B = one fast multi-week family [preregister now]
+│  default active family WIP=2; initial ceiling=3 with isolated owner/search/prediction custody
+│  multiple families may evidence-qualify in parallel; current capital-policy commit stays singular
 │  CRV1 may build against deterministic API fixtures while the real PIT producer lands
-│  Minimum Viable Atlas → freeze → untouched test where available → seal prospectively
 │  deeper Atlas = discovery-only right-tail episode census, not famous-company survivor selection
 │  retain true-right-tail / false-winner / missed-right-tail / matched ordinary-or-left controls
 │  audit incumbent winner-blindness without tuning; separate entry / continuation / exit alpha
@@ -182,12 +192,14 @@ v3 temporal authority [CLOSED LOCAL]
 │  AIInvocationReceipt + role firewall + source-claim/discovery + ReviewPacket fixture mechanics
 │  real outcome-informed mutation remains blocked until matured validated ReviewPacket
 ├─ DISCOVERY INCUBATOR
-│  MARKET_TRANSITION_ALPHA_v1 may run crisis/false-crisis discovery only; no second confirmatory family
+│  MARKET_TRANSITION_ALPHA_v1 discovery-only unless explicitly admitted into active family WIP
 ├─ deterministic review/custody closure
-├─ thin Alpaca PAPER Capitalization Vertical immediately after Clock #1 under independent ownership
-│  initial execution incumbent = MOC_CLOSE_AUCTION_V1 (market + cls)
-│  current frozen AOV targets may exercise account/map/lifecycle/restart/IS paths with financial_alpha_evidence=0
-├─ independent-replication data lead time after first Challenger seal
+├─ PAPER-0 immediately under independent ownership
+│  ExecutionIntentV1 → CIQSEC↔broker map → MOC_CLOSE_AUCTION_V1 (market + cls)
+│  → broker canonical open/fill state → restart/fencing/FREEZE_NEW_RISK
+│  first order resolves actual session close or fails closed to verified regular full-session day
+│  current frozen AOV targets remain financial_alpha_evidence=0
+├─ independent-replication entitlement/identity/PIT/license readiness starts now in quarantine
 └─ borrow entitlement lead time asynchronously
 
 first capital-relevant edge
@@ -247,11 +259,11 @@ Portfolio-alpha evidence remains exactly `0`.
 - Proved CIQ provider capability through the installed authenticated Office client without changing AOV authority: direct Genix `SPGLabel` transport returned a valid provider response; exact-date `SPGTable` returned `SP_TOTAL_RETURN`, `SP_PRICE_CLOSE`, and `SP_VOLUME`; and `SPG(..., as_of_date, ...)` returned historically changing PIT fundamentals. The historical capability is explicitly post-Clock only.
 - Solved primary identity and captured/admitted the frozen 109-name raw master. Identifier Lookup + scalar SPG proved `SP_CIQ_ID` is security-level and `SP_TRADING_ITEM_ID` listing-level; direct company-key `SPGTable` returned the current primary pair for all 109 names. Raw master: `data/aov0/raw/ciq_primary_security_master_20260808T162322Z.csv`, retrieval `2026-08-08T16:23:22.0736860Z`, SHA-256 `8aefbbd751a714b8689402ccbf8fa2b776c6388d4bbc3870ec4f8b975306eca4`. Exact-primary-SPT parts `004..033` now form the sufficient completion window. The deterministic combined market object is `data/aov0/raw/ciq_primary_security_market_history_20260808T193921Z.csv`, 21,345 rows, SHA-256 `897dfb12b383f3e8ed4765dfca21083f0129a1695cd1f432a4ebfb1ddbabbe48`, with zero duplicate-key conflicts. 104 names have 201 completed closes; five genuine short-history listings have 189/90/76/59/27 observations and are excluded where required rather than backfilled.
 - Admitted direct NY Fed SOFR after the real 15:00 ET gate at `2026-08-07T19:00:08.894288Z` with raw SHA-256 `445ca1ae93a7ae904681716d8e37088fab905ae4f74f32fc2619a459918d54cc` and output SHA-256 `ed75219416a524f17cb3e29b9e4fadff2dcfa1d12a8368d752007aac779c4e5e`. Real CIQ admission now yields 99 canonical securities, 10 mechanical exclusions, 26 Rule100 sizing-eligible names, and risky gross `1.0`. The prospective clock started from the separate receipt at `2026-08-08T19:48:52.440503Z`; evaluation begins `2026-08-10T20:00:00Z`; outcome authority remains sealed until `2026-09-09T20:00:00Z`. No outcome opening, financial-alpha claim, live-capital action, commit, push, hosted CI, or publication occurred.
-- Closed the CEO/Quant/PM/Risk/Architecture/Engineering velocity decision with verdict `APPROVED_WITH_VELOCITY_PARALLELISM_RECUT`; owner then ratified the roadmap at `9.77/10` with one execution recut=`A1_A2_SECOND_CRITICAL_LANE`. Post-Clock engineering remains domain-parallel under one-writer/immutable-join law; Clock #1 is running and `financial_alpha_evidence=0`.
+- Historical 2026-08-08 velocity council closed at `APPROVED_WITH_VELOCITY_PARALLELISM_RECUT` / owner `9.77/10` / `A1_A2_SECOND_CRITICAL_LANE`; this remains audit history and is superseded as current strategic finality by the 2026-08-09 `PASS — STRATEGIC_DIRECTION_LOCKED` record. Clock #1 remains running and `financial_alpha_evidence=0`.
 
 ## What Is Locked
 
-- Architecture/scientific-bar authority remains approved and must not be reopened. Prior strategic, sim-to-real and Winner/authority recuts are retained; latest roadmap verdict=`APPROVED_WITH_VELOCITY_PARALLELISM_RECUT`, owner execution recut=`A1_A2_SECOND_CRITICAL_LANE`, and top-level design is effectively closed. Clock #1 is running; outcomes remain unavailable. **Lane 1 Future Truth** preserves the weekly tape and Alpha PIT/CRV1 path. **Lane 2 Historical Compression** is equally first-class: legitimate historical PIT CIQ → exact frozen-AOV A1 → freeze A2 contract → query-metered untouched A2 → incumbent economics. Supporting bounded AI/discovery/PAPER work may run only with independent ownership. One writer per domain and deterministic immutable joins are mandatory.
+- Strategic direction is `APPROVED_AND_LOCKED`; broad architecture reopen=`NO`. Clock #1 is running; outcomes remain unavailable. **Lane 1 Future Truth** now includes the weekly tape, unchanged CRV1 252d clock and one fast multi-week family clock. **Lane 2 Historical Compression** remains first-class but cannot earn A1/A2 until historical vintage + semantic parity close. PAPER-0 and replication readiness are authorized. Multiple family evidence streams may qualify in parallel; only the current portfolio/capital-policy commit is singular. One writer per mutable surface and deterministic immutable joins are mandatory.
 - System-wide Destructive Authority Replacement is frozen: when future current authority changes, remove the old active writer/reader/fallback/alias/dual-write/feature flag/compatibility adapter in the same slice; keep old artifacts as immutable historical evidence only. Owner governance is six constitutions: Fund Mandate, Research, Capital, Execution, Live-Risk, Operator.
 - `launch.py` → `dashboard.py` is the sole current application and `core.engine.run_simulation` through the hardened `research/` runner is the sole simulation authority.
 - Gate-A local candidate is `39f7be3`; Gate-B local executable lineage ends at `dca69fc` before documentation closure.
@@ -267,12 +279,12 @@ Portfolio-alpha evidence remains exactly `0`.
 - Preserve the exact Clock #1 custody set: master SHA-256 `8aefbbd…306eca4`, market SHA-256 `897dfb12…babbe48`, decision-cut SHA-256 `81926aa8…6cd9b80`, seal SHA-256 `1b8c44db…baca68`, verification-proof SHA-256 `0192d411…326430`, receipt SHA-256 `56278108…665fc`.
 - Keep `evaluation_started=false` until the frozen next-eligible close `2026-08-10T20:00:00Z`; do not load/open outcome authority before `2026-09-09T20:00:00Z`. Financial-alpha evidence remains `0` until matured prospective outcomes actually exist.
 - Weekly operation after Clock #1: freeze original 109 candidate entities; refresh fundamentals, primary-security/status, completed market and rate/benchmark measurements each cut; fail stale REQUIRED data closed; do not rerun the growth screen.
-- WIP law after Clock #1: **two critical evidence lanes**. Lane 1 keeps weekly tape + review/custody active while `alpha_pit_data_api_v1` and CRV1 mechanics advance against frozen contracts. Lane 2 reconstructs legitimate historical PIT CIQ, runs exact frozen-AOV A1, freezes A2 before hidden inspection, obtains query-metered untouched A2, and reports Parent/Child incremental economics plus loss/missed-winner/clipping attribution. A1/A2 may trigger `CONTINUE / PIVOT / HOLD` but cannot silently retune frozen CRV1. Bounded AI, Market Transition discovery, PAPER, replication and borrow are supporting lanes only under independent ownership. Optimizer/leverage/options/UI/platform breadth remains suppressed until evidence makes it the nearest economic blocker.
+- WIP law after Clock #1: run **multiple independent evidence clocks**. Weekly tape/review custody remains always-on; CRV1 keeps its 252d primary horizon; one fast multi-week family is preregistered beside it under default active family WIP=`2` / initial ceiling=`3`. Lane 2 remains first-class but A1/A2 is hard-blocked until one historical CIQ filing-vintage semantic wins destructively and current-vs-historical AOV semantics pass same-input parity. PAPER-0 minimum execution/restart/calendar closure and replication-readiness quarantine start now under independent ownership. Evidence qualification may occur in parallel; only the current portfolio/capital-policy commit remains singular. Optimizer/leverage/options/UI/platform/L2-L3 breadth remains suppressed until measured evidence makes it the nearest economic blocker.
 - Post-Clock AI fixture/source-claim engineering may start before outcome maturity, but **real outcome-informed** `MutationManifestDraft` remains blocked until a matured reconciled validated ReviewPacket. Before bounded long/cash capital require prospective evidence + one genuinely independent replication + Capitalization Vertical authority + owner/risk approval. `RESONANCE_LEVERAGE_POLICY_v1` remains downstream evidence/CRO-gated and does not authorize leverage/short/options; true L/S is a separate optional extension. Optional micro-live canary is an explicit owner/risk exception only and remains `financial_alpha_evidence=0`.
 - At major matured evidence checkpoints, PM/CEO must classify the Alpha Program `CONTINUE`, `PIVOT`, or `STOP / HOLD`; absent alpha does not automatically authorize more architecture/data/optimizer/L-S complexity.
 
 ## First Command
 
 ```text
-NEXT ACTIVE ACTION WHEN RESUMED: preserve Clock #1 and the frozen-109 weekly tape; in parallel execute Lane 2 historical compression (legitimate PIT CIQ → exact frozen-AOV A1 → freeze hidden A2 contract → query-metered untouched A2 → Parent/Child economics and loss/missed-winner diagnosis); continue Alpha PIT/CRV1 mechanics behind frozen joins; do not open prospective outcomes, retune Parent/Child, rescue frozen CRV1 in place, or claim financial alpha.
+NEXT ACTIVE ACTION WHEN RESUMED: preserve Clock #1 and the frozen-109 weekly tape; resolve historical CIQ Original-vs-Current/Restated authority and current/historical AOV parity before A1/A2; continue unchanged CRV1 and preregister one fast multi-week family; close PAPER-0 ExecutionIntent/TIF/broker-state/restart/fencing/session-close minimum gates; start quarantined replication readiness; do not open prospective outcomes, retune Parent/Child, claim A1/A2 early, or claim financial/live authority.
 ```

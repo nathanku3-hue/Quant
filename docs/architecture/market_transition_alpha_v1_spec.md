@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-08
 **Status:** `PREREGISTERED_DISCOVERY_INCUBATOR / CLOCK_1_DISCOVERY_RELEASED / NOT_IMPLEMENTED`
-**Authority:** supporting post-Clock discovery/preregistration lane only; no confirmatory or capital authority; may not consume capacity needed by Lane 1 Future Truth or Lane 2 A1→A2 Historical Compression
-**Current gate effect:** **DISCOVERY INCUBATOR ONLY / NO CONFIRMATORY AUTHORITY** — Clock #1 is running; incumbent AOV A1/A2 economics take priority over broad regime expansion
+**Authority:** supporting post-Clock discovery/preregistration lane; no capital authority. It remains discovery-only until explicitly admitted into one of the active Alpha-family WIP slots under the 2026-08-09 strategic lock.
+**Current gate effect:** **DISCOVERY INCUBATOR / MAY COMPETE FOR A FUTURE FAMILY WIP SLOT / NO AUTOMATIC CONFIRMATORY AUTHORITY** — Clock #1 is running; the strategic lock allows multiple independent family clocks but does not automatically promote Market Transition
 **Relationship to CYCLE_RESONANCE_v1:** separate Alpha Family; no mutation of CRV1
 
 ---
@@ -20,7 +20,7 @@ ENTRY_TIMING_COMPONENT_v1   separate timing Alpha Component
 RESONANCE_LEVERAGE_POLICY_v1 Capital Policy
 ```
 
-A market forecast does not directly choose leverage, shorts, hedges or broker orders.
+A market forecast does not directly choose leverage, shorts, hedges or broker orders. Market-state classification is not Alpha by itself; confirmatory/prospective authority requires immutable future-directed predictions frozen before outcome access. Multiple evidence-qualified families may coexist, but only one current portfolio/capital-policy authority commits financial risk.
 
 ---
 
@@ -30,7 +30,7 @@ A market forecast does not directly choose leverage, shorts, hedges or broker or
 family_id = MARKET_TRANSITION_ALPHA_v1
 pre_clock_implementation = FALSE
 post_clock_discovery_incubator = ALLOWED
-parallel_confirmatory_family_build_beside_CRV1 = FALSE
+parallel_confirmatory_family_build_beside_CRV1 = REQUIRES_EXPLICIT_FAMILY_WIP_ADMISSION
 financial_alpha_evidence = 0
 ```
 
@@ -517,11 +517,9 @@ Do not build a generic provider/data platform. First consumer gets exact adapter
 
 ---
 
-# 19. Post-Clock sequencing — velocity recut
+# 19. Post-Clock sequencing — final strategic lock
 
-`MARKET_TRANSITION_ALPHA_v1` does **not** become a second confirmatory Alpha-family build beside `CYCLE_RESONANCE_v1`.
-
-After Clock #1 it may run as a registered Discovery Incubator in parallel:
+`MARKET_TRANSITION_ALPHA_v1` remains a registered Discovery Incubator by default:
 
 ```text
 Crisis Transition Atlas
@@ -531,14 +529,9 @@ Crisis Transition Atlas
 + preregistered falsifiers / search budget
 ```
 
-Confirmatory/prospective implementation enters the single `ALPHA_FAMILY_BUILD` authority slot only after:
+The 2026-08-09 strategic lock allows multiple independently owned Alpha-family prediction clocks/evidence streams. Market Transition may enter confirmatory/prospective implementation only through an explicit local family-WIP admission that proves separate owner/writer custody, search budget, Prediction/Trial Ledger identity, artifact namespace, risk-set/label contract and no shared mutable outcome authority.
 
-```text
-CYCLE_RESONANCE_v1 prospective seal
-OR explicit PM/CEO PIVOT
-```
-
-This preserves maximum research calendar parallelism without two competing confirmatory family implementations mutating shared Alpha authority.
+CRV1 sealing is **not** a constitutional prerequisite to that admission. Default active family WIP is `2`, initial ceiling `3`. Evidence qualification may occur in parallel; current portfolio/capital-policy authority remains singular.
 
 ---
 
@@ -567,9 +560,10 @@ ACTIVE_PRODUCT_STATE = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 CLOCK_1_STARTED = TRUE
 MARKET_TRANSITION_ALPHA_v1 = PREREGISTERED_DISCOVERY_INCUBATOR / DISCOVERY_LANE_RELEASED / NOT IMPLEMENTED
 ENTRY_TIMING_COMPONENT_v1 = SPECIFIED / DISCOVERY_ONLY / NOT IMPLEMENTED
-CONFIRMATORY_ALPHA_FAMILY_SLOT = CYCLE_RESONANCE_v1
+CONFIRMATORY_ALPHA_FAMILY_WIP = DEFAULT_2 / INITIAL_CEILING_3
+CURRENT_STATUS = DISCOVERY_ONLY_UNLESS_EXPLICIT_WIP_ADMISSION
 financial_alpha_evidence = 0
 LIVE = CLOSED
 ```
 
-Clock #1 releases the Crisis Transition Atlas, false-crisis controls, PIT source-gap inventory and preregistration work for this family. It does **not** open a second confirmatory Alpha-family implementation beside `CYCLE_RESONANCE_v1`; confirmatory/prospective implementation waits until CRV1 seals or an explicit PM/CEO `PIVOT`. No market-transition discovery result carries capital authority.
+Clock #1 releases the Crisis Transition Atlas, false-crisis controls, PIT source-gap inventory and preregistration work for this family. Confirmatory/prospective implementation requires explicit family-WIP admission under the final strategic lock; it is not granted automatically by this spec and no market-transition discovery/evidence result carries capital authority by itself.

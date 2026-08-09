@@ -1,11 +1,12 @@
 # CYCLE_RESONANCE_v1 — Thin Build Specification
 
 **Date:** 2026-08-08
-**Status:** `BUILD_SPEC / PREREGISTERED / CLOCK_1_RELEASED / NOT_IMPLEMENTED`
+**Status:** `BUILD_SPEC / PREREGISTERED / CLOCK_1_RELEASED / MECHANICS_PARTIAL`
 **Family ID:** `CYCLE_RESONANCE_v1`
-**First implementation authority:** **RELEASED AFTER CLOCK #1; NOT YET IMPLEMENTED**
-**Current execution effect:** **NO RUNTIME EFFECT YET** — Clock #1 is running and the Alpha-family build slot is released
+**First implementation authority:** **RELEASED AFTER CLOCK #1; INPUT-PACKET + IMPLEMENTATION-MANIFEST MECHANICS IMPLEMENTED**
+**Current execution effect:** **NO EMPIRICAL MODEL AUTHORITY YET** — provider-blind PIT packet closure and the explicit no-scientific-defaults implementation-manifest contract are implemented; clock/claim/resonance/model/runner mechanics and the legitimate broad CRV1 risk-set join remain open
 **Data dependency:** `docs/architecture/alpha_pit_data_api_v1.md` only
+**Strategic role after 2026-08-09 lock:** `SLOW_BUSINESS_CYCLE_FAMILY / 252D_PRIMARY_UNCHANGED / NOT_SOLE_PROGRAMME_CLOCK`
 
 ---
 
@@ -35,7 +36,7 @@ The implementation objective is not to maximize average classification accuracy.
 
 ```text
 family_id = CYCLE_RESONANCE_v1
-status = PREREGISTERED / NOT IMPLEMENTED
+status = PREREGISTERED / MECHANICS_PARTIAL / EMPIRICAL_CANDIDATE_NOT_FROZEN
 primary_horizon = 252 trading days from legitimate execution boundary
 primary_outcome = top 5% date-local cross-sectional primary-security total return
 primary_label_spec = CRV1_RIGHT_TAIL_252D_TOP5_V1
@@ -53,6 +54,14 @@ Changing any of the following after outcome inspection requires a new family/ver
 - outcome measure.
 
 Sensitivity outcomes are diagnostic only and do not replace the primary outcome under the same version.
+
+## 1.1 Strategic role — slow hypothesis, not slow programme
+
+The final strategic re-audit explicitly retains CRV1's `252`-trading-day primary horizon. CRV1 is the slow business/company-cycle family and **does not monopolize programme evidence velocity**. A separate genuinely multi-week Alpha Family is authorized for preregistration and may run an independent confirmatory/prospective prediction clock beside CRV1 under the active family WIP law.
+
+Do not shorten CRV1 in place to manufacture faster evidence. Do not inject sector-rotation, tactical price/volume, market-transition or microstructure mechanisms into CRV1 v1 merely to make it multi-scale. Those are separate families/components and require their own identity/search budget/evidence.
+
+CRV1's clock/resonance states are intermediate evidence. Predictive authority belongs to immutable ex-ante `WinnerPredictionV1` artifacts frozen before outcome access.
 
 ---
 
@@ -643,7 +652,7 @@ A later family version can be registered, but the running tape remains immutable
 
 # 19. Evaluation contract
 
-Primary evaluation is right-tail and incremental, not standalone CAGR/Sharpe.
+Primary evaluation is right-tail and incremental, not standalone CAGR/Sharpe. CRV1 may independently become evidence-qualified while other families are also qualifying; this does not itself create portfolio capital authority. Portfolio composition remains an `I` versus `I+X` marginal economic decision under one current capital-policy authority.
 
 Required comparison:
 
@@ -868,10 +877,10 @@ This does **not** mean the Alpha Family has proven alpha.
 ```text
 ACTIVE_PRODUCT_STATE = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 CLOCK_1_STARTED = TRUE
-CYCLE_RESONANCE_v1 = PREREGISTERED / IMPLEMENTATION_LANE_RELEASED / NOT IMPLEMENTED
-ALPHA_PIT_DATA_API_V1 = SPECIFIED / IMPLEMENTATION_LANE_RELEASED / NOT IMPLEMENTED
+CYCLE_RESONANCE_v1 = PREREGISTERED / INPUT_PACKET_AND_IMPLEMENTATION_MANIFEST_MECHANICS_IMPLEMENTED / EMPIRICAL_CANDIDATE_NOT_FROZEN
+ALPHA_PIT_DATA_API_V1 = MECHANICS_IMPLEMENTED / CURRENT_CIQ_STRUCTURED_CUSTODY_VERIFIED / CRV1_RISK_SET_BLOCKED
 financial_alpha_evidence = 0
 LIVE = CLOSED
 ```
 
-Clock #1 has released the first confirmatory Alpha-family build slot. `CYCLE_RESONANCE_v1` may now implement concurrently with the Alpha PIT producer against the frozen contract, using deterministic fixtures until real PIT artifacts cross the integration join. Discovery/outcome visibility remains quarantined, no prospective prediction is yet sealed for this family, and financial-alpha evidence remains `0`.
+Clock #1 released the first confirmatory Alpha-family build slot. `pit_packet.py` now closes provider-blind Alpha PIT artifacts deterministically, and `implementation_manifest.py` requires every scientific choice explicitly before freeze: family/risk-set/label identity, observation/expectation/claim surfaces, coverage policy, transform hashes, claim interpreter, ordered-sequence law, falsifiers, model/hyperparameters, training/calibration/ranking rules, search-family budget, cost assumptions, and code-byte identity. Missing scientific parameters fail closed; search trials cannot exceed the preregistered budget; sealed manifest tampering fails hash verification. Clock/claim/resonance/model/runner mechanics remain open, discovery/outcome visibility remains quarantined, no empirical or prospective prediction is yet sealed for this family, and financial-alpha evidence remains `0`.

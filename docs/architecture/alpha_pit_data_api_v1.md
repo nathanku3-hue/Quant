@@ -1,11 +1,12 @@
 # Alpha PIT Data API v1 — Narrow Internal Research Contract
 
 **Date:** 2026-08-08
-**Status:** `BUILD_SPEC / POST_CLOCK_ONLY / NOT_IMPLEMENTED`
+**Status:** `BUILD_SPEC / CLOCK_1_RELEASED / MECHANICS_IMPLEMENTED / CRV1_RISK_SET_BLOCKED`
 **Authority:** implementation contract for the first post-Clock Alpha Discovery Lane only
 **First consumer:** `CYCLE_RESONANCE_v1`
-**Current execution effect:** **NONE** — `PRE_SEAL_REAL_CIQ_ADMISSION` remains unchanged
+**Current execution effect:** **MECHANICAL PRODUCER ACTIVE / NO CRV1 EMPIRICAL AUTHORITY YET** — the capability firewall, content-addressed artifacts, concrete CIQ structured adapter, SEC-claims adapter boundary, explicit missingness, and current-CIQ custody validation are implemented; the independent non-growth `CRV1_US_PRIMARY_COMMON_V1` risk-set source is not landed, CIQ expectations are not landed, and SEC claim bytes are not landed
 **Schema family:** `alpha_pit_data_api_v1`
+**2026-08-09 strategic lock:** current v1 remains deliberately CRV1-first; when the second real Alpha Family opens, extract only a tiny immutable `FamilyDataContract` rather than cloning a platform or preserving CRV1 globals as shared authority
 
 ---
 
@@ -42,6 +43,26 @@ No `permno`, ticker, legacy route contract, dashboard loader, provider-port fall
 When `alpha_pit_data_api_v1` becomes current authority for this research lane, the System-wide Destructive Authority Replacement Law applies to any competing current research-data path: no dual reader, dual writer, fallback, alias, feature flag, or compatibility adapter.
 
 Historical artifacts remain immutable evidence only.
+
+## 1.1 Second-consumer / FamilyDataContract recut
+
+The final strategic lock authorizes multiple independent Alpha-family prediction clocks and parallel evidence qualification. This does **not** justify a generic data platform.
+
+When Family #2 actually opens, extract only the smallest shared family binding justified by real reuse:
+
+```text
+FamilyDataContract
+- family_id
+- risk_set_spec_id
+- primary_label_spec_id
+- allowed observation surface
+- allowed expectation surface
+- allowed claim surface
+```
+
+Inject that immutable contract into session construction, artifact manifests and outcome binding. Add cross-family artifact/label/risk-set rejection and concurrent-session isolation tests. No dynamic registry, plugin system, feature store, provider ranking or universal schema platform is authorized.
+
+Until Family #2 exists, CRV1-specific constants remain valid v1 authority rather than being generalized speculatively.
 
 ---
 
@@ -571,20 +592,33 @@ current pre-Clock CIQ admission replacement
 
 ---
 
-# 10. Build order after Clock #1
+# 10. Build order after Clock #1 — contract-first parallelism
+
+The Alpha PIT lane and `CYCLE_RESONANCE_v1` lane may build concurrently against this already-frozen contract. CRV1 uses deterministic contract fixtures until real PIT artifacts pass the integration join; fixture success is engineering evidence only.
 
 ```text
+J1 CONTRACT ALREADY FROZEN
 1. contracts + session capability firewall
-2. CIQCycleV1Adapter for exact first-family structured surfaces
-3. risk_set + observations + expectations
-4. SECAlphaClaimsV1Adapter + source_claims
-5. discovery-only outcome capability
-6. content-addressed manifests / coverage
-7. failure-injection tests
-8. only then connect CYCLE_RESONANCE_v1
+2. deterministic contract fixtures for risk_set / observations / expectations / source_claims / discovery outcomes
+
+PARALLEL PRODUCER WORK
+3. CIQCycleV1Adapter for exact first-family structured surfaces
+4. risk_set + observations + expectations
+5. SECAlphaClaimsV1Adapter + source_claims
+6. discovery-only outcome capability
+7. content-addressed manifests / coverage
+8. failure-injection tests
+
+PARALLEL CONSUMER WORK
+CYCLE_RESONANCE_v1 may implement packet/clock/resonance/model logic against fixtures
+without importing a provider or claiming real PIT integration
+
+J3 REAL PIT INTEGRATION
+9. replace fixture inputs with real content-addressed API artifacts
+10. run producer/consumer closure and failure tests together
 ```
 
-Historical breadth expands only as required by the Minimum Viable Atlas. The API is not permission to reconstruct every possible source before the first prospective seal.
+No consumer may bypass the API because its adapter is unfinished. Historical breadth expands only as required by the Minimum Viable Atlas. The API is not permission to reconstruct every possible source before the first prospective seal. A future fast family may require a different data grain; richer intraday/trade/quote/LOB authority remains demand-pulled by the family mechanism and may not be acquired merely because a model can consume it.
 
 ---
 
@@ -593,12 +627,12 @@ Historical breadth expands only as required by the Minimum Viable Atlas. The API
 This document is **module/API design authority only**.
 
 ```text
-CURRENT_GATE = PRE_SEAL_REAL_CIQ_ADMISSION
-CLOCK_1_STARTED = FALSE
-ALPHA_PIT_DATA_API_V1 = SPECIFIED / NOT IMPLEMENTED
-CYCLE_RESONANCE_v1 = PREREGISTERED / NOT IMPLEMENTED
+ACTIVE_PRODUCT_STATE = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
+CLOCK_1_STARTED = TRUE
+ALPHA_PIT_DATA_API_V1 = MECHANICS_IMPLEMENTED / CURRENT_CIQ_STRUCTURED_CUSTODY_VERIFIED / CRV1_RISK_SET_BLOCKED
+CYCLE_RESONANCE_v1 = PREREGISTERED / INPUT_PACKET_AND_MANIFEST_MECHANICS_IMPLEMENTED / EMPIRICAL_CANDIDATE_NOT_FROZEN
 financial_alpha_evidence = 0
 LIVE = CLOSED
 ```
 
-The next current executable action remains the existing real CIQ admission path. Implementation of this API begins only after Clock #1 releases the first Alpha Discovery Lane.
+Clock #1 released implementation of this API under the post-Clock domain-WIP law. The read/session firewall and concrete first-family producer adapters are now implemented mechanically. Real current CIQ custody verifies through the adapter without being backdated into historical PIT: 109 current identities are readable, five names explicitly lack 200-day history, `fund.gross_margin_q` and `fund.cash_from_ops_q` are source-level missing for all 109, all 981 requested expectation rows are source-level missing, and SEC claims are explicitly unlanded. The AOV growth-screen 109 is forbidden as a CRV1 risk set. A future CRV1 risk-set source must bind the frozen eligibility contract, prove no growth/current-survivor/future-membership filter, and bind an independent identity receipt. No empirical CRV1 candidate or financial-alpha evidence is created until the legitimate broad risk set and remaining required source surfaces cross the deterministic join.

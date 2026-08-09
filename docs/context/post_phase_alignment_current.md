@@ -1,11 +1,11 @@
 # Post-Phase Alignment — Current
 
-Date: 2026-08-08
-Status: `CLOCK_1_RUNNING; LANE_1_SLICE_1_MECHANICS_GREEN; LANE_2_A1_A2_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+Date: 2026-08-09
+Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MULTI_CLOCK_EVIDENCE_AUTHORIZED; A1_A2_VINTAGE_PARITY_BLOCKED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
 
-## 2026-08-08 supersession
+## 2026-08-09 strategic lock supersession
 
-The older real-seal blocker language below is retained as audit history but is no longer current: Clock #1 is already running. Lane 1 keeps the frozen-109 weekly tape independent from Alpha PIT/CRV1 engineering. Owner additionally authorized **Lane 2 Historical Compression** as a first-class critical lane: legitimate historical PIT CIQ → exact frozen-AOV replay → A1 → freeze hidden A2 contract → query-metered untouched historical PIT OOS → A2 → incumbent Parent/Child economics. This authorization does not claim A1/A2 and does not open Clock #1 outcomes. Weekly preflight mechanics are implemented; Alpha PIT v1 deterministic fixtures and the provider-blind CRV1 input packet are implemented; real PIT integration, recurring weekly seals, A1/A2, and matured ReviewPackets remain open. Validation: Lane-1 `13/13 PASS`, AOV `79/79 PASS`, ZERO-COMPAT contract test seven zeros, selected compile PASS. No outcome open, Parent/Child mutation, strategy capital, push, or publication occurred.
+Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Clock #1 stays unchanged. CRV1 remains the 252d slow business-cycle family, but one fast multi-week family is authorized for immediate preregistration and may run an independent evidence clock. Default active family WIP=`2`, ceiling=`3`; evidence qualification may happen in parallel, while current portfolio/capital-policy commits remain singular. Lane 2 Historical Compression remains first-class but A1/A2 is hard-blocked until one CIQ filing-vintage semantic wins destructively and current-vs-historical AOV semantics pass same-input parity. PAPER-0 implementation is authorized behind minimum identity/TIF/broker-state/restart/fencing/calendar gates. Replication readiness starts now in quarantine. No outcome open, Parent/Child mutation, financial-alpha uplift or strategy live capital is created by this alignment.
 
 ## Preserved
 
@@ -52,7 +52,7 @@ No other architecture phase is authorized before trying the real seal.
 
 ## Parallel work after seal
 
-Once the clock starts, run two critical evidence lanes: Lane 1 Future Truth preserves weekly prospective time and the Alpha PIT/CRV1 path; Lane 2 Historical Compression consumes historical provider/compute capacity to measure the frozen incumbent through A1→frozen A2. Review lineage/fixtures may finish while both progress. Supporting AI/PAPER/discovery work may run only with independent ownership. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
+Run independent clocks rather than one waterfall: Clock #1 weekly evidence, CRV1 slow predictions, one fast multi-week family, Lane 2 Historical Compression after its vintage/parity gates, PAPER-0 operational learning, and replication-readiness quarantine. Review lineage/fixtures may finish in parallel. Supporting AI/discovery work may run only with independent ownership. Evidence qualification may be parallel; current portfolio/capital-policy authority is singular. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
 
 ## Model portfolio direction
 
@@ -60,8 +60,8 @@ Move from serial replacement toward Safety Parent / Champion / 1–3 Challengers
 
 ## Deferred
 
-Provider breadth, AOV-2/event state, hidden-OOS platform breadth, search-debt automation beyond immediate need, broker/live integration, optimizer/RL-first work.
+Generic provider/data platforms, AOV-2/event-platform state, hidden-OOS platform breadth, search-debt automation beyond immediate need, family WIP above the initial ceiling without review, PAPER-1 rare lifecycle tail beyond minimum need, L2/L3/DeepLOB without measured information value, optimizer/RL-first work, and strategy live capital.
 
 ## Next alignment
 
-Preserve Clock #1 and the frozen-109 weekly tape; execute Lane 2 A1→A2 historical compression in parallel; put Parent/Child incremental economics and loss/missed-winner attribution on the board before broadening alpha architecture. Continue CRV1 mechanics behind frozen contracts, but use A1/A2 only for explicit `CONTINUE / PIVOT / HOLD` decisions rather than in-place rescue. Do not restore compatibility or broaden AI/data/options/leverage/UI/platform work to avoid the evidence task.
+Preserve Clock #1; resolve historical vintage + parity before A1/A2; continue unchanged CRV1 and preregister one fast multi-week family; close PAPER-0 minimum gates; start replication readiness; then let A1/A2/PAPER/prospective economics trigger the next `CONTINUE / PIVOT / HOLD / STOP / PROMOTE` decision. Do not restore compatibility or build generic AI/data/options/leverage/UI/platform work to avoid the evidence task.

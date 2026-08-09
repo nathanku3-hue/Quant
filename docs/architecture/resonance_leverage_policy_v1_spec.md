@@ -3,7 +3,7 @@
 **Date:** 2026-08-08
 **Status:** `CAPITAL_POLICY_SPEC / EVIDENCE_GATED / NOT_IMPLEMENTED`
 **Authority:** future capital-policy design only; not Core Alpha
-**Current execution effect:** **NONE** — Clock #1 is running, but this capital-policy lane remains evidence/CRO-gated and unreleased; incumbent AOV A1/A2/A3 economics must identify capital sizing/hedging as the nearest economic blocker before implementation is reconsidered
+**Current execution effect:** **NONE** — Clock #1 is running, but this capital-policy lane remains evidence/CRO-gated and unreleased. Multiple family clocks or multi-scale resonance do not themselves authorize leverage; one current portfolio/capital-policy authority remains singular even when several Alpha Families are evidence-qualified.
 **Financial-alpha evidence:** `0`
 
 ---
@@ -51,7 +51,7 @@ desired_convex_hedge_budget
 capital_regime_state
 ```
 
-The policy cannot exceed CRO hard limits or directly generate broker orders.
+The policy cannot exceed CRO hard limits or directly generate broker orders. Evidence qualification may happen in parallel across families; capital-policy commits remain atomic/singular. No family receives leverage simply because several horizons agree.
 
 ---
 

@@ -1,7 +1,7 @@
 # GodView Top-Level Roadmap
 
-Status: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; LIVE CLOSED`
-Date: 2026-08-08
+Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / MANDATORY_RECUTS_AUTHORIZED / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; LIVE CLOSED`
+Date: 2026-08-09
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Active brief: `docs/context/ACTIVE_BRIEF`
 Method authority: `docs/architecture/alpha_organism_endgame_current.md`
@@ -22,7 +22,7 @@ immutable PIT reality
 → bounded live authority
 ```
 
-Prospective calendar time is the scarce asset. Historical provider/compute capacity is a separate resource. The product is optimized for **evidence velocity × economic relevance**, not infrastructure completeness. Owner execution review=`9.77/10`, approved with one recut: A1→A2 historical PIT backtesting is a first-class second critical lane.
+Prospective calendar time is the scarce asset. Historical provider/compute capacity is a separate resource. The product is optimized for **evidence velocity × economic relevance**, not infrastructure completeness. Final re-audit verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Mandatory execution recuts are authorized by `docs/architecture/aov_strategic_direction_lock_20260809.md`: CRV1 remains the 252d slow business-cycle family, one fast multi-week family is authorized for immediate preregistration, evidence qualification may run in parallel, PAPER-0 implementation is authorized behind minimum gates, historical A1/A2 is hard-blocked until vintage + semantic parity close, and replication readiness starts now.
 
 ## Gate A — Episode-2 freeze
 
@@ -99,7 +99,7 @@ A seal/clock-start receipt is still not financial-alpha evidence; `financial_alp
 
 ## Work while the clock runs
 
-Finish deterministic review closure, not another platform phase, while post-Clock construction uses the active velocity law: **parallelize work; serialize authority**.
+Finish deterministic review closure, not another platform phase. The active velocity law is now **parallelize independent prediction clocks and evidence qualification; serialize current portfolio/capital-policy commits and financial capital authority**. Default active Alpha-family WIP is `2`, with an initial ceiling of `3` until explicit WIP review.
 
 Always-on closure:
 
@@ -107,29 +107,36 @@ Always-on closure:
 - redistribution/regime/corporate-action fixtures;
 - cohort/regime aggregation and closed B0 failure ontology.
 
-Two critical evidence lanes run concurrently:
+The critical clocks run concurrently:
 
 ```text
 LANE 1 — FUTURE TRUTH                    LANE 2 — COMPRESSED LEARNING
 ─────────────────────                    ─────────────────────────────
-weekly prospective tape                  historical PIT CIQ reconstruction
+weekly frozen-109 tape                   historical PIT CIQ
         │                                         │
-Alpha PIT + CRV1                         exact frozen-AOV replay
+CRV1 slow clock (252d)                  VINTAGE AUTHORITY + PARITY GATE
         │                                         │
-matured ReviewPackets                           A1
+fast multi-week Alpha clock             exact frozen-AOV replay
         │                                         │
-bounded mutation                               FREEZE A2 CONTRACT
+parallel evidence qualification                A1
         │                                         │
-hidden/OOS validation                    untouched historical PIT OOS
+matured ReviewPackets                   FREEZE A2 CONTRACT
         │                                         │
-prospective Challenger                          A2
+bounded mutation                        untouched/query-metered A2
         │                                         │
-independent replication                 Parent/Child economics + loss/winner diagnosis
-        │
-bounded capital
+prospective Challengers                 Parent/Child economics + loss/winner diagnosis
+
+PAPER-0                                 REPLICATION READINESS
+────────                                ─────────────────────
+ExecutionIntentV1                       entitlement / identity / PIT / license
+→ market + cls                          → quarantined preparation now
+→ broker canonical state
+→ restart/fencing/FREEZE_NEW_RISK
 ```
 
-Lane 2 may not open Clock #1 outcomes and may not tune Parent/Child between A1 and A2. A1/A2 admission requires a legitimate historical universe/source/availability/identity contract; otherwise the result is explicitly diagnostic rather than promoted.
+CRV1's 252d outcome no longer determines programme learning speed. A separate fast family is required, but the strategic lock deliberately does not choose `SECTOR_ROTATION_ALPHA_v1` versus `VOL_SQUEEZE_BREAKOUT_v1`; that is the next local preregistration decision.
+
+Lane 2 may not open Clock #1 outcomes and may not tune Parent/Child between A1 and A2. A1/A2 is currently **BLOCKED** until one historical CIQ filing-vintage semantic wins destructively and current-vs-historical AOV shared economics pass same-input parity. Current `Original` replay requirements conflict with `Current/Restated` capture semantics; no A1/A2 claim is permitted until that truth issue closes.
 
 Supporting authority-domain work may run concurrently only with independent ownership:
 
@@ -138,12 +145,13 @@ AI Research Tooling
 → receipt / role firewall / source-claim + ReviewPacket fixture mechanics
 → real outcome-informed mutation remains blocked until mature validated ReviewPacket
 
-Discovery Incubator
-→ MARKET_TRANSITION_ALPHA_v1 historical crisis/false-crisis discovery only
-→ no second confirmatory family beside CRV1
+Discovery / Family Incubators
+→ MARKET_TRANSITION_ALPHA_v1 remains discovery-only unless explicitly admitted into one of the active family WIP slots
+→ one fast multi-week family is authorized for immediate preregistration
 
-PAPER Capitalization
+PAPER-0
 → independently owned operational vertical
+→ smallest lineage-correct broker path first; unsupported states fail closed
 ```
 
 After the first matured valid ReviewPacket, real outcome-informed AI may cross its maturity gate:
@@ -155,7 +163,7 @@ validated ReviewPacket
 → development Trial
 ```
 
-Search-debt automation, second confirmatory Alpha families, generic AI/data/provider platforms, elaborate research UI, universal Right-Tail Atlas work, generalized external-strategy ingestion, generic execution architecture, optimizer-first work, leverage/short/options policy, AOV-2, and provider breadth remain evidence-gated rather than blocking A1/A2/A3 economics.
+Search-debt automation, family WIP beyond the initial `2` / ceiling `3`, generic AI/data/provider platforms, elaborate research UI, universal Right-Tail Atlas work, generalized external-strategy ingestion, generic execution architecture, optimizer-first work, leverage/short/options policy, AOV-2, L2/L3, and provider breadth remain evidence-gated rather than blocking A1/A2/A3 economics.
 
 ## Model portfolio direction
 
@@ -180,7 +188,7 @@ No model gains live authority from development results alone.
 
 ## Deferred
 
-Episode-3 milestone · second confirmatory Alpha family before evidence demands it · universal PIT/data/provider platform · generic AI/agent platform · elaborate research UI · universal Right-Tail Atlas · generalized external-strategy ingestion · generic execution architecture · event/pattern authority · 13F/options/ownership expansion · optimizer/RL-first development · unrestricted generated Python · second app/engine · compatibility restoration · broker/live capital · leverage/shorting/derivatives.
+Episode-3 milestone · family WIP beyond the initial operating ceiling without explicit review · universal PIT/data/provider platform · generic AI/agent platform · elaborate research UI · universal Right-Tail Atlas · generalized external-strategy ingestion · generic execution architecture · true liquidity-cascade/LOB authority · L2/L3 / DeepLOB acquisition without a measured information gap · 13F/options/ownership expansion · optimizer/RL-first development · unrestricted generated Python · second app/engine · compatibility restoration · strategy live capital · leverage/shorting/derivatives.
 
 ## Current validation
 

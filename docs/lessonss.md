@@ -1,3 +1,39 @@
+## 2026-08-09 Round Entry (Slow Hypothesis Must Not Become Slow Programme)
+
+- Date: 2026-08-09
+- Mistake or miss: the roadmap correctly prioritized prospective evidence but still let one scientifically valid `252d` family own the only confirmatory Alpha slot, making the programme's learning speed inherit the slowest hypothesis horizon.
+- Root cause: evidence hygiene and construction WIP were coupled too tightly. Serial promotion/capital authority was mistakenly implemented as serial evidence production/qualification.
+- Fix applied: keep CRV1's `252d` primary outcome unchanged, authorize a separate multi-week family clock, allow default two / initial ceiling three independently owned family evidence clocks, and keep only the current portfolio/capital-policy commit chain singular.
+- Guardrail for next time: never shorten a hypothesis merely to obtain faster results, but never let a slow hypothesis determine company learning speed. Ask separately whether work shares a mutable authority surface and whether it shares capital authority.
+- Evidence paths: `docs/architecture/aov_strategic_direction_lock_20260809.md`, `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/architecture/cycle_resonance_v1_build_spec.md`.
+
+## 2026-08-09 Round Entry (Historical PIT Labels Must Match Provider Bytes Before Speeding Up Capture)
+
+- Date: 2026-08-09
+- Mistake or miss: historical replay validation required `FilingVer=Original`, while historical capture requested/emitted `Current/Restated`, and the A1 report still asserted `historical_spg_asof_original=true`.
+- Root cause: provider acquisition throughput work advanced before one explicit historical-vintage authority had been frozen across query, receipt, validator and report layers.
+- Fix applied: hard-block A1/A2 until Quant/Data proves one economically legitimate provider-vintage semantic, destructively removes the competing active interpretation, and proves current-vs-historical AOV same-input parity. Bounded Excel concurrency begins only after that truth gate closes.
+- Guardrail for next time: optimize provider wall-clock only after source semantics are one-to-one across query options, raw receipts, normalization, validators and evidence claims. Faster conflicting data is not evidence velocity.
+- Evidence paths: `research/aov0/historical_pit.py`, `scripts/aov0_capture_ciq_historical_pit_fundamentals.ps1`, `scripts/aov0_capture_ciq_historical_pit_fundamental_chunk.ps1`, `scripts/aov0_historical_pit_replay.py`, `docs/context/observability_pack_current.md`.
+
+## 2026-08-09 Round Entry (PAPER Should Be Thin Before It Is Complete)
+
+- Date: 2026-08-09
+- Mistake or miss: the PAPER capitalization design contained the right production invariants but risked making every rare lifecycle state and hardening tail a prerequisite to the first paper rebalance.
+- Root cause: capital-readiness requirements and first operational-learning requirements were represented as one gate.
+- Fix applied: authorize `PAPER-0` as the minimum lineage-correct target→ExecutionIntent→`market+cls`→broker state→restart/fencing/freeze vertical. Unsupported rare states may fail closed and move to PAPER-1 before bounded capital; first-order calendar correctness remains mandatory.
+- Guardrail for next time: for zero-capital PAPER learning, ship the smallest restart-safe/custody-correct vertical and fail closed on unsupported edges. Do not use ad-hoc submissions and do not mutate historical deterministic fill authority into broker truth.
+- Evidence paths: `docs/architecture/aov_strategic_direction_lock_20260809.md`, `execution/rebalancer.py`, `execution/broker_api.py`, `gv_portfolio_v0/book.py`.
+
+## 2026-08-08 Round Entry (A Downstream Alpha Risk Set Must Prove Its Base Rate, Not Borrow a Convenient Laboratory)
+
+- Date: 2026-08-08
+- Mistake or miss: once real current CIQ identity/market/fundamental custody was available, the fastest-looking CRV1 join was to reuse the already-running AOV frozen 109. That would have made engineering easy but silently conditioned CRV1 on a three-year high-growth screen, destroying the full-risk-set base rate required by the preregistered top-5% outcome.
+- Root cause: permanent identity/market bytes were correctly reusable, but **membership authority** was adjacent to them and could be mistaken for the same reusable object. A provider label such as `CRV1_US_PRIMARY_COMMON_V1` is also too weak unless the capture proves the actual eligibility/filter contract.
+- Fix applied: keep current CIQ structured custody reusable only as source data; make `risk_set()` fail closed without a separate CRV1 source. Require an explicit frozen eligibility-contract ID/hash, no growth/current-survivor/future-membership filter, row-level U.S. primary-common/primary-listing/active-tradable/unique-identity/200-observation proofs, and an independent identity-receipt hash. Separately, preserve absent gross-margin/CFO/expectations/SEC surfaces as `MISSING_SOURCE` rather than degrading them to entity history gaps or fallback data.
+- Guardrail for next time: every downstream Alpha family must prove its denominator/base-rate population independently of whichever laboratory first supplied identities or features. Reuse source bytes when semantics match; never reuse selection authority merely because the IDs overlap. When provider desktop work is already active in another lane, do not kill ambiguous Office workers or run competing acquisition jobs; continue deterministic mechanics and retry the provider join under clear process custody.
+- Evidence paths: `research/alpha_pit_v1/adapters/ciq_cycle_v1.py`, `research/alpha_pit_v1/adapters/sec_claims_v1.py`, `research/cycle_resonance_v1/implementation_manifest.py`, `scripts/alpha_pit_validate_current_ciq_custody.py`, `tests/alpha_pit_v1/test_ciq_cycle_adapter.py`, `tests/cycle_resonance_v1/test_implementation_manifest.py`. Alpha-PIT+CRV1 `19/19 PASS`; AOV `102/102 PASS`; `financial_alpha_evidence=0`.
+
 ## 2026-08-08 Round Entry (Historical Compute and Future Time Are Different Resources)
 
 - Date: 2026-08-08
@@ -2427,3 +2463,27 @@ Application pattern:
 - Guardrail for next time: any owner/product judgment must be represented as unresolved state in production code, not as a convenient engineering default. Test fixtures may carry example values only when the call site explicitly opts into a non-authoritative development contract.
 - Evidence paths: `research/aov0/contracts.py`, `research/aov0/experiment.py`, `research/aov0/review.py`, `scripts/aov0_first_seal.py`, `tests/aov0/conftest.py`.
 
+
+## 2026-08-09 Round Entry (Lane 2 CIQ Excel Capture: Own One Session, Do Not Thrash COM)
+
+- Date: 2026-08-09
+- Mistake or miss: Lane 2 market backfill stalled after many parallel/restarted Excel captures. Symptoms stacked: `Get-FileHash` unavailable in stripped PowerShell sessions, `CO_E_SERVER_EXEC_FAILURE` on `New-Object Excel.Application`, `RPC_E_CALL_REJECTED` / `MK_E_UNAVAILABLE` on `GetActiveObject`, null CIQ COM add-in object after forced kill cycles, and modal **CIQ Pro Office Tools** dialogs blocking automation. Competing writers (WSL gap capture vs A1 backfill) and shell commands that killed themselves by matching `ciq_capture` in their own command line made the outage worse.
+- Root cause: provider desktop automation is a **single physical authority surface** (one Excel+CIQ host), not a free fan-out of independent jobs. Treating each chunk as a fresh COM birth/death event ignores add-in load time, modal dialogs, and Office process residual state. Also: PowerShell reserved `$PID`, string interpolation `$i:$code` (drive parse), and self-matching process filters are operational footguns on this machine.
+- Fix applied / operational law:
+  1. **One owned Excel session** for a full backfill range: start Excel once, dismiss CIQ dialogs, wait until `COMAddIns['SNL.Clients.Office.Excel.ExcelAddIn'].Object` is non-null, then reuse that instance for all chunks (`tmp/aov0_backfill_market_session.ps1`).
+  2. Prefer `.NET SHA256` over `Get-FileHash` in capture scripts.
+  3. Atomic part landings (`Move` temp → final) are progress authority; never re-fetch an existing non-empty `part_*.csv`.
+  4. Kill only **exact child capture PIDs**, never filters that match the killing shell's command line. Never use bare `$PID` as a variable name in monitors.
+  5. Deprioritize A2-bridge gap capture while A1 backfill owns Excel; do not run two CIQ Office workers concurrently.
+  6. After thrash: interactive Excel recovery (dismiss dialogs, smoke `SPG`/`SPGTable`) before more automation — thrashing COM harder does not heal Office.
+- Guardrail for next time: when provider desktop work is the critical path, **serialize on the physical host**. Parallelize only pure code/tests/SOFR/planning. If COM fails twice with the same modal/add-in symptom, stop automation and recover interactively. Landed CSV bytes + hashes remain custody; process noise is not evidence failure.
+- Evidence paths: `data/aov0/historical/raw/market_warmup_to_20250516/` (parts 000–032 complete), `data/aov0/historical/raw/market_backfill_to_20240705/part_000_*`, `data/aov0/historical/raw/nyfed_sofr_20230101_20260807.json`, `scripts/aov0_lane2_a1_driver.ps1`, `tmp/aov0_backfill_market_session.ps1`, `docs/phase_brief/lane2_status_20260809.md`. Lane-2 focused historical tests green; `financial_alpha_evidence=0`; no A1/A2 admission claimed.
+
+## 2026-08-09 Round Entry (Minimum A1 Needs Warmup Depth Before Economic Length)
+
+- Date: 2026-08-09
+- Mistake or miss: a ~10-month historical tape ending 2025-05-16 looks long enough for a “minimum vertical,” but Rule100 technical eligibility requires SMA200/ADV20/vol windows. Valid common security sets only appear near the end of that tape (~2025-04-24+), leaving far fewer than 252 trading days for formal A1 admission.
+- Root cause: evaluation calendar length was counted from raw market coverage rather than from **first date the frozen technical feature set is defined** for a fixed security set.
+- Fix applied / next law: backfill ~200+ pre-evaluation weekdays (target ~2023-08-14 → 2024-07-05) before claiming A1. Use `trading_days >= 252` + real `CIQSEC:` identity + canonical arm gates as the admission gate; shorter windows remain diagnostic only. SOFR must cover the full evaluation+cash history (admitted `2023-01-03 → 2026-08-06`).
+- Guardrail: never report A1 as earned from a post-SMA warm-up stub. If history is short, label `CURRENT_SCREEN_CONDITIONED_DIAGNOSTIC` / gate fail and keep `financial_alpha_evidence=0`.
+- Evidence paths: `research/aov0/historical_pit.py` (`build_historical_market_panel`, `build_historical_replay_inputs`), `scripts/aov0_historical_pit_replay.py` (`a1_minimum_gate`), panel diagnostics in session notes.

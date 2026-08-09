@@ -2,17 +2,22 @@
 
 **Repository:** `E:\code\quant`
 **Status:** `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
-**Roadmap re-audit:** `APPROVED_WITH_VELOCITY_PARALLELISM_RECUT`
+**Roadmap re-audit:** `PASS — STRATEGIC_DIRECTION_LOCKED`
+**Strategic direction:** `APPROVED_AND_LOCKED; BROAD_ARCHITECTURE_REOPEN=NO`
 **Strategic reorder:** `APPROVED_AND_RETAINED`
 **Sim-to-real recut:** `APPROVED_AND_RETAINED`
 **Winner / authority recut:** `APPROVED_AND_RETAINED`
-**Velocity / parallelism recut:** `APPROVED; PARALLELIZE_WORK_SERIALIZE_AUTHORITY`
-**Historical A1→A2 execution recut:** `APPROVED; SECOND_CRITICAL_LANE`
-**Owner execution rating:** `9.77 / 10; APPROVE_WITH_ONE_EXECUTION_RECUT`
-**Documentation sync:** `PATCHED`
+**Velocity / parallelism recut:** `APPROVED; PARALLELIZE_PREDICTION_CLOCKS_AND_EVIDENCE / SERIALIZE_CAPITAL_POLICY_AUTHORITY`
+**Historical A1→A2 execution recut:** `APPROVED; SECOND_CRITICAL_LANE / BLOCKED_UNTIL_VINTAGE_AND_PARITY_CLOSE`
+**PAPER-0 recut:** `AUTHORIZED_FOR_IMPLEMENTATION / FIRST_ORDER_MINIMUM_GATES_REQUIRED`
+**Replication-readiness recut:** `START_NOW / QUARANTINED`
+**Alpha-family WIP:** `DEFAULT=2 / INITIAL_CEILING=3 UNTIL EXPLICIT_WIP_REVIEW`
+**Final re-audit ratings:** `STRATEGY=9.0 / SHIP_FAST=8.2 / IMMEDIATE_SIM_TO_PAPER=7.5; DIRECTION_PASS_AFTER_RECUT`
+**Documentation sync:** `PATCHED_2026-08-09`
 **Authority type:** Approved roadmap/change authority with prior capital-path, evidence-clock, sim-to-real and Winner/Core-Alpha recuts retained; destructive v3 + real CIQ admission + the first immutable Clock-Start Receipt are now complete, while this velocity recut governs post-Clock construction topology
-**Implementation authority:** **CLOCK #1 RELEASED ONLY THE DECLARED POST-CLOCK DOMAINS** — Alpha PIT + first confirmatory Alpha family, bounded AI research tooling under independent ownership, discovery-only incubators, and independent PAPER Capitalization; runtime/evidence/capital authority still requires each deterministic join gate
-**Date:** 2026-08-08
+**Implementation authority:** **MANDATORY RECUTS AUTHORIZED FOR EXECUTION** — preserve Clock #1; continue Alpha PIT + CRV1; preregister one fast multi-week Alpha family; allow independent family clocks/evidence qualification within WIP; implement PAPER-0 behind minimum execution/restart/calendar gates; start quarantined replication readiness; block A1/A2 until historical-vintage + current/historical parity close. Runtime/evidence/capital authority still requires each deterministic join gate.
+**Date:** 2026-08-09
+**Final lock record:** `docs/architecture/aov_strategic_direction_lock_20260809.md`
 **Target mandate:** Multi-hour → multi-week systematic evidence engine, initially AOV / long-cash; true Long-Short only after PIT borrow/locate authority exists.
 
 ---
@@ -23,21 +28,20 @@
 
 | Dimension | Rating | Verdict |
 |---|---:|---|
-| Endgame aggressiveness | **9.9 / 10** | Right-tail / sustainable-compounding destination is correct |
-| Prospective-time aggression | **10 / 10** | Future evidence time remains scarcer than historical completeness |
-| Right-tail mandate alignment | **9.95 / 10** | Capital-weighted right-tail capture is first-class CIO economics |
-| Ship-fast topology | **9.9 / 10** | Minimum Viable Atlas first; seal; expand history underneath running clocks |
-| Post-Clock construction parallelism | **9.8 / 10 after recut** | Alpha PIT, one Alpha family, bounded AI tooling and independent PAPER may build concurrently under separate authority domains |
-| Historical evidence compression | **9.8 / 10 after recut** | A1 exact frozen-AOV replay → freeze A2 contract → untouched PIT A2 is a first-class second critical lane, not subordinate Atlas work |
-| Destructive / no-compat law | **9.9 / 10** | New authority removes old active compatibility in the same slice |
-| Research methodology | **9.9 / 10** | Risk-set, rare-event, search, dependence and hazard methods are sufficient |
-| Sim-to-real authority | **9.5 / 10** | Capitalization contracts are clear; implementation/drills remain post-Clock work |
-| Architecture parsimony | **9.95 / 10** | One incumbent per fork; shared abstractions only after real reuse |
-| CEO / PM capital efficiency | **9.9 / 10** | Six constitutions replace owner-menu governance |
+| Strategic direction | **9.0 / 10** | Endgame is approved and locked; mandatory recuts are execution gates, not a reason to reopen strategy |
+| Endgame aggressiveness after recut | **9.5 / 10** | CRV1 stays slow/clean while a separate multi-week family prevents one-year evidence latency from controlling programme speed |
+| Ship-fast topology | **8.2 / 10 current / higher after recut** | Destructive authority is strong; family clocks, PAPER-0, replication readiness and provider acquisition must parallelize more aggressively |
+| Immediate sim→PAPER readiness | **7.5 / 10 current** | Ingredients exist; ExecutionIntent/TIF/broker-state/restart/calendar joins are mandatory before first PAPER order |
+| Parallel evidence qualification | **APPROVED** | Multiple families may independently qualify evidence; only current portfolio/capital-policy commits remain singular |
+| Historical evidence compression | **HARD GATED** | A1/A2 requires one historical-vintage authority plus current-vs-historical AOV parity before admission |
+| Destructive / no-compat law | **9.9 / 10** | Break obsolete active authority, never PIT/OOS/accounting/risk custody |
+| Research methodology | **9.9 / 10** | Ex-ante Prediction Constitution, multi-scale cycles, Event-Family design and I vs I+X marginal testing are retained |
+| Architecture parsimony | **9.9 / 10** | Rule of Two, one writer per mutable surface, no generic platform response |
+| Capital governance | **LOCKED** | One current portfolio/capital-policy authority; strategy live capital remains closed |
 
-**Latest alignment rating:** **~99 / 100 design alignment; owner execution review = 9.77 / 10 after the A1→A2 recut.**
-**Roadmap verdict:** **`APPROVED_WITH_VELOCITY_PARALLELISM_RECUT`; owner execution recut=`A1_A2_SECOND_CRITICAL_LANE`.**
-**Top-level design:** **effectively closed; the operating objective is `EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE`, under `PARALLELIZE_WORK / SERIALIZE_AUTHORITY`. The next meaningful disagreement should come from A1/A2/A3 economics and experiments, not another broad architecture meeting.**
+**Final strategic verdict:** **`PASS — STRATEGIC_DIRECTION_LOCKED`.**
+**Roadmap state:** **`APPROVED_AND_LOCKED / MANDATORY_RECUTS_AUTHORIZED_FOR_EXECUTION / BROAD_ARCHITECTURE_REOPEN=NO`.**
+**Top-level design:** **broad strategy is closed, but execution is not declared complete. The operating objective is `EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE`; parallelize independent prediction clocks, evidence qualification, provider acquisition, replication readiness and PAPER learning; serialize current portfolio/capital-policy commits and financial capital. The next strategic disagreement must be evidence-triggered, not architecture-triggered.**
 **Current execution state:** **`CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`; financial-alpha evidence remains `0`.**
 
 The prior architecture/scientific-bar, strategic-reorder, and sim-to-real conclusions remain valid on their scopes. The latest recut removes the remaining waterfall/governance risks: the Right-Tail Atlas is minimum-viable-family-first rather than a historical megaproject; `CYCLE_RESONANCE_v1` is preregistered now but not implemented; future authority transitions are destructive rather than compatibility-preserving; owner decisions collapse into six constitutions; and each implementation fork starts from one simplest valid incumbent rather than a menu of parallel designs.
@@ -46,7 +50,7 @@ The deeper economic objective is not raw `RIGHT_TAIL_PRECISION` alone. The CIO o
 
 ### One-line reasoning
 
-> Keep future truth running, compress historical learning in parallel, and ask the incumbent economic question first: preserve the weekly prospective clock; reconstruct legitimate historical PIT CIQ; replay exact frozen AOV for A1; freeze and query untouched A2; then let measured incumbent loss/winner-miss economics determine how aggressively CRV1 and later challengers should expand.
+> Slow hypothesis ≠ slow company: preserve Clock #1, keep CRV1's 252d science intact, start a separate multi-week prediction clock, resolve historical PIT truth before A1/A2, ship the smallest lineage-correct PAPER-0 path, and let multiple evidence streams mature in parallel while exactly one current capital-policy authority commits financial risk.
 
 ---
 
@@ -245,6 +249,42 @@ Examples:
 
 No unrealized P&L threshold may be an alpha input.
 
+## 2.6 Ex-Ante Prediction Constitution — Alpha must predict future outcomes
+
+Every Alpha Family that claims predictive authority must write an immutable prediction before outcome visibility. At minimum it binds family/implementation identity, `prediction_made_at`, knowledge cutoff, target variable, horizon, execution boundary, forecast/probability/distribution, input/model hashes, comparator, abstention semantics and prediction hash.
+
+```text
+STATE != FORECAST != TARGET WEIGHT != EXECUTION
+```
+
+Cycle/regime classification, GMM/HMM states, anomaly scores, Hurst estimates, breadth/volatility states and resonance state are context/features until they contribute to a future-directed falsifiable prediction.
+
+## 2.7 Multi-Scale Cycle Philosophy — 萬物皆週期, but no universal regime score
+
+GodView recognizes simultaneous structural/secular, business/earnings, sector/market and tactical/event cycles. These horizons may disagree. The portfolio crosses cycles by composing independently validated forecasts rather than collapsing all information into one regime classifier.
+
+Every composition seam requires an `I` versus `I+X` marginal test after cost, capacity, drawdown, false-winner and winner-clipping effects.
+
+## 2.8 Event-Family scientific unit; models remain implementations
+
+The scientific unit is an economic Alpha/Event Family. A family freezes mechanism, PIT inputs, state/event detector, future target, horizon, falsifier, search budget, costs/capacity and evidence contract. `Hawkes`, `GMM`, `XGBoost`, `TFT`, `DeepLOB` or foundation models are replaceable implementations, not architecture.
+
+Model escalation is demand-driven:
+
+```text
+M0 deterministic
+→ M1 linear/logistic/statistical
+→ M2 tree boosting
+→ M3 sequence/deep
+→ M4 foundation/ensemble
+```
+
+Higher complexity must prove incremental untouched/OOS economic utility.
+
+## 2.9 Demand-pulled data acquisition
+
+Do not acquire richer data because a fashionable model can consume it. Test the economic hypothesis with legitimate current data, measure the residual information gap, and acquire richer sources only when the missing information is economically binding. Daily CIQ price/volume may support sector-rotation, squeeze/breakout and low-frequency exhaustion-proxy research; true liquidation/LOB absorption and L2/L3 remain deferred until justified.
+
 ---
 
 # 3. Current Repo Truth — Reuse, Do Not Rebuild
@@ -322,23 +362,25 @@ NOW
        │ weekly frozen-109 AOV tape never stops                     │
        │ → matured deterministic ReviewPackets                      │
        │                                                             │
-       │ CLOCK B — RESEARCH / BUILD DOMAINS                         │
+       │ CLOCK B — RESEARCH / PREDICTION DOMAINS                    │
        │ PIT PIPELINE: one narrow alpha_pit_data_api_v1 incumbent   │
-       │ ALPHA FAMILY: one confirmatory family build, first=CRV1    │
+       │ FAMILY CLOCK A: CRV1 252d business-cycle family            │
+       │ FAMILY CLOCK B: one preregistered multi-week family        │
+       │ optional Clock C only within initial WIP ceiling=3         │
        │ AI TOOLING: one bounded receipt/fixture/discovery vertical │
-       │ DISCOVERY: registered incubators may run without authority │
-       │ Challenger A seal → Challenger B seal → Challenger C seal  │
+       │ evidence qualification may occur in parallel               │
        │                                    ↓   ↓  ↓                 │
        │                         MULTIPLE IMMUTABLE RUNNING TAPES    │
        │                                                             │
        │ CLOCK C — EXTERNAL LEAD TIME                               │
-       │ first Challenger seal → independent-replication data prep  │
+       │ NOW → quarantined independent-replication readiness        │
        │ Clock #1 → borrow/locate entitlement feasibility           │
        │                                                             │
-       │ CLOCK D — OPERATIONAL PARITY                               │
+       │ CLOCK D — PAPER-0 OPERATIONAL PARITY                       │
        │ current frozen AOV targets                                 │
-       │ → paper execution intent → fills/positions/cash/P&L        │
-       │ → reconciliation/restart/kill-path learning                │
+       │ → ExecutionIntentV1 → MOC market+cls                       │
+       │ → broker canonical state → reconciliation/restart/fencing  │
+       │ → persistent FREEZE_NEW_RISK on ambiguity                  │
        └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -373,7 +415,7 @@ NOW
                                  → BOUNDED L/S CAPITAL
 ```
 
-**Strategic law:** true Long-Short is a capability extension, not the license for the company to begin bounded long/cash capital deployment.
+**Strategic law:** true Long-Short is a capability extension, not the license for the company to begin bounded long/cash capital deployment. Multiple Alpha Families may independently qualify evidence; only the current portfolio/capital-policy authority and financial capital commit remain singular.
 
 ---
 
@@ -892,7 +934,7 @@ general-market alpha
 
 Independent replication SHALL separate universe-selection edge, policy edge, forecast edge, and portfolio-construction edge. A second universe / untouched cross-sectional block is higher priority than adding dozens of new features to the same 109 names.
 
-The **replication lead-time clock starts after the first Forecast Challenger seal**, not after the entire research stack matures. Data entitlement, permanent identity, PIT availability, and retention feasibility may have external lead time; prepare that independent surface early while keeping it untouched by iterative research. Before first bounded long/cash capital, require the conjunction of prospective edge evidence, one genuinely independent replication, and operational parity.
+The **replication-readiness lead-time clock starts now**, not after the first Forecast Challenger seal. Entitlement, permanent identity, PIT/vintage semantics, retention/license feasibility and expected acquisition latency may be prepared in an immutable quarantined authority domain while outcomes remain inaccessible to iterative research. Actual family-specific replication acquisition remains demand-pulled. Before first bounded long/cash capital, require the conjunction of prospective edge evidence, one genuinely independent replication, and operational parity.
 
 ---
 
@@ -2645,21 +2687,25 @@ Do not rerun the high-growth screener as the weekly universe selector.
 
 ## CLOCK B1 — Future Truth / Alpha Construction
 
-Post-Clock WIP is **domain-scoped**, not globally serial. There is exactly one confirmatory Alpha-family implementation at a time, while its narrow PIT producer and independently owned bounded tooling may build beside it:
+Post-Clock WIP is **domain-scoped**, not globally serial. Independent Alpha-family prediction clocks may build and evidence-qualify concurrently when ownership, search budget, artifacts and mutable writer surfaces are isolated:
 
 ```text
 ALPHA_PIT_PIPELINE       one incumbent producer = alpha_pit_data_api_v1
-ALPHA_FAMILY_BUILD       one confirmatory family = CYCLE_RESONANCE_v1 first
+FAMILY CLOCK A           CYCLE_RESONANCE_v1 / 252d primary unchanged
+FAMILY CLOCK B           one preregistered multi-week family
+FAMILY CLOCK C           optional only within initial WIP ceiling=3
 AI_RESEARCH_TOOLING      one bounded non-authoritative tooling lane if independently owned
-DISCOVERY_INCUBATORS     outcome-visible discovery only; zero confirmatory/capital authority
+DISCOVERY_INCUBATORS     outcome-visible discovery; no automatic confirmatory/capital authority
 
-CRV1 fixture build ───────┐
-Alpha PIT producer ───────┼→ deterministic real-PIT integration join → CRV1 freeze/seal
-bounded AI fixtures ──────┘   (AI does not block the join)
+CRV1 fixture/build ───────┐
+Fast-family build ────────┼→ family-bound deterministic joins → independent prediction seals
+Alpha PIT producer ───────┼
+bounded AI fixtures ──────┘   (AI does not own evidence/capital authority)
 
-sealed Challenger A ─────────────────────────→ future evidence matures
-next confirmatory family may use the Alpha slot only after A seals or explicit PM/CEO PIVOT
+multiple qualified family evidence streams ─→ one current portfolio/capital-policy commit chain
 ```
+
+Default active family WIP=`2`; initial ceiling=`3` until explicit ownership/search-budget/risk-capacity review. Evidence qualification is not serialized.
 
 Prediction Ledger + Trial Ledger protect custody and multiple-testing honesty. Shared `UniverseSnapshot` / `FeatureSnapshot` abstractions are extracted only when the second real consumer requires them. Parallel work never means parallel writers to one authority domain.
 
@@ -2689,27 +2735,29 @@ Two externally dominated clocks run without waiting for the serial research chai
 Clock #1
 → borrow / locate entitlement feasibility
 
-first Forecast Challenger seal
-→ independent-replication data entitlement / identity / PIT preparation
+NOW
+→ independent-replication entitlement / identity / PIT-vintage / license readiness in quarantine
 ```
 
 The independent replication surface remains untouched by iterative research until its preregistered use.
 
 ## CLOCK D — Capitalization Vertical / Operational Readiness
 
-Immediately after Clock #1, independent ownership starts the thin **Capitalization Vertical** in PAPER mode while research tapes continue:
+Immediately after Clock #1, independent ownership starts the thin **PAPER-0 Capitalization Vertical** while research tapes continue:
 
 ```text
 current frozen AOV target [operational learning only]
-→ paper rebalance identity
+→ live_rebalance_id
+→ ExecutionIntentV1
 → account + CIQSEC↔broker execution map
-→ signed account-bound intent
-→ broker submit / ACK / partial-fill / terminal lifecycle
-→ canonical live book + open orders
+→ MOC_CLOSE_AUCTION_V1 = market + cls
+→ broker submit / ACK / open orders / partial-fill / fill/cancel/reject
+→ canonical PAPER state including residual open risk
 → broker positions/cash/open-orders reconciliation
-→ persistent restart / FREEZE_NEW_RISK behavior
-→ implementation-shortfall / fees / timing / cash-drag bridge
+→ rebalance_epoch fencing + persistent restart / FREEZE_NEW_RISK behavior
 ```
+
+PAPER-0 may fail closed on unsupported rare lifecycle states; bust/correct/full replacement normalization and extended attribution may close in PAPER-1 before bounded capital. The first PAPER order must resolve the actual session close, including early-close semantics, or be explicitly restricted to a verified regular full-session day and fail closed otherwise.
 
 This path remains `financial_alpha_evidence=0` until a promoted capital-relevant research policy exists. When promotion later occurs, exactly one `promoted_policy_id / promoted_seal_id` feeds exactly one `live_rebalance_id`; the adapter is reused rather than replaced.
 
@@ -2772,7 +2820,7 @@ CRITICAL LANE 1 — FUTURE TRUTH
 1. weekly AOV prospective tape — always on
 2. deterministic review + custody/replay closure
 3. one narrow alpha_pit_data_api_v1 incumbent
-4. one confirmatory Alpha-family implementation at a time; first=CYCLE_RESONANCE_v1
+4. default two independent confirmatory/prediction family clocks; Clock A=CYCLE_RESONANCE_v1 252d unchanged, Clock B=one fast multi-week family; initial ceiling=3 with explicit WIP review
 5. matured ReviewPacket → bounded mutation only after the maturity gate
 
 CRITICAL LANE 2 — HISTORICAL COMPRESSION
@@ -2794,14 +2842,14 @@ DISCOVERY INCUBATORS
 
 ASYNC EXTERNAL LEAD TIME
 13. borrow/locate feasibility from Clock #1
-14. independent-replication data preparation after first Challenger seal
+14. independent-replication entitlement/identity/PIT-vintage/license readiness starts now in quarantine
 
 INDEPENDENT CAPITALIZATION CLOCK
 15. thin PAPER Capitalization Vertical on current frozen AOV targets
     for account/map/lifecycle/reconciliation/restart/IS learning only
 ```
 
-**One writer per authority domain.** Two lanes may not write the same current-authority object/package, and parallel work converges only through immutable versioned objects plus deterministic join gates. Authority replacement/promotion remains serial and destructive even when engineering is parallel.
+**One writer per mutable authority surface.** Two lanes/families may not write the same current-authority object/package, and parallel work converges only through immutable versioned objects plus deterministic join gates. Evidence qualification may occur in parallel. Destructive current-authority replacement and the portfolio/capital-policy commit remain serial/atomic even when engineering and evidence production are parallel.
 
 Join gates:
 
@@ -2829,7 +2877,7 @@ query-metered hidden historical PIT evaluation is append-only; result cannot be 
 
 The `alpha_pit_data_api_v1` and `CYCLE_RESONANCE_v1` teams may implement against the already-frozen contract concurrently: Alpha-family code uses deterministic contract fixtures until real API artifacts cross J3. Bounded AI tooling may likewise build receipt/schema/fixture mechanics and discovery-only source-claim interpretation post-Clock; real outcome-informed mutation cannot cross J5 early.
 
-`MARKET_TRANSITION_ALPHA_v1` may run historical Crisis-Transition/false-crisis discovery, PIT source-gap inventory and preregistration in parallel, but its confirmatory implementation does not occupy a second Alpha-family authority slot beside CRV1. It enters that slot only after CRV1 seals or an explicit PM/CEO `PIVOT`.
+`MARKET_TRANSITION_ALPHA_v1` may run historical Crisis-Transition/false-crisis discovery, PIT source-gap inventory and preregistration in parallel. It remains discovery-only unless explicitly admitted into one of the active Alpha-family WIP slots under the family-isolation/search-budget law; CRV1 sealing is no longer a constitutional prerequisite to such a local admission decision.
 
 Queued capital work becomes active only when it is the nearest blocker or independently owned:
 
@@ -2847,11 +2895,11 @@ post-Seal refactors
 2. Measure the current frozen AOV historically with legitimate PIT data; make the A1 exact-replay path a real critical lane, not background Atlas work.
 3. Freeze and obtain untouched/query-metered A2 before using hidden history as an iterative research playground.
 4. Determine exactly where the incumbent loses money, where Child helps/hurts Parent, and where winners are missed, under-sized or clipped.
-5. Build/seal `CYCLE_RESONANCE_v1` as one economically motivated challenger; Alpha PIT producer/consumer engineering may still run concurrently where ownership is independent.
+5. Keep `CYCLE_RESONANCE_v1` as the 252d slow business-cycle clock **and preregister/build one fast multi-week family beside it**; Alpha PIT producer/consumer engineering may run concurrently where ownership is independent.
 6. Finish deterministic review/custody before the first prospective outcomes mature; real outcome-informed mutation waits for the matured validated ReviewPacket.
 7. Start bounded AI tooling only if it does not reduce throughput of the two critical evidence lanes; otherwise queue it.
-8. Keep Market Transition discovery-only, PAPER Capitalization independently parallel, and replication/borrow lead time asynchronous.
-9. Add another Alpha family, optimizer, leverage, options, generalized provider/data/AI/UI platform, universal Atlas or generic execution architecture only when measured evidence makes it the nearest economic blocker.
+8. Keep Market Transition discovery-only unless explicitly admitted into family WIP; run PAPER-0 independently in parallel; start replication readiness now and keep borrow lead time asynchronous.
+9. Add family WIP above the initial ceiling, optimizer, leverage, options, generalized provider/data/AI/UI platform, universal Atlas, L2/L3, or generic execution architecture only when measured evidence makes it the nearest economic blocker.
 10. Capitalize bounded long/cash only after prospective edge + independent replication + Capitalization Vertical authority satisfy owner/risk gates; true L/S remains optional and borrow-backed.
 
 Repository-wide SAW/full-suite closure remains a phase-close concern, not an automatic Alpha-lane serialization point: an owned research slice whose deterministic scope gates pass may ship while unrelated inherited failures remain explicitly open.
@@ -2966,7 +3014,7 @@ These are intellectual anchors, not code requirements.
 
 # 33. Re-audit Checklist — Required Owner Decisions
 
-Latest alignment result: **`APPROVED_WITH_WINNER_AND_AUTHORITY_RECUT` at ~99/100 after recuts; prior strategic and sim-to-real recuts are retained; documentation is patched; top-level design is effectively closed; destructive v3 temporal-authority semantics and the pre-Seal adversarial authority suite remain closed locally; execution authority is still blocked only on real CIQ inputs.** The Winner/authority recut changes post-Clock research/capitalization topology and future authority-replacement rules, not the current pre-Seal gate.
+Final alignment result: **`PASS — STRATEGIC_DIRECTION_LOCKED`; prior strategic/sim-to-real/Winner recuts are retained as historical foundations; broad architecture reopen=`NO`; mandatory execution recuts are authorized; Clock #1 remains unchanged and outcome-sealed.** The current execution gates are evidence-duration/multi-family WIP, historical-vintage + parity for A1/A2, PAPER-0 minimum joins, and replication readiness—not another architecture-design cycle.
 
 ## Six owner constitutions — top-level governance surface
 
@@ -3034,7 +3082,7 @@ The detailed checklist below proves consistency with those constitutions; it is 
 
 - [x] New Forecast Layer is challenger first.
 - [x] An independently pre-registered Forecast Challenger may be built after Seal #1 without waiting for AOV outcome maturity; only outcome-informed mutation must wait for a matured ReviewPacket.
-- [x] One active build lane does not mean one running experiment: after A is sealed, B may use the build lane while A keeps collecting immutable future evidence.
+- [x] Multiple independently owned Alpha-family builds/prediction clocks may run concurrently within default WIP=`2` / initial ceiling=`3`; evidence qualification is parallel while the current portfolio/capital-policy commit is singular.
 - [x] Multiple running Challenger tapes remain explicitly accounted in Trial Ledger / search-family governance.
 - [x] Raw Rule100 score is not relabeled as probability/expected return.
 - [x] OOS count is policy-versioned, not a global constant.
@@ -3048,7 +3096,7 @@ The detailed checklist below proves consistency with those constitutions; it is 
 ## Independent replication
 
 - [x] AOV-109 remains a laboratory, not external-validity proof.
-- [x] Independent-replication data/identity/PIT lead time starts after the first Forecast Challenger seal.
+- [x] Independent-replication entitlement/identity/PIT-vintage/license readiness starts now in quarantined custody; outcomes remain inaccessible to research until preregistered use.
 - [x] First bounded long/cash capital requires prospective evidence + one genuinely independent replication + operational parity.
 
 ## Long-Short
@@ -3082,7 +3130,7 @@ The detailed checklist below proves consistency with those constitutions; it is 
 
 - [x] Parent-order IS/capacity is primary execution research and may start on long-side trades before short authority exists.
 - [x] HFT queue model is deferred/non-blocking.
-- [x] Post-Seal engineering WIP is domain-scoped rather than globally serial: one incumbent writer each for Alpha PIT Pipeline, one confirmatory Alpha Family, bounded AI Research Tooling, and independently owned PAPER Capitalization; discovery incubators may run without confirmatory/capital authority; all joins are deterministic and authority promotion remains serial.
+- [x] Post-Seal engineering WIP is domain-scoped rather than globally serial: one Alpha PIT incumbent, default two independent Alpha-family clocks (initial ceiling three), bounded AI Research Tooling, and independently owned PAPER-0 may run concurrently; discovery incubators have no automatic confirmatory/capital authority; all joins are deterministic, evidence qualification may be parallel, and the current capital-policy commit remains singular.
 - [x] Thin PAPER Capitalization Vertical starts after Clock #1 under independent ownership and may use current frozen AOV targets for operational learning with `financial_alpha_evidence=0`.
 - [x] Capitalization Vertical binds one promoted policy/seal to one `live_rebalance_id`; research arms/cohorts/tapes never become broker sleeves automatically.
 - [x] `CIQSEC:<id>` requires a PIT hash-bound broker instrument/account execution map before submission.
@@ -3142,8 +3190,8 @@ Performance
 = NO_ACTION_UNTIL_MEASURED_BOTTLENECK
 
 Roadmap Topology
-= APPROVED_WITH_VELOCITY_PARALLELISM_RECUT + A1_A2_SECOND_CRITICAL_LANE
-= prior strategic/sim-to-real/winner recuts retained; Lane 1 preserves future truth and builds the first confirmatory Alpha Family, while Lane 2 independently compresses historical learning through legitimate PIT → exact frozen-AOV A1 → frozen untouched A2. Market Transition is discovery-incubator-only until the Alpha-family slot opens; system-wide destructive authority replacement remains mandatory.
+= PASS — STRATEGIC_DIRECTION_LOCKED
+= prior strategic/sim-to-real/winner recuts retained; CRV1 remains the 252d slow clock, one fast multi-week family is authorized, historical A1/A2 is blocked until vintage+parity close, PAPER-0 and replication readiness are active recuts, parallel evidence qualification is allowed, and one current portfolio/capital-policy authority remains singular.
 
 Research / CIO
 = RIGHT_TAIL_WINNER_MANDATE

@@ -1,8 +1,8 @@
 # Lane 2 — Historical Compression / A1 → A2
 
 **Mode:** `APPROVED_EXECUTION_LANE_SPEC`
-**Date:** 2026-08-08
-**Status:** `AUTHORIZED / NOT YET EVIDENCE-EARNED`
+**Date:** 2026-08-09
+**Status:** `AUTHORIZED / HARD_BLOCKED_UNTIL_HISTORICAL_VINTAGE_AND_PARITY_CLOSE / NOT_YET_EVIDENCE_EARNED`
 **Clock #1:** `RUNNING / OUTCOME_SEALED`
 **Financial alpha evidence:** `0`
 
@@ -39,6 +39,10 @@ bounded capital
 ```
 
 Lane 2 is independent of Clock #1 outcome authority. It may not open or consume the sealed prospective outcomes.
+
+### 2026-08-09 hard admission gates
+
+A1/A2 cannot currently be claimed. The historical replay contract requires `FilingVer=Original`, while the active CIQ historical fundamental capture scripts request/emit `Current/Restated`. Quant/Data must prove and freeze one legitimate historical-vintage semantic, destructively remove the competing active interpretation/misleading labels, and then prove current-vs-historical AOV same-input parity before `exact frozen-AOV replay` can earn A1 authority.
 
 ## A1 — exact frozen-AOV historical replay
 
@@ -150,7 +154,7 @@ Owned deterministic slice gates control Lane-2 progress. Unrelated repository-wi
 
 Do not let Lane 2 become an excuse to start:
 
-- a second confirmatory Alpha family;
+- family WIP above the final-lock default `2` / initial ceiling `3` without explicit WIP review;
 - a generic AI/agent platform;
 - a generic data/provider platform;
 - elaborate research UI;
@@ -163,6 +167,8 @@ Do not let Lane 2 become an excuse to start:
 
 ## Done when
 
+- [ ] one CIQ historical filing-vintage semantic is explicit, provider-proven, fail-closed and sole active authority;
+- [ ] current-vs-historical same-input parity reconciles shared AOV economics;
 - [ ] historical PIT source/availability/universe contract is explicit and fail-closed;
 - [ ] exact frozen AOV replay is deterministic and hash-bound;
 - [ ] A1 is either legitimately admitted or explicitly downgraded to diagnostic scope;

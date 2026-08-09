@@ -1,20 +1,24 @@
 # Multi-Stream Contract — Current
 
-Date: 2026-08-07
-Gate: `FIRST REAL AOV-0 FIVE-ARM PROSPECTIVE SEAL`
-Status: `ONE PRIMARY SEAL BOUNDARY + PARALLEL NON-BLOCKING LANES`
+Date: 2026-08-09
+Gate: `STRATEGIC_DIRECTION_LOCKED / MULTI_CLOCK_EVIDENCE / PAPER_0_AND_REPLICATION_RECUTS`
+Status: `PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY / ONE_WRITER_PER_MUTABLE_AUTHORITY_SURFACE`
 
 ## Lane map
 
 | Lane | Current state | Blocking relationship |
 |---|---|---|
-| Insurance V0 | materiality `0.05` + annual premium ceiling `0.0015` | frozen; no longer blocks |
-| First-seal data admission | CIQ Security IDs + Rule100 targets + vertical primitives + CIQ primary-security total returns + official SOFR + CIQ decision cut | blocks real seal |
-| AOV mechanical vertical | hard cut + research hardening + cube + Parent/Child + DAG + seal machinery | locally complete |
-| Review | deterministic core complete; full lineage/fixtures open | parallel after seal; must finish before mature interpretation |
-| E2 external custody | push + hosted Win/Linux + independent audit + optional publication | parallel external lane; does not block local AOV mechanics |
-| Model evolution | first AI MutationManifest | starts only from a matured validated ReviewPacket |
-| Identification/AOV-2 | discovery-only source pool | deferred; never blocks first seal |
+| Insurance V0 | materiality `0.05` + annual premium ceiling `0.0015` | frozen; no result-driven calibration |
+| Clock #1 / weekly AOV tape | real v3 clock running; frozen-109 weekly refresh/seal cadence | always-on; does not wait for Alpha PIT/CRV1 |
+| Lane 1 Alpha PIT | fixture + concrete CIQ structured/SEC-claims adapter mechanics green; current CIQ custody verified | broad non-growth CRV1 risk-set + expectation/SEC source capture still block real CRV1 join |
+| Lane 1 CRV1 | unchanged 252d slow business-cycle clock; provider-blind mechanics in working tree | legitimate risk set/source join + empirical prediction clock open |
+| Fast Alpha Clock | authorized for immediate preregistration; candidate not chosen | default family WIP is 2; second family needs isolated owner/search/prediction identity and minimal FamilyDataContract |
+| Lane 2 Historical Compression | first-class but A1/A2 hard-blocked | resolve `Original` vs `Current/Restated` vintage authority + current/historical AOV parity before evidence admission |
+| PAPER-0 | implementation authorized; no first order yet | ExecutionIntentV1, `market+cls`, broker canonical state, restart/fencing/FREEZE_NEW_RISK, actual-session-close gate |
+| Replication readiness | start now in quarantine | entitlement/identity/PIT/license prep only; outcomes inaccessible to research |
+| Review | deterministic core complete; full lineage/fixtures open | must finish before mature interpretation / outcome-informed mutation |
+| E2 external custody | push + hosted Win/Linux + independent audit + optional publication | parallel external lane |
+| Model evolution | first real outcome-informed MutationManifest | starts only from a matured validated ReviewPacket |
 
 ## Integration law
 
@@ -24,6 +28,7 @@ Status: `ONE PRIMARY SEAL BOUNDARY + PARALLEL NON-BLOCKING LANES`
 - Frozen insurance V0 values cannot be changed in place; any change creates a new contract/model family.
 - Historical or synthetic input cannot substitute for admitted current first-seal data.
 - Review is deterministic before any AI interpretation.
+- Multiple families may independently become evidence-qualified; only the current portfolio/capital-policy commit chain is singular.
 - UI cannot own market, formula, weight, evidence, or review authority.
 
 ## Frozen seams
@@ -40,7 +45,7 @@ Status: `ONE PRIMARY SEAL BOUNDARY + PARALLEL NON-BLOCKING LANES`
 
 ## Deferred lanes
 
-Broad provider acquisition, source-app sweep, event NLP/pattern authority, 13F/options/ownership, universal PIT platform, optimizer/RL-first work, hidden-OOS platform breadth before need, broker integration, additional applications, and live capital.
+Broad provider platformization, source-app sweep, event NLP/pattern authority, 13F/options/ownership, universal PIT platform, optimizer/RL-first work, hidden-OOS platform breadth before need, family WIP above the initial ceiling without review, L2/L3 / DeepLOB without a measured information gap, additional applications, and strategy live capital. PAPER-0 and replication readiness are no longer deferred.
 
 ## Stop conditions
 

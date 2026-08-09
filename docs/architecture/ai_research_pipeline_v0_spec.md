@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-08
 **Status:** `BUILD_SPEC / CLOCK_1_RELEASED / NOT_IMPLEMENTED`
-**Authority:** research-workflow and provenance design; bounded tooling may start only under genuinely independent ownership and may not slow Lane 1 Future Truth or Lane 2 A1→A2 Historical Compression
+**Authority:** research-workflow and provenance design; bounded tooling may start only under genuinely independent ownership and may not slow Future Truth, Historical Compression, the authorized fast-family clock, or PAPER-0 minimum closure
 **Current execution effect:** **SUPPORTING TOOLING LANE / NO FINANCIAL AUTHORITY** — Clock #1 is running; AI is not a critical-path substitute for measuring incumbent AOV economics
 **Financial-alpha evidence:** `0`
 
@@ -73,6 +73,8 @@ bounded mutations
 failure interpretations
 next research priorities
 ```
+
+AI may support several independently owned family clocks, but it cannot merge their evidence into capital authority. Evidence qualification remains deterministic/family-bound; current portfolio/capital-policy authority remains singular.
 
 All AI outputs are `NON_AUTHORITATIVE` until a deterministic admission boundary accepts them.
 
