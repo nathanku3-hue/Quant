@@ -1,6 +1,7 @@
 ## 2026-08-09 Strategic Direction Lock — Prediction / Multi-Clock / PAPER-0 Registry
 
 - Strategic authority: `STRATEGIC_DIRECTION=APPROVED_AND_LOCKED`; `BROAD_ARCHITECTURE_REOPEN=NO`; `MANDATORY_RECUTS=AUTHORIZED_FOR_EXECUTION`; canonical record=`docs/architecture/aov_strategic_direction_lock_20260809.md`.
+- PAPER-0 authority=`docs/architecture/paper_0_authority.md`; historical vintage gate=`docs/architecture/historical_fundamental_vintage_authority.md`; method endgame=`docs/architecture/alpha_organism_endgame_current.md`.
 - Evidence/capital law: `parallel_evidence_qualification = true`; `current_capital_policy_authority_count = 1`. Several Alpha Families may independently qualify evidence; qualification is not a capital commit.
 - Family WIP law: `default_active_alpha_families = 2`; `initial_alpha_family_ceiling = 3`; CRV1 keeps `primary_horizon=252 trading days`; one fast family with economically justified multi-week horizon is preregistered separately.
 - Prediction law: `State_t != Forecast_t(h) != TargetWeight_t != Execution_t`. `Forecast_t(h)` is an immutable future-directed statistic/distribution/probability bound to `as_of`, target, horizon, execution boundary, input/model hashes, comparator and prediction identity before outcome visibility.

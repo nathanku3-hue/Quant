@@ -83,9 +83,10 @@ Portfolio-alpha evidence: `0`
 - [x] `PARALLEL_EVIDENCE_QUALIFICATION=YES`; `SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY=YES`.
 - [x] CRV1 252d primary outcome remains unchanged; separate fast multi-week Alpha clock authorized for preregistration now.
 - [x] Initial active family WIP default=`2`, ceiling=`3` until explicit ownership/search-budget/risk-capacity review.
-- [x] PAPER-0 implementation authorized behind minimum `ExecutionIntentV1` / `market+cls` / broker canonical state / restart / fencing / `FREEZE_NEW_RISK` / session-close gates; strategy live capital remains closed.
+- [x] PAPER-0 implementation authorized behind minimum `ExecutionIntentV1` / `market+cls` / broker canonical state / restart / fencing / `FREEZE_NEW_RISK` / session-close gates; strategy live capital remains closed. Authority surface=`docs/architecture/paper_0_authority.md`.
 - [x] Replication-readiness entitlement/identity/PIT/license quarantine starts now; replication outcomes stay inaccessible to research.
-- [x] A1/A2 is hard-blocked until one historical CIQ filing-vintage semantic wins destructively and current-vs-historical AOV semantics pass same-input parity.
+- [x] A1/A2 is hard-blocked until one historical CIQ filing-vintage semantic wins destructively and current-vs-historical AOV semantics pass same-input parity. Authority surface=`docs/architecture/historical_fundamental_vintage_authority.md`.
+- [x] Method endgame view `docs/architecture/alpha_organism_endgame_current.md` recut to post-lock multi-clock / PAPER-0 / vintage-hard-block language.
 - [x] No generic data/agent/model/event platform, second OMS, optimizer programme, L2/L3 acquisition or broad UI response is authorized by these recuts.
 
 ## Closed — Velocity / AI / Market Transition roadmap recut (historical docs/research governance)

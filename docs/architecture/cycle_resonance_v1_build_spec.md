@@ -1,12 +1,13 @@
 # CYCLE_RESONANCE_v1 — Thin Build Specification
 
-**Date:** 2026-08-08
+**Date:** 2026-08-09
 **Status:** `BUILD_SPEC / PREREGISTERED / CLOCK_1_RELEASED / MECHANICS_PARTIAL`
 **Family ID:** `CYCLE_RESONANCE_v1`
 **First implementation authority:** **RELEASED AFTER CLOCK #1; INPUT-PACKET + IMPLEMENTATION-MANIFEST MECHANICS IMPLEMENTED**
 **Current execution effect:** **NO EMPIRICAL MODEL AUTHORITY YET** — provider-blind PIT packet closure and the explicit no-scientific-defaults implementation-manifest contract are implemented; clock/claim/resonance/model/runner mechanics and the legitimate broad CRV1 risk-set join remain open
 **Data dependency:** `docs/architecture/alpha_pit_data_api_v1.md` only
 **Strategic role after 2026-08-09 lock:** `SLOW_BUSINESS_CYCLE_FAMILY / 252D_PRIMARY_UNCHANGED / NOT_SOLE_PROGRAMME_CLOCK`
+**Programme lock:** `docs/architecture/aov_strategic_direction_lock_20260809.md`
 
 ---
 

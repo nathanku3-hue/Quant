@@ -31,7 +31,7 @@ Architecture completion, a Seal Candidate, test fixtures, or historical mechanic
 
 Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; canonical meeting record=`docs/architecture/aov_strategic_direction_lock_20260809.md`; broad architecture reopen=`NO`.
 
-The active recuts are execution gates: preserve Clock #1; retain CRV1's `252d` primary horizon as the slow business-cycle family; preregister one fast multi-week family; allow parallel family evidence qualification under default WIP=`2`, initial ceiling=`3`; keep current portfolio/capital-policy authority singular; implement PAPER-0 behind minimum execution/restart/calendar gates; start replication readiness now; and block A1/A2 until historical filing-vintage + current/historical AOV parity close.
+The active recuts are execution gates: preserve Clock #1; retain CRV1's `252d` primary horizon as the slow business-cycle family; preregister one fast multi-week family; allow parallel family evidence qualification under default WIP=`2`, initial ceiling=`3`; keep current portfolio/capital-policy authority singular; implement PAPER-0 behind minimum execution/restart/calendar gates (`docs/architecture/paper_0_authority.md`); start replication readiness now; and block A1/A2 until historical filing-vintage + current/historical AOV parity close (`docs/architecture/historical_fundamental_vintage_authority.md`).
 
 This docs synchronization does not itself bank the worktree's uncommitted Lane-1/Lane-2 executable bytes or create any new alpha/live claim.
 

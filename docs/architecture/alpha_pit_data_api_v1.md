@@ -1,12 +1,12 @@
 # Alpha PIT Data API v1 — Narrow Internal Research Contract
 
-**Date:** 2026-08-08
+**Date:** 2026-08-09
 **Status:** `BUILD_SPEC / CLOCK_1_RELEASED / MECHANICS_IMPLEMENTED / CRV1_RISK_SET_BLOCKED`
 **Authority:** implementation contract for the first post-Clock Alpha Discovery Lane only
 **First consumer:** `CYCLE_RESONANCE_v1`
 **Current execution effect:** **MECHANICAL PRODUCER ACTIVE / NO CRV1 EMPIRICAL AUTHORITY YET** — the capability firewall, content-addressed artifacts, concrete CIQ structured adapter, SEC-claims adapter boundary, explicit missingness, and current-CIQ custody validation are implemented; the independent non-growth `CRV1_US_PRIMARY_COMMON_V1` risk-set source is not landed, CIQ expectations are not landed, and SEC claim bytes are not landed
 **Schema family:** `alpha_pit_data_api_v1`
-**2026-08-09 strategic lock:** current v1 remains deliberately CRV1-first; when the second real Alpha Family opens, extract only a tiny immutable `FamilyDataContract` rather than cloning a platform or preserving CRV1 globals as shared authority
+**2026-08-09 strategic lock:** current v1 remains deliberately CRV1-first; when the second real Alpha Family opens, extract only a tiny immutable `FamilyDataContract` rather than cloning a platform or preserving CRV1 globals as shared authority (`docs/architecture/aov_strategic_direction_lock_20260809.md`)
 
 ---
 

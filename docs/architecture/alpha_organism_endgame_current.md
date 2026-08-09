@@ -1,34 +1,104 @@
 # GodView Alpha-Organism Endgame — Current
 
-Date: 2026-08-07
-Status: `CIQ-AUTHORITY AOV LOCAL; FIRST REAL PROSPECTIVE SEAL BLOCKED CIQ SECURITY/MARKET DATA; ALPHA EVIDENCE 0`
-Canonical product maturity: `70/100` (accepted operability/custody/replay only)
-Portfolio-alpha evidence: `0`
-Limited Live: `CLOSED`
+**Date:** 2026-08-09  
+**Status:** `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MANDATORY_RECUTS_AUTHORIZED; CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`  
+**Canonical product maturity:** `70/100` (operability / custody / replay only)  
+**Portfolio-alpha evidence:** `0`  
+**Limited Live:** `CLOSED; NOT AUTHORIZED`  
+**Strategic lock:** `docs/architecture/aov_strategic_direction_lock_20260809.md`  
+**Roadmap / change authority:** `docs/architecture/aov_endgame_generalization_spec_current.md`  
+**Runtime authority:** frozen executable contract + exact code bytes + admitted receipts (`docs/context/gv_endgame_authority_current.md`)
+
+---
 
 ## Mission
 
-GodView is a point-in-time certified portfolio operating system whose scarce resource is **prospective learning time**:
+GodView is a point-in-time certified portfolio operating system whose scarce resource is **prospective learning time**, optimized for:
+
+```text
+EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE
+```
+
+Endgame path:
 
 ```text
 immutable PIT reality
-→ deterministic market-state organism
-→ same-cut capital-policy experiment
-→ exact outcome review
+→ multi-scale state estimation (context only)
+→ independent ex-ante Alpha-family forecasts
+→ Prediction / Trial custody
+→ marginal composition tests (I vs I+X)
+→ portfolio target
+→ one current capital-policy authority
+→ execution / PAPER operational learning
+→ matured deterministic review
 → bounded mutation
-→ retained positive/negative/neutral/cash evidence
-→ research-capital allocation across model organisms
-→ replicated prospective evidence
-→ bounded live authority
+→ independent replication
+→ bounded live authority (owner/risk gated)
 ```
 
-The north star is the first immutable prospective experiment, not architecture completion.
+AI never owns market truth, formulas, target weights, accounting, evidence status, risk limits, owner budgets, capital-policy commits or live authority. AI may propose a bounded MutationManifest only from validated deterministic ReviewPackets.
 
-AI never owns market truth, formulas, target weights, accounting, evidence status, risk limits, owner budgets, or live authority. AI may propose a bounded MutationManifest only from validated deterministic ReviewPackets.
+---
 
-## Current organism
+## Strategic direction lock (2026-08-09)
 
-State:
+Final re-audit = **`PASS — STRATEGIC_DIRECTION_LOCKED`**. Broad architecture reopen = **`NO`**.
+
+| Law | Meaning |
+|---|---|
+| Parallelize | independent prediction clocks, evidence qualification, historical acquisition (after vintage freeze), replication readiness, PAPER learning |
+| Serialize | current portfolio / capital-policy commits; production risk; financial capital |
+| CRV1 | slow business-cycle family; primary horizon **252 trading days unchanged** |
+| Fast Alpha clock | one multi-week family authorized for **immediate preregistration** |
+| Family WIP | default active = **2**; initial ceiling = **3** until explicit WIP review |
+| PAPER-0 | implementation authorized; first order gated (`docs/architecture/paper_0_authority.md`) |
+| Historical A1/A2 | hard-blocked until vintage + parity (`docs/architecture/historical_fundamental_vintage_authority.md`) |
+| Capital | `financial_alpha_evidence=0`; strategy live capital closed |
+
+Evidence qualification itself is **not** serialized. Multiple families may become evidence-qualified; only the current capital-policy authority is singular.
+
+---
+
+## Ex-ante Prediction Constitution
+
+```text
+STATE ≠ FORECAST ≠ TARGET WEIGHT ≠ EXECUTION
+```
+
+GMM/HMM, cycle/resonance, breadth, anomaly, Hurst, vol-regime and similar objects are **context/features** until they contribute to an immutable future-directed prediction frozen before outcome access.
+
+Minimum predictive artifact:
+
+```text
+prediction_id, family_id, implementation_id
+prediction_made_at, knowledge_cutoff / as_of
+target_variable, forecast_horizon, execution_boundary
+forecast / probability / distribution
+input_packet_hash, model_or_rule_hash
+comparator, abstention semantics
+prediction_hash
+```
+
+---
+
+## Multi-scale cycles
+
+Overlapping clocks may disagree simultaneously:
+
+```text
+STRUCTURAL / SECULAR      years
+BUSINESS / EARNINGS       quarters → years
+SECTOR / MARKET           weeks → months
+TACTICAL / EVENT          days → weeks
+```
+
+Compose independently validated forecasts; do not route all capital through one universal regime classifier.
+
+---
+
+## Current organism (AOV-0)
+
+State cube remains:
 
 ```text
 Q = quality
@@ -42,15 +112,17 @@ U = model/data uncertainty
 
 Rule100 is a degenerate control/regression fixture. Reversal Hazard is risk insurance: it may reduce exposure or increase cash, never increase approved risk.
 
-## Current executable planes
+### Executable planes
 
-1. **Truth** — permanent `CIQSEC:<Capital IQ Security ID>` active security identity, PIT times, S&P Capital IQ Pro primary-security total-return authority, official cash source.
+1. **Truth** — permanent `CIQSEC:<Capital IQ Security ID>`, PIT times, CIQ primary-security total-return authority, official cash.
 2. **Interpretation** — deterministic AOV cube transforms.
-3. **Theory** — frozen contract + one mutation manifest.
-4. **Experiment** — hardened canonical runner, named benchmarks, hash DAG, immutable evidence manifest, seal schema.
-5. **Review** — deterministic gross/cost/net reconciliation and CVaR insurance classification core.
-6. **Policy** — Rule100 budget/cap/schedule/cash semantics preserved; Parent/Child deterministic.
-7. **Governance** — insurance V0 is frozen at `0.05 / 0.0015`; any change creates a new contract/model family; no compatibility aliases.
+3. **Theory** — frozen contract + mutation manifests only after matured ReviewPackets.
+4. **Experiment** — hardened runner, named benchmarks, hash DAG, immutable evidence, seal schema.
+5. **Review** — deterministic gross/cost/net reconciliation and CVaR insurance classification.
+6. **Policy** — Rule100 budget/cap/schedule/cash semantics; Parent/Child deterministic and currently frozen.
+7. **Governance** — insurance V0 frozen at `0.05 / 0.0015`; Destructive Authority Replacement Law; one writer per mutable surface.
+
+---
 
 ## Hard-cut law
 
@@ -60,108 +132,92 @@ Current AOV authority has:
 
 - one root launcher/application (`launch.py` → `dashboard.py`);
 - one engine (`core.engine.run_simulation` through the canonical research runner);
-- one permanent-ID contract (`CIQSEC:<Capital IQ Security ID>`); company `SP_ENTITY_ID`, ticker, legacy PERMNO, and dual-provider aliases are invalid;
+- one permanent-ID contract (`CIQSEC:<Capital IQ Security ID>`);
 - one P&L return authority;
 - one named benchmark policy;
 - one immutable evidence-manifest policy;
-- zero AOV ticker/asset aliases;
-- zero legacy book projection;
+- zero ticker/entity/PERMNO dual-provider aliases in active runtime;
 - zero transitional authority fallback.
 
 `python scripts/aov_zero_compat_scan.py` must remain all-zero.
 
-## Gate A local truth
+---
 
-Episode-2 local executable custody is frozen at `39f7be3894623c095994066b8f0ea2895b968643` and passes exact archived-byte `115/115` selected tests. The older `142/142` statement is stale.
-
-Push, hosted Windows/Linux, independent audit, and publication remain separate external actions and were not performed.
-
-## Gate B local truth
-
-Current local executable lineage ends at `dca69fc72dd3192913aa921323ff48f68610a925` after the AOV hard cut and explicit restoration of the insurance owner-decision boundary.
-
-Implemented mechanics:
+## Clock #1 truth (running)
 
 ```text
-minimal PIT cube
-→ Rule100
-→ Parent
-→ one Child
-→ hash DAG
-→ five-arm evidence machinery
-→ immutable seal/reopen machinery
-→ deterministic review core
+decision_cut_v3 = AOV0_CIQ_20260807_ad2faf0533cec19c
+seal_candidate  = c78088ace7819170cd0064154fba138da4b4f8183dbd4ec48c347a942985ba88
+fresh_process   = 55ba4e2f3670d4fc01839bd22bb164cfd0755efb1ce47f3641b9ca88d61c344c
+clock_start     = eabd645382424f559286045a4980412db9a02a4ad0d594850f93675443cd1b78
+clock_started_at = 2026-08-08T19:48:52.440503Z
+evaluation_start = 2026-08-10T20:00:00Z
+outcome_open_not_before = 2026-09-09T20:00:00Z
 ```
 
-This proves mechanics only. It does not claim an admitted real A1 result or a real prospective seal.
+Clock #1 Parent/Child, identity, source authority, execution/evaluation boundary and outcome seal remain **unchanged**. A seal/clock-start receipt is not financial-alpha evidence.
 
-## Frozen P0 authority
+Local AOV executable tip through insurance boundary: `dca69fc72dd3192913aa921323ff48f68610a925`. Episode-2 local immutable predecessor: `39f7be3894623c095994066b8f0ea2895b968643` (`115/115` archived selected matrix).
 
-Frozen defaults/authority include:
+---
 
-- `F_proxy = robust_z(sign(return) × min(abs(return)/realized_vol,3) × dollar_volume/ADV20)`;
-- `C_proxy = EWMA20(abs(F_proxy))`;
-- date-local Rule100 universe, permanent `CIQSEC:<Capital IQ Security ID>` identity;
-- Rule100 budget/cap/schedule/residual-cash inheritance;
-- one frozen V0 engineering configuration;
-- S&P Capital IQ Pro primary-security total-return matrix only; corporate actions reconciliation-only;
-- one-bar execution, weekly attempts, fixed 30-calendar-day horizon;
-- paired weekly dependence-aware inference;
-- economic cash from existing owner authority: official SOFR − 25 bp, ACT/360, no zero floor, after publication only, no proxy substitution;
-- insurance primary endpoint = Expected Shortfall/CVaR.
-
-Frozen production insurance V0:
-
-- insurance materiality floor ratio = `0.05`;
-- annual insurance-premium ceiling = `0.0015`.
-
-These values require at least 5% relative CVaR/Expected-Shortfall improvement and allow at most 15 bp/year expected net-return sacrifice. Subsequent outcomes cannot calibrate them in place.
-
-## First real seal blocker
-
-The real seal entrypoint now requires only:
+## Parallel lanes while the clock runs
 
 ```text
-data/aov0/current/rule100_targets.parquet
-data/aov0/current/vertical_primitives.parquet
-data/aov0/current/total_returns.parquet
-data/aov0/current/official_sofr.parquet
-data/aov0/current/decision_cut.json
+LANE 1 — FUTURE TRUTH
+  frozen-109 weekly tape
+  + Alpha PIT
+  + CRV1 slow clock (252d)
+  + one fast multi-week Alpha family clock
+  → matured ReviewPackets → bounded mutation → prospective Challengers
+
+LANE 2 — HISTORICAL COMPRESSION
+  historical vintage authority + parity gate  [HARD BLOCK for A1/A2]
+  → exact frozen-AOV replay → A1 → freeze A2 → query-metered A2
+
+PAPER-0
+  ExecutionIntentV1 → market+cls → broker canonical state → restart/fencing
+
+REPLICATION READINESS
+  entitlement / identity / PIT / license quarantine starts now
 ```
 
-No current admitted CIQ-security Rule100 package or official-SOFR package exists at those paths. Existing historical equal-weight data is not Rule100 authority and cannot be relabeled. The earlier CRSP/PERMNO admission plan is superseded for active AOV because the available WRDS account lacks CRSP entitlement. Approved equity authority is one destructive S&P Capital IQ Pro family: one hash-bound `run_4.xlsx` object for the frozen 109-company universe + quarterly Rule100 fundamentals, plus primary-security master + primary-security market/total-return data, with canonical `CIQSEC:<id>` identity. Direct Federal Reserve Bank of New York SOFR retrieval after 15:00 America/New_York remains unchanged; WRDS-mirrored SOFR is not official cash authority. `run_2.xlsx` is historical evidence only. `run_4.xlsx` is the bounded current-cut company-universe/fundamental leg: 1,203 absolute `FQqYYYY` entity-quarter rows and 109 current factor states with canonical Rule100 V1.1 `factor_positive_count`; relative `FQ0` is excluded and all values are conservatively known only at local admission because complete historical publication timestamps are absent. This does not create `CIQSEC:` identity or historical PIT replay authority. Primary-security master/market history is still required for canonical identity, `technical_quality`, final Rule100 targets, AOV primitives, and total returns.
+Supporting domains (independent ownership only): bounded AI Research Tooling; Market Transition discovery unless explicitly admitted into family WIP.
 
-The seal slice hard-binds the prospective cut: `aov0_ciq_decision_cut_v1` must carry SHA-256 for the four Parquets, frozen CIQ contract hash, mechanically recomputed date-local CIQ-security universe hash, and four raw-source receipts/retrieval times for `SPCIQPRO:QUARTERLY_FUNDAMENTALS` (dual-role `run_4` universe/fundamentals), `SPCIQPRO:PRIMARY_SECURITY_MASTER`, `SPCIQPRO:PRIMARY_SECURITY_MARKET_DATA`, and direct NY Fed SOFR, plus knowledge cutoff, decision target date, seal timestamp, and first eligible execution bar. NY Fed retrieval before 15:00 America/New_York is invalid. The entrypoint re-hashes before and after experiment execution, rejects unnamespaced/non-CIQ identity and post-cut/future data or receipt drift, and the seal records the current target-vector hash for all five arms in addition to whole-history DAG hashes.
+---
 
 ## Alpha evidence ladder
 
 | Level | Meaning | Current |
 |---|---|---:|
-| `A0` | mechanical lineage, content hashes, DAG, immutable evidence/seal/review substrate | local substrate exists |
-| `A1` | admitted real exploratory AOV result | not earned |
-| `A2` | query-metered hidden OOS | not started |
+| `A0` | mechanical lineage, hashes, DAG, seal/review substrate | local substrate exists |
+| `A1` | admitted real exploratory exact frozen-AOV historical PIT replay | **blocked** until vintage + parity |
+| `A2` | query-metered untouched historical PIT OOS | **blocked** until A1 freeze |
 | `A3` | matured prospective paper evidence | `0` |
-| `A4` | independent future replication | `0` |
+| `A4` | independent future replication | readiness starts; outcomes quarantined |
 | `A5` | bounded live operational parity | closed |
 
-A test fixture seal is not A1/A3. A real seal starts the prospective clock but still does not itself earn alpha evidence.
+---
 
-## Review and first AI loop
+## Frozen P0 AOV authority (unchanged science)
 
-While the first real clock runs, finish deterministic review lineage and fixtures. The minimum post-maturity AI loop is:
+- `F_proxy = robust_z(sign(return) × min(abs(return)/realized_vol,3) × dollar_volume/ADV20)`
+- `C_proxy = EWMA20(abs(F_proxy))`
+- date-local Rule100 universe; permanent `CIQSEC:` identity
+- Rule100 budget/cap/schedule/residual-cash inheritance
+- one frozen V0 engineering configuration
+- S&P Capital IQ Pro primary-security total-return matrix only
+- one-bar execution, weekly attempts, fixed 30-calendar-day horizon
+- paired weekly dependence-aware inference
+- economic cash = official SOFR − 25 bp, ACT/360, no zero floor, after publication only
+- insurance endpoint = Expected Shortfall / CVaR
+- insurance materiality floor = `0.05`; annual premium ceiling = `0.0015`
 
-```text
-validated ReviewPacket
-→ one schema-valid MutationManifest
-→ deterministic compile
-→ development run
-```
-
-Do not wait for broad governance infrastructure first.
+---
 
 ## Model portfolio direction
 
-As soon as the first evidence-backed mutation exists, research capital leaves the single serial Parent→Child abstraction and establishes the minimum structural roles:
+When the first evidence-backed mutation exists, establish minimum research-capital roles:
 
 ```text
 Safety Parent
@@ -170,24 +226,37 @@ Challenger
 Negative Control
 ```
 
-Additional Challengers and Sentinel are added only when real evidence creates a decision need. The durable endgame is allocation of research/prospective budget across organisms, not repeated wholesale replacement of one model or premature model-governance platformization.
+Add Sentinel / additional Challengers only when real evidence creates the need. Multiple evidence-qualified components do not create multiple simultaneous capital-policy authorities.
 
-## Deferred / forbidden before first seal
+---
 
-Episode 3 as a milestone · universal PIT platform · provider breadth · AOV-2 event integrations · technical-pattern authority · 13F/options/ownership expansion · optimizer/RL-first route · unrestricted generated Python · second app/engine · compatibility restoration · broker/live capital · leverage/shorting/derivatives · alpha claim.
-
-## Fastest path
+## Explicitly deferred / forbidden by this endgame view
 
 ```text
-owner insurance budget
-+ five admitted current AOV input artifacts
-→ FIRST REAL FIVE-ARM PROSPECTIVE SEAL
-→ prospective clock
-→ finish deterministic review lineage/fixtures
-→ matured ReviewPacket
-→ first bounded AI mutation
-→ model portfolio
-→ hidden OOS
-→ future prospective replication
-→ limited-live consideration
+generic data / provider / Alpha / Cycle / Event / AI-agent platform
+second OMS / broad execution platform
+optimizer-first programme
+L2/L3 / DeepLOB without measured information gap
+leverage / shorting / options / derivatives
+strategy live capital
+opening Clock #1 outcomes early
+Parent/Child mutation before matured ReviewPacket
+A1/A2 claims under contradictory historical vintage labels
 ```
+
+---
+
+## Fastest path now
+
+```text
+preserve Clock #1 + weekly tape
++ resolve historical vintage + parity → then A1/A2
++ keep CRV1 252d + preregister one multi-week family
++ implement PAPER-0 behind minimum gates
++ start replication-readiness quarantine
+→ matured ReviewPackets / independent forecasts
+→ bounded mutation and composition tests
+→ capturable capital-policy proposal (still gated)
+```
+
+Next strategic meeting is **evidence-triggered**, not architecture-triggered.

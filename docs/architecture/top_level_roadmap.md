@@ -22,7 +22,7 @@ immutable PIT reality
 → bounded live authority
 ```
 
-Prospective calendar time is the scarce asset. Historical provider/compute capacity is a separate resource. The product is optimized for **evidence velocity × economic relevance**, not infrastructure completeness. Final re-audit verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Mandatory execution recuts are authorized by `docs/architecture/aov_strategic_direction_lock_20260809.md`: CRV1 remains the 252d slow business-cycle family, one fast multi-week family is authorized for immediate preregistration, evidence qualification may run in parallel, PAPER-0 implementation is authorized behind minimum gates, historical A1/A2 is hard-blocked until vintage + semantic parity close, and replication readiness starts now.
+Prospective calendar time is the scarce asset. Historical provider/compute capacity is a separate resource. The product is optimized for **evidence velocity × economic relevance**, not infrastructure completeness. Final re-audit verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Mandatory execution recuts are authorized by `docs/architecture/aov_strategic_direction_lock_20260809.md`: CRV1 remains the 252d slow business-cycle family, one fast multi-week family is authorized for immediate preregistration, evidence qualification may run in parallel, PAPER-0 implementation is authorized behind minimum gates (`docs/architecture/paper_0_authority.md`), historical A1/A2 is hard-blocked until vintage + semantic parity close (`docs/architecture/historical_fundamental_vintage_authority.md`), and replication readiness starts now.
 
 ## Gate A — Episode-2 freeze
 

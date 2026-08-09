@@ -1,4 +1,12 @@
 
+## 2026-08-09 — DOCS ALIGNMENT: MEMO → ROADMAP / SPECS / CONTEXT
+
+- Synchronized canonical docs to the strategic lock and `memo.md` re-audit disposition without creating runtime/capital/evidence authority.
+- Added explicit authority surfaces: `docs/architecture/paper_0_authority.md` and `docs/architecture/historical_fundamental_vintage_authority.md`.
+- Recut method view `docs/architecture/alpha_organism_endgame_current.md` from pre-seal language to `CLOCK_1_RUNNING` + multi-clock / PAPER-0 / vintage-hard-block topology.
+- Lane-2 status brief now hard-blocks A1/A2 economic admission until vintage + parity close; capture remains instrumentation only.
+- Cross-linked roadmap, endgame authority, CRV1, Alpha PIT, planner/impact/done checklist and ACTIVE_BRIEF surfaces. `financial_alpha_evidence=0`; strategy live capital remains closed.
+
 ## 2026-08-09 — STRATEGIC DIRECTION LOCK: MULTI-CLOCK ALPHA / PAPER-0 / HISTORICAL AUTHORITY
 
 - Final re-audit: `PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Canonical decision record=`docs/architecture/aov_strategic_direction_lock_20260809.md`.

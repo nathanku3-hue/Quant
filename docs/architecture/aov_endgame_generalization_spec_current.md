@@ -18,6 +18,9 @@
 **Implementation authority:** **MANDATORY RECUTS AUTHORIZED FOR EXECUTION** — preserve Clock #1; continue Alpha PIT + CRV1; preregister one fast multi-week Alpha family; allow independent family clocks/evidence qualification within WIP; implement PAPER-0 behind minimum execution/restart/calendar gates; start quarantined replication readiness; block A1/A2 until historical-vintage + current/historical parity close. Runtime/evidence/capital authority still requires each deterministic join gate.
 **Date:** 2026-08-09
 **Final lock record:** `docs/architecture/aov_strategic_direction_lock_20260809.md`
+**PAPER-0 authority:** `docs/architecture/paper_0_authority.md`
+**Historical vintage gate:** `docs/architecture/historical_fundamental_vintage_authority.md`
+**Method endgame view:** `docs/architecture/alpha_organism_endgame_current.md`
 **Target mandate:** Multi-hour → multi-week systematic evidence engine, initially AOV / long-cash; true Long-Short only after PIT borrow/locate authority exists.
 
 ---
@@ -3216,19 +3219,22 @@ DRAFT
 → REAUDIT_APPROVED
 → PRE_SEAL_TEMPORAL_AUTHORITY_FIX
 → V3_TEMPORAL_AND_ADVERSARIAL_EVIDENCED
-→ PRE_SEAL_REAL_CIQ_ADMISSION   [CLOSED]
-→ CLOCK_START_RECEIPT_ISSUED    [CLOSED]
-→ CLOCK_1_RUNNING               [current]
-→ POST_CLOCK_DOMAIN_IMPLEMENTATION_ACTIVE
+→ PRE_SEAL_REAL_CIQ_ADMISSION              [CLOSED]
+→ CLOCK_START_RECEIPT_ISSUED               [CLOSED]
+→ CLOCK_1_RUNNING                          [current execution]
+→ STRATEGIC_DIRECTION_LOCKED               [2026-08-09]
+→ POST_CLOCK_MANDATORY_RECUTS_AUTHORIZED   [current programme]
 ```
 
 Current state of this document:
 
 ```text
-CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
+STRATEGIC_DIRECTION_LOCKED
++ CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
++ MANDATORY_RECUTS_AUTHORIZED_FOR_EXECUTION
 ```
 
-Architecture/scientific-bar authority remains approved and shall not be reopened. Prior strategic, sim-to-real and Winner/authority recuts are retained. Real CIQ admission, destructive v3 authority, adversarial tests, real Seal Candidate, fresh-process verification and the immutable Clock-Start Receipt are complete. Clock #1 now releases only the declared post-Clock authority domains under `PARALLELIZE_WORK / SERIALIZE_AUTHORITY`; implementation work remains non-authoritative until its own contract, test, custody, evidence and promotion joins pass. Outcomes remain sealed and `financial_alpha_evidence=0`.
+Architecture/scientific-bar authority remains approved and shall not be reopened. Prior strategic, sim-to-real and Winner/authority recuts are retained. Real CIQ admission, destructive v3 authority, adversarial tests, real Seal Candidate, fresh-process verification and the immutable Clock-Start Receipt are complete. Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED` (`docs/architecture/aov_strategic_direction_lock_20260809.md`). Clock #1 now releases only the declared post-Clock authority domains under **parallelize prediction clocks and evidence qualification; serialize current portfolio/capital-policy commits**. Implementation work remains non-authoritative until its own contract, test, custody, evidence and promotion joins pass. A1/A2 remains hard-blocked until vintage+parity; PAPER-0 first order remains gated; outcomes remain sealed and `financial_alpha_evidence=0`.
 
 ---
 

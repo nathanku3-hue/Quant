@@ -5,7 +5,7 @@
 - Root cause: evidence hygiene and construction WIP were coupled too tightly. Serial promotion/capital authority was mistakenly implemented as serial evidence production/qualification.
 - Fix applied: keep CRV1's `252d` primary outcome unchanged, authorize a separate multi-week family clock, allow default two / initial ceiling three independently owned family evidence clocks, and keep only the current portfolio/capital-policy commit chain singular.
 - Guardrail for next time: never shorten a hypothesis merely to obtain faster results, but never let a slow hypothesis determine company learning speed. Ask separately whether work shares a mutable authority surface and whether it shares capital authority.
-- Evidence paths: `docs/architecture/aov_strategic_direction_lock_20260809.md`, `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/architecture/cycle_resonance_v1_build_spec.md`.
+- Evidence paths: `docs/architecture/aov_strategic_direction_lock_20260809.md`, `docs/architecture/aov_endgame_generalization_spec_current.md`, `docs/architecture/cycle_resonance_v1_build_spec.md`, `docs/architecture/alpha_organism_endgame_current.md`.
 
 ## 2026-08-09 Round Entry (Historical PIT Labels Must Match Provider Bytes Before Speeding Up Capture)
 
@@ -14,7 +14,7 @@
 - Root cause: provider acquisition throughput work advanced before one explicit historical-vintage authority had been frozen across query, receipt, validator and report layers.
 - Fix applied: hard-block A1/A2 until Quant/Data proves one economically legitimate provider-vintage semantic, destructively removes the competing active interpretation, and proves current-vs-historical AOV same-input parity. Bounded Excel concurrency begins only after that truth gate closes.
 - Guardrail for next time: optimize provider wall-clock only after source semantics are one-to-one across query options, raw receipts, normalization, validators and evidence claims. Faster conflicting data is not evidence velocity.
-- Evidence paths: `research/aov0/historical_pit.py`, `scripts/aov0_capture_ciq_historical_pit_fundamentals.ps1`, `scripts/aov0_capture_ciq_historical_pit_fundamental_chunk.ps1`, `scripts/aov0_historical_pit_replay.py`, `docs/context/observability_pack_current.md`.
+- Evidence paths: `docs/architecture/historical_fundamental_vintage_authority.md`, `research/aov0/historical_pit.py`, `scripts/aov0_capture_ciq_historical_pit_fundamentals.ps1`, `scripts/aov0_capture_ciq_historical_pit_fundamental_chunk.ps1`, `scripts/aov0_historical_pit_replay.py`, `docs/context/observability_pack_current.md`.
 
 ## 2026-08-09 Round Entry (PAPER Should Be Thin Before It Is Complete)
 
@@ -23,7 +23,7 @@
 - Root cause: capital-readiness requirements and first operational-learning requirements were represented as one gate.
 - Fix applied: authorize `PAPER-0` as the minimum lineage-correct target→ExecutionIntent→`market+cls`→broker state→restart/fencing/freeze vertical. Unsupported rare states may fail closed and move to PAPER-1 before bounded capital; first-order calendar correctness remains mandatory.
 - Guardrail for next time: for zero-capital PAPER learning, ship the smallest restart-safe/custody-correct vertical and fail closed on unsupported edges. Do not use ad-hoc submissions and do not mutate historical deterministic fill authority into broker truth.
-- Evidence paths: `docs/architecture/aov_strategic_direction_lock_20260809.md`, `execution/rebalancer.py`, `execution/broker_api.py`, `gv_portfolio_v0/book.py`.
+- Evidence paths: `docs/architecture/paper_0_authority.md`, `docs/architecture/aov_strategic_direction_lock_20260809.md`, `execution/rebalancer.py`, `execution/broker_api.py`, `gv_portfolio_v0/book.py`.
 
 ## 2026-08-08 Round Entry (A Downstream Alpha Risk Set Must Prove Its Base Rate, Not Borrow a Convenient Laboratory)
 
