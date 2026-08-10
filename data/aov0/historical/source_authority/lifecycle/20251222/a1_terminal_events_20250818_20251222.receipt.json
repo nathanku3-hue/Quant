@@ -1,0 +1,113 @@
+{
+  "schema_version": "aov0_historical_terminal_events_receipt_v1",
+  "created_at_utc": "2026-08-10T07:12:38Z",
+  "event_count": 3,
+  "events_sha256": "02e9fa5b64102d0a05afed0ff1a0bf1899124e277fc662966ea1396880118504",
+  "source_class": "PUBLIC_PRIMARY_REGULATORY_FILINGS_PLUS_HASH_BOUND_CIQ_IDENTITY_AND_MARKET_CUSTODY",
+  "source_filings": [
+    {
+      "issuer_or_filer": "Shift4 Payments, Inc.",
+      "form": "8-K",
+      "event_date": "2025-08-18",
+      "accession": "0001193125-25-182293",
+      "locator": "https://www.sec.gov/Archives/edgar/data/1794669/000119312525182293/d23961d8k.htm#Item2.01",
+      "admitted_facts": [
+        "Global Blue merger consummated on 2025-08-18",
+        "remaining Global Blue common shares converted to USD 7.50 cash without interest",
+        "NYSE trading suspension requested effective prior to market open on 2025-08-18"
+      ]
+    },
+    {
+      "issuer_or_filer": "Evoke Pharma, Inc.",
+      "form": "8-K",
+      "event_date": "2025-12-17",
+      "accession": "0001193125-25-321801",
+      "locator": "https://www.sec.gov/Archives/edgar/data/1403708/000119312525321801/d81175d8k.htm",
+      "admitted_facts": [
+        "Evoke merger completed on 2025-12-17",
+        "each non-excluded untendered share converted to the USD 11.00 cash offer price",
+        "Nasdaq trading suspension expected effective prior to market open on 2025-12-17"
+      ]
+    },
+    {
+      "issuer_or_filer": "ZEEKR Intelligent Technology Holding Limited",
+      "forms": ["6-K proxy exhibit", "6-K completion exhibit"],
+      "event_date": "2025-12-22",
+      "proxy_locator": "https://www.sec.gov/Archives/edgar/data/1954042/000110465925073651/tm2522436d1_ex99-1.htm",
+      "completion_locator": "https://www.sec.gov/Archives/edgar/data/1954042/000110465925123525/tm2534059d1_ex99-1.htm",
+      "admitted_facts": [
+        "each Zeekr ADS could elect USD 26.87 cash or stock consideration",
+        "an ADS with no valid election defaults to USD 26.87 cash",
+        "Zeekr completed the merger and requested NYSE trading suspension effective 2025-12-22"
+      ],
+      "research_execution_binding": "PASSIVE_AOV_REPLAY_MAKES_NO_CORPORATE_ACTION_ELECTION; APPLY_CONTRACTUAL_NO_VALID_ELECTION_DEFAULT_CASH"
+    }
+  ],
+  "event_bindings": [
+    {
+      "source_entity_id": "10976234",
+      "security_id": "CIQSEC:IQ576249691",
+      "source_spt_item": "SPT686212034",
+      "last_trading_date": "2025-08-15",
+      "effective_date": "2025-08-18",
+      "cash_consideration": "7.5",
+      "currency": "USD",
+      "event_type": "CASH_MERGER_PREOPEN_TRADING_SUSPENSION",
+      "source_authority": "SEC:SHIFT4_FORM_8-K_2025-08-18",
+      "source_locator": "https://www.sec.gov/Archives/edgar/data/1794669/000119312525182293/d23961d8k.htm#Item2.01"
+    },
+    {
+      "source_entity_id": "4810409",
+      "security_id": "CIQSEC:IQ35230943",
+      "source_spt_item": "SPT241616054",
+      "last_trading_date": "2025-12-16",
+      "effective_date": "2025-12-17",
+      "cash_consideration": "11",
+      "currency": "USD",
+      "event_type": "CASH_MERGER_PREOPEN_TRADING_SUSPENSION",
+      "source_authority": "SEC:EVOKE_FORM_8-K_2025-12-17",
+      "source_locator": "https://www.sec.gov/Archives/edgar/data/1403708/000119312525321801/d81175d8k.htm"
+    },
+    {
+      "source_entity_id": "29331846",
+      "security_id": "CIQSEC:IQ1672834977",
+      "source_spt_item": "SPT1861750247",
+      "last_trading_date": "2025-12-19",
+      "effective_date": "2025-12-22",
+      "cash_consideration": "26.87",
+      "currency": "USD",
+      "event_type": "DEFAULT_CASH_ELECTION_MERGER_TRADING_SUSPENSION",
+      "source_authority": "SEC:ZEEKR_PROXY_AND_COMPLETION_6-K_2025-12-22",
+      "source_locator": "https://www.sec.gov/Archives/edgar/data/1954042/000110465925073651/tm2522436d1_ex99-1.htm;https://www.sec.gov/Archives/edgar/data/1954042/000110465925123525/tm2534059d1_ex99-1.htm"
+    }
+  ],
+  "ciq_identity_binding": {
+    "historical_security_master_sha256": "86587b5de42df38c81d3166d6a44aa644f31bbca141c536f04bccb07abdfad85",
+    "historical_security_master_receipt_sha256": "34cf12f2f331b04e3c7f98d8f88aa6a19fb585aef036711f25857b15d73d3d10",
+    "current_primary_security_conditioned": false
+  },
+  "ciq_market_bindings": [
+    {
+      "security_id": "CIQSEC:IQ576249691",
+      "last_actual_close_date": "2025-08-15",
+      "last_actual_close_usd": 7.49,
+      "effective_date_provider_row": {"date": "2025-08-18", "close_usd": 7.49, "total_return_percent": 0.0, "volume": 0.0}
+    },
+    {
+      "security_id": "CIQSEC:IQ35230943",
+      "last_actual_close_date": "2025-12-16",
+      "last_actual_close_usd": 11.0,
+      "effective_date_provider_row": {"date": "2025-12-17", "close_usd": 11.0, "total_return_percent": 0.0, "volume": 0.0}
+    },
+    {
+      "security_id": "CIQSEC:IQ1672834977",
+      "last_actual_close_date": "2025-12-19",
+      "last_actual_close_usd": 26.73,
+      "effective_date_provider_row": {"date": "2025-12-22", "close_usd": 26.73, "total_return_percent": 0.0, "volume": 0.0}
+    }
+  ],
+  "lifecycle_law": "APPLY_SOURCE_AUTHORIZED_CASH_CONSIDERATION_RETURN_ON_EFFECTIVE_DATE_FROM_LAST_ACTUAL_CLOSE; FORCE_ZERO_TARGET_AND_PIT_ELIGIBILITY_FROM_EFFECTIVE_DATE; RETAIN_FIXED_SECURITY_COLUMN_AS_ZERO_RETURN_CASH_STATE; NEVER_SUBSTITUTE_LISTING; NEVER_SURVIVOR_FILTER",
+  "current_screen_conditioned": false,
+  "current_primary_security_conditioned": false,
+  "financial_alpha_evidence": 0
+}

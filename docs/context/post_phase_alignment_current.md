@@ -1,11 +1,15 @@
 # Post-Phase Alignment — Current
 
-Date: 2026-08-09
-Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MULTI_CLOCK_EVIDENCE_AUTHORIZED; A1_A2_VINTAGE_PARITY_BLOCKED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+Date: 2026-08-10
+Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MULTI_CLOCK_EVIDENCE_AUTHORIZED; LANE2_A1_A2_CLOSED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## 2026-08-10 Lane-2 closure alignment
+
+Lane 2 Historical Compression has completed the authorized A1→freeze→one-shot A2 sequence. Historical vintage/parity, the 104-company 2025-05-16 start risk set, exact dated CIQ Security/Trading Item identity and three-event terminal lifecycle authority are closed. A1 is admitted over 264 trading days / 94 active securities; A2 is an untouched 38-trading-day historical PIT read frozen before held-out capture and consumed exactly once. Child reduces drawdown/CVaR/turnover but also reduces return/Sharpe versus Parent in both windows. Parent/Child remain frozen; A2 must not be re-queried or reused as untouched evidence for a challenger informed by it. Clock #1 outcomes remain sealed and `financial_alpha_evidence=0`.
 
 ## 2026-08-09 strategic lock supersession
 
-Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Clock #1 stays unchanged. CRV1 remains the 252d slow business-cycle family, but one fast multi-week family is authorized for immediate preregistration and may run an independent evidence clock. Default active family WIP=`2`, ceiling=`3`; evidence qualification may happen in parallel, while current portfolio/capital-policy commits remain singular. Lane 2 Historical Compression remains first-class but A1/A2 is hard-blocked until one CIQ filing-vintage semantic wins destructively and current-vs-historical AOV semantics pass same-input parity. PAPER-0 implementation is authorized behind minimum identity/TIF/broker-state/restart/fencing/calendar gates. Replication readiness starts now in quarantine. No outcome open, Parent/Child mutation, financial-alpha uplift or strategy live capital is created by this alignment.
+Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Clock #1 stays unchanged. CRV1 remains the 252d slow business-cycle family, but one fast multi-week family is authorized for immediate preregistration and may run an independent evidence clock. Default active family WIP=`2`, ceiling=`3`; evidence qualification may happen in parallel, while current portfolio/capital-policy commits remain singular. Lane 2 is now closed through A1/A2 and moves to bounded economic diagnosis; it no longer owns a source-admission blocker. PAPER-0 implementation is authorized behind minimum identity/TIF/broker-state/restart/fencing/calendar gates. Replication readiness continues in quarantine. No Clock #1 outcome open, Parent/Child mutation, financial-alpha uplift or strategy live capital is created by this alignment.
 
 ## Preserved
 

@@ -97,9 +97,10 @@
   "historical_primary_identity": {
     "authority": "OPEN",
     "candidate_entities_with_exactly_one_target_date_major_us_security_row": 104,
-    "candidate_rows_currently_marked_primary_issue_yes": 104,
+    "diagnostic_current_primary_count_withdrawn": true,
+    "diagnostic_current_primary_count_withdrawn_reason": "The earlier 104/104 current-primary corroboration was disproved by the all-listings probe and is not used. Exact dated exchange+funding selection is mechanically unique for all 104 with SPT_PRIMARY_ISSUE omitted.",
     "current_primary_flag_is_historical_authority": false,
-    "reason": "SPT_PRIMARY_ISSUE_HAS_NO_EFFECTIVE_DATE_AND_WAS_PROVED_CURRENT_CONDITIONED_OUTSIDE_THE_FINAL_COHORT"
+    "reason": "SPT_PRIMARY_ISSUE_HAS_NO_EFFECTIVE_DATE_AND_IS_EXCLUDED_FROM_THE_FORMAL_HISTORICAL_IDENTITY_QUERY"
   },
   "historical_risk_set_admission_authority": "NONE",
   "a1_authority": "NONE",

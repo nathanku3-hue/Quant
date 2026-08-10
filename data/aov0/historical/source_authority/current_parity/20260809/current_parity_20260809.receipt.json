@@ -1,0 +1,27 @@
+{
+  "exact_membership_match": true,
+  "financial_alpha_evidence": 0,
+  "parent_child_mutation_authority": "NONE",
+  "parity_as_of_date": "2026-08-09",
+  "pass": true,
+  "prospective_clock_authority": "NONE",
+  "provider_proof": {
+    "bytes": 4749,
+    "captured_at_utc": "2026-08-09T20:20:12.001385+00:00",
+    "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/current_parity/20260809/current_screen_decomposed_parity.provider.json",
+    "schema_version": "aov0_ciq_current_screen_decomposed_parity_provider_proof_v1",
+    "sha256": "367e24db23edc91aa9af33bb19b02cd1f29596cd51c5e101808e2e26f4bb8244"
+  },
+  "reconstructed_entity_membership_sha256": "3b755229c1f15f784ed70427c19606b24ebec3806c72e025ad2195ebcdc57f90",
+  "reconstructed_membership_name": "current_decomposed_reconstruction.csv",
+  "reconstructed_membership_sha256": "524e54c415b0ac39c188480d038859893b3717393ea9f4a0bc1aed3286f76fda",
+  "reconstructed_result_count": 112,
+  "reference_entity_membership_sha256": "3b755229c1f15f784ed70427c19606b24ebec3806c72e025ad2195ebcdc57f90",
+  "reference_membership_name": "current_direct_screen.csv",
+  "reference_membership_sha256": "524e54c415b0ac39c188480d038859893b3717393ea9f4a0bc1aed3286f76fda",
+  "reference_result_count": 112,
+  "reference_source_id": "SPCIQPRO:COMPANIES_PRODUCTQUERY_DIRECT_VS_DECOMPOSED",
+  "schema_version": "aov0_historical_screen_current_parity_receipt_v1",
+  "screen_law_hash": "81e8cba8ebbda5de695d87ab321d15ebc3cf3f1c1158d3c94633dee7a3b78381",
+  "source_id": "AOV0:HISTORICAL_SCREEN_RECONSTRUCTION_PARITY"
+}

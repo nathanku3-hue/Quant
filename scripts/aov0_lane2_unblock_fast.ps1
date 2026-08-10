@@ -78,7 +78,8 @@ function Validate-RiskSet {
 import sys
 from research.aov0.historical_risk_set import load_historical_start_risk_set
 obj = load_historical_start_risk_set(sys.argv[1], sys.argv[2], expected_as_of_date=sys.argv[3])
-print(f"RISK_SET_VALID\tASOF={obj.as_of_date.date().isoformat()}\tENTITIES={len(obj.entity_ids)}\tSHA256={obj.metadata['membership_sha256']}")
+hash_value = obj.metadata.get('membership_sha256')
+print('RISK_SET_VALID\tASOF=%s\tENTITIES=%s\tSHA256=%s' % (obj.as_of_date.date().isoformat(), len(obj.entity_ids), hash_value))
 '@
     & $py -c $code $Membership $Receipt $asOfIso
     if ($LASTEXITCODE -ne 0) { throw "historical_risk_set_validation_failed:$LASTEXITCODE" }
@@ -102,7 +103,8 @@ from research.aov0.historical_risk_set import load_historical_start_risk_set
 from research.aov0.historical_security_master import load_historical_start_security_master
 risk = load_historical_start_risk_set(sys.argv[1], sys.argv[2], expected_as_of_date=sys.argv[5])
 obj = load_historical_start_security_master(sys.argv[3], sys.argv[4], expected_as_of_date=sys.argv[5], expected_entity_ids=risk.entity_ids)
-print(f"HISTORICAL_IDENTITY_VALID\tASOF={obj.as_of_date.date().isoformat()}\tENTITIES={len(obj.entity_ids)}\tSHA256={obj.metadata['master_sha256']}")
+hash_value = obj.metadata.get('master_sha256')
+print('HISTORICAL_IDENTITY_VALID\tASOF=%s\tENTITIES=%s\tSHA256=%s' % (obj.as_of_date.date().isoformat(), len(obj.entity_ids), hash_value))
 '@
     & $py -c $code $Membership $RiskReceipt $Master $Receipt $asOfIso
     if ($LASTEXITCODE -ne 0) { throw "historical_identity_validation_failed:$LASTEXITCODE" }

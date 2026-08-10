@@ -4,11 +4,10 @@ param(
     [Parameter(Mandatory=$true)][string]$PartsDir,
     [Parameter(Mandatory=$true)][datetime]$TargetDate,
     [Parameter(Mandatory=$true)][int]$Weekdays,
-    [int]$ChunkDays=7,
+    [ValidateRange(1,20)][int]$ChunkDays=7,
     [int]$BootSeconds=10
 )
 $ErrorActionPreference='Stop'
-if($ChunkDays-ne7){throw 'historical_market_chunk_days_must_equal_frozen_7'}
 if(-not (Test-Path -LiteralPath $Master)){throw "historical_market_master_missing:$Master"}
 Add-Type -AssemblyName office
 if(-not ('CiqHistoricalMarketRcStub' -as [type])){$src=@'
@@ -27,7 +26,9 @@ function File-Sha256([string]$Path){
 }
 function Csv([object]$value){$text=[string]$value;return '"'+($text-replace'"','""')+'"'}
 function ColName([int]$n){$s='';while($n-gt0){$n--; $s=[char](65+($n%26))+$s;$n=[math]::Floor($n/26)};return $s}
-function Is-Missing([string]$text){return (!$text -or $text-eq'NA' -or $text-match'^#')}
+function Invoke-ComRetry([scriptblock]$Action,[string]$Label='COM',[int]$Attempts=60){for($i=0;$i-lt$Attempts;$i++){try{return & $Action}catch [Runtime.InteropServices.COMException]{if($_.Exception.HResult-eq-2147418111){Start-Sleep -Milliseconds 500;continue};throw}};throw "$Label rejected after $Attempts retries"}
+$ExcelCvErrHresults=@(-2146826288,-2146826281,-2146826273,-2146826265,-2146826259,-2146826252,-2146826246,-2146826245)
+function Is-MissingValue([object]$value){if($null-eq$value){return $true};$text=[string]$value;if(!$text-or$text-eq'NA'-or$text-match'^#'){return $true};try{$number=[int64]([double]$value);if($ExcelCvErrHresults-contains$number){return $true}}catch{};return $false}
 
 $masterRows=@(Import-Csv -LiteralPath $Master)
 if($masterRows.Count-lt1){throw 'historical_market_master_empty'}
@@ -53,20 +54,29 @@ try{
         try{$addin=$excel.AddIns2.Item($key);$addin.Installed=$false;Start-Sleep -Milliseconds 300;$addin.Installed=$true}catch{}
     }
     Start-Sleep -Seconds $BootSeconds
-    $workbook=$excel.Workbooks.Add();$sheet=$workbook.Worksheets.Item(1);$startRow=8;$lastRow=$startRow+$masterRows.Count-1
-    for($i=0;$i-lt$masterRows.Count;$i++){$sheet.Cells.Item($startRow+$i,2).Value2=[string]$masterRows[$i].SPT_INSTRUMENT_ITEM_ID}
-    for($d=0;$d-lt$take;$d++){$dateText=$chunk[$d].ToString('MM/dd/yyyy',[Globalization.CultureInfo]::InvariantCulture);$base=3+$d*3;$sheet.Cells.Item(5,$base).Value2='SP_TOTAL_RETURN';$sheet.Cells.Item(6,$base).Value2=$dateText;$sheet.Cells.Item(5,$base+1).Value2='SP_PRICE_CLOSE';$sheet.Cells.Item(6,$base+1).Value2=$dateText;$sheet.Cells.Item(5,$base+2).Value2='SP_VOLUME';$sheet.Cells.Item(6,$base+2).Value2=$dateText}
-    $lastCol=2+$take*3;$last=ColName $lastCol;$sheet.Range('A3').Formula=('=SPGTable($B$8:$B${0},$C$5:${1}$5,$C$6:${1}$6,"Options:Curr=USD,ConvMethod=R,FilingVer=Current/Restated")' -f $lastRow,$last)
     $addinObject=$null
     for($attempt=0;$attempt-lt3-and-not$addinObject;$attempt++){
         try{$addinObject=$excel.COMAddIns.Item('SNL.Clients.Office.Excel.ExcelAddIn').Object}catch{}
         if(!$addinObject){Start-Sleep -Seconds 2}
     }
     if(!$addinObject){throw 'ciq_addin_object_missing'}
-    $addinObject.OnRibbonAction2([CiqHistoricalMarketRcStub]::new('allowDataRefresh',$excel),$true);$addinObject.OnRibbonAction([CiqHistoricalMarketRcStub]::new('refreshDataAllSheets',$excel));Start-Sleep -Seconds 2
-    $stable=0;for($poll=0;$poll-lt120;$poll++){$pending=$false;for($r=$startRow;$r-le$lastRow;$r++){for($c=3;$c-le$lastCol;$c++){$text=[string]$sheet.Cells.Item($r,$c).Text;if($text-eq'#PEND'-or$text-eq'#REFRESH'){$pending=$true;break}};if($pending){break}};if(!$pending){$stable++}else{$stable=0};if($stable-ge2){break};Start-Sleep -Seconds 1};if($stable-lt2){throw "chunk_timeout:$ChunkIndex"}
-    $retrieved=[DateTime]::UtcNow;$rows=New-Object System.Collections.Generic.List[object]
-    for($i=0;$i-lt$masterRows.Count;$i++){$r=$startRow+$i;$m=$masterRows[$i];for($d=0;$d-lt$take;$d++){$base=3+$d*3;$trCell=$sheet.Cells.Item($r,$base);$closeCell=$sheet.Cells.Item($r,$base+1);$volCell=$sheet.Cells.Item($r,$base+2);$trText=[string]$trCell.Text;$closeText=[string]$closeCell.Text;$volText=[string]$volCell.Text;if((Is-Missing $trText)-or(Is-Missing $closeText)-or(Is-Missing $volText)){continue};try{$tr=[double]$trCell.Value2;$close=[double]$closeCell.Value2;$vol=[double]$volCell.Value2}catch{continue};$rows.Add([pscustomobject]@{date=$chunk[$d].ToString('yyyy-MM-dd');entity=$m.SP_ENTITY_ID;security=$m.SP_SECURITY_ID;spt=$m.SPT_INSTRUMENT_ITEM_ID;trade=$m.SP_TRADING_ITEM_ID;total_return=$tr;close=$close;volume=$vol})}}
+    $addinObject.OnRibbonAction2([CiqHistoricalMarketRcStub]::new('allowDataRefresh',$excel),$true)
+    $workbook=Invoke-ComRetry {$excel.Workbooks.Add()} 'HistoricalMarket.Workbooks.Add';$sheet=$workbook.Worksheets.Item(1);$startRow=8;$lastRow=$startRow+$masterRows.Count-1
+    for($i=0;$i-lt$masterRows.Count;$i++){$sheet.Cells.Item($startRow+$i,2).Value2=[string]$masterRows[$i].SPT_INSTRUMENT_ITEM_ID}
+    for($d=0;$d-lt$take;$d++){$dateText=$chunk[$d].ToString('MM/dd/yyyy',[Globalization.CultureInfo]::InvariantCulture);$base=3+$d*3;$sheet.Cells.Item(5,$base).Value2='SP_TOTAL_RETURN';$sheet.Cells.Item(6,$base).Value2=$dateText;$sheet.Cells.Item(5,$base+1).Value2='SP_PRICE_CLOSE';$sheet.Cells.Item(6,$base+1).Value2=$dateText;$sheet.Cells.Item(5,$base+2).Value2='SP_VOLUME';$sheet.Cells.Item(6,$base+2).Value2=$dateText}
+    $lastCol=2+$take*3;$last=ColName $lastCol;$sheet.Range('A3').Formula=('=SPGTable($B$8:$B${0},$C$5:${1}$5,$C$6:${1}$6,"Options:Curr=USD,ConvMethod=R,FilingVer=Current/Restated")' -f $lastRow,$last)
+    $addinObject.OnRibbonAction([CiqHistoricalMarketRcStub]::new('refreshDataAllSheets',$excel));Start-Sleep -Seconds 2
+    $valueRange=$sheet.Range($sheet.Cells.Item($startRow,3),$sheet.Cells.Item($lastRow,$lastCol));$matrix=$null;$stable=0
+    for($poll=0;$poll-lt120;$poll++){
+        $matrix=Invoke-ComRetry {,$valueRange.Value2} 'HistoricalMarket.Value2';$pending=0;$filled=0
+        $rowLow=$matrix.GetLowerBound(0);$rowHigh=$matrix.GetUpperBound(0);$colLow=$matrix.GetLowerBound(1);$colHigh=$matrix.GetUpperBound(1)
+        for($ri=$rowLow;$ri-le$rowHigh;$ri++){for($ci=$colLow;$ci-le$colHigh;$ci++){$text=[string]$matrix.GetValue($ri,$ci);if($text-eq'#PEND'-or$text-eq'#REFRESH'){$pending++}elseif(-not [string]::IsNullOrWhiteSpace($text)){$filled++}}}
+        if($pending-eq0-and$filled-gt0){$stable++}else{$stable=0};if($stable-ge2){break};Start-Sleep -Seconds 1
+    }
+    if($stable-lt2){throw "chunk_timeout:$ChunkIndex"}
+    $matrix=Invoke-ComRetry {,$valueRange.Value2} 'HistoricalMarket.FinalValue2';$retrieved=[DateTime]::UtcNow;$rows=New-Object System.Collections.Generic.List[object]
+    $rowLow=$matrix.GetLowerBound(0);$colLow=$matrix.GetLowerBound(1)
+    for($i=0;$i-lt$masterRows.Count;$i++){$matrixRow=$rowLow+$i;$m=$masterRows[$i];for($d=0;$d-lt$take;$d++){$base=$colLow+$d*3;$trValue=$matrix.GetValue($matrixRow,$base);$closeValue=$matrix.GetValue($matrixRow,$base+1);$volValue=$matrix.GetValue($matrixRow,$base+2);if((Is-MissingValue $trValue)-or(Is-MissingValue $closeValue)-or(Is-MissingValue $volValue)){continue};try{$tr=[double]$trValue;$close=[double]$closeValue;$vol=[double]$volValue}catch{continue};$rows.Add([pscustomobject]@{date=$chunk[$d].ToString('yyyy-MM-dd');entity=$m.SP_ENTITY_ID;security=$m.SP_SECURITY_ID;spt=$m.SPT_INSTRUMENT_ITEM_ID;trade=$m.SP_TRADING_ITEM_ID;total_return=$tr;close=$close;volume=$vol})}}
     if($rows.Count-eq0){throw "chunk_no_rows:$ChunkIndex"}
     $headers=@('SPT_DATE','SP_ENTITY_ID','SP_SECURITY_ID','SPT_INSTRUMENT_ITEM_ID','SP_TRADING_ITEM_ID','SPT_TOTAL_RETURN','SP_TOTAL_RETURN','SPT_CLOSE','SP_PRICE_CLOSE','SPT_VOLUME','SP_VOLUME','chunk_retrieved_at_utc','RETURN_SOURCE_METRIC','CLOSE_SOURCE_METRIC','VOLUME_SOURCE_METRIC')
     $lines=New-Object System.Collections.Generic.List[string];$lines.Add(($headers|ForEach-Object{Csv $_})-join',')

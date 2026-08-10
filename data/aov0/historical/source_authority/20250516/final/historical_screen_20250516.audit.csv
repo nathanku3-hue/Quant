@@ -1,0 +1,105 @@
+SP_ENTITY_ID,CompanyName,CompanyType,CompanyStatus,LFY,FY-1,FY-2,FY-3,company_type_pass,company_status_pass,growth_lfy_fy1_pass,growth_fy1_fy2_pass,growth_fy2_fy3_pass,screen_pass
+4021980,Tidewater Inc. (NYSE:TDW),Public Company,Operating,1345835.0,1009985.0,647684.0,371033.0,True,True,True,True,True,True
+4092847,"OptimumBank Holdings, Inc. (NYSEAM:OPHC)",Public Company,Operating,37091.0,23118.0,15330.0,10005.0,True,True,True,True,True,True
+4142027,"Axon Enterprise, Inc. (NASDAQGS:AXON)",Public Company,Operating,2082526.0,1563391.0,1189935.0,863381.0,True,True,True,True,True,True
+4153733,"Ocean Power Technologies, Inc. (NYSEAM:OPTT)",Public Company,Operating,5525.0,2732.0,1759.0,1206.0,True,True,True,True,True,True
+4160258,"MercadoLibre, Inc. (NASDAQGS:MELI)",Public Company,Operating,20777000.0,14473000.0,10537000.0,7069409.0,True,True,True,True,True,True
+4239659,IRSA Inversiones y Representaciones Sociedad Anónima (BASE:IRSA),Public Company,Operating,733560.3612448897,530671.449366525,302343.4942113295,103445.18746880491,True,True,True,True,True,True
+4261521,NuScale Power Corporation (NYSE:SMR),Public Company,Operating,37045.0,22810.0,11804.0,2862.0,True,True,True,True,True,True
+4276821,"Super Micro Computer, Inc. (NASDAQGS:SMCI)",Public Company,Operating,14989251.0,7123482.0,5196099.0,3557422.0,True,True,True,True,True,True
+4327198,Sow Good Inc. (NASDAQCM:SOWG),Public Company,Operating,31992.511,16070.924,428.132,88.44,True,True,True,True,True,True
+4349995,Energy Fuels Inc. (TSX:EFR),Public Company,Operating,78114.0,37928.0,12515.0,3184.0,True,True,True,True,True,True
+4401941,"Sarepta Therapeutics, Inc. (NASDAQGS:SRPT)",Public Company,Operating,1901979.0,1243336.0,933013.0,701887.0,True,True,True,True,True,True
+4403916,"Inter & Co, Inc. (NASDAQGS:INTR)",Public Company,Operating,857210.7083387229,643340.54289111,481080.1301669453,366461.3257146973,True,True,True,True,True,True
+4416726,"Evolent Health, Inc. (NYSE:EVH)",Public Company,Operating,2554741.0,1963896.0,1352013.0,907957.0,True,True,True,True,True,True
+4420334,"Oscar Health, Inc. (NYSE:OSCR)",Public Company,Operating,9177564.0,5861307.0,3988671.0,1894040.0,True,True,True,True,True,True
+4424169,FTAI Aviation Ltd. (NASDAQGS:FTAI),Public Company,Operating,1734901.0,1170896.0,708411.0,455802.0,True,True,True,True,True,True
+4426783,"Remitly Global, Inc. (NASDAQGS:RELY)",Public Company,Operating,1263963.0,944285.0,653560.0,458605.0,True,True,True,True,True,True
+4565554,"Ardelyx, Inc. (NASDAQGM:ARDX)",Public Company,Operating,333615.0,124456.0,52158.0,10097.0,True,True,True,True,True,True
+4641918,Wise Group plc (LSE:WISE),Public Company,Operating,1775067.345405879,1166827.2221098326,765133.8458330417,550769.5780137813,True,True,True,True,True,True
+4770121,Permian Resources Corporation (NYSE:PR),Public Company,Operating,5000734.0,3120893.0,2131265.0,1029892.0,True,True,True,True,True,True
+4810409,"Evoke Pharma, Inc.",Public Company,Operating,10249.415,5180.63,2508.645,1618.076,True,True,True,True,True,True
+4810724,"Natera, Inc. (NASDAQGS:NTRA)",Public Company,Operating,1696911.0,1082571.0,820222.0,625486.0,True,True,True,True,True,True
+4810896,VolitionRx Limited (NYSEAM:VNRX),Public Company,Operating,1233.511,775.302,306.392,90.035,True,True,True,True,True,True
+4811056,"Vivakor, Inc. (NASDAQCM:VIVK)",Public Company,Operating,89811.24,59321.752,28107.223,1088.428,True,True,True,True,True,True
+4811197,Immuron Limited (ASX:IMC),Public Company,Operating,3214.7319887160584,1214.781395761171,555.250938849675,108.91646068966594,True,True,True,True,True,True
+4811521,Aurinia Pharmaceuticals Inc. (NASDAQGM:AUPH),Public Company,Operating,235133.0,175513.0,134030.0,45605.0,True,True,True,True,True,True
+4811591,"Sunshine Biopharma, Inc. (NASDAQCM:SBFM)",Public Company,Operating,34874.283,24092.787,4345.603,228.426,True,True,True,True,True,True
+4811695,MannKind Corporation (NASDAQGM:MNKD),Public Company,Operating,285504.0,198962.0,99770.0,75442.0,True,True,True,True,True,True
+4811760,Ascendis Pharma A/S (NASDAQGS:ASND),Public Company,Operating,393408.5454800061,288452.44222154573,53912.29699841286,9199.657928386509,True,True,True,True,True,True
+4811954,Evogene Ltd. (TASE:EVGN),Public Company,Operating,8511.0,5640.0,1675.0,930.0,True,True,True,True,True,True
+4812067,Sanara MedTech Inc. (NASDAQCM:SMTI),Public Company,Operating,86672.425,64989.842,45842.845,24143.919,True,True,True,True,True,True
+4812756,"ADMA Biologics, Inc. (NASDAQGM:ADMA)",Public Company,Operating,426454.0,258215.0,154079.692,80942.625,True,True,True,True,True,True
+4812813,ProQR Therapeutics N.V. (NASDAQCM:PRQR),Public Company,Operating,21144.947960781978,7131.334983049036,5058.952792167478,2835.1221463541347,True,True,True,True,True,True
+4913670,MakeMyTrip Limited (NASDAQGS:MMYT),Public Company,Operating,782524.0,593036.0,303922.0,163440.0,True,True,True,True,True,True
+4977885,"Aspen Aerogels, Inc. (NYSE:ASPN)",Public Company,Operating,452699.0,238718.0,180364.0,121622.0,True,True,True,True,True,True
+4978093,Borr Drilling Limited (NYSE:BORR),Public Company,Operating,1010600.0,771600.0,443800.0,245300.0,True,True,True,True,True,True
+4989077,CitroTech Inc. (NYSEAM:CITR),Public Company,Operating,808.372,520.645,62.732,38.919,True,True,True,True,True,True
+4994908,Costamare Inc. (NYSE:CMRE),Public Company,Operating,2083894.0,1511406.0,1113859.0,793639.0,True,True,True,True,True,True
+4996395,"Eva Live, Inc. (NASDAQCM:GOAI)",Public Company,Operating,9330.971,5377.273,1350.941,498.531,True,True,True,True,True,True
+4999273,NextPlat Corp (NASDAQCM:NXPL),Public Company,Operating,65483.0,37756.0,11710.142,7739.91,True,True,True,True,True,True
+5000790,Cadiz Inc. (NASDAQGM:CDZI),Public Company,Operating,9608.0,1991.0,1501.0,564.0,True,True,True,True,True,True
+5001439,Enlight Renewable Energy Ltd (TASE:ENLT),Public Company,Operating,377935.0,255702.0,192172.0,102454.69327098884,True,True,True,True,True,True
+5013726,"TransMedics Group, Inc. (NASDAQGM:TMDX)",Public Company,Operating,441540.0,241623.0,93459.0,30262.0,True,True,True,True,True,True
+5031604,"CVRx, Inc. (NASDAQGS:CVRX)",Public Company,Operating,51292.0,39295.0,22469.0,13036.0,True,True,True,True,True,True
+5109836,"SoundHound AI, Inc. (NASDAQGM:SOUN)",Public Company,Operating,84693.0,45873.0,31129.0,21197.0,True,True,True,True,True,True
+5174695,"Zscaler, Inc. (NASDAQGS:ZS)",Public Company,Operating,2167771.0,1616952.0,1090946.0,673100.0,True,True,True,True,True,True
+5176861,"Castle Biosciences, Inc. (NASDAQGM:CSTL)",Public Company,Operating,332069.0,219788.0,137039.0,94085.0,True,True,True,True,True,True
+5181255,"RxSight, Inc. (NASDAQGM:RXST)",Public Company,Operating,139927.0,89077.0,49005.0,22593.0,True,True,True,True,True,True
+5214991,"TriSalus Life Sciences, Inc. (NASDAQGM:TLSI)",Public Company,Operating,29431.0,18511.0,12398.0,8401.0,True,True,True,True,True,True
+5239538,iQSTEL Inc. (NASDAQCM:IQST),Public Company,Operating,283220.442,144502.351,93203.532,64702.018,True,True,True,True,True,True
+5242080,"Duolingo, Inc. (NASDAQGS:DUOL)",Public Company,Operating,748024.0,531109.0,369495.0,250772.0,True,True,True,True,True,True
+5244284,monday.com Ltd. (NASDAQGS:MNDY),Public Company,Operating,971995.0,729695.0,519029.0,308150.0,True,True,True,True,True,True
+5250653,"electroCore, Inc. (NASDAQCM:ECOR)",Public Company,Operating,25182.0,16030.0,8592.0,5451.192,True,True,True,True,True,True
+5255493,BioHarvest Sciences Inc. (NASDAQGM:BHST),Public Company,Operating,25188.0,12672.0,5498.0,2102.0,True,True,True,True,True,True
+5255986,"Evolus, Inc. (NASDAQGM:EOLS)",Public Company,Operating,266274.0,202085.0,148616.0,99673.0,True,True,True,True,True,True
+5263639,"SentinelOne, Inc. (NYSE:S)",Public Company,Operating,821461.0,621154.0,422179.0,204799.0,True,True,True,True,True,True
+5264620,Grindr Inc. (NYSE:GRND),Public Company,Operating,344636.0,259691.0,195015.0,145833.0,True,True,True,True,True,True
+5265242,Gauzy Ltd. (NASDAQGM:GAUZ),Public Company,Operating,103527.0,77980.0,49033.0,7312.0,True,True,True,True,True,True
+5267913,PROCEPT BioRobotics Corporation (NASDAQGM:PRCT),Public Company,Operating,224498.0,136191.0,75014.0,34473.0,True,True,True,True,True,True
+5277128,Nayax Ltd. (TASE:NYAX),Public Company,Operating,314013.0,235491.0,173514.0,119134.0,True,True,True,True,True,True
+5293460,GitLab Inc. (NASDAQGS:GTLB),Public Company,Operating,759249.0,579906.0,424336.0,252653.0,True,True,True,True,True,True
+5297753,Samsara Inc. (NYSE:IOT),Public Company,Operating,1249199.0,937385.0,652545.0,428345.0,True,True,True,True,True,True
+5302933,"Rhythm Pharmaceuticals, Inc. (NASDAQGM:RYTM)",Public Company,Operating,130126.0,77428.0,23638.0,3154.0,True,True,True,True,True,True
+5303886,"Klaviyo, Inc. (NYSE:KVYO)",Public Company,Operating,937464.0,698099.0,472748.0,290640.0,True,True,True,True,True,True
+5309396,"Roadzen, Inc. (NASDAQGM:RDZN)",Public Company,Operating,46724.287,13560.498,9988.728,1164.84,True,True,True,True,True,True
+5311902,"GRAIL, Inc. (NASDAQGS:GRAL)",Public Company,Operating,125595.0,93105.0,55550.0,14612.0,True,True,True,True,True,True
+5321096,Metalpha Technology Holding Limited (NASDAQCM:MATH),Public Company,Operating,16763.545,5692.056,2032.916,225.749,True,True,True,True,True,True
+5321237,"agilon health, inc. (NYSE:AGL)",Public Company,Operating,6060530.0,4316363.0,2708211.0,1833559.0,True,True,True,True,True,True
+5326808,PDD Holdings Inc. (NASDAQGS:PDD),Public Company,Operating,54749516.56517936,34995275.29652969,19432424.882797416,14565494.800625104,True,True,True,True,True,True
+5328081,"ACM Research, Inc. (NASDAQGM:ACMR)",Public Company,Operating,782118.0,557723.0,388832.0,259751.0,True,True,True,True,True,True
+6319660,"NEXGEL, Inc. (NASDAQCM:NXGL)",Public Company,Operating,8688.0,4089.0,2048.0,1551.0,True,True,True,True,True,True
+6459368,"Amprius Technologies, Inc. (NYSE:AMPX)",Public Company,Operating,24167.0,9053.0,4409.0,2772.0,True,True,True,True,True,True
+6867615,"Rekor Systems, Inc. (NASDAQCM:REKR)",Public Company,Operating,46028.0,34933.0,19920.0,14294.0,True,True,True,True,True,True
+6910410,"IonQ, Inc. (NYSE:IONQ)",Public Company,Operating,43073.0,22042.0,11131.0,2099.0,True,True,True,True,True,True
+7106242,Symbotic Inc. (NASDAQGM:SYM),Public Company,Operating,1788179.0,1176891.0,593312.0,251913.0,True,True,True,True,True,True
+7389138,Hippo Holdings Inc. (NYSE:HIPO),Public Company,Operating,372100.0,209700.0,119700.0,91200.0,True,True,True,True,True,True
+8251154,Telix Pharmaceuticals Limited (ASX:TLX),Public Company,Operating,516653.1228799274,333895.2127255306,111228.12704580388,5706.991010360339,True,True,True,True,True,True
+8435281,Dutch Bros Inc. (NYSE:BROS),Public Company,Operating,1281015.0,965776.0,739012.0,497876.0,True,True,True,True,True,True
+9098887,"Hims & Hers Health, Inc. (NYSE:HIMS)",Public Company,Operating,1476514.0,872000.0,526916.0,271878.0,True,True,True,True,True,True
+9956217,Nu Holdings Ltd. (NYSE:NU),Public Company,Operating,5513233.0,3706833.0,1839417.0,850036.0,True,True,True,True,True,True
+10976234,Global Blue Group Holding AG,Public Company,Operating,458056.8809119203,324427.440618677,146410.98317194098,52166.32144092072,True,True,True,True,True,True
+13087393,"EVgo, Inc. (NASDAQGS:EVGO)",Public Company,Operating,256825.0,160953.0,54588.0,22214.0,True,True,True,True,True,True
+13373011,"Mirum Pharmaceuticals, Inc. (NASDAQGM:MIRM)",Public Company,Operating,336888.0,186374.0,77062.0,19138.0,True,True,True,True,True,True
+13597615,"Bakkt, Inc. (NYSE:BKKT)",Public Company,Operating,3490220.0,780136.0,54567.0,39437.0,True,True,True,True,True,True
+14887727,Joint Stock Company Kaspi.kz (NASDAQGS:KSPI),Public Company,Operating,5435838.878402682,4175478.49583683,2760928.258513328,2074870.0138809024,True,True,True,True,True,True
+17514167,Local Bounti Corporation (NYSE:LOCL),Public Company,Operating,38138.0,27557.0,19474.0,638.0,True,True,True,True,True,True
+19095891,Interactive Strength Inc. (NASDAQCM:TRNR),Public Company,Operating,5380.0,962.0,681.0,323.0,True,True,True,True,True,True
+19098526,The Real Brokerage Inc. (NASDAQCM:REAX),Public Company,Operating,1264639.0,689158.0,381756.0,121681.0,True,True,True,True,True,True
+19243702,Odysight.ai Inc. (NASDAQCM:ODYS),Public Company,Operating,3964.0,3033.0,665.0,387.0,True,True,True,True,True,True
+19659800,DraftKings Inc. (NASDAQGS:DKNG),Public Company,Operating,4767699.0,3665393.0,2240461.0,1296025.0,True,True,True,True,True,True
+19871451,"GameSquare Holdings, Inc. (NASDAQCM:GAME)",Public Company,Operating,96198.101,51997.642,28082.009,10080.519058616534,True,True,True,True,True,True
+25283066,Surf Air Mobility Inc. (NYSE:SRFM),Public Company,Operating,119425.0,60505.0,20274.0,11798.0,True,True,True,True,True,True
+27682584,LQR House Inc. (NASDAQCM:YHC),Public Company,Operating,2501.66,1120.622,601.131,315.292,True,True,True,True,True,True
+27875239,Global-E Online Ltd. (NASDAQGS:GLBE),Public Company,Operating,752764.0,569946.0,409049.0,245274.0,True,True,True,True,True,True
+28743844,"PSQ Holdings, Inc. (NYSE:PSQH)",Public Company,Operating,23199.434,5685.987,475.175,8.843,True,True,True,True,True,True
+29331846,ZEEKR Intelligent Technology Holding Limited,Public Company,Operating,10553072.648978593,7302145.442610411,4747970.851872136,1011991.3913939506,True,True,True,True,True,True
+29657689,On Holding AG (NYSE:ONON),Public Company,Operating,2633873.067963967,1995690.060076465,1280885.9126989795,792703.4493446487,True,True,True,True,True,True
+100420749,Lotus Technology Inc. (NASDAQGS:LOT),Public Company,Operating,924349.0,679008.0,9557.0,3687.0,True,True,True,True,True,True
+101570773,BitFuFu Inc. (NASDAQCM:FUFU),Public Company,Operating,463330.0,284106.012,198198.774,103043.585,True,True,True,True,True,True
+105643522,NaaS Technology Inc. (NASDAQCM:NAAS),Public Company,Operating,45232.004869191165,13814.601639679173,2755.5856591488646,845.8262660665237,True,True,True,True,True,True
+107089758,"Abacus Global Management, Inc. (NYSE:ABX)",Public Company,Operating,111923.786,66401.451,44713.552,1199.986,True,True,True,True,True,True
+108129648,Ispire Technology Inc. (NASDAQCM:ISPR),Public Company,Operating,151908.691,115605.536,88095.418,63414.783,True,True,True,True,True,True
+110336920,Murano Global Investments Plc (NASDAQCM:MRNO),Public Company,Operating,40065.17356180362,16180.274511913636,319.80885926474485,75.41104481708973,True,True,True,True,True,True
+113495488,"Brand Engagement Network, Inc. (NASDAQCM:BNAI)",Public Company,Operating,99.79,35.21,15.642,7.41,True,True,True,True,True,True
+123916273,Yuanbao Inc. (NASDAQGM:YB),Public Company,Operating,456601.5082569888,289011.8196884386,126552.72958968706,59756.86101235831,True,True,True,True,True,True

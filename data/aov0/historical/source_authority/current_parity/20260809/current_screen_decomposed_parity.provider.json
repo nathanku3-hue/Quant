@@ -1,0 +1,200 @@
+{
+  "captured_at_utc": "2026-08-09T20:20:12.001385+00:00",
+  "companies_perspective": "266637",
+  "direct_count": 112,
+  "direct_query_lines": [
+    {
+      "fieldKey": "271669",
+      "operator": 7,
+      "secondaryKeys": [
+        {
+          "displayValue": "Current",
+          "keyJointHint": "sk_50048",
+          "value": "0"
+        }
+      ],
+      "value": "'70539003'"
+    },
+    {
+      "fieldKey": "322992",
+      "operator": 7,
+      "secondaryKeys": [
+        {
+          "displayValue": "None",
+          "keyJointHint": "sk_50003",
+          "value": "0"
+        }
+      ],
+      "value": "'7957'"
+    },
+    {
+      "fieldKey": "275891",
+      "operator": 7,
+      "secondaryKeys": [
+        {
+          "displayValue": "None",
+          "keyJointHint": "sk_50003",
+          "value": "0"
+        }
+      ],
+      "value": "'Operating','Operating Subsidiary'"
+    },
+    {
+      "fieldKey": "CC:ab8cb64b-0e23-49a3-8b72-73ace690b215",
+      "operator": 0,
+      "secondaryKeys": null,
+      "value": 1
+    },
+    {
+      "fieldKey": "CC:9b712897-d30d-4c95-b499-02a5b5d5ce90",
+      "operator": 0,
+      "secondaryKeys": null,
+      "value": 1
+    },
+    {
+      "fieldKey": "CC:32379cde-f92f-4cc3-b3fd-b08d516d3026",
+      "operator": 0,
+      "secondaryKeys": null,
+      "value": 1
+    }
+  ],
+  "direct_response_exception": null,
+  "exact_membership_parity": true,
+  "extra": [],
+  "financial_alpha_evidence": 0,
+  "formula_validations": [
+    {
+      "components": [
+        {
+          "primary": "IQ_TOTAL_REV",
+          "secondary": "FY0",
+          "tertiary": "Current"
+        },
+        {
+          "primary": "IQ_TOTAL_REV",
+          "secondary": "FY-1",
+          "tertiary": "Current"
+        }
+      ],
+      "formula": "={IQ_TOTAL_REV(FY0|Current|0)} >= {IQ_TOTAL_REV(FY-1|Current|0)} * 1.3",
+      "isValid": true,
+      "ok": true
+    },
+    {
+      "components": [
+        {
+          "primary": "IQ_TOTAL_REV",
+          "secondary": "FY-1",
+          "tertiary": "Current"
+        },
+        {
+          "primary": "IQ_TOTAL_REV",
+          "secondary": "FY-2",
+          "tertiary": "Current"
+        }
+      ],
+      "formula": "={IQ_TOTAL_REV(FY-1|Current|0)} >= {IQ_TOTAL_REV(FY-2|Current|0)} * 1.3",
+      "isValid": true,
+      "ok": true
+    },
+    {
+      "components": [
+        {
+          "primary": "IQ_TOTAL_REV",
+          "secondary": "FY-2",
+          "tertiary": "Current"
+        },
+        {
+          "primary": "IQ_TOTAL_REV",
+          "secondary": "FY-3",
+          "tertiary": "Current"
+        }
+      ],
+      "formula": "={IQ_TOTAL_REV(FY-2|Current|0)} >= {IQ_TOTAL_REV(FY-3|Current|0)} * 1.3",
+      "isValid": true,
+      "ok": true
+    }
+  ],
+  "missing": [],
+  "parent_child_mutation_authority": "NONE",
+  "prospective_clock_authority": "NONE",
+  "reconstructed_count": 112,
+  "revenue_count": 4964,
+  "revenue_query_lines": [
+    {
+      "fieldKey": "CC:72e69519-a6ad-4660-8d3f-a25ba32b8cb7",
+      "operator": 0,
+      "secondaryKeys": null,
+      "value": 1
+    },
+    {
+      "fieldKey": "CC:591df72c-be1a-4a59-9e30-eabb0f88f52a",
+      "operator": 0,
+      "secondaryKeys": null,
+      "value": 1
+    },
+    {
+      "fieldKey": "CC:f6ab5e18-f382-42e4-8982-5c5a9f7276e4",
+      "operator": 0,
+      "secondaryKeys": null,
+      "value": 1
+    }
+  ],
+  "revenue_response_exception": null,
+  "schema_version": "aov0_ciq_current_screen_decomposed_parity_provider_proof_v1",
+  "screen_law": {
+    "company_status_field_key": "275891",
+    "company_status_values": [
+      "Operating",
+      "Operating Subsidiary"
+    ],
+    "company_type_field_key": "322992",
+    "company_type_value": "7957",
+    "exchange_field_key": "271669",
+    "exchange_value": "70539003",
+    "growth_multiplier": 1.3,
+    "revenue_metric": "IQ_TOTAL_REV",
+    "revenue_reporting_basis": "Current"
+  },
+  "source_id": "SPCIQPRO:COMPANIES_PRODUCTQUERY_DIRECT_VS_DECOMPOSED",
+  "state_count": 5134,
+  "state_query_lines": [
+    {
+      "fieldKey": "271669",
+      "operator": 7,
+      "secondaryKeys": [
+        {
+          "displayValue": "Current",
+          "keyJointHint": "sk_50048",
+          "value": "0"
+        }
+      ],
+      "value": "'70539003'"
+    },
+    {
+      "fieldKey": "322992",
+      "operator": 7,
+      "secondaryKeys": [
+        {
+          "displayValue": "None",
+          "keyJointHint": "sk_50003",
+          "value": "0"
+        }
+      ],
+      "value": "'7957'"
+    },
+    {
+      "fieldKey": "275891",
+      "operator": 7,
+      "secondaryKeys": [
+        {
+          "displayValue": "None",
+          "keyJointHint": "sk_50003",
+          "value": "0"
+        }
+      ],
+      "value": "'Operating','Operating Subsidiary'"
+    }
+  ],
+  "state_response_exception": null
+}

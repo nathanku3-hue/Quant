@@ -1,10 +1,10 @@
-"""Fail-closed historical primary-security identity admission for Lane 2.
+"""Fail-closed historical screen-selected security identity admission for Lane 2.
 
 Formal historical AOV evidence must not map a historical company cohort through
 whatever security happens to be primary at the later retrieval date.  The
-historical-start primary security/trading-item mapping is therefore a separate,
-hash-bound provider object whose effective date must equal the A1 decision
-start.  A current-primary export remains useful for diagnostics but cannot
+historical-start security/trading-item mapping is therefore a separate,
+hash-bound provider object selected by the exact dated market law used by the
+historical screen.  A current-primary export remains diagnostic-only and cannot
 satisfy this contract.
 """
 
@@ -19,11 +19,19 @@ from typing import Any, Iterable
 import pandas as pd
 
 
-HISTORICAL_SECURITY_MASTER_SOURCE_ID = "SPCIQPRO:HISTORICAL_PRIMARY_SECURITY_MASTER"
+HISTORICAL_SECURITY_MASTER_SOURCE_ID = "SPCIQPRO:SECURITIES_PRODUCTQUERY"
 HISTORICAL_SECURITY_MASTER_RECEIPT_SCHEMA = "aov0_ciq_historical_primary_security_master_receipt_v1"
-HISTORICAL_SECURITY_MASTER_CAPTURE_MODE = "HISTORICAL_PIT_PRIMARY_SECURITY_SNAPSHOT"
-HISTORICAL_SECURITY_MASTER_FREEZE_MODE = "HISTORICAL_START_PRIMARY_SECURITY_FROZEN"
-HISTORICAL_SECURITY_MASTER_SELECTION = "PROVIDER_PRIMARY_AS_OF_REQUESTED_CUTOFF"
+HISTORICAL_SECURITY_MASTER_CAPTURE_MODE = "HISTORICAL_PIT_SCREEN_SELECTED_SECURITY_SNAPSHOT"
+HISTORICAL_SECURITY_MASTER_FREEZE_MODE = "HISTORICAL_START_SCREEN_SELECTED_SECURITY_FROZEN"
+HISTORICAL_SECURITY_MASTER_SELECTION = "EXACT_DATED_MAJOR_US_FUNDING_SCREEN_UNIQUE_SECURITY"
+HISTORICAL_SECURITY_MASTER_PERSPECTIVE = "321247"
+HISTORICAL_SECURITY_MASTER_MI_KEY_FIELD = "322517"
+HISTORICAL_SECURITY_MASTER_PRICE_FIELD = "324251"
+HISTORICAL_SECURITY_MASTER_PRICE_DATE_KEY = "sk_557"
+HISTORICAL_SECURITY_MASTER_EXCHANGE_GROUP_FIELD = "406718"
+HISTORICAL_SECURITY_MASTER_EXCHANGE_GROUP_VALUE = "-1,-4"
+HISTORICAL_SECURITY_MASTER_FUNDING_TYPE_FIELD = "321268"
+HISTORICAL_SECURITY_MASTER_FUNDING_TYPE_VALUES = ("1", "16")
 
 REQUIRED_IDENTITY_COLUMNS = (
     "SP_ENTITY_ID",
@@ -64,12 +72,13 @@ def load_historical_start_security_master(
     expected_as_of_date: str | pd.Timestamp,
     expected_entity_ids: Iterable[object],
 ) -> HistoricalSecurityMaster:
-    """Admit one exact historical-start primary-security provider snapshot.
+    """Admit one exact historical-start screen-selected provider snapshot.
 
     The receipt must mechanically bind the provider-effective date to the A1
-    start date and explicitly state that the object is not conditioned on the
-    later/current primary mapping.  Raw identity rows must be a one-to-one
-    mapping for exactly the admitted historical company cohort.
+    start date and explicitly prove that the exact historical market law yields
+    one security row per company without consulting the later/current primary
+    flag. Raw identity rows must be a one-to-one mapping for exactly the
+    admitted historical company cohort.
     """
 
     master_path = Path(master_path)
@@ -94,6 +103,27 @@ def load_historical_start_security_master(
         raise HistoricalSecurityMasterError("historical_security_master_freeze_mode_invalid")
     if receipt.get("primary_security_selection") != HISTORICAL_SECURITY_MASTER_SELECTION:
         raise HistoricalSecurityMasterError("historical_security_master_selection_invalid")
+    if str(receipt.get("market_perspective") or "") != HISTORICAL_SECURITY_MASTER_PERSPECTIVE:
+        raise HistoricalSecurityMasterError("historical_security_master_perspective_invalid")
+    if str(receipt.get("mi_key_field_key") or "") != HISTORICAL_SECURITY_MASTER_MI_KEY_FIELD:
+        raise HistoricalSecurityMasterError("historical_security_master_mi_key_invalid")
+    if str(receipt.get("price_field_key") or "") != HISTORICAL_SECURITY_MASTER_PRICE_FIELD:
+        raise HistoricalSecurityMasterError("historical_security_master_price_field_invalid")
+    if str(receipt.get("price_date_secondary_key") or "") != HISTORICAL_SECURITY_MASTER_PRICE_DATE_KEY:
+        raise HistoricalSecurityMasterError("historical_security_master_price_date_key_invalid")
+    if str(receipt.get("exchange_group_field_key") or "") != HISTORICAL_SECURITY_MASTER_EXCHANGE_GROUP_FIELD:
+        raise HistoricalSecurityMasterError("historical_security_master_exchange_field_invalid")
+    if str(receipt.get("exchange_group_value") or "") != HISTORICAL_SECURITY_MASTER_EXCHANGE_GROUP_VALUE:
+        raise HistoricalSecurityMasterError("historical_security_master_exchange_group_invalid")
+    if str(receipt.get("funding_type_field_key") or "") != HISTORICAL_SECURITY_MASTER_FUNDING_TYPE_FIELD:
+        raise HistoricalSecurityMasterError("historical_security_master_funding_field_invalid")
+    funding_values = tuple(str(value) for value in receipt.get("funding_type_values") or ())
+    if funding_values != HISTORICAL_SECURITY_MASTER_FUNDING_TYPE_VALUES:
+        raise HistoricalSecurityMasterError("historical_security_master_funding_values_invalid")
+    if receipt.get("primary_issue_field_requested") is not False:
+        raise HistoricalSecurityMasterError("historical_security_master_current_primary_field_forbidden")
+    if receipt.get("exactly_one_screen_security_per_entity") is not True:
+        raise HistoricalSecurityMasterError("historical_security_master_screen_uniqueness_missing")
     if receipt.get("historical_as_of_mechanically_bound") is not True:
         raise HistoricalSecurityMasterError("historical_security_master_asof_not_mechanically_bound")
     if receipt.get("current_primary_conditioned") is not False:
@@ -185,7 +215,11 @@ def load_historical_start_security_master(
         "capture_mode": HISTORICAL_SECURITY_MASTER_CAPTURE_MODE,
         "identity_freeze_mode": HISTORICAL_SECURITY_MASTER_FREEZE_MODE,
         "primary_security_selection": HISTORICAL_SECURITY_MASTER_SELECTION,
+        # Retain the legacy metadata key because the replay gate consumes it;
+        # its semantics are now exact historical screen-selected identity, not
+        # a current or undated provider-primary flag.
         "historical_primary_security_identity_reconstructed": True,
+        "historical_screen_security_identity_reconstructed": True,
         "as_of_date": expected_date.date().isoformat(),
         "entity_count": len(entity_ids),
         "master_path": master_path.resolve().as_posix(),

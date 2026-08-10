@@ -1,0 +1,105 @@
+SP_ENTITY_ID,EventCount,NearestPreCutoffDate,NearestPreCutoffType,NearestPostCutoffDate,NearestPostCutoffType,LatestTerminalDate,LatestTerminalType,UnresolvedTerminalAtCutoff
+4021980,1156,2025-05-09T00:00:00.000Z,"Earnings Release Date, Estimated",2025-06-05T17:00:00.000Z,Shareholder or Analyst Call,2017-07-31T08:00:00.000Z,Bankruptcy: Emergence or Exit,false
+4092847,311,2025-05-16T20:30:00.000Z,"Earnings Release Date, Estimated",2025-06-10T08:00:00.000Z,Conference,,,false
+4142027,1563,2025-05-14T21:00:00.000Z,Company Conference Presentation,2025-05-27T08:00:00.000Z,Conference,,,false
+4153733,829,2025-05-15T08:00:00.000Z,Fixed Income Offering,2025-05-21T08:00:00.000Z,Conference,,,false
+4160258,692,2025-05-13T08:00:00.000Z,Conference,2025-05-22T15:58:00.000Z,CEO Change,,,false
+4239659,769,2025-05-08T00:00:00.000Z,Earnings Release Date,2025-09-03T10:26:00.000Z,Announcement of Earnings,,,false
+4261521,458,2025-05-13T08:00:00.000Z,Conference,2025-05-20T11:00:00.000Z,Conference,,,false
+4276821,1614,2025-05-16T17:05:00.000Z,Client Announcement,2025-05-19T11:40:00.000Z,Product-related Announcement,,,false
+4327198,344,2025-05-15T17:30:00.000Z,"Earnings Release Date, Estimated",2025-05-20T17:08:00.000Z,Delisting,,,false
+4349995,764,2025-05-09T00:00:00.000Z,Earnings Release Date,2025-05-21T20:00:00.000Z,Annual General Meeting,,,false
+4401941,1401,2025-05-16T17:01:00.000Z,Product-related Announcement,2025-05-19T11:00:00.000Z,Conference,,,false
+4403916,324,2025-05-12T19:00:00.000Z,Earnings Call,2025-08-06T14:31:00.000Z,Announcement of Earnings,,,false
+4416726,613,2025-05-12T04:00:00.000Z,Company Conference Presentation,2025-05-20T08:00:00.000Z,Conference,,,false
+4420334,291,2025-05-07T20:30:00.000Z,"Earnings Release Date, Estimated",2025-06-04T18:00:00.000Z,Annual General Meeting,,,false
+4424169,659,2025-05-16T08:00:00.000Z,"Ex-Dividend Date, Regular",2025-05-29T08:00:00.000Z,Shelf Registration Filing,,,false
+4426783,324,2025-05-14T22:20:00.000Z,Company Conference Presentation,2025-05-19T08:00:00.000Z,Conference,,,false
+4565554,599,2025-05-06T16:01:00.000Z,Product-related Announcement,2025-06-03T00:05:00.000Z,Other Executive or Board Change,,,false
+4641918,290,2025-04-15T11:00:00.000Z,Sales or Trading Statement Release Date,2025-06-05T04:00:00.000Z,Announcement of Earnings,,,false
+4770121,590,2025-05-09T00:17:00.000Z,Buyback: Tranche Update,2025-05-21T18:00:00.000Z,Annual General Meeting,,,false
+4810409,380,2025-05-14T00:20:00.000Z,Announcement of Earnings,2025-05-21T04:00:00.000Z,"Earnings Release Date, Estimated",,,false
+4810724,847,2025-05-15T14:00:00.000Z,Company Conference Presentation,2025-05-20T08:00:00.000Z,Conference,,,false
+4810896,847,2025-05-16T16:30:00.000Z,Earnings Call,2025-05-19T16:30:00.000Z,Product-related Announcement,,,false
+4811056,315,2025-05-16T04:00:00.000Z,Delayed SEC Filing,2025-05-19T04:00:00.000Z,Private Placement,,,false
+4811197,481,2025-04-10T05:21:00.000Z,Announcement of Sales or Trading Statement,2025-05-29T08:00:00.000Z,Follow-on Equity Offering,,,false
+4811521,919,2025-05-16T08:00:00.000Z,Shelf Registration Filing,2025-05-22T14:00:00.000Z,Product-related Announcement,,,false
+4811591,241,2025-05-16T00:06:00.000Z,Buyback: Tranche Update,2025-05-20T00:00:00.000Z,"Earnings Release Date, Estimated",,,false
+4811695,1140,2025-05-16T00:08:00.000Z,Other Executive or Board Change,2025-05-20T08:00:00.000Z,Conference,,,false
+4811760,637,2025-05-14T00:01:00.000Z,Product-related Announcement,2025-05-27T16:00:00.000Z,Annual General Meeting,,,false
+4811954,540,2025-03-27T08:00:00.000Z,Shelf Registration Filing,2025-05-20T19:14:00.000Z,"Earnings Release Date, Estimated",,,false
+4812067,426,2025-05-14T17:30:00.000Z,Earnings Release Date,2025-05-22T19:00:00.000Z,Shareholder or Analyst Call,,,false
+4812756,573,2025-05-10T00:00:00.000Z,"Earnings Release Date, Estimated",2025-06-04T18:00:00.000Z,Shareholder or Analyst Call,,,false
+4812813,483,2025-05-15T17:30:00.000Z,"Earnings Release Date, Estimated",2025-05-17T01:15:00.000Z,Company Conference Presentation,,,false
+4913670,517,2025-05-14T17:30:00.000Z,Earnings Release Date,2025-05-19T17:30:00.000Z,"Earnings Release Date, Estimated",,,false
+4977885,610,2025-05-08T17:30:00.000Z,Earnings Release Date,2025-05-20T11:00:00.000Z,Conference,,,false
+4978093,429,2025-04-30T14:00:00.000Z,Earnings Release Date,2025-05-21T04:00:00.000Z,Annual General Meeting,,,false
+4989077,222,2025-05-15T04:00:00.000Z,Delayed SEC Filing,2025-05-17T00:00:00.000Z,"Earnings Release Date, Estimated",,,false
+4994908,591,2025-05-09T20:30:00.000Z,"Earnings Release Date, Estimated",2025-06-30T04:00:00.000Z,Index Constituent: Drop,,,false
+4996395,90,2025-05-16T01:08:00.000Z,Announcement of Earnings,2025-05-23T20:30:00.000Z,"Earnings Release Date, Estimated",,,false
+4999273,227,2025-05-15T17:30:00.000Z,Earnings Release Date,2025-05-27T16:01:00.000Z,CEO Change,,,false
+5000790,409,2025-05-15T00:44:00.000Z,Announcement of Earnings,2025-05-20T04:00:00.000Z,Company Conference Presentation,,,false
+5001439,284,2025-05-14T19:14:00.000Z,"Earnings Release Date, Estimated",2025-05-27T13:00:00.000Z,Special Call,,,false
+5013726,351,2025-05-09T00:30:00.000Z,Earnings Call,2025-05-22T16:00:00.000Z,Shareholder or Analyst Call,,,false
+5031604,350,2025-05-09T00:30:00.000Z,Earnings Call,2025-05-28T04:00:00.000Z,Company Conference Presentation,,,false
+5109836,329,2025-05-13T17:02:00.000Z,Product-related Announcement,2025-05-21T04:00:00.000Z,Company Conference Presentation,,,false
+5174695,1173,2025-05-16T19:00:00.000Z,Business Expansion,2025-05-22T00:05:00.000Z,Other Executive or Board Change,,,false
+5176861,616,2025-05-09T15:00:00.000Z,Product-related Announcement,2025-05-22T19:00:00.000Z,Annual General Meeting,,,false
+5181255,285,2025-05-15T02:40:00.000Z,Company Conference Presentation,2025-05-27T08:00:00.000Z,Conference,,,false
+5214991,282,2025-05-15T17:30:00.000Z,"Earnings Release Date, Estimated",2025-05-30T08:00:00.000Z,Shelf Registration Filing,,,false
+5239538,295,2025-05-15T23:38:00.000Z,Announcement of Earnings,2025-05-19T04:00:00.000Z,Index Constituent: Drop,,,false
+5242080,249,2025-05-14T00:30:00.000Z,Company Conference Presentation,2025-06-11T19:30:00.000Z,Annual General Meeting,,,false
+5244284,242,2025-05-15T20:30:00.000Z,"Earnings Release Date, Estimated",2025-06-10T08:00:00.000Z,Conference,,,false
+5250653,570,2025-05-15T02:09:00.000Z,Activist Communication,2025-07-18T00:06:00.000Z,Change in Company Bylaws or Rules,,,false
+5255493,272,2025-05-16T00:31:00.000Z,Corporate Guidance: New or Confirmed,2025-05-21T22:49:00.000Z,Client Announcement,,,false
+5255986,456,2025-05-10T00:00:00.000Z,"Earnings Release Date, Estimated",2025-05-22T16:00:00.000Z,Product-related Announcement,,,false
+5263639,624,2025-05-15T17:00:00.000Z,Product-related Announcement,2025-05-22T04:00:00.000Z,Buyback: Transaction Announcement,,,false
+5264620,205,2025-05-14T01:10:00.000Z,Company Conference Presentation,2025-05-27T08:00:00.000Z,Conference,,,false
+5265242,109,2025-05-13T20:30:00.000Z,"Earnings Release Date, Estimated",2025-07-01T16:00:00.000Z,Product-related Announcement,,,false
+5267913,264,2025-05-15T02:00:00.000Z,Company Conference Presentation,2025-06-03T08:00:00.000Z,Conference,,,false
+5277128,292,2025-05-13T17:30:00.000Z,Earnings Call,2025-05-19T08:00:00.000Z,Conference,,,false
+5293460,473,2025-05-15T17:00:00.000Z,Product-related Announcement,2025-05-27T04:00:00.000Z,Company Conference Presentation,,,false
+5297753,300,2025-05-13T17:00:00.000Z,Product-related Announcement,2025-05-19T22:04:00.000Z,Client Announcement,,,false
+5302933,559,2025-05-14T20:20:00.000Z,Company Conference Presentation,2025-06-03T08:00:00.000Z,Conference,,,false
+5303886,266,2025-05-14T08:00:00.000Z,Public Offering Lead Underwriter Change,2025-06-03T09:00:00.000Z,Conference,,,false
+5309396,182,2025-04-01T08:00:00.000Z,Fixed Income Offering,2025-06-03T17:01:00.000Z,Product-related Announcement,,,false
+5311902,295,2025-05-14T08:00:00.000Z,Shelf Registration Filing,2025-05-29T04:00:00.000Z,Annual General Meeting,,,false
+5321096,129,2025-04-07T15:19:00.000Z,Other Executive or Board Change,2025-06-05T15:00:00.000Z,Client Announcement,,,false
+5321237,312,2025-05-14T21:00:00.000Z,Company Conference Presentation,2025-05-28T08:00:00.000Z,Conference,,,false
+5326808,203,2025-03-21T17:30:00.000Z,"Earnings Release Date, Estimated",2025-05-22T20:30:00.000Z,"Earnings Release Date, Estimated",,,false
+5328081,558,2025-05-08T17:30:00.000Z,Earnings Release Date,2025-06-12T18:00:00.000Z,Shareholder or Analyst Call,,,false
+6319660,250,2025-05-14T01:00:00.000Z,Buyback: Tranche Update,2025-06-02T04:00:00.000Z,Company Conference Presentation,,,false
+6459368,372,2025-05-10T00:00:00.000Z,"Earnings Release Date, Estimated",2025-05-19T04:00:00.000Z,Company Conference Presentation,,,false
+6867615,479,2025-05-15T18:30:00.000Z,Annual General Meeting,2025-05-19T02:00:00.000Z,Conference,,,false
+6910410,484,2025-05-16T04:00:00.000Z,Company Conference Presentation,2025-05-21T00:05:00.000Z,Strategic Alliance,,,false
+7106242,184,2025-05-16T00:00:00.000Z,Other Executive or Board Change,2025-05-19T04:00:00.000Z,Company Conference Presentation,,,false
+7389138,297,2025-05-09T17:30:00.000Z,"Earnings Release Date, Estimated",2025-06-03T19:00:00.000Z,Shareholder or Analyst Call,,,false
+8251154,591,2025-05-12T08:00:00.000Z,Conference,2025-05-21T04:01:00.000Z,Annual General Meeting,,,false
+8435281,296,2025-05-14T01:00:00.000Z,Annual General Meeting,2025-05-23T00:11:00.000Z,Other Executive or Board Change,,,false
+9098887,371,2025-05-15T18:40:00.000Z,Company Conference Presentation,2025-05-22T23:39:00.000Z,Product-related Announcement,,,false
+9956217,142,2025-05-14T02:00:00.000Z,Earnings Call,2025-06-30T04:00:00.000Z,Index Constituent: Drop,,,false
+10976234,144,2025-05-07T14:02:00.000Z,Other Executive or Board Change,2025-06-04T14:04:00.000Z,Buyback: Tranche Update,,,false
+13087393,364,2025-05-15T19:00:00.000Z,Shareholder or Analyst Call,2025-05-21T15:00:00.000Z,Other Executive or Board Change,,,false
+13373011,468,2025-05-15T13:45:00.000Z,Company Conference Presentation,2025-05-19T16:30:00.000Z,Other Executive or Board Change,,,false
+13597615,363,2025-05-15T04:00:00.000Z,M&A: Transaction Closing,2025-06-14T00:14:00.000Z,Auditor Change,,,false
+14887727,198,2025-05-13T00:00:00.000Z,Earnings Release Date,2025-08-04T15:00:00.000Z,Corporate Guidance: New or Confirmed,,,false
+17514167,252,2025-05-16T20:30:00.000Z,"Earnings Release Date, Estimated",2025-05-29T08:00:00.000Z,Shelf Registration Filing,,,false
+19095891,158,2025-05-15T04:00:00.000Z,Delayed SEC Filing,2025-05-20T00:00:00.000Z,Earnings Release Date,,,false
+19098526,415,2025-05-08T17:30:00.000Z,Earnings Release Date,2025-05-28T04:00:00.000Z,Buyback: Transaction Closing,,,false
+19243702,172,2025-05-15T16:00:00.000Z,Announcement of Earnings,2025-05-22T17:30:00.000Z,"Earnings Release Date, Estimated",,,false
+19659800,463,2025-05-09T16:30:00.000Z,Earnings Call,2025-05-19T18:00:00.000Z,Shareholder or Analyst Call,,,false
+19871451,343,2025-05-16T20:30:00.000Z,"Earnings Release Date, Estimated",2025-05-21T08:00:00.000Z,Conference,,,false
+25283066,220,2025-05-16T00:00:00.000Z,"Earnings Release Date, Estimated",2025-05-22T04:00:00.000Z,Private Placement,,,false
+27682584,159,2025-05-15T20:30:00.000Z,"Earnings Release Date, Estimated",2025-05-30T04:00:00.000Z,Annual General Meeting,,,false
+27875239,198,2025-05-14T17:30:00.000Z,Earnings Release Date,2025-05-18T02:00:00.000Z,Conference,,,false
+28743844,187,2025-05-16T00:00:00.000Z,"Earnings Release Date, Estimated",2025-05-23T08:00:00.000Z,Follow-on Equity Offering,,,false
+29331846,93,2025-05-15T17:30:00.000Z,Earnings Release Date,2025-06-02T14:06:00.000Z,Announcement of Sales or Trading Statement,,,false
+29657689,168,2025-05-14T17:30:00.000Z,"Earnings Release Date, Estimated",2025-05-22T04:00:00.000Z,Annual General Meeting,,,false
+100420749,104,2025-05-14T04:00:00.000Z,Company Conference Presentation,2025-05-30T14:11:00.000Z,Other Executive or Board Change,,,false
+101570773,136,2025-05-08T17:19:00.000Z,Announcement of Operating Results,2025-05-20T20:30:00.000Z,"Earnings Release Date, Estimated",,,false
+105643522,189,2025-04-30T04:00:00.000Z,Delayed SEC Filing,2025-06-11T00:30:00.000Z,Lawsuits & Legal Issues,,,false
+107089758,218,2025-05-09T01:02:00.000Z,Buyback: Tranche Update,2025-05-31T04:00:00.000Z,Buyback: Transaction Closing,,,false
+108129648,155,2025-05-16T00:30:00.000Z,CFO Change,2025-05-22T17:00:00.000Z,Business Expansion,,,false
+110336920,43,2025-05-15T04:00:00.000Z,Auditor Going Concern Doubt,2025-06-19T00:00:00.000Z,"Earnings Release Date, Estimated",,,false
+113495488,172,2025-05-15T14:00:00.000Z,Client Announcement,2025-05-24T00:17:00.000Z,Delisting,,,false
+123916273,28,2025-05-01T04:00:00.000Z,Index Constituent: Add,2025-06-05T04:00:00.000Z,Earnings Release Date,,,false

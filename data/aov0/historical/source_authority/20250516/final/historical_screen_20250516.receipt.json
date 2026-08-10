@@ -1,0 +1,63 @@
+{
+  "capture_mode": "HISTORICAL_PIT_SCREEN_RECONSTRUCTION",
+  "component_receipts": [
+    {
+      "receipt_path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/20250516/ciq_productquery/market_original_revenue_candidates_20250516.receipt.json",
+      "receipt_sha256": "f0d3d9f745637ba7300569f8c7ec3d4b3433b65c7e2feeb49625e9a891cc3ef0",
+      "role": "market_candidates"
+    },
+    {
+      "receipt_path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/20250516/ciq_productquery/historical_company_state_20250516.receipt.json",
+      "receipt_sha256": "bda250ef75c528077f3d84c1e8d26a17b1ff3c169f41a0b369535c0b98b9c027",
+      "role": "historical_company_state"
+    },
+    {
+      "receipt_path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/20250516/ciq_productquery/historical_original_revenue_20250516.receipt.json",
+      "receipt_sha256": "4c89548ac75a9090688d66044add45bd0ba0a6761f768c60b898ad8c7e6b0b12",
+      "role": "historical_annual_revenue"
+    }
+  ],
+  "criteria": [
+    "Exchange[Current] in Major US Exchanges",
+    "Company Type in Public Company",
+    "Company Status in Operating,Operating Subsidiary",
+    "Total Revenue[Latest Fiscal Year] >= Total Revenue[FY-1] * 1.3",
+    "Total Revenue[FY-1] >= Total Revenue[FY-2] * 1.3",
+    "Total Revenue[FY-2] >= Total Revenue[FY-3] * 1.3"
+  ],
+  "current_screen_conditioned": false,
+  "current_screen_parity": {
+    "exact_membership_match": true,
+    "parity_receipt_path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/current_parity/20260809/current_parity_20260809.receipt.json",
+    "parity_receipt_sha256": "b56766a528e88b9a9bb87771edd81a6e8479e2eaf501c8c6d28d66f244a4a77d",
+    "pass": true,
+    "reconstructed_membership_sha256": "524e54c415b0ac39c188480d038859893b3717393ea9f4a0bc1aed3286f76fda",
+    "reference_membership_sha256": "524e54c415b0ac39c188480d038859893b3717393ea9f4a0bc1aed3286f76fda",
+    "screen_law_hash": "81e8cba8ebbda5de695d87ab321d15ebc3cf3f1c1158d3c94633dee7a3b78381"
+  },
+  "financial_alpha_evidence": 0,
+  "growth_multiplier": 1.3,
+  "historical_as_of_mechanically_bound": true,
+  "observed_identity_columns": [
+    "SP_ENTITY_ID"
+  ],
+  "parent_child_mutation_authority": "NONE",
+  "prospective_clock_authority": "NONE",
+  "provider_effective_as_of_date": "2025-05-16",
+  "raw_object_bytes": 4547,
+  "raw_object_name": "historical_screen_20250516.csv",
+  "raw_object_sha256": "c41662b3be3290b15a507800b03239a043455246b319d883f4fb54758a98998d",
+  "reconstruction_logic": "AOV0_HIGH_GROWTH_SCREEN_RECONSTRUCTION_V1",
+  "requested_cutoff_date": "2025-05-16",
+  "result_count": 104,
+  "revenue_periods": [
+    "LFY",
+    "FY-1",
+    "FY-2",
+    "FY-3"
+  ],
+  "schema_version": "aov0_historical_screen_reconstruction_receipt_v1",
+  "screen_law_hash": "81e8cba8ebbda5de695d87ab321d15ebc3cf3f1c1158d3c94633dee7a3b78381",
+  "source_id": "AOV0:HISTORICAL_SCREEN_RECONSTRUCTION",
+  "universe_freeze_mode": "HISTORICAL_START_SCREEN_FROZEN"
+}

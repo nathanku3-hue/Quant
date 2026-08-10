@@ -91,6 +91,69 @@ def _convert_market_receipt_to_ciq_securities(market: Path) -> Path:
     return market
 
 
+def _convert_market_receipt_to_ciq_market_revenue_intersection(market: Path) -> Path:
+    receipt = json.loads(market.read_text(encoding="utf-8"))
+    receipt.update(
+        {
+            "schema_version": "aov0_ciq_historical_market_original_revenue_candidate_receipt_v1",
+            "source_id": "SPCIQPRO:SECURITIES_PRODUCTQUERY+COMPANIES_PRODUCTQUERY",
+            "capture_scope": "HISTORICAL_MARKET_ORIGINAL_REVENUE_CANDIDATES_ONLY_NOT_A1_RISK_SET",
+            "market_component": {
+                "source_id": "SPCIQPRO:SECURITIES_PRODUCTQUERY",
+                "market_perspective": "321247",
+                "historical_market_date_mechanically_bound": True,
+                "price_field_key": "324251",
+                "price_date_secondary_key": "sk_557",
+                "exchange_group_field_key": "406718",
+                "exchange_group_value": "-1,-4",
+                "funding_type_field_key": "321268",
+                "funding_type_values": ["1", "16"],
+                "source_security_row_count": 6,
+                "source_entity_count": 4,
+                "current_company_state_filters_used": False,
+                "major_us_exchange_group_parity": {
+                    "as_of_date": "2025-05-16",
+                    "exact_match": True,
+                    "group_security_row_count": 6,
+                    "explicit_union_security_row_count": 6,
+                    "group_only_count": 0,
+                    "explicit_only_count": 0,
+                    "explicit_exchange_codes": {
+                        "NYSE": "0",
+                        "NYSEAM": "1",
+                        "NASDAQGM": "2",
+                        "NASDAQCM": "211",
+                        "NASDAQGS": "212",
+                    },
+                    "excluded_arca_code": "33",
+                },
+            },
+            "revenue_component": {
+                "source_id": "SPCIQPRO:COMPANIES_PRODUCTQUERY",
+                "companies_perspective": "266637",
+                "field_key": "329288",
+                "filing_version": "Original",
+                "reporting_basis": "Originally Reported",
+                "historical_as_of_mechanically_bound": True,
+                "as_of_secondary_key": "sk_860",
+                "as_of_value": "05/16/2025",
+                "period_secondary_key": "sk_854",
+                "periods": ["FY0", "FY-1", "FY-2", "FY-3"],
+                "growth_multiplier": 1.3,
+                "provider_formula_validation_passed": True,
+            },
+            "intersection": {
+                "candidate_csv_name": receipt["merged_csv_name"],
+                "candidate_csv_sha256": receipt["merged_csv_sha256"],
+                "candidate_csv_bytes": receipt["merged_csv_bytes"],
+                "candidate_count": 4,
+            },
+        }
+    )
+    market.write_text(json.dumps(receipt, sort_keys=True), encoding="utf-8")
+    return market
+
+
 def _components(tmp_path: Path) -> tuple[Path, Path, Path]:
     ids = ("1", "2", "3", "4")
     cohort_hash = entity_membership_hash(ids)
@@ -115,6 +178,14 @@ def _components(tmp_path: Path) -> tuple[Path, Path, Path]:
             "primary_exchange_source": {"source_id": "EXCHANGES", "sha256": "b" * 64},
         },
     )
+    company_audit = tmp_path / "company_keydev_audit.csv"
+    pd.DataFrame(
+        {
+            "SP_ENTITY_ID": ids,
+            "EventCount": [5, 4, 3, 2],
+            "UnresolvedTerminalAtCutoff": ["false"] * 4,
+        }
+    ).to_csv(company_audit, index=False)
     company = _write_receipt_with_csv(
         tmp_path,
         name="company",
@@ -127,12 +198,32 @@ def _components(tmp_path: Path) -> tuple[Path, Path, Path]:
         ),
         payload={
             "schema_version": HISTORICAL_COMPANY_STATE_RECEIPT_SCHEMA,
-            "source_id": "FIXTURE:HISTORICAL_COMPANY_STATE",
+            "source_id": "SPCIQPRO:SECURITIES_PRODUCTQUERY+KEY_DEVELOPMENTS_PRODUCTQUERY",
             "as_of_date": "2025-05-16",
             "historical_as_of_mechanically_bound": True,
             "current_conditioned": False,
             "historical_company_type_reconstructed": True,
             "historical_company_status_reconstructed": True,
+            "reconstruction_law": "DATED_MAJOR_US_COMMON_OR_DR_LISTING_WITH_TERMINAL_TRANSITION_CHECK_V1",
+            "status_output_semantics": "ELIGIBLE_OPERATING_BUCKET_NOT_SUBSIDIARY_CLASSIFICATION",
+            "market_perspective": "321247",
+            "price_field_key": "324251",
+            "price_date_secondary_key": "sk_557",
+            "exchange_group_field_key": "406718",
+            "exchange_group_value": "-1,-4",
+            "funding_type_field_key": "321268",
+            "funding_type_values": ["1", "16"],
+            "key_developments_perspective": "311682",
+            "key_developments_entity_field_key": "398876",
+            "key_developments_date_field_key": "311764",
+            "current_company_type_status_values_used": False,
+            "key_developments_entity_coverage_count": 4,
+            "key_developments_provider_row_count": 14,
+            "key_developments_response_exception": None,
+            "key_developments_audit_csv_name": company_audit.name,
+            "key_developments_audit_csv_sha256": _sha(company_audit),
+            "key_developments_audit_csv_bytes": company_audit.stat().st_size,
+            "unresolved_terminal_state_count": 0,
             "requested_entity_count": 4,
             "requested_entity_membership_sha256": cohort_hash,
             "requested_entity_coverage_complete": True,
@@ -154,11 +245,18 @@ def _components(tmp_path: Path) -> tuple[Path, Path, Path]:
         ),
         payload={
             "schema_version": HISTORICAL_ANNUAL_REVENUE_RECEIPT_SCHEMA,
-            "source_id": "SPCIQPRO:HISTORICAL_ANNUAL_REVENUE",
+            "source_id": "SPCIQPRO:COMPANIES_PRODUCTQUERY",
             "as_of_date": "2025-05-16",
             "historical_as_of_mechanically_bound": True,
             "current_conditioned": False,
             "filing_version": "Original",
+            "reporting_basis": "Originally Reported",
+            "companies_perspective": "266637",
+            "field_key": "329288",
+            "period_secondary_key": "sk_854",
+            "reporting_basis_secondary_key": "sk_858",
+            "as_of_secondary_key": "sk_860",
+            "provider_numeric_values_returned": True,
             "relative_periods": ["LFY", "FY-1", "FY-2", "FY-3"],
             "requested_entity_count": 4,
             "requested_entity_membership_sha256": cohort_hash,
@@ -198,6 +296,30 @@ def test_reconstruct_accepts_ciq_securities_productquery_market_component(tmp_pa
     assert rebuilt.membership["SP_ENTITY_ID"].tolist() == ["1"]
     assert rebuilt.metadata["candidate_count"] == 4
     assert rebuilt.metadata["current_screen_conditioned"] is False
+
+
+def test_reconstruct_accepts_truthfully_labeled_ciq_market_revenue_intersection(tmp_path: Path) -> None:
+    market, company, revenue = _components(tmp_path)
+    _convert_market_receipt_to_ciq_market_revenue_intersection(market)
+    rebuilt = reconstruct_historical_screen(
+        market_receipt_path=market,
+        company_state_receipt_path=company,
+        revenue_receipt_path=revenue,
+        expected_as_of_date="2025-05-16",
+    )
+    assert rebuilt.membership["SP_ENTITY_ID"].tolist() == ["1"]
+    assert rebuilt.metadata["candidate_count"] == 4
+
+    receipt = json.loads(market.read_text(encoding="utf-8"))
+    receipt["capture_scope"] = "HISTORICAL_MARKET_CANDIDATES_ONLY"
+    market.write_text(json.dumps(receipt), encoding="utf-8")
+    with pytest.raises(HistoricalScreenReconstructionError, match="market_scope_invalid"):
+        reconstruct_historical_screen(
+            market_receipt_path=market,
+            company_state_receipt_path=company,
+            revenue_receipt_path=revenue,
+            expected_as_of_date="2025-05-16",
+        )
 
 
 @pytest.mark.parametrize(

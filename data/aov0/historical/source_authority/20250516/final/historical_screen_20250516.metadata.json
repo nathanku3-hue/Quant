@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2025-05-16",
+  "audit_name": "historical_screen_20250516.audit.csv",
+  "candidate_count": 104,
+  "candidate_membership_sha256": "de5c7c83a87a7e8af1cdb54ac792bd91e95ee8edf69facd4c2a13c9be679f751",
+  "criteria": [
+    "Exchange[Current] in Major US Exchanges",
+    "Company Type in Public Company",
+    "Company Status in Operating,Operating Subsidiary",
+    "Total Revenue[Latest Fiscal Year] >= Total Revenue[FY-1] * 1.3",
+    "Total Revenue[FY-1] >= Total Revenue[FY-2] * 1.3",
+    "Total Revenue[FY-2] >= Total Revenue[FY-3] * 1.3"
+  ],
+  "current_screen_conditioned": false,
+  "financial_alpha_evidence": 0,
+  "growth_multiplier": 1.3,
+  "membership_name": "historical_screen_20250516.csv",
+  "reconstructed_membership_sha256": "de5c7c83a87a7e8af1cdb54ac792bd91e95ee8edf69facd4c2a13c9be679f751",
+  "result_count": 104,
+  "revenue_periods": [
+    "LFY",
+    "FY-1",
+    "FY-2",
+    "FY-3"
+  ],
+  "screen_law_hash": "81e8cba8ebbda5de695d87ab321d15ebc3cf3f1c1158d3c94633dee7a3b78381"
+}

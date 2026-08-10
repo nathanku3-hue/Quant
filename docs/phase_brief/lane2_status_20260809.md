@@ -14,13 +14,14 @@
 ```text
 Vintage authority                 CLOSED — CIQ SPG historical as-of + FilingVer=Original
 Current↔historical AOV parity     CLOSED — historical decisions call exact current-cut builder
-Historical high-growth risk set   OPEN — 104-name exact-date market+Original-revenue candidate cut frozen; historical company type/status authority still missing
-Historical primary identity       OPEN — 104/104 have one dated qualifying row and current primary corroboration, but no historical-effective primary flag
-A1                                NOT EARNED
-A2                                NOT EARNED / cannot freeze before admitted A1
+Historical high-growth risk set   CLOSED — 104-company 2025-05-16 reconstruction admitted, current-screen conditioning rejected
+Historical primary identity       CLOSED — exact dated Major-US/funding security selection, 104/104, no current-primary conditioning
+Terminal lifecycle authority      CLOSED — 3 source-bound cash-merger/terminal events, no survivor filtering
+A1                                ADMITTED — 264 trading days / 94 active CIQ securities / all canonical gates PASS
+A2                                CLOSED — one frozen/query-metered untouched read, query_count=1
 ```
 
-A current-screen-conditioned cohort or current-primary security map remains diagnostic-only. Neither may be relabeled as historical PIT authority.
+A1 report classification is `A1_ADMITTED_HISTORICAL_PIT`; A2 result classification is `A2_UNTOUCHED_HISTORICAL_PIT`. Both remain historical-only evidence and keep `financial_alpha_evidence=0`. The A2 chronology is A1 report `2026-08-10T07:33:38Z` → freeze `07:36:04Z` → held-out PIT capture after freeze → query lock `07:43:15Z` → result/receipt `07:45:03Z`. Any lower section that still describes these gates as open is retained only as pre-closure investigation history and is superseded by this gate block.
 
 ## Fundamental vintage / parity work completed
 
@@ -147,16 +148,15 @@ Current dry status: the Xpress credential gap no longer blocks the target-date m
 2. Complete **historical Company Type / Company Status** reconstruction for the frozen 104-name market+Original-revenue candidate cohort. Do not use current profile labels as historical truth; bind dated provider event/state evidence to every inclusion/exclusion needed by the final screen.
 3. Complete **historical primary security + trading-item** selection for the exact final cohort. The one-row-per-entity dated Securities evidence and 104/104 current-primary corroboration may support the proof, but cannot replace an effective-dated provider-primary relationship under the current contract.
 4. Finalize/admit the historical risk-set + historical-primary receipts; then materialize historical market/fundamental replay inputs for exactly that admitted cohort and only then spend transition-query budget.
-5. Run A1 through the exact current-cut decision builder + activated historical cube; require ≥252 trading days, real CIQSEC identity, source-semantic gates, and canonical arm gates.
-6. If and only if A1 is admitted, freeze implementation/rules/parameters/data boundaries and A2 paths.
-7. Execute one query-metered untouched A2 read; no tuning between A1 and A2.
-8. Continue prospective Lane 1 independently; A1/A2 never increment `financial_alpha_evidence` under current law.
+5. **DONE:** A1 admitted through the exact current-cut decision builder + activated historical cube: 264 trading days, 94 active CIQ securities, Original/as-of PIT semantics, source-bound terminal lifecycle, and all canonical arm gates pass.
+6. **DONE:** immutable A2 freeze binds the admitted A1 report, 94 frozen active securities, implementation hashes, source cohort, terminal-event packet, A2 window `2026-06-12..2026-08-07`, and one-query law.
+7. **DONE:** exactly one untouched A2 query executed after the freeze; result and query receipt are append-only/hash-bound and second evaluation is forbidden.
+8. **NEXT:** keep Parent/Child frozen and use the already-visible A1/A2 economics for loss/missed-winner and regime diagnosis; continue prospective Lane 1 independently. A1/A2 never increment `financial_alpha_evidence` under current law.
 
 ## Non-claims
 
-- No A1 admission yet
-- No A2 freeze or query yet
-- No Parent / Child mutation
-- No prospective outcome open
-- No `financial_alpha_evidence` uplift
-- No live-capital authority
+- A1/A2 are historical evidence only, not prospective financial-alpha evidence
+- No Parent / Child mutation occurred between or after A1/A2 in this closure
+- No prospective Clock #1 outcome was opened
+- No `financial_alpha_evidence` uplift occurred
+- No live-capital authority was created

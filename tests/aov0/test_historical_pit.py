@@ -12,6 +12,7 @@ from research.aov0.ciq_market import (
 )
 from research.aov0.cube import build_vertical_cube
 from research.aov0.experiment import run_five_arm_experiment
+from research.aov0.historical_lifecycle import CASH_MERGER_EVENT, HistoricalTerminalEvents
 from research.aov0.historical_pit import (
     HISTORICAL_PIT_MODE,
     REQUIRED_RELATIVE_PERIODS,
@@ -231,6 +232,108 @@ def test_market_overlap_must_reconcile_and_replay_is_weekly_one_bar_ready() -> N
         )
 
 
+def test_historical_market_overlap_coalesces_exact_identity_finite_values_order_independently() -> None:
+    raw_market, dates = _market()
+    target_date = pd.Timestamp(dates[230])
+    exact = raw_market.loc[pd.to_datetime(raw_market["SPT_DATE"]).eq(target_date)].copy()
+    sparse = exact.copy()
+    mask = sparse["SP_SECURITY_ID"].astype(str).eq("101")
+    sparse.loc[mask, "SPT_TOTAL_RETURN"] = np.nan
+
+    left_first = build_historical_market_panel(
+        security_master_raw=_master(),
+        market_parts=[sparse, exact],
+        frozen_entity_ids={"1", "2", "3", "4"},
+    ).frame
+    right_first = build_historical_market_panel(
+        security_master_raw=_master(),
+        market_parts=[exact, sparse],
+        frozen_entity_ids={"1", "2", "3", "4"},
+    ).frame
+
+    left = left_first.loc[left_first["security_id"].eq("CIQSEC:101")].iloc[0]
+    right = right_first.loc[right_first["security_id"].eq("CIQSEC:101")].iloc[0]
+    expected = float(exact.loc[mask, "SPT_TOTAL_RETURN"].iloc[0]) / 100.0
+    assert float(left["total_return"]) == pytest.approx(expected)
+    assert float(right["total_return"]) == pytest.approx(expected)
+    assert float(left["close"]) == pytest.approx(float(right["close"]))
+    assert float(left["volume"]) == pytest.approx(float(right["volume"]))
+
+
+def test_historical_market_drops_only_cohort_wide_closed_date_placeholders() -> None:
+    raw_market, dates = _market()
+    closed_date = pd.Timestamp(dates[75])
+    closed_mask = pd.to_datetime(raw_market["SPT_DATE"]).eq(closed_date)
+    raw_market.loc[closed_mask, ["SPT_TOTAL_RETURN", "SPT_CLOSE", "SPT_VOLUME"]] = np.nan
+
+    market = build_historical_market_panel(
+        security_master_raw=_master(),
+        market_parts=[raw_market],
+        frozen_entity_ids={"1", "2", "3", "4"},
+    ).frame
+    assert closed_date not in set(pd.DatetimeIndex(market["date"]))
+    target_date = pd.Timestamp(dates[210])
+    target = market.loc[pd.to_datetime(market["date"]).eq(target_date)]
+    assert len(target) == 4
+    assert pd.to_numeric(target["sma200"], errors="coerce").notna().all()
+
+    partial = raw_market.copy()
+    partial_date = pd.Timestamp(dates[250])
+    partial_mask = (
+        pd.to_datetime(partial["SPT_DATE"]).eq(partial_date)
+        & partial["SP_SECURITY_ID"].astype(str).eq("101")
+    )
+    partial.loc[partial_mask, ["SPT_TOTAL_RETURN", "SPT_CLOSE", "SPT_VOLUME"]] = np.nan
+    partial_market = build_historical_market_panel(
+        security_master_raw=_master(),
+        market_parts=[partial],
+        frozen_entity_ids={"1", "2", "3", "4"},
+    ).frame
+    partial_rows = partial_market.loc[pd.to_datetime(partial_market["date"]).eq(partial_date)]
+    assert len(partial_rows) == 4
+    missing = partial_rows.loc[partial_rows["security_id"].eq("CIQSEC:101")]
+    assert len(missing) == 1
+    assert missing[["total_return", "close", "volume"]].isna().all(axis=None)
+
+
+def test_historical_replay_keeps_real_zero_market_observations_as_sessions() -> None:
+    raw_market, dates = _market()
+    start = next(pd.Timestamp(day) for day in dates[210:] if pd.Timestamp(day).weekday() == 4)
+    end = pd.Timestamp(dates[dates.get_loc(start) + 55])
+    session_window = dates[(dates >= start) & (dates <= end)]
+    decisions = completed_week_decision_dates(session_window)
+    zero_state_decision = pd.Timestamp(decisions[3])
+    zero_window = dates[(dates <= zero_state_decision)][-20:]
+    zero_mask = (
+        raw_market["SP_SECURITY_ID"].astype(str).eq("101")
+        & pd.to_datetime(raw_market["SPT_DATE"]).isin(zero_window)
+    )
+    raw_market.loc[zero_mask, "SPT_TOTAL_RETURN"] = 0.0
+    raw_market.loc[zero_mask, "SPT_VOLUME"] = 0.0
+
+    market = build_historical_market_panel(
+        security_master_raw=_master(),
+        market_parts=[raw_market],
+        frozen_entity_ids={"1", "2", "3", "4"},
+    )
+    raw_fundamentals = pd.concat(
+        [_provider_snapshot(date) for date in decisions], ignore_index=True
+    )
+    states = build_historical_factor_states(
+        raw_fundamentals, frozen_entity_ids={"1", "2", "3", "4"}
+    )
+    replay = build_historical_replay_inputs(
+        market_panel=market,
+        factor_states=states,
+        evaluation_start=start,
+        evaluation_end=end,
+    )
+
+    assert "CIQSEC:101" in replay.rule100_weights.columns
+    assert replay.decision_rule100_weights.loc[zero_state_decision, "CIQSEC:101"] == 0.0
+    assert replay.total_returns.loc[zero_state_decision, "CIQSEC:101"] == 0.0
+
+
 def test_historical_market_technicals_match_current_cut_kernel_same_input() -> None:
     raw_market, _dates = _market()
     security_map, _ = normalize_primary_security_master(
@@ -422,6 +525,154 @@ def test_historical_decision_cut_matches_current_rule100_and_activated_cube(tmp_
         "economic_cash",
     }
     assert all(run.status.value != "blocked" for run in experiment.runs.values())
+
+
+def test_historical_replay_realizes_terminal_cash_without_survivor_filter(tmp_path) -> None:
+    raw_market, dates = _market()
+    start = next(pd.Timestamp(day) for day in dates[210:] if pd.Timestamp(day).weekday() == 4)
+    start_loc = dates.get_loc(start)
+    last_trading_date = pd.Timestamp(dates[start_loc + 15])
+    effective_date = pd.Timestamp(dates[start_loc + 16])
+    end = pd.Timestamp(dates[start_loc + 55])
+    security_id = "CIQSEC:101"
+    raw_security_id = "101"
+    last_close = float(
+        raw_market.loc[
+            raw_market["SP_SECURITY_ID"].astype(str).eq(raw_security_id)
+            & pd.to_datetime(raw_market["SPT_DATE"]).eq(last_trading_date),
+            "SPT_CLOSE",
+        ].iloc[0]
+    )
+    cash_consideration = last_close * 1.05
+    terminal_mask = (
+        raw_market["SP_SECURITY_ID"].astype(str).eq(raw_security_id)
+        & pd.to_datetime(raw_market["SPT_DATE"]).ge(effective_date)
+    )
+    raw_market.loc[terminal_mask, ["SPT_TOTAL_RETURN", "SPT_CLOSE", "SPT_VOLUME"]] = np.nan
+    market = build_historical_market_panel(
+        security_master_raw=_master(),
+        market_parts=[raw_market],
+        frozen_entity_ids={"1", "2", "3", "4"},
+    )
+    session_window = dates[(dates >= start) & (dates <= end)]
+    decisions = completed_week_decision_dates(session_window)
+    states = build_historical_factor_states(
+        pd.concat([_provider_snapshot(date) for date in decisions], ignore_index=True),
+        frozen_entity_ids={"1", "2", "3", "4"},
+    )
+    event_frame = pd.DataFrame(
+        [
+            {
+                "source_entity_id": "1",
+                "security_id": security_id,
+                "source_spt_item": "SPT101",
+                "last_trading_date": last_trading_date,
+                "effective_date": effective_date,
+                "cash_consideration": cash_consideration,
+                "currency": "USD",
+                "event_type": CASH_MERGER_EVENT,
+                "source_authority": "SEC:TEST_PRIMARY_FILING",
+                "source_locator": "https://www.sec.gov/test",
+            }
+        ]
+    )
+    terminal_events = HistoricalTerminalEvents(
+        frame=event_frame,
+        events_path=tmp_path / "events.csv",
+        receipt_path=tmp_path / "events.receipt.json",
+        metadata={"financial_alpha_evidence": 0},
+    )
+
+    replay = build_historical_replay_inputs(
+        market_panel=market,
+        factor_states=states,
+        evaluation_start=start,
+        evaluation_end=end,
+        terminal_events=terminal_events,
+    )
+
+    assert security_id in replay.security_ids
+    expected_terminal_return = cash_consideration / last_close - 1.0
+    assert replay.total_returns.loc[effective_date, security_id] == pytest.approx(expected_terminal_return)
+    effective_loc = replay.total_returns.index.get_loc(effective_date)
+    prior_date = pd.Timestamp(replay.total_returns.index[effective_loc - 1])
+    next_date = pd.Timestamp(replay.total_returns.index[effective_loc + 1])
+    assert replay.rule100_weights.loc[prior_date, security_id] > 0.0
+    assert replay.rule100_weights.loc[effective_date, security_id] == 0.0
+    assert replay.total_returns.loc[next_date, security_id] == 0.0
+    assert security_id in replay.eligible_by_date[prior_date]
+    assert security_id not in replay.eligible_by_date[effective_date]
+    assert replay.metadata["terminal_event_count"] == 1
+    assert replay.metadata["terminal_survivor_filtering"] is False
+    assert list(replay.rule100_weights.columns).count(security_id) == 1
+
+
+def test_historical_replay_a2_accepts_frozen_security_already_in_terminal_cash(tmp_path) -> None:
+    raw_market, dates = _market()
+    initial = next(pd.Timestamp(day) for day in dates[210:] if pd.Timestamp(day).weekday() == 4)
+    initial_loc = dates.get_loc(initial)
+    last_trading_date = pd.Timestamp(dates[initial_loc + 10])
+    effective_date = pd.Timestamp(dates[initial_loc + 11])
+    last_close = float(
+        raw_market.loc[
+            raw_market["SP_SECURITY_ID"].astype(str).eq("101")
+            & pd.to_datetime(raw_market["SPT_DATE"]).eq(last_trading_date),
+            "SPT_CLOSE",
+        ].iloc[0]
+    )
+    terminal_mask = (
+        raw_market["SP_SECURITY_ID"].astype(str).eq("101")
+        & pd.to_datetime(raw_market["SPT_DATE"]).ge(effective_date)
+    )
+    raw_market.loc[terminal_mask, ["SPT_TOTAL_RETURN", "SPT_CLOSE", "SPT_VOLUME"]] = np.nan
+    market = build_historical_market_panel(
+        security_master_raw=_master(),
+        market_parts=[raw_market],
+        frozen_entity_ids={"1", "2", "3", "4"},
+    )
+    later_dates = dates[dates > effective_date]
+    a2_start = next(pd.Timestamp(day) for day in later_dates if pd.Timestamp(day).weekday() == 4)
+    a2_end = pd.Timestamp(dates[dates.get_loc(a2_start) + 20])
+    decisions = completed_week_decision_dates(dates[(dates >= a2_start) & (dates <= a2_end)])
+    states = build_historical_factor_states(
+        pd.concat([_provider_snapshot(date) for date in decisions], ignore_index=True),
+        frozen_entity_ids={"1", "2", "3", "4"},
+    )
+    terminal_events = HistoricalTerminalEvents(
+        frame=pd.DataFrame(
+            [
+                {
+                    "source_entity_id": "1",
+                    "security_id": "CIQSEC:101",
+                    "source_spt_item": "SPT101",
+                    "last_trading_date": last_trading_date,
+                    "effective_date": effective_date,
+                    "cash_consideration": last_close * 1.05,
+                    "currency": "USD",
+                    "event_type": CASH_MERGER_EVENT,
+                    "source_authority": "SEC:TEST_PRIMARY_FILING",
+                    "source_locator": "https://www.sec.gov/test",
+                }
+            ]
+        ),
+        events_path=tmp_path / "events.csv",
+        receipt_path=tmp_path / "events.receipt.json",
+        metadata={"financial_alpha_evidence": 0},
+    )
+
+    replay = build_historical_replay_inputs(
+        market_panel=market,
+        factor_states=states,
+        evaluation_start=a2_start,
+        evaluation_end=a2_end,
+        required_security_ids=["CIQSEC:101", "CIQSEC:202", "CIQSEC:303", "CIQSEC:404"],
+        terminal_events=terminal_events,
+    )
+
+    assert replay.security_ids == ("CIQSEC:101", "CIQSEC:202", "CIQSEC:303", "CIQSEC:404")
+    assert replay.total_returns["CIQSEC:101"].eq(0.0).all()
+    assert replay.rule100_weights["CIQSEC:101"].eq(0.0).all()
+    assert all("CIQSEC:101" not in eligible for eligible in replay.eligible_by_date.values())
 
 
 def test_historical_session_continuity_rejects_missing_market_week() -> None:

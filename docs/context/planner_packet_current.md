@@ -1,8 +1,8 @@
 # Planner Packet — Current
 
-Date: 2026-08-09
+Date: 2026-08-10
 Active product state: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
-ACTIVE_STATUS: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MANDATORY_RECUTS_AUTHORIZED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
+ACTIVE_STATUS: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; LANE2_A1_A2_CLOSED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
 Canonical product maturity: `70/100`
 Portfolio-alpha evidence: `0`
 Limited Live: `CLOSED`
@@ -13,8 +13,8 @@ Limited Live: `CLOSED`
 - CRV1 remains the unchanged `252d` slow business-cycle family; one fast multi-week family is authorized for immediate preregistration. Default active family WIP=`2`, initial ceiling=`3` until explicit ownership/search-budget/risk-capacity review.
 - Evidence qualification may happen in parallel across families. Only the current portfolio/capital-policy commit chain and financial capital authority remain singular.
 - PAPER-0 implementation is authorized now behind minimum identity/TIF/broker-state/restart/fencing/calendar gates (`docs/architecture/paper_0_authority.md`). First order must resolve actual session close or be restricted to a verified regular full-session day.
-- Historical fundamental vintage + current↔historical parity are now **closed** under `CIQ SPG historical as-of + FilingVer=Original` (`docs/architecture/historical_fundamental_vintage_authority.md`). The remaining A1 hard blockers are the exact historical high-growth start risk set and an exact historical primary Security/Trading Item mapping for that same start date; current-109/current-primary objects remain diagnostic-only.
-- Independent-replication entitlement/identity/PIT/license readiness starts now in quarantine. Historical CIQ acquisition may use bounded workers under the frozen Original semantic, but provider spend should prioritize the two source-authority blockers before deeper diagnostic capture.
+- Historical fundamental vintage + current↔historical parity are **closed** under `CIQ SPG historical as-of + FilingVer=Original` (`docs/architecture/historical_fundamental_vintage_authority.md`). The 2025-05-16 104-company historical risk set, exact dated CIQ Security/Trading Item identity, and three-event terminal lifecycle packet are also admitted. A1 is now admitted and the one-shot A2 read is closed; current-109/current-primary objects remain diagnostic-only.
+- Independent-replication entitlement/identity/PIT/license readiness continues in quarantine. Lane-2 provider spend is no longer blocked on source authority; the next Lane-2 work is economic diagnosis of the already-closed A1/A2 evidence, not another A2 query.
 - This documentation commit does not bank currently uncommitted Lane-1/Lane-2 executable bytes. Any mechanics claims below that refer to working-tree code remain local working-tree observations until separately source-banked and validated.
 
 ## Lane 1 implementation update — 2026-08-08
@@ -29,9 +29,10 @@ Limited Live: `CLOSED`
 
 ## Historical Compression authority — current Lane-2 gate
 
-- Lane 2 remains a first-class critical lane. Historical vintage + exact-replay parity are closed; A1/A2 admission is now explicitly blocked on historical start-risk-set membership + historical primary-security/listing identity.
-- Target sequence remains legitimate historical PIT CIQ → exact frozen-AOV replay → A1 → frozen query-metered A2 → Parent/Child incremental economics + loss/missed-winner diagnosis.
-- Lane 2 never opens Clock #1 outcomes or tunes Parent/Child between A1 and A2. A2 used to design a challenger is no longer untouched evidence for that challenger.
+- Lane 2 Historical Compression has completed its A1→A2 evidence sequence. A1=`A1_ADMITTED_HISTORICAL_PIT` over 264 trading days / 94 active CIQ securities; A2=`A2_UNTOUCHED_HISTORICAL_PIT` over 38 trading days, frozen before held-out PIT capture and evaluated exactly once.
+- A1 economics: Parent cumulative return `+0.7145%`, Child `+0.3501%`; Child improves max drawdown by `1.5173pp` and CVaR loss by `0.3449pp` but reduces cumulative return by `0.3644pp` and Sharpe by `0.0256`.
+- A2 economics: Parent cumulative return `+6.7152%`, Child `+5.3701%`; Child improves max drawdown by `0.5529pp` and CVaR loss by `0.1945pp` but reduces cumulative return by `1.3451pp` and Sharpe by `0.2527`. This is a consistent risk-reduction/return-dilution signature, not authority to tune Parent/Child in place.
+- Lane 2 never opens Clock #1 outcomes. Parent/Child remain frozen; A2 used for later challenger design is no longer untouched evidence for that challenger.
 - Operating objective remains `EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE`; the final lock removes the previous blanket suppression of a second family and instead authorizes one fast multi-week family clock under isolated WIP.
 
 ## Clock #1 completion update — 2026-08-08

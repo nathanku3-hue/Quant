@@ -1,7 +1,7 @@
 # Done Checklist — Current
 
-Date: 2026-08-09
-Active state: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / MANDATORY_RECUTS_AUTHORIZED / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
+Date: 2026-08-10
+Active state: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / LANE2_A1_A2_CLOSED / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
 Canonical score: `70/100`
 Portfolio-alpha evidence: `0`
 
@@ -211,11 +211,12 @@ Current AOV v3 suite is `75/75 PASS`; ZERO-COMPAT remains seven zeros.
 - [x] **P0 A1 PARITY GATE:** same-input current/historical economics reconcile identity, ADV20, realized vol, SMA/trend, Q/U, technical state, sizing eligibility, Rule100 weights and activated cube state.
 - [x] **P0 A1 MARKET COMPONENT:** authenticated CIQ Securities ProductQuery proves the 2025-05-16 date-qualified market set with `SPT_PRICE_CLOSE[sk_557=05/16/2025]`; provider `Major US Exchanges` group `406718=-1,-4` exactly equals NYSE/NYSEAM/NASDAQGM/NASDAQCM/NASDAQGS at the target date (5,394 vs 5,394, zero differences; ARCA excluded). Xpress remains optional/alternate, not required for this component.
 - [x] **P0 A1 ORIGINAL-REVENUE COMPONENT:** Companies perspective `266637`, `IQ_TOTAL_REV` field `329288`, Original Reporting Basis + `sk_860=05/16/2025`; provider-generated FY0/FY-1/FY-2/FY-3 tokens validate the exact three `>=1.3x` formulas. Market intersection freezes 104 candidates at SHA-256 `02a7daa757cfbaeae6cf37e70509e787f4705d54f9bd2d234074e5ee61b946ae`, explicitly `NOT_A1_RISK_SET`.
-- [ ] **P0 A1 SOURCE BLOCKER — NARROWED:** exact historical Company Type / Company Status semantics for those 104 candidates. Current profile labels and SPG profile fields with an as-of argument are proved current-conditioned and cannot be substituted. `run_4` is current-cut baseline only; `run_2` is diagnostic-only.
-- [ ] **P0 A1 IDENTITY BLOCKER — NARROWED:** exact historical-effective provider-primary CIQ Security ID + Trading Item mapping for exactly the final historical risk set. All 104 partial candidates have one qualifying dated security row and all 104 exact rows are currently primary, but `SPT_PRIMARY_ISSUE` has no effective-date key and current-primary corroboration cannot substitute for historical-primary authority.
-- [ ] `A1` exact frozen-AOV historical PIT replay admitted only after the two source-authority blockers above + ≥252 trading-day / canonical arm gates.
-- [ ] A2 split/query budget/metrics/executable hashes frozen before hidden historical outcome inspection.
-- [ ] `A2` query-metered untouched historical PIT OOS evaluated once under the frozen contract and retained append-only.
+- [x] **P0 A1 SOURCE AUTHORITY:** exact historical Company Type / eligible Company Status semantics reconstructed for the 104-company 2025-05-16 cohort without current profile labels; final historical screen receipt recompiles to the same 104 membership.
+- [x] **P0 A1 IDENTITY AUTHORITY:** exact dated Major-US/funding CIQ Security ID + Trading Item mapping admitted for all 104 companies with `SPT_PRIMARY_ISSUE` omitted; current-primary conditioning is false.
+- [x] **P0 A1 TERMINAL LIFECYCLE AUTHORITY:** three source-bound post-start terminal cash events are hash-bound; cash settlement is realized on effective date and the fixed security column remains as zero-return cash afterward, with no future-completeness survivor filter.
+- [x] `A1` exact frozen-AOV historical PIT replay admitted as `A1_ADMITTED_HISTORICAL_PIT`: 264 trading days, 94 active CIQ securities, canonical arm gates PASS, `financial_alpha_evidence=0`.
+- [x] A2 split/query budget/metrics/executable/source/lifecycle hashes frozen before held-out PIT inspection; freeze window=`2026-06-12..2026-08-07`.
+- [x] `A2` query-metered untouched historical PIT OOS evaluated exactly once as `A2_UNTOUCHED_HISTORICAL_PIT`; result/query-lock/query-receipt are hash-bound, query count=`1`, second evaluation forbidden, `financial_alpha_evidence=0`.
 - [ ] `A3` matured prospective evidence; unavailable before `2026-09-09T20:00:00Z`.
 
 ## Open — review closure while clock runs

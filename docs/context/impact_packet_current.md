@@ -1,8 +1,18 @@
 # Impact Packet — Current
 
-Date: 2026-08-09
+Date: 2026-08-10
 State: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
-Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MANDATORY_RECUTS_AUTHORIZED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0`
+Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; LANE2_A1_A2_CLOSED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## Lane 2 A1→A2 closure impact — 2026-08-10
+
+Historical Compression has completed the authorized A1→A2 sequence without touching Clock #1 outcomes or mutating Parent/Child. The final 2025-05-16 source cohort is 104 companies with exact dated CIQ Security/Trading Item identity and no current-screen/current-primary conditioning. Three source-bound terminal cash events are incorporated through explicit lifecycle authority rather than future-completeness filtering or alternate-listing substitution.
+
+A1 is admitted as `A1_ADMITTED_HISTORICAL_PIT`: 264 trading days, 94 active CIQ securities, all canonical/source/identity/lifecycle gates pass. A2 was frozen after A1, held-out PIT fundamentals were retrieved only after that freeze, the query lock committed exactly one evaluation, and the retained result is `A2_UNTOUCHED_HISTORICAL_PIT`; second evaluation is forbidden. Scoped Lane-2 validation is `50/50 PASS`, A2 custody verification passes, and independent Reviewer A/B/C closure reviews pass.
+
+Economic impact is consistent across both windows: Child reduces max drawdown, CVaR loss and turnover versus Parent, but also reduces cumulative return and Sharpe. A1 Child-minus-Parent cumulative return=`-0.3644pp`; A2=`-1.3451pp`. This is historical diagnostic evidence only; `financial_alpha_evidence=0`, no in-place tuning authority is created, and the next Lane-2 work is loss/regime/missed-winner diagnosis without another A2 query.
+
+Current-truth surfaces updated this round: `docs/phase_brief/lane2_status_20260809.md`, `docs/context/done_checklist_current.md`, `docs/context/planner_packet_current.md`, `docs/context/bridge_contract_current.md`, `docs/context/impact_packet_current.md`, `docs/context/observability_pack_current.md`, `docs/context/post_phase_alignment_current.md`, `docs/decision log.md`, `docs/lessonss.md`, and the Lane-2 SAW closure report. No commit, push, hosted CI, publication, live-capital action, or prospective-outcome open is claimed.
 
 ## Final strategic lock documentation impact — 2026-08-09
 

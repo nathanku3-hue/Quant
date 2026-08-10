@@ -27,6 +27,10 @@ if str(ROOT) not in sys.path:
 from core import engine  # noqa: E402
 from research.aov0.contracts import DEFAULT_CONTRACT  # noqa: E402
 from research.aov0.experiment import run_five_arm_experiment  # noqa: E402
+from research.aov0.historical_lifecycle import (  # noqa: E402
+    HistoricalTerminalEvents,
+    load_historical_terminal_events,
+)
 from research.aov0.historical_pit import (  # noqa: E402
     HISTORICAL_PIT_MODE,
     build_factor_transition_plan,
@@ -77,6 +81,7 @@ FROZEN_IMPLEMENTATION_PATHS = (
     "research/aov0/cube.py",
     "research/aov0/dag.py",
     "research/aov0/experiment.py",
+    "research/aov0/historical_lifecycle.py",
     "research/aov0/historical_pit.py",
     "research/aov0/historical_risk_set.py",
     "research/aov0/historical_security_master.py",
@@ -89,6 +94,8 @@ FROZEN_IMPLEMENTATION_PATHS = (
     "strategies/rule100_softmax.py",
     "strategies/rule100_softmax_v1_1.py",
     "scripts/aov0_capture_ciq_historical_market_chunk.ps1",
+    "scripts/aov0_capture_ciq_historical_market_productquery.py",
+    "scripts/aov0_capture_ciq_historical_pit_productquery.py",
     "scripts/aov0_capture_ciq_historical_pit_period_matrix_chunk.ps1",
     "scripts/aov0_capture_ciq_historical_pit_transition_batch.ps1",
     "scripts/aov0_historical_pit_replay.py",
@@ -224,6 +231,39 @@ def _assert_file_manifest(path: Path, manifest: dict[str, Any], *, label: str) -
         raise ValueError(f"{label}_size_drift")
 
 
+def _load_optional_terminal_events(
+    events_path: Path | None,
+    receipt_path: Path | None,
+) -> HistoricalTerminalEvents | None:
+    if (events_path is None) != (receipt_path is None):
+        raise ValueError("historical_terminal_events_and_receipt_required_together")
+    if events_path is None or receipt_path is None:
+        return None
+    return load_historical_terminal_events(events_path, receipt_path)
+
+
+def _load_terminal_events_from_sources(
+    sources: dict[str, Any] | None,
+    *,
+    label: str,
+) -> HistoricalTerminalEvents | None:
+    if sources is None:
+        return None
+    if not isinstance(sources, dict) or set(sources) != {"events", "receipt"}:
+        raise ValueError(f"{label}_terminal_event_sources_invalid")
+    event_rows = sources.get("events") or []
+    receipt_rows = sources.get("receipt") or []
+    if len(event_rows) != 1 or len(receipt_rows) != 1:
+        raise ValueError(f"{label}_terminal_event_sources_invalid")
+    event_manifest = event_rows[0]
+    receipt_manifest = receipt_rows[0]
+    event_path = Path(str(event_manifest.get("path") or ""))
+    receipt_path = Path(str(receipt_manifest.get("path") or ""))
+    _assert_file_manifest(event_path, event_manifest, label=f"{label}_terminal_events")
+    _assert_file_manifest(receipt_path, receipt_manifest, label=f"{label}_terminal_events_receipt")
+    return load_historical_terminal_events(event_path, receipt_path)
+
+
 def _source_manifest(paths: Iterable[Path]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for path in sorted({Path(value) for value in paths}, key=lambda item: item.as_posix()):
@@ -336,24 +376,65 @@ def _metrics_for_benchmark(simulation: pd.DataFrame, target_weights: pd.DataFram
     return compute_metrics(simulation, executed, target_weights)
 
 
+def _cube_computed_at_iso(cube: Any) -> str:
+    frame = getattr(cube, "frame", None)
+    if not isinstance(frame, pd.DataFrame) or frame.empty or "computed_at" not in frame.columns:
+        raise ValueError("historical_cube_computed_at_missing")
+    computed = pd.to_datetime(frame["computed_at"], utc=True, errors="raise")
+    if computed.isna().any():
+        raise ValueError("historical_cube_computed_at_invalid")
+    return computed.max().isoformat()
+
+
 def plan_fundamentals(args: argparse.Namespace) -> dict[str, Any]:
-    risk_set = _load_optional_risk_set(
-        getattr(args, "risk_set_membership", None),
-        getattr(args, "risk_set_receipt", None),
-        expected_as_of_date=args.start,
-    )
-    historical_security_master = _load_optional_historical_security_master(
-        args.security_master,
-        getattr(args, "historical_security_master_receipt", None),
-        risk_set=risk_set,
-        expected_as_of_date=args.start,
-    )
+    freeze_path = getattr(args, "freeze", None)
     master = pd.read_csv(args.security_master)
-    frozen = _entity_ids_from_master(
-        master,
-        expected_entity_ids=None if risk_set is None else risk_set.entity_ids,
-        require_current_109=risk_set is None,
-    )
+    if freeze_path is not None:
+        if (
+            getattr(args, "risk_set_membership", None) is not None
+            or getattr(args, "risk_set_receipt", None) is not None
+            or getattr(args, "historical_security_master_receipt", None) is not None
+        ):
+            raise ValueError("a2_plan_source_authority_must_be_inherited_from_freeze")
+        freeze_payload = verify_freeze(freeze_path)
+        expected_window = {"start": args.start, "end": args.end}
+        if freeze_payload.get("a2_window") != expected_window:
+            raise ValueError("a2_plan_window_does_not_match_freeze")
+        _assert_file_manifest(
+            args.security_master,
+            freeze_payload["frozen_security_master"],
+            label="a2_plan_frozen_security_master",
+        )
+        frozen = _entity_ids_from_master(
+            master,
+            expected_entity_ids=[str(value) for value in freeze_payload["frozen_source_entity_ids"]],
+        )
+        source_cohort = dict(freeze_payload["source_cohort"])
+        historical_risk_set_admitted = True
+        historical_primary_security_identity_admitted = True
+        risk_set_mode = source_cohort.get("risk_set_mode")
+        planner_mode = "A2_FROZEN_SOURCE_COHORT"
+    else:
+        risk_set = _load_optional_risk_set(
+            getattr(args, "risk_set_membership", None),
+            getattr(args, "risk_set_receipt", None),
+            expected_as_of_date=args.start,
+        )
+        historical_security_master = _load_optional_historical_security_master(
+            args.security_master,
+            getattr(args, "historical_security_master_receipt", None),
+            risk_set=risk_set,
+            expected_as_of_date=args.start,
+        )
+        frozen = _entity_ids_from_master(
+            master,
+            expected_entity_ids=None if risk_set is None else risk_set.entity_ids,
+            require_current_109=risk_set is None,
+        )
+        historical_risk_set_admitted = risk_set is not None
+        historical_primary_security_identity_admitted = historical_security_master is not None
+        risk_set_mode = None if risk_set is None else HISTORICAL_SCREEN_FREEZE_MODE
+        planner_mode = "A1_SOURCE_AUTHORITY" if risk_set is not None else "CURRENT_109_DIAGNOSTIC"
     market_parts = [pd.read_csv(path) for path in args.market_part]
     market = build_historical_market_panel(
         security_master_raw=master,
@@ -378,9 +459,11 @@ def plan_fundamentals(args: argparse.Namespace) -> dict[str, Any]:
         "end": end.date().isoformat(),
         "weekly_asof_dates": int(len(out)),
         "frozen_entity_count": len(frozen),
-        "historical_risk_set_admitted": risk_set is not None,
-        "historical_primary_security_identity_admitted": historical_security_master is not None,
-        "risk_set_mode": None if risk_set is None else HISTORICAL_SCREEN_FREEZE_MODE,
+        "historical_risk_set_admitted": historical_risk_set_admitted,
+        "historical_primary_security_identity_admitted": historical_primary_security_identity_admitted,
+        "risk_set_mode": risk_set_mode,
+        "planner_mode": planner_mode,
+        "freeze_path": None if freeze_path is None else freeze_path.resolve().as_posix(),
         "market_part_count": len(args.market_part),
         "out": args.out.resolve().as_posix(),
         "out_sha256": _sha256_file(args.out),
@@ -423,9 +506,11 @@ def _run_window(
     evidence_root: Path,
     risk_set: HistoricalRiskSet | None = None,
     historical_security_master: HistoricalSecurityMaster | None = None,
+    terminal_events: HistoricalTerminalEvents | None = None,
     inherited_source_cohort: dict[str, Any] | None = None,
     inherited_risk_set_sources: dict[str, Any] | None = None,
     inherited_historical_security_master_receipt_sources: list[dict[str, Any]] | None = None,
+    inherited_terminal_event_sources: dict[str, Any] | None = None,
     expected_source_entity_ids: list[str] | None = None,
     required_security_ids: list[str] | None = None,
 ) -> dict[str, Any]:
@@ -457,6 +542,7 @@ def _run_window(
         evaluation_end=end,
         contract=DEFAULT_CONTRACT,
         required_security_ids=required_security_ids,
+        terminal_events=terminal_events,
     )
     sofr_rows = _load_nyfed_rows(sofr_raw)
     cash = historical_cash_from_official_sofr_rows(replay.rule100_weights.index, sofr_rows)
@@ -568,6 +654,15 @@ def _run_window(
         source_cohort.get("current_primary_security_conditioned")
     )
     replay_metadata["fixed_source_cohort_limitation"] = source_cohort.get("limitation")
+    terminal_lifecycle_authority_pass = bool(
+        terminal_events is None
+        or (
+            terminal_events.metadata.get("current_screen_conditioned") is False
+            and terminal_events.metadata.get("current_primary_security_conditioned") is False
+            and int(terminal_events.metadata.get("financial_alpha_evidence", -1)) == 0
+        )
+    )
+    replay_metadata["terminal_lifecycle_authority_pass"] = terminal_lifecycle_authority_pass
     a1_gate = bool(
         stage == "A1"
         and trading_days >= 252
@@ -575,6 +670,7 @@ def _run_window(
         and real_ciq_identity
         and historical_screen_membership_reconstructed
         and historical_primary_security_identity_reconstructed
+        and terminal_lifecycle_authority_pass
     )
     if stage == "A2":
         evidence_classification = A2_UNTOUCHED_CLASSIFICATION
@@ -591,7 +687,7 @@ def _run_window(
         "contract_hash": DEFAULT_CONTRACT.contract_hash,
         "mutation_hash": DEFAULT_MUTATION.manifest_hash,
         "turnover_cost_rate": TURNOVER_COST_RATE,
-        "cube_computed_at": deterministic_computed_at.isoformat(),
+        "cube_computed_at": _cube_computed_at_iso(cube),
         "evidence_authority": "HISTORICAL_ONLY",
         "evidence_classification": evidence_classification,
         "financial_alpha_evidence": 0,
@@ -624,6 +720,8 @@ def _run_window(
             "source_semantics_pass": True,
             "historical_universe_risk_set_pass": historical_screen_membership_reconstructed,
             "historical_primary_security_identity_pass": historical_primary_security_identity_reconstructed,
+            "terminal_lifecycle_authority_pass": terminal_lifecycle_authority_pass,
+            "terminal_event_count": int(replay_metadata.get("terminal_event_count", 0)),
             "diagnostic_only": not (
                 historical_screen_membership_reconstructed
                 and historical_primary_security_identity_reconstructed
@@ -658,6 +756,18 @@ def _run_window(
                     else _source_manifest([historical_security_master.receipt_path])
                 )
             ),
+            "terminal_events": (
+                inherited_terminal_event_sources
+                if stage == "A2"
+                else (
+                    None
+                    if terminal_events is None
+                    else {
+                        "events": _source_manifest([terminal_events.events_path]),
+                        "receipt": _source_manifest([terminal_events.receipt_path]),
+                    }
+                )
+            ),
         },
         "replay_metadata": replay_metadata,
     }
@@ -668,9 +778,11 @@ def _run_window(
 def run_stage(args: argparse.Namespace) -> dict[str, Any]:
     risk_set: HistoricalRiskSet | None = None
     historical_security_master: HistoricalSecurityMaster | None = None
+    terminal_events: HistoricalTerminalEvents | None = None
     inherited_source_cohort: dict[str, Any] | None = None
     inherited_risk_set_sources: dict[str, Any] | None = None
     inherited_historical_security_master_receipt_sources: list[dict[str, Any]] | None = None
+    inherited_terminal_event_sources: dict[str, Any] | None = None
     expected_source_entity_ids: list[str] | None = None
     required: list[str] | None = None
     freeze_payload: dict[str, Any] | None = None
@@ -688,11 +800,17 @@ def run_stage(args: argparse.Namespace) -> dict[str, Any]:
             risk_set=risk_set,
             expected_as_of_date=args.start,
         )
+        terminal_events = _load_optional_terminal_events(
+            getattr(args, "terminal_events", None),
+            getattr(args, "terminal_events_receipt", None),
+        )
     else:
         if getattr(args, "risk_set_membership", None) is not None or getattr(args, "risk_set_receipt", None) is not None:
             raise ValueError("a2_risk_set_must_be_inherited_from_freeze")
         if getattr(args, "historical_security_master_receipt", None) is not None:
             raise ValueError("a2_historical_security_master_receipt_must_be_inherited_from_freeze")
+        if getattr(args, "terminal_events", None) is not None or getattr(args, "terminal_events_receipt", None) is not None:
+            raise ValueError("a2_terminal_events_must_be_inherited_from_freeze")
     if args.stage == "A2":
         if args.freeze is None:
             raise ValueError("a2_freeze_required")
@@ -705,6 +823,11 @@ def run_stage(args: argparse.Namespace) -> dict[str, Any]:
         inherited_risk_set_sources = dict(freeze_payload["historical_risk_set_sources"])
         inherited_historical_security_master_receipt_sources = list(
             freeze_payload["historical_security_master_receipt_sources"]
+        )
+        inherited_terminal_event_sources = freeze_payload.get("terminal_event_sources")
+        terminal_events = _load_terminal_events_from_sources(
+            inherited_terminal_event_sources,
+            label="a2_frozen",
         )
         _assert_file_manifest(
             args.security_master,
@@ -752,6 +875,7 @@ def run_stage(args: argparse.Namespace) -> dict[str, Any]:
                 "historical_security_master_receipt": freeze_payload[
                     "historical_security_master_receipt_sources"
                 ],
+                "terminal_events": freeze_payload.get("terminal_event_sources"),
             },
             "evaluation_query_count_committed": 1,
             "second_evaluation_forbidden": True,
@@ -771,11 +895,13 @@ def run_stage(args: argparse.Namespace) -> dict[str, Any]:
         evidence_root=args.evidence_root,
         risk_set=risk_set,
         historical_security_master=historical_security_master,
+        terminal_events=terminal_events,
         inherited_source_cohort=inherited_source_cohort,
         inherited_risk_set_sources=inherited_risk_set_sources,
         inherited_historical_security_master_receipt_sources=(
             inherited_historical_security_master_receipt_sources
         ),
+        inherited_terminal_event_sources=inherited_terminal_event_sources,
         expected_source_entity_ids=expected_source_entity_ids,
         required_security_ids=required,
     )
@@ -840,6 +966,8 @@ def create_freeze(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("a1_historical_primary_security_gate_not_passed_cannot_freeze_a2")
     if gate.get("source_semantics_pass") is not True:
         raise ValueError("a1_source_semantics_gate_not_passed_cannot_freeze_a2")
+    if gate.get("terminal_lifecycle_authority_pass") is not True:
+        raise ValueError("a1_terminal_lifecycle_gate_not_passed_cannot_freeze_a2")
     if gate.get("candidate_pass") is not True:
         raise ValueError("a1_candidate_gate_not_passed_cannot_freeze_a2")
     source_entity_ids = [str(value) for value in a1.get("source_entity_ids") or []]
@@ -857,6 +985,8 @@ def create_freeze(args: argparse.Namespace) -> dict[str, Any]:
     historical_security_master_receipt_sources = input_sources.get("historical_security_master_receipt") or []
     if len(historical_security_master_receipt_sources) != 1:
         raise ValueError("a1_historical_security_master_receipt_missing_cannot_freeze_a2")
+    terminal_event_sources = input_sources.get("terminal_events")
+    _load_terminal_events_from_sources(terminal_event_sources, label="a1_freeze")
     implementation = []
     for relative in FROZEN_IMPLEMENTATION_PATHS:
         path = ROOT / relative
@@ -887,6 +1017,7 @@ def create_freeze(args: argparse.Namespace) -> dict[str, Any]:
         "frozen_security_master": security_master_sources[0],
         "historical_risk_set_sources": historical_risk_set_sources,
         "historical_security_master_receipt_sources": historical_security_master_receipt_sources,
+        "terminal_event_sources": terminal_event_sources,
         "a1_active_security_ids": list(a1["security_ids"]),
         "frozen_security_ids": list(a1["security_ids"]),
         "a2_window": {"start": args.a2_start, "end": args.a2_end},
@@ -952,6 +1083,8 @@ def verify_freeze(path: Path) -> dict[str, Any]:
     historical_security_master_receipt_sources = payload.get("historical_security_master_receipt_sources") or []
     if len(historical_security_master_receipt_sources) != 1:
         raise ValueError("a2_freeze_historical_security_master_receipt_sources_invalid")
+    terminal_event_sources = payload.get("terminal_event_sources")
+    _load_terminal_events_from_sources(terminal_event_sources, label="a2_freeze")
     paths = payload.get("a2_paths") or {}
     if set(paths) != {"result", "evidence_root", "query_lock", "query_receipt"}:
         raise ValueError("a2_freeze_paths_invalid")
@@ -980,6 +1113,8 @@ def verify_freeze(path: Path) -> dict[str, Any]:
         raise ValueError("a2_frozen_historical_risk_set_manifest_drift")
     if a1_sources.get("historical_security_master_receipt") != historical_security_master_receipt_sources:
         raise ValueError("a2_frozen_historical_security_master_receipt_manifest_drift")
+    if a1_sources.get("terminal_events") != terminal_event_sources:
+        raise ValueError("a2_frozen_terminal_event_manifest_drift")
     primary_receipt_manifest = historical_security_master_receipt_sources[0]
     _assert_file_manifest(
         Path(primary_receipt_manifest["path"]),
@@ -1020,6 +1155,7 @@ def parse_args() -> argparse.Namespace:
     plan.add_argument("--risk-set-membership", type=Path)
     plan.add_argument("--risk-set-receipt", type=Path)
     plan.add_argument("--historical-security-master-receipt", type=Path)
+    plan.add_argument("--freeze", type=Path)
     plan.add_argument("--out", type=Path, required=True)
     plan.add_argument("--refuse-existing", action="store_true")
 
@@ -1043,6 +1179,8 @@ def parse_args() -> argparse.Namespace:
     run.add_argument("--risk-set-membership", type=Path)
     run.add_argument("--risk-set-receipt", type=Path)
     run.add_argument("--historical-security-master-receipt", type=Path)
+    run.add_argument("--terminal-events", type=Path)
+    run.add_argument("--terminal-events-receipt", type=Path)
     run.add_argument("--refuse-existing", action="store_true")
 
     freeze = sub.add_parser("freeze-a2")

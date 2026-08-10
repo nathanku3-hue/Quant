@@ -8047,3 +8047,13 @@ Request Artifact Identity Truth Reconciliation V1 (2026-07-11)
 - `1+1>2` acceptance: shared work is valuable only when integration reduces time-to-honest-evidence or improves marginal evidence/capturability while preserving source, timing, search, accounting, promotion and risk custody.
 - Current state: Clock #1 is running from immutable receipt `eabd645382424f559286045a4980412db9a02a4ad0d594850f93675443cd1b78`; evaluation/outcomes remain time-gated; `financial_alpha_evidence=0`; Limited Live remains closed.
 
+## 2026-08-10 — LANE2_A1_A2_HISTORICAL_COMPRESSION_CLOSED
+
+- Decision: accept Lane-2 A1/A2 historical compression as closed historical evidence under the exact frozen-AOV contract; do not mutate Parent/Child in place and do not re-query A2.
+- Source authority: 2025-05-16 historical screen reconstructs 104 companies without current-screen conditioning; exact dated CIQ Security/Trading Item identity is 104/104 without current-primary conditioning; Original/as-of PIT fundamentals and three source-bound terminal cash events are hash-bound.
+- A1: `A1_ADMITTED_HISTORICAL_PIT`, 264 trading days, 94 active CIQ securities, all canonical/source/identity/lifecycle gates PASS. Parent cumulative return=`+0.7145%`; Child=`+0.3501%`; Child improves max drawdown by `1.5173pp` and CVaR loss by `0.3449pp`, but reduces cumulative return by `0.3644pp` and Sharpe by `0.0256`.
+- A2 freeze: immutable freeze created `2026-08-10T07:36:04.945799Z`, binds the admitted A1 report, 94 frozen active securities, implementation/source/lifecycle hashes, A2 window `2026-06-12..2026-08-07`, one-query law, and second-evaluation prohibition.
+- A2: `A2_UNTOUCHED_HISTORICAL_PIT`, 38 trading days, query lock=`2026-08-10T07:43:15.322007Z`, result=`2026-08-10T07:45:03.388297Z`, query receipt count=`1`. Parent cumulative return=`+6.7152%`; Child=`+5.3701%`; Child improves max drawdown by `0.5529pp` and CVaR loss by `0.1945pp`, but reduces cumulative return by `1.3451pp` and Sharpe by `0.2527`.
+- Economic interpretation boundary: the Child shows a consistent risk-reduction/return-dilution signature in both A1 and A2. This may drive diagnosis or a future separately frozen challenger, but it is not authority to tune the incumbent or reuse A2 as untouched evidence for that challenger.
+- Claim boundary: A1/A2 remain historical only; prospective Clock #1 outcomes stay sealed; `financial_alpha_evidence=0`; no strategy live-capital authority is created.
+

@@ -106,6 +106,9 @@ def command_parity(args: argparse.Namespace) -> int:
         reconstructed_membership_path=args.reconstructed_membership.resolve(),
         reference_source_id=args.reference_source_id,
         parity_as_of_date=args.as_of_date,
+        provider_proof_path=(
+            None if args.provider_proof is None else args.provider_proof.resolve()
+        ),
     )
     _write_json(out, payload)
     print(
@@ -159,6 +162,7 @@ def build_parser() -> argparse.ArgumentParser:
     parity.add_argument("--reference-membership", type=Path, required=True)
     parity.add_argument("--reconstructed-membership", type=Path, required=True)
     parity.add_argument("--reference-source-id", required=True)
+    parity.add_argument("--provider-proof", type=Path)
     parity.add_argument("--out", type=Path, required=True)
     parity.set_defaults(func=command_parity)
 

@@ -38,6 +38,16 @@ def _write_fixture(tmp_path: Path) -> tuple[Path, Path, dict[str, object]]:
         "capture_mode": HISTORICAL_SECURITY_MASTER_CAPTURE_MODE,
         "identity_freeze_mode": HISTORICAL_SECURITY_MASTER_FREEZE_MODE,
         "primary_security_selection": HISTORICAL_SECURITY_MASTER_SELECTION,
+        "market_perspective": "321247",
+        "mi_key_field_key": "322517",
+        "price_field_key": "324251",
+        "price_date_secondary_key": "sk_557",
+        "exchange_group_field_key": "406718",
+        "exchange_group_value": "-1,-4",
+        "funding_type_field_key": "321268",
+        "funding_type_values": ["1", "16"],
+        "primary_issue_field_requested": False,
+        "exactly_one_screen_security_per_entity": True,
         "historical_as_of_mechanically_bound": True,
         "current_primary_conditioned": False,
         "requested_cutoff_date": "2025-05-16",
@@ -76,6 +86,7 @@ def test_historical_security_master_admits_exact_asof_primary_identity(tmp_path:
     assert admitted.security_ids == ("CIQSEC:IQ101", "CIQSEC:IQ202")
     assert admitted.trading_item_ids == ("1001", "2002")
     assert admitted.metadata["historical_primary_security_identity_reconstructed"] is True
+    assert admitted.metadata["historical_screen_security_identity_reconstructed"] is True
     assert admitted.metadata["current_primary_conditioned"] is False
     assert admitted.metadata["financial_alpha_evidence"] == 0
 
@@ -96,6 +107,17 @@ def test_historical_security_master_rejects_current_conditioning_or_asof_drift(t
     receipt["provider_effective_as_of_date"] = "2026-08-08"
     receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
     with pytest.raises(HistoricalSecurityMasterError, match="provider_effective_as_of_date_mismatch"):
+        load_historical_start_security_master(
+            master,
+            receipt_path,
+            expected_as_of_date="2025-05-16",
+            expected_entity_ids=("1", "2"),
+        )
+
+    master, receipt_path, receipt = _write_fixture(tmp_path)
+    receipt["primary_issue_field_requested"] = True
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    with pytest.raises(HistoricalSecurityMasterError, match="current_primary_field_forbidden"):
         load_historical_start_security_master(
             master,
             receipt_path,

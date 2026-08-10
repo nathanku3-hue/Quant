@@ -42,6 +42,12 @@ XPRESSAPI_MARKET_CANDIDATE_MERGED_SCHEMA = (
 CIQ_SECURITIES_MARKET_CANDIDATE_RECEIPT_SCHEMA = (
     "aov0_ciq_securities_historical_market_candidate_receipt_v1"
 )
+CIQ_MARKET_ORIGINAL_REVENUE_CANDIDATE_RECEIPT_SCHEMA = (
+    "aov0_ciq_historical_market_original_revenue_candidate_receipt_v1"
+)
+CIQ_MARKET_ORIGINAL_REVENUE_CANDIDATE_SOURCE_ID = (
+    "SPCIQPRO:SECURITIES_PRODUCTQUERY+COMPANIES_PRODUCTQUERY"
+)
 CIQ_SECURITIES_MARKET_CANDIDATE_SOURCE_ID = "SPCIQPRO:SECURITIES_PRODUCTQUERY"
 CIQ_SECURITIES_MARKET_PERSPECTIVE = "321247"
 CIQ_SECURITIES_PRICE_FIELD_KEY = "324251"
@@ -62,6 +68,21 @@ REVENUE_PERIODS = ("LFY", "FY-1", "FY-2", "FY-3")
 GROWTH_MULTIPLIER = 1.3
 ALLOWED_COMPANY_TYPES = ("Public Company",)
 ALLOWED_COMPANY_STATUSES = ("Operating", "Operating Subsidiary")
+CIQ_RECONSTRUCTED_COMPANY_STATE_SOURCE_ID = (
+    "SPCIQPRO:SECURITIES_PRODUCTQUERY+KEY_DEVELOPMENTS_PRODUCTQUERY"
+)
+CIQ_RECONSTRUCTED_COMPANY_STATE_LAW = (
+    "DATED_MAJOR_US_COMMON_OR_DR_LISTING_WITH_TERMINAL_TRANSITION_CHECK_V1"
+)
+CIQ_RECONSTRUCTED_COMPANY_STATUS_OUTPUT = "ELIGIBLE_OPERATING_BUCKET_NOT_SUBSIDIARY_CLASSIFICATION"
+CIQ_KEY_DEVELOPMENTS_PERSPECTIVE = "311682"
+CIQ_KEY_DEVELOPMENTS_ENTITY_FIELD_KEY = "398876"
+CIQ_KEY_DEVELOPMENTS_DATE_FIELD_KEY = "311764"
+CIQ_HISTORICAL_REVENUE_SOURCE_ID = "SPCIQPRO:COMPANIES_PRODUCTQUERY"
+CIQ_HISTORICAL_REVENUE_FIELD_KEY = "329288"
+CIQ_HISTORICAL_REVENUE_PERIOD_SECONDARY_KEY = "sk_854"
+CIQ_HISTORICAL_REVENUE_REPORTING_BASIS_SECONDARY_KEY = "sk_858"
+CIQ_HISTORICAL_REVENUE_ASOF_SECONDARY_KEY = "sk_860"
 
 
 class HistoricalScreenReconstructionError(ValueError):
@@ -201,6 +222,51 @@ def _validate_ciq_securities_market_receipt(
         raise HistoricalScreenReconstructionError("historical_screen_market_result_counts_mismatch")
 
 
+def _validate_ciq_market_original_revenue_candidate_receipt(
+    receipt: Mapping[str, Any], *, expected_date: pd.Timestamp
+) -> dict[str, Any]:
+    if receipt.get("source_id") != CIQ_MARKET_ORIGINAL_REVENUE_CANDIDATE_SOURCE_ID:
+        raise HistoricalScreenReconstructionError("historical_screen_market_source_invalid")
+    if receipt.get("capture_scope") != "HISTORICAL_MARKET_ORIGINAL_REVENUE_CANDIDATES_ONLY_NOT_A1_RISK_SET":
+        raise HistoricalScreenReconstructionError("historical_screen_market_scope_invalid")
+    market = receipt.get("market_component")
+    revenue = receipt.get("revenue_component")
+    intersection = receipt.get("intersection")
+    if not isinstance(market, Mapping) or not isinstance(revenue, Mapping) or not isinstance(intersection, Mapping):
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_component_missing")
+    projected_market = {
+        **receipt,
+        **market,
+        "source_id": market.get("source_id"),
+        "capture_scope": "HISTORICAL_MARKET_CANDIDATES_ONLY",
+        "result_entity_count": market.get("source_entity_count"),
+    }
+    _validate_ciq_securities_market_receipt(projected_market, expected_date=expected_date)
+    if revenue.get("source_id") != CIQ_HISTORICAL_REVENUE_SOURCE_ID:
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_revenue_source_invalid")
+    if str(revenue.get("companies_perspective") or "") != "266637":
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_revenue_perspective_invalid")
+    if str(revenue.get("field_key") or "") != CIQ_HISTORICAL_REVENUE_FIELD_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_revenue_field_invalid")
+    if revenue.get("filing_version") != "Original" or revenue.get("reporting_basis") != "Originally Reported":
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_revenue_vintage_invalid")
+    if revenue.get("historical_as_of_mechanically_bound") is not True:
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_revenue_asof_not_bound")
+    if str(revenue.get("as_of_secondary_key") or "") != CIQ_HISTORICAL_REVENUE_ASOF_SECONDARY_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_revenue_asof_key_invalid")
+    if str(revenue.get("period_secondary_key") or "") != CIQ_HISTORICAL_REVENUE_PERIOD_SECONDARY_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_revenue_period_key_invalid")
+    if tuple(str(value) for value in revenue.get("periods") or ()) != ("FY0", "FY-1", "FY-2", "FY-3"):
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_revenue_periods_invalid")
+    if revenue.get("provider_formula_validation_passed") is not True:
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_formula_validation_missing")
+    if float(revenue.get("growth_multiplier", 0)) != GROWTH_MULTIPLIER:
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_growth_multiplier_invalid")
+    if int(intersection.get("candidate_count", -1)) < 1:
+        raise HistoricalScreenReconstructionError("historical_screen_market_partial_candidate_count_invalid")
+    return dict(intersection)
+
+
 def _read_market_receipt(
     path: Path, *, expected_date: pd.Timestamp
 ) -> tuple[dict[str, Any], str]:
@@ -220,6 +286,23 @@ def _read_market_receipt(
         receipt = _read_receipt(path, schema=schema, label="market")
         _validate_ciq_securities_market_receipt(receipt, expected_date=expected_date)
         csv_role = "merged"
+    elif schema == CIQ_MARKET_ORIGINAL_REVENUE_CANDIDATE_RECEIPT_SCHEMA:
+        receipt = _read_receipt(path, schema=schema, label="market")
+        intersection = _validate_ciq_market_original_revenue_candidate_receipt(
+            receipt, expected_date=expected_date
+        )
+        receipt = dict(receipt)
+        market_component = receipt.get("market_component") or {}
+        receipt["historical_market_date_mechanically_bound"] = market_component.get(
+            "historical_market_date_mechanically_bound"
+        )
+        receipt["current_company_state_filters_used"] = market_component.get(
+            "current_company_state_filters_used"
+        )
+        receipt["intersection_csv_name"] = intersection.get("candidate_csv_name")
+        receipt["intersection_csv_sha256"] = intersection.get("candidate_csv_sha256")
+        receipt["intersection_csv_bytes"] = intersection.get("candidate_csv_bytes")
+        csv_role = "intersection"
     else:
         raise HistoricalScreenReconstructionError("historical_screen_market_receipt_schema_invalid")
     return receipt, csv_role
@@ -358,7 +441,64 @@ def reconstruct_historical_screen(
         raise HistoricalScreenReconstructionError("historical_screen_company_type_missing")
     if company_receipt.get("historical_company_status_reconstructed") is not True:
         raise HistoricalScreenReconstructionError("historical_screen_company_status_missing")
+    if company_receipt.get("source_id") != CIQ_RECONSTRUCTED_COMPANY_STATE_SOURCE_ID:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_source_invalid")
+    if company_receipt.get("reconstruction_law") != CIQ_RECONSTRUCTED_COMPANY_STATE_LAW:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_law_invalid")
+    if company_receipt.get("status_output_semantics") != CIQ_RECONSTRUCTED_COMPANY_STATUS_OUTPUT:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_output_semantics_invalid")
+    if str(company_receipt.get("market_perspective") or "") != CIQ_SECURITIES_MARKET_PERSPECTIVE:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_market_perspective_invalid")
+    if str(company_receipt.get("price_field_key") or "") != CIQ_SECURITIES_PRICE_FIELD_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_price_field_invalid")
+    if str(company_receipt.get("price_date_secondary_key") or "") != CIQ_SECURITIES_PRICE_DATE_SECONDARY_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_price_date_key_invalid")
+    if str(company_receipt.get("exchange_group_field_key") or "") != CIQ_SECURITIES_EXCHANGE_GROUP_FIELD_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_exchange_field_invalid")
+    if str(company_receipt.get("exchange_group_value") or "") != CIQ_SECURITIES_MAJOR_US_EXCHANGE_GROUP_VALUE:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_exchange_group_invalid")
+    if str(company_receipt.get("funding_type_field_key") or "") != CIQ_SECURITIES_FUNDING_TYPE_FIELD_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_funding_field_invalid")
+    if tuple(str(v) for v in company_receipt.get("funding_type_values") or ()) != CIQ_SECURITIES_FUNDING_TYPE_VALUES:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_funding_values_invalid")
+    if str(company_receipt.get("key_developments_perspective") or "") != CIQ_KEY_DEVELOPMENTS_PERSPECTIVE:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_perspective_invalid")
+    if str(company_receipt.get("key_developments_entity_field_key") or "") != CIQ_KEY_DEVELOPMENTS_ENTITY_FIELD_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_entity_field_invalid")
+    if str(company_receipt.get("key_developments_date_field_key") or "") != CIQ_KEY_DEVELOPMENTS_DATE_FIELD_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_date_field_invalid")
+    if company_receipt.get("current_company_type_status_values_used") is not False:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_current_values_forbidden")
+    if int(company_receipt.get("key_developments_entity_coverage_count", -1)) != len(candidate_ids):
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_coverage_invalid")
+    if int(company_receipt.get("key_developments_provider_row_count", -1)) < len(candidate_ids):
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_rows_invalid")
+    if company_receipt.get("key_developments_response_exception") is not None:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_provider_exception")
+    if int(company_receipt.get("unresolved_terminal_state_count", -1)) != 0:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_terminal_state_unresolved")
     _validate_component_cohort(company_receipt, label="company_state", expected_ids=candidate_ids)
+    audit_path = _bound_csv(
+        company_state_receipt_path,
+        company_receipt,
+        label="company_state_keydev_audit",
+        name_field="key_developments_audit_csv_name",
+        hash_field="key_developments_audit_csv_sha256",
+        bytes_field="key_developments_audit_csv_bytes",
+    )
+    audit = pd.read_csv(audit_path, dtype=str, encoding="utf-8-sig").fillna("")
+    audit_required = {"SP_ENTITY_ID", "EventCount", "UnresolvedTerminalAtCutoff"}
+    if not audit_required.issubset(audit.columns):
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_audit_columns_missing")
+    audit["SP_ENTITY_ID"] = audit["SP_ENTITY_ID"].astype(str).str.strip()
+    if _canonical_entity_ids(audit["SP_ENTITY_ID"]) != candidate_ids:
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_audit_membership_mismatch")
+    event_counts = pd.to_numeric(audit["EventCount"], errors="coerce")
+    if event_counts.isna().any() or event_counts.lt(1).any():
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_audit_coverage_invalid")
+    unresolved = audit["UnresolvedTerminalAtCutoff"].astype(str).str.strip().str.lower()
+    if not unresolved.isin({"false"}).all():
+        raise HistoricalScreenReconstructionError("historical_screen_company_state_keydev_audit_unresolved")
     company_path = _bound_csv(company_state_receipt_path, company_receipt, label="company_state")
     company = _normalize_company_state(company_path, expected_ids=candidate_ids)
 
@@ -377,6 +517,22 @@ def reconstruct_historical_screen(
         raise HistoricalScreenReconstructionError("historical_screen_revenue_vintage_invalid")
     if tuple(revenue_receipt.get("relative_periods") or ()) != REVENUE_PERIODS:
         raise HistoricalScreenReconstructionError("historical_screen_revenue_periods_invalid")
+    if revenue_receipt.get("source_id") != CIQ_HISTORICAL_REVENUE_SOURCE_ID:
+        raise HistoricalScreenReconstructionError("historical_screen_revenue_source_invalid")
+    if str(revenue_receipt.get("companies_perspective") or "") != "266637":
+        raise HistoricalScreenReconstructionError("historical_screen_revenue_perspective_invalid")
+    if str(revenue_receipt.get("field_key") or "") != CIQ_HISTORICAL_REVENUE_FIELD_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_revenue_field_invalid")
+    if revenue_receipt.get("reporting_basis") != "Originally Reported":
+        raise HistoricalScreenReconstructionError("historical_screen_revenue_reporting_basis_invalid")
+    if str(revenue_receipt.get("period_secondary_key") or "") != CIQ_HISTORICAL_REVENUE_PERIOD_SECONDARY_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_revenue_period_key_invalid")
+    if str(revenue_receipt.get("reporting_basis_secondary_key") or "") != CIQ_HISTORICAL_REVENUE_REPORTING_BASIS_SECONDARY_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_revenue_reporting_basis_key_invalid")
+    if str(revenue_receipt.get("as_of_secondary_key") or "") != CIQ_HISTORICAL_REVENUE_ASOF_SECONDARY_KEY:
+        raise HistoricalScreenReconstructionError("historical_screen_revenue_asof_key_invalid")
+    if revenue_receipt.get("provider_numeric_values_returned") is not True:
+        raise HistoricalScreenReconstructionError("historical_screen_revenue_numeric_provider_proof_missing")
     _validate_component_cohort(revenue_receipt, label="revenue", expected_ids=candidate_ids)
     revenue_path = _bound_csv(revenue_receipt_path, revenue_receipt, label="revenue")
     revenue = _normalize_revenue(revenue_path, expected_ids=candidate_ids)
@@ -439,6 +595,7 @@ def build_current_screen_parity_receipt(
     reconstructed_membership_path: str | Path,
     reference_source_id: str,
     parity_as_of_date: str | pd.Timestamp,
+    provider_proof_path: str | Path | None = None,
 ) -> dict[str, Any]:
     """Prove exact current-date membership parity for the reconstruction law."""
 
@@ -455,6 +612,62 @@ def build_current_screen_parity_receipt(
     reference_ids = _canonical_entity_ids(reference["SP_ENTITY_ID"])
     reconstructed_ids = _canonical_entity_ids(reconstructed["SP_ENTITY_ID"])
     exact = reference_ids == reconstructed_ids
+    provider_proof: dict[str, Any] | None = None
+    provider_proof_manifest: dict[str, Any] | None = None
+    if provider_proof_path is not None:
+        proof_path = Path(provider_proof_path)
+        if not proof_path.is_file():
+            raise FileNotFoundError(proof_path)
+        try:
+            provider_proof = json.loads(proof_path.read_text(encoding="utf-8-sig"))
+        except json.JSONDecodeError as exc:
+            raise HistoricalScreenReconstructionError(
+                "historical_screen_parity_provider_proof_json_invalid"
+            ) from exc
+        if provider_proof.get("schema_version") != "aov0_ciq_current_screen_decomposed_parity_provider_proof_v1":
+            raise HistoricalScreenReconstructionError(
+                "historical_screen_parity_provider_proof_schema_invalid"
+            )
+        if provider_proof.get("exact_membership_parity") is not True:
+            raise HistoricalScreenReconstructionError(
+                "historical_screen_parity_provider_proof_failed"
+            )
+        if any(
+            provider_proof.get(field) is not None
+            for field in (
+                "direct_response_exception",
+                "state_response_exception",
+                "revenue_response_exception",
+            )
+        ):
+            raise HistoricalScreenReconstructionError(
+                "historical_screen_parity_provider_response_exception"
+            )
+        if int(provider_proof.get("direct_count", -1)) != len(reference_ids):
+            raise HistoricalScreenReconstructionError(
+                "historical_screen_parity_provider_direct_count_mismatch"
+            )
+        if int(provider_proof.get("reconstructed_count", -1)) != len(reconstructed_ids):
+            raise HistoricalScreenReconstructionError(
+                "historical_screen_parity_provider_reconstructed_count_mismatch"
+            )
+        validations = provider_proof.get("formula_validations") or []
+        if len(validations) != 3 or not all(
+            isinstance(item, Mapping)
+            and item.get("ok") is True
+            and item.get("isValid") is True
+            for item in validations
+        ):
+            raise HistoricalScreenReconstructionError(
+                "historical_screen_parity_provider_formula_validation_invalid"
+            )
+        provider_proof_manifest = {
+            "path": proof_path.resolve().as_posix(),
+            "sha256": _sha256_file(proof_path),
+            "bytes": proof_path.stat().st_size,
+            "schema_version": provider_proof["schema_version"],
+            "captured_at_utc": provider_proof.get("captured_at_utc"),
+        }
     return {
         "schema_version": HISTORICAL_SCREEN_PARITY_RECEIPT_SCHEMA,
         "source_id": "AOV0:HISTORICAL_SCREEN_RECONSTRUCTION_PARITY",
@@ -471,6 +684,7 @@ def build_current_screen_parity_receipt(
         "reconstructed_result_count": len(reconstructed_ids),
         "exact_membership_match": exact,
         "pass": exact,
+        "provider_proof": provider_proof_manifest,
         "financial_alpha_evidence": 0,
         "prospective_clock_authority": "NONE",
         "parent_child_mutation_authority": "NONE",

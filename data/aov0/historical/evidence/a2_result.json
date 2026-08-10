@@ -1,0 +1,650 @@
+{
+  "a1_minimum_gate": {
+    "candidate_pass": false,
+    "canonical_arm_gates_pass": true,
+    "diagnostic_only": false,
+    "historical_primary_security_identity_pass": true,
+    "historical_spg_asof_original": true,
+    "historical_universe_risk_set_pass": true,
+    "no_parameter_tuning": true,
+    "real_ciq_primary_security_identity": true,
+    "requires_252_trading_days": true,
+    "source_semantics_pass": true,
+    "terminal_event_count": 3,
+    "terminal_lifecycle_authority_pass": true,
+    "trading_days_pass": false
+  },
+  "a2_query_meter": {
+    "evaluation_query_count": 1,
+    "heldout_pit_capture_after_freeze": true,
+    "implementation_freeze_created_at_utc": "2026-08-10T07:36:04.945799Z",
+    "implementation_freeze_sha256": "908b33a55c1ee2567991c9a75ea251367f4dc0fd5584b7a7a694d148f92a4205",
+    "query_lock_path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/evidence/a2_query_lock.json",
+    "query_lock_sha256": "8fac53faf70f1d80d7f0139130367a988417bc07516eaf395404cb043ed23655",
+    "second_evaluation_forbidden": true
+  },
+  "canonical_experiment_id": "9f037c612cb819f55824252da2fa8dd3b09b4c49c6287936623184124104b070",
+  "canonical_experiment_manifest": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/evidence/evidence/canonical_five_arm/experiments/9f037c612cb819f55824252da2fa8dd3b09b4c49c6287936623184124104b070.json",
+  "canonical_experiment_manifest_sha256": "47d86c58f99e60a26ec73071a8ced020686bb77816e237d17ec9424d843ad8c8",
+  "contract_hash": "782411b86101993e4d4ee9e07588d2f559f30c5206e87e34649fce597872b155",
+  "created_at_utc": "2026-08-10T07:45:03.388297Z",
+  "cube_computed_at": "2026-08-01T03:59:59+00:00",
+  "cvar_level": 0.95,
+  "cvar_loss": {
+    "child": 0.018975403484909302,
+    "economic_cash": 0.0004527777777777778,
+    "parent": 0.02092039079207763,
+    "pit_equal_weight": 0.019944629691358025,
+    "rule100": 0.02063280439705433
+  },
+  "evidence_authority": "HISTORICAL_ONLY",
+  "evidence_classification": "A2_UNTOUCHED_HISTORICAL_PIT",
+  "factor_pit_mode": "CIQ_SPG_ASOF_FILINGVER_ORIGINAL",
+  "financial_alpha_evidence": 0,
+  "input_sources": {
+    "historical_risk_set": {
+      "membership": [
+        {
+          "bytes": 4547,
+          "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/20250516/final/historical_screen_20250516.csv",
+          "sha256": "c41662b3be3290b15a507800b03239a043455246b319d883f4fb54758a98998d"
+        }
+      ],
+      "receipt": [
+        {
+          "bytes": 3104,
+          "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/20250516/final/historical_screen_20250516.receipt.json",
+          "sha256": "c2b8858a00f741f3866cafdee834a9108e93c2efa960347dfa4673c08991a7e0"
+        }
+      ]
+    },
+    "historical_security_master_receipt": [
+      {
+        "bytes": 2059,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/20250516/ciq_productquery/historical_screen_security_identity_20250516.receipt.json",
+        "sha256": "34cf12f2f331b04e3c7f98d8f88aa6a19fb585aef036711f25857b15d73d3d10"
+      }
+    ],
+    "market": [
+      {
+        "bytes": 608213,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_000_20250519_20250627.csv",
+        "sha256": "5d83870c10b17c55ade0195da5bcb9549e511fafac7f9cfd6c67f991c24db874"
+      },
+      {
+        "bytes": 611541,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_001_20250630_20250808.csv",
+        "sha256": "37b54b98082baf630fd6fc1297d52a944d4161aade87068e3d94acf436d1b690"
+      },
+      {
+        "bytes": 610601,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_002_20250811_20250919.csv",
+        "sha256": "a0290df33f0c76c1dc086855746dc834c268241453ef2b86bb66856c4c571fda"
+      },
+      {
+        "bytes": 614037,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_003_20250922_20251031.csv",
+        "sha256": "b5d0a0bf9442704735f023b6788afbba13e70c93c6f5deb7cd2d9cda13fb24f4"
+      },
+      {
+        "bytes": 610883,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_004_20251103_20251212.csv",
+        "sha256": "cc8f308363e895a682b0f43a62ca516580d444dd5bb3b2e7d27a530c207b8475"
+      },
+      {
+        "bytes": 604665,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_005_20251215_20260123.csv",
+        "sha256": "5743f108f2860f8ec163f2647aa6f91f798962ba32ef464b6246451965457604"
+      },
+      {
+        "bytes": 610347,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_006_20260126_20260306.csv",
+        "sha256": "8d357a8f65ae78dd8511b18ea80e034d5d912c6de6bd8fffdcf813d049e33106"
+      },
+      {
+        "bytes": 609601,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_007_20260309_20260417.csv",
+        "sha256": "18ad51db598da6fb0522c80a200aa003f798bc141e920e2c649b4b3b834c8b4d"
+      },
+      {
+        "bytes": 609635,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_008_20260420_20260529.csv",
+        "sha256": "05779606128efd53da40a53d1e37171b1b1df529653dd887fd95e6e9f4ce6c91"
+      },
+      {
+        "bytes": 102440,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a1_20250519_20260605/part_009_20260601_20260605.csv",
+        "sha256": "0217ec34c3295d492f28ab3ae1f04054652c33f0cd013fa3c5deed3cb4360eee"
+      },
+      {
+        "bytes": 403281,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a2_20260608_20260807/part_000_20260608_20260703.csv",
+        "sha256": "2685d6e28680464c8ec3ba9c384656f18555d3ee84f70668a2c4b73cce3626b4"
+      },
+      {
+        "bytes": 408135,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a2_20260608_20260807/part_001_20260706_20260731.csv",
+        "sha256": "b3a34fa889c95f3a41c6ee4da1bb3d1afa72fa031e636d2f15bf3c8acc7d48f7"
+      },
+      {
+        "bytes": 102178,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_a2_20260608_20260807/part_002_20260803_20260807.csv",
+        "sha256": "d6753637f5cdfd044cfd8b15fc163688eb62aae44b711fc2d591a75e23a7c162"
+      },
+      {
+        "bytes": 604485,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_000_20240603_20240712.csv",
+        "sha256": "72d2c05b6a9bd57387946ddbd1934bde1526b7c4c63268e94a94e19c13e17f36"
+      },
+      {
+        "bytes": 610535,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_001_20240715_20240823.csv",
+        "sha256": "3d2dea13682633bcb2282ed6da66dfe0b079bb00a678fa68f8f82c428286c3b8"
+      },
+      {
+        "bytes": 607659,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_002_20240826_20241004.csv",
+        "sha256": "6426ae0f165e699de16b67d49509ec490308499d7779abc452e7f73d15d3f789"
+      },
+      {
+        "bytes": 611231,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_003_20241007_20241115.csv",
+        "sha256": "bb147f812c81fffe0f7f74da3487a74d873c6a2add0cb526559f6edd53a56266"
+      },
+      {
+        "bytes": 607279,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_004_20241118_20241227.csv",
+        "sha256": "a051a855d57eacd05ddcec7cbdd2c31e42b02e3a4648b50b18bbe195e634b0f5"
+      },
+      {
+        "bytes": 604809,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_005_20241230_20250207.csv",
+        "sha256": "eedee164ffa4478abd174aab64173518d7a43727b9f89bfef52a5ca4a4eb2ae4"
+      },
+      {
+        "bytes": 610563,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_006_20250210_20250321.csv",
+        "sha256": "675c989321d814f8d3af35db4367b6b93be26a318b5f78bce83912572a3e9e6d"
+      },
+      {
+        "bytes": 609723,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_007_20250324_20250502.csv",
+        "sha256": "d0dfd1f1e1a9c4b2ac3fde45531bcf4ba615d22742df6b16ce69dbd9c05845fe"
+      },
+      {
+        "bytes": 204607,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/market_pq_historical104_warmup_to_20250516/part_008_20250505_20250516.csv",
+        "sha256": "7130020ca3ca110fcdeec3397ed64209e266971ada455b200979e993bd5a3796"
+      }
+    ],
+    "official_nyfed_sofr": [
+      {
+        "bytes": 190182,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/nyfed_sofr_20230101_20260807.json",
+        "sha256": "db4678cf6d3f9ba24d0776432eae50a3caf55497ede11f9693d74b740bdff064"
+      }
+    ],
+    "period_matrix": [
+      {
+        "bytes": 88406,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/period_matrix_a2/period_000_20260612_20260807.csv",
+        "sha256": "9543f1f0df252f37cc56f609d75f56a2f39056cf0f47012837ffa6279fed5d50"
+      }
+    ],
+    "security_master": [
+      {
+        "bytes": 5759,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/20250516/ciq_productquery/historical_screen_security_identity_20250516.csv",
+        "sha256": "86587b5de42df38c81d3166d6a44aa644f31bbca141c536f04bccb07abdfad85"
+      }
+    ],
+    "terminal_events": {
+      "events": [
+        {
+          "bytes": 951,
+          "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/lifecycle/20251222/a1_terminal_events_20250818_20251222.csv",
+          "sha256": "02e9fa5b64102d0a05afed0ff1a0bf1899124e277fc662966ea1396880118504"
+        }
+      ],
+      "receipt": [
+        {
+          "bytes": 5442,
+          "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/source_authority/lifecycle/20251222/a1_terminal_events_20250818_20251222.receipt.json",
+          "sha256": "bfc30a9c7eb4a0a9a06ab0208090dc4062e5184106244a80c27753a407186848"
+        }
+      ]
+    },
+    "transition_fundamentals": [
+      {
+        "bytes": 124013,
+        "path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/raw/transitions_a2/transition_000_20260612_20260807.csv",
+        "sha256": "9355bd582a19ff11519236ed5377c6ea5f7d93233d57082d1a9469b4c3e8b40f"
+      }
+    ]
+  },
+  "metrics": {
+    "child": {
+      "CAGR": null,
+      "Sharpe": 1.9210880176967646,
+      "Sortino": 4.19617093932845,
+      "annualized_volatility": 0.19002596454378892,
+      "average_cash_residual": 0.1276414873722716,
+      "average_gross_exposure": 0.8723585126277285,
+      "average_turnover": 0.09595677909358281,
+      "benchmark_excess_return": 0.07634397279911032,
+      "cumulative_return": 0.05370132844487974,
+      "drawdown_duration": 22,
+      "gross_return_sum": 0.058694575599131694,
+      "information_ratio": 3.933687691904156,
+      "max_drawdown": -0.07102281307017566,
+      "missing_executed_return_count": 0,
+      "non_finite_input_count": 0,
+      "rebalance_count": 7,
+      "total_cost_drag": 0.003646357605556147,
+      "total_turnover": 3.646357605556147,
+      "tracking_error": 0.12611868035372178,
+      "trading_days": 38
+    },
+    "economic_cash": {
+      "CAGR": null,
+      "Sharpe": 8.841464141229068,
+      "Sortino": null,
+      "annualized_volatility": 0.0029789659983816023,
+      "average_cash_residual": 0.02631578947368421,
+      "average_gross_exposure": 0.9736842105263158,
+      "average_turnover": 0.02631578947368421,
+      "benchmark_excess_return": null,
+      "cumulative_return": 0.003978683886788126,
+      "drawdown_duration": 7,
+      "gross_return_sum": 0.0049716666666666685,
+      "information_ratio": null,
+      "max_drawdown": -0.0009055555555556039,
+      "missing_executed_return_count": 0,
+      "non_finite_input_count": 0,
+      "rebalance_count": 0,
+      "total_cost_drag": 0.001,
+      "total_turnover": 1.0,
+      "tracking_error": null,
+      "trading_days": 38
+    },
+    "parent": {
+      "CAGR": null,
+      "Sharpe": 2.1738120568778774,
+      "Sortino": 4.701608545210855,
+      "annualized_volatility": 0.20835156906771182,
+      "average_cash_residual": 0.0263157894736843,
+      "average_gross_exposure": 0.9736842105263158,
+      "average_turnover": 0.10864389129872504,
+      "benchmark_excess_return": 0.08979474003776644,
+      "cumulative_return": 0.06715209568353586,
+      "drawdown_duration": 22,
+      "gross_return_sum": 0.07242549886353805,
+      "information_ratio": 4.62834581236251,
+      "max_drawdown": -0.0765522438414411,
+      "missing_executed_return_count": 0,
+      "non_finite_input_count": 0,
+      "rebalance_count": 7,
+      "total_cost_drag": 0.004128467869351551,
+      "total_turnover": 4.128467869351551,
+      "tracking_error": 0.12617295113068003,
+      "trading_days": 38
+    },
+    "pit_equal_weight": {
+      "CAGR": null,
+      "Sharpe": -0.6411593109630941,
+      "Sortino": -1.4502754180681263,
+      "annualized_volatility": 0.2044030163009368,
+      "average_cash_residual": 0.02631578947368221,
+      "average_gross_exposure": 0.9736842105263177,
+      "average_turnover": 0.026957637997432605,
+      "benchmark_excess_return": null,
+      "cumulative_return": -0.02264264435423058,
+      "drawdown_duration": 34,
+      "gross_return_sum": -0.018737856142728094,
+      "information_ratio": null,
+      "max_drawdown": -0.11425168121251394,
+      "missing_executed_return_count": 0,
+      "non_finite_input_count": 0,
+      "rebalance_count": 1,
+      "total_cost_drag": 0.001024390243902439,
+      "total_turnover": 1.024390243902439,
+      "tracking_error": null,
+      "trading_days": 38
+    },
+    "rule100": {
+      "CAGR": null,
+      "Sharpe": 2.1013367848804685,
+      "Sortino": 4.595333899159862,
+      "annualized_volatility": 0.20764662161988198,
+      "average_cash_residual": 0.026315789473684376,
+      "average_gross_exposure": 0.9736842105263156,
+      "average_turnover": 0.1080366258774909,
+      "benchmark_excess_return": 0.08715720460527565,
+      "cumulative_return": 0.06451456025104507,
+      "drawdown_duration": 22,
+      "gross_return_sum": 0.06990201242663246,
+      "information_ratio": 4.562237899025803,
+      "max_drawdown": -0.07713844837432637,
+      "missing_executed_return_count": 0,
+      "non_finite_input_count": 0,
+      "rebalance_count": 7,
+      "total_cost_drag": 0.004105391783344654,
+      "total_turnover": 4.105391783344654,
+      "tracking_error": 0.12436668010615108,
+      "trading_days": 38
+    }
+  },
+  "mutation_hash": "431503a53428af1b0c0de4445f563dd91437a88d6a90df9942e95bfe77d748ff",
+  "parent_vs_child": {
+    "child_CVaR_improvement_vs_parent": 0.0019449873071683277,
+    "child_minus_parent_CAGR": null,
+    "child_minus_parent_CVaR_loss": -0.0019449873071683277,
+    "child_minus_parent_Sharpe": -0.25272403918111275,
+    "child_minus_parent_cumulative_return": -0.013450767238656125,
+    "child_minus_parent_max_drawdown": 0.005529430771265442,
+    "child_minus_parent_total_turnover": -0.4821102637954042
+  },
+  "prospective_authority_changed": false,
+  "replay_metadata": {
+    "clock_v3_activation_policy": "DECISION_CLOSE_TO_NEXT_OBSERVED_CLOSE_THEN_ENGINE_ONE_BAR_LAG",
+    "contract_hash": "782411b86101993e4d4ee9e07588d2f559f30c5206e87e34649fce597872b155",
+    "current_primary_security_conditioned": false,
+    "current_screen_conditioned": false,
+    "date_local_eligible_universe": true,
+    "decision_cube_activation": "DECISION_CUT_STATE_FROZEN_TO_NEXT_OBSERVED_CLOSE",
+    "decision_start": "2026-06-12",
+    "decision_state_builder": "research.aov0.ciq_market.build_ciq_market_slice",
+    "evaluation_end": "2026-08-07",
+    "evaluation_start": "2026-06-15",
+    "evidence_authority": "HISTORICAL_ONLY_FINANCIAL_ALPHA_EVIDENCE_ZERO",
+    "factor_pit_mode": "CIQ_SPG_ASOF_FILINGVER_ORIGINAL",
+    "financial_alpha_evidence": 0,
+    "first_credited_return_left_endpoint": "2026-06-15",
+    "fixed_source_cohort": true,
+    "fixed_source_cohort_limitation": null,
+    "historical_primary_security_identity_reconstructed": true,
+    "historical_screen_membership_reconstructed": true,
+    "market_authority": "SPCIQPRO_PRIMARY_SECURITY_MARKET_DATA",
+    "primary_security_count": 94,
+    "primitive_end": "2026-07-31",
+    "primitive_start": "2026-06-12",
+    "schema_version": "aov0_historical_pit_replay_inputs_v1",
+    "source_cohort_mode": "HISTORICAL_START_SCREEN_FROZEN",
+    "terminal_event_count": 3,
+    "terminal_events": [
+      {
+        "cash_consideration": 26.87,
+        "effective_date": "2025-12-22",
+        "event_type": "DEFAULT_CASH_ELECTION_MERGER_TRADING_SUSPENSION",
+        "last_trading_date": "2025-12-19",
+        "security_id": "CIQSEC:IQ1672834977",
+        "source_authority": "SEC:ZEEKR_PROXY_AND_COMPLETION_6-K_2025-12-22",
+        "source_entity_id": "29331846",
+        "source_locator": "https://www.sec.gov/Archives/edgar/data/1954042/000110465925073651/tm2522436d1_ex99-1.htm;https://www.sec.gov/Archives/edgar/data/1954042/000110465925123525/tm2534059d1_ex99-1.htm",
+        "source_spt_item": "SPT1861750247",
+        "terminal_return": 0.005237560793116325
+      },
+      {
+        "cash_consideration": 11.0,
+        "effective_date": "2025-12-17",
+        "event_type": "CASH_MERGER_PREOPEN_TRADING_SUSPENSION",
+        "last_trading_date": "2025-12-16",
+        "security_id": "CIQSEC:IQ35230943",
+        "source_authority": "SEC:EVOKE_FORM_8-K_2025-12-17",
+        "source_entity_id": "4810409",
+        "source_locator": "https://www.sec.gov/Archives/edgar/data/1403708/000119312525321801/d81175d8k.htm",
+        "source_spt_item": "SPT241616054",
+        "terminal_return": 0.0
+      },
+      {
+        "cash_consideration": 7.5,
+        "effective_date": "2025-08-18",
+        "event_type": "CASH_MERGER_PREOPEN_TRADING_SUSPENSION",
+        "last_trading_date": "2025-08-15",
+        "security_id": "CIQSEC:IQ576249691",
+        "source_authority": "SEC:SHIFT4_FORM_8-K_2025-08-18",
+        "source_entity_id": "10976234",
+        "source_locator": "https://www.sec.gov/Archives/edgar/data/1794669/000119312525182293/d23961d8k.htm#Item2.01",
+        "source_spt_item": "SPT686212034",
+        "terminal_return": 0.001335113484646211
+      }
+    ],
+    "terminal_lifecycle_authority_pass": true,
+    "terminal_lifecycle_law": "HASH_BOUND_EVENT_REALIZES_CASH_SETTLEMENT_ON_EFFECTIVE_DATE_THEN_ZERO_TARGET_AND_ELIGIBILITY_WITH_FIXED_CASH_COLUMN",
+    "terminal_survivor_filtering": false,
+    "trading_days": 38,
+    "weekly_decision_count": 8
+  },
+  "report_content_hash": "8b2aca5db6757790af2d752a7001a69916478ca63b0324802a3a89a28e2d5a28",
+  "schema_version": "aov0_historical_pit_evidence_report_v1",
+  "security_count": 94,
+  "security_ids": [
+    "CIQSEC:IQ104428055",
+    "CIQSEC:IQ109916200",
+    "CIQSEC:IQ113678246",
+    "CIQSEC:IQ119056665",
+    "CIQSEC:IQ1380491",
+    "CIQSEC:IQ142458416",
+    "CIQSEC:IQ1672834977",
+    "CIQSEC:IQ1679037270",
+    "CIQSEC:IQ1684699268",
+    "CIQSEC:IQ1765371761",
+    "CIQSEC:IQ1770089996",
+    "CIQSEC:IQ1798729071",
+    "CIQSEC:IQ1814551032",
+    "CIQSEC:IQ1829593820",
+    "CIQSEC:IQ1855279437",
+    "CIQSEC:IQ210235568",
+    "CIQSEC:IQ214992529",
+    "CIQSEC:IQ224193775",
+    "CIQSEC:IQ224595724",
+    "CIQSEC:IQ225523981",
+    "CIQSEC:IQ228618557",
+    "CIQSEC:IQ229087176",
+    "CIQSEC:IQ243722644",
+    "CIQSEC:IQ244520896",
+    "CIQSEC:IQ245181897",
+    "CIQSEC:IQ246247134",
+    "CIQSEC:IQ247089947",
+    "CIQSEC:IQ248398889",
+    "CIQSEC:IQ250531253",
+    "CIQSEC:IQ253706543",
+    "CIQSEC:IQ27603970",
+    "CIQSEC:IQ286753997",
+    "CIQSEC:IQ28748353",
+    "CIQSEC:IQ294780",
+    "CIQSEC:IQ301743802",
+    "CIQSEC:IQ3044099",
+    "CIQSEC:IQ309184792",
+    "CIQSEC:IQ310103275",
+    "CIQSEC:IQ315008071",
+    "CIQSEC:IQ3175944",
+    "CIQSEC:IQ317721336",
+    "CIQSEC:IQ321823804",
+    "CIQSEC:IQ323581924",
+    "CIQSEC:IQ33026309",
+    "CIQSEC:IQ339110510",
+    "CIQSEC:IQ34322384",
+    "CIQSEC:IQ35230943",
+    "CIQSEC:IQ35572",
+    "CIQSEC:IQ362584",
+    "CIQSEC:IQ380776488",
+    "CIQSEC:IQ412156569",
+    "CIQSEC:IQ412327965",
+    "CIQSEC:IQ412495516",
+    "CIQSEC:IQ412550767",
+    "CIQSEC:IQ426696553",
+    "CIQSEC:IQ429233",
+    "CIQSEC:IQ49439457",
+    "CIQSEC:IQ51119246",
+    "CIQSEC:IQ51146962",
+    "CIQSEC:IQ531207172",
+    "CIQSEC:IQ533311640",
+    "CIQSEC:IQ538319234",
+    "CIQSEC:IQ542604862",
+    "CIQSEC:IQ54509692",
+    "CIQSEC:IQ5546852",
+    "CIQSEC:IQ572577901",
+    "CIQSEC:IQ573757461",
+    "CIQSEC:IQ576249691",
+    "CIQSEC:IQ58838228",
+    "CIQSEC:IQ58915635",
+    "CIQSEC:IQ590571226",
+    "CIQSEC:IQ596916833",
+    "CIQSEC:IQ60295846",
+    "CIQSEC:IQ610185344",
+    "CIQSEC:IQ6233553",
+    "CIQSEC:IQ62603649",
+    "CIQSEC:IQ630435491",
+    "CIQSEC:IQ633087980",
+    "CIQSEC:IQ633151331",
+    "CIQSEC:IQ637368438",
+    "CIQSEC:IQ6479558",
+    "CIQSEC:IQ648976269",
+    "CIQSEC:IQ654292267",
+    "CIQSEC:IQ686802842",
+    "CIQSEC:IQ702865071",
+    "CIQSEC:IQ706899929",
+    "CIQSEC:IQ712146583",
+    "CIQSEC:IQ78729055",
+    "CIQSEC:IQ882669",
+    "CIQSEC:IQ885779",
+    "CIQSEC:IQ912997",
+    "CIQSEC:IQ9282918",
+    "CIQSEC:IQ944412",
+    "CIQSEC:IQ98507226"
+  ],
+  "source_cohort": {
+    "as_of_date": "2025-05-16",
+    "current_primary_security_conditioned": false,
+    "current_screen_conditioned": false,
+    "frozen_company_count": 104,
+    "historical_primary_security_as_of_date": "2025-05-16",
+    "historical_primary_security_identity_reconstructed": true,
+    "historical_screen_membership_reconstructed": true,
+    "limitation": null,
+    "risk_set_mode": "HISTORICAL_START_SCREEN_FROZEN",
+    "screen_law_hash": "81e8cba8ebbda5de695d87ab321d15ebc3cf3f1c1158d3c94633dee7a3b78381"
+  },
+  "source_entity_ids": [
+    "100420749",
+    "101570773",
+    "105643522",
+    "107089758",
+    "108129648",
+    "10976234",
+    "110336920",
+    "113495488",
+    "123916273",
+    "13087393",
+    "13373011",
+    "13597615",
+    "14887727",
+    "17514167",
+    "19095891",
+    "19098526",
+    "19243702",
+    "19659800",
+    "19871451",
+    "25283066",
+    "27682584",
+    "27875239",
+    "28743844",
+    "29331846",
+    "29657689",
+    "4021980",
+    "4092847",
+    "4142027",
+    "4153733",
+    "4160258",
+    "4239659",
+    "4261521",
+    "4276821",
+    "4327198",
+    "4349995",
+    "4401941",
+    "4403916",
+    "4416726",
+    "4420334",
+    "4424169",
+    "4426783",
+    "4565554",
+    "4641918",
+    "4770121",
+    "4810409",
+    "4810724",
+    "4810896",
+    "4811056",
+    "4811197",
+    "4811521",
+    "4811591",
+    "4811695",
+    "4811760",
+    "4811954",
+    "4812067",
+    "4812756",
+    "4812813",
+    "4913670",
+    "4977885",
+    "4978093",
+    "4989077",
+    "4994908",
+    "4996395",
+    "4999273",
+    "5000790",
+    "5001439",
+    "5013726",
+    "5031604",
+    "5109836",
+    "5174695",
+    "5176861",
+    "5181255",
+    "5214991",
+    "5239538",
+    "5242080",
+    "5244284",
+    "5250653",
+    "5255493",
+    "5255986",
+    "5263639",
+    "5264620",
+    "5265242",
+    "5267913",
+    "5277128",
+    "5293460",
+    "5297753",
+    "5302933",
+    "5303886",
+    "5309396",
+    "5311902",
+    "5321096",
+    "5321237",
+    "5326808",
+    "5328081",
+    "6319660",
+    "6459368",
+    "6867615",
+    "6910410",
+    "7106242",
+    "7389138",
+    "8251154",
+    "8435281",
+    "9098887",
+    "9956217"
+  ],
+  "source_semantics": {
+    "filing_version": "Original",
+    "period_probe_metric": "IQ_PERIOD_END",
+    "period_probe_relative_period": "FQ0",
+    "provider_function": "SPG",
+    "retrieval_timestamp_bound": true
+  },
+  "stage": "A2",
+  "turnover_cost_rate": 0.001,
+  "window": {
+    "end": "2026-08-07",
+    "start": "2026-06-15",
+    "trading_days": 38,
+    "weekly_decisions": 8
+  }
+}

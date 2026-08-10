@@ -1,7 +1,7 @@
 # Observability Pack — Current
 
-Date: 2026-08-09
-Gate: `STRATEGIC_DIRECTION_LOCKED / MULTI_CLOCK_EVIDENCE / PAPER_0 / A1_A2_VINTAGE_PARITY_GATE`
+Date: 2026-08-10
+Gate: `STRATEGIC_DIRECTION_LOCKED / MULTI_CLOCK_EVIDENCE / PAPER_0 / LANE2_A1_A2_CLOSED`
 Status: `PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
 
 ## Strategic-lock sentinels — current
@@ -29,16 +29,16 @@ Status: `PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORIT
 
 ## Lane 2 sentinels — historical compression
 
-- **Hard vintage gate:** replay currently requires `FilingVer=Original` while active capture scripts request/emit `Current/Restated`; `historical_spg_asof_original=true` may not be claimed from conflicting bytes. One explicit provider-vintage authority must win destructively before A1/A2.
-- **Hard parity gate:** current and historical AOV paths must reconcile same-input identity, ADV20, realized vol, SMA/trend, Q/U, technical state, sizing eligibility and Rule100 weights before `exact frozen-AOV replay` is an A1 claim.
-- Historical PIT universe/source/availability/identity semantics must be explicit before A1 admission; current-screen-conditioned or otherwise PIT-insufficient output is diagnostic only.
-- A1 must replay the exact frozen AOV incumbent; no Parent/Child tuning authority is granted by historical results.
-- A2 split/query budget/primary metrics/executable hashes must be frozen before hidden historical outcome inspection.
-- A2 is query-metered, append-only and cannot be rescued by threshold/universe/cost/timing changes under the same version.
-- Lane 2 cannot open or depend on Clock #1 prospective outcomes.
-- A2 used to design a challenger is no longer untouched evidence for that challenger.
-- Required economic output separates Parent, Child and Child-minus-Parent and attributes losses, costs/cash drag, missed winners, under-sizing and winner clipping.
-- No A1/A2 evidence is currently claimed merely because a capture/admission prototype exists in the working tree.
+- Vintage authority is closed on `CIQ SPG historical as-of + FilingVer=Original`; any future historical capture entering this lineage must retain the same source semantics or create a new explicit authority version.
+- Current↔historical same-input parity is closed through the exact current-cut builder; do not create a separate historical economics implementation.
+- The frozen A1 source cohort remains the admitted 104-company 2025-05-16 reconstruction with exact dated CIQ Security/Trading Item identity; current-screen/current-primary conditioning remains forbidden.
+- Terminal securities must use the source-bound lifecycle packet. Never repair them by future-completeness filtering, alternate-listing substitution, ticker fallback, or fabricated continuation.
+- A1 is admitted as `A1_ADMITTED_HISTORICAL_PIT` over 264 trading days / 94 active securities. This is historical evidence only and grants no in-place Parent/Child tuning authority.
+- A2 is consumed as `A2_UNTOUCHED_HISTORICAL_PIT`; its freeze precedes held-out PIT capture, query count is exactly `1`, and a second A2 evaluation is forbidden.
+- Do not delete, overwrite, regenerate, or reinterpret the retained A2 result/query-lock/query-receipt under the same trial identity.
+- Lane 2 cannot open or depend on Clock #1 prospective outcomes; `financial_alpha_evidence` remains `0`.
+- The current economic signature is Child risk reduction with return/Sharpe dilution versus Parent in both A1 and A2. Treat this as diagnosis input, not a parameter-tuning instruction.
+- Any challenger informed by A2 must be separately frozen and cannot claim A2 as untouched evidence for itself.
 
 ## PAPER-0 / replication sentinels
 

@@ -1,0 +1,12 @@
+{
+  "created_at_utc": "2026-08-10T07:45:03.474526Z",
+  "evaluation_query_count": 1,
+  "financial_alpha_evidence": 0,
+  "freeze_path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/evidence/a2_freeze.json",
+  "freeze_sha256": "908b33a55c1ee2567991c9a75ea251367f4dc0fd5584b7a7a694d148f92a4205",
+  "query_lock_path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/evidence/a2_query_lock.json",
+  "query_lock_sha256": "8fac53faf70f1d80d7f0139130367a988417bc07516eaf395404cb043ed23655",
+  "result_path": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e/data/aov0/historical/evidence/a2_result.json",
+  "result_sha256": "381218c4c1609fda48694efe9d445ae5f2dff6d43410205880da66ddb5441985",
+  "schema_version": "aov0_historical_pit_a2_query_receipt_v1"
+}

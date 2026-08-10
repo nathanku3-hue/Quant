@@ -35,6 +35,7 @@ from research.aov0.ciq_market import (
 )
 from research.aov0.contracts import AOV0Contract, DEFAULT_CONTRACT, validate_contract
 from research.aov0.cube import VerticalCube, activate_decision_cube_states, build_vertical_cube
+from research.aov0.historical_lifecycle import HistoricalTerminalEvents
 
 
 HISTORICAL_PIT_FUNDAMENTAL_SCHEMA = "aov0_ciq_historical_asof_fundamentals_v1"
@@ -417,7 +418,7 @@ def build_historical_market_panel(
 
     records: list[pd.Series] = []
     for (_date, _security), group in market.groupby(["date", "security_id"], sort=False):
-        first = group.iloc[0]
+        reconciled = group.iloc[0].copy()
         for column in ("trading_item_id", "source_entity_id"):
             if group[column].astype(str).nunique(dropna=False) != 1:
                 raise ValueError(f"aov0_historical_market_overlap_identity_conflict:{column}")
@@ -425,11 +426,36 @@ def build_historical_market_panel(
             values = pd.to_numeric(group[column], errors="coerce").to_numpy(dtype=float)
             finite = values[np.isfinite(values)]
             if finite.size == 0:
+                reconciled[column] = np.nan
                 continue
             if not np.allclose(finite, finite[0], rtol=1e-10, atol=1e-12):
                 raise ValueError(f"aov0_historical_market_overlap_value_conflict:{column}")
-        records.append(first)
+            # Exact-identity custody may overlap with one transport returning an
+            # explicit NA while another returns the same finite provider value.
+            # Reconcile the economic value, not the input-file order.  This is
+            # deliberately per field: no alternate listing or entity fallback
+            # can be introduced by this coalescence.
+            reconciled[column] = float(finite[0])
+        records.append(reconciled)
     market = pd.DataFrame(records).drop(columns=["_part_index"], errors="ignore")
+    market = market.sort_values(["security_id", "date"]).reset_index(drop=True)
+
+    # ProductQuery date grids can include U.S. business weekdays on which the
+    # exchange was closed (for example federal-market holidays).  The provider
+    # represents those requested dates as an all-missing return/close/volume
+    # triplet for every security.  Such rows are query-grid placeholders, not
+    # market sessions, and must not consume rolling-window observations.  Drop
+    # only dates with no economic market value anywhere in the frozen cohort.
+    # A date where even one security has any market value is retained in full;
+    # per-security/partial missingness then remains visible to the replay's
+    # fail-closed partial-session and post-start-gap checks.
+    economic_columns = ["total_return", "close", "volume"]
+    economic = market[economic_columns].apply(pd.to_numeric, errors="coerce")
+    row_has_market_value = economic.notna().any(axis=1)
+    date_has_market_value = row_has_market_value.groupby(market["date"]).transform("any")
+    market = market.loc[date_has_market_value].copy()
+    if market.empty:
+        raise ValueError("aov0_historical_market_no_observed_sessions")
     market = market.sort_values(["security_id", "date"]).reset_index(drop=True)
 
     market["dollar_volume"] = pd.to_numeric(market["close"], errors="coerce") * pd.to_numeric(
@@ -603,6 +629,110 @@ def _build_historical_current_cut(
     return current_cut, cube
 
 
+def _apply_terminal_events_to_market(
+    market: pd.DataFrame,
+    *,
+    security_map: pd.DataFrame,
+    terminal_events: HistoricalTerminalEvents | None,
+) -> tuple[pd.DataFrame, dict[str, dict[str, object]]]:
+    """Convert source-authorized terminal securities to a fixed cash state.
+
+    The fixed security column remains in the replay matrix to avoid a future-
+    completeness survivor filter.  On the effective date the realized return is
+    the cash merger consideration divided by the last actual close.  From the
+    following session onward the column is a zero-return cash state.  Target and
+    eligibility overlays are applied separately at the same effective date.
+    """
+
+    out = market.copy()
+    out["_terminal_cash"] = False
+    lifecycle: dict[str, dict[str, object]] = {}
+    if terminal_events is None:
+        return out, lifecycle
+
+    mapping = security_map.copy().set_index("security_id", drop=False)
+    if mapping.index.duplicated().any():
+        raise ValueError("aov0_historical_terminal_event_security_map_duplicate")
+    market_dates = pd.DatetimeIndex(pd.to_datetime(out["date"], errors="raise")).normalize()
+    market_start = pd.Timestamp(market_dates.min())
+    market_end = pd.Timestamp(market_dates.max())
+
+    for event in terminal_events.frame.itertuples(index=False):
+        security_id = str(event.security_id)
+        if security_id not in mapping.index:
+            raise ValueError(f"aov0_historical_terminal_event_security_unmapped:{security_id}")
+        mapped = mapping.loc[security_id]
+        if str(mapped["source_entity_id"]) != str(event.source_entity_id):
+            raise ValueError(f"aov0_historical_terminal_event_entity_mismatch:{security_id}")
+        if str(mapped["trading_item_id"]) != str(event.source_spt_item):
+            raise ValueError(f"aov0_historical_terminal_event_spt_mismatch:{security_id}")
+
+        last_trading_date = pd.Timestamp(event.last_trading_date).normalize()
+        effective_date = pd.Timestamp(event.effective_date).normalize()
+        cash_consideration = float(event.cash_consideration)
+        terminal_return: float | None = None
+
+        # When the event falls inside the captured tape, its last actual trading
+        # close must itself be present and economically observed.  A later A2
+        # window may begin after the event; in that case no historical price is
+        # needed because the column is already cash at the window boundary.
+        if market_start <= last_trading_date <= market_end:
+            last_rows = out.loc[
+                out["security_id"].astype(str).eq(security_id)
+                & pd.to_datetime(out["date"], errors="raise").dt.normalize().eq(last_trading_date)
+            ]
+            if len(last_rows) != 1:
+                raise ValueError(f"aov0_historical_terminal_event_last_trade_missing:{security_id}")
+            last_row = last_rows.iloc[0]
+            last_values = pd.to_numeric(
+                pd.Series([last_row["total_return"], last_row["close"], last_row["volume"]]),
+                errors="coerce",
+            ).to_numpy(dtype=float)
+            if not np.isfinite(last_values).all() or float(last_values[2]) <= 0.0:
+                raise ValueError(f"aov0_historical_terminal_event_last_trade_not_observed:{security_id}")
+            last_close = float(last_values[1])
+            if last_close <= 0.0:
+                raise ValueError(f"aov0_historical_terminal_event_last_close_invalid:{security_id}")
+            terminal_return = cash_consideration / last_close - 1.0
+
+        event_rows = out["security_id"].astype(str).eq(security_id) & pd.to_datetime(
+            out["date"], errors="raise"
+        ).dt.normalize().ge(effective_date)
+        if effective_date <= market_end and not event_rows.any():
+            raise ValueError(f"aov0_historical_terminal_event_cash_rows_missing:{security_id}")
+        if event_rows.any():
+            dates = pd.to_datetime(out.loc[event_rows, "date"], errors="raise").dt.normalize()
+            effective_mask = event_rows.copy()
+            effective_mask.loc[event_rows] = dates.eq(effective_date).to_numpy()
+            later_mask = event_rows & ~effective_mask
+            if effective_mask.any():
+                if terminal_return is None:
+                    raise ValueError(
+                        f"aov0_historical_terminal_event_effective_return_source_missing:{security_id}"
+                    )
+                out.loc[effective_mask, "total_return"] = terminal_return
+                out.loc[effective_mask, "close"] = cash_consideration
+                out.loc[effective_mask, "volume"] = 0.0
+            if later_mask.any():
+                out.loc[later_mask, "total_return"] = 0.0
+                out.loc[later_mask, "close"] = cash_consideration
+                out.loc[later_mask, "volume"] = 0.0
+            out.loc[event_rows, "_terminal_cash"] = True
+
+        lifecycle[security_id] = {
+            "source_entity_id": str(event.source_entity_id),
+            "source_spt_item": str(event.source_spt_item),
+            "last_trading_date": last_trading_date,
+            "effective_date": effective_date,
+            "cash_consideration": cash_consideration,
+            "terminal_return": terminal_return,
+            "event_type": str(event.event_type),
+            "source_authority": str(event.source_authority),
+            "source_locator": str(event.source_locator),
+        }
+    return out, lifecycle
+
+
 def build_historical_replay_inputs(
     *,
     market_panel: HistoricalMarketPanel,
@@ -611,6 +741,7 @@ def build_historical_replay_inputs(
     evaluation_end: str | pd.Timestamp,
     contract: AOV0Contract = DEFAULT_CONTRACT,
     required_security_ids: Sequence[str] | None = None,
+    terminal_events: HistoricalTerminalEvents | None = None,
 ) -> HistoricalReplayInputs:
     """Build frozen-AOV decision states with Clock-v3 activation semantics.
 
@@ -631,6 +762,16 @@ def build_historical_replay_inputs(
 
     market = market_panel.frame.copy()
     market["date"] = pd.to_datetime(market["date"], errors="raise").dt.normalize()
+    market, lifecycle = _apply_terminal_events_to_market(
+        market,
+        security_map=market_panel.security_map,
+        terminal_events=terminal_events,
+    )
+    terminal_cash_at_start = {
+        security_id
+        for security_id, event in lifecycle.items()
+        if pd.Timestamp(event["effective_date"]).normalize() <= decision_start
+    }
     required_market = (
         "total_return",
         "realized_vol",
@@ -650,6 +791,13 @@ def build_historical_replay_inputs(
         & finite["adv20"].gt(0.0)
         & finite["dollar_volume"].ge(0.0)
     )
+    observed_numeric = market[["total_return", "close", "volume"]].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    market["_market_observation_complete"] = (
+        observed_numeric.notna().all(axis=1)
+        & np.isfinite(observed_numeric.fillna(np.nan).to_numpy(dtype=float)).all(axis=1)
+    )
 
     start_rows = market.loc[market["date"].eq(decision_start) & market["_valid"]].copy()
     start_ids = sorted(start_rows["security_id"].astype(str).unique().tolist())
@@ -657,7 +805,8 @@ def build_historical_replay_inputs(
         selected_ids = start_ids
     else:
         selected_ids = sorted({str(value) for value in required_security_ids})
-        unavailable_at_start = sorted(set(selected_ids) - set(start_ids))
+        available_at_start = set(start_ids) | terminal_cash_at_start
+        unavailable_at_start = sorted(set(selected_ids) - available_at_start)
         if unavailable_at_start:
             raise ValueError(
                 "aov0_historical_replay_frozen_security_unavailable_at_start:"
@@ -667,28 +816,33 @@ def build_historical_replay_inputs(
         raise ValueError("aov0_historical_replay_no_primary_security_history_at_start")
 
     selected_market = market.loc[market["security_id"].isin(selected_ids)].copy()
-    session_valid_counts = (
-        selected_market.loc[selected_market["date"].between(decision_start, end) & selected_market["_valid"]]
+    # Replay-session custody is a data-completeness question, not a Rule100
+    # eligibility question. A real zero return/zero volume or zero rolling
+    # volatility can make a name ineligible in the current-cut builder without
+    # making the market tape incomplete. Only finite return/close/volume
+    # triplets define complete market observations here.
+    session_observed_counts = (
+        selected_market.loc[
+            selected_market["date"].between(decision_start, end)
+            & selected_market["_market_observation_complete"]
+        ]
         .groupby("date", sort=True)["security_id"]
         .nunique()
     )
     session_calendar = pd.DatetimeIndex(
-        session_valid_counts.loc[session_valid_counts.eq(len(selected_ids))].index
+        session_observed_counts.loc[session_observed_counts.eq(len(selected_ids))].index
     ).normalize()
     session_calendar = validate_historical_session_continuity(session_calendar)
     if len(session_calendar) < 2 or decision_start not in session_calendar:
         raise ValueError("aov0_historical_replay_calendar_too_short")
 
-    # A date with any real market observation but an incomplete frozen security
-    # set is a data failure, not a non-trading holiday and never a survivor
-    # filter. Dates on which every frozen security is incomplete are omitted as
-    # closed-market rows from the observed session calendar.
-    any_valid_counts = (
-        selected_market.loc[selected_market["date"].between(decision_start, end) & selected_market["_valid"]]
-        .groupby("date", sort=True)["security_id"]
-        .nunique()
-    )
-    partial_dates = any_valid_counts.loc[any_valid_counts.between(1, len(selected_ids) - 1)].index
+    # A date with any complete market observation but an incomplete frozen
+    # security set is a data failure, not a non-trading holiday and never a
+    # survivor filter. Cohort-wide all-missing query-grid placeholders were
+    # already removed by build_historical_market_panel.
+    partial_dates = session_observed_counts.loc[
+        session_observed_counts.between(1, len(selected_ids) - 1)
+    ].index
     if len(partial_dates):
         raise ValueError(
             "aov0_historical_replay_partial_market_session:"
@@ -729,11 +883,15 @@ def build_historical_replay_inputs(
     # that frozen set explicitly. Any later incomplete observed session blocks.
     in_evaluation = selected_market.loc[selected_market["date"].isin(evaluation_calendar)].copy()
     full_counts = in_evaluation.groupby("security_id")["date"].nunique()
-    valid_counts = in_evaluation.loc[in_evaluation["_valid"]].groupby("security_id")["date"].nunique()
+    observed_counts = (
+        in_evaluation.loc[in_evaluation["_market_observation_complete"]]
+        .groupby("security_id")["date"]
+        .nunique()
+    )
     for security_id in selected_ids:
         if (
             int(full_counts.get(security_id, 0)) != len(evaluation_calendar)
-            or int(valid_counts.get(security_id, 0)) != len(evaluation_calendar)
+            or int(observed_counts.get(security_id, 0)) != len(evaluation_calendar)
         ):
             raise ValueError(f"aov0_historical_replay_post_start_market_gap:{security_id}")
     complete_ids = selected_ids
@@ -768,13 +926,34 @@ def build_historical_replay_inputs(
         decision = pd.Timestamp(date).normalize()
         activation = pd.Timestamp(decision_to_activation[decision]).normalize()
         state = factor_by_date[decision].reset_index(drop=True)
+        inactive_terminal_ids = {
+            security_id
+            for security_id, event in lifecycle.items()
+            if security_id in complete_ids
+            and pd.Timestamp(event["effective_date"]).normalize() <= decision
+        }
+        cut_security_map = security_map.loc[
+            ~security_map["security_id"].astype(str).isin(inactive_terminal_ids)
+        ].copy()
+        if cut_security_map.empty:
+            raise ValueError("aov0_historical_replay_no_active_security_after_terminal_events")
+        cut_entity_ids = set(cut_security_map["source_entity_id"].astype(str))
+        cut_state = state.loc[state["source_entity_id"].astype(str).isin(cut_entity_ids)].copy()
+        if cut_state.empty:
+            raise ValueError("aov0_historical_replay_no_factor_state_after_terminal_events")
+        cut_market = selected_market.loc[
+            ~selected_market["security_id"].astype(str).isin(inactive_terminal_ids)
+        ].copy()
         current_cut, decision_cube = _build_historical_current_cut(
             market_panel=HistoricalMarketPanel(
-                security_map=security_map,
-                frame=selected_market.drop(columns=["_valid"], errors="ignore"),
+                security_map=cut_security_map,
+                frame=cut_market.drop(
+                    columns=["_valid", "_market_observation_complete", "_terminal_cash"],
+                    errors="ignore",
+                ),
                 mapping_exclusions=market_panel.mapping_exclusions,
             ),
-            factor_state=state,
+            factor_state=cut_state,
             decision_date=decision,
             activation_date=activation,
         )
@@ -814,6 +993,11 @@ def build_historical_replay_inputs(
     if decisions.isna().any().any():
         raise ValueError("aov0_historical_replay_decision_target_missing")
     decisions.index.name = "date"
+    for security_id, event in lifecycle.items():
+        if security_id not in complete_ids:
+            continue
+        effective_date = pd.Timestamp(event["effective_date"]).normalize()
+        decisions.loc[decisions.index >= effective_date, security_id] = 0.0
 
     activation_rows = pd.DataFrame(
         [decisions.loc[decision_date].to_dict() for decision_date in decision_dates],
@@ -826,6 +1010,11 @@ def build_historical_replay_inputs(
     if targets.iloc[0].isna().any():
         raise ValueError("aov0_historical_replay_initial_target_missing")
     targets = targets.fillna(0.0)
+    for security_id, event in lifecycle.items():
+        if security_id not in complete_ids:
+            continue
+        effective_date = pd.Timestamp(event["effective_date"]).normalize()
+        targets.loc[targets.index >= effective_date, security_id] = 0.0
     targets.index.name = "date"
 
     primitives = pd.concat(primitive_rows, ignore_index=True, sort=False)
@@ -858,7 +1047,32 @@ def build_historical_replay_inputs(
             active_decision = activation_to_decision[day]
         if active_decision is None:
             raise ValueError("aov0_historical_replay_eligibility_not_active")
-        eligible[day] = decision_eligible[active_decision]
+        eligible[day] = tuple(
+            security_id
+            for security_id in decision_eligible[active_decision]
+            if not (
+                security_id in lifecycle
+                and pd.Timestamp(lifecycle[security_id]["effective_date"]).normalize() <= day
+            )
+        )
+    selected_lifecycle = [
+        {
+            "security_id": security_id,
+            "source_entity_id": str(event["source_entity_id"]),
+            "source_spt_item": str(event["source_spt_item"]),
+            "last_trading_date": pd.Timestamp(event["last_trading_date"]).date().isoformat(),
+            "effective_date": pd.Timestamp(event["effective_date"]).date().isoformat(),
+            "cash_consideration": float(event["cash_consideration"]),
+            "terminal_return": (
+                None if event["terminal_return"] is None else float(event["terminal_return"])
+            ),
+            "event_type": str(event["event_type"]),
+            "source_authority": str(event["source_authority"]),
+            "source_locator": str(event["source_locator"]),
+        }
+        for security_id, event in sorted(lifecycle.items())
+        if security_id in complete_ids
+    ]
     metadata: dict[str, object] = {
         "schema_version": HISTORICAL_REPLAY_SCHEMA,
         "evidence_authority": "HISTORICAL_ONLY_FINANCIAL_ALPHA_EVIDENCE_ZERO",
@@ -878,6 +1092,10 @@ def build_historical_replay_inputs(
         "date_local_eligible_universe": True,
         "fixed_source_cohort": True,
         "fixed_source_cohort_limitation": "CURRENT_FROZEN_109_COMPANY_SOURCE_COHORT_NOT_HISTORICAL_SCREEN_MEMBERSHIP",
+        "terminal_lifecycle_law": "HASH_BOUND_EVENT_REALIZES_CASH_SETTLEMENT_ON_EFFECTIVE_DATE_THEN_ZERO_TARGET_AND_ELIGIBILITY_WITH_FIXED_CASH_COLUMN",
+        "terminal_event_count": len(selected_lifecycle),
+        "terminal_events": selected_lifecycle,
+        "terminal_survivor_filtering": False,
         "factor_pit_mode": HISTORICAL_PIT_MODE,
         "market_authority": "SPCIQPRO_PRIMARY_SECURITY_MARKET_DATA",
         "financial_alpha_evidence": 0,

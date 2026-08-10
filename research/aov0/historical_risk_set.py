@@ -130,6 +130,8 @@ def _validate_reconstruction_receipt(
         by_role["market_candidates"], role="market_candidates", expected_as_of_date=expected_as_of_date
     )
     market_schema = market.get("schema_version")
+    market_state = market
+    expected_market_scope = "HISTORICAL_MARKET_CANDIDATES_ONLY"
     if market_schema == "aov0_xpressapi_historical_screen_market_candidate_merged_receipt_v1":
         if market.get("source_id") != "SPGLOBAL_XPRESSAPI:SCREENER":
             raise HistoricalRiskSetError("historical_screen_recon_market_source_invalid")
@@ -185,13 +187,90 @@ def _validate_reconstruction_receipt(
             raise HistoricalRiskSetError("historical_screen_recon_market_exchange_parity_counts_mismatch")
         if source_rows != group_rows or result_entities < 1 or result_entities > source_rows:
             raise HistoricalRiskSetError("historical_screen_recon_market_result_counts_mismatch")
+    elif market_schema == "aov0_ciq_historical_market_original_revenue_candidate_receipt_v1":
+        if market.get("source_id") != "SPCIQPRO:SECURITIES_PRODUCTQUERY+COMPANIES_PRODUCTQUERY":
+            raise HistoricalRiskSetError("historical_screen_recon_market_source_invalid")
+        market_component = market.get("market_component")
+        revenue_component = market.get("revenue_component")
+        intersection = market.get("intersection")
+        if not isinstance(market_component, dict) or not isinstance(revenue_component, dict) or not isinstance(intersection, dict):
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_component_missing")
+        market_state = market_component
+        expected_market_scope = "HISTORICAL_MARKET_ORIGINAL_REVENUE_CANDIDATES_ONLY_NOT_A1_RISK_SET"
+        if market_component.get("source_id") != "SPCIQPRO:SECURITIES_PRODUCTQUERY":
+            raise HistoricalRiskSetError("historical_screen_recon_market_source_invalid")
+        if str(market_component.get("market_perspective") or "") != "321247":
+            raise HistoricalRiskSetError("historical_screen_recon_market_perspective_invalid")
+        if str(market_component.get("price_field_key") or "") != "324251":
+            raise HistoricalRiskSetError("historical_screen_recon_market_price_field_invalid")
+        if str(market_component.get("price_date_secondary_key") or "") != "sk_557":
+            raise HistoricalRiskSetError("historical_screen_recon_market_price_date_key_invalid")
+        if str(market_component.get("exchange_group_field_key") or "") != "406718":
+            raise HistoricalRiskSetError("historical_screen_recon_market_exchange_field_invalid")
+        if str(market_component.get("exchange_group_value") or "") != "-1,-4":
+            raise HistoricalRiskSetError("historical_screen_recon_market_exchange_group_invalid")
+        if str(market_component.get("funding_type_field_key") or "") != "321268":
+            raise HistoricalRiskSetError("historical_screen_recon_market_funding_field_invalid")
+        if tuple(str(value) for value in market_component.get("funding_type_values") or ()) != ("1", "16"):
+            raise HistoricalRiskSetError("historical_screen_recon_market_funding_values_invalid")
+        parity = market_component.get("major_us_exchange_group_parity")
+        if not isinstance(parity, dict) or parity.get("exact_match") is not True:
+            raise HistoricalRiskSetError("historical_screen_recon_market_exchange_parity_invalid")
+        if {str(k): str(v) for k, v in (parity.get("explicit_exchange_codes") or {}).items()} != {
+            "NYSE": "0",
+            "NYSEAM": "1",
+            "NASDAQGM": "2",
+            "NASDAQCM": "211",
+            "NASDAQGS": "212",
+        }:
+            raise HistoricalRiskSetError("historical_screen_recon_market_exchange_codes_invalid")
+        if str(parity.get("excluded_arca_code") or "") != "33":
+            raise HistoricalRiskSetError("historical_screen_recon_market_arca_exclusion_invalid")
+        try:
+            parity_date = pd.Timestamp(parity.get("as_of_date")).normalize()
+            group_rows = int(parity.get("group_security_row_count", -1))
+            explicit_rows = int(parity.get("explicit_union_security_row_count", -1))
+            group_only = int(parity.get("group_only_count", -1))
+            explicit_only = int(parity.get("explicit_only_count", -1))
+            source_rows = int(market_component.get("source_security_row_count", -1))
+            result_entities = int(market_component.get("source_entity_count", -1))
+        except Exception as exc:  # pragma: no cover - exact parser exception is version-specific.
+            raise HistoricalRiskSetError("historical_screen_recon_market_exchange_parity_counts_invalid") from exc
+        if parity_date != expected_as_of_date:
+            raise HistoricalRiskSetError("historical_screen_recon_market_exchange_parity_date_mismatch")
+        if group_rows < 1 or group_rows != explicit_rows or group_only != 0 or explicit_only != 0:
+            raise HistoricalRiskSetError("historical_screen_recon_market_exchange_parity_counts_mismatch")
+        if source_rows != group_rows or result_entities < 1 or result_entities > source_rows:
+            raise HistoricalRiskSetError("historical_screen_recon_market_result_counts_mismatch")
+        if revenue_component.get("source_id") != "SPCIQPRO:COMPANIES_PRODUCTQUERY":
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_revenue_source_invalid")
+        if str(revenue_component.get("companies_perspective") or "") != "266637":
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_revenue_perspective_invalid")
+        if str(revenue_component.get("field_key") or "") != "329288":
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_revenue_field_invalid")
+        if revenue_component.get("filing_version") != "Original" or revenue_component.get("reporting_basis") != "Originally Reported":
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_revenue_vintage_invalid")
+        if revenue_component.get("historical_as_of_mechanically_bound") is not True:
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_revenue_asof_not_bound")
+        if str(revenue_component.get("as_of_secondary_key") or "") != "sk_860":
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_revenue_asof_key_invalid")
+        if str(revenue_component.get("period_secondary_key") or "") != "sk_854":
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_revenue_period_key_invalid")
+        if tuple(str(value) for value in revenue_component.get("periods") or ()) != ("FY0", "FY-1", "FY-2", "FY-3"):
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_revenue_periods_invalid")
+        if revenue_component.get("provider_formula_validation_passed") is not True:
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_formula_validation_missing")
+        if float(revenue_component.get("growth_multiplier", 0)) != 1.3:
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_growth_multiplier_invalid")
+        if int(intersection.get("candidate_count", -1)) < 1:
+            raise HistoricalRiskSetError("historical_screen_recon_market_partial_candidate_count_invalid")
     else:
         raise HistoricalRiskSetError("historical_screen_recon_market_schema_invalid")
-    if market.get("capture_scope") != "HISTORICAL_MARKET_CANDIDATES_ONLY":
+    if market.get("capture_scope") != expected_market_scope:
         raise HistoricalRiskSetError("historical_screen_recon_market_scope_invalid")
-    if market.get("historical_market_date_mechanically_bound") is not True:
+    if market_state.get("historical_market_date_mechanically_bound") is not True:
         raise HistoricalRiskSetError("historical_screen_recon_market_date_not_bound")
-    if market.get("current_company_state_filters_used") is not False:
+    if market_state.get("current_company_state_filters_used") is not False:
         raise HistoricalRiskSetError("historical_screen_recon_market_current_state_forbidden")
     if market.get("historical_risk_set_admission_authority") != "NONE":
         raise HistoricalRiskSetError("historical_screen_recon_market_authority_invalid")

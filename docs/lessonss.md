@@ -1,3 +1,162 @@
+## 2026-08-10 Round Entry (Capital IQ Pro Operating Runbook — Reuse the Existing Authenticated Web Session, Know the Exact Data Surfaces, and Fail Closed on Unavailable Historical Semantics)
+
+- Date: 2026-08-10
+- Mistake or miss: Capital IQ Pro work initially mixed three very different access layers—Excel/Office formulas, installed-client service internals, and the already-authenticated Capital IQ Pro web application—and treated “the desktop is logged in” as if every field/function had the same historical semantics and reliability. That led to unnecessary Excel/COM restarts, ambiguous auth assumptions, retries of legacy functions, and temptation to back-project current Company Type/Status or Primary Issue fields into historical truth.
+- Root cause: S&P Capital IQ Pro exposes multiple overlapping interfaces with different identity layers, field vocabularies, historical-date behavior, and operational stability. The decisive lesson is to freeze **one explicit provider contract per datum** (transport + perspective/function + field key + secondary keys + identity + date/vintage semantics), rather than saying generically “CIQ supports this field.”
+
+### Preferred operating path: existing signed-in Capital IQ Pro web session
+
+- **Do not re-sign in, sign out, launch a new CIQ session, or reset the authenticated browser when an existing CIQ Pro tab is healthy.** The Lane-2 Python capture scripts are deliberately attach-only. Their receipts assert `existing_session_reused=true`, `sign_in_performed=false`, and `sign_out_performed=false`.
+- The preferred capture scripts attach to the already-running Chromium DevTools target (default local debugger port `9230`), enumerate `http://127.0.0.1:9230/json/list`, select an existing page whose URL contains `capitaliq.spglobal.com`, and open that page's `webSocketDebuggerUrl`. They do not navigate the page.
+- Requests execute **inside the authenticated browser tab** with `fetch(..., credentials='include')`, so the browser supplies the existing authenticated session/cookies. Never print, export, persist, or reverse-engineer bearer/refresh tokens when this route works.
+- Modern Chromium may reject a synthetic DevTools `Origin`; the working attach path omits a fabricated Origin rather than relaunching Chrome with a new auth profile.
+- **Custody rule:** provider request success is not enough. Every captured object must land atomically, carry retrieval timestamp + SHA-256 + byte count + provider contract metadata, and be revalidated before reuse. On resume, verify existing CSV+receipt hash/size/master/date semantics and reuse them; do not blindly re-query.
+
+### Proven web/ProductQuery market-data surface
+
+- Historical/security market queries use the Securities ProductQuery perspective **`321247`**.
+- Exact query/listing identity is the SPT instrument/trading-item layer (`SPT...`). The working historical market capture binds:
+  - query identity field key `321263` → `SPT_INSTRUMENT_ITEM_ID`;
+  - MI/entity key field `322517`;
+  - S&P Capital IQ security ID field `322518`;
+  - Total Return field `322797`;
+  - Close Price field `324251`;
+  - Trading Volume field `324277`;
+  - date secondary key `sk_557`;
+  - Total Return period secondary key `sk_100`, value `1D`.
+- The direct browser request used by `scripts/aov0_capture_ciq_historical_market_productquery.py` posts to `/SNL.Services.Data.Service/v1/ProductQuery.svc/productQueryRequests` from the authenticated CIQ page. One request can include exact SPT keys and repeated date-qualified Total Return / Close / Volume fields.
+- Returned headers are validated by provider display captions (`MI KEY`, `SPCIQ ID`, `Total Return`, `Close Price`, `Trading Volume`) and by requested secondary/tertiary values; returned identity must match the requested historical master exactly.
+- **Provider units matter:** Total Return is provider percent return and the AOV market normalizer converts it to decimal. Close and Volume are numeric market observations. Missing provider values remain `NA`; they are never silently converted to zero.
+- Market capture may include a full query grid even when some field cells are `NA`. Replay completeness must distinguish a genuine finite market observation from Rule100/technical eligibility. Do not treat a zero/NA technical field as a holiday, and do not use future completeness to survivor-filter securities.
+
+### Proven historical screen/market semantics
+
+- Securities perspective `321247` with Close Price field `324251` and `sk_557=05/16/2025` proved the target-date traded-security population directly.
+- Provider exchange group field **`406718`**, value **`-1,-4`**, was mechanically checked at 2025-05-16 and exactly equaled the union of:
+  - NYSE code `0`;
+  - NYSE American code `1`;
+  - NASDAQ Global Market code `2`;
+  - NASDAQ Capital Market code `211`;
+  - NASDAQ Global Select Market code `212`.
+  The two paths both returned 5,394 security rows with zero set difference. ARCA code `33` added eight rows and is **not** part of the frozen Major-US group.
+- Funding/equity-type field **`321268`** with retained values **`1` and `16`** is part of the dated market candidate law.
+- This dated price/exchange/funding query is historical market authority only. It does **not** automatically make attached current profile fields historical.
+
+### Proven historical company-fundamental surface
+
+- Scalar historical fundamentals use the modern Office micro-data ProductQuery endpoint **`/apisv3/ht/office-micro-data-service/v1/ProductQuery`** from the authenticated web page.
+- SPG function dispatch ID is **`12`**. The frozen historical options string is `Options:Curr=USD,Mag=Thousands,ConvMethod=R,FilingVer=Original`.
+- The historical SPG request parameters are `[entity, metric, relative_period, as_of_date, options, ...]`. The fourth argument is a real historical as-of gate for company fundamentals.
+- A historical PIT period matrix can query `IQ_PERIOD_END` / `FQ0` for every entity/date. The provider may return Excel/OLE serial dates; normalize them from the 1899-12-30 epoch before comparing period ends.
+- The sparse transition capture used by the replay queries five relative quarters (`FQ0`, `FQ-1`, `FQ-2`, `FQ-3`, `FQ-4`) and these exact metrics:
+  - `IQ_PERIOD_END`;
+  - `IQ_TOTAL_REV`;
+  - `IQ_TOTAL_ASSETS`;
+  - `IQ_INVENTORY`;
+  - `IQ_DA_SUPPL_CF`;
+  - `IQ_TOTAL_EQUITY`;
+  - `IQ_TOTAL_DEBT`;
+  - `IQ_CASH_ST_INVEST`;
+  - `IQ_OPER_INC`;
+  - `IQ_CAPEX_BNK`.
+- The ProductQuery capture batches scalar requests (proven up to the script guardrail of 500 requests per HTTP batch) and requires exactly one response per request ID. Provider-level `error` or `responseException` fails the batch closed.
+- **Filing version is authority:** historical A1/A2 uses `FilingVer=Original`. A capture labeled `Current/Restated` is not interchangeable. The replay source validator rejects a mixed or non-Original historical input.
+
+### Proven historical annual-revenue/screen-formula surface
+
+- Companies ProductQuery perspective is **`266637`**.
+- `IQ_TOTAL_REV` field key is **`329288`**.
+- Important secondary keys are:
+  - period `sk_854`;
+  - Reporting Basis `sk_858`;
+  - As Of Date `sk_860`;
+  - retained advanced-option key `sk_50003` value `0`.
+- Capital IQ's own serializer produced historical tokens such as `{IQ_TOTAL_REV(FY0|Originally Reported|05/16/2025|0)}`.
+- The frozen 30% growth law uses Original/as-of FY0, FY-1, FY-2, FY-3 and validates all three provider formulas before reconstruction. Do not derive this screen from current/restated values and call it historical.
+
+### Identity semantics that are actually proved
+
+- `SP_ENTITY_ID` is the company/entity layer and is **not** the permanent risky-asset identity.
+- `SP_CIQ_ID` is the **security-level** provider identifier. Canonical AOV risky identity is `CIQSEC:<SP_CIQ_ID>`.
+- `SP_TRADING_ITEM_ID` is the **listing/trading-item** identifier. Its SPT alias is `SPT<SP_TRADING_ITEM_ID>` and this exact SPT key is the preferred market-query key.
+- Cross-listing proof is required when learning provider identity layers. For COE, the primary NYSEAM listing and alternate DB listing shared the same `SP_CIQ_ID=IQ337968870` while their `SP_TRADING_ITEM_ID` values differed (`344984472` vs `364472819`). That proves security vs listing semantics mechanically.
+- Identifier Lookup output type `MI ID` returned an `SPT...` value; therefore “MI ID” in that UI is the Trading/Instrument Item layer, not the Capital IQ security ID.
+- Supporting provider fields observed include `SP_CUSIP`, `SP_ISIN`, `SP_SEDOL`, `SP_SECURITY_DESCRIPTION`, `SP_SECURITY_STATUS`, ticker and exchange.
+- **Do not claim a literal provider metric `SP_SECURITY_ID`.** The active CSV schema may use an internal `SP_SECURITY_ID` column as an alias for `SP_CIQ_ID`, but field catalog probing did not establish a generic Capital IQ provider metric with that name. Preserve `SECURITY_ID_SOURCE_METRIC=SP_CIQ_ID` semantics.
+
+### Historical primary identity: what works and what does not
+
+- For the admitted 2025-05-16 candidate cohort, the dated Securities market law itself yielded exactly one qualifying Major-US/funding security row for each of 104 entities **without requesting a current-primary field**. This exact dated uniqueness is the admitted Lane-2 historical screen-selected identity law.
+- `SPT_PRIMARY_ISSUE` / Primary Issue field key `324610` was deliberately omitted from the formal historical identity query. It has no proven effective-date secondary key and was independently shown to be current-conditioned after later primary changes.
+- `SPT_SECURITY_STATUS` is also current-conditioned and must not be back-projected merely because the row itself is date-gated by historical price.
+- No readable/proven `Primary Since`, effective-primary history, or Base Security/GICRS endpoint was found in the installed client/searches. If a future task requires *provider-declared historical primary relationship* rather than the existing exact-dated-selection law, treat that as unavailable until new source authority is discovered.
+
+### Company Type / Company Status: current values are not historical PIT
+
+- Current Company Type and Company Status profile fields are accessible, but the historical `SPG(..., as_of_date, ...)` argument did **not** rewind those profile labels in bounded tests.
+- Concrete failure example: companies known to trade at 2025-05-16 later show today's `Private Company`/acquired state. Global Blue's acquisition completed after the cutoff, proving the current label cannot be back-projected.
+- Therefore a date-gated Security row does not make Company Type/Status historical, and a historical SPG date does not make every profile field PIT.
+- Lane 2 reconstructed the required operating/public bucket using independently dated market/listing evidence plus a Key Developments terminal-state audit rather than current profile values.
+- The retained Key Developments contract uses perspective **`311682`**, entity field **`398876`**, date field **`311764`**, and role secondary key `sk_50017` value `1`. Event evidence is used as dated state-transition evidence, not as a substitute for arbitrary current profile labels.
+
+### Terminal/delisting/cash-merger handling
+
+- Do not interpret a post-merger disappearance from CIQ market rows as “missing data” and then survivor-filter the name or substitute an alternate listing.
+- Terminal corporate-action facts are bound separately to exact `CIQSEC:` + `SPT...` identity, last trading date, effective date, cash consideration, currency, event type and source locator.
+- For a source-bound cash merger, the historical replay realizes the effective-date return as `cash_consideration / last_actual_close - 1`, then carries that frozen security column as zero-return cash and removes it from subsequent risky eligibility/targets. This preserves the original cohort without future-completeness survivor bias.
+- A terminal event must be source-authorized and hash-bound; current CIQ listing status is corroboration only, not the event clock.
+
+### Excel / Office access: available but no longer the preferred Lane-2 transport
+
+- S&P Capital IQ Pro Office is installed. The core Excel add-in object is available as `SNL.Clients.Office.Excel.ExcelAddIn`; supported `SPG`, `SPGTable`, `SPGLabel` behavior is real.
+- Installed-client descriptors proved dispatch IDs `SPG=12`, `SPGTable=14`, `SPGLabel=15`. A direct authenticated `SPGLabel` request returned provider data, proving the installed Office/Genix stack.
+- `SPGTable` successfully returns `SP_TOTAL_RETURN`, `SP_PRICE_CLOSE`, and `SP_VOLUME` by exact date. For the 109-name × 3-field Office extraction path, 5/6/7 weekdays were stable atomic widths; 8/10 weekdays exceeded the bounded stability envelope. If Excel must be used, use one bounded fresh process per atomic chunk, temp→final landing, verify final bytes, clear formulas before close, and do not increase width merely because smaller widths succeed.
+- **Office/COM is operationally fragile.** Observed failures include RPC/COM teardown, orphan automation processes, detached RCWs (`Cannot use a COM object that has been separated from its underlying RCW`) and CIQ shell/front-end errors such as `t is not a function`. A nonzero teardown does not invalidate an already atomically landed and verified file; conversely, a running Excel process is not progress evidence.
+- Do not broad-kill ambiguous Excel processes because they may contain unrelated user work. If a CIQ automation call transports poorly, inspect the final expected bytes before retrying the same chunk.
+- For Lane 2, once the browser ProductQuery path was proven, **do not restart the broken Office/Excel path just to continue historical market/PIT capture.**
+
+### Authentication internals: proved, but do not turn them into the normal workflow
+
+- The installed Office security layer can import the live desktop session from its shared-memory session clipboard, and direct Genix requests can carry the Office access token. This proved capability and helped reverse-engineer the service contract.
+- Token contents were never required to be printed or persisted. The durable workflow is attach-to-existing browser session or supported Office bootstrap—not extracting credentials.
+- An automation Excel process does not reliably publish a healthy authenticated session by itself. Do not treat “Excel launched” as “CIQ auth initialized.”
+
+### Routes that are reachable/proved but are not the incumbent
+
+- Modern Genix/Office ProductQuery is real and HTTP 200 was achieved with the correct `FunctionsRequest` envelope. Raw direct `SPGTable`, however, requires Office's metric/key normalization; do not rebuild private normalization when a supported web/Office surface already returns the required data.
+- Older WCF ProductQuery exists but is not the preferred current transport.
+- Identifier Lookup is useful for semantic audits/cross-listing proof, but not for bulk 104/109-name production once exact company→primary or exact SPT keys are captured.
+
+### Routes/data semantics explicitly unavailable, unentitled, unstable, or rejected
+
+- **No XpressAPI bearer entitlement was available in the local environment.** Xpress uses separate API welcome credentials/authentication; the authenticated CIQ Office/web session is not an Xpress token. Do not derive or guess one from desktop auth.
+- The full neutral Xpress country partition can be generated deterministically (249 ISO3 codes), but a provider-authoritative `Major US Exchanges` reference remains required if Xpress is ever used. Xpress is an alternate source, not required for the now-proven CIQ ProductQuery path.
+- No global historical-date switch was found that makes the entire CIQ Screener/profile state PIT.
+- Current Company Type/Status are not historical PIT; current Primary Issue/Security Status are not historical-primary authority.
+- No proven `Primary Since`/effective-primary field or readable Base Security/GICRS endpoint was found.
+- `SNLPrice` is rejected as the incumbent: bounded tests spawned automation processes and failed to produce reliable terminal output.
+- `CIQTRADINGRANGE*`, `SPGRANGEV` and similar legacy range attempts are rejected for this path; observed probes returned errors/invalid-ticker behavior or were operationally unstable.
+- Embedded SNLQuery/persisted-query execution through synthetic Excel/Unity objects reproduced hangs and is rejected.
+- Raw legacy WCF ProductQuery is reachable but not the current extraction authority.
+- Direct raw Genix `SPGTable` without Office metric normalization is not a supported substitute for the proven browser request contract.
+- UI SendKeys/autocomplete is not a production identity path. If UI inspection is necessary, exact UI Automation value/selection patterns are safer, but bulk capture should remain API/ProductQuery driven.
+- Some securities legitimately return provider `NA` for a field/history. Do not impute missing Total Return from close changes unless a separately frozen provider/economic law explicitly authorizes that derivation. Missingness is data, not an invitation to silently repair.
+
+### Practical decision tree for future Capital IQ Pro work
+
+1. **Is a signed-in `capitaliq.spglobal.com` browser tab already running on the known local debugger?** If yes, attach and reuse it; do not relogin.
+2. **Is the requested datum already covered by a proved ProductQuery/SPG contract above?** If yes, use the exact frozen perspective/field/secondary-key/identity semantics and hash-bound receipts.
+3. **Is the field a current profile/primary/status field?** Do not assume the as-of date rewinds it. Prove historical behavior separately or classify it as current-only.
+4. **Is exact risky-asset identity required?** Use `CIQSEC:<SP_CIQ_ID>` plus exact `SPT<SP_TRADING_ITEM_ID>`; never ticker/company fallback and never alternate-listing backfill.
+5. **Does the name disappear after a corporate action?** Use source-bound lifecycle evidence and cash settlement; never survivor-filter it away.
+6. **Does a request return `NA`?** Preserve missingness and fail/eligibility-gate according to the frozen replay contract. Do not synthesize values from adjacent fields without a separately authorized rule.
+7. **Does the browser ProductQuery path not cover the datum?** Only then consider bounded Office/Identifier Lookup/provider discovery. Avoid legacy SNLPrice/SNLQuery/range retries unless a new explicit task requires re-evaluating them.
+8. **If the authenticated session itself is absent**, stop with `existing_ciq_pro_browser_session_not_found`; do not automatically sign in or replace the user's session unless explicitly authorized.
+
+- Fix applied: Lane 2 now has two reusable attach-only Python transports (`scripts/aov0_capture_ciq_historical_market_productquery.py`, `scripts/aov0_capture_ciq_historical_pit_productquery.py`), hash-bound historical screen/identity/lifecycle admission, and explicit code/tests that distinguish dated market/fundamental truth from current-only profile semantics. This allowed A1 admission and one frozen A2 evaluation without restarting the broken Excel/COM path.
+- Guardrail for next time: document every CIQ datum as `transport + perspective/function + field key + secondary keys + identity layer + vintage/as-of semantics + receipt`, and write unavailable/current-only semantics just as explicitly as available ones. **Reuse an authenticated session; never relogin just because Excel failed. Never let a date-gated row lend false PIT authority to an unrelated current field.**
+- Evidence paths: `docs/context/ciq_provider_acquisition_findings_20260808.md`, `docs/phase_brief/lane2_status_20260809.md`, `scripts/aov0_capture_ciq_historical_market_productquery.py`, `scripts/aov0_capture_ciq_historical_pit_productquery.py`, `research/aov0/historical_risk_set.py`, `research/aov0/historical_screen_reconstruction.py`, `research/aov0/historical_security_master.py`, `research/aov0/historical_lifecycle.py`, `scripts/aov0_historical_pit_replay.py`, `tests/aov0/test_historical_pit_productquery_capture.py`, `tests/aov0/test_historical_lifecycle.py`. Final Lane-2 evidence: A1=`A1_ADMITTED_HISTORICAL_PIT`, A2=`A2_UNTOUCHED_HISTORICAL_PIT`, query count=`1`, `financial_alpha_evidence=0`.
+
 ## 2026-08-09 Round Entry (Slow Hypothesis Must Not Become Slow Programme)
 
 - Date: 2026-08-09
@@ -2570,3 +2729,102 @@ Application pattern:
 - Fix applied: `research/aov0/historical_screen_reconstruction.py` and `research/aov0/historical_risk_set.py` now accept either the existing Xpress market receipt or a fail-closed CIQ Securities market receipt that binds perspective/date/filter/exchange-parity semantics. The 104-name market+Original-revenue intersection is frozen with `historical_risk_set_admission_authority=NONE`. `scripts/aov0_lane2_unblock_fast.ps1` validates this partial freeze and stops at historical Company Type/Status rather than falling back to Xpress; a dedicated Windows-safe Python validator replaces fragile PowerShell `python -c` quoting. Current-primary uniqueness remains non-authoritative.
 - Guardrail: **a date-gated row does not make every attached field point-in-time.** Bind historical semantics independently per field/component. Use `run_4` only as the frozen current-cut parity baseline; keep `run_2` diagnostic-only. A market candidate receipt may be promoted only after exact target-date exchange parity; a final risk set still needs historical company-state; a final security master still needs historical-effective provider-primary authority.
 - Evidence paths: `data/aov0/historical/source_authority/20250516/ciq_productquery/market_original_revenue_candidates_20250516.csv` + receipt, `research/aov0/historical_screen_reconstruction.py`, `research/aov0/historical_risk_set.py`, `scripts/aov0_validate_lane2_partial_candidate.py`, `scripts/aov0_lane2_unblock_fast.ps1`, `tests/aov0/test_historical_screen_reconstruction.py`, `tests/aov0/test_lane2_partial_candidate_validator.py`, `docs/phase_brief/lane2_status_20260809.md`. Focused reconstruction/risk-set/validator tests PASS; controller Status validates 104 candidates and Auto fail-closes on historical company-state. `financial_alpha_evidence=0`; no A1/A2 admission.
+
+## 2026-08-10 Round Entry (Terminal Securities Are Lifecycle Facts, Not Missing-Data Survivor Filters)
+
+- Date: 2026-08-10
+- Mistake or miss: an A1 replay initially encountered a post-start partial market tape and could be mistaken for a provider recapture problem or fixed by retaining only securities with future-complete history. Either shortcut would corrupt the frozen historical cohort.
+- Root cause: three distinct states were adjacent in one market matrix: source-observation completeness, Rule100 technical eligibility, and a security that legitimately stops trading after a cash merger. Treating all three as the same `valid` flag makes real corporate-action exits look like data defects and invites survivorship filtering.
+- Fix applied: keep observation completeness separate from technical eligibility; use a hash-bound terminal-event packet with exact CIQ/SPT identity, source/effective dates and cash consideration; realize the cash settlement on the effective date, keep the frozen security column as zero-return cash afterward, and remove it from later target/eligibility construction without substituting another listing. A1 then admits 264 trading days / 94 active securities, and the frozen one-shot A2 closes with the same lifecycle authority.
+- Guardrail for next time: never repair a delisted/acquired security by future-completeness filtering, ticker/listing substitution, or fabricated continued market history. First prove whether the gap is a real terminal event; if so, bind the event independently and model its economic settlement. Separately, do not let a zero/invalid technical state masquerade as missing market custody.
+- Evidence paths: `research/aov0/historical_lifecycle.py`, `research/aov0/historical_pit.py`, `tests/aov0/test_historical_lifecycle.py`, `tests/aov0/test_historical_pit.py`, `data/aov0/historical/source_authority/lifecycle/20251222/a1_terminal_events_20250818_20251222.csv`, `data/aov0/historical/evidence/a1_report.json`, `data/aov0/historical/evidence/a2_freeze.json`, `data/aov0/historical/evidence/a2_result.json`. Focused lifecycle/PIT/replay tests PASS; A2 custody verification PASS; `financial_alpha_evidence=0`.
+
+## 2026-08-10 Round Entry (Capital IQ Pro Practical Access Map — Reuse the Signed-In Web Session, Do Not Guess Historical Semantics)
+
+- Date: 2026-08-10
+- Mistake or miss: provider work repeatedly treated “Capital IQ Pro is signed in” as one generic capability. In reality, the machine exposed several very different surfaces: a stable authenticated web ProductQuery session, a fragile Excel/COM add-in host, current-only profile fields, historically date-bound market/fundamental fields, and a completely separate XpressAPI authentication contract. Conflating those surfaces caused unnecessary Excel restarts, temptation to relogin, and incorrect assumptions that an `as_of` argument makes every field historical.
+- Root cause: S&P Capital IQ Pro exposes different data semantics and transport layers behind similar labels. Field availability, historical effective dating, authentication and operational stability have to be proven independently. The practical law is **transport authority is not semantic authority**: a request can succeed technically and still return a current-state field that is invalid for PIT use.
+
+### Working incumbent — existing authenticated Capital IQ Pro web session
+
+- **Do not relogin, sign out, launch a new CIQ browser, or navigate away when an authenticated tab already exists.** The reliable Lane-2 path attaches to the already-running Chromium DevTools target on local port `9230`, finds the `capitaliq.spglobal.com` page, opens its `webSocketDebuggerUrl`, and executes `fetch(..., credentials='include')` inside that tab. If no matching page exists, fail closed with `existing_ciq_pro_browser_session_not_found`; do not silently start a new login flow.
+- The two reusable capture entrypoints are:
+  - `scripts/aov0_capture_ciq_historical_market_productquery.py` — Securities ProductQuery market/identity capture;
+  - `scripts/aov0_capture_ciq_historical_pit_productquery.py` — scalar SPG historical/as-of fundamental capture.
+- Both writers explicitly record `existing_session_reused=true`, `sign_in_performed=false`, `sign_out_performed=false`, raw hashes, master hashes and retrieval timestamps. This is the preferred custody path whenever the signed-in web tab is healthy.
+
+### Accessible and proved through the signed-in web ProductQuery session
+
+1. **Securities ProductQuery — perspective `321247`** via `/SNL.Services.Data.Service/v1/ProductQuery.svc/productQueryRequests`.
+   - Query/listing identity key used by the capture: field `321263` (`SPT_INSTRUMENT_ITEM_ID` input alias).
+   - `MI KEY` / company entity field: `322517`.
+   - S&P Capital IQ security ID: `322518` (`SP_CIQ_ID`).
+   - Daily Total Return: field `322797`, period `1D` (`sk_100` semantic; response tertiary `1D`).
+   - Close Price: field `324251`.
+   - Trading Volume: field `324277`.
+   - Historical market date secondary: `sk_557`.
+   - Major-US-exchange group: field `406718`, value `-1,-4`.
+   - Funding/equity type filter: field `321268`, accepted values `1,16` for this Lane-2 law.
+   - At `2025-05-16`, the provider `Major US Exchanges` group was independently decomposed and matched exactly to NYSE=`0`, NYSEAM=`1`, NASDAQGM=`2`, NASDAQCM=`211`, NASDAQGS=`212`: `5,394` security rows on each path, zero differences. ARCA=`33` added eight and is outside the group.
+   - This surface can return exact dated listing rows without requesting the current primary flag. That is how the 104-company historical identity was admitted: all 104 candidate entities had exactly one dated Major-US/funding security row, with `SPT_PRIMARY_ISSUE` deliberately omitted from the formal selection.
+
+2. **Historical/as-of scalar SPG through the web session** via `/apisv3/ht/office-micro-data-service/v1/ProductQuery`.
+   - `dispid=12`; parameter shape is `entity, metric, relative_period, as_of_date, options`.
+   - Frozen historical option string: `Options:Curr=USD,Mag=Thousands,ConvMethod=R,FilingVer=Original`.
+   - Proven weekly period probe: `IQ_PERIOD_END / FQ0`.
+   - Proven five-quarter transition metrics used by A1/A2: `IQ_PERIOD_END`, `IQ_TOTAL_REV`, `IQ_TOTAL_ASSETS`, `IQ_INVENTORY`, `IQ_DA_SUPPL_CF`, `IQ_TOTAL_EQUITY`, `IQ_TOTAL_DEBT`, `IQ_CASH_ST_INVEST`, `IQ_OPER_INC`, `IQ_CAPEX_BNK` over `FQ0..FQ-4`.
+   - This route successfully produced the full A1 weekly FQ0 grid and the sparse Original-filing transition matrix in request batches, without Excel and without a new login.
+   - Important: `IQ_PERIOD_END` may return an Excel/OLE date serial; normalize against `1899-12-30` rather than treating numeric output as an error.
+
+3. **Companies ProductQuery — perspective `266637`**, especially historical Original revenue law.
+   - `IQ_TOTAL_REV`: field `329288`.
+   - Period secondary: `sk_854`.
+   - Reporting Basis secondary: `sk_858`.
+   - As Of Date secondary: `sk_860`.
+   - Advanced-options secondary used in the provider token: `sk_50003`, value `0`.
+   - Capital IQ's own serializer produced historical tokens such as `{IQ_TOTAL_REV(FY0|Originally Reported|05/16/2025|0)}`.
+   - Provider formula validation succeeded for all three frozen `>=1.3x` annual-growth legs. Intersecting those Original/as-of predicates with the exact dated market population yielded the 104-company candidate set.
+
+4. **Key Developments ProductQuery — perspective `311682`** for historical company-state audit.
+   - Entity field: `398876`.
+   - Event date field: `311764`.
+   - Role secondary: `sk_50017`, value `1` in the retained audit.
+   - The 104-candidate company-state reconstruction received full Key Developments entity coverage and used dated terminal-state event logic rather than today's profile labels.
+
+5. **Current Companies screen is accessible and useful for parity, but it is current-state authority only.**
+   - Current exchange field: `271669`, current value `70539003` with `sk_50048=Current`.
+   - Company Type field: `322992`, Public Company value `7957`.
+   - Company Status field: `275891`, values `Operating` / `Operating Subsidiary`.
+   - The decomposed current law matched the direct current screen exactly at `112/112`; this proves reconstruction parity, not historical state.
+
+### Accessible but NOT historical authority
+
+- `SPT_PRIMARY_ISSUE` field `324610` is readable as a current flag, but no usable historical effective-date key / `Primary Since` surface was found. It must **not** be requested to define historical-primary identity. A dated market row plus a current `Primary Issue?=Yes` is only corroboration.
+- `SPT_SECURITY_STATUS` and similar security/profile status fields were also found to be current-conditioned for the historical problem. They do not inherit the `SPT_PRICE_CLOSE[date]` time stamp.
+- Companies `Company Type` and `Company Status` are current profile state. Passing an Office/scalar `SPG(..., as_of=...)` argument did **not** rewind these profile labels. Global Blue supplied the concrete falsifier: its acquisition completed after the A1 cutoff, while today's profile is Private. Therefore current profile labels cannot be back-projected.
+- The correct Lane-2 reconstruction was component-specific: exact dated listed-security law for historical public-company type semantics plus dated Key Developments terminal-state audit for the eligible operating bucket. Do not claim an archival `Operating` vs `Operating Subsidiary` sublabel when the provider bytes do not prove it.
+- Total Return can be provider-missing for a security even when Close and Volume are present. Do not synthesize return from price, assume zero, or substitute another listing. In A1, only securities satisfying the frozen start-date technical/market authority entered the active 94-security set; later genuine terminal events were modeled from separately sourced corporate-action facts.
+
+### Not available / not interchangeable on this machine
+
+- **XpressAPI authentication is separate.** The existing Capital IQ Pro web/Office login does not mint or expose a usable `SPGLOBAL_XPRESSAPI_TOKEN`. Xpress requires its own API welcome credentials/authentication service. No process/user/machine token or matching local secret was available during this work. Do not waste time trying to extract an Xpress bearer token from the signed-in CIQ Pro session.
+- **No historical effective-primary flag was found.** Exhaustive field/schema/client searches did not produce a readable effective-dated `Primary Since` / historical `SPT_PRIMARY_ISSUE` authority. Historical identity must therefore be solved by independently dated query law, not by inventing an effective date for the current flag.
+- **Historical Company Type/Status is not directly rewindable through the current profile fields.** An `as_of` argument on scalar SPG is not sufficient evidence for those fields.
+- **Excel/COM is not the incumbent bulk path.** It can occasionally return real 1×1 `SPGTable` cells, but repeated bulk attempts produced Excel hard crashes, one-row collapse, add-in quarantine and finally RCW/front-end failures (`t is not a function`; `無法使用已經從其基礎 RCW 分離的 COM 物件`). Treat that host as quarantined for Lane 2 unless an explicit future task requires interactive Office recovery. Do not relogin merely because Excel/COM is broken; the signed-in web ProductQuery session can remain healthy independently.
+- **WRDS CRSP is not entitled** on the available account. Do not route an active AOV/Lane-2 plan back to CRSP/PERMNO unless entitlement changes explicitly.
+
+### Fast operating sequence for future Capital IQ Pro work
+
+1. Check for an existing `capitaliq.spglobal.com` DevTools page on port `9230`; attach only if present.
+2. Reuse browser cookies with in-page `fetch(..., credentials='include')`; do not navigate or relogin.
+3. Choose the provider perspective and field law first; verify whether each field is historically date-bound or current-only **before** widening the request.
+4. For market/listing data, prefer Securities perspective `321247` with exact SPT IDs and dated fields; bind returned MI KEY + SPCIQ ID back to the requested master.
+5. For historical fundamentals, prefer scalar SPG ProductQuery with explicit `FilingVer=Original`, explicit `as_of`, and receipt timestamps.
+6. For historical screen reconstruction, keep market, company state, annual revenue and identity as separate authority components; never assume one date parameter rewinds the others.
+7. Capture in restartable atomic parts, hash every raw object/receipt, verify row/entity coverage, and reuse complete parts instead of re-querying.
+8. If a provider field is missing or current-only, fail closed or reconstruct from separately source-bound facts; never silently infer, backfill with another listing, or borrow current state.
+9. Keep Excel/COM, XpressAPI and CIQ web ProductQuery as three separate operational/authentication surfaces. A failure in one does not authorize resetting the others.
+10. Preserve the boundary: provider access and historical A1/A2 results remain `financial_alpha_evidence=0`; they do not open Clock #1 outcomes, mutate Parent/Child, or authorize capital.
+
+- Guardrail for next time: maintain a **field-level capability map** for Capital IQ Pro: `transport -> perspective -> field -> secondary/as-of law -> current/PIT classification -> receipt`. Never write “CIQ supports historical X” merely because a request succeeded. A field is PIT authority only after the actual returned bytes and provider/query semantics prove its effective date.
+- Evidence paths: `scripts/aov0_capture_ciq_historical_market_productquery.py`, `scripts/aov0_capture_ciq_historical_pit_productquery.py`, `data/aov0/historical/source_authority/20250516/ciq_productquery/historical_screen_security_identity_20250516.receipt.json`, `data/aov0/historical/source_authority/20250516/ciq_productquery/historical_company_state_20250516.receipt.json`, `data/aov0/historical/source_authority/20250516/ciq_productquery/historical_original_revenue_20250516.receipt.json`, `data/aov0/historical/source_authority/current_parity/20260809/current_screen_decomposed_parity.provider.json`, `docs/context/ciq_provider_acquisition_findings_20260808.md`, `docs/phase_brief/lane2_status_20260809.md`. Lane-2 scoped regression `50/50 PASS`; A1 admitted; A2 query count=`1`; `financial_alpha_evidence=0`.
