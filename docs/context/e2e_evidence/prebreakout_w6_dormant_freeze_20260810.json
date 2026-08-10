@@ -1,0 +1,55 @@
+{
+  "schema_version": "prebreakout_w6_dormant_freeze_v1",
+  "record_date": "2026-08-10",
+  "workstream": "W6",
+  "scope_id": "PREBREAKOUT_UNTOUCHED_EVALUATOR_ONLY",
+  "disposition": "CLOSE_NOW_DORMANT",
+  "status": "BYTES_FROZEN_NO_REAL_LOCKBOX",
+  "family_scope": "PREBREAKOUT_DISCOVERY_v1",
+  "vsb_w7_evaluator_authority": "NONE",
+  "w7_may_consume_w6_outputs": false,
+  "w7_required_upstream_authority": "SEPARATELY_AUTHORIZED_VSB_SPECIFIC_OUTCOME_EVALUATOR",
+  "frozen_code_bundle_sha256": "4c4efe40356a073f6fd4f039c3e326786774885eb90a7723581cc4cdef115297",
+  "frozen_bytes": [
+    {
+      "path": "research/prebreakout_untouched_evaluator_v1/__init__.py",
+      "sha256": "461cc78f8f98d85a71a283adf637c713497a572d6a2bee515275a1d9d75fb6cc"
+    },
+    {
+      "path": "research/prebreakout_untouched_evaluator_v1/contracts.py",
+      "sha256": "13434d270fbbccc49f378497eda80b0ea851ca0255a2bcfccd6b2dc38489c8d9"
+    },
+    {
+      "path": "research/prebreakout_untouched_evaluator_v1/evaluator.py",
+      "sha256": "c20c95f9ec5092090c0cfb1764be8216bdac74f3e80588ec9abca48506c20dee"
+    }
+  ],
+  "validation_fixture_sha256": "33bd71ec18e31eaad37f8fd414b113139fc442a735e8a2ed7ea5e4d952c22c29",
+  "authority_doc_sha256": "3f378731fec3f19565dcb8d81a96384f5f825e588b4aeaf8bdf901c0d23ca4b1",
+  "real_untouched_lockbox_consumed": false,
+  "real_label_surface_opened": false,
+  "prebreakout_empirical_result": null,
+  "financial_alpha_evidence": 0,
+  "promotion_authority": "NONE",
+  "capital_authority": "NONE",
+  "reopen_only_after": [
+    "W2_W5_PREBREAKOUT_IMPLEMENTATION_FROZEN",
+    "AT_LEAST_ONE_PREBREAKOUT_LOCKBOX_PREREGISTERED",
+    "IMMUTABLE_PREBREAKOUT_PREDICTIONS_SEALED",
+    "EXTERNAL_CUSTODY_AUTHORIZES_ONE_TIME_LABEL_OPEN"
+  ],
+  "eventual_acceptance_contract": [
+    "EXACT_PREDICTION_LABEL_DENOMINATOR_EQUALITY",
+    "PREDICTION_FREEZE_BEFORE_LABEL_OPEN",
+    "NO_POST_B_RESCUE",
+    "PRECISION_RECALL_LIFT",
+    "AVERAGE_PRECISION_PR_AUC",
+    "TTFLD",
+    "FALSE_AND_CATASTROPHIC_WINNERS",
+    "EFFECTIVE_EPISODES",
+    "RIGHT_TAIL_WEALTH",
+    "I_VS_I_PLUS_X",
+    "MU_SNDK_ZERO_STATISTICAL_WEIGHT"
+  ],
+  "dormant_law": "NO_REAL_LOCKBOX_NO_MORE_W6_WORK"
+}

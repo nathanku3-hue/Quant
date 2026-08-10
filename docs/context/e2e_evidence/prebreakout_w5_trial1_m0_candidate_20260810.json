@@ -1,0 +1,150 @@
+{
+  "schema_version": "prebreakout_w5_trial1_m0_candidate_freeze_v1",
+  "frozen_at_utc": "2026-08-10T15:10:38Z",
+  "worker_id": "W5",
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "disposition": "CLOSE_MECHANICS_REOPEN_FOR_TRIAL1_PREPARATION_UNCHARGED",
+  "trial_id": "PREBREAKOUT_TRIAL_1_M0",
+  "implementation_id": "PREBREAKOUT_TRIAL1_M0_MARKET_EARLY_WARNING_V1",
+  "feature_spec_id": "PREBREAKOUT_TRIAL1_M0_MARKET_20_60_5_15_V1",
+  "transform_spec_id": "PREBREAKOUT_TRIAL1_M0_FIXED_COMPONENT_TRANSFORMS_V1",
+  "model_spec_id": "PREBREAKOUT_TRIAL1_M0_DETERMINISTIC_AND_GATE_V1",
+  "training_window_spec_id": "PREBREAKOUT_TRIAL1_M0_EXPANDING_126_V1",
+  "calibration_spec_id": "PREBREAKOUT_TRIAL1_M0_NO_CALIBRATION_V1",
+  "ranking_spec_id": "PREBREAKOUT_TRIAL1_M0_TRIGGERED_SCORE_DESC_SECURITY_ID_ASC_V1",
+  "control_spec_id": "PREBREAKOUT_TRIAL1_M0_DATE_LOCAL_FULL_ORDINARY_CONTROL_V1",
+  "cross_sectional_holdout_spec_id": "PREBREAKOUT_TRIAL1_M0_CIQSEC_HASH_MOD5_REM0_V1",
+  "temporal_fold_plan_id": "PREBREAKOUT_TRIAL1_M0_EXPANDING_126_20E_4X20OOS_V1",
+  "primary_objective_id": "PREBREAKOUT_TRIAL1_M0_RIGHT_TAIL_LIFT_THEN_TTFLD_V1",
+  "w2_authority_version": "PREBREAKOUT_W2_CONTRACT_v1",
+  "w2_methodology_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+  "w2_breakout_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+  "w2_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+  "uncharged_declaration_sha256": "02b0e07445bb91ab7fd4c192abbd26b112facf75cf4923d4ddd8778ea5a062c1",
+  "walk_forward_spec_sha256": "7a0b77fbb95fc39a86723fd3f79d69d6fd88c12f73db65fd3224ff2723fcc9af",
+  "w4_control_definition_sha256": "144f3c08ba5ff576cd1d4a702129893f9b08f9b58b4d4a6e21ad385a7d7c44ba",
+  "code_bundle_sha256": "92f51a098f2420fd5d76b7307d0aad75a76d0cf10a81934aa48a15a20f43b2bd",
+  "code_files": [
+    {
+      "path": "research/prebreakout_discovery_v1/trial1_m0.py",
+      "sha256": "2473cd5266b73dda8fe62c9e603959291db70e6a2a4ff30a7ca775ad0e9280d8"
+    },
+    {
+      "path": "research/prebreakout_discovery_v1/contracts.py",
+      "sha256": "0d736c25496f3263d56a6e903273f0535ee3623992f57e6cb373529d413c1106"
+    },
+    {
+      "path": "research/prebreakout_discovery_v1/walk_forward.py",
+      "sha256": "32b7707bd073daada11dd52a16e5076c22b17c7a0607b9674ff992df298dad7f"
+    },
+    {
+      "path": "research/prebreakout_discovery_v1/preregistration.py",
+      "sha256": "3df15dce6e0c14ccf5e8ab65ecf66cadd212f28bc134f5c50ec7790ea9583214"
+    }
+  ],
+  "supporting_files": [
+    {
+      "path": "research/prebreakout_discovery_v1/__init__.py",
+      "sha256": "d4c41e686ed77f9a91212553620d6df088eeda7da43c80815667a19f28d0f602"
+    },
+    {
+      "path": "tests/prebreakout_discovery_v1/test_trial1_m0.py",
+      "sha256": "d1dc1c189225d32f446fe2c9fe83b6185b277e359c9908e77dbaee3f0b843ea4"
+    },
+    {
+      "path": "docs/phase_brief/prebreakout_w5_trial1_m0_20260810.md",
+      "sha256": "c3b61c7e7d1a562ee9cec25b18d3309ff757f9bf320ef4ecc76d4a51a1230551"
+    }
+  ],
+  "market_only_rule": {
+    "allowed_inputs": [
+      "market.close",
+      "market.total_return_1d",
+      "market.volume"
+    ],
+    "minimum_history_sessions": 60,
+    "near_high_gate": "0.95*prior_high20 <= close_t <= prior_high20",
+    "volatility_compression_gate": "sample_std20_total_return_1d < sample_std60_total_return_1d",
+    "volume_pressure_gate": "median_volume_recent5 > median_volume_prior15",
+    "trigger": "near_high_gate AND volatility_compression_gate AND volume_pressure_gate",
+    "score": "mean(capped_near_high_component,capped_vol_compression_component,capped_volume_pressure_component) if trigger else 0",
+    "fitted_parameter_count": 0,
+    "calibration": "NONE",
+    "post_breakout_rescue": "FORBIDDEN"
+  },
+  "split": {
+    "mode": "EXPANDING",
+    "minimum_training_sessions": 126,
+    "embargo_sessions": 20,
+    "temporal_oos_fold_count": 4,
+    "oos_sessions_per_fold": 20,
+    "minimum_decision_spine_sessions": 226,
+    "insufficient_coverage_policy": "BLOCK_NO_SILENT_RESPLIT"
+  },
+  "cross_sectional_holdout": {
+    "assignment": "DETERMINISTIC_CIQSEC_HASH",
+    "modulus": 5,
+    "holdout_remainders": [0],
+    "approximate_fraction": 0.2,
+    "label_tuning_authority": "FORBIDDEN"
+  },
+  "control": {
+    "type": "DATE_LOCAL_FULL_ORDINARY_CONTROL",
+    "primary_denominator": "POSITIVE_WEIGHT_NON_HOLDOUT_W3_ELIGIBLE_ROWS",
+    "flag_breadth_base_rate": true,
+    "w4_match_columns": [
+      "trial1_control_stratum"
+    ],
+    "w4_match_value": "ALL_W3_ELIGIBLE",
+    "sampled_control_rows": false,
+    "old_sector_map_used": false
+  },
+  "primary_objective": {
+    "right_tail": "TEMPORAL_OOS_20D_TOP5_WINNER_RECALL_LIFT_VS_DATE_LOCAL_FLAG_BREADTH",
+    "lead": "MEDIAN_EFFECTIVE_TTFLD_SESSIONS_MISS_EQUALS_ZERO",
+    "selection": "LEXICOGRAPHIC_MAX_RIGHT_TAIL_RECALL_LIFT_THEN_MEDIAN_EFFECTIVE_TTFLD",
+    "cagr_primary": false,
+    "sharpe_primary": false,
+    "null_law": "NULL_IF_FEWER_THAN_TWO_INFORMATIVE_FOLDS_OR_NO_ELIGIBLE_WINNER_EPISODES_AND_TRIAL_STILL_CONSUMED"
+  },
+  "smoke_policy": {
+    "mu_sndk_specific_logic": false,
+    "scoreable": true,
+    "statistical_weight": 0,
+    "promotion_denominator_weight": 0
+  },
+  "source_manifest_gate": {
+    "exact_real_source_manifest_exists": false,
+    "source_manifest_sha256": null,
+    "required_w3_w4_binding": true,
+    "development_label_visibility_required": "HASHED_NOT_INSPECTED",
+    "w6_lockbox_included": false,
+    "trial_open_permitted_now": false
+  },
+  "trial_custody": {
+    "trial_open_appended": false,
+    "material_trials_consumed": 0,
+    "material_trial_budget_max": 8,
+    "trial_cost_when_opened": 1,
+    "cost_refunded_on_fail_or_null": false,
+    "development_run_performed": false,
+    "result_inspected": false
+  },
+  "authority_boundary": {
+    "provider_access_performed": false,
+    "development_labels_inspected": false,
+    "w6_lockbox_accessed": false,
+    "prospective_clock_started": false,
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE",
+    "broker_orders": "FORBIDDEN"
+  },
+  "validation": {
+    "trial1_candidate_tests": "7/7 PASS",
+    "prebreakout_discovery_package": "26/26 PASS",
+    "adjacent_w3_w4_w6": "43/43 PASS",
+    "selected_compile": "PASS",
+    "persistent_trial1_ledger_scan": "NO_ENTRY_FOUND"
+  },
+  "reopen_condition": "REAL_W3_W4_BOUND_SOURCE_MANIFEST_EXISTS_THEN_APPEND_EXACT_W2_TRIAL_OPEN_BEFORE_ANY_RESULT_INSPECTION"
+}

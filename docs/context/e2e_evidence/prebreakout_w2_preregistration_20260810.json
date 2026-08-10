@@ -1,0 +1,110 @@
+{
+  "schema_version": "prebreakout_w2_preregistration_evidence_v1",
+  "round_id": "PREBREAKOUT_W2_20260810",
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "status": "W2_SCIENTIFIC_CONTRACT_FROZEN_OUTCOME_BLIND",
+  "contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+  "frozen_contract": {
+    "risk_set_spec_id": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "primary_label_spec_id": "PREBREAKOUT_RIGHT_TAIL_20D_TOP5_V1",
+    "secondary_label_spec_id": "PREBREAKOUT_RIGHT_TAIL_10D_TOP5_V1",
+    "breakout_spec_id": "PREBREAKOUT_ALGORITHMIC_BREAKOUT_B_20D_HIGH_V1",
+    "breakout_lookback_sessions": 20,
+    "breakout_comparator": "STRICT_GT_PRIOR_20_SESSION_HIGH",
+    "breakout_episode_cooldown_sessions": 20,
+    "primary_horizon_sessions": 20,
+    "secondary_horizon_sessions": 10,
+    "winner_fraction": 0.05,
+    "ttfld_window": "B_MINUS_20_THROUGH_B_MINUS_1",
+    "missed_effective_ttfld_sessions": 0,
+    "search_family_id": "PREBREAKOUT_SEARCH_v1",
+    "trial_ledger_scope": "PREBREAKOUT_V1_TRIAL_LEDGER",
+    "prediction_ledger_scope": "PREBREAKOUT_V1_PREDICTION_LEDGER",
+    "trial_budget_max": 8,
+    "material_trial_cost": 1,
+    "real_material_trials_charged_this_round": 0
+  },
+  "implemented_paths": {
+    "preregistration": {
+      "path": "research/prebreakout_discovery_v1/preregistration.py",
+      "sha256": "3df15dce6e0c14ccf5e8ab65ecf66cadd212f28bc134f5c50ec7790ea9583214"
+    },
+    "breakout_ttfld": {
+      "path": "research/prebreakout_discovery_v1/breakout.py",
+      "sha256": "58951dc81a9f643b577e6ef201f3d2bc9751333e634d0932d94d1f9c8d43efe7"
+    },
+    "persistent_trial_ledger": {
+      "path": "research/prebreakout_discovery_v1/ledger.py",
+      "sha256": "28781b58eaa558850f3db6abb3139bceca279fc686b4f8c41a5c7b1c23756913"
+    },
+    "contract_breakout_tests": {
+      "path": "tests/prebreakout_discovery_v1/test_contract_and_breakout.py",
+      "sha256": "1d53adb1f7c4651d066f9ee13400e9103ca1d9905b74946f277b8e5908a9452f"
+    },
+    "trial_ledger_tests": {
+      "path": "tests/prebreakout_discovery_v1/test_trial_ledger.py",
+      "sha256": "08b1833d5cae521b9e8bafe9a6555d6a2e91a914b103b149832aa50417e7b9d9"
+    },
+    "architecture": {
+      "path": "docs/architecture/prebreakout_discovery_v1_spec.md",
+      "sha256": "a47be15570a3f519902012a37917baad1bff00c63a1d9132b8dfa34fb8bbd6da"
+    }
+  },
+  "validation": {
+    "compile_command": "./.venv/Scripts/python.exe -m py_compile research/prebreakout_discovery_v1/preregistration.py research/prebreakout_discovery_v1/breakout.py research/prebreakout_discovery_v1/ledger.py",
+    "compile_result": "PASS",
+    "test_command": "./.venv/Scripts/python.exe -m pytest tests/prebreakout_discovery_v1/test_contract_and_breakout.py tests/prebreakout_discovery_v1/test_trial_ledger.py -q",
+    "test_result": "12/12 PASS",
+    "neighbor_w3_w4_command": "./.venv/Scripts/python.exe -m pytest tests/prebreakout_pit_v1/test_authority.py tests/prebreakout_discovery_v1/test_atlas.py -q",
+    "neighbor_w3_w4_result": "24/24 PASS",
+    "full_prebreakout_fixture_command": "./.venv/Scripts/python.exe -m pytest tests/prebreakout_discovery_v1 tests/prebreakout_pit_v1 -q",
+    "full_prebreakout_fixture_result": "PASS",
+    "financial_alpha_evidence": 0
+  },
+  "smoke_contract": {
+    "named_trace_symbols": [
+      "MU",
+      "SNDK"
+    ],
+    "named_symbols_exist_in_w2_core_logic": false,
+    "statistical_weight": 0,
+    "promotion_denominator_weight": 0,
+    "eligible_b_minus_1_requires_flag_no_later_than_b_minus_1": true,
+    "deterministic_exclusion_allowed_only_from_w3_frozen_vocabulary": true,
+    "deterministic_unavailable_satisfies_w2_obligation": false,
+    "w3_proof_must_bind_w2_contract_sha256": true,
+    "prior_w3_receipt": "docs/context/e2e_evidence/prebreakout_pit_w3_mu_sndk_20260810.json",
+    "prior_w3_receipt_disposition": "HISTORICAL_BLOCKER_RECEIPT_ONLY; BREAKOUT_CONTRACT_UNBOUND NO LONGER SATISFIES CURRENT W2; REFRESH REQUIRED WHEN EXACT B/B-1 AND DATE-LOCAL SOURCE AUTHORITY EXIST"
+  },
+  "falsifiers": [
+    "PIT_OR_CUSTODY_BREACH",
+    "SEARCH_CONTAMINATION_OR_BUDGET_BREACH",
+    "NO_RIGHT_TAIL_ENRICHMENT",
+    "NO_POSITIVE_PREBREAKOUT_LEAD",
+    "CATASTROPHIC_FALSE_WINNER_NOT_IMPROVED",
+    "NO_INCREMENTAL_I_PLUS_X",
+    "PROSPECTIVE_EFFECT_FAILS",
+    "INDEPENDENT_REPLICATION_FAILS"
+  ],
+  "authority_boundary": {
+    "provider_acquisition_performed_by_w2": false,
+    "discovery_label_open_performed_by_w2": false,
+    "untouched_label_open_performed_by_w2": false,
+    "prediction_append_performed_by_w2": false,
+    "prospective_clock_started_by_w2": false,
+    "a2_requery_performed": false,
+    "clock_1_outcome_opened": false,
+    "vsb_retuned": false,
+    "parent_child_mutated": false,
+    "broker_order_performed": false,
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE"
+  },
+  "next_required_handoffs": [
+    "W3 regenerate MU/SNDK B-1 proof against contract_sha256 94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71 once exact algorithmic B/B-1 sessions and source-complete date-local CIQ authority exist",
+    "W4 consume W2/W3-aligned risk-set identity for full discovery census without giving named smoke traces statistical weight",
+    "W5 bind rolling/expanding development to W2 primary horizon 20 and hard material-trial budget 8; every material variant must open the W2 Trial Ledger before result inspection",
+    "W6 accept only immutable prediction-before-label lockbox evidence after W2/W3/W4/W5 freeze"
+  ],
+  "claim_boundary": "W2 preregistration and fixture mechanics are scientific/custody closure only. No historical, untouched, prospective, replication, PAPER, broker, or capital result is created."
+}

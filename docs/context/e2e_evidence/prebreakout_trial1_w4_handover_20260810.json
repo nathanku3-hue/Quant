@@ -1,0 +1,116 @@
+{
+  "schema_version": "prebreakout_trial1_w4_handover_v1",
+  "recorded_at_utc": "2026-08-10T20:24:00Z",
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "branch": "codex/pit-source-authority-1",
+  "base_git_head_before_docs_handover": "685f82a10678af2de86393714a9979c64a73bc4c",
+  "w2_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+  "w3": {
+    "status": "REAL_SOURCE_AUTHORITY_COMPLETE",
+    "session_count": 346,
+    "source_custody_manifest_sha256": "7c892dca7461cc71560996b0f0d701818776dd2f67b7766900e0c89cdd17a72e",
+    "session_partition_sha256": "8c210715d52bbc56aa68f093a6e733b0cb9bfb334260d762c197240c97336463",
+    "authority_manifest_sha256": "49dc4fb471f9c0ef82aa8bdc3a81d55e6ddf682ba9df7e5e317f695088dd0ba5",
+    "authority_bundle_sha256": "e13df0033020abe34de96311412edce1360b9504bda049eb8857a76ca54873f6",
+    "mu_sndk_proof_bundle_sha256": "7bf933603d8705f9588e765fed4cd74774516c37862b5b1dadcbe65d33970971",
+    "mu_accepted_episode_count": 11,
+    "sndk_accepted_episode_count": 12,
+    "pit_eligible_bminus1_proof_count": 23,
+    "deterministic_unavailable_count": 0,
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE"
+  },
+  "precharge": {
+    "receipt_sha256": "07c9eedbaacc4dd1e463d91ad68947f36dede4551f6c39e81a602b8247586731",
+    "source_manifest_sha256": "3d481b36d80eca9653720b0cecb45808fa2f29fef66623fdb2aa5d2cf921d0d8",
+    "code_bundle_sha256": "f4e1c8a904c5664feb38e89f27467ae1fd40095d1157ee813e54648f86022136",
+    "prepared_variant_sha256": "652f04cf04b4ede02f7e014e95f66eeba2662d370452eccfbb3bc07761debfd1",
+    "development_label_custody_sha256": "2f9fdc0270a4feb0b6b59ceb23f0a4b7008292b8c30a5fff968c7d07cf89f7b3",
+    "episode_anchor_custody_sha256": "318acec3e9ba026eb475575571ba43ca94141207819f92c33e6b19f12304b3f7",
+    "development_label_visibility": "HASHED_NOT_INSPECTED",
+    "w6_lockbox_included": false,
+    "w6_market_rows_read": false
+  },
+  "trial1_open": {
+    "trial_id": "PREBREAKOUT_TRIAL_1_M0",
+    "ledger_path": "data/prebreakout/ledger/trial_ledger.jsonl",
+    "ledger_line_count": 1,
+    "sequence": 0,
+    "recorded_at": "2026-08-10T20:00:50.847608Z",
+    "chain_hash": "67999418489331536960f042de0dd96da12f1572fa6c6ab01e600914d1ef71a9",
+    "cumulative_material_trials": 1,
+    "trial_budget_max": 8,
+    "source_manifest_sha256": "3d481b36d80eca9653720b0cecb45808fa2f29fef66623fdb2aa5d2cf921d0d8",
+    "code_sha256": "f4e1c8a904c5664feb38e89f27467ae1fd40095d1157ee813e54648f86022136",
+    "variant_sha256": "652f04cf04b4ede02f7e014e95f66eeba2662d370452eccfbb3bc07761debfd1",
+    "untouched_lockbox_access": "FORBIDDEN",
+    "prospective_outcome_access": "FORBIDDEN",
+    "trial_close_appended": false
+  },
+  "flag_freeze": {
+    "receipt_sha256": "4c29b0455e20ccde39734ef14b961de2cb6f6c384f26d9acf783a033472c3f8e",
+    "flag_projection_row_count": 1561972,
+    "flag_projection_sha256": "2e018f086fc77da7d9b3b3c768f4bfa39d348368b329f529d35ca06a3062dd12",
+    "w3_projection_sha256": "994e91d9394e9dbabc9049c677ebacce2d50114a6d4810602b1971220d04d03c",
+    "development_labels_materialized_at_flag_freeze": false,
+    "development_label_values_inspected_at_flag_freeze": false,
+    "w6_market_rows_read": false
+  },
+  "development_label_open": {
+    "receipt_sha256": "f7770a3bba61e22157a6eecc8903c4227412491c1c9cebcbd8e2bfa8155ed076",
+    "development_label_file_sha256": "51c9f07093038e00965b0e03c03958ba2201875f5339fdf43ea58facd47bbccf",
+    "development_label_payload_sha256": "2f9fdc0270a4feb0b6b59ceb23f0a4b7008292b8c30a5fff968c7d07cf89f7b3",
+    "development_label_record_count": 1238254,
+    "episode_anchor_file_sha256": "a15d31dcb805c44976c03254abd62080f1bb9692c4a0d6eef4f7864e84f06453",
+    "episode_anchor_payload_sha256": "318acec3e9ba026eb475575571ba43ca94141207819f92c33e6b19f12304b3f7",
+    "episode_anchor_record_count": 30391,
+    "precharge_label_hash_reproduced": true,
+    "precharge_episode_hash_reproduced": true,
+    "prediction_before_label_materialization": true,
+    "w6_labels_opened": false,
+    "w6_lockbox_included": false
+  },
+  "w5": {
+    "status": "COMPLETE_PRIMARY_DEVELOPMENT_SIGN_FAIL",
+    "run_sha256": "768d873113187662687172bc5437f23a6fef90a8cf9e9b2b8a5b051b7071488d",
+    "informative_fold_count": 4,
+    "fold_recall_lifts": [
+      "0.75860330040991253",
+      "0.81331048901190295",
+      "0.5293137480804978",
+      "0.67281576903825957"
+    ],
+    "median_temporal_oos_recall_lift": "0.71570953472408605",
+    "frozen_survival_sign": "RECALL_LIFT_MUST_BE_GREATER_THAN_1",
+    "primary_survival_sign_pass": false
+  },
+  "w4": {
+    "status": "REAL_CENSUS_INCOMPLETE",
+    "final_atlas_artifact_present": false,
+    "last_mechanical_issue": "PANDAS_NULLABLE_PD_NA_IN_INCOMPLETE_LABEL_NORMALIZATION",
+    "last_mechanical_issue_fixed": true,
+    "current_atlas_code_sha256": "1d4b6241cccf03c92a109916ccb421479ad9c50916992af67f470af06fd3ed74",
+    "focused_test_count": 17,
+    "focused_tests_pass": true,
+    "required_next_action": "RERUN_REAL_W4_CENSUS_ONLY_AGAINST_ALREADY_FROZEN_TRIAL1_ARTIFACTS"
+  },
+  "w6": {
+    "real_lockbox_consumed": false,
+    "real_label_surface_opened": false,
+    "trial1_source_included_w6": false,
+    "instruction": "DO_NOT_CONSUME_W6"
+  },
+  "validation": {
+    "focused_prebreakout_test_count": 87,
+    "focused_prebreakout_tests_pass": true,
+    "selected_compile": "PASS"
+  },
+  "authority_boundary": {
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE",
+    "broker_orders_created": false,
+    "a2_requery_performed": false,
+    "trial2_or_later_opened": false
+  },
+  "next_action": "FINISH_REAL_W4_CENSUS_SEAL_VERIFY_THEN_CLOSE_TRIAL1_AS_FAIL_UNLESS_W4_PROVES_CUSTODY_INVALIDATION_AND_STOP_WITHOUT_W6"
+}

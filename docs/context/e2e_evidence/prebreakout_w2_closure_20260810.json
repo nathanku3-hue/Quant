@@ -1,0 +1,107 @@
+{
+  "schema_version": "prebreakout_w2_closure_v1",
+  "date": "2026-08-10",
+  "workstream": "W2_PREBREAKOUT_SCIENTIFIC_CONTRACT",
+  "disposition": "CLOSED_IMMUTABLE_AUTHORITY",
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "w2_authority_version": "PREBREAKOUT_W2_CONTRACT_v1",
+  "scientific_binding": {
+    "methodology_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+    "breakout_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+    "single_scientific_seal": true,
+    "risk_set_spec_id": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "primary_label_spec_id": "PREBREAKOUT_RIGHT_TAIL_20D_TOP5_V1",
+    "secondary_label_spec_id": "PREBREAKOUT_RIGHT_TAIL_10D_TOP5_V1",
+    "breakout_spec_id": "PREBREAKOUT_ALGORITHMIC_BREAKOUT_B_20D_HIGH_V1",
+    "ttfld_spec_id": "PREBREAKOUT_TTFLD_BOUNDED_20_TO_B_MINUS_1_V1"
+  },
+  "frozen_law": {
+    "breakout_b": "close_t > max(close over immediately prior 20 observed exact-listing sessions)",
+    "equality_is_breakout": false,
+    "accepted_episode_cooldown_full_sessions": 20,
+    "next_accepted_b_requires_session_index_distance_gt": 20,
+    "b_minus_1": "immediately prior observed exact-listing session",
+    "primary_horizon_sessions": 20,
+    "primary_winner_fraction": 0.05,
+    "secondary_horizon_sessions": 10,
+    "secondary_winner_fraction": 0.05,
+    "ttfld_window": "B-20..B-1",
+    "minimum_legitimate_lead_sessions": 1,
+    "miss_effective_ttfld_sessions": 0,
+    "mu_statistical_weight": 0,
+    "sndk_statistical_weight": 0
+  },
+  "implementation_custody": {
+    "preregistration_py_sha256": "3df15dce6e0c14ccf5e8ab65ecf66cadd212f28bc134f5c50ec7790ea9583214",
+    "breakout_py_sha256": "58951dc81a9f643b577e6ef201f3d2bc9751333e634d0932d94d1f9c8d43efe7",
+    "ledger_py_sha256": "28781b58eaa558850f3db6abb3139bceca279fc686b4f8c41a5c7b1c23756913",
+    "w2_spec_sha256": "56b506ce68349e3546aafdad36a6e4bbd90b288a1bd5925af10421779057725f",
+    "canonical_handoff_sha256": "50417ffa580633b0728e4f1dc27c28c754f9315cb368616bc5b6b13ab665f522"
+  },
+  "search_custody": {
+    "search_family_id": "PREBREAKOUT_SEARCH_v1",
+    "trial_ledger_scope": "PREBREAKOUT_V1_TRIAL_LEDGER",
+    "hard_material_trial_budget": 8,
+    "real_trial_open_count": 0,
+    "real_material_trials_consumed": 0,
+    "real_budget_state": "0/8",
+    "non_test_prebreakout_trial_ledger_files_found": 0,
+    "non_test_trial_open_evidence_records_found": 0,
+    "trial_open_1_issued": false,
+    "trial_open_1_preconditions": [
+      "Exact Trial-1 data/source manifest is frozen, including W3 PIT/source bindings.",
+      "Exact Trial-1 implementation manifest is frozen, including implementation identity and code-byte custody."
+    ],
+    "fixture_trial_open_calls_consume_real_budget": false
+  },
+  "downstream_bindings": {
+    "w3": {
+      "current_gate_path": "docs/context/e2e_evidence/prebreakout_pit_w3_current_gate_20260810.json",
+      "current_gate_sha256": "b0799b0e61841d302478767f6b25275df63231f3f62f0b6f1d86bba0a262c606",
+      "w3_authority_py_sha256": "23ee0cc1b9cbc3b04b6d323d7d65c6c728ce3f2a0c2539028e08472c6248be70",
+      "arbitrary_breakout_hash_accepted": false,
+      "current_gate": "B_MINUS_1_PIT_AUTHORITY_UNAVAILABLE",
+      "historical_breakout_contract_unbound_is_current_authority": false
+    },
+    "w4": {
+      "methodology_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+      "breakout_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+      "methodology_binding_sha256": "080aba6676202e68d14aff405049a2422d231dd7b8335f3be32f376b049205ad",
+      "atlas_py_sha256": "a9409399b14d4f964f3e7c5088f7b60966288c0a4b4cec3d9a83032fa25a5834",
+      "breakout_methodology_hash_divergence_allowed": false
+    },
+    "w5": {
+      "handoff_path": "docs/phase_brief/prebreakout_w5_walkforward_20260810.md",
+      "handoff_sha256": "60b6f02841b643c0698e4c5e8d2e540a2c6af98fa546d54a5e8f1d275adc0d4a",
+      "trial1_candidate_receipt_path": "docs/context/e2e_evidence/prebreakout_w5_trial1_m0_candidate_20260810.json",
+      "trial1_candidate_receipt_sha256": "d333bd284f6affddebe63b5df2e26439d653a79189f88fd33c9facbace994d79",
+      "trial1_candidate_w2_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+      "trial1_exact_real_source_manifest_exists": false,
+      "trial1_trial_open_appended": false,
+      "trial1_material_trials_consumed": 0,
+      "w2_bound_primary_horizon_sessions": 20,
+      "w2_bound_ttfld_window": "B-20..B-1",
+      "w2_bound_trial_budget": 8,
+      "real_charged_run_authorized_now": false
+    }
+  },
+  "validation": {
+    "command": ".venv/Scripts/python.exe -m pytest tests/prebreakout_discovery_v1 tests/prebreakout_pit_v1/test_authority.py tests/prebreakout_atlas_v1/test_atlas.py tests/prebreakout_untouched_evaluator_v1/test_evaluator.py -q",
+    "result": "69/69 PASS",
+    "focused_w3": "17/17 PASS",
+    "focused_w4": "14/14 PASS",
+    "discovery_package": "26/26 PASS",
+    "adjacent_w3_w4_w6": "43/43 PASS",
+    "w4_single_seal_divergence_test_added": true
+  },
+  "authority_boundary": {
+    "provider_capture_performed_by_w2_closure": false,
+    "real_material_trial_opened": false,
+    "discovery_outcome_opened": false,
+    "untouched_lockbox_opened": false,
+    "prospective_clock_started": false,
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE"
+  },
+  "canonical_handoff": "docs/context/prebreakout_w2_binding_current.md"
+}

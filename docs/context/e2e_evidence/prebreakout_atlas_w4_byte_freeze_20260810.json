@@ -1,0 +1,80 @@
+{
+  "schema_version": "prebreakout_atlas_w4_byte_freeze_v1",
+  "frozen_at_utc": "2026-08-10T15:03:47Z",
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "worker_id": "W4",
+  "disposition": "CLOSE_MECHANICS_DORMANT_UNTIL_REAL_DISCOVERY_DATA",
+  "authority_class": "DISCOVERY_ONLY_ZERO_FINANCIAL_AUTHORITY",
+  "financial_alpha_evidence": 0,
+  "capital_authority": "NONE",
+  "real_atlas_run_performed": false,
+  "outcome_open_performed": false,
+  "provider_capture_performed": false,
+  "model_fit_performed": false,
+  "promotion_metrics_computed": false,
+  "frozen_files": [
+    {
+      "path": "research/prebreakout_atlas_v1/atlas.py",
+      "sha256": "bec89c222f1f1af41240b3b807d4b22e4c364e3be87f4ce25ed1d67d2d77555d"
+    },
+    {
+      "path": "research/prebreakout_atlas_v1/__init__.py",
+      "sha256": "f7dbea76d9e153f8f1d088b479903863d0562a9d6ebbc16d60904376ee18047d"
+    },
+    {
+      "path": "tests/prebreakout_atlas_v1/test_atlas.py",
+      "sha256": "4707516ed04c613fb29162e43408557c06b20e59c82545ec9ed40728af1cc68f"
+    },
+    {
+      "path": "research/prebreakout_discovery_v1/atlas.py",
+      "sha256": "d51944d47a7bf2c8e8a52ba85e550c7e6c12e9219bf2985ccd9b3a608f78f639"
+    },
+    {
+      "path": "tests/prebreakout_discovery_v1/test_atlas.py",
+      "sha256": "8b17a6edc4dcb91dff729d2092444edc36c01ae66889b172bf5a210c92917a1f"
+    },
+    {
+      "path": "docs/architecture/prebreakout_discovery_atlas_v1.md",
+      "sha256": "a03c39e5f00c18953db5f35afbf2948561cf6646bcb5e39c3d5eab08648df881"
+    },
+    {
+      "path": "docs/phase_brief/prebreakout_atlas_w4_20260810.md",
+      "sha256": "1ff12390f8bec80de2b35932a0a1f0ea86d784f2224a14c15b229baea0fe3ea7"
+    }
+  ],
+  "upstream_reference_bytes_not_owned_by_w4": [
+    {
+      "path": "research/prebreakout_discovery_v1/preregistration.py",
+      "sha256_at_w4_freeze": "3df15dce6e0c14ccf5e8ab65ecf66cadd212f28bc134f5c50ec7790ea9583214",
+      "role": "W2 methodology reference only; exact binding must be reverified at real-run reopen"
+    },
+    {
+      "path": "research/prebreakout_pit_v1/authority.py",
+      "sha256_at_w4_freeze": "bb7e3f1c90f49deae80553f19cd4ffb591872ec4edadb0e7ce5e4e7ae04bab58",
+      "role": "W3 PIT authority reference only; full date-local real authority must exist at real-run reopen"
+    }
+  ],
+  "frozen_semantics": {
+    "flag_ownership": "W4_CONSUMES_EXTERNALLY_SUPPLIED_FROZEN_FLAGS_AND_NEVER_DEVELOPS_THE_FLAG",
+    "trial_1": "FIRST_REAL_CANDIDATE_IS_A_CHARGED_FULLY_DETERMINISTIC_PREFIT_RULE_WITH_FLAGS_FROZEN_BEFORE_DISCOVERY_LABEL_OPEN",
+    "trial_1_real_open_exists_at_freeze": false,
+    "trial_1_preopen_manifest_law": "EXACT_DATA_SOURCE_AND_IMPLEMENTATION_MANIFESTS_FROZEN_BEFORE_TRIAL_OPEN",
+    "trial_1_not_w5_fit": true,
+    "winner_census": "FULL_EFFECTIVE_EPISODE_TRUE_WINNER_AND_MISSED_WINNER_CENSUS",
+    "false_winner_census": "FULL_DATE_LOCAL_ELIGIBLE_FLAGGED_NONWINNER_CENSUS",
+    "control_census": "FULL_ORDINARY_CONTROL_POOL_PLUS_ALL_EXACT_PREREGISTERED_MATCHED_CONTROLS",
+    "b_minus_1": "EXACT_B_MINUS_1_REQUIRED",
+    "b_or_post_b_rescue": "FORBIDDEN",
+    "mu_sndk_statistical_weight": 0,
+    "mu_sndk_promotion_denominator_weight": 0,
+    "promotion_metrics": "FORBIDDEN_IN_W4",
+    "additional_atlas_plumbing_while_dormant": "FORBIDDEN"
+  },
+  "real_run_reopen_gates": [
+    "W2_BINDING_EXACT",
+    "W3_FULL_DATE_LOCAL_PIT_AUTHORITY_EXISTS",
+    "TRIAL_1_AND_CONTROL_DEFINITION_CHARGED_AND_EXTERNAL_FLAGS_FROZEN_BEFORE_LABEL_OPEN",
+    "DISCOVERY_LABELS_LEGITIMATELY_MATURED_AND_OPEN"
+  ],
+  "reopen_only_for": "FIRST_REAL_ATLAS_RUN"
+}

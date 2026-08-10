@@ -1,5 +1,7 @@
 # PREBREAKOUT Fast-Path Handover — 2026-08-10
 
+> **Historical handover — superseded.** This memo describes the pre-charge W3→Trial-1 state. Current takeover authority is `docs/handover/prebreakout_trial1_w4_handover_20260810.md`: W3 is complete, Trial #1 is charged `1/8`, W5 is complete with median recall lift `0.71570953472408605`, W4 real census remains incomplete, and W6 must not be consumed.
+
 ## Executive status
 
 Owner stream: `PREBREAKOUT_DISCOVERY_v1` fast path
