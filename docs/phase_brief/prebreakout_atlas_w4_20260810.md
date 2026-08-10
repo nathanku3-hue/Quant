@@ -1,9 +1,9 @@
 # W4 Phase Brief — PREBREAKOUT Discovery Atlas
 
-> **Current real-run update — supersedes the dormant fixture-only state below as current truth.** W3 real authority is complete and Trial #1 is charged `1/8`; its flags were frozen before development label materialization, and W5 has completed with median recall lift `0.71570953472408605`. The real W4 census is the remaining incomplete step. The last real W4 attempt exposed only a nullable `pd.NA` handling bug for `INCOMPLETE_HORIZON` labels; that mechanical bug is fixed and the focused W4 suite is `17/17 PASS`, but no final real Atlas artifact has been materialized yet. Reuse the existing Trial #1 open and frozen artifacts, finish W4 only, then close Trial #1. **Do not consume W6.** Canonical current handover=`docs/handover/prebreakout_trial1_w4_handover_20260810.md`.
+> **FINAL REAL-RUN CLOSE — supersedes all dormant/incomplete wording below.** W4 is complete. Final Atlas=`data/prebreakout/compiled/trial1_real_20260810/w4_discovery_atlas.json.gz`, internal SHA-256=`c471bf11fbca068edbd3e5084cc7121cd6339a3f6fd0852055f015be411b6e68`, file SHA-256=`942bbaf89264ac87d96f88dae00653f756aa29c356caaa75d0f58e4f350f70a6`, fresh-process verification=`PASS`; frozen Atlas code remained `1d4b6241cccf03c92a109916ccb421479ad9c50916992af67f470af06fd3ed74`. Statistical winner episodes=`2,381`, detected=`909`, missed=`1,472`, median effective TTFLD miss=0=`0`, detected-only median=`11`, unmatched exact-control cases=`0`. No PIT/custody invalidation was found. Trial #1 is closed ledger status `FAILED` / scientific `FAIL`, still exactly `1/8`, and W6 remains untouched. Current handover=`docs/handover/prebreakout_trial1_close_econphysics_handover_20260810.md`; successor design authority=`docs/architecture/econphysics_winner_selection_integration_lock_20260810.md`.
 
 **Date:** 2026-08-10
-**State:** `W4_MECHANICS_CLOSED / BYTES_FROZEN / DORMANT_UNTIL_REAL_DISCOVERY_DATA`
+**State:** `W4_REAL_CENSUS_COMPLETE / SEALED / VERIFIED / TRIAL1_CLOSED_FAILED / W6_UNTOUCHED`
 **Family:** `PREBREAKOUT_DISCOVERY_v1`
 **Authority:** `DISCOVERY_ONLY / EXTERNAL_FROZEN_FLAGS_ONLY / FINANCIAL_ALPHA_EVIDENCE_0 / CAPITAL_AUTHORITY_NONE`
 

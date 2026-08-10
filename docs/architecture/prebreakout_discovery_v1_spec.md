@@ -1,8 +1,10 @@
 # PREBREAKOUT_DISCOVERY_v1 — W2 Scientific Preregistration
 
+> **Historical Trial-1 authority / successor recut — 2026-08-10:** This W2 contract remains immutable authority for `PREBREAKOUT_TRIAL1_M0_MARKET_EARLY_WARNING_V1`, its B/B-1/TTFLD/evaluation custody, and the permanent Trial #1 charge. It is **not** the design authority for the successor causal mechanism. Future PREBREAKOUT work is governed by `docs/architecture/econphysics_winner_selection_integration_lock_20260810.md`: `ECON_STATE_v1 → EXPECTATION_GAP_v1 → WINNER_SELECTION_v1 → MARKET_CONFIRMATION_v1 → CONTINUATION_EXIT_v1`. Winner selection remains a required cross-sectional decision layer; historical winner outcomes may falsify/measure it but may not invent the upstream causal representation. No Trial #2/new material search is authorized until `ECONPHYSICS_PREBREAKOUT_v1` freezes its causal graph, PIT observables, state/transition laws, invariance assumptions, selection mapping, and falsifiers. The existing `1/8` charge is not reset or refunded.
+
 **Date:** 2026-08-10
 **Owner lane:** W2
-**Status:** `SCIENTIFIC_CONTRACT_FROZEN / OUTCOME_BLIND / NO_REAL_TRIAL_CHARGED / NO_CLOCK_START`
+**Status:** `TRIAL1_SCIENTIFIC_CONTRACT_FROZEN / TRIAL1_FAIL_CLOSED_MARKET_BEHAVIOR_BRANCH / SUCCESSOR_CAUSAL_CONTRACT_NOT_YET_FROZEN / NO_NEW_TRIAL_AUTHORITY`
 **Family:** `PREBREAKOUT_DISCOVERY_v1`
 **Canonical Python authority:** `research/prebreakout_discovery_v1/preregistration.py`
 **Mechanical breakout/lead law:** `research/prebreakout_discovery_v1/breakout.py`

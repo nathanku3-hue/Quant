@@ -1,15 +1,15 @@
 # W5 — PREBREAKOUT Trial-1 M0 Candidate Freeze
 
-> **Current execution update — supersedes the uncharged state below as current truth.** Trial #1 was opened exactly once at `2026-08-10T20:00:50.847608Z` and permanently consumes `1/8`. Exact open chain hash=`67999418489331536960f042de0dd96da12f1572fa6c6ab01e600914d1ef71a9`; charged source manifest=`3d481b36d80eca9653720b0cecb45808fa2f29fef66623fdb2aa5d2cf921d0d8`; charged code bundle=`f4e1c8a904c5664feb38e89f27467ae1fd40095d1157ee813e54648f86022136`; variant=`652f04cf04b4ede02f7e014e95f66eeba2662d370452eccfbb3bc07761debfd1`. Flags were frozen before development label materialization. W5 completed 4/4 informative folds with median temporal-OOS recall lift `0.71570953472408605`, below the frozen `>1` breadth baseline. Do not retune or open another Trial-1. Finish W4 census, then close Trial #1 as FAIL unless W4 proves a custody invalidation. W6 remains untouched/forbidden. Canonical current handover=`docs/handover/prebreakout_trial1_w4_handover_20260810.md`.
+> **FINAL EXECUTION CLOSE — supersedes all uncharged/incomplete wording below.** Trial #1 opened exactly once at `2026-08-10T20:00:50.847608Z`, permanently consumes `1/8`, and closed exactly once at `2026-08-10T21:55:46.709318Z` with ledger status `FAILED` / scientific status `FAIL`. W5 completed 4/4 informative folds with median temporal-OOS recall lift `0.71570953472408605 < 1`; final W4 was sealed and fresh-process verified with Atlas SHA-256=`c471bf11fbca068edbd3e5084cc7121cd6339a3f6fd0852055f015be411b6e68`, finding no PIT/custody invalidation and median effective TTFLD miss=0=`0`. MU/SNDK smoke was explicitly **not** used for close. W6 remains untouched. No Trial #2 is authorized before the `ECONPHYSICS_PREBREAKOUT_v1` causal contract freeze. Current handover=`docs/handover/prebreakout_trial1_close_econphysics_handover_20260810.md`.
 
 **Date:** 2026-08-10
-**Disposition:** `MECHANICS_CLOSED / REOPENED_FOR_TRIAL_1_PREPARATION / TRIAL_1_UNCHARGED / DEVELOPMENT_NOT_RUN`
+**Disposition:** `TRIAL1_CLOSED_FAILED / MARKET_BEHAVIOR_DISCOVERY_BRANCH_CLOSED / SUCCESSOR_CAUSAL_CONTRACT_NOT_YET_FROZEN`
 **Family:** `PREBREAKOUT_DISCOVERY_v1`
 **Trial:** `PREBREAKOUT_TRIAL_1_M0`
 **Implementation:** `PREBREAKOUT_TRIAL1_M0_MARKET_EARLY_WARNING_V1`
 **Authority:** `DEVELOPMENT_CANDIDATE_ONLY / FINANCIAL_ALPHA_EVIDENCE_0 / CAPITAL_AUTHORITY_NONE`
 **W6:** `CLOSED / FORBIDDEN`
-**Trial budget consumed:** `0 / 8`
+**Trial budget consumed:** `1 / 8`
 
 ## Decision
 

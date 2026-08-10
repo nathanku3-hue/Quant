@@ -571,7 +571,7 @@ def _validate_candidate_rows(
     if not rows:
         raise PrebreakoutPITAuthorityError("prebreakout_pit_candidate_rows_required")
     output: list[dict[str, Any]] = []
-    seen_security: set[str] = set()
+    seen_pairs: set[tuple[str, str]] = set()
     seen_trading: set[str] = set()
     for raw in rows:
         if not isinstance(raw, Mapping) or set(raw) != _CANDIDATE_FIELDS:
@@ -584,11 +584,12 @@ def _validate_candidate_rows(
         spt = _spt_id(raw.get("spt_instrument_item_id"))
         if spt != f"SPT{trading_item_id}":
             raise PrebreakoutPITAuthorityError("prebreakout_pit_trading_item_alias_mismatch")
-        if security_id in seen_security:
-            raise PrebreakoutPITAuthorityError("prebreakout_pit_candidate_security_duplicate")
+        pair = (security_id, trading_item_id)
+        if pair in seen_pairs:
+            raise PrebreakoutPITAuthorityError("prebreakout_pit_candidate_identity_duplicate")
         if trading_item_id in seen_trading:
             raise PrebreakoutPITAuthorityError("prebreakout_pit_candidate_trading_item_duplicate")
-        seen_security.add(security_id)
+        seen_pairs.add(pair)
         seen_trading.add(trading_item_id)
         if _date_value(raw.get("membership_as_of_date"), field="membership_as_of_date") != decision_day:
             raise PrebreakoutPITAuthorityError("prebreakout_pit_candidate_not_date_local")

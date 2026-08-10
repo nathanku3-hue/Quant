@@ -1,5 +1,7 @@
 # PREBREAKOUT Trial-1 → W4 Handover — 2026-08-10
 
+> **SUPERSEDED AFTER SUCCESSFUL W4/Trial-1 CLOSE.** Final continuation authority is `docs/handover/prebreakout_trial1_close_econphysics_handover_20260810.md`. Trial #1 is now closed `FAILED`/scientific `FAIL`, permanently charged `1/8`; final W4 Atlas internal SHA-256=`c471bf11fbca068edbd3e5084cc7121cd6339a3f6fd0852055f015be411b6e68`, fresh-process verified; W6 remains untouched. Future mechanism design is governed by `docs/architecture/econphysics_winner_selection_integration_lock_20260810.md`; no Trial #2 is authorized before the successor causal contract freeze.
+
 ## Executive status
 
 Owner stream: `PREBREAKOUT_DISCOVERY_v1`

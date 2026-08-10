@@ -257,6 +257,43 @@ def test_ci_q_security_and_trading_item_identity_are_exact_and_not_ticker_compat
         )
 
 
+def test_ambiguous_date_local_multi_listing_may_share_ciq_security_and_excludes_each_exact_listing() -> None:
+    source = _source_authority()
+    candidates = [
+        _candidate(
+            security_id="CIQSEC:IQ404",
+            company_id="1004",
+            trading_item_id="504",
+            primary_listing_state=AMBIGUOUS_DATE_LOCAL,
+            primary_listing_proof_kind=PRIMARY_PROOF_AMBIGUOUS,
+        ),
+        _candidate(
+            security_id="CIQSEC:IQ404",
+            company_id="1004",
+            trading_item_id="505",
+            primary_listing_state=AMBIGUOUS_DATE_LOCAL,
+            primary_listing_proof_kind=PRIMARY_PROOF_AMBIGUOUS,
+        ),
+    ]
+    actions = [
+        _action(security_id="CIQSEC:IQ404", trading_item_id="504"),
+        _action(security_id="CIQSEC:IQ404", trading_item_id="505"),
+    ]
+    packet = build_prebreakout_pit_authority(
+        as_of=AS_OF,
+        decision_session_date=DECISION_DAY,
+        source_authority=source,
+        candidate_rows=candidates,
+        corporate_action_rows=actions,
+        source_receipts=_receipts(),
+        fixture=True,
+    )
+    assert packet.body["eligible_count"] == 0
+    assert packet.body["exclusion_count"] == 2
+    assert {row["trading_item_id"] for row in packet.exclusion_rows} == {"504", "505"}
+    assert {row["exclusion_reason"] for row in packet.exclusion_rows} == {EXCLUSION_AMBIGUOUS_PRIMARY}
+
+
 def test_candidate_and_corporate_action_future_availability_fail_closed() -> None:
     source, candidates, actions, receipts = _valid_inputs()
     candidates[0]["available_at"] = "2025-08-15T20:00:01Z"
