@@ -1,0 +1,133 @@
+{
+  "schema_version": "prebreakout_pit_w3_current_gate_v2",
+  "round_id": "PREBREAKOUT_FAST_PATH_W3_ACQUISITION_20260810",
+  "workstream": "W3_PREBREAKOUT_PIT_DATA_AUTHORITY",
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "risk_set_spec_id": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+  "disposition": "KEEP_OPEN_AS_DATA_GATE_CLOSE_MECHANICS_WORK",
+  "mechanics_work": "CLOSED",
+  "raw_source_capture": "COMPLETE",
+  "pit_authority_compile": "OPEN",
+  "data_gate": "OPEN",
+  "current_state": "B_MINUS_1_PIT_AUTHORITY_UNAVAILABLE",
+  "current_state_reason": "RAW_BYTES_LANDED_BUT_DATE_LOCAL_W3_AUTHORITY_AND_CORPORATE_ACTION_STATE_NOT_YET_COMPILED",
+  "w2": {
+    "authority_version": "PREBREAKOUT_W2_CONTRACT_v1",
+    "contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+    "breakout_spec_id": "PREBREAKOUT_ALGORITHMIC_BREAKOUT_B_20D_HIGH_V1",
+    "breakout_law": "close_t > max(close over immediately prior 20 observed exact-listing sessions), strict comparator, >20-session accepted-episode spacing",
+    "b_minus_1_law": "immediately prior observed exact-listing session to B",
+    "ttfld_window": "B-20..B-1",
+    "primary_label": "PREBREAKOUT_RIGHT_TAIL_20D_TOP5_V1",
+    "hard_material_trial_budget": 8,
+    "real_material_trials_consumed": 0,
+    "contract_consumed_by_w3": true
+  },
+  "real_source_state": {
+    "provider_capture_performed": true,
+    "provider": "S&P CAPITAL IQ PRO authenticated existing web session",
+    "existing_session_reused": true,
+    "sign_in_performed": false,
+    "sign_out_performed": false,
+    "market_listing_raw_capture_complete": true,
+    "filtered_lifecycle_raw_capture_complete": true,
+    "market_session_count": 346,
+    "market_row_count": 1894207,
+    "union_company_count": 5919,
+    "union_exact_listing_count": 6018,
+    "lifecycle_part_count": 12,
+    "lifecycle_entity_count": 5919,
+    "lifecycle_entity_set_equals_market_union": true,
+    "lifecycle_row_count": 176353,
+    "date_local_primary_compile_complete": false,
+    "corporate_action_state_compile_complete": false,
+    "historical_as_of_w3_packet_compile_complete": false,
+    "ticker_used_to_resolve_identity": false,
+    "aov_109_substitution_used": false,
+    "current_primary_back_projection_used": false,
+    "current_survivor_back_projection_used": false
+  },
+  "mu_sndk_current_gate": [
+    {
+      "case_id": "MU_SMOKE",
+      "display_symbol": "MU",
+      "display_symbol_used_for_logic": false,
+      "security_id": "CIQSEC:IQ289030",
+      "trading_item_id": "2630498",
+      "spt_instrument_item_id": "SPT2630498",
+      "identity_state": "RESOLVED_FROM_PROVIDER_BYTES",
+      "exact_listing_session_count": 346,
+      "accepted_w2_breakout_episode_count": 11,
+      "all_breakout_episodes_retained": true,
+      "b_minus_1_pit_authority_state": "NOT_COMPILED",
+      "current_state": "B_MINUS_1_PIT_AUTHORITY_UNAVAILABLE",
+      "statistical_weight": 0,
+      "promotion_denominator_weight": 0,
+      "deterministic_unavailable_is_pass": false
+    },
+    {
+      "case_id": "SNDK_SMOKE",
+      "display_symbol": "SNDK",
+      "display_symbol_used_for_logic": false,
+      "security_id": "CIQSEC:IQ1860586153",
+      "trading_item_id": "1929119896",
+      "spt_instrument_item_id": "SPT1929119896",
+      "identity_state": "RESOLVED_FROM_PROVIDER_BYTES",
+      "exact_listing_session_count": 346,
+      "accepted_w2_breakout_episode_count": 12,
+      "all_breakout_episodes_retained": true,
+      "b_minus_1_pit_authority_state": "NOT_COMPILED",
+      "current_state": "B_MINUS_1_PIT_AUTHORITY_UNAVAILABLE",
+      "statistical_weight": 0,
+      "promotion_denominator_weight": 0,
+      "deterministic_unavailable_is_pass": false
+    }
+  ],
+  "historical_receipt": {
+    "path": "docs/context/e2e_evidence/prebreakout_pit_w3_mu_sndk_20260810.json",
+    "classification": "HISTORICAL_PRE_W2_CUSTODY_ONLY",
+    "current_authority": false,
+    "historical_reason": "BREAKOUT_CONTRACT_UNBOUND",
+    "satisfies_current_w2_smoke_obligation": false
+  },
+  "acquisition_contract": {
+    "path": "docs/architecture/prebreakout_pit_acquisition_manifest_v1.json",
+    "sha256": "f3cac6961707fc653c00016ff715fb7250236ad443854051a387ab330473dc3f",
+    "role": "PRE_CAPTURE_FROZEN_CONTRACT"
+  },
+  "real_capture_evidence": {
+    "path": "docs/context/e2e_evidence/prebreakout_w3_real_data_capture_20260810.json",
+    "status": "REAL_RAW_SOURCE_CAPTURE_COMPLETE_PIT_AUTHORITY_COMPILE_OPEN"
+  },
+  "known_next_integration_issue": {
+    "missing_total_return_1d_rows": 177820,
+    "trial1_frozen_policy": "INVALID_OR_INSUFFICIENT_MARKET_HISTORY_ABSTAINS_WITH_SCORE_ZERO_NO_IMPUTATION",
+    "current_implementation_mismatch": "Trial1 _normalize_market_history rejects any NaN total-return row for the entire frame",
+    "must_fix_before_trial_open": true,
+    "scientific_reparameterization_authorized": false
+  },
+  "next_required_actions": [
+    "Build one deterministic hash manifest over both market directories and all 12 lifecycle parts.",
+    "Compile date-local primary state and complete exact-listing corporate-action state into W3 authority packets.",
+    "Regenerate zero-weight MU/SNDK B-1 proofs for all retained W2 episodes.",
+    "Make Trial-1 missing-return behavior conform to its frozen abstention policy and recompute code-bundle hash before charge.",
+    "Freeze exact source/code manifests before appending the first and only preferred Trial-1 open."
+  ],
+  "validation": {
+    "w3_focused": "17/17 PASS",
+    "acquisition_scripts_compile": "PASS",
+    "market_lifecycle_entity_set_reconciliation": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "authority_boundary": {
+    "outcome_access_performed": false,
+    "provider_capture_performed": true,
+    "trial_1_opened": false,
+    "development_labels_opened": false,
+    "w6_lockbox_opened": false,
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE",
+    "broker_orders": 0,
+    "parent_child_mutation": "FORBIDDEN"
+  }
+}

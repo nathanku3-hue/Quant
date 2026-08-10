@@ -1,0 +1,130 @@
+{
+  "schema_version": "prebreakout_pit_w3_evidence_v1",
+  "round_id": "PREBREAKOUT_PIT_W3_20260810",
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "risk_set_spec_id": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+  "status": "HISTORICAL_ONLY_PRE_W2_BREAKOUT_CONTRACT_UNBOUND",
+  "authority_class": "HISTORICAL_PRE_W2_CUSTODY_ONLY",
+  "current_authority": false,
+  "superseded_on": "2026-08-10",
+  "superseded_by": "docs/context/e2e_evidence/prebreakout_pit_w3_current_gate_20260810.json",
+  "satisfies_current_w2_smoke_obligation": false,
+  "implemented_paths": {
+    "authority": {
+      "path": "research/prebreakout_pit_v1/authority.py",
+      "sha256": "bb7e3f1c90f49deae80553f19cd4ffb591872ec4edadb0e7ce5e4e7ae04bab58"
+    },
+    "exports": {
+      "path": "research/prebreakout_pit_v1/__init__.py",
+      "sha256": "9dbbe0e69226a8de2e94089ff4173b136c0f3c7fc5c86068bb2eb6fefecee66d"
+    },
+    "tests": {
+      "path": "tests/prebreakout_pit_v1/test_authority.py",
+      "sha256": "9cd52d65745b4e5c2ab320614626dceba3280b38bfc10b2af89847bc65e26600"
+    },
+    "architecture": {
+      "path": "docs/architecture/prebreakout_pit_authority_v1.md",
+      "sha256": "5abe5a3249e276c4d0956f9f56810ab66b6935eb9cb782660f533a22967789b8"
+    },
+    "phase_brief": {
+      "path": "docs/phase_brief/prebreakout_pit_w3_20260810.md",
+      "sha256": "74f011e496a2a49cb800a15306ddbaad7a06a8405300645e3f56ed957e7d859f"
+    }
+  },
+  "validation": {
+    "focused_command": ".venv/Scripts/python.exe -m pytest tests/prebreakout_pit_v1/test_authority.py -q",
+    "focused_result": "15/15 PASS",
+    "adjacent_command": ".venv/Scripts/python.exe -m pytest tests/prebreakout_pit_v1 tests/alpha_pit_v1 tests/aov0/test_historical_security_master.py tests/aov0/test_historical_lifecycle.py -q",
+    "adjacent_result": "42/42 PASS",
+    "compile": "PASS",
+    "git_diff_check": "PASS",
+    "financial_alpha_evidence": 0
+  },
+  "frozen_invariants": {
+    "exact_ciqsec_security_id": true,
+    "exact_trading_item_and_spt_alias": true,
+    "date_local_primary_listing_proof": true,
+    "availability_at_or_before_decision_cut": true,
+    "source_observed_range_not_after_decision_session": true,
+    "prospective_source_receipt_retrieved_at_or_before_as_of": true,
+    "corporate_action_coverage_exact_for_candidates": true,
+    "current_survivor_back_projection_used": false,
+    "current_primary_back_projection_used": false,
+    "alternate_listing_backfill_used": false,
+    "ticker_fallback_used": false,
+    "company_entity_fallback_used": false,
+    "permno_fallback_used": false,
+    "outcome_access_performed": false,
+    "statistical_evidence_weight": 0,
+    "capital_authority": "NONE"
+  },
+  "real_source_state": {
+    "w2_breakout_contract_bound": false,
+    "w2_breakout_session_bound": false,
+    "w2_b_minus_1_session_bound": false,
+    "new_provider_acquisition_performed_by_w3": false,
+    "aov_109_substitution_allowed": false,
+    "mu_or_sndk_found_in_repo_local_aov_109_primary_master": false
+  },
+  "smoke_proofs": [
+    {
+      "schema_version": "prebreakout_bminus1_eligibility_proof_v1",
+      "family_id": "PREBREAKOUT_DISCOVERY_v1",
+      "case_id": "MU_SMOKE",
+      "display_symbol": "MU",
+      "display_symbol_used_for_logic": false,
+      "breakout_contract_sha256": null,
+      "breakout_session": null,
+      "b_minus_1_session": null,
+      "security_id": null,
+      "trading_item_id": null,
+      "status": "DETERMINISTIC_UNAVAILABLE",
+      "reason": "BREAKOUT_CONTRACT_UNBOUND",
+      "pit_authority_sha256": null,
+      "row_available_at": null,
+      "row_corporate_action_state": null,
+      "statistical_weight": 0,
+      "promotion_denominator_weight": 0,
+      "outcome_access_performed": false,
+      "financial_alpha_evidence": 0,
+      "capital_authority": "NONE",
+      "proof_sha256": "c9b907d9eb221c68b70e2ebd9f46bb1429927266d9cacb79e0024700ed834778"
+    },
+    {
+      "schema_version": "prebreakout_bminus1_eligibility_proof_v1",
+      "family_id": "PREBREAKOUT_DISCOVERY_v1",
+      "case_id": "SNDK_SMOKE",
+      "display_symbol": "SNDK",
+      "display_symbol_used_for_logic": false,
+      "breakout_contract_sha256": null,
+      "breakout_session": null,
+      "b_minus_1_session": null,
+      "security_id": null,
+      "trading_item_id": null,
+      "status": "DETERMINISTIC_UNAVAILABLE",
+      "reason": "BREAKOUT_CONTRACT_UNBOUND",
+      "pit_authority_sha256": null,
+      "row_available_at": null,
+      "row_corporate_action_state": null,
+      "statistical_weight": 0,
+      "promotion_denominator_weight": 0,
+      "outcome_access_performed": false,
+      "financial_alpha_evidence": 0,
+      "capital_authority": "NONE",
+      "proof_sha256": "e9bef0fcda9426cc3a8cb3b5400bb2f3c610bea35dccac5986ee3e46850c358c"
+    }
+  ],
+  "saw": {
+    "path": "docs/context/saw_prebreakout_pit_w3_20260810.md",
+    "sha256": "8160828be090a9e6761b5b8b1b9e0c98b8a627a2f781c0a6c87a095bd9a18377",
+    "verdict": "BLOCK",
+    "reason": "Mandatory independent Reviewer A/B/C roles are not exposed on the current DevSpace tool surface."
+  },
+  "next_required_inputs": [
+    "W2 frozen algorithmic-breakout contract hash",
+    "W2 exact breakout session B and prior trading session B-1",
+    "source-complete date-local CIQ candidate/identity packet for B-1",
+    "source-complete corporate-action state packet for the same exact CIQSEC + Trading Item identities"
+  ],
+  "claim_boundary": "No W4 Atlas outcome access, empirical PREBREAKOUT result, model/search evaluation, prediction append, broker order, replication outcome, or capital authority is created by this W3 evidence."
+}

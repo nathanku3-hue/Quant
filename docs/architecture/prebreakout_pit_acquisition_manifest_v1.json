@@ -1,0 +1,200 @@
+{
+  "schema_version": "prebreakout_pit_acquisition_manifest_v1",
+  "manifest_status": "FROZEN_FUTURE_ACQUISITION_ONLY_NO_PROVIDER_CAPTURE_TODAY",
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "risk_set_spec_id": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+  "w2_contract_sha256": "94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71",
+  "w2_breakout_spec_id": "PREBREAKOUT_ALGORITHMIC_BREAKOUT_B_20D_HIGH_V1",
+  "current_gate_state": "B_MINUS_1_PIT_AUTHORITY_UNAVAILABLE",
+  "provider": "S&P CAPITAL IQ PRO",
+  "provider_capture_performed": false,
+  "outcome_access_performed": false,
+  "financial_alpha_evidence": 0,
+  "capital_authority": "NONE",
+  "forbidden_inputs": [
+    "AOV_109_OR_ANY_GROWTH_SCREEN_SUBSTITUTION",
+    "TICKER_AS_IDENTITY",
+    "PERMNO_AS_IDENTITY",
+    "COMPANY_ENTITY_AS_RISKY_ASSET_IDENTITY",
+    "CURRENT_SURVIVOR_BACK_PROJECTION",
+    "CURRENT_PRIMARY_BACK_PROJECTION",
+    "ALTERNATE_LISTING_BACKFILL",
+    "FUTURE_COMPLETENESS_FILTER",
+    "CURRENT_PROFILE_FIELD_USED_AS_HISTORICAL_PIT_WITHOUT_EFFECTIVE_DATE_PROOF"
+  ],
+  "population_contract": {
+    "population": "FULL_DATE_LOCAL_US_PRIMARY_COMMON_POPULATION",
+    "date_local": true,
+    "source_population_complete_required": true,
+    "growth_filter_allowed": false,
+    "rule100_filter_allowed": false,
+    "liquidity_filter_allowed_for_membership": false,
+    "future_membership_filter_allowed": false,
+    "survivor_filter_allowed": false,
+    "primary_resolution": "DATE_LOCAL_PROVIDER_PRIMARY_OR_UNIQUE_DATE_LOCAL_QUALIFYING_LISTING",
+    "ambiguous_primary_policy": "DETERMINISTIC_EXCLUSION_NO_RESCUE",
+    "required_risky_identity": "CIQSEC:<SP_CIQ_ID>",
+    "required_listing_identity": "SP_TRADING_ITEM_ID plus exact SPT<SP_TRADING_ITEM_ID> alias"
+  },
+  "raw_objects": [
+    {
+      "role": "DATE_LOCAL_LISTING_POPULATION",
+      "purpose": "Resolve the complete date-local U.S. common-equity listing population before PREBREAKOUT primary-listing admission.",
+      "required_normalized_columns": [
+        "SP_ENTITY_ID",
+        "SP_CIQ_ID",
+        "SP_TRADING_ITEM_ID",
+        "SPT_INSTRUMENT_ITEM_ID",
+        "LISTING_COUNTRY",
+        "SECURITY_CLASS",
+        "TRADING_STATUS",
+        "EXCHANGE",
+        "PRIMARY_LISTING_ID",
+        "PRIMARY_LISTING_STATE",
+        "PRIMARY_LISTING_PROOF_KIND",
+        "MEMBERSHIP_AS_OF_DATE",
+        "OBSERVED_AT",
+        "AVAILABLE_AT"
+      ],
+      "historical_rule": "No current Primary Issue, Security Status, Company Type, Company Status, or current-primary value may be back-projected. Historical primary must be provider-date-local or derived from exact uniqueness among date-local qualifying listings.",
+      "completeness_rule": "All source-qualifying U.S. common-equity listing rows for the decision date must be retained, including rows later deterministically excluded.",
+      "identity_rule": "SP_ENTITY_ID is provenance only; risky identity is CIQSEC:<SP_CIQ_ID>; listing identity is exact Trading Item/SPT.",
+      "receipt_requirements": [
+        "provider request contract and field/perspective identifiers",
+        "decision/effective as-of date",
+        "retrieved_at UTC",
+        "raw object SHA-256 and byte count",
+        "observed range start/end",
+        "source population row count",
+        "historical_as_of_mechanically_bound boolean",
+        "license_scope and retention_class"
+      ]
+    },
+    {
+      "role": "PRIMARY_LISTING_MARKET_HISTORY",
+      "purpose": "Supply W2 corporate-action-normalized primary-listing closes for algorithmic B and share the same raw CIQ market bytes with W9 when the exact date/as-of/listing request is identical.",
+      "required_normalized_columns": [
+        "SPT_DATE",
+        "SP_CIQ_ID",
+        "SP_TRADING_ITEM_ID",
+        "SPT_INSTRUMENT_ITEM_ID",
+        "SP_PRICE_CLOSE",
+        "SP_TOTAL_RETURN",
+        "SP_VOLUME",
+        "OBSERVED_AT",
+        "AVAILABLE_AT"
+      ],
+      "prebreakout_minimum_history": "At least 20 prior observed exact-listing sessions before any candidate B; analysis windows require 20 observed-session warmup before the first evaluated session.",
+      "shared_current_capture_depth": "When coordinated with W9 on the same current as-of date, retain at least 200 complete exact-listing market observations because W9 requires >=200; PREBREAKOUT membership itself does not gain a 200-day eligibility filter from this shared capture depth.",
+      "breakout_law": "B occurs when close_t is strictly greater than the maximum close over the immediately prior 20 observed exact-listing sessions; accepted B episodes require >20 session-index distance from the prior accepted B.",
+      "missingness_rule": "Missing/nonfinite/nonpositive close, duplicate session, mixed listing, or unbound corporate-action normalization fails closed; no close-change or alternate-listing repair.",
+      "receipt_requirements": [
+        "exact identity population raw SHA-256 binding",
+        "exact listing keys",
+        "date range",
+        "retrieved_at UTC",
+        "raw object SHA-256 and byte count",
+        "observed range start/end",
+        "provider units for close/total return/volume",
+        "license_scope and retention_class"
+      ]
+    },
+    {
+      "role": "CORPORATE_ACTION_STATE",
+      "purpose": "Provide complete known-at-cutoff lifecycle/corporate-action state for every candidate CIQSEC + Trading Item pair.",
+      "required_normalized_columns": [
+        "SP_CIQ_ID",
+        "SP_TRADING_ITEM_ID",
+        "SPT_INSTRUMENT_ITEM_ID",
+        "ACTION_STATE",
+        "EVENT_TYPE",
+        "ANNOUNCED_OR_OBSERVED_AT",
+        "AVAILABLE_AT",
+        "EFFECTIVE_SESSION_DATE",
+        "CASH_CONSIDERATION",
+        "CURRENCY",
+        "SOURCE_AUTHORITY",
+        "SOURCE_LOCATOR"
+      ],
+      "allowed_compiled_states": [
+        "CLEAR",
+        "PENDING_TERMINAL",
+        "EFFECTIVE_TERMINAL",
+        "UNRESOLVED"
+      ],
+      "coverage_rule": "Exactly one compiled corporate-action state is required for every candidate identity; incomplete event coverage blocks W3 authority rather than shrinking the population.",
+      "terminal_rule": "Known terminal events effective on/before the decision session deterministically exclude; known future-effective terminal events may remain PENDING_TERMINAL; unresolved state deterministically excludes; no alternate-listing rescue.",
+      "provider_semantic_gate": "Before acquisition, the provider request must prove complete date-local lifecycle semantics for the requested population. Current listing/status fields alone are not sufficient corporate-action authority.",
+      "receipt_requirements": [
+        "exact candidate population hash binding",
+        "provider event-source contract",
+        "decision/effective as-of date",
+        "retrieved_at UTC",
+        "raw object SHA-256 and byte count",
+        "source coverage count",
+        "historical_as_of_mechanically_bound boolean",
+        "license_scope and retention_class"
+      ]
+    }
+  ],
+  "historical_as_of_contract": {
+    "required_when": "Any requested decision/B-1 date precedes raw retrieval wall-clock time.",
+    "historical_as_of_mechanically_bound": true,
+    "observed_range_end_must_not_exceed_decision_session": true,
+    "later_retrieval_is_custody_only": true,
+    "current_profile_rewind_assumption_forbidden": true,
+    "provider_request_must_record": [
+      "transport",
+      "perspective_or_function",
+      "field identifiers",
+      "secondary keys/options",
+      "as-of argument/effective-date key",
+      "identity layer",
+      "vintage/effective-date semantics"
+    ]
+  },
+  "mu_sndk_acceptance_sequence": [
+    "Resolve exact CIQSEC + Trading Item from CIQ source authority; ticker is display-only and cannot resolve identity.",
+    "Acquire the exact listing close series with date-local/corporate-action normalization and compute algorithmic B using frozen W2 law.",
+    "Derive B-1 as the immediately prior observed exact-listing session to B.",
+    "Build the full source-complete W3 PIT authority packet for B-1, including exact primary proof, availability, and complete corporate-action state.",
+    "If proof is PIT_ELIGIBLE_B_MINUS_1, downstream PREBREAKOUT must have an immutable flag inside B-20..B-1; otherwise the smoke obligation fails.",
+    "If proof is a canonical DETERMINISTIC_EXCLUSION, log it as valid zero-weight exclusion.",
+    "If proof is DETERMINISTIC_UNAVAILABLE, keep the gate blocked; it is never a pass or accepted exclusion."
+  ],
+  "w9_raw_acquisition_coordination": {
+    "principle": "CAPTURE_IDENTICAL_RAW_BYTES_ONCE_WHERE_LEGITIMATE; DERIVE_AND_ADMIT_SEPARATELY",
+    "w9_family": "CYCLE_RESONANCE_v1",
+    "w9_risk_set_spec_id": "CRV1_US_PRIMARY_COMMON_V1",
+    "w9_existing_capture_scope": "CRV1_US_PRIMARY_COMMON_NON_GROWTH_CAPTURE_V1",
+    "share_eligible": [
+      "Same provider",
+      "same decision/as-of date",
+      "same exact CIQSEC + Trading Item listing rows",
+      "same raw identity columns and provider semantics",
+      "same market date range and exact listing keys",
+      "same raw close/total-return/volume values",
+      "same retrieval transaction or byte-identical retained raw object"
+    ],
+    "never_shared_as_admission_authority": [
+      "PREBREAKOUT risk-set receipt",
+      "CRV1 risk-set receipt",
+      "family_id",
+      "risk_set_spec_id",
+      "eligibility/exclusion semantics",
+      "minimum-history eligibility law",
+      "corporate-action admission",
+      "label/outcome authority"
+    ],
+    "historical_nonshare_rule": "A later/current W9 identity snapshot can never satisfy an earlier PREBREAKOUT B-1 date. Historical PREBREAKOUT capture requires its own mechanically bound date-local source authority even if market bytes overlap.",
+    "corporate_action_rule": "W3 requires complete corporate-action state. W9 does not gain that requirement merely because raw identity/market acquisition is coordinated.",
+    "aov_109_reuse": false
+  },
+  "pre_capture_hard_gates": [
+    "W2 contract hash must equal 94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71.",
+    "Provider request semantics for historical primary/listing membership must be date-local and not current-conditioned.",
+    "Provider request semantics for complete corporate-action state must be proven before bytes are admitted.",
+    "Every raw object must have deterministic receipt/hash/byte-count/time/license/retention custody.",
+    "No provider capture may occur under this manifest on 2026-08-10 without a later explicit acquisition action."
+  ]
+}
