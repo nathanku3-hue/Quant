@@ -1,9 +1,59 @@
 # Done Checklist — Current
 
 Date: 2026-08-10
-Active state: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / LANE2_A1_A2_CLOSED / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
+Active state: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8 / PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE / PREBREAKOUT_W4_ATLAS_COMPLETE_SEALED_FRESH_VERIFIED / PREBREAKOUT_W5_DEVELOPMENT_FAIL / ECONPHYSICS_PREBREAKOUT_V1_CAUSAL_CONTRACT_FROZEN_NO_CAPTURE_NO_EMPIRICAL_TRIAL / PREBREAKOUT_W6_UNTOUCHED / W9_CRV1_DATA_ADMISSION_ENGINEERING_SLICE_CLOSED / LANE2_A1_A2_CLOSED / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
 Canonical score: `70/100`
 Portfolio-alpha evidence: `0`
+
+## PREBREAKOUT Trial #1 close + Econphysics recut — 2026-08-10
+
+- [x] Real W3 PIT authority is complete; W2/W3 identity, availability, date-local listing/corporate-action and prediction-before-label custody were reverified before result inspection.
+- [x] `PREBREAKOUT_TRIAL_1_M0` opened exactly once and closed exactly once as `FAILED`; material search debt is permanently `1/8`. No refund/reset and no second `TRIAL_OPEN` occurred.
+- [x] Trial #1 market-only M0 remained the frozen deterministic representation; no fitted rescue, ticker branch, MU/SNDK tuning, W6 input, or post-result technical-feature mutation occurred.
+- [x] W5 development is complete and economically fails: four temporal-OOS recall lifts≈`0.759 / 0.813 / 0.529 / 0.673`, median=`0.7157095 < 1`.
+- [x] W4 real Atlas is complete / sealed / fresh-process verified: `2,381` statistical winners, `909` detected, `1,472` missed, median effective TTFLD (miss=0)=`0`, detected-only median=`11`, false-winner decision rows=`90,954`, exact-control unmatched cases=`0`.
+- [x] `pit_or_custody_invalidation=false`; Trial #1 is a valid scientific failure of the market-behavior discovery branch, not an infrastructure/custody failure. Triggered economic falsifiers=`NO_RIGHT_TAIL_ENRICHMENT / NO_POSITIVE_PREBREAKOUT_LEAD`.
+- [x] W6 remains untouched: `w6_lockbox_opened=false`, `w6_labels_opened=false`; old-family Trial #2 remains forbidden.
+- [x] Successor scientific identity is `ECONPHYSICS_PREBREAKOUT_v1`; causal contract + PIT observable manifest are frozen before any new capture/trial. CRV1 causal vocabulary / Alpha-PIT row semantics may be reused; CRV1 252d outcome/risk-set/search/prediction authority may not.
+- [x] M0 successor winner selection is deterministic/monotonic with explicit abstention/missingness; selection breadth/K has no historical default and must be frozen ex ante from attention/capital capacity before winner-label evaluation.
+- [x] **Today stop line is binding:** `CAPTURE=NO-GO`; no new provider capture, no successor empirical trial, no successor prediction clock, and no W6. Freeze evidence=`docs/context/e2e_evidence/econphysics_prebreakout_v1_methodology_freeze_20260810.json`.
+
+## PREBREAKOUT W3 PIT authority — 2026-08-10
+
+- [x] New W3 authority compiler frozen at `research/prebreakout_pit_v1/authority.py` under `PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1`; it owns PIT source/identity/availability/corporate-action truth only.
+- [x] Exact risky identity requires `CIQSEC:IQ...` + numeric Trading Item + exact `SPT<trading_item>`; ticker/company/PERMNO fallback and alternate-listing rescue are forbidden.
+- [x] Historical primary state requires date-local proof: provider-declared date-local primary or exact date-local unique qualifying listing; ambiguous primary state deterministically excludes and current Primary Issue cannot repair it.
+- [x] Candidate and corporate-action rows require `observed_at <= available_at <= as_of`; historical mode requires mechanically bound historical as-of semantics.
+- [x] Source population and corporate-action coverage must be complete; every candidate has exactly one exact-identity action state. Effective terminal and unresolved action states exclude deterministically; missing action coverage blocks authority.
+- [x] Sealed authority packet revalidates source flags/receipt bindings, counts, exact identities, decision date, availability, listing proof, lifecycle state and zero outcome/Alpha/capital authority before hash acceptance.
+- [x] Generic B-1 proof consumes the exact frozen W2 breakout-contract SHA-256 `94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71`; any other non-null breakout hash fails closed. It consumes exact B/B-1 sessions and exact CIQSEC/Trading Item and does not infer a calendar or branch on display symbols.
+- [x] Historical MU/SNDK receipt `docs/context/e2e_evidence/prebreakout_pit_w3_mu_sndk_20260810.json` is explicitly `HISTORICAL_PRE_W2_CUSTODY_ONLY`; `BREAKOUT_CONTRACT_UNBOUND` is no longer current authority and does not satisfy W2.
+- [x] The earlier `B_MINUS_1_PIT_AUTHORITY_UNAVAILABLE` receipt is superseded as current execution truth by the later real W3 authority used in Trial #1. MU/SNDK retain zero statistical/promotion weight and no special-case authority.
+- [x] The acquisition manifest remains the retained source law; the real W3 authority used by Trial #1 satisfied the required date-local PIT/identity/listing/corporate-action seam. Shared raw bytes never merge PREBREAKOUT and CRV1 family authority.
+- [x] Final W3 recut validation: W3 focused=`17/17 PASS`; W2+W3 handshake=`24/24 PASS`; adjacent W2/W3 + W9 CIQ admission + historical identity/lifecycle=`40/40 PASS`; compile, JSON/hash/state and Git whitespace checks PASS.
+- [ ] Mandatory independent Reviewer A/B/C SAW closure is unavailable on the current tool surface; `docs/context/saw_prebreakout_pit_w3_20260810.md` remains `BLOCK` rather than relabeling same-agent or PRODUCT review as independent A/B/C.
+- [x] W2 scientific authority is closed and immutable: `PREBREAKOUT_W2_CONTRACT_v1`, methodology/breakout SHA-256=`94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70c94ae3fd261e71`; B=`strict close > prior 20-session high`, accepted-episode cooldown=`20`, B-1=`immediately prior observed session`, TTFLD=`B-20...B-1`, primary=`20d top-5%`, secondary=`10d top-5%`, hard search budget=`8`.
+- [x] Real W3 authority + W4/W5 Trial #1 execution are complete; the predecessor ledger remains `1/8`, and all historical pre-run gate wording is superseded by the Trial #1 close evidence.
+- [ ] Future PREBREAKOUT work is **successor-only and separately authorized**: capture only PIT observables demanded by the frozen `ECONPHYSICS_PREBREAKOUT_v1` manifest, validate economic-state transitions with winner labels sealed, then freeze selection budget/K before full-census winner evaluation.
+- [ ] Only one frozen successor survivor may approach W6 after development survival; W6 failure closes that version with no rescue.
+
+## Board WIP-3 / L0 + VSB confirmation guardian — 2026-08-10
+
+- [x] Board three-family registration remains intact; the later methodology freeze recuts the former fast VSB slot to frozen `VSB_CONFIRMATION_v1`, with PREBREAKOUT owning new stock discovery. Current W7 engineering allocation is `PARKED / NO ACTIVE ENGINEERING / NO DEDICATED WORKER`. CRV1 remains unchanged; ETF-first Sector Rotation remains isolated; current capital-policy authority remains singular.
+- [x] L0 exact six-field `FamilyDataContract` is hash-bound through Alpha PIT sessions/artifacts/outcome labels with cross-family rejection, discovery-label isolation, and concurrent-session isolation; no dynamic registry/plugin/provider platform added.
+- [x] VSB frozen code identities match preregistration: `VSB_US_PRIMARY_COMMON_DAILY_V1`, 10d primary/20d secondary labels, `VSB_M0_EQUAL_RANK_20_60_20_v1`, `VSB_M0_SEARCH_v1`, one material trial.
+- [x] Provider-blind VSB PIT packet validates exact CIQ security/listing membership, source receipts, no future/extra rows, at least 60 sessions through the decision date, finite close/1d return, nonnegative volume, and zero financial/capital authority.
+- [x] VSB features implement sample-std 20d/60d compression, prior-20-session high breakout, prior-20-session volume-median expansion; invalid domains remain explicit invalid state rather than imputation/repair.
+- [x] VSB M0 model uses average-tie cross-sectional percentile ranks, equal three-feature score, zero-threshold three-way trigger, generic reason codes, and no literal smoke-ticker branch.
+- [x] VSB runner seals predictions strictly after the knowledge cutoff with outcome status `UNMATURED_NOT_EVALUATED`, `financial_alpha_evidence=0`, no broker/capital authority; prediction payload plus batch/per-security prediction identities bind the frozen W7 guardian-contract hash and carry `retune_authority=NONE`, `prebreakout_authority=NONE`.
+- [x] No-network VSB source-admission mechanics validate already-landed same-day CIQ U.S.-primary-common receipts and fail closed on AOV/growth/Rule100/current-survivor/alternate-listing/legacy-identity/liquidity shortcuts; they perform no provider acquisition. The producer also requires the New-York-local decision date, an admitted 2026 NYSE session, `as_of>=16:00 ET`, and source receipts retrieved at/after that completed-close boundary.
+- [x] VSB prediction custody is hash-chained and append-only under the frozen prediction scope with exclusive-writer fail-closed locking, duplicate date/identity rejection, fsync, reload verification, and tamper/partial-line detection.
+- [x] W7 guardian is executable and confirmation-only: inputs must be **VSB-specific matured 10d evaluation receipts** binding frozen VSB family/implementation/search/10d-label identities, guardian hash, prediction-batch hash, VSB evaluation-receipt hash, prediction-before-label proof, zero custody violations, and exact top-5% winner count. PREBREAKOUT W6 outputs are invalid W7 inputs. Before 20 matured primary dates, recall/breadth/lift/bootstrap values remain null; at eligibility, gate=`lift>1 AND 80% moving-block-bootstrap LB>1` with `L=10`, `10000` reps, seed `20260810`.
+- [x] Real-close preflight at `2026-08-10T11:30:26.419305Z` correctly blocked before provider access; no prediction/tape append or automation occurred. The later methodology freeze supersedes the prior “capture next” follow-on for W7.
+- [x] Final live-byte focused W7 suite=`22/22 PASS`; VSB + Alpha PIT + CRV1=`49/49 PASS`; AOV=`167/167 PASS`; selected W7 compile and tracked diff-whitespace checks PASS.
+- [x] W7 formal park: no VSB capture/admission/prediction append/rescue clock/retune/pre-breakout use is authorized; no new VSB prediction clock today; no dedicated W7 worker remains assigned. Product/runtime mechanics are parked.
+- [ ] First W7 result-bearing read remains future-triggered, not active engineering: only separately authorized **VSB-specific matured 10d evaluation receipts** may activate the frozen guardian at `>=20` primary dates; A1/A2, PREBREAKOUT W6 outputs, and named hindsight winners carry zero acceptance weight and no result can rescue M0 in place.
+- [ ] Build ETF-first `SECTOR_ROTATION_ALPHA_v1` only on independent capacity that does not slow VSB or Clock #1; no stock-sector breadth/old sector-map repair/ETF-flow vendor/ML/optimizer/Child redesign in M0.
 
 ## Clock #1 completion — 2026-08-08
 
@@ -30,11 +80,13 @@ Portfolio-alpha evidence: `0`
 - [x] Alpha-PIT + CRV1 focused matrix `19/19 PASS`; AOV regression `102/102 PASS`; ZERO-COMPAT contract test PASS asserting seven zero counters; selected modules compile PASS; Git whitespace PASS.
 - [x] Concrete Alpha PIT producer boundaries implemented: CIQ structured adapter verifies current custody bytes/availability and SEC claims adapter has no generic-web fallback; unlanded fields/sources remain explicit missingness.
 - [x] Current real CIQ structured-custody diagnostic completed mechanically: 109 identities; SMA200 `104/109`; gross-margin/CFO `109/109 MISSING_SOURCE`; expectations `981/981 MISSING_SOURCE`; SEC claims source unlanded; `financial_alpha_evidence=0`.
-- [x] CRV1 risk-set admission hardened: AOV growth-screen 109 forbidden; future `CRV1_US_PRIMARY_COMMON_V1` source must bind the frozen eligibility contract/hash, no growth/current-survivor/future-membership filter, row-level eligibility proofs, and an independent identity receipt.
+- [x] CRV1 risk-set admission hardened and frozen: AOV growth-screen 109 reuse is impossible; `CRV1_US_PRIMARY_COMMON_V1` requires the frozen non-growth contract, exact `CIQSEC` + Trading Item, no growth/current-survivor/future-membership filter, source-derived `>=200` complete market observations, and the exact independently bound identity receipt used downstream.
+- [x] W9 data-admission engineering slice closed: no more CRV1 adapter/platform work and no provider capture today. Future raw CIQ identity/market bytes may be physically shared with W3 only at the custody layer; W3 must independently compile `PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1` plus availability/corporate-action truth, while W9 independently compiles `CRV1_US_PRIMARY_COMMON_V1`. Shared raw hashes never imply shared risk-set authority.
+- [x] CRV1 confirmatory/read capability exposes no outcome method; fundamentals/expectations/SEC remain explicit manifest-bound `MISSING_SOURCE` unless independent CRV1 custody lands.
 - [x] CRV1 implementation-manifest freeze gate implemented with no scientific defaults, explicit search-budget custody, code-byte binding and tamper verification.
 - [ ] First recurring post-Clock weekly provider refresh / next v3 Seal Candidate; preflight mechanics do not substitute for fresh provider bytes.
-- [ ] Independent non-growth `CRV1_US_PRIMARY_COMMON_V1` risk-set capture plus required expectation/SEC source surfaces; current AOV 109 cannot substitute.
-- [ ] Clock/claim/resonance/model/runner mechanics and frozen empirical CRV1 candidate from legitimate real PIT data.
+- [ ] Reopen W9 only during the future shared W3/W9 raw stock-data round/admission; do not create a standalone W9 provider round before then.
+- [ ] Clock/claim/resonance/model/runner mechanics and frozen empirical CRV1 candidate from legitimate real PIT data remain separate from the closed W9 data-admission engineering slice.
 - [ ] Matured, reconciled, validated ReviewPacket; no real outcome-informed MutationManifest before this gate.
 
 ## Closed locally
@@ -55,7 +107,7 @@ Portfolio-alpha evidence: `0`
 - [x] Rule100 control / deterministic Parent / one frozen Child.
 - [x] Hash DAG and selective recomputation.
 - [x] Five-arm evidence and baseline seal/reopen mechanics.
-- [x] Final strategic re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`; mandatory recuts authorized. `CYCLE_RESONANCE_v1` retains its 252d primary horizon as the slow business-cycle family; one fast multi-week family is authorized for immediate preregistration. Parallel evidence qualification is allowed under default family WIP=`2`, initial ceiling=`3`; current portfolio/capital-policy authority remains singular. Destructive Authority Replacement and PIT/OOS/accounting/risk custody remain frozen. Current execution state remains `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`; `financial_alpha_evidence=0`.
+- [x] Final strategic re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`; mandatory recuts authorized. `CYCLE_RESONANCE_v1` retains its 252d primary horizon. Board family registration remains capped at `3` (`CRV1 + VSB + ETF-first Sector Rotation`), but the later W7 formal park removes VSB from active engineering-worker allocation: `VSB_CONFIRMATION_v1=PARKED_NO_WORKER`. Current portfolio/capital-policy authority remains singular. Destructive Authority Replacement and PIT/OOS/accounting/risk custody remain frozen. Current execution state remains `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`; `financial_alpha_evidence=0`.
 - [x] Decision-cut/seal v2 custody fixes are locally closed: actual seal time separation, NYSE-session validation, exact executable-byte manifest, and fresh-process full-chain reopen.
 - [x] First-seal path rejects post-cut target/return history, future primitive knowledge/SOFR publication, input byte drift, and target/execution timing inconsistency.
 - [x] Seal binds current decision target-vector hashes for all five arms.
@@ -82,7 +134,7 @@ Portfolio-alpha evidence: `0`
 - [x] Meeting verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; final record=`docs/architecture/aov_strategic_direction_lock_20260809.md`; no further broad architecture cycle required.
 - [x] `PARALLEL_EVIDENCE_QUALIFICATION=YES`; `SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY=YES`.
 - [x] CRV1 252d primary outcome remains unchanged; separate fast multi-week Alpha clock authorized for preregistration now.
-- [x] Initial active family WIP default=`2`, ceiling=`3` until explicit ownership/search-budget/risk-capacity review.
+- [x] Historical initial family WIP default=`2`, ceiling=`3`; explicit ownership/search-budget/risk-capacity review is now satisfied by the 2026-08-10 Board `GO`, and active WIP is exactly `3` with isolated family custody/search/prediction identity.
 - [x] PAPER-0 implementation authorized behind minimum `ExecutionIntentV1` / `market+cls` / broker canonical state / restart / fencing / `FREEZE_NEW_RISK` / session-close gates; strategy live capital remains closed. Authority surface=`docs/architecture/paper_0_authority.md`.
 - [x] Replication-readiness entitlement/identity/PIT/license quarantine starts now; replication outcomes stay inaccessible to research.
 - [x] Historical fundamental vintage authority closed destructively on `CIQ SPG historical as-of + FilingVer=Original`; legacy generic historical normalization is diagnostic-only / not A1_A2 authority. Authority surface=`docs/architecture/historical_fundamental_vintage_authority.md`.
@@ -231,14 +283,18 @@ Current AOV v3 suite is `75/75 PASS`; ZERO-COMPAT remains seven zeros.
 
 Always-on / active:
 - [ ] prospective weekly AOV tape.
-- [ ] **LANE 2 HISTORICAL COMPRESSION:** historical PIT CIQ reconstruction → exact frozen-AOV replay → A1 → freeze A2 contract → query-metered untouched PIT A2 → Parent/Child economics + incumbent loss/missed-winner diagnosis. Lane 2 may not open Clock #1 outcomes or tune Parent/Child between A1 and A2.
+- [x] **LANE 2 HISTORICAL COMPRESSION A1→A2:** historical PIT CIQ reconstruction → exact frozen-AOV replay → admitted A1 → frozen/query-metered untouched A2 exactly once. No Clock #1 outcomes opened; Parent/Child remained frozen; `financial_alpha_evidence=0`.
+- [x] **Winner Capture Diagnostic v0:** retained A1/A2 bytes only; 10d/20d top-5% winner-access funnel, exact regime split, Parent/Child whole-stage gap reconciliation, generic SNDK/MU smoke explanations; no A2 re-query/provider call/mutation. Evidence=`docs/context/e2e_evidence/winner_capture_diagnostic_v0_20260810.json`.
 - [ ] weekly fresh-data contract: same frozen 109 candidate entities; fresh fundamentals + identity/status + completed market + benchmark/rate + staleness validation; no weekly rerun of the growth screen.
 - [ ] deterministic review + custody/replay closure.
-- [ ] `ALPHA_PIT_PIPELINE` WIP slot: one narrow `alpha_pit_data_api_v1` incumbent; only first-family-required fields/sources; no generic provider platform.
-- [ ] `ALPHA_FAMILY_BUILD` WIP: default `2` independent confirmatory/prediction family clocks, initial ceiling `3`; first slow clock=`CYCLE_RESONANCE_v1` with unchanged 252d primary outcome, plus one fast multi-week family to preregister. Each family has isolated owner/writer, search budget, Prediction/Trial Ledger scope and artifact namespace.
+- [ ] `ALPHA_PIT_PIPELINE` WIP slot: one narrow `alpha_pit_data_api_v1` incumbent; the exact six-field `FamilyDataContract` second-consumer recut is implemented, but each family's legitimate source-bound producer remains narrow and explicit; no generic provider platform.
+- [ ] `ALPHA_FAMILY_BUILD` WIP: Board family ceiling/registration remains `3`; slow family=`CYCLE_RESONANCE_v1` keeps unchanged 252d primary outcome; `VSB_CONFIRMATION_v1` is parked with no active engineering worker; ETF-first Sector Rotation remains separately isolated. Each family keeps isolated custody/search/Prediction/Trial Ledger identity when active.
 - [ ] Alpha PIT + CRV1 may build concurrently against the frozen interface; deterministic API fixtures are allowed for engineering but have zero PIT/OOS/prospective evidence authority until real integration.
 - [ ] `AI_RESEARCH_TOOLING` WIP slot may run only with independent ownership and without slowing the critical PIT+CRV1 pair; first scope=`AIInvocationReceipt` + role firewall + source-claim/discovery schema + ReviewPacket/Mutation fixture mechanics.
-- [ ] registered discovery incubators may run with explicit Trial/Search budgets and zero automatic confirmatory/capital authority; an incubator enters confirmatory WIP only through explicit family admission. Leading fast-family candidates=`SECTOR_ROTATION_ALPHA_v1` / `VOL_SQUEEZE_BREAKOUT_v1`.
+- [x] Historical fast-family M0 selection/preregistration retained as `VOL_SQUEEZE_BREAKOUT_v1`, one material trial, independent broad date-local U.S. primary-common risk set, primary 10d top-5% label, zero financial/capital authority. Under the later methodology freeze its active role is `VSB_CONFIRMATION_v1` only.
+- [x] VSB source-bound `VSB_US_PRIMARY_COMMON_DAILY_V1` admission mechanics + append-only M0 prediction tape remain landed, and W7 confirmation guardian mechanics are frozen/hash-bound. No real prediction or empirical result is claimed; AOV 109/Lane-2 94 remain forbidden substitutes; SNDK/MU remain zero-weight generic smoke probes.
+- [ ] VSB first acceptance read remains blocked until `>=20` **VSB-specific matured primary 10d evaluation receipts** and then uses observed winner-recall lift `>1` plus frozen 80% moving-block-bootstrap lower bound `>1`. No pre-20 lift/CI peeking; A1/A2 and PREBREAKOUT W6 outputs have zero acceptance weight.
+- [ ] registered discovery incubators may run with explicit Trial/Search budgets and zero automatic confirmatory/capital authority; `SECTOR_ROTATION_ALPHA_v1` remains queued/discovery-only unless a later explicit family-WIP decision admits it.
 - [ ] Minimum Viable Atlas first: enough legitimate PIT history for honest discovery/contemporaneous controls → freeze implementation → untouched PIT test where available → seal prospectively as soon as honest; deepen full risk-set/false-winner/replication coverage underneath the running clock.
 - [ ] once a Challenger is sealed, it leaves Alpha-family build WIP and continues as an immutable running tape while the family slot may move only to the next evidence-justified preregistered family/component; Trial Ledger retains all attempts/failures.
 

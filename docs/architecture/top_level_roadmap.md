@@ -1,7 +1,7 @@
 # GodView Top-Level Roadmap
 
-Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / MANDATORY_RECUTS_AUTHORIZED / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; LIVE CLOSED`
-Date: 2026-08-09
+Status: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / LANE2_A1_A2_CLOSED / WINNER_CAPTURE_DIAGNOSTIC_V0_FROZEN / VSB_SOURCE_AND_LEDGER_MECHANICS_IMPLEMENTED / W9_CRV1_DATA_ADMISSION_ENGINEERING_SLICE_CLOSED / CRV1 + VSB + SECTOR_ROTATION_ACTIVE_RESEARCH_CLOCKS / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; LIVE CLOSED`
+Date: 2026-08-10
 Canonical authority: `docs/context/gv_endgame_authority_current.md`
 Active brief: `docs/context/ACTIVE_BRIEF`
 Method authority: `docs/architecture/alpha_organism_endgame_current.md`
@@ -22,7 +22,7 @@ immutable PIT reality
 → bounded live authority
 ```
 
-Prospective calendar time is the scarce asset. Historical provider/compute capacity is a separate resource. The product is optimized for **evidence velocity × economic relevance**, not infrastructure completeness. Final re-audit verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Mandatory execution recuts are authorized by `docs/architecture/aov_strategic_direction_lock_20260809.md`: CRV1 remains the 252d slow business-cycle family, one fast multi-week family is authorized for immediate preregistration, evidence qualification may run in parallel, PAPER-0 implementation is authorized behind minimum gates (`docs/architecture/paper_0_authority.md`), historical A1/A2 is hard-blocked until vintage + semantic parity close (`docs/architecture/historical_fundamental_vintage_authority.md`), and replication readiness starts now.
+Prospective calendar time is the scarce asset. Historical provider/compute capacity is a separate resource. The product is optimized for **evidence velocity × economic relevance**, not infrastructure completeness. Final re-audit verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. The 2026-08-10 Board registration remains bounded at WIP=`3`, but the PREBREAKOUT roadmap is locally recut without reopening the broad endgame: unchanged `CYCLE_RESONANCE_v1` remains the slow 252d business-cycle family; `VOL_SQUEEZE_BREAKOUT_v1` is retained only as frozen `VSB_CONFIRMATION_v1`; ETF-first `SECTOR_ROTATION_ALPHA_v1` remains orthogonal; and new stock-winner discovery authority is `ECONPHYSICS_PREBREAKOUT_v1`. Trial #1 of the predecessor market-only branch is closed as a valid FAIL at permanent `1/8`; W3 is complete, W4 sealed/verified, W5 failed, W6 untouched. The successor causal methodology is frozen, but **today remains no-capture/no-successor-empirical-trial**. Family custody/search/prediction identity stays isolated and current portfolio/capital-policy authority remains singular. W9's fail-closed independent non-growth CRV1 admission mechanics are now frozen and the engineering slice is closed. No provider capture is authorized today. Reopen W9 only in the future shared W3/W9 stock-data round: raw CIQ identity/market bytes may be shared at the custody layer, but W3 independently owns `PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1` plus date-local availability/corporate-action truth, while W9 independently owns `CRV1_US_PRIMARY_COMMON_V1` plus non-growth and source-derived `>=200` complete market observations. Shared raw bytes never imply shared risk-set authority; AOV-109 cannot be relabeled into either lane. Historical A1/A2 is closed after one A2 read, Winner Capture Diagnostic v0 is retained-byte diagnostic only, PAPER-0 remains gated by its minimum controls, and replication readiness stays quarantined.
 
 ## Gate A — Episode-2 freeze
 
@@ -99,7 +99,7 @@ A seal/clock-start receipt is still not financial-alpha evidence; `financial_alp
 
 ## Work while the clock runs
 
-Finish deterministic review closure, not another platform phase. The active velocity law is now **parallelize independent prediction clocks and evidence qualification; serialize current portfolio/capital-policy commits and financial capital authority**. Default active Alpha-family WIP is `2`, with an initial ceiling of `3` until explicit WIP review.
+Finish deterministic review closure, not another platform phase. The active velocity law is **parallelize independent prediction clocks and evidence qualification; serialize current portfolio/capital-policy commits and financial capital authority**. The 2026-08-10 Board has completed the required WIP review and active Alpha-family WIP is exactly `3`: CRV1 + VSB + ETF-first Sector Rotation. Do not add a fourth family without a new explicit WIP review.
 
 Always-on closure:
 
@@ -112,19 +112,19 @@ The critical clocks run concurrently:
 ```text
 LANE 1 — FUTURE TRUTH                    LANE 2 — COMPRESSED LEARNING
 ─────────────────────                    ─────────────────────────────
-weekly frozen-109 tape                   historical PIT CIQ
+weekly frozen-109 tape                   A1 admitted / A2 one-shot closed
         │                                         │
-CRV1 slow clock (252d)                  VINTAGE AUTHORITY + PARITY GATE
+CRV1 slow clock (252d)                  retained-byte winner diagnosis
         │                                         │
-fast multi-week Alpha clock             exact frozen-AOV replay
+VSB fast clock (10d / 20d)              Rule100 access → Parent/Child capture
         │                                         │
-parallel evidence qualification                A1
+source-admission + append-only tape      no re-query / no mutation
         │                                         │
-matured ReviewPackets                   FREEZE A2 CONTRACT
+first real CIQ VSB prediction           historical diagnostic authority only
         │                                         │
-bounded mutation                        untouched/query-metered A2
-        │                                         │
-prospective Challengers                 Parent/Child economics + loss/winner diagnosis
+Sector ETF clock (20d / 40d)            financial_alpha_evidence = 0
+        │
+new untouched/prospective labels
 
 PAPER-0                                 REPLICATION READINESS
 ────────                                ─────────────────────
@@ -134,9 +134,9 @@ ExecutionIntentV1                       entitlement / identity / PIT / license
 → restart/fencing/FREEZE_NEW_RISK
 ```
 
-CRV1's 252d outcome no longer determines programme learning speed. A separate fast family is required, but the strategic lock deliberately does not choose `SECTOR_ROTATION_ALPHA_v1` versus `VOL_SQUEEZE_BREAKOUT_v1`; that is the next local preregistration decision.
+CRV1's 252d outcome no longer determines programme learning speed, but the fast stock-winner discovery path is no longer a market-only VSB clock. `VOL_SQUEEZE_BREAKOUT_v1` remains frozen as `VSB_CONFIRMATION_v1` only. The predecessor PREBREAKOUT Trial #1 established that market-only recognition can have lead when it fires but lacks right-tail coverage; it is closed permanently at `1/8` with no PIT/custody invalidation and W6 untouched. `ECONPHYSICS_PREBREAKOUT_v1` is now the successor discovery identity with a frozen causal/PIT methodology and zero empirical authority today. Its lawful future critical path is `demand-pulled PIT data → economic-state transition validation with winner labels sealed → ex-ante SelectionBudget/K freeze → full-census winner selection → ~4-fold OOS → freeze one survivor → W6 once → prospective forward → shadow economics → PAPER`. `SECTOR_ROTATION_ALPHA_v1` remains orthogonal and may progress independently without blocking the stock path.
 
-Lane 2 may not open Clock #1 outcomes and may not tune Parent/Child between A1 and A2. A1/A2 is currently **BLOCKED** until one historical CIQ filing-vintage semantic wins destructively and current-vs-historical AOV shared economics pass same-input parity. Current `Original` replay requirements conflict with `Current/Restated` capture semantics; no A1/A2 claim is permitted until that truth issue closes.
+Lane 2 may not open Clock #1 outcomes or tune Parent/Child. A1/A2 is **CLOSED**, not blocked: A2 was evaluated exactly once and cannot be re-queried. Winner Capture Diagnostic v0 uses retained hashes/bytes only and reproduces the structural bottleneck; the diagnostic remains historical evidence with `financial_alpha_evidence=0`.
 
 Supporting authority-domain work may run concurrently only with independent ownership:
 
@@ -146,8 +146,9 @@ AI Research Tooling
 → real outcome-informed mutation remains blocked until mature validated ReviewPacket
 
 Discovery / Family Incubators
-→ MARKET_TRANSITION_ALPHA_v1 remains discovery-only unless explicitly admitted into one of the active family WIP slots
-→ one fast multi-week family is authorized for immediate preregistration
+→ broad family ceiling/registration is not reopened by this local recut; VSB is parked as confirmation-only and does not own new discovery
+→ MARKET_TRANSITION_ALPHA_v1 remains discovery-only unless a future Board/WIP review changes its authority
+→ PREBREAKOUT next action **today is none after methodology freeze**; on a later separately authorized round, capture only demanded econphysics PIT observables and validate economic states before any winner-label search; Sector Rotation remains independent
 
 PAPER-0
 → independently owned operational vertical
@@ -163,7 +164,7 @@ validated ReviewPacket
 → development Trial
 ```
 
-Search-debt automation, family WIP beyond the initial `2` / ceiling `3`, generic AI/data/provider platforms, elaborate research UI, universal Right-Tail Atlas work, generalized external-strategy ingestion, generic execution architecture, optimizer-first work, leverage/short/options policy, AOV-2, L2/L3, and provider breadth remain evidence-gated rather than blocking A1/A2/A3 economics.
+Search-debt automation, family WIP beyond the Board-approved active `3`, generic AI/data/provider platforms, elaborate research UI, universal Right-Tail Atlas work, generalized external-strategy ingestion, generic execution architecture, optimizer-first work, leverage/short/options policy, AOV-2, L2/L3, and provider breadth remain evidence-gated rather than blocking prospective Alpha economics.
 
 ## Model portfolio direction
 
@@ -180,15 +181,15 @@ No model gains live authority from development results alone.
 ## Evidence ladder
 
 1. `A0` mechanical lineage / immutable experiment substrate — local substrate exists.
-2. `A1` admitted real exploratory **exact frozen-AOV historical PIT replay** — open; first-class Lane 2 milestone.
-3. `A2` query-metered untouched historical PIT OOS under a pre-frozen contract — open; first-class Lane 2 milestone.
+2. `A1` admitted real exploratory **exact frozen-AOV historical PIT replay** — admitted and retained.
+3. `A2` query-metered untouched historical PIT OOS under a pre-frozen contract — consumed exactly once and closed; no re-query.
 4. `A3` matured prospective paper evidence — `0`.
 5. `A4` independent future replication — `0`.
 6. `A5` bounded live parity — closed.
 
 ## Deferred
 
-Episode-3 milestone · family WIP beyond the initial operating ceiling without explicit review · universal PIT/data/provider platform · generic AI/agent platform · elaborate research UI · universal Right-Tail Atlas · generalized external-strategy ingestion · generic execution architecture · true liquidity-cascade/LOB authority · L2/L3 / DeepLOB acquisition without a measured information gap · 13F/options/ownership expansion · optimizer/RL-first development · unrestricted generated Python · second app/engine · compatibility restoration · strategy live capital · leverage/shorting/derivatives.
+Episode-3 milestone · family WIP above the active Board-approved `3` without a new explicit review · universal PIT/data/provider platform · generic AI/agent platform · elaborate research UI · universal Right-Tail Atlas · generalized external-strategy ingestion · generic execution architecture · true liquidity-cascade/LOB authority · L2/L3 / DeepLOB acquisition without a measured information gap · 13F/options/ownership expansion · ETF-flow vendor acquisition · stock-sector breadth / repair of the old sector map · optimizer/RL/boosting-first development · Child redesign · unrestricted generated Python · second app/engine · compatibility restoration · strategy live capital · leverage/shorting/derivatives.
 
 ## Current validation
 
@@ -198,6 +199,8 @@ Episode-3 milestone · family WIP beyond the initial operating ceiling without e
 - Current dashboard/book/historical receipt: `33/33 PASS`.
 - Hard-cut E2 regression: `107/107 PASS`.
 - Historical Alpha runtime substrate in live Git checkout: `7/7 PASS`.
+- Final VSB + Alpha PIT + CRV1 pre-evaluation custody: `37/37 PASS`; AOV regression `166/166 PASS`; selected compile + Git whitespace PASS.
+- VSB independent Reviewer A/B/C SAW remains open because distinct reviewer capacity was unavailable in the implementation session; this does not change `financial_alpha_evidence=0`.
 - ZERO-COMPAT: six counters `0`.
 - Compile/YAML/dependencies/whitespace: PASS.
 

@@ -2,7 +2,23 @@
 
 Date: 2026-08-10
 State: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
-Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; LANE2_A1_A2_CLOSED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0`
+Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE; PREBREAKOUT_W4_ATLAS_COMPLETE_SEALED_FRESH_VERIFIED; PREBREAKOUT_W5_DEVELOPMENT_FAIL; ECONPHYSICS_PREBREAKOUT_V1_CAUSAL_CONTRACT_FROZEN_NO_CAPTURE_NO_EMPIRICAL_TRIAL; PREBREAKOUT_W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## PREBREAKOUT Trial #1 close / Econphysics impact — 2026-08-10
+
+Real W3 authority completed the fail-closed `PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1` source/identity/availability/listing/corporate-action seam and was used to run the already-preregistered Trial #1 without current-survivor/current-primary, ticker/entity/PERMNO, alternate-listing or outcome-before-prediction rescue. Trial #1 then closed exactly once as `FAILED`, permanently consuming `1/8`; W6 remained unopened.
+
+The economic result is a representation/coverage failure, not a custody failure. W5 four-fold recall lift is approximately `0.759 / 0.813 / 0.529 / 0.673` with median `0.7157095 < 1`. The sealed/fresh-verified W4 Atlas has `2,381` statistical winner episodes, `909` detected and `1,472` missed; median effective TTFLD with misses is `0`, detected-only median lead is `11` sessions, false-winner decision rows are `90,954`, and exact-control unmatched cases are `0`. `pit_or_custody_invalidation=false`. MU/SNDK remain zero-weight integration smoke and do not define successor methodology.
+
+The local roadmap is therefore destructively recut to new scientific identity `ECONPHYSICS_PREBREAKOUT_v1`. Its causal contract and PIT observable manifest are now frozen before any new material observation: causal graph/edge rationale, applicability, PIT source/field/unit/identity/observed_at/available_at/vintage/missingness law, state transitions, expectation gap, deterministic winner-selection mapping, market-confirmation/continuation boundaries, invariance, falsifiers, and append-only search debt. CRV1 causal vocabulary and Alpha-PIT observable semantics may be reused, but CRV1 252d outcome/risk-set/search/prediction authority may not. **Today remains `CAPTURE=NO-GO`: no new provider capture, no successor empirical trial, no new prediction clock, no W6.** Evidence=`docs/context/e2e_evidence/prebreakout_trial1_close_20260810.json` and `docs/context/e2e_evidence/econphysics_prebreakout_v1_methodology_freeze_20260810.json`.
+
+## Board WIP-3 / VSB confirmation-guardian impact — 2026-08-10
+
+Board approval across CEO/CRO/Risk/Quant/Alpha Manager retains the three-family registration, but the later methodology freeze recuts the former fast VSB slot to `VSB_CONFIRMATION_v1` only. **Current engineering allocation parks W7:** no active VSB engineering WIP and no dedicated worker. PREBREAKOUT owns new stock discovery; CRV1 and ETF-first Sector Rotation remain independently active, and no family widens capital authority.
+
+L0 FamilyDataContract isolation remains mechanically closed. VSB retains its source/PIT/M0/prediction/tape chain but is recut by the later methodology freeze to `VSB_CONFIRMATION_v1` only. W7 freezes a guardian-contract hash into prediction payload and batch/per-security prediction identity, blocks all recall/breadth/lift/bootstrap metrics before 20 matured primary 10d dates, and at eligibility applies the exact `lift>1` plus 80% moving-block-bootstrap lower-bound `>1` law (`L=10`, `10000` reps, seed `20260810`). The guardian consumes **VSB-specific matured 10d evaluation receipts only**; PREBREAKOUT W6 outputs are invalid W7 inputs. It does not perform provider/network acquisition, construct labels, query A2, open Clock #1 outcomes, submit broker orders, mutate Parent/Child, retune M0, claim pre-breakout authority, or create financial/capital authority.
+
+Final live-byte W7 + Alpha-PIT + CRV1 validation is `49/49 PASS`; AOV is `167/167 PASS`. Product/runtime mechanics are now **PARKED**: no capture, append, rescue, retune, PREBREAKOUT use, or dedicated worker. A future VSB-specific matured-10d receipt feed may activate the frozen guardian only after the existing `>=20` date gate. Full governance closure remains open **only** for unavailable independent final-byte review / distinct SAW A/B/C coverage; this is not an empirical Alpha finding.
 
 ## Lane 2 A1→A2 closure impact — 2026-08-10
 
@@ -110,6 +126,16 @@ Market acquisition is also narrowed operationally: one fresh Office process per 
 - ZERO-COMPAT: all seven counters zero, including archived/release executable-source import prohibition.
 - Compile/YAML/`pip check`/whitespace: PASS.
 
+## Focused-pivot impact — 2026-08-10 Winner Capture + Fast Family #2
+
+The closed A1/A2 evidence is now consumed through frozen `Winner Capture Diagnostic v0`, not a second held-out query. The provider-blind diagnostic verifies retained source hashes and one-bar execution lag, labels Rule100 target-state-change anchors by next-10d/20d top-5% total return, reports winner access/support/entry/capital/contribution/Child clipping/downside avoided with exact AOV trend-breadth regimes, and reconciles the non-overlapping whole-stage Parent−Child gross gap. Final evidence hash=`ca00de044ac59543735579157b8b2483385509bc72924a3ef82fdef6f37b75fe`; `a2_requery_count=0`; `financial_alpha_evidence=0`.
+
+The retained A2 diagnostic reproduces 10d winner recall=`26.6667%` at Rule100 breadth=`20.3901%` and 20d recall=`20.0000%` at breadth=`19.1489%`. Parent−Child gross gap=`1.373092pp`; Child cost savings=`0.048211pp`. The five largest full-stage realized winners `OPHC/SMTI/CSTL/NTRA/TLSI` explain `92.5781%` of the gross gap via Parent−Child contribution deltas; Parent had OPHC/NTRA at opening, later SMTI, and never CSTL/TLSI. These are historical search-debt/forensic facts, not challenger acceptance evidence.
+
+Fast-family historical M0 `VOL_SQUEEZE_BREAKOUT_v1` is now retained only as `VSB_CONFIRMATION_v1`. Its one-trial identity, independent broad date-local U.S. primary-common risk set, close/1d-return/volume surface, 20/60/20 mechanism, daily prediction custody, and 10d top-5% label remain frozen. SNDK/MU have zero acceptance weight and no literal-ticker scoring branch is authorized. The W7 guardian is implemented, hash-bound, and parked with no worker. There is no active VSB dependency; only a future VSB-specific matured-10d evaluation trigger may invoke the frozen `>=20 dates + lift>1 + 80% bootstrap LB>1` confirmation gate.
+
+Validation impact: changed Python compiles PASS; focused diagnostic/Alpha-PIT/CRV1=`26/26 PASS`; full AOV=`166/166 PASS`; full Alpha PIT + CRV1 packages=`21/21 PASS`; whitespace and both new artifact-hash recomputations PASS. Independent PRODUCT review=`PASS` with a VSB-future-evidence advisory only. SAW report=`docs/saw_reports/saw_winner_capture_vol_squeeze_pivot_20260810.md` is intentionally `BLOCK` because this environment does not expose distinct mandatory Reviewer A/B/C roles; this is a review-coverage blocker, not a discovered product/runtime/data defect.
+
 ## Documentation impact — 2026-08-08 Winner / authority recut
 
 The Winner/authority recut remains retained historical roadmap authority: it preregistered `CYCLE_RESONANCE_v1`, Minimum-Viable-Atlas-first, capital-weighted right-tail capture, Destructive Authority Replacement, six owner constitutions and one-incumbent semantics. Its former `PRE_SEAL_REAL_CIQ_ADMISSION` execution-state wording and later `APPROVED_WITH_VELOCITY_PARALLELISM_RECUT` finality are superseded by the 2026-08-09 strategic lock. The scientific/authority content remains historical foundation.
@@ -126,4 +152,4 @@ New architecture records: `docs/architecture/aov_velocity_council_20260808.md`, 
 
 ## Claim boundary
 
-Canonical maturity remains `70/100`; portfolio-alpha evidence remains `0`. Final strategic verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`; mandatory recuts authorized. Current execution state is unchanged: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`. CRV1 remains 252d, fast-family preregistration is authorized, A1/A2 remains blocked on vintage+parity, PAPER-0 is authorized but no broker strategy execution is claimed, and strategy live capital remains closed. Compute performance is non-blocking; provider acquisition and broker hot-path shape are the practical performance concerns.
+Canonical maturity remains `70/100`; portfolio-alpha evidence remains `0`. Final strategic verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Current execution state remains `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`. The Board three-family registration is retained, but W7/VSB confirmation is parked with no active engineering worker; CRV1 and ETF-first Sector Rotation remain independent research lanes. A1/A2 is closed after exactly one A2 read; Winner Capture v0 is retained-diagnostic-only; VSB has a frozen no-retune guardian but no real prediction entry or untouched/prospective acceptance result. PAPER-0 is authorized but no broker strategy execution is claimed; strategy live capital remains closed.

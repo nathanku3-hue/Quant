@@ -1,0 +1,164 @@
+{
+  "schema_version": "econphysics_prebreakout_pit_observable_manifest_v1",
+  "family_id": "ECONPHYSICS_PREBREAKOUT_v1",
+  "status": "FROZEN_METHOD_ONLY_NO_CAPTURE_AUTHORITY",
+  "frozen_date": "2026-08-10",
+  "authority_reuse": {
+    "reuse_crv1_causal_vocabulary": true,
+    "reuse_alpha_pit_row_semantics": true,
+    "reuse_crv1_252d_outcome_authority": false,
+    "reuse_crv1_search_ledger": false,
+    "reuse_crv1_prediction_ledger": false,
+    "reuse_crv1_risk_set_authority": false,
+    "reuse_trial1_market_features_as_economic_state": false
+  },
+  "identity_law": {
+    "security_identity": "CIQSEC:<Capital IQ Security ID>",
+    "listing_identity": "exact Trading Item / SPT identity where listing-specific market state is used",
+    "ticker_fallback": false,
+    "company_entity_fallback": false,
+    "permno_fallback": false,
+    "current_primary_backprojection": false
+  },
+  "pit_row_contract": {
+    "required_fields": [
+      "source_id",
+      "field_or_claim_identity",
+      "unit",
+      "security_identity",
+      "observed_at",
+      "available_at",
+      "vintage_or_revision_law",
+      "coverage_or_missingness_state",
+      "source_receipt_sha256"
+    ],
+    "availability_rule": "available_at <= decision_as_of",
+    "revision_rule": "never overwrite a prior PIT vintage; later revisions are new observations and cannot be backdated",
+    "family_missingness_projection": {
+      "PRESENT": "OBSERVED",
+      "MISSING_HISTORY": "UNOBSERVED",
+      "MISSING_SOURCE": "UNOBSERVED",
+      "NOT_ENTITLED": "UNOBSERVED",
+      "STALE": "UNOBSERVED",
+      "NOT_APPLICABLE": "NOT_APPLICABLE"
+    },
+    "implicit_imputation": false,
+    "market_proxy_for_missing_economic_state": false
+  },
+  "nodes": [
+    {
+      "node_id": "SUPPLY_CAPACITY_STATE",
+      "role": "upstream economic cause",
+      "applicability": "conditional on business model having material physical/service capacity or supply discipline",
+      "structured_observables": ["fund.capex_q"],
+      "source_claim_topics": ["SUPPLY_CAPACITY", "COMPETITION"],
+      "expectation_measures": [],
+      "notes": "capex is investment/capital-cycle evidence, not a direct substitute for physical capacity; absent direct capacity evidence remains UNOBSERVED"
+    },
+    {
+      "node_id": "INVENTORY_CHANNEL_STATE",
+      "role": "stock/flow normalization",
+      "applicability": "conditional on economically meaningful inventory or channel stock",
+      "structured_observables": ["fund.inventory_q", "fund.revenue_q"],
+      "source_claim_topics": ["INVENTORY_CHANNEL"],
+      "expectation_measures": [],
+      "notes": "inventory and revenue may be combined only with compatible units/periods and explicit transform identity"
+    },
+    {
+      "node_id": "DEMAND_ORDER_STATE",
+      "role": "demand/order corroboration",
+      "applicability": "general where demand/order evidence is economically meaningful",
+      "structured_observables": ["fund.revenue_q"],
+      "source_claim_topics": ["DEMAND", "GUIDANCE"],
+      "expectation_measures": [],
+      "notes": "revenue is realized demand/capture evidence and is not a complete orders/backlog substitute"
+    },
+    {
+      "node_id": "PRICING_MIX_STATE",
+      "role": "pricing realization / mix transition",
+      "applicability": "general where price or mix is an economically meaningful margin driver",
+      "structured_observables": [],
+      "source_claim_topics": ["PRICING", "COMPETITION"],
+      "expectation_measures": [],
+      "notes": "no market-price substitution; missing company/industry pricing evidence remains UNOBSERVED"
+    },
+    {
+      "node_id": "UTILIZATION_COST_STATE",
+      "role": "throughput / utilization / unit-cost transition",
+      "applicability": "conditional on utilization or throughput having economic meaning",
+      "structured_observables": [],
+      "source_claim_topics": ["UTILIZATION", "SUPPLY_CAPACITY", "MARGIN"],
+      "expectation_measures": [],
+      "notes": "margin cannot be relabeled as utilization; direct utilization/cost evidence is preferred and absence remains UNOBSERVED"
+    },
+    {
+      "node_id": "MARGIN_CASH_STATE",
+      "role": "downstream operating leverage and cash conversion",
+      "applicability": "general where reported margins/cash flow are meaningful",
+      "structured_observables": ["fund.gross_margin_q", "fund.operating_margin_q", "fund.cash_from_ops_q", "fund.revenue_q"],
+      "source_claim_topics": ["MARGIN"],
+      "expectation_measures": [],
+      "notes": "structured fields keep source units and PIT vintage; sign/inflection transforms are versioned"
+    },
+    {
+      "node_id": "REVISION_GUIDANCE_STATE",
+      "role": "market-consensus trajectory and management guidance",
+      "applicability": "general when consensus or guidance is available",
+      "structured_observables": [],
+      "source_claim_topics": ["GUIDANCE"],
+      "expectation_measures": [
+        "EPS_FY1",
+        "EPS_FY2",
+        "REVENUE_FY1",
+        "REVENUE_FY2",
+        "EPS_FY1_REVISION_30D",
+        "EPS_FY1_REVISION_90D",
+        "REVENUE_FY1_REVISION_30D",
+        "REVENUE_FY1_REVISION_90D"
+      ],
+      "notes": "observed consensus and management guidance remain distinct epistemic classes"
+    },
+    {
+      "node_id": "EXPECTATION_GAP_STATE",
+      "role": "mispricing representation",
+      "applicability": "requires an economic-state trajectory plus at least one lawful consensus/guidance expectation observable",
+      "structured_observables": [],
+      "source_claim_topics": ["GUIDANCE"],
+      "expectation_measures": [
+        "EPS_FY1_REVISION_30D",
+        "EPS_FY1_REVISION_90D",
+        "REVENUE_FY1_REVISION_30D",
+        "REVENUE_FY1_REVISION_90D"
+      ],
+      "notes": "derived family state; not a provider-observed fact and not inferred from price when consensus is missing"
+    },
+    {
+      "node_id": "MARKET_CONFIRMATION_STATE",
+      "role": "downstream recognition / capturability only",
+      "applicability": "listing-level market confirmation after upstream alpha priority exists",
+      "structured_observables": [
+        "market.close",
+        "market.total_return_1d",
+        "market.volume",
+        "market.adv20",
+        "market.realized_vol20",
+        "market.sma20",
+        "market.sma200"
+      ],
+      "source_claim_topics": [],
+      "expectation_measures": [],
+      "notes": "forbidden as a substitute for ECON_STATE_v1; VSB remains a separate frozen confirmation component"
+    }
+  ],
+  "outcome_firewall": {
+    "top5_winner_labels_may_define_nodes": false,
+    "w4_w5_decomposition_may_define_nodes": false,
+    "mu_sndk_may_define_nodes": false,
+    "trial1_features_may_define_nodes": false,
+    "outcomes_may_falsify_after_freeze": true
+  },
+  "capture_authority": "NONE",
+  "w6_authority": "HOLD_UNTOUCHED",
+  "financial_alpha_evidence": 0,
+  "capital_authority": "NONE"
+}

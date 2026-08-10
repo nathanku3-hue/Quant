@@ -1,7 +1,15 @@
 # Post-Phase Alignment — Current
 
 Date: 2026-08-10
-Status: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MULTI_CLOCK_EVIDENCE_AUTHORIZED; LANE2_A1_A2_CLOSED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; W3_REAL_AUTHORITY_COMPLETE; W4_ATLAS_SEALED_VERIFIED; W5_DEVELOPMENT_FAIL; ECONPHYSICS_PREBREAKOUT_V1_CAUSAL_CONTRACT_FROZEN_NO_CAPTURE_NO_EMPIRICAL_TRIAL; W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## 2026-08-10 Board WIP-3 / VSB-core alignment
+
+CEO/CRO/Risk/Quant/Alpha Manager approved the three-family registration. The later methodology freeze supersedes the old active-VSB allocation: unchanged slow CRV1 and ETF-first Sector Rotation remain active research lanes, while `VSB_CONFIRMATION_v1` is **PARKED / NO ACTIVE ENGINEERING / NO DEDICATED WORKER** and PREBREAKOUT owns stock discovery. L0 FamilyDataContract isolation is mechanically closed. VSB retains no-network source admission, source-bound packet, frozen 20/60/20 M0, prediction/tape custody, and the hash-bound confirmation guardian without starting a new clock. No provider/network acquisition, empirical evaluation, capital authority, stock-sector breadth, ETF-flow vendor, optimizer/ML or Child redesign is created by this recut.
+
+## 2026-08-10 PREBREAKOUT Trial #1 close / Econphysics alignment
+
+W2 remains immutable historical Trial-1 authority, but the execution state has advanced: real W3 authority is complete; Trial #1 opened/closed exactly once and is a valid scientific `FAIL` permanently charged `1/8`; W4 real Atlas is complete/sealed/fresh-process verified; W5 development fails economically; W6 remains untouched. There is no PIT/custody invalidation. The market-only representation has useful lead when it fires but insufficient causal coverage, so the old market-pattern discovery identity is not rescued. `ECONPHYSICS_PREBREAKOUT_v1` is the new scientific identity and its causal contract/PIT observable manifest are frozen before new empirical work. CRV1 causal vocabulary + Alpha-PIT row semantics may be reused, but CRV1 252d outcome/risk-set/search/prediction authority remains isolated. **Today stops at methodology freeze: no provider capture, no old-family Trial #2, no successor empirical trial/prediction clock, no W6.**
 
 ## 2026-08-10 Lane-2 closure alignment
 
@@ -9,7 +17,7 @@ Lane 2 Historical Compression has completed the authorized A1→freeze→one-sho
 
 ## 2026-08-09 strategic lock supersession
 
-Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Clock #1 stays unchanged. CRV1 remains the 252d slow business-cycle family, but one fast multi-week family is authorized for immediate preregistration and may run an independent evidence clock. Default active family WIP=`2`, ceiling=`3`; evidence qualification may happen in parallel, while current portfolio/capital-policy commits remain singular. Lane 2 is now closed through A1/A2 and moves to bounded economic diagnosis; it no longer owns a source-admission blocker. PAPER-0 implementation is authorized behind minimum identity/TIF/broker-state/restart/fencing/calendar gates. Replication readiness continues in quarantine. No Clock #1 outcome open, Parent/Child mutation, financial-alpha uplift or strategy live capital is created by this alignment.
+Final re-audit=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Clock #1 stays unchanged. The Board registration/ceiling remains `3`, but current worker allocation parks W7 and therefore must not be read as three active engineering workers. Evidence qualification may happen in parallel, while current portfolio/capital-policy commits remain singular. Lane 2 is closed through A1/A2 and retained for bounded diagnosis only. PAPER-0 implementation is authorized behind minimum identity/TIF/broker-state/restart/fencing/calendar gates. Replication readiness continues in quarantine. No Clock #1 outcome open, Parent/Child mutation, financial-alpha uplift or strategy live capital is created by this alignment.
 
 ## Preserved
 
@@ -42,21 +50,13 @@ ZERO-COMPAT acceptance is now machine checked.
 - deterministic review core complete;
 - executable local lineage through `dca69fc`.
 
-### Real seal — active blocker
+### Real seal — closed; Clock #1 running
 
-- insurance V0 owner decision is closed at materiality `0.05` and annual premium ceiling `0.0015`;
-- canonical Capital IQ Security IDs and same-cut primary-security market data for the frozen 109-company candidate screen;
-- admitted current Rule100 targets;
-- admitted current vertical primitives;
-- admitted current total returns;
-- admitted current official SOFR;
-- admitted decision-cut receipt.
-
-No other architecture phase is authorized before trying the real seal.
+The real v3 cut → clock-false Seal Candidate → fresh-process verification → immutable Clock-Start Receipt chain is closed. Clock #1 is running with outcomes sealed; no later research family may rewrite that custody path or open its outcome early.
 
 ## Parallel work after seal
 
-Run independent clocks rather than one waterfall: Clock #1 weekly evidence, CRV1 slow predictions, one fast multi-week family, Lane 2 Historical Compression after its vintage/parity gates, PAPER-0 operational learning, and replication-readiness quarantine. Review lineage/fixtures may finish in parallel. Supporting AI/discovery work may run only with independent ownership. Evidence qualification may be parallel; current portfolio/capital-policy authority is singular. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
+Run independent evidence/operational lanes rather than one waterfall: Clock #1 weekly evidence, CRV1 slow research, PREBREAKOUT stock discovery, ETF-first Sector Rotation, retained Lane-2 diagnosis, PAPER-0 operational learning, and replication-readiness quarantine. `VSB_CONFIRMATION_v1` is not an active clock/worker today; it remains parked until a future VSB-specific matured-10d evaluation trigger. Evidence qualification may be parallel; current portfolio/capital-policy authority is singular. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
 
 ## Model portfolio direction
 
@@ -68,4 +68,4 @@ Generic provider/data platforms, AOV-2/event-platform state, hidden-OOS platform
 
 ## Next alignment
 
-Preserve Clock #1; resolve historical vintage + parity before A1/A2; continue unchanged CRV1 and preregister one fast multi-week family; close PAPER-0 minimum gates; start replication readiness; then let A1/A2/PAPER/prospective economics trigger the next `CONTINUE / PIVOT / HOLD / STOP / PROMOTE` decision. Do not restore compatibility or build generic AI/data/options/leverage/UI/platform work to avoid the evidence task.
+Preserve Clock #1 and the one-read A2 boundary. Keep W7/VSB parked: no capture, append, rescue, retune, PREBREAKOUT use, new prediction clock, or dedicated worker. Continue PREBREAKOUT, CRV1, ETF-first Sector Rotation, PAPER-0 and replication-readiness under their own authority; only a future VSB-specific matured-10d evaluation feed may reactivate the frozen guardian. Let matured evidence trigger the next `CONTINUE / PIVOT / HOLD / STOP / PROMOTE` decision. Do not restore compatibility or substitute generic AI/data/options/leverage/UI/platform work for evidence.

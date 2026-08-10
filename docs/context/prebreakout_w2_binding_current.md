@@ -1,7 +1,7 @@
 # PREBREAKOUT W2 Binding — Current Immutable Authority
 
 Date: 2026-08-10
-Disposition: `CLOSED / IMMUTABLE SCIENTIFIC AUTHORITY / ZERO REAL MATERIAL TRIALS`
+Disposition: `CLOSED / IMMUTABLE HISTORICAL TRIAL-1 SCIENTIFIC AUTHORITY / TRIAL-1 CLOSED FAIL / PERMANENT 1_OF_8`
 Family: `PREBREAKOUT_DISCOVERY_v1`
 W2 authority version: `PREBREAKOUT_W2_CONTRACT_v1`
 
@@ -77,24 +77,22 @@ minimum legitimate lead = 1 observed session
 miss effective TTFLD     = 0
 ```
 
-## Search custody — closed at zero
+## Search custody — Trial #1 closed at permanent 1/8
 
 ```text
-search_family_id    = PREBREAKOUT_SEARCH_v1
-trial_ledger_scope  = PREBREAKOUT_V1_TRIAL_LEDGER
-hard material budget = 8
-real TRIAL_OPEN count = 0
-real material trials consumed = 0/8
+search_family_id              = PREBREAKOUT_SEARCH_v1
+trial_ledger_scope            = PREBREAKOUT_V1_TRIAL_LEDGER
+hard material budget          = 8
+real TRIAL_OPEN count         = 1
+real TRIAL_CLOSE count        = 1
+real material trials consumed = 1/8
+Trial #1 result               = FAILED
+refund / reset                = FORBIDDEN
 ```
 
-Repository inspection on 2026-08-10 found no non-test PREBREAKOUT Trial-Ledger file and no non-test `TRIAL_OPEN` evidence. Fixture/unit-test `TRIAL_OPEN` calls do not consume the real scientific budget.
+Trial #1 opened only after its exact source/data and implementation identities were frozen, and it closed exactly once after the frozen development evaluation. Open chain hash=`67999418489331536960f042de0dd96da12f1572fa6c6ab01e600914d1ef71a9`; close chain hash=`a3d9322eb05442f9fcdcd12f80a6a22d51b00d9edbc0635cc00841461871f9ee`. No second open occurred.
 
-**Do not issue real `TRIAL_OPEN #1`** until both prerequisites are frozen first:
-
-1. the exact data/source manifest for Trial-1, including W3 PIT/source authority bindings; and
-2. the exact Trial-1 implementation manifest, including implementation identity and code-byte custody.
-
-Only after both manifests are immutable may the W2 ledger open Trial-1, and that open must bind the corresponding source/code identities before any result-bearing discovery label inspection.
+The old-family ledger remains immutable historical custody. It does not authorize Trial #2 or a successor rescue. `ECONPHYSICS_PREBREAKOUT_v1` is a separate scientific/search identity, with zero successor empirical-trial authority today.
 
 ## MU / SNDK law
 
@@ -107,7 +105,7 @@ promotion denominator weight = 0
 
 The earlier W3 evidence receipt containing `BREAKOUT_CONTRACT_UNBOUND` is retained as historical custody describing the state when that receipt was created. It is **not current W2 state** and must not be cited as evidence that W2 remains unbound.
 
-Current next dependency for MU/SNDK is W3/source refresh against this exact W2 seal and exact source-derived B/B-1 dates; no provider acquisition or outcome opening is authorized by this W2 closure.
+Real W3 authority later resolved the source/identity seam used by Trial #1. MU/SNDK remain zero-weight integration traces; their realized Trial-1 traces do not create promotion weight, special-case logic, or successor-mechanism authority.
 
 ## W3 / W4 / W5 handoff
 
@@ -127,18 +125,21 @@ breakout_contract_sha256    = 94c8756e11d4e31cbf4d6ca4953b63c83306f4b357a42f0b70
 binding_sha256              = 080aba6676202e68d14aff405049a2422d231dd7b8335f3be32f376b049205ad
 ```
 
-W5 must consume the same W2 version/hash plus `20d` primary horizon, `B-20...B-1` lead law, and hard budget `8`. W5 may not run a real charged candidate until the Trial-1 source/data manifest and implementation manifest are frozen and W2 has then issued exactly one corresponding `TRIAL_OPEN`.
+W5 consumed the same W2 version/hash plus `20d` primary horizon, `B-20...B-1` lead law and hard budget `8`; Trial #1 is now closed `FAILED`. This W2 binding remains immutable historical authority and must not be edited to rescue the result.
 
-## Authority boundary
-
-This closure changes no outcome state and creates no empirical evidence:
+## Authority boundary — current after Trial #1 close
 
 ```text
-provider acquisition            = NOT PERFORMED
-real material search trial      = NOT OPENED
-Atlas outcome open              = NOT PERFORMED
-untouched lockbox open          = NOT PERFORMED
-prospective clock start         = NOT AUTHORIZED
+W3 real authority               = COMPLETE
+real material search trial      = TRIAL_1_OPENED_AND_CLOSED_FAILED
+Atlas development outcome open  = PERFORMED_AFTER_PREDICTION_FREEZE
+W4 Atlas                        = COMPLETE_SEALED_FRESH_PROCESS_VERIFIED
+W5 development                  = COMPLETE_ECONOMIC_FAIL
+untouched W6 lockbox open       = FALSE
+W6 labels open                  = FALSE
+old-family Trial #2             = NOT AUTHORIZED
+successor empirical trial today = NOT AUTHORIZED
+prospective clock start         = NOT AUTHORIZED TODAY
 financial_alpha_evidence        = 0
 capital_authority               = NONE
 ```

@@ -1,17 +1,28 @@
 # Observability Pack — Current
 
 Date: 2026-08-10
-Gate: `STRATEGIC_DIRECTION_LOCKED / MULTI_CLOCK_EVIDENCE / PAPER_0 / LANE2_A1_A2_CLOSED`
-Status: `PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+Gate: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_LOCKED / PREBREAKOUT_TRIAL1_CLOSED_1_OF_8 / ECONPHYSICS_METHOD_FROZEN / W6_UNTOUCHED / MULTI_CLOCK_EVIDENCE / PAPER_0 / LANE2_A1_A2_CLOSED`
+Status: `CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_W3_COMPLETE_W4_VERIFIED_W5_FAIL; ECONPHYSICS_PREBREAKOUT_V1_NO_CAPTURE_NO_EMPIRICAL_TRIAL_TODAY; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
 
 ## Strategic-lock sentinels — current
 
 - Broad architecture reopen must remain `NO`; mandatory recuts are execution gates.
 - CRV1 primary horizon remains `252d`; faster evidence comes from a separate family, not in-place horizon rescue.
-- Default active Alpha-family WIP=`2`, initial ceiling=`3`; every family has isolated owner/writer/search/prediction identity.
+- Board family registration remains `3`, but active engineering does not assign W7: `VSB_CONFIRMATION_v1` is parked with no worker. CRV1 and ETF-first Sector Rotation remain independently active; PREBREAKOUT owns stock discovery. Family custody/search/prediction identities remain isolated.
 - Multiple families may independently become evidence-qualified. Only the current portfolio/capital-policy authority is singular.
-- One fast multi-week family must be preregistered; choosing Sector Rotation vs Vol-Squeeze is a local mechanism decision, not a new architecture cycle.
+- The prior Sector Rotation vs Vol-Squeeze choice is superseded by the methodology freeze: VSB is a frozen confirmation benchmark only; PREBREAKOUT owns the stock-winner discovery path; Sector Rotation remains orthogonal ETF-first. None creates capital authority.
 - Generic data/agent/model/event platforms, second OMS, optimizer-first work and L2/L3 acquisition without measured information value remain suppressed.
+
+## PREBREAKOUT Trial #1 / Econphysics sentinels — current
+
+- Historical W2 Trial-1 authority remains exactly `PREBREAKOUT_W2_CONTRACT_v1`; B/B-1/TTFLD and 20d/10d top-5% label definitions are immutable evidence for Trial #1 and remain external measuring devices for successor evaluation unless explicitly versioned later.
+- Trial #1 ledger truth is permanent `1/8`: exactly one `TRIAL_OPEN` and one `TRIAL_CLOSE=FAILED`; no refund/reset, no rescue, and no second open under the old family.
+- W3 real authority is complete. The earlier `B_MINUS_1_PIT_AUTHORITY_UNAVAILABLE` receipt is historical pre-run gate evidence, not current execution truth.
+- W4 Atlas is complete/sealed/fresh-process verified and W5 is a valid economic failure with `pit_or_custody_invalidation=false`; current key outcome is representation/coverage failure: `2,381` winners, `909` detected, `1,472` missed, median effective TTFLD=`0`, detected-only median=`11`, median fold lift=`0.7157095`.
+- MU/SNDK remain zero statistical/promotion weight. Trial #1/W4/W5/MU/SNDK may falsify or diagnose the successor but may not define its causal variables, edge signs, lags, thresholds, applicability profiles, or special cases.
+- `ECONPHYSICS_PREBREAKOUT_v1` causal contract + PIT observable manifest are frozen. CRV1 causal vocabulary/Alpha-PIT row semantics may be reused; CRV1 252d outcome/risk-set/search/prediction authority may not.
+- Successor M0 is deterministic/monotonic and missingness is explicit `UNOBSERVED`/abstain; market state cannot proxy missing economic state. Selection breadth/K has no runtime default and must be frozen ex ante from capital/attention capacity before winner-label inspection.
+- **Today stop sentinel:** no provider capture, no successor empirical trial, no successor prediction clock, no W6. W6 remains `lockbox_opened=false / labels_opened=false`.
 
 ## Lane 1 sentinels — current
 
@@ -25,7 +36,7 @@ Status: `PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORIT
 - Unsupported source-level fields (`fund.gross_margin_q`, `fund.cash_from_ops_q`, current expectations, SEC claims when unlanded) remain explicit `MISSING_SOURCE`; no fallback/imputation is allowed.
 - CRV1 implementation freeze requires every scientific parameter explicitly; missing parameters, search-budget overrun, family/risk-set/label drift, or sealed-manifest tamper must fail closed.
 - Outcome-informed mutation remains blocked until a matured, reconciled, validated ReviewPacket exists.
-- Current local evidence: Alpha-PIT+CRV1 `19/19 PASS`; AOV `102/102 PASS`; ZERO-COMPAT contract test asserts seven zeros; selected compile and Git whitespace PASS. Real current-CIQ diagnostic: SMA200 `104/109`, gross-margin/CFO `109/109 MISSING_SOURCE`, expectations `981/981 MISSING_SOURCE`, SEC claims unlanded, CRV1 risk set blocked.
+- Current W7/VSB mechanical evidence: final live-byte VSB + Alpha PIT + CRV1 suite `49/49 PASS`; AOV regression `167/167 PASS`; guardian hash remains frozen. L0 includes explicit cross-family discovery-label rejection and concurrent-session isolation. VSB source/tape/guardian mechanics are landed and parked; no real provider/network capture, real VSB prediction, empirical outcome evidence, or active W7 worker exists.
 
 ## Lane 2 sentinels — historical compression
 

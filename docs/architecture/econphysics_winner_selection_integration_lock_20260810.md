@@ -189,34 +189,27 @@ I vs I+X incremental value
 
 They are downstream measuring devices. They are not upstream feature generators.
 
-## 6. New mechanism freeze required before any new material trial
+## 6. Successor mechanism freeze — completed before any new material trial
 
-**The next correct action is not Trial #2.**
+The required successor freeze is now complete at:
 
-Before any new material PREBREAKOUT trial/search charge, freeze a successor causal contract for `ECONPHYSICS_PREBREAKOUT_v1` containing at minimum:
+- `docs/architecture/econphysics_prebreakout_v1_causal_contract.md`
+- `docs/architecture/econphysics_prebreakout_v1_pit_observable_manifest.json`
+- evidence: `docs/context/e2e_evidence/econphysics_prebreakout_v1_methodology_freeze_20260810.json`
 
-1. causal graph and economic rationale for every edge;
-2. PIT observable manifest with source, field, unit, release/availability clock, revision/vintage law, missingness state, and identity binding;
-3. state definitions and state-transition laws;
-4. expectation-gap definition and consensus/market-expectation observables;
-5. cross-sectional winner-selection mapping from state representation to `alpha_priority_score`;
-6. invariance assumptions — what must remain stable across time/industry/regime for the mechanism to be meaningful;
-7. explicit economic falsifiers and invalidation falsifiers;
-8. market-confirmation boundary and forbidden feedback from market outcomes into the cause model;
-9. continuation/exit boundary;
-10. Trial/Search custody, with no refund/reset of the already consumed Trial #1 charge.
+The freeze covers the causal graph/edge rationale, applicability law, PIT observables and revision/missingness semantics, state/transition laws, expectation gap, deterministic winner-selection mapping, invariance assumptions, falsifiers, market-confirmation/continuation boundaries and Trial/Search custody.
 
-Until that freeze is complete:
+**Completing the methodology freeze does not authorize an empirical action today.** The Board stop line remains:
 
 ```text
-new PREBREAKOUT material trial = FORBIDDEN
-Trial #2 open = FORBIDDEN
-new adaptive winner-pattern search = FORBIDDEN
+new provider capture today = FORBIDDEN
+old-family Trial #2 = FORBIDDEN
+successor empirical trial today = FORBIDDEN
+successor prediction clock today = FORBIDDEN
 W6 open = FORBIDDEN
-provider spend to test an unfrozen mechanism = FORBIDDEN
 ```
 
-The existing `1/8` Trial #1 charge remains permanent. This lock does not reset the budget or authorize a new budget. Any successor budget semantics must be explicit in the causal-contract freeze before another open is possible.
+The existing `1/8` Trial #1 charge remains permanent and is never refunded/reset. The successor has a distinct scientific/search identity, but this freeze authorizes `0` successor material trials today. Any future nonzero material-trial budget requires separate owner/CRO authority before the first successor `TRIAL_OPEN`.
 
 ## 7. Destructive recut
 
@@ -230,7 +223,7 @@ PREBREAKOUT_DISCOVERY_v1 as market-pattern search identity
   → superseded for new mechanism design
 
 ECONPHYSICS_PREBREAKOUT_v1
-  → next causal research identity; NOT YET TRIAL-AUTHORIZED
+  → causal methodology contract FROZEN; new scientific identity; NO EMPIRICAL TRIAL AUTHORITY TODAY
 
 ECON_STATE_v1
 EXPECTATION_GAP_v1
