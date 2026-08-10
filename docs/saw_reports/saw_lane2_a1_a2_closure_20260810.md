@@ -24,7 +24,7 @@ Implementer ownership: current Lane-2 worktree and local deterministic/provider-
 | CHK-01 Historical source/identity/lifecycle authority is fail-closed and not current-conditioned | PASS | 104-company final risk set; 104/104 exact dated CIQ Security/Trading Item identity; three hash-bound terminal events; no survivor filtering |
 | CHK-02 A1 is legitimately admitted under exact frozen-AOV replay | PASS | `A1_ADMITTED_HISTORICAL_PIT`; 264 trading days; 94 active CIQ securities; canonical/source/identity/lifecycle gates pass |
 | CHK-03 A2 is frozen before held-out PIT capture and evaluated exactly once | PASS | freeze `07:36:04Z`; held-out captures after freeze; query lock `07:43:15Z`; result/receipt `07:45:03Z`; query count=1; second evaluation forbidden |
-| CHK-04 Owned Lane-2 regression is green | PASS | 50/50 focused pytest PASS across lifecycle/PIT/replay/risk-set/reconstruction/security/product-query capture |
+| CHK-04 Owned Lane-2 regression is green | PASS | 58/58 focused pytest PASS across lifecycle/PIT/replay/risk-set/reconstruction/security/product-query capture/partial-candidate validation |
 | CHK-05 Docs/current truth and whitespace are synchronized | PASS | Lane-2 brief, done checklist, planner packet, bridge contract, decision log, lessons; scoped `git diff --check` PASS |
 | CHK-06 Independent Reviewer A/B/C closure review | PASS | Reviewer A PASS; Reviewer B PASS; Reviewer C PASS; no blocking/material findings |
 
@@ -40,7 +40,7 @@ Implementer ownership: current Lane-2 worktree and local deterministic/provider-
 
 - Reviewer A — strategy/regression: **PASS**. A1 admission and A2 one-shot chronology are supported; Child risk-reduction/return-dilution conclusion is appropriately diagnostic and does not create alpha authority.
 - Reviewer B — runtime/operational resilience: **PASS**. Post-freeze PIT capture, immutable query lock, query count=1, terminal lifecycle, and no second A2 evaluation are supported.
-- Reviewer C — data integrity/performance path: **PASS**. Exact identity/count/hash/timestamp custody and 50-test regression support closure; no silent imputation/substitution or survivorship repair is evidenced.
+- Reviewer C — data integrity/performance path: **PASS**. Exact identity/count/hash/timestamp custody and the final 58-test regression support closure; no silent imputation/substitution or survivorship repair is evidenced.
 
 ## Economic closure
 
