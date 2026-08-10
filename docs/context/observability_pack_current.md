@@ -1,8 +1,8 @@
 # Observability Pack — Current
 
 Date: 2026-08-10
-Gate: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_LOCKED / PREBREAKOUT_TRIAL1_CLOSED_1_OF_8 / ECONPHYSICS_METHOD_FROZEN / W6_UNTOUCHED / MULTI_CLOCK_EVIDENCE / PAPER_0 / LANE2_A1_A2_CLOSED`
-Status: `CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_W3_COMPLETE_W4_VERIFIED_W5_FAIL; ECONPHYSICS_PREBREAKOUT_V1_NO_CAPTURE_NO_EMPIRICAL_TRIAL_TODAY; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+Gate: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_LOCKED / PREBREAKOUT_TRIAL1_CLOSED_1_OF_8 / PREBREAKOUT_FAILURE_PACKET_V1_ZERO_TRIAL_COST / ECONPHYSICS_METHOD_FROZEN / W6_UNTOUCHED / MULTI_CLOCK_EVIDENCE / PAPER_0 / LANE2_A1_A2_CLOSED`
+Status: `CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_W3_COMPLETE_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUPERSEDED_W5_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_DEVELOPMENT_DIAGNOSTIC_ACTIVE; ECONPHYSICS_PREBREAKOUT_V1_NO_CAPTURE_NO_EMPIRICAL_TRIAL_TODAY; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
 
 ## Strategic-lock sentinels — current
 
@@ -18,11 +18,12 @@ Status: `CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINE
 - Historical W2 Trial-1 authority remains exactly `PREBREAKOUT_W2_CONTRACT_v1`; B/B-1/TTFLD and 20d/10d top-5% label definitions are immutable evidence for Trial #1 and remain external measuring devices for successor evaluation unless explicitly versioned later.
 - Trial #1 ledger truth is permanent `1/8`: exactly one `TRIAL_OPEN` and one `TRIAL_CLOSE=FAILED`; no refund/reset, no rescue, and no second open under the old family.
 - W3 real authority is complete. The earlier `B_MINUS_1_PIT_AUTHORITY_UNAVAILABLE` receipt is historical pre-run gate evidence, not current execution truth.
-- W4 Atlas is complete/sealed/fresh-process verified and W5 is a valid economic failure with `pit_or_custody_invalidation=false`; current key outcome is representation/coverage failure: `2,381` winners, `909` detected, `1,472` missed, median effective TTFLD=`0`, detected-only median=`11`, median fold lift=`0.7157095`.
-- MU/SNDK remain zero statistical/promotion weight. Trial #1/W4/W5/MU/SNDK may falsify or diagnose the successor but may not define its causal variables, edge signs, lags, thresholds, applicability profiles, or special cases.
-- `ECONPHYSICS_PREBREAKOUT_v1` causal contract + PIT observable manifest are frozen. CRV1 causal vocabulary/Alpha-PIT row semantics may be reused; CRV1 252d outcome/risk-set/search/prediction authority may not.
+- W4 **statistical** Atlas close is sealed/fresh-process verified and W5 is a valid economic failure with `pit_or_custody_invalidation=false`: `2,381` winners, `909` detected, `1,472` missed, median effective TTFLD=`0`, detected-only median=`11`, median fold lift=`0.7157095`. The sealed Atlas smoke subfield is not acceptance truth because `any_legitimate_prebreakout_flag` incorrectly required `winner_label=True`; the evaluator is corrected without regenerating the sealed Atlas.
+- MU/SNDK remain zero statistical/promotion weight. Independent development smoke truth is `19 checked / 3 legitimate pre-B flags / 16 no-flag / 4 deferred`. Trial #1/W4/W5/MU/SNDK may falsify or diagnose the successor but may not define its causal variables, edge signs, lags, thresholds, applicability profiles, or special cases.
+- `FailurePacketV1` is authorized at trial cost `0` over already-opened development evidence only. It records OOS score monotonicity, miss taxonomy, lead shape, winner-payoff capture, false-winner persistence/concentration, catastrophic downside, the role split `DISCOVERY=FAIL / DEFENSIVE_QUALITY=DIAGNOSTIC_POSITIVE`, cross-A2 right-tail clipping diagnosis, and the econphysics observability demand map. None is acceptance or untouched evidence.
+- `ECONPHYSICS_PREBREAKOUT_v1` causal contract + PIT observable manifest remain frozen. The demand map finds market confirmation already observable/downstream-only. Supply-capacity, inventory-channel, and demand-order nodes have partial banked PIT mechanics but no admitted successor-specific state corpus today and therefore still block transition validation; pricing/utilization source claims, expectations/guidance, and current gross-margin/CFO source gaps are additional blockers. CRV1 causal vocabulary/Alpha-PIT row semantics may be reused; CRV1 252d outcome/risk-set/search/prediction authority may not.
 - Successor M0 is deterministic/monotonic and missingness is explicit `UNOBSERVED`/abstain; market state cannot proxy missing economic state. Selection breadth/K has no runtime default and must be frozen ex ante from capital/attention capacity before winner-label inspection.
-- **Today stop sentinel:** no provider capture, no successor empirical trial, no successor prediction clock, no W6. W6 remains `lockbox_opened=false / labels_opened=false`.
+- **Today authority-escalation stop sentinel:** no provider capture, no successor empirical trial, no successor prediction clock, no W6. W6 remains `lockbox_opened=false / labels_opened=false`. This is not a development-learning stop: FailurePacketV1 workers may continue using already-admitted Trial #1 bytes, but may not mutate causal/model/threshold/SelectionBudget law.
 
 ## Lane 1 sentinels — current
 

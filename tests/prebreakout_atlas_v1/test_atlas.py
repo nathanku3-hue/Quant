@@ -292,6 +292,43 @@ def test_fixture_atlas_builds_full_episode_and_control_census_with_zero_weight_s
     assert all(row["promotion_denominator_weight"] == 0 for row in traces.values())
 
 
+def test_smoke_trace_uses_pit_eligible_breakout_episode_not_winner_label() -> None:
+    grid = _full_fixture_grid()
+    smoke_rows = pd.DataFrame(
+        [
+            _row(
+                day=D0,
+                ordinal=D0_ORDINAL,
+                security_num=12,
+                episode_id="NW_SMOKE_BREAKOUT",
+                winner=False,
+                flagged=True,
+            ),
+            _row(
+                day=B1,
+                ordinal=B1_ORDINAL,
+                security_num=12,
+                episode_id="NW_SMOKE_BREAKOUT",
+                winner=False,
+                flagged=False,
+            ),
+        ]
+    )
+    combined = pd.DataFrame(grid.to_dict("records") + smoke_rows.to_dict("records"))
+    report = build_discovery_atlas(
+        combined,
+        methodology=METHODOLOGY,
+        matched_control_contract=_match_contract(),
+        smoke_proofs=(_smoke_proof("SMOKE_NONWINNER_BREAKOUT", "TRACE_ONLY", 12),),
+        fixture=True,
+    )
+
+    trace = report["smoke_traces"][0]
+    assert trace["any_legitimate_prebreakout_flag"] is True
+    assert trace["statistical_weight"] == 0
+    assert trace["promotion_denominator_weight"] == 0
+
+
 def test_incomplete_horizon_rows_are_custodied_but_not_imputed_as_nonwinners() -> None:
     grid = _full_fixture_grid()
     mask = grid["security_id"].eq("CIQSEC:IQ7") & grid["decision_session_date"].eq(B1)

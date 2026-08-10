@@ -1348,7 +1348,6 @@ def _build_smoke_traces(frame: pd.DataFrame, proofs: Sequence[Mapping[str, Any]]
             eligible_pre_b1 = rows[
                 rows["decision_session_date"].le(pd.Timestamp(str(b1_text)).normalize())
                 & rows["eligibility_status"].eq(w3.ELIGIBLE)
-                & rows["winner_label"].eq(True)
             ]
             any_early = bool(eligible_pre_b1["flagged"].any())
         else:

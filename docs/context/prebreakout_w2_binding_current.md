@@ -55,8 +55,10 @@ For smoke/engineering proof:
 
 ```text
 if W3 says PIT_ELIGIBLE_B_MINUS_1:
-    a legitimate PREBREAKOUT flag must exist no later than B-1
+    evaluate whether any legitimate PREBREAKOUT flag exists no later than B-1
     and inside the frozen TTFLD window B-20 ... B-1
+    emit that detection state even when the answer is false
+    do not consult winner_label
 else:
     W3 must provide one deterministic PIT exclusion reason
 ```
@@ -105,7 +107,7 @@ promotion denominator weight = 0
 
 The earlier W3 evidence receipt containing `BREAKOUT_CONTRACT_UNBOUND` is retained as historical custody describing the state when that receipt was created. It is **not current W2 state** and must not be cited as evidence that W2 remains unbound.
 
-Real W3 authority later resolved the source/identity seam used by Trial #1. MU/SNDK remain zero-weight integration traces; their realized Trial-1 traces do not create promotion weight, special-case logic, or successor-mechanism authority.
+Real W3 authority later resolved the source/identity seam used by Trial #1. MU/SNDK remain zero-weight integration traces; every PIT-eligible breakout-B episode is checked regardless of `winner_label`. The sealed W4 Atlas smoke field was later found to be contaminated by an extra `winner_label=True` predicate and is superseded for smoke truth only by the independent checker (`19` development episodes checked, `3` legitimate pre-B flags, `16` no-flag, `4` deferred). Their realized Trial-1 traces do not create promotion weight, special-case logic, or successor-mechanism authority.
 
 ## W3 / W4 / W5 handoff
 
@@ -133,13 +135,16 @@ W5 consumed the same W2 version/hash plus `20d` primary horizon, `B-20...B-1` le
 W3 real authority               = COMPLETE
 real material search trial      = TRIAL_1_OPENED_AND_CLOSED_FAILED
 Atlas development outcome open  = PERFORMED_AFTER_PREDICTION_FREEZE
-W4 Atlas                        = COMPLETE_SEALED_FRESH_PROCESS_VERIFIED
-W5 development                  = COMPLETE_ECONOMIC_FAIL
-untouched W6 lockbox open       = FALSE
+W4 statistical close             = COMPLETE_SEALED_FRESH_PROCESS_VERIFIED
+W4 smoke subfield                 = SUPERSEDED_BY_INDEPENDENT_CHECKER_NON_CLOSING
+W5 development                    = COMPLETE_ECONOMIC_FAIL
+FailurePacketV1                   = DEVELOPMENT_DIAGNOSTIC_ACTIVE_TRIAL_COST_0
+untouched W6 lockbox open         = FALSE
 W6 labels open                  = FALSE
 old-family Trial #2             = NOT AUTHORIZED
 successor empirical trial today = NOT AUTHORIZED
-prospective clock start         = NOT AUTHORIZED TODAY
+successor prediction clock      = NOT AUTHORIZED TODAY
+FailurePacket development read  = AUTHORIZED_ALREADY_OPEN_BYTES_ONLY
 financial_alpha_evidence        = 0
 capital_authority               = NONE
 ```

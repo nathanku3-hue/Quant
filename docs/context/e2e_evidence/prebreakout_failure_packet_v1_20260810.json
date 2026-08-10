@@ -1,0 +1,585 @@
+{
+  "authority": {
+    "authority_class": "DEVELOPMENT_NEGATIVE_KNOWLEDGE_ONLY_ZERO_FINANCIAL_AUTHORITY",
+    "capital_authority": "NONE",
+    "capture_authority": "NONE",
+    "causal_edge_mutation": "FORBIDDEN",
+    "causal_lag_mutation": "FORBIDDEN",
+    "causal_sign_mutation": "FORBIDDEN",
+    "defensive_quality_is_acceptance_truth": false,
+    "defensive_quality_status": "DIAGNOSTIC_POSITIVE",
+    "discovery_status": "FAIL",
+    "financial_alpha_evidence": 0,
+    "selection_budget_mutation": "FORBIDDEN",
+    "successor_empirical_trial_authority": "NONE",
+    "successor_model_mutation": "FORBIDDEN",
+    "successor_prediction_clock_authority": "NONE",
+    "threshold_mutation": "FORBIDDEN",
+    "trial1_future_market_confirmation_reuse": "REQUIRES_SEPARATE_PREREGISTRATION",
+    "trial_cost": 0,
+    "untouched_evidence": false,
+    "w6_authority": "HOLD_UNTOUCHED"
+  },
+  "cross_a2_trial1_right_tail_clipping_audit": {
+    "a2_child_vs_parent": {
+      "child_CVaR_improvement_vs_parent": 0.0019449873071683277,
+      "child_minus_parent_Sharpe": -0.25272403918111275,
+      "child_minus_parent_cumulative_return": -0.013450767238656125,
+      "child_minus_parent_max_drawdown": 0.005529430771265442,
+      "horizon20_clipped_winner_rate": 0.35,
+      "horizon20_winner_gross_giveup_sum": 0.01394201824375468,
+      "largest_five_realized_winner_gap_share": 0.925780848317167,
+      "largest_five_realized_winner_tickers": [
+        "OPHC",
+        "SMTI",
+        "CSTL",
+        "NTRA",
+        "TLSI"
+      ]
+    },
+    "interpretation": "Independent development/historical diagnostics are directionally consistent with a clean-state bias: downside improves while the largest convex winners are under-captured. This creates a system-level audit hypothesis only; it cannot mutate Parent/Child or the successor methodology.",
+    "status": "CONVERGENT_DIAGNOSTIC_RIGHT_TAIL_CLIPPING_RISK_NOT_SYSTEM_PROOF",
+    "trial1": {
+      "detected_winner_forward_20d_median": 0.4448832882354612,
+      "flagged_nonwinner_bottom_5pct_rate_ratio_vs_ordinary": 0.4079963240718806,
+      "highest_payoff_quartile_detection_rate": 0.27563025210084036,
+      "lowest_payoff_quartile_detection_rate": 0.43791946308724833,
+      "missed_winner_forward_20d_median": 0.515374961505149
+    }
+  },
+  "discovery_failure_diagnostics": {
+    "false_winner_persistence_concentration": {
+      "false_winner_days_per_identity_max": 75,
+      "false_winner_days_per_identity_median": 17.0,
+      "false_winner_days_per_identity_p90": 38.0,
+      "false_winner_decision_row_count": 90954,
+      "false_winner_rows_per_date_max": 1084,
+      "false_winner_rows_per_date_median": 353.5,
+      "false_winner_rows_per_date_p90": 715.0,
+      "max_consecutive_false_winner_sessions": 21,
+      "max_consecutive_false_winner_sessions_per_identity_median": 4.0,
+      "max_consecutive_false_winner_sessions_per_identity_p90": 9.0,
+      "top_10_identity_share_of_false_winner_rows": 0.007707192646832465,
+      "top_1pct_identity_share_of_false_winner_rows": 0.03204916771115069,
+      "unique_false_winner_identity_count": 4672
+    },
+    "temporal_oos": {
+      "all_four_folds_below_one": true,
+      "all_months_below_one": true,
+      "all_trigger_score_quintiles_below_one": true,
+      "defensive_quality": {
+        "bottom_5pct_rate_ratio_flagged_vs_ordinary": 0.4079963240718806,
+        "flagged_nonwinner_count": 20621,
+        "flagged_nonwinner_date_local_bottom_1pct_rate": 0.004412977062218128,
+        "flagged_nonwinner_date_local_bottom_5pct_rate": 0.022695310605693225,
+        "flagged_nonwinner_forward_20d_mean": -0.012565183574893479,
+        "flagged_nonwinner_forward_20d_median": 0.000999500000000042,
+        "flagged_nonwinner_return_le_minus_20pct_rate": 0.06624315018670288,
+        "flagged_nonwinner_return_le_minus_40pct_rate": 0.009698850686193685,
+        "ordinary_nonwinner_count": 243572,
+        "ordinary_nonwinner_date_local_bottom_1pct_rate": 0.011245134908774407,
+        "ordinary_nonwinner_date_local_bottom_5pct_rate": 0.055626262460381326,
+        "ordinary_nonwinner_forward_20d_mean": -0.031161626043155848,
+        "ordinary_nonwinner_forward_20d_median": -0.011838798295599362,
+        "ordinary_nonwinner_return_le_minus_20pct_rate": 0.11472583055523623,
+        "ordinary_nonwinner_return_le_minus_40pct_rate": 0.027141871807925377
+      },
+      "fold_recall_lifts": [
+        0.7586033004099125,
+        0.813310489011903,
+        0.5293137480804978,
+        0.6728157690382596
+      ],
+      "highest_score_quintile_is_worst": true,
+      "matured_temporal_oos_row_count": 280198,
+      "median_fold_recall_lift": 0.715709534724086,
+      "monthly": [
+        {
+          "base_winner_rate": 0.057131487692570065,
+          "month": "2026-01",
+          "row_count": 35182,
+          "trigger_count": 4263,
+          "trigger_lift_vs_base": 0.9032995939841024,
+          "trigger_winner_rate": 0.051606849636406285
+        },
+        {
+          "base_winner_rate": 0.05911411164169274,
+          "month": "2026-02",
+          "row_count": 66803,
+          "trigger_count": 3339,
+          "trigger_lift_vs_base": 0.5066317622159321,
+          "trigger_winner_rate": 0.02994908655286014
+        },
+        {
+          "base_winner_rate": 0.05755199543011451,
+          "month": "2026-03",
+          "row_count": 77026,
+          "trigger_count": 3983,
+          "trigger_lift_vs_base": 0.7765140353155546,
+          "trigger_winner_rate": 0.044689932211900575
+        },
+        {
+          "base_winner_rate": 0.05583063933106901,
+          "month": "2026-04",
+          "row_count": 73311,
+          "trigger_count": 6992,
+          "trigger_lift_vs_base": 0.6250515055844074,
+          "trigger_winner_rate": 0.03489702517162471
+        },
+        {
+          "base_winner_rate": 0.054527191849619745,
+          "month": "2026-05",
+          "row_count": 27876,
+          "trigger_count": 2889,
+          "trigger_lift_vs_base": 0.6538476252937641,
+          "trigger_winner_rate": 0.035652474904811354
+        }
+      ],
+      "ranking_information_status": "ABSENT_OR_ANTI_MONOTONE_IN_DEVELOPMENT",
+      "threshold_rescue_interpretation": "NOT_SUPPORTED_BY_SCORE_RANKING_DIAGNOSTIC",
+      "trigger_count": 21466,
+      "trigger_lift_vs_universe": 0.6891518661202871,
+      "trigger_score_quintiles": [
+        {
+          "lift_vs_oos_base": 0.6482528529815802,
+          "row_count": 4294,
+          "score_max": 0.2785289040069313,
+          "score_min": 0.0172060523049003,
+          "score_quintile": 1,
+          "winner_rate": 0.03702841173730787
+        },
+        {
+          "lift_vs_oos_base": 0.7095740303028121,
+          "row_count": 4293,
+          "score_max": 0.3762586231566311,
+          "score_min": 0.2785483961744204,
+          "score_quintile": 2,
+          "winner_rate": 0.04053109713487072
+        },
+        {
+          "lift_vs_oos_base": 0.7381201119816608,
+          "row_count": 4293,
+          "score_max": 0.4672586342304127,
+          "score_min": 0.3762675958281012,
+          "score_quintile": 3,
+          "winner_rate": 0.04216165851385977
+        },
+        {
+          "lift_vs_oos_base": 0.7381201119816608,
+          "row_count": 4293,
+          "score_max": 0.5933895734191573,
+          "score_min": 0.4673501246345996,
+          "score_quintile": 4,
+          "winner_rate": 0.04216165851385977
+        },
+        {
+          "lift_vs_oos_base": 0.6117017502610449,
+          "row_count": 4293,
+          "score_max": 1.0,
+          "score_min": 0.5934345606970076,
+          "score_quintile": 5,
+          "winner_rate": 0.03494060097833683
+        }
+      ],
+      "trigger_winner_rate": 0.03936457653964409,
+      "universe_winner_rate": 0.05712032205797329
+    },
+    "winner_episode": {
+      "anti_convex_capture_status": "DETECTION_RATE_DECLINES_IN_LARGEST_PAYOFF_QUARTILE",
+      "detected_winner_episode_count": 909,
+      "detected_winner_forward_20d_median": 0.4448832882354612,
+      "lead_shape": {
+        "detected_episode_count": 909,
+        "lead_session_counts": [
+          {
+            "episode_count": 127,
+            "lead_sessions": 1
+          },
+          {
+            "episode_count": 81,
+            "lead_sessions": 2
+          },
+          {
+            "episode_count": 55,
+            "lead_sessions": 3
+          },
+          {
+            "episode_count": 39,
+            "lead_sessions": 4
+          },
+          {
+            "episode_count": 33,
+            "lead_sessions": 5
+          },
+          {
+            "episode_count": 20,
+            "lead_sessions": 6
+          },
+          {
+            "episode_count": 27,
+            "lead_sessions": 7
+          },
+          {
+            "episode_count": 21,
+            "lead_sessions": 8
+          },
+          {
+            "episode_count": 18,
+            "lead_sessions": 9
+          },
+          {
+            "episode_count": 32,
+            "lead_sessions": 10
+          },
+          {
+            "episode_count": 25,
+            "lead_sessions": 11
+          },
+          {
+            "episode_count": 28,
+            "lead_sessions": 12
+          },
+          {
+            "episode_count": 23,
+            "lead_sessions": 13
+          },
+          {
+            "episode_count": 37,
+            "lead_sessions": 14
+          },
+          {
+            "episode_count": 40,
+            "lead_sessions": 15
+          },
+          {
+            "episode_count": 22,
+            "lead_sessions": 16
+          },
+          {
+            "episode_count": 32,
+            "lead_sessions": 17
+          },
+          {
+            "episode_count": 35,
+            "lead_sessions": 18
+          },
+          {
+            "episode_count": 75,
+            "lead_sessions": 19
+          },
+          {
+            "episode_count": 139,
+            "lead_sessions": 20
+          }
+        ],
+        "lead_sessions_mean": 10.443344334433444,
+        "lead_sessions_median": 11.0,
+        "lead_sessions_p25": 3.0,
+        "lead_sessions_p75": 18.0
+      },
+      "miss_taxonomy": {
+        "coverage_failure_share": 0.042798913043478264,
+        "episode_count": 1472,
+        "interpretation": "REPRESENTATION_TEMPORAL_COMPOSITION_DOMINATES_DATA_COVERAGE_FAILURE",
+        "leaves": [
+          {
+            "count": 63,
+            "reason": "NO_READY_MARKET_HISTORY",
+            "share_of_misses": 0.042798913043478264
+          },
+          {
+            "count": 526,
+            "reason": "NEVER_NEAR_HIGH",
+            "share_of_misses": 0.35733695652173914
+          },
+          {
+            "count": 178,
+            "reason": "NO_COMPRESSION_COMPONENT",
+            "share_of_misses": 0.12092391304347826
+          },
+          {
+            "count": 50,
+            "reason": "NO_VOLUME_PRESSURE_COMPONENT",
+            "share_of_misses": 0.033967391304347824
+          },
+          {
+            "count": 610,
+            "reason": "COMPONENTS_PRESENT_SEPARATELY_NO_COMPONENT_SYNC",
+            "share_of_misses": 0.41440217391304346
+          },
+          {
+            "count": 45,
+            "reason": "COMPONENT_SYNC_BUT_NO_LEGAL_TRIGGER",
+            "share_of_misses": 0.030570652173913044
+          }
+        ],
+        "noncoverage_failure_share": 0.9572010869565217
+      },
+      "missed_winner_episode_count": 1472,
+      "missed_winner_forward_20d_median": 0.515374961505149,
+      "statistical_winner_episode_count": 2381,
+      "winner_payoff_quartiles": [
+        {
+          "detection_rate": 0.43791946308724833,
+          "episode_count": 596,
+          "median_forward_20d_return": 0.28877650817970446,
+          "winner_payoff_quartile": 1
+        },
+        {
+          "detection_rate": 0.4504201680672269,
+          "episode_count": 595,
+          "median_forward_20d_return": 0.4106643557125813,
+          "winner_payoff_quartile": 2
+        },
+        {
+          "detection_rate": 0.3630252100840336,
+          "episode_count": 595,
+          "median_forward_20d_return": 0.5745856723455569,
+          "winner_payoff_quartile": 3
+        },
+        {
+          "detection_rate": 0.27563025210084036,
+          "episode_count": 595,
+          "median_forward_20d_return": 1.0715789194968144,
+          "winner_payoff_quartile": 4
+        }
+      ]
+    }
+  },
+  "econphysics_prebreakout_v1_observability_demand_map": {
+    "authority_interpretation": "This map identifies demand only. It does not authorize capture, define a new observable, or alter any frozen causal edge/sign/lag/threshold/SelectionBudget.",
+    "capture_authority": "NONE",
+    "family_id": "ECONPHYSICS_PREBREAKOUT_v1",
+    "map_role": "DATA_GAP_AND_OBSERVABILITY_DEMAND_ONLY",
+    "nodes": [
+      {
+        "banked": [
+          "fund.capex_q logical/PIT mechanics"
+        ],
+        "blocking": true,
+        "manifest_expectation_measures": [],
+        "manifest_source_claim_topics": [
+          "SUPPLY_CAPACITY",
+          "COMPETITION"
+        ],
+        "manifest_structured_observables": [
+          "fund.capex_q"
+        ],
+        "node_id": "SUPPLY_CAPACITY_STATE",
+        "status": "PARTIAL_CAPABILITY_DIRECT_STATE_UNOBSERVED",
+        "unobserved": [
+          "direct capacity/supply claim evidence in successor corpus"
+        ]
+      },
+      {
+        "banked": [
+          "fund.inventory_q",
+          "fund.revenue_q logical/PIT mechanics"
+        ],
+        "blocking": true,
+        "manifest_expectation_measures": [],
+        "manifest_source_claim_topics": [
+          "INVENTORY_CHANNEL"
+        ],
+        "manifest_structured_observables": [
+          "fund.inventory_q",
+          "fund.revenue_q"
+        ],
+        "node_id": "INVENTORY_CHANNEL_STATE",
+        "status": "PARTIAL_STRUCTURED_CAPABILITY_CHANNEL_STATE_UNOBSERVED",
+        "unobserved": [
+          "channel/inventory source claims in successor corpus"
+        ]
+      },
+      {
+        "banked": [
+          "fund.revenue_q logical/PIT mechanics"
+        ],
+        "blocking": true,
+        "manifest_expectation_measures": [],
+        "manifest_source_claim_topics": [
+          "DEMAND",
+          "GUIDANCE"
+        ],
+        "manifest_structured_observables": [
+          "fund.revenue_q"
+        ],
+        "node_id": "DEMAND_ORDER_STATE",
+        "status": "PARTIAL_REALIZED_DEMAND_ORDERS_GUIDANCE_UNOBSERVED",
+        "unobserved": [
+          "orders/backlog/demand claims",
+          "guidance claims"
+        ]
+      },
+      {
+        "banked": [],
+        "blocking": true,
+        "manifest_expectation_measures": [],
+        "manifest_source_claim_topics": [
+          "PRICING",
+          "COMPETITION"
+        ],
+        "manifest_structured_observables": [],
+        "node_id": "PRICING_MIX_STATE",
+        "status": "UNOBSERVED",
+        "unobserved": [
+          "pricing claims",
+          "competition claims"
+        ]
+      },
+      {
+        "banked": [],
+        "blocking": true,
+        "manifest_expectation_measures": [],
+        "manifest_source_claim_topics": [
+          "UTILIZATION",
+          "SUPPLY_CAPACITY",
+          "MARGIN"
+        ],
+        "manifest_structured_observables": [],
+        "node_id": "UTILIZATION_COST_STATE",
+        "status": "UNOBSERVED",
+        "unobserved": [
+          "utilization/throughput claims",
+          "direct unit-cost evidence"
+        ]
+      },
+      {
+        "banked": [
+          "fund.revenue_q",
+          "fund.operating_margin_q logical/PIT mechanics"
+        ],
+        "blocking": true,
+        "manifest_expectation_measures": [],
+        "manifest_source_claim_topics": [
+          "MARGIN"
+        ],
+        "manifest_structured_observables": [
+          "fund.gross_margin_q",
+          "fund.operating_margin_q",
+          "fund.cash_from_ops_q",
+          "fund.revenue_q"
+        ],
+        "node_id": "MARGIN_CASH_STATE",
+        "status": "PARTIAL_CURRENT_SOURCE_GAPS",
+        "unobserved": [
+          "fund.gross_margin_q current source MISSING_SOURCE",
+          "fund.cash_from_ops_q current source MISSING_SOURCE"
+        ]
+      },
+      {
+        "banked": [
+          "expectation row contract/measures frozen"
+        ],
+        "blocking": true,
+        "manifest_expectation_measures": [
+          "EPS_FY1",
+          "EPS_FY2",
+          "REVENUE_FY1",
+          "REVENUE_FY2",
+          "EPS_FY1_REVISION_30D",
+          "EPS_FY1_REVISION_90D",
+          "REVENUE_FY1_REVISION_30D",
+          "REVENUE_FY1_REVISION_90D"
+        ],
+        "manifest_source_claim_topics": [
+          "GUIDANCE"
+        ],
+        "manifest_structured_observables": [],
+        "node_id": "REVISION_GUIDANCE_STATE",
+        "status": "UNOBSERVED",
+        "unobserved": [
+          "current expectations source MISSING_SOURCE",
+          "guidance source claims unlanded"
+        ]
+      },
+      {
+        "banked": [
+          "derived-state law frozen"
+        ],
+        "blocking": true,
+        "manifest_expectation_measures": [
+          "EPS_FY1_REVISION_30D",
+          "EPS_FY1_REVISION_90D",
+          "REVENUE_FY1_REVISION_30D",
+          "REVENUE_FY1_REVISION_90D"
+        ],
+        "manifest_source_claim_topics": [
+          "GUIDANCE"
+        ],
+        "manifest_structured_observables": [],
+        "node_id": "EXPECTATION_GAP_STATE",
+        "status": "BLOCKED_BY_EXPECTATION_OBSERVABILITY",
+        "unobserved": [
+          "lawful consensus/revision trajectory needed to construct expectation gap"
+        ]
+      },
+      {
+        "banked": [
+          "close",
+          "total_return_1d",
+          "volume",
+          "derived ADV/realized-vol/SMA mechanics"
+        ],
+        "blocking": false,
+        "manifest_expectation_measures": [],
+        "manifest_source_claim_topics": [],
+        "manifest_structured_observables": [
+          "market.close",
+          "market.total_return_1d",
+          "market.volume",
+          "market.adv20",
+          "market.realized_vol20",
+          "market.sma20",
+          "market.sma200"
+        ],
+        "node_id": "MARKET_CONFIRMATION_STATE",
+        "status": "EXISTING_PIT_AUTHORITY_DOWNSTREAM_ONLY",
+        "unobserved": []
+      }
+    ],
+    "non_blocking_existing_surface": "MARKET_CONFIRMATION_STATE is already observable but is downstream-only and cannot substitute for missing economic state.",
+    "true_state_transition_validation_blockers": [
+      "SUCCESSOR_SPECIFIC_PIT_CORPUS_NOT_CAPTURED_OR_ADMITTED_TODAY",
+      "SOURCE_CLAIMS_UNLANDED_FOR_PRICING_UTILIZATION_AND_GUIDANCE_MECHANISMS",
+      "EXPECTATIONS_UNOBSERVED_SO_EXPECTATION_GAP_CANNOT_BE_VALIDATED",
+      "GROSS_MARGIN_AND_CASH_FROM_OPERATIONS_CURRENT_SOURCE_GAPS"
+    ]
+  },
+  "family_id": "PREBREAKOUT_DISCOVERY_v1",
+  "implementation_id": "PREBREAKOUT_TRIAL1_M0_MARKET_EARLY_WARNING_V1",
+  "mu_sndk_smoke_correction": {
+    "correct_law": "ALL_PIT_ELIGIBLE_BREAKOUT_B_EPISODES_ZERO_WEIGHT_ENGINEERING_SMOKE_INDEPENDENT_OF_WINNER_LABEL",
+    "defect": "W4_SMOKE_ANY_LEGITIMATE_PREBREAKOUT_FLAG_WAS_CONTAMINATED_BY_WINNER_LABEL",
+    "independent_checker": {
+      "checked_development_episode_count": 19,
+      "deferred_postdevelopment_episode_count": 4,
+      "legitimate_pre_b_flag_episode_count": 3,
+      "no_legitimate_pre_b_flag_episode_count": 16
+    },
+    "sealed_trial1_atlas_mu_sndk_smoke_is_acceptance_truth": false,
+    "sealed_trial1_atlas_statistical_close_affected": false,
+    "supersession": "INDEPENDENT_CHECKER_SUPERSEDES_SEALED_ATLAS_SMOKE_NUMBERS_ONLY"
+  },
+  "packet_sha256": "42690ac11749a8f7b45bc7749f4e32d9768799be92fcbfbf38c23eb82db87961",
+  "role_split": {
+    "DEFENSIVE_QUALITY": "DIAGNOSTIC_POSITIVE",
+    "DISCOVERY": "FAIL",
+    "interpretation": "Trial #1 carries useful downside/market-quality information but failed its winner-discovery role; the defensive result is outcome-visible development evidence only and cannot be promoted or reused as untouched evidence."
+  },
+  "schema_version": "prebreakout_failure_packet_v1",
+  "source_sha256s": {
+    "a2_result_json": "381218c4c1609fda48694efe9d445ae5f2dff6d43410205880da66ddb5441985",
+    "development_labels_parquet": "51c9f07093038e00965b0e03c03958ba2201875f5339fdf43ea58facd47bbccf",
+    "econphysics_prebreakout_v1_pit_observable_manifest": "2d803a3142685ce9fac95d0f6abe99edd4532c6b04485b6851855caf296ad6ca",
+    "sealed_w4_discovery_atlas_json_gz": "942bbaf89264ac87d96f88dae00653f756aa29c356caaa75d0f58e4f350f70a6",
+    "trial1_development_result_json": "43e2e41bb230f80965c5c5a017005830945cae2129375a582169aa2221056b3b",
+    "trial1_flag_projection_parquet": "2e018f086fc77da7d9b3b3c768f4bfa39d348368b329f529d35ca06a3062dd12",
+    "w4_false_stage_parquet": "5251392ca17824cb6483349b5ecacaa3653961b0e62171e4bb82eaef8ee9ccc4",
+    "w4_winner_stage_parquet": "a5e84c533761b6aad27913335dbd627c6e30fd6e5ca68fcde16102b9b457972a",
+    "w5_development_run_json_gz": "00ea66588e7b65d07e96ea5e4b29dc076169d2ef0265dd68c76484c849ab121b",
+    "winner_capture_diagnostic_v0": "4cf3692d5177688a777f114ad42747cf3f5511759692ad920a1ea780bc5aedc0"
+  },
+  "status": "FAILURE_PACKET_COMPLETE",
+  "trial_id": "PREBREAKOUT_TRIAL_1_M0"
+}
