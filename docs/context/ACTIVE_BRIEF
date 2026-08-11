@@ -3,6 +3,11 @@
 ## Authority (read first)
 
 ```text
+RESEARCH_LOOP_STATE      = docs/context/research_loop_state_current.json   # phase/next SoT
+RESEARCH_LOOP_HUMAN      = docs/context/RESEARCH_LOOP.md
+METHOD_CONSTITUTION      = docs/architecture/alpha_scientific_method_v1.md
+LOOP_CLI                 = python scripts/print_research_loop_state.py
+
 LINEAGE_BRANCH           = codex/pit-source-authority-1
 COMMIT_BASE              = 6045d39ce6649cdb8ca4544af30d4a70ce0fc075
 WORKTREE                 = E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e
@@ -17,8 +22,9 @@ RUNTIME_AUTHORITY        = docs/context/gv_endgame_authority_current.md
 ```text
 ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 ACTIVE_BASIS_AUTHORITY   = AO-K0A / OrthogonalizationContractV1 / NO_EMPIRICAL_RESULT
-ACTIVE_RESEARCH_SHADOW   = AO-FTK-0 / PREOPEN_FREEZE_CLOSED (inventory/margin transition sparse basis)
+ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-20260812 / L3_PASS (inherit FTK-0 inventory/margin surface)
 AO_FTK_0_STATUS          = CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER
+AO_FTK_1_STATUS          = L3_PASS / effective_dof=2 / material_trials_charged=0 / L5=false
 OK_SBI_0_STATUS          = S0_DESIGN_LOCKED_RELEASE_BLOCKED + Q_SOURCE_BLOCKED_TERMINAL (PARKED)
 CAPITAL_ALPHA_PATH       = CLOSED
 FINANCIAL_ALPHA_EVIDENCE = 0
@@ -42,28 +48,35 @@ qm_park_receipt          = docs/context/e2e_evidence/qm_track_parked_terminal_20
 ao_ftk_0_freeze          = docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json
 ao_ftk_0_preopen         = docs/context/e2e_evidence/ao_ftk_0_preopen_freeze_20260812.json
 ao_ftk_0_commit          = 6832066
+ao_ftk_1_l3_receipt      = docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json
+ao_ftk_1_preflight       = docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json
 ```
 
 ## Do now
 
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
 2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / Rule100 bridges / open OK-SBI S2.
-3. **AO-FTK-0 CLOSED** at pre-open freeze (`READY_FOR_LATER_CHARGED_DEVELOPMENT_READ`). No active FTK worker. Owner may later authorize a **new slice_id** charged development read only.
-4. Do not fill OK-SBI 20 gates for optics; do not spend Q amendment.
-5. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
+3. **AO-FTK-0 CLOSED** (NO_WORKER). Do not reopen as worker or open its outcomes.
+4. **AO-FTK-1 L3 PASS** recorded — continuous inventory lag-1 delta + continuous M1; `financial_alpha_evidence=0`; material trials remaining **3**. Owner may authorize **L4 charged-slice freeze** next. **L5 is not auto-open.**
+5. Do not fill OK-SBI 20 gates for optics; do not spend Q amendment.
+6. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
 
 ## Do not
 
 ```text
 Q / M⊥ / Q+M⊥ trophy leaderboard as automatic next
 W6 open / new provider for Q invention / K tuning / capital
-AO-FTK-0 outcome open / charged development read without new slice_id
+AO-FTK-0 outcome open / reopen as worker
+L5 RUN / material trial debit / label join without explicit owner L4+L5 authorization
 full endgame rewrite / fourth evidence clock
 treat public main as current authority
+claim financial_alpha_evidence > 0
 ```
 
-## Phase briefs
+## Phase briefs / handover
 
+- **Stream handover (roadmap + dispatcher):** `docs/handover/stream_handover_roadmap_alignment_dispatcher_20260812.md`
 - `docs/phase_brief/ao_ftk_0_transition_sparse_basis_worker_prompt_20260812.md` (CLOSED)
+- AO-FTK-1 L3 receipt: `docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.md`
 - `docs/phase_brief/ok_sbi_0_s0_preopen_worker_prompt_20260811.md`
-- Workspace root (non-authority copy): `AO-FTK-0_Worker_Prompt.md` may exist; prefer lineage worktree docs.
+- Workspace root pointer: `STREAM_HANDOVER_20260812.md` / `AO-FTK-0_Worker_Prompt.md` — prefer lineage worktree docs.

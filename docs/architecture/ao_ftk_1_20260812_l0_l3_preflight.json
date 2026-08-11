@@ -1,0 +1,191 @@
+{
+  "schema_version": "ao_ftk_1_l0_l3_preflight_v1",
+  "slice_id": "AO-FTK-1-20260812",
+  "name": "FTK_CHARGED_DEV_PREP_L0_L3",
+  "date": "2026-08-12",
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "science_mode": "CHARGED_DEVELOPMENT_PREP",
+  "phases": ["L0_QUESTION", "L1_CAUSAL_MODEL", "L2_OBSERVATION_CONTRACT"],
+  "parent_freeze": {
+    "slice_id": "AO-FTK-0",
+    "commit": "6832066",
+    "close_commit": "15613f3",
+    "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+    "machine_freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
+    "preopen": "docs/context/e2e_evidence/ao_ftk_0_preopen_freeze_20260812.json",
+    "status": "CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER"
+  },
+  "L0_question": {
+    "locked": true,
+    "h0": "A representation of the frozen 1–2 DOF inventory/margin transition kernel that survives R1–R8 can distinguish a real weak next-PIT transition signal from noise under full-W3 abstention burden.",
+    "not_hypothesis": [
+      "good company = growth + ROIC",
+      "Q/M residual geometry",
+      "high-dimensional feature soup",
+      "diagnostic survivors = confirmed alpha",
+      "MU/SNDK appearance = success"
+    ],
+    "sensing_focus": "NEXT_PIT_STRUCTURED_TRANSITION without Q/M and without outcome redesign"
+  },
+  "L1_causal_authority": {
+    "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+    "rationale_class": "MECHANISTIC",
+    "entry_mode": "CONTINUATION",
+    "comparator_later": "PIT_EQUAL_WEIGHT_FULL_W3",
+    "policy_capital": "DEFERRED",
+    "primitive_redesign": "FORBIDDEN",
+    "operator_redesign": "FORBIDDEN",
+    "inherited_primitives_bound": [
+      "FTK_PRIM_IQ_PERIOD_END",
+      "FTK_PRIM_IQ_TOTAL_REV",
+      "FTK_PRIM_IQ_INVENTORY",
+      "FTK_PRIM_IQ_OPER_INC"
+    ],
+    "inherited_operators_frozen": [
+      {
+        "decision_dof_slot": 1,
+        "operator_id": "INV_DELTA_MEAN_REVERSION",
+        "node_id": "INVENTORY_CHANNEL_STATE"
+      },
+      {
+        "decision_dof_slot": 2,
+        "operator_id": "MARGIN_M1_STATE_MEAN_REVERSION",
+        "node_id": "MARGIN_CASH_STATE"
+      }
+    ],
+    "effective_decision_dof_frozen": 2,
+    "max_effective_decision_dof": 2
+  },
+  "L2_observation_contract": {
+    "material_trial_debited": false,
+    "labels_joined": false,
+    "outcome_open_authorized": false,
+    "runnable_evaluation": false,
+    "representation_vectors_under_test": [
+      {
+        "vector_id": "INV_ECONOMIC_LEVEL_LAG1_DELTA_CONTINUOUS",
+        "node_id": "INVENTORY_CHANNEL_STATE",
+        "encoding": "CONTINUOUS",
+        "formula": "inventory_economic_level[FQ0] - inventory_economic_level[FQ-1]",
+        "inventory_economic_level": "-(IQ_INVENTORY / IQ_TOTAL_REV)",
+        "decision_prediction_from_vector": "prediction_direction = -sign(vector); zero-delta → ABSTAIN or non-informative",
+        "notes": "Continuous preferred over sign-only for R1/R2; sign is decision surface only, not sole sensing score"
+      },
+      {
+        "vector_id": "MARGIN_M1_CONTINUOUS_STATE",
+        "node_id": "MARGIN_CASH_STATE",
+        "encoding": "CONTINUOUS",
+        "formula": "frozen_M1_continuous_state_prediction(operating_margin node); M1 implementation bytes mutation FORBIDDEN",
+        "operating_margin": "IQ_OPER_INC / IQ_TOTAL_REV",
+        "decision_prediction_from_vector": "prediction_direction = -frozen_M1_continuous_state_prediction",
+        "m1_historical_properties": {
+          "continuous_measurement": true,
+          "own_history_robust_z": true,
+          "pit_peer_residual": true,
+          "temporal_accumulation_observations": 3,
+          "mixed_evidence_zeroed": false,
+          "fit_or_tuning_performed": false
+        },
+        "notes": "FTK-0 deliberately retained continuous M1 to address S0 D4 sign-only under-sensing risk"
+      }
+    ],
+    "sensing_targets": [
+      {
+        "target_id": "NEXT_PIT_INVENTORY_TO_REVENUE_NORMALIZATION_DIRECTION",
+        "node_id": "INVENTORY_CHANNEL_STATE",
+        "operator_id": "INV_DELTA_MEAN_REVERSION",
+        "horizon": "NEXT_PIT_STRUCTURED_TRANSITION"
+      },
+      {
+        "target_id": "NEXT_PIT_OPERATING_MARGIN_DIRECTION",
+        "node_id": "MARGIN_CASH_STATE",
+        "operator_id": "MARGIN_M1_STATE_MEAN_REVERSION",
+        "horizon": "NEXT_PIT_STRUCTURED_TRANSITION"
+      }
+    ],
+    "payoff_horizon": "BLOCKED_UNSET",
+    "right_tail_definition": "BLOCKED_UNSET",
+    "catastrophe_definition": "BLOCKED_UNSET",
+    "applicability_stratification_plan": {
+      "statuses": [
+        "W3_INELIGIBLE",
+        "NOT_APPLICABLE",
+        "APPLICABLE_OBSERVED",
+        "APPLICABLE_UNOBSERVED"
+      ],
+      "rules": {
+        "W3_INELIGIBLE": "Not in PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1 date-local eligible set; no claim",
+        "NOT_APPLICABLE": "Economic non-claim (e.g. inventory meaningless for pure services); never denominator deletion; never cash-drag rewrite",
+        "APPLICABLE_OBSERVED": "Node applies and lawful PIT operator inputs exist",
+        "APPLICABLE_UNOBSERVED": "Node applies but missing/invalid → ABSTAIN (selected=false, risky_weight=0, removed_from_denominator=false)"
+      },
+      "services_non_inventory_firms": "NOT_APPLICABLE or ABSTAIN — never rewrite denominator",
+      "coverage_pass_fail_as_eligibility": "FORBIDDEN",
+      "complete_case_denominator": "FORBIDDEN",
+      "imputation": "FORBIDDEN"
+    },
+    "missingness_to_abstention_mapping": {
+      "LATEST_UNOBSERVED": "APPLICABLE_UNOBSERVED → ABSTAIN",
+      "PRIOR_UNOBSERVED": "APPLICABLE_UNOBSERVED → ABSTAIN",
+      "RATIO_DENOMINATOR_NONPOSITIVE": "APPLICABLE_UNOBSERVED → ABSTAIN",
+      "UNIT_OR_PERIOD_INCOMPATIBLE": "APPLICABLE_UNOBSERVED → ABSTAIN",
+      "FQ0_PLAN_CAPTURE_MISMATCH": "snapshot-level UNOBSERVED → ABSTAIN",
+      "MISSING_PERIOD_END": "period metrics UNOBSERVED → ABSTAIN"
+    },
+    "peer_common_mode_handling_plan": {
+      "R3_plan": true,
+      "inventory_node": "Retain continuous inventory_to_revenue / economic-level delta as primary; optional cross-sectional demean of continuous inventory_to_revenue is diagnostic/common-mode control only — not a third decision DOF, not free threshold grid",
+      "margin_node": "Inherit M1 pit_peer_residual continuous state (bytes frozen); no re-fit",
+      "security_or_peer_return_imputation": "FORBIDDEN",
+      "common_mode_does_not_rewrite_denominator": true
+    },
+    "staleness_lag_law": {
+      "pit_availability_timestamp": "CONSERVATIVE_END_OF_REQUESTED_AS_OF_DATE_UTC",
+      "minimum_publication_processing_lag": "AS_OF_DATE_END_OF_DAY_CONSERVATIVE_NO_INTRA_DAY_BRIDGE",
+      "restatement_carry_law": "FilingVer=Original; never overwrite prior PIT vintage",
+      "period_grid": "FQ0..FQ-4 Original filing; first FQ0 baseline-only; adjacent nonmissing advancing FQ0 only"
+    },
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "search_budget_carry_forward": {
+      "hard_material_trials_total": 3,
+      "material_trials_charged_this_slice": 0,
+      "material_trials_remaining": 3,
+      "free_threshold_grid": "FORBIDDEN",
+      "simplicity_preference_when_tie": "LOWER_EFFECTIVE_DOF",
+      "one_standard_error_preference": true
+    },
+    "forbidden_inputs_this_preflight": [
+      "W6 / winner labels / future outcomes",
+      "Rule100 feature store / legacy assembled Q",
+      "new provider acquisition",
+      "Clock #1 outcomes",
+      "A2 re-query / Parent-Child mutation",
+      "post-hoc threshold search on outcomes",
+      "inventing ROIC / NOPAT / invested capital"
+    ],
+    "historical_diagnostic_context_only": {
+      "role": "HISTORICAL_DIAGNOSTIC_ONLY_NOT_ALPHA",
+      "dynamics": "data/prebreakout/analysis/econphysics_s0_economic_dynamics_diagnostic_v2.json",
+      "shootout": "data/prebreakout/analysis/econphysics_s0_m0_m1_shootout_v2.json",
+      "notes": [
+        "Inventory node dynamics survivors included DELTA_MEAN_REVERSION (diagnostic only)",
+        "Margin node dynamics survivor was M1_STATE_MEAN_REVERSION continuous (diagnostic only)",
+        "Integrated M0/M1 shootout: NO_EXTRACTION_LIFT at D5; also_flagged D4 sign-only under-sensing risk",
+        "Do not treat diagnostic survivors as financial alpha evidence"
+      ]
+    }
+  },
+  "qm_park_unchanged": {
+    "Q_SOURCE_STATUS": "Q_SOURCE_BLOCKED_TERMINAL",
+    "OK_SBI_S2": "NOT_AUTHORIZED",
+    "QM_REVIVAL_IN_FTK": "FORBIDDEN",
+    "Q_AMENDMENT_STATUS": "AVAILABLE_UNSPENT",
+    "qm_terms_used": false
+  },
+  "product": {
+    "state": "CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED",
+    "capital_alpha_path": "CLOSED",
+    "financial_alpha_evidence": 0,
+    "w6": "UNTOUCHED"
+  }
+}

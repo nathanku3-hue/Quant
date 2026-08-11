@@ -1,0 +1,154 @@
+{
+  "schema_version": "ao_ftk_1_l3_representation_snr_disposition_v1",
+  "slice_id": "AO-FTK-1-20260812",
+  "name": "FTK_CHARGED_DEV_PREP_L0_L3",
+  "date": "2026-08-12",
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "science_mode": "CHARGED_DEVELOPMENT_PREP",
+  "spec_version": "v1.0",
+  "parent_freeze_commit": "6832066",
+  "parent_close_commit": "15613f3",
+  "parent_verdict": "READY_FOR_LATER_CHARGED_DEVELOPMENT_READ",
+  "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+  "phases_completed": ["L0", "L1", "L2", "L3"],
+  "method_constitution": "docs/architecture/alpha_scientific_method_v1.md",
+  "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
+  "inherited_freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
+  "L0_question_locked": "A representation of the frozen 1–2 DOF inventory/margin transition kernel that survives R1–R8 can distinguish a real weak next-PIT transition signal from noise under full-W3 abstention burden.",
+  "L1_confirmation": {
+    "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+    "rationale_class": "MECHANISTIC",
+    "entry_mode": "CONTINUATION",
+    "comparator_later": "PIT_EQUAL_WEIGHT_FULL_W3",
+    "policy_capital": "DEFERRED",
+    "primitive_redesign": false,
+    "operator_redesign": false
+  },
+  "representation_under_test": {
+    "primary": "continuous inventory economic-level lag-1 delta + continuous operating-margin M1 state (1–2 DOF)",
+    "inventory_decision_surface": "INV_DELTA_MEAN_REVERSION uses -sign(delta) for direction; continuous magnitude retained for SNR sensing scores",
+    "margin_decision_surface": "MARGIN_M1_STATE_MEAN_REVERSION uses frozen continuous M1 state; bytes mutation FORBIDDEN",
+    "sign_only_under_sensing_mitigation": "FTK-0 observable_representation already specifies continuous inventory lag-1 delta + continuous M1; L3 requires continuous preferred over premature quantization of sensing scores",
+    "d4_concern_from_prior_diagnosis": "S0 integrated shootout flagged D4_REPRESENTATION_SNR (sign-only under-sensing risk); FTK surface deliberately retains continuous M1 and continuous inventory delta as sensing vectors"
+  },
+  "r1_r8": {
+    "R1_magnitude_monotonicity": {
+      "status": "PASS",
+      "evidence": [
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#opportunity_kernel_v1_fields.observable_representation",
+        "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json#L2_observation_contract.representation_vectors_under_test"
+      ],
+      "notes": "Continuous inventory lag-1 delta magnitude and continuous M1 margin state provide monotonic channels; sign is decision emission only, not sole score."
+    },
+    "R2_weak_signal_sensitivity": {
+      "status": "PASS",
+      "evidence": [
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#operators",
+        "data/prebreakout/analysis/econphysics_s0_m0_m1_shootout_v2.json#shootout.m1_representation"
+      ],
+      "notes": "Continuous M1 (own-history robust z, temporal accumulation=3) and continuous inventory delta retain weak transitions that pure sign quantization would collapse."
+    },
+    "R3_peer_common_mode_rejection": {
+      "status": "PASS",
+      "evidence": [
+        "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json#L2_observation_contract.peer_common_mode_handling_plan",
+        "data/prebreakout/analysis/econphysics_s0_m0_m1_shootout_v2.json#shootout.m1_representation.pit_peer_residual"
+      ],
+      "notes": "Margin inherits frozen M1 pit_peer_residual; inventory plan allows continuous XS demean as common-mode control only (not third DOF)."
+    },
+    "R4_async_causal_sequence_retention": {
+      "status": "PASS",
+      "evidence": [
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#primitives",
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#operators"
+      ],
+      "notes": "FQ0/FQ-1 (and FQ0..FQ-4 grid) sequence retained; adjacent nonmissing advancing FQ0 only; M1 temporal accumulation preserved."
+    },
+    "R5_staleness_degradation": {
+      "status": "PASS",
+      "evidence": [
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#primitives[*].pit_availability_timestamp",
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#primitives[*].minimum_publication_processing_lag"
+      ],
+      "notes": "Conservative EOD as-of PIT + Original-filing restatement law; no intra-day bridge; stale/missing → abstain not invent."
+    },
+    "R6_missingness_confidence_monotonicity": {
+      "status": "PASS",
+      "evidence": [
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#applicability_taxonomy",
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#denominator_and_abstention",
+        "data/prebreakout/analysis/econphysics_s0_economic_dynamics_diagnostic_v2.json#admission.admitted_missing_cell_counts"
+      ],
+      "notes": "Missing/invalid inputs map to APPLICABLE_UNOBSERVED→ABSTAIN with risky_weight=0; inventory high missingness does not force imputation or complete-case rewrite."
+    },
+    "R7_conflicting_evidence_retention": {
+      "status": "PASS",
+      "evidence": [
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#operator_routing",
+        "data/prebreakout/analysis/econphysics_s0_m0_m1_shootout_v2.json#shootout.m1_representation.mixed_evidence_zeroed"
+      ],
+      "notes": "Two domain-limited nodes may disagree; no forced mixed-evidence zeroing; no free composite trophy; conflict remains stratified, not deleted."
+    },
+    "R8_abstention_vs_deletion": {
+      "status": "PASS",
+      "evidence": [
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#denominator_and_abstention",
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#applicability_taxonomy"
+      ],
+      "notes": "Full-W3 denominator immutable; missingness abstains (selected=false) without row deletion; NOT_APPLICABLE is non-claim not cash-drag deletion."
+    }
+  },
+  "first_fail_R_if_any": null,
+  "disposition": "PASS",
+  "disposition_rationale": "Under the inherited FTK-0 freeze, the representation under test is continuous inventory economic-level lag-1 delta plus continuous margin M1 state (not sign-only soup). R1–R8 pass as structural SNR preflight without material trial debit. Sign remains the inventory decision emission but continuous magnitude is retained for sensing. Continuous M1 was deliberately frozen to address prior D4 under-sensing. No evidence forces SIMPLIFY collapse to 1 DOF this turn; simplicity preference applies only on later empirical tie. No within-freeze repair required before L4 charged-slice freeze recommendation. Passing L3 does not authorize L5.",
+  "effective_dof_recommendation": 2,
+  "simplify_rejected_reason": "Both inventory and margin nodes remain independently authorized domain-limited DOF on the frozen surface; no indistinguishability / stability evidence from a charged read exists this turn to force LOWER_EFFECTIVE_DOF.",
+  "revise_within_freeze_not_required": {
+    "continuous_vs_quantized": "Already resolved by FTK-0 observable_representation + this preflight continuous-preferred sensing vectors",
+    "forbidden_if_attempted": [
+      "new primitive",
+      "free threshold grid",
+      "post-hoc operator hunt",
+      "new router",
+      "Q/M term",
+      "third DOF",
+      "outcome-driven redesign"
+    ]
+  },
+  "material_trials_charged_this_slice": 0,
+  "material_trials_remaining": 3,
+  "hard_material_trials_total": 3,
+  "outcome_open_authorized": false,
+  "runnable_evaluation": false,
+  "l5_authorized": false,
+  "l5_auto_open": false,
+  "label_join_performed": false,
+  "financial_alpha_evidence": 0,
+  "qm_terms_used": false,
+  "q_source_status": "Q_SOURCE_BLOCKED_TERMINAL",
+  "ok_sbi_s2": "NOT_AUTHORIZED",
+  "qm_revival_in_ftk": "FORBIDDEN",
+  "q_amendment_status": "AVAILABLE_UNSPENT",
+  "w6": "UNTOUCHED",
+  "product_state": "CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED",
+  "capital_alpha_path": "CLOSED",
+  "next_phase_recommendation": "L4_CHARGED_SLICE_FREEZE",
+  "next_phase_note": "Recommend owner-authorized L4 empirical/charged-slice freeze under frozen surface (effective_dof=2). L5 RUN requires separate owner authorization + material trial debit + sealed label join law. No automatic L3/L4→L5.",
+  "next_owner_action": "authorize L4 freeze",
+  "stop_lines_honored": true,
+  "stop_lines_hit": [],
+  "stop_lines_checked": [
+    "REOPEN_AO_FTK_0_AS_WORKER",
+    "AO_FTK_0_OUTCOME_OPEN",
+    "L5_AUTO_OPEN_AFTER_L3",
+    "MATERIAL_TRIAL_DEBIT_THIS_TURN",
+    "LABEL_JOIN_OR_OUTCOME_INSPECT",
+    "OK_SBI_S2_OR_QM_TROPHY",
+    "INVENT_ROIC_OR_Q_GF",
+    "THIRD_DECISION_DOF",
+    "FREE_THRESHOLD_GRID",
+    "CLAIM_FINANCIAL_ALPHA_EVIDENCE_GT_0"
+  ],
+  "ao_ftk_0_status_unchanged": "CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER",
+  "constitution": "Inherit FTK-0. Answer L3. Debit nothing. Join nothing. Passing SNR is not a license to open outcomes — only a license to ask the owner for L4/L5."
+}
