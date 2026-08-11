@@ -1,0 +1,38 @@
+{
+  "LABEL_BYTES_JOINED": true,
+  "auth_receipt_id": "AO_FTK_1_20260812_L5_AUTHORIZATION",
+  "debit_receipt_id": "AO_FTK_1_20260812_L5_TRIAL_DEBIT",
+  "economic_cuts": {
+    "catastrophe_cut": "BLOCKED_UNSET",
+    "payoff_horizon": "BLOCKED_UNSET",
+    "right_tail_cut": "BLOCKED_UNSET"
+  },
+  "financial_alpha_evidence": 0,
+  "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.hash_procedure.json",
+  "hash_procedure_sha256_pre_join": "ae85e9c22038a4190491fed1f6fa5f9819c7623a7f2a986b82b1756c109db733",
+  "horizon": "NEXT_PIT_STRUCTURED_TRANSITION",
+  "identity_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.identity.json",
+  "identity_sha256_pre_join": "49e39094ca36863091fafae9edebbbf98ea326dbc1c89ac22b1f37af6862e557",
+  "join_authorized": true,
+  "join_count": 1,
+  "join_performed": true,
+  "joined_at_utc": "2026-08-11T19:03:31Z",
+  "joined_labels_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_labels.parquet",
+  "joined_labels_sha256": "ea18e3821a2573bc3ed936a242045963e698dd5a53a28c580a314408e31dfa0f",
+  "joined_manifest_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.joined.manifest.json",
+  "joined_manifest_sha256": "41f5bf0217c3931fbcba55f2cc201c969d9873cee8a63a22361f1e8ff8d08b45",
+  "joined_row_count": 35324,
+  "label_identity_content_address_sha256": "5307be03003cdb21d67315588744d7ccf6be00033cba5f9a173dd61234ba355a",
+  "outcome_inspected": true,
+  "outcome_scope": "SENSING_TARGETS_ONLY",
+  "product_clock_join": false,
+  "receipt_id": "AO_FTK_1_20260812_L5_LABEL_JOIN",
+  "schema_version": "ao_ftk_1_l5_label_join_receipt_v1",
+  "second_join": "FORBIDDEN",
+  "sensing_targets": [
+    "NEXT_PIT_INVENTORY_TO_REVENUE_NORMALIZATION_DIRECTION",
+    "NEXT_PIT_OPERATING_MARGIN_DIRECTION"
+  ],
+  "slice_id": "AO-FTK-1-20260812",
+  "w6_join": false
+}

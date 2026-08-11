@@ -1,0 +1,21 @@
+{
+  "auth_receipt_id": "AO_FTK_1_20260812_L5_AUTHORIZATION",
+  "capital_authority": false,
+  "charged_after": 1,
+  "charged_before": 0,
+  "debit": 1,
+  "debit_units": 1,
+  "debited_at_utc": "2026-08-11T19:03:18Z",
+  "financial_alpha_evidence": 0,
+  "free_threshold_grid": "FORBIDDEN",
+  "material_trials_charged_this_slice": 1,
+  "material_trials_remaining": 2,
+  "multi_debit": "FORBIDDEN",
+  "plan_id": "FTK1_TRIAL_DEBIT_PLAN_V1",
+  "receipt_id": "AO_FTK_1_20260812_L5_TRIAL_DEBIT",
+  "remaining_after": 2,
+  "remaining_before": 3,
+  "schema_version": "ao_ftk_1_l5_trial_debit_receipt_v1",
+  "slice_id": "AO-FTK-1-20260812",
+  "uncharged_adaptive_search": "FORBIDDEN"
+}

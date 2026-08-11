@@ -1,0 +1,97 @@
+{
+  "authorized_at_utc": "2026-08-11T19:03:18Z",
+  "authorized_phases": [
+    "L5_RUN",
+    "L6_LAYERED_DIAGNOSIS",
+    "L7_ROADMAP_DECISION"
+  ],
+  "capital_authority": false,
+  "catastrophe_cut": "BLOCKED_UNSET",
+  "constitution": "One auth · one debit · one join · one frozen sensing eval · L6 first-fail + info-gain · stop at L7. No redesign, no second run, no capital, no alpha claim.",
+  "date": "2026-08-12",
+  "debit_allowed": 1,
+  "entry_phase": "L5_RUN",
+  "evals_allowed": 1,
+  "evaluation": {
+    "allowed": 1,
+    "dof_rewrite": "FORBIDDEN",
+    "effective_decision_dof": 2,
+    "feature_add": "FORBIDDEN",
+    "operator_fit": "FORBIDDEN",
+    "operators": [
+      "INV_DELTA_MEAN_REVERSION",
+      "MARGIN_M1_STATE_MEAN_REVERSION"
+    ],
+    "qm_terms": "FORBIDDEN",
+    "routing": "DOMAIN_LIMITED_EX_ANTE",
+    "threshold_grid": "FORBIDDEN"
+  },
+  "financial_alpha_evidence": 0,
+  "joins_allowed": 1,
+  "l4_freeze": {
+    "effective_decision_dof": 2,
+    "l3_disposition_commit": "28aa0f1",
+    "parent_freeze_commit": "6832066",
+    "path": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
+    "sha256": "7a608b1c4c55a39211769b6752e2c6a487ebb49f633348f5156c9604fd958c21",
+    "terminal_verdict": "L4_FREEZE_PASS"
+  },
+  "l5_authorized": true,
+  "l5_auto_open": false,
+  "label_custody": {
+    "LABEL_BYTES_JOINED_before": false,
+    "LABEL_HASH_PROCEDURE_FROZEN": true,
+    "LABEL_IDENTITY_FROZEN": true,
+    "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.hash_procedure.json",
+    "hash_procedure_sha256": "ae85e9c22038a4190491fed1f6fa5f9819c7623a7f2a986b82b1756c109db733",
+    "identity_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.identity.json",
+    "identity_sha256": "49e39094ca36863091fafae9edebbbf98ea326dbc1c89ac22b1f37af6862e557"
+  },
+  "label_join": {
+    "allowed": 1,
+    "product_clock_join": "FORBIDDEN",
+    "scope": "SENSING_TARGETS_ONLY",
+    "sensing_targets": [
+      "NEXT_PIT_INVENTORY_TO_REVENUE_NORMALIZATION_DIRECTION",
+      "NEXT_PIT_OPERATING_MARGIN_DIRECTION"
+    ],
+    "w6_join": "FORBIDDEN"
+  },
+  "material_trial_debit": {
+    "after_charged": 1,
+    "after_remaining": 2,
+    "before_charged": 0,
+    "before_remaining": 3,
+    "debit_units": 1,
+    "plan_id": "FTK1_TRIAL_DEBIT_PLAN_V1"
+  },
+  "mode": "SENSING_FIRST",
+  "name": "FTK_L5_SENSING_FIRST_ONE_SHOT",
+  "new_slice": "FORBIDDEN",
+  "ok_sbi_s2": "NOT_AUTHORIZED",
+  "one_shot": true,
+  "outcome_open_scope": "SENSING_LABEL_JOIN_ONLY",
+  "owner_decision": "L5_AUTHORIZE",
+  "payoff_horizon": "BLOCKED_UNSET",
+  "prior": {
+    "l3_commit": "28aa0f1",
+    "l3_disposition": "PASS",
+    "l4_commit": "a3350f0",
+    "l4_verdict": "L4_FREEZE_PASS",
+    "parent_freeze": "AO-FTK-0 @ 6832066"
+  },
+  "product_state": "CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED",
+  "q_amendment": "AVAILABLE_UNSPENT",
+  "q_source_status": "Q_SOURCE_BLOCKED_TERMINAL",
+  "qm_revival_in_ftk": "FORBIDDEN",
+  "receipt_id": "AO_FTK_1_20260812_L5_AUTHORIZATION",
+  "redesign": "FORBIDDEN",
+  "right_tail_cut": "BLOCKED_UNSET",
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "runnable_evaluation": true,
+  "schema_version": "ao_ftk_1_l5_authorization_receipt_v1",
+  "science_mode": "ONE_AUTHORIZED_CHARGED_SENSING_EVALUATION",
+  "second_run": "FORBIDDEN",
+  "slice_id": "AO-FTK-1-20260812",
+  "w6": "UNTOUCHED"
+}

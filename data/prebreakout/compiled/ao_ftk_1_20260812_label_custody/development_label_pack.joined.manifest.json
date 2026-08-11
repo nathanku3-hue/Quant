@@ -1,0 +1,31 @@
+{
+  "LABEL_BYTES_JOINED": true,
+  "auth_receipt_id": "AO_FTK_1_20260812_L5_AUTHORIZATION",
+  "debit_receipt_id": "AO_FTK_1_20260812_L5_TRIAL_DEBIT",
+  "economic_cuts": {
+    "catastrophe_cut": "BLOCKED_UNSET",
+    "payoff_horizon": "BLOCKED_UNSET",
+    "right_tail_cut": "BLOCKED_UNSET"
+  },
+  "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.hash_procedure.json",
+  "hash_procedure_sha256_pre_join": "ae85e9c22038a4190491fed1f6fa5f9819c7623a7f2a986b82b1756c109db733",
+  "identity_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.identity.json",
+  "identity_sha256_pre_join": "49e39094ca36863091fafae9edebbbf98ea326dbc1c89ac22b1f37af6862e557",
+  "join_authorized": true,
+  "join_performed": true,
+  "joined_labels_jsonl": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_labels.jsonl",
+  "joined_labels_jsonl_sha256": "ad52c2c890174e1da42a89ca83d092a03755d2e24be334d5d503fa335c13c474",
+  "joined_labels_parquet": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_labels.parquet",
+  "joined_labels_parquet_sha256": "ea18e3821a2573bc3ed936a242045963e698dd5a53a28c580a314408e31dfa0f",
+  "joined_row_count": 35324,
+  "label_identity_content_address_sha256": "5307be03003cdb21d67315588744d7ccf6be00033cba5f9a173dd61234ba355a",
+  "outcome_inspected": true,
+  "outcome_scope": "SENSING_TARGETS_ONLY",
+  "schema_version": "ao_ftk_1_label_pack_joined_manifest_v1",
+  "seal_status": "JOINED_UNDER_L5_AUTH",
+  "sensing_targets": [
+    "NEXT_PIT_INVENTORY_TO_REVENUE_NORMALIZATION_DIRECTION",
+    "NEXT_PIT_OPERATING_MARGIN_DIRECTION"
+  ],
+  "slice_id": "AO-FTK-1-20260812"
+}

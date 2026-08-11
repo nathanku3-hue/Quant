@@ -1,0 +1,119 @@
+{
+  "auth_receipt_id": "AO_FTK_1_20260812_L5_AUTHORIZATION",
+  "capital_authority": false,
+  "constitution": "One auth · one debit · one join · one frozen sensing eval · L6 first-fail + info-gain · stop at L7. No redesign, no second run, no capital, no alpha claim.",
+  "debit_receipt_id": "AO_FTK_1_20260812_L5_TRIAL_DEBIT",
+  "diagnosed_at_utc": "2026-08-11T19:03:31Z",
+  "failure_route": "NONE_IN_SCOPE_PASS",
+  "falsifiers": {
+    "F1_INVENTORY_OPERATOR_UNSTABLE": "NOT_TRIGGERED",
+    "F2_MARGIN_OPERATOR_UNSTABLE": "NOT_TRIGGERED",
+    "F3_THRESHOLD_RESCUE_REQUIRED": "NOT_TRIGGERED_NO_GRID",
+    "F4_DENOMINATOR_REWRITE": "NOT_TRIGGERED",
+    "F5_QM_SMUGGLING": "NOT_TRIGGERED",
+    "F6_ASYMMETRY_CATASTROPHE": "NOT_IN_SCOPE_SENSING_FIRST"
+  },
+  "financial_alpha_evidence": 0,
+  "first_fail_layer": null,
+  "information_gain": {
+    "comparator": {
+      "description": "Directional hit-rate lift vs majority-class no-information baseline on evaluable (prediction×label) rows; fold-stable association > 0 required for mechanism PASS.",
+      "minimum_fold_coverage": 0.2,
+      "minimum_fold_n": 30,
+      "minimum_supporting_temporal_folds": 3,
+      "name": "NO_INFORMATION_BASELINE_MAJORITY_CLASS",
+      "temporal_fold_count": 4
+    },
+    "forbidden_to_change": [
+      "second evaluation without new owner auth",
+      "threshold/parameter grid",
+      "DOF collapse or third DOF",
+      "operator/feature rewrite under same freeze",
+      "post-hoc economic cut binding",
+      "W6 open",
+      "capital / alpha claim",
+      "AO-FTK-2 autonomous open",
+      "Q invention / QM revival in FTK"
+    ],
+    "inventory_directional_association": 0.1817139581541989,
+    "inventory_lift_vs_null": 1.0838590956887488,
+    "inventory_mechanism_status": "PASS",
+    "margin_directional_association": 0.22607557663994765,
+    "margin_lift_vs_null": 1.1528995539147822,
+    "margin_mechanism_status": "PASS",
+    "summary": "Relative to the prior L3/L4 representation freeze (unjoined, uncharged), this one-shot join+eval measured fold-stable next-PIT transition association on the frozen 2-DOF surface (surface_status=BOTH_NODES_MEASURABLE_SIGNAL). Inventory operator INV_DELTA_MEAN_REVERSION: PASS (lift=1.0838590956887488, assoc=0.1817139581541989). Margin operator MARGIN_M1_STATE_MEAN_REVERSION: PASS (lift=1.1528995539147822, assoc=0.22607557663994765). No economic cuts were bound; financial_alpha_evidence remains 0.",
+    "surface_status": "BOTH_NODES_MEASURABLE_SIGNAL",
+    "which_single_layer_may_change_next": "Owner may later authorize economic-cut freeze + second trial, bounded refinement, or STOP — not auto-dispatched."
+  },
+  "join_receipt_id": "AO_FTK_1_20260812_L5_LABEL_JOIN",
+  "layers": [
+    {
+      "in_scope_sensing_first": true,
+      "layer": "D1_CUSTODY_PIT",
+      "notes": "Operator immutability pins match; dof=2; economic cuts BLOCKED_UNSET; no PIT rewrite.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope_sensing_first": true,
+      "layer": "D2_DATA_OBSERVABLE",
+      "notes": "Admitted snapshots=23047, adjacent pairs=17662; predecessor gate enforced; missingness abstains (no row deletion).",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope_sensing_first": true,
+      "layer": "D3_MEASUREMENT_POWER",
+      "notes": "Inventory evaluable N=7129 qualifying_folds=4; margin evaluable N=12282 qualifying_folds=4.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope_sensing_first": true,
+      "layer": "D4_REPRESENTATION_SNR",
+      "notes": "Continuous inventory lag-1 + continuous M1 surface retained; inventory coverage=0.5031761716544325, abstention=0.47780545804552144; margin coverage=0.8668831168831169; services inventory NOT_APPLICABLE count=5720 measured.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope_sensing_first": true,
+      "layer": "D5_MECHANISM_SELF_TRANSITION",
+      "notes": "Inventory INV_DELTA_MEAN_REVERSION status=PASS lift=1.0838590956887488 assoc=0.1817139581541989 supporting_folds=3; margin MARGIN_M1_STATE_MEAN_REVERSION status=PASS lift=1.1528995539147822 assoc=0.22607557663994765 supporting_folds=3.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope_sensing_first": false,
+      "layer": "D6_SELECTION_ENRICHMENT",
+      "notes": "No selection estimand preregistered this turn; sensing-only.",
+      "status": "NOT_IN_SCOPE_SENSING_FIRST",
+      "stop_here": false
+    },
+    {
+      "in_scope_sensing_first": false,
+      "layer": "D7_CONFIRMATION_TIMING",
+      "notes": "No confirmation/timing estimand preregistered this turn.",
+      "status": "NOT_IN_SCOPE_SENSING_FIRST",
+      "stop_here": false
+    },
+    {
+      "in_scope_sensing_first": false,
+      "layer": "D8_HOLD_EXIT_CONVEXITY",
+      "notes": "No hold/exit estimand preregistered this turn.",
+      "status": "NOT_IN_SCOPE_SENSING_FIRST",
+      "stop_here": false
+    },
+    {
+      "in_scope_sensing_first": false,
+      "layer": "D9_ECONOMICS_COST_CAPACITY",
+      "notes": "Economic cuts remain BLOCKED_UNSET; do not bind payoff/catastrophe after peeking. F6 asymmetry catastrophe NOT_IN_SCOPE_SENSING_FIRST.",
+      "status": "NOT_IN_SCOPE_SENSING_FIRST",
+      "stop_here": false
+    }
+  ],
+  "mode": "SENSING_FIRST",
+  "receipt_id": "AO_FTK_1_20260812_L6_LAYERED_DIAGNOSIS",
+  "run_id": "AO_FTK_1_20260812_L5_SENSING_RUN_1",
+  "schema_version": "ao_ftk_1_l6_layered_diagnosis_v1",
+  "slice_id": "AO-FTK-1-20260812"
+}

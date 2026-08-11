@@ -113,10 +113,12 @@ def test_material_trials_uncharged() -> None:
 
 
 def test_label_identity_and_hash_frozen_bytes_unjoined() -> None:
+    """L4 freeze-time custody: unjoined. Live identity may be joined after L5."""
     doc = load_machine_freeze(REPO)
     lp = doc["label_pack"]
     assert lp["LABEL_IDENTITY_FROZEN"] is True
     assert lp["LABEL_HASH_PROCEDURE_FROZEN"] is True
+    # L4 machine freeze is immutable historical record — always unjoined.
     assert lp["LABEL_BYTES_JOINED"] is False
     assert lp["label_join"] is False
     assert lp["outcome_open"] is False
@@ -127,26 +129,32 @@ def test_label_identity_and_hash_frozen_bytes_unjoined() -> None:
 
     identity = load_label_identity(REPO)
     assert identity["LABEL_IDENTITY_FROZEN"] is True
-    assert identity["LABEL_BYTES_JOINED"] is False
-    assert identity["join_performed"] is False
-    assert identity["security_identity"] if False else identity["row_key_set_definition"][
-        "security_identity"
-    ] == "CIQSEC"
+    assert identity["row_key_set_definition"]["security_identity"] == "CIQSEC"
     assert (
         identity["row_key_set_definition"]["ticker_entity_permno_fallback"] == "FORBIDDEN"
     )
 
     proc = load_label_hash_procedure(REPO)
     assert proc["LABEL_HASH_PROCEDURE_FROZEN"] is True
-    assert proc["LABEL_BYTES_JOINED"] is False
-    assert proc["join_authorized"] is False
-    assert proc["seal_name"] == "SEALED_UNJOINED"
 
-    # No joined outcomes/parquet under label custody dir.
-    custody_dir = REPO / "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody"
-    for p in custody_dir.iterdir():
-        assert p.suffix.lower() != ".parquet", p
-        assert "joined" not in p.name.lower() or p.suffix == ".json"
+    l5_join = REPO / "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_label_join.json"
+    if l5_join.is_file():
+        # Post-L5: live custody may be joined under the L5 auth receipt.
+        assert identity["LABEL_BYTES_JOINED"] is True
+        assert identity["join_performed"] is True
+        assert proc["LABEL_BYTES_JOINED"] is True
+        custody_dir = REPO / "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody"
+        assert any(p.suffix.lower() == ".parquet" for p in custody_dir.iterdir())
+    else:
+        assert identity["LABEL_BYTES_JOINED"] is False
+        assert identity["join_performed"] is False
+        assert proc["LABEL_BYTES_JOINED"] is False
+        assert proc["join_authorized"] is False
+        assert proc["seal_name"] == "SEALED_UNJOINED"
+        custody_dir = REPO / "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody"
+        for p in custody_dir.iterdir():
+            assert p.suffix.lower() != ".parquet", p
+            assert "joined" not in p.name.lower() or p.suffix == ".json"
 
 
 def test_blocked_unset_economic_cuts_retained() -> None:

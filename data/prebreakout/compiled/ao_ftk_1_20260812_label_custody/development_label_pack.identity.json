@@ -1,68 +1,70 @@
 {
-  "schema_version": "ao_ftk_1_label_pack_identity_v1",
-  "slice_id": "AO-FTK-1-20260812",
-  "pack_role": "DEVELOPMENT_LABEL_PACK",
+  "LABEL_BYTES_JOINED": true,
   "LABEL_IDENTITY_FROZEN": true,
-  "LABEL_BYTES_JOINED": false,
-  "join_authorized": false,
-  "join_performed": false,
-  "outcome_inspected": false,
-  "seal_status": "IDENTITY_AND_HASH_FROZEN_UNJOINED",
+  "economic_cuts": {
+    "catastrophe_definition": "BLOCKED_UNSET",
+    "payoff_horizon_primary": "BLOCKED_UNSET",
+    "payoff_horizon_secondary": "BLOCKED_UNSET",
+    "right_tail_definition": "BLOCKED_UNSET"
+  },
+  "join_authorized": true,
+  "join_performed": true,
+  "joined_artifact_paths": {
+    "development_labels_parquet": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_labels.parquet",
+    "development_labels_parquet_sha256": "ea18e3821a2573bc3ed936a242045963e698dd5a53a28c580a314408e31dfa0f",
+    "joined_manifest": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.joined.manifest.json",
+    "joined_manifest_sha256": "41f5bf0217c3931fbcba55f2cc201c969d9873cee8a63a22361f1e8ff8d08b45",
+    "note": "Joined under L5_AUTHORIZE sensing-first one-shot only."
+  },
+  "notes": "Identity frozen at L4. Bytes joined once under L5 auth (sensing targets only).",
+  "outcome_inspected": true,
+  "pack_role": "DEVELOPMENT_LABEL_PACK",
   "pack_schema_id": "AO_FTK_1_DEVELOPMENT_LABEL_PACK_SCHEMA_V1",
   "row_key_set_definition": {
-    "description": "decision-date × security identity under full-W3 law",
-    "decision_date_semantics": "PIT as-of decision date under conservative EOD publication/processing lag law inherited from FTK-0 primitives",
-    "security_identity": "CIQSEC",
-    "ticker_entity_permno_fallback": "FORBIDDEN",
-    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
     "applicability_statuses": [
       "W3_INELIGIBLE",
       "NOT_APPLICABLE",
       "APPLICABLE_OBSERVED",
       "APPLICABLE_UNOBSERVED"
     ],
-    "missingness_action": "APPLICABLE_UNOBSERVED → ABSTAIN; no row deletion; no imputation"
+    "decision_date_semantics": "PIT as-of decision date under conservative EOD publication/processing lag law inherited from FTK-0 primitives",
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "description": "decision-date × security identity under full-W3 law",
+    "missingness_action": "APPLICABLE_UNOBSERVED → ABSTAIN; no row deletion; no imputation",
+    "security_identity": "CIQSEC",
+    "ticker_entity_permno_fallback": "FORBIDDEN"
   },
+  "schema_version": "ao_ftk_1_label_pack_identity_v1",
+  "seal_status": "JOINED_UNDER_L5_AUTH",
   "sensing_target_keys": [
     {
-      "target_id": "NEXT_PIT_INVENTORY_TO_REVENUE_NORMALIZATION_DIRECTION",
+      "horizon": "NEXT_PIT_STRUCTURED_TRANSITION",
       "node_id": "INVENTORY_CHANNEL_STATE",
       "operator_id": "INV_DELTA_MEAN_REVERSION",
-      "horizon": "NEXT_PIT_STRUCTURED_TRANSITION"
+      "target_id": "NEXT_PIT_INVENTORY_TO_REVENUE_NORMALIZATION_DIRECTION"
     },
     {
-      "target_id": "NEXT_PIT_OPERATING_MARGIN_DIRECTION",
+      "horizon": "NEXT_PIT_STRUCTURED_TRANSITION",
       "node_id": "MARGIN_CASH_STATE",
       "operator_id": "MARGIN_M1_STATE_MEAN_REVERSION",
-      "horizon": "NEXT_PIT_STRUCTURED_TRANSITION"
+      "target_id": "NEXT_PIT_OPERATING_MARGIN_DIRECTION"
     }
   ],
+  "slice_id": "AO-FTK-1-20260812",
   "source_receipt_lineage": {
     "admitted_sources_only": true,
-    "s0_structured_request": "docs/architecture/econphysics_prebreakout_s0_structured_request_v1.json",
-    "parent_freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
-    "parent_freeze_commit": "6832066",
-    "l3_disposition": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
-    "l3_disposition_commit": "28aa0f1",
-    "w3_authority": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
     "forbidden_sources": [
       "W6 / winner labels / future outcomes",
       "Rule100 feature store / assembled Q",
       "Clock #1 outcomes",
       "invented ROIC / NOPAT / invested capital",
       "ticker/entity/permno fallback bridges"
-    ]
-  },
-  "economic_cuts": {
-    "payoff_horizon_primary": "BLOCKED_UNSET",
-    "payoff_horizon_secondary": "BLOCKED_UNSET",
-    "right_tail_definition": "BLOCKED_UNSET",
-    "catastrophe_definition": "BLOCKED_UNSET"
-  },
-  "joined_artifact_paths": {
-    "development_labels_parquet": null,
-    "outcome_table": null,
-    "note": "No joined bytes this turn. Paths remain null until L5 authorization."
-  },
-  "notes": "Identity freeze only. Readiness of label machinery ≠ permission to materialize or inspect labels."
+    ],
+    "l3_disposition": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
+    "l3_disposition_commit": "28aa0f1",
+    "parent_freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
+    "parent_freeze_commit": "6832066",
+    "s0_structured_request": "docs/architecture/econphysics_prebreakout_s0_structured_request_v1.json",
+    "w3_authority": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1"
+  }
 }

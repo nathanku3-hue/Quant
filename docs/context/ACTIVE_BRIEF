@@ -57,13 +57,29 @@ ao_ftk_1_l4_close        = docs/context/e2e_evidence/ao_ftk_1_20260812_l4_close.
 ao_ftk_1_l4_work_commit  = a3350f0
 ```
 
+## AO-FTK-1 L5/L6 status (2026-08-12)
+
+```text
+L5_AUTH               = SPENT (SENSING_FIRST one-shot)
+MATERIAL_TRIALS       = charged 1 / remaining 2
+LABEL_BYTES_JOINED    = true (sensing targets only; one join)
+EVALS                 = 1 frozen 2-DOF sensing eval
+SURFACE_STATUS        = BOTH_NODES_MEASURABLE_SIGNAL
+FIRST_FAIL_LAYER      = None
+FAILURE_ROUTE         = NONE_IN_SCOPE_PASS
+FINANCIAL_ALPHA_EVIDENCE = 0
+NEXT                  = OWNER L7 decision (no auto next slice / no second L5)
+RECEIPTS              = docs/context/e2e_evidence/ao_ftk_1_20260812_l5_*.json
+                        + l6_layered_diagnosis + l7_owner_packet
+```
+
 ## Do now
 
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
 2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / Rule100 bridges / open OK-SBI S2.
 3. **AO-FTK-0 CLOSED** (NO_WORKER). Do not reopen as worker or open its outcomes.
 4. **AO-FTK-1 L4 CLOSED** (`L4_FREEZE_PASS_CLOSED_READY_FOR_OWNER_L5` / NO_WORKER) → **WAIT_OWNER_L5**. Binding freeze: 2-DOF continuous inventory lag-1 + continuous M1; label identity + hash procedure; trial-debit plan (0 charged / 3 remaining). **L5 is NOT_AUTHORIZED.** No active FTK-1 worker. No silent L5. No trial debit. No label join. `financial_alpha_evidence=0`.
-5. Owner next: **authorize L5 | hold | stop** (separate receipt required for L5).
+5. Owner next: **L7 route** from `ao_ftk_1_20260812_l7_owner_packet.json` (HOLD_EVIDENCE / L8 / STOP / later economic freeze). No auto L5.
 6. Do not fill OK-SBI 20 gates for optics; do not spend Q amendment.
 7. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
 
@@ -73,7 +89,7 @@ ao_ftk_1_l4_work_commit  = a3350f0
 Q / M⊥ / Q+M⊥ trophy leaderboard as automatic next
 W6 open / new provider for Q invention / K tuning / capital
 AO-FTK-0 outcome open / reopen as worker
-L5 RUN / material trial debit / label join without explicit owner L5 authorization
+second L5 / multi-debit / multi-join / post-hoc economic cut bind without new owner authorization
 silent L4→L5 / rewrite frozen 2-DOF / third DOF / invent payoff-catastrophe defaults
 full endgame rewrite / fourth evidence clock
 treat public main as current authority
