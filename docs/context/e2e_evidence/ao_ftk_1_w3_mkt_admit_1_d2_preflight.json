@@ -1,0 +1,84 @@
+{
+  "schema_version": "ao_ftk_1_w3_mkt_admit_1_d2_preflight_v1",
+  "receipt_id": "AO_FTK_1_W3_MKT_ADMIT_1_D2_PREFLIGHT",
+  "work_id": "AO-FTK-1-W3-MKT-ADMIT-1",
+  "parent_program": "AO-FTK-1-20260812",
+  "parent_econ_freeze": "AO-FTK-1-ECON-1",
+  "preflight_at_utc": "2026-08-11T21:00:50Z",
+  "D2_PRECHECK": "GREEN",
+  "thresholds": {
+    "min_coverage_rate_usable_h63_close_path": 0.9,
+    "min_decision_dates_h63_calendar_complete": 60,
+    "min_n_w3_eligible_sample": 1000,
+    "min_security_count_for_full_w3_admit": 1000,
+    "require_same_return_convention_ftk_and_w3": true,
+    "forbid_aov_proxy_as_full_w3": true,
+    "forbid_imputation": true,
+    "forbid_row_delete_denominator_rewrite": true
+  },
+  "coverage": {
+    "method": "close_to_close_entry_and_exit_on_session_spine",
+    "sample_stride_sessions": 10,
+    "session_spine_count": 346,
+    "session_date_min": "2025-03-24",
+    "session_date_max": "2026-08-07",
+    "decision_dates_h63_calendar_complete": 282,
+    "last_complete_decision_date": "2026-05-06",
+    "last_exit_date": "2026-08-07",
+    "n_w3_eligible_sample_min": 4638,
+    "n_w3_eligible_sample_max": 5260,
+    "n_with_usable_market_path_for_H63_eval_min": 4612,
+    "n_with_usable_market_path_for_H63_eval_max": 5187,
+    "coverage_rate_min": 0.9861216730038023,
+    "coverage_rate_mean": 0.993346019960318,
+    "coverage_rate_max": 0.996415770609319,
+    "missing_close_count_manifest": 0,
+    "missing_total_return_count_manifest": 177820,
+    "market_row_count": 1894207,
+    "market_company_count": 5919,
+    "market_exact_listing_count": 6018
+  },
+  "coverage_stats": {
+    "N_w3_eligible_range": [
+      4638,
+      5260
+    ],
+    "N_with_usable_market_path_for_H63_eval_range": [
+      4612,
+      5187
+    ],
+    "coverage_rate_min_mean_max": [
+      0.9861216730038023,
+      0.993346019960318,
+      0.996415770609319
+    ],
+    "decision_dates_with_benchmark_computable_calendar": 282,
+    "decision_dates_with_ge_K_scorers_returns": "DIAGNOSTIC_ONLY_NOT_ELIGIBILITY_REWRITE; requires FTK scores at L5 open",
+    "missingness": {
+      "missing_close_manifest": 0,
+      "missing_total_return_manifest": 177820,
+      "h63_path_missing_rate_approx": 0.006653980039681984,
+      "policy": "abstain on missing path; never impute; never delete from denominator"
+    }
+  },
+  "symmetry": {
+    "same_return_convention_ftk_and_w3": true,
+    "series_ftk": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE (same as benchmark)",
+    "series_w3": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE (PIT-EW Full-W3)",
+    "flag": "CLOSE_TO_CLOSE_NOT_DIVIDEND_COMPLETE",
+    "flag_on_both_legs": true
+  },
+  "admit_receipt_id": "AO_FTK_1_W3_MKT_ADMIT_1_CUSTODY_ADMIT",
+  "full_w3_admitted": true,
+  "debit_allowed_now": false,
+  "material_trial_debit_this_turn": false,
+  "economic_l5_authorized": false,
+  "l5_ready_recommendation": true,
+  "material_trials_remaining": 1,
+  "blockers": [],
+  "reverify_at_l5_open": true,
+  "financial_alpha_evidence": 0,
+  "stop_lines_hit": [],
+  "constitution": "Admit real Full-W3 market custody or HOLD. Prove D2 green before the last trial. Never fake W3. Never debit here.",
+  "note": "D2_PRECHECK=GREEN means Full-W3 denominator can be evaluated under admitted market custody without proxy/imputation/row-delete, with return-convention symmetry, and non-vacuous H=63 fold-stable support on the market spine. It does NOT authorize economic L5 or debit the last trial."
+}

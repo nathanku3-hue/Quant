@@ -1,0 +1,198 @@
+{
+  "schema_version": "ao_ftk_1_w3_mkt_admit_1_survey_v1",
+  "work_id": "AO-FTK-1-W3-MKT-ADMIT-1",
+  "parent_program": "AO-FTK-1-20260812",
+  "parent_econ_freeze": "AO-FTK-1-ECON-1",
+  "surveyed_at_utc": "2026-08-11T21:00:50Z",
+  "demand": {
+    "estimand_freeze_id": "AO-FTK-1-ECON-1",
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "comparator": "PIT_EqualWeight_Full_W3",
+    "clock": "TRANSITION_POSITION",
+    "H_VALUE": 63,
+    "execution_lag_sessions": 1,
+    "K": 20,
+    "cost_bps_round_trip_selected_only": 20,
+    "RT_CAT": {
+      "RIGHT_TAIL_PERCENTILE": 0.9,
+      "CATASTROPHE_PERCENTILE": 0.1
+    },
+    "required_coverage": {
+      "name_dates_in_full_w3_eligible_set": true,
+      "decision_asof_grid": "ECON-1 / FTK decision sessions intersecting market spine",
+      "returns_window": "from entry (decision_asof + lag) through H=63 trading sessions of exposure",
+      "fields": [
+        "official close and/or admitted total_return per E2 OWNER_BOUND"
+      ],
+      "pit_asof_law": "PIT_asof_conservative_EOD_FTK_primitive_spirit",
+      "missingness_taxonomy": "abstain (cash); never impute; never complete-case delete; never rewrite denominator"
+    },
+    "session_arithmetic": {
+      "t0": "decision_asof session",
+      "tE": "next trading session after t0 (lag=1)",
+      "tX": "trading session H_VALUE steps after tE (H=63)",
+      "holding_period_return": "close[tX]/close[tE]-1 under chosen series; costs 20 bps RT selected only"
+    },
+    "symmetry": {
+      "same_return_convention_ftk_and_w3": true,
+      "forbidden": [
+        "asymmetric FTK vs W3 series",
+        "AOV-104 proxy as Full-W3 denominator",
+        "invent returns / peer fill / impute"
+      ]
+    },
+    "forbidden_fixes": [
+      "shrink denominator to AOV-104 and still call it Full-W3",
+      "impute security returns",
+      "borrow peer returns",
+      "complete-case delete from W3",
+      "change H/K/DOF to dodge coverage",
+      "open AO-FTK-2 / L8",
+      "run economic L5 this turn"
+    ]
+  },
+  "candidates": [
+    {
+      "candidate_id": "PREBREAKOUT_W3_DATE_LOCAL_MARKET_CORPUS",
+      "paths": {
+        "source_manifest": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/source_manifest.json",
+        "authority_manifest": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/authority.manifest.json",
+        "capture_evidence": "docs/context/e2e_evidence/prebreakout_w3_real_data_capture_20260810.json",
+        "raw_dirs": [
+          "data/prebreakout/raw/historical_corpus_20250324_20260807",
+          "data/prebreakout/raw/historical_corpus_20250401_20260807"
+        ],
+        "w3_authority_dir": "data/prebreakout/compiled/w3_real_authority_20250324_20260807"
+      },
+      "hashes": {
+        "source_manifest_sha256_file": "1c74ddfedacca57792c1a587222413cec73fcaef92c8c3a21faa677c60d79414",
+        "source_manifest_declared_sha256": "7c892dca7461cc71560996b0f0d701818776dd2f67b7766900e0c89cdd17a72e",
+        "authority_manifest_sha256_file": "7abdfc2e4ac6430e24aac1db8f6a4eee4bfbf69118437ded13c718a5af3a9631",
+        "capture_evidence_sha256_file": "76813ad46f75c662e6f73b198de09a641343442252a67dfa4c71115784b7a055",
+        "first_part_csv_sha256": "feaeba2ec78779a9ac97f48ef61da320038557bf925264bfb712002dde97ed69",
+        "last_part_csv_sha256": "d090be925800404b875a46898c47c0b4bc9fc72b3b8f3855186fdb16321490eb"
+      },
+      "security_count": {
+        "company_count": 5919,
+        "exact_listing_count": 6018,
+        "note": "date-local Full-W3 market/listing population; not AOV-104"
+      },
+      "date_range": {
+        "first_session": "2025-03-24",
+        "last_session": "2026-08-07",
+        "session_count": 346,
+        "row_count": 1894207
+      },
+      "schema_fields": [
+        "SP_ENTITY_ID",
+        "SP_CIQ_ID",
+        "SP_TRADING_ITEM_ID",
+        "SPT_INSTRUMENT_ITEM_ID",
+        "SP_PRICE_CLOSE",
+        "SP_TOTAL_RETURN",
+        "SP_VOLUME",
+        "MEMBERSHIP_AS_OF_DATE"
+      ],
+      "return_convention": {
+        "total_return_field": "SP_TOTAL_RETURN",
+        "total_return_period": "1D",
+        "total_return_field_key": "322797",
+        "close_field": "SP_PRICE_CLOSE",
+        "close_field_key": "324251",
+        "missing_total_return_count": 177820,
+        "missing_close_count": 0,
+        "missing_policy": "RETAIN_ROW_NO_IMPUTATION_NO_ALTERNATE_LISTING_RESCUE"
+      },
+      "identity_keys": [
+        "CIQSEC:<SP_CIQ_ID>",
+        "SP_TRADING_ITEM_ID",
+        "SPT_INSTRUMENT_ITEM_ID",
+        "SP_ENTITY_ID"
+      ],
+      "pit_law": {
+        "date_local_membership_query": true,
+        "provider": "SPCIQPRO:SECURITIES_PRODUCTQUERY",
+        "risk_set_spec_id": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+        "current_survivor_back_projection_used": false,
+        "ticker_identity_fallback_used": false,
+        "aov_109_reused": false
+      },
+      "full_w3_compatible": true,
+      "status": "LAWFUL_FULL_W3_CANDIDATE"
+    },
+    {
+      "candidate_id": "AOV_HISTORICAL_MARKET_PRODUCTQUERY_104",
+      "paths": {
+        "market_dir": "data/aov0/historical/raw/market_productquery_a1_104_20240501_20260605",
+        "manifest": "data/aov0/historical/raw/market_productquery_a1_104_20240501_20260605/market_capture.manifest.json"
+      },
+      "hashes": {
+        "manifest_sha256_file": "70e4098b83b0f422e6394a9c92026ea0734526ff9ec10f2ec3f057348d1e49d6",
+        "master_sha256": "86587b5de42df38c81d3166d6a44aa644f31bbca141c536f04bccb07abdfad85"
+      },
+      "security_count": {
+        "entity_count": 104,
+        "note": "AOV screen-selected ~104; NOT Full-W3"
+      },
+      "date_range": {
+        "start_date": "2024-05-01",
+        "end_date": "2026-06-05",
+        "weekday_count": 548,
+        "part_count": 28
+      },
+      "return_convention": {
+        "preference": "SPT_TOTAL_RETURN / SP_TOTAL_RETURN",
+        "close": "SPT_CLOSE / SP_PRICE_CLOSE",
+        "metric": "SPT_TOTAL_RETURN_1D_PERCENT"
+      },
+      "identity_keys": [
+        "SP_SECURITY_ID",
+        "SP_ENTITY_ID",
+        "SPT_INSTRUMENT_ITEM_ID",
+        "SP_TRADING_ITEM_ID"
+      ],
+      "pit_law": {
+        "source_id": "SPCIQPRO:SECURITIES_PRODUCTQUERY",
+        "schema_version": "aov0_ciq_productquery_historical_market_capture_manifest_v1"
+      },
+      "full_w3_compatible": false,
+      "status": "NOT_FULL_W3",
+      "promotion_to_full_w3": "FORBIDDEN"
+    },
+    {
+      "candidate_id": "CRSP_DSF",
+      "paths": {
+        "dir": "data/crsp"
+      },
+      "present": false,
+      "full_w3_compatible": false,
+      "status": "ABSENT_IN_AUTHORITY_WORKTREE"
+    },
+    {
+      "candidate_id": "COMPUSTAT_DAILY",
+      "paths": {
+        "dir": "data/comp"
+      },
+      "present": false,
+      "full_w3_compatible": false,
+      "status": "ABSENT_IN_AUTHORITY_WORKTREE"
+    },
+    {
+      "candidate_id": "WRDS_MARKET",
+      "paths": {
+        "dir": "data/wrds"
+      },
+      "present": false,
+      "full_w3_compatible": false,
+      "status": "ABSENT_IN_AUTHORITY_WORKTREE"
+    }
+  ],
+  "lawful_full_w3_candidates": [
+    "PREBREAKOUT_W3_DATE_LOCAL_MARKET_CORPUS"
+  ],
+  "aov_proxy_promotion": "FORBIDDEN",
+  "material_trial_debit_this_turn": false,
+  "economic_l5_authorized": false,
+  "financial_alpha_evidence": 0,
+  "constitution": "Admit real Full-W3 market custody or HOLD. Prove D2 green before the last trial. Never fake W3. Never debit here."
+}

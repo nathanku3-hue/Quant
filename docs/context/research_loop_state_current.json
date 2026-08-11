@@ -62,13 +62,13 @@
       "loop_phase": "L7_ROADMAP_DECISION",
       "material_trials_charged_this_slice": 2,
       "material_trials_remaining": 1,
-      "next": "CLOSED / NO_WORKER; ECON-1 Trial 2 closed waiting owner L7; remaining=1; alpha=0",
+      "next": "ECON-1 W3 market admitted D2 GREEN; wait owner L5 final auth; remaining=1; alpha=0",
       "parent_freeze_commit": "6832066",
       "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
       "role": "SHADOW_RESEARCH_PARENT",
       "runnable_evaluation": false,
       "slice_id": "AO-FTK-1-20260812",
-      "status": "ECON_1_L5_COMPLETE_WAITING_OWNER_L7",
+      "status": "ECON_1_W3_MKT_ADMIT_D2_GREEN_WAIT_OWNER_L5",
       "track_id": "AO-FTK-1",
       "worker_status": "CLOSED / NO_WORKER"
     },
@@ -78,9 +78,9 @@
       "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_trial2_long_session_close.json",
       "econ_freeze_work_commit": "febd8e4",
       "economic_clock_class": "TRANSITION_POSITION",
-      "economic_l5_authorized": true,
+      "economic_l5_authorized": false,
       "effective_decision_dof": 2,
-      "failure_route": "HOLD_OR_ADMIT_FULL_W3_MARKET_CUSTODY_THEN_RERUN_UNDER_NEW_AUTH",
+      "failure_route": "CLEARED_BY_FULL_W3_MARKET_ADMIT_PENDING_OWNER_L5",
       "financial_alpha_evidence": 0,
       "first_fail_layer": "D2_DATA_OBSERVABLE",
       "freeze_id": "AO-FTK-1-ECON-1",
@@ -96,23 +96,32 @@
       "label_bytes_joined": true,
       "long_session_close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_trial2_long_session_close.json",
       "long_session_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_empty_attachment.json",
-      "loop_phase": "L5_COMPLETE_WAITING_OWNER_L7",
+      "loop_phase": "W3_MKT_ADMITTED_D2_GREEN_WAIT_OWNER_L5",
       "machine_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
       "material_trials_charged_this_turn": 1,
       "material_trials_charged_to_date": 2,
       "material_trials_remaining": 1,
       "md_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.md",
-      "next": "CLOSED / NO_WORKER; owner L7 only; remaining trials=1; alpha=0; no FTK-2",
+      "next": "WAIT_OWNER_L5_ECONOMIC_FINAL; D2 preflight GREEN; last trial still 1; no auto L5; re-verify D2 at L5 open",
       "owner_bind_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json",
       "parent_program": "AO-FTK-1-20260812",
       "receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
       "role": "SHADOW_RESEARCH",
-      "session_path": "C_TRIAL2_COMPLETE",
-      "status": "L5_COMPLETE_WAITING_OWNER_L7",
-      "terminal_verdict": "L5_COMPLETE_WAITING_OWNER_L7",
+      "session_path": "D_W3_MKT_ADMIT_D2_GREEN",
+      "status": "W3_MKT_ADMIT_PASS_D2_GREEN",
+      "terminal_verdict": "W3_MKT_ADMIT_PASS_D2_GREEN",
       "track_id": "AO-FTK-1-ECON-1",
       "work_commit": "705b308",
-      "worker_status": "CLOSED / NO_WORKER"
+      "worker_status": "CLOSED / NO_WORKER",
+      "w3_mkt_admit_work_id": "AO-FTK-1-W3-MKT-ADMIT-1",
+      "w3_mkt_admit_receipt": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_custody_admit.json",
+      "w3_mkt_d2_preflight": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_d2_preflight.json",
+      "w3_mkt_survey": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_survey.json",
+      "D2_PRECHECK": "GREEN",
+      "full_w3_market_admitted": true,
+      "material_trial_debit_this_turn": false,
+      "runnable_evaluation": false,
+      "note": "W3 market admitted; D2 preflight GREEN; last trial still 1; WAIT_OWNER_L5_ECONOMIC_FINAL; no auto L5"
     },
     {
       "next": "continue under own contract; do not merge into FTK/Q",
@@ -141,10 +150,11 @@
   ],
   "allowed_now": [
     "preserve Clock #1",
-    "owner L7 route decision only",
+    "owner L5_AUTHORIZE_ECONOMIC_FINAL after verifying D2 GREEN (separate auth)",
+    "re-verify D2 preflight at any L5 open",
     "CRV1 / Sector Rotation isolated work",
     "PAPER-0 ops at alpha_evidence=0",
-    "read ECON Trial 2 receipts"
+    "read W3 market admit + D2 preflight receipts"
   ],
   "authority": {
     "active_brief": "docs/context/ACTIVE_BRIEF",
@@ -154,16 +164,18 @@
   },
   "constitution": "docs/architecture/alpha_scientific_method_v1.md",
   "forbidden_now": [
-    "second economic eval without new owner auth",
+    "auto economic L5 without new owner auth",
+    "debit last trial without L5 auth and D2 re-green",
     "open AO-FTK-2",
     "L8 refinement now",
     "claim financial_alpha_evidence > 0",
     "capital open",
-    "invent D7 confirmation rule",
-    "W6 open",
-    "H/K/percentile grid search",
+    "AOV-104 as Full-W3",
+    "invent prices/returns",
+    "impute or peer-fill returns",
+    "denominator rewrite to match panel",
     "asymmetric return FTK vs W3",
-    "reuse sensing labels for economic estimand",
+    "W6 open",
     "multi-debit",
     "reopen AO-FTK-0 as worker"
   ],
@@ -310,36 +322,34 @@
     "worker_status": "CLOSED / NO_WORKER"
   },
   "next_worker_slice": {
+    "primary": "OWNER_SELECT",
+    "recommended": "L5_AUTHORIZE_ECONOMIC_FINAL_AFTER_D2_GREEN",
     "alternatives": [
       "HOLD_EVIDENCE",
       "STOP_TRACK",
-      "ADMIT_FULL_W3_MARKET_CUSTODY_NEW_SLICE",
       "PARALLEL_ONLY_CRV1_SECTOR_PAPER_CLOCK"
     ],
     "forbidden_as_next": [
-      "auto second economic eval",
+      "auto L5 without owner auth",
+      "debit without auth",
       "open AO-FTK-2",
       "L8 refinement now",
       "capital open",
-      "claim financial_alpha_evidence > 0",
-      "invent D7 confirmation",
-      "W6 open",
-      "reuse sensing labels for economic estimand"
-    ],
-    "primary": "OWNER_SELECT",
-    "recommended": "OWNER_L7_ROUTE_ONLY"
+      "AOV-as-W3",
+      "claim financial_alpha_evidence > 0"
+    ]
   },
   "process": {
-    "diagnosis_layer_if_any": "D2_DATA_OBSERVABLE",
-    "failure_route_if_any": "HOLD_OR_ADMIT_FULL_W3_MARKET_CUSTODY_THEN_RERUN_UNDER_NEW_AUTH",
-    "last_completed_note": "AO-FTK-1-ECON-1 Trial 2 long session CLOSED: C_TRIAL2_COMPLETE; work_commit=705b308; first_fail=D2_DATA_OBSERVABLE; remaining=1; AO-FTK-2 NOT_OPENED; alpha=0; NO_WORKER",
-    "last_completed_phase": "TRIAL2_LONG_SESSION_CLOSE",
-    "loop_phase": "L7_ROADMAP_DECISION",
-    "loop_phase_label": "AO-FTK-1-ECON-1 CLOSED / L5_COMPLETE_WAITING_OWNER_L7 / NO_WORKER; Trial 2 complete; trials remaining=1; alpha=0",
+    "diagnosis_layer_if_any": "D2_DATA_OBSERVABLE_PREFLIGHT_GREEN",
+    "failure_route_if_any": "NONE_PENDING_OWNER_L5",
+    "last_completed_note": "AO-FTK-1-W3-MKT-ADMIT-1: Full-W3 market custody ADMITTED (prebreakout historical corpus ~5919 companies); D2_PRECHECK=GREEN; trials remaining=1 unspent; no debit; no L5; alpha=0",
+    "last_completed_phase": "W3_MKT_ADMIT_D2_PREFLIGHT",
+    "loop_phase": "WAIT_OWNER_L5_ECONOMIC_FINAL",
+    "loop_phase_label": "AO-FTK-1-ECON-1 W3 market admitted; D2 preflight GREEN; last trial still 1; WAIT_OWNER_L5_ECONOMIC_FINAL; no auto L5; alpha=0",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
     "method_status": "LOCKED",
-    "next_phase": "L7_ROADMAP_DECISION",
-    "next_phase_note": "Owner L7 route only (HOLD_EVIDENCE / STOP_TRACK / admit Full-W3 market custody new slice). No auto L8/FTK-2/capital. Remaining material trials=1. financial_alpha_evidence=0.",
+    "next_phase": "WAIT_OWNER_L5_ECONOMIC_FINAL",
+    "next_phase_note": "Owner may issue separate L5_AUTHORIZE_ECONOMIC_FINAL after verifying D2 GREEN receipts. Worker must re-verify D2 at L5 open. No auto L5. No FTK-2/L8/capital. Remaining material trials=1. financial_alpha_evidence=0.",
     "representation_snr_gate_status": "PASS_AO_FTK_1_20260812_L5_SENSING_COMPLETE"
   },
   "product": {
@@ -360,5 +370,23 @@
       "do not reconstruct solely from chat history"
     ]
   },
-  "updated_at_utc": "2026-08-12"
+  "updated_at_utc": "2026-08-12",
+  "last_w3_mkt_admit": {
+    "work_id": "AO-FTK-1-W3-MKT-ADMIT-1",
+    "terminal": "W3_MKT_ADMIT_PASS_D2_GREEN",
+    "D2_PRECHECK": "GREEN",
+    "full_w3_admitted": true,
+    "security_count": 5919,
+    "return_convention": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE",
+    "symmetry_ftk_w3": true,
+    "material_trials_remaining": 1,
+    "debit_this_turn": false,
+    "l5_authorized": false,
+    "financial_alpha_evidence": 0,
+    "survey": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_survey.json",
+    "admit": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_custody_admit.json",
+    "d2_preflight": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_d2_preflight.json",
+    "summary": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_summary.md",
+    "next_owner_action": "L5_AUTHORIZE_ECONOMIC_FINAL"
+  }
 }

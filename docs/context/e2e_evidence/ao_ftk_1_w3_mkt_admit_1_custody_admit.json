@@ -1,0 +1,112 @@
+{
+  "schema_version": "ao_ftk_1_w3_mkt_admit_1_custody_admit_v1",
+  "receipt_id": "AO_FTK_1_W3_MKT_ADMIT_1_CUSTODY_ADMIT",
+  "work_id": "AO-FTK-1-W3-MKT-ADMIT-1",
+  "parent_program": "AO-FTK-1-20260812",
+  "parent_econ_freeze": "AO-FTK-1-ECON-1",
+  "admitted_at_utc": "2026-08-11T21:00:50Z",
+  "admitted": true,
+  "full_w3_compatible": true,
+  "candidate_id": "PREBREAKOUT_W3_DATE_LOCAL_MARKET_CORPUS",
+  "paths": {
+    "source_manifest": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/source_manifest.json",
+    "authority_manifest": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/authority.manifest.json",
+    "capture_evidence": "docs/context/e2e_evidence/prebreakout_w3_real_data_capture_20260810.json",
+    "raw_dirs": [
+      "data/prebreakout/raw/historical_corpus_20250324_20260807",
+      "data/prebreakout/raw/historical_corpus_20250401_20260807"
+    ],
+    "w3_authority_dir": "data/prebreakout/compiled/w3_real_authority_20250324_20260807"
+  },
+  "hashes": {
+    "source_manifest_sha256_file": "1c74ddfedacca57792c1a587222413cec73fcaef92c8c3a21faa677c60d79414",
+    "source_manifest_declared_sha256": "7c892dca7461cc71560996b0f0d701818776dd2f67b7766900e0c89cdd17a72e",
+    "authority_manifest_sha256_file": "7abdfc2e4ac6430e24aac1db8f6a4eee4bfbf69118437ded13c718a5af3a9631",
+    "capture_evidence_sha256_file": "76813ad46f75c662e6f73b198de09a641343442252a67dfa4c71115784b7a055",
+    "first_part_csv_sha256": "feaeba2ec78779a9ac97f48ef61da320038557bf925264bfb712002dde97ed69",
+    "last_part_csv_sha256": "d090be925800404b875a46898c47c0b4bc9fc72b3b8f3855186fdb16321490eb"
+  },
+  "security_count": 5919,
+  "security_count_detail": {
+    "company_count": 5919,
+    "exact_listing_count": 6018,
+    "note": "date-local Full-W3 market/listing population; not AOV-104"
+  },
+  "date_range": {
+    "first_session": "2025-03-24",
+    "last_session": "2026-08-07",
+    "session_count": 346,
+    "row_count": 1894207
+  },
+  "return_convention": {
+    "preference": "admitted_market_total_return_1d_when_complete_else_CLOSE_TO_CLOSE",
+    "operational_series_for_h63_eval": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE",
+    "total_return_field": "SP_TOTAL_RETURN",
+    "total_return_period": "1D",
+    "close_field": "SP_PRICE_CLOSE",
+    "flag": "CLOSE_TO_CLOSE_NOT_DIVIDEND_COMPLETE",
+    "flag_applies_to": [
+      "FTK_SELECTED_BOOK",
+      "FULL_W3_BENCHMARK"
+    ],
+    "note": "SP_TOTAL_RETURN 1D is admitted in corpus but has non-trivial missingness (177820 missing cells in source manifest). H=63 eval uses official close[tX]/close[tE]-1 under same law both legs; flag CLOSE_TO_CLOSE_NOT_DIVIDEND_COMPLETE on BOTH legs. Missing path → abstain; no impute; no peer fill; no row-delete denominator rewrite."
+  },
+  "identity_keys": [
+    "CIQSEC:<SP_CIQ_ID>",
+    "SP_TRADING_ITEM_ID",
+    "SPT_INSTRUMENT_ITEM_ID",
+    "SP_ENTITY_ID"
+  ],
+  "identity_map_to_w3": {
+    "eligible_security_id": "CIQSEC:<SP_CIQ_ID>",
+    "market_join_key": "CIQSEC: + SP_CIQ_ID from market CSV",
+    "trading_item_id": "SP_TRADING_ITEM_ID",
+    "spt_instrument_item_id": "SPT_INSTRUMENT_ITEM_ID",
+    "w3_authority_dir": "data/prebreakout/compiled/w3_real_authority_20250324_20260807",
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1"
+  },
+  "pit_law": {
+    "date_local_membership_query": true,
+    "provider": "SPCIQPRO:SECURITIES_PRODUCTQUERY",
+    "risk_set_spec_id": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "current_survivor_back_projection_used": false,
+    "ticker_identity_fallback_used": false,
+    "aov_109_reused": false
+  },
+  "coverage_statistics_ref": {
+    "method": "close_to_close_entry_and_exit_on_session_spine",
+    "sample_stride_sessions": 10,
+    "session_spine_count": 346,
+    "session_date_min": "2025-03-24",
+    "session_date_max": "2026-08-07",
+    "decision_dates_h63_calendar_complete": 282,
+    "last_complete_decision_date": "2026-05-06",
+    "last_exit_date": "2026-08-07",
+    "n_w3_eligible_sample_min": 4638,
+    "n_w3_eligible_sample_max": 5260,
+    "n_with_usable_market_path_for_H63_eval_min": 4612,
+    "n_with_usable_market_path_for_H63_eval_max": 5187,
+    "coverage_rate_min": 0.9861216730038023,
+    "coverage_rate_mean": 0.993346019960318,
+    "coverage_rate_max": 0.996415770609319,
+    "missing_close_count_manifest": 0,
+    "missing_total_return_count_manifest": 177820,
+    "market_row_count": 1894207,
+    "market_company_count": 5919,
+    "market_exact_listing_count": 6018
+  },
+  "aov_104_promoted": false,
+  "proxy_full_w3": false,
+  "imputation": false,
+  "row_deletion": false,
+  "material_trial_debit_this_turn": false,
+  "economic_l5_authorized": false,
+  "financial_alpha_evidence": 0,
+  "stop_lines_hit": [],
+  "constitution": "Admit real Full-W3 market custody or HOLD. Prove D2 green before the last trial. Never fake W3. Never debit here.",
+  "prior_trial2_correction": {
+    "note": "Trial 2 market probe only inspected AOV ~104 productquery market dir and set full_w3_market_total_return_admitted=false. Prebreakout Full-W3 date-local market corpus was already in custody for W3 authority compile and is now explicitly admitted for FTK-ECON market R_net.",
+    "trial2_probe_flag": "FULL_W3_MARKET_CUSTODY_MISSING_FOR_ECONOMIC_ESTIMAND",
+    "corrected_by": "AO-FTK-1-W3-MKT-ADMIT-1"
+  }
+}
