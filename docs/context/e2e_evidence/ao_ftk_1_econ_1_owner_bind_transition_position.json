@@ -1,0 +1,271 @@
+{
+  "schema_version": "ao_ftk_1_econ_1_owner_bind_transition_position_v1",
+  "receipt_id": "AO_FTK_1_ECON_1_OWNER_BIND_TRANSITION_POSITION",
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "parent_program": "AO-FTK-1-20260812",
+  "name": "FTK_ECON1_TRANSITION_POSITION_BIND",
+  "date": "2026-08-12",
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "authorized_phase": "OWNER_BIND_TRANSITION_POSITION",
+  "science_mode": "OUTCOME_BLIND_OWNER_BIND",
+  "prior_freeze_verdict": "PASS_WAITING_NUMERICS",
+  "prior_freeze_commit": "febd8e4",
+  "prior_sensing_commit": "948471c",
+  "economic_clock_class": "TRANSITION_POSITION",
+  "not_fast_trading": true,
+  "not_great_enterprise_hodl": true,
+  "great_enterprise_kernel": "OUT_OF_SCOPE",
+  "owner_attachment_present": false,
+  "owner_attachment_fields": {
+    "H_VALUE": null,
+    "RIGHT_TAIL_PERCENTILE": null,
+    "CATASTROPHE_PERCENTILE": null,
+    "K": null,
+    "delta_J_required": null,
+    "D7_MODE": null,
+    "E2_MODE": null,
+    "E3_MODE": null
+  },
+  "outcome_blind": true,
+  "residual_peek": false,
+  "binds": {
+    "E1": {
+      "name": "H_VALUE",
+      "economic_clock_class": "TRANSITION_POSITION",
+      "H_TYPE": "fixed executable wager horizon",
+      "H_VALUE": "OWNER_BLOCKED_UNSET",
+      "source": "OWNER_BLOCKED_UNSET",
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "OWNER_BLOCKED_UNSET",
+        "outcome_blind": true,
+        "residual_peek": false
+      },
+      "forbidden": [
+        "H grid {5d,10d,21d}",
+        "borrow Breakout 10d/20d as default",
+        "multi-year GE/HODL as primary",
+        "invent H without owner attachment"
+      ]
+    },
+    "E2": {
+      "name": "net_return_construction",
+      "source": "BLOCKED_UNSET",
+      "value": {
+        "price_provider_semantics": "BLOCKED_UNSET",
+        "entry_price_convention": "BLOCKED_UNSET",
+        "exit_price_convention": "BLOCKED_UNSET",
+        "corporate_action_adjustment": "BLOCKED_UNSET"
+      },
+      "authority_path": null,
+      "surveyed_non_authority": [
+        "docs/architecture/alpha_pit_data_api_v1.md",
+        "docs/architecture/aov_endgame_generalization_spec_current.md",
+        "research/aov0/contracts.py (AOV family total-return authority — not FTK-ECON bind)"
+      ],
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "BLOCKED_UNSET",
+        "outcome_blind": true,
+        "residual_peek": false
+      },
+      "invention_refused": true
+    },
+    "E3": {
+      "name": "execution_lag_and_cost",
+      "source": "BLOCKED_UNSET",
+      "value": {
+        "execution_lag": "BLOCKED_UNSET",
+        "cost_formula": "BLOCKED_UNSET",
+        "free_fit": false
+      },
+      "authority_path": null,
+      "surveyed_non_authority": [
+        "research/aov0/contracts.py (execution_lag=one_bar — AOV family)",
+        "docs/decision log.md (cost=turnover*0.0010 — other families)"
+      ],
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "BLOCKED_UNSET",
+        "outcome_blind": true,
+        "residual_peek": false
+      },
+      "invention_refused": true
+    },
+    "E4": {
+      "name": "right_tail_percentile",
+      "source": "OWNER_BLOCKED_UNSET",
+      "RIGHT_TAIL_FORM": "date-local percentile of forward R_net on frozen full-W3 outcome population",
+      "RIGHT_TAIL_PERCENTILE": "OWNER_BLOCKED_UNSET",
+      "forbidden": [
+        "MU/SNDK named-winner primary success",
+        "CAGR as primary success"
+      ],
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "OWNER_BLOCKED_UNSET",
+        "outcome_blind": true,
+        "residual_peek": false
+      }
+    },
+    "E5": {
+      "name": "catastrophe_percentile",
+      "source": "OWNER_BLOCKED_UNSET",
+      "CATASTROPHE_FORM": "date-local left-tail percentile of forward R_net",
+      "CATASTROPHE_PERCENTILE": "OWNER_BLOCKED_UNSET",
+      "primary_definition_count": 1,
+      "path_drawdown": "diagnostic only (optional; non-primary)",
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "OWNER_BLOCKED_UNSET",
+        "outcome_blind": true,
+        "residual_peek": false
+      }
+    },
+    "E6": {
+      "name": "delta_J_required",
+      "source": "OWNER_OR_CRO_BLOCKED_UNSET",
+      "delta_J_required": "OWNER_OR_CRO_BLOCKED_UNSET",
+      "J_form": "net payoff(fixed-breadth FTK selected set) − PIT EqualWeight(Full W3) net payoff",
+      "comparator_form": "INHERITED_FORM",
+      "comparator_paths": [
+        "docs/architecture/aov_endgame_generalization_spec_current.md",
+        "research/benchmarks.py (build_pit_equal_weight_benchmark)",
+        "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json"
+      ],
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "OWNER_OR_CRO_BLOCKED_UNSET",
+        "outcome_blind": true,
+        "residual_peek": false
+      }
+    },
+    "E7": {
+      "name": "K_action_map",
+      "source": "OWNER_BLOCKED_UNSET",
+      "score_map": "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K",
+      "score_map_status": "FROZEN_FORM",
+      "K": "OWNER_BLOCKED_UNSET",
+      "abstention": "cash",
+      "threshold_search": false,
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "OWNER_BLOCKED_UNSET",
+        "outcome_blind": true,
+        "residual_peek": false
+      }
+    },
+    "E9": {
+      "name": "stability_folds",
+      "source": "INHERITED_AUTHORITY",
+      "authority_path": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+      "value": {
+        "temporal_fold_count": 4,
+        "minimum_fold_n": 30,
+        "minimum_fold_coverage": 0.2,
+        "minimum_supporting_temporal_folds": 3,
+        "xs_holdout_is_corroboration_not_tuning": true
+      },
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "INHERITED_AUTHORITY",
+        "outcome_blind": true,
+        "residual_peek": false
+      }
+    },
+    "E10_D7": {
+      "name": "D7_CONFIRMATION",
+      "source": "BLOCKED_UNSET",
+      "D7_MODE": "UNSET",
+      "rule_status": "BLOCKED_UNSET",
+      "rule_path": null,
+      "invented_this_bind": false,
+      "allowed_owner_modes_later": [
+        "INHERIT <path>",
+        "OUT_OF_SCOPE",
+        "UNSET"
+      ],
+      "provenance": {
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "source": "BLOCKED_UNSET",
+        "outcome_blind": true,
+        "residual_peek": false
+      },
+      "invention_refused": true
+    }
+  },
+  "surface_pins": {
+    "effective_decision_dof": 2,
+    "operators": [
+      "INV_DELTA_MEAN_REVERSION",
+      "MARGIN_M1_STATE_MEAN_REVERSION"
+    ],
+    "operator_immutability_pins": {
+      "INV_DELTA_MEAN_REVERSION": "9434b4958beec33cebeb20a2747cae337b1ca56271a63c861badeb54890fdd85",
+      "MARGIN_M1_STATE_MEAN_REVERSION": "a464058d05abbe4a7da420598ed57a6d0b2033bb732521ecc5b5257471b633cd"
+    },
+    "routing": "DOMAIN_LIMITED_EX_ANTE",
+    "score_map_form": "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K"
+  },
+  "l5_ready": false,
+  "l5_blockers_remaining": [
+    "E1.H_VALUE=OWNER_BLOCKED_UNSET (no owner attachment)",
+    "E2.price_return=BLOCKED_UNSET (no FTK-ECON authoritative law; refuse invent)",
+    "E3.execution_lag=BLOCKED_UNSET",
+    "E3.cost_formula=BLOCKED_UNSET",
+    "E4.RIGHT_TAIL_PERCENTILE=OWNER_BLOCKED_UNSET",
+    "E5.CATASTROPHE_PERCENTILE=OWNER_BLOCKED_UNSET",
+    "E6.delta_J_required=OWNER_OR_CRO_BLOCKED_UNSET",
+    "E7.K=OWNER_BLOCKED_UNSET",
+    "E10.D7_RULE=BLOCKED_UNSET (no invent; owner INHERIT path or OUT_OF_SCOPE)",
+    "economic_l5_authorized=false (separate L5_AUTHORIZE receipt required; never auto)"
+  ],
+  "verdict": "WAITING_NUMERICS",
+  "terminal_verdict": "ECON_BIND_WAITING_OWNER_NUMERICS",
+  "firewall": {
+    "l5_authorized": false,
+    "economic_l5_authorized": false,
+    "l5_auto_open": false,
+    "second_l5": "NOT_AUTHORIZED",
+    "runnable_evaluation": false,
+    "material_trials_charged_this_turn": 0,
+    "material_trials_remaining": 2,
+    "material_trials_charged_to_date": 1,
+    "label_bytes_joined": false,
+    "trial2_debit": false,
+    "economic_label_join": false,
+    "evaluation_run": false,
+    "financial_alpha_evidence": 0,
+    "capital_authority": false,
+    "ao_ftk_2": "NOT_AUTHORIZED",
+    "l8_bounded_refinement": "DEFER",
+    "w6": "UNTOUCHED",
+    "great_enterprise_kernel": "OUT_OF_SCOPE"
+  },
+  "l5_authorized": false,
+  "economic_l5_authorized": false,
+  "material_trials_charged_this_turn": 0,
+  "financial_alpha_evidence": 0,
+  "next_phase": "WAITING_OWNER_NUMERICS",
+  "next_owner_action": "provide owner bind attachment (H, p, q, K, delta_J, D7_MODE, E2_MODE, E3_MODE) | HOLD | STOP",
+  "next_worker_recommended": "OWNER_NUMERICS_OR_HOLD",
+  "artifacts": {
+    "machine_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
+    "md_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.md",
+    "econ_freeze_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
+    "contract_module": "research/asymmetric_opportunity_v1/ao_ftk_1_econ_1_contract.py",
+    "test_module": "tests/asymmetric_opportunity_v1/test_ao_ftk_1_econ_1_economic_freeze.py"
+  },
+  "stop_lines_hit": [],
+  "stop_lines_honored": true,
+  "constitution": "Stamp FTK as TRANSITION_POSITION. Bind one horizon and the economic laws without invention or peeking. Clear L5 blockers or HOLD. Debit nothing. Run nothing."
+}

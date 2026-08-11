@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from research.asymmetric_opportunity_v1.ao_ftk_1_econ_1_contract import (
+    ECONOMIC_CLOCK_CLASS,
     EFFECTIVE_DECISION_DOF,
     FORBIDDEN_E_AUTHORITY_KEYS,
     FREEZE_ID,
@@ -20,6 +21,7 @@ from research.asymmetric_opportunity_v1.ao_ftk_1_econ_1_contract import (
     L7_ROUTE,
     MACHINE_FREEZE_REL,
     MD_FREEZE_REL,
+    OWNER_BIND_RECEIPT_REL,
     PARENT_L4_FREEZE_REL,
     PARENT_L5_WORK_COMMIT,
     PARENT_PROGRAM,
@@ -34,12 +36,15 @@ from research.asymmetric_opportunity_v1.ao_ftk_1_econ_1_contract import (
     assert_surface_pins_match_parent,
     assert_valid_econ_freeze,
     economic_label_join,
+    evaluate_l5_readiness,
     load_label_hash_procedure,
     load_label_identity,
     load_machine_freeze,
+    load_owner_bind_receipt,
     load_parent_l4_freeze,
     load_receipt,
     pin_operator_identity,
+    refuse_invented_bind,
     trial_debit,
     validate_econ_freeze,
 )
@@ -53,6 +58,7 @@ def test_authority_artifacts_landed() -> None:
         REPO / MACHINE_FREEZE_REL,
         REPO / MD_FREEZE_REL,
         REPO / RECEIPT_REL,
+        REPO / OWNER_BIND_RECEIPT_REL,
         REPO / LABEL_IDENTITY_REL,
         REPO / LABEL_HASH_PROCEDURE_REL,
         REPO
@@ -72,10 +78,12 @@ def test_econ_freeze_schema_validates() -> None:
     assert doc["parent_program"] == PARENT_PROGRAM
     assert doc["l7_route"] == L7_ROUTE
     assert doc["status"] == "ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS"
-    assert doc["next_phase"] == "WAIT_OWNER_L5_ECONOMIC"
+    assert doc["next_phase"] == "WAITING_OWNER_NUMERICS"
     assert doc["parent_l5_work_commit"] == PARENT_L5_WORK_COMMIT
-    assert doc["authorized_phase"] == "ECONOMIC_ESTIMAND_FREEZE"
+    assert doc["authorized_phase"] == "OWNER_BIND_TRANSITION_POSITION"
     assert doc["second_l5"] == "NOT_AUTHORIZED"
+    assert doc["owner_bind"]["verdict"] == "WAITING_NUMERICS"
+    assert doc["owner_bind"]["l5_ready"] is False
 
 
 def test_effective_dof_frozen_at_two_matches_parent() -> None:
@@ -240,10 +248,12 @@ def test_receipt_matches_freeze_firewall() -> None:
     assert receipt["material_trials_charged_this_turn"] == 0
     assert receipt["label_bytes_joined"] is False
     assert receipt["financial_alpha_evidence"] == 0
-    assert receipt["next_phase"] == "WAIT_OWNER_L5_ECONOMIC"
+    assert receipt["next_phase"] == "WAITING_OWNER_NUMERICS"
     assert receipt["surface_dof"] == 2
     assert receipt["stop_lines_hit"] == []
-    assert "L5_AUTHORIZE_ECONOMIC" in receipt["next_owner_action"]
+    assert receipt["economic_clock_class"] == ECONOMIC_CLOCK_CLASS
+    assert receipt["bind_verdict"] == "WAITING_NUMERICS"
+    assert receipt["l5_ready"] is False
 
     freeze = load_machine_freeze(REPO)
     assert freeze["l5_authorized"] is False
@@ -264,3 +274,152 @@ def test_l7_route_select_receipt() -> None:
     assert data["l7_select_effective"] is True
     assert data["second_l5"] == "NOT_AUTHORIZED"
     assert data["material_trial_debit_this_turn"] == "FORBIDDEN"
+
+
+def test_transition_position_clock_stamped() -> None:
+    doc = load_machine_freeze(REPO)
+    clock = doc["economic_clock"]
+    assert clock["economic_clock_class"] == ECONOMIC_CLOCK_CLASS
+    assert clock["not_fast_trading"] is True
+    assert clock["not_great_enterprise_hodl"] is True
+    assert clock["great_enterprise_kernel"] == "OUT_OF_SCOPE"
+    assert doc["estimand"]["E1"]["economic_clock_class"] == ECONOMIC_CLOCK_CLASS
+
+    bind = load_owner_bind_receipt(REPO)
+    assert bind["economic_clock_class"] == ECONOMIC_CLOCK_CLASS
+    assert bind["not_fast_trading"] is True
+    assert bind["not_great_enterprise_hodl"] is True
+    assert bind["great_enterprise_kernel"] == "OUT_OF_SCOPE"
+    assert bind["verdict"] == "WAITING_NUMERICS"
+    assert bind["l5_ready"] is False
+    assert bind["material_trials_charged_this_turn"] == 0
+    assert bind["firewall"]["trial2_debit"] is False
+    assert bind["firewall"]["economic_label_join"] is False
+    assert bind["firewall"]["evaluation_run"] is False
+    assert bind["outcome_blind"] is True
+    assert bind["residual_peek"] is False
+    assert bind["owner_attachment_present"] is False
+
+
+def test_no_debit_join_or_eval_this_bind() -> None:
+    doc = load_machine_freeze(REPO)
+    assert doc["material_trials_charged_this_turn"] == 0
+    assert doc["material_trial_debit_plan"]["debit_this_turn"] is False
+    assert doc["label_bytes_joined"] is False
+    assert doc["runnable_evaluation"] is False
+    assert doc["l5_authorized"] is False
+    assert doc["economic_l5_authorized"] is False
+    assert doc["l5_auto_open"] is False
+    assert doc["owner_bind"]["trial2_debit"] is False
+    assert doc["owner_bind"]["economic_label_join"] is False
+    assert doc["owner_bind"]["evaluation_run"] is False
+    assert doc["owner_bind"]["auto_l5"] is False
+
+    receipt = load_receipt(REPO)
+    assert receipt["material_trials_charged_this_turn"] == 0
+    assert receipt["label_bytes_joined"] is False
+    assert receipt["authority_self_check"]["trial2_debit_this_turn"] is False
+    assert receipt["authority_self_check"]["economic_label_join_this_turn"] is False
+    assert receipt["authority_self_check"]["evaluation_this_turn"] is False
+
+
+def test_l5_ready_iff_checklist_green() -> None:
+    doc = load_machine_freeze(REPO)
+    readiness = evaluate_l5_readiness(doc)
+    assert readiness["l5_ready"] is False
+    assert readiness["economic_l5_authorized"] is False
+    # clock stamped PASS; numerics/laws still blockers
+    assert "economic_clock_class" not in readiness["blockers_remaining"]
+    assert "H_VALUE" in readiness["blockers_remaining"]
+    assert "E2_price_return" in readiness["blockers_remaining"]
+    assert "E3_lag_cost" in readiness["blockers_remaining"]
+    assert "D7" in readiness["blockers_remaining"]
+    assert doc["owner_bind"]["l5_ready"] is readiness["l5_ready"]
+
+    # Simulate full owner bind (without writing) → checklist would be green
+    sim = json.loads(json.dumps(doc))
+    sim["estimand"]["E1"]["value"]["H_VALUE"] = "63d"
+    sim["estimand"]["E1"]["value_owner"] = "OWNER_BOUND"
+    sim["estimand"]["E2"]["value_owner"] = "OWNER_BOUND"
+    sim["estimand"]["E2"]["value"] = {
+        "price_provider_semantics": "OWNER_BOUND_LAW",
+        "entry_price_convention": "OWNER_BOUND_LAW",
+        "exit_price_convention": "OWNER_BOUND_LAW",
+        "corporate_action_adjustment": "OWNER_BOUND_LAW",
+    }
+    sim["estimand"]["E3"]["value_owner"] = "OWNER_BOUND"
+    sim["estimand"]["E3"]["value"] = {
+        "execution_lag": "1_session",
+        "cost_formula": "OWNER_BOUND_BPS",
+        "free_fit": False,
+    }
+    sim["estimand"]["E4"]["value"]["RIGHT_TAIL_PERCENTILE"] = 90
+    sim["estimand"]["E4"]["value_owner"] = "OWNER_BOUND"
+    sim["estimand"]["E5"]["value"]["CATASTROPHE_PERCENTILE"] = 10
+    sim["estimand"]["E5"]["value_owner"] = "OWNER_BOUND"
+    sim["estimand"]["E6"]["value"]["delta_J_required"] = 0.0
+    sim["estimand"]["E6"]["value_owner"] = "OWNER_BOUND"
+    sim["estimand"]["E7"]["value"]["K"] = 10
+    sim["estimand"]["E7"]["value_owner"] = "OWNER_BOUND"
+    sim["d6_d9_mapping"]["D7_CONFIRMATION_TIMING"]["rule_status"] = (
+        "EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL"
+    )
+    sim["d6_d9_mapping"]["D7_CONFIRMATION_TIMING"]["invented_this_freeze"] = False
+    ready_sim = evaluate_l5_readiness(sim)
+    assert ready_sim["l5_ready"] is True
+    assert ready_sim["blockers_remaining"] == []
+    # still must not auto-authorize
+    assert ready_sim["economic_l5_authorized"] is False
+
+
+def test_cannot_invent_missing_e2_e3_d7() -> None:
+    doc = load_machine_freeze(REPO)
+    assert doc["estimand"]["E2"]["value_owner"] == "BLOCKED_UNSET"
+    assert doc["estimand"]["E3"]["value_owner"] == "BLOCKED_UNSET"
+    assert doc["d6_d9_mapping"]["D7_CONFIRMATION_TIMING"]["rule_status"] == "BLOCKED_UNSET"
+    assert doc["d6_d9_mapping"]["D7_CONFIRMATION_TIMING"]["invented_this_freeze"] is False
+
+    # Claiming INHERITED without path is invalid
+    bad = json.loads(json.dumps(doc))
+    bad["estimand"]["E2"]["value_owner"] = "INHERITED_AUTHORITY"
+    bad["estimand"]["E2"]["value"] = {
+        "price_provider_semantics": "invented",
+        "entry_price_convention": "invented",
+        "exit_price_convention": "invented",
+        "corporate_action_adjustment": "invented",
+    }
+    errs = validate_econ_freeze(bad)
+    assert any("E2 INHERITED_AUTHORITY requires authority_path" in e for e in errs)
+
+    bad3 = json.loads(json.dumps(doc))
+    bad3["estimand"]["E3"]["value_owner"] = "INHERITED_AUTHORITY"
+    bad3["estimand"]["E3"]["value"] = {
+        "execution_lag": "one_bar",
+        "cost_formula": "turnover*0.0010",
+        "free_fit": False,
+    }
+    errs3 = validate_econ_freeze(bad3)
+    assert any("E3 INHERITED_AUTHORITY requires authority_path" in e for e in errs3)
+
+    with pytest.raises(Econ1FailClosedError, match="refuse_invent"):
+        refuse_invented_bind("E2")
+    with pytest.raises(Econ1FailClosedError, match="refuse_invent"):
+        refuse_invented_bind("E3")
+    with pytest.raises(Econ1FailClosedError, match="refuse_invent"):
+        refuse_invented_bind("D7")
+    with pytest.raises(Econ1FailClosedError, match="refuse_invent"):
+        refuse_invented_bind("H_VALUE")
+
+
+def test_dof_two_pins_stable_after_bind() -> None:
+    doc = load_machine_freeze(REPO)
+    parent = load_parent_l4_freeze(REPO)
+    assert_surface_pins_match_parent(doc, parent)
+    assert doc["surface_inheritance"]["effective_decision_dof"] == 2
+    assert doc["surface_inheritance"]["silent_one_dof_collapse"] == "FORBIDDEN"
+    assert doc["surface_inheritance"]["third_decision_dof"] == "FORBIDDEN"
+    score_map = doc["estimand"]["E7"]["value"]["score_map"]
+    assert "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K" in score_map
+    bind = load_owner_bind_receipt(REPO)
+    assert bind["surface_pins"]["effective_decision_dof"] == 2
+    assert bind["surface_pins"]["score_map_form"] == "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K"

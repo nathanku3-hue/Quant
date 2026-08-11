@@ -1,7 +1,7 @@
 """AO-FTK-1-ECON-1 economic / asymmetry estimand freeze helpers.
 
-Outcome-blind form freeze only. No economic L5, no trial debit, no label join,
-no evaluation, no alpha claim.
+Outcome-blind form freeze + transition-position owner bind finalize only.
+No economic L5, no trial debit, no label join, no evaluation, no alpha claim.
 """
 
 from __future__ import annotations
@@ -16,13 +16,49 @@ from typing import Any
 FREEZE_ID = "AO-FTK-1-ECON-1"
 PARENT_PROGRAM = "AO-FTK-1-20260812"
 NAME = "FTK_ECONOMIC_ASYMMETRY_FREEZE"
+BIND_NAME = "FTK_ECON1_TRANSITION_POSITION_BIND"
 KERNEL_ID = "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1"
 PARENT_L5_WORK_COMMIT = "948471c"
 PARENT_L4_WORK_COMMIT = "a3350f0"
+PRIOR_FREEZE_COMMIT = "febd8e4"
 L7_ROUTE = "LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL"
 PLAN_ID = "FTK1_ECON_TRIAL_DEBIT_PLAN_V1"
 EFFECTIVE_DECISION_DOF = 2
 SCHEMA_VERSION = "ao_ftk_1_econ_1_economic_asymmetry_freeze_v1"
+ECONOMIC_CLOCK_CLASS = "TRANSITION_POSITION"
+AUTHORIZED_PHASES = frozenset(
+    {
+        "ECONOMIC_ESTIMAND_FREEZE",
+        "OWNER_BIND_TRANSITION_POSITION",
+        "OWNER_BIND_TRANSITION_POSITION_PLUS_ECON_FREEZE_FINALIZE",
+    }
+)
+RECOGNIZED_STATUSES = frozenset(
+    {
+        "ECON_FREEZE_PASS_WAITING_OWNER_L5",
+        "ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS",
+        "ECON_FREEZE_BLOCKED_MISSING_AUTHORITY",
+        "HOLD_RECOMMENDED",
+        "ECON_FREEZE_PASS_L5_READY",
+        "ECON_BIND_WAITING_OWNER_NUMERICS",
+    }
+)
+RECOGNIZED_NEXT_PHASES = frozenset(
+    {
+        "WAIT_OWNER_L5_ECONOMIC",
+        "WAITING_OWNER_NUMERICS",
+        "HOLD_EVIDENCE",
+        "BLOCKED_MISSING_AUTHORITY",
+    }
+)
+BIND_VERDICTS = frozenset(
+    {
+        "PASS_L5_READY",
+        "WAITING_NUMERICS",
+        "HOLD",
+        "BLOCKED",
+    }
+)
 
 MACHINE_FREEZE_REL = Path(
     "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json"
@@ -30,6 +66,9 @@ MACHINE_FREEZE_REL = Path(
 MD_FREEZE_REL = Path("docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.md")
 RECEIPT_REL = Path(
     "docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json"
+)
+OWNER_BIND_RECEIPT_REL = Path(
+    "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json"
 )
 L7_SELECT_REL = Path(
     "docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_route_select.json"
@@ -67,12 +106,35 @@ VALUE_OWNERS = frozenset(
         "OWNER_BLOCKED_UNSET",
         "BLOCKED_UNSET",
         "INHERITED_AUTHORITY",
+        "OWNER_BOUND",
+        "EXPLICITLY_OUT_OF_SCOPE",
+        "OWNER_OR_CRO_BLOCKED_UNSET",
+    }
+)
+
+D7_RULE_STATUSES = frozenset(
+    {
+        "INHERITED_AUTHORITY",
+        "BLOCKED_UNSET",
+        "EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL",
     }
 )
 
 CONSTITUTION = (
-    "Freeze the economic estimand outcome-blind on the unchanged 2-DOF sensing law. "
-    "Debit nothing. Join nothing. Run nothing. Stop at WAIT_OWNER_L5_ECONOMIC."
+    "Stamp FTK as TRANSITION_POSITION. Bind one horizon and the economic laws "
+    "without invention or peeking. Clear L5 blockers or HOLD. Debit nothing. Run nothing."
+)
+
+# Sentinel values that mean "not bound" for L5 readiness (must not invent).
+UNSET_SENTINELS = frozenset(
+    {
+        None,
+        "OWNER_BLOCKED_UNSET",
+        "BLOCKED_UNSET",
+        "OWNER_OR_CRO_BLOCKED_UNSET",
+        "UNSET",
+        "",
+    }
 )
 
 FORBIDDEN_QM_API_TOKENS = (
@@ -140,9 +202,171 @@ def load_receipt(repo: Path | None = None) -> dict[str, Any]:
     return load_json(root / RECEIPT_REL)
 
 
+def load_owner_bind_receipt(repo: Path | None = None) -> dict[str, Any]:
+    root = repo or default_repo_root()
+    return load_json(root / OWNER_BIND_RECEIPT_REL)
+
+
 def load_parent_l4_freeze(repo: Path | None = None) -> dict[str, Any]:
     root = repo or default_repo_root()
     return load_json(root / PARENT_L4_FREEZE_REL)
+
+
+def _is_bound_scalar(value: Any) -> bool:
+    """True if value is a concrete bound scalar (not an unset/blocked sentinel)."""
+    if value in UNSET_SENTINELS:
+        return False
+    if isinstance(value, str):
+        upper = value.upper()
+        if "BLOCKED" in upper or upper in {"UNSET", "OWNER_BLOCKED_UNSET"}:
+            return False
+        # numeric-looking strings or non-empty concrete labels count as bound
+        return len(value.strip()) > 0
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, (int, float)):
+        return True
+    return False
+
+
+def evaluate_l5_readiness(doc: dict[str, Any]) -> dict[str, Any]:
+    """Evaluate L5 readiness checklist outcome-blind from freeze document.
+
+    Does not authorize L5. Returns checklist items + l5_ready flag.
+    """
+    estimand = doc.get("estimand") or {}
+    clock = doc.get("economic_clock") or {}
+    e1 = (estimand.get("E1") or {}).get("value") or {}
+    e2 = (estimand.get("E2") or {}).get("value") or {}
+    e2_owner = (estimand.get("E2") or {}).get("value_owner")
+    e3 = (estimand.get("E3") or {}).get("value") or {}
+    e3_owner = (estimand.get("E3") or {}).get("value_owner")
+    e4 = (estimand.get("E4") or {}).get("value") or {}
+    e5 = (estimand.get("E5") or {}).get("value") or {}
+    e6 = (estimand.get("E6") or {}).get("value") or {}
+    e7 = (estimand.get("E7") or {}).get("value") or {}
+    e11 = (estimand.get("E11") or {}).get("value") or {}
+    d7 = (doc.get("d6_d9_mapping") or {}).get("D7_CONFIRMATION_TIMING") or {}
+    surface = doc.get("surface_inheritance") or {}
+    fail_closed = doc.get("fail_closed_guards") or {}
+
+    items: list[dict[str, Any]] = []
+
+    def add(item_id: str, ok: bool, detail: str) -> None:
+        items.append({"id": item_id, "pass": ok, "detail": detail})
+
+    clock_ok = clock.get("economic_clock_class") == ECONOMIC_CLOCK_CLASS
+    add(
+        "economic_clock_class",
+        clock_ok,
+        f"economic_clock_class={clock.get('economic_clock_class')!r}",
+    )
+
+    h_val = e1.get("H_VALUE")
+    h_ok = _is_bound_scalar(h_val)
+    add("H_VALUE", h_ok, f"H_VALUE={h_val!r}")
+
+    e2_ok = e2_owner in ("INHERITED_AUTHORITY", "OWNER_BOUND") and all(
+        _is_bound_scalar(e2.get(k))
+        for k in (
+            "price_provider_semantics",
+            "entry_price_convention",
+            "exit_price_convention",
+            "corporate_action_adjustment",
+        )
+    )
+    add("E2_price_return", e2_ok, f"value_owner={e2_owner!r}")
+
+    e3_ok = e3_owner in ("INHERITED_AUTHORITY", "OWNER_BOUND") and all(
+        _is_bound_scalar(e3.get(k)) for k in ("execution_lag", "cost_formula")
+    ) and e3.get("free_fit") is False
+    add("E3_lag_cost", e3_ok, f"value_owner={e3_owner!r}")
+
+    rt = e4.get("RIGHT_TAIL_PERCENTILE")
+    rt_ok = _is_bound_scalar(rt)
+    add("E4_percentile", rt_ok, f"RIGHT_TAIL_PERCENTILE={rt!r}")
+
+    cat = e5.get("CATASTROPHE_PERCENTILE")
+    cat_ok = _is_bound_scalar(cat)
+    add("E5_percentile", cat_ok, f"CATASTROPHE_PERCENTILE={cat!r}")
+
+    dj = e6.get("delta_J_required")
+    dj_ok = _is_bound_scalar(dj)
+    add("E6_delta_J", dj_ok, f"delta_J_required={dj!r}")
+
+    k_val = e7.get("K")
+    k_ok = isinstance(k_val, int) and k_val >= 1
+    if not k_ok and isinstance(k_val, str) and k_val.isdigit() and int(k_val) >= 1:
+        k_ok = True
+    score_map = str(e7.get("score_map") or "")
+    score_ok = "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K" in score_map
+    add("E7_K", k_ok and score_ok, f"K={k_val!r}; score_map_ok={score_ok}")
+
+    d7_status = d7.get("rule_status")
+    d7_ok = d7_status in (
+        "INHERITED_AUTHORITY",
+        "EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL",
+    ) and d7.get("invented_this_freeze") is not True
+    add("D7", d7_ok, f"rule_status={d7_status!r}")
+
+    e11_ok = (
+        e11.get("bytes_joined") is False
+        and e11.get("join_authorized") is False
+        and "ao_ftk_1_econ_1_label_custody" in str(e11.get("identity_path") or "")
+    )
+    add("E11_labels_unjoined", e11_ok, f"bytes_joined={e11.get('bytes_joined')}")
+
+    dof_ok = surface.get("effective_decision_dof") == EFFECTIVE_DECISION_DOF
+    add("surface_dof_2", dof_ok, f"dof={surface.get('effective_decision_dof')}")
+
+    l5_false = (
+        doc.get("l5_authorized") is False
+        and doc.get("economic_l5_authorized") is False
+        and doc.get("l5_auto_open") is False
+    )
+    add("l5_authorized_false", l5_false, "l5 remains unauthorized this bind")
+
+    fc_ok = bool(fail_closed) and all(
+        fail_closed.get(k) == "FAIL_CLOSED"
+        for k in (
+            "economic_label_join_when_l5_false",
+            "trial_debit_when_l5_false",
+            "economic_evaluator_run_when_l5_false",
+        )
+        if k in fail_closed
+    )
+    # also accept nested implementation path presence
+    if not fc_ok:
+        fc_ok = (
+            fail_closed.get("economic_label_join_when_l5_false") == "FAIL_CLOSED"
+            and fail_closed.get("trial_debit_when_l5_false") == "FAIL_CLOSED"
+            and fail_closed.get("economic_evaluator_run_when_l5_false") == "FAIL_CLOSED"
+        )
+    add("fail_closed_guards", fc_ok, "fail-closed guards present")
+
+    not_fast = clock.get("not_fast_trading") is True
+    not_ge = clock.get("not_great_enterprise_hodl") is True
+    add(
+        "clock_exclusions",
+        not_fast and not_ge,
+        f"not_fast_trading={not_fast}; not_ge_hodl={not_ge}",
+    )
+
+    blockers = [i["id"] for i in items if not i["pass"]]
+    l5_ready = len(blockers) == 0
+    return {
+        "l5_ready": l5_ready,
+        "checklist": items,
+        "blockers_remaining": blockers,
+        "economic_l5_authorized": False,  # never auto
+    }
+
+
+def refuse_invented_bind(field: str, *, reason: str = "missing_owner_or_authority") -> None:
+    """Hard refuse invented E2/E3/D7/H values — outcome-blind bind only."""
+    raise Econ1FailClosedError(
+        f"ao_ftk_1_econ_1_fail_closed:refuse_invent:{field}:{reason}"
+    )
 
 
 def load_label_identity(repo: Path | None = None) -> dict[str, Any]:
@@ -290,18 +514,15 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
         errors.append(f"freeze_id must be {FREEZE_ID}")
     if doc.get("parent_program") != PARENT_PROGRAM:
         errors.append(f"parent_program must be {PARENT_PROGRAM}")
-    if doc.get("name") != NAME:
-        errors.append(f"name must be {NAME}")
-    if doc.get("status") not in (
-        "ECON_FREEZE_PASS_WAITING_OWNER_L5",
-        "ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS",
-        "ECON_FREEZE_BLOCKED_MISSING_AUTHORITY",
-        "HOLD_RECOMMENDED",
-    ):
+    if doc.get("name") not in (NAME, BIND_NAME):
+        errors.append(f"name must be {NAME} or {BIND_NAME}")
+    if doc.get("status") not in RECOGNIZED_STATUSES:
         errors.append("status must be a recognized economic freeze terminal")
 
-    if doc.get("authorized_phase") != "ECONOMIC_ESTIMAND_FREEZE":
-        errors.append("authorized_phase must be ECONOMIC_ESTIMAND_FREEZE")
+    if doc.get("authorized_phase") not in AUTHORIZED_PHASES:
+        errors.append(
+            "authorized_phase must be ECONOMIC_ESTIMAND_FREEZE or OWNER_BIND_TRANSITION_POSITION*"
+        )
     if doc.get("l7_route") != L7_ROUTE:
         errors.append(f"l7_route must be {L7_ROUTE}")
     if doc.get("second_l5") != "NOT_AUTHORIZED":
@@ -322,6 +543,23 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
         errors.append("label_bytes_joined must be false")
     if doc.get("material_trials_charged_this_turn") != 0:
         errors.append("material_trials_charged_this_turn must be 0")
+
+    # Transition-position clock (required after bind turn)
+    clock = doc.get("economic_clock")
+    if isinstance(clock, dict):
+        if clock.get("economic_clock_class") != ECONOMIC_CLOCK_CLASS:
+            errors.append(
+                f"economic_clock.economic_clock_class must be {ECONOMIC_CLOCK_CLASS}"
+            )
+        if clock.get("not_fast_trading") is not True:
+            errors.append("economic_clock.not_fast_trading must be true")
+        if clock.get("not_great_enterprise_hodl") is not True:
+            errors.append("economic_clock.not_great_enterprise_hodl must be true")
+        ge = clock.get("great_enterprise_kernel")
+        if ge is not None and ge not in ("OUT_OF_SCOPE", "OUT OF SCOPE"):
+            errors.append("economic_clock.great_enterprise_kernel must be OUT_OF_SCOPE")
+    elif doc.get("owner_bind") is not None:
+        errors.append("economic_clock object required when owner_bind present")
 
     surface = doc.get("surface_inheritance")
     if not isinstance(surface, dict):
@@ -403,8 +641,11 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
                 errors.append(f"d6_d9_mapping.{layer} required")
         d7 = dmap.get("D7_CONFIRMATION_TIMING")
         if isinstance(d7, dict):
-            if d7.get("rule_status") not in ("INHERITED_AUTHORITY", "BLOCKED_UNSET"):
-                errors.append("D7.rule_status must be INHERITED_AUTHORITY or BLOCKED_UNSET")
+            if d7.get("rule_status") not in D7_RULE_STATUSES:
+                errors.append(
+                    "D7.rule_status must be INHERITED_AUTHORITY, "
+                    "BLOCKED_UNSET, or EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL"
+                )
             if d7.get("invented_this_freeze") is True:
                 errors.append("D7 must not be invented this freeze")
 
@@ -425,12 +666,46 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
         if plan.get("debit_trigger") != "ECONOMIC_L5_AUTHORIZATION_RECEIPT":
             errors.append("debit_trigger must be ECONOMIC_L5_AUTHORIZATION_RECEIPT")
 
-    if doc.get("next_phase") != "WAIT_OWNER_L5_ECONOMIC":
-        errors.append("next_phase must be WAIT_OWNER_L5_ECONOMIC")
+    if doc.get("next_phase") not in RECOGNIZED_NEXT_PHASES:
+        errors.append(
+            "next_phase must be WAIT_OWNER_L5_ECONOMIC | WAITING_OWNER_NUMERICS | "
+            "HOLD_EVIDENCE | BLOCKED_MISSING_AUTHORITY"
+        )
 
+    readiness = evaluate_l5_readiness(doc)
     blockers = doc.get("l5_blockers")
-    if not isinstance(blockers, list) or not blockers:
-        errors.append("l5_blockers must be a non-empty list (explicit readiness gaps)")
+    if readiness["l5_ready"]:
+        # when fully ready, blockers may be empty or only residual L5 auth note
+        if not isinstance(blockers, list):
+            errors.append("l5_blockers must be a list")
+        if doc.get("status") not in (
+            "ECON_FREEZE_PASS_L5_READY",
+            "ECON_FREEZE_PASS_WAITING_OWNER_L5",
+        ):
+            errors.append("status must reflect L5_READY when checklist green")
+        if doc.get("next_phase") != "WAIT_OWNER_L5_ECONOMIC":
+            errors.append("next_phase must be WAIT_OWNER_L5_ECONOMIC when L5_READY")
+        if doc.get("l5_authorized") is not False or doc.get("economic_l5_authorized") is not False:
+            errors.append("L5_READY never auto-authorizes economic L5")
+    else:
+        if not isinstance(blockers, list) or not blockers:
+            errors.append("l5_blockers must be a non-empty list when not L5_READY")
+
+    # owner_bind section consistency (if present)
+    owner_bind = doc.get("owner_bind")
+    if isinstance(owner_bind, dict):
+        if owner_bind.get("outcome_blind") is not True:
+            errors.append("owner_bind.outcome_blind must be true")
+        if owner_bind.get("residual_peek") is not False:
+            errors.append("owner_bind.residual_peek must be false")
+        if owner_bind.get("verdict") not in BIND_VERDICTS:
+            errors.append("owner_bind.verdict must be PASS_L5_READY|WAITING_NUMERICS|HOLD|BLOCKED")
+        if owner_bind.get("l5_ready") is True and not readiness["l5_ready"]:
+            errors.append("owner_bind.l5_ready true but checklist not green")
+        if owner_bind.get("l5_ready") is False and readiness["l5_ready"]:
+            errors.append("owner_bind.l5_ready false but checklist is green")
+        if owner_bind.get("material_trials_charged_this_turn") not in (0, None):
+            errors.append("owner_bind must not charge material trials")
 
     if not isinstance(doc.get("stop_lines"), list) or not doc.get("stop_lines"):
         errors.append("stop_lines must be a non-empty list")
@@ -445,6 +720,16 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
         errors.append("ao_ftk_2 must be NOT_AUTHORIZED")
     if doc.get("l8_bounded_refinement") != "DEFER":
         errors.append("l8_bounded_refinement must be DEFER")
+
+    # Hard anti-invention: E2/E3 must not claim inheritance without path
+    e2 = (doc.get("estimand") or {}).get("E2") or {}
+    if e2.get("value_owner") == "INHERITED_AUTHORITY":
+        if not (e2.get("authority_path") or (e2.get("value") or {}).get("authority_path")):
+            errors.append("E2 INHERITED_AUTHORITY requires authority_path citation")
+    e3 = (doc.get("estimand") or {}).get("E3") or {}
+    if e3.get("value_owner") == "INHERITED_AUTHORITY":
+        if not (e3.get("authority_path") or (e3.get("value") or {}).get("authority_path")):
+            errors.append("E3 INHERITED_AUTHORITY requires authority_path citation")
 
     return errors
 
