@@ -22,9 +22,9 @@ RUNTIME_AUTHORITY        = docs/context/gv_endgame_authority_current.md
 ```text
 ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 ACTIVE_BASIS_AUTHORITY   = AO-K0A / OrthogonalizationContractV1 / NO_EMPIRICAL_RESULT
-ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-20260812 / L4_FREEZE_PASS (WAIT_OWNER_L5)
+ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-20260812 / L4_CLOSED (WAIT_OWNER_L5 / NO_WORKER)
 AO_FTK_0_STATUS          = CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER
-AO_FTK_1_STATUS          = L4_FREEZE_PASS / effective_dof=2 / material_trials_charged=0 / labels_unjoined / L5=false
+AO_FTK_1_STATUS          = L4_FREEZE_PASS_CLOSED / NO_WORKER / effective_dof=2 / material_trials_charged=0 / labels_unjoined / L5=false
 OK_SBI_0_STATUS          = S0_DESIGN_LOCKED_RELEASE_BLOCKED + Q_SOURCE_BLOCKED_TERMINAL (PARKED)
 CAPITAL_ALPHA_PATH       = CLOSED
 FINANCIAL_ALPHA_EVIDENCE = 0
@@ -53,6 +53,8 @@ ao_ftk_1_l3_close        = docs/context/e2e_evidence/ao_ftk_1_20260812_l3_close.
 ao_ftk_1_preflight       = docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json
 ao_ftk_1_l4_freeze       = docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json
 ao_ftk_1_l4_receipt      = docs/context/e2e_evidence/ao_ftk_1_20260812_l4_charged_slice_freeze.json
+ao_ftk_1_l4_close        = docs/context/e2e_evidence/ao_ftk_1_20260812_l4_close.json
+ao_ftk_1_l4_work_commit  = a3350f0
 ```
 
 ## Do now
@@ -60,7 +62,7 @@ ao_ftk_1_l4_receipt      = docs/context/e2e_evidence/ao_ftk_1_20260812_l4_charge
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
 2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / Rule100 bridges / open OK-SBI S2.
 3. **AO-FTK-0 CLOSED** (NO_WORKER). Do not reopen as worker or open its outcomes.
-4. **AO-FTK-1 L4 DONE** (`L4_FREEZE_PASS` → **WAIT_OWNER_L5**). Frozen: 2-DOF continuous inventory lag-1 + continuous M1; label identity + hash procedure; trial-debit plan (0 charged / 3 remaining). **L5 is NOT_AUTHORIZED.** No silent L5. No trial debit. No label join. `financial_alpha_evidence=0`.
+4. **AO-FTK-1 L4 CLOSED** (`L4_FREEZE_PASS_CLOSED_READY_FOR_OWNER_L5` / NO_WORKER) → **WAIT_OWNER_L5**. Binding freeze: 2-DOF continuous inventory lag-1 + continuous M1; label identity + hash procedure; trial-debit plan (0 charged / 3 remaining). **L5 is NOT_AUTHORIZED.** No active FTK-1 worker. No silent L5. No trial debit. No label join. `financial_alpha_evidence=0`.
 5. Owner next: **authorize L5 | hold | stop** (separate receipt required for L5).
 6. Do not fill OK-SBI 20 gates for optics; do not spend Q amendment.
 7. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
