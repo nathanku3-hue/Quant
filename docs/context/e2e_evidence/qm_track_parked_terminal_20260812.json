@@ -1,0 +1,48 @@
+{
+  "schema_version": "qm_track_parked_terminal_v1",
+  "receipt_id": "QM_TRACK_PARKED_TERMINAL_20260812",
+  "date": "2026-08-12",
+  "slice_issuing_park": "AO-FTK-0",
+  "purpose": "Prevent quiet Q/M revival inside Fundamental Transition Kernel (FTK) freeze and successor development reads unless a new owner-authorized custody admit slice exists.",
+  "Q_SOURCE_STATUS": "Q_SOURCE_BLOCKED_TERMINAL",
+  "Q_SOURCE_RECEIPT": {
+    "bind_slice_id": "OK-SBI-0-S0-Q-SOURCE-BIND",
+    "terminal_commit": "9dfe9e9",
+    "bind_attempt_evidence": "docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json",
+    "contract": "docs/architecture/q_source_contract_v1.md",
+    "Q_feasibility": "Q_SOURCE_BLOCKED"
+  },
+  "OK_SBI_S2": "NOT_AUTHORIZED",
+  "OK_SBI_0_DEV_OPEN_1": "NOT_ISSUED",
+  "QM_REVIVAL_IN_FTK": "FORBIDDEN",
+  "Q_AMENDMENT_STATUS": "AVAILABLE_UNSPENT",
+  "Q_AMENDMENT_OWNER": "future OK-SBI-0-Q-CUSTODY-ADMIT-1 only",
+  "q_amendment_cycles_used": 0,
+  "forbidden_inside_ao_ftk_0": [
+    "Q",
+    "M",
+    "M_perp",
+    "M⊥",
+    "Q+M",
+    "Q×M",
+    "residual-M",
+    "ROIC invention",
+    "Rule100 feature-store bridge",
+    "OK-SBI 20-gate fill for optics",
+    "S2 trophy leaderboard"
+  ],
+  "blockers_unchanged": [
+    "s0_fundamentals_lack_trading_item_id:CIQSEC+trading_item joint identity unbound for Q primitives",
+    "roic_no_admitted_metric:no IQ_ROIC/NOPAT/invested_capital in admitted S0 metrics"
+  ],
+  "ftk_relationship": {
+    "ao_ftk_0_uses_qm_geometry": false,
+    "ao_ftk_0_kernel": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+    "ao_ftk_0_basis": "inventory/margin transition sparse basis only",
+    "ok_sbi_s0_status": "S0_DESIGN_LOCKED_RELEASE_BLOCKED_AND_Q_TERMINAL_PARKED"
+  },
+  "financial_alpha_evidence": 0,
+  "outcome_open_authorized": false,
+  "runnable_evaluation": false,
+  "constitution": "Q/M is terminal under current admitted custody. AO-FTK-0 freezes a sparse inventory/margin transition basis only. Full W3 and abstention remain law. No outcomes, no capital, no Q/M composites, no invented fundamentals."
+}

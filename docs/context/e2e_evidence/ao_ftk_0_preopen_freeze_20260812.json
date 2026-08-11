@@ -1,0 +1,81 @@
+{
+  "schema_version": "ao_ftk_0_preopen_freeze_v1",
+  "slice_id": "AO-FTK-0",
+  "date": "2026-08-12",
+  "terminal_preopen_verdict": "READY_FOR_LATER_CHARGED_DEVELOPMENT_READ",
+  "outcome_open_authorized": false,
+  "runnable_evaluation": false,
+  "financial_alpha_evidence": 0,
+  "qm_revival_attempted": false,
+  "q_amendment_cycles_used": 0,
+  "ok_sbi_s2": "NOT_AUTHORIZED",
+  "ok_sbi_gates_filled": false,
+  "capital_authority": "NONE",
+  "artifacts": {
+    "machine_freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
+    "md_freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.md",
+    "qm_park_receipt": "docs/context/e2e_evidence/qm_track_parked_terminal_20260812.json",
+    "test_module": "tests/asymmetric_opportunity_v1/test_ao_ftk_0_preopen_contracts.py",
+    "machine_freeze_sha256": "f35ed94c0874f655a5ff09b453025c943e6fbaf95a9fbaa60f7f38db9cc51afa",
+    "md_freeze_sha256": "a1baed25d520259daf50e92d187809bfcedfb064f094102220855764819c0eb1",
+    "qm_park_sha256": "690487f958bc6cc36f44e8a8bc6ab073de57a7e33b01005d4be548b6ece6e914"
+  },
+  "primitive_bind_summary": [
+    {
+      "primitive_id": "FTK_PRIM_IQ_PERIOD_END",
+      "exact_field_identifier": "IQ_PERIOD_END",
+      "bind_status": "BOUND"
+    },
+    {
+      "primitive_id": "FTK_PRIM_IQ_TOTAL_REV",
+      "exact_field_identifier": "IQ_TOTAL_REV",
+      "bind_status": "BOUND"
+    },
+    {
+      "primitive_id": "FTK_PRIM_IQ_INVENTORY",
+      "exact_field_identifier": "IQ_INVENTORY",
+      "bind_status": "BOUND"
+    },
+    {
+      "primitive_id": "FTK_PRIM_IQ_OPER_INC",
+      "exact_field_identifier": "IQ_OPER_INC",
+      "bind_status": "BOUND"
+    }
+  ],
+  "operator_freeze": [
+    {
+      "operator_id": "INV_DELTA_MEAN_REVERSION",
+      "node_id": "INVENTORY_CHANNEL_STATE",
+      "decision_dof_slot": 1,
+      "status": "FROZEN_DECISION_SURFACE"
+    },
+    {
+      "operator_id": "MARGIN_M1_STATE_MEAN_REVERSION",
+      "node_id": "MARGIN_CASH_STATE",
+      "decision_dof_slot": 2,
+      "status": "FROZEN_DECISION_SURFACE"
+    }
+  ],
+  "complexity": {
+    "complexity_unit": "effective_DOF + charged_search_debt",
+    "feature_count_role": "non-authority cost proxy",
+    "max_effective_decision_dof": 2,
+    "effective_decision_dof_frozen": 2,
+    "high_dimensional_adaptive_decision_surface": "FORBIDDEN",
+    "charged_search_debt_this_slice": 0,
+    "notes": "Two domain-limited operators (inventory delta mean-reversion; margin M1 state mean-reversion). No free router hunt. No third decision DOF."
+  },
+  "search_budget": {
+    "hard_material_trials_total": 3,
+    "material_trials_charged_this_slice": 0,
+    "material_trials_remaining": 3,
+    "one_standard_error_preference": true,
+    "simplicity_preference_when_tie": "LOWER_EFFECTIVE_DOF",
+    "free_threshold_grid": "FORBIDDEN",
+    "rescue_redesign_without_new_slice_id": "FORBIDDEN",
+    "notes": "This freeze charges 0 material trials. Later charged development read must debit the budget before any material empirical trial."
+  },
+  "label_custody_plan_join_authorized": false,
+  "qm_park_status": "Q_SOURCE_BLOCKED_TERMINAL",
+  "constitution": "Q/M is terminal under current admitted custody. AO-FTK-0 freezes a sparse inventory/margin transition basis only. Full W3 and abstention remain law. No outcomes, no capital, no Q/M composites, no invented fundamentals. Success is a preregistered pre-open contract — not alpha, not a leaderboard, not gate-filling theater."
+}

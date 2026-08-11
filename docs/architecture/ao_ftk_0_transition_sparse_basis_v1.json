@@ -1,0 +1,426 @@
+{
+  "schema_version": "ao_ftk_0_transition_sparse_basis_v1",
+  "slice_id": "AO-FTK-0",
+  "name": "BOTTLENECK_OR_TRANSITION_SPARSE_BASIS",
+  "contract_id": "FundamentalTransitionKernelContractV1",
+  "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+  "date": "2026-08-12",
+  "spec_version": "v1.0",
+  "status": "PREOPEN_FREEZE_READY_FOR_LATER_CHARGED_DEVELOPMENT_READ",
+  "terminal_preopen_verdict": "READY_FOR_LATER_CHARGED_DEVELOPMENT_READ",
+  "science_mode": "PRE_RESULT / PRE_OPEN",
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "financial_alpha_evidence": 0,
+  "capital_authority": "NONE",
+  "promotion_authority": "NONE",
+  "outcome_open_authorized": false,
+  "runnable_evaluation": false,
+  "charged_development_read": "FORBIDDEN_THIS_TURN",
+  "qm_terms_forbidden": true,
+  "qm_revival_in_ftk": "FORBIDDEN",
+  "q_amendment_cycles_used": 0,
+  "ok_sbi_s2": "NOT_AUTHORIZED",
+  "ok_sbi_gates_filled": false,
+  "authority": {
+    "lineage_branch": "codex/pit-source-authority-1",
+    "public_main": "NON_AUTHORITY_UNTIL_MERGE",
+    "basis_law_reuse": "OpportunityKernelV1 + full-W3 / ABSTENTION from AO-K0A OrthogonalizationContractV1 accounting",
+    "q_track_status": "Q_SOURCE_BLOCKED_TERMINAL",
+    "q_terminal_commit": "9dfe9e9",
+    "q_source_bind_evidence": "docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json",
+    "qm_park_receipt": "docs/context/e2e_evidence/qm_track_parked_terminal_20260812.json",
+    "opportunity_kernel_constitution": "docs/architecture/asymmetric_opportunity_constitution_v1.md",
+    "orthogonalization_contract": "docs/architecture/orthogonalization_contract_v1.md",
+    "s0_structured_request": "docs/architecture/econphysics_prebreakout_s0_structured_request_v1.json",
+    "s0_dynamics_diagnostic_historical": "data/prebreakout/analysis/econphysics_s0_economic_dynamics_diagnostic_v2.json",
+    "s0_dynamics_diagnostic_role": "HISTORICAL_DIAGNOSTIC_ONLY_NOT_ALPHA"
+  },
+  "hypothesis": {
+    "h0": "A 1-2 effective-DOF Reality/transition kernel can identify a reproducible conditional state transition from inventory and/or operating-margin dynamics that is decision-relevant for sparse opportunity discovery.",
+    "not_hypothesis": [
+      "good company = growth + ROIC",
+      "momentum residual after quality",
+      "high-dimensional feature soup",
+      "Q/M residual geometry revival"
+    ]
+  },
+  "estimand": {
+    "sensing": "P(S_{t+1} | S_t, C_t) for frozen transition state on inventory and/or operating-margin nodes",
+    "payoff": "forward net-payoff distribution functionals — LATER charged development read only",
+    "policy": "DEFERRED — discovery kernel freeze only; no sizing/capital"
+  },
+  "complexity_ledger": {
+    "complexity_unit": "effective_DOF + charged_search_debt",
+    "feature_count_role": "non-authority cost proxy",
+    "max_effective_decision_dof": 2,
+    "effective_decision_dof_frozen": 2,
+    "high_dimensional_adaptive_decision_surface": "FORBIDDEN",
+    "charged_search_debt_this_slice": 0,
+    "notes": "Two domain-limited operators (inventory delta mean-reversion; margin M1 state mean-reversion). No free router hunt. No third decision DOF."
+  },
+  "non_identity_to_qm": {
+    "statement": "AO-FTK-0 is not a Q basis, residual-M basis, or Q/M composite. Q/M terms are forbidden in the FTK kernel API.",
+    "forbidden_api_tokens": [
+      "Q",
+      "M",
+      "M_perp",
+      "M⊥",
+      "Q+M",
+      "Q×M",
+      "Q*M",
+      "residual-M",
+      "residual_M",
+      "ROIC",
+      "Q_GF",
+      "Rule100"
+    ],
+    "allowed_api_surface": [
+      "kernel_id",
+      "node_id",
+      "operator_id",
+      "applicability_status",
+      "abstention",
+      "prediction_direction",
+      "primitive_id",
+      "missingness_reason"
+    ]
+  },
+  "denominator_and_abstention": {
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "missingness_law": "PERSISTENT_ABSTENTION_STATE_NEVER_ELIGIBILITY_REWRITE",
+    "abstention": {
+      "forecast": "ABSTAIN",
+      "selected": false,
+      "risky_weight": 0.0,
+      "removed_from_denominator": false
+    },
+    "security_level_return_imputation": "FORBIDDEN",
+    "peer_return_imputation": "FORBIDDEN",
+    "complete_case_denominator": "FORBIDDEN",
+    "coverage_pass_fail_gate": "FORBIDDEN",
+    "residual_capital_semantics_when_later_evaluated": "ECONOMIC_CASH",
+    "opportunity_comparator_when_later_evaluated": "PIT_EQUAL_WEIGHT_FULL_W3"
+  },
+  "primitives": [
+    {
+      "primitive_id": "FTK_PRIM_IQ_PERIOD_END",
+      "bind_status": "BOUND",
+      "provider_source_object": "SPCIQPRO:SPG_PRODUCTQUERY_EXISTING_WEB_SESSION",
+      "exact_field_identifier": "IQ_PERIOD_END",
+      "provider_numeric_field_key": "BOUND_BY_METRIC_MNEMONIC_IN_ADMITTED_S0_RECEIPT",
+      "identity_keys": {
+        "security_identity": "CIQSEC",
+        "trading_item_joint_key": "NOT_REQUIRED_FOR_FUNDAMENTAL_TRANSITION_NODE",
+        "ticker_entity_permno_fallback": "FORBIDDEN"
+      },
+      "period_perspective_semantics": "FQ0 relative period period-end detector; first FQ0 observation is baseline-only; capture only on adjacent nonmissing advancing FQ0 period changes",
+      "pit_availability_timestamp": "CONSERVATIVE_END_OF_REQUESTED_AS_OF_DATE_UTC",
+      "minimum_publication_processing_lag": "AS_OF_DATE_END_OF_DAY_CONSERVATIVE_NO_INTRA_DAY_BRIDGE",
+      "unit_currency_law": "DATE_ISO_OR_PROVIDER_PERIOD_END_STRING_NOT_CURRENCY",
+      "formula_denominator": "N/A_PRIMITIVE_TIMESTAMP",
+      "restatement_carry_law": "FilingVer=Original; never overwrite prior PIT vintage",
+      "applicability": "APPLICABLE when W3-eligible security has admitted period probe path",
+      "missingness_reason_taxonomy": [
+        "LATEST_UNOBSERVED",
+        "PRIOR_UNOBSERVED",
+        "FQ0_PLAN_CAPTURE_MISMATCH",
+        "MISSING_PERIOD_END"
+      ],
+      "corporate_action_treatment": "CIQSEC_SECURITY_IDENTITY_AS_ADMITTED_S0_MASTER; NO_TICKER_BRIDGE",
+      "source_receipt_hash": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f",
+      "source_object_sha256": "a5b873826c9598d33c71cc1e28f44f4ce26512a9c89aa6685f2a1606e9be0b87",
+      "source_paths": [
+        "data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.csv",
+        "data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.receipt.json"
+      ],
+      "no_bridge_proof": "Uses only admitted S0 Original-filing metrics; no Rule100/feature-store borrow; no invented Q/ROIC; no outcome join"
+    },
+    {
+      "primitive_id": "FTK_PRIM_IQ_TOTAL_REV",
+      "bind_status": "BOUND",
+      "provider_source_object": "SPCIQPRO:SPG_PRODUCTQUERY_EXISTING_WEB_SESSION",
+      "exact_field_identifier": "IQ_TOTAL_REV",
+      "provider_numeric_field_key": "329288",
+      "role": "RATIO_DENOMINATOR_AND_PERIOD_COMPATIBILITY_ONLY_NOT_DECISION_NODE",
+      "identity_keys": {
+        "security_identity": "CIQSEC",
+        "trading_item_joint_key": "NOT_REQUIRED_FOR_FUNDAMENTAL_TRANSITION_NODE",
+        "ticker_entity_permno_fallback": "FORBIDDEN"
+      },
+      "period_perspective_semantics": "FQ0..FQ-4 relative periods on same validated Original-filing transition row grid",
+      "pit_availability_timestamp": "CONSERVATIVE_END_OF_REQUESTED_AS_OF_DATE_UTC",
+      "minimum_publication_processing_lag": "AS_OF_DATE_END_OF_DAY_CONSERVATIVE_NO_INTRA_DAY_BRIDGE",
+      "unit_currency_law": "USD_THOUSANDS; Options:Curr=USD,Mag=Thousands,ConvMethod=R,FilingVer=Original",
+      "formula_denominator": "SELF_WHEN_USED_AS_RATIO_DENOMINATOR; MUST_BE_POSITIVE",
+      "restatement_carry_law": "FilingVer=Original; never overwrite prior PIT vintage",
+      "applicability": "Required for lawful inventory_to_revenue and operating_margin construction; revenue direction node is PARKED (not FTK decision surface)",
+      "missingness_reason_taxonomy": [
+        "LATEST_UNOBSERVED",
+        "DENOMINATOR_NONPOSITIVE",
+        "UNIT_MISMATCH",
+        "PERIOD_END_MISSING"
+      ],
+      "corporate_action_treatment": "CIQSEC_SECURITY_IDENTITY_AS_ADMITTED_S0_MASTER; NO_TICKER_BRIDGE",
+      "source_receipt_hash": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f",
+      "source_object_sha256": "a5b873826c9598d33c71cc1e28f44f4ce26512a9c89aa6685f2a1606e9be0b87",
+      "no_bridge_proof": "Admitted S0 metric only; not used as growth+ROIC quality score; not Q_GF substitute"
+    },
+    {
+      "primitive_id": "FTK_PRIM_IQ_INVENTORY",
+      "bind_status": "BOUND",
+      "provider_source_object": "SPCIQPRO:SPG_PRODUCTQUERY_EXISTING_WEB_SESSION",
+      "exact_field_identifier": "IQ_INVENTORY",
+      "provider_numeric_field_key": "BOUND_BY_METRIC_MNEMONIC_IN_ADMITTED_S0_RECEIPT",
+      "identity_keys": {
+        "security_identity": "CIQSEC",
+        "trading_item_joint_key": "NOT_REQUIRED_FOR_FUNDAMENTAL_TRANSITION_NODE",
+        "ticker_entity_permno_fallback": "FORBIDDEN"
+      },
+      "period_perspective_semantics": "FQ0..FQ-4 on same validated Original-filing transition row",
+      "pit_availability_timestamp": "CONSERVATIVE_END_OF_REQUESTED_AS_OF_DATE_UTC",
+      "minimum_publication_processing_lag": "AS_OF_DATE_END_OF_DAY_CONSERVATIVE_NO_INTRA_DAY_BRIDGE",
+      "unit_currency_law": "USD_THOUSANDS shared with IQ_TOTAL_REV on same row",
+      "formula_denominator": "inventory_to_revenue = IQ_INVENTORY / IQ_TOTAL_REV; inventory_economic_level = -(inventory_to_revenue)",
+      "restatement_carry_law": "FilingVer=Original; never overwrite prior PIT vintage",
+      "applicability": "APPLICABLE only when inventory is economically meaningful for the business model; else NOT_APPLICABLE",
+      "missingness_reason_taxonomy": [
+        "LATEST_UNOBSERVED",
+        "PRIOR_UNOBSERVED",
+        "YOY_UNOBSERVED",
+        "RATIO_DENOMINATOR_NONPOSITIVE",
+        "UNIT_OR_PERIOD_INCOMPATIBLE"
+      ],
+      "corporate_action_treatment": "CIQSEC_SECURITY_IDENTITY_AS_ADMITTED_S0_MASTER; NO_TICKER_BRIDGE",
+      "source_receipt_hash": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f",
+      "source_object_sha256": "a5b873826c9598d33c71cc1e28f44f4ce26512a9c89aa6685f2a1606e9be0b87",
+      "no_bridge_proof": "Admitted S0 metric; same-period positive-revenue ratio law from S0 structured request; no imputation"
+    },
+    {
+      "primitive_id": "FTK_PRIM_IQ_OPER_INC",
+      "bind_status": "BOUND",
+      "provider_source_object": "SPCIQPRO:SPG_PRODUCTQUERY_EXISTING_WEB_SESSION",
+      "exact_field_identifier": "IQ_OPER_INC",
+      "provider_numeric_field_key": "BOUND_BY_METRIC_MNEMONIC_IN_ADMITTED_S0_RECEIPT",
+      "identity_keys": {
+        "security_identity": "CIQSEC",
+        "trading_item_joint_key": "NOT_REQUIRED_FOR_FUNDAMENTAL_TRANSITION_NODE",
+        "ticker_entity_permno_fallback": "FORBIDDEN"
+      },
+      "period_perspective_semantics": "FQ0..FQ-4 on same validated Original-filing transition row",
+      "pit_availability_timestamp": "CONSERVATIVE_END_OF_REQUESTED_AS_OF_DATE_UTC",
+      "minimum_publication_processing_lag": "AS_OF_DATE_END_OF_DAY_CONSERVATIVE_NO_INTRA_DAY_BRIDGE",
+      "unit_currency_law": "USD_THOUSANDS shared with IQ_TOTAL_REV on same row",
+      "formula_denominator": "operating_margin = IQ_OPER_INC / IQ_TOTAL_REV (same relative period, positive revenue)",
+      "restatement_carry_law": "FilingVer=Original; never overwrite prior PIT vintage",
+      "applicability": "APPLICABLE where reported operating margin is economically meaningful",
+      "missingness_reason_taxonomy": [
+        "LATEST_RATIO_UNOBSERVED_OR_DENOMINATOR_NONPOSITIVE",
+        "PRIOR_RATIO_UNOBSERVED",
+        "YOY_RATIO_UNOBSERVED",
+        "UNIT_OR_PERIOD_INCOMPATIBLE"
+      ],
+      "corporate_action_treatment": "CIQSEC_SECURITY_IDENTITY_AS_ADMITTED_S0_MASTER; NO_TICKER_BRIDGE",
+      "source_receipt_hash": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f",
+      "source_object_sha256": "a5b873826c9598d33c71cc1e28f44f4ce26512a9c89aa6685f2a1606e9be0b87",
+      "no_bridge_proof": "Admitted S0 metric; not ROIC; not NOPAT/invested-capital invention"
+    }
+  ],
+  "unbound_or_parked_inputs": [
+    {
+      "primitive_id": "IQ_CAPEX_BNK",
+      "status": "PARKED_NON_DECISION",
+      "reason": "Capex is supply/capital-cycle evidence only, never capacity-state truth; not part of FTK v1 decision surface"
+    },
+    {
+      "primitive_id": "REVENUE_DIRECTION_NODE",
+      "status": "PARKED",
+      "reason": "S0 dynamics diagnostic: revenue node had no low-freedom dynamics survivor; no asymmetric rescue in this slice"
+    },
+    {
+      "primitive_id": "ROIC",
+      "status": "UNBOUND_FORBIDDEN_INVENTION",
+      "reason": "Q_SOURCE_BLOCKED_TERMINAL; inventing ROIC from OPER_INC/CAPEX forbidden"
+    }
+  ],
+  "derived_levels": [
+    {
+      "level_id": "INVENTORY_TO_REVENUE",
+      "formula": "IQ_INVENTORY / IQ_TOTAL_REV",
+      "law": "SAME_RELATIVE_PERIOD_AND_PERIOD_END; SAME_USD_THOUSANDS_UNIT; REVENUE_MUST_BE_POSITIVE; else UNOBSERVED"
+    },
+    {
+      "level_id": "INVENTORY_ECONOMIC_LEVEL",
+      "formula": "-(IQ_INVENTORY / IQ_TOTAL_REV)",
+      "law": "positive delta means inventory normalization (economic improvement)"
+    },
+    {
+      "level_id": "OPERATING_MARGIN",
+      "formula": "IQ_OPER_INC / IQ_TOTAL_REV",
+      "law": "SAME_RELATIVE_PERIOD_AND_PERIOD_END; SAME_USD_THOUSANDS_UNIT; REVENUE_MUST_BE_POSITIVE; else UNOBSERVED"
+    }
+  ],
+  "operators": [
+    {
+      "operator_id": "INV_DELTA_MEAN_REVERSION",
+      "family_alias": "DELTA_MEAN_REVERSION",
+      "node_id": "INVENTORY_CHANNEL_STATE",
+      "decision_dof_slot": 1,
+      "status": "FROZEN_DECISION_SURFACE",
+      "formula": "prediction = -sign(inventory_economic_level[FQ0] - inventory_economic_level[FQ-1]); maps to next-PIT inventory economic delta sign",
+      "historical_diagnostic_role": "S0 dynamics survivor on NEXT_PIT_INVENTORY_TO_REVENUE_NORMALIZATION_DIRECTION — NOT confirmed alpha",
+      "threshold_grid": "FORBIDDEN_WITHOUT_SEARCH_BUDGET_CHARGE",
+      "fit_or_tuning": "FORBIDDEN"
+    },
+    {
+      "operator_id": "MARGIN_M1_STATE_MEAN_REVERSION",
+      "family_alias": "M1_STATE_MEAN_REVERSION",
+      "node_id": "MARGIN_CASH_STATE",
+      "decision_dof_slot": 2,
+      "status": "FROZEN_DECISION_SURFACE",
+      "formula": "prediction = -frozen_M1_continuous_state_prediction(operating_margin node); M1 implementation bytes unchanged from S0 low-SNR continuous state; maps to next-PIT operating-margin direction",
+      "historical_diagnostic_role": "S0 dynamics survivor on NEXT_PIT_OPERATING_MARGIN_DIRECTION — NOT confirmed alpha",
+      "threshold_grid": "FORBIDDEN_WITHOUT_SEARCH_BUDGET_CHARGE",
+      "fit_or_tuning": "FORBIDDEN",
+      "m1_bytes_mutation": "FORBIDDEN"
+    }
+  ],
+  "operator_routing": {
+    "mode": "DOMAIN_LIMITED_EX_ANTE",
+    "rule": "Inventory node may emit only INV_DELTA_MEAN_REVERSION. Margin node may emit only MARGIN_M1_STATE_MEAN_REVERSION. No post-hoc operator search. No free composite trophy across nodes without new slice_id.",
+    "parked_representation_conditioned_alternates": [
+      {
+        "operator_id": "INV_M0_STATE_MEAN_REVERSION",
+        "status": "PARKED_ALTERNATE_NOT_DECISION_SURFACE",
+        "reason": "Keeps effective DOF at 2; promotion requires new slice_id and search-budget charge"
+      },
+      {
+        "operator_id": "INV_M1_STATE_MEAN_REVERSION",
+        "status": "PARKED_ALTERNATE_NOT_DECISION_SURFACE",
+        "reason": "Keeps effective DOF at 2; promotion requires new slice_id and search-budget charge"
+      }
+    ]
+  },
+  "applicability_taxonomy": {
+    "statuses": [
+      "W3_INELIGIBLE",
+      "NOT_APPLICABLE",
+      "APPLICABLE_OBSERVED",
+      "APPLICABLE_UNOBSERVED"
+    ],
+    "definitions": {
+      "W3_INELIGIBLE": "Security not in PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1 date-local eligible set",
+      "NOT_APPLICABLE": "Economic non-claim for the node (e.g. inventory meaningless for pure services model); not missingness; not cash-drag narrative; not denominator deletion",
+      "APPLICABLE_OBSERVED": "Node applies and lawful PIT observation exists for operator inputs",
+      "APPLICABLE_UNOBSERVED": "Node applies but observation missing/invalid → ABSTAIN (selected=false, risky_weight=0)"
+    },
+    "coverage_cube_design": "Status-stratified counts only when later evaluated; this freeze defines axes, not PASS/FAIL gates",
+    "imputation": "FORBIDDEN"
+  },
+  "falsifiers": [
+    {
+      "falsifier_id": "F1_INVENTORY_OPERATOR_UNSTABLE",
+      "statement": "Under a later authorized charged development read, INV_DELTA_MEAN_REVERSION fails the preregistered fold-stability / association law on the inventory node"
+    },
+    {
+      "falsifier_id": "F2_MARGIN_OPERATOR_UNSTABLE",
+      "statement": "MARGIN_M1_STATE_MEAN_REVERSION fails preregistered fold-stability / association law on the margin node under full-W3 abstention burden"
+    },
+    {
+      "falsifier_id": "F3_THRESHOLD_RESCUE_REQUIRED",
+      "statement": "Kernel only appears useful after post-hoc threshold grid or outcome-driven operator search"
+    },
+    {
+      "falsifier_id": "F4_DENOMINATOR_REWRITE",
+      "statement": "Any evaluation path deletes non-observed rows from W3 denominator or uses coverage PASS/FAIL as eligibility rewrite"
+    },
+    {
+      "falsifier_id": "F5_QM_SMUGGLING",
+      "statement": "Any Q/M/residual-M/ROIC/Rule100 term enters the FTK kernel API or decision surface"
+    },
+    {
+      "falsifier_id": "F6_ASYMMETRY_CATASTROPHE",
+      "statement": "Later authorized asymmetry evaluation shows unacceptable downside/catastrophe burden relative to upside density under frozen comparators"
+    }
+  ],
+  "search_budget": {
+    "hard_material_trials_total": 3,
+    "material_trials_charged_this_slice": 0,
+    "material_trials_remaining": 3,
+    "one_standard_error_preference": true,
+    "simplicity_preference_when_tie": "LOWER_EFFECTIVE_DOF",
+    "free_threshold_grid": "FORBIDDEN",
+    "rescue_redesign_without_new_slice_id": "FORBIDDEN",
+    "notes": "This freeze charges 0 material trials. Later charged development read must debit the budget before any material empirical trial."
+  },
+  "label_custody_plan": {
+    "join_authorized": false,
+    "join_performed": false,
+    "outcome_inspected": false,
+    "horizons": {
+      "sensing_horizon": "NEXT_PIT_STRUCTURED_TRANSITION",
+      "payoff_horizon_primary": "BLOCKED_UNSET",
+      "payoff_horizon_secondary": "BLOCKED_UNSET"
+    },
+    "right_tail_definition": "BLOCKED_UNSET",
+    "catastrophe_definition": "BLOCKED_UNSET",
+    "planned_pack_paths": {
+      "development_label_pack_plan": "data/prebreakout/compiled/ao_ftk_0_label_custody/development_label_pack.plan.json",
+      "prospective_label_pack_plan": "data/prebreakout/compiled/ao_ftk_0_label_custody/prospective_label_pack.plan.json"
+    },
+    "hash_procedure": "Content-address planned pack schema + row-key set + decision-date list + label-source receipt; seal as SEALED_UNJOINED only after owner binds numeric cuts; never open/join in AO-FTK-0",
+    "seal_status": "PLAN_ONLY_UNSEALED"
+  },
+  "opportunity_kernel_v1_fields": {
+    "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+    "entry_mode": "CONTINUATION",
+    "observable_representation": "inventory economic-level lag-1 delta + operating-margin M1 continuous state (1-2 DOF)",
+    "target": "next-PIT inventory normalization direction and/or next-PIT operating-margin direction (sensing); payoff deferred",
+    "horizon": "NEXT_PIT_STRUCTURED_TRANSITION for sensing; payoff horizon BLOCKED_UNSET",
+    "rationale_class": "MECHANISTIC",
+    "simple_comparator": "PIT_EQUAL_WEIGHT_FULL_W3 when later evaluated",
+    "upside_channel": "conditional state transition into economically improved inventory/margin regime prior to market recognition",
+    "downside_failure_mode": "false transition signal; margin/inventory noise; catastrophe left-tail under later asymmetry gates",
+    "hard_falsifier": "F1-F6 as frozen",
+    "applicability_abstention": "W3_INELIGIBLE | NOT_APPLICABLE | APPLICABLE_OBSERVED | APPLICABLE_UNOBSERVED→ABSTAIN",
+    "pit_source_contract": "ADMITTED_ECONPHYSICS_S0 + IMMUTABLE_W3_DATE_LOCAL_AUTHORITY",
+    "search_cost_trial_identity": "material_trial = one charged empirical evaluation debit against search_budget.material_trials_remaining"
+  },
+  "stop_lines": [
+    "NEW_WINNER_OR_FUTURE_OUTCOME_OPEN",
+    "W6_LOCKBOX_OR_PROSPECTIVE_OUTCOME_JOIN",
+    "OK_SBI_S2_OR_QM_TROPHY",
+    "INVENT_ROIC_OR_Q_GF",
+    "RULE100_FEATURE_STORE_BRIDGE",
+    "TICKER_ENTITY_PERMNO_FALLBACK",
+    "SPEND_Q_AMENDMENT_INSIDE_AO_FTK_0",
+    "FILL_OK_SBI_20_GATES_FOR_OPTICS",
+    "SECOND_MATERIAL_REDESIGN_WITHOUT_NEW_SLICE_ID",
+    "K_TUNING_PORTFOLIO_OPTIMIZATION_CAPITAL_PAPER",
+    "PARENT_CHILD_MUTATION_A2_REQUERY",
+    "VSB_UNPARK",
+    "TREAT_DIAGNOSTIC_SURVIVORS_AS_ALPHA",
+    "FULL_ENDGAME_REWRITE",
+    "FOURTH_EVIDENCE_CLOCK"
+  ],
+  "exit_criteria_for_later_charged_development_read": [
+    "Owner issues new slice_id authorizing charged development read",
+    "Label cuts bound or explicitly deferred with BLOCKED_UNSET retained",
+    "Search budget debited before first material trial",
+    "Full-W3 abstention law unchanged",
+    "No Q/M revival; no provider acquisition unless separately authorized",
+    "outcome_open_authorized remains false until explicit carve-out"
+  ],
+  "forbidden_this_turn": [
+    "outcome_join",
+    "outcome_open",
+    "provider_capture",
+    "q_amendment_spend",
+    "ok_sbi_gate_fill",
+    "ok_sbi_s2",
+    "qm_revival",
+    "capital_production",
+    "w6_access",
+    "rule100_bridge"
+  ],
+  "constitution": "Q/M is terminal under current admitted custody. AO-FTK-0 freezes a sparse inventory/margin transition basis only. Full W3 and abstention remain law. No outcomes, no capital, no Q/M composites, no invented fundamentals. Success is a preregistered pre-open contract — not alpha, not a leaderboard, not gate-filling theater."
+}
