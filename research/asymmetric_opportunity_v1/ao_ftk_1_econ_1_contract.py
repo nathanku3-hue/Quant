@@ -1,7 +1,7 @@
 """AO-FTK-1-ECON-1 economic / asymmetry estimand freeze helpers.
 
-Outcome-blind form freeze + transition-position owner bind finalize only.
-No economic L5, no trial debit, no label join, no evaluation, no alpha claim.
+Outcome-blind form freeze + transition-position owner bind + Trial 2 receipts.
+Fail-closed without economic L5 authorization. No AO-FTK-2 / capital / alpha.
 """
 
 from __future__ import annotations
@@ -31,6 +31,7 @@ AUTHORIZED_PHASES = frozenset(
         "ECONOMIC_ESTIMAND_FREEZE",
         "OWNER_BIND_TRANSITION_POSITION",
         "OWNER_BIND_TRANSITION_POSITION_PLUS_ECON_FREEZE_FINALIZE",
+        "L5_COMPLETE_WAITING_OWNER_L7",
     }
 )
 RECOGNIZED_STATUSES = frozenset(
@@ -41,6 +42,8 @@ RECOGNIZED_STATUSES = frozenset(
         "HOLD_RECOMMENDED",
         "ECON_FREEZE_PASS_L5_READY",
         "ECON_BIND_WAITING_OWNER_NUMERICS",
+        "ECON_L5_COMPLETE_WAITING_OWNER_L7",
+        "L5_COMPLETE_WAITING_OWNER_L7",
     }
 )
 RECOGNIZED_NEXT_PHASES = frozenset(
@@ -49,6 +52,13 @@ RECOGNIZED_NEXT_PHASES = frozenset(
         "WAITING_OWNER_NUMERICS",
         "HOLD_EVIDENCE",
         "BLOCKED_MISSING_AUTHORITY",
+        "L7_ROADMAP_DECISION",
+    }
+)
+POST_TRIAL2_STATUSES = frozenset(
+    {
+        "ECON_L5_COMPLETE_WAITING_OWNER_L7",
+        "L5_COMPLETE_WAITING_OWNER_L7",
     }
 )
 BIND_VERDICTS = frozenset(
@@ -122,7 +132,8 @@ D7_RULE_STATUSES = frozenset(
 
 CONSTITUTION = (
     "Stamp FTK as TRANSITION_POSITION. Bind one horizon and the economic laws "
-    "without invention or peeking. Clear L5 blockers or HOLD. Debit nothing. Run nothing."
+    "without invention or peeking. One economic trial after L5 auth. L6 first-fail. "
+    "L7 stop. No FTK-2 / capital / alpha claim."
 )
 
 # Sentinel values that mean "not bound" for L5 readiness (must not invent).
@@ -309,22 +320,38 @@ def evaluate_l5_readiness(doc: dict[str, Any]) -> dict[str, Any]:
     ) and d7.get("invented_this_freeze") is not True
     add("D7", d7_ok, f"rule_status={d7_status!r}")
 
-    e11_ok = (
-        e11.get("bytes_joined") is False
-        and e11.get("join_authorized") is False
-        and "ao_ftk_1_econ_1_label_custody" in str(e11.get("identity_path") or "")
-    )
-    add("E11_labels_unjoined", e11_ok, f"bytes_joined={e11.get('bytes_joined')}")
+    post_trial = doc.get("status") in POST_TRIAL2_STATUSES or doc.get(
+        "authorized_phase"
+    ) == "L5_COMPLETE_WAITING_OWNER_L7"
+    if post_trial:
+        e11_ok = (
+            e11.get("bytes_joined") is True
+            and "ao_ftk_1_econ_1_label_custody" in str(e11.get("identity_path") or "")
+        )
+        add("E11_labels_unjoined", e11_ok, f"post-trial bytes_joined={e11.get('bytes_joined')}")
+    else:
+        e11_ok = (
+            e11.get("bytes_joined") is False
+            and e11.get("join_authorized") is False
+            and "ao_ftk_1_econ_1_label_custody" in str(e11.get("identity_path") or "")
+        )
+        add("E11_labels_unjoined", e11_ok, f"bytes_joined={e11.get('bytes_joined')}")
 
     dof_ok = surface.get("effective_decision_dof") == EFFECTIVE_DECISION_DOF
     add("surface_dof_2", dof_ok, f"dof={surface.get('effective_decision_dof')}")
 
-    l5_false = (
-        doc.get("l5_authorized") is False
-        and doc.get("economic_l5_authorized") is False
-        and doc.get("l5_auto_open") is False
-    )
-    add("l5_authorized_false", l5_false, "l5 remains unauthorized this bind")
+    # Pre-auth bind checklist requires L5 still false. Post-trial docs flip auth;
+    # readiness for bind purposes treats post-trial as already authorized (skip gate).
+    if post_trial:
+        l5_gate_ok = doc.get("l5_auto_open") is False
+        add("l5_authorized_false", l5_gate_ok, "post-trial: auto_open remains false")
+    else:
+        l5_false = (
+            doc.get("l5_authorized") is False
+            and doc.get("economic_l5_authorized") is False
+            and doc.get("l5_auto_open") is False
+        )
+        add("l5_authorized_false", l5_false, "l5 remains unauthorized this bind")
 
     fc_ok = bool(fail_closed) and all(
         fail_closed.get(k) == "FAIL_CLOSED"
@@ -358,7 +385,8 @@ def evaluate_l5_readiness(doc: dict[str, Any]) -> dict[str, Any]:
         "l5_ready": l5_ready,
         "checklist": items,
         "blockers_remaining": blockers,
-        "economic_l5_authorized": False,  # never auto
+        "economic_l5_authorized": bool(doc.get("economic_l5_authorized")),
+        "post_trial": post_trial,
     }
 
 
@@ -507,6 +535,10 @@ def _e_block_errors(e_key: str, block: Any) -> list[str]:
 def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
     """Return schema / firewall errors (empty = valid economic freeze)."""
     errors: list[str] = []
+    post_trial = (
+        doc.get("status") in POST_TRIAL2_STATUSES
+        or doc.get("authorized_phase") == "L5_COMPLETE_WAITING_OWNER_L7"
+    )
 
     if doc.get("schema_version") != SCHEMA_VERSION:
         errors.append(f"schema_version must be {SCHEMA_VERSION}")
@@ -521,28 +553,44 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
 
     if doc.get("authorized_phase") not in AUTHORIZED_PHASES:
         errors.append(
-            "authorized_phase must be ECONOMIC_ESTIMAND_FREEZE or OWNER_BIND_TRANSITION_POSITION*"
+            "authorized_phase must be ECONOMIC_ESTIMAND_FREEZE or OWNER_BIND_TRANSITION_POSITION* "
+            "or L5_COMPLETE_WAITING_OWNER_L7"
         )
     if doc.get("l7_route") != L7_ROUTE:
         errors.append(f"l7_route must be {L7_ROUTE}")
     if doc.get("second_l5") != "NOT_AUTHORIZED":
         errors.append("second_l5 must be NOT_AUTHORIZED")
-    if doc.get("l5_authorized") is not False:
-        errors.append("l5_authorized must be false")
     if doc.get("l5_auto_open") is not False:
         errors.append("l5_auto_open must be false")
-    if doc.get("economic_l5_authorized") is not False:
-        errors.append("economic_l5_authorized must be false")
-    if doc.get("runnable_evaluation") is not False:
-        errors.append("runnable_evaluation must be false")
     if doc.get("capital_authority") is not False:
         errors.append("capital_authority must be false")
     if doc.get("financial_alpha_evidence") != 0:
         errors.append("financial_alpha_evidence must be 0")
-    if doc.get("label_bytes_joined") is not False:
-        errors.append("label_bytes_joined must be false")
-    if doc.get("material_trials_charged_this_turn") != 0:
-        errors.append("material_trials_charged_this_turn must be 0")
+
+    if post_trial:
+        if doc.get("l5_authorized") is not True:
+            errors.append("post-trial l5_authorized must be true")
+        if doc.get("economic_l5_authorized") is not True:
+            errors.append("post-trial economic_l5_authorized must be true")
+        if doc.get("runnable_evaluation") is not False:
+            errors.append("post-trial runnable_evaluation must be false (one-shot spent)")
+        if doc.get("label_bytes_joined") is not True:
+            errors.append("post-trial label_bytes_joined must be true")
+        if doc.get("material_trials_charged_this_turn") not in (1,):
+            errors.append("post-trial material_trials_charged_this_turn must be 1")
+        if doc.get("next_phase") != "L7_ROADMAP_DECISION":
+            errors.append("post-trial next_phase must be L7_ROADMAP_DECISION")
+    else:
+        if doc.get("l5_authorized") is not False:
+            errors.append("l5_authorized must be false")
+        if doc.get("economic_l5_authorized") is not False:
+            errors.append("economic_l5_authorized must be false")
+        if doc.get("runnable_evaluation") is not False:
+            errors.append("runnable_evaluation must be false")
+        if doc.get("label_bytes_joined") is not False:
+            errors.append("label_bytes_joined must be false")
+        if doc.get("material_trials_charged_this_turn") != 0:
+            errors.append("material_trials_charged_this_turn must be 0")
 
     # Transition-position clock (required after bind turn)
     clock = doc.get("economic_clock")
@@ -622,10 +670,16 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
             errors.append("E11 identity_path must point at econ_1 custody")
         bytes_joined = e11_value.get("bytes_joined", e11.get("bytes_joined"))
         join_authorized = e11_value.get("join_authorized", e11.get("join_authorized"))
-        if bytes_joined is not False:
-            errors.append("E11.bytes_joined must be false")
-        if join_authorized is not False:
-            errors.append("E11.join_authorized must be false")
+        if post_trial:
+            if bytes_joined is not True:
+                errors.append("post-trial E11.bytes_joined must be true")
+            if join_authorized is not True:
+                errors.append("post-trial E11.join_authorized must be true")
+        else:
+            if bytes_joined is not False:
+                errors.append("E11.bytes_joined must be false")
+            if join_authorized is not False:
+                errors.append("E11.join_authorized must be false")
 
     dmap = doc.get("d6_d9_mapping")
     if not isinstance(dmap, dict):
@@ -661,20 +715,31 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
             errors.append("next_debit must be 1")
         if plan.get("remaining_after_trial2") != 1:
             errors.append("remaining_after_trial2 must be 1")
-        if plan.get("debit_this_turn") is not False and plan.get("debit_this_turn") != "FORBIDDEN":
-            errors.append("debit_this_turn must be false/FORBIDDEN")
+        if post_trial:
+            if plan.get("debit_this_turn") is not True:
+                errors.append("post-trial debit_this_turn must be true")
+        else:
+            if plan.get("debit_this_turn") is not False and plan.get("debit_this_turn") != "FORBIDDEN":
+                errors.append("debit_this_turn must be false/FORBIDDEN")
         if plan.get("debit_trigger") != "ECONOMIC_L5_AUTHORIZATION_RECEIPT":
             errors.append("debit_trigger must be ECONOMIC_L5_AUTHORIZATION_RECEIPT")
 
     if doc.get("next_phase") not in RECOGNIZED_NEXT_PHASES:
         errors.append(
             "next_phase must be WAIT_OWNER_L5_ECONOMIC | WAITING_OWNER_NUMERICS | "
-            "HOLD_EVIDENCE | BLOCKED_MISSING_AUTHORITY"
+            "HOLD_EVIDENCE | BLOCKED_MISSING_AUTHORITY | L7_ROADMAP_DECISION"
         )
 
     readiness = evaluate_l5_readiness(doc)
     blockers = doc.get("l5_blockers")
-    if readiness["l5_ready"]:
+    if post_trial:
+        if not readiness["l5_ready"]:
+            errors.append("post-trial checklist must remain green on bound fields")
+        if not isinstance(blockers, list):
+            errors.append("l5_blockers must be a list")
+        if doc.get("status") not in POST_TRIAL2_STATUSES:
+            errors.append("post-trial status must be ECON_L5_COMPLETE_WAITING_OWNER_L7")
+    elif readiness["l5_ready"]:
         # when fully ready, blockers may be empty or only residual L5 auth note
         if not isinstance(blockers, list):
             errors.append("l5_blockers must be a list")
@@ -704,8 +769,12 @@ def validate_econ_freeze(doc: dict[str, Any]) -> list[str]:
             errors.append("owner_bind.l5_ready true but checklist not green")
         if owner_bind.get("l5_ready") is False and readiness["l5_ready"]:
             errors.append("owner_bind.l5_ready false but checklist is green")
-        if owner_bind.get("material_trials_charged_this_turn") not in (0, None):
-            errors.append("owner_bind must not charge material trials")
+        if post_trial:
+            if owner_bind.get("material_trials_charged_this_turn") not in (1,):
+                errors.append("post-trial owner_bind material_trials_charged_this_turn must be 1")
+        else:
+            if owner_bind.get("material_trials_charged_this_turn") not in (0, None):
+                errors.append("owner_bind must not charge material trials")
 
     if not isinstance(doc.get("stop_lines"), list) or not doc.get("stop_lines"):
         errors.append("stop_lines must be a non-empty list")

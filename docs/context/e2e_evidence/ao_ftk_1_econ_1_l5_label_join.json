@@ -1,0 +1,53 @@
+{
+  "FORWARD_R_NET_materialized": false,
+  "auth_receipt_id": "AO_FTK_1_ECON_1_L5_AUTHORIZATION",
+  "constitution": "Accept draft binds. One transition-position economic trial. Same return law both sides. ΔJ>0 is a screen not capital. L6 first-fail. L7 stop. No slice 2.",
+  "content_address": "2b7decebfc5a68ceea9f53d63e6833fca0ee101146f1e7747c0eb762e2914990",
+  "debit_receipt_id": "AO_FTK_1_ECON_1_L5_TRIAL_DEBIT",
+  "estimand_scope": {
+    "E2": "OWNER_BOUND",
+    "E3": "OWNER_BOUND",
+    "H": 63,
+    "full_w3_ledgers": true,
+    "note": "R_net unobserved without Full-W3 market custody"
+  },
+  "financial_alpha_evidence": 0,
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.hash_procedure.json",
+  "identity_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.identity.json",
+  "join_authorized": true,
+  "join_performed": true,
+  "joined_at_utc": "2026-08-11T20:33:56Z",
+  "joined_jsonl_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_labels.jsonl",
+  "joined_manifest_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.joined.manifest.json",
+  "label_pack_type": "ECONOMIC",
+  "label_row_count": 1,
+  "market_probe": {
+    "admitted_market_date_count": 548,
+    "admitted_market_date_max": "2026-06-05",
+    "admitted_market_date_min": "2024-05-01",
+    "admitted_market_dir": "data/aov0/historical/raw/market_productquery_a1_104_20240501_20260605",
+    "admitted_market_part_count": 28,
+    "admitted_market_security_count": 104,
+    "close_to_close_available_for_admitted_market": true,
+    "close_to_close_available_for_full_w3": false,
+    "coverage_gap": {
+      "market_securities": 104,
+      "note": "AOV historical market custody covers ~104 primary securities, not Full-W3 (~5k). Economic estimand requires Full-W3 PIT-EW under same return law; cannot fabricate Full-W3 returns.",
+      "w3_eligible": 5260
+    },
+    "flag": "FULL_W3_MARKET_CUSTODY_MISSING_FOR_ECONOMIC_ESTIMAND",
+    "full_w3_market_total_return_admitted": false,
+    "return_convention_available_for_admitted_market": "SPT_TOTAL_RETURN",
+    "w3_authority_dir": "data/prebreakout/compiled/w3_real_authority_20250324_20260807",
+    "w3_date_packet_count": 346,
+    "w3_eligible_count_sample": 5260,
+    "w3_sample_date": "2025-03-24"
+  },
+  "pack_scope": "ECON_ONLY",
+  "parent_program": "AO-FTK-1-20260812",
+  "receipt_id": "AO_FTK_1_ECON_1_L5_LABEL_JOIN",
+  "schema_version": "ao_ftk_1_econ_1_l5_label_join_v1",
+  "sensing_pack_forbidden": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody",
+  "sensing_pack_reuse": false
+}

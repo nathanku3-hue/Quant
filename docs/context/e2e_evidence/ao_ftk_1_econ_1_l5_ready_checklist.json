@@ -1,0 +1,148 @@
+{
+  "ACCEPT_DRAFT": true,
+  "binds": {
+    "CAT": 0.1,
+    "D7": "OUT_OF_SCOPE",
+    "E2": "OWNER_BOUND",
+    "E3": "OWNER_BOUND",
+    "H": 63,
+    "INTERPRETATION": "POSITIVE_NET_EDGE_SCREEN",
+    "K": 20,
+    "RT": 0.9,
+    "delta_J": 0.0
+  },
+  "blockers_remaining": [],
+  "checklist": [
+    {
+      "detail": "economic_clock_class='TRANSITION_POSITION'",
+      "id": "economic_clock_class",
+      "pass": true
+    },
+    {
+      "detail": "H_VALUE=63",
+      "id": "H_VALUE",
+      "pass": true
+    },
+    {
+      "detail": "value_owner='OWNER_BOUND'",
+      "id": "E2_price_return",
+      "pass": true
+    },
+    {
+      "detail": "value_owner='OWNER_BOUND'",
+      "id": "E3_lag_cost",
+      "pass": true
+    },
+    {
+      "detail": "RIGHT_TAIL_PERCENTILE=0.9",
+      "id": "E4_percentile",
+      "pass": true
+    },
+    {
+      "detail": "CATASTROPHE_PERCENTILE=0.1",
+      "id": "E5_percentile",
+      "pass": true
+    },
+    {
+      "detail": "delta_J_required=0.0",
+      "id": "E6_delta_J",
+      "pass": true
+    },
+    {
+      "detail": "K=20; score_map_ok=True",
+      "id": "E7_K",
+      "pass": true
+    },
+    {
+      "detail": "rule_status='EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL'",
+      "id": "D7",
+      "pass": true
+    },
+    {
+      "detail": "bytes_joined=False",
+      "id": "E11_labels_unjoined",
+      "pass": true
+    },
+    {
+      "detail": "dof=2",
+      "id": "surface_dof_2",
+      "pass": true
+    },
+    {
+      "detail": "l5 remains unauthorized this bind",
+      "id": "l5_authorized_false",
+      "pass": true
+    },
+    {
+      "detail": "fail-closed guards present",
+      "id": "fail_closed_guards",
+      "pass": true
+    },
+    {
+      "detail": "not_fast_trading=True; not_ge_hodl=True",
+      "id": "clock_exclusions",
+      "pass": true
+    }
+  ],
+  "constitution": "Accept draft binds. One transition-position economic trial. Same return law both sides. ΔJ>0 is a screen not capital. L6 first-fail. L7 stop. No slice 2.",
+  "date": "2026-08-12",
+  "economic_l5_authorized": false,
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "l5_auto_open": false,
+  "l5_ready": true,
+  "owner_attachment_present": true,
+  "parent_program": "AO-FTK-1-20260812",
+  "prompt_checklist": [
+    {
+      "item": "economic_clock_class",
+      "status": "PASS"
+    },
+    {
+      "item": "H_VALUE",
+      "status": "PASS"
+    },
+    {
+      "item": "E2 OWNER_BOUND + symmetry law",
+      "status": "PASS"
+    },
+    {
+      "item": "E3 lag=1 cost=20bps RT",
+      "status": "PASS"
+    },
+    {
+      "item": "E4 p=0.90",
+      "status": "PASS"
+    },
+    {
+      "item": "E5 q=0.10",
+      "status": "PASS"
+    },
+    {
+      "item": "E6 delta_J=0.0 POSITIVE_NET_EDGE_SCREEN",
+      "status": "PASS"
+    },
+    {
+      "item": "E7 K=20",
+      "status": "PASS"
+    },
+    {
+      "item": "D7 OUT_OF_SCOPE",
+      "status": "PASS"
+    },
+    {
+      "item": "economic label identity+hash frozen; joined=false",
+      "status": "PASS"
+    },
+    {
+      "item": "dof=2 pins match L4",
+      "status": "PASS"
+    },
+    {
+      "item": "fail-closed guards present",
+      "status": "PASS"
+    }
+  ],
+  "receipt_id": "AO_FTK_1_ECON_1_L5_READY_CHECKLIST",
+  "schema_version": "ao_ftk_1_econ_1_l5_ready_checklist_v1",
+  "verdict": "PASS_L5_READY"
+}

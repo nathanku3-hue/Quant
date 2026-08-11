@@ -1,21 +1,12 @@
 {
-  "schema_version": "ao_ftk_1_econ_1_label_pack_hash_procedure_v1",
+  "LABEL_BYTES_JOINED": true,
   "LABEL_HASH_PROCEDURE_FROZEN": true,
-  "LABEL_BYTES_JOINED": false,
-  "join_authorized": false,
-  "join_performed": false,
-  "outcome_inspected": false,
-  "seal_name": "SEALED_UNJOINED",
-  "seal_status": "IDENTITY_AND_HASH_FROZEN_UNJOINED",
-  "freeze_id": "AO-FTK-1-ECON-1",
-  "parent_program": "AO-FTK-1-20260812",
-  "hash_algorithm": "sha256",
-  "identity_artifact": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.identity.json",
   "canonicalization": {
     "encoding": "utf-8",
     "json_serialization": "sort_keys=true, separators=(',', ':'), ensure_ascii=false",
     "notes": "Hash planned identity + procedure inputs only. Do not hash joined outcome bytes (none exist this turn)."
   },
+  "content_address": "2b7decebfc5a68ceea9f53d63e6833fca0ee101146f1e7747c0eb762e2914990",
   "content_address_inputs": [
     "pack_schema_id",
     "row_key_set_definition",
@@ -29,9 +20,13 @@
     "description": "Decision-date list is content-addressed at economic L5 join time from admitted W3-eligible as-of grid under FTK-0 PIT lag law; not enumerated or joined this turn.",
     "status": "PLAN_ONLY_UNMATERIALIZED"
   },
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "hash_algorithm": "sha256",
+  "identity_artifact": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.identity.json",
+  "join_authorized": true,
   "join_gate": {
-    "fail_closed_when_economic_l5_false": true,
     "economic_l5_authorized_default": false,
+    "fail_closed_when_economic_l5_false": true,
     "requires": [
       "owner economic L5 authorization receipt",
       "material trial debit of exactly 1 recorded under that receipt",
@@ -39,6 +34,14 @@
       "E1–E3 / E4–E7 owner numerics bound or explicitly waived with written law",
       "join_authorized flipped true only under that receipt"
     ]
+  },
+  "join_performed": true,
+  "notes": "Hash procedure frozen at AO-FTK-1-ECON-1 freeze. Join FORBIDDEN until economic L5_AUTHORIZE. Distinct from sensing pack hash procedure.",
+  "outcome_inspected": false,
+  "parent_program": "AO-FTK-1-20260812",
+  "planned_joined_paths_if_later_authorized": {
+    "economic_labels_parquet": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_labels.parquet",
+    "note": "Path reserved; file must not exist until economic L5 join. Presence of joined parquet without economic L5 receipt is a custody defect."
   },
   "procedure": [
     "1. Load economic_label_pack.identity.json (LABEL_IDENTITY_FROZEN=true).",
@@ -49,9 +52,7 @@
     "6. Seal name = SEALED_UNJOINED only while identity frozen and bytes unjoined.",
     "7. Refuse join/open unless separate owner economic L5 authorization receipt exists."
   ],
-  "planned_joined_paths_if_later_authorized": {
-    "economic_labels_parquet": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_labels.parquet",
-    "note": "Path reserved; file must not exist until economic L5 join. Presence of joined parquet without economic L5 receipt is a custody defect."
-  },
-  "notes": "Hash procedure frozen at AO-FTK-1-ECON-1 freeze. Join FORBIDDEN until economic L5_AUTHORIZE. Distinct from sensing pack hash procedure."
+  "schema_version": "ao_ftk_1_econ_1_label_pack_hash_procedure_v1",
+  "seal_name": "SEALED_JOINED_SCHEMA_RNET_UNOBSERVED",
+  "seal_status": "BYTES_JOINED_SCHEMA_ONLY"
 }

@@ -9,156 +9,73 @@ METHOD_CONSTITUTION      = docs/architecture/alpha_scientific_method_v1.md
 LOOP_CLI                 = python scripts/print_research_loop_state.py
 
 LINEAGE_BRANCH           = codex/pit-source-authority-1
-COMMIT_BASE              = 6045d39ce6649cdb8ca4544af30d4a70ce0fc075
 WORKTREE                 = E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e
 PUBLIC_MAIN              = NON_AUTHORITY_UNTIL_MERGE
-CUSTODY_FREEZE           = docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json
-ROADMAP_AUTHORITY        = docs/architecture/aov_endgame_generalization_spec_current.md
-RUNTIME_AUTHORITY        = docs/context/gv_endgame_authority_current.md
 ```
 
 ## Product vs research
 
 ```text
 ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
-ACTIVE_BASIS_AUTHORITY   = AO-K0A / OrthogonalizationContractV1 / NO_EMPIRICAL_RESULT
-ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-ECON-1 / BIND_COMPLETE_WAITING_NUMERICS / TRANSITION_POSITION / NO_WORKER
+ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-ECON-1 / L5_COMPLETE_WAITING_OWNER_L7 / TRANSITION_POSITION / NO_WORKER
 AO_FTK_0_STATUS          = CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER
-AO_FTK_1_STATUS          = L7_SELECTED (LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL) / sensing L5 spent / charged=1 remaining=2 / NO_WORKER
-AO_FTK_1_ECON_1_STATUS   = BIND_COMPLETE / WAITING_NUMERICS / clock=TRANSITION_POSITION / economic_l5=false / debit=0 / labels unjoined / NO_WORKER
+AO_FTK_1_STATUS          = ECON_1_L5_COMPLETE_WAITING_OWNER_L7 / sensing L5 spent / charged=2 remaining=1 / NO_WORKER
+AO_FTK_1_ECON_1_STATUS   = L5_COMPLETE_WAITING_OWNER_L7 / Trial 2 complete / first_fail=D2_DATA_OBSERVABLE / alpha=0 / NO_WORKER
 OK_SBI_0_STATUS          = S0_DESIGN_LOCKED_RELEASE_BLOCKED + Q_SOURCE_BLOCKED_TERMINAL (PARKED)
 CAPITAL_ALPHA_PATH       = CLOSED
 FINANCIAL_ALPHA_EVIDENCE = 0
 ```
 
-## Q / gates
-
-```text
-QSourceContractV1        = Q_SOURCE_BLOCKED_TERMINAL
-  docs/architecture/q_source_contract_v1.md
-bind_slice               = OK-SBI-0-S0-Q-SOURCE-BIND (audited 2026-08-12)
-q_source_binding_hash    = BLOCKED_UNSET
-q_amendment_cycles_used  = 0
-runnable_evaluation      = false
-blocked_field_count      = 20
-OK-SBI-0-DEV-OPEN-1      = NOT_ISSUED
-OK_SBI_S2                = NOT_AUTHORIZED
-BLOCKED_UNSET            = official non-failing state (no invented defaults)
-bind_attempt_evidence    = docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json
-qm_park_receipt          = docs/context/e2e_evidence/qm_track_parked_terminal_20260812.json
-ao_ftk_0_freeze          = docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json
-ao_ftk_0_preopen         = docs/context/e2e_evidence/ao_ftk_0_preopen_freeze_20260812.json
-ao_ftk_0_commit          = 6832066
-ao_ftk_1_l3_receipt      = docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json
-ao_ftk_1_l3_close        = docs/context/e2e_evidence/ao_ftk_1_20260812_l3_close.json
-ao_ftk_1_preflight       = docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json
-ao_ftk_1_l4_freeze       = docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json
-ao_ftk_1_l4_receipt      = docs/context/e2e_evidence/ao_ftk_1_20260812_l4_charged_slice_freeze.json
-ao_ftk_1_l4_close        = docs/context/e2e_evidence/ao_ftk_1_20260812_l4_close.json
-ao_ftk_1_l4_work_commit  = a3350f0
-ao_ftk_1_l5_work_commit  = 948471c
-ao_ftk_1_l5_l6_l7_close  = docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json
-ao_ftk_1_econ_1_freeze   = docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json
-ao_ftk_1_econ_1_receipt  = docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json
-ao_ftk_1_econ_1_bind     = docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json
-ao_ftk_1_l7_select       = docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_route_select.json
-```
-
-## AO-FTK-1-ECON-1 status (2026-08-12) — TRANSITION_POSITION BIND / WAITING_NUMERICS
+## AO-FTK-1-ECON-1 status (2026-08-12) — Trial 2 COMPLETE / L7 STOP
 
 ```text
 WORKER_STATUS         = CLOSED / NO_WORKER
-LONG_SESSION_CLOSE    = docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_close.json
-WORK_COMMIT           = 0350082
-BIND_VERDICT          = WAITING_NUMERICS
-TERMINAL_VERDICT      = ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS
-SESSION_PATH          = A_WAITING (long session empty attachment recheck)
-ECONOMIC_CLOCK        = TRANSITION_POSITION (not FAST_TRADING; not GE/HODL)
-L7_ROUTE              = LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL (machine-effective)
-PHASE_DONE            = OWNER_BIND_TRANSITION_POSITION (attachment still empty / template placeholders only)
-SURFACE_DOF           = 2 (unchanged; operator pins match parent L4)
-ECONOMIC_L5           = NOT_AUTHORIZED / l5_auto_open=false / l5_ready=false
-MATERIAL_TRIALS       = charged 1 / remaining 2 (this turn debit = 0)
-LABEL_BYTES_JOINED    = false (economic pack identity+hash only)
-FINANCIAL_ALPHA_EVIDENCE = 0
-PRIOR_FREEZE_COMMIT   = febd8e4
-PRIOR_BIND_COMMIT     = 9cb64c7
-OWNER_BIND_RECEIPT    = docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json
-LONG_SESSION_RECEIPT  = docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_empty_attachment.json
-NEXT                  = WAITING_OWNER_NUMERICS
-NEXT_WORKER           = OWNER_NUMERICS_OR_HOLD (not auto L5; not Trial 2)
+SESSION_PATH          = C_TRIAL2_COMPLETE
+OWNER_DECISION        = ACCEPT_DRAFT + L5_AUTHORIZE_ECONOMIC
+ECONOMIC_CLOCK        = TRANSITION_POSITION
+BINDS                 = H=63 RT=0.90 CAT=0.10 K=20 ΔJ=0.0 D7=OUT_OF_SCOPE E2/E3=OWNER_BOUND
+L5_READY              = true
+L5_RAN                = true
+TRIALS_AFTER          = charged=2 remaining=1
+FIRST_FAIL_LAYER      = D2_DATA_OBSERVABLE
+D9_INTERPRETATION     = POSITIVE_NET_EDGE_SCREEN
+ALPHA                 = 0
+AO_FTK_2              = NOT_OPENED
+L8                    = not executed
+NEXT                  = OWNER L7 route only
 ```
 
-### L5 readiness (after bind survey)
+### Receipts
 
 ```text
-[x] economic_clock_class = TRANSITION_POSITION
-[x] L7 route machine-effective
-[x] ECON freeze form PASS
-[ ] H_VALUE bound (single scalar; months→quarters class)
-[ ] E2 price/return INHERITED or OWNER_BOUND (not improvised)
-[ ] E3 lag/cost INHERITED or OWNER_BOUND
-[ ] E4/E5 percentiles bound
-[ ] E6 delta_J_required bound
-[ ] E7 K bound
-[ ] D7 inherited OR explicitly out of scope
-[x] E11 identity+hash frozen; join false
-[x] surface dof=2 pins match parent
-[x] l5_authorized still false
-[x] fail-closed guards still true
-[ ] separate L5_AUTHORIZE receipt issued
+owner_bind     = docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json
+l5_ready       = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_ready_checklist.json
+l5_auth        = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_authorization.json
+l5_debit       = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_trial_debit.json
+l5_join        = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_label_join.json
+l5_run         = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_run.json
+l6             = docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_layered_diagnosis.json
+l7             = docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_owner_packet.json
+machine_freeze = docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json
 ```
-
-### Owner attachment required for L5_READY
-
-```text
-H_VALUE                 = <single scalar consistent with TRANSITION_POSITION>
-RIGHT_TAIL_PERCENTILE   = <one p>
-CATASTROPHE_PERCENTILE  = <one q>
-K                       = <integer ≥ 1>
-delta_J_required        = <scalar>
-D7_MODE                 = INHERIT <path> | OUT_OF_SCOPE | UNSET
-E2_MODE                 = INHERIT <path> | OWNER_BOUND law | UNSET
-E3_MODE                 = INHERIT <path> | OWNER_BOUND law | UNSET
-```
-
-Without attachment worker must not invent. E2/E3 currently BLOCKED_UNSET (no FTK-ECON law). D7 BLOCKED_UNSET (no invent).
 
 ## Do now
 
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
-2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / Rule100 bridges / open OK-SBI S2.
-3. **AO-FTK-0 CLOSED** (NO_WORKER). Do not reopen as worker or open its outcomes.
-4. **AO-FTK-1 sensing L5/L6 CLOSED** @ `948471c` (debit 1 remaining 2). L7 route selected.
-5. **AO-FTK-1-ECON-1 BIND COMPLETE / WAITING_NUMERICS** — clock=TRANSITION_POSITION; form frozen; owner attachment empty; **No active worker. No Trial 2 debit. No economic join. No auto L5.**
-6. Owner next: provide bind attachment (H, RT%, catastrophe%, K, ΔJ) + E2/E3/D7 authority or written OUT_OF_SCOPE for D7 → then **separate** `L5_AUTHORIZE_ECONOMIC` | HOLD | STOP.
-7. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
+2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / open OK-SBI S2.
+3. **AO-FTK-1-ECON-1 Trial 2 COMPLETE** — owner L7 route only.
+4. Recommended owner routes: HOLD_EVIDENCE | STOP_TRACK | admit Full-W3 market custody (new slice) then separate auth for remaining trial.
+5. **No active worker. No FTK-2. No L8. No capital. alpha=0.**
 
 ## Do not
 
 ```text
-Q / M⊥ / Q+M⊥ trophy leaderboard as automatic next
-W6 open / new provider for Q invention / K tuning / capital
-AO-FTK-0 outcome open / reopen as worker
-auto L5 after economic freeze/bind / Trial 2 debit without economic L5 auth
-economic label join without economic L5 auth
-H grid / post-peek cut bind / invent D7 / invent price-lag-cost law
-borrow Breakout clock as FTK primary / GE multi-year primary for ECON-1
-adaptive transition exit search / DOF rewrite / third DOF / drop inventory
-open AO-FTK-2 / L8 now / Great Enterprise kernel inside ECON-1
-reuse sensing labels for economic estimand
-full endgame rewrite / fourth evidence clock
-treat public main as current authority
-claim financial_alpha_evidence > 0
+second economic eval / param grid / invent D7 / open AO-FTK-2 / L8 now
+claim financial_alpha_evidence > 0 / capital open / W6 open
+asymmetric return FTK vs W3 / reuse sensing labels for economic estimand
+borrow Breakout clock / GE multi-year primary / multi-debit
 ```
 
-## Phase briefs / handover
+## One-line constitution
 
-- **Stream handover (roadmap + dispatcher):** `docs/handover/stream_handover_roadmap_alignment_dispatcher_20260812.md`
-- AO-FTK-1-ECON-1 freeze: `docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.md`
-- AO-FTK-1-ECON-1 receipt: `docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json`
-- AO-FTK-1-ECON-1 owner bind: `docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json`
-- AO-FTK-1-ECON-1 close: `docs/context/e2e_evidence/ao_ftk_1_econ_1_close.json`
-- AO-FTK-1 L4 freeze: `docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.md`
-- AO-FTK-1 L5/L6/L7 close: `docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json`
-- Workspace root pointer: `STREAM_HANDOVER_20260812.md` / `AO-FTK-0_Worker_Prompt.md` — prefer lineage worktree docs.
+Accept draft binds. One transition-position economic trial. Same return law both sides. ΔJ>0 is a screen not capital. L6 first-fail. L7 stop. No slice 2.

@@ -1,33 +1,39 @@
-# AO-FTK-1-ECON-1 — Economic / Asymmetry Estimand Freeze + Transition-Position Bind
+# AO-FTK-1-ECON-1 — Economic / Asymmetry Estimand Freeze + Trial 2 Complete
 
 **Freeze ID:** `AO-FTK-1-ECON-1`  
 **Parent program:** `AO-FTK-1-20260812`  
 **Name:** `FTK_ECONOMIC_ASYMMETRY_FREEZE`  
-**Bind name:** `FTK_ECON1_TRANSITION_POSITION_BIND`  
+**Bind name:** `FTK_ECON1_ACCEPT_DRAFT_TRANSITION_POSITION_BIND`  
 **Date:** 2026-08-12  
-**Spec:** `v1.1`  
+**Spec:** `v1.0` (ACCEPT_DRAFT long session)  
 **Role:** `SHADOW_RESEARCH / RESEARCH_ONLY`  
-**Science mode:** `OUTCOME_BLIND_ECONOMIC_ASYMMETRY_FREEZE` + `OWNER_BIND_TRANSITION_POSITION`  
-**Status:** `ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS`  
-**Bind verdict:** `WAITING_NUMERICS`  
-**Authorized phase:** `OWNER_BIND_TRANSITION_POSITION`  
-**L7 route:** `LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL` (machine-effective)  
-**Economic L5 authorized:** `false`  
+**Science mode:** `OUTCOME_BLIND_ECONOMIC_ASYMMETRY_FREEZE` + `TRANSITION_POSITION_ECONOMIC`  
+**Status:** `ECON_L5_COMPLETE_WAITING_OWNER_L7`  
+**Bind verdict:** `PASS_L5_READY` (ACCEPT_DRAFT)  
+**Authorized phase:** `L5_COMPLETE_WAITING_OWNER_L7`  
+**Session path:** `C_TRIAL2_COMPLETE`  
+**L7 route:** `LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL` (machine-effective; Trial 2 spent)  
+**Economic L5 authorized:** `true` (one-shot spent)  
 **financial_alpha_evidence:** `0`  
-**Material trials charged this turn:** `0`  
+**Material trials after:** charged `2` / remaining `1`  
+**First fail layer:** `D2_DATA_OBSERVABLE` (Full-W3 market custody missing)  
 **Prior freeze commit:** `febd8e4`  
-**Prior sensing commit:** `948471c`
+**Prior sensing commit:** `948471c`  
+**Prior Path A:** `0350082` empty attachment
 
 Machine freeze: `docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json`  
-Owner bind receipt: `docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json`
+Owner bind receipt: `docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json`  
+L5 run: `docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_run.json`  
+L6: `docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_layered_diagnosis.json`  
+L7: `docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_owner_packet.json`
 
 ---
 
 ## Constitution
 
-> **Stamp FTK as TRANSITION_POSITION.**  
-> Bind one horizon and the economic laws without invention or peeking.  
-> Clear L5 blockers or HOLD. Debit nothing. Run nothing.
+> **Accept draft binds. One transition-position economic trial.**  
+> Same return law both sides. ΔJ>0 is a screen not capital.  
+> L6 first-fail. L7 stop. No slice 2.
 
 ---
 

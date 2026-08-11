@@ -1,67 +1,74 @@
 {
-  "schema_version": "ao_ftk_1_econ_1_label_pack_identity_v1",
+  "LABEL_BYTES_JOINED": true,
   "LABEL_IDENTITY_FROZEN": true,
-  "LABEL_BYTES_JOINED": false,
-  "join_authorized": false,
-  "join_performed": false,
-  "outcome_inspected": false,
-  "seal_status": "IDENTITY_AND_HASH_FROZEN_UNJOINED",
-  "pack_role": "ECONOMIC_LABEL_PACK",
-  "label_pack_type": "ECONOMIC",
-  "pack_schema_id": "AO_FTK_1_ECON_1_ECONOMIC_LABEL_PACK_SCHEMA_V1",
+  "economic_cuts": {
+    "catastrophe_definition": 0.1,
+    "delta_J_required": 0.0,
+    "payoff_horizon_primary": 63,
+    "right_tail_definition": 0.9
+  },
+  "economic_target_keys": [
+    {
+      "depends_on": [
+        "E1_H",
+        "E2_NET_RETURN",
+        "E3_LAG_COST"
+      ],
+      "note": "Concrete R_net columns materialize only after E1–E3 bound and economic L5 join",
+      "status": "SCHEMA_PLANNED_UNMATERIALIZED",
+      "target_id": "FORWARD_R_NET"
+    },
+    {
+      "depends_on": [
+        "E4_RIGHT_TAIL"
+      ],
+      "status": "SCHEMA_PLANNED_UNMATERIALIZED",
+      "target_id": "RIGHT_TAIL_INDICATOR"
+    },
+    {
+      "depends_on": [
+        "E5_CATASTROPHE"
+      ],
+      "status": "SCHEMA_PLANNED_UNMATERIALIZED",
+      "target_id": "CATASTROPHE_INDICATOR"
+    }
+  ],
+  "forbidden_reuse": {
+    "rule": "REUSE_SENSING_LABELS_FOR_ECONOMIC_ESTIMAND is a stop-line",
+    "sensing_pack_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/"
+  },
   "freeze_id": "AO-FTK-1-ECON-1",
-  "parent_program": "AO-FTK-1-20260812",
+  "join_authorized": true,
+  "join_performed": true,
+  "joined_artifact_paths": {
+    "economic_labels_jsonl": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_labels.jsonl",
+    "joined_manifest": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.joined.manifest.json"
+  },
+  "label_pack_type": "ECONOMIC",
   "notes": "Economic estimand pack identity frozen at AO-FTK-1-ECON-1. Distinct from sensing development pack. Bytes unjoined until separate economic L5 authorization.",
+  "outcome_inspected": false,
+  "pack_role": "ECONOMIC_LABEL_PACK",
+  "pack_schema_id": "AO_FTK_1_ECON_1_ECONOMIC_LABEL_PACK_SCHEMA_V1",
+  "parent_program": "AO-FTK-1-20260812",
   "row_key_set_definition": {
-    "description": "decision-date × security identity under full-W3 law for economic R_net outcomes",
-    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
-    "security_identity": "CIQSEC",
-    "ticker_entity_permno_fallback": "FORBIDDEN",
-    "decision_date_semantics": "PIT as-of decision date under conservative EOD publication/processing lag law inherited from FTK-0 primitives",
-    "missingness_action": "APPLICABLE_UNOBSERVED → ABSTAIN; no row deletion; no imputation",
     "applicability_statuses": [
       "W3_INELIGIBLE",
       "NOT_APPLICABLE",
       "APPLICABLE_OBSERVED",
       "APPLICABLE_UNOBSERVED"
-    ]
+    ],
+    "decision_date_semantics": "PIT as-of decision date under conservative EOD publication/processing lag law inherited from FTK-0 primitives",
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "description": "decision-date × security identity under full-W3 law for economic R_net outcomes",
+    "missingness_action": "APPLICABLE_UNOBSERVED → ABSTAIN; no row deletion; no imputation",
+    "security_identity": "CIQSEC",
+    "ticker_entity_permno_fallback": "FORBIDDEN"
   },
-  "economic_target_keys": [
-    {
-      "target_id": "FORWARD_R_NET",
-      "depends_on": ["E1_H", "E2_NET_RETURN", "E3_LAG_COST"],
-      "status": "SCHEMA_PLANNED_UNMATERIALIZED",
-      "note": "Concrete R_net columns materialize only after E1–E3 bound and economic L5 join"
-    },
-    {
-      "target_id": "RIGHT_TAIL_INDICATOR",
-      "depends_on": ["E4_RIGHT_TAIL"],
-      "status": "SCHEMA_PLANNED_UNMATERIALIZED"
-    },
-    {
-      "target_id": "CATASTROPHE_INDICATOR",
-      "depends_on": ["E5_CATASTROPHE"],
-      "status": "SCHEMA_PLANNED_UNMATERIALIZED"
-    }
-  ],
-  "economic_cuts": {
-    "payoff_horizon_primary": "OWNER_BLOCKED_UNSET",
-    "right_tail_definition": "OWNER_BLOCKED_UNSET",
-    "catastrophe_definition": "OWNER_BLOCKED_UNSET",
-    "delta_J_required": "OWNER_OR_CRO_BLOCKED_UNSET"
-  },
-  "joined_artifact_paths": null,
-  "forbidden_reuse": {
-    "sensing_pack_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/",
-    "rule": "REUSE_SENSING_LABELS_FOR_ECONOMIC_ESTIMAND is a stop-line"
-  },
+  "schema_version": "ao_ftk_1_econ_1_label_pack_identity_v1",
+  "seal_status": "IDENTITY_HASH_FROZEN_BYTES_JOINED_SCHEMA_ONLY",
   "source_receipt_lineage": {
     "admitted_sources_only": true,
-    "parent_l4_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
-    "parent_l5_run": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
-    "parent_l5_work_commit": "948471c",
     "econ_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
-    "w3_authority": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
     "forbidden_sources": [
       "W6 / winner labels / future outcomes for redesign",
       "Rule100 feature store / assembled Q",
@@ -69,6 +76,10 @@
       "invented ROIC / NOPAT / invested capital",
       "ticker/entity/permno fallback bridges",
       "post-peek economic cuts from sensing residuals"
-    ]
+    ],
+    "parent_l4_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
+    "parent_l5_run": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+    "parent_l5_work_commit": "948471c",
+    "w3_authority": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1"
   }
 }

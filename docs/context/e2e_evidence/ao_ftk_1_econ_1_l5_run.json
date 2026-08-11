@@ -1,0 +1,118 @@
+{
+  "ao_ftk_2": "NOT_OPENED",
+  "auth_receipt_id": "AO_FTK_1_ECON_1_L5_AUTHORIZATION",
+  "binds": {
+    "CAPITAL_MATERIALITY_FLOOR": "NOT_YET_GRANTED",
+    "CATASTROPHE_PERCENTILE": 0.1,
+    "D7": "OUT_OF_SCOPE",
+    "E2": "OWNER_BOUND",
+    "E3": "OWNER_BOUND",
+    "H": 63,
+    "INTERPRETATION": "POSITIVE_NET_EDGE_SCREEN",
+    "K": 20,
+    "RIGHT_TAIL_PERCENTILE": 0.9,
+    "delta_J_required": 0.0
+  },
+  "capital_authority": false,
+  "completed_at_utc": "2026-08-11T20:33:56Z",
+  "constitution": "Accept draft binds. One transition-position economic trial. Same return law both sides. ΔJ>0 is a screen not capital. L6 first-fail. L7 stop. No slice 2.",
+  "debit_receipt_id": "AO_FTK_1_ECON_1_L5_TRIAL_DEBIT",
+  "economic_clock_class": "TRANSITION_POSITION",
+  "effective_decision_dof": 2,
+  "evaluation_count": 1,
+  "evaluation_status": "COMPLETED_BLOCKED_FULL_W3_MARKET_CUSTODY_MISSING",
+  "financial_alpha_evidence": 0,
+  "first_block_layer_hint": "D2_DATA_OBSERVABLE",
+  "forbidden_checks": {
+    "H_search": false,
+    "K_search": false,
+    "asymmetric_return_ftk_vs_w3": false,
+    "dof_change": false,
+    "named_winner_success": false,
+    "second_run": false,
+    "sensing_label_reuse": false,
+    "threshold_grid": false
+  },
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "join_receipt_id": "AO_FTK_1_ECON_1_L5_LABEL_JOIN",
+  "market_probe": {
+    "admitted_market_date_count": 548,
+    "admitted_market_date_max": "2026-06-05",
+    "admitted_market_date_min": "2024-05-01",
+    "admitted_market_dir": "data/aov0/historical/raw/market_productquery_a1_104_20240501_20260605",
+    "admitted_market_part_count": 28,
+    "admitted_market_security_count": 104,
+    "close_to_close_available_for_admitted_market": true,
+    "close_to_close_available_for_full_w3": false,
+    "coverage_gap": {
+      "market_securities": 104,
+      "note": "AOV historical market custody covers ~104 primary securities, not Full-W3 (~5k). Economic estimand requires Full-W3 PIT-EW under same return law; cannot fabricate Full-W3 returns.",
+      "w3_eligible": 5260
+    },
+    "flag": "FULL_W3_MARKET_CUSTODY_MISSING_FOR_ECONOMIC_ESTIMAND",
+    "full_w3_market_total_return_admitted": false,
+    "return_convention_available_for_admitted_market": "SPT_TOTAL_RETURN",
+    "w3_authority_dir": "data/prebreakout/compiled/w3_real_authority_20250324_20260807",
+    "w3_date_packet_count": 346,
+    "w3_eligible_count_sample": 5260,
+    "w3_sample_date": "2025-03-24"
+  },
+  "mode": "TRANSITION_POSITION_ECONOMIC",
+  "operators_frozen": [
+    "INV_DELTA_MEAN_REVERSION",
+    "MARGIN_M1_STATE_MEAN_REVERSION"
+  ],
+  "parent_program": "AO-FTK-1-20260812",
+  "payoff": {
+    "d9_interpretation": "POSITIVE_NET_EDGE_SCREEN",
+    "d9_screen": "NOT_EVALUABLE",
+    "delta_J": null,
+    "delta_J_required": 0.0,
+    "effect_sizes_recorded": false,
+    "reason_if_null": "Full-W3 market total-return / close custody not admitted for economic estimand; refuse invent; refuse asymmetric AOV-104 proxy as Full-W3 denominator."
+  },
+  "policy": {
+    "H_search": false,
+    "K": 20,
+    "K_search": false,
+    "abstention": "cash (risky_weight=0; remain in Full-W3 denominator)",
+    "asymmetric_return_series": false,
+    "dof_change": false,
+    "named_winner_success": false,
+    "score_inputs": "frozen continuous FTK node scores (INV lag-1 delta; MARGIN M1 state)",
+    "score_map": "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K",
+    "second_run": false,
+    "threshold_search": false
+  },
+  "promotion_authority": "NONE",
+  "receipt_id": "AO_FTK_1_ECON_1_L5_RUN",
+  "routing": "DOMAIN_LIMITED_EX_ANTE",
+  "run_id": "AO_FTK_1_ECON_1_L5_ECONOMIC_RUN_1",
+  "schema_version": "ao_ftk_1_econ_1_l5_economic_run_v1",
+  "second_run": false,
+  "selection": {
+    "K": 20,
+    "performed": false,
+    "reason_if_not": "Blocked before selection payoff: Full-W3 R_net unobservable"
+  },
+  "session_arithmetic": {
+    "decision_asof": "PIT as-of under conservative EOD law (FTK primitive spirit)",
+    "entry": "official close on first session after decision_asof + lag",
+    "execution_lag_sessions": 1,
+    "exit": "official close after exactly 63 sessions of exposure from entry",
+    "hold_sessions": 63,
+    "inclusive_session_arithmetic": "Let t0 = decision_asof session. Entry session tE = next trading session after t0 (lag=1). Exit session tX = trading session H_VALUE steps after tE (H=63). Holding-period return uses close[tX]/close[tE]-1 under chosen return series; costs 20 bps RT on selected only. Deterministic & frozen.",
+    "return_series_policy": "admitted market total-return if available for W3 custody; else CLOSE_TO_CLOSE flagged CLOSE_TO_CLOSE_NOT_DIVIDEND_COMPLETE",
+    "symmetry_law": "FTK selected book and Full-W3 PIT-EW use identical return law"
+  },
+  "stability": {
+    "minimum_fold_coverage": 0.2,
+    "minimum_fold_n": 30,
+    "minimum_supporting_temporal_folds": 3,
+    "note": "Identical fold law to sensing L5; not re-invented.",
+    "source": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+    "temporal_fold_count": 4,
+    "xs_holdout_is_corroboration_not_tuning": true
+  },
+  "surface_unchanged": true
+}

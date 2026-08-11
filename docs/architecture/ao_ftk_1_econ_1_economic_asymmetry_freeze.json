@@ -1,472 +1,126 @@
 {
-  "schema_version": "ao_ftk_1_econ_1_economic_asymmetry_freeze_v1",
-  "freeze_id": "AO-FTK-1-ECON-1",
-  "parent_program": "AO-FTK-1-20260812",
-  "name": "FTK_ECONOMIC_ASYMMETRY_FREEZE",
-  "date": "2026-08-12",
-  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
-  "science_mode": "OUTCOME_BLIND_ECONOMIC_ASYMMETRY_FREEZE",
-  "spec_version": "v1.1",
-  "status": "ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS",
-  "authorized_phase": "OWNER_BIND_TRANSITION_POSITION",
-  "owner_route": "LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL",
-  "l7_route": "LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL",
-  "l7_route_source": "OWNER_DISPATCH_OF_AO_FTK_1_ECON_1_WORKER_PROMPT",
-  "l7_machine_effective": true,
-  "second_l5": "NOT_AUTHORIZED",
-  "l5_authorized": false,
-  "economic_l5_authorized": false,
-  "l5_auto_open": false,
-  "runnable_evaluation": false,
-  "label_bytes_joined": false,
-  "material_trials_charged_this_turn": 0,
-  "parent_l4_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
-  "parent_l5_run": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
-  "parent_l5_work_commit": "948471c",
-  "parent_l4_work_commit": "a3350f0",
-  "parent_l7_owner_packet": "docs/context/e2e_evidence/ao_ftk_1_20260812_l7_owner_packet.json",
-  "prior_sensing": {
-    "l5_commit": "948471c",
-    "sensing_result": "BOTH_NODES_MEASURABLE_SIGNAL / PASS",
-    "material_trials_charged": 1,
-    "material_trials_remaining": 2,
-    "economic_cuts_after_l5": "BLOCKED_UNSET",
-    "note": "Context only — do not retune to sensing residuals"
+  "accept_draft_session": {
+    "L5_AUTHORIZE_ECONOMIC": true,
+    "owner_decision": "ACCEPT_DRAFT",
+    "path_target": "C_TRIAL2_COMPLETE",
+    "prior_path_a": "docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_empty_attachment.json",
+    "prior_state": "WAITING_OWNER_NUMERICS @ 0350082",
+    "session_name": "FTK_ECON1_LONG_SESSION_THROUGH_TRIAL2"
   },
-  "surface_inheritance": {
-    "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
-    "effective_decision_dof": 2,
-    "max_effective_decision_dof": 2,
-    "silent_one_dof_collapse": "FORBIDDEN",
-    "third_decision_dof": "FORBIDDEN",
-    "dof_rewrite_this_turn": "FORBIDDEN",
-    "representation": {
-      "inventory_state": "continuous lag-1 inventory economic-level delta",
-      "margin_state": "continuous operating-margin M1 state",
-      "sensing_preference": "continuous preferred over sign-only scores",
-      "inventory_decision_emit": "-sign(delta) via INV_DELTA_MEAN_REVERSION (sign is emission only; continuous retained for SNR)",
-      "note": "UNCHANGED from parent L4/L5; no representation redesign"
-    },
-    "operators": [
-      {
-        "operator_id": "INV_DELTA_MEAN_REVERSION",
-        "family_alias": "DELTA_MEAN_REVERSION",
-        "node_id": "INVENTORY_CHANNEL_STATE",
-        "decision_dof_slot": 1,
-        "status": "FROZEN_DECISION_SURFACE",
-        "formula": "prediction = -sign(inventory_economic_level[FQ0] - inventory_economic_level[FQ-1]); maps to next-PIT inventory economic delta sign",
-        "operator_bytes": "FROZEN",
-        "m1_bytes_mutation": null,
-        "threshold_grid": "FORBIDDEN_WITHOUT_SEARCH_BUDGET_CHARGE",
-        "fit_or_tuning": "FORBIDDEN",
-        "immutability_pin": "9434b4958beec33cebeb20a2747cae337b1ca56271a63c861badeb54890fdd85"
-      },
-      {
-        "operator_id": "MARGIN_M1_STATE_MEAN_REVERSION",
-        "family_alias": "M1_STATE_MEAN_REVERSION",
-        "node_id": "MARGIN_CASH_STATE",
-        "decision_dof_slot": 2,
-        "status": "FROZEN_DECISION_SURFACE",
-        "formula": "prediction = -frozen_M1_continuous_state_prediction(operating_margin node); M1 implementation bytes unchanged from S0 low-SNR continuous state; maps to next-PIT operating-margin direction",
-        "operator_bytes": "FROZEN",
-        "m1_bytes_mutation": "FORBIDDEN",
-        "threshold_grid": "FORBIDDEN_WITHOUT_SEARCH_BUDGET_CHARGE",
-        "fit_or_tuning": "FORBIDDEN",
-        "immutability_pin": "a464058d05abbe4a7da420598ed57a6d0b2033bb732521ecc5b5257471b633cd"
-      }
-    ],
-    "routing": "DOMAIN_LIMITED_EX_ANTE",
-    "operator_routing": {
-      "mode": "DOMAIN_LIMITED_EX_ANTE",
-      "rule": "Inventory node may emit only INV_DELTA_MEAN_REVERSION. Margin node may emit only MARGIN_M1_STATE_MEAN_REVERSION. No post-hoc operator search. No free composite trophy across nodes without new slice_id."
-    }
-  },
+  "alpha_capital": "NONE",
+  "ao_ftk_2": "NOT_AUTHORIZED",
   "authority_survey": {
-    "outcome_blind": true,
+    "bind_turn_date": "2026-08-12",
+    "bind_turn_reconfirmed": true,
     "findings": [
       {
-        "topic": "executable_wager_horizon_H",
-        "status": "NO_FTK_CANONICAL_EXECUTABLE_H",
-        "notes": "Sensing used NEXT_PIT_STRUCTURED_TRANSITION (structured transition sensing, not market wager horizon). No single authoritative FTK executable H in parent L4/L5. Breakout 10d/20d and {5d,10d,21d} grids FORBIDDEN as invent.",
         "disposition": "E1.H_VALUE=OWNER_BLOCKED_UNSET",
+        "notes": "Sensing used NEXT_PIT_STRUCTURED_TRANSITION (structured transition sensing, not market wager horizon). No single authoritative FTK executable H in parent L4/L5. Breakout 10d/20d and {5d,10d,21d} grids FORBIDDEN as invent.",
         "outcome_blind": true,
-        "residual_peek": false
+        "residual_peek": false,
+        "status": "NO_FTK_CANONICAL_EXECUTABLE_H",
+        "topic": "executable_wager_horizon_H"
       },
       {
-        "topic": "price_total_return_construction",
-        "status": "NO_FTK_ECON_BOUND_LAW",
+        "disposition": "E2=BLOCKED_UNSET L5 blocker",
+        "notes": "Repo has AOV/PIT total-return narrative; no FTK-ECON-1 bound price/return construction. Do not improvise.",
+        "outcome_blind": true,
         "paths_surveyed": [
           "docs/architecture/alpha_pit_data_api_v1.md (primary-security total return concepts)",
           "docs/architecture/aov_endgame_generalization_spec_current.md (CIQ primary-security total-return authority narrative)",
           "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json (economic cuts BLOCKED_UNSET)"
         ],
-        "notes": "Repo has AOV/PIT total-return narrative; no FTK-ECON-1 bound price/return construction. Do not improvise.",
-        "disposition": "E2=BLOCKED_UNSET L5 blocker",
-        "outcome_blind": true,
-        "residual_peek": false
+        "residual_peek": false,
+        "status": "NO_FTK_ECON_BOUND_LAW",
+        "topic": "price_total_return_construction"
       },
       {
-        "topic": "execution_lag_and_cost",
-        "status": "NO_FTK_ECON_BOUND_LAW",
+        "disposition": "E3=BLOCKED_UNSET L5 blocker",
+        "notes": "AOV defaults are not FTK economic estimand authority. free_fit=false. Do not invent.",
+        "outcome_blind": true,
         "paths_surveyed": [
           "research/aov0/contracts.py (execution_lag=one_bar default — AOV family, not FTK-ECON authority)",
           "docs/decision log.md (cost=turnover*0.0010 for other families)",
           "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json"
         ],
-        "notes": "AOV defaults are not FTK economic estimand authority. free_fit=false. Do not invent.",
-        "disposition": "E3=BLOCKED_UNSET L5 blocker",
-        "outcome_blind": true,
-        "residual_peek": false
+        "residual_peek": false,
+        "status": "NO_FTK_ECON_BOUND_LAW",
+        "topic": "execution_lag_and_cost"
       },
       {
-        "topic": "pit_ew_full_w3_comparator",
-        "status": "FORM_INHERITABLE",
+        "disposition": "E6/E8 form FROZEN; numeric cost path remains E3-dependent",
+        "notes": "Comparator form frozen as PIT EqualWeight(Full W3); implementation bytes bound later under economic L5 with cost law.",
+        "outcome_blind": true,
         "paths_surveyed": [
           "docs/architecture/aov_endgame_generalization_spec_current.md (PIT-EW full W3 opportunity comparator)",
           "research/benchmarks.py (build_pit_equal_weight_benchmark)",
           "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json (OpportunityKernelV1 + full-W3 / ABSTENTION)"
         ],
-        "notes": "Comparator form frozen as PIT EqualWeight(Full W3); implementation bytes bound later under economic L5 with cost law.",
-        "disposition": "E6/E8 form FROZEN; numeric cost path remains E3-dependent",
-        "outcome_blind": true,
-        "residual_peek": false
+        "residual_peek": false,
+        "status": "FORM_INHERITABLE",
+        "topic": "pit_ew_full_w3_comparator"
       },
       {
-        "topic": "d7_confirmation_rule",
-        "status": "NO_FTK_AUTHORITATIVE_RULE",
+        "disposition": "D7_RULE=BLOCKED_UNSET L5 blocker",
+        "notes": "Constitution names the layer; no executable confirmation definition for FTK economic selection. Do not invent from PRODUCT_SPEC lifecycle confirmation.",
+        "outcome_blind": true,
         "paths_surveyed": [
           "docs/architecture/alpha_scientific_method_v1.md (layer ID D7_CONFIRMATION_TIMING only)",
           "docs/architecture/ao_ftk_* (no confirmation feature definition)",
           "research/asymmetric_opportunity_v1/* (no D7 rule object)"
         ],
-        "notes": "Constitution names the layer; no executable confirmation definition for FTK economic selection. Do not invent from PRODUCT_SPEC lifecycle confirmation.",
-        "disposition": "D7_RULE=BLOCKED_UNSET L5 blocker",
-        "outcome_blind": true,
-        "residual_peek": false
+        "residual_peek": false,
+        "status": "NO_FTK_AUTHORITATIVE_RULE",
+        "topic": "d7_confirmation_rule"
       },
       {
-        "topic": "sensing_trial1_folds",
-        "status": "INHERITED_AUTHORITY",
-        "path": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
-        "notes": "temporal_fold_count=4; minimum_fold_n=30; minimum_fold_coverage=0.2; minimum_supporting_temporal_folds=3; xs_holdout corroboration only. Economic Trial 2 must reuse identical partition law.",
         "disposition": "E9=INHERITED_AUTHORITY",
+        "notes": "temporal_fold_count=4; minimum_fold_n=30; minimum_fold_coverage=0.2; minimum_supporting_temporal_folds=3; xs_holdout corroboration only. Economic Trial 2 must reuse identical partition law.",
         "outcome_blind": true,
-        "residual_peek": false
+        "path": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+        "residual_peek": false,
+        "status": "INHERITED_AUTHORITY",
+        "topic": "sensing_trial1_folds"
       }
     ],
-    "bind_turn_reconfirmed": true,
-    "bind_turn_date": "2026-08-12"
+    "outcome_blind": true
   },
-  "estimand": {
-    "E1": {
-      "name": "payoff_horizon",
-      "form": {
-        "H_TYPE": "fixed executable wager horizon",
-        "definition": "Single preregistered executable market wager horizon from decision_asof + execution lag through exit; not a grid."
-      },
-      "value": {
-        "H_TYPE": "fixed executable wager horizon",
-        "H_VALUE": "OWNER_BLOCKED_UNSET"
-      },
-      "value_owner": "OWNER_BLOCKED_UNSET",
-      "forbidden": [
-        "grid {5d,10d,21d} inside Trial 2",
-        "borrow Breakout 10d/20d merely because those clocks exist elsewhere",
-        "post-peek horizon binding from sensing residuals"
-      ],
-      "notes": "Form-only PASS; H_VALUE still OWNER_BLOCKED_UNSET. Primary H must be consistent with TRANSITION_POSITION (months→quarters class). Do not borrow Breakout 10d/20d. Do not use multi-year GE/HODL as primary. No owner attachment this bind turn.",
-      "economic_clock_class": "TRANSITION_POSITION",
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "OWNER_BLOCKED_UNSET",
-        "outcome_blind": true,
-        "residual_peek": false,
-        "owner_attachment": false
-      }
-    },
-    "E2": {
-      "name": "net_return_construction",
-      "form": {
-        "pipeline": [
-          "decision_asof",
-          "fixed execution lag",
-          "frozen executable entry price convention",
-          "H",
-          "same frozen exit-price convention",
-          "corporate-action / total-return adjustment",
-          "costs",
-          "R_net"
-        ],
-        "formula_text": "R_net = total_return_adjusted_exit_over_entry(decision_asof → lag → entry → H → exit) − costs"
-      },
-      "value": {
-        "price_provider_semantics": "BLOCKED_UNSET",
-        "entry_price_convention": "BLOCKED_UNSET",
-        "exit_price_convention": "BLOCKED_UNSET",
-        "corporate_action_adjustment": "BLOCKED_UNSET"
-      },
-      "value_owner": "BLOCKED_UNSET",
-      "l5_blocker": true,
-      "notes": "No FTK-ECON-bound price/return law found in authority survey. Do not improvise AOV defaults into FTK authority.",
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "BLOCKED_UNSET",
-        "outcome_blind": true,
-        "residual_peek": false,
-        "owner_attachment": false
-      }
-    },
-    "E3": {
-      "name": "execution_and_cost",
-      "form": {
-        "execution_lag_form": "fixed lag between decision_asof and executable entry (integer sessions or bar law)",
-        "cost_formula_form": "ex-ante cost applied to selected book; free_fit=false",
-        "free_fit": false
-      },
-      "value": {
-        "execution_lag": "BLOCKED_UNSET",
-        "cost_formula": "BLOCKED_UNSET",
-        "free_fit": false
-      },
-      "value_owner": "BLOCKED_UNSET",
-      "l5_blocker": true,
-      "notes": "No FTK-authoritative lag/cost law. Owner must bind or explicitly waive with written substitute law at economic L5. Do not fit from Trial-2 outcomes.",
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "BLOCKED_UNSET",
-        "outcome_blind": true,
-        "residual_peek": false,
-        "owner_attachment": false
-      }
-    },
-    "E4": {
-      "name": "right_tail",
-      "form": {
-        "RIGHT_TAIL_FORM": "date-local percentile of forward R_net on the frozen full-W3 outcome population",
-        "event_definition": "defined independently of whether FTK observed or selected the name"
-      },
-      "value": {
-        "RIGHT_TAIL_FORM": "date-local percentile of forward R_net on the frozen full-W3 outcome population",
-        "RIGHT_TAIL_PERCENTILE": "OWNER_BLOCKED_UNSET"
-      },
-      "value_owner": "OWNER_BLOCKED_UNSET",
-      "forbidden": [
-        "named-winner test (MU/SNDK) as primary success",
-        "absolute hurdle invented post-peek",
-        "CAGR as primary success"
-      ],
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "OWNER_BLOCKED_UNSET",
-        "outcome_blind": true,
-        "residual_peek": false,
-        "owner_attachment": false
-      }
-    },
-    "E5": {
-      "name": "catastrophe",
-      "form": {
-        "CATASTROPHE_FORM": "date-local left-tail percentile of forward R_net",
-        "primary_definition": "ONE only",
-        "forward_path_drawdown": "optional DIAGNOSTIC only (not multi-primary gates)"
-      },
-      "value": {
-        "CATASTROPHE_FORM": "date-local left-tail percentile of forward R_net",
-        "CATASTROPHE_PERCENTILE": "OWNER_BLOCKED_UNSET",
-        "primary_definition_count": 1
-      },
-      "value_owner": "OWNER_BLOCKED_UNSET",
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "OWNER_BLOCKED_UNSET",
-        "outcome_blind": true,
-        "residual_peek": false,
-        "owner_attachment": false
-      }
-    },
-    "E6": {
-      "name": "economic_utility_J",
-      "form": {
-        "J": "net payoff of fixed-breadth FTK-selected set minus PIT EqualWeight(Full W3) net payoff",
-        "catastrophe_role": "separate hard safety gate (not arbitrary weight inside J)",
-        "abstained_cohort_attribution": "SEPARATE from strategy P&L"
-      },
-      "value": {
-        "J_definition": "net payoff of fixed-breadth FTK-selected set minus PIT EqualWeight(Full W3) net payoff",
-        "delta_J_required": "OWNER_OR_CRO_BLOCKED_UNSET",
-        "comparator": "PIT_EqualWeight_Full_W3"
-      },
-      "value_owner": "OWNER_BLOCKED_UNSET",
-      "notes": "delta_J_required remains owner/CRO-owned; form frozen outcome-blind.",
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "OWNER_BLOCKED_UNSET",
-        "outcome_blind": true,
-        "residual_peek": false,
-        "owner_attachment": false
-      }
-    },
-    "E7": {
-      "name": "action_map",
-      "form": {
-        "score_inputs": "unchanged continuous frozen FTK node scores (INV continuous lag-1 delta; MARGIN M1 continuous state)",
-        "score_combination": "preregistered dual-node fixed-breadth rule WITHOUT third DOF / free composite trophy: both nodes emit independent continuous scores; selection uses preregistered dual-node monotone map documented ex ante (default form: equal-weight rank of the two node scores within date-local Full-W3 eligible set, then top-K). No threshold search. No policy optimizer.",
-        "selection": "fixed top-K",
-        "abstention": "cash",
-        "threshold_search": "FORBIDDEN",
-        "policy_optimizer": "FORBIDDEN"
-      },
-      "value": {
-        "score_inputs": "unchanged continuous frozen FTK node scores",
-        "score_map": "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K (form frozen; not a third feature DOF)",
-        "K": "OWNER_BLOCKED_UNSET",
-        "abstention": "cash",
-        "threshold_search": false,
-        "policy_optimizer": false
-      },
-      "value_owner": "OWNER_BLOCKED_UNSET",
-      "notes": "Trial 2 must test the sensing law, not a free policy search. K remains owner-owned unless a single integer is later bound by owner receipt.",
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "OWNER_BLOCKED_UNSET",
-        "outcome_blind": true,
-        "residual_peek": false,
-        "owner_attachment": false
-      }
-    },
-    "E8": {
-      "name": "comparison_population",
-      "form": {
-        "PRIMARY": "Full-W3 ledger; all eligible name-dates remain; abstention → cash",
-        "DIAGNOSTIC": "applicable/observable support ledger; explains conditional performance; NEVER rewrites denominator"
-      },
-      "value": {
-        "PRIMARY": "Full-W3 ledger (PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1)",
-        "DIAGNOSTIC": "applicable/observable support ledger",
-        "denominator_rewrite": "FORBIDDEN"
-      },
-      "value_owner": "FROZEN"
-    },
-    "E9": {
-      "name": "stability",
-      "form": {
-        "time_blocks": "identical to sensing Trial 1",
-        "fold_definitions": "identical to sensing Trial 1",
-        "aggregation_law": "identical to sensing Trial 1",
-        "stability_rule": "frozen before economic join"
-      },
-      "value": {
-        "source_run": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
-        "temporal_fold_count": 4,
-        "minimum_fold_n": 30,
-        "minimum_fold_coverage": 0.2,
-        "minimum_supporting_temporal_folds": 3,
-        "xs_holdout_is_corroboration_not_tuning": true,
-        "one_SE_simplicity_preference": "retain if already in constitution; no new favorable folds after sensing"
-      },
-      "value_owner": "INHERITED_AUTHORITY",
-      "forbidden": [
-        "invent new favorable folds after sensing results"
-      ],
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "INHERITED_AUTHORITY",
-        "authority_path": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
-        "outcome_blind": true,
-        "residual_peek": false
-      }
-    },
-    "E10": {
-      "name": "d6_to_d9_mapping",
-      "form": {
-        "mapping_ref": "d6_d9_mapping section of this freeze",
-        "first_fail_order": "D1→D9 for any later economic RUN"
-      },
-      "value": {
-        "D6_SELECTION_ENRICHMENT": "mapped",
-        "D7_CONFIRMATION_TIMING": "BLOCKED_UNSET",
-        "D8_HOLD_EXIT_CONVEXITY": "mapped",
-        "D9_ECONOMICS_COST_CAPACITY": "mapped"
-      },
-      "value_owner": "FROZEN",
-      "notes": "D7 rule absent in repo → BLOCKED_UNSET → L5 blocker (do not invent).",
-      "bind_provenance": {
-        "bound_at": "2026-08-12",
-        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-        "source": "BLOCKED_UNSET",
-        "outcome_blind": true,
-        "residual_peek": false,
-        "owner_attachment_d7_mode": null
-      }
-    },
-    "E11": {
-      "name": "economic_label_pack",
-      "form": {
-        "label_pack_type": "ECONOMIC",
-        "identity_frozen": true,
-        "hash_procedure_frozen": true,
-        "bytes_joined": false,
-        "join_authorized": false
-      },
-      "value": {
-        "label_pack_type": "ECONOMIC",
-        "identity_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.identity.json",
-        "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.hash_procedure.json",
-        "bytes_joined": false,
-        "join_authorized": false,
-        "sensing_pack_path_forbidden_reuse": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/"
-      },
-      "value_owner": "FROZEN",
-      "notes": "New economic pack; sensing labels must not be silently reused for economic estimand."
-    },
-    "E12": {
-      "name": "ids",
-      "form": {
-        "PARENT_PROGRAM": "AO-FTK-1-20260812",
-        "FREEZE_ID": "AO-FTK-1-ECON-1"
-      },
-      "value": {
-        "PARENT_PROGRAM": "AO-FTK-1-20260812",
-        "FREEZE_ID": "AO-FTK-1-ECON-1",
-        "not_ao_ftk_2": true
-      },
-      "value_owner": "FROZEN"
-    }
-  },
+  "authorized_phase": "L5_COMPLETE_WAITING_OWNER_L7",
+  "bind_name": "FTK_ECON1_TRANSITION_POSITION_BIND",
+  "bind_turn": "AO-FTK-1-ECON-1-TRANSITION-POSITION-BIND",
+  "capital_alpha_path": "CLOSED",
+  "capital_authority": false,
+  "constitution": "Accept draft binds. One transition-position economic trial. Same return law both sides. ΔJ>0 is a screen not capital. L6 first-fail. L7 stop. No slice 2.",
   "d6_d9_mapping": {
     "D6_SELECTION_ENRICHMENT": {
       "constitutional_id": "D6_SELECTION_ENRICHMENT",
-      "subclaim": "Does the unchanged FTK surface, under fixed-breadth action map, produce a selected population with improved predeclared forward-payoff and/or right-tail characteristics vs the frozen comparator?",
-      "layer_rename": "FORBIDDEN"
+      "layer_rename": "FORBIDDEN",
+      "subclaim": "Does the unchanged FTK surface, under fixed-breadth action map, produce a selected population with improved predeclared forward-payoff and/or right-tail characteristics vs the frozen comparator?"
     },
     "D7_CONFIRMATION_TIMING": {
+      "L6_treatment": "NOT_IN_SCOPE",
       "constitutional_id": "D7_CONFIRMATION_TIMING",
-      "subclaim": "Apply the EXISTING constitutional / repo-authoritative confirmation definition only. No new confirmation feature or rule may be invented here.",
-      "rule_status": "BLOCKED_UNSET",
-      "rule_path": null,
       "invented_this_freeze": false,
-      "l5_blocker": true,
-      "notes": "Survey found layer ID only (alpha_scientific_method_v1.md). No executable FTK confirmation rule. Owner must bind existing rule path or explicitly scope D7 out with written law at L5."
+      "l5_blocker": false,
+      "notes": "Owner ACCEPT_DRAFT D7_MODE=OUT_OF_SCOPE. No confirmation rule invented. L6 D7 status = NOT_IN_SCOPE (not fake PASS/FAIL).",
+      "rule_path": null,
+      "rule_status": "EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL",
+      "subclaim": "Apply the EXISTING constitutional / repo-authoritative confirmation definition only. No new confirmation feature or rule may be invented here."
     },
     "D8_HOLD_EXIT_CONVEXITY": {
+      "adaptive_exit_search": "FORBIDDEN_THIS_TURN",
       "constitutional_id": "D8_HOLD_EXIT_CONVEXITY",
-      "subclaim": "Does the frozen holding/exit law avoid unacceptable catastrophic outcomes under the ex-ante catastrophe definition?",
       "layer_rename": "FORBIDDEN",
       "primary_hold_law_trial2": "enter under frozen action map at decision_asof; hold for frozen H; exit under frozen exit-price convention",
-      "adaptive_exit_search": "FORBIDDEN_THIS_TURN"
+      "subclaim": "Does the frozen holding/exit law avoid unacceptable catastrophic outcomes under the ex-ante catastrophe definition?"
     },
     "D9_ECONOMICS_COST_CAPACITY": {
+      "CAPITAL_MATERIALITY_FLOOR": "NOT_YET_GRANTED",
+      "INTERPRETATION": "POSITIVE_NET_EDGE_SCREEN",
+      "TRIAL2_D9_FLOOR": 0.0,
       "constitutional_id": "D9_ECONOMICS_COST_CAPACITY",
-      "subclaim": "After lag + costs + fixed breadth + abstention→cash, does ΔJ clear the frozen economic materiality floor?",
-      "layer_rename": "FORBIDDEN"
+      "layer_rename": "FORBIDDEN",
+      "subclaim": "After lag + costs + fixed breadth + abstention→cash, does ΔJ > 0 under POSITIVE_NET_EDGE_SCREEN (capital floor not granted)?"
     },
     "first_fail_order": [
       "D1",
@@ -479,158 +133,498 @@
       "D8",
       "D9"
     ],
+    "notes": "D7 OUT_OF_SCOPE for this trial. Record routes only at freeze; execute L6 after eval.",
     "trial2_precommitted_routes": {
-      "D6_FAIL": "sensing exists, payoff relevance absent → HOLD or STOP FTK; do not refine rep",
+      "D6_D8_D9_PASS_IN_SCOPE": "research candidate only; still alpha=0; no auto capital (D7 not claimed)",
+      "D6_D8_PASS_D9_FAIL": "sensing≠positive net edge; bank knowledge; no capital path",
+      "D6_D9_PASS": "research candidate for later replication/prospective work; still NOT capital authority; alpha promotion not automatic",
+      "D6_FAIL": "sensing exists, payoff relevance absent → HOLD or STOP FTK primary; no representation refine",
       "D6_PASS_D7_FAIL": "transition sensor, not confirmed selection kernel → no winner-kernel claim",
-      "D7_PASS_D8_FAIL": "upside purchased with unacceptable downside → reject action law; only separately frozen safety-policy slice may continue",
-      "D6_D8_PASS_D9_FAIL": "not executable after costs/breadth → no capital path; refine only if cheap falsifiable seam identified",
-      "D6_D9_PASS": "research candidate for later replication/prospective work; still NOT capital authority; alpha promotion not automatic"
+      "D6_PASS_D8_FAIL": "safety fail; reject hold/action law",
+      "D7": "NOT_IN_SCOPE this trial",
+      "D7_PASS_D8_FAIL": "upside purchased with unacceptable downside → reject action law; only separately frozen safety-policy slice may continue"
+    }
+  },
+  "date": "2026-08-12",
+  "economic_clock": {
+    "economic_clock_class": "TRANSITION_POSITION",
+    "exclusions": {
+      "FAST_TRADING": "recognition/momentum/breakout weeks-only winner labels — NOT this trial primary",
+      "GREAT_ENTERPRISE_HODL": "years-long durable compounder ownership — separate future program"
     },
-    "notes": "Do not execute routes this freeze/bind. Record only. D7 remains BLOCKED_UNSET until owner INHERIT or EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL."
+    "great_enterprise_kernel": "OUT_OF_SCOPE",
+    "hypothesis_under_test_when_trial2_authorized": "company enters favorable economic transition → transition persists long enough → market/economics improve → capture repricing over the transition horizon",
+    "not_fast_trading": true,
+    "not_great_enterprise_hodl": true,
+    "outcome_blind": true,
+    "primary_H_requirement": "ONE scalar H_VALUE only; no band search; no multi-primary H",
+    "product_class_band": "months_to_quarters",
+    "stamped_at": "2026-08-12",
+    "stamped_by": "AO-FTK-1-ECON-1-TRANSITION-POSITION-BIND"
   },
-  "material_trial_debit_plan": {
-    "plan_id": "FTK1_ECON_TRIAL_DEBIT_PLAN_V1",
-    "material_trials_total_remaining_before_trial2": 2,
-    "material_trials_charged_to_date": 1,
-    "next_debit": 1,
-    "remaining_after_trial2": 1,
-    "debit_trigger": "ECONOMIC_L5_AUTHORIZATION_RECEIPT",
-    "debit_this_turn": false,
-    "debit_this_turn_policy": "FORBIDDEN",
-    "notes": "Freeze records plan only. Exactly one unit may be debited only under a separate economic L5 authorization receipt. Not debited this turn."
+  "economic_l5_authorized": true,
+  "estimand": {
+    "E1": {
+      "bind_provenance": {
+        "ACCEPT_DRAFT": true,
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+        "outcome_blind": true,
+        "owner_attachment": true,
+        "residual_peek": false,
+        "source": "OWNER_BOUND"
+      },
+      "economic_clock_class": "TRANSITION_POSITION",
+      "forbidden": [
+        "grid {5d,10d,21d} inside Trial 2",
+        "borrow Breakout 10d/20d merely because those clocks exist elsewhere",
+        "post-peek horizon binding from sensing residuals"
+      ],
+      "form": {
+        "H_TYPE": "fixed executable wager horizon",
+        "definition": "Single preregistered executable market wager horizon from decision_asof + execution lag through exit; not a grid."
+      },
+      "name": "payoff_horizon",
+      "notes": "Owner ACCEPT_DRAFT H=63 trading sessions (~one quarter TRANSITION_POSITION). Breakout 10/20d and multi-year GE primary forbidden.",
+      "value": {
+        "H_CLASS": "TRANSITION_POSITION",
+        "H_TYPE": "fixed executable wager horizon",
+        "H_UNIT": "trading_sessions_of_exposure_after_executable_entry",
+        "H_VALUE": 63
+      },
+      "value_owner": "OWNER_BOUND"
+    },
+    "E10": {
+      "bind_provenance": {
+        "ACCEPT_DRAFT": true,
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+        "outcome_blind": true,
+        "owner_attachment": true,
+        "owner_attachment_d7_mode": "OUT_OF_SCOPE",
+        "residual_peek": false,
+        "source": "OUT_OF_SCOPE"
+      },
+      "form": {
+        "first_fail_order": "D1→D9 for any later economic RUN",
+        "mapping_ref": "d6_d9_mapping section of this freeze"
+      },
+      "name": "d6_to_d9_mapping",
+      "notes": "D7 OUT_OF_SCOPE: no authoritative FTK-ECON confirmation rule; do not invent. L6 treatment: D7 status = NOT_IN_SCOPE.",
+      "value": {
+        "D6_SELECTION_ENRICHMENT": "mapped",
+        "D7_CONFIRMATION_TIMING": "EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL",
+        "D8_HOLD_EXIT_CONVEXITY": "mapped",
+        "D9_ECONOMICS_COST_CAPACITY": "mapped"
+      },
+      "value_owner": "FROZEN"
+    },
+    "E11": {
+      "form": {
+        "bytes_joined": false,
+        "hash_procedure_frozen": true,
+        "identity_frozen": true,
+        "join_authorized": false,
+        "label_pack_type": "ECONOMIC"
+      },
+      "name": "economic_label_pack",
+      "notes": "New economic pack; sensing labels must not be silently reused for economic estimand.",
+      "value": {
+        "bytes_joined": true,
+        "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.hash_procedure.json",
+        "identity_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.identity.json",
+        "join_authorized": true,
+        "label_pack_type": "ECONOMIC",
+        "sensing_pack_path_forbidden_reuse": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/"
+      },
+      "value_owner": "FROZEN"
+    },
+    "E12": {
+      "form": {
+        "FREEZE_ID": "AO-FTK-1-ECON-1",
+        "PARENT_PROGRAM": "AO-FTK-1-20260812"
+      },
+      "name": "ids",
+      "value": {
+        "FREEZE_ID": "AO-FTK-1-ECON-1",
+        "PARENT_PROGRAM": "AO-FTK-1-20260812",
+        "not_ao_ftk_2": true
+      },
+      "value_owner": "FROZEN"
+    },
+    "E2": {
+      "bind_provenance": {
+        "ACCEPT_DRAFT": true,
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+        "outcome_blind": true,
+        "owner_attachment": true,
+        "residual_peek": false,
+        "source": "OWNER_BOUND"
+      },
+      "form": {
+        "formula_text": "R_net = total_return_adjusted_exit_over_entry(decision_asof → lag → entry → H → exit) − costs",
+        "pipeline": [
+          "decision_asof",
+          "fixed execution lag",
+          "frozen executable entry price convention",
+          "H",
+          "same frozen exit-price convention",
+          "corporate-action / total-return adjustment",
+          "costs",
+          "R_net"
+        ]
+      },
+      "l5_blocker": false,
+      "name": "net_return_construction",
+      "notes": "Owner ACCEPT_DRAFT E2_MODE=OWNER_BOUND; free_fit=false; symmetry mandatory.",
+      "value": {
+        "R_net": "holding_period_return_minus_E3_costs",
+        "corporate_action_adjustment": "admitted_market_custody_only_no_ticker_bridge",
+        "decision_asof": "PIT_asof_conservative_EOD_FTK_primitive_spirit",
+        "entry_price_convention": "official_close_first_session_after_decision_asof_plus_execution_lag",
+        "exit_price_convention": "official_close_after_exactly_H_VALUE_sessions_of_exposure_from_entry",
+        "free_fit": false,
+        "price_provider_semantics": "admitted_market_total_return_if_available_else_CLOSE_TO_CLOSE",
+        "return_series_fallback": "CLOSE_TO_CLOSE_NOT_DIVIDEND_COMPLETE",
+        "return_series_preference": "admitted_market_total_return",
+        "same_return_convention_ftk_and_w3": true,
+        "session_arithmetic": {
+          "H_VALUE": 63,
+          "entry": "close[t_decision + lag]",
+          "execution_lag_sessions": 1,
+          "exit": "close[t_entry + H_VALUE]",
+          "inclusive_note": "Exposure spans exactly H_VALUE trading sessions from entry session to exit session under frozen calendar; deterministic before join."
+        },
+        "symmetry_law": "FTK_selected_and_Full_W3_PIT_EW_identical_return_convention"
+      },
+      "value_owner": "OWNER_BOUND"
+    },
+    "E3": {
+      "bind_provenance": {
+        "ACCEPT_DRAFT": true,
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+        "outcome_blind": true,
+        "owner_attachment": true,
+        "residual_peek": false,
+        "source": "OWNER_BOUND"
+      },
+      "form": {
+        "cost_formula_form": "ex-ante cost applied to selected book; free_fit=false",
+        "execution_lag_form": "fixed lag between decision_asof and executable entry (integer sessions or bar law)",
+        "free_fit": false
+      },
+      "l5_blocker": false,
+      "name": "execution_and_cost",
+      "notes": "Owner ACCEPT_DRAFT E3_MODE=OWNER_BOUND; explicit FTK-ECON Trial-2 law.",
+      "value": {
+        "cash_abstain_cost": 0,
+        "cost_bps_round_trip": 20,
+        "cost_entry_bps": 10,
+        "cost_exit_bps": 10,
+        "cost_formula": "20_bps_RT_selected_names_only_10_entry_10_exit_cash_0",
+        "cost_scope": "selected_names_only",
+        "execution_lag": 1,
+        "execution_lag_unit": "trading_sessions_after_decision_asof",
+        "free_fit": false
+      },
+      "value_owner": "OWNER_BOUND"
+    },
+    "E4": {
+      "bind_provenance": {
+        "ACCEPT_DRAFT": true,
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+        "outcome_blind": true,
+        "owner_attachment": true,
+        "residual_peek": false,
+        "source": "OWNER_BOUND"
+      },
+      "forbidden": [
+        "named-winner test (MU/SNDK) as primary success",
+        "absolute hurdle invented post-peek",
+        "CAGR as primary success"
+      ],
+      "form": {
+        "RIGHT_TAIL_FORM": "date-local percentile of forward R_net on the frozen full-W3 outcome population",
+        "event_definition": "defined independently of whether FTK observed or selected the name"
+      },
+      "name": "right_tail",
+      "value": {
+        "RIGHT_TAIL_FORM": "date-local percentile of forward R_net on the frozen full-W3 outcome population",
+        "RIGHT_TAIL_PERCENTILE": 0.9,
+        "independent_of_ftk_selection": true
+      },
+      "value_owner": "OWNER_BOUND"
+    },
+    "E5": {
+      "bind_provenance": {
+        "ACCEPT_DRAFT": true,
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+        "outcome_blind": true,
+        "owner_attachment": true,
+        "residual_peek": false,
+        "source": "OWNER_BOUND"
+      },
+      "form": {
+        "CATASTROPHE_FORM": "date-local left-tail percentile of forward R_net",
+        "forward_path_drawdown": "optional DIAGNOSTIC only (not multi-primary gates)",
+        "primary_definition": "ONE only"
+      },
+      "name": "catastrophe",
+      "value": {
+        "CATASTROPHE_FORM": "date-local left-tail percentile of forward R_net",
+        "CATASTROPHE_PERCENTILE": 0.1,
+        "primary_definition_count": 1
+      },
+      "value_owner": "OWNER_BOUND"
+    },
+    "E6": {
+      "bind_provenance": {
+        "ACCEPT_DRAFT": true,
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+        "outcome_blind": true,
+        "owner_attachment": true,
+        "residual_peek": false,
+        "source": "OWNER_BOUND"
+      },
+      "form": {
+        "J": "net payoff of fixed-breadth FTK-selected set minus PIT EqualWeight(Full W3) net payoff",
+        "abstained_cohort_attribution": "SEPARATE from strategy P&L",
+        "catastrophe_role": "separate hard safety gate (not arbitrary weight inside J)"
+      },
+      "name": "economic_utility_J",
+      "notes": "POSITIVE_NET_EDGE_SCREEN only; do not set financial_alpha_evidence>0; capital materiality floor NOT_YET_GRANTED.",
+      "value": {
+        "CAPITAL_MATERIALITY_FLOOR": "NOT_YET_GRANTED",
+        "INTERPRETATION": "POSITIVE_NET_EDGE_SCREEN",
+        "J_definition": "net payoff of fixed-breadth FTK-selected set minus PIT EqualWeight(Full W3) net payoff",
+        "NOT_meaning": "edge large enough for capital / deployable Alpha",
+        "TRIAL2_D9_FLOOR": 0.0,
+        "comparator": "PIT_EqualWeight_Full_W3",
+        "delta_J_required": 0.0,
+        "meaning": "any positive net J after costs passes D9 screen"
+      },
+      "value_owner": "OWNER_BOUND"
+    },
+    "E7": {
+      "bind_provenance": {
+        "ACCEPT_DRAFT": true,
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+        "outcome_blind": true,
+        "owner_attachment": true,
+        "residual_peek": false,
+        "source": "OWNER_BOUND"
+      },
+      "form": {
+        "abstention": "cash",
+        "policy_optimizer": "FORBIDDEN",
+        "score_combination": "preregistered dual-node fixed-breadth rule WITHOUT third DOF / free composite trophy: both nodes emit independent continuous scores; selection uses preregistered dual-node monotone map documented ex ante (default form: equal-weight rank of the two node scores within date-local Full-W3 eligible set, then top-K). No threshold search. No policy optimizer.",
+        "score_inputs": "unchanged continuous frozen FTK node scores (INV continuous lag-1 delta; MARGIN M1 continuous state)",
+        "selection": "fixed top-K",
+        "threshold_search": "FORBIDDEN"
+      },
+      "name": "action_map",
+      "notes": "Trial 2 must test the sensing law, not a free policy search. K remains owner-owned unless a single integer is later bound by owner receipt.",
+      "value": {
+        "K": 20,
+        "abstention": "cash",
+        "policy_optimizer": false,
+        "score_inputs": "unchanged continuous frozen FTK node scores",
+        "score_map": "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K (form frozen; not a third feature DOF)",
+        "selection": "dual-node equal-weight rank → fixed top-K",
+        "threshold_search": false
+      },
+      "value_owner": "OWNER_BOUND"
+    },
+    "E8": {
+      "form": {
+        "DIAGNOSTIC": "applicable/observable support ledger; explains conditional performance; NEVER rewrites denominator",
+        "PRIMARY": "Full-W3 ledger; all eligible name-dates remain; abstention → cash"
+      },
+      "name": "comparison_population",
+      "value": {
+        "DIAGNOSTIC": "applicable/observable support ledger",
+        "PRIMARY": "Full-W3 ledger (PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1)",
+        "denominator_rewrite": "FORBIDDEN"
+      },
+      "value_owner": "FROZEN"
+    },
+    "E9": {
+      "bind_provenance": {
+        "authority_path": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+        "bound_at": "2026-08-12",
+        "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
+        "outcome_blind": true,
+        "residual_peek": false,
+        "source": "INHERITED_AUTHORITY"
+      },
+      "forbidden": [
+        "invent new favorable folds after sensing results"
+      ],
+      "form": {
+        "aggregation_law": "identical to sensing Trial 1",
+        "fold_definitions": "identical to sensing Trial 1",
+        "stability_rule": "frozen before economic join",
+        "time_blocks": "identical to sensing Trial 1"
+      },
+      "name": "stability",
+      "value": {
+        "minimum_fold_coverage": 0.2,
+        "minimum_fold_n": 30,
+        "minimum_supporting_temporal_folds": 3,
+        "one_SE_simplicity_preference": "retain if already in constitution; no new favorable folds after sensing",
+        "source_run": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+        "temporal_fold_count": 4,
+        "xs_holdout_is_corroboration_not_tuning": true
+      },
+      "value_owner": "INHERITED_AUTHORITY"
+    }
   },
-  "label_pack": {
-    "label_pack_type": "ECONOMIC",
-    "LABEL_IDENTITY_FROZEN": true,
-    "LABEL_HASH_PROCEDURE_FROZEN": true,
-    "LABEL_BYTES_JOINED": false,
-    "join_authorized": false,
-    "join_performed": false,
-    "outcome_inspected": false,
-    "seal_status": "IDENTITY_AND_HASH_FROZEN_UNJOINED",
-    "identity_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.identity.json",
-    "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.hash_procedure.json",
-    "sensing_pack_must_not_reuse": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/"
+  "fail_closed_guards": {
+    "economic_evaluator_run_when_l5_false": "FAIL_CLOSED",
+    "economic_label_join_when_l5_false": "FAIL_CLOSED",
+    "implementation": "research/asymmetric_opportunity_v1/ao_ftk_1_econ_1_contract.py",
+    "trial_debit_when_l5_false": "FAIL_CLOSED"
   },
+  "financial_alpha_evidence": 0,
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "hold_exit_law_trial2": {
+    "catastrophe_gate": "hard safety gate separate from J (E5)",
+    "forbidden_this_turn": [
+      "free hold while transition remains alive adaptive exit search",
+      "adaptive transition exit search"
+    ],
+    "primary_hold_law": "enter under frozen action map at decision_asof; hold for frozen H; exit under frozen exit-price convention",
+    "status": "FORM_ONLY_NOT_EXECUTED"
+  },
+  "hold_flip_conditions": {
+    "a_cannot_freeze_without_outcome_inspection": false,
+    "action_if_any_true": "stop freeze as HOLD_RECOMMENDED; do not peek",
+    "b_another_family_greater_info_per_dollar": false,
+    "c_pressure_to_set_cuts_after_sensing_residuals": false
+  },
+  "l5_authorized": true,
+  "l5_auto_open": false,
+  "l5_blockers": [],
   "l5_readiness_checklist": [
     {
-      "item": "economic_clock_class = TRANSITION_POSITION",
-      "status": "PASS",
-      "field": "economic_clock"
-    },
-    {
-      "item": "L7 route machine-effective",
-      "status": "PASS",
-      "note": "LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL"
-    },
-    {
-      "item": "ECON freeze form PASS (or form PASS with only owner-owned numerics left)",
-      "status": "PASS_FORM"
-    },
-    {
-      "item": "H_VALUE bound (single scalar)",
-      "status": "OWNER_BLOCKED_UNSET",
-      "field": "E1.H_VALUE"
-    },
-    {
-      "item": "E2 price/return INHERITED or OWNER_BOUND (not improvised)",
-      "status": "BLOCKED_UNSET",
-      "field": "E2"
-    },
-    {
-      "item": "E3 lag/cost INHERITED or OWNER_BOUND",
-      "status": "BLOCKED_UNSET",
-      "field": "E3"
-    },
-    {
-      "item": "E4 percentile bound",
-      "status": "OWNER_BLOCKED_UNSET",
-      "field": "E4.RIGHT_TAIL_PERCENTILE"
-    },
-    {
-      "item": "E5 percentile bound",
-      "status": "OWNER_BLOCKED_UNSET",
-      "field": "E5.CATASTROPHE_PERCENTILE"
-    },
-    {
-      "item": "E6 delta_J_required bound",
-      "status": "OWNER_OR_CRO_BLOCKED_UNSET",
-      "field": "E6.delta_J_required"
-    },
-    {
-      "item": "E7 K bound (score map form frozen)",
-      "status": "OWNER_BLOCKED_UNSET",
-      "field": "E7.K"
-    },
-    {
-      "item": "D7 inherited OR explicitly out of scope",
-      "status": "BLOCKED_UNSET",
-      "field": "D7_CONFIRMATION_TIMING"
-    },
-    {
-      "item": "E11 identity+hash frozen; join still false",
-      "status": "PASS",
-      "note": "bytes_joined=false"
-    },
-    {
-      "item": "surface dof=2 pins unchanged",
-      "status": "PASS",
-      "note": "operator pins match parent L4"
-    },
-    {
-      "item": "l5_authorized still false",
-      "status": "PASS",
-      "note": "economic_l5_authorized=false; no auto L5"
-    },
-    {
-      "item": "fail-closed guards still true",
+      "detail": "economic_clock_class='TRANSITION_POSITION'",
+      "item": "economic_clock_class",
       "status": "PASS"
     },
     {
-      "item": "separate L5_AUTHORIZE receipt issued",
+      "detail": "H_VALUE=63",
+      "item": "H_VALUE",
+      "status": "PASS"
+    },
+    {
+      "detail": "value_owner='OWNER_BOUND'",
+      "item": "E2_price_return",
+      "status": "PASS"
+    },
+    {
+      "detail": "value_owner='OWNER_BOUND'",
+      "item": "E3_lag_cost",
+      "status": "PASS"
+    },
+    {
+      "detail": "RIGHT_TAIL_PERCENTILE=0.9",
+      "item": "E4_percentile",
+      "status": "PASS"
+    },
+    {
+      "detail": "CATASTROPHE_PERCENTILE=0.1",
+      "item": "E5_percentile",
+      "status": "PASS"
+    },
+    {
+      "detail": "delta_J_required=0.0",
+      "item": "E6_delta_J",
+      "status": "PASS"
+    },
+    {
+      "detail": "K=20; score_map_ok=True",
+      "item": "E7_K",
+      "status": "PASS"
+    },
+    {
+      "detail": "rule_status='EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL'",
+      "item": "D7",
+      "status": "PASS"
+    },
+    {
+      "detail": "bytes_joined=False",
+      "item": "E11_labels_unjoined",
+      "status": "PASS"
+    },
+    {
+      "detail": "dof=2",
+      "item": "surface_dof_2",
+      "status": "PASS"
+    },
+    {
+      "detail": "l5 remains unauthorized this bind",
+      "item": "l5_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "fail-closed guards present",
+      "item": "fail_closed_guards",
+      "status": "PASS"
+    },
+    {
+      "detail": "not_fast_trading=True; not_ge_hodl=True",
+      "item": "clock_exclusions",
+      "status": "PASS"
+    },
+    {
+      "item": "separate_L5_AUTHORIZE_receipt_issued",
+      "note": "issued in P2 of same ACCEPT_DRAFT long session",
       "status": "NOT_ISSUED"
     }
   ],
-  "l5_blockers": [
-    "E1.H_VALUE=OWNER_BLOCKED_UNSET (no owner attachment)",
-    "E2.price_return=BLOCKED_UNSET (no FTK-ECON authoritative law; refuse invent)",
-    "E3.execution_lag=BLOCKED_UNSET",
-    "E3.cost_formula=BLOCKED_UNSET",
-    "E4.RIGHT_TAIL_PERCENTILE=OWNER_BLOCKED_UNSET",
-    "E5.CATASTROPHE_PERCENTILE=OWNER_BLOCKED_UNSET",
-    "E6.delta_J_required=OWNER_OR_CRO_BLOCKED_UNSET",
-    "E7.K=OWNER_BLOCKED_UNSET",
-    "E10.D7_RULE=BLOCKED_UNSET (no invent; owner INHERIT path or OUT_OF_SCOPE)",
-    "economic_l5_authorized=false (separate L5_AUTHORIZE receipt required; never auto)"
-  ],
-  "hold_flip_conditions": {
-    "a_cannot_freeze_without_outcome_inspection": false,
-    "b_another_family_greater_info_per_dollar": false,
-    "c_pressure_to_set_cuts_after_sensing_residuals": false,
-    "action_if_any_true": "stop freeze as HOLD_RECOMMENDED; do not peek"
-  },
-  "fail_closed_guards": {
-    "economic_label_join_when_l5_false": "FAIL_CLOSED",
-    "trial_debit_when_l5_false": "FAIL_CLOSED",
-    "economic_evaluator_run_when_l5_false": "FAIL_CLOSED",
-    "implementation": "research/asymmetric_opportunity_v1/ao_ftk_1_econ_1_contract.py"
-  },
-  "capital_authority": false,
-  "financial_alpha_evidence": 0,
-  "qm_terms_forbidden": true,
-  "q_source_status": "Q_SOURCE_BLOCKED_TERMINAL",
-  "ok_sbi_s2": "NOT_AUTHORIZED",
-  "qm_revival_in_ftk": "FORBIDDEN",
-  "q_amendment_status": "AVAILABLE_UNSPENT",
-  "w6": "UNTOUCHED",
-  "product_state": "CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED",
-  "capital_alpha_path": "CLOSED",
-  "ao_ftk_2": "NOT_AUTHORIZED",
+  "l5_ready": true,
+  "l7_machine_effective": true,
+  "l7_route": "LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL",
+  "l7_route_source": "OWNER_DISPATCH_OF_AO_FTK_1_ECON_1_WORKER_PROMPT",
   "l8_bounded_refinement": "DEFER",
-  "alpha_capital": "NONE",
-  "next_phase": "WAITING_OWNER_NUMERICS",
-  "next_owner_action": "provide owner bind attachment (H, RT%, catastrophe%, K, delta_J, D7_MODE, E2_MODE, E3_MODE) or HOLD | STOP; never invent; no auto L5",
-  "next_worker_recommended": "OWNER_NUMERICS_OR_HOLD",
+  "label_bytes_joined": true,
+  "label_pack": {
+    "LABEL_BYTES_JOINED": true,
+    "LABEL_HASH_PROCEDURE_FROZEN": true,
+    "LABEL_IDENTITY_FROZEN": true,
+    "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.hash_procedure.json",
+    "identity_path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.identity.json",
+    "join_authorized": true,
+    "join_performed": true,
+    "label_pack_type": "ECONOMIC",
+    "outcome_inspected": false,
+    "seal_status": "BYTES_JOINED_SCHEMA_RNET_UNOBSERVED",
+    "sensing_pack_must_not_reuse": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/"
+  },
+  "material_trial_debit_plan": {
+    "debit_this_turn": true,
+    "debit_this_turn_policy": "FORBIDDEN_UNTIL_L5_AUTH",
+    "debit_trigger": "ECONOMIC_L5_AUTHORIZATION_RECEIPT",
+    "debited_under_receipt": "AO_FTK_1_ECON_1_L5_TRIAL_DEBIT",
+    "material_trials_charged_to_date": 2,
+    "material_trials_total_remaining_before_trial2": 2,
+    "next_debit": 1,
+    "notes": "Exactly one unit debited only after L5 authorization in this long session.",
+    "plan_id": "FTK1_ECON_TRIAL_DEBIT_PLAN_V1",
+    "remaining_after_trial2": 1
+  },
+  "material_trials_charged_this_turn": 1,
+  "material_trials_charged_to_date": 2,
+  "material_trials_remaining": 1,
+  "method_constitution": "docs/architecture/alpha_scientific_method_v1.md",
+  "name": "FTK_ECONOMIC_ASYMMETRY_FREEZE",
+  "next_owner_action": "L7 route only; remaining 1 material trial",
   "next_owner_action_forbidden": [
     "auto L5 after freeze",
     "silent Trial 2 debit",
@@ -639,6 +633,92 @@
     "L8 refinement now",
     "capital / alpha claim"
   ],
+  "next_phase": "L7_ROADMAP_DECISION",
+  "next_worker_recommended": "OWNER_L7_ONLY",
+  "ok_sbi_s2": "NOT_AUTHORIZED",
+  "owner_bind": {
+    "ACCEPT_DRAFT": true,
+    "auto_l5": false,
+    "bind_id": "AO-FTK-1-ECON-1-ACCEPT-DRAFT-TRANSITION-POSITION",
+    "blocked_unset": [],
+    "bound_at": "2026-08-12",
+    "bound_by": "WORKER_AO_FTK_1_ECON_1_ACCEPT_DRAFT_LONG_SESSION",
+    "economic_label_join": true,
+    "evaluation_run": true,
+    "explicitly_out_of_scope": [
+      "E10_D7"
+    ],
+    "inherited": [
+      "E9_folds",
+      "E8_comparator_form",
+      "surface_dof_2_operators",
+      "score_map_form"
+    ],
+    "l5_blockers_remaining": [],
+    "l5_ready": true,
+    "material_trials_charged_this_turn": 1,
+    "outcome_blind": true,
+    "owner_attachment_fields": {
+      "CAPITAL_MATERIALITY_FLOOR": "NOT_YET_GRANTED",
+      "CATASTROPHE_PERCENTILE": 0.1,
+      "D7_MODE": "OUT_OF_SCOPE",
+      "E2_MODE": "OWNER_BOUND",
+      "E3_MODE": "OWNER_BOUND",
+      "H_VALUE": 63,
+      "INTERPRETATION": "POSITIVE_NET_EDGE_SCREEN",
+      "K": 20,
+      "L5_AUTHORIZE_ECONOMIC": true,
+      "RIGHT_TAIL_PERCENTILE": 0.9,
+      "TRIAL2_D9_FLOOR": 0.0,
+      "delta_J_required": 0.0,
+      "same_return_convention_ftk_and_w3": true
+    },
+    "owner_attachment_present": true,
+    "owner_bound": [
+      "E1_H_VALUE",
+      "E2_net_return",
+      "E3_lag_cost",
+      "E4_right_tail",
+      "E5_catastrophe",
+      "E6_delta_J",
+      "E7_K"
+    ],
+    "receipt_path": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json",
+    "residual_peek": false,
+    "trial2_debit": true,
+    "verdict": "PASS_L5_READY"
+  },
+  "owner_route": "LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL",
+  "parent_l4_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
+  "parent_l4_work_commit": "a3350f0",
+  "parent_l5_run": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+  "parent_l5_work_commit": "948471c",
+  "parent_l7_owner_packet": "docs/context/e2e_evidence/ao_ftk_1_20260812_l7_owner_packet.json",
+  "parent_program": "AO-FTK-1-20260812",
+  "prior_authorized_phase": "ECONOMIC_ESTIMAND_FREEZE",
+  "prior_freeze_commit": "febd8e4",
+  "prior_freeze_verdict": "PASS_WAITING_NUMERICS",
+  "prior_sensing": {
+    "economic_cuts_after_l5": "BLOCKED_UNSET",
+    "l5_commit": "948471c",
+    "material_trials_charged": 1,
+    "material_trials_remaining": 2,
+    "note": "Context only — do not retune to sensing residuals",
+    "sensing_result": "BOTH_NODES_MEASURABLE_SIGNAL / PASS"
+  },
+  "prior_sensing_commit": "948471c",
+  "product_state": "CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED",
+  "q_amendment_status": "AVAILABLE_UNSPENT",
+  "q_source_status": "Q_SOURCE_BLOCKED_TERMINAL",
+  "qm_revival_in_ftk": "FORBIDDEN",
+  "qm_terms_forbidden": true,
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "runnable_evaluation": false,
+  "schema_version": "ao_ftk_1_econ_1_economic_asymmetry_freeze_v1",
+  "science_mode": "OUTCOME_BLIND_ECONOMIC_ASYMMETRY_FREEZE",
+  "second_l5": "NOT_AUTHORIZED",
+  "spec_version": "v1.0",
+  "status": "ECON_L5_COMPLETE_WAITING_OWNER_L7",
   "stop_lines": [
     "TRIAL2_DEBIT_THIS_TURN",
     "ECONOMIC_LABEL_JOIN_THIS_TURN",
@@ -672,216 +752,59 @@
     "EVALUATION_RUN_THIS_TURN"
   ],
   "stop_lines_hit": [],
-  "constitution": "Stamp FTK as TRANSITION_POSITION. Bind one horizon and the economic laws without invention or peeking. Clear L5 blockers or HOLD. Debit nothing. Run nothing.",
-  "method_constitution": "docs/architecture/alpha_scientific_method_v1.md",
-  "bind_name": "FTK_ECON1_TRANSITION_POSITION_BIND",
-  "prior_authorized_phase": "ECONOMIC_ESTIMAND_FREEZE",
-  "prior_freeze_verdict": "PASS_WAITING_NUMERICS",
-  "prior_freeze_commit": "febd8e4",
-  "prior_sensing_commit": "948471c",
-  "bind_turn": "AO-FTK-1-ECON-1-TRANSITION-POSITION-BIND",
-  "economic_clock": {
-    "economic_clock_class": "TRANSITION_POSITION",
-    "product_class_band": "months_to_quarters",
-    "not_fast_trading": true,
-    "not_great_enterprise_hodl": true,
-    "great_enterprise_kernel": "OUT_OF_SCOPE",
-    "exclusions": {
-      "FAST_TRADING": "recognition/momentum/breakout weeks-only winner labels — NOT this trial primary",
-      "GREAT_ENTERPRISE_HODL": "years-long durable compounder ownership — separate future program"
+  "surface_inheritance": {
+    "dof_rewrite_this_turn": "FORBIDDEN",
+    "effective_decision_dof": 2,
+    "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+    "max_effective_decision_dof": 2,
+    "operator_routing": {
+      "mode": "DOMAIN_LIMITED_EX_ANTE",
+      "rule": "Inventory node may emit only INV_DELTA_MEAN_REVERSION. Margin node may emit only MARGIN_M1_STATE_MEAN_REVERSION. No post-hoc operator search. No free composite trophy across nodes without new slice_id."
     },
-    "hypothesis_under_test_when_trial2_authorized": "company enters favorable economic transition → transition persists long enough → market/economics improve → capture repricing over the transition horizon",
-    "primary_H_requirement": "ONE scalar H_VALUE only; no band search; no multi-primary H",
-    "outcome_blind": true,
-    "stamped_at": "2026-08-12",
-    "stamped_by": "AO-FTK-1-ECON-1-TRANSITION-POSITION-BIND"
-  },
-  "hold_exit_law_trial2": {
-    "primary_hold_law": "enter under frozen action map at decision_asof; hold for frozen H; exit under frozen exit-price convention",
-    "forbidden_this_turn": [
-      "free hold while transition remains alive adaptive exit search",
-      "adaptive transition exit search"
-    ],
-    "catastrophe_gate": "hard safety gate separate from J (E5)",
-    "status": "FORM_ONLY_NOT_EXECUTED"
-  },
-  "owner_bind": {
-    "bind_id": "AO-FTK-1-ECON-1-TRANSITION-POSITION-BIND",
-    "bound_at": "2026-08-12",
-    "bound_by": "WORKER_AO_FTK_1_ECON_1_TRANSITION_POSITION_BIND",
-    "owner_attachment_present": false,
-    "owner_attachment_fields": {
-      "H_VALUE": null,
-      "RIGHT_TAIL_PERCENTILE": null,
-      "CATASTROPHE_PERCENTILE": null,
-      "K": null,
-      "delta_J_required": null,
-      "D7_MODE": null,
-      "E2_MODE": null,
-      "E3_MODE": null
-    },
-    "outcome_blind": true,
-    "residual_peek": false,
-    "material_trials_charged_this_turn": 0,
-    "trial2_debit": false,
-    "economic_label_join": false,
-    "evaluation_run": false,
-    "auto_l5": false,
-    "fields": {
-      "E1_H_VALUE": {
-        "field": "E1.H_VALUE",
-        "source": "OWNER_BLOCKED_UNSET",
-        "value": "OWNER_BLOCKED_UNSET",
-        "reason": "no owner attachment H_VALUE; refuse invent / refuse grid / refuse breakout borrow",
-        "outcome_blind": true,
-        "residual_peek": false
+    "operators": [
+      {
+        "decision_dof_slot": 1,
+        "family_alias": "DELTA_MEAN_REVERSION",
+        "fit_or_tuning": "FORBIDDEN",
+        "formula": "prediction = -sign(inventory_economic_level[FQ0] - inventory_economic_level[FQ-1]); maps to next-PIT inventory economic delta sign",
+        "immutability_pin": "9434b4958beec33cebeb20a2747cae337b1ca56271a63c861badeb54890fdd85",
+        "m1_bytes_mutation": null,
+        "node_id": "INVENTORY_CHANNEL_STATE",
+        "operator_bytes": "FROZEN",
+        "operator_id": "INV_DELTA_MEAN_REVERSION",
+        "status": "FROZEN_DECISION_SURFACE",
+        "threshold_grid": "FORBIDDEN_WITHOUT_SEARCH_BUDGET_CHARGE"
       },
-      "E2_net_return": {
-        "field": "E2",
-        "source": "BLOCKED_UNSET",
-        "value": {
-          "price_provider_semantics": "BLOCKED_UNSET",
-          "entry_price_convention": "BLOCKED_UNSET",
-          "exit_price_convention": "BLOCKED_UNSET",
-          "corporate_action_adjustment": "BLOCKED_UNSET"
-        },
-        "reason": "no FTK-ECON authoritative price/return law; AOV narrative not auto-inherited; owner must admit law or bind path",
-        "surveyed_non_authority": [
-          "docs/architecture/alpha_pit_data_api_v1.md",
-          "docs/architecture/aov_endgame_generalization_spec_current.md",
-          "research/aov0/contracts.py (ACTIVE_TOTAL_RETURN_AUTHORITY is AOV family)"
-        ],
-        "outcome_blind": true,
-        "residual_peek": false
-      },
-      "E3_lag_cost": {
-        "field": "E3",
-        "source": "BLOCKED_UNSET",
-        "value": {
-          "execution_lag": "BLOCKED_UNSET",
-          "cost_formula": "BLOCKED_UNSET",
-          "free_fit": false
-        },
-        "reason": "AOV one_bar / turnover*0.0010 not FTK-ECON authority; free_fit=false; refuse invent",
-        "surveyed_non_authority": [
-          "research/aov0/contracts.py (execution_lag=one_bar)",
-          "docs/decision log.md (cost=turnover*0.0010 other families)"
-        ],
-        "outcome_blind": true,
-        "residual_peek": false
-      },
-      "E4_right_tail": {
-        "field": "E4.RIGHT_TAIL_PERCENTILE",
-        "source": "OWNER_BLOCKED_UNSET",
-        "value": "OWNER_BLOCKED_UNSET",
-        "form_frozen": "date-local percentile of forward R_net on frozen full-W3 outcome population",
-        "reason": "no owner attachment RIGHT_TAIL_PERCENTILE",
-        "outcome_blind": true,
-        "residual_peek": false
-      },
-      "E5_catastrophe": {
-        "field": "E5.CATASTROPHE_PERCENTILE",
-        "source": "OWNER_BLOCKED_UNSET",
-        "value": "OWNER_BLOCKED_UNSET",
-        "form_frozen": "date-local left-tail percentile of forward R_net; ONE primary",
-        "reason": "no owner attachment CATASTROPHE_PERCENTILE",
-        "outcome_blind": true,
-        "residual_peek": false
-      },
-      "E6_delta_J": {
-        "field": "E6.delta_J_required",
-        "source": "OWNER_OR_CRO_BLOCKED_UNSET",
-        "value": "OWNER_OR_CRO_BLOCKED_UNSET",
-        "form_frozen": "J = FTK fixed-breadth net − PIT EqualWeight(Full W3) net; catastrophe separate gate",
-        "comparator_form": "INHERITED_FORM",
-        "comparator_paths": [
-          "docs/architecture/aov_endgame_generalization_spec_current.md",
-          "research/benchmarks.py (build_pit_equal_weight_benchmark)",
-          "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json"
-        ],
-        "reason": "no owner/CRO attachment delta_J_required",
-        "outcome_blind": true,
-        "residual_peek": false
-      },
-      "E7_K": {
-        "field": "E7.K",
-        "source": "OWNER_BLOCKED_UNSET",
-        "value": "OWNER_BLOCKED_UNSET",
-        "score_map_form": "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K",
-        "score_map_status": "FROZEN_FORM",
-        "reason": "no owner attachment K; threshold_search FORBIDDEN",
-        "outcome_blind": true,
-        "residual_peek": false
-      },
-      "E9_folds": {
-        "field": "E9",
-        "source": "INHERITED_AUTHORITY",
-        "value": {
-          "source_run": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
-          "temporal_fold_count": 4,
-          "minimum_fold_n": 30,
-          "minimum_fold_coverage": 0.2,
-          "minimum_supporting_temporal_folds": 3,
-          "xs_holdout_is_corroboration_not_tuning": true
-        },
-        "authority_path": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
-        "outcome_blind": true,
-        "residual_peek": false
-      },
-      "E10_D7": {
-        "field": "D7_CONFIRMATION_TIMING",
-        "source": "BLOCKED_UNSET",
-        "value": "BLOCKED_UNSET",
-        "reason": "no executable FTK confirmation rule; owner attachment D7_MODE unset; refuse invent; owner may later INHERIT path OR EXPLICITLY_OUT_OF_SCOPE_THIS_TRIAL",
-        "surveyed_non_authority": [
-          "docs/architecture/alpha_scientific_method_v1.md (layer ID only)",
-          "docs/architecture/ao_ftk_* (no confirmation feature definition)",
-          "research/asymmetric_opportunity_v1/* (no D7 rule object)"
-        ],
-        "outcome_blind": true,
-        "residual_peek": false
+      {
+        "decision_dof_slot": 2,
+        "family_alias": "M1_STATE_MEAN_REVERSION",
+        "fit_or_tuning": "FORBIDDEN",
+        "formula": "prediction = -frozen_M1_continuous_state_prediction(operating_margin node); M1 implementation bytes unchanged from S0 low-SNR continuous state; maps to next-PIT operating-margin direction",
+        "immutability_pin": "a464058d05abbe4a7da420598ed57a6d0b2033bb732521ecc5b5257471b633cd",
+        "m1_bytes_mutation": "FORBIDDEN",
+        "node_id": "MARGIN_CASH_STATE",
+        "operator_bytes": "FROZEN",
+        "operator_id": "MARGIN_M1_STATE_MEAN_REVERSION",
+        "status": "FROZEN_DECISION_SURFACE",
+        "threshold_grid": "FORBIDDEN_WITHOUT_SEARCH_BUDGET_CHARGE"
       }
+    ],
+    "representation": {
+      "inventory_decision_emit": "-sign(delta) via INV_DELTA_MEAN_REVERSION (sign is emission only; continuous retained for SNR)",
+      "inventory_state": "continuous lag-1 inventory economic-level delta",
+      "margin_state": "continuous operating-margin M1 state",
+      "note": "UNCHANGED from parent L4/L5; no representation redesign",
+      "sensing_preference": "continuous preferred over sign-only scores"
     },
-    "inherited": [
-      "E9_folds",
-      "E8_comparator_form",
-      "surface_dof_2_operators",
-      "score_map_form"
-    ],
-    "owner_bound": [],
-    "explicitly_out_of_scope": [],
-    "blocked_unset": [
-      "E1_H_VALUE",
-      "E2_net_return",
-      "E3_lag_cost",
-      "E4_right_tail",
-      "E5_catastrophe",
-      "E6_delta_J",
-      "E7_K",
-      "E10_D7"
-    ],
-    "verdict": "WAITING_NUMERICS",
-    "l5_ready": false,
-    "l5_blockers_remaining": [
-      "E1.H_VALUE=OWNER_BLOCKED_UNSET (no owner attachment)",
-      "E2.price_return=BLOCKED_UNSET (no FTK-ECON authoritative law; refuse invent)",
-      "E3.execution_lag=BLOCKED_UNSET",
-      "E3.cost_formula=BLOCKED_UNSET",
-      "E4.RIGHT_TAIL_PERCENTILE=OWNER_BLOCKED_UNSET",
-      "E5.CATASTROPHE_PERCENTILE=OWNER_BLOCKED_UNSET",
-      "E6.delta_J_required=OWNER_OR_CRO_BLOCKED_UNSET",
-      "E7.K=OWNER_BLOCKED_UNSET",
-      "E10.D7_RULE=BLOCKED_UNSET (no invent; owner INHERIT path or OUT_OF_SCOPE)",
-      "economic_l5_authorized=false (separate L5_AUTHORIZE receipt required; never auto)"
-    ],
-    "receipt_path": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json",
-    "long_session_recheck": {
-      "session_id": "AO-FTK-1-ECON-1-LONG-SESSION-BIND-OPTIONAL-TRIAL2",
-      "owner_attachment_present": false,
-      "path": "A_WAITING",
-      "verdict": "WAITING_NUMERICS",
-      "debit_join_run": false,
-      "receipt": "docs\\context\\e2e_evidence\\ao_ftk_1_econ_1_long_session_empty_attachment.json"
-    }
-  }
+    "routing": "DOMAIN_LIMITED_EX_ANTE",
+    "silent_one_dof_collapse": "FORBIDDEN",
+    "third_decision_dof": "FORBIDDEN"
+  },
+  "trial2_result": {
+    "financial_alpha_evidence": 0,
+    "first_fail_layer": "D2_DATA_OBSERVABLE",
+    "run_id": "AO_FTK_1_ECON_1_L5_ECONOMIC_RUN_1",
+    "session_path": "C_TRIAL2_COMPLETE"
+  },
+  "w6": "UNTOUCHED"
 }

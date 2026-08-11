@@ -1,0 +1,124 @@
+{
+  "ao_ftk_2": "NOT_OPENED",
+  "auth_receipt_id": "AO_FTK_1_ECON_1_L5_AUTHORIZATION",
+  "capital_authority": false,
+  "constitution": "Accept draft binds. One transition-position economic trial. Same return law both sides. ΔJ>0 is a screen not capital. L6 first-fail. L7 stop. No slice 2.",
+  "debit_receipt_id": "AO_FTK_1_ECON_1_L5_TRIAL_DEBIT",
+  "diagnosed_at_utc": "2026-08-11T20:33:56Z",
+  "failure_route": "HOLD_OR_ADMIT_FULL_W3_MARKET_CUSTODY_THEN_RERUN_UNDER_NEW_AUTH",
+  "financial_alpha_evidence": 0,
+  "first_fail_layer": "D2_DATA_OBSERVABLE",
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "information_gain": {
+    "d9_interpretation": "POSITIVE_NET_EDGE_SCREEN",
+    "delta_J": null,
+    "financial_alpha_evidence": 0,
+    "forbidden_to_change": [
+      "second evaluation without new owner auth",
+      "threshold/parameter/H/K grid",
+      "DOF collapse or third DOF",
+      "operator/feature rewrite under same freeze",
+      "invent Full-W3 returns / ticker bridges",
+      "claim financial_alpha_evidence > 0",
+      "open AO-FTK-2 / L8 / capital",
+      "invent D7 confirmation rule"
+    ],
+    "summary": "Relative to economic freeze+bind (unjoined), this one-shot economic Trial 2 joined the economic pack schema under ACCEPT_DRAFT H=63/K=20/RT=0.90/CAT=0.10/ΔJ=0.0 and attempted Full-W3 net-edge evaluation. Result: Full-W3 market custody missing; R_net/ΔJ unevaluable; no capital path; alpha remains 0. Sensing L5 association evidence is unchanged historical context only.",
+    "what_was_learned": [
+      "Owner numerics bind successfully clears L5_READY without invention",
+      "Economic estimand is blocked by Full-W3 market return custody, not by DOF/surface",
+      "AOV ~104-name market history is not a valid Full-W3 comparator substitute",
+      "D7 OUT_OF_SCOPE is enforceable without inventing a confirmation rule"
+    ],
+    "what_was_not_learned": [
+      "Whether fixed-breadth K=20 improves right-tail / payoff vs Full-W3",
+      "Whether H=63 hold/exit catastrophe load is acceptable",
+      "Whether ΔJ > 0 under POSITIVE_NET_EDGE_SCREEN"
+    ],
+    "which_single_layer_may_change_next": "Owner may admit Full-W3 market custody (new data slice) or HOLD/STOP; not auto-dispatched. Remaining material trials=1 after this debit."
+  },
+  "join_receipt_id": "AO_FTK_1_ECON_1_L5_LABEL_JOIN",
+  "layers": [
+    {
+      "in_scope": true,
+      "layer": "D1_CUSTODY_PIT",
+      "notes": "Operator pins match parent L4; dof=2; ACCEPT_DRAFT binds outcome-blind; no PIT rewrite; economic pack distinct from sensing; symmetry law recorded.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D2_DATA_OBSERVABLE",
+      "notes": "Full-W3 forward R_net not observable under admitted market custody. Admitted market securities=104; W3 eligible sample=5260. Refuse invent returns; refuse AOV-104 proxy as Full-W3 denominator.",
+      "status": "FAIL",
+      "stop_here": true
+    },
+    {
+      "in_scope": true,
+      "layer": "D3_MEASUREMENT_POWER",
+      "notes": "Not reached; stopped at D2.",
+      "status": "NOT_REACHED",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D4_REPRESENTATION_SNR",
+      "notes": "Not reached; stopped at D2.",
+      "status": "NOT_REACHED",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D5_MECHANISM_SELF_TRANSITION",
+      "notes": "Not reached; stopped at D2. Sensing L5 remains historical PASS.",
+      "status": "NOT_REACHED",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D6_SELECTION",
+      "notes": "Not reached; stopped at D2. Subclaim (K=20 vs Full-W3) unevaluable.",
+      "status": "NOT_REACHED",
+      "stop_here": false
+    },
+    {
+      "in_scope": false,
+      "layer": "D7_CONFIRMATION",
+      "notes": "NOT_IN_SCOPE (OUT_OF_SCOPE); do not invent.",
+      "status": "NOT_IN_SCOPE",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D8_HOLD_EXIT",
+      "notes": "Not reached; stopped at D2. Fixed H=63 law frozen but unevaluable.",
+      "status": "NOT_REACHED",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D9_ECONOMICS",
+      "notes": "Not reached; stopped at D2. POSITIVE_NET_EDGE_SCREEN unevaluable; capital floor not granted.",
+      "status": "NOT_REACHED",
+      "stop_here": false
+    }
+  ],
+  "mode": "TRANSITION_POSITION_ECONOMIC",
+  "parent_program": "AO-FTK-1-20260812",
+  "precommitted_routes_recorded": {
+    "D6_D8_D9_PASS_IN_SCOPE": "research candidate only; alpha=0; no auto capital",
+    "D6_D8_PASS_D9_FAIL": "sensing≠positive net edge; bank knowledge; no capital path",
+    "D6_FAIL": "HOLD/STOP FTK primary; no representation refine",
+    "D6_PASS_D8_FAIL": "safety fail; reject hold/action law",
+    "actual_route_this_run": "HOLD_OR_ADMIT_FULL_W3_MARKET_CUSTODY_THEN_RERUN_UNDER_NEW_AUTH"
+  },
+  "receipt_id": "AO_FTK_1_ECON_1_L6_LAYERED_DIAGNOSIS",
+  "run_id": "AO_FTK_1_ECON_1_L5_ECONOMIC_RUN_1",
+  "schema_version": "ao_ftk_1_econ_1_l6_layered_diagnosis_v1",
+  "subclaims": {
+    "D6": "fixed-breadth K=20 improves predeclared payoff/right-tail vs Full-W3 — UNEVALUABLE",
+    "D7": "NOT_IN_SCOPE",
+    "D8": "fixed-H=63 hold vs catastrophe (10th pct) — UNEVALUABLE",
+    "D9": "ΔJ > 0 after lag+costs with fold stability — UNEVALUABLE; capital floor not granted"
+  }
+}
