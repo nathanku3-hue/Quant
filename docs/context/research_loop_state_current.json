@@ -110,7 +110,7 @@
       "status": "L5_COMPLETE_WAITING_OWNER_L7",
       "terminal_verdict": "L5_COMPLETE_WAITING_OWNER_L7",
       "track_id": "AO-FTK-1-ECON-1",
-      "work_commit": "PENDING_COMMIT",
+      "work_commit": "705b308",
       "worker_status": "CLOSED / NO_WORKER"
     },
     {
@@ -209,7 +209,8 @@
     "material_trials_charged": 2,
     "material_trials_remaining": 1,
     "run_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_run.json",
-    "session_path": "C_TRIAL2_COMPLETE"
+    "session_path": "C_TRIAL2_COMPLETE",
+    "work_commit": "705b308"
   },
   "last_empirical_diagnosis": {
     "also_flagged": [
