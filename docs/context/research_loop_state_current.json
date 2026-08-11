@@ -43,22 +43,24 @@
       "l5_auto_open": false,
       "l5_debit_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_trial_debit.json",
       "l5_join_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_label_join.json",
+      "l5_l6_l7_close_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json",
       "l5_run_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+      "l5_work_commit": "948471c",
       "l6_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l6_layered_diagnosis.json",
       "l7_owner_packet": "docs/context/e2e_evidence/ao_ftk_1_20260812_l7_owner_packet.json",
       "label_bytes_joined": true,
       "loop_phase": "L7_ROADMAP_DECISION",
       "material_trials_charged_this_slice": 1,
       "material_trials_remaining": 2,
-      "next": "OWNER L7 decision; no autonomous next slice; no second L5",
+      "next": "CLOSED / NO_WORKER; WAITING_OWNER_L7; select route from owner packet; never silent second L5",
       "parent_freeze_commit": "6832066",
       "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
       "role": "SHADOW_RESEARCH_CLOSED",
       "runnable_evaluation": false,
       "slice_id": "AO-FTK-1-20260812",
-      "status": "L5_COMPLETE_WAITING_OWNER_L7",
+      "status": "L5_L6_COMPLETE_CLOSED_WAITING_OWNER_L7",
       "track_id": "AO-FTK-1",
-      "worker_status": "L5_COMPLETE / WAITING_OWNER_L7"
+      "worker_status": "CLOSED / NO_WORKER"
     },
     {
       "next": "continue under own contract; do not merge into FTK/Q",
@@ -90,8 +92,8 @@
     "owner select L7 route from owner packet",
     "CRV1 / Sector Rotation isolated work",
     "PAPER-0 ops at alpha_evidence=0",
-    "update this state file when owner decides",
-    "read L5/L6/L7 receipts"
+    "read L5/L6/L7 close + receipts",
+    "update this state file when owner decides"
   ],
   "authority": {
     "active_brief": "docs/context/ACTIVE_BRIEF",
@@ -101,6 +103,7 @@
   },
   "constitution": "docs/architecture/alpha_scientific_method_v1.md",
   "forbidden_now": [
+    "reopen AO-FTK-1 L5 worker without new owner authorization",
     "second L5 evaluation without new owner authorization",
     "threshold/parameter grid or DOF rewrite",
     "post-hoc economic cut binding after peeking",
@@ -153,6 +156,20 @@
     "terminal_verdict": "L4_FREEZE_PASS",
     "worker_status": "CLOSED / NO_WORKER"
   },
+  "last_l5_l6_l7_close": {
+    "failure_route": "NONE_IN_SCOPE_PASS",
+    "financial_alpha_evidence": 0,
+    "first_fail_layer": null,
+    "l5_work_commit": "948471c",
+    "label_bytes_joined": true,
+    "material_trials_charged_this_slice": 1,
+    "material_trials_remaining": 2,
+    "receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json",
+    "slice_id": "AO-FTK-1-20260812",
+    "surface_status": "BOTH_NODES_MEASURABLE_SIGNAL",
+    "terminal_verdict": "L5_L6_COMPLETE_CLOSED_WAITING_OWNER_L7",
+    "worker_status": "CLOSED / NO_WORKER"
+  },
   "last_l5_run": {
     "effective_decision_dof": 2,
     "evals": 1,
@@ -174,12 +191,14 @@
     "slice_id": "AO-FTK-1-20260812"
   },
   "last_l7_owner_packet": {
+    "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json",
     "l5_auth_spent": true,
     "l7_status": "WAITING_OWNER",
     "packet": "docs/context/e2e_evidence/ao_ftk_1_20260812_l7_owner_packet.json",
     "slice_id": "AO-FTK-1-20260812",
     "trials_remaining": 2,
-    "worker_did_not_select_next_slice": true
+    "worker_did_not_select_next_slice": true,
+    "worker_status": "CLOSED / NO_WORKER"
   },
   "next_worker_slice": {
     "alternatives": [
@@ -192,6 +211,7 @@
       "PARALLEL_ONLY_CRV1_SECTOR_PAPER_CLOCK"
     ],
     "forbidden_as_next": [
+      "reopen AO-FTK-1 as active L5 worker without new owner authorization",
       "silent second L5 without new owner authorization",
       "open AO-FTK-2 before owner L7",
       "OK-SBI-0 S2 evaluation",
@@ -210,14 +230,14 @@
   "process": {
     "diagnosis_layer_if_any": null,
     "failure_route_if_any": "NONE_IN_SCOPE_PASS",
-    "last_completed_note": "AO-FTK-1-20260812 L5 one-shot: debit=1 remaining=2 labels joined; surface=BOTH_NODES_MEASURABLE_SIGNAL first_fail=None route=NONE_IN_SCOPE_PASS; alpha_evidence=0; L7 WAITING_OWNER",
+    "last_completed_note": "AO-FTK-1-20260812 L5 sensing-first + L6 diagnosis complete and worker CLOSED: debit=1 remaining=2 labels joined; surface=BOTH_NODES_MEASURABLE_SIGNAL; first_fail=null route=NONE_IN_SCOPE_PASS; alpha_evidence=0; L7 WAITING_OWNER",
     "last_completed_phase": "L6_LAYERED_DIAGNOSIS",
     "loop_phase": "L7_ROADMAP_DECISION",
-    "loop_phase_label": "AO-FTK-1 L5 sensing-first complete + L6 diagnosis; waiting owner L7 decision",
+    "loop_phase_label": "AO-FTK-1 L5/L6 CLOSED/NO_WORKER; waiting owner L7 decision",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
     "method_status": "LOCKED",
     "next_phase": "OWNER_L7_DECISION",
-    "next_phase_note": "Owner selects L7 route only. No auto L5 re-run. No AO-FTK-2. Trials remaining=2. financial_alpha_evidence=0.",
+    "next_phase_note": "Owner selects L7 route only. No active FTK-1 worker. No auto L5 re-run. No AO-FTK-2. Trials remaining=2. financial_alpha_evidence=0.",
     "representation_snr_gate_status": "PASS_AO_FTK_1_20260812_L5_SENSING_COMPLETE"
   },
   "product": {

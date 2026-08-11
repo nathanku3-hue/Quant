@@ -22,9 +22,9 @@ RUNTIME_AUTHORITY        = docs/context/gv_endgame_authority_current.md
 ```text
 ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 ACTIVE_BASIS_AUTHORITY   = AO-K0A / OrthogonalizationContractV1 / NO_EMPIRICAL_RESULT
-ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-20260812 / L4_CLOSED (WAIT_OWNER_L5 / NO_WORKER)
+ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-20260812 / L5_L6_CLOSED (WAITING_OWNER_L7 / NO_WORKER)
 AO_FTK_0_STATUS          = CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER
-AO_FTK_1_STATUS          = L4_FREEZE_PASS_CLOSED / NO_WORKER / effective_dof=2 / material_trials_charged=0 / labels_unjoined / L5=false
+AO_FTK_1_STATUS          = L5_L6_COMPLETE_CLOSED_WAITING_OWNER_L7 / NO_WORKER / effective_dof=2 / charged=1 remaining=2 / labels_joined / L5_auth_spent=true
 OK_SBI_0_STATUS          = S0_DESIGN_LOCKED_RELEASE_BLOCKED + Q_SOURCE_BLOCKED_TERMINAL (PARKED)
 CAPITAL_ALPHA_PATH       = CLOSED
 FINANCIAL_ALPHA_EVIDENCE = 0
@@ -55,22 +55,26 @@ ao_ftk_1_l4_freeze       = docs/architecture/ao_ftk_1_20260812_l4_charged_slice_
 ao_ftk_1_l4_receipt      = docs/context/e2e_evidence/ao_ftk_1_20260812_l4_charged_slice_freeze.json
 ao_ftk_1_l4_close        = docs/context/e2e_evidence/ao_ftk_1_20260812_l4_close.json
 ao_ftk_1_l4_work_commit  = a3350f0
+ao_ftk_1_l5_work_commit  = 948471c
+ao_ftk_1_l5_l6_l7_close  = docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json
 ```
 
-## AO-FTK-1 L5/L6 status (2026-08-12)
+## AO-FTK-1 L5/L6 status (2026-08-12) — CLOSED
 
 ```text
+WORKER_STATUS         = CLOSED / NO_WORKER
+TERMINAL_VERDICT      = L5_L6_COMPLETE_CLOSED_WAITING_OWNER_L7
 L5_AUTH               = SPENT (SENSING_FIRST one-shot)
 MATERIAL_TRIALS       = charged 1 / remaining 2
 LABEL_BYTES_JOINED    = true (sensing targets only; one join)
 EVALS                 = 1 frozen 2-DOF sensing eval
 SURFACE_STATUS        = BOTH_NODES_MEASURABLE_SIGNAL
-FIRST_FAIL_LAYER      = None
+FIRST_FAIL_LAYER      = null
 FAILURE_ROUTE         = NONE_IN_SCOPE_PASS
 FINANCIAL_ALPHA_EVIDENCE = 0
-NEXT                  = OWNER L7 decision (no auto next slice / no second L5)
-RECEIPTS              = docs/context/e2e_evidence/ao_ftk_1_20260812_l5_*.json
-                        + l6_layered_diagnosis + l7_owner_packet
+NEXT                  = OWNER L7 decision only (no active worker; no second L5)
+CLOSE                 = docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json
+L5_WORK_COMMIT        = 948471c
 ```
 
 ## Do now
@@ -78,8 +82,8 @@ RECEIPTS              = docs/context/e2e_evidence/ao_ftk_1_20260812_l5_*.json
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
 2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / Rule100 bridges / open OK-SBI S2.
 3. **AO-FTK-0 CLOSED** (NO_WORKER). Do not reopen as worker or open its outcomes.
-4. **AO-FTK-1 L4 CLOSED** (`L4_FREEZE_PASS_CLOSED_READY_FOR_OWNER_L5` / NO_WORKER) → **WAIT_OWNER_L5**. Binding freeze: 2-DOF continuous inventory lag-1 + continuous M1; label identity + hash procedure; trial-debit plan (0 charged / 3 remaining). **L5 is NOT_AUTHORIZED.** No active FTK-1 worker. No silent L5. No trial debit. No label join. `financial_alpha_evidence=0`.
-5. Owner next: **L7 route** from `ao_ftk_1_20260812_l7_owner_packet.json` (HOLD_EVIDENCE / L8 / STOP / later economic freeze). No auto L5.
+4. **AO-FTK-1 L5/L6 CLOSED** (`L5_L6_COMPLETE_CLOSED_WAITING_OWNER_L7` / NO_WORKER). One-shot sensing-first done: debit 1 (remaining 2), labels joined once, one frozen 2-DOF eval, L6 first-fail clean (`NONE_IN_SCOPE_PASS`). **No active FTK-1 worker. No second L5.** `financial_alpha_evidence=0`.
+5. Owner next: **L7 route** from `ao_ftk_1_20260812_l7_owner_packet.json` (HOLD_EVIDENCE / L8 / STOP / later economic freeze). Worker closed. No auto L5.
 6. Do not fill OK-SBI 20 gates for optics; do not spend Q amendment.
 7. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
 
