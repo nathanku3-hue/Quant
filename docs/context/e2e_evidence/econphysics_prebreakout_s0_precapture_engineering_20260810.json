@@ -1,0 +1,98 @@
+{
+  "schema_version": "econphysics_prebreakout_s0_precapture_engineering_evidence_v1",
+  "round_id": "ECONPHYSICS_PREBREAKOUT_S0_PRECAPTURE_20260810",
+  "family_id": "ECONPHYSICS_PREBREAKOUT_v1",
+  "slice_id": "ECONPHYSICS_S0_STRUCTURED_STATE_TRANSITION_PROOF_v1",
+  "status": "PRECAPTURE_ENGINEERING_READY_CAPTURE_NOT_EXECUTED",
+  "scope": {
+    "failure_packet_extension_performed": false,
+    "provider_capture_executed": false,
+    "market_data_access_performed": false,
+    "winner_or_equity_outcome_access_performed": false,
+    "selection_performed": false,
+    "selection_budget_frozen": false,
+    "successor_empirical_trial_opened": false,
+    "successor_prediction_clock_started": false,
+    "w6_access_performed": false,
+    "a2_requery_performed": false,
+    "vsb_outcome_access_performed": false,
+    "crv1_outcome_access_performed": false,
+    "financial_alpha_evidence": 0,
+    "promotion_authority": "NONE",
+    "capital_authority": "NONE"
+  },
+  "real_w3_request_freeze": {
+    "pre_w6_first_session": "2025-03-24",
+    "pre_w6_last_session": "2026-06-10",
+    "pre_w6_session_count": 306,
+    "w6_decision_session_count_excluded": 20,
+    "maturity_tail_session_count_excluded": 20,
+    "w3_eligible_row_count": 1485440,
+    "exact_ciqsec_company_pair_count": 5733,
+    "weekly_asof_count": 64,
+    "weekly_asof_first": "2025-03-28",
+    "weekly_asof_last": "2026-06-10",
+    "date_local_period_probe_pair_count": 310329,
+    "request_manifest": "docs/architecture/econphysics_prebreakout_s0_structured_request_v1.json",
+    "request_manifest_sha256": "5b8f9194f0d0cd309a45ab8dbc53fbdc2baf818f4e7defeb5886069e90cdc2f5",
+    "ciqsec_company_master_sha256": "5f8d425f78093bd9f0ce47f61178f51f40fccafe437e366fa9f7f1818cd54744",
+    "weekly_asof_spine_sha256": "35da4eaa52a1fa47c3ee607ee956329cf5bdb3a5461048eae9b5b48e8a561264",
+    "period_probe_plan_sha256": "f12b787aee5a58a1875411675c7e1a5f6c09dd63d397f9b282984c35f0ebe74d"
+  },
+  "frozen_capture_shape": {
+    "stage_1": {
+      "mode": "EXACT_W3_ELIGIBLE_ENTITY_DATE_PAIRS",
+      "metric": "IQ_PERIOD_END",
+      "relative_period": "FQ0",
+      "missing_period_end": "PRESERVE_EXPLICITLY"
+    },
+    "stage_2": {
+      "rule": "ADJACENT_NONMISSING_ADVANCING_FQ0_PERIOD_CHANGE_ONLY",
+      "first_observation": "BASELINE_ONLY_NO_FULL_PULL",
+      "bridge_across_missing_probe": false
+    },
+    "stage_3": {
+      "relative_periods": ["FQ0", "FQ-1", "FQ-2", "FQ-3", "FQ-4"],
+      "metrics": ["IQ_PERIOD_END", "IQ_TOTAL_REV", "IQ_INVENTORY", "IQ_OPER_INC", "IQ_CAPEX_BNK"],
+      "filing_version": "Original",
+      "currency": "USD",
+      "magnitude": "Thousands"
+    }
+  },
+  "implementation": {
+    "research/econphysics_prebreakout_v1/__init__.py": "f01ed7c3b651b48ed17255724bd21619ad33c1ca878bb1562457a3700f323021",
+    "research/econphysics_prebreakout_v1/contracts.py": "b2d77e06486b763ae6c78f87422bb565ae27498a9dc931851b4be806e05518c9",
+    "research/econphysics_prebreakout_v1/structured_state.py": "34168f70a66fc1e748415de3c23a3068faf94bb11705c08682c82e797eb79d58",
+    "research/econphysics_prebreakout_v1/transition_evaluator.py": "2380cd61eeb5cda2a2045ea982a562abff176164487d846b79bc730314f9b14a",
+    "scripts/econphysics_prebreakout_s0_request.py": "eb10bb03fe3f19c1c2a7838db6c5794ec6c0b58e8ae16979d3140ecac8a156e7",
+    "scripts/aov0_capture_ciq_historical_pit_productquery.py": "24723ad1a4d58d53a5d9efd84f3297d335f8657c6d2431a4753cec3bc033d9e3",
+    "tests/econphysics_prebreakout_v1/test_s0_structured_transition.py": "a9ed2fe4015f3a3209a321f8b33ca9ea02992940d3fae3693030b0f68d876189"
+  },
+  "mechanism_contract": {
+    "fit_or_tuning_performed": false,
+    "directions": ["LATEST_VS_PRIOR", "YOY"],
+    "explicit_states": ["MIXED", "UNOBSERVED", "NOT_APPLICABLE"],
+    "capex_semantics": "SUPPLY_CAPITAL_CYCLE_EVIDENCE_ONLY_NOT_CAPACITY_STATE",
+    "targets": [
+      "NEXT_PIT_INVENTORY_TO_REVENUE_NORMALIZATION_DIRECTION",
+      "NEXT_PIT_REVENUE_DIRECTION",
+      "NEXT_PIT_OPERATING_MARGIN_DIRECTION"
+    ],
+    "temporal_fold_count": 4,
+    "majority_fold_requirement": 3,
+    "fold_support_rule": "N>0 AND lift_vs_no_information_baseline>1 AND directional_association>0",
+    "xs_holdout": "sha256(ECONPHYSICS_S0_XS_HOLDOUT_V1|CIQSEC) mod 5 == 0",
+    "low_coverage_status": "UNOBSERVED",
+    "non_survivor_status": "FAILED"
+  },
+  "validation": {
+    "s0_focused_pytest": "11/11 PASS",
+    "legacy_productquery_plus_s0_pytest": "15/15 PASS",
+    "selected_python_compile": "PASS",
+    "scoped_git_diff_check": "PASS",
+    "real_w3_request_freeze_execution": "PASS_LOCAL_ONLY_NO_PROVIDER",
+    "provider_capture_validation": "NOT_RUN_REQUIRES_EXPLICIT_GO",
+    "s0_mechanism_result": "NOT_AVAILABLE_NO_PROVIDER_CAPTURE"
+  },
+  "next_authority_gate": "EXPLICIT_PROVIDER_CAPTURE_GO_FOR_FROZEN_S0_REQUEST"
+}

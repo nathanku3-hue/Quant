@@ -1,0 +1,128 @@
+{
+  "admission": {
+    "available_at_rule": "CONSERVATIVE_END_OF_REQUESTED_AS_OF_DATE_UTC",
+    "capex_semantics": "SUPPLY_CAPITAL_CYCLE_EVIDENCE_ONLY_NOT_CAPACITY_STATE",
+    "inventory_to_revenue_formula": "IQ_INVENTORY / IQ_TOTAL_REV",
+    "missingness": "PRESERVE_AS_UNOBSERVED; NO_IMPUTATION",
+    "operating_margin_formula": "IQ_OPER_INC / IQ_TOTAL_REV",
+    "ratio_law": "SAME_RELATIVE_PERIOD_AND_PERIOD_END; SAME_USD_THOUSANDS_UNIT; REVENUE_MUST_BE_POSITIVE"
+  },
+  "capital_authority": "NONE",
+  "family_id": "ECONPHYSICS_PREBREAKOUT_v1",
+  "financial_alpha_evidence": 0,
+  "forbidden_surfaces": [
+    "MARKET_FEATURES",
+    "EQUITY_OUTCOMES",
+    "SELECTION_LABELS",
+    "W6_DECISIONS",
+    "W6_MATURITY_TAIL",
+    "VSB_OUTCOMES",
+    "A2_OUTCOMES_OR_REQUERY",
+    "CRV1_OUTCOMES"
+  ],
+  "frozen_inputs": {
+    "capture_script_sha256": "24723ad1a4d58d53a5d9efd84f3297d335f8657c6d2431a4753cec3bc033d9e3",
+    "causal_contract_sha256": "3accc584b8407fabb2fd78217f64da3f08df46af2f4eaa7f758c6124c88281c9",
+    "ciqsec_company_master": "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_ciqsec_company_master.csv",
+    "ciqsec_company_master_sha256": "5f8d425f78093bd9f0ce47f61178f51f40fccafe437e366fa9f7f1818cd54744",
+    "period_probe_plan": "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_period_probe_plan.csv",
+    "period_probe_plan_sha256": "f12b787aee5a58a1875411675c7e1a5f6c09dd63d397f9b282984c35f0ebe74d",
+    "pit_observable_manifest_sha256": "2d803a3142685ce9fac95d0f6abe99edd4532c6b04485b6851855caf296ad6ca",
+    "pre_w6_weekly_asof_spine": "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_pre_w6_weekly_asof_spine.csv",
+    "pre_w6_weekly_asof_spine_sha256": "35da4eaa52a1fa47c3ee607ee956329cf5bdb3a5461048eae9b5b48e8a561264"
+  },
+  "promotion_authority": "NONE",
+  "provider_capture_authority": "NONE_UNTIL_EXPLICIT_CAPTURE_GO",
+  "request": {
+    "filing_version": "Original",
+    "options": "Options:Curr=USD,Mag=Thousands,ConvMethod=R,FilingVer=Original",
+    "provider": "S&P Capital IQ Pro authenticated existing web session",
+    "provider_function": "SPG",
+    "stage_1_period_probe": {
+      "allow_missing_period_end": true,
+      "argv_after_python": [
+        "scripts/aov0_capture_ciq_historical_pit_productquery.py",
+        "--batch-requests",
+        "200",
+        "period-matrix",
+        "--plan",
+        "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_period_probe_plan.csv",
+        "--master",
+        "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_ciqsec_company_master.csv",
+        "--out",
+        "data/prebreakout/raw/econphysics_s0_structured_v1/fq0_period_matrix.csv",
+        "--allow-missing-period-end"
+      ],
+      "metric": "IQ_PERIOD_END",
+      "output": "data/prebreakout/raw/econphysics_s0_structured_v1/fq0_period_matrix.csv",
+      "plan_mode": "EXACT_W3_ELIGIBLE_ENTITY_DATE_PAIRS",
+      "relative_period": "FQ0"
+    },
+    "stage_2_transition_plan": {
+      "output": "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_period_change_plan.csv",
+      "rule": "CAPTURE_ONLY_ADJACENT_NONMISSING_FQ0_PERIOD_CHANGES; FIRST_OBSERVATION_IS_BASELINE_ONLY; NO_INITIAL_FULL_PULL; NO_BRIDGE_ACROSS_MISSING_PROBES"
+    },
+    "stage_3_sparse_fundamentals": {
+      "argv_after_python": [
+        "scripts/aov0_capture_ciq_historical_pit_productquery.py",
+        "--batch-requests",
+        "200",
+        "transitions",
+        "--plan",
+        "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_period_change_plan.csv",
+        "--master",
+        "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_ciqsec_company_master.csv",
+        "--out",
+        "data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.csv",
+        "--metric",
+        "IQ_PERIOD_END",
+        "--metric",
+        "IQ_TOTAL_REV",
+        "--metric",
+        "IQ_INVENTORY",
+        "--metric",
+        "IQ_OPER_INC",
+        "--metric",
+        "IQ_CAPEX_BNK"
+      ],
+      "metrics": [
+        "IQ_PERIOD_END",
+        "IQ_TOTAL_REV",
+        "IQ_INVENTORY",
+        "IQ_OPER_INC",
+        "IQ_CAPEX_BNK"
+      ],
+      "output": "data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.csv",
+      "relative_periods": [
+        "FQ0",
+        "FQ-1",
+        "FQ-2",
+        "FQ-3",
+        "FQ-4"
+      ]
+    },
+    "value_unit": "USD_THOUSANDS"
+  },
+  "schema_version": "econphysics_prebreakout_s0_structured_request_v1",
+  "slice_id": "ECONPHYSICS_S0_STRUCTURED_STATE_TRANSITION_PROOF_v1",
+  "source_authority": {
+    "authority_manifest_sha256": "7abdfc2e4ac6430e24aac1db8f6a4eee4bfbf69118437ded13c718a5af3a9631",
+    "eligible_row_count": 1485440,
+    "master_pair_count": 5733,
+    "maturity_tail_count_excluded": 20,
+    "partition_declared_sha256": "8c210715d52bbc56aa68f093a6e733b0cb9bfb334260d762c197240c97336463",
+    "partition_sha256": "c8dce8868c34b10cfbbd8738b82cc9b8d4708f9b0fe2ff1c148f7b63d2274016",
+    "period_probe_pair_count": 310329,
+    "pre_w6_first_session": "2025-03-24",
+    "pre_w6_last_session": "2026-06-10",
+    "pre_w6_session_count": 306,
+    "session_partition_sha256": "c8dce8868c34b10cfbbd8738b82cc9b8d4708f9b0fe2ff1c148f7b63d2274016",
+    "w3_root": "data/prebreakout/compiled/w3_real_authority_20250324_20260807",
+    "w6_decision_count_excluded": 20,
+    "weekly_as_of_count": 64,
+    "weekly_as_of_first": "2025-03-28",
+    "weekly_as_of_last": "2026-06-10"
+  },
+  "status": "FROZEN_REQUEST_ONLY_CAPTURE_NOT_EXECUTED",
+  "successor_empirical_authority": "NONE_UNTIL_PROVIDER_CAPTURE_GO_AND_S0_EVIDENCE_EXISTS"
+}

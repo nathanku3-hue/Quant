@@ -1,0 +1,96 @@
+{
+  "schema_version": "econphysics_prebreakout_s0_dynamics_diagnostic_evidence_v1",
+  "date": "2026-08-11",
+  "status": "NODE_SPECIFIC_DYNAMICS_SURVIVORS",
+  "diagnostic_only": true,
+  "same_corpus_posterior_diagnostic": true,
+  "preregistered_confirmatory_claim": false,
+  "financial_alpha_evidence": 0,
+  "promotion_authority": "NONE",
+  "capital_authority": "NONE",
+  "forbidden_surface_access": {
+    "market_data": false,
+    "equity_or_winner_outcomes": false,
+    "w6": false,
+    "selection_k": false,
+    "threshold_tuning": false,
+    "provider_access_by_diagnostic": false
+  },
+  "source_and_implementation": {
+    "structured_transitions_sha256": "a5b873826c9598d33c71cc1e28f44f4ce26512a9c89aa6685f2a1606e9be0b87",
+    "structured_transitions_receipt_sha256": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f",
+    "master_sha256": "5f8d425f78093bd9f0ce47f61178f51f40fccafe437e366fa9f7f1818cd54744",
+    "transition_plan_sha256": "40ebcb33d1f8c1450fc9755d4c6467fc0963318505ec03c02f76f250aeb2b80b",
+    "m0_m1_shootout_v2_sha256": "fbf6caa24f3614e913cd88c422d362187584d138dbafd1b690e5868b95f5e5b9",
+    "dynamics_runtime_sha256": "c7d83bb3449a07120ff0550b9301c07570aed28fb6761c84f37ad15cc1a96aa0",
+    "dynamics_runner_sha256": "8741a121328d14b7a452a5896eb658a47079f19a1fe9d4a1a4b205f46f020c29",
+    "diagnostic_output_sha256": "01229ae43a9329a0c80ddf87ac88e9feb7ce6d9060b05b7aa4a6b40d3e998df3"
+  },
+  "corpus": {
+    "admitted_snapshot_count": 23047,
+    "security_count": 5382,
+    "adjacent_transition_pair_count": 17662,
+    "temporal_fold_count": 4,
+    "xs_holdout_role": "CORROBORATION_NOT_OPERATOR_SELECTION"
+  },
+  "fixed_operator_family": [
+    "LEVEL_STATE_PERSISTENCE",
+    "DELTA_PERSISTENCE",
+    "DELTA_MEAN_REVERSION",
+    "DELTA2_ACCELERATION",
+    "M0_STATE_MEAN_REVERSION",
+    "M1_STATE_MEAN_REVERSION"
+  ],
+  "results": {
+    "inventory": {
+      "routing": "DYNAMICS_SIGNAL_PRESENT",
+      "lag1_reversal_rate_by_fold": [0.61305, 0.549296, 0.577375, 0.647059],
+      "surviving_operators": [
+        "DELTA_MEAN_REVERSION",
+        "M0_STATE_MEAN_REVERSION",
+        "M1_STATE_MEAN_REVERSION"
+      ],
+      "m0_state_mean_reversion": {
+        "supporting_folds": 4,
+        "lift_by_fold": [1.038462, 1.037613, 1.104167, 1.120968],
+        "association_by_fold": [0.259883, 0.165331, 0.21403, 0.336538]
+      },
+      "m1_state_mean_reversion": {
+        "supporting_folds": 4,
+        "lift_by_fold": [1.006584, 1.049239, 1.117534, 1.032353],
+        "association_by_fold": [0.189689, 0.137312, 0.212755, 0.224063]
+      }
+    },
+    "operating_margin": {
+      "routing": "DYNAMICS_SIGNAL_PRESENT",
+      "lag1_reversal_rate_by_fold": [0.618876, 0.546792, 0.569764, 0.64965],
+      "surviving_operators": ["M1_STATE_MEAN_REVERSION"],
+      "m1_state_mean_reversion": {
+        "supporting_folds": 3,
+        "lift_by_fold": [0.986177, 1.068206, 1.184994, 1.204193],
+        "association_by_fold": [0.21957, 0.163761, 0.243389, 0.317049]
+      }
+    },
+    "revenue": {
+      "routing": "NO_LOW_FREEDOM_DYNAMICS_SIGNAL",
+      "lag1_reversal_rate_by_fold": [0.58724, 0.423481, 0.486922, 0.580388],
+      "surviving_operators": []
+    }
+  },
+  "routing_conclusion": {
+    "observable_insufficiency_supported_globally": false,
+    "retain_nodes": ["INVENTORY_CHANNEL_STATE", "MARGIN_CASH_STATE"],
+    "non_surviving_node": "DEMAND_ORDER_STATE",
+    "m0_m1_persistence_failure_remains_valid": true,
+    "withdrawn_overclaim": "M0/M1 persistence failure does not establish that structured fundamentals contain no transition information"
+  },
+  "layer_boundary": {
+    "upstream_causal_observables": ["orders_backlog", "pricing_mix", "utilization_capacity", "channel_inventory"],
+    "downstream_expectation_observables": ["revisions", "guidance", "consensus"],
+    "mixed_in_diagnostic": false
+  },
+  "validation": {
+    "focused_tests": "21/21 PASS",
+    "command": ".venv/Scripts/python.exe -m pytest tests/econphysics_prebreakout_v1/test_dynamics_diagnostic.py tests/econphysics_prebreakout_v1/test_s0_structured_transition.py tests/econphysics_prebreakout_v1/test_low_snr_m1_and_restartable.py -q"
+  }
+}
