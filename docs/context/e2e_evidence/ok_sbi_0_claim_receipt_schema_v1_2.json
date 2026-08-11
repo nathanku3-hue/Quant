@@ -1,0 +1,65 @@
+{
+  "forbidden_claim_crosswalks": [
+    {
+      "from": "COMMON_SUPPORT_SCIENTIFIC_LEDGER",
+      "reason": "common-support lift sold as full-W3 deployability",
+      "sold_as": "FULL_W3_OPPORTUNITY_CENSUS"
+    },
+    {
+      "from": "FULL_W3_OPPORTUNITY_CENSUS",
+      "reason": "opportunity census sold as strategy P&L",
+      "sold_as": "STRATEGY_PNL"
+    },
+    {
+      "from": "ABSTENTION_ATTRIBUTION_LEDGER",
+      "reason": "abstention attribution sold as Alpha",
+      "sold_as": "ALPHA"
+    }
+  ],
+  "invalid_by_construction": [
+    "common-support lift sold as full-W3 deployability",
+    "opportunity census sold as strategy P&L",
+    "abstention attribution sold as Alpha",
+    "any result sentence without ledger_id or clock_id"
+  ],
+  "legal_clock_ids": [
+    "CAPITAL_TIME_REPORT_ONLY",
+    "M_CLOCK",
+    "Q_CLOCK"
+  ],
+  "legal_ledger_ids": [
+    "COMMON_SUPPORT_SCIENTIFIC_LEDGER",
+    "APPLICABLE_SYSTEM_LEDGER",
+    "FULL_W3_OPPORTUNITY_CENSUS",
+    "ABSTENTION_ATTRIBUTION_LEDGER"
+  ],
+  "outcome_open_required_for_numeric_result": true,
+  "required_fields": [
+    "claim_id",
+    "slice_id",
+    "evaluation_job_id",
+    "result_receipt_sha256",
+    "ledger_id",
+    "clock_id",
+    "arm_id",
+    "comparator_arm_id",
+    "metric_id",
+    "population_scope",
+    "population_sha256",
+    "applicability_scope",
+    "status_stratum",
+    "K_schedule_id",
+    "label_pack_sha256",
+    "numerator",
+    "denominator",
+    "estimate",
+    "uncertainty_method",
+    "confidence_interval",
+    "claim_authority"
+  ],
+  "s0_numeric_result_claims": "FORBIDDEN",
+  "schema_id": "OkSbi0ClaimReceiptSchemaV1",
+  "slice_id": "OK-SBI-0",
+  "spec_version": "v1.2",
+  "untagged_claim": "INVALID"
+}

@@ -1,0 +1,54 @@
+{
+  "contract_id": "QSourceContractV1",
+  "schema_version": "q_source_contract_v1",
+  "date": "2026-08-12",
+  "slice_id": "OK-SBI-0",
+  "status": "Q_SOURCE_BLOCKED",
+  "allowed_status": [
+    "BLOCKED_UNSET",
+    "Q_GF_BOUND",
+    "Q_MINIMAL_AMENDMENT_REQUIRED",
+    "Q_AMENDED_BOUND",
+    "Q_SOURCE_BLOCKED"
+  ],
+  "max_outcome_blind_q_amendment_cycles": 1,
+  "q_amendment_cycles_used": 0,
+  "conceptual_candidate_only": {
+    "primitives": ["RevGrowth_12m", "ROIC"],
+    "authority": false,
+    "note": "Not deployable numeric Q until every required field is source-bound with hashes and no-bridge proof."
+  },
+  "required_primitive_fields": [
+    "primitive_id",
+    "provider_source_object",
+    "exact_field_identifier",
+    "ciqsec_trading_item_identity",
+    "period_perspective_semantics",
+    "pit_availability_timestamp",
+    "minimum_publication_processing_lag",
+    "unit_currency_law",
+    "formula_denominator",
+    "restatement_carry_law",
+    "applicability_rule",
+    "missingness_reason",
+    "corporate_action_treatment",
+    "source_receipt_hash",
+    "no_bridge_proof"
+  ],
+  "separations": {
+    "Q_SOURCE_OBSERVED_ne_Q_NUMERIC_VALUE_AVAILABLE": true,
+    "Q_NUMERIC_AVAILABLE_ne_Q_VALIDATED": true,
+    "Q_VALIDATED_ne_Q_CAPITAL_AUTHORIZED": true
+  },
+  "forbidden": [
+    "silent_synthetic_substitute",
+    "unavailable_field_bridge",
+    "ticker_entity_permno_fallback",
+    "legacy_rule100_feature_store_borrow_for_q_definition",
+    "post_label_q_redesign"
+  ],
+  "implementation_module": "research/asymmetric_opportunity_v1/q_source_contract.py",
+  "markdown_authority": "docs/architecture/q_source_contract_v1.md",
+  "financial_alpha_evidence": 0,
+  "capital_authority": "NONE"
+}

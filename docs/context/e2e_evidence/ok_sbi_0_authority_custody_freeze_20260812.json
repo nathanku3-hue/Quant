@@ -1,0 +1,110 @@
+{
+  "schema_version": "ok_sbi_0_authority_custody_freeze_v1",
+  "date": "2026-08-12",
+  "docs_mode": "DELTA_CURRENT_TRUTH_ONLY",
+  "broad_architecture_reopen": "NO",
+  "authority": {
+    "AUTHORITY_BRANCH": "codex/pit-source-authority-1",
+    "AUTHORITY_COMMIT_BASE": "6045d39ce6649cdb8ca4544af30d4a70ce0fc075",
+    "AUTHORITY_WORKTREE_PATH": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e",
+    "DOCS_REWRITE_TARGET": "AUTHORITY_BRANCH + exact committed successor",
+    "PUBLIC_MAIN": "NON_AUTHORITY_UNTIL_MERGE",
+    "PUBLIC_MAIN_TIP_NOTE": "GitHub/main may contain stale August-5 cut; do not edit or reason from root main as current authority until controlled merge",
+    "CHAT_SANDBOX": "DRAFT_ONLY"
+  },
+  "topology": {
+    "AUTHORITY_LINEAGE_BRANCH": "codex/pit-source-authority-1",
+    "ACTIVE_PRODUCT_STATE": "CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED",
+    "ACTIVE_BASIS_AUTHORITY": "AO-K0A / OrthogonalizationContractV1 / FROZEN_SOURCE_PREFLIGHT / NO_EMPIRICAL_RESULT",
+    "ACTIVE_RESEARCH_SHADOW": "OK-SBI-0 / S0_DESIGN_LOCKED_RELEASE_BLOCKED",
+    "ROADMAP_CHANGE_AUTHORITY": "docs/architecture/aov_endgame_generalization_spec_current.md",
+    "RUNTIME_AUTHORITY": "docs/context/gv_endgame_authority_current.md + frozen executable contract/receipts",
+    "CANONICAL_SCIENTIFIC_UNIT": "OpportunityKernelV1",
+    "CAPITAL_ALPHA_PATH": "CLOSED",
+    "FINANCIAL_ALPHA_EVIDENCE": 0,
+    "FOURTH_EVIDENCE_CLOCK": "FORBIDDEN",
+    "OK_SBI_IS_PRODUCT_TIP": false,
+    "OK_SBI_REPLACES_CLOCK_1": false
+  },
+  "naming_supersession": {
+    "AO-K0A": "RETAIN — frozen denominator/source/orthogonalization preflight; active prerequisite; no empirical result",
+    "OK-SBI-0": "ACTIVE_RESEARCH_SHADOW umbrella — sparse basis identification under OpportunityKernelV1; S0 only until release gates clear",
+    "AO-K0B": "LEGACY_NEXT_SLICE_POINTER — blocked; must not run as Q/M_perp/Q+M_perp trophy",
+    "AO-K0B-D": "alias for development/result-bearing stage within OK-SBI-0; authoritative only after atomic QSource + gates + label hashes + carve-out",
+    "GO_AFTER_PRECONDITIONS": "SUPERSEDED by S0..S4 state machine only when machine-readable freeze is landed",
+    "Q_Mperp_QplusMperp_leaderboard_as_automatic_next": "FORBIDDEN",
+    "AO-K0B_composition_as_established_authority": "FORBIDDEN — diagnosis only until source-bound",
+    "approx_79_49_percent_coverage": "HISTORICAL_NON_AUTHORITY"
+  },
+  "q_identity": {
+    "global_sentence": "Q is not a deployable numeric factor until QSourceContractV1.status ∈ {Q_GF_BOUND, Q_AMENDED_BOUND}. RevGrowth+ROIC, Rule100-Q, and similar formulations are conceptual or historical candidates only unless exact PIT primitives, transforms, lags, missingness law, and hashes are bound.",
+    "separations": {
+      "Q_SOURCE_OBSERVED": "not equal to Q_NUMERIC_VALUE_AVAILABLE",
+      "Q_NUMERIC_AVAILABLE": "not equal to Q_VALIDATED",
+      "Q_VALIDATED": "not equal to Q_CAPITAL_AUTHORIZED"
+    },
+    "current_status": "Q_SOURCE_BLOCKED",
+    "contract_path": "docs/architecture/q_source_contract_v1.md",
+    "machine_path": "docs/architecture/q_source_contract_v1.json"
+  },
+  "numeric_gates_policy": {
+    "BLOCKED_UNSET": "OFFICIAL_NON_FAILING_STATE",
+    "invented_defaults_in_authority_fields": "FORBIDDEN",
+    "runnable_evaluation": false,
+    "runnable_evaluation_law": "runnable_evaluation == (blocked_field_count == 0)",
+    "blocked_field_count": 20,
+    "ownership": {
+      "quant": [
+        "estimand",
+        "population_denominator",
+        "label_tail_mechanics",
+        "score_bootstrap_construction",
+        "lag_cost_implementation",
+        "effective_episode_calculation"
+      ],
+      "owner_cro": [
+        "delta_economic",
+        "epsilon_catastrophe",
+        "promotion_confidence",
+        "capital_risk_implications",
+        "permission_to_freeze_gates"
+      ],
+      "joint_signature_required": [
+        "K_t_breadth",
+        "primary_secondary_tails",
+        "cost_execution_law",
+        "stability_blocks",
+        "search_budget",
+        "promotion_decision"
+      ]
+    }
+  },
+  "complexity_unit": {
+    "complexity_unit": "effective_DOF + charged_search_debt",
+    "feature_count": "non_authority_implementation_cost_proxy"
+  },
+  "operating_rule": {
+    "CRV1_Clock1": "preserve",
+    "Sector_Rotation": "current_bounded_family_work",
+    "VSB_Confirmation": "parked",
+    "OK-SBI-0": "shadow_prerequisites_only",
+    "new_fourth_clock": "forbidden_without_explicit_WIP_review",
+    "capital_authority": "one_closed"
+  },
+  "s0_status": {
+    "STATE": "S0_DESIGN_LOCKED_RELEASE_BLOCKED",
+    "outcome_open_authorized": false,
+    "OK_SBI_0_DEV_OPEN_1": "NOT_ISSUED",
+    "preopen_scaffold": "LANDED_UNCOMMITTED_PARTIAL",
+    "focused_tests": "41/41 PASS as of worker done packet 2026-08-12",
+    "next_legitimate_action": "bind numeric Q field map or single outcome-blind amendment; then populate remaining BLOCKED_UNSET gates; no outcome join"
+  },
+  "authority_artifacts": {
+    "ok_sbi_0_sparse_basis_identification_v1_2.md": "docs/architecture/ok_sbi_0_sparse_basis_identification_v1_2.md",
+    "ok_sbi_0_release_hardening_v1_2.md": "docs/architecture/ok_sbi_0_release_hardening_v1_2.md",
+    "ok_sbi_0_machine_freeze_v1_2.json": "docs/context/e2e_evidence/ok_sbi_0_machine_freeze_v1_2.json",
+    "ok_sbi_0_claim_receipt_schema_v1_2.json": "docs/context/e2e_evidence/ok_sbi_0_claim_receipt_schema_v1_2.json",
+    "orthogonalization_contract_v1.md": "docs/architecture/orthogonalization_contract_v1.md",
+    "ao_k0a_receipt": "docs/context/e2e_evidence/ao_k0a_orthogonal_basis_preflight_20260811.json"
+  }
+}

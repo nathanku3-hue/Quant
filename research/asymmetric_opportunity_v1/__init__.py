@@ -1,8 +1,10 @@
 """Asymmetric-opportunity basis mechanics.
 
-AO-K0A is a source/denominator/orthogonalization preflight only.  It has no
-outcome reader, selector tuning, W6 access, provider acquisition, or capital
-authority.
+AO-K0A is a source/denominator/orthogonalization preflight only.
+OK-SBI-0 / AO-K0B-D S0 adds pre-open contracts only: Q source binding,
+applicability, status strata, arm formulas, C firewall, claim schema,
+label-pack seals, and honest release blockers.  No outcome reader, no
+selector tuning, no W6 access, no provider acquisition, no capital authority.
 """
 
 from research.asymmetric_opportunity_v1.orthogonalization import (

@@ -1,0 +1,586 @@
+{
+  "Q_feasibility": "Q_SOURCE_BLOCKED",
+  "STATE": "S0_DESIGN_LOCKED_RELEASE_BLOCKED",
+  "alias": "AO-K0B-D",
+  "authorization": {
+    "ALPHA_CAPITAL_PRODUCTION": "NONE",
+    "OK_SBI_0_DEV_OPEN_1": "NOT_ISSUED",
+    "OUTCOME_OPEN_NOW": false,
+    "RELEASE_NOW": false,
+    "S0_IMPLEMENTATION_WORK": true,
+    "financial_alpha_evidence": 0
+  },
+  "blocked_field_count": 20,
+  "blocked_fields": [
+    "K_t_schedule",
+    "right_tail_definition_Q_CLOCK",
+    "right_tail_definition_M_CLOCK",
+    "catastrophe_definition_Q_CLOCK",
+    "catastrophe_definition_M_CLOCK",
+    "execution_lag",
+    "cost_law",
+    "delta_economic",
+    "epsilon_catastrophe",
+    "coverage_tolerances",
+    "confidence_level",
+    "temporal_block_definition",
+    "stability_rule",
+    "multiple_testing_method",
+    "minimum_effective_episodes",
+    "random_seed_repetition_law",
+    "code_hash",
+    "Q_CLOCK_LABEL_PACK_sha256",
+    "M_CLOCK_LABEL_PACK_sha256",
+    "q_source_binding_hash"
+  ],
+  "constitution": "Science is locked. Release is not. Build pre-open machinery only. Q may be amended at most once outcome-blind. Every future claim must bind clock + ledger + population + denominator. While any release blocker remains, runnable_evaluation=false and outcome open is forbidden. This is not a Q/M\u22a5/Q+M\u22a5 trophy slice. It is sparse basis identification infrastructure.",
+  "date": "2026-08-11",
+  "forbidden_this_turn": [
+    "outcome_join",
+    "empirical_q_mperp_qplusmperp_result",
+    "cross_horizon_leaderboard",
+    "composite_trophy",
+    "w6",
+    "providers",
+    "capital",
+    "second_q_redesign",
+    "silent_field_bridges",
+    "a5_presumed_winner"
+  ],
+  "freeze_body_sha256": "76380aff486ddf48b09512cadcdc7fa706b53cf67c96767a16745cda1d269a21",
+  "inherited_k0a": {
+    "contract_id": "OrthogonalizationContractV1",
+    "contract_path": "docs/architecture/orthogonalization_contract_v1.md",
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "evidence_path": "docs/context/e2e_evidence/ao_k0a_orthogonal_basis_preflight_20260811.json",
+    "semantics": {
+      "abstention_risky_weight": 0.0,
+      "abstention_selected": false,
+      "breadth_denominator": "ALL_W3_ELIGIBLE_SECURITIES",
+      "complete_case_denominator": "FORBIDDEN",
+      "contract_id": "OrthogonalizationContractV1",
+      "coverage_pass_fail_gate": "FORBIDDEN",
+      "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+      "m_normalization": "DATE_LOCAL_AVERAGE_TIE_PERCENTILE_RANK_OVER_Q_AND_M_OBSERVED_W3",
+      "m_residual_arm_observability": "Q_AND_M_OBSERVED",
+      "missingness": "PERSISTENT_ABSTENTION_STATE_NEVER_ELIGIBILITY_REWRITE",
+      "observed_subset_renormalization": "FORBIDDEN",
+      "opportunity_benchmark": "PIT_EQUAL_WEIGHT_FULL_W3",
+      "opportunity_benchmark_builder": "research.benchmarks.build_pit_equal_weight_benchmark",
+      "orthogonalization": "OLS_RANK_M_ON_INTERCEPT_AND_RANK_Q_WITHIN_DECISION_DATE",
+      "outcome_input": false,
+      "peer_return_imputation": "FORBIDDEN",
+      "q_arm_observability": "Q_OBSERVED",
+      "q_normalization": "DATE_LOCAL_AVERAGE_TIE_PERCENTILE_RANK_OVER_Q_OBSERVED_W3",
+      "q_plus_m_residual_arm_observability": "Q_AND_M_OBSERVED",
+      "residual_capital": "ECONOMIC_CASH",
+      "residual_capital_builder": "research.benchmarks.build_economic_cash_frames",
+      "right_tail_denominator": "ALL_MATURED_W3_ELIGIBLE_WINNERS",
+      "security_level_return_imputation": "FORBIDDEN",
+      "temporal_fit": false
+    }
+  },
+  "machine_law": {
+    "STATE": "S0_DESIGN_LOCKED_RELEASE_BLOCKED",
+    "blocked_field_count": 20,
+    "blocked_fields": [
+      "K_t_schedule",
+      "right_tail_definition_Q_CLOCK",
+      "right_tail_definition_M_CLOCK",
+      "catastrophe_definition_Q_CLOCK",
+      "catastrophe_definition_M_CLOCK",
+      "execution_lag",
+      "cost_law",
+      "delta_economic",
+      "epsilon_catastrophe",
+      "coverage_tolerances",
+      "confidence_level",
+      "temporal_block_definition",
+      "stability_rule",
+      "multiple_testing_method",
+      "minimum_effective_episodes",
+      "random_seed_repetition_law",
+      "code_hash",
+      "Q_CLOCK_LABEL_PACK_sha256",
+      "M_CLOCK_LABEL_PACK_sha256",
+      "q_source_binding_hash"
+    ],
+    "do_not_invent_owner_unapproved_numbers": true,
+    "law": "runnable_evaluation = (blocked_field_count == 0)",
+    "outcome_open_authorized": false,
+    "release_now": false,
+    "runnable_evaluation": false
+  },
+  "outcome_open_authorized": false,
+  "q_amendment_cycles_used": 0,
+  "review_bar": {
+    "S0_to_S1": "mechanical pre-open PASS + all hashes replay + PRODUCT_PREOPEN PASS + blockers zero",
+    "S1_to_S2": "owner/CRO signed carve-out OK-SBI-0-DEV-OPEN-1; SAW may be UNAVAILABLE",
+    "S2_to_S3_RESEARCH_ONLY": "deterministic result receipt + PRODUCT_RESULT PASS; SAW_UNAVAILABLE recorded as coverage-limited",
+    "S3_to_S4_CANDIDATE": "full SAW A/B/C or owner-approved triple independent reviews",
+    "SAW_UNAVAILABLE_is_candidate_promotion_blocker": true,
+    "SAW_UNAVAILABLE_is_research_scientific_failure": false
+  },
+  "runnable_evaluation": false,
+  "schema_version": "ok_sbi_0_machine_freeze_v1_2",
+  "slice_id": "OK-SBI-0",
+  "spec_version": "v1.2",
+  "step1_q_source": {
+    "Q_feasibility": "Q_SOURCE_BLOCKED",
+    "contract": {
+      "contract_id": "QSourceContractV1",
+      "feasibility_verdict": "Q_SOURCE_BLOCKED",
+      "forbid_silent_synthetic_substitute": true,
+      "forbid_ticker_entity_permno_fallback": true,
+      "forbid_unavailable_field_bridge": true,
+      "max_outcome_blind_q_amendment_cycles": 1,
+      "notes": [
+        "RevGrowth_12m+ROIC is conceptual candidate only, not authority.",
+        "AO-K0A did not rederive numeric Q; no silent bridge to Rule100 artifacts.",
+        "No provider/source substitution authorized this turn."
+      ],
+      "numeric_q_status": "NOT_BOUND_S0",
+      "outcome_input": false,
+      "primitives": [
+        {
+          "applicability_rule": "BLOCKED_UNSET",
+          "ciqsec_trading_item_identity": "CIQSEC+trading_item required; unbound",
+          "corporate_action_treatment": "BLOCKED_UNSET",
+          "exact_field_identifier": "BLOCKED_UNSET",
+          "formula_denominator": "BLOCKED_UNSET",
+          "minimum_publication_processing_lag": "BLOCKED_UNSET",
+          "missingness_reason": "BLOCKED_UNSET",
+          "no_bridge_proof": "BLOCKED_UNSET",
+          "period_perspective_semantics": "BLOCKED_UNSET",
+          "pit_availability_timestamp": "BLOCKED_UNSET",
+          "primitive_id": "RevGrowth_12m",
+          "provider_source_object": "CONCEPTUAL_ONLY",
+          "restatement_carry_law": "BLOCKED_UNSET",
+          "source_receipt_hash": "BLOCKED_UNSET",
+          "unit_currency_law": "BLOCKED_UNSET"
+        },
+        {
+          "applicability_rule": "BLOCKED_UNSET",
+          "ciqsec_trading_item_identity": "CIQSEC+trading_item required; unbound",
+          "corporate_action_treatment": "BLOCKED_UNSET",
+          "exact_field_identifier": "BLOCKED_UNSET",
+          "formula_denominator": "BLOCKED_UNSET",
+          "minimum_publication_processing_lag": "BLOCKED_UNSET",
+          "missingness_reason": "BLOCKED_UNSET",
+          "no_bridge_proof": "BLOCKED_UNSET",
+          "period_perspective_semantics": "BLOCKED_UNSET",
+          "pit_availability_timestamp": "BLOCKED_UNSET",
+          "primitive_id": "ROIC",
+          "provider_source_object": "CONCEPTUAL_ONLY",
+          "restatement_carry_law": "BLOCKED_UNSET",
+          "source_receipt_hash": "BLOCKED_UNSET",
+          "unit_currency_law": "BLOCKED_UNSET"
+        }
+      ],
+      "provider_calls": "FORBIDDEN_THIS_TURN",
+      "q_amendment_cycles_used": 0,
+      "slice_id": "OK-SBI-0",
+      "spec_version": "v1.2",
+      "unbound_inventory": {
+        "ROIC": [
+          "provider_source_object",
+          "exact_field_identifier",
+          "period_perspective_semantics",
+          "pit_availability_timestamp",
+          "minimum_publication_processing_lag",
+          "unit_currency_law",
+          "formula_denominator",
+          "restatement_carry_law",
+          "applicability_rule",
+          "missingness_reason",
+          "corporate_action_treatment",
+          "source_receipt_hash",
+          "no_bridge_proof"
+        ],
+        "RevGrowth_12m": [
+          "provider_source_object",
+          "exact_field_identifier",
+          "period_perspective_semantics",
+          "pit_availability_timestamp",
+          "minimum_publication_processing_lag",
+          "unit_currency_law",
+          "formula_denominator",
+          "restatement_carry_law",
+          "applicability_rule",
+          "missingness_reason",
+          "corporate_action_treatment",
+          "source_receipt_hash",
+          "no_bridge_proof"
+        ]
+      }
+    },
+    "invent_q_forbidden": true,
+    "q_amendment_cycles_used": 0,
+    "second_redesign_requires_new_slice_id": true,
+    "step": 1,
+    "step_name": "QSourceContractV1_feasibility",
+    "stop_q_binding": true
+  },
+  "step2_applicability": {
+    "applicable_unobserved_action": "ABSTAIN",
+    "applicable_unobserved_counts_in": [
+      "foregone_right_tail_attribution",
+      "avoided_catastrophe_attribution"
+    ],
+    "applicable_unobserved_unfilled_breadth": "ECONOMIC_CASH",
+    "claim_scope_allowed": [
+      "DOMAIN_LIMITED_EX_ANTE"
+    ],
+    "full_w3_denominator_rewrite": "FORBIDDEN",
+    "law_id": "ApplicabilityLawV1",
+    "not_applicable_consumes_k_t": false,
+    "not_applicable_creates_kernel_cash_drag_narrative": false,
+    "not_applicable_is_backfill_pool": false,
+    "not_applicable_is_candidate": false,
+    "not_applicable_is_missingness": false,
+    "not_applicable_is_strategy_abstention": false,
+    "outcome_conditioned_domain_discovery": "FORBIDDEN",
+    "slice_id": "OK-SBI-0"
+  },
+  "step3_status_strata": {
+    "contract_id": "StatusStrataContractV1",
+    "coverage_cube_label_join": "FORBIDDEN_THIS_TURN",
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "denominator_rewrite": "FORBIDDEN",
+    "k0a_statuses_preserved": true,
+    "mandatory_strata": [
+      "ELIGIBLE_COMPLETE",
+      "Q_UNOBSERVED",
+      "M_WARMUP",
+      "M_MISSING_HISTORY",
+      "Q_AND_M_MISSING",
+      "Q_NOT_APPLICABLE",
+      "M_NOT_APPLICABLE",
+      "OTHER_EXPLICIT_STATUS"
+    ],
+    "missingness": "PERSISTENT_ABSTENTION_PLUS_APPLICABILITY_STRATA",
+    "mixed_unobserved_mashup_language": "FORBIDDEN",
+    "row_deletion_for_missingness": "FORBIDDEN",
+    "slice_id": "OK-SBI-0"
+  },
+  "step4_numeric_gates": {
+    "K_t_schedule": "BLOCKED_UNSET",
+    "M_CLOCK_LABEL_PACK_sha256": "BLOCKED_UNSET",
+    "Q_CLOCK_LABEL_PACK_sha256": "BLOCKED_UNSET",
+    "catastrophe_definition_M_CLOCK": "BLOCKED_UNSET",
+    "catastrophe_definition_Q_CLOCK": "BLOCKED_UNSET",
+    "code_hash": "BLOCKED_UNSET",
+    "confidence_level": "BLOCKED_UNSET",
+    "contract_hash": "305a553f369319e9ade21ea5071624e5468c2c3b710aa12d1e3858e3b9647fe6",
+    "cost_law": "BLOCKED_UNSET",
+    "coverage_tolerances": "BLOCKED_UNSET",
+    "delta_economic": "BLOCKED_UNSET",
+    "denominator_hash": "843ed542380f4ad673a891c9f85370df2e1169f8c592d6ee1b36fea5b72ac040",
+    "epsilon_catastrophe": "BLOCKED_UNSET",
+    "execution_lag": "BLOCKED_UNSET",
+    "minimum_effective_episodes": "BLOCKED_UNSET",
+    "multiple_testing_method": "BLOCKED_UNSET",
+    "q_source_binding_hash": "BLOCKED_UNSET",
+    "random_seed_repetition_law": "BLOCKED_UNSET",
+    "right_tail_definition_M_CLOCK": "BLOCKED_UNSET",
+    "right_tail_definition_Q_CLOCK": "BLOCKED_UNSET",
+    "source_hash": "47c156a3a8b99b67068b417b61b9c566cf6a4f271a88b68be9324de243262dc0",
+    "stability_rule": "BLOCKED_UNSET",
+    "temporal_block_definition": "BLOCKED_UNSET"
+  },
+  "step5_label_packs": {
+    "M_CLOCK_LABEL_PACK": {
+      "blocked_fields": [
+        "right_tail_cut",
+        "catastrophe_cut",
+        "maturity_cutoff",
+        "eligible_decision_date_list",
+        "row_key_set",
+        "label_source_receipt"
+      ],
+      "clock_id": "M_CLOCK",
+      "joined": false,
+      "outcome_inspected": false,
+      "pack_id": "M_CLOCK_LABEL_PACK",
+      "seal_means_open": false,
+      "seal_status": "PACK_BLOCKED_UNSET",
+      "sha256": null,
+      "structural_fingerprint_sha256": "6493c60c4919546b5e52140802120e1e2a54c9a81153f8e21c7f076531fbdaef"
+    },
+    "Q_CLOCK_LABEL_PACK": {
+      "blocked_fields": [
+        "right_tail_cut",
+        "catastrophe_cut",
+        "maturity_cutoff",
+        "eligible_decision_date_list",
+        "row_key_set",
+        "label_source_receipt"
+      ],
+      "clock_id": "Q_CLOCK",
+      "joined": false,
+      "outcome_inspected": false,
+      "pack_id": "Q_CLOCK_LABEL_PACK",
+      "seal_means_open": false,
+      "seal_status": "PACK_BLOCKED_UNSET",
+      "sha256": null,
+      "structural_fingerprint_sha256": "0e51fe0d5b9f3aeae3dd1e265b2eea51edc6ad91ec31ece0bb46837b3be0e55e"
+    },
+    "both_fully_sealed": false,
+    "join_forbidden": true,
+    "step": 5,
+    "step_name": "seal_dual_label_packs"
+  },
+  "step6_contracts": {
+    "arm_formula_hashes": {
+      "A1C_Q_COMMON": "2ee277554a2ce7cbd8a431529e6d9d2e0a8f1c94369e1886efee8cffba4185b6",
+      "A1_Q_NATIVE": "ea3937c5159ba9176e728da04830dbdd0aacf6c920ceff4c7f0f1481b789eeff",
+      "A2_M_RAW": "091ab781804cff0056824811afaad8773515c4b666a25e4ab0d04469951c3060",
+      "A3_Q_PLUS_M": "efead3b763b1d37afaaa116bb70e2423a30cbd39d77e47ba3aab69ad2978a6ca",
+      "A4_Q_TIMES_M": "a8cd9c4da1fe726c670a5ade05ba584229059fddade56d4fb95ce0d4078f1bf6",
+      "A5_Q_PLUS_M_PERP": "f853745288eb49114292033f7a49f88bf9b78a8883d91f1ddbc7c4d1af7f8fcf"
+    },
+    "arms": {
+      "arms": [
+        {
+          "arm_id": "A1_Q_NATIVE",
+          "definition": "date-local Q rank on Q-observed",
+          "formula": "rank_date_local(Q | Q_observed)",
+          "presumed_winner": false,
+          "role": "full/applicable Q baseline"
+        },
+        {
+          "arm_id": "A1C_Q_COMMON",
+          "definition": "Q re-ranked on Q\u2229M",
+          "formula": "rank_date_local(Q | Q_and_M_observed)",
+          "presumed_winner": false,
+          "role": "paired conditional baseline"
+        },
+        {
+          "arm_id": "A2_M_RAW",
+          "definition": "M rank on common support",
+          "formula": "rank_date_local(M | Q_and_M_observed)",
+          "presumed_winner": false,
+          "role": "raw M"
+        },
+        {
+          "arm_id": "A3_Q_PLUS_M",
+          "definition": "0.5\u00b7rank(Q)+0.5\u00b7rank(M)",
+          "formula": "0.5 * rank_Q_joint + 0.5 * rank_M_joint",
+          "presumed_winner": false,
+          "role": "additive raw"
+        },
+        {
+          "arm_id": "A4_Q_TIMES_M",
+          "definition": "min(rank(Q),rank(M))",
+          "formula": "min(rank_Q_joint, rank_M_joint)",
+          "presumed_winner": false,
+          "role": "sparse conjunction"
+        },
+        {
+          "arm_id": "A5_Q_PLUS_M_PERP",
+          "definition": "0.5\u00b7rank(Q)+0.5\u00b7rank(M\u22a5)",
+          "formula": "0.5 * rank_Q_joint + 0.5 * percentile_rank(M_perp | joint)",
+          "presumed_winner": false,
+          "role": "K0A residual incumbent probe"
+        }
+      ],
+      "constraints": {
+        "a5_presumed_scientific_winner": "FORBIDDEN",
+        "arm_specific_denominator": "FORBIDDEN",
+        "arm_specific_k_t": "FORBIDDEN",
+        "arm_specific_tail_label_cost_lag": "FORBIDDEN",
+        "composite_trophy": "FORBIDDEN",
+        "cross_horizon_leaderboard": "FORBIDDEN",
+        "extra_sector_size_beta_vol_neutralization_in_arm_scores": "FORBIDDEN",
+        "post_label_tuning": "FORBIDDEN"
+      },
+      "evaluation": "FORBIDDEN_UNTIL_CARVEOUT",
+      "qx_m_surface_template": {
+        "binning": "fixed_preopen_equal_width_rank",
+        "m_bins": [
+          0.0,
+          0.2,
+          0.4,
+          0.6,
+          0.8,
+          1.0
+        ],
+        "outcome_input": false,
+        "post_label_bin_change": "FORBIDDEN",
+        "q_bins": [
+          0.0,
+          0.2,
+          0.4,
+          0.6,
+          0.8,
+          1.0
+        ],
+        "template_id": "Q_X_M_2D_SURFACE_TEMPLATE_V1"
+      },
+      "slice_id": "OK-SBI-0",
+      "spec_version": "v1.2"
+    },
+    "c_future_hooks": {
+      "c_adjusted_diagnostic_result": {
+        "requires": "OK-SBI-0-DEV-OPEN-1 + post-S2 protocol",
+        "runnable_evaluation": false,
+        "status": "HOOK_ONLY_NOT_RUN"
+      },
+      "difference": {
+        "requires": "OK-SBI-0-DEV-OPEN-1 + post-S2 protocol",
+        "runnable_evaluation": false,
+        "status": "HOOK_ONLY_NOT_RUN"
+      },
+      "unadjusted_paired_result": {
+        "requires": "OK-SBI-0-DEV-OPEN-1 + post-S2 protocol",
+        "runnable_evaluation": false,
+        "status": "HOOK_ONLY_NOT_RUN"
+      }
+    },
+    "claim_schema": {
+      "forbidden_claim_crosswalks": [
+        {
+          "from": "COMMON_SUPPORT_SCIENTIFIC_LEDGER",
+          "reason": "common-support lift sold as full-W3 deployability",
+          "sold_as": "FULL_W3_OPPORTUNITY_CENSUS"
+        },
+        {
+          "from": "FULL_W3_OPPORTUNITY_CENSUS",
+          "reason": "opportunity census sold as strategy P&L",
+          "sold_as": "STRATEGY_PNL"
+        },
+        {
+          "from": "ABSTENTION_ATTRIBUTION_LEDGER",
+          "reason": "abstention attribution sold as Alpha",
+          "sold_as": "ALPHA"
+        }
+      ],
+      "invalid_by_construction": [
+        "common-support lift sold as full-W3 deployability",
+        "opportunity census sold as strategy P&L",
+        "abstention attribution sold as Alpha",
+        "any result sentence without ledger_id or clock_id"
+      ],
+      "legal_clock_ids": [
+        "CAPITAL_TIME_REPORT_ONLY",
+        "M_CLOCK",
+        "Q_CLOCK"
+      ],
+      "legal_ledger_ids": [
+        "COMMON_SUPPORT_SCIENTIFIC_LEDGER",
+        "APPLICABLE_SYSTEM_LEDGER",
+        "FULL_W3_OPPORTUNITY_CENSUS",
+        "ABSTENTION_ATTRIBUTION_LEDGER"
+      ],
+      "outcome_open_required_for_numeric_result": true,
+      "required_fields": [
+        "claim_id",
+        "slice_id",
+        "evaluation_job_id",
+        "result_receipt_sha256",
+        "ledger_id",
+        "clock_id",
+        "arm_id",
+        "comparator_arm_id",
+        "metric_id",
+        "population_scope",
+        "population_sha256",
+        "applicability_scope",
+        "status_stratum",
+        "K_schedule_id",
+        "label_pack_sha256",
+        "numerator",
+        "denominator",
+        "estimate",
+        "uncertainty_method",
+        "confidence_interval",
+        "claim_authority"
+      ],
+      "s0_numeric_result_claims": "FORBIDDEN",
+      "schema_id": "OkSbi0ClaimReceiptSchemaV1",
+      "slice_id": "OK-SBI-0",
+      "spec_version": "v1.2",
+      "untagged_claim": "INVALID"
+    },
+    "context_c_firewall": {
+      "allowlist": [
+        "decision_date_block",
+        "sector_group",
+        "market_cap_bucket",
+        "liquidity_bucket",
+        "ipo_age_bucket",
+        "volatility_bucket",
+        "drawdown_bucket",
+        "distress_bucket",
+        "corporate_action_state"
+      ],
+      "firewall_id": "ContextCFirewallV1",
+      "forbidden_uses": [
+        "arm_score",
+        "q_rank",
+        "m_rank",
+        "k_t_fill",
+        "applicability_rewrite",
+        "threshold_selection",
+        "domain_router_discovery",
+        "position_sizing",
+        "cost_lag_choice"
+      ],
+      "future_reporting_hooks": [
+        "unadjusted_paired_result",
+        "c_adjusted_diagnostic_result",
+        "difference"
+      ],
+      "outcome_blind_buckets_only": true,
+      "promotion_may_rely_on_c_adjusted_alone": false,
+      "slice_id": "OK-SBI-0",
+      "source_bound_buckets_only": true
+    },
+    "empirical_ranking": {
+      "a5_presumed_winner": false,
+      "composite_trophy": "FORBIDDEN",
+      "cross_horizon_leaderboard": "FORBIDDEN",
+      "empirical_arm_performance": "FORBIDDEN",
+      "overall_winner": "FORBIDDEN"
+    },
+    "ledgers": {
+      "forbidden_claim_crosswalks": [
+        {
+          "from": "COMMON_SUPPORT_SCIENTIFIC_LEDGER",
+          "reason": "common-support lift sold as full-W3 deployability",
+          "sold_as": "FULL_W3_OPPORTUNITY_CENSUS"
+        },
+        {
+          "from": "FULL_W3_OPPORTUNITY_CENSUS",
+          "reason": "opportunity census sold as strategy P&L",
+          "sold_as": "STRATEGY_PNL"
+        },
+        {
+          "from": "ABSTENTION_ATTRIBUTION_LEDGER",
+          "reason": "abstention attribution sold as Alpha",
+          "sold_as": "ALPHA"
+        }
+      ],
+      "ledgers": [
+        {
+          "ledger_id": "COMMON_SUPPORT_SCIENTIFIC_LEDGER",
+          "role": "conditional novelty / redundancy / synergy only"
+        },
+        {
+          "ledger_id": "APPLICABLE_SYSTEM_LEDGER",
+          "role": "applicable-domain deployability only"
+        },
+        {
+          "ledger_id": "FULL_W3_OPPORTUNITY_CENSUS",
+          "role": "full-W3 opportunity + tail census only"
+        },
+        {
+          "ledger_id": "ABSTENTION_ATTRIBUTION_LEDGER",
+          "role": "foregone right-tail / avoided catastrophe only"
+        }
+      ],
+      "merge_ledgers": "FORBIDDEN",
+      "slice_id": "OK-SBI-0"
+    }
+  }
+}

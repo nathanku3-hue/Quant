@@ -137,7 +137,7 @@ Q + M_perp arm:
   otherwise        -> ABSTENTION
 ```
 
-AO-K0A freezes the orthogonal basis and arm observability. It does **not** invent an unapproved scalar weighting/combination rule for `Q + M_perp`; that result-bearing composition rule must be explicit before AO-K0B selection is opened.
+AO-K0A freezes the orthogonal basis and arm observability. It does **not** invent an unapproved scalar weighting/combination rule for `Q + M_perp`; any result-bearing composition multi-arm evaluation is gated by **OK-SBI-0** (shadow) after numeric Q source-binding — not by an automatic legacy AO-K0B trophy open.
 
 ## 8. Full-W3 evaluation law
 
@@ -270,4 +270,15 @@ portfolio optimization
 capital promotion
 ```
 
-The next result-bearing slice remains `AO-K0B — DEVELOPMENT BASIS TEST`, but it may not begin until the numeric Q representation and scalar `Q + M_perp` composition rule are explicitly source-bound without violating this contract.
+### Downstream naming (docs delta 2026-08-12; does not reopen this contract)
+
+```text
+AO-K0A (this contract)     = frozen prerequisite; no empirical result
+OK-SBI-0                   = active research shadow at S0 (pre-open only)
+AO-K0B                     = legacy blocked next-slice pointer; must not run as automatic trophy
+AO-K0B-D                   = development stage inside OK-SBI-0 only after QSource + gates + hashes + carve-out
+```
+
+**Q is not a deployable numeric factor until `QSourceContractV1.status ∈ {Q_GF_BOUND, Q_AMENDED_BOUND}`** (`docs/architecture/q_source_contract_v1.md`). This contract freezes Q **source-observability / basis-status** only — not a numeric Q kernel and not Rule100 feature-store borrow.
+
+Result-bearing sparse-basis work is **not** authorized by default as a `Q / M_perp / Q+M_perp` leaderboard. Any later evaluation must respect OK-SBI-0 science order (missingness → raw Q×M joint law → Residual-M novelty → deployability), dual clocks, multi-arm probes (including raw additive and conjunction arms), and ledger-tagged claims — and requires an explicit one-shot stop-line carve-out. Until then: `runnable_evaluation=false`, `OUTCOME_OPEN=NO`, `financial_alpha_evidence=0`.
