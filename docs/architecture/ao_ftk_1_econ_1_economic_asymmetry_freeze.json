@@ -874,6 +874,14 @@
       "E10.D7_RULE=BLOCKED_UNSET (no invent; owner INHERIT path or OUT_OF_SCOPE)",
       "economic_l5_authorized=false (separate L5_AUTHORIZE receipt required; never auto)"
     ],
-    "receipt_path": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json"
+    "receipt_path": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json",
+    "long_session_recheck": {
+      "session_id": "AO-FTK-1-ECON-1-LONG-SESSION-BIND-OPTIONAL-TRIAL2",
+      "owner_attachment_present": false,
+      "path": "A_WAITING",
+      "verdict": "WAITING_NUMERICS",
+      "debit_join_run": false,
+      "receipt": "docs\\context\\e2e_evidence\\ao_ftk_1_econ_1_long_session_empty_attachment.json"
+    }
   }
 }

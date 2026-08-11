@@ -1,0 +1,83 @@
+{
+  "schema_version": "ao_ftk_1_econ_1_long_session_empty_attachment_v1",
+  "receipt_id": "AO_FTK_1_ECON_1_LONG_SESSION_EMPTY_ATTACHMENT",
+  "session_id": "AO-FTK-1-ECON-1-LONG-SESSION-BIND-OPTIONAL-TRIAL2",
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "name": "FTK_ECON1_LONG_SESSION_BIND_OPTIONAL_TRIAL2",
+  "date": "2026-08-12",
+  "prior_bind_commit": "9cb64c7",
+  "prior_bind_verdict": "WAITING_NUMERICS",
+  "prior_freeze_form": "PASS_WAITING_NUMERICS",
+  "prior_freeze_commit": "febd8e4",
+  "prior_sensing_commit": "948471c",
+  "attachment_assessment": {
+    "owner_attachment_present": false,
+    "attachment_form_in_prompt": "TEMPLATE_PLACEHOLDERS_ONLY",
+    "reason": "OWNER ATTACHMENT block present as prompt template but all required fields are angle-bracket placeholders or multi-option menus, not concrete values. L5_AUTHORIZE_ECONOMIC shown as false. Treated as empty attachment under section 0 / 3.1.",
+    "fields_parsed": {
+      "H_VALUE": null,
+      "RIGHT_TAIL_PERCENTILE": null,
+      "CATASTROPHE_PERCENTILE": null,
+      "K": null,
+      "delta_J_required": null,
+      "D7_MODE": null,
+      "E2_MODE": null,
+      "E3_MODE": null,
+      "L5_AUTHORIZE_ECONOMIC": false,
+      "L5_AUTH_NOTE": null
+    },
+    "placeholder_literals_refused": [
+      "<single scalar; transition months→quarters class>",
+      "<one p in (0,1) or percent convention stated>",
+      "<one q>",
+      "<integer ≥ 1>",
+      "<scalar floor for ΔJ>"
+    ],
+    "invention_refused": true
+  },
+  "p0_self_check": {
+    "sot": "docs/context/research_loop_state_current.json",
+    "loop_phase": "WAITING_OWNER_NUMERICS",
+    "bind_receipt": "docs\\context\\e2e_evidence\\ao_ftk_1_econ_1_owner_bind_transition_position.json",
+    "prior_bind_commit_matches": true,
+    "surface_dof": 2,
+    "trials_charged": 1,
+    "trials_remaining": 2,
+    "label_bytes_joined": false,
+    "economic_l5_authorized": false,
+    "alpha_evidence": 0
+  },
+  "path": "A_WAITING",
+  "session_path": "A_WAITING",
+  "verdict": "WAITING_NUMERICS",
+  "l5_ready": false,
+  "l5_ran": false,
+  "debit": false,
+  "join": false,
+  "evaluation_run": false,
+  "l6": false,
+  "l7": false,
+  "ao_ftk_2": "NOT_OPENED",
+  "stop_line_honored": "EMPTY_ATTACHMENT_THEN_INVENT",
+  "phases_executed": [
+    "P0_SELF_CHECK",
+    "P1_EMPTY_ATTACHMENT_STOP"
+  ],
+  "phases_skipped": [
+    "P2_L5_ECONOMIC_ONE_SHOT",
+    "P3_L6_DIAGNOSIS",
+    "P4_L7_OWNER_PACKET"
+  ],
+  "next_owner_action": "fill OWNER ATTACHMENT with concrete H/p/q/K/delta_J + E2/E3/D7 (or HOLD|STOP); set L5_AUTHORIZE_ECONOMIC=true only if Trial 2 desired in same session",
+  "financial_alpha_evidence": 0,
+  "worker_status": "CLOSED / NO_WORKER",
+  "artifacts": {
+    "owner_bind_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json",
+    "machine_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
+    "freeze_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
+    "sot": "docs/context/research_loop_state_current.json",
+    "contract": "research/asymmetric_opportunity_v1/ao_ftk_1_econ_1_contract.py"
+  },
+  "constitution": "Fill blockers without invention; if authorized, one economic transition-position trial; L6 first-fail; L7 stop. Never slice 2 in this session.",
+  "one_line": "Long session dispatched without filled owner attachment → WAITING_NUMERICS; debit=0 join=false eval=false; AO-FTK-2 not opened; alpha=0."
+}

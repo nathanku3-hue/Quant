@@ -166,7 +166,19 @@
     "economic_label_join_this_turn": false,
     "evaluation_this_turn": false,
     "auto_l5": false,
-    "clock_stamped": "TRANSITION_POSITION"
+    "clock_stamped": "TRANSITION_POSITION",
+    "long_session_recheck": {
+      "session_id": "AO-FTK-1-ECON-1-LONG-SESSION-BIND-OPTIONAL-TRIAL2",
+      "owner_attachment_this_turn": false,
+      "attachment_form": "TEMPLATE_PLACEHOLDERS_ONLY",
+      "path": "A_WAITING",
+      "verdict": "WAITING_NUMERICS",
+      "trial2_debit_this_turn": false,
+      "economic_label_join_this_turn": false,
+      "evaluation_this_turn": false,
+      "auto_l5": false,
+      "stop_line_honored": "EMPTY_ATTACHMENT_THEN_INVENT"
+    }
   },
   "constitution": "Stamp FTK as TRANSITION_POSITION. Bind one horizon and the economic laws without invention or peeking. Clear L5 blockers or HOLD. Debit nothing. Run nothing.",
   "spec_version": "v1.1",
@@ -178,5 +190,7 @@
   "not_great_enterprise_hodl": true,
   "great_enterprise_kernel": "OUT_OF_SCOPE",
   "prior_freeze_commit": "febd8e4",
-  "owner_bind_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json"
+  "owner_bind_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json",
+  "session_path": "A_WAITING",
+  "long_session_receipt": "docs\\context\\e2e_evidence\\ao_ftk_1_econ_1_long_session_empty_attachment.json"
 }

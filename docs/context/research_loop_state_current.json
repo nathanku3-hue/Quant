@@ -54,7 +54,7 @@
       "loop_phase": "WAITING_OWNER_NUMERICS",
       "material_trials_charged_this_slice": 1,
       "material_trials_remaining": 2,
-      "next": "CLOSED / NO_WORKER; transition-position clock stamped; WAITING_OWNER_NUMERICS; no auto L5; no Trial 2 debit",
+      "next": "CLOSED / NO_WORKER; ECON-1 still WAITING_OWNER_NUMERICS after long-session empty attachment; no auto L5; no Trial 2 debit",
       "parent_freeze_commit": "6832066",
       "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
       "role": "SHADOW_RESEARCH_PARENT",
@@ -81,7 +81,7 @@
       "material_trials_charged_this_turn": 0,
       "material_trials_remaining": 2,
       "md_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.md",
-      "next": "CLOSED / NO_WORKER; WAITING_OWNER_NUMERICS; owner attach H/p/q/K/ΔJ + E2/E3/D7 or HOLD; no auto L5",
+      "next": "CLOSED / NO_WORKER; long-session empty attachment recheck → WAITING_NUMERICS; no debit/join/run; no AO-FTK-2",
       "parent_program": "AO-FTK-1-20260812",
       "receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
       "role": "SHADOW_RESEARCH",
@@ -94,7 +94,9 @@
       "bind_verdict": "WAITING_NUMERICS",
       "economic_clock_class": "TRANSITION_POSITION",
       "l5_ready": false,
-      "owner_bind_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json"
+      "owner_bind_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json",
+      "long_session_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_empty_attachment.json",
+      "session_path": "A_WAITING"
     },
     {
       "next": "continue under own contract; do not merge into FTK/Q",
@@ -271,7 +273,9 @@
     "worker_status": "CLOSED / NO_WORKER",
     "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_close.json",
     "econ_freeze_work_commit": "febd8e4",
-    "prior_freeze_commit": "febd8e4"
+    "prior_freeze_commit": "febd8e4",
+    "long_session_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_empty_attachment.json",
+    "session_path": "A_WAITING"
   },
   "next_worker_slice": {
     "alternatives": [
@@ -303,14 +307,14 @@
   "process": {
     "diagnosis_layer_if_any": null,
     "failure_route_if_any": "NONE_IN_SCOPE_PASS",
-    "last_completed_note": "AO-FTK-1-ECON-1 transition-position bind: clock stamped TRANSITION_POSITION; authority survey reconfirmed; owner attachment empty → WAITING_NUMERICS; debit=0 join=false alpha=0; l5_ready=false; NO_WORKER",
+    "last_completed_note": "AO-FTK-1-ECON-1 long session FTK_ECON1_LONG_SESSION_BIND_OPTIONAL_TRIAL2: P0 self-check OK @ 9cb64c7 lineage; owner attachment TEMPLATE_PLACEHOLDERS_ONLY → Path A WAITING_NUMERICS; debit=0 join=false eval=false L6/L7 skipped; AO-FTK-2 NOT_OPENED; alpha=0; NO_WORKER",
     "last_completed_phase": "OWNER_BIND_TRANSITION_POSITION",
     "loop_phase": "WAITING_OWNER_NUMERICS",
-    "loop_phase_label": "AO-FTK-1-ECON-1 BIND_COMPLETE / WAITING_NUMERICS / NO_WORKER; transition clock stamped; L5 not ready",
+    "loop_phase_label": "AO-FTK-1-ECON-1 BIND_COMPLETE / WAITING_NUMERICS / NO_WORKER; long-session empty attachment; L5 not ready; trials remaining=2",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
     "method_status": "LOCKED",
     "next_phase": "WAITING_OWNER_NUMERICS",
-    "next_phase_note": "Owner must provide bind attachment for H/percentiles/K/delta_J and E2/E3/D7 (INHERIT path or D7 OUT_OF_SCOPE) without invention. Only then L5_READY → WAIT_OWNER_L5_ECONOMIC → separate L5_AUTHORIZE_ECONOMIC. No auto L5. Trials remaining=2. financial_alpha_evidence=0.",
+    "next_phase_note": "Owner must fill concrete bind attachment (H, RT%, catastrophe%, K, delta_J, D7_MODE, E2_MODE, E3_MODE) without invention. Template placeholders are not binds. Only then PASS_L5_READY → WAIT_OWNER_L5_ECONOMIC or L5_AUTHORIZE_ECONOMIC=true for Trial 2. No auto L5. Trials remaining=2. financial_alpha_evidence=0.",
     "representation_snr_gate_status": "PASS_AO_FTK_1_20260812_L5_SENSING_COMPLETE"
   },
   "product": {

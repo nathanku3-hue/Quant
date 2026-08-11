@@ -70,18 +70,21 @@ ao_ftk_1_l7_select       = docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_route_se
 WORKER_STATUS         = CLOSED / NO_WORKER
 BIND_VERDICT          = WAITING_NUMERICS
 TERMINAL_VERDICT      = ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS
+SESSION_PATH          = A_WAITING (long session empty attachment recheck)
 ECONOMIC_CLOCK        = TRANSITION_POSITION (not FAST_TRADING; not GE/HODL)
 L7_ROUTE              = LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL (machine-effective)
-PHASE_DONE            = OWNER_BIND_TRANSITION_POSITION (attachment empty)
+PHASE_DONE            = OWNER_BIND_TRANSITION_POSITION (attachment still empty / template placeholders only)
 SURFACE_DOF           = 2 (unchanged; operator pins match parent L4)
 ECONOMIC_L5           = NOT_AUTHORIZED / l5_auto_open=false / l5_ready=false
 MATERIAL_TRIALS       = charged 1 / remaining 2 (this turn debit = 0)
 LABEL_BYTES_JOINED    = false (economic pack identity+hash only)
 FINANCIAL_ALPHA_EVIDENCE = 0
 PRIOR_FREEZE_COMMIT   = febd8e4
+PRIOR_BIND_COMMIT     = 9cb64c7
 OWNER_BIND_RECEIPT    = docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json
+LONG_SESSION_RECEIPT  = docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_empty_attachment.json
 NEXT                  = WAITING_OWNER_NUMERICS
-NEXT_WORKER           = OWNER_NUMERICS_OR_HOLD (not auto L5)
+NEXT_WORKER           = OWNER_NUMERICS_OR_HOLD (not auto L5; not Trial 2)
 ```
 
 ### L5 readiness (after bind survey)
