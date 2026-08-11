@@ -1,8 +1,8 @@
 # Multi-Stream Contract — Current
 
-Date: 2026-08-11
-Gate: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_LOCKED / AO_K0_OPPORTUNITY_CONSTITUTION_FROZEN / MULTI_CLOCK_EVIDENCE / PAPER_0_AND_REPLICATION_RECUTS`
-Status: `CRV1 + SECTOR_ROTATION_ACTIVE_RESEARCH / VSB_CONFIRMATION_PARKED_NO_WORKER / PREBREAKOUT_AO_K0A_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ / PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY / ONE_WRITER_PER_MUTABLE_AUTHORITY_SURFACE`
+Date: 2026-08-12
+Gate: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_LOCKED / AO_K0A_ORTHOGONAL_BASIS_FROZEN / OK_SBI_0_SHADOW_S0 / MULTI_CLOCK_EVIDENCE / PAPER_0_AND_REPLICATION_RECUTS`
+Status: `CRV1 + SECTOR_ROTATION_ACTIVE_RESEARCH / VSB_CONFIRMATION_PARKED_NO_WORKER / PREBREAKOUT_AO_K0A_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ / OK_SBI_0_S0_RELEASE_BLOCKED_Q_SOURCE_BLOCKED / PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY / ONE_WRITER_PER_MUTABLE_AUTHORITY_SURFACE`
 
 ## Lane map
 
@@ -15,7 +15,8 @@ Status: `CRV1 + SECTOR_ROTATION_ACTIVE_RESEARCH / VSB_CONFIRMATION_PARKED_NO_WOR
 | Frozen Confirmation — VSB / W7 | source-admission + M0 + append-only tape + guardian mechanics retained/frozen | PARKED; no capture/append/rescue/retune/PREBREAKOUT/new clock and no dedicated worker; future trigger is VSB-specific matured 10d evaluation receipts only |
 | Sector Rotation | Board-admitted ETF-first orthogonal family; no capital authority | proceeds on its independent ladder and must not delay the stock-winner/Clock #1 path; stock-sector breadth and old sector map are not authority |
 | Lane 2 Historical Compression | A1/A2 closed after one A2 read | retained diagnostic only; no re-query or in-place Parent/Child tuning |
-| PREBREAKOUT AO-K0A | `OpportunityKernelV1` + full-W3 Q/M-perp orthogonal basis preflight frozen; no result read | next gate is source-bound numeric Q + scalar Q+M-perp rule, then exact development input/label hashes; first result read is one charged full-W3 basis trial; W6 stays untouched |
+| PREBREAKOUT AO-K0A | `OpportunityKernelV1` + full-W3 orthogonal basis preflight frozen; no result read | active **basis** authority; Q source-observability only — not numeric Q kernel |
+| OK-SBI-0 (shadow) | S0 design-locked / release-blocked; Q-bind audit closed `Q_SOURCE_BLOCKED` | **not** product tip; **not** fourth clock; bind attempt terminal on admitted custody; owner pivot for new Q custody/slice; `runnable_evaluation=false` until blockers=0; no outcome join without `OK-SBI-0-DEV-OPEN-1`; legacy AO-K0B trophy next is FORBIDDEN |
 | PAPER-0 | implementation authorized; no first order yet | ExecutionIntentV1, `market+cls`, broker canonical state, restart/fencing/FREEZE_NEW_RISK, actual-session-close gate |
 | Replication readiness | start now in quarantine | entitlement/identity/PIT/license prep only; outcomes inaccessible to research |
 | Review | deterministic core complete; full lineage/fixtures open | must finish before mature interpretation / outcome-informed mutation |
@@ -31,7 +32,8 @@ Status: `CRV1 + SECTOR_ROTATION_ACTIVE_RESEARCH / VSB_CONFIRMATION_PARKED_NO_WOR
 - Historical or synthetic input cannot substitute for admitted current first-seal data.
 - Review is deterministic before any AI interpretation.
 - Board family registration remains `3`, but current engineering allocation does **not** assign W7 an active worker: CRV1 and ETF-first Sector Rotation may proceed while `VSB_CONFIRMATION_v1` is parked. Custody/search/prediction identity remains isolated per family. PREBREAKOUT owns stock discovery through the frozen AO-K0 constitution; only the current portfolio/capital-policy commit chain is singular.
-- AO-K0A is source-custody gated before any empirical result: denominator=`PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1`; observability boundaries may use only immutable W3 + admitted S0 + exact W3 market; missingness is persistent ABSTENTION with no coverage PASS/FAIL or denominator relief. Before AO-K0B is charged, numeric Q and scalar Q+M-perp composition must be source-bound, then exact development inputs + uninspected labels hash-bound. No provider capture is authorized by AO-K0A.
+- AO-K0A is source-custody gated before any empirical result: denominator=`PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1`; observability boundaries may use only immutable W3 + admitted S0 + exact W3 market; missingness is persistent ABSTENTION with no coverage PASS/FAIL or denominator relief. No provider capture is authorized by AO-K0A.
+- OK-SBI-0 is a **shadow** research stream under `OpportunityKernelV1`: parallelize evidence qualification, serialize capital authority, bound family WIP. It must not take a capital-policy writer slot or Clock #1 surface. Before any result-bearing OK-SBI evaluation: `QSourceContractV1 ∈ {Q_GF_BOUND, Q_AMENDED_BOUND}`, all numeric gates not `BLOCKED_UNSET`, dual label packs sealed, PRODUCT_PREOPEN PASS, and owner/CRO one-shot carve-out. Automatic `Q/M⊥/Q+M⊥` leaderboard-as-next is forbidden.
 - UI cannot own market, formula, weight, evidence, or review authority.
 
 ## Frozen seams

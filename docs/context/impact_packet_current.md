@@ -1,8 +1,20 @@
 # Impact Packet — Current
 
-Date: 2026-08-11
+Date: 2026-08-12
 State: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
-Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE; PREBREAKOUT_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; PREBREAKOUT_W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_NO_FURTHER_EXTENSION; ECONPHYSICS_PREBREAKOUT_V1_S0_REAL_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; PREBREAKOUT_W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0`
+Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE; PREBREAKOUT_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; PREBREAKOUT_W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_NO_FURTHER_EXTENSION; ECONPHYSICS_PREBREAKOUT_V1_S0_REAL_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; OK_SBI_0_SHADOW_S0_DESIGN_LOCKED_RELEASE_BLOCKED; Q_SOURCE_BLOCKED; PREBREAKOUT_W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## Authority topology + OK-SBI-0 shadow impact — 2026-08-12
+
+This delta does **not** open architecture, Alpha, or capital. It freezes authority **topology** so product and research cannot be confused:
+
+- Product state remains `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED` on lineage `codex/pit-source-authority-1` (base commit `6045d39…`). Public main is non-authority until merge. Custody freeze=`docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json`.
+- Active basis authority remains **AO-K0A** / `OrthogonalizationContractV1` (no empirical result).
+- Active research **shadow** is **OK-SBI-0 @ S0** — sparse basis identification pre-open only. Not a product tip, not a fourth evidence clock, not capital.
+- Q remains unbound: `QSourceContractV1` current status=`Q_SOURCE_BLOCKED` (`docs/architecture/q_source_contract_v1.md`). No deployable numeric Q; RevGrowth+ROIC is conceptual only.
+- Numeric gates may be `BLOCKED_UNSET` without failing the design. Current OK-SBI machine freeze: `blocked_field_count=20`, `runnable_evaluation=false`. No invented gate defaults.
+- Forbidden narrative: automatic next = `Q / M⊥ / Q+M⊥` trophy leaderboard. Legacy `AO-K0B` is a blocked pointer; result-bearing work, if authorized later, is OK-SBI development (AO-K0B-D) after Q bind + gates + hashes + one-shot carve-out, with science order missingness → raw joint → residual → deployability.
+- Complexity unit=`effective_DOF + charged_search_debt`. Parallel open science (Continuation/Dislocation ontology, Reality/Recognition freeze, shared-cause, portfolio optimization) stays **roadmap-closed** as co-equal next work.
 
 ## AO-K0A Denominator Alignment / Orthogonal Basis impact — 2026-08-11
 
@@ -14,7 +26,7 @@ The basis geometry is now orthogonal rather than multiplicative. Q is ranked ove
 
 Observability boundaries may use only immutable W3, admitted S0, and exact W3 market custody. AO-K0A intentionally rejects historical test assemblies/transient factor stores. The deterministic source preflight generated 310,329 pre-W6 weekly W3 status rows in memory (SHA-256 `bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf`) with zero rows removed. The earlier ~79.49% common-coverage number is not recertified or used as a gate; the old numeric Rule100-Q cannot be exactly rebuilt from admitted S0 without additional primitives, so AO-K0A does not fabricate that bridge.
 
-AO-K0A charges `0` new material trials and performed no winner/future-outcome read, W6 read, provider request, K tuning, dislocation experiment, peer-valuation acquisition, portfolio optimization, broker action or capital escalation. Canonical docs=`docs/architecture/orthogonalization_contract_v1.md` + `docs/architecture/ao_k0a_orthogonal_basis_preflight_v1.json`; `financial_alpha_evidence=0`. The next result-bearing slice is `AO-K0B`, after the numeric Q representation and scalar Q+M-perp composition rule are explicitly source-bound.
+AO-K0A charges `0` new material trials and performed no winner/future-outcome read, W6 read, provider request, K tuning, dislocation experiment, peer-valuation acquisition, portfolio optimization, broker action or capital escalation. Canonical docs=`docs/architecture/orthogonalization_contract_v1.md` + `docs/architecture/ao_k0a_orthogonal_basis_preflight_v1.json`; `financial_alpha_evidence=0`. Numeric Q is still **not** a machine object under admitted sources (`QSourceContractV1=Q_SOURCE_BLOCKED`). Bind slice `OK-SBI-0-S0-Q-SOURCE-BIND` closed terminal-blocked (ROIC absent; joint identity/formula unbound; evidence=`docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json`). Next is **owner pivot** on Q path — **not** re-bind inventively and **not** an immediate charged `AO-K0B` composite trophy.
 
 ## PREBREAKOUT Trial #1 close / Econphysics impact — 2026-08-10
 
@@ -170,4 +182,4 @@ New architecture records: `docs/architecture/aov_velocity_council_20260808.md`, 
 
 ## Claim boundary
 
-Canonical maturity remains `70/100`; portfolio-alpha evidence remains `0`. Final strategic verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Current execution state remains `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`. The Board three-family registration is retained, but W7/VSB confirmation is parked with no active engineering worker; CRV1 and ETF-first Sector Rotation remain independent research lanes. A1/A2 is closed after exactly one A2 read; Winner Capture v0 is retained-diagnostic-only; VSB has a frozen no-retune guardian but no real prediction entry or untouched/prospective acceptance result. PAPER-0 is authorized but no broker strategy execution is claimed; strategy live capital remains closed.
+Canonical maturity remains `70/100`; portfolio-alpha evidence remains `0`. Final strategic verdict=`PASS — STRATEGIC_DIRECTION_LOCKED`; broad architecture reopen=`NO`. Current execution state remains `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`. Active research shadow=`OK-SBI-0 @ S0` with `Q_SOURCE_BLOCKED` and `runnable_evaluation=false` (not product tip). The Board three-family registration is retained, but W7/VSB confirmation is parked with no active engineering worker; CRV1 and ETF-first Sector Rotation remain independent research lanes. A1/A2 is closed after exactly one A2 read; Winner Capture v0 is retained-diagnostic-only; VSB has a frozen no-retune guardian but no real prediction entry or untouched/prospective acceptance result. PAPER-0 is authorized but no broker strategy execution is claimed; strategy live capital remains closed.

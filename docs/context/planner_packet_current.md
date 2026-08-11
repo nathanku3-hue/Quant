@@ -1,11 +1,39 @@
 # Planner Packet — Current
 
-Date: 2026-08-11
+Date: 2026-08-12
 Active product state: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
-ACTIVE_STATUS: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; W9_CRV1_DATA_ADMISSION_ENGINEERING_SLICE_CLOSED; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; LANE2_A1_A2_CLOSED; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE; PREBREAKOUT_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; PREBREAKOUT_W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_NO_FURTHER_EXTENSION; ECONPHYSICS_PREBREAKOUT_V1_S0_REAL_CORPUS_M0_M1_PERSISTENCE_FAILED_DYNAMICS_DIAGNOSTIC_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS_OBSERVABLE_INSUFFICIENCY_NOT_ESTABLISHED; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; PREBREAKOUT_W6_UNTOUCHED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
+ACTIVE_STATUS: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; W9_CRV1_DATA_ADMISSION_ENGINEERING_SLICE_CLOSED; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; LANE2_A1_A2_CLOSED; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE; PREBREAKOUT_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; PREBREAKOUT_W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_NO_FURTHER_EXTENSION; ECONPHYSICS_PREBREAKOUT_V1_S0_REAL_CORPUS_M0_M1_PERSISTENCE_FAILED_DYNAMICS_DIAGNOSTIC_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS_OBSERVABLE_INSUFFICIENCY_NOT_ESTABLISHED; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; OK_SBI_0_SHADOW_S0_DESIGN_LOCKED_RELEASE_BLOCKED; Q_SOURCE_BLOCKED; PREBREAKOUT_W6_UNTOUCHED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
 Canonical product maturity: `70/100`
 Portfolio-alpha evidence: `0`
 Limited Live: `CLOSED`
+
+## Authority topology + OK-SBI-0 shadow — current truth, 2026-08-12
+
+Machine custody freeze=`docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json`. Docs mode=`DELTA_CURRENT_TRUTH_ONLY`; broad architecture reopen=`NO`.
+
+```text
+AUTHORITY_LINEAGE_BRANCH = codex/pit-source-authority-1
+AUTHORITY_COMMIT_BASE    = 6045d39ce6649cdb8ca4544af30d4a70ce0fc075
+AUTHORITY_WORKTREE_PATH  = E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e
+PUBLIC_MAIN              = NON_AUTHORITY_UNTIL_MERGE
+CHAT_SANDBOX             = DRAFT_ONLY
+
+ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
+ACTIVE_BASIS_AUTHORITY   = AO-K0A / OrthogonalizationContractV1 / FROZEN_SOURCE_PREFLIGHT / NO_EMPIRICAL_RESULT
+ACTIVE_RESEARCH_SHADOW   = OK-SBI-0 / S0_DESIGN_LOCKED_RELEASE_BLOCKED
+CAPITAL_ALPHA_PATH       = CLOSED
+FINANCIAL_ALPHA_EVIDENCE = 0
+```
+
+- **Product tip ≠ research shadow.** `PIT-SOURCE-AUTHORITY-1` is the **authority lineage/branch name** (and an older next-slice label), not the current product-state string. Product state remains Clock #1 running with outcomes sealed.
+- **OK-SBI-0** is shadow sparse-basis identification under `OpportunityKernelV1`. It does **not** replace product, runtime, Clock #1, capital authority, or become a fourth evidence clock.
+- **AO-K0A remains the active factual prerequisite** (denominator / abstention / residual geometry). Do not prose-erase AO-K0A.
+- **Q identity:** `Q is not a deployable numeric factor until QSourceContractV1.status ∈ {Q_GF_BOUND, Q_AMENDED_BOUND}`. Contract=`docs/architecture/q_source_contract_v1.md` + `docs/architecture/q_source_contract_v1.json`. Current feasibility=`Q_SOURCE_BLOCKED`. RevGrowth+ROIC / Rule100-Q = conceptual or historical only. `Q_SOURCE_OBSERVED ≠ Q_NUMERIC_VALUE_AVAILABLE ≠ Q_VALIDATED ≠ Q_CAPITAL_AUTHORIZED`.
+- **Numeric gates:** `BLOCKED_UNSET` is an official non-failing state. No invented defaults in authority fields. `runnable_evaluation = (blocked_field_count == 0)`; current machine freeze reports `blocked_field_count=20`, `runnable_evaluation=false` (`docs/context/e2e_evidence/ok_sbi_0_machine_freeze_v1_2.json`).
+- **Naming (staged, not prose-only mass rename):** AO-K0B = legacy blocked next-slice pointer (must not run as automatic `Q/M⊥/Q+M⊥` trophy). AO-K0B-D = development stage **inside** OK-SBI-0 only after atomic QSource + gate freeze + development-input/label hashes + one-shot carve-out. ~79.49% coverage remains **HISTORICAL_NON_AUTHORITY**.
+- **Complexity unit:** `effective_DOF + charged_search_debt`; feature count is a non-authority cost proxy.
+- **S0 Q-bind status:** `OK-SBI-0-S0-Q-SOURCE-BIND` closed as `Q_SOURCE_BLOCKED_TERMINAL` from admitted S0/W3 only (ROIC metric absent; S0 fundamentals lack trading_item; formula/lag unbound). `q_amendment_cycles_used=0`; evidence=`docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json`. Pre-open scaffold + bind audit committed on authority branch (`9dfe9e9`+). Further gate clear / label seal / PRODUCT_PREOPEN / `OK-SBI-0-DEV-OPEN-1` remain blocked until lawful Q bind exists.
+- **Forbidden now:** empirical Q/M⊥/Q+M⊥ leaderboard, W6, new provider for Q invention, K tuning, capital, post-hoc domain router, second Q redesign loop, inventing ROIC from OPER_INC/CAPEX, full endgame essay rewrite, S2 self-authorization.
 
 ## AO-K0A Denominator Alignment / Orthogonal Basis Preflight — current truth, 2026-08-11
 
@@ -15,7 +43,7 @@ Limited Live: `CLOSED`
 - Full-W3 evaluation is frozen prospectively: right-tail recall denominator=all matured W3 winners; breadth denominator=all W3 names. ABSTAIN winners are foregone upside, ABSTAIN bottom-tail names are avoided catastrophes. Security/peer return imputation, complete-case denominator and observed-subset renormalization are forbidden. Residual capital uses economic cash; opportunity comparator is PIT equal-weight full W3.
 - Boundary derivation is restricted to immutable W3 + admitted S0 + exact W3 market custody. Historical test assemblies/transient feature stores are forbidden. The source-only preflight content-addresses 310,329 weekly pre-W6 W3 rows at SHA-256 `bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf`, with zero missingness deletions and zero W6/outcome/provider reads.
 - The previously stated ~79.49% common coverage is **not recertified** under these allowed sources and is not authority. AO-K0A does not backsolve an observability definition to match it. The old numeric Rule100-Q cannot be exactly reconstructed from admitted S0 without missing primitives, so AO-K0A does not borrow old feature artifacts or fabricate a replacement Q kernel.
-- AO-K0A consumes zero new material trials and opens no empirical Q/M-perp/Q+M-perp result. `AO-K0B — DEVELOPMENT BASIS TEST` remains a separate charged/result-bearing slice, and cannot select names until the numeric Q representation and scalar Q+M-perp composition rule are explicitly source-bound under this contract. `financial_alpha_evidence=0`; W6 remains untouched.
+- AO-K0A consumes zero new material trials and opens no empirical Q/M-perp/Q+M-perp result. Numeric Q remains **source-unbound** (`QSourceContractV1` = `Q_SOURCE_BLOCKED`). The active research shadow is **OK-SBI-0 @ S0** (pre-open machinery only; `runnable_evaluation=false`). Legacy label `AO-K0B — DEVELOPMENT BASIS TEST` is a **blocked pointer**, not automatic next trophy: no `Q / M_perp / Q+M_perp` leaderboard until OK-SBI-0 clears Q bind + numeric gates + label hashes + one-shot carve-out. `financial_alpha_evidence=0`; W6 remains untouched.
 
 ## Econphysics dynamics diagnostic — superseded only as next-action authority, 2026-08-11
 
@@ -114,7 +142,8 @@ CLOCK #1 CUSTODY                                      [CLOSED / RUNNING]
 ACTIVE SHIP-FAST BOTTLENECK
 → LANE 1 FUTURE TRUTH: weekly AOV custody + CRV1 slow clock; W7 VSB_CONFIRMATION is PARKED with no active engineering worker
 → LANE 2 COMPRESSED LEARNING: A1/A2 closed; consume retained Winner Capture v0 only, no A2 re-query or Parent/Child mutation
-→ PREBREAKOUT: Trial #1 closed FAIL at permanent `1/8`; W3 complete; W4 statistical close sealed with smoke subfield superseded; W5 FAIL; `FailurePacketV1` retained/no further extension; S0 real PIT corpus is now admitted locally and the frozen persistence M0/M1 both FAIL, while the diagnostic-only dynamics family retains inventory + margin and rejects global observable insufficiency; **no winner/market/W6/selector read or successor empirical clock is authorized**
+→ PREBREAKOUT: Trial #1 closed FAIL at permanent `1/8`; W3 complete; W4 statistical close sealed with smoke subfield superseded; W5 FAIL; `FailurePacketV1` retained/no further extension; S0 real PIT corpus is now admitted locally and the frozen persistence M0/M1 both FAIL, while the diagnostic-only dynamics family retains inventory + margin and rejects global observable insufficiency; **AO-K0A frozen; OK-SBI-0 shadow S0 only — Q_SOURCE_BLOCKED; no winner/market/W6/selector read or successor empirical clock is authorized**
+→ OK-SBI-0 SHADOW: Q-bind terminal-blocked on admitted custody (`Q_SOURCE_BLOCKED`); owner pivot required; no outcome open; not a product tip and not a fourth clock
 → PAPER-0: ExecutionIntent/TIF/broker canonical state/restart-fencing/calendar minimum closure
 → REPLICATION READINESS: entitlement/identity/PIT/license quarantine continues
 
@@ -132,7 +161,7 @@ Architecture is closed. The active P0 is now **time-to-first-honest prospective 
 2. Treat A1/A2 as closed historical evidence: no second A2 evaluation, no provider refresh for the held-out slice, and no Parent/Child mutation. Use frozen Winner Capture Diagnostic v0 only for forensic attribution/search-debt accounting.
 3. Do not extend `FailurePacketV1`; retain its `DISCOVERY=FAIL / DEFENSIVE_QUALITY=DIAGNOSTIC_POSITIVE` negative knowledge without using it to mutate the successor. Keep Trial cost=`0` for that retained diagnostic object.
 4. Preserve the historical capture-attempt/no-rescue record, but treat the later restartable real corpus and v2 reports as current local truth. Do not reopen provider acquisition for this diagnosis, open Trial #2, start a successor empirical clock, or touch W6.
-5. Preserve AO-K0A / `OrthogonalizationContractV1` as the current PREBREAKOUT basis authority. Do **not** open a result-bearing basis until the numeric Q representation and scalar Q+M-perp composition law are source-bound from lawful custody, then exact development PIT inputs and uninspected labels are hash-bound. The next result-bearing package, when separately authorized, is one charged `Q / M_perp / Q+M_perp` development read against full W3 with permanent ABSTENTION accounting. Inventory mean reversion remains a future `FundamentalTransitionKernel` challenger and must not displace this denominator/orthogonalization law.
+5. Preserve AO-K0A / `OrthogonalizationContractV1` as the current PREBREAKOUT **basis** authority. Active research shadow=`OK-SBI-0 @ S0`: QSource bind attempt is **closed terminal-blocked** (`Q_SOURCE_BLOCKED`; evidence bind attempt 20260812). Next is **owner pivot** (new admitted Q custody / new slice_id) — not re-bind inventively, not automatic `Q / M_perp / Q+M_perp` leaderboard, not self-authorized S2. Result-bearing work, if ever authorized, is OK-SBI-0 development (AO-K0B-D) under dual clocks, multi-arm diagnostics (including raw Q×M and conjunction), ledger-tagged claims, and one-shot carve-out `OK-SBI-0-DEV-OPEN-1` — science order remains missingness → raw joint law → Residual-M → deployability. Inventory mean reversion remains a future `FundamentalTransitionKernel` challenger and must not displace this denominator/orthogonalization law.
 6. Keep W7 parked as `VSB_CONFIRMATION_v1`; it remains downstream market confirmation only, not discovery authority. Only separately authorized VSB-specific matured 10d evaluation receipts may activate its frozen guardian; PREBREAKOUT W6 outputs and hindsight winners are invalid W7 inputs.
 7. Continue CRV1 without altering its 252d horizon and without sharing CRV1 empirical authority into PREBREAKOUT. Shared raw bytes are permitted only for byte-identical provider requests; family admission, horizon, search ledger, prediction ledger and outcome authority stay separate.
 8. Implement PAPER-0: future `ExecutionIntentV1`, `market+cls` propagation, broker→canonical PAPER state, restart reconciliation, rebalance fencing and persistent `FREEZE_NEW_RISK`; first order must resolve actual session close or fail closed to a verified regular full-session day.

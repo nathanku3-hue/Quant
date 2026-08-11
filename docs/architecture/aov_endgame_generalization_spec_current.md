@@ -1,7 +1,7 @@
 # AOV Endgame Generalization Roadmap & Execution Specification
 
 **Repository:** `E:\code\quant`
-**Status:** `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED / AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ`
+**Status:** `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED / AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ / OK_SBI_0_SHADOW_S0_DESIGN_LOCKED_RELEASE_BLOCKED / Q_SOURCE_BLOCKED`
 **Roadmap re-audit:** `PASS — STRATEGIC_DIRECTION_LOCKED`
 **Strategic direction:** `APPROVED_AND_LOCKED; BROAD_ARCHITECTURE_REOPEN=NO`
 **Strategic reorder:** `APPROVED_AND_RETAINED`
@@ -13,10 +13,10 @@
 **Replication-readiness recut:** `START_NOW / QUARANTINED`
 **Alpha-family WIP:** `DEFAULT=2 / INITIAL_CEILING=3 UNTIL EXPLICIT_WIP_REVIEW`
 **Final re-audit ratings:** `STRATEGY=9.0 / SHIP_FAST=8.2 / IMMEDIATE_SIM_TO_PAPER=7.5; DIRECTION_PASS_AFTER_RECUT`
-**Documentation sync:** `PATCHED_2026-08-11_AO_K0A_ORTHOGONAL_BASIS`
+**Documentation sync:** `PATCHED_2026-08-12_OK_SBI_0_AUTHORITY_TOPOLOGY_DELTA`
 **Authority type:** Approved roadmap/change authority with prior capital-path, evidence-clock, sim-to-real and Winner/Core-Alpha recuts retained; destructive v3 + real CIQ admission + the first immutable Clock-Start Receipt are now complete, while this velocity recut governs post-Clock construction topology
-**Implementation authority:** **MANDATORY RECUTS AUTHORIZED FOR EXECUTION** — preserve Clock #1; continue Alpha PIT + CRV1; preserve `OpportunityKernelV1` and the frozen AO-K0A full-W3 denominator/orthogonalization law; allow independent family clocks/evidence qualification within WIP; implement PAPER-0 behind minimum execution/restart/calendar gates; start quarantined replication readiness. AO-K0B remains blocked until numeric Q and scalar Q+M-perp composition are source-bound under immutable W3 + admitted S0 + exact W3 market custody, then exact development inputs + uninspected labels are hash-bound. Runtime/evidence/capital authority still requires each deterministic join gate.
-**Date:** 2026-08-11
+**Implementation authority:** **MANDATORY RECUTS AUTHORIZED FOR EXECUTION** — preserve Clock #1; continue Alpha PIT + CRV1; preserve `OpportunityKernelV1` and the frozen AO-K0A full-W3 denominator/orthogonalization law; allow independent family clocks/evidence qualification within WIP; implement PAPER-0 behind minimum execution/restart/calendar gates; start quarantined replication readiness. **OK-SBI-0 is shadow research only** at `S0_DESIGN_LOCKED_RELEASE_BLOCKED` (not product tip; not fourth clock). Numeric Q is unbound until `QSourceContractV1 ∈ {Q_GF_BOUND, Q_AMENDED_BOUND}` (current=`Q_SOURCE_BLOCKED`). Legacy AO-K0B automatic `Q/M_perp/Q+M_perp` trophy next is **FORBIDDEN**. Runtime/evidence/capital authority still requires each deterministic join gate. Public main is non-authority until merge; authority lineage=`codex/pit-source-authority-1`.
+**Date:** 2026-08-12
 **Final lock record:** `docs/architecture/aov_strategic_direction_lock_20260809.md`
 **PAPER-0 authority:** `docs/architecture/paper_0_authority.md`
 **Historical vintage gate:** `docs/architecture/historical_fundamental_vintage_authority.md`
@@ -61,7 +61,11 @@ Missingness never becomes a coverage PASS/FAIL and never shrinks `D_t`. Full-W3 
 
 Observability boundaries may use only immutable W3, admitted S0 and exact W3 market custody. Test assemblies/transient feature stores are forbidden. Source preflight content-addresses 310,329 pre-W6 weekly rows at SHA-256 `bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf`, with zero row deletions and zero W6/outcome/provider reads. Historical ~79.49% coverage is not recertified or gating authority.
 
-AO-K0A consumes zero new material trials and opens no empirical result. AO-K0B consumes one material basis trial only after numeric Q and scalar Q+M-perp composition are explicitly source-bound and exact development inputs + uninspected labels are hash-bound. W6 remains untouched; `financial_alpha_evidence=0`; no provider, K tuning, dislocation experiment, peer valuation, portfolio optimization, A2, Parent/Child, Clock #1, broker or capital authority follows from the freeze.
+AO-K0A consumes zero new material trials and opens no empirical result. **OK-SBI-0** is the active sparse-basis **shadow** program under `OpportunityKernelV1` (custody freeze=`docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json`; Q contract=`docs/architecture/q_source_contract_v1.md`; machine freeze=`docs/context/e2e_evidence/ok_sbi_0_machine_freeze_v1_2.json`). Current state=`S0_DESIGN_LOCKED_RELEASE_BLOCKED`, `Q_SOURCE_BLOCKED`, `blocked_field_count=20`, `runnable_evaluation=false`. `BLOCKED_UNSET` is an official non-failing gate state — no invented defaults. Complexity unit=`effective_DOF + charged_search_debt`.
+
+Legacy **AO-K0B** remains a blocked pointer only. Result-bearing work (AO-K0B-D inside OK-SBI-0), if ever authorized, requires QSource bind + all numeric gates + sealed dual label packs + PRODUCT_PREOPEN + one-shot carve-out `OK-SBI-0-DEV-OPEN-1`, and must follow science order missingness → raw Q×M joint law → Residual-M novelty → deployability (not a residual-only trophy). W6 remains untouched; `financial_alpha_evidence=0`; no provider-for-Q-invention, K tuning, dislocation experiment, peer valuation, portfolio optimization, A2, Parent/Child, Clock #1, broker or capital authority follows from AO-K0A or OK-SBI S0.
+
+Parallel tracks kept scientifically open but **roadmap-closed as co-equal next**: Continuation vs Dislocation ontology freeze, full downside/safety-margin kernel, Reality vs Recognition as permanent top-level ontology, economic independence/common-cause ontology, general high-dim sensing policy, portfolio optimization.
 
 ---
 

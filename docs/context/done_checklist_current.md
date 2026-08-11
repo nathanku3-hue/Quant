@@ -1,9 +1,21 @@
 # Done Checklist — Current
 
-Date: 2026-08-11
-Active state: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8 / PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE / PREBREAKOUT_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED / PREBREAKOUT_W5_DEVELOPMENT_FAIL / PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_NO_FURTHER_EXTENSION / ECONPHYSICS_PREBREAKOUT_V1_S0_REAL_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS / AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ / PREBREAKOUT_W6_UNTOUCHED / W9_CRV1_DATA_ADMISSION_ENGINEERING_SLICE_CLOSED / LANE2_A1_A2_CLOSED / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
+Date: 2026-08-12
+Active state: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8 / PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE / PREBREAKOUT_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED / PREBREAKOUT_W5_DEVELOPMENT_FAIL / PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_NO_FURTHER_EXTENSION / ECONPHYSICS_PREBREAKOUT_V1_S0_REAL_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS / AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ / OK_SBI_0_SHADOW_S0_DESIGN_LOCKED_RELEASE_BLOCKED / Q_SOURCE_BLOCKED / PREBREAKOUT_W6_UNTOUCHED / W9_CRV1_DATA_ADMISSION_ENGINEERING_SLICE_CLOSED / LANE2_A1_A2_CLOSED / CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
 Canonical score: `70/100`
 Portfolio-alpha evidence: `0`
+
+## Authority topology + OK-SBI-0 S0 docs delta — 2026-08-12
+
+- [x] Custody freeze landed: `docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json` (branch `codex/pit-source-authority-1`, base `6045d39…`, worktree path bound, public main non-authority).
+- [x] Topology locked: product=`CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`; basis=`AO-K0A`; research shadow=`OK-SBI-0 @ S0`; capital/alpha closed; fourth evidence clock forbidden.
+- [x] `QSourceContractV1` authority placeholder: `docs/architecture/q_source_contract_v1.md` + `docs/architecture/q_source_contract_v1.json`; current status=`Q_SOURCE_BLOCKED`; global Q-unbound sentence frozen.
+- [x] `BLOCKED_UNSET` official for numeric gates; invented defaults forbidden; `runnable_evaluation=(blocked_field_count==0)`; current freeze `blocked_field_count=20` / `runnable_evaluation=false`.
+- [x] Staged naming: AO-K0A retained; OK-SBI-0 shadow umbrella; AO-K0B legacy blocked pointer; AO-K0B-D only after atomic bind; ~79.49% historical non-authority; complexity unit=`effective_DOF + charged_search_debt`.
+- [x] Current-truth delta applied to planner/impact/done/bridge/post_phase/multi_stream + roadmap/endgame pointers (docs mode=`DELTA_CURRENT_TRUTH_ONLY`; no full endgame rewrite).
+- [x] OK-SBI-0-S0-Q-SOURCE-BIND closed: admitted-custody audit → `Q_SOURCE_BLOCKED_TERMINAL`; `q_amendment_cycles_used=0`; `q_source_binding_hash=BLOCKED_UNSET`; evidence=`docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json`; commit=`9dfe9e9` (+ docs close).
+- [ ] Numeric Q field map bound (`Q_GF_BOUND` or `Q_AMENDED_BOUND`) — **terminal blocked** on admitted custody (ROIC absent; joint CIQSEC+trading_item + formula unbound). Owner pivot / new slice required — do not invent Q.
+- [ ] Remaining 20 release blockers cleared; dual label packs fully sealed; PRODUCT_PREOPEN; `OK-SBI-0-DEV-OPEN-1` — all still open.
 
 ## AO-K0A Denominator Alignment + Orthogonal Basis Preflight — 2026-08-11
 
@@ -16,9 +28,10 @@ Portfolio-alpha evidence: `0`
 - [x] Capital mapping law is frozen without optimization: ABSTENTION risky weight=0; residual capital=canonical economic cash; opportunity comparator=PIT equal-weight full W3.
 - [x] Observability boundaries use only immutable W3 + admitted S0 + exact W3 market custody. Test assemblies/transient feature stores/execution-microstructure fragments are forbidden sources.
 - [x] Source-only preflight generated/content-addressed 310,329 pre-W6 weekly rows at SHA-256 `bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf`; missingness removed `0` rows; W6/outcome/provider reads=`0`.
-- [x] Historical ~79.49% common coverage is not recertified or gating authority. AO-K0A does not tune a source definition to recover it and does not borrow old Rule100 feature artifacts; numeric Q remains explicitly source-unbound for AO-K0B.
+- [x] Historical ~79.49% common coverage is not recertified or gating authority. AO-K0A does not tune a source definition to recover it and does not borrow old Rule100 feature artifacts; numeric Q remains explicitly source-unbound (`QSourceContractV1`).
 - [x] AO-K0A stop-lines held: no empirical Q/M-perp/Q+M-perp result, W6, provider, K tuning, dislocation experiment, peer valuation, portfolio optimization, broker or capital action. `financial_alpha_evidence=0`.
-- [ ] Next empirical action is separately gated: source-bind numeric Q and scalar Q+M-perp composition, then hash-bind exact development inputs + uninspected labels and run one charged full-W3 `Q / M_perp / Q+M_perp` development package. Only a lawful survivor may later approach W6.
+- [x] Q-source bind attempt completed (`OK-SBI-0-S0-Q-SOURCE-BIND`): verdict=`Q_SOURCE_BLOCKED_TERMINAL` from admitted S0/W3 only; no Rule100 bridge; no outcome join.
+- [ ] Next research action is **owner pivot** on Q path (new admitted ROIC/joint-identity custody or new `slice_id`) — **not** re-loop bind inventively, not automatic `Q / M_perp / Q+M_perp` trophy, not S2 self-authorization. W6 remains separately gated and untouched.
 
 ## PREBREAKOUT Trial #1 close + Econphysics recut — 2026-08-10
 
@@ -69,7 +82,7 @@ Portfolio-alpha evidence: `0`
 - [x] The transport-capacity blocker was subsequently superseded by restartable local custody; no provider acquisition is required for the current dynamics diagnosis.
 - [x] The former node-specific-continuation next action is superseded by AO-K0. Inventory + margin remain retained diagnostic candidates, but no additional transform is the current universal next slice.
 - [x] Revisions/guidance/consensus remain downstream expectation-gap inputs and are explicitly excluded from AO-K0A's Q/M-perp denominator/orthogonalization preflight.
-- [ ] Only one frozen AO-K0B survivor/version may approach W6 after lawful full-W3 development survival; W6 failure closes that version with no rescue.
+- [ ] Only one frozen OK-SBI / lawful basis survivor/version may later approach W6 after lawful full-W3 development survival; W6 failure closes that version with no rescue. Legacy AO-K0B label is not automatic promotion authority.
 
 ## Board WIP-3 / L0 + VSB confirmation guardian — 2026-08-10
 

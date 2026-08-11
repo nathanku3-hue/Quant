@@ -1,13 +1,23 @@
 # Post-Phase Alignment — Current
 
-Date: 2026-08-11
-Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; W3_REAL_AUTHORITY_COMPLETE; W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_ZERO_TRIAL_COST; ECONPHYSICS_PREBREAKOUT_V1_REAL_S0_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+Date: 2026-08-12
+Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; W3_REAL_AUTHORITY_COMPLETE; W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_ZERO_TRIAL_COST; ECONPHYSICS_PREBREAKOUT_V1_REAL_S0_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; OK_SBI_0_SHADOW_S0_DESIGN_LOCKED_RELEASE_BLOCKED; Q_SOURCE_BLOCKED; W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## 2026-08-12 authority topology / OK-SBI-0 shadow alignment
+
+Docs mode=`DELTA_CURRENT_TRUTH_ONLY`. Custody freeze=`docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json`.
+
+- Lineage `codex/pit-source-authority-1` (base `6045d39…`) is the authority branch; public main is non-authority until merge.
+- Product state remains Clock #1 running / outcomes sealed. Runtime authority remains `gv_endgame_authority_current.md` + executable receipts. Roadmap authority remains `aov_endgame_generalization_spec_current.md`.
+- Active basis = AO-K0A. Active research shadow = OK-SBI-0 @ S0 (`runnable_evaluation=false`). Capital/alpha path closed; financial_alpha_evidence=0.
+- Q language: not deployable until `QSourceContractV1 ∈ {Q_GF_BOUND, Q_AMENDED_BOUND}`; current=`Q_SOURCE_BLOCKED`. Numeric gates may remain `BLOCKED_UNSET` without design failure; invented defaults forbidden.
+- Naming: do not erase AO-K0A; do not promote OK-SBI-0 to product tip; do not treat AO-K0B as automatic `Q/M⊥/Q+M⊥` next. Complexity unit=`effective_DOF + charged_search_debt`.
 
 ## 2026-08-11 AO-K0A denominator / orthogonal-basis alignment
 
 The strategic lock remains closed and `OpportunityKernelV1` remains the universal scientific unit. AO-K0A amends only the active basis seam: denominator=`PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1` exactly; missingness is persistent `ABSTENTION`, not a coverage failure; full-W3 right-tail/breadth accountability is mandatory. Q ranks on all Q-observed W3 names, while Q and M are re-ranked on Q∩M before date-local `OLS rank(M) ~ 1 + rank(Q)` and `M_perp` extraction. Q keeps its broader observability; residual/joint arms abstain outside Q∩M. Residual capital is economic cash and PIT-EW full W3 is the opportunity comparator. Return imputation, complete-case denominators and observed-subset renormalization are forbidden.
 
-Observability boundaries are now source-first: immutable W3 + admitted S0 + exact W3 market only, with no test/feature-store bridge. The read-only preflight content-addresses 310,329 pre-W6 weekly W3 rows at SHA-256 `bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf`, removes zero rows, and consumes zero W6/outcome/provider surfaces. Historical ~79.49% coverage is not recertified. `AO-K0B` is separately result-bearing and must first source-bind numeric Q and scalar Q+M-perp composition before exact development inputs/labels are hash-bound and one material basis trial is opened. `financial_alpha_evidence=0`; inventory mean reversion remains a separate future fundamental-transition challenger.
+Observability boundaries are now source-first: immutable W3 + admitted S0 + exact W3 market only, with no test/feature-store bridge. The read-only preflight content-addresses 310,329 pre-W6 weekly W3 rows at SHA-256 `bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf`, removes zero rows, and consumes zero W6/outcome/provider surfaces. Historical ~79.49% coverage is not recertified. Numeric Q is **not** created by AO-K0A. Result-bearing sparse-basis work is gated by **OK-SBI-0** (shadow): QSource bind + numeric gates + label hashes + carve-out before any development evaluation; legacy `AO-K0B` trophy language is not automatic next. `financial_alpha_evidence=0`; inventory mean reversion remains a separate future fundamental-transition challenger.
 
 ## 2026-08-10 Board WIP-3 / VSB-core alignment
 
@@ -62,7 +72,7 @@ The real v3 cut → clock-false Seal Candidate → fresh-process verification �
 
 ## Parallel work after seal
 
-Run independent evidence/operational lanes rather than one waterfall: Clock #1 weekly evidence, CRV1 slow research, PREBREAKOUT stock discovery, ETF-first Sector Rotation, retained Lane-2 diagnosis, PAPER-0 operational learning, and replication-readiness quarantine. `VSB_CONFIRMATION_v1` is not an active clock/worker today; it remains parked until a future VSB-specific matured-10d evaluation trigger. Evidence qualification may be parallel; current portfolio/capital-policy authority is singular. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
+Run independent evidence/operational lanes rather than one waterfall: Clock #1 weekly evidence, CRV1 slow research, PREBREAKOUT AO-K0A basis preservation + **OK-SBI-0 shadow S0 pre-open** (not a fourth clock), ETF-first Sector Rotation, retained Lane-2 diagnosis, PAPER-0 operational learning, and replication-readiness quarantine. `VSB_CONFIRMATION_v1` is not an active clock/worker today; it remains parked until a future VSB-specific matured-10d evaluation trigger. Evidence qualification may be parallel; current portfolio/capital-policy authority is singular. After maturity, the first bounded AI MutationManifest may run before broad governance platformization.
 
 ## Model portfolio direction
 
@@ -74,4 +84,4 @@ Generic provider/data platforms, AOV-2/event-platform state, hidden-OOS platform
 
 ## Next alignment
 
-Preserve Clock #1 and the one-read A2 boundary. Keep W7/VSB parked. For PREBREAKOUT, preserve AO-K0A bytes and do not open empirical basis outcomes until numeric Q + scalar Q+M-perp composition are source-bound, then exact development PIT inputs plus uninspected labels are hash-bound; the next separately authorized action is one charged full-W3 `Q / M_perp / Q+M_perp` development read. Continue CRV1, ETF-first Sector Rotation, PAPER-0 and replication-readiness under their own authority; only a future VSB-specific matured-10d evaluation feed may reactivate the frozen guardian. Let matured evidence trigger the next `CONTINUE / PIVOT / HOLD / STOP / PROMOTE` decision. Do not restore compatibility or substitute generic AI/data/options/leverage/UI/platform work for evidence.
+Preserve Clock #1 and the one-read A2 boundary. Keep W7/VSB parked. For PREBREAKOUT, preserve AO-K0A bytes. OK-SBI-0 Q-source bind is **closed terminal-blocked** (`Q_SOURCE_BLOCKED_TERMINAL` on admitted custody); next is **owner pivot** (new admitted Q custody or new slice) — do **not** invent Q, open outcomes, or run an automatic `Q / M_perp / Q+M_perp` trophy. Result-bearing OK-SBI development still requires lawful Q bind + zero blockers + sealed labels + PRODUCT_PREOPEN + one-shot carve-out. Continue CRV1, ETF-first Sector Rotation, PAPER-0 and replication-readiness under their own authority; only a future VSB-specific matured-10d evaluation feed may reactivate the frozen guardian. Let matured evidence trigger the next `CONTINUE / PIVOT / HOLD / STOP / PROMOTE` decision. Do not restore compatibility or substitute generic AI/data/options/leverage/UI/platform work for evidence.
