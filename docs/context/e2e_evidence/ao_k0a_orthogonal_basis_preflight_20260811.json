@@ -1,0 +1,161 @@
+{
+  "schema_version": "ao_k0a_orthogonal_basis_preflight_evidence_v1",
+  "round_id": "AO_K0A_ORTHOGONAL_BASIS_PREFLIGHT_20260811",
+  "scope_id": "AO-K0A-DENOMINATOR-ALIGNMENT-ORTHOGONAL-BASIS",
+  "date": "2026-08-11",
+  "status": "FROZEN_SOURCE_PREFLIGHT_NO_EMPIRICAL_RESULT",
+  "authorization": {
+    "owner_verdict": "GO AO-K0A",
+    "approved_transition": "DENOMINATOR_ALIGNMENT / ORTHOGONAL_BASIS_PREFLIGHT",
+    "mechanical_freeze": "PASS",
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE"
+  },
+  "contract": {
+    "id": "OrthogonalizationContractV1",
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "missingness": "PERSISTENT_ABSTENTION_STATE_NEVER_ELIGIBILITY_REWRITE",
+    "coverage_pass_fail_gate": "FORBIDDEN",
+    "complete_case_denominator": "FORBIDDEN",
+    "observed_subset_renormalization": "FORBIDDEN",
+    "security_level_return_imputation": "FORBIDDEN",
+    "peer_return_imputation": "FORBIDDEN",
+    "residual_capital": "ECONOMIC_CASH",
+    "opportunity_benchmark": "PIT_EQUAL_WEIGHT_FULL_W3"
+  },
+  "source_authority": {
+    "allowed_boundary_sources": [
+      "IMMUTABLE_W3_DATE_LOCAL_AUTHORITY",
+      "ADMITTED_ECONPHYSICS_S0",
+      "EXACT_W3_MARKET_CUSTODY"
+    ],
+    "forbidden_boundary_sources": [
+      "TEST_ASSEMBLY_ARTIFACTS",
+      "TRANSIENT_FEATURE_STORES",
+      "EXECUTION_MICROSTRUCTURE_TEST_FRAGMENTS",
+      "CURRENT_SURVIVOR_PROJECTION",
+      "ALTERNATE_LISTING_BRIDGE",
+      "TICKER_ENTITY_PERMNO_FALLBACK",
+      "OUTCOME_BEARING_SURFACES"
+    ],
+    "w3": {
+      "authority_manifest_path": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/authority.manifest.json",
+      "authority_manifest_sha256": "7abdfc2e4ac6430e24aac1db8f6a4eee4bfbf69118437ded13c718a5af3a9631",
+      "source_manifest_path": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/source_manifest.json",
+      "source_manifest_sha256": "1c74ddfedacca57792c1a587222413cec73fcaef92c8c3a21faa677c60d79414",
+      "session_partition_path": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/session_partition.json",
+      "session_partition_sha256": "c8dce8868c34b10cfbbd8738b82cc9b8d4708f9b0fe2ff1c148f7b63d2274016",
+      "all_session_count": 346,
+      "mean_eligible_count": 4822.994219653179,
+      "min_eligible_count": 4561,
+      "max_eligible_count": 5260
+    },
+    "s0": {
+      "raw_path": "data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.csv",
+      "raw_sha256": "a5b873826c9598d33c71cc1e28f44f4ce26512a9c89aa6685f2a1606e9be0b87",
+      "receipt_path": "data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.receipt.json",
+      "receipt_sha256": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f",
+      "master_path": "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_ciqsec_company_master.csv",
+      "master_sha256": "5f8d425f78093bd9f0ce47f61178f51f40fccafe437e366fa9f7f1818cd54744",
+      "transition_plan_path": "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_period_change_plan.csv",
+      "transition_plan_sha256": "40ebcb33d1f8c1450fc9755d4c6467fc0963318505ec03c02f76f250aeb2b80b",
+      "admitted_snapshot_count": 23047,
+      "admitted_security_count": 5382,
+      "quarantined_transition_snapshot_count": 16
+    }
+  },
+  "source_preflight": {
+    "pre_w6_session_count": 306,
+    "weekly_decision_count": 64,
+    "matrix_row_count": 310329,
+    "matrix_sha256": "bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf",
+    "status_counts": {
+      "ELIGIBLE_COMPLETE": 223367,
+      "M_MISSING_HISTORY": 17767,
+      "M_WARMUP": 30270,
+      "Q_AND_M_MISSING": 36068,
+      "Q_UNOBSERVED": 2857
+    },
+    "rows_removed_for_missingness": 0,
+    "post_m_warmup_source_complete_rate": 0.8973228991748552,
+    "historical_approx_79_49_percent": "NOT_RECERTIFIED_NOT_AUTHORITY",
+    "q_numeric_kernel_status": "NOT_REDERIVED_IN_AO_K0A",
+    "w6_dates_consumed": 0,
+    "winner_or_future_outcome_reads": 0,
+    "new_provider_requests": 0,
+    "selection_performed": false,
+    "portfolio_optimization_performed": false
+  },
+  "validation": {
+    "focused_test_command": "./.venv/Scripts/python.exe -m pytest -q tests/asymmetric_opportunity_v1/test_orthogonalization_contract.py",
+    "focused_tests": "7/7 PASS",
+    "compile": "PASS",
+    "machine_freeze_json_parse": "PASS",
+    "source_preflight_replay": "PASS_EXACT_MATRIX_HASH",
+    "active_stale_authority_sweep": "PASS_ONLY_EXPLICITLY_HISTORICAL_OR_SUPERSEDED_OLD_AO_REFERENCES_REMAIN",
+    "forbidden_artifact_reference_scan": "PASS_IMPLEMENTATION_HAS_NO_FORBIDDEN_ARTIFACT_PATH; CONTRACT_DOC_ONLY_NAMES_FORBIDDEN_CLASSES"
+  },
+  "independent_review": {
+    "product_review_id": "5a45cf70cd50a84488d0503cb5da2260cba40d2064e41283e6f687ced887fb3a",
+    "role": "PRODUCT",
+    "result": "pass",
+    "candidate_manifest_digest": "5c0f6fd693e27333678d79ed9bcc719caf2e6aa4bc459d798f979d7df334018e",
+    "evidence_manifest_digest": "b6fbc5b00ad372292b444e97250455d80d978d76d940b30c470eaa3e52432248",
+    "role_policy_digest": "ae23661d2c81506ebb0324e1aed7fb0bdd765cc5b0a3531fd751f836a59a8cd8",
+    "reviewed_at": "2026-08-11T11:47:54.920Z",
+    "advisories": [
+      "Historical 79.49 percent is not recertified and is not an accepted product result.",
+      "financial_alpha_evidence remains zero; acceptance is contract/preflight only.",
+      "AO-K0B remains blocked until numeric Q and scalar Q+M_perp composition are source-bound."
+    ],
+    "distinct_saw_reviewer_a_b_c": "UNAVAILABLE_ON_CURRENT_TOOL_SURFACE_NOT_SUBSTITUTED_BY_PRODUCT_REVIEW",
+    "full_saw_verdict": "BLOCK_GOVERNANCE_REVIEW_COVERAGE_ONLY",
+    "mechanical_freeze_status": "PASS"
+  },
+  "artifact_sha256": {
+    "research/asymmetric_opportunity_v1/__init__.py": "e5c3283315eb1a334ad91c76f15346631b0790900fdaddf2b49f57345326b947",
+    "research/asymmetric_opportunity_v1/orthogonalization.py": "05689c3fa33fc137c45d312752c2b4f5590093fdcff23f0fa737009bd1a22a58",
+    "scripts/ao_k0a_orthogonal_basis_preflight.py": "2422eea1130dbad0a9079a4310ff70d40ff38948750f36412cdd923c1487eb4d",
+    "tests/asymmetric_opportunity_v1/test_orthogonalization_contract.py": "b30da0d6d85410dda58e2b3c654af29700f394d2440e761291e0700a8554dbfb",
+    "docs/architecture/orthogonalization_contract_v1.md": "17746009bebdea81e3a77ca4b72169a7123b2d79041c7488c7db5a224974199f",
+    "docs/architecture/ao_k0a_orthogonal_basis_preflight_v1.json": "4fee39c0e24ebc4022bd14e956303df8d522d6edc053b9d2f8a94728dba633bb",
+    "docs/architecture/asymmetric_opportunity_constitution_v1.md": "eb9b56056eacea5771e1c7b3e10234fb9009d53d4a8704f5e3ad08647055229e",
+    "docs/phase_brief/ao_k0a_orthogonal_basis_preflight_20260811.md": "8239eadd0c202c50e42d2d78045ee547777b0ff103ef56cf63292aad37596a42",
+    "docs/context/planner_packet_current.md": "a6f54d0af241c49e7fd6a755679d3089d1cc9963e57a376736f9a81c364aa609",
+    "docs/context/impact_packet_current.md": "50992e9a93c5bbe0c043f5869bf1bf6517913ad34943ae269bc78c6ec0129c54",
+    "docs/context/bridge_contract_current.md": "f071885383ccdd54ed361991b907ee16a501d8ccd4325f87ffa58199104e9206",
+    "docs/context/done_checklist_current.md": "204d5e101aa2b0b1f15fd0e38113748a12befe141b9d20f7ecdd13035ee97691",
+    "docs/context/post_phase_alignment_current.md": "f119df8f29290c4dbd2fe5f144bc2802ee8e612f8775f324a3389ddd96e337bb",
+    "docs/context/observability_pack_current.md": "2b3f4ab44fbab919594e5a091e246ad0f79ffc1780a8f78e74c3affa5e5c7e5d",
+    "docs/context/multi_stream_contract_current.md": "699d0d25e64ddfac1a4731baa7bc0329470d07ca91bb3b41e87411778dbf6ecc",
+    "docs/architecture/alpha_organism_endgame_current.md": "95f3ea90da88563219e292113b46708ed79b23a81dba2f015daed226ddee6f3c",
+    "docs/architecture/aov_endgame_generalization_spec_current.md": "34fb62e2f7d79323c39cbc2a1b7d8539aeabc18392bf6545ca37db2101cb18ff",
+    "docs/decision log.md": "fd6c5f1be92bf678724c465304da82e0ea75ae4ba3ca19e2529db5bb6a7ee964",
+    "docs/notes.md": "6d3b39cd77d66d5c86c35865481b525607cf3d4bc88ee225df4f03f11037be03",
+    "docs/lessonss.md": "e8ad88c498866db4d9e5414f6b4fac35575181c89b2473fdabc6747b2b65da0b",
+    "docs/saw_reports/saw_ao_k0a_orthogonal_basis_preflight_20260811.md": "1330ce736f87202de6f3064529aca24cb148c78c5669618dc7968f81cf14e796"
+  },
+  "stop_line": [
+    "NEW_WINNER_OR_FUTURE_OUTCOME_OPEN",
+    "EMPIRICAL_Q_MPERP_QPLUSMPERP_RESULT",
+    "W6",
+    "NEW_PROVIDER_REQUEST",
+    "K_TUNING",
+    "DISLOCATION_EXPERIMENT",
+    "PEER_VALUATION_ACQUISITION",
+    "PORTFOLIO_OPTIMIZATION",
+    "CAPITAL_PROMOTION"
+  ],
+  "ao_k0b_block": {
+    "numeric_q_representation": "SOURCE_UNBOUND",
+    "scalar_q_plus_m_perp_composition": "UNBOUND",
+    "result_bearing_action_authorized": false
+  },
+  "git": {
+    "commit_requested": false,
+    "push_requested": false,
+    "commit_performed": false,
+    "push_performed": false,
+    "working_tree_note": "Existing unrelated dirty/untracked work was preserved; no clean/reset/revert was performed."
+  }
+}

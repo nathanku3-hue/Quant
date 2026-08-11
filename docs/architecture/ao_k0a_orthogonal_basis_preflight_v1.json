@@ -1,0 +1,146 @@
+{
+  "schema_version": "ao_k0a_orthogonal_basis_preflight_v1",
+  "contract_id": "OrthogonalizationContractV1",
+  "status": "FROZEN_SOURCE_PREFLIGHT_NO_EMPIRICAL_RESULT",
+  "date": "2026-08-11",
+  "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+  "observability": {
+    "missingness": "PERSISTENT_ABSTENTION_STATE_NEVER_ELIGIBILITY_REWRITE",
+    "allowed_sources": [
+      "IMMUTABLE_W3_DATE_LOCAL_AUTHORITY",
+      "ADMITTED_ECONPHYSICS_S0",
+      "EXACT_W3_MARKET_CUSTODY"
+    ],
+    "forbidden_boundary_sources": [
+      "TEST_ASSEMBLY_ARTIFACTS",
+      "TRANSIENT_FEATURE_STORES",
+      "EXECUTION_MICROSTRUCTURE_TEST_FRAGMENTS",
+      "CURRENT_SURVIVOR_PROJECTION",
+      "ALTERNATE_LISTING_BRIDGE",
+      "TICKER_ENTITY_PERMNO_FALLBACK",
+      "OUTCOME_BEARING_SURFACES"
+    ],
+    "q_source_law": "latest planned S0 fundamental transition at/before decision date must be admitted; quarantined planned transition makes Q source unobserved until later admitted transition; no bridge",
+    "q_numeric_kernel_status": "NOT_REDERIVED_IN_AO_K0A",
+    "m_law": "60 continuous W3-eligible sessions on exact security_id+trading_item_id with finite SP_TOTAL_RETURN in exact W3 market custody",
+    "m_warmup": "fewer than 60 global W3 sessions available",
+    "m_missing_history": "60 global sessions exist but exact-listing continuous W3 return history is incomplete"
+  },
+  "basis_status": [
+    "ELIGIBLE_COMPLETE",
+    "Q_UNOBSERVED",
+    "M_WARMUP",
+    "M_MISSING_HISTORY",
+    "Q_AND_M_MISSING"
+  ],
+  "status_mapping": {
+    "q_missing_m_not_observed": "Q_AND_M_MISSING",
+    "q_missing_m_observed": "Q_UNOBSERVED",
+    "q_observed_m_warmup": "M_WARMUP",
+    "q_observed_m_missing": "M_MISSING_HISTORY",
+    "q_observed_m_observed": "ELIGIBLE_COMPLETE"
+  },
+  "rank_processing": {
+    "method": "AVERAGE_TIE_PERCENTILE_RANK",
+    "q_arm": "date-local over all Q-observed W3 securities",
+    "joint_q": "date-local recomputed over Q_AND_M_observed W3 securities",
+    "joint_m": "date-local over same Q_AND_M_observed W3 securities"
+  },
+  "orthogonalization": {
+    "formula": "rank_M_joint = a_t + b_t * rank_Q_joint + residual",
+    "residual_m": "OLS residual",
+    "intercept": true,
+    "within_decision_date": true,
+    "temporal_fitting": false,
+    "outcome_input": false
+  },
+  "arms": {
+    "Q": {
+      "observable": "Q_OBSERVED",
+      "otherwise": "ABSTENTION"
+    },
+    "M_RESIDUAL": {
+      "observable": "Q_AND_M_OBSERVED",
+      "otherwise": "ABSTENTION"
+    },
+    "Q_PLUS_M_RESIDUAL": {
+      "observable": "Q_AND_M_OBSERVED",
+      "otherwise": "ABSTENTION",
+      "scalar_composition_rule": "NOT_INVENTED_BY_AO_K0A"
+    }
+  },
+  "abstention": {
+    "forecast": "ABSTAIN",
+    "selected": false,
+    "risky_weight": 0.0,
+    "removed_from_denominator": false
+  },
+  "evaluation": {
+    "right_tail_denominator": "ALL_MATURED_W3_ELIGIBLE_WINNERS",
+    "breadth_denominator": "ALL_W3_ELIGIBLE_SECURITIES",
+    "foregone_upside": "ABSTENTION_AND_RIGHT_TAIL / RIGHT_TAIL_IN_FULL_W3",
+    "avoided_catastrophe": "ABSTENTION_AND_BOTTOM_TAIL / BOTTOM_TAIL_IN_FULL_W3",
+    "cat_false_rate": "SELECTED_NONWINNER_AND_BOTTOM_TAIL / SELECTED_NONWINNER",
+    "cat_capture": "SELECTED_AND_BOTTOM_TAIL / BOTTOM_TAIL_IN_FULL_W3",
+    "conditional_scientific_value": "Q_PLUS_M_PERP_vs_Q_on_common_observable_subset",
+    "deployable_system_value": "Q_PLUS_M_PERP_vs_Q_on_full_W3_with_abstention_burden",
+    "composition_authority_uses": "DEPLOYABLE_SYSTEM_VALUE"
+  },
+  "capital": {
+    "security_level_return_imputation": "FORBIDDEN",
+    "peer_return_imputation": "FORBIDDEN",
+    "residual_capital": "ECONOMIC_CASH",
+    "economic_cash_builder": "research.benchmarks.build_economic_cash_frames",
+    "opportunity_benchmark": "PIT_EQUAL_WEIGHT_FULL_W3",
+    "opportunity_benchmark_builder": "research.benchmarks.build_pit_equal_weight_benchmark",
+    "observed_subset_renormalization": "FORBIDDEN"
+  },
+  "coverage": {
+    "pass_fail_gate": "FORBIDDEN",
+    "complete_case_denominator": "FORBIDDEN",
+    "historical_approx_79_49_percent": "NOT_RECERTIFIED_BY_AO_K0A_AND_NOT_AUTHORITY"
+  },
+  "source_preflight": {
+    "w3_all_session_count": 346,
+    "w3_mean_eligible_count": 4822.994219653179,
+    "w3_min_eligible_count": 4561,
+    "w3_max_eligible_count": 5260,
+    "pre_w6_session_count": 306,
+    "weekly_decision_count": 64,
+    "matrix_row_count": 310329,
+    "matrix_sha256": "bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf",
+    "rows_removed_for_missingness": 0,
+    "status_counts": {
+      "ELIGIBLE_COMPLETE": 223367,
+      "M_MISSING_HISTORY": 17767,
+      "M_WARMUP": 30270,
+      "Q_AND_M_MISSING": 36068,
+      "Q_UNOBSERVED": 2857
+    },
+    "post_m_warmup_source_complete_rate": 0.8973228991748552,
+    "w6_dates_consumed": 0,
+    "winner_or_future_outcome_reads": 0,
+    "new_provider_requests": 0
+  },
+  "forbidden": {
+    "security_level_return_imputation": true,
+    "peer_return_imputation": true,
+    "complete_case_denominator": true,
+    "observed_subset_renormalization": true,
+    "coverage_pass_fail_gate": true,
+    "feature_store_boundary_inference": true,
+    "alternate_listing_history_bridge": true,
+    "outcome_input_to_basis": true
+  },
+  "stop_before": [
+    "NEW_WINNER_OR_FUTURE_OUTCOME_OPEN",
+    "EMPIRICAL_Q_MPERP_QPLUSMPERP_RESULT",
+    "W6",
+    "NEW_PROVIDER_REQUEST",
+    "K_TUNING",
+    "DISLOCATION_EXPERIMENT",
+    "PEER_VALUATION_ACQUISITION",
+    "PORTFOLIO_OPTIMIZATION",
+    "CAPITAL_PROMOTION"
+  ]
+}

@@ -1,8 +1,8 @@
 # Multi-Stream Contract — Current
 
-Date: 2026-08-09
-Gate: `STRATEGIC_DIRECTION_LOCKED / MULTI_CLOCK_EVIDENCE / PAPER_0_AND_REPLICATION_RECUTS`
-Status: `PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY / ONE_WRITER_PER_MUTABLE_AUTHORITY_SURFACE`
+Date: 2026-08-11
+Gate: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_LOCKED / AO_K0_OPPORTUNITY_CONSTITUTION_FROZEN / MULTI_CLOCK_EVIDENCE / PAPER_0_AND_REPLICATION_RECUTS`
+Status: `CRV1 + SECTOR_ROTATION_ACTIVE_RESEARCH / VSB_CONFIRMATION_PARKED_NO_WORKER / PREBREAKOUT_AO_K0A_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ / PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY / ONE_WRITER_PER_MUTABLE_AUTHORITY_SURFACE`
 
 ## Lane map
 
@@ -12,8 +12,10 @@ Status: `PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORI
 | Clock #1 / weekly AOV tape | real v3 clock running; frozen-109 weekly refresh/seal cadence | always-on; does not wait for Alpha PIT/CRV1 |
 | Lane 1 Alpha PIT | fixture + concrete CIQ structured/SEC-claims adapter mechanics green; current CIQ custody verified | broad non-growth CRV1 risk-set + expectation/SEC source capture still block real CRV1 join |
 | Lane 1 CRV1 | unchanged 252d slow business-cycle clock; provider-blind mechanics in working tree | legitimate risk set/source join + empirical prediction clock open |
-| Fast Alpha Clock | authorized for immediate preregistration; candidate not chosen | default family WIP is 2; second family needs isolated owner/search/prediction identity and minimal FamilyDataContract |
-| Lane 2 Historical Compression | first-class but A1/A2 hard-blocked | resolve `Original` vs `Current/Restated` vintage authority + current/historical AOV parity before evidence admission |
+| Frozen Confirmation — VSB / W7 | source-admission + M0 + append-only tape + guardian mechanics retained/frozen | PARKED; no capture/append/rescue/retune/PREBREAKOUT/new clock and no dedicated worker; future trigger is VSB-specific matured 10d evaluation receipts only |
+| Sector Rotation | Board-admitted ETF-first orthogonal family; no capital authority | proceeds on its independent ladder and must not delay the stock-winner/Clock #1 path; stock-sector breadth and old sector map are not authority |
+| Lane 2 Historical Compression | A1/A2 closed after one A2 read | retained diagnostic only; no re-query or in-place Parent/Child tuning |
+| PREBREAKOUT AO-K0A | `OpportunityKernelV1` + full-W3 Q/M-perp orthogonal basis preflight frozen; no result read | next gate is source-bound numeric Q + scalar Q+M-perp rule, then exact development input/label hashes; first result read is one charged full-W3 basis trial; W6 stays untouched |
 | PAPER-0 | implementation authorized; no first order yet | ExecutionIntentV1, `market+cls`, broker canonical state, restart/fencing/FREEZE_NEW_RISK, actual-session-close gate |
 | Replication readiness | start now in quarantine | entitlement/identity/PIT/license prep only; outcomes inaccessible to research |
 | Review | deterministic core complete; full lineage/fixtures open | must finish before mature interpretation / outcome-informed mutation |
@@ -28,7 +30,8 @@ Status: `PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORI
 - Frozen insurance V0 values cannot be changed in place; any change creates a new contract/model family.
 - Historical or synthetic input cannot substitute for admitted current first-seal data.
 - Review is deterministic before any AI interpretation.
-- Multiple families may independently become evidence-qualified; only the current portfolio/capital-policy commit chain is singular.
+- Board family registration remains `3`, but current engineering allocation does **not** assign W7 an active worker: CRV1 and ETF-first Sector Rotation may proceed while `VSB_CONFIRMATION_v1` is parked. Custody/search/prediction identity remains isolated per family. PREBREAKOUT owns stock discovery through the frozen AO-K0 constitution; only the current portfolio/capital-policy commit chain is singular.
+- AO-K0A is source-custody gated before any empirical result: denominator=`PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1`; observability boundaries may use only immutable W3 + admitted S0 + exact W3 market; missingness is persistent ABSTENTION with no coverage PASS/FAIL or denominator relief. Before AO-K0B is charged, numeric Q and scalar Q+M-perp composition must be source-bound, then exact development inputs + uninspected labels hash-bound. No provider capture is authorized by AO-K0A.
 - UI cannot own market, formula, weight, evidence, or review authority.
 
 ## Frozen seams
@@ -45,7 +48,7 @@ Status: `PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORI
 
 ## Deferred lanes
 
-Broad provider platformization, source-app sweep, event NLP/pattern authority, 13F/options/ownership, universal PIT platform, optimizer/RL-first work, hidden-OOS platform breadth before need, family WIP above the initial ceiling without review, L2/L3 / DeepLOB without a measured information gap, additional applications, and strategy live capital. PAPER-0 and replication readiness are no longer deferred.
+Broad provider platformization, source-app sweep, event NLP/pattern authority, expectation-gap build before basis qualification, dislocation backtest before a quality/falsifier floor exists, 13F/options/ownership, universal PIT platform, optimizer/RL/boosting-first work, generic AI swarm/agent platforms, ETF-flow vendors, stock-sector breadth, hidden-OOS platform breadth before need, family WIP above the now-active `3` without a new review, L2/L3 / DeepLOB without a measured information gap, additional applications, Child redesign, and strategy live capital. PAPER-0 and replication readiness are no longer deferred.
 
 ## Stop conditions
 

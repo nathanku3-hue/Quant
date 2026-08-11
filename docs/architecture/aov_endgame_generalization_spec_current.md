@@ -1,7 +1,7 @@
 # AOV Endgame Generalization Roadmap & Execution Specification
 
 **Repository:** `E:\code\quant`
-**Status:** `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
+**Status:** `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED / AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ`
 **Roadmap re-audit:** `PASS — STRATEGIC_DIRECTION_LOCKED`
 **Strategic direction:** `APPROVED_AND_LOCKED; BROAD_ARCHITECTURE_REOPEN=NO`
 **Strategic reorder:** `APPROVED_AND_RETAINED`
@@ -13,15 +13,55 @@
 **Replication-readiness recut:** `START_NOW / QUARANTINED`
 **Alpha-family WIP:** `DEFAULT=2 / INITIAL_CEILING=3 UNTIL EXPLICIT_WIP_REVIEW`
 **Final re-audit ratings:** `STRATEGY=9.0 / SHIP_FAST=8.2 / IMMEDIATE_SIM_TO_PAPER=7.5; DIRECTION_PASS_AFTER_RECUT`
-**Documentation sync:** `PATCHED_2026-08-09`
+**Documentation sync:** `PATCHED_2026-08-11_AO_K0A_ORTHOGONAL_BASIS`
 **Authority type:** Approved roadmap/change authority with prior capital-path, evidence-clock, sim-to-real and Winner/Core-Alpha recuts retained; destructive v3 + real CIQ admission + the first immutable Clock-Start Receipt are now complete, while this velocity recut governs post-Clock construction topology
-**Implementation authority:** **MANDATORY RECUTS AUTHORIZED FOR EXECUTION** — preserve Clock #1; continue Alpha PIT + CRV1; preregister one fast multi-week Alpha family; allow independent family clocks/evidence qualification within WIP; implement PAPER-0 behind minimum execution/restart/calendar gates; start quarantined replication readiness; block A1/A2 until historical-vintage + current/historical parity close. Runtime/evidence/capital authority still requires each deterministic join gate.
-**Date:** 2026-08-09
+**Implementation authority:** **MANDATORY RECUTS AUTHORIZED FOR EXECUTION** — preserve Clock #1; continue Alpha PIT + CRV1; preserve `OpportunityKernelV1` and the frozen AO-K0A full-W3 denominator/orthogonalization law; allow independent family clocks/evidence qualification within WIP; implement PAPER-0 behind minimum execution/restart/calendar gates; start quarantined replication readiness. AO-K0B remains blocked until numeric Q and scalar Q+M-perp composition are source-bound under immutable W3 + admitted S0 + exact W3 market custody, then exact development inputs + uninspected labels are hash-bound. Runtime/evidence/capital authority still requires each deterministic join gate.
+**Date:** 2026-08-11
 **Final lock record:** `docs/architecture/aov_strategic_direction_lock_20260809.md`
 **PAPER-0 authority:** `docs/architecture/paper_0_authority.md`
 **Historical vintage gate:** `docs/architecture/historical_fundamental_vintage_authority.md`
 **Method endgame view:** `docs/architecture/alpha_organism_endgame_current.md`
 **Target mandate:** Multi-hour → multi-week systematic evidence engine, initially AOV / long-cash; true Long-Short only after PIT borrow/locate authority exists.
+
+---
+
+# AO-K0A Current Stock-Discovery Basis Recut — 2026-08-11
+
+This roadmap remains strategically locked. AO-K0A is a **local denominator/orthogonalization recut**, not a broad architecture reopen.
+
+Current stock-discovery basis authority is:
+
+```text
+right-tail / downside question
+→ immutable full-W3 denominator
+→ persistent ABSTENTION state
+→ independent date-local ranks
+→ Q∩M orthogonal projection
+→ full-W3 development accountability
+→ untouched / prospective
+→ marginal composition
+→ capital economics
+```
+
+Canonical contract=`docs/architecture/orthogonalization_contract_v1.md`; machine freeze=`docs/architecture/ao_k0a_orthogonal_basis_preflight_v1.json`. Historical AO-K0 constitution bytes remain evidence but are superseded where they specify a separate AO denominator, raw Q×M, or coverage-failure gates.
+
+The active preflight is frozen before outcome visibility:
+
+```text
+D_t         = PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1
+Q rank      = all Q-observed W3 names
+joint ranks = Q and M independently re-ranked on Q∩M
+M_perp      = OLS residual from rank(M) ~ 1 + rank(Q), date-local only
+Q arm       = Q-observed; else ABSTENTION
+M_perp arm  = Q&M-observed; else ABSTENTION
+Q+M_perp    = Q&M-observed; else ABSTENTION
+```
+
+Missingness never becomes a coverage PASS/FAIL and never shrinks `D_t`. Full-W3 right-tail/breadth denominators are mandatory; ABSTENTION risky weight is zero; residual capital uses economic cash; PIT-EW full W3 is the opportunity comparator. Security/peer return imputation, complete-case denominator and observed-subset renormalization are forbidden.
+
+Observability boundaries may use only immutable W3, admitted S0 and exact W3 market custody. Test assemblies/transient feature stores are forbidden. Source preflight content-addresses 310,329 pre-W6 weekly rows at SHA-256 `bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf`, with zero row deletions and zero W6/outcome/provider reads. Historical ~79.49% coverage is not recertified or gating authority.
+
+AO-K0A consumes zero new material trials and opens no empirical result. AO-K0B consumes one material basis trial only after numeric Q and scalar Q+M-perp composition are explicitly source-bound and exact development inputs + uninspected labels are hash-bound. W6 remains untouched; `financial_alpha_evidence=0`; no provider, K tuning, dislocation experiment, peer valuation, portfolio optimization, A2, Parent/Child, Clock #1, broker or capital authority follows from the freeze.
 
 ---
 

@@ -1,13 +1,53 @@
 # GodView Alpha-Organism Endgame — Current
 
-**Date:** 2026-08-09  
-**Status:** `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; MANDATORY_RECUTS_AUTHORIZED; CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`  
+**Date:** 2026-08-11
+**Status:** `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
 **Canonical product maturity:** `70/100` (operability / custody / replay only)  
 **Portfolio-alpha evidence:** `0`  
 **Limited Live:** `CLOSED; NOT AUTHORIZED`  
 **Strategic lock:** `docs/architecture/aov_strategic_direction_lock_20260809.md`  
 **Roadmap / change authority:** `docs/architecture/aov_endgame_generalization_spec_current.md`  
 **Runtime authority:** frozen executable contract + exact code bytes + admitted receipts (`docs/context/gv_endgame_authority_current.md`)
+
+---
+
+## 2026-08-11 AO-K0A denominator / orthogonal-basis recut — current authority
+
+The strategic lock remains closed; this is a local Alpha-discovery basis recut, not a broad architecture reopen. `OpportunityKernelV1` remains canonical, while active basis authority is `OrthogonalizationContractV1` at `docs/architecture/orthogonalization_contract_v1.md` with machine freeze `docs/architecture/ao_k0a_orthogonal_basis_preflight_v1.json`.
+
+```text
+RIGHT-TAIL / DOWNSIDE QUESTION
+→ immutable full-W3 denominator
+→ persistent ABSTENTION states
+→ Q rank on all Q-observed W3
+→ Q/M re-rank on Q∩M
+→ date-local OLS M_perp
+→ full-W3 development accountability
+→ untouched / prospective
+→ marginal composition
+→ capital economics
+```
+
+`ECONPHYSICS_PREBREAKOUT_v1` remains immutable historical evidence and a specialized `FUNDAMENTAL_TRANSITION / MECHANISTIC` kernel. AO-K0A does not reuse its diagnostic outcomes as Alpha evidence and does not use transient/test feature artifacts to define observability.
+
+The active basis preflight is:
+
+```text
+denominator = PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1
+Q arm       = Q-observed only; otherwise ABSTENTION
+M_perp arm  = Q&M-observed only; otherwise ABSTENTION
+Q+M_perp    = Q&M-observed only; otherwise ABSTENTION
+
+Q rank      = date-local over all Q-observed W3
+joint ranks = date-local recomputation over Q∩M
+M_perp      = residual from rank(M) ~ 1 + rank(Q)
+```
+
+Missingness never creates a coverage PASS/FAIL or denominator rewrite. ABSTENTION carries zero risky weight; missed winners remain in the full-W3 right-tail denominator; breadth is selected/full-W3; residual capital is economic cash; PIT equal-weight full W3 is the opportunity comparator. Security-level/peer return imputation, complete-case denominators and observed-subset renormalization are forbidden.
+
+Only immutable W3 + admitted S0 + exact W3 market custody may define observability. The read-only source preflight content-addresses 310,329 pre-W6 weekly W3 rows at SHA-256 `bd36a6305f38ff68c57f6ccfb9d3481be6fd42d2288128ef9ec3eb3cc12df5cf`, with zero row deletion and zero W6/outcome/provider reads. Historical ~79.49% coverage is not recertified or gating authority.
+
+AO-K0A itself consumes zero new material trials. `AO-K0B` is the next separately charged result-bearing slice only after numeric Q and scalar Q+M-perp composition are explicitly source-bound, then exact development inputs and uninspected labels are hash-bound. Current hard boundary: **no empirical basis result, provider capture, K tuning, dislocation backtest, peer-valuation acquisition, portfolio optimization, W6 access, Parent/Child/A2/Clock #1 mutation, or capital authority from AO-K0A.** `financial_alpha_evidence=0`.
 
 ---
 
