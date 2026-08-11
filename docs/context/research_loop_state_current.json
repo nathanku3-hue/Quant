@@ -62,7 +62,7 @@
       "loop_phase": "L7_ROADMAP_DECISION",
       "material_trials_charged_this_slice": 2,
       "material_trials_remaining": 1,
-      "next": "CLOSED / NO_WORKER; AO-FTK-1-ECON-1 Trial 2 complete; owner L7 only; remaining trials=1; alpha=0; no FTK-2",
+      "next": "CLOSED / NO_WORKER; ECON-1 Trial 2 closed waiting owner L7; remaining=1; alpha=0",
       "parent_freeze_commit": "6832066",
       "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
       "role": "SHADOW_RESEARCH_PARENT",
@@ -74,7 +74,7 @@
     },
     {
       "bind_verdict": "PASS_L5_READY",
-      "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_close.json",
+      "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_trial2_long_session_close.json",
       "econ_freeze_work_commit": "febd8e4",
       "economic_clock_class": "TRANSITION_POSITION",
       "economic_l5_authorized": true,
@@ -93,7 +93,7 @@
       "l6_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_layered_diagnosis.json",
       "l7_owner_packet": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_owner_packet.json",
       "label_bytes_joined": true,
-      "long_session_close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_close.json",
+      "long_session_close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_trial2_long_session_close.json",
       "long_session_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_empty_attachment.json",
       "loop_phase": "L5_COMPLETE_WAITING_OWNER_L7",
       "machine_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
@@ -101,7 +101,7 @@
       "material_trials_charged_to_date": 2,
       "material_trials_remaining": 1,
       "md_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.md",
-      "next": "OWNER L7 route only; no auto FTK-2; remaining trials=1",
+      "next": "CLOSED / NO_WORKER; owner L7 only; remaining trials=1; alpha=0; no FTK-2",
       "owner_bind_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_owner_bind_transition_position.json",
       "parent_program": "AO-FTK-1-20260812",
       "receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
@@ -212,6 +212,16 @@
     "session_path": "C_TRIAL2_COMPLETE",
     "work_commit": "705b308"
   },
+  "last_econ_trial2_close": {
+    "ao_ftk_2": "NOT_OPENED",
+    "financial_alpha_evidence": 0,
+    "first_fail_layer": "D2_DATA_OBSERVABLE",
+    "material_trials_remaining": 1,
+    "receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_trial2_long_session_close.json",
+    "session_path": "C_TRIAL2_COMPLETE",
+    "work_commit": "705b308",
+    "worker_status": "CLOSED / NO_WORKER"
+  },
   "last_empirical_diagnosis": {
     "also_flagged": [
       "D4_REPRESENTATION_SNR (sign-only under-sensing risk)"
@@ -320,10 +330,10 @@
   "process": {
     "diagnosis_layer_if_any": "D2_DATA_OBSERVABLE",
     "failure_route_if_any": "HOLD_OR_ADMIT_FULL_W3_MARKET_CUSTODY_THEN_RERUN_UNDER_NEW_AUTH",
-    "last_completed_note": "AO-FTK-1-ECON-1 ACCEPT_DRAFT long session COMPLETE: bind PASS_L5_READY; debit 1→charged=2 remaining=1; join once; one economic eval; L6 first_fail=D2_DATA_OBSERVABLE; L7 packet; AO-FTK-2 NOT_OPENED; alpha=0",
-    "last_completed_phase": "L5_L6_L7_ECON_TRIAL2",
+    "last_completed_note": "AO-FTK-1-ECON-1 Trial 2 long session CLOSED: C_TRIAL2_COMPLETE; work_commit=705b308; first_fail=D2_DATA_OBSERVABLE; remaining=1; AO-FTK-2 NOT_OPENED; alpha=0; NO_WORKER",
+    "last_completed_phase": "TRIAL2_LONG_SESSION_CLOSE",
     "loop_phase": "L7_ROADMAP_DECISION",
-    "loop_phase_label": "AO-FTK-1-ECON-1 L5_COMPLETE_WAITING_OWNER_L7 / NO_WORKER; Trial 2 complete; trials remaining=1; alpha=0",
+    "loop_phase_label": "AO-FTK-1-ECON-1 CLOSED / L5_COMPLETE_WAITING_OWNER_L7 / NO_WORKER; Trial 2 complete; trials remaining=1; alpha=0",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
     "method_status": "LOCKED",
     "next_phase": "L7_ROADMAP_DECISION",

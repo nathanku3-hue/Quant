@@ -59,6 +59,14 @@ l7             = docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_owner_packet.json
 machine_freeze = docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json
 ```
 
+## Close
+
+`	ext
+CLOSE_RECEIPT = docs/context/e2e_evidence/ao_ftk_1_econ_1_trial2_long_session_close.json
+WORKER_STATUS = CLOSED / NO_WORKER
+WORK_COMMIT  = 705b308
+`
+
 ## Do now
 
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
