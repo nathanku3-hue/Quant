@@ -68,6 +68,8 @@ ao_ftk_1_l7_select       = docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_route_se
 
 ```text
 WORKER_STATUS         = CLOSED / NO_WORKER
+LONG_SESSION_CLOSE    = docs/context/e2e_evidence/ao_ftk_1_econ_1_long_session_close.json
+WORK_COMMIT           = 0350082
 BIND_VERDICT          = WAITING_NUMERICS
 TERMINAL_VERDICT      = ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS
 SESSION_PATH          = A_WAITING (long session empty attachment recheck)
