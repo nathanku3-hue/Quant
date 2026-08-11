@@ -54,15 +54,17 @@
       "loop_phase": "WAIT_OWNER_L5_ECONOMIC",
       "material_trials_charged_this_slice": 1,
       "material_trials_remaining": 2,
-      "next": "sensing L5/L6 closed; L7 route selected → economic freeze complete; WAIT_OWNER_L5_ECONOMIC; no auto L5",
+      "next": "CLOSED / NO_WORKER; economic freeze closed; WAIT_OWNER_L5_ECONOMIC; never silent economic L5",
       "parent_freeze_commit": "6832066",
       "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
       "role": "SHADOW_RESEARCH_PARENT",
       "runnable_evaluation": false,
       "slice_id": "AO-FTK-1-20260812",
-      "status": "L7_SELECTED_ECONOMIC_FREEZE_COMPLETE_WAITING_OWNER_L5_ECONOMIC",
+      "status": "L7_SELECTED_ECON_FREEZE_CLOSED_WAITING_OWNER_L5_ECONOMIC",
       "track_id": "AO-FTK-1",
-      "worker_status": "CLOSED / NO_WORKER"
+      "worker_status": "CLOSED / NO_WORKER",
+      "econ_1_close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_close.json",
+      "econ_1_freeze_work_commit": "febd8e4"
     },
     {
       "economic_l5_authorized": false,
@@ -76,14 +78,16 @@
       "material_trials_charged_this_turn": 0,
       "material_trials_remaining": 2,
       "md_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.md",
-      "next": "WAIT_OWNER_L5_ECONOMIC; bind owner numerics then separate L5_AUTHORIZE_ECONOMIC; no auto L5; no AO-FTK-2; no L8 now",
+      "next": "CLOSED / NO_WORKER; WAIT_OWNER_L5_ECONOMIC; bind numerics then separate L5_AUTHORIZE_ECONOMIC; no auto L5",
       "parent_program": "AO-FTK-1-20260812",
       "receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
       "role": "SHADOW_RESEARCH",
-      "status": "FREEZE_COMPLETE / WAIT_OWNER_L5_ECONOMIC",
+      "status": "FREEZE_COMPLETE_CLOSED / WAIT_OWNER_L5_ECONOMIC",
       "terminal_verdict": "ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS",
       "track_id": "AO-FTK-1-ECON-1",
-      "worker_status": "CLOSED / NO_WORKER"
+      "worker_status": "CLOSED / NO_WORKER",
+      "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_close.json",
+      "econ_freeze_work_commit": "febd8e4"
     },
     {
       "next": "continue under own contract; do not merge into FTK/Q",
@@ -247,7 +251,10 @@
     "parent_program": "AO-FTK-1-20260812",
     "receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
     "terminal_verdict": "ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS",
-    "worker_status": "CLOSED / NO_WORKER"
+    "worker_status": "CLOSED / NO_WORKER",
+    "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_close.json",
+    "close_verdict": "ECON_FREEZE_PASS_CLOSED_WAITING_OWNER_L5_ECONOMIC",
+    "econ_freeze_work_commit": "febd8e4"
   },
   "next_worker_slice": {
     "alternatives": [
@@ -277,10 +284,10 @@
   "process": {
     "diagnosis_layer_if_any": null,
     "failure_route_if_any": "NONE_IN_SCOPE_PASS",
-    "last_completed_note": "AO-FTK-1-ECON-1 economic asymmetry freeze PASS (form + ownership): L7 route LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL machine-effective; E1–E12 frozen outcome-blind; surface dof=2 unchanged; debit=0 join=false alpha=0; next WAIT_OWNER_L5_ECONOMIC",
+    "last_completed_note": "AO-FTK-1-ECON-1 closed: economic freeze PASS form+ownership @febd8e4; L7 route machine-effective; debit=0 join=false alpha=0; WAIT_OWNER_L5_ECONOMIC; NO_WORKER",
     "last_completed_phase": "ECONOMIC_ESTIMAND_FREEZE",
     "loop_phase": "WAIT_OWNER_L5_ECONOMIC",
-    "loop_phase_label": "AO-FTK-1-ECON-1 FREEZE_COMPLETE; waiting owner economic L5 authorize (numerics + separate receipt)",
+    "loop_phase_label": "AO-FTK-1-ECON-1 FREEZE_COMPLETE_CLOSED / NO_WORKER; waiting owner economic L5",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
     "method_status": "LOCKED",
     "next_phase": "WAIT_OWNER_L5_ECONOMIC",
