@@ -1,1 +1,59 @@
-docs/phase_brief/alpha-organism-vertical-0-brief.md
+# ACTIVE_BRIEF — 2026-08-12
+
+## Authority (read first)
+
+```text
+LINEAGE_BRANCH           = codex/pit-source-authority-1
+COMMIT_BASE              = 6045d39ce6649cdb8ca4544af30d4a70ce0fc075
+WORKTREE                 = E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e
+PUBLIC_MAIN              = NON_AUTHORITY_UNTIL_MERGE
+CUSTODY_FREEZE           = docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json
+ROADMAP_AUTHORITY        = docs/architecture/aov_endgame_generalization_spec_current.md
+RUNTIME_AUTHORITY        = docs/context/gv_endgame_authority_current.md
+```
+
+## Product vs research
+
+```text
+ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
+ACTIVE_BASIS_AUTHORITY   = AO-K0A / OrthogonalizationContractV1 / NO_EMPIRICAL_RESULT
+ACTIVE_RESEARCH_SHADOW   = OK-SBI-0 / S0_DESIGN_LOCKED_RELEASE_BLOCKED
+CAPITAL_ALPHA_PATH       = CLOSED
+FINANCIAL_ALPHA_EVIDENCE = 0
+```
+
+## Q / gates
+
+```text
+QSourceContractV1        = Q_SOURCE_BLOCKED
+  docs/architecture/q_source_contract_v1.md
+bind_slice               = OK-SBI-0-S0-Q-SOURCE-BIND (audited 2026-08-12)
+q_source_binding_hash    = BLOCKED_UNSET
+q_amendment_cycles_used  = 0
+runnable_evaluation      = false
+blocked_field_count      = 20
+OK-SBI-0-DEV-OPEN-1      = NOT_ISSUED
+BLOCKED_UNSET            = official non-failing state (no invented defaults)
+bind_attempt_evidence    = docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json
+```
+
+## Do now
+
+1. Preserve Clock #1; outcomes sealed until legitimate maturity.
+2. OK-SBI-0 Q-source: **terminal-blocked on admitted custody** (ROIC absent; joint CIQSEC+trading_item + formula unbound). Owner pivot required for new admitted Q custody or new slice — do **not** invent Q / open outcomes.
+3. Remaining numeric `BLOCKED_UNSET` gates stay blocked until Q is lawfully bound; seal dual label packs only after bind path is real.
+4. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
+
+## Do not
+
+```text
+Q / M⊥ / Q+M⊥ trophy leaderboard as automatic next
+W6 open / new provider for Q invention / K tuning / capital
+full endgame rewrite / fourth evidence clock
+treat public main as current authority
+```
+
+## Phase briefs
+
+- `docs/phase_brief/ok_sbi_0_s0_preopen_worker_prompt_20260811.md`
+- Workspace root (non-authority copy): `OK-SBI-0_Worker_Prompt_S0.md` may exist; prefer lineage worktree docs.

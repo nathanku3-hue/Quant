@@ -16,7 +16,9 @@ from research.asymmetric_opportunity_v1.context_c_firewall import (
 )
 from research.asymmetric_opportunity_v1.label_packs import seal_dual_label_packs
 from research.asymmetric_opportunity_v1.ledgers import ledger_catalog
-from research.asymmetric_opportunity_v1.q_source_contract import evaluate_q_source_feasibility
+from research.asymmetric_opportunity_v1.q_source_contract import (
+    evaluate_q_source_feasibility,
+)
 from research.asymmetric_opportunity_v1.release_gates import (
     default_blocked_gates,
     machine_law,
@@ -63,8 +65,8 @@ def build_machine_freeze(
     repo_root: Path | None = None,
     extra_gates: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    root = repo_root or Path.cwd()
-    q_feas = evaluate_q_source_feasibility()
+    root = (repo_root or Path.cwd()).resolve()
+    q_feas = evaluate_q_source_feasibility(repo_root=root, include_custody_audit=True)
     labels = seal_dual_label_packs()
     gates = default_blocked_gates()
 
@@ -85,6 +87,13 @@ def build_machine_freeze(
         {"denominator": W3_DENOMINATOR_ID, "contract": ORTHOGONALIZATION_CONTRACT_ID}
     )
 
+    # q_source_binding_hash remains BLOCKED_UNSET until Q_GF_BOUND / Q_AMENDED_BOUND.
+    binding_hash = q_feas.get("q_source_binding_hash", "BLOCKED_UNSET")
+    if binding_hash and binding_hash != "BLOCKED_UNSET":
+        gates["q_source_binding_hash"] = binding_hash
+    else:
+        gates["q_source_binding_hash"] = "BLOCKED_UNSET"
+
     # Label pack seals — only set sha when fully sealed.
     q_seal = labels["Q_CLOCK_LABEL_PACK"]
     m_seal = labels["M_CLOCK_LABEL_PACK"]
@@ -102,7 +111,7 @@ def build_machine_freeze(
         "slice_id": SLICE_ID,
         "alias": ALIAS,
         "spec_version": SPEC_VERSION,
-        "date": "2026-08-11",
+        "date": "2026-08-12",
         "constitution": CONSTITUTION,
         "authorization": {
             "S0_IMPLEMENTATION_WORK": True,

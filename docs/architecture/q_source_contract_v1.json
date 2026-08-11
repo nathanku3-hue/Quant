@@ -3,6 +3,7 @@
   "schema_version": "q_source_contract_v1",
   "date": "2026-08-12",
   "slice_id": "OK-SBI-0",
+  "bind_slice_id": "OK-SBI-0-S0-Q-SOURCE-BIND",
   "status": "Q_SOURCE_BLOCKED",
   "allowed_status": [
     "BLOCKED_UNSET",
@@ -13,10 +14,34 @@
   ],
   "max_outcome_blind_q_amendment_cycles": 1,
   "q_amendment_cycles_used": 0,
+  "q_source_binding_hash": "BLOCKED_UNSET",
+  "amendment_consumed": false,
+  "amendment_refusal_reason": "ROIC has zero admitted metric; one outcome-blind amendment cannot lawfully invent ROIC or complete CIQSEC+trading_item joint identity for S0 fundamentals without new admitted custody.",
   "conceptual_candidate_only": {
     "primitives": ["RevGrowth_12m", "ROIC"],
     "authority": false,
     "note": "Not deployable numeric Q until every required field is source-bound with hashes and no-bridge proof."
+  },
+  "admitted_custody_audit": {
+    "RevGrowth_12m": {
+      "candidate_input": "IQ_TOTAL_REV on ADMITTED_ECONPHYSICS_S0 structured_transitions",
+      "bind_status": "UNBOUND",
+      "blockers": [
+        "formula_not_frozen",
+        "pit_lag_not_frozen",
+        "applicability_not_frozen",
+        "s0_rows_lack_trading_item_id"
+      ]
+    },
+    "ROIC": {
+      "candidate_input": null,
+      "bind_status": "UNBOUND",
+      "blockers": [
+        "no_IQ_ROIC_or_components_in_admitted_S0_metrics",
+        "invent_from_OPER_INC_CAPEX_forbidden"
+      ]
+    },
+    "evidence_path": "docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json"
   },
   "required_primitive_fields": [
     "primitive_id",
@@ -45,10 +70,13 @@
     "unavailable_field_bridge",
     "ticker_entity_permno_fallback",
     "legacy_rule100_feature_store_borrow_for_q_definition",
-    "post_label_q_redesign"
+    "post_label_q_redesign",
+    "provider_shopping_to_invent_q"
   ],
   "implementation_module": "research/asymmetric_opportunity_v1/q_source_contract.py",
   "markdown_authority": "docs/architecture/q_source_contract_v1.md",
   "financial_alpha_evidence": 0,
-  "capital_authority": "NONE"
+  "capital_authority": "NONE",
+  "outcome_open_authorized": false,
+  "runnable_evaluation": false
 }

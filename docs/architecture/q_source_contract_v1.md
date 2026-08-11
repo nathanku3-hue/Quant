@@ -69,7 +69,7 @@ post-label Q redesign
 legacy test/feature-store borrow for Q definition
 ```
 
-## Current state (2026-08-12)
+## Current state (2026-08-12) — OK-SBI-0-S0-Q-SOURCE-BIND
 
 ```text
 status                         = Q_SOURCE_BLOCKED
@@ -77,6 +77,51 @@ conceptual_candidate           = RevGrowth_12m + ROIC (NOT authority)
 q_amendment_cycles_used        = 0
 q_source_binding_hash          = BLOCKED_UNSET
 runnable_evaluation (OK-SBI-0) = false
+outcome_open_authorized        = false
+financial_alpha_evidence       = 0
+```
+
+### Admitted-custody audit (outcome-blind)
+
+Bound attempt used only AO-K0A admitted boundary sources:
+
+```text
+IMMUTABLE_W3_DATE_LOCAL_AUTHORITY
+ADMITTED_ECONPHYSICS_S0
+EXACT_W3_MARKET_CUSTODY
+```
+
+Findings:
+
+| Primitive | Candidate input in custody? | Bind status |
+|---|---|---|
+| `RevGrowth_12m` | `IQ_TOTAL_REV` on admitted S0 structured transitions (level only) | **UNBOUND** — formula, PIT lag, applicability, joint CIQSEC+trading_item on S0 rows not frozen as Q authority |
+| `ROIC` | **none** (no `IQ_ROIC` / NOPAT / invested-capital metric in admitted S0 receipt metrics) | **UNBOUND** — inventing ROIC from `IQ_OPER_INC`/`IQ_CAPEX_BNK` is forbidden |
+
+Identity gap:
+
+```text
+W3 eligible rows carry (security_id=CIQSEC, trading_item_id)
+S0 master maps SP_ENTITY_ID → security_id
+S0 fundamental rows lack trading_item_id
+→ CIQSEC+trading_item joint identity for Q primitives remains unbound
+```
+
+Amendment budget:
+
+```text
+max_outcome_blind_q_amendment_cycles = 1
+q_amendment_cycles_used              = 0
+amendment_consumed                   = false
+reason: a single field tweak cannot lawfully invent ROIC or complete joint
+        identity without new admitted custody; second redesign requires new slice_id
+```
+
+Evidence:
+
+```text
+docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json
+research/asymmetric_opportunity_v1/q_source_contract.py  (audit_admitted_custody_for_q)
 ```
 
 ## Relation to OK-SBI-0 / AO-K0B

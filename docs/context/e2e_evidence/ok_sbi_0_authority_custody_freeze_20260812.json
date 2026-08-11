@@ -95,9 +95,14 @@
     "STATE": "S0_DESIGN_LOCKED_RELEASE_BLOCKED",
     "outcome_open_authorized": false,
     "OK_SBI_0_DEV_OPEN_1": "NOT_ISSUED",
-    "preopen_scaffold": "LANDED_UNCOMMITTED_PARTIAL",
-    "focused_tests": "41/41 PASS as of worker done packet 2026-08-12",
-    "next_legitimate_action": "bind numeric Q field map or single outcome-blind amendment; then populate remaining BLOCKED_UNSET gates; no outcome join"
+    "preopen_scaffold": "LANDED",
+    "q_source_bind_slice": "OK-SBI-0-S0-Q-SOURCE-BIND",
+    "Q_feasibility": "Q_SOURCE_BLOCKED",
+    "q_amendment_cycles_used": 0,
+    "q_source_binding_hash": "BLOCKED_UNSET",
+    "q_source_bind_attempt_evidence": "docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json",
+    "focused_tests": "asymmetric_opportunity_v1 Q-source + preopen suite PASS after Q-bind audit 2026-08-12",
+    "next_legitimate_action": "owner pivot on Q path (new admitted ROIC/joint-identity custody or new slice_id); do not invent Q, do not open outcomes, do not self-authorize S2"
   },
   "authority_artifacts": {
     "ok_sbi_0_sparse_basis_identification_v1_2.md": "docs/architecture/ok_sbi_0_sparse_basis_identification_v1_2.md",

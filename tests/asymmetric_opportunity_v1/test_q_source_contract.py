@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from research.asymmetric_opportunity_v1.q_source_contract import (
@@ -9,12 +11,15 @@ from research.asymmetric_opportunity_v1.q_source_contract import (
     Q_MINIMAL_AMENDMENT_REQUIRED,
     Q_SOURCE_BLOCKED,
     QSourceContractV1,
+    audit_admitted_custody_for_q,
     conceptual_candidate_contract,
     evaluate_q_source_feasibility,
     primitive_from_mapping,
     required_field_names,
     validate_amendment_budget,
 )
+
+REPO = Path(__file__).resolve().parents[2]
 
 
 def _fully_bound_primitive(primitive_id: str = "RevGrowth_12m"):
@@ -34,14 +39,47 @@ def _fully_bound_primitive(primitive_id: str = "RevGrowth_12m"):
 
 
 def test_conceptual_candidate_is_source_blocked_not_invented() -> None:
-    packet = evaluate_q_source_feasibility()
+    contract = conceptual_candidate_contract()
+    packet = evaluate_q_source_feasibility(
+        contract, repo_root=REPO, include_custody_audit=False
+    )
     assert packet["Q_feasibility"] == Q_SOURCE_BLOCKED
     assert packet["stop_q_binding"] is True
     assert packet["q_amendment_cycles_used"] == 0
-    contract = packet["contract"]
-    assert contract["numeric_q_status"] == "NOT_BOUND_S0"
-    assert "RevGrowth_12m" in contract["unbound_inventory"]
-    assert "ROIC" in contract["unbound_inventory"]
+    body = packet["contract"]
+    assert body["numeric_q_status"] == "NOT_BOUND_S0"
+    assert "RevGrowth_12m" in body["unbound_inventory"]
+    assert "ROIC" in body["unbound_inventory"]
+
+
+def test_admitted_custody_audit_blocks_without_inventing_roic() -> None:
+    attempt = audit_admitted_custody_for_q(repo_root=REPO)
+    assert attempt["Q_feasibility"] == Q_SOURCE_BLOCKED
+    audit = attempt["audit"]
+    assert audit["q_amendment_cycles_used"] == 0
+    assert audit["amendment_consumed"] is False
+    assert audit["q_source_binding_hash"] == "BLOCKED_UNSET"
+    assert audit["has_roic_metric"] is False
+    assert audit["outcome_input"] is False
+    assert audit["financial_alpha_evidence"] == 0
+    assert any("roic_no_admitted_metric" in b for b in audit["blockers"])
+    assert any(
+        "trading_item" in b for b in audit["blockers"]
+    ) or audit["s0_has_trading_item"] is False
+    # No silent bridge language in contract bind values.
+    for prim in attempt["contract"].primitives:
+        blob = " ".join(str(v) for v in prim.to_dict().values()).upper()
+        assert "RULE100_ARTIFACT_BRIDGE" not in blob
+        assert "SYNTHETIC_FILL" not in blob
+
+
+def test_evaluate_with_custody_audit_stays_blocked() -> None:
+    packet = evaluate_q_source_feasibility(repo_root=REPO, include_custody_audit=True)
+    assert packet["Q_feasibility"] == Q_SOURCE_BLOCKED
+    assert packet["q_source_binding_hash"] == "BLOCKED_UNSET"
+    assert packet["financial_alpha_evidence"] == 0
+    assert "custody_audit" in packet
+    assert packet["custody_audit"]["numeric_q_status"] == "NOT_BOUND_S0"
 
 
 def test_fully_bound_without_amendment_is_gf_bound() -> None:

@@ -34,7 +34,7 @@
     "q_source_binding_hash"
   ],
   "constitution": "Science is locked. Release is not. Build pre-open machinery only. Q may be amended at most once outcome-blind. Every future claim must bind clock + ledger + population + denominator. While any release blocker remains, runnable_evaluation=false and outcome open is forbidden. This is not a Q/M\u22a5/Q+M\u22a5 trophy slice. It is sparse basis identification infrastructure.",
-  "date": "2026-08-11",
+  "date": "2026-08-12",
   "forbidden_this_turn": [
     "outcome_join",
     "empirical_q_mperp_qplusmperp_result",
@@ -47,7 +47,7 @@
     "silent_field_bridges",
     "a5_presumed_winner"
   ],
-  "freeze_body_sha256": "76380aff486ddf48b09512cadcdc7fa706b53cf67c96767a16745cda1d269a21",
+  "freeze_body_sha256": "d8a7b2d56c728e00818d5e6ab0729bc0e14de4c75d0903ed28c4299710392a1a",
   "inherited_k0a": {
     "contract_id": "OrthogonalizationContractV1",
     "contract_path": "docs/architecture/orthogonalization_contract_v1.md",
@@ -127,6 +127,7 @@
   "spec_version": "v1.2",
   "step1_q_source": {
     "Q_feasibility": "Q_SOURCE_BLOCKED",
+    "bind_slice_id": "OK-SBI-0-S0-Q-SOURCE-BIND",
     "contract": {
       "contract_id": "QSourceContractV1",
       "feasibility_verdict": "Q_SOURCE_BLOCKED",
@@ -135,16 +136,18 @@
       "forbid_unavailable_field_bridge": true,
       "max_outcome_blind_q_amendment_cycles": 1,
       "notes": [
-        "RevGrowth_12m+ROIC is conceptual candidate only, not authority.",
-        "AO-K0A did not rederive numeric Q; no silent bridge to Rule100 artifacts.",
-        "No provider/source substitution authorized this turn."
+        "OK-SBI-0-S0-Q-SOURCE-BIND admitted-custody audit.",
+        "RevGrowth_12m has candidate IQ_TOTAL_REV input in admitted S0 only; formula/lag/applicability/joint CIQSEC+trading_item remain unbound.",
+        "ROIC has no admitted source metric; inventing from OPER_INC/CAPEX forbidden.",
+        "No provider calls; no Rule100 feature-store borrow; no outcome join.",
+        "Amendment cycle not consumed: a single field tweak cannot complete ROIC."
       ],
       "numeric_q_status": "NOT_BOUND_S0",
       "outcome_input": false,
       "primitives": [
         {
           "applicability_rule": "BLOCKED_UNSET",
-          "ciqsec_trading_item_identity": "CIQSEC+trading_item required; unbound",
+          "ciqsec_trading_item_identity": "BLOCKED_UNSET",
           "corporate_action_treatment": "BLOCKED_UNSET",
           "exact_field_identifier": "BLOCKED_UNSET",
           "formula_denominator": "BLOCKED_UNSET",
@@ -154,14 +157,14 @@
           "period_perspective_semantics": "BLOCKED_UNSET",
           "pit_availability_timestamp": "BLOCKED_UNSET",
           "primitive_id": "RevGrowth_12m",
-          "provider_source_object": "CONCEPTUAL_ONLY",
+          "provider_source_object": "BLOCKED_UNSET",
           "restatement_carry_law": "BLOCKED_UNSET",
           "source_receipt_hash": "BLOCKED_UNSET",
           "unit_currency_law": "BLOCKED_UNSET"
         },
         {
           "applicability_rule": "BLOCKED_UNSET",
-          "ciqsec_trading_item_identity": "CIQSEC+trading_item required; unbound",
+          "ciqsec_trading_item_identity": "BLOCKED_UNSET",
           "corporate_action_treatment": "BLOCKED_UNSET",
           "exact_field_identifier": "BLOCKED_UNSET",
           "formula_denominator": "BLOCKED_UNSET",
@@ -171,7 +174,7 @@
           "period_perspective_semantics": "BLOCKED_UNSET",
           "pit_availability_timestamp": "BLOCKED_UNSET",
           "primitive_id": "ROIC",
-          "provider_source_object": "CONCEPTUAL_ONLY",
+          "provider_source_object": "BLOCKED_UNSET",
           "restatement_carry_law": "BLOCKED_UNSET",
           "source_receipt_hash": "BLOCKED_UNSET",
           "unit_currency_law": "BLOCKED_UNSET"
@@ -185,6 +188,7 @@
         "ROIC": [
           "provider_source_object",
           "exact_field_identifier",
+          "ciqsec_trading_item_identity",
           "period_perspective_semantics",
           "pit_availability_timestamp",
           "minimum_publication_processing_lag",
@@ -200,6 +204,7 @@
         "RevGrowth_12m": [
           "provider_source_object",
           "exact_field_identifier",
+          "ciqsec_trading_item_identity",
           "period_perspective_semantics",
           "pit_availability_timestamp",
           "minimum_publication_processing_lag",
@@ -214,8 +219,154 @@
         ]
       }
     },
+    "custody_audit": {
+      "Q_feasibility": "Q_SOURCE_BLOCKED",
+      "admitted_boundary_sources": [
+        "IMMUTABLE_W3_DATE_LOCAL_AUTHORITY",
+        "ADMITTED_ECONPHYSICS_S0",
+        "EXACT_W3_MARKET_CUSTODY"
+      ],
+      "amendment_consumed": false,
+      "amendment_refusal_reason": "ROIC has zero admitted metric; one outcome-blind amendment cannot lawfully invent ROIC or complete CIQSEC+trading_item joint identity for S0 fundamentals without new admitted custody. Second redesign requires a new slice_id after owner pivot.",
+      "audit_body_sha256": "766950ab40a1222622204c72703af475318980eb34266d422f3ec17eb11d14c0",
+      "bind_slice_id": "OK-SBI-0-S0-Q-SOURCE-BIND",
+      "blockers": [
+        "s0_fundamentals_lack_trading_item_id:CIQSEC+trading_item joint identity unbound for Q primitives",
+        "roic_no_admitted_metric:no IQ_ROIC/NOPAT/invested_capital in admitted S0 metrics"
+      ],
+      "custody_checks": [
+        {
+          "expected_sha256": "a5b873826c9598d33c71cc1e28f44f4ce26512a9c89aa6685f2a1606e9be0b87",
+          "hash_match": true,
+          "path": "data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.csv",
+          "present": true,
+          "sha256": "a5b873826c9598d33c71cc1e28f44f4ce26512a9c89aa6685f2a1606e9be0b87"
+        },
+        {
+          "expected_sha256": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f",
+          "hash_match": true,
+          "path": "data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.receipt.json",
+          "present": true,
+          "sha256": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f"
+        },
+        {
+          "expected_sha256": "5f8d425f78093bd9f0ce47f61178f51f40fccafe437e366fa9f7f1818cd54744",
+          "hash_match": true,
+          "path": "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_ciqsec_company_master.csv",
+          "present": true,
+          "sha256": "5f8d425f78093bd9f0ce47f61178f51f40fccafe437e366fa9f7f1818cd54744"
+        },
+        {
+          "expected_sha256": "40ebcb33d1f8c1450fc9755d4c6467fc0963318505ec03c02f76f250aeb2b80b",
+          "hash_match": true,
+          "path": "data/prebreakout/compiled/econphysics_s0_request_20260810/s0_period_change_plan.csv",
+          "present": true,
+          "sha256": "40ebcb33d1f8c1450fc9755d4c6467fc0963318505ec03c02f76f250aeb2b80b"
+        },
+        {
+          "expected_sha256": null,
+          "hash_match": null,
+          "path": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/authority.manifest.json",
+          "present": true,
+          "sha256": "7abdfc2e4ac6430e24aac1db8f6a4eee4bfbf69118437ded13c718a5af3a9631"
+        },
+        {
+          "expected_sha256": null,
+          "hash_match": null,
+          "path": "docs/context/e2e_evidence/ao_k0a_orthogonal_basis_preflight_20260811.json",
+          "present": true,
+          "sha256": "47c156a3a8b99b67068b417b61b9c566cf6a4f271a88b68be9324de243262dc0"
+        }
+      ],
+      "date": "2026-08-12",
+      "field_matrix": {
+        "ROIC": {
+          "applicability_rule": "BLOCKED_UNSET",
+          "ciqsec_trading_item_identity": "PARTIAL:W3 carries CIQSEC+trading_item; ROIC fundamental identity unbound",
+          "corporate_action_treatment": "BLOCKED_UNSET",
+          "exact_field_identifier": "BLOCKED_UNSET:no_IQ_ROIC_or_components_in_admitted_S0",
+          "formula_denominator": "BLOCKED_UNSET:forbidden_to_invent_ROIC_from_IQ_OPER_INC_and_IQ_CAPEX_BNK",
+          "minimum_publication_processing_lag": "BLOCKED_UNSET",
+          "missingness_reason": "BLOCKED_UNSET",
+          "no_bridge_proof": "PASS_NEGATIVE:refused silent bridge from OPER_INC/CAPEX to ROIC; refused legacy Rule100-Q borrow",
+          "period_perspective_semantics": "BLOCKED_UNSET",
+          "pit_availability_timestamp": "BLOCKED_UNSET",
+          "primitive_id": "BOUND:ROIC",
+          "provider_source_object": "BLOCKED_UNSET:no_admitted_ROIC_source_object",
+          "restatement_carry_law": "BLOCKED_UNSET",
+          "source_receipt_hash": "BLOCKED_UNSET",
+          "unit_currency_law": "BLOCKED_UNSET"
+        },
+        "RevGrowth_12m": {
+          "applicability_rule": "BLOCKED_UNSET",
+          "ciqsec_trading_item_identity": "PARTIAL:S0_master.security_id=CIQSEC + W3.trading_item_id surface exists; S0 fundamental rows lack trading_item_id; joint Q identity unbound",
+          "corporate_action_treatment": "BLOCKED_UNSET",
+          "exact_field_identifier": "CANDIDATE_INPUT_ONLY:IQ_TOTAL_REV (level; RevGrowth_12m transform not source-bound)",
+          "formula_denominator": "BLOCKED_UNSET:RevGrowth_12m formula not frozen (must not invent FQ0/FQ-4 ratio as authority this turn)",
+          "minimum_publication_processing_lag": "BLOCKED_UNSET",
+          "missingness_reason": "BLOCKED_UNSET",
+          "no_bridge_proof": "PASS_CANDIDATE:no Rule100 feature-store borrow; no ticker/PERMNO fallback; no synthetic ROIC/RevGrowth fill; Q remains unbound",
+          "period_perspective_semantics": "CANDIDATE_INPUT_ONLY:relative_period FQ0..FQ-4 + period_end on S0 transitions; RevGrowth_12m period law not frozen as Q authority",
+          "pit_availability_timestamp": "CANDIDATE_INPUT_ONLY:as_of_date + retrieved_at_utc on S0 rows; decision-cut PIT availability law for Q not frozen",
+          "primitive_id": "BOUND:RevGrowth_12m",
+          "provider_source_object": "CANDIDATE_INPUT_ONLY:data/prebreakout/raw/econphysics_s0_structured_v1/structured_transitions.csv",
+          "restatement_carry_law": "CANDIDATE_INPUT_ONLY:FilingVer=Original",
+          "source_receipt_hash": "2d0400e2d1a4cd6f90b1982c9159fc9f128c56950843f43599dd71c54a0a1f4f",
+          "unit_currency_law": "CANDIDATE_INPUT_ONLY:Options:Curr=USD,Mag=Thousands,ConvMethod=R,FilingVer=Original"
+        }
+      },
+      "financial_alpha_evidence": 0,
+      "forbidden_boundary_sources": [
+        "TEST_ASSEMBLY_ARTIFACTS",
+        "TRANSIENT_FEATURE_STORES",
+        "RULE100_FEATURE_STORE_BORROW",
+        "PROVIDER_SHOPPING",
+        "OUTCOME_BEARING_SURFACES"
+      ],
+      "fully_bound_field_count": 1,
+      "has_roic_metric": false,
+      "has_total_rev_input": true,
+      "numeric_q_status": "NOT_BOUND_S0",
+      "outcome_input": false,
+      "provider_calls": "FORBIDDEN_THIS_TURN",
+      "q_amendment_cycles_used": 0,
+      "q_source_binding_hash": "BLOCKED_UNSET",
+      "s0_has_ciqsec_map": true,
+      "s0_has_trading_item": false,
+      "s0_master_columns": [
+        "SP_ENTITY_ID",
+        "security_id",
+        "first_w3_eligible_as_of",
+        "last_w3_eligible_as_of",
+        "w3_eligible_session_count"
+      ],
+      "s0_receipt_metrics": [
+        "IQ_PERIOD_END",
+        "IQ_TOTAL_REV",
+        "IQ_INVENTORY",
+        "IQ_OPER_INC",
+        "IQ_CAPEX_BNK"
+      ],
+      "s0_transition_columns": [
+        "as_of_date",
+        "source_entity_id",
+        "relative_period",
+        "period_end",
+        "IQ_TOTAL_REV",
+        "IQ_INVENTORY",
+        "IQ_OPER_INC",
+        "IQ_CAPEX_BNK",
+        "retrieved_at_utc",
+        "provider_function",
+        "filing_version"
+      ],
+      "unbound_field_count": 27
+    },
+    "financial_alpha_evidence": 0,
     "invent_q_forbidden": true,
+    "outcome_input": false,
     "q_amendment_cycles_used": 0,
+    "q_source_binding_hash": "BLOCKED_UNSET",
     "second_redesign_requires_new_slice_id": true,
     "step": 1,
     "step_name": "QSourceContractV1_feasibility",
@@ -271,7 +422,7 @@
     "catastrophe_definition_Q_CLOCK": "BLOCKED_UNSET",
     "code_hash": "BLOCKED_UNSET",
     "confidence_level": "BLOCKED_UNSET",
-    "contract_hash": "305a553f369319e9ade21ea5071624e5468c2c3b710aa12d1e3858e3b9647fe6",
+    "contract_hash": "d3d846afd24d3672e5aa5229abf58bc45fa0007425b6f32f5e42a09db88631fe",
     "cost_law": "BLOCKED_UNSET",
     "coverage_tolerances": "BLOCKED_UNSET",
     "delta_economic": "BLOCKED_UNSET",
