@@ -17,7 +17,8 @@ RUNTIME_AUTHORITY        = docs/context/gv_endgame_authority_current.md
 ```text
 ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 ACTIVE_BASIS_AUTHORITY   = AO-K0A / OrthogonalizationContractV1 / NO_EMPIRICAL_RESULT
-ACTIVE_RESEARCH_SHADOW   = AO-FTK-0 / PREOPEN_FREEZE (inventory/margin transition sparse basis)
+ACTIVE_RESEARCH_SHADOW   = AO-FTK-0 / PREOPEN_FREEZE_CLOSED (inventory/margin transition sparse basis)
+AO_FTK_0_STATUS          = CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER
 OK_SBI_0_STATUS          = S0_DESIGN_LOCKED_RELEASE_BLOCKED + Q_SOURCE_BLOCKED_TERMINAL (PARKED)
 CAPITAL_ALPHA_PATH       = CLOSED
 FINANCIAL_ALPHA_EVIDENCE = 0
@@ -38,14 +39,17 @@ OK_SBI_S2                = NOT_AUTHORIZED
 BLOCKED_UNSET            = official non-failing state (no invented defaults)
 bind_attempt_evidence    = docs/context/e2e_evidence/ok_sbi_0_q_source_bind_attempt_20260812.json
 qm_park_receipt          = docs/context/e2e_evidence/qm_track_parked_terminal_20260812.json
+ao_ftk_0_freeze          = docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json
+ao_ftk_0_preopen         = docs/context/e2e_evidence/ao_ftk_0_preopen_freeze_20260812.json
+ao_ftk_0_commit          = 6832066
 ```
 
 ## Do now
 
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
-2. `Q_SOURCE_BLOCKED_TERMINAL` under admitted S0+W3 — do **not** invent Q / Rule100 bridges / open OK-SBI S2.
-3. **NEXT_WORKER = AO-FTK-0 complete for pre-open freeze** — machine freeze at `docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json`. Owner may later authorize a **new slice_id** charged development read; do not self-authorize evaluation.
-4. Do not fill OK-SBI 20 gates for optics; do not spend Q amendment inside FTK.
+2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / Rule100 bridges / open OK-SBI S2.
+3. **AO-FTK-0 CLOSED** at pre-open freeze (`READY_FOR_LATER_CHARGED_DEVELOPMENT_READ`). No active FTK worker. Owner may later authorize a **new slice_id** charged development read only.
+4. Do not fill OK-SBI 20 gates for optics; do not spend Q amendment.
 5. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
 
 ## Do not
@@ -60,6 +64,6 @@ treat public main as current authority
 
 ## Phase briefs
 
-- `docs/phase_brief/ao_ftk_0_transition_sparse_basis_worker_prompt_20260812.md`
+- `docs/phase_brief/ao_ftk_0_transition_sparse_basis_worker_prompt_20260812.md` (CLOSED)
 - `docs/phase_brief/ok_sbi_0_s0_preopen_worker_prompt_20260811.md`
 - Workspace root (non-authority copy): `AO-FTK-0_Worker_Prompt.md` may exist; prefer lineage worktree docs.
