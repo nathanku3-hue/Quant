@@ -22,9 +22,9 @@ RUNTIME_AUTHORITY        = docs/context/gv_endgame_authority_current.md
 ```text
 ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 ACTIVE_BASIS_AUTHORITY   = AO-K0A / OrthogonalizationContractV1 / NO_EMPIRICAL_RESULT
-ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-20260812 / L3_PASS (inherit FTK-0 inventory/margin surface)
+ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-20260812 / L3_PASS_CLOSED (inherit FTK-0 inventory/margin surface)
 AO_FTK_0_STATUS          = CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER
-AO_FTK_1_STATUS          = L3_PASS / effective_dof=2 / material_trials_charged=0 / L5=false
+AO_FTK_1_STATUS          = L3_PASS_CLOSED / NO_WORKER / effective_dof=2 / material_trials_charged=0 / L5=false
 OK_SBI_0_STATUS          = S0_DESIGN_LOCKED_RELEASE_BLOCKED + Q_SOURCE_BLOCKED_TERMINAL (PARKED)
 CAPITAL_ALPHA_PATH       = CLOSED
 FINANCIAL_ALPHA_EVIDENCE = 0
@@ -49,6 +49,7 @@ ao_ftk_0_freeze          = docs/architecture/ao_ftk_0_transition_sparse_basis_v1
 ao_ftk_0_preopen         = docs/context/e2e_evidence/ao_ftk_0_preopen_freeze_20260812.json
 ao_ftk_0_commit          = 6832066
 ao_ftk_1_l3_receipt      = docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json
+ao_ftk_1_l3_close        = docs/context/e2e_evidence/ao_ftk_1_20260812_l3_close.json
 ao_ftk_1_preflight       = docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json
 ```
 
@@ -57,7 +58,7 @@ ao_ftk_1_preflight       = docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.j
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
 2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / Rule100 bridges / open OK-SBI S2.
 3. **AO-FTK-0 CLOSED** (NO_WORKER). Do not reopen as worker or open its outcomes.
-4. **AO-FTK-1 L3 PASS** recorded — continuous inventory lag-1 delta + continuous M1; `financial_alpha_evidence=0`; material trials remaining **3**. Owner may authorize **L4 charged-slice freeze** next. **L5 is not auto-open.**
+4. **AO-FTK-1 L3 CLOSED** (`L3_PASS_CLOSED_READY_FOR_OWNER_L4` / NO_WORKER) — continuous inventory lag-1 delta + continuous M1; `financial_alpha_evidence=0`; material trials remaining **3**. Owner may authorize **L4 charged-slice freeze** next. **L5 is not auto-open.** No active FTK-1 worker.
 5. Do not fill OK-SBI 20 gates for optics; do not spend Q amendment.
 6. CRV1 + Sector Rotation may proceed in isolation; VSB remains parked.
 

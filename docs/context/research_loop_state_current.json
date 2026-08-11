@@ -18,15 +18,15 @@
   "process": {
     "method_status": "LOCKED",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
-    "loop_phase": "L3_REPRESENTATION_SNR",
-    "loop_phase_label": "AO-FTK-1 L3 representation/SNR disposition PASS; L4 freeze recommended (not auto L5)",
+    "loop_phase": "L7_ROADMAP_DECISION",
+    "loop_phase_label": "AO-FTK-1 L0–L3 closed PASS; owner routes L4 freeze or parallel work",
     "last_completed_phase": "L3_REPRESENTATION_SNR",
-    "last_completed_note": "AO-FTK-1-20260812 L0–L3 PASS on inherited FTK-0 surface; continuous inventory delta + continuous M1; material_trials_charged=0; alpha_evidence=0",
+    "last_completed_note": "AO-FTK-1-20260812 CLOSED/NO_WORKER after L3 PASS; continuous inventory delta + continuous M1; material_trials_charged=0; alpha_evidence=0",
     "next_phase": "L4_EMPIRICAL_FREEZE",
-    "next_phase_note": "Owner may authorize L4 charged-slice freeze under AO-FTK-1 PASS (effective_dof=2). L5 requires separate owner authorization + material trial debit + sealed labels. No auto L5.",
+    "next_phase_note": "Owner may authorize L4 charged-slice freeze under AO-FTK-1 L3 PASS (effective_dof=2). L5 requires separate owner authorization + material trial debit + sealed labels. No auto L5. No active FTK-1 worker.",
     "diagnosis_layer_if_any": null,
     "failure_route_if_any": null,
-    "representation_snr_gate_status": "PASS_AO_FTK_1_20260812"
+    "representation_snr_gate_status": "PASS_AO_FTK_1_20260812_CLOSED"
   },
   "active_tracks": [
     {
@@ -53,14 +53,15 @@
       "freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
       "preopen": "docs/context/e2e_evidence/ao_ftk_0_preopen_freeze_20260812.json",
       "commit": "6832066",
-      "next": "CLOSED / NO_WORKER; do not reopen as worker; successor is AO-FTK-1"
+      "next": "CLOSED / NO_WORKER; do not reopen as worker; L3 successor closed as AO-FTK-1"
     },
     {
       "track_id": "AO-FTK-1",
-      "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
-      "status": "L3_PASS",
+      "role": "SHADOW_RESEARCH_CLOSED",
+      "status": "L3_PASS_CLOSED_READY_FOR_OWNER_L4",
       "loop_phase": "L3_REPRESENTATION_SNR",
       "slice_id": "AO-FTK-1-20260812",
+      "worker_status": "CLOSED / NO_WORKER",
       "parent_freeze_commit": "6832066",
       "disposition": "PASS",
       "effective_dof_recommendation": 2,
@@ -69,8 +70,10 @@
       "l5_authorized": false,
       "financial_alpha_evidence": 0,
       "receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
+      "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_close.json",
       "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
-      "next": "owner authorize L4 charged-slice freeze; never auto L5"
+      "l3_work_commit": "28aa0f1",
+      "next": "NO_WORKER; owner authorize L4 charged-slice freeze; never auto L5"
     },
     {
       "track_id": "CRV1",
@@ -98,8 +101,8 @@
     }
   ],
   "next_worker_slice": {
-    "primary": "AO-FTK-1-20260812",
-    "recommended": "L4_CHARGED_SLICE_FREEZE_UNDER_FTK1_PASS",
+    "primary": "OWNER_SELECT",
+    "recommended": "L4_CHARGED_SLICE_FREEZE_UNDER_FTK1_L3_PASS",
     "alternatives": [
       "OK-SBI-0-Q-CUSTODY-ADMIT-1",
       "STOP_STOCK_DISCOVERY_TRACK",
@@ -111,7 +114,8 @@
       "invent Q / Rule100 bridge",
       "fill OK-SBI 20 gates for optics",
       "AO-FTK-0 outcome open / reopen as worker",
-      "L5 auto-open after L3 without owner authorization",
+      "AO-FTK-1 reopen as L0–L3 worker (already closed PASS)",
+      "L5 auto-open without owner authorization",
       "material trial debit without L4/L5 authorization",
       "spend Q amendment inside FTK",
       "full endgame rewrite",
@@ -120,7 +124,7 @@
   },
   "allowed_now": [
     "preserve Clock #1",
-    "owner authorize L4 charged-slice freeze after AO-FTK-1 L3 PASS",
+    "owner authorize L4 charged-slice freeze after AO-FTK-1 L3 PASS close",
     "owner authorize Q custody admit slice (Option A, separate)",
     "CRV1 / Sector Rotation isolated work",
     "PAPER-0 ops at alpha_evidence=0",
@@ -137,7 +141,8 @@
     "W6 open",
     "fourth evidence clock without WIP review",
     "claim financial_alpha_evidence > 0",
-    "reopen AO-FTK-0 as worker"
+    "reopen AO-FTK-0 as worker",
+    "reopen AO-FTK-1 L0–L3 as active worker (closed PASS)"
   ],
   "last_empirical_diagnosis": {
     "slice": "ECONPHYSICS_S0_M0_M1_SHOOTOUT_V2",
@@ -154,7 +159,9 @@
     "effective_dof_recommendation": 2,
     "material_trials_charged_this_slice": 0,
     "l5_authorized": false,
-    "receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json"
+    "worker_status": "CLOSED / NO_WORKER",
+    "receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
+    "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_close.json"
   },
   "self_id_protocol": {
     "when_user_asks_phase_or_next": [

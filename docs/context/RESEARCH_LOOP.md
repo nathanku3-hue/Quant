@@ -30,13 +30,13 @@ After lockbox: P1 RUN → P2 MATURE → P3 EVALUATE → P4 PROMOTE|KILL
 Open `research_loop_state_current.json` for live values. As of last lock:
 
 ```text
-process.loop_phase     ≈ L3_REPRESENTATION_SNR (AO-FTK-1 PASS complete)
+process.loop_phase     ≈ L7_ROADMAP_DECISION (AO-FTK-1 L0–L3 closed)
 process.next_phase     ≈ L4_EMPIRICAL_FREEZE (owner authorize; not auto L5)
 product                = Clock #1 sealed, capital closed, alpha_evidence=0
 OK-SBI Q/M             = Q_SOURCE_BLOCKED_TERMINAL (parked)
 AO-FTK-0               = CLOSED pre-open READY / NO_WORKER
-AO-FTK-1               = L3 PASS, effective_dof=2, material_trials_charged=0
-next_worker_slice      = AO-FTK-1-20260812 (primary)
+AO-FTK-1               = L3 PASS CLOSED / NO_WORKER, effective_dof=2
+next_worker_slice      = OWNER_SELECT
 next                   = owner L4 charged-slice freeze
                          OR Q custody admit OR parallel-only
 ```
