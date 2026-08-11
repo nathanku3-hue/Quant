@@ -1,0 +1,166 @@
+{
+  "schema_version": "ao_ftk_1_econ_1_economic_asymmetry_freeze_receipt_v1",
+  "receipt_id": "AO_FTK_1_ECON_1_ECONOMIC_ASYMMETRY_FREEZE",
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "parent_program": "AO-FTK-1-20260812",
+  "name": "FTK_ECONOMIC_ASYMMETRY_FREEZE",
+  "date": "2026-08-12",
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "science_mode": "OUTCOME_BLIND_ECONOMIC_ASYMMETRY_FREEZE",
+  "authorized_phase": "ECONOMIC_ESTIMAND_FREEZE",
+  "terminal_verdict": "ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS",
+  "status": "ECON_FREEZE_PASS_WAITING_OWNER_NUMERICS",
+  "l7_route": "LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL",
+  "l7_select_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_route_select.json",
+  "l7_machine_effective": true,
+  "parent_l5_work_commit": "948471c",
+  "parent_l4_work_commit": "a3350f0",
+  "surface_dof": 2,
+  "surface_dof_unchanged": true,
+  "artifacts": {
+    "machine_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.json",
+    "md_freeze": "docs/architecture/ao_ftk_1_econ_1_economic_asymmetry_freeze.md",
+    "l7_route_select": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_route_select.json",
+    "parent_l4_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
+    "parent_l5_run": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_run.json",
+    "parent_l7_owner_packet": "docs/context/e2e_evidence/ao_ftk_1_20260812_l7_owner_packet.json",
+    "label_identity": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.identity.json",
+    "label_hash_procedure": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/economic_label_pack.hash_procedure.json",
+    "contract_module": "research/asymmetric_opportunity_v1/ao_ftk_1_econ_1_contract.py",
+    "test_module": "tests/asymmetric_opportunity_v1/test_ao_ftk_1_econ_1_economic_freeze.py"
+  },
+  "surface_inheritance": {
+    "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+    "effective_decision_dof": 2,
+    "operators": [
+      "INV_DELTA_MEAN_REVERSION",
+      "MARGIN_M1_STATE_MEAN_REVERSION"
+    ],
+    "operator_immutability_pins": {
+      "INV_DELTA_MEAN_REVERSION": "9434b4958beec33cebeb20a2747cae337b1ca56271a63c861badeb54890fdd85",
+      "MARGIN_M1_STATE_MEAN_REVERSION": "a464058d05abbe4a7da420598ed57a6d0b2033bb732521ecc5b5257471b633cd"
+    },
+    "routing": "DOMAIN_LIMITED_EX_ANTE",
+    "silent_one_dof_collapse": "FORBIDDEN",
+    "third_decision_dof": "FORBIDDEN"
+  },
+  "estimand_summary": {
+    "E1_H": {
+      "form": "fixed executable wager horizon",
+      "H_VALUE": "OWNER_BLOCKED_UNSET",
+      "value_owner": "OWNER_BLOCKED_UNSET"
+    },
+    "E2_E3": {
+      "status": "BLOCKED_UNSET",
+      "blockers": [
+        "price_provider_semantics",
+        "execution_lag",
+        "cost_formula"
+      ]
+    },
+    "E4_E5": {
+      "form": "date-local percentile of forward R_net (right / left tail)",
+      "percentiles": "OWNER_BLOCKED_UNSET"
+    },
+    "E6_J": {
+      "form": "FTK fixed-breadth net − PIT-EW Full W3 net",
+      "delta_J_required": "OWNER_OR_CRO_BLOCKED_UNSET"
+    },
+    "E7_K": {
+      "score_map_form": "DUAL_NODE_EQUAL_WEIGHT_RANK_THEN_TOP_K",
+      "K": "OWNER_BLOCKED_UNSET"
+    },
+    "E8": "FROZEN Full-W3 primary + diagnostic support ledger",
+    "E9": "INHERITED_AUTHORITY sensing Trial-1 folds",
+    "E10_D7": "BLOCKED_UNSET (no invent)",
+    "E11_labels": {
+      "identity_hash_frozen": true,
+      "bytes_joined": false,
+      "path": "data/prebreakout/compiled/ao_ftk_1_econ_1_label_custody/"
+    },
+    "E12_ids": {
+      "PARENT_PROGRAM": "AO-FTK-1-20260812",
+      "FREEZE_ID": "AO-FTK-1-ECON-1"
+    }
+  },
+  "material_trial_debit_plan": {
+    "plan_id": "FTK1_ECON_TRIAL_DEBIT_PLAN_V1",
+    "material_trials_charged_to_date": 1,
+    "material_trials_total_remaining_before_trial2": 2,
+    "next_debit": 1,
+    "remaining_after_trial2": 1,
+    "debit_trigger": "ECONOMIC_L5_AUTHORIZATION_RECEIPT",
+    "debited_this_turn": false
+  },
+  "label_custody": {
+    "label_pack_type": "ECONOMIC",
+    "LABEL_IDENTITY_FROZEN": true,
+    "LABEL_HASH_PROCEDURE_FROZEN": true,
+    "LABEL_BYTES_JOINED": false,
+    "join_authorized": false,
+    "join_performed": false,
+    "outcome_inspected": false,
+    "seal_status": "IDENTITY_AND_HASH_FROZEN_UNJOINED",
+    "sensing_pack_reuse": "FORBIDDEN"
+  },
+  "firewall": {
+    "l5_authorized": false,
+    "economic_l5_authorized": false,
+    "l5_auto_open": false,
+    "runnable_evaluation": false,
+    "capital_authority": false,
+    "material_trials_charged_this_turn": 0,
+    "material_trials_remaining": 2,
+    "label_bytes_joined": false,
+    "financial_alpha_evidence": 0,
+    "qm_terms_forbidden": true,
+    "q_source_status": "Q_SOURCE_BLOCKED_TERMINAL",
+    "ok_sbi_s2": "NOT_AUTHORIZED",
+    "qm_revival_in_ftk": "FORBIDDEN",
+    "ao_ftk_2": "NOT_AUTHORIZED",
+    "l8_bounded_refinement": "DEFER",
+    "w6": "UNTOUCHED",
+    "capital_alpha_path": "CLOSED",
+    "fail_closed": {
+      "economic_label_join": "FAIL_CLOSED_WHEN_ECONOMIC_L5_FALSE",
+      "trial_debit": "FAIL_CLOSED_WHEN_ECONOMIC_L5_FALSE",
+      "economic_evaluator_run": "FAIL_CLOSED_WHEN_ECONOMIC_L5_FALSE"
+    }
+  },
+  "l5_authorized": false,
+  "economic_l5_authorized": false,
+  "material_trials_charged_this_turn": 0,
+  "label_bytes_joined": false,
+  "financial_alpha_evidence": 0,
+  "l5_blockers": [
+    "E1.H_VALUE=OWNER_BLOCKED_UNSET",
+    "E2.price_provider_semantics=BLOCKED_UNSET (no FTK-ECON authoritative price/return law)",
+    "E3.execution_lag=BLOCKED_UNSET",
+    "E3.cost_formula=BLOCKED_UNSET",
+    "E4.RIGHT_TAIL_PERCENTILE=OWNER_BLOCKED_UNSET",
+    "E5.CATASTROPHE_PERCENTILE=OWNER_BLOCKED_UNSET",
+    "E6.delta_J_required=OWNER_OR_CRO_BLOCKED_UNSET",
+    "E7.K=OWNER_BLOCKED_UNSET",
+    "E10.D7_RULE=BLOCKED_UNSET (no invent; owner bind or scope-out)",
+    "economic_l5_authorized=false (separate L5_AUTHORIZE receipt required)"
+  ],
+  "next_phase": "WAIT_OWNER_L5_ECONOMIC",
+  "next_owner_action": "bind remaining numerics if any → L5_AUTHORIZE_ECONOMIC | HOLD | STOP",
+  "next_worker_recommended": "L5_AUTHORIZE_ECONOMIC_SEPARATE",
+  "stop_lines_honored": true,
+  "stop_lines_hit": [],
+  "authority_self_check": {
+    "prior_sot_loop_phase": "L7_ROADMAP_DECISION",
+    "prior_sot_next_phase": "OWNER_L7_DECISION",
+    "prior_ftk1_status": "L5_L6_COMPLETE_CLOSED_WAITING_OWNER_L7",
+    "prior_sensing": "BOTH_NODES_MEASURABLE_SIGNAL",
+    "prior_trials_charged": 1,
+    "prior_trials_remaining": 2,
+    "owner_decision_this_turn": "L7_SELECT_LATER_ECONOMIC_CUT_FREEZE_PLUS_SECOND_TRIAL + ECONOMIC_ESTIMAND_FREEZE",
+    "prompt_authorizes_freeze_only": true,
+    "trial2_debit_this_turn": false,
+    "economic_label_join_this_turn": false,
+    "evaluation_this_turn": false
+  },
+  "constitution": "Freeze the economic estimand outcome-blind on the unchanged 2-DOF sensing law. Debit nothing. Join nothing. Run nothing. Stop at WAIT_OWNER_L5_ECONOMIC."
+}
