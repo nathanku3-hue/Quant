@@ -1,0 +1,215 @@
+{
+  "schema_version": "ao_ftk_1_l4_charged_slice_freeze_v1",
+  "slice_id": "AO-FTK-1-20260812",
+  "name": "FTK_L4_CHARGED_SLICE_FREEZE",
+  "date": "2026-08-12",
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "science_mode": "CHARGED_SLICE_FREEZE",
+  "spec_version": "v1.0",
+  "status": "L4_FREEZE_READY_WAITING_OWNER_L5",
+  "authorized_phase": "L4_EMPIRICAL_FREEZE",
+  "owner_decision": "L4_AUTHORIZE",
+  "parent_freeze_commit": "6832066",
+  "parent_close_commit": "15613f3",
+  "l3_disposition_commit": "28aa0f1",
+  "l3_disposition": "PASS",
+  "l3_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
+  "l3_close_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_close.json",
+  "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
+  "inherited_freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
+  "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+  "effective_decision_dof": 2,
+  "max_effective_decision_dof": 2,
+  "silent_one_dof_collapse": "FORBIDDEN",
+  "third_decision_dof": "FORBIDDEN",
+  "dof_rewrite_this_turn": "FORBIDDEN",
+  "representation": {
+    "inventory_state": "continuous lag-1 inventory economic-level delta",
+    "margin_state": "continuous operating-margin M1 state",
+    "sensing_preference": "continuous preferred over sign-only scores",
+    "inventory_decision_emit": "-sign(delta) via INV_DELTA_MEAN_REVERSION (sign is emission only; continuous retained for SNR)",
+    "vectors": [
+      {
+        "vector_id": "INV_ECONOMIC_LEVEL_LAG1_DELTA_CONTINUOUS",
+        "node_id": "INVENTORY_CHANNEL_STATE",
+        "encoding": "CONTINUOUS",
+        "formula": "inventory_economic_level[FQ0] - inventory_economic_level[FQ-1]",
+        "inventory_economic_level": "-(IQ_INVENTORY / IQ_TOTAL_REV)",
+        "decision_prediction_from_vector": "prediction_direction = -sign(vector); zero-delta → ABSTAIN or non-informative"
+      },
+      {
+        "vector_id": "MARGIN_M1_CONTINUOUS_STATE",
+        "node_id": "MARGIN_CASH_STATE",
+        "encoding": "CONTINUOUS",
+        "formula": "frozen_M1_continuous_state_prediction(operating_margin node); M1 implementation bytes mutation FORBIDDEN",
+        "operating_margin": "IQ_OPER_INC / IQ_TOTAL_REV",
+        "decision_prediction_from_vector": "prediction_direction = -frozen_M1_continuous_state_prediction",
+        "m1_bytes_mutation": "FORBIDDEN"
+      }
+    ]
+  },
+  "derived_levels": [
+    {
+      "level_id": "INVENTORY_TO_REVENUE",
+      "formula": "IQ_INVENTORY / IQ_TOTAL_REV"
+    },
+    {
+      "level_id": "INVENTORY_ECONOMIC_LEVEL",
+      "formula": "-(IQ_INVENTORY / IQ_TOTAL_REV)"
+    },
+    {
+      "level_id": "OPERATING_MARGIN",
+      "formula": "IQ_OPER_INC / IQ_TOTAL_REV"
+    }
+  ],
+  "operators": [
+    {
+      "operator_id": "INV_DELTA_MEAN_REVERSION",
+      "family_alias": "DELTA_MEAN_REVERSION",
+      "node_id": "INVENTORY_CHANNEL_STATE",
+      "decision_dof_slot": 1,
+      "status": "FROZEN_DECISION_SURFACE",
+      "formula": "prediction = -sign(inventory_economic_level[FQ0] - inventory_economic_level[FQ-1]); maps to next-PIT inventory economic delta sign",
+      "operator_bytes": "FROZEN",
+      "m1_bytes_mutation": null,
+      "threshold_grid": "FORBIDDEN_WITHOUT_SEARCH_BUDGET_CHARGE",
+      "fit_or_tuning": "FORBIDDEN",
+      "immutability_pin": "9434b4958beec33cebeb20a2747cae337b1ca56271a63c861badeb54890fdd85"
+    },
+    {
+      "operator_id": "MARGIN_M1_STATE_MEAN_REVERSION",
+      "family_alias": "M1_STATE_MEAN_REVERSION",
+      "node_id": "MARGIN_CASH_STATE",
+      "decision_dof_slot": 2,
+      "status": "FROZEN_DECISION_SURFACE",
+      "formula": "prediction = -frozen_M1_continuous_state_prediction(operating_margin node); M1 implementation bytes unchanged from S0 low-SNR continuous state; maps to next-PIT operating-margin direction",
+      "operator_bytes": "FROZEN",
+      "m1_bytes_mutation": "FORBIDDEN",
+      "threshold_grid": "FORBIDDEN_WITHOUT_SEARCH_BUDGET_CHARGE",
+      "fit_or_tuning": "FORBIDDEN",
+      "immutability_pin": "a464058d05abbe4a7da420598ed57a6d0b2033bb732521ecc5b5257471b633cd"
+    }
+  ],
+  "operator_routing": {
+    "mode": "DOMAIN_LIMITED_EX_ANTE",
+    "rule": "Inventory node may emit only INV_DELTA_MEAN_REVERSION. Margin node may emit only MARGIN_M1_STATE_MEAN_REVERSION. No post-hoc operator search. No free composite trophy across nodes without new slice_id."
+  },
+  "routing": "DOMAIN_LIMITED_EX_ANTE",
+  "material_trial_debit": {
+    "plan_id": "FTK1_TRIAL_DEBIT_PLAN_V1",
+    "hard_material_trials_total": 3,
+    "current_charged": 0,
+    "remaining": 3,
+    "next_debit": 1,
+    "debit_trigger": "L5_AUTHORIZATION_RECEIPT",
+    "debit_this_turn": "FORBIDDEN",
+    "free_threshold_grid": "FORBIDDEN",
+    "uncharged_adaptive_search": "FORBIDDEN",
+    "multi_debit": "FORBIDDEN",
+    "notes": "L4 freezes the debit plan only. Exactly one unit may be debited only under a separate owner L5 authorization receipt."
+  },
+  "label_pack": {
+    "LABEL_IDENTITY_FROZEN": true,
+    "LABEL_HASH_PROCEDURE_FROZEN": true,
+    "LABEL_BYTES_JOINED": false,
+    "label_join": false,
+    "outcome_open": false,
+    "seal_status": "IDENTITY_AND_HASH_FROZEN_UNJOINED",
+    "join_authorized": false,
+    "join_performed": false,
+    "outcome_inspected": false,
+    "identity_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.identity.json",
+    "hash_procedure_path": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.hash_procedure.json",
+    "joined_bytes_path": null,
+    "notes": "Readiness of label machinery is not permission to materialize or inspect labels. Bytes remain unjoined until L5 auth."
+  },
+  "payoff_horizon": "BLOCKED_UNSET",
+  "right_tail_cut": "BLOCKED_UNSET",
+  "catastrophe_cut": "BLOCKED_UNSET",
+  "economic_cuts": {
+    "payoff_horizon_primary": "BLOCKED_UNSET",
+    "payoff_horizon_secondary": "BLOCKED_UNSET",
+    "right_tail_definition": "BLOCKED_UNSET",
+    "catastrophe_definition": "BLOCKED_UNSET",
+    "notes": "Must freeze before any claim of right-tail discovery, economic wager quality, catastrophe avoidance, deployability, or portfolio value. Do not invent defaults to make L4 look complete."
+  },
+  "denominator_and_abstention": {
+    "denominator": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "missingness_law": "PERSISTENT_ABSTENTION_STATE_NEVER_ELIGIBILITY_REWRITE",
+    "imputation": "FORBIDDEN",
+    "complete_case_denominator": "FORBIDDEN",
+    "row_deletion": "FORBIDDEN"
+  },
+  "applicability_taxonomy": {
+    "statuses": [
+      "W3_INELIGIBLE",
+      "NOT_APPLICABLE",
+      "APPLICABLE_OBSERVED",
+      "APPLICABLE_UNOBSERVED"
+    ],
+    "APPLICABLE_UNOBSERVED_action": "ABSTAIN"
+  },
+  "falsifiers_inherited": [
+    "F1_INVENTORY_OPERATOR_UNSTABLE",
+    "F2_MARGIN_OPERATOR_UNSTABLE",
+    "F3_THRESHOLD_RESCUE_REQUIRED",
+    "F4_DENOMINATOR_REWRITE",
+    "F5_QM_SMUGGLING",
+    "F6_ASYMMETRY_CATASTROPHE"
+  ],
+  "runnable_evaluation": false,
+  "l5_authorized": false,
+  "l5_auto_open": false,
+  "capital_authority": false,
+  "financial_alpha_evidence": 0,
+  "qm_terms_forbidden": true,
+  "q_source_status": "Q_SOURCE_BLOCKED_TERMINAL",
+  "ok_sbi_s2": "NOT_AUTHORIZED",
+  "qm_revival_in_ftk": "FORBIDDEN",
+  "q_amendment_status": "AVAILABLE_UNSPENT",
+  "w6": "UNTOUCHED",
+  "product_state": "CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED",
+  "capital_alpha_path": "CLOSED",
+  "ao_ftk_0_status": "CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER",
+  "fail_closed_guards": {
+    "label_join_when_l5_false": "FAIL_CLOSED",
+    "trial_debit_when_l5_false": "FAIL_CLOSED",
+    "evaluator_run_when_l5_false": "FAIL_CLOSED",
+    "implementation": "research/asymmetric_opportunity_v1/ao_ftk_1_l4_contract.py"
+  },
+  "next_phase": "WAIT_OWNER_L5",
+  "next_owner_action": "authorize L5 | hold | stop",
+  "next_owner_action_forbidden": "silent L5 / auto-open / debit without receipt",
+  "stop_lines": [
+    "L5_EXECUTION",
+    "MATERIAL_TRIAL_DEBIT_THIS_TURN",
+    "LABEL_BYTES_JOIN_OR_OUTCOME_OPEN",
+    "L3_OR_L4_AUTO_TO_L5",
+    "SILENT_ONE_DOF_COLLAPSE",
+    "THIRD_DECISION_DOF",
+    "UNCHARGED_DOF_RESEARCH_OR_FEATURE_SELECTION",
+    "FREE_THRESHOLD_GRID",
+    "POST_HOC_OPERATOR_SEARCH",
+    "REOPEN_AO_FTK_0_AS_WORKER",
+    "AO_FTK_0_OUTCOME_OPEN",
+    "INVENT_ROIC_OR_Q_GF",
+    "OK_SBI_S2_OR_QM_TROPHY",
+    "FILL_OK_SBI_20_GATES_FOR_OPTICS",
+    "SPEND_Q_AMENDMENT_INSIDE_FTK",
+    "RULE100_FEATURE_STORE_BRIDGE",
+    "TICKER_ENTITY_PERMNO_FALLBACK",
+    "INVENT_PAYOFF_OR_CATASTROPHE_DEFAULTS",
+    "W6_LOCKBOX_OR_PROSPECTIVE_OUTCOME_JOIN_FOR_REDESIGN",
+    "K_TUNING_PORTFOLIO_OPTIMIZATION_CAPITAL",
+    "PARENT_CHILD_MUTATION_A2_REQUERY",
+    "VSB_UNPARK",
+    "CLAIM_FINANCIAL_ALPHA_EVIDENCE_GT_0",
+    "DUAL_PRIMARY_A_PLUS_B",
+    "FULL_ENDGAME_REWRITE",
+    "FOURTH_EVIDENCE_CLOCK",
+    "TREAT_L3_PASS_AS_ALPHA"
+  ],
+  "stop_lines_hit": [],
+  "constitution": "L4 freezes the passed 2-DOF candidate and the debit/join locks. It does not spend the trial, open labels, or claim alpha. Stop at WAIT_OWNER_L5.",
+  "method_constitution": "docs/architecture/alpha_scientific_method_v1.md"
+}

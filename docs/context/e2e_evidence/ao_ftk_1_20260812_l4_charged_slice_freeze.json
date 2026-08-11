@@ -1,0 +1,105 @@
+{
+  "schema_version": "ao_ftk_1_l4_charged_slice_freeze_receipt_v1",
+  "receipt_id": "AO_FTK_1_20260812_L4_CHARGED_SLICE_FREEZE",
+  "slice_id": "AO-FTK-1-20260812",
+  "name": "FTK_L4_CHARGED_SLICE_FREEZE",
+  "date": "2026-08-12",
+  "role": "SHADOW_RESEARCH / RESEARCH_ONLY",
+  "science_mode": "CHARGED_SLICE_FREEZE",
+  "authorized_phase": "L4_EMPIRICAL_FREEZE",
+  "owner_decision": "L4_AUTHORIZE",
+  "terminal_verdict": "L4_FREEZE_PASS",
+  "status": "L4_FREEZE_READY_WAITING_OWNER_L5",
+  "parent_freeze_commit": "6832066",
+  "parent_close_commit": "15613f3",
+  "l3_disposition_commit": "28aa0f1",
+  "l3_disposition": "PASS",
+  "kernel_id": "AO_FTK_0_TRANSITION_SPARSE_BASIS_V1",
+  "effective_decision_dof_frozen": 2,
+  "artifacts": {
+    "machine_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
+    "md_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.md",
+    "l3_disposition": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
+    "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
+    "parent_freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
+    "label_identity": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.identity.json",
+    "label_hash_procedure": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.hash_procedure.json",
+    "contract_module": "research/asymmetric_opportunity_v1/ao_ftk_1_l4_contract.py",
+    "test_module": "tests/asymmetric_opportunity_v1/test_ao_ftk_1_l4_charged_slice_freeze.py"
+  },
+  "representation_frozen": {
+    "inventory_state": "continuous lag-1 inventory economic-level delta",
+    "margin_state": "continuous operating-margin M1 state",
+    "sensing_preference": "continuous preferred over sign-only scores",
+    "operators": [
+      "INV_DELTA_MEAN_REVERSION",
+      "MARGIN_M1_STATE_MEAN_REVERSION"
+    ],
+    "routing": "DOMAIN_LIMITED_EX_ANTE",
+    "silent_one_dof_collapse": "FORBIDDEN",
+    "third_decision_dof": "FORBIDDEN"
+  },
+  "material_trial_debit_plan": {
+    "plan_id": "FTK1_TRIAL_DEBIT_PLAN_V1",
+    "hard_material_trials_total": 3,
+    "current_charged": 0,
+    "remaining": 3,
+    "next_debit": 1,
+    "debit_trigger": "L5_AUTHORIZATION_RECEIPT",
+    "debited_this_turn": false
+  },
+  "label_custody": {
+    "LABEL_IDENTITY_FROZEN": true,
+    "LABEL_HASH_PROCEDURE_FROZEN": true,
+    "LABEL_BYTES_JOINED": false,
+    "join_authorized": false,
+    "join_performed": false,
+    "outcome_inspected": false,
+    "seal_status": "IDENTITY_AND_HASH_FROZEN_UNJOINED"
+  },
+  "economic_cuts": {
+    "payoff_horizon": "BLOCKED_UNSET",
+    "right_tail_cut": "BLOCKED_UNSET",
+    "catastrophe_cut": "BLOCKED_UNSET"
+  },
+  "firewall": {
+    "l5_authorized": false,
+    "l5_auto_open": false,
+    "runnable_evaluation": false,
+    "capital_authority": false,
+    "material_trials_charged_this_slice": 0,
+    "material_trials_remaining": 3,
+    "label_bytes_joined": false,
+    "financial_alpha_evidence": 0,
+    "qm_terms_forbidden": true,
+    "q_source_status": "Q_SOURCE_BLOCKED_TERMINAL",
+    "ok_sbi_s2": "NOT_AUTHORIZED",
+    "qm_revival_in_ftk": "FORBIDDEN",
+    "w6": "UNTOUCHED",
+    "capital_alpha_path": "CLOSED",
+    "ao_ftk_0_status": "CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER",
+    "fail_closed": {
+      "label_join": "FAIL_CLOSED_WHEN_L5_FALSE",
+      "trial_debit": "FAIL_CLOSED_WHEN_L5_FALSE",
+      "evaluator_run": "FAIL_CLOSED_WHEN_L5_FALSE"
+    }
+  },
+  "l5_authorized": false,
+  "material_trials_charged_this_slice": 0,
+  "label_bytes_joined": false,
+  "financial_alpha_evidence": 0,
+  "next_phase": "WAIT_OWNER_L5",
+  "next_owner_action": "authorize L5 | hold | stop",
+  "stop_lines_honored": true,
+  "stop_lines_hit": [],
+  "authority_self_check": {
+    "prior_sot_primary": "OWNER_SELECT",
+    "prior_sot_next_phase": "L4_EMPIRICAL_FREEZE",
+    "prior_l3": "PASS",
+    "prior_l5_authorized": false,
+    "owner_decision_this_turn": "L4_AUTHORIZE",
+    "primary_now": "AO-FTK-1-20260812",
+    "note": "Owner L4_AUTHORIZE closed OWNER_SELECT for this charged-slice freeze; L5 remains NOT_AUTHORIZED."
+  },
+  "constitution": "L4 freezes the passed 2-DOF candidate and the debit/join locks. It does not spend the trial, open labels, or claim alpha. Stop at WAIT_OWNER_L5."
+}

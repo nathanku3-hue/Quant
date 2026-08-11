@@ -18,15 +18,15 @@
   "process": {
     "method_status": "LOCKED",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
-    "loop_phase": "L7_ROADMAP_DECISION",
-    "loop_phase_label": "AO-FTK-1 L0–L3 closed PASS; owner routes L4 freeze or parallel work",
-    "last_completed_phase": "L3_REPRESENTATION_SNR",
-    "last_completed_note": "AO-FTK-1-20260812 CLOSED/NO_WORKER after L3 PASS; continuous inventory delta + continuous M1; material_trials_charged=0; alpha_evidence=0",
-    "next_phase": "L4_EMPIRICAL_FREEZE",
-    "next_phase_note": "Owner may authorize L4 charged-slice freeze under AO-FTK-1 L3 PASS (effective_dof=2). L5 requires separate owner authorization + material trial debit + sealed labels. No auto L5. No active FTK-1 worker.",
+    "loop_phase": "L4_EMPIRICAL_FREEZE",
+    "loop_phase_label": "AO-FTK-1 L4 charged-slice freeze PASS; waiting owner L5 authorization",
+    "last_completed_phase": "L4_EMPIRICAL_FREEZE",
+    "last_completed_note": "AO-FTK-1-20260812 L4 freeze PASS: 2-DOF surface + label identity/hash + trial-debit plan frozen; material_trials_charged=0; labels unjoined; alpha_evidence=0; L5 NOT_AUTHORIZED",
+    "next_phase": "WAIT_OWNER_L5",
+    "next_phase_note": "Owner may authorize L5 separately (debit exactly 1 + join once + one frozen evaluation). No auto L5. No silent redesign of L4 freeze.",
     "diagnosis_layer_if_any": null,
     "failure_route_if_any": null,
-    "representation_snr_gate_status": "PASS_AO_FTK_1_20260812_CLOSED"
+    "representation_snr_gate_status": "PASS_AO_FTK_1_20260812_L4_FROZEN"
   },
   "active_tracks": [
     {
@@ -53,27 +53,32 @@
       "freeze": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json",
       "preopen": "docs/context/e2e_evidence/ao_ftk_0_preopen_freeze_20260812.json",
       "commit": "6832066",
-      "next": "CLOSED / NO_WORKER; do not reopen as worker; L3 successor closed as AO-FTK-1"
+      "worker_status": "CLOSED / NO_WORKER",
+      "next": "CLOSED / NO_WORKER; do not reopen as worker; L3/L4 successor is AO-FTK-1"
     },
     {
       "track_id": "AO-FTK-1",
-      "role": "SHADOW_RESEARCH_CLOSED",
-      "status": "L3_PASS_CLOSED_READY_FOR_OWNER_L4",
-      "loop_phase": "L3_REPRESENTATION_SNR",
+      "role": "SHADOW_RESEARCH",
+      "status": "L4_FREEZE_PASS",
+      "loop_phase": "L4_EMPIRICAL_FREEZE",
       "slice_id": "AO-FTK-1-20260812",
-      "worker_status": "CLOSED / NO_WORKER",
+      "worker_status": "L4_COMPLETE / WAIT_OWNER_L5",
       "parent_freeze_commit": "6832066",
-      "disposition": "PASS",
-      "effective_dof_recommendation": 2,
+      "l3_disposition": "PASS",
+      "l3_disposition_commit": "28aa0f1",
+      "effective_decision_dof": 2,
       "material_trials_charged_this_slice": 0,
       "material_trials_remaining": 3,
       "l5_authorized": false,
+      "l5_auto_open": false,
+      "label_bytes_joined": false,
+      "runnable_evaluation": false,
       "financial_alpha_evidence": 0,
-      "receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
-      "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_close.json",
+      "l3_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
+      "l4_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
+      "l4_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
       "preflight": "docs/architecture/ao_ftk_1_20260812_l0_l3_preflight.json",
-      "l3_work_commit": "28aa0f1",
-      "next": "NO_WORKER; owner authorize L4 charged-slice freeze; never auto L5"
+      "next": "WAIT_OWNER_L5; authorize L5 separately or hold/stop; never silent L5"
     },
     {
       "track_id": "CRV1",
@@ -101,11 +106,12 @@
     }
   ],
   "next_worker_slice": {
-    "primary": "OWNER_SELECT",
-    "recommended": "L4_CHARGED_SLICE_FREEZE_UNDER_FTK1_L3_PASS",
+    "primary": "AO-FTK-1-20260812",
+    "recommended": "L5_AUTHORIZE_SEPARATE",
     "alternatives": [
+      "HOLD_AT_WAIT_OWNER_L5",
+      "STOP_OR_PARK_FTK1",
       "OK-SBI-0-Q-CUSTODY-ADMIT-1",
-      "STOP_STOCK_DISCOVERY_TRACK",
       "PARALLEL_ONLY_CRV1_SECTOR_PAPER_CLOCK"
     ],
     "forbidden_as_next": [
@@ -114,17 +120,20 @@
       "invent Q / Rule100 bridge",
       "fill OK-SBI 20 gates for optics",
       "AO-FTK-0 outcome open / reopen as worker",
-      "AO-FTK-1 reopen as L0–L3 worker (already closed PASS)",
+      "AO-FTK-1 L0–L3 rewrite / silent 1-DOF collapse / third DOF",
       "L5 auto-open without owner authorization",
-      "material trial debit without L4/L5 authorization",
+      "material trial debit without L5 authorization",
+      "label join / outcome open without L5 authorization",
       "spend Q amendment inside FTK",
       "full endgame rewrite",
-      "capital open"
+      "capital open",
+      "claim financial_alpha_evidence > 0"
     ]
   },
   "allowed_now": [
     "preserve Clock #1",
-    "owner authorize L4 charged-slice freeze after AO-FTK-1 L3 PASS close",
+    "owner authorize L5 for AO-FTK-1 under binding L4 freeze (separate receipt)",
+    "owner hold or stop at WAIT_OWNER_L5",
     "owner authorize Q custody admit slice (Option A, separate)",
     "CRV1 / Sector Rotation isolated work",
     "PAPER-0 ops at alpha_evidence=0",
@@ -132,9 +141,10 @@
     "land ALPHA_SCIENTIFIC_METHOD_v1 pointers in current-truth"
   ],
   "forbidden_now": [
-    "outcome open on FTK without L4/L5 authorization + new binding",
-    "L5 RUN / material trial debit without explicit owner authorization",
-    "label join / outcome inspect on FTK sensing targets",
+    "outcome open on FTK without L5 authorization + new binding",
+    "L5 RUN / material trial debit without explicit owner L5 authorization",
+    "label join / outcome inspect on FTK sensing targets without L5 auth",
+    "silent L4→L5 or rewrite of frozen 2-DOF surface",
     "OK-SBI S2 / composite trophy",
     "invent ROIC / Q_GF without admit slice",
     "winner-driven redesign",
@@ -142,7 +152,7 @@
     "fourth evidence clock without WIP review",
     "claim financial_alpha_evidence > 0",
     "reopen AO-FTK-0 as worker",
-    "reopen AO-FTK-1 L0–L3 as active worker (closed PASS)"
+    "reopen AO-FTK-1 L0–L3 as active worker (closed PASS; L4 frozen)"
   ],
   "last_empirical_diagnosis": {
     "slice": "ECONPHYSICS_S0_M0_M1_SHOOTOUT_V2",
@@ -159,9 +169,22 @@
     "effective_dof_recommendation": 2,
     "material_trials_charged_this_slice": 0,
     "l5_authorized": false,
-    "worker_status": "CLOSED / NO_WORKER",
+    "worker_status": "SUPERSEDED_BY_L4_FREEZE",
     "receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_representation_snr_disposition.json",
     "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l3_close.json"
+  },
+  "last_l4_freeze": {
+    "slice_id": "AO-FTK-1-20260812",
+    "terminal_verdict": "L4_FREEZE_PASS",
+    "effective_decision_dof": 2,
+    "material_trials_charged_this_slice": 0,
+    "material_trials_remaining": 3,
+    "label_bytes_joined": false,
+    "l5_authorized": false,
+    "financial_alpha_evidence": 0,
+    "receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
+    "machine_freeze": "docs/architecture/ao_ftk_1_20260812_l4_charged_slice_freeze.json",
+    "next_owner_action": "authorize L5 | hold | stop"
   },
   "self_id_protocol": {
     "when_user_asks_phase_or_next": [

@@ -1,0 +1,52 @@
+{
+  "schema_version": "ao_ftk_1_label_pack_hash_procedure_v1",
+  "slice_id": "AO-FTK-1-20260812",
+  "LABEL_HASH_PROCEDURE_FROZEN": true,
+  "LABEL_BYTES_JOINED": false,
+  "join_authorized": false,
+  "join_performed": false,
+  "outcome_inspected": false,
+  "seal_name": "SEALED_UNJOINED",
+  "seal_status": "IDENTITY_AND_HASH_FROZEN_UNJOINED",
+  "content_address_inputs": [
+    "pack_schema_id",
+    "row_key_set_definition",
+    "decision_date_list_plan",
+    "sensing_target_keys",
+    "label_source_receipt_lineage"
+  ],
+  "hash_algorithm": "sha256",
+  "canonicalization": {
+    "encoding": "utf-8",
+    "json_serialization": "sort_keys=true, separators=(',', ':'), ensure_ascii=false",
+    "notes": "Hash planned identity + procedure inputs only. Do not hash joined outcome bytes (none exist this turn)."
+  },
+  "identity_artifact": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_label_pack.identity.json",
+  "procedure": [
+    "1. Load development_label_pack.identity.json (LABEL_IDENTITY_FROZEN=true).",
+    "2. Confirm join_authorized=false, join_performed=false, outcome_inspected=false, LABEL_BYTES_JOINED=false.",
+    "3. Build content-address payload from schema + row-key set + decision-date list plan + sensing targets + source receipt lineage.",
+    "4. Compute sha256 of canonical JSON payload.",
+    "5. Seal name = SEALED_UNJOINED only while identity frozen and bytes unjoined.",
+    "6. Refuse join/open unless separate owner L5 authorization receipt exists."
+  ],
+  "join_gate": {
+    "requires": [
+      "owner L5 authorization receipt",
+      "material trial debit of exactly 1 recorded",
+      "L4 freeze still binding",
+      "join_authorized flipped true only under that receipt"
+    ],
+    "l5_authorized_default": false,
+    "fail_closed_when_l5_false": true
+  },
+  "decision_date_list_plan": {
+    "status": "PLAN_ONLY_UNMATERIALIZED",
+    "description": "Decision-date list is content-addressed at L5 join time from admitted W3-eligible as-of grid under FTK-0 PIT lag law; not enumerated or joined this turn."
+  },
+  "planned_joined_paths_if_later_authorized": {
+    "development_labels_parquet": "data/prebreakout/compiled/ao_ftk_1_20260812_label_custody/development_labels.parquet",
+    "note": "Path reserved; file must not exist until L5 join. Presence of joined parquet without L5 receipt is a custody defect."
+  },
+  "notes": "Hash procedure frozen at L4. Bytes remain unjoined. No outcome inspection."
+}
