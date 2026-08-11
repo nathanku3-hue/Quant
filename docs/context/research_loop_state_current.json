@@ -74,6 +74,7 @@
     },
     {
       "bind_verdict": "PASS_L5_READY",
+      "close_commit": "81d918a",
       "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_econ_1_trial2_long_session_close.json",
       "econ_freeze_work_commit": "febd8e4",
       "economic_clock_class": "TRANSITION_POSITION",
@@ -214,6 +215,7 @@
   },
   "last_econ_trial2_close": {
     "ao_ftk_2": "NOT_OPENED",
+    "close_commit": "81d918a",
     "financial_alpha_evidence": 0,
     "first_fail_layer": "D2_DATA_OBSERVABLE",
     "material_trials_remaining": 1,
