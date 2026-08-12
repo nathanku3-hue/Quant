@@ -5,11 +5,17 @@ from datetime import UTC, datetime
 
 import pytest
 
-from research.aov0.weekly_tape import build_weekly_tape_preflight
+from research.aov0.weekly_tape import (
+    CLOCK1_FROZEN_CANDIDATE_ENTITY_IDS,
+    CLOCK1_FROZEN_CANDIDATE_SOURCE_SHA256,
+    CLOCK1_FROZEN_CANDIDATE_UNIVERSE_SHA256,
+    build_weekly_tape_preflight,
+    frozen_candidate_universe_hash,
+)
 
 
 def _ids() -> list[str]:
-    return [str(1_000_000 + index) for index in range(109)]
+    return list(CLOCK1_FROZEN_CANDIDATE_ENTITY_IDS)
 
 
 def _receipts() -> dict[str, dict[str, object]]:
@@ -52,11 +58,26 @@ def test_weekly_tape_preflight_accepts_same_109_with_fresh_required_receipts() -
     )
     assert packet["status"] == "READY_FOR_V3_DECISION_CUT_CONSTRUCTION"
     assert packet["candidate_count"] == 109
+    assert packet["candidate_universe_sha256"] == CLOCK1_FROZEN_CANDIDATE_UNIVERSE_SHA256
+    assert packet["candidate_source_sha256"] == CLOCK1_FROZEN_CANDIDATE_SOURCE_SHA256
+    assert frozen_candidate_universe_hash(_ids()) == CLOCK1_FROZEN_CANDIDATE_UNIVERSE_SHA256
     assert packet["growth_screen_rerun_authorized"] is False
     assert packet["parent_child_mutation_authority"] == "NONE"
     assert packet["outcome_open_authority"] == "NONE"
     assert packet["financial_alpha_evidence"] == 0
     assert len(packet["preflight_id"]) == 64
+
+
+def test_weekly_tape_preflight_rejects_self_consistent_wrong_109() -> None:
+    wrong = [str(1_000_000 + index) for index in range(109)]
+    with pytest.raises(ValueError, match="frozen_candidate_universe_not_clock1"):
+        build_weekly_tape_preflight(
+            frozen_candidate_entity_ids=wrong,
+            refreshed_candidate_entity_ids=wrong,
+            previous_cut_at="2026-08-08T19:48:38Z",
+            current_cut_at="2026-08-14T20:30:00Z",
+            source_receipts=_receipts(),
+        )
 
 
 def test_weekly_tape_preflight_fails_closed_on_candidate_membership_drift() -> None:

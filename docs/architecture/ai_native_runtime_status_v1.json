@@ -1,0 +1,129 @@
+{
+  "schema_version": "ai_native_runtime_status_v1",
+  "status": "LOCKED_CURRENT_TRUTH",
+  "effective_date": "2026-08-12",
+  "authority": {
+    "lineage_branch": "codex/pit-source-authority-1",
+    "public_main": "NON_AUTHORITY_UNTIL_MERGE",
+    "worktree": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e",
+    "audit_doc": "docs/architecture/ai_native_runtime_closure_audit_20260812.md",
+    "method_constitution": "docs/architecture/alpha_scientific_method_v1.md",
+    "result_first_amendment": "docs/architecture/result_first_ai_research_loop_v1.md",
+    "scientific_preflight": "docs/architecture/opportunity_kernel_scientific_preflight_v2.json",
+    "execution_feasibility": "docs/architecture/execution_feasibility_v1.json",
+    "family_sot": "docs/context/research_loop_state_current.json"
+  },
+  "verdict": {
+    "ai_native_quant_research_architecture": "YES_CONSTITUTIONALLY",
+    "ai_native_quant_research_runtime": "PARTIAL",
+    "global_coupling_safety": "NOT_PROVEN",
+    "universal_outcome_authority_gate": "NOT_IMPLEMENTED",
+    "roadmap_revision_needed": "NARROW_ONLY",
+    "one_line": "Constitution locked; runtime partial; primary gap is constitution-to-execution closure, not strategy redesign."
+  },
+  "layers": {
+    "AI_NATIVE_RESEARCH_CONSTITUTION": "LOCKED",
+    "AI_NATIVE_DECISION_SEMANTICS": "LOCKED",
+    "FAMILY_LEVEL_FIRST_FAIL_ENFORCEMENT": "IMPLEMENTED_IN_FTK",
+    "OUTCOME_CAPABILITY_FIREWALL": "PARTIALLY_IMPLEMENTED",
+    "UNIVERSAL_PREFLIGHT_ENFORCEMENT": "NOT_IMPLEMENTED",
+    "CROSS_FAMILY_RDV_ALLOCATOR": "NOT_IMPLEMENTED",
+    "GLOBAL_COUPLING_DIAGNOSTICS": "NOT_IMPLEMENTED",
+    "D1_D9_CONSTITUTION": "LOCKED",
+    "D1_D9_FTK_IMPLEMENTATION": "IMPLEMENTED",
+    "D1_D9_UNIVERSAL_RUNNER": "NOT_IMPLEMENTED",
+    "OPPORTUNITY_KERNEL_V1_CONTRACT": "LOCKED",
+    "SCIENTIFIC_L_NAMESPACE": "LOCKED_L0_L11_P1_P4",
+    "SCIENCE_S5_RENAME": "REJECTED"
+  },
+  "known_gaps": {
+    "legacy_outcome_bypass_example": "research/backtest_runner.py:run_research_backtest",
+    "preflight_python_consumers": "NONE_UNIVERSAL",
+    "execution_feasibility_python_consumers": "NONE_UNIVERSAL",
+    "risk_decision_missing_unresolved": true,
+    "risk_input_fallbacks_include": [
+      "order.sector",
+      "order.vix",
+      "order.volatility",
+      "default_symbol_volatility"
+    ],
+    "paper0_temporal_design_defect": "DIAGNOSTIC_ONLY_CANDIDATE_IMPLEMENTATION",
+    "authority_reproducibility": "DIRTY_OR_UNTRACKED_SURFACES_MAY_BACK_CURRENT_SOT_LANES"
+  },
+  "golden_questions_ranked": [
+    {
+      "rank": 1,
+      "id": "GQ_CONSTITUTIONAL_ENFORCEMENT_CLOSURE",
+      "class": "TOP_3_NOW"
+    },
+    {
+      "rank": 2,
+      "id": "GQ_ACTION_BOUNDARY_CLOCK_AND_RISK_STATE_PROVENANCE",
+      "class": "TOP_3_NOW"
+    },
+    {
+      "rank": 3,
+      "id": "GQ_ENDOGENOUS_OBSERVABILITY",
+      "class": "TOP_3_NOW"
+    },
+    {
+      "rank": 4,
+      "id": "GQ_AUTHORITY_REPRODUCIBILITY",
+      "class": "NEXT"
+    },
+    {
+      "rank": 5,
+      "id": "GQ_COMMON_MODE_DEPENDENCY",
+      "class": "NEXT"
+    },
+    {
+      "rank": 6,
+      "id": "GQ_DIAGNOSTIC_INFORMATION_LAUNDERING",
+      "class": "NEXT"
+    },
+    {
+      "rank": 7,
+      "id": "GQ_L5_COMPARISON_SET_INTEGRITY",
+      "class": "NEXT"
+    },
+    {
+      "rank": 8,
+      "id": "GQ_CORRELATED_ABSTENTION",
+      "class": "NEXT"
+    },
+    {
+      "rank": 9,
+      "id": "GQ_AI_GATE_GAMING",
+      "class": "NEXT"
+    },
+    {
+      "rank": 10,
+      "id": "GQ_TEMPORAL_TYPING_OF_CURRENT_VS_HISTORICAL_STATE",
+      "class": "NEXT"
+    }
+  ],
+  "narrow_seams_only": [
+    "UNIVERSAL_OUTCOME_CAPABILITY_GATE",
+    "ACTION_BOUNDARY_AUTHORITY_PACKET",
+    "FAIL_CLOSED_RISK_PROVENANCE_CONTRACT",
+    "FRESH_CHECKOUT_AUTHORITY_CLOSURE_TEST",
+    "L5_COMPARISON_SET_RECEIPT"
+  ],
+  "explicit_rejections": [
+    "fills_to_alpha",
+    "lambda_soft_hard_risk",
+    "blended_expert_score",
+    "e6_5_on_pure_sensing",
+    "rdv_as_alpha_evidence",
+    "outcome_trained_stress_block_rate",
+    "auto_dislocation_open",
+    "sharpe_bo_inner_loop_privilege",
+    "automatic_l4_to_l5",
+    "retroactive_r9_or_family_reopen",
+    "science_s5_rename",
+    "broad_architecture_reopen"
+  ],
+  "product_effect": "NONE",
+  "capital_effect": "NONE",
+  "financial_alpha_evidence": 0
+}

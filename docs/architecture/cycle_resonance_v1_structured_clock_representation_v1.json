@@ -1,0 +1,219 @@
+{
+  "schema_version": "cycle_resonance_v1_structured_clock_representation_v1",
+  "slice_id": "CRV1-E4-STRUCTURED-CLOCK-REPRESENTATION-1",
+  "family_id": "CYCLE_RESONANCE_v1",
+  "date": "2026-08-12",
+  "status": "FROZEN_OUTCOME_BLIND",
+  "programme_stage": "E4",
+  "authority": {
+    "e3_clock_contract": "docs/architecture/cycle_resonance_v1_clock_state_coordinate_preflight_v1.json",
+    "family_build_spec": "docs/architecture/cycle_resonance_v1_build_spec.md",
+    "result_first_method": "docs/architecture/result_first_ai_research_loop_v1.md",
+    "w9_source_admission_state": "FROZEN_CLOSED_REOPEN_ONLY_SHARED_W3_W9_RAW_CIQ_ROUND"
+  },
+  "decision_value_preflight": {
+    "decision_to_change": "Can the six-clock CRV1 causal core be expressed with one minimal, deterministic, outcome-blind representation and one fixed ordered-sequence/lag law, or should the graph be simplified/parked before claim/model engineering?",
+    "current_belief": "E3 established non-aliased clock semantics, but the build spec still permits LEVEL, DELTA, INFLECTION, and ORDERED_SEQUENCE without defaults and leaves required edges, skip law, contradiction handling, missing-clock behavior, and maximum edge lag unset.",
+    "cheapest_discriminating_test": "Freeze exactly one primary representation per required core clock from the existing semantic coordinates plus one graph-level ordered-sequence law, using no provider bytes, outcomes, labels, returns, fitted models, ranking, or result-bearing diagnostics.",
+    "why_no_cheaper_test_exists": "A schema-only or naming check would leave scientific degrees of freedom open for later outcome selection. The minimum decision-useful E4 object must close the representation and sequence choices that the existing build spec explicitly refuses to default.",
+    "pass_route": "REPRESENTATION_CONTRACT_PASS -> CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1",
+    "fail_route": "SIMPLIFY_CRV1_CLOCK_GRAPH_OR_PARK_CRV1",
+    "unresolved_route": "NAME_EXACT_REPRESENTATION_OR_SOURCE_DEPENDENCY -> HOLD_SOURCE",
+    "killer_rule": "IF_PASS_FAIL_UNRESOLVED_ROUTES_IDENTICAL_THEN_DO_NOT_RUN",
+    "route_separation": "PASS permits only the next outcome-blind claim/interpreter contract slice; FAIL changes the research route by simplifying/parking; UNRESOLVED spends no claim/model work and names the exact dependency.",
+    "engineering_cost": "LOW",
+    "untouched_evidence_cost": "NONE",
+    "search_debt": "NONE",
+    "provider_access": false,
+    "outcome_access": false,
+    "return_access": false,
+    "label_join": false,
+    "model_fit": false,
+    "ranking": false,
+    "trial_debit": 0,
+    "financial_alpha_evidence": 0
+  },
+  "representation_constitution": {
+    "allowed_representation_types": [
+      "LEVEL",
+      "DELTA",
+      "INFLECTION",
+      "ORDERED_SEQUENCE"
+    ],
+    "primary_representation_count_per_core_clock": 1,
+    "representation_grid_allowed": false,
+    "outcome_selected_representation_allowed": false,
+    "ordered_sequence_role": "GRAPH_LEVEL_COMPOSITE_ONLY_NOT_A_COMPETING_PER_CLOCK_TRANSFORM",
+    "core_required_clock_ids": [
+      "SUPPLY_CAPACITY_CLOCK",
+      "INVENTORY_CLOCK",
+      "PRICING_CLOCK",
+      "UTILIZATION_MARGIN_CLOCK",
+      "EARNINGS_REVISIONS_CLOCK",
+      "EXPECTATION_GAP_CLOCK"
+    ],
+    "corroborating_clock_ids": [
+      "DEMAND_CLOCK"
+    ],
+    "downstream_action_clock_ids": [
+      "MARKET_CONFIRMATION_CLOCK"
+    ],
+    "demand_policy": "DEMAND_CLOCK remains corroborating only. E4 does not select a required core transform for DEMAND and demand cannot fill, skip, repair, or reverse a required core edge.",
+    "market_confirmation_policy": "MARKET_CONFIRMATION_CLOCK remains downstream ACTION_EXECUTION only. E4 does not select a core transform for it and it cannot establish, repair, reorder, or rescue any core economic/expectation state.",
+    "availability_policy": "Every contributing datum must satisfy available_at <= as_of under E3. Representation event time is decision-time detection, never retroactively inferred economic occurrence time.",
+    "all_eight_required_per_security": false,
+    "all_six_required_for_established_core_sequence": true,
+    "missing_core_clock_effect": "PARTIAL_SEQUENCE_NOT_RISK_SET_EXCLUSION",
+    "no_imputation": true,
+    "no_denominator_shrink": true
+  },
+  "core_clock_representations": [
+    {
+      "clock_id": "SUPPLY_CAPACITY_CLOCK",
+      "coordinate_id": "SUPPLY_CAPACITY_DISCIPLINE_STATE",
+      "primary_representation": "LEVEL",
+      "rationale": "Supply/capacity discipline is the starting causal precondition. Requiring an inflection would incorrectly demand that the transition itself be observed inside the covered window; the minimal needed state is whether disciplined/tightening supply is lawfully present at the cut.",
+      "favorable_state": "POSITIVE_DISCIPLINE_LEVEL",
+      "representation_rule": "Use the E3 semantic state direction only after source-bound scope is lawful: POSITIVE=disciplined/tightening relevant supply-capacity state, NEUTRAL=balanced/no directional discipline, NEGATIVE=expanding/loosening state, UNKNOWN otherwise. Generic capex direction alone cannot set the level.",
+      "event_time_rule": "core_event_at is the earliest decision cut at which coverage is PRESENT and the LEVEL is POSITIVE under frozen source/claim semantics.",
+      "contradiction_rule": "Opposing direct capacity/supply evidence under the same scope with no frozen precedence makes the clock CONTRADICTED; capex-only evidence remains PARTIAL, not contradictory.",
+      "missingness_rule": "MISSING/PARTIAL supply-capacity state yields PARTIAL_SEQUENCE; never backfill from capex, demand, margin, market confirmation, or later evidence."
+    },
+    {
+      "clock_id": "INVENTORY_CLOCK",
+      "coordinate_id": "INVENTORY_BURDEN_NORMALIZATION_STATE",
+      "primary_representation": "DELTA",
+      "rationale": "Inventory normalization is inherently a directional change in burden, so DELTA is the minimum representation. Absolute inventory LEVEL would confound business scale and would not express normalization.",
+      "favorable_state": "POSITIVE_NORMALIZATION_DELTA",
+      "representation_rule": "Positive DELTA means inventory burden is normalizing/improving under consistent scope and units; negative means burden is worsening; zero means no material direction; UNKNOWN when a lawful comparable pair is absent. Numeric inventory/revenue evidence may establish direction only when numerator/denominator periods and units are compatible; source-bound channel evidence may corroborate after its interpreter is frozen.",
+      "event_time_rule": "core_event_at is the earliest decision cut at which a lawful comparable pair yields POSITIVE normalization DELTA with PRESENT coverage.",
+      "contradiction_rule": "Physical/channel evidence opposing the numeric burden direction under matched scope makes the clock CONTRADICTED unless a later frozen source-precedence law resolves the scope; denominator-only improvement or write-down/reclassification is PARTIAL/UNOBSERVED, not positive normalization.",
+      "missingness_rule": "No lawful comparable burden pair => MISSING/PARTIAL and PARTIAL_SEQUENCE; no neutral fill or cross-period repair."
+    },
+    {
+      "clock_id": "PRICING_CLOCK",
+      "coordinate_id": "PRICING_POWER_MIX_STATE",
+      "primary_representation": "INFLECTION",
+      "rationale": "The preregistered mechanism explicitly requires a pricing inflection. LEVEL or DELTA alone would not close the scientific choice about a turn in pricing/mix state.",
+      "favorable_state": "POSITIVE_PRICING_INFLECTION",
+      "representation_rule": "POSITIVE_TURN requires a source-bound pricing/mix state to move from NEGATIVE or NEUTRAL to POSITIVE on sequential lawful decision cuts. NO_TURN preserves the prior signed regime; NEGATIVE_TURN is the symmetric deterioration; UNKNOWN when either side is unobserved. Margin movement alone cannot create the inflection.",
+      "event_time_rule": "core_event_at is the first decision cut at which POSITIVE_TURN is lawfully detectable; the earlier component state must itself have been available at or before its earlier cut.",
+      "contradiction_rule": "Direct pricing/mix evidence with opposing signed directions at the same cut/scope is CONTRADICTED. Cost, FX, margin, or product-mix effects that cannot be separated from pricing make the state PARTIAL rather than inferring a turn.",
+      "missingness_rule": "No sequential source-bound pricing/mix states => UNKNOWN/PARTIAL and PARTIAL_SEQUENCE."
+    },
+    {
+      "clock_id": "UTILIZATION_MARGIN_CLOCK",
+      "coordinate_id": "UTILIZATION_OPERATING_LEVERAGE_MARGIN_STATE",
+      "primary_representation": "INFLECTION",
+      "rationale": "The core mechanism calls for utilization/operating-leverage and margin inflection after pricing. INFLECTION directly expresses that turn while preserving E3's rule that margin-only evidence is semantically partial rather than relabeled as utilization.",
+      "favorable_state": "POSITIVE_UTILIZATION_MARGIN_INFLECTION",
+      "representation_rule": "POSITIVE_TURN requires the joint E3 state to move from NEGATIVE or NEUTRAL to POSITIVE with PRESENT coverage. If only margin or only utilization is lawfully observed, the clock remains PARTIAL and cannot satisfy the required core edge for ESTABLISHED sequence status.",
+      "event_time_rule": "core_event_at is the first decision cut at which the PRESENT joint state produces POSITIVE_TURN.",
+      "contradiction_rule": "Materially opposing utilization and margin directions at the same cut are CONTRADICTED. Pricing/cost/accounting explanations that leave utilization attribution unresolved keep the clock PARTIAL.",
+      "missingness_rule": "Margin-only or utilization-only evidence stays PARTIAL; missing subcomponents are never imputed and the core sequence remains PARTIAL rather than excluding the security."
+    },
+    {
+      "clock_id": "EARNINGS_REVISIONS_CLOCK",
+      "coordinate_id": "CONSENSUS_REVISION_DIRECTION_STATE",
+      "primary_representation": "DELTA",
+      "rationale": "Earnings revisions are themselves changes in expectation state. DELTA is the minimum direct representation; LEVEL would collapse current consensus with the revision process and INFLECTION would add an unnecessary second-order turn requirement.",
+      "favorable_state": "POSITIVE_CONSENSUS_REVISION_DELTA",
+      "representation_rule": "Use only source-bound historical-vintage revision measures already allowed by E3. Among lawfully observed non-zero EPS_FY1/EPS_FY2/REVENUE_FY1/REVENUE_FY2 revision directions, POSITIVE requires all observed non-zero directions to be positive; NEGATIVE requires all to be negative; opposing non-zero directions are MIXED/CONTRADICTED; all-zero is NEUTRAL; no lawful revision observations is UNKNOWN. No weighting, 30d-vs-90d selection, or outcome-based measure subset is allowed in E4.",
+      "event_time_rule": "core_event_at is the earliest decision cut with PRESENT, non-MIXED POSITIVE revision DELTA under exact historical-vintage source semantics.",
+      "contradiction_rule": "Opposing non-zero revision directions across lawfully observed allowed measures are CONTRADICTED for the core clock; coverage change or current-consensus backfill cannot resolve the conflict.",
+      "missingness_rule": "Unbound or missing expectation source => MISSING and PARTIAL_SEQUENCE/HOLD_SOURCE when real execution needs the clock; no guidance/current-consensus proxy fill."
+    },
+    {
+      "clock_id": "EXPECTATION_GAP_CLOCK",
+      "coordinate_id": "ECONOMIC_TRAJECTORY_VS_EXPECTATIONS_GAP_STATE",
+      "primary_representation": "INFLECTION",
+      "rationale": "The frozen core ends with expectation-gap resolution, not merely gap existence. A categorical INFLECTION is the smallest representation that can express a favorable transition from an upstream-ahead gap toward alignment without requiring a continuous fitted gap magnitude.",
+      "favorable_state": "POSITIVE_GAP_RESOLUTION_INFLECTION",
+      "representation_rule": "POSITIVE_TURN means the prior lawful gap state was UPSTREAM_AHEAD and the current lawful gap state is ALIGNED, with no market-price/return input. NEGATIVE_TURN means an ALIGNED or UPSTREAM_AHEAD state moves to UPSTREAM_BEHIND or otherwise worsens. Remaining same-state transitions are NO_TURN; missing/contradictory side(s) yield UNKNOWN. E4 does not infer within-category magnitude changes.",
+      "event_time_rule": "core_event_at is the first decision cut at which UPSTREAM_AHEAD -> ALIGNED is lawfully detectable from same-cut-compatible upstream economic and expectation states.",
+      "contradiction_rule": "Any gap assignment requiring market confirmation/returns, mismatched knowledge cuts, or a missing side is invalid/UNKNOWN; a direct transition to UPSTREAM_BEHIND is a negative contradiction to favorable resolution.",
+      "missingness_rule": "Missing required upstream or expectation side => MISSING/UNKNOWN and PARTIAL_SEQUENCE; no neutral fill, market proxy, or denominator shrink."
+    }
+  ],
+  "ordered_sequence_contract": {
+    "representation": "ORDERED_SEQUENCE",
+    "sequence_id": "CRV1_CORE6_DETECTION_ORDER_MAX183D_V1",
+    "clock_order": [
+      "SUPPLY_CAPACITY_CLOCK",
+      "INVENTORY_CLOCK",
+      "PRICING_CLOCK",
+      "UTILIZATION_MARGIN_CLOCK",
+      "EARNINGS_REVISIONS_CLOCK",
+      "EXPECTATION_GAP_CLOCK"
+    ],
+    "required_edges": [
+      "SUPPLY_CAPACITY_CLOCK->INVENTORY_CLOCK",
+      "INVENTORY_CLOCK->PRICING_CLOCK",
+      "PRICING_CLOCK->UTILIZATION_MARGIN_CLOCK",
+      "UTILIZATION_MARGIN_CLOCK->EARNINGS_REVISIONS_CLOCK",
+      "EARNINGS_REVISIONS_CLOCK->EXPECTATION_GAP_CLOCK"
+    ],
+    "allowed_skipped_edges": [],
+    "skip_policy": "No core edge may be skipped for ESTABLISHED sequence status. Missing intermediate clocks yield PARTIAL, not a repaired shortcut edge.",
+    "event_time_semantics": "Each edge uses core_event_at, the first decision-time cut at which the frozen favorable representation state is lawfully detectable from data available_at <= that cut. Economic period end, filing period, or later reconstructed occurrence time may not replace core_event_at.",
+    "same_cut_allowed": true,
+    "maximum_adjacent_detection_lag": {
+      "value": 183,
+      "unit": "CALENDAR_DAYS",
+      "interpretation": "one fixed approximately two-quarter mechanistic prior per adjacent core edge; independent of the 252-trading-day outcome horizon and not selected from results"
+    },
+    "edge_rule": "For every required adjacent edge A->B, 0 <= core_event_at(B)-core_event_at(A) <= 183 calendar days. A predecessor must not be CONTRADICTED or reverse to its unfavorable state before B is detected.",
+    "lag_grid_allowed": false,
+    "alternate_lag_sensitivity_pre_outcome": "NEW_REPRESENTATION_VERSION_AND_SEARCH_BUDGET_ENTRY_REQUIRED",
+    "established_rule": "ESTABLISHED only when all six core clocks have PRESENT favorable representation events and all five required edges satisfy order and lag law with no contradiction.",
+    "partial_rule": "PARTIAL when at least one core event is missing/PARTIAL/UNKNOWN or an otherwise ordered edge exceeds 183 days, provided no observed required edge is causally reversed/contradicted.",
+    "contradicted_rule": "CONTRADICTED when a required downstream favorable event is lawfully detected before its observed predecessor favorable event, a predecessor becomes unfavorable before the downstream event, or a required clock is internally CONTRADICTED.",
+    "not_established_rule": "NOT_ESTABLISHED when observed core states are lawful but no favorable sequence progress exists; missingness alone never becomes negative evidence.",
+    "demand_effect": "DEMAND may corroborate narrative/state confidence but cannot alter required edge order, satisfy a missing core clock, or change PARTIAL/CONTRADICTED to ESTABLISHED.",
+    "market_confirmation_effect": "MARKET_CONFIRMATION is excluded from core sequence status. It may be evaluated only later as downstream action confirmation and cannot repair core sequence state."
+  },
+  "graph_guardrails": {
+    "core_order_changed": false,
+    "risk_set_semantics_changed": false,
+    "primary_horizon_changed": false,
+    "primary_outcome_changed": false,
+    "representation_grid": false,
+    "lag_horizon_grid": false,
+    "model_search": false,
+    "ranking": false,
+    "provider_capture": false,
+    "w9_reopened": false,
+    "outcomes_opened": false,
+    "financial_alpha_evidence": 0,
+    "trial_debit": 0
+  },
+  "disposition": {
+    "terminal": "REPRESENTATION_CONTRACT_PASS",
+    "basis": [
+      "Each of the six required core nodes has one semantic representation selected directly from the preregistered mechanism wording, with no result-bearing comparison among alternatives.",
+      "ORDERED_SEQUENCE is frozen once at graph level rather than treated as another per-clock model variant.",
+      "All five core edges are required for ESTABLISHED status; missingness yields PARTIAL and never rewrites the risk set or creates shortcut edges.",
+      "One fixed 183-calendar-day adjacent detection lag is preregistered as a mechanistic prior, with no grid and no coupling to the 252d outcome horizon.",
+      "DEMAND remains corroborating and MARKET_CONFIRMATION remains downstream-only.",
+      "No source capture, provider access, outcome/return/label read, model fitting, ranking, L5 authorization, trial debit, or capital action is required to freeze this representation contract."
+    ],
+    "next_preferred_slice": "CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1",
+    "next_slice_authorized": false,
+    "next_slice_scope": "If separately opened, freeze the smallest deterministic source-claim interpretation contract needed by the E4 clock representations; no provider capture, outcome read, model fit, ranking, or L5.",
+    "fail_route_retained": "SIMPLIFY_CRV1_CLOCK_GRAPH_OR_PARK_CRV1",
+    "unresolved_route_retained": "HOLD_SOURCE_ON_EXACT_NAMED_DEPENDENCY"
+  },
+  "authority_effect": {
+    "provider_access": false,
+    "source_capture": false,
+    "outcome_access": false,
+    "return_access": false,
+    "label_join": false,
+    "model_fit": false,
+    "ranking": false,
+    "l5_authorized": false,
+    "capital_authority": "NONE",
+    "financial_alpha_evidence": 0,
+    "trial_debit": 0
+  }
+}

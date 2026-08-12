@@ -12,9 +12,19 @@ from research.aov0.contracts import normalize_security_id
 
 
 API_SCHEMA_ID = "alpha_pit_data_api_v1"
-FAMILY_ID = "CYCLE_RESONANCE_v1"
-RISK_SET_SPEC_ID = "CRV1_US_PRIMARY_COMMON_V1"
-PRIMARY_LABEL_SPEC_ID = "CRV1_RIGHT_TAIL_252D_TOP5_V1"
+CRV1_FAMILY_ID = "CYCLE_RESONANCE_v1"
+CRV1_RISK_SET_SPEC_ID = "CRV1_US_PRIMARY_COMMON_V1"
+CRV1_PRIMARY_LABEL_SPEC_ID = "CRV1_RIGHT_TAIL_252D_TOP5_V1"
+VOL_SQUEEZE_BREAKOUT_FAMILY_ID = "VOL_SQUEEZE_BREAKOUT_v1"
+VOL_SQUEEZE_BREAKOUT_RISK_SET_SPEC_ID = "VSB_US_PRIMARY_COMMON_DAILY_V1"
+VOL_SQUEEZE_BREAKOUT_PRIMARY_LABEL_SPEC_ID = "VSB_RIGHT_TAIL_10D_TOP5_V1"
+
+# Backward-compatible CRV1 aliases remain the incumbent Alpha PIT v1 defaults.
+# Family #2 is admitted through an explicit FamilyDataContract, not by changing
+# these incumbent aliases or adding a dynamic registry.
+FAMILY_ID = CRV1_FAMILY_ID
+RISK_SET_SPEC_ID = CRV1_RISK_SET_SPEC_ID
+PRIMARY_LABEL_SPEC_ID = CRV1_PRIMARY_LABEL_SPEC_ID
 
 OBSERVATION_FIELDS = (
     "market.close",
@@ -52,6 +62,76 @@ CLAIM_TOPICS = (
     "GUIDANCE",
     "COMPETITION",
     "OTHER_RELEVANT_CYCLE",
+)
+
+
+@dataclass(frozen=True)
+class FamilyDataContract:
+    """Small immutable family binding authorized by the second-consumer recut."""
+
+    family_id: str
+    risk_set_spec_id: str
+    primary_label_spec_id: str
+    allowed_observation_surface: tuple[str, ...]
+    allowed_expectation_surface: tuple[str, ...]
+    allowed_claim_surface: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        for field_name in ("family_id", "risk_set_spec_id", "primary_label_spec_id"):
+            if not str(getattr(self, field_name)).strip():
+                raise AlphaPITContractError(f"alpha_pit_family_contract_{field_name}_required")
+        for field_name in (
+            "allowed_observation_surface",
+            "allowed_expectation_surface",
+            "allowed_claim_surface",
+        ):
+            values = tuple(str(value) for value in getattr(self, field_name))
+            if len(values) != len(set(values)):
+                raise AlphaPITContractError(f"alpha_pit_family_contract_{field_name}_duplicate")
+        unknown_observations = sorted(set(self.allowed_observation_surface) - set(OBSERVATION_FIELDS))
+        if unknown_observations:
+            raise AlphaPITContractError(
+                "alpha_pit_family_contract_unknown_observation:" + unknown_observations[0]
+            )
+        unknown_expectations = sorted(set(self.allowed_expectation_surface) - set(EXPECTATION_MEASURES))
+        if unknown_expectations:
+            raise AlphaPITContractError(
+                "alpha_pit_family_contract_unknown_expectation:" + unknown_expectations[0]
+            )
+        unknown_claims = sorted(set(self.allowed_claim_surface) - set(CLAIM_TOPICS))
+        if unknown_claims:
+            raise AlphaPITContractError("alpha_pit_family_contract_unknown_claim:" + unknown_claims[0])
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "family_id": self.family_id,
+            "risk_set_spec_id": self.risk_set_spec_id,
+            "primary_label_spec_id": self.primary_label_spec_id,
+            "allowed_observation_surface": list(self.allowed_observation_surface),
+            "allowed_expectation_surface": list(self.allowed_expectation_surface),
+            "allowed_claim_surface": list(self.allowed_claim_surface),
+        }
+
+
+CRV1_FAMILY_DATA_CONTRACT = FamilyDataContract(
+    family_id=CRV1_FAMILY_ID,
+    risk_set_spec_id=CRV1_RISK_SET_SPEC_ID,
+    primary_label_spec_id=CRV1_PRIMARY_LABEL_SPEC_ID,
+    allowed_observation_surface=OBSERVATION_FIELDS,
+    allowed_expectation_surface=EXPECTATION_MEASURES,
+    allowed_claim_surface=CLAIM_TOPICS,
+)
+VOL_SQUEEZE_BREAKOUT_FAMILY_DATA_CONTRACT = FamilyDataContract(
+    family_id=VOL_SQUEEZE_BREAKOUT_FAMILY_ID,
+    risk_set_spec_id=VOL_SQUEEZE_BREAKOUT_RISK_SET_SPEC_ID,
+    primary_label_spec_id=VOL_SQUEEZE_BREAKOUT_PRIMARY_LABEL_SPEC_ID,
+    allowed_observation_surface=(
+        "market.close",
+        "market.total_return_1d",
+        "market.volume",
+    ),
+    allowed_expectation_surface=(),
+    allowed_claim_surface=(),
 )
 
 # Versioned aliases consumed by the frozen CRV1 contract. Keep the original

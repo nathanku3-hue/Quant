@@ -1,0 +1,86 @@
+{
+  "schema_version": "crv1_w9_engineering_slice_freeze_v1",
+  "date": "2026-08-10",
+  "workstream": "W9_CRV1_DATA_ADMISSION",
+  "disposition": "CLOSE_ENGINEERING_SLICE_JOIN_FUTURE_SHARED_STOCK_DATA_ROUND",
+  "family_id": "CYCLE_RESONANCE_v1",
+  "primary_horizon_trading_days": 252,
+  "primary_horizon_changed": false,
+  "risk_set_spec_id": "CRV1_US_PRIMARY_COMMON_V1",
+  "engineering_slice_closed": true,
+  "adapter_platform_work_authorized": false,
+  "provider_capture_authorized_today": false,
+  "provider_capture_performed_today": false,
+  "reopen_condition": "FUTURE_SHARED_W3_W9_RAW_CIQ_STOCK_DATA_ROUND_OR_ADMISSION_ONLY",
+  "frozen_mechanics": {
+    "aov_109_reuse_possible": false,
+    "growth_filter_possible": false,
+    "current_survivor_filter_possible": false,
+    "future_membership_filter_possible": false,
+    "legacy_identity_fallback_possible": false,
+    "required_identity": "EXACT_CIQSEC_PLUS_TRADING_ITEM",
+    "minimum_complete_market_observations": 200,
+    "market_observation_count_source_derived": true,
+    "confirmatory_read_outcome_capability": false,
+    "fundamentals_without_independent_crv1_custody": "MISSING_SOURCE",
+    "expectations_without_independent_crv1_custody": "MISSING_SOURCE",
+    "sec_claims_without_independent_crv1_custody": "MISSING_SOURCE"
+  },
+  "future_shared_raw_round": {
+    "coordinate_with": "W3_PREBREAKOUT_PIT_AUTHORITY",
+    "shared_layer": "RAW_CIQ_IDENTITY_MARKET_BYTES_AND_RAW_RECEIPTS_ONLY_WHERE_LEGITIMATE",
+    "shared_risk_set_authority": false,
+    "shared_admission_receipt_authority": false,
+    "shared_raw_hash_implies_shared_authority": false,
+    "w3_authority": {
+      "family_id": "PREBREAKOUT_DISCOVERY_v1",
+      "risk_set_spec_id": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+      "owns": [
+        "date_local_membership",
+        "date_local_availability",
+        "date_local_primary_listing_proof",
+        "corporate_action_authority",
+        "deterministic_w3_eligibility_exclusion"
+      ]
+    },
+    "w9_authority": {
+      "family_id": "CYCLE_RESONANCE_v1",
+      "risk_set_spec_id": "CRV1_US_PRIMARY_COMMON_V1",
+      "owns": [
+        "non_growth_risk_set_admission",
+        "exact_ciqsec_trading_item_binding",
+        "source_derived_200_complete_market_observation_gate"
+      ]
+    },
+    "cross_family_substitution_forbidden": true
+  },
+  "acceptance": {
+    "aov_109_reuse_impossible": true,
+    "growth_current_survivor_future_member_filters_impossible": true,
+    "exact_ciqsec_plus_trading_item_required": true,
+    "no_outcome_capability": true
+  },
+  "frozen_code_sha256": {
+    "research/alpha_pit_v1/adapters/ciq_cycle_v1.py": "00937ba7644cb2ca8ed7eb7f0eee191a281c0c5bca5606f40d10942bd22fb6a1",
+    "research/alpha_pit_v1/adapters/ciq_crv1_source_v1.py": "87291d5f774cb266efb343238e0b494635a804f77078cd2d241c8d2815f26a9e",
+    "scripts/alpha_pit_admit_crv1_current_sources.py": "595fd3b1e18d4006046e2307725fe4af321cee52a61f926024cb9369ffbcd21f",
+    "tests/alpha_pit_v1/test_ciq_cycle_adapter.py": "3d50b0a1df489ded8779d35d3292c6ca54ae048197059fc4c6deef55cd276c17",
+    "tests/alpha_pit_v1/test_ciq_crv1_source_admission.py": "f7a327024875f36edd6fba8de7753f83870a97daebb96b83914a3687ef78cb55"
+  },
+  "w3_reference_code_sha256": {
+    "research/prebreakout_pit_v1/authority.py": "1c924435da7a3fef432ae8a81bdc26ba85a651b0fc685b53b5a59c6549591a7a"
+  },
+  "prior_w9_evidence": {
+    "path": "docs/context/e2e_evidence/crv1_non_growth_source_admission_20260810.json",
+    "sha256": "de671fa39600846bf0a3b0f62b67d258bf648ab533ae201697f2142954466f79"
+  },
+  "closure_validation": {
+    "command": ".venv/Scripts/python.exe -m pytest tests/alpha_pit_v1/test_ciq_crv1_source_admission.py tests/alpha_pit_v1/test_ciq_cycle_adapter.py tests/cycle_resonance_v1/test_pit_packet.py -q",
+    "result": "12_PASSED"
+  },
+  "outcomes_accessed": false,
+  "prediction_opened": false,
+  "financial_alpha_evidence": 0,
+  "broker_orders": 0,
+  "next_legitimate_w9_action": "NONE_UNTIL_FUTURE_SHARED_W3_W9_RAW_CIQ_STOCK_DATA_ROUND_OR_ADMISSION"
+}

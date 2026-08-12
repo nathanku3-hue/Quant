@@ -1,0 +1,99 @@
+{
+  "acceptance": {
+    "a1_a2_eligible_for_acceptance": false,
+    "bootstrap": {
+      "block_length_decision_dates": 10,
+      "confidence": 0.8,
+      "method": "MOVING_BLOCK_BOOTSTRAP_BY_DECISION_DATE",
+      "replicates": 10000,
+      "seed": 20260810
+    },
+    "m0_mechanism_pass": "PIT_CUSTODY_BREACHES_EQ_0 AND MATURED_10D_DECISION_DATES_GE_20 AND WINNER_RECALL_LIFT_10D_GT_1 AND BOOTSTRAP_80PCT_LOWER_LIFT_10D_GT_1",
+    "minimum_matured_primary_decision_dates": 20,
+    "primary_statistic": "winner_recall_lift_10d = aggregate_winner_recall_10d / mean_support_breadth",
+    "secondary_20d_blocking": false,
+    "source": "NEW_UNTOUCHED_OR_PROSPECTIVE_FREEZE_ONLY"
+  },
+  "authority": {
+    "a2_requery_authorized": false,
+    "broker_orders_authorized": false,
+    "capital_policy_authority": false,
+    "clock_1_outcome_access_authorized": false,
+    "financial_alpha_evidence": 0,
+    "parent_child_mutation_authorized": false
+  },
+  "decision_clock": {
+    "first_outcome_interval": "DECISION_CLOSE_TO_NEXT_OBSERVED_SESSION_CLOSE",
+    "frequency": "DAILY",
+    "information_cut": "COMPLETED_PRIMARY_MARKET_CLOSE",
+    "same_day_retroactive_execution": false
+  },
+  "family_data_contract": {
+    "allowed_claim_surface": [],
+    "allowed_expectation_surface": [],
+    "allowed_observation_surface": [
+      "market.close",
+      "market.total_return_1d",
+      "market.volume"
+    ],
+    "family_id": "VOL_SQUEEZE_BREAKOUT_v1",
+    "primary_label_spec_id": "VSB_RIGHT_TAIL_10D_TOP5_V1",
+    "risk_set_spec_id": "VSB_US_PRIMARY_COMMON_DAILY_V1"
+  },
+  "family_id": "VOL_SQUEEZE_BREAKOUT_v1",
+  "family_wip_role": "FAST_FAMILY_2",
+  "labels": {
+    "primary": {
+      "horizon_observed_sessions": 10,
+      "label_spec_id": "VSB_RIGHT_TAIL_10D_TOP5_V1",
+      "tie_break": "forward_total_return_DESC_security_id_ASC",
+      "winner_count": "ceil(0.05 * risk_set_count)",
+      "winner_fraction": 0.05
+    },
+    "secondary": {
+      "horizon_observed_sessions": 20,
+      "label_spec_id": "VSB_RIGHT_TAIL_20D_TOP5_V1",
+      "tie_break": "forward_total_return_DESC_security_id_ASC",
+      "winner_count": "ceil(0.05 * risk_set_count)",
+      "winner_fraction": 0.05
+    }
+  },
+  "m0": {
+    "component_weights": "EQUAL_ONE_THIRD",
+    "features": {
+      "breakout": "ln(close_t / max(close[t-20:t-1]))",
+      "compression": "ln(sample_std(ret1d[t-59:t]) / sample_std(ret1d[t-19:t]))",
+      "volume_expansion": "ln(volume_t / median(volume[t-20:t-1]))"
+    },
+    "forecast_score": "mean(date_local_pct_rank(compression), date_local_pct_rank(breakout), date_local_pct_rank(volume_expansion)) IF trigger ELSE 0",
+    "implementation_id": "VSB_M0_EQUAL_RANK_20_60_20_v1",
+    "search_family_id": "VSB_M0_SEARCH_v1",
+    "support": "forecast_score > 0",
+    "trial_budget_max": 1,
+    "trigger": "compression > 0 AND breakout > 0 AND volume_expansion > 0"
+  },
+  "preregistered_date": "2026-08-10",
+  "preregistration_content_hash": "4f8e62e2a2de66bde6f3e47b6bc162ad21efd6d7912bd4a7177121afc6896fd2",
+  "risk_set": {
+    "forbidden_universe_shortcuts": [
+      "AOV_HIGH_GROWTH_109",
+      "AOV_LANE2_FROZEN_94",
+      "CURRENT_SURVIVOR_BACK_PROJECTION"
+    ],
+    "minimum_prior_observed_market_sessions": 60,
+    "risk_set_spec_id": "VSB_US_PRIMARY_COMMON_DAILY_V1",
+    "semantics": "DATE_LOCAL_US_LISTED_PRIMARY_COMMON_EQUITY_WITH_EXACT_CIQSEC_AND_TRADING_ITEM_IDENTITY_NO_GROWTH_OR_FUNDAMENTAL_SCREEN",
+    "v1_liquidity_threshold": null
+  },
+  "schema_version": "vol_squeeze_breakout_v1_preregistration_v1",
+  "smoke_probes": {
+    "acceptance_weight": 0,
+    "literal_ticker_branching_authorized": false,
+    "symbols": [
+      "SNDK",
+      "MU"
+    ],
+    "required_output": "GENERIC_RISK_SET_MEMBERSHIP_OR_EXCLUSION_PLUS_M0_FEATURE_TRIGGER_SCORE_STATE_SEALED_BEFORE_OUTCOME"
+  },
+  "status": "PREREGISTERED_M0_NO_UNTOUCHED_RESULT_NO_CAPITAL_AUTHORITY"
+}

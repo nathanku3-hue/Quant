@@ -1,0 +1,326 @@
+{
+  "schema_version": "cycle_resonance_v1_clock_state_coordinate_preflight_v1",
+  "slice_id": "CRV1-E3-CLOCK-STATE-COORDINATE-PREFLIGHT-1",
+  "family_id": "CYCLE_RESONANCE_v1",
+  "date": "2026-08-12",
+  "status": "FROZEN_OUTCOME_BLIND",
+  "programme_stage": "E3",
+  "method_stage_satisfied": "L2_CLOCK_STATE_COORDINATE_DECLARATION",
+  "authority": {
+    "family_build_spec": "docs/architecture/cycle_resonance_v1_build_spec.md",
+    "result_first_method": "docs/architecture/result_first_ai_research_loop_v1.md",
+    "machine_preflight": "docs/architecture/opportunity_kernel_scientific_preflight_v2.json",
+    "w9_source_admission_state": "FROZEN_CLOSED_REOPEN_ONLY_SHARED_W3_W9_RAW_CIQ_ROUND"
+  },
+  "decision_value_preflight": {
+    "decision_to_change": "Can the preregistered CRV1 causal graph be expressed with one frozen, scientifically non-aliased clock/state-coordinate contract before more source, representation, or model work is spent?",
+    "current_belief": "The eight clock identities and the core causal ordering are already preregistered, but their v2 clock roles, semantic state coordinates, availability boundaries, aliasing controls, invariance claims, falsifiers, and missingness laws were not yet frozen as one contract.",
+    "cheapest_discriminating_test": "Outcome-blind semantic preflight over the eight existing CRV1 clocks using only frozen family and method authority; no provider capture, source rebinding, transform implementation, model work, or outcome read.",
+    "why_no_cheaper_test_exists": "A naming or schema check cannot detect causal/availability/action aliasing. The minimum decision-useful test must classify all eight existing clocks and state the graph-level forbidden conflations before E4 representation work begins.",
+    "pass_route": "CLOCK_CONTRACT_PASS -> CRV1-E4-STRUCTURED-CLOCK-REPRESENTATION-1",
+    "fail_route": "SIMPLIFY_CRV1_CLOCK_GRAPH_OR_PARK_CRV1",
+    "unresolved_route": "NAME_EXACT_MISSING_CLOCK_OR_SOURCE_DEPENDENCY -> HOLD_SOURCE",
+    "killer_rule": "IF_PASS_FAIL_UNRESOLVED_ROUTES_IDENTICAL_THEN_DO_NOT_RUN",
+    "route_separation": "PASS advances only representation work; FAIL removes/simplifies the graph or parks the family; UNRESOLVED spends no representation/model work and requests only the named dependency.",
+    "engineering_cost": "LOW",
+    "untouched_evidence_cost": "NONE",
+    "search_debt": "NONE",
+    "outcomes_opened": false,
+    "provider_access": false,
+    "source_capture": false,
+    "trial_debit": 0,
+    "financial_alpha_evidence": 0
+  },
+  "global_clock_law": {
+    "canonical_clock_count": 8,
+    "canonical_clock_ids": [
+      "SUPPLY_CAPACITY_CLOCK",
+      "INVENTORY_CLOCK",
+      "PRICING_CLOCK",
+      "DEMAND_CLOCK",
+      "UTILIZATION_MARGIN_CLOCK",
+      "EARNINGS_REVISIONS_CLOCK",
+      "EXPECTATION_GAP_CLOCK",
+      "MARKET_CONFIRMATION_CLOCK"
+    ],
+    "role_allowlist": [
+      "DATA_AVAILABILITY",
+      "ECONOMIC_STATE",
+      "ACTION_EXECUTION"
+    ],
+    "data_availability_clock_policy": "NO_CANONICAL_CRV1_CLOCK_USES_DATA_AVAILABILITY_AS_ITS_SCIENTIFIC_ROLE. availability is a hard input boundary on every clock, not a causal state coordinate and not a free lag/horizon parameter.",
+    "availability_boundary": "Every contributing observed row or source claim must satisfy available_at <= as_of. max_available_at binds the clock evidence. Period end, filing date, retrieval date, or report cadence may not substitute for proven availability. Any boundary crossing makes that datum UNOBSERVED at the cut.",
+    "data_time_cannot_define_state": true,
+    "economic_state_roles_are_semantically_typed": true,
+    "action_execution_cannot_rescue_economic_state": true,
+    "core_required_order": [
+      "SUPPLY_CAPACITY_CLOCK",
+      "INVENTORY_CLOCK",
+      "PRICING_CLOCK",
+      "UTILIZATION_MARGIN_CLOCK",
+      "EARNINGS_REVISIONS_CLOCK",
+      "EXPECTATION_GAP_CLOCK"
+    ],
+    "corroborating_state_clocks": [
+      "DEMAND_CLOCK"
+    ],
+    "downstream_action_clocks": [
+      "MARKET_CONFIRMATION_CLOCK"
+    ],
+    "demand_ordering_policy": "DEMAND_CLOCK remains a corroborating/state clock under the existing build spec and is not inserted as a new required causal edge by E3.",
+    "market_confirmation_ordering_policy": "MARKET_CONFIRMATION_CLOCK is downstream recognition/action confirmation only. It has no upstream causal edge and may not establish, repair, or rescue supply, inventory, pricing, demand, utilization/margin, earnings-revision, or expectation-gap state.",
+    "temporal_lag_policy": "E3 freezes semantic time meaning but no numeric edge lag, H, K, threshold, or horizon grid. E4 must freeze one outcome-blind representation/sequence law before any later result-bearing use. Outcome-driven lag or horizon bake-offs under CYCLE_RESONANCE_v1 are forbidden.",
+    "representation_boundary": "E3 freezes clock meaning and source/state coordinates. Exact LEVEL/DELTA/INFLECTION/ORDERED_SEQUENCE transforms belong to E4 and must be frozen without outcome selection.",
+    "coverage_law": "A security is not required to observe all eight clocks. Missingness remains explicit per clock; no imputation, denominator shrink, current-survivor repair, or hidden coverage threshold is permitted. The later frozen CoveragePolicyV1 may determine representation eligibility but cannot rewrite the CRV1 risk set.",
+    "missingness_states": [
+      "PRESENT",
+      "PARTIAL",
+      "MISSING",
+      "NOT_APPLICABLE"
+    ],
+    "unobserved_action": "ABSTAIN_AT_THE_AFFECTED_CLOCK_OR_DOWNSTREAM_DERIVED_STATE; NEVER_INVENT_OR_BACKFILL"
+  },
+  "clocks": [
+    {
+      "clock_id": "SUPPLY_CAPACITY_CLOCK",
+      "clock_type": "BUSINESS_ECONOMIC_STATE",
+      "role": "ECONOMIC_STATE",
+      "why_this_clock": "The preregistered mechanism begins with supply/capacity discipline; CRV1 needs a state coordinate for whether relevant capacity/supply is tightening, balanced, or expanding before downstream inventory and pricing states are interpreted.",
+      "observable_state_coordinate": {
+        "coordinate_id": "SUPPLY_CAPACITY_DISCIPLINE_STATE",
+        "semantic_coordinate": "Direction and phase of economically relevant supply/capacity discipline, not accounting spend itself.",
+        "allowed_observation_fields": ["fund.capex_q"],
+        "allowed_claim_topics": ["SUPPLY_CAPACITY", "COMPETITION", "OTHER_RELEVANT_CYCLE"],
+        "direct_evidence_preferred": true,
+        "numeric_transform_frozen_here": false
+      },
+      "availability_boundary": "Only source rows/claims available_at <= as_of may contribute; a capex period end or later-filed capacity statement cannot be moved backward to the economic period.",
+      "economic_time_meaning": "Slow installed/committed supply and capacity regime as known at the decision cut; reporting cadence is observation timing, not the economic state clock.",
+      "aliasing_risk": [
+        "CAPEX_SPEND_MISTAKEN_FOR_CAPACITY_ADDITION_OR_DISCIPLINE",
+        "REPORTING_CADENCE_MISTAKEN_FOR_ECONOMIC_TRANSITION",
+        "COMPANY_CAPACITY_MISTAKEN_FOR_INDUSTRY_SUPPLY_WITHOUT_SCOPE_BINDING"
+      ],
+      "invariance_claim": "Within a declared scope, positive/negative supply-capacity state keeps the same economic meaning across time and industries only when evidence actually refers to relevant capacity/supply discipline; capex direction alone is not invariant evidence of capacity state.",
+      "falsifier": "If the available evidence cannot distinguish capacity/supply discipline from generic capex or scope-mismatched supply commentary, the clock is UNOBSERVED/PARTIAL rather than assigned a direction. Persistent inability to form the semantic state without proxy substitution routes the clock graph to SIMPLIFY or HOLD_SOURCE.",
+      "missingness_law": "No direct lawful capacity/supply evidence => MISSING or PARTIAL. capex-only evidence cannot be promoted to PRESENT capacity state. Missingness never removes the security from the CRV1 risk set."
+    },
+    {
+      "clock_id": "INVENTORY_CLOCK",
+      "clock_type": "BUSINESS_ECONOMIC_STATE",
+      "role": "ECONOMIC_STATE",
+      "why_this_clock": "Inventory normalization is the second frozen mechanism state and must represent inventory burden/normalization rather than a reporting event.",
+      "observable_state_coordinate": {
+        "coordinate_id": "INVENTORY_BURDEN_NORMALIZATION_STATE",
+        "semantic_coordinate": "Direction and phase of inventory burden relative to the economically relevant business scale and channel context.",
+        "allowed_observation_fields": ["fund.inventory_q", "fund.revenue_q"],
+        "allowed_claim_topics": ["INVENTORY_CHANNEL", "DEMAND", "OTHER_RELEVANT_CYCLE"],
+        "direct_evidence_preferred": true,
+        "numeric_transform_frozen_here": false
+      },
+      "availability_boundary": "Inventory, revenue, and channel claims must each be available_at <= as_of and period/scope consistent before joint interpretation.",
+      "economic_time_meaning": "Inventory accumulation or normalization state in the operating cycle, independent of when the quarter is reported.",
+      "aliasing_risk": [
+        "REVENUE_DENOMINATOR_MOVE_MISTAKEN_FOR_INVENTORY_NORMALIZATION",
+        "WRITE_DOWN_OR_RECLASSIFICATION_MISTAKEN_FOR_PHYSICAL_NORMALIZATION",
+        "OWNED_INVENTORY_MISTAKEN_FOR_CHANNEL_INVENTORY"
+      ],
+      "invariance_claim": "Improvement means lower excess inventory burden under consistent scope/units; the sign may not be inferred from denominator growth, write-down, or scope change alone.",
+      "falsifier": "If apparent normalization is explainable solely by denominator change, accounting reclassification, or incompatible inventory/channel scope, the directional state is PARTIAL/UNOBSERVED and cannot support the ordered sequence.",
+      "missingness_law": "Missing or incompatible inventory/business-scale evidence => MISSING/PARTIAL; no imputation or cross-period repair; risk-set membership is unchanged."
+    },
+    {
+      "clock_id": "PRICING_CLOCK",
+      "clock_type": "BUSINESS_ECONOMIC_STATE",
+      "role": "ECONOMIC_STATE",
+      "why_this_clock": "The frozen mechanism requires a pricing inflection distinct from margin and demand; the clock must represent pricing power/mix rather than infer price from downstream profitability.",
+      "observable_state_coordinate": {
+        "coordinate_id": "PRICING_POWER_MIX_STATE",
+        "semantic_coordinate": "Direction and phase of realized/announced pricing power or mix as source-bound evidence.",
+        "allowed_observation_fields": ["fund.gross_margin_q", "fund.operating_margin_q"],
+        "allowed_claim_topics": ["PRICING", "COMPETITION", "OTHER_RELEVANT_CYCLE"],
+        "direct_evidence_preferred": true,
+        "numeric_transform_frozen_here": false
+      },
+      "availability_boundary": "Pricing claims and any supporting margin observations must be available_at <= as_of; later margin realization cannot backfill an earlier pricing state.",
+      "economic_time_meaning": "Economic pricing/mix regime as knowable at the cut, not the date on which the accounting margin is published.",
+      "aliasing_risk": [
+        "MARGIN_CHANGE_MISTAKEN_FOR_PRICING_POWER",
+        "INPUT_COST_OR_FX_CHANGE_MISTAKEN_FOR_PRICING",
+        "PRODUCT_MIX_CHANGE_MISTAKEN_FOR_LIST_PRICE_CHANGE"
+      ],
+      "invariance_claim": "Direct source-bound pricing/mix direction keeps the same semantic sign across industries; accounting margin may corroborate but may not by itself establish pricing state.",
+      "falsifier": "If only downstream margins/revenue are observed and no source-bound pricing/mix evidence distinguishes pricing from costs or mix, pricing state is UNOBSERVED/PARTIAL rather than inferred.",
+      "missingness_law": "No lawful direct pricing/mix evidence => MISSING/PARTIAL. Supporting margins do not silently fill the clock."
+    },
+    {
+      "clock_id": "DEMAND_CLOCK",
+      "clock_type": "CORROBORATING_BUSINESS_ECONOMIC_STATE",
+      "role": "ECONOMIC_STATE",
+      "why_this_clock": "Demand is an existing corroborating/state clock that can distinguish an inventory/pricing transition from a purely supply-side accounting story without becoming a new mandatory causal edge.",
+      "observable_state_coordinate": {
+        "coordinate_id": "DEMAND_ORDER_TRAJECTORY_STATE",
+        "semantic_coordinate": "Direction and phase of demand/order/volume trajectory as distinct from price/mix-driven revenue changes.",
+        "allowed_observation_fields": ["fund.revenue_q"],
+        "allowed_claim_topics": ["DEMAND", "GUIDANCE", "INVENTORY_CHANNEL", "OTHER_RELEVANT_CYCLE"],
+        "direct_evidence_preferred": true,
+        "numeric_transform_frozen_here": false
+      },
+      "availability_boundary": "Demand/guidance claims and revenue observations must be available_at <= as_of; future shipments or later guidance cannot define current demand state.",
+      "economic_time_meaning": "Underlying order/volume/demand trajectory at the decision cut; revenue recognition timing is supporting observation timing, not identical to demand time.",
+      "aliasing_risk": [
+        "REVENUE_GROWTH_MISTAKEN_FOR_DEMAND_WHEN_PRICING_OR_MIX_DRIVES_SALES",
+        "SHIPMENT_OR_RECOGNITION_TIMING_MISTAKEN_FOR_ORDER_STATE",
+        "GUIDANCE_MISTAKEN_FOR_REALIZED_DEMAND"
+      ],
+      "invariance_claim": "A signed demand state requires evidence interpretable as order/volume/demand direction under stable scope; revenue alone is insufficient when pricing/mix or acquisition effects are unresolved.",
+      "falsifier": "If available evidence cannot separate demand/order movement from price/mix, acquisition, or recognition timing, the clock remains PARTIAL/UNOBSERVED and supplies no causal-edge proof.",
+      "missingness_law": "Demand may be missing without invalidating the existing core six-clock order because it is corroborating. Missing demand cannot be fabricated from revenue alone."
+    },
+    {
+      "clock_id": "UTILIZATION_MARGIN_CLOCK",
+      "clock_type": "BUSINESS_ECONOMIC_STATE",
+      "role": "ECONOMIC_STATE",
+      "why_this_clock": "The frozen mechanism requires utilization/operating-leverage and margin inflection after pricing; the clock must preserve the difference between observed profitability and causal utilization attribution.",
+      "observable_state_coordinate": {
+        "coordinate_id": "UTILIZATION_OPERATING_LEVERAGE_MARGIN_STATE",
+        "semantic_coordinate": "Joint state of utilization/operating leverage and margin trajectory, allowing explicit partial state when only margin is observed.",
+        "allowed_observation_fields": ["fund.gross_margin_q", "fund.operating_margin_q", "fund.cash_from_ops_q"],
+        "allowed_claim_topics": ["UTILIZATION", "MARGIN", "SUPPLY_CAPACITY", "OTHER_RELEVANT_CYCLE"],
+        "direct_evidence_preferred": false,
+        "numeric_transform_frozen_here": false
+      },
+      "availability_boundary": "All accounting observations and utilization/margin claims must be available_at <= as_of and use compatible period/scope; later operating leverage cannot be backdated.",
+      "economic_time_meaning": "Operating leverage/utilization and margin phase in the business cycle; accounting release time is distinct from the economic state transition.",
+      "aliasing_risk": [
+        "MARGIN_CHANGE_ATTRIBUTED_TO_UTILIZATION_WITHOUT_DIRECT_SUPPORT",
+        "PRICING_OR_INPUT_COST_MOVE_MISTAKEN_FOR_UTILIZATION",
+        "CASH_FLOW_TIMING_MISTAKEN_FOR_MARGIN_STATE"
+      ],
+      "invariance_claim": "Margin direction is a valid sub-state under fixed metric semantics; utilization attribution is valid only when source-bound utilization/capacity evidence supports it. A margin-only state must remain semantically partial rather than relabeled as utilization.",
+      "falsifier": "If utilization and margin evidence materially contradict, emit a contradictory/partial state; if margin movement is solely pricing/cost/accounting timing and no utilization evidence exists, do not claim utilization inflection.",
+      "missingness_law": "Margin-only evidence may be PARTIAL; utilization-only evidence may be PARTIAL; neither missing subcomponent is imputed. Downstream expectation-gap state must respect the partial status."
+    },
+    {
+      "clock_id": "EARNINGS_REVISIONS_CLOCK",
+      "clock_type": "EXPECTATION_STATE",
+      "role": "ECONOMIC_STATE",
+      "role_scope_note": "The v2 role vocabulary has no EXPECTATION_STATE bucket. ECONOMIC_STATE is therefore the coarse state-role bucket only; clock_type remains EXPECTATION_STATE and this clock must never be interpreted as underlying real-economy state or data-availability time.",
+      "why_this_clock": "The frozen mechanism requires a transition from business-state evidence into observable consensus revision state before the expectation gap can be defined.",
+      "observable_state_coordinate": {
+        "coordinate_id": "CONSENSUS_REVISION_DIRECTION_STATE",
+        "semantic_coordinate": "Direction and phase of source-bound earnings/revenue consensus revisions, separate from the underlying company economic state.",
+        "allowed_expectation_measures": ["EPS_FY1", "EPS_FY2", "REVENUE_FY1", "REVENUE_FY2", "EPS_FY1_REVISION_30D", "EPS_FY1_REVISION_90D", "REVENUE_FY1_REVISION_30D", "REVENUE_FY1_REVISION_90D"],
+        "allowed_claim_topics": ["GUIDANCE", "OTHER_RELEVANT_CYCLE"],
+        "direct_evidence_preferred": true,
+        "numeric_transform_frozen_here": false
+      },
+      "availability_boundary": "Each consensus/revision observation must have source-bound semantics and available_at <= as_of. Current consensus, later revisions, or reconstructed vintage may not be backfilled into an earlier cut.",
+      "economic_time_meaning": "Market/analyst expectation-update state after economic evidence becomes observable; it is a belief-state clock, not publication latency and not underlying realized economics.",
+      "aliasing_risk": [
+        "CONSENSUS_REVISION_MISTAKEN_FOR_DATA_AVAILABILITY_LATENCY",
+        "CURRENT_CONSENSUS_BACKFILLED_AS_HISTORICAL_REVISION",
+        "ANALYST_COVERAGE_CHANGE_MISTAKEN_FOR_ECONOMIC_REVISION"
+      ],
+      "invariance_claim": "With fixed historical-vintage/source semantics, positive/negative revision direction keeps the same expectation-state meaning across securities; the claim is falsified if source semantics cannot distinguish historical consensus change from current/backfilled estimates.",
+      "falsifier": "Unbound or non-PIT consensus/revision semantics make this clock UNOBSERVED for real evidence and route the required source dependency to HOLD_SOURCE; they do not authorize proxy reconstruction from current estimates.",
+      "missingness_law": "Missing expectation source => MISSING at this clock and any dependent expectation-gap state. No current-consensus or guidance proxy may silently fill historical revision state."
+    },
+    {
+      "clock_id": "EXPECTATION_GAP_CLOCK",
+      "clock_type": "MISPRICING_STATE",
+      "role": "ECONOMIC_STATE",
+      "role_scope_note": "The v2 coarse state-role bucket is ECONOMIC_STATE, but clock_type is MISPRICING_STATE. The coordinate is a relation between upstream economic trajectory and observable expectations; it is not itself realized economics and may not use market confirmation as an input.",
+      "why_this_clock": "The preregistered mechanism requires an explicit state for whether the observable economic trajectory is ahead of, aligned with, or behind current expectations before downstream market recognition is considered.",
+      "observable_state_coordinate": {
+        "coordinate_id": "ECONOMIC_TRAJECTORY_VS_EXPECTATIONS_GAP_STATE",
+        "semantic_coordinate": "Signed relation between upstream source-bound economic-state trajectory and source-bound consensus/guidance trajectory.",
+        "allowed_upstream_clocks": ["SUPPLY_CAPACITY_CLOCK", "INVENTORY_CLOCK", "PRICING_CLOCK", "DEMAND_CLOCK", "UTILIZATION_MARGIN_CLOCK"],
+        "allowed_expectation_clock": "EARNINGS_REVISIONS_CLOCK",
+        "allowed_expectation_measures": ["EPS_FY1", "EPS_FY2", "REVENUE_FY1", "REVENUE_FY2", "FORWARD_PE"],
+        "allowed_claim_topics": ["GUIDANCE"],
+        "market_confirmation_input_allowed": false,
+        "numeric_transform_frozen_here": false
+      },
+      "availability_boundary": "Every upstream economic-state input and expectation/guidance input must be available_at <= as_of. The gap is evaluated only from simultaneously knowable components.",
+      "economic_time_meaning": "Decision-time misalignment between business-state trajectory and observable expectations; it is neither the reporting clock nor later price recognition.",
+      "aliasing_risk": [
+        "MARKET_PRICE_OR_RETURN_USED_AS_EXPECTATION_GAP_INPUT",
+        "MISSING_EXPECTATION_STATE_TREATED_AS_POSITIVE_GAP",
+        "UPSTREAM_ECONOMIC_AND_EXPECTATION_STATES_BUILT_FROM_DIFFERENT_KNOWLEDGE_CUTS"
+      ],
+      "invariance_claim": "Positive gap always means upstream economics is stronger than the currently observable expectation trajectory under the same knowledge cut; negative gap means weaker. The sign may not be inferred from price performance.",
+      "falsifier": "If either side of the comparison is UNOBSERVED/contradictory, or if market-confirmation/return data is required to assign the gap, EXPECTATION_GAP_CLOCK is UNOBSERVED and the representation must simplify or hold rather than infer a gap.",
+      "missingness_law": "Any missing required side of the gap => MISSING/UNOBSERVED gap. No neutral fill, price proxy, or denominator shrink."
+    },
+    {
+      "clock_id": "MARKET_CONFIRMATION_CLOCK",
+      "clock_type": "DOWNSTREAM_MARKET_ACTION_CONFIRMATION",
+      "role": "ACTION_EXECUTION",
+      "why_this_clock": "The existing market-confirmation clock is retained only as downstream recognition/capturability state. It may inform action readiness after an upstream thesis exists but may not define the economic mechanism or expectation gap.",
+      "observable_state_coordinate": {
+        "coordinate_id": "MARKET_RECOGNITION_ACTION_CONFIRMATION_STATE",
+        "semantic_coordinate": "Downstream completed-market recognition/capturability state at the decision cut.",
+        "allowed_observation_fields": ["market.close", "market.total_return_1d", "market.volume", "market.adv20", "market.realized_vol20", "market.sma20", "market.sma200"],
+        "allowed_claim_topics": [],
+        "upstream_causal_input_allowed": false,
+        "numeric_transform_frozen_here": false
+      },
+      "availability_boundary": "Only completed market observations available_at <= as_of may contribute. No partial-session, future-close, or later maturity return may enter the clock.",
+      "economic_time_meaning": "Action/recognition time after the economic/expectation thesis is independently formed; it is not business-cycle time and not evidence that the upstream cause is true.",
+      "aliasing_risk": [
+        "PRICE_MOMENTUM_MISTAKEN_FOR_CAUSAL_ECONOMIC_STATE",
+        "FUTURE_OR_PARTIAL_SESSION_DATA_LEAKED_INTO_DECISION_CUT",
+        "MARKET_CONFIRMATION_USED_TO_RESCUE_AN_UNRESOLVED_UPSTREAM_THESIS"
+      ],
+      "invariance_claim": "A confirmation state changes only downstream action readiness/capturability under fixed completed-market semantics; it never changes the meaning or integrity of upstream economic/expectation states.",
+      "falsifier": "If any implementation requires MARKET_CONFIRMATION_CLOCK to establish or repair an upstream causal state, the implementation violates E3 and must SIMPLIFY/REJECT that edge. If completed-market data is unavailable at the cut, action confirmation is UNOBSERVED/ABSTAIN.",
+      "missingness_law": "Missing market confirmation prevents a positive action-confirmation state but does not fabricate a negative economic thesis and does not remove the security from the CRV1 risk set."
+    }
+  ],
+  "graph_guardrails": {
+    "required_core_order_preserved": true,
+    "demand_remains_corroborating": true,
+    "market_confirmation_is_downstream_only": true,
+    "forbidden_edges": [
+      "MARKET_CONFIRMATION_CLOCK -> SUPPLY_CAPACITY_CLOCK",
+      "MARKET_CONFIRMATION_CLOCK -> INVENTORY_CLOCK",
+      "MARKET_CONFIRMATION_CLOCK -> PRICING_CLOCK",
+      "MARKET_CONFIRMATION_CLOCK -> DEMAND_CLOCK",
+      "MARKET_CONFIRMATION_CLOCK -> UTILIZATION_MARGIN_CLOCK",
+      "MARKET_CONFIRMATION_CLOCK -> EARNINGS_REVISIONS_CLOCK",
+      "MARKET_CONFIRMATION_CLOCK -> EXPECTATION_GAP_CLOCK",
+      "DATA_AVAILABILITY_TIME -> ECONOMIC_STATE_DIRECTION",
+      "FUTURE_RETURN_OR_MATURITY_OUTCOME -> ANY_E3_CLOCK_STATE"
+    ],
+    "no_lag_horizon_bakeoff": true,
+    "no_outcome_selected_clock_subset": true,
+    "no_requirement_all_eight_observable_per_security": true
+  },
+  "disposition": {
+    "terminal": "CLOCK_CONTRACT_PASS",
+    "basis": [
+      "All eight preregistered clock identities can be assigned a non-aliased scientific role without changing the frozen CRV1 mechanism identity.",
+      "Data availability is separated from state meaning and enforced as a boundary rather than a causal clock.",
+      "Expectation/revision and expectation-gap clocks remain semantically typed expectation/mispricing states inside the coarse v2 ECONOMIC_STATE role bucket, preventing them from being mistaken for realized business state.",
+      "Market confirmation is isolated as downstream ACTION_EXECUTION and cannot rescue upstream causal-state failure.",
+      "Missingness is explicit and does not require all eight clocks for every security or rewrite the risk set.",
+      "No numeric transform, lag, threshold, model, provider capture, outcome read, or trial debit is needed to make this routing decision."
+    ],
+    "next_slice": "CRV1-E4-STRUCTURED-CLOCK-REPRESENTATION-1",
+    "next_slice_scope": "Freeze deterministic structured representations for the semantic clock coordinates under this E3 contract, including one outcome-blind sequence/lag law where required; no outcomes, no provider capture, no automatic L5.",
+    "fail_route_retained": "SIMPLIFY_CRV1_CLOCK_GRAPH_OR_PARK_CRV1",
+    "unresolved_route_retained": "HOLD_SOURCE_ON_EXACT_NAMED_DEPENDENCY"
+  },
+  "authority_effect": {
+    "w9_reopened": false,
+    "risk_set_semantics_rerun": false,
+    "provider_capture_authorized": false,
+    "outcome_read_authorized": false,
+    "returns_join_authorized": false,
+    "l5_authorized": false,
+    "capital_authority": "NONE",
+    "financial_alpha_evidence": 0,
+    "trial_debit": 0
+  }
+}

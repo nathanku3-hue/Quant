@@ -6,6 +6,13 @@
   "forward_only": true,
   "historical_evidence_immutable": true,
   "current_product_unchanged": true,
+  "enforcement": {
+    "constitution_status": "LOCKED",
+    "universal_python_gate": "NOT_IMPLEMENTED",
+    "runtime_status_doc": "docs/architecture/ai_native_runtime_status_v1.json",
+    "closure_audit_doc": "docs/architecture/ai_native_runtime_closure_audit_20260812.md",
+    "note": "Contract is authoritative for future family versions; presence of this JSON alone does not gate legacy outcome-bearing entry points."
+  },
   "decision_value_preflight": {
     "required_fields": [
       "decision_to_change",

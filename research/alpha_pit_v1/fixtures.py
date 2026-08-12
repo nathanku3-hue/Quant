@@ -8,11 +8,10 @@ from typing import Any, Sequence
 from core.gv_fs0_canonical import domain_hash
 from research.alpha_pit_v1.contracts import (
     EXPECTATION_MEASURES,
-    FAMILY_ID,
-    PRIMARY_LABEL_SPEC_ID,
-    RISK_SET_SPEC_ID,
+    CRV1_FAMILY_DATA_CONTRACT,
     AlphaPITBackendV1,
     ArtifactRef,
+    FamilyDataContract,
     ResearchMode,
 )
 from research.alpha_pit_v1.manifests import build_artifact_ref
@@ -39,9 +38,18 @@ def _iso(value: datetime) -> str:
 
 
 class DeterministicAlphaPITFixtureBackend(AlphaPITBackendV1):
-    """Small fixture backend that exercises contracts without empirical authority."""
+    """Small family-bound fixture backend with zero empirical authority."""
 
     security_ids = ("CIQSEC:101", "CIQSEC:202")
+
+    def __init__(
+        self,
+        *,
+        family_contract: FamilyDataContract = CRV1_FAMILY_DATA_CONTRACT,
+    ) -> None:
+        if not isinstance(family_contract, FamilyDataContract):
+            raise TypeError("alpha_pit_fixture_family_data_contract_required")
+        self.family_contract = family_contract
 
     def risk_set(self, *, as_of: datetime, research_mode: ResearchMode) -> ArtifactRef:
         rows = [
@@ -64,12 +72,17 @@ class DeterministicAlphaPITFixtureBackend(AlphaPITBackendV1):
         self._reject_future(rows, as_of=as_of)
         risk_set_id = domain_hash(
             "ALPHA_PIT_V1:FIXTURE:RISK_SET",
-            {"family_id": FAMILY_ID, "risk_set_spec_id": RISK_SET_SPEC_ID, "as_of": _iso(as_of), "rows": rows},
+            {
+                "family_id": self.family_contract.family_id,
+                "risk_set_spec_id": self.family_contract.risk_set_spec_id,
+                "as_of": _iso(as_of),
+                "rows": rows,
+            },
         )
         payload = {
             "risk_set_id": risk_set_id,
-            "family_id": FAMILY_ID,
-            "risk_set_spec_id": RISK_SET_SPEC_ID,
+            "family_id": self.family_contract.family_id,
+            "risk_set_spec_id": self.family_contract.risk_set_spec_id,
             "as_of": _iso(as_of),
             "rows": rows,
             "row_count": len(rows),
@@ -85,6 +98,7 @@ class DeterministicAlphaPITFixtureBackend(AlphaPITBackendV1):
             risk_set_id=risk_set_id,
             source_receipts=[FIXTURE_SOURCE_RECEIPT],
             coverage_summary=self._coverage(len(rows), len(rows), 0),
+            family_contract=self.family_contract,
             fixture=True,
         )
 
@@ -133,6 +147,7 @@ class DeterministicAlphaPITFixtureBackend(AlphaPITBackendV1):
             created_at=FIXTURE_CREATED_AT,
             source_receipts=[FIXTURE_SOURCE_RECEIPT],
             coverage_summary=self._coverage(len(ids), len(rows), 0, requested_field_count=len(fields)),
+            family_contract=self.family_contract,
             fixture=True,
         )
 
@@ -179,6 +194,7 @@ class DeterministicAlphaPITFixtureBackend(AlphaPITBackendV1):
             created_at=FIXTURE_CREATED_AT,
             source_receipts=[FIXTURE_SOURCE_RECEIPT],
             coverage_summary=self._coverage(len(ids), len(rows), 0),
+            family_contract=self.family_contract,
             fixture=True,
         )
 
@@ -229,11 +245,12 @@ class DeterministicAlphaPITFixtureBackend(AlphaPITBackendV1):
             created_at=FIXTURE_CREATED_AT,
             source_receipts=[FIXTURE_SOURCE_RECEIPT],
             coverage_summary=self._coverage(len(ids), len(rows), 0, requested_field_count=len(EXPECTATION_MEASURES)),
+            family_contract=self.family_contract,
             fixture=True,
         )
 
     def outcomes(self, *, risk_set_id: str, label_spec_id: str) -> ArtifactRef:
-        if label_spec_id != PRIMARY_LABEL_SPEC_ID:
+        if label_spec_id != self.family_contract.primary_label_spec_id:
             raise ValueError("alpha_pit_fixture_label_spec_invalid")
         rows = [
             {
@@ -263,7 +280,7 @@ class DeterministicAlphaPITFixtureBackend(AlphaPITBackendV1):
             research_mode=ResearchMode.DISCOVERY,
             request={"risk_set_id": risk_set_id, "label_spec_id": label_spec_id},
             payload={
-                "family_id": FAMILY_ID,
+                "family_id": self.family_contract.family_id,
                 "risk_set_id": risk_set_id,
                 "label_spec_id": label_spec_id,
                 "rows": rows,
@@ -277,6 +294,7 @@ class DeterministicAlphaPITFixtureBackend(AlphaPITBackendV1):
             risk_set_id=risk_set_id,
             source_receipts=[FIXTURE_SOURCE_RECEIPT],
             coverage_summary=self._coverage(len(rows), len(rows), 0),
+            family_contract=self.family_contract,
             fixture=True,
         )
 

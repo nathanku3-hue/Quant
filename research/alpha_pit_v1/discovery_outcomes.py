@@ -8,11 +8,11 @@ method and need not load this module at all.
 from __future__ import annotations
 
 from research.alpha_pit_v1.contracts import (
-    FAMILY_ID,
+    CRV1_FAMILY_DATA_CONTRACT,
     OUTCOME_COVERAGE_STATUSES,
-    PRIMARY_LABEL_SPEC_ID,
     AlphaPITBackendV1,
     ArtifactRef,
+    FamilyDataContract,
     ResearchMode,
     validate_security_ids,
 )
@@ -29,33 +29,37 @@ class AlphaPITDiscoveryAPIv1(AlphaPITReadAPIv1):
         family_id: str,
         decision_context_id: str,
         backend: AlphaPITBackendV1,
+        family_contract: FamilyDataContract = CRV1_FAMILY_DATA_CONTRACT,
     ) -> None:
         self._initialize(
             mode=ResearchMode.DISCOVERY,
             family_id=family_id,
             decision_context_id=decision_context_id,
             backend=backend,
+            family_contract=family_contract,
         )
 
     def outcomes(
         self,
         *,
         risk_set_id: str,
-        label_spec_id: str = PRIMARY_LABEL_SPEC_ID,
+        label_spec_id: str | None = None,
     ) -> ArtifactRef:
-        if label_spec_id != PRIMARY_LABEL_SPEC_ID:
+        expected_label = self.family_contract.primary_label_spec_id
+        resolved_label = expected_label if label_spec_id is None else str(label_spec_id)
+        if resolved_label != expected_label:
             raise ValueError("alpha_pit_outcome_label_spec_invalid")
         if not str(risk_set_id).strip():
             raise ValueError("alpha_pit_outcome_risk_set_required")
         ref = self._backend.outcomes(
             risk_set_id=str(risk_set_id),
-            label_spec_id=label_spec_id,
+            label_spec_id=resolved_label,
         )
-        verify_artifact_ref(ref)
+        verify_artifact_ref(ref, family_contract=self.family_contract)
         if ref.artifact_type != "OUTCOMES":
             raise ValueError("alpha_pit_outcome_artifact_type_invalid")
         manifest = ref.manifest
-        if manifest.get("family_id") != FAMILY_ID:
+        if manifest.get("family_id") != self.family_contract.family_id:
             raise ValueError("alpha_pit_outcome_manifest_family_invalid")
         if manifest.get("research_mode") != ResearchMode.DISCOVERY.value:
             raise ValueError("alpha_pit_outcome_manifest_mode_invalid")
@@ -65,11 +69,11 @@ class AlphaPITDiscoveryAPIv1(AlphaPITReadAPIv1):
         payload = ref.payload
         if not isinstance(payload, dict):
             raise ValueError("alpha_pit_outcome_payload_mapping_required")
-        if payload.get("family_id") != FAMILY_ID:
+        if payload.get("family_id") != self.family_contract.family_id:
             raise ValueError("alpha_pit_outcome_family_invalid")
         if payload.get("risk_set_id") != risk_set_id:
             raise ValueError("alpha_pit_outcome_risk_set_binding_invalid")
-        if payload.get("label_spec_id") != label_spec_id:
+        if payload.get("label_spec_id") != resolved_label:
             raise ValueError("alpha_pit_outcome_label_binding_invalid")
         rows = payload.get("rows")
         if not isinstance(rows, list):
@@ -78,7 +82,7 @@ class AlphaPITDiscoveryAPIv1(AlphaPITReadAPIv1):
             if not isinstance(row, dict):
                 raise ValueError("alpha_pit_outcome_row_mapping_required")
             validate_security_ids([str(row.get("security_id") or "")])
-            if row.get("risk_set_id") != risk_set_id or row.get("label_spec_id") != label_spec_id:
+            if row.get("risk_set_id") != risk_set_id or row.get("label_spec_id") != resolved_label:
                 raise ValueError("alpha_pit_outcome_row_binding_invalid")
             if str(row.get("coverage_status") or "") not in OUTCOME_COVERAGE_STATUSES:
                 raise ValueError("alpha_pit_outcome_coverage_status_invalid")

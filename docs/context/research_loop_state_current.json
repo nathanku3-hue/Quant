@@ -174,10 +174,20 @@
       "source_admit_terminal": "HOLD_SOURCE"
     },
     {
-      "next": "continue under own contract; do not merge into FTK/Q",
+      "contract": "docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.json",
+      "e3_contract": "docs/architecture/cycle_resonance_v1_clock_state_coordinate_preflight_v1.json",
+      "e4_receipt": "docs/context/e2e_evidence/crv1_e4_structured_clock_representation_20260812.json",
+      "financial_alpha_evidence": 0,
+      "loop_phase": "E4_REPRESENTATION_CONTRACT_FROZEN_METHOD_L3_NOT_COMPLETE",
+      "method_l2_satisfied": true,
+      "method_l3_complete": false,
+      "next": "CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1 is preferred only under a new explicit slice; not auto-opened; no W9 reopen, provider capture, outcome/model/ranking/L5",
+      "outcomes_opened": false,
       "role": "PARALLEL_FAMILY",
-      "status": "ACTIVE_RESEARCH_ISOLATED",
-      "track_id": "CRV1"
+      "slice_id": "CRV1-E4-STRUCTURED-CLOCK-REPRESENTATION-1",
+      "status": "E4_REPRESENTATION_CONTRACT_PASS",
+      "track_id": "CRV1",
+      "trial_debit": 0
     },
     {
       "next": "continue under own contract",
@@ -206,7 +216,8 @@
     "TR-v0 parked after HOLD_SOURCE at G-S0 source semantics",
     "TR-v0 may reopen only under a future bounded exact source-semantic bind; no L3 before PASS_SOURCE_ADMITTED",
     "preserve FTK STOP; no FTK re-open",
-    "CRV1 / Sector / PAPER / Clock parallel"
+    "CRV1 / Sector / PAPER / Clock parallel",
+    "CRV1 E4 representation contract PASS; E5 claim-interpreter preflight is the preferred future CRV1 slice only if separately opened"
   ],
   "authority": {
     "active_brief": "docs/context/ACTIVE_BRIEF",
@@ -231,7 +242,10 @@
     "asymmetric return FTK vs W3",
     "reopen AO-FTK-0 as worker",
     "open TR-v0 L3/L5/timing while source terminal is HOLD_SOURCE",
-    "relabel CRV1 expectation artifact authority as TR-v0"
+    "relabel CRV1 expectation artifact authority as TR-v0",
+    "rerun CRV1 E0/E1 risk-set source semantics or standalone W9 provider capture",
+    "CRV1 lag/horizon/multi-clock outcome bake-off or market-confirmation rescue of upstream economic state",
+    "CRV1 representation rewrite, skipped-core-edge repair, alternate 183d lag selection, claim-interpreter/model/ranking/L5 auto-open without a new explicit slice"
   ],
   "human_pointer": "docs/context/RESEARCH_LOOP.md",
   "last_econ_final_trial": {
@@ -444,8 +458,9 @@
   },
   "next_worker_slice": {
     "primary": "PARALLEL_FAMILY_WIP",
-    "recommended": "CRV1_OR_SECTOR_ISOLATED_OR_IDLE",
+    "recommended": "CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1_NOT_AUTO_OPENED",
     "alternatives": [
+      "SECTOR_ROTATION_ISOLATED",
       "HOLD_ALL_STOCK_DISCOVERY",
       "REOPEN_TR_V0_ONLY_WITH_CIQ_CONSENSUS_SEMANTICS_BIND"
     ],
@@ -465,6 +480,8 @@
     "scientific_preflight_contract": "docs/architecture/opportunity_kernel_scientific_preflight_v2.json",
     "execution_feasibility_contract": "docs/architecture/execution_feasibility_v1.json",
     "ai_research_loop_contract": "docs/architecture/result_first_ai_research_loop_v1.md",
+    "runtime_status_contract": "docs/architecture/ai_native_runtime_status_v1.json",
+    "runtime_closure_audit": "docs/architecture/ai_native_runtime_closure_audit_20260812.md",
     "l3_contract_default_for_future_versions": "L3_R1_R9_V2",
     "rdv_scale": ["LOW", "MED", "HIGH"],
     "rdv_alpha_evidence": false,
@@ -476,6 +493,26 @@
     "telemetry_calibration_policy_conditioned": true,
     "reuse_default": "TWO_REAL_CONSUMERS",
     "reuse_safety_authority_exception": true,
+    "constitution_status": "LOCKED",
+    "runtime_status": "PARTIAL",
+    "universal_preflight_enforcement": "NOT_IMPLEMENTED",
+    "cross_family_rdv_allocator": "NOT_IMPLEMENTED",
+    "universal_outcome_authority_gate": "NOT_IMPLEMENTED",
+    "d1_d9_constitution": "LOCKED",
+    "d1_d9_ftk_implementation": "IMPLEMENTED",
+    "d1_d9_universal_runner": "NOT_IMPLEMENTED",
+    "top_golden_questions_now": [
+      "GQ_CONSTITUTIONAL_ENFORCEMENT_CLOSURE",
+      "GQ_ACTION_BOUNDARY_CLOCK_AND_RISK_STATE_PROVENANCE",
+      "GQ_ENDOGENOUS_OBSERVABILITY"
+    ],
+    "narrow_seams_only": [
+      "UNIVERSAL_OUTCOME_CAPABILITY_GATE",
+      "ACTION_BOUNDARY_AUTHORITY_PACKET",
+      "FAIL_CLOSED_RISK_PROVENANCE_CONTRACT",
+      "FRESH_CHECKOUT_AUTHORITY_CLOSURE_TEST",
+      "L5_COMPARISON_SET_RECEIPT"
+    ],
     "explicit_rejections": [
       "fills_to_alpha",
       "lambda_soft_hard_risk",
@@ -483,7 +520,9 @@
       "e6_5_on_pure_sensing",
       "rdv_as_alpha_evidence",
       "outcome_trained_stress_block_rate",
-      "auto_dislocation_open"
+      "auto_dislocation_open",
+      "science_s5_rename",
+      "ai_native_loop_absent_claim_without_constitution_runtime_split"
     ]
   },
   "process": {
@@ -495,8 +534,10 @@
     "loop_phase_label": "FTK STOPPED; TR-v0 HOLD_SOURCE; stock-discovery primary free; alpha=0",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
     "method_status": "LOCKED_RESULT_FIRST_FORWARD_GATE_AMENDED_20260812",
+    "ai_native_architecture": "YES_CONSTITUTIONALLY",
+    "ai_native_runtime": "PARTIAL",
     "next_phase": "PARALLEL_FAMILY_OR_PARK",
-    "next_phase_note": "FTK STOPPED (D6 fail banked). TR-v0 L2 contract frozen; expectations source admit HOLD_SOURCE (G-S0 exact CIQ semantics unbound). Park TR-v0. No FTK rescue. No TR L5. Parallel CRV1/Sector/PAPER/Clock. alpha=0.",
+    "next_phase_note": "FTK STOPPED (D6 fail banked). TR-v0 HOLD_SOURCE parked. CRV1 E4 representation contract PASS freezes the six-clock core as LEVEL/DELTA/INFLECTION forms plus one required-edge ORDERED_SEQUENCE with max adjacent detection lag 183 calendar days; alpha=0/debit=0/outcomes=0. E5 claim-interpreter preflight is preferred only under a new explicit slice. W9 remains closed. Sector/PAPER/Clock remain parallel. Constitution LOCKED / runtime PARTIAL: universal outcome gate + risk provenance + authority reproducibility remain open seams (ai_native_runtime_status_v1).",
     "representation_snr_gate_status": "PASS_AO_FTK_1_20260812_L5_SENSING_COMPLETE"
   },
   "product": {
@@ -518,6 +559,58 @@
     ]
   },
   "updated_at_utc": "2026-08-12",
+  "last_crv1_e4": {
+    "slice_id": "CRV1-E4-STRUCTURED-CLOCK-REPRESENTATION-1",
+    "programme_stage": "E4",
+    "terminal": "REPRESENTATION_CONTRACT_PASS",
+    "contract": "docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.json",
+    "receipt": "docs/context/e2e_evidence/crv1_e4_structured_clock_representation_20260812.json",
+    "core_clock_count": 6,
+    "core_representations": {
+      "SUPPLY_CAPACITY_CLOCK": "LEVEL",
+      "INVENTORY_CLOCK": "DELTA",
+      "PRICING_CLOCK": "INFLECTION",
+      "UTILIZATION_MARGIN_CLOCK": "INFLECTION",
+      "EARNINGS_REVISIONS_CLOCK": "DELTA",
+      "EXPECTATION_GAP_CLOCK": "INFLECTION"
+    },
+    "sequence_id": "CRV1_CORE6_DETECTION_ORDER_MAX183D_V1",
+    "required_edge_count": 5,
+    "allowed_skipped_edges": [],
+    "maximum_adjacent_detection_lag_days": 183,
+    "all_eight_required_per_security": false,
+    "all_six_required_for_established_core_sequence": true,
+    "demand_role": "CORROBORATING_ONLY",
+    "market_confirmation_role": "ACTION_EXECUTION_DOWNSTREAM_ONLY",
+    "risk_set_semantics_changed": false,
+    "w9_reopened": false,
+    "provider_access": false,
+    "outcomes_opened": false,
+    "model_fit": false,
+    "ranking": false,
+    "l5_authorized": false,
+    "trial_debit": 0,
+    "financial_alpha_evidence": 0,
+    "next_preferred": "CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1_NOT_AUTO_OPENED"
+  },
+  "last_crv1_e3": {
+    "slice_id": "CRV1-E3-CLOCK-STATE-COORDINATE-PREFLIGHT-1",
+    "programme_stage": "E3",
+    "method_stage_satisfied": "L2_CLOCK_STATE_COORDINATE_DECLARATION",
+    "terminal": "CLOCK_CONTRACT_PASS",
+    "contract": "docs/architecture/cycle_resonance_v1_clock_state_coordinate_preflight_v1.json",
+    "receipt": "docs/context/e2e_evidence/crv1_e3_clock_state_coordinate_preflight_20260812.json",
+    "clock_count": 8,
+    "all_eight_required_per_security": false,
+    "market_confirmation_role": "ACTION_EXECUTION_DOWNSTREAM_ONLY",
+    "risk_set_semantics_rerun": false,
+    "w9_reopened": false,
+    "provider_access": false,
+    "outcomes_opened": false,
+    "trial_debit": 0,
+    "financial_alpha_evidence": 0,
+    "next": "CRV1-E4-STRUCTURED-CLOCK-REPRESENTATION-1"
+  },
   "last_tr_v0_l2": {
     "slice_id": "TR-v0-L2-OBSERVATION-CONTRACT-1",
     "terminal": "L2_OBSERVATION_CONTRACT_FROZEN",

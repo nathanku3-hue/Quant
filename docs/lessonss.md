@@ -1,3 +1,12 @@
+## 2026-08-12 Round Entry (Constitution Locked Is Not Runtime Closed)
+
+- Date: 2026-08-12
+- Mistake or miss: zero-context / stale-cut audits treated public main as authority and labeled the AI-native scientific loop `NOT_IMPLEMENTED`, even after result-first contracts, OpportunityKernel fields, D1–D9 law, and live family SoT were locked on the authority worktree. That mis-ranking hides the real residual risk: constitution-to-execution closure.
+- Root cause: collapsing “document locked” into “system absent,” and “family-local first-fail” into “universal runner,” without an authority-cut and constitution/runtime split.
+- Fix applied: bank `ai_native_runtime_status_v1.json` + closure audit; mark architecture YES constitutionally / runtime PARTIAL; rank GQ enforcement closure, risk provenance, endogenous observability above new modelling GQs; keep narrow seams only.
+- Guardrail: never claim AI-native loop absent without the split table; never rename scientific L5; never treat preflight JSON presence as a universal Python gate; charge diagnostic outcome reads to search debt.
+- Evidence: `docs/architecture/ai_native_runtime_closure_audit_20260812.md`, `docs/architecture/ai_native_runtime_status_v1.json`, amended method/preflight/feasibility/SoT/ACTIVE_BRIEF surfaces.
+
 ## 2026-08-12 Round Entry (Research Progress Is a Decision Change, Not a Completed Run)
 
 - Date: 2026-08-12
@@ -2984,3 +2993,12 @@ Application pattern:
 - Fix applied: recut the universal unit to `OpportunityKernelV1`, preserve econphysics as one specialized fundamental-transition kernel, and freeze a sparse first basis (`Q`, `M`, `Q×M`) before any outcome read. Missingness stays visible in a broad date-local denominator; coverage failure is allowed to kill the basis rather than shrinking the risk set. Horizon, K, execution, cost, asymmetry metrics and trial charge are frozen with the formulas.
 - Guardrail for next time: **first prove a sparse basis; then earn every additional variable or mechanism marginally.** A mechanistic story is not entitled to universality, and a statistical continuation kernel is not required to fake a physical causal graph. Freeze `scientific unit → denominator → representation → target → K/horizon → missingness → execution/cost → asymmetry metrics → trial charge` before opening outcomes. Only after independent survival may composition seams be tested.
 - Evidence paths: `docs/architecture/asymmetric_opportunity_constitution_v1.md`, `docs/architecture/ao_k0_minimal_basis_freeze_v1.json`, `docs/phase_brief/ao_k0_asymmetric_opportunity_constitution_20260811.md`, current planner/impact/bridge/done/alignment/observability surfaces. AO-K0 result reads=`0`; new provider calls=`0`; W6 untouched; `financial_alpha_evidence=0`.
+
+## 2026-08-12 Round Entry (Freeze One Representation Per Causal Node Before Implementation Creates a Hidden Search Grid)
+
+- Date: 2026-08-12
+- Mistake or miss avoided: after E3 froze eight clock meanings, the build spec still exposed `LEVEL / DELTA / INFLECTION / ORDERED_SEQUENCE` plus edge/lag choices with no defaults. Implementing those mechanics first would have created a silent representation-and-lag search surface that could later be selected from outcomes while still claiming one CRV1 version.
+- Root cause: semantic preregistration and representation preregistration are separate. A non-aliased causal graph can still carry large hidden scientific degrees of freedom if each node may be represented several ways, intermediate nodes may be skipped opportunistically, or the temporal tolerance is chosen after seeing which sequence works.
+- Fix applied: E4 freezes exactly one primary representation for each required six-clock node (`LEVEL, DELTA, INFLECTION, INFLECTION, DELTA, INFLECTION` respectively), makes `ORDERED_SEQUENCE` graph-level only, requires all five adjacent core edges for `ESTABLISHED`, permits no skip repair, and freezes one `0..183 calendar day` adjacent decision-time detection lag. Missing core clocks now route to `PARTIAL` rather than risk-set deletion; demand remains corroborating and market confirmation remains downstream-only.
+- Guardrail for next time: **representation freedom is search freedom.** Before writing transforms, freeze one representation per required causal node, one edge/skip law, one decision-time event stamp, one lag law, and explicit missing/contradiction states. Never let optional corroborators or downstream market signals repair a missing causal node. Any alternate transform or lag is a new pre-outcome representation version/search-budget entry.
+- Evidence paths: `docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.json`, `docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.md`, `docs/context/e2e_evidence/crv1_e4_structured_clock_representation_20260812.json`, `docs/phase_brief/crv1_e4_structured_clock_representation_20260812.md`. Provider/outcome/return/label/model/ranking/L5 access=`0`; trial debit=`0`; `financial_alpha_evidence=0`.

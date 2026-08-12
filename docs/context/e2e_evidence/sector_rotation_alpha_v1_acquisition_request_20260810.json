@@ -1,0 +1,72 @@
+{
+  "benchmark_family_id": "US_SELECT_SECTOR_ETF_11_V1",
+  "capital_authority": "NONE",
+  "capture_state": "PARKED_CAPTURE_HOLD",
+  "family_id": "SECTOR_ROTATION_ALPHA_v1",
+  "financial_alpha_evidence": 0,
+  "forbidden_inputs_or_methods": {
+    "etf_flow_vendor": false,
+    "machine_learning": false,
+    "old_sector_map": false,
+    "optimizer": false,
+    "stock_breadth": false,
+    "underlying_stock_membership": false
+  },
+  "frozen_model_summary": {
+    "comparator": "I_RELATIVE_STRENGTH_ONLY_VS_I_PLUS_X_DVP_PRE_LABEL",
+    "dollar_volume_participation_windows": [5, 20],
+    "material_trials": 1,
+    "relative_strength_windows": [20, 60],
+    "retune_allowed": false
+  },
+  "identity_and_membership_law": {
+    "alternate_listing_backfill": false,
+    "current_survivor_back_projection": false,
+    "entity_identity_fallback": false,
+    "identity_authority": "CIQSEC_PLUS_TRADING_ITEM_FROM_SOURCE_BOUND_MEMBERSHIP_RECEIPT",
+    "permno_identity_fallback": false,
+    "sector_key_membership_receipt_required": true,
+    "ticker_identity_fallback": false
+  },
+  "implementation_id": "SRA_M0_RELSTR_20_60_DVP_5_20_EQUAL_RANK_v1",
+  "independent_capacity_must_not_delay_stock_path": true,
+  "market_history_request": {
+    "availability_timestamp_required": true,
+    "close_required": true,
+    "decision_session_included": true,
+    "future_sessions_forbidden": true,
+    "minimum_observed_sessions_per_security": 60,
+    "provider_fields": ["SP_TOTAL_RETURN", "SP_PRICE_CLOSE", "SP_VOLUME"],
+    "source_receipt_sha256_required": true,
+    "total_return_is_corporate_action_authority": true,
+    "volume_required": true
+  },
+  "outcome_accessed": false,
+  "prediction_append_performed": false,
+  "primary_horizon_sessions": 20,
+  "provider": "S&P Capital IQ Pro",
+  "provider_acquisition_allowed": false,
+  "provider_acquisition_performed": false,
+  "reopen_condition": "TRULY_INDEPENDENT_PROVIDER_CAPACITY_AVAILABLE",
+  "request_id": "SRA_ETF_11_CIQ_ACQUISITION_V1",
+  "request_sha256": "7d4a46c0fa2e0292ab42d0f88f90dc800bb25c5edebcd00bdd1a209a73915c0c",
+  "risk_set_spec_id": "SRA_US_SELECT_SECTOR_ETF_11_V1",
+  "schema_version": "sra_etf_source_acquisition_request_v1",
+  "search_family_id": "SRA_M0_SEARCH_v1",
+  "secondary_horizon_sessions": 40,
+  "sector_count": 11,
+  "sector_requests": [
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"COMMUNICATION_SERVICES","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"CONSUMER_DISCRETIONARY","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"CONSUMER_STAPLES","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"ENERGY","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"FINANCIALS","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"HEALTH_CARE","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"INDUSTRIALS","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"INFORMATION_TECHNOLOGY","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"MATERIALS","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"REAL_ESTATE","unresolved_identity_action":"BLOCK"},
+    {"benchmark_family_id":"US_SELECT_SECTOR_ETF_11_V1","benchmark_membership_receipt_required":true,"exact_security_id_required":true,"exact_trading_item_id_required":true,"identity_provider_fields":["SP_CIQ_ID","SP_TRADING_ITEM_ID"],"instrument_type":"ETF","listing_country":"US","primary_listing_required":true,"sector_key":"UTILITIES","unresolved_identity_action":"BLOCK"}
+  ],
+  "trial_budget_max": 1
+}

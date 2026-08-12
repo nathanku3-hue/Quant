@@ -29,12 +29,34 @@ Keep strict separation of concerns:
 
 Before starting any work, check which truth surfaces exist and are required for this repo/round:
 
+#### 2.1.0 Research loop self-ID (FIRST — non-negotiable)
+
+When the user asks **which phase**, **what’s next**, **loop position**, or **self-identify**:
+
+1. Read `docs/context/research_loop_state_current.json` **first** (canonical machine state).
+2. Optionally print via `python scripts/print_research_loop_state.py`.
+3. Answer using: `process.loop_phase`, `process.next_phase`, `next_worker_slice`, `product.state`, `forbidden_now`.
+4. **JSON wins over chat history** until the owner updates the JSON.
+5. After any freeze / run close / layered diagnosis / roadmap decision, **update the JSON in the same turn**.
+
+Process constitution: `docs/architecture/alpha_scientific_method_v1.md`  
+Result-first amendment: `docs/architecture/result_first_ai_research_loop_v1.md`  
+Runtime status (constitution vs enforcement): `docs/architecture/ai_native_runtime_status_v1.json`  
+Closure audit: `docs/architecture/ai_native_runtime_closure_audit_20260812.md`  
+Human one-pager: `docs/context/RESEARCH_LOOP.md`  
+Product/shadow brief: `docs/context/ACTIVE_BRIEF`  
+
+AI-native **architecture = YES constitutionally**; **runtime = PARTIAL**. Do not claim the scientific loop is absent. Do not rename scientific L5. Public `main` is non-authority until merge.
+
 **Root SOP governance:**
 - `E:\code\SOP\KERNEL_ACTIVATION_MATRIX.md` — when each kernel capability becomes mandatory
 - `E:\code\SOP\SPEC_TO_MULTISTREAM_EXECUTION_CHECKLIST.md` — 11-section checklist for multi-stream execution readiness
 - `E:\code\SOP\ENDGAME.md` — target state for SOP governance control plane
 
 **Current truth surfaces (in `docs/context/`):**
+- `research_loop_state_current.json` — **canonical loop phase + next worker** (read first for phase/next)
+- `RESEARCH_LOOP.md` — human pointer to loop enums and agent protocol
+- `ACTIVE_BRIEF` — product vs shadow one-pager
 - `bridge_contract_current.md` — translates recent execution truth into PM/planner next-step language (SYSTEM_DELTA, PM_DELTA, OPEN_DECISION, RECOMMENDED_NEXT_STEP, DO_NOT_REDECIDE)
 - `done_checklist_current.md` — machine-checkable done criteria for current phase
 - `planner_packet_current.md` — compact fresh-context packet for planner (current context, active brief, bridge truth, decision tail, blocked next step, active bottleneck)
@@ -44,6 +66,7 @@ Before starting any work, check which truth surfaces exist and are required for 
 - `observability_pack_current.md` — drift detection markers (high-risk attempts, stuck sessions, skill under-triggering, budget pressure, compaction/hallucination pressure)
 
 **Activation rules:**
+- Research loop state JSON: **always active** for phase/next self-ID
 - Bridge contract: always active (required for any repo with execution truth)
 - Done checklist: always active (required when closure can drift)
 - Planner packet: always active (required when planner rereads too much)
@@ -53,7 +76,8 @@ Before starting any work, check which truth surfaces exist and are required for 
 - Observability pack: active (drift risk is non-trivial, 5+ phases completed)
 
 **Entry sequence:**
-1. Start from `planner_packet_current.md` (compact entry point)
+0. If question is phase/next/loop → `research_loop_state_current.json` (+ optional CLI print)
+1. Else start from `planner_packet_current.md` (compact entry point) or `ACTIVE_BRIEF`
 2. Load `impact_packet_current.md` (changed files, owned files, touched interfaces)
 3. Load `bridge_contract_current.md` (PM/planner bridge)
 4. Load `done_checklist_current.md` (acceptance criteria)

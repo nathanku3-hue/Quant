@@ -16,7 +16,9 @@ from alpaca.data.requests import StockLatestTradeRequest
 from alpaca.trading.client import TradingClient
 from alpaca.trading.enums import OrderSide
 from alpaca.trading.enums import OrderType
+from alpaca.trading.enums import QueryOrderStatus
 from alpaca.trading.enums import TimeInForce
+from alpaca.trading.requests import GetOrdersRequest
 from alpaca.trading.requests import LimitOrderRequest
 from alpaca.trading.requests import MarketOrderRequest
 from core.security_policy import assert_egress_url_allowed
@@ -120,6 +122,15 @@ class _AlpacaPyREST:
     def list_positions(self) -> list[Any]:
         return list(self._trading.get_all_positions())
 
+    def list_orders(self, *, status: str = "all", limit: int = 500) -> list[Any]:
+        status_s = str(status).lower().strip()
+        try:
+            query_status = QueryOrderStatus(status_s)
+        except ValueError:
+            raise ValueError(f"unsupported order query status: {status}") from None
+        request = GetOrdersRequest(status=query_status, limit=int(limit), nested=False)
+        return list(self._trading.get_orders(filter=request))
+
     def submit_order(self, **kwargs: Any) -> Any:
         order_type = _alpaca_py_order_type(str(kwargs.get("type", "")))
         base_payload = {
@@ -200,6 +211,11 @@ def _to_number(value: Any) -> int | float:
 def _clean_optional_text(value: Any) -> str:
     if value is None:
         return ""
+    if hasattr(value, "value"):
+        try:
+            value = value.value
+        except Exception:
+            pass
     text = str(value).strip()
     if text.lower() in {"none", "null", "nan"}:
         return ""
@@ -393,6 +409,86 @@ class AlpacaBroker:
             "positions": positions,
         }
 
+    def get_reconciliation_snapshot(self, *, recent_order_limit: int = 500) -> dict[str, Any]:
+        """Capture broker truth needed by PAPER-0 restart reconciliation.
+
+        This is read-only.  It does not submit, cancel, replace, or close orders.
+        Missing account/order identity fails closed rather than fabricating local
+        authority.
+        """
+
+        if isinstance(recent_order_limit, bool):
+            raise ValueError("recent_order_limit must be a positive integer")
+        try:
+            limit = int(recent_order_limit)
+        except (TypeError, ValueError):
+            raise ValueError("recent_order_limit must be a positive integer") from None
+        if limit <= 0:
+            raise ValueError("recent_order_limit must be a positive integer")
+
+        account = self.api.get_account()
+        account_id = _clean_optional_text(
+            getattr(account, "id", None) or getattr(account, "account_number", None)
+        )
+        if not account_id:
+            raise RuntimeError("broker account identity unavailable for PAPER reconciliation")
+
+        positions_rows: list[dict[str, Any]] = []
+        for position in self.api.list_positions():
+            symbol = _clean_optional_text(getattr(position, "symbol", "")).upper()
+            broker_instrument_id = _clean_optional_text(getattr(position, "asset_id", ""))
+            if not symbol or not broker_instrument_id:
+                raise RuntimeError("broker position missing symbol or asset_id")
+            quantity = _clean_optional_text(getattr(position, "qty", None))
+            if not quantity:
+                raise RuntimeError("broker position missing quantity")
+            positions_rows.append(
+                {
+                    "symbol": symbol,
+                    "broker_instrument_id": broker_instrument_id,
+                    "quantity": quantity,
+                }
+            )
+        positions_rows.sort(key=lambda row: (str(row["symbol"]), str(row["broker_instrument_id"])))
+
+        list_orders = getattr(self.api, "list_orders", None)
+        if not callable(list_orders):
+            raise RuntimeError("broker order listing unavailable for PAPER reconciliation")
+        open_raw = list_orders(status="open", limit=limit)
+        recent_raw = list_orders(status="all", limit=limit)
+
+        def _snapshot_orders(rows: Any, *, surface: str) -> list[dict[str, Any]]:
+            snapshots: list[dict[str, Any]] = []
+            for raw_order in list(rows):
+                snapshot = self._build_order_snapshot(raw_order, fallback_client_order_id="")
+                if not _clean_optional_text(snapshot.get("order_id", "")):
+                    raise RuntimeError(f"{surface} broker order missing order_id")
+                if not _clean_optional_text(snapshot.get("client_order_id", "")):
+                    raise RuntimeError(f"{surface} broker order missing client_order_id")
+                snapshots.append(snapshot)
+            snapshots.sort(
+                key=lambda row: (
+                    str(row.get("client_order_id") or ""),
+                    str(row.get("order_id") or ""),
+                )
+            )
+            return snapshots
+
+        cash = _clean_optional_text(getattr(account, "cash", None))
+        equity = _clean_optional_text(getattr(account, "equity", None))
+        if not cash or not equity:
+            raise RuntimeError("broker account snapshot missing cash/equity")
+        return {
+            "schema": "alpaca_paper_reconciliation_snapshot_v1",
+            "captured_at_utc": _utc_now_iso_ms(),
+            "account_id": account_id,
+            "cash": cash,
+            "equity": equity,
+            "positions": positions_rows,
+            "open_orders": _snapshot_orders(open_raw, surface="open"),
+            "recent_orders": _snapshot_orders(recent_raw, surface="recent"),
+        }
+
     @staticmethod
     def _build_order_snapshot(order: Any, *, fallback_client_order_id: str) -> dict[str, Any]:
         order_type = _clean_optional_text(getattr(order, "type", "")).lower() or None
@@ -558,6 +654,7 @@ class AlpacaBroker:
         symbol_u = str(symbol).upper().strip()
         side_l = str(side).lower().strip()
         order_type_l = str(order_type).lower().strip()
+        time_in_force_l = str(time_in_force).lower().strip()
         client_order_id_s = str(client_order_id).strip() if client_order_id is not None else ""
         if isinstance(qty, bool):
             return {"ok": False, "error": f"invalid_qty:{qty}"}
@@ -571,6 +668,8 @@ class AlpacaBroker:
             return {"ok": False, "error": f"invalid_side:{side}"}
         if order_type_l not in {"market", "limit"}:
             return {"ok": False, "error": f"invalid_order_type:{order_type}"}
+        if time_in_force_l not in {"day", "gtc", "opg", "cls", "ioc", "fok"}:
+            return {"ok": False, "error": f"invalid_time_in_force:{time_in_force}"}
         if (not math.isfinite(qty_f)) or qty_f <= 0.0:
             return {"ok": False, "error": f"invalid_qty:{qty}"}
         if order_type_l == "limit":
@@ -589,7 +688,7 @@ class AlpacaBroker:
             "qty": qty_f,
             "side": side_l,
             "type": order_type_l,
-            "time_in_force": str(time_in_force).lower().strip(),
+            "time_in_force": time_in_force_l,
         }
         order_payload["client_order_id"] = client_order_id_s
         if order_type_l == "limit":
@@ -624,6 +723,7 @@ class AlpacaBroker:
                     side=side_l,
                     qty=qty_f,
                     order_type=order_type_l,
+                    time_in_force=time_in_force_l,
                     limit_price=limit_price_f,
                     client_order_id=client_order_id_s,
                 ):
@@ -636,6 +736,7 @@ class AlpacaBroker:
                 recovered["recovered"] = True
                 recovered["recovery_reason"] = str(exc)
                 recovered.setdefault("order_type", order_type_l)
+                recovered.setdefault("time_in_force", time_in_force_l)
                 if order_type_l == "limit":
                     recovered.setdefault("limit_price", limit_price_f)
                 return _normalize_submit_acceptance(recovered)
@@ -650,6 +751,7 @@ class AlpacaBroker:
                     side=side_l,
                     qty=qty_f,
                     order_type=order_type_l,
+                    time_in_force=time_in_force_l,
                     limit_price=limit_price_f,
                     client_order_id=client_order_id_s,
                 ):
@@ -662,6 +764,7 @@ class AlpacaBroker:
                 recovered["recovered"] = True
                 recovered["recovery_reason"] = str(exc)
                 recovered.setdefault("order_type", order_type_l)
+                recovered.setdefault("time_in_force", time_in_force_l)
                 if order_type_l == "limit":
                     recovered.setdefault("limit_price", limit_price_f)
                 return _normalize_submit_acceptance(recovered)
@@ -675,6 +778,7 @@ class AlpacaBroker:
         side: str,
         qty: float,
         order_type: str,
+        time_in_force: str,
         limit_price: float | None,
         client_order_id: str,
     ) -> bool:
@@ -695,6 +799,11 @@ class AlpacaBroker:
             return False
         if not recovered_client_order_id or recovered_client_order_id != str(client_order_id).strip():
             return False
+        expected_time_in_force = str(time_in_force).lower().strip()
+        if expected_time_in_force != "day":
+            recovered_time_in_force = str(recovered.get("time_in_force", "")).lower().strip()
+            if recovered_time_in_force != expected_time_in_force:
+                return False
         if str(order_type).lower().strip() == "market":
             recovered_limit_raw = recovered.get("limit_price", None)
             if recovered_limit_raw is None:

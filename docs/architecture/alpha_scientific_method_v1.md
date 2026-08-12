@@ -46,6 +46,34 @@ Canonical machine preflight=`docs/architecture/opportunity_kernel_scientific_pre
 
 This amendment is forward-only. Historical freezes/runs/diagnoses remain immutable under their pinned contract versions.
 
+### 1.2 Constitution vs runtime (do not conflate)
+
+```text
+AI_NATIVE_RESEARCH_CONSTITUTION     = LOCKED
+AI_NATIVE_DECISION_SEMANTICS        = LOCKED
+FAMILY_LEVEL_FIRST_FAIL (FTK)       = IMPLEMENTED
+UNIVERSAL_PREFLIGHT_ENFORCEMENT     = NOT_IMPLEMENTED
+CROSS_FAMILY_RDV_ALLOCATOR          = NOT_IMPLEMENTED
+AI_NATIVE_QUANT_RESEARCH_RUNTIME    = PARTIAL
+```
+
+Machine status + ranked post-lock Golden Questions:
+
+```text
+docs/architecture/ai_native_runtime_status_v1.json
+docs/architecture/ai_native_runtime_closure_audit_20260812.md
+```
+
+Scientific phase IDs remain the L0–L11 / P1–P4 namespace below. **Do not rename** scientific `L5_RUN` to `SCIENCE_S5`.
+
+D1→D9 status split:
+
+```text
+D1_D9_CONSTITUTION        = LOCKED
+D1_D9_FTK_IMPLEMENTATION  = IMPLEMENTED
+D1_D9_UNIVERSAL_RUNNER    = NOT_IMPLEMENTED
+```
+
 ---
 
 ## 2. Canonical loop (enum names)

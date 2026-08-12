@@ -193,6 +193,8 @@ class PortfolioRebalancer:
                 raise ValueError(f"Invalid order quantity for {symbol}: {qty_raw} (must be an integer)")
             side = str(order["side"]).lower()
             order_type = str(order.get("order_type", "market")).lower().strip()
+            time_in_force_raw = order.get("time_in_force", None)
+            time_in_force = None if time_in_force_raw is None else str(time_in_force_raw).lower().strip()
             client_order_id = str(order.get("client_order_id", "")).strip()
             limit_price: float | None = None
             if not client_order_id:
@@ -214,6 +216,8 @@ class PortfolioRebalancer:
                 raise ValueError(f"Invalid order side for {symbol}: {side}")
             if order_type not in {"market", "limit"}:
                 raise ValueError(f"Invalid order type for {symbol}: {order_type}")
+            if time_in_force is not None and time_in_force not in {"day", "gtc", "opg", "cls", "ioc", "fok"}:
+                raise ValueError(f"Invalid time_in_force for {symbol}: {time_in_force_raw}")
             if order_type == "limit":
                 limit_price_raw = order.get("limit_price", None)
                 if isinstance(limit_price_raw, bool):
@@ -230,6 +234,7 @@ class PortfolioRebalancer:
             normalized_order["qty"] = qty
             normalized_order["side"] = side
             normalized_order["order_type"] = order_type
+            normalized_order["time_in_force"] = time_in_force
             normalized_order["client_order_id"] = client_order_id
             normalized_order["limit_price"] = limit_price
             prepared_orders.append((order, normalized_order))
@@ -249,6 +254,8 @@ class PortfolioRebalancer:
             qty = int(normalized_order["qty"])
             side = str(normalized_order["side"]).lower()
             order_type = str(normalized_order["order_type"]).lower().strip()
+            time_in_force_value = normalized_order.get("time_in_force", None)
+            time_in_force: str | None = None if time_in_force_value is None else str(time_in_force_value)
             client_order_id = str(normalized_order["client_order_id"]).strip()
             limit_price_value = normalized_order.get("limit_price", None)
             limit_price: float | None = None if limit_price_value is None else float(limit_price_value)
@@ -295,6 +302,7 @@ class PortfolioRebalancer:
                     "risk_audit_error": audit_error,
                     "client_order_id": client_order_id,
                     "order_type": order_type,
+                    "time_in_force": time_in_force,
                     "limit_price": limit_price,
                 }
                 print(
@@ -321,6 +329,7 @@ class PortfolioRebalancer:
                     "status": "simulated",
                     "client_order_id": client_order_id,
                     "order_type": order_type,
+                    "time_in_force": time_in_force,
                     "limit_price": limit_price,
                 }
             else:
@@ -333,6 +342,8 @@ class PortfolioRebalancer:
                 # Preserve optional order intent fields without breaking legacy callers.
                 if order_type != "market":
                     submit_kwargs["order_type"] = order_type
+                if time_in_force is not None:
+                    submit_kwargs["time_in_force"] = time_in_force
                 if order_type == "limit":
                     submit_kwargs["limit_price"] = limit_price
                 try:
@@ -346,6 +357,8 @@ class PortfolioRebalancer:
                 if not result.get("client_order_id"):
                     result["client_order_id"] = client_order_id
                 result.setdefault("order_type", order_type)
+                if time_in_force is not None:
+                    result.setdefault("time_in_force", time_in_force)
                 if order_type == "limit":
                     result.setdefault("limit_price", limit_price)
             if result.get("ok") is True:

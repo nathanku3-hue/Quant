@@ -1,0 +1,106 @@
+{
+  "schema_version": "ao_k0_opportunity_constitution_freeze_receipt_v1",
+  "round_id": "AO-K0-20260811",
+  "slice": "AO-K0 — ASYMMETRIC_OPPORTUNITY_CONSTITUTION + MINIMAL_BASIS_FREEZE",
+  "date": "2026-08-11",
+  "status": "CLOSED_DOCS_FREEZE_NO_EMPIRICAL_READ",
+  "hierarchy_confirmation": {
+    "status": "Approved",
+    "session": "current-thread",
+    "trigger": "project-init",
+    "domains": [
+      "Financial",
+      "Scientific",
+      "Research Governance",
+      "PIT Evidence"
+    ],
+    "authorization_basis": "user instruction 'go next slice' under the supplied AO-K0 phase hierarchy"
+  },
+  "canonical_authority": {
+    "constitution": {
+      "path": "docs/architecture/asymmetric_opportunity_constitution_v1.md",
+      "sha256": "3a1d9cd45e0c8bcde4fcd3fb9142de0108c6733a4352f56737d5a7edf374bb2f"
+    },
+    "machine_freeze": {
+      "path": "docs/architecture/ao_k0_minimal_basis_freeze_v1.json",
+      "sha256": "3236192f64b733ef8a0eb6231ab06ca31a8cf5d5eacc4b99c63e14ba4d36b3be"
+    },
+    "endgame_current": {
+      "path": "docs/architecture/alpha_organism_endgame_current.md",
+      "sha256": "b294684f339d46ef3885c87c6845acddf45fc04e359c5f24903e0ef4f6d22aba"
+    },
+    "roadmap_current": {
+      "path": "docs/architecture/aov_endgame_generalization_spec_current.md",
+      "sha256": "4a7a64f2c0e510811a00524e3ed082f3cace0e1a1a12802d2f175a090b405b3a"
+    },
+    "phase_brief": {
+      "path": "docs/phase_brief/ao_k0_asymmetric_opportunity_constitution_20260811.md",
+      "sha256": "6d844e678dccdbdde5c21bafc6bbf99ebfe82a8385d5347a17a02173b687457c"
+    }
+  },
+  "current_truth_hashes": {
+    "docs/context/planner_packet_current.md": "6b3b968ea7ff8abe8c4ec5bab986c979bd2b371d4ad6f27ec9edfbef31eb628d",
+    "docs/context/impact_packet_current.md": "6269907b01204b9e9847e8c92ee4e93f2f1e3b5e4c533b1a1681cff49a883b64",
+    "docs/context/bridge_contract_current.md": "ee3d8852397ab49540ceb2d231e441e971ec353f3fcb0e30ff5cf17e7481ddbf",
+    "docs/context/done_checklist_current.md": "6ef5a6841cb863385f9e10d338e8ec307824d49c61c548332bed85c299ae6689",
+    "docs/context/post_phase_alignment_current.md": "3b1ea04f8f1825cd688954a5e18c951af932158ef75b4a8429ab5f95be0e157a",
+    "docs/context/observability_pack_current.md": "33043c1966952c1a3e846d9299953f2fbb7871f7d374f4be97467fd774e83929",
+    "docs/context/multi_stream_contract_current.md": "e1facb52b5950697c8aaaf365cd29e7957e32e64749e19aff9800786794582c8"
+  },
+  "documentation_registry_hashes": {
+    "docs/decision log.md": "2df2c183a21523290bb3c143cd5184a945aec08a29e25d2bcf8f791787b48530",
+    "docs/notes.md": "54030fd60cdd59288b50ecdd899087ae116746b1ce4f54c080987e4b3047094c",
+    "docs/lessonss.md": "3bdeacedf7bcf5eb3d363f7f14ced35132f5a191516b18697d7aa9e0378ca2f0"
+  },
+  "frozen_scientific_state": {
+    "universal_unit": "OpportunityKernelV1",
+    "first_basis_experiment": "AO_K0_BASIS_Q_M_QM_V1",
+    "entry_incumbent": "CONTINUATION",
+    "deferred_entry_mode": "DISLOCATION",
+    "risk_set": "AO_BASIS_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "decision_schedule": "weekly_last_observed_NYSE_session",
+    "horizon_observed_sessions": 20,
+    "selection_k": "ceil(0.05 * abs(D_t))",
+    "execution": "canonical_shift_1",
+    "turnover_cost_rate": 0.001,
+    "q": "four PIT fundamental group percentile ranks; >=3 observed; no missing fill",
+    "m": "trailing 60 observed-session primary-security total return percentile rank",
+    "q_plus_m": "q_score * m_score",
+    "asymmetry_evaluation": "AsymmetryEvaluationV1"
+  },
+  "trial_state": {
+    "ao_k0_freeze_material_trials_consumed": 0,
+    "first_result_bearing_joint_basis_trial_charge": 1,
+    "prebreakout_trial1_debt": "1/8 permanent unchanged"
+  },
+  "stop_line_attestations": {
+    "new_provider_capture": false,
+    "q_m_qm_empirical_result_read": false,
+    "winner_label_inspection_for_basis": false,
+    "new_inventory_margin_transform": false,
+    "revenue_rescue": false,
+    "expectation_gap_build": false,
+    "dislocation_backtest": false,
+    "w6_read": false,
+    "a2_requery": false,
+    "parent_child_mutation": false,
+    "clock1_outcome_open": false,
+    "generic_ai_swarm_platform": false,
+    "portfolio_optimizer": false,
+    "broker_or_capital_action": false
+  },
+  "authority_state": {
+    "w6": "UNTOUCHED",
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE",
+    "broad_architecture_reopen": false
+  },
+  "validation": {
+    "machine_freeze_json_parse": "PASS",
+    "current_truth_stale_next_action_scan": "PASS_ZERO_MATCHES",
+    "scoped_git_diff_check": "PASS",
+    "empirical_test_required": false,
+    "reason": "documentation/methodology freeze only; no executable behavior changed by AO-K0"
+  },
+  "next_action": "prove exact lawful broad development PIT custody and hash-bind uninspected labels before one separately authorized charged Q/M/Q+M development read"
+}

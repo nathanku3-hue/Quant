@@ -39,6 +39,21 @@ outcome-trained stress_block_rate
 auto DISLOCATION open
 ```
 
+## Follow-on (same day) — runtime closure truth
+
+Constitution lock is not universal runtime enforcement. See:
+
+```text
+docs/architecture/ai_native_runtime_status_v1.json
+docs/architecture/ai_native_runtime_closure_audit_20260812.md
+docs/phase_brief/ai_native_runtime_closure_audit_20260812.md
+```
+
+```text
+AI_NATIVE_ARCHITECTURE = YES_CONSTITUTIONALLY
+AI_NATIVE_RUNTIME      = PARTIAL
+```
+
 ## Acceptance checks
 
 - [x] Canonical result-first method lock exists and is referenced by scientific method, AI pipeline, endgame and kernel constitution.

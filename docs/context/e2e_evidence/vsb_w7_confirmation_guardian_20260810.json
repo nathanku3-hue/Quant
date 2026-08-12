@@ -1,0 +1,114 @@
+{
+  "schema_version": "vsb_w7_confirmation_guardian_mechanics_v1",
+  "round_id": "VSB_W7_CONFIRMATION_GUARDIAN_20260810",
+  "scope_id": "VSB-W7-CONFIRMATION-GUARDIAN-NO-RETUNE",
+  "created_at_utc": "2026-08-10T12:51:46Z",
+  "methodology_authority": "docs/architecture/prebreakout_methodology_freeze_20260810.md",
+  "family_id": "VOL_SQUEEZE_BREAKOUT_v1",
+  "confirmation_role_id": "VSB_CONFIRMATION_v1",
+  "implementation_id": "VSB_M0_EQUAL_RANK_20_60_20_v1",
+  "search_family_id": "VSB_M0_SEARCH_v1",
+  "guardian_contract_sha256": "04dfa0337ade2111460b2161b7c2cee02a933e1bdcbd61aac61274d084d864be",
+  "acceptance_law": {
+    "minimum_matured_primary_10d_decision_dates": 20,
+    "winner_recall_lift_10d_strictly_greater_than": 1.0,
+    "bootstrap_lower_bound_strictly_greater_than": 1.0,
+    "bootstrap_confidence": 0.8,
+    "bootstrap_method": "NONCIRCULAR_MOVING_BLOCK_TRUNCATE_TYPE7_V1",
+    "bootstrap_block_length_decision_dates": 10,
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20260810,
+    "bootstrap_lower_percentile": 0.1,
+    "bootstrap_upper_percentile": 0.9
+  },
+  "guardian_behavior": {
+    "before_minimum_matured_dates": "BLOCKED_INSUFFICIENT_MATURED_PRIMARY_DATES",
+    "pre_minimum_recall_exposed": false,
+    "pre_minimum_support_breadth_exposed": false,
+    "pre_minimum_lift_exposed": false,
+    "pre_minimum_bootstrap_interval_exposed": false,
+    "outcome_fetch": false,
+    "label_construction": false,
+    "consumes_only_matured_evaluator_receipts": true,
+    "prediction_before_label_proof_required": true,
+    "zero_custody_violations_required": true,
+    "exact_top5_winner_count_required": true,
+    "guardian_hash_bound_in_prediction_payload": true,
+    "guardian_hash_bound_in_batch_prediction_identity": true,
+    "guardian_hash_bound_in_security_prediction_identity": true
+  },
+  "authority_boundary": {
+    "retune_authority": "NONE",
+    "prebreakout_authority": "NONE",
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE",
+    "broker_orders": "FORBIDDEN",
+    "provider_capture_performed": false,
+    "prediction_append_performed": false,
+    "outcome_open_performed": false,
+    "a2_requery_performed": false,
+    "clock1_outcome_access_performed": false,
+    "sndk_mu_statistical_weight": 0
+  },
+  "final_candidate_file_sha256": {
+    "research/vol_squeeze_breakout_v1/contracts.py": "2df7167673573db60ab983cb99b4fca13b29e74e590332fbb98e564e2b304caf",
+    "research/vol_squeeze_breakout_v1/guardian.py": "5f65f0fe74d3e739ac6096fef7f750e8649df50f402e8397b279f5e23b3d36d0",
+    "research/vol_squeeze_breakout_v1/runner.py": "4c9fbea199882481761cae1a06fc7338cff9d7f45978fe74ab2917028c350dd3",
+    "research/vol_squeeze_breakout_v1/__init__.py": "7a18308c39936bdd918efca633cfc54a9c3c098b19f3b84587f605fe4fa443d6",
+    "tests/vol_squeeze_breakout_v1/test_guardian.py": "318855bb20076e662c77bc55d7341173b5a89709ab1dd036a6f0e6c1297854cc",
+    "tests/vol_squeeze_breakout_v1/test_m0_core.py": "d584f6efabe892deecfc901dc7d8880c980d81b22954f861239f9f57fedcb2df",
+    "docs/architecture/vol_squeeze_breakout_v1_spec.md": "1238c0501a7a32dae30813981cbfbb91108005526d532a40034c027845314c66"
+  },
+  "validation": {
+    "baseline_vsb_before_w7": "16/16 PASS",
+    "w7_focused_final": "22/22 PASS",
+    "vsb_alpha_pit_crv1_final_live_bytes": "49/49 PASS",
+    "aov_directory_final_live_bytes": "167/167 PASS",
+    "selected_py_compile": "PASS",
+    "owned_tracked_git_diff_check": "PASS",
+    "first_read_stale_vsb_capture_next_scan": "0 matches",
+    "se_evidence_validation": "PASS"
+  },
+  "adversarial_checks": [
+    "19 matured dates expose no recall/breadth/lift/bootstrap metrics",
+    "lift exactly 1.0 fails strict acceptance boundary",
+    "wrong implementation identity fails closed",
+    "wrong guardian contract hash fails closed",
+    "missing prediction-before-label proof fails closed",
+    "nonzero custody violation count fails closed",
+    "winner count inconsistent with frozen top-5% label fails closed",
+    "invalid outcome authority class fails closed",
+    "duplicate decision dates fail closed",
+    "confirmation result tamper fails closed",
+    "batch and per-security prediction identities include guardian contract hash"
+  ],
+  "current_truth_sync_paths": [
+    "docs/context/planner_packet_current.md",
+    "docs/context/impact_packet_current.md",
+    "docs/context/bridge_contract_current.md",
+    "docs/context/done_checklist_current.md",
+    "docs/architecture/vol_squeeze_breakout_v1_spec.md",
+    "docs/notes.md",
+    "docs/decision log.md",
+    "docs/lessonss.md"
+  ],
+  "review": {
+    "pre_identity_hardening_product_review": {
+      "review_id": "4c06ae9811852457fec50def27aa4f8abba15931f3120ade3d741f4a7e90350d",
+      "status": "PASS_SUPERSEDED_CANDIDATE",
+      "use": "supplemental only; not final-byte review authority"
+    },
+    "final_product_review_attempt_1": {
+      "review_id": "24c1c22657c1b8c06b670d7d8b0ead4e09d797f492019cd7db57ab0c47845e3e",
+      "status": "UNAVAILABLE",
+      "failure_code": "launch_failed"
+    },
+    "final_product_review_retry": {
+      "review_id": "978719bc8895575fb0023bcf73f0513dda36b1bcb501a0395f6ccb3923f5c67b",
+      "status": "UNAVAILABLE",
+      "failure_code": "launch_failed"
+    },
+    "mandatory_distinct_saw_reviewer_a_b_c": "UNAVAILABLE_ON_CURRENT_TOOL_SURFACE"
+  },
+  "claim": "W7 confirmation-guardian mechanics implemented and locally validated; no empirical VSB result, alpha evidence, pre-breakout authority, retune authority, or capital authority is claimed."
+}

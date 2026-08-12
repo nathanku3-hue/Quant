@@ -543,11 +543,18 @@ ACTIVE_PRODUCT_STATE = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 CLOCK_1_STARTED = TRUE
 AI_RESEARCH_PIPELINE_V0 = SPECIFIED / TOOLING_LANE_RELEASED / NOT IMPLEMENTED
 RESEARCH_METHOD = RESULT_FIRST_AI_RESEARCH_LOOP_v1 / FORWARD_ONLY
+AI_NATIVE_ARCHITECTURE = YES_CONSTITUTIONALLY
+AI_NATIVE_RUNTIME = PARTIAL
+UNIVERSAL_OUTCOME_AUTHORITY_GATE = NOT_IMPLEMENTED
+UNIVERSAL_PREFLIGHT_ENFORCEMENT = NOT_IMPLEMENTED
+CROSS_FAMILY_RDV_ALLOCATOR = NOT_IMPLEMENTED
 RDV = ORDINAL_LOW_MED_HIGH / RESEARCH_PRIORITY_ONLY
 AUTO_L4_TO_L5 = FORBIDDEN
 REAL_OUTCOME_INFORMED_AI = BLOCKED_UNTIL_MATURE_RECONCILED_REVIEWPACKET
 financial_alpha_evidence = 0
 LIVE = CLOSED
+RUNTIME_STATUS = docs/architecture/ai_native_runtime_status_v1.json
+CLOSURE_AUDIT = docs/architecture/ai_native_runtime_closure_audit_20260812.md
 ```
 
-Clock #1 releases only bounded AI receipt/schema/fixture/source-claim engineering under independent ownership. Real outcome-informed mutation remains mechanically blocked until a matured, reconciled, validated ReviewPacket exists. No AI output receives evidence, promotion, risk, broker, or capital authority from this release.
+The research **constitution** is locked result-first / AI-native. The **runtime** remains partial until a universal outcome-capability gate closes legacy bypasses. Clock #1 releases only bounded AI receipt/schema/fixture/source-claim engineering under independent ownership. Real outcome-informed mutation remains mechanically blocked until a matured, reconciled, validated ReviewPacket exists. No AI output receives evidence, promotion, risk, broker, or capital authority from this release.

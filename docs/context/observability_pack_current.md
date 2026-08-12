@@ -15,6 +15,15 @@ Status: `CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINE
 - Generic shared research infrastructure defaults to two real consumers; safety/authority primitives may share earlier only where duplication creates safety/authority risk.
 - Stop on fills→Alpha, lambda-soft hard risk, blended expert score, outcome-trained stress-block rate, or auto-DISLOCATION showcase opening.
 
+## AI-native runtime-closure sentinels — current
+
+- Constitution LOCKED ≠ universal enforcement IMPLEMENTED. Runtime=`PARTIAL` (`docs/architecture/ai_native_runtime_status_v1.json`).
+- Fail closed if an outcome-bearing path runs without ScientificDecisionReceipt / applicable L5 auth / trial debit / family-version identity.
+- Fail closed if missing mandatory risk inputs soft-default to ALLOW instead of `UNRESOLVED`.
+- Fail closed if historical receipt tests assert against mutable current SoT.
+- Fail closed if L5 authorization cannot bind READY compare-set hash + nonselected `READY_BUT_NOT_PRIORITY`.
+- Public main is non-authority until merge; do not plan from main.
+
 ## Strategic-lock sentinels — current
 
 - Broad architecture reopen must remain `NO`; mandatory recuts are execution gates.

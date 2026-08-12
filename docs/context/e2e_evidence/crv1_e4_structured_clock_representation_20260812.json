@@ -1,0 +1,92 @@
+{
+  "schema_version": "crv1_e4_structured_clock_representation_receipt_v1",
+  "slice_id": "CRV1-E4-STRUCTURED-CLOCK-REPRESENTATION-1",
+  "family_id": "CYCLE_RESONANCE_v1",
+  "date": "2026-08-12",
+  "mode": "OUTCOME_BLIND_PRE_L5",
+  "decision_to_change": "Can the six-clock CRV1 causal core be frozen with one minimal deterministic representation and one fixed ordered-sequence/lag law before claim/model engineering?",
+  "contract": "docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.json",
+  "human_contract": "docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.md",
+  "e3_contract": "docs/architecture/cycle_resonance_v1_clock_state_coordinate_preflight_v1.json",
+  "programme_stage": "E4",
+  "terminal": "REPRESENTATION_CONTRACT_PASS",
+  "core_clock_count": 6,
+  "primary_representations": {
+    "SUPPLY_CAPACITY_CLOCK": "LEVEL",
+    "INVENTORY_CLOCK": "DELTA",
+    "PRICING_CLOCK": "INFLECTION",
+    "UTILIZATION_MARGIN_CLOCK": "INFLECTION",
+    "EARNINGS_REVISIONS_CLOCK": "DELTA",
+    "EXPECTATION_GAP_CLOCK": "INFLECTION"
+  },
+  "ordered_sequence": {
+    "sequence_id": "CRV1_CORE6_DETECTION_ORDER_MAX183D_V1",
+    "required_edge_count": 5,
+    "allowed_skipped_edges": [],
+    "maximum_adjacent_detection_lag_value": 183,
+    "maximum_adjacent_detection_lag_unit": "CALENDAR_DAYS",
+    "same_cut_allowed": true,
+    "lag_grid_allowed": false,
+    "event_time": "FIRST_LAWFUL_DECISION_TIME_DETECTION_CUT"
+  },
+  "coverage": {
+    "all_eight_required_per_security": false,
+    "all_six_required_for_established_core_sequence": true,
+    "missing_core_clock": "PARTIAL_SEQUENCE_NOT_RISK_SET_EXCLUSION",
+    "imputation": false,
+    "denominator_shrink": false
+  },
+  "non_core": {
+    "DEMAND_CLOCK": "CORROBORATING_ONLY_NO_REQUIRED_CORE_TRANSFORM_NO_EDGE_REPAIR",
+    "MARKET_CONFIRMATION_CLOCK": "ACTION_EXECUTION_DOWNSTREAM_ONLY_EXCLUDED_FROM_CORE_SEQUENCE_NO_UPSTREAM_RESCUE"
+  },
+  "routes": {
+    "pass": "REPRESENTATION_CONTRACT_PASS -> CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1 (NOT_AUTO_OPENED)",
+    "fail": "SIMPLIFY_CRV1_CLOCK_GRAPH_OR_PARK_CRV1",
+    "unresolved": "NAME_EXACT_REPRESENTATION_OR_SOURCE_DEPENDENCY -> HOLD_SOURCE"
+  },
+  "authority_effect": {
+    "risk_set_semantics_changed": false,
+    "primary_horizon_changed": false,
+    "primary_outcome_changed": false,
+    "w9_reopened": false,
+    "provider_access": false,
+    "source_capture": false,
+    "outcome_access": false,
+    "return_access": false,
+    "label_join": false,
+    "model_fit": false,
+    "ranking": false,
+    "l5_authorized": false,
+    "trial_debit": 0,
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE"
+  },
+  "pass_basis": [
+    "One primary representation per required core clock is sufficient to express the preregistered mechanism without a representation bake-off.",
+    "ORDERED_SEQUENCE is frozen once at graph level rather than treated as a per-clock alternative.",
+    "All five adjacent core edges are required for ESTABLISHED status and no skip repair is allowed; missingness remains PARTIAL without risk-set rewrite.",
+    "The single 183-calendar-day adjacent detection lag is preregistered outcome-blind and is independent of the 252-trading-day outcome horizon.",
+    "DEMAND remains corroborating and MARKET_CONFIRMATION remains downstream-only.",
+    "No provider, outcome, return, label, model, ranking, L5, trial, broker, or capital authority was used."
+  ],
+  "validation": {
+    "declared_checks": [
+      "JSON parse: E4 machine contract",
+      "JSON parse: E4 receipt",
+      "JSON parse: research loop SoT",
+      "cycle_resonance_v1 focused tests",
+      "scoped git diff --check",
+      "Thin SAW evidence publication"
+    ],
+    "status": "PASS",
+    "results": {
+      "contract_json_parse": "PASS",
+      "receipt_json_parse": "PASS",
+      "research_loop_json_parse": "PASS",
+      "cycle_resonance_v1_tests": "6/6 PASS",
+      "scoped_git_diff_check": "PASS",
+      "thin_saw": "PASS"
+    }
+  }
+}

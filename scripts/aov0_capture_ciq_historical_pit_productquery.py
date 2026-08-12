@@ -45,6 +45,13 @@ TRANSITION_METRICS = (
     "IQ_OPER_INC",
     "IQ_CAPEX_BNK",
 )
+S0_STRUCTURED_TRANSITION_METRICS = (
+    "IQ_PERIOD_END",
+    "IQ_TOTAL_REV",
+    "IQ_INVENTORY",
+    "IQ_OPER_INC",
+    "IQ_CAPEX_BNK",
+)
 PERIOD_RECEIPT_SCHEMA = "aov0_ciq_productquery_historical_pit_period_matrix_receipt_v1"
 TRANSITION_RECEIPT_SCHEMA = "aov0_ciq_productquery_historical_pit_transition_receipt_v1"
 
@@ -370,6 +377,47 @@ def _capture_receipt(
     }
 
 
+def _period_probe_pairs(plan: pd.DataFrame, master: pd.DataFrame) -> tuple[list[tuple[pd.Timestamp, str]], str]:
+    if plan.empty or "as_of_date" not in plan.columns:
+        raise ValueError("historical_pit_period_plan_invalid")
+    valid_entities = set(master["SP_ENTITY_ID"].tolist())
+    if list(plan.columns) == ["as_of_date"]:
+        dates = [pd.Timestamp(value).normalize() for value in plan["as_of_date"].tolist()]
+        if len(set(dates)) != len(dates):
+            raise ValueError("historical_pit_period_plan_duplicate_date")
+        return [(date, entity) for date in dates for entity in master["SP_ENTITY_ID"].tolist()], "DATE_CARTESIAN"
+    if "source_entity_id" not in plan.columns:
+        raise ValueError("historical_pit_period_plan_invalid")
+    pairs: list[tuple[pd.Timestamp, str]] = []
+    seen: set[tuple[pd.Timestamp, str]] = set()
+    for row in plan.itertuples(index=False):
+        entity = str(row.source_entity_id).strip()
+        date = pd.Timestamp(row.as_of_date).normalize()
+        if entity not in valid_entities:
+            raise ValueError(f"historical_pit_period_plan_entity_outside_master:{entity}")
+        key = (date, entity)
+        if key in seen:
+            raise ValueError(f"historical_pit_period_plan_duplicate_pair:{entity}:{date.date().isoformat()}")
+        seen.add(key)
+        pairs.append(key)
+    pairs.sort(key=lambda item: (item[0], int(item[1])))
+    return pairs, "EXACT_ENTITY_DATE_PAIRS"
+
+
+def _requested_transition_metrics(args: argparse.Namespace) -> tuple[str, ...]:
+    requested = tuple(str(value).strip().upper() for value in (getattr(args, "metric", None) or ()))
+    if not requested:
+        return TRANSITION_METRICS
+    if len(requested) != len(set(requested)):
+        raise ValueError("historical_pit_transition_metrics_duplicate")
+    unknown = sorted(set(requested) - set(TRANSITION_METRICS))
+    if unknown:
+        raise ValueError("historical_pit_transition_metric_not_allowed:" + unknown[0])
+    if PERIOD_METRIC not in requested:
+        raise ValueError("historical_pit_transition_period_metric_required")
+    return requested
+
+
 async def capture_period_matrix(args: argparse.Namespace) -> None:
     plan_path = Path(args.plan)
     master_path = Path(args.master)
@@ -378,28 +426,25 @@ async def capture_period_matrix(args: argparse.Namespace) -> None:
         raise FileExistsError(f"historical_pit_capture_output_exists:{out}")
     plan = pd.read_csv(plan_path, dtype=str).fillna("")
     master = _load_master(master_path)
-    if list(plan.columns) != ["as_of_date"] or plan.empty:
+    pairs, plan_mode = _period_probe_pairs(plan, master)
+    if not pairs:
         raise ValueError("historical_pit_period_plan_invalid")
-    dates = [pd.Timestamp(value).normalize() for value in plan["as_of_date"].tolist()]
-    if len(set(dates)) != len(dates):
-        raise ValueError("historical_pit_period_plan_duplicate_date")
 
     request_meta: dict[int, tuple[pd.Timestamp, str]] = {}
     payloads: list[dict[str, object]] = []
     request_id = 1
-    for date in dates:
-        for entity in master["SP_ENTITY_ID"].tolist():
-            payloads.append(
-                _scalar_request(
-                    request_id,
-                    entity=entity,
-                    metric=PERIOD_METRIC,
-                    period="FQ0",
-                    as_of=date.date().isoformat(),
-                )
+    for date, entity in pairs:
+        payloads.append(
+            _scalar_request(
+                request_id,
+                entity=entity,
+                metric=PERIOD_METRIC,
+                period="FQ0",
+                as_of=date.date().isoformat(),
             )
-            request_meta[request_id] = (date, entity)
-            request_id += 1
+        )
+        request_meta[request_id] = (date, entity)
+        request_id += 1
 
     async with Cdp(args.port) as cdp:
         values = await _execute_requests(cdp, payloads, batch_requests=args.batch_requests)
@@ -423,7 +468,7 @@ async def capture_period_matrix(args: argparse.Namespace) -> None:
                 "filing_version": FILING_VERSION,
             }
         )
-    if missing:
+    if missing and not bool(getattr(args, "allow_missing_period_end", False)):
         entity, date = missing[0]
         raise ValueError(f"historical_pit_period_matrix_fq0_missing:{entity}:{date}:count={len(missing)}")
     rows.sort(key=lambda row: (str(row["as_of_date"]), int(str(row["source_entity_id"]))))
@@ -438,16 +483,21 @@ async def capture_period_matrix(args: argparse.Namespace) -> None:
         retrieved_at=retrieved_at,
         mode="HISTORICAL_PIT_WEEKLY_FQ0_PERIOD_MATRIX",
         extra={
-            "weekly_date_count": len(dates),
-            "entity_count": len(master),
+            "weekly_date_count": len({date for date, _ in pairs}),
+            "entity_count": len({entity for _, entity in pairs}),
+            "probe_pair_count": len(pairs),
+            "period_probe_plan_mode": plan_mode,
+            "missing_fq0_period_end_count": len(missing),
+            "missing_fq0_period_end_allowed": bool(getattr(args, "allow_missing_period_end", False)),
             "provider_metric": PERIOD_METRIC,
             "relative_period": "FQ0",
         },
     )
     _atomic_text(receipt_path, json.dumps(receipt, indent=2, sort_keys=True) + "\n")
     print(
-        f"PERIOD_MATRIX_CAPTURE_OK\tDATES={len(dates)}\tENTITIES={len(master)}"
-        f"\tROWS={len(rows)}\tSHA256={_sha256(out)}\tPATH={out}",
+        f"PERIOD_MATRIX_CAPTURE_OK\tDATES={len({date for date, _ in pairs})}"
+        f"\tENTITIES={len({entity for _, entity in pairs})}\tPAIRS={len(pairs)}"
+        f"\tMISSING_FQ0={len(missing)}\tROWS={len(rows)}\tSHA256={_sha256(out)}\tPATH={out}",
         flush=True,
     )
 
@@ -477,13 +527,14 @@ async def capture_transitions(args: argparse.Namespace) -> None:
         observed_pairs.add(key)
         pairs.append(key)
     pairs.sort(key=lambda item: (item[1], int(item[0])))
+    transition_metrics = _requested_transition_metrics(args)
 
     request_meta: dict[int, tuple[str, pd.Timestamp, str, str]] = {}
     payloads: list[dict[str, object]] = []
     request_id = 1
     for entity, date in pairs:
         for period in PERIODS:
-            for metric in TRANSITION_METRICS:
+            for metric in transition_metrics:
                 payloads.append(
                     _scalar_request(
                         request_id,
@@ -509,7 +560,7 @@ async def capture_transitions(args: argparse.Namespace) -> None:
                 "source_entity_id": entity,
                 "relative_period": period,
                 "period_end": "",
-                **{name: "" for name in TRANSITION_METRICS if name != "IQ_PERIOD_END"},
+                **{name: "" for name in transition_metrics if name != "IQ_PERIOD_END"},
                 "retrieved_at_utc": retrieved_at,
                 "provider_function": PROVIDER_FUNCTION,
                 "filing_version": FILING_VERSION,
@@ -551,7 +602,7 @@ async def capture_transitions(args: argparse.Namespace) -> None:
         extra={
             "transition_count": len(pairs),
             "relative_periods": list(PERIODS),
-            "metrics": list(TRANSITION_METRICS),
+            "metrics": list(transition_metrics),
         },
     )
     _atomic_text(receipt_path, json.dumps(receipt, indent=2, sort_keys=True) + "\n")
@@ -572,11 +623,17 @@ def main() -> None:
     period.add_argument("--plan", required=True)
     period.add_argument("--master", required=True)
     period.add_argument("--out", required=True)
+    period.add_argument("--allow-missing-period-end", action="store_true")
 
     transitions = sub.add_parser("transitions")
     transitions.add_argument("--plan", required=True)
     transitions.add_argument("--master", required=True)
     transitions.add_argument("--out", required=True)
+    transitions.add_argument(
+        "--metric",
+        action="append",
+        help="Repeat to restrict sparse transition capture to an exact allowed metric subset; IQ_PERIOD_END is mandatory.",
+    )
 
     args = parser.parse_args()
     if args.batch_requests < 1 or args.batch_requests > 500:

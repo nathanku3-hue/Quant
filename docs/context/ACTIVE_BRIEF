@@ -30,6 +30,74 @@ REUSE_DEFAULT           = >=2 real consumers; safety/authority exception allowed
 
 Still rejected: fills→Alpha, lambda-soft hard risk, blended expert score, E6.5 on pure sensing, RDV as Alpha evidence, outcome-trained stress-block rate, auto-DISLOCATION open. This changes future research authorization semantics only; current family/product state below is unchanged.
 
+## AI-native constitution vs runtime (2026-08-12 closure truth)
+
+```text
+AI_NATIVE_ARCHITECTURE          = YES_CONSTITUTIONALLY
+AI_NATIVE_RUNTIME               = PARTIAL
+UNIVERSAL_PREFLIGHT_ENFORCEMENT = NOT_IMPLEMENTED
+CROSS_FAMILY_RDV_ALLOCATOR      = NOT_IMPLEMENTED
+UNIVERSAL_OUTCOME_GATE          = NOT_IMPLEMENTED
+D1_D9_CONSTITUTION              = LOCKED
+D1_D9_FTK_IMPLEMENTATION        = IMPLEMENTED
+D1_D9_UNIVERSAL_RUNNER          = NOT_IMPLEMENTED
+SCIENCE_S5_RENAME               = REJECTED
+PUBLIC_MAIN                     = NON_AUTHORITY_UNTIL_MERGE
+RUNTIME_STATUS                  = docs/architecture/ai_native_runtime_status_v1.json
+CLOSURE_AUDIT                   = docs/architecture/ai_native_runtime_closure_audit_20260812.md
+```
+
+**Top-3 Golden Questions now (outcome-blind):**
+1. `GQ_CONSTITUTIONAL_ENFORCEMENT_CLOSURE` — any outcome path without receipt/auth/debit must fail (incl. legacy `backtest_runner`).
+2. `GQ_ACTION_BOUNDARY_CLOCK` + `GQ_RISK_STATE_PROVENANCE` — missing risk inputs → `UNRESOLVED`, not soft ALLOW / order defaults.
+3. `GQ_ENDOGENOUS_OBSERVABILITY` — fail-closed must not selectively erase high-value states.
+
+Narrow seams only: universal outcome gate · action-boundary packet · fail-closed risk provenance · fresh-checkout authority closure · L5 compare-set receipt. **Not** another strategy/platform reopen.
+
+## CRV1 status (SoT) — E3 PASS + E4 PASS; E5 not auto-opened
+
+```text
+CRV1_TRACK               = E4_REPRESENTATION_CONTRACT_PASS
+E3                       = CLOCK_CONTRACT_PASS (method L2 clock/state declaration)
+E4                       = REPRESENTATION_CONTRACT_PASS (six-clock core LEVEL/DELTA/INFLECTION + ordered sequence; max adjacent lag 183d)
+E5                       = CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1 preferred only under NEW explicit slice; NOT_AUTO_OPENED
+W9                       = CLOSED; no standalone provider capture
+OUTCOMES / RETURNS       = 0 / 0
+TRIAL_DEBIT              = 0
+FINANCIAL_ALPHA          = 0
+E3_CONTRACT              = docs/architecture/cycle_resonance_v1_clock_state_coordinate_preflight_v1.json
+E4_CONTRACT              = docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.json
+```
+
+Availability remains an input boundary (`available_at <= as_of`), never an economic-state clock or free lag parameter. No lag/horizon multi-clock outcome bake-off; market confirmation cannot rescue upstream thesis.
+
+## CRV1 E4 structured-clock representation — PASS
+
+```text
+SLICE_ID                 = CRV1-E4-STRUCTURED-CLOCK-REPRESENTATION-1
+PROGRAMME_STAGE          = E4
+TERMINAL                 = REPRESENTATION_CONTRACT_PASS
+CORE_REPRESENTATIONS     = SUPPLY LEVEL / INVENTORY DELTA / PRICING INFLECTION / UTIL_MARGIN INFLECTION / REVISIONS DELTA / EXPECTATION_GAP INFLECTION
+ORDERED_SEQUENCE         = CRV1_CORE6_DETECTION_ORDER_MAX183D_V1
+REQUIRED_EDGES           = 5 / 5 adjacent core edges
+SKIPPED_EDGES            = none for ESTABLISHED
+MAX_ADJACENT_LAG         = 183 calendar days, first lawful decision-time detection
+DEMAND                   = corroborating only; cannot repair core
+MARKET_CONFIRMATION      = downstream ACTION_EXECUTION only; excluded from core sequence
+ALL_8_REQUIRED_PER_NAME  = false
+MISSING_CORE             = PARTIAL sequence; never risk-set exclusion
+W9                       = still CLOSED
+OUTCOMES / RETURNS       = 0 / 0
+MODEL / RANKING          = 0 / 0
+TRIAL_DEBIT              = 0
+FINANCIAL_ALPHA          = 0
+NEXT_PREFERRED           = CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1 (NOT AUTO-OPENED)
+CONTRACT                 = docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.json
+RECEIPT                  = docs/context/e2e_evidence/crv1_e4_structured_clock_representation_20260812.json
+```
+
+E4 closes the representation menu without result selection. `ORDERED_SEQUENCE` is graph-level only; missing core clocks yield `PARTIAL`, and no demand/market shortcut is legal. The fixed 183-day adjacent lag is an outcome-blind approximately two-quarter mechanistic prior and is not the 252-trading-day outcome horizon. E4 does not complete method L3 or authorize E5/L5 automatically.
+
 ## Product vs research
 
 ```text
@@ -124,7 +192,7 @@ NEXT                   = park TR-v0; spend WIP on another independent family
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
 2. **FTK primary is STOPPED.** Do not re-open economics or re-run L5.
 3. **TR-v0 is PARKED at HOLD_SOURCE.** Do not open L3 unless a future bounded exact source-semantic bind passes the same G-S0/G-S1/G-S2 gate.
-4. Parallel families (CRV1 / Sector Rotation) continue under own contracts; spend research WIP on an independent family rather than broad CIQ expectation discovery.
+4. CRV1 E4 is frozen `REPRESENTATION_CONTRACT_PASS`; preferred next CRV1 work is `CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1` only under a new explicit slice. Sector Rotation remains independently available.
 
 ## Do not
 
@@ -132,6 +200,9 @@ NEXT                   = park TR-v0; spend WIP on another independent family
 open AO-FTK-2 / L8 / rescue / re-run FTK L5
 TR-v0 L3/L5 / timing research / H-K-threshold grid while source terminal is HOLD_SOURCE
 invent expectation bytes / relabel CRV1 expectation authority / returns join / claim alpha
+rerun CRV1 E0/E1 risk-set semantics / standalone W9 provider capture / representation or lag-horizon bake-off
+skip/repair a required CRV1 core edge or use DEMAND/MARKET_CONFIRMATION to establish or rescue the six-clock core
+open CRV1 E5/model/ranking/L5 automatically from E4 PASS
 AOV-104 as Full-W3 / capital open / W6 open
 ```
 
@@ -140,9 +211,9 @@ AOV-104 as Full-W3 / capital open / W6 open
 ```text
 HANDOVER_CLOSE = docs/handover/stream_handover_roadmap_alignment_dispatcher_close_20260812.md
 CLOSE_RECEIPT  = docs/context/e2e_evidence/stream_close_roadmap_alignment_dispatcher_20260812.json
-PRIMARY_WIP    = PARALLEL_FAMILY_WIP (CRV1_OR_SECTOR_ISOLATED_OR_IDLE)
+PRIMARY_WIP    = PARALLEL_FAMILY_WIP (preferred future CRV1-E5 only if separately opened; Sector/idle remain legal)
 ```
 
 ## One-line constitution
 
-Owner stamped L7_ROUTE=STOP. Sensing banked PASS; economics banked D6_SELECTION FAIL; TR-v0 HOLD_SOURCE parked; alpha=0. Future research is result-first / forward-gate-only: identical terminal routes => DO_NOT_RUN; L4 => candidate only; ordinal RDV allocates scarce L5. No FTK-2, no L8, no rescue, no invent consensus, no re-run.
+Owner stamped L7_ROUTE=STOP. Sensing banked PASS; economics banked D6_SELECTION FAIL; TR-v0 HOLD_SOURCE parked; CRV1 E3 clock semantics + E4 representation contract PASS; alpha=0. E5 claim-interpreter preflight is preferred only under a new explicit slice. Future research remains result-first / forward-gate-only: no auto-L5, no FTK rescue, no CRV1 W9/semantic re-run, no representation/lag grid.

@@ -494,3 +494,29 @@ FINANCIAL_ALPHA      = 0
 ```
 
 Current family/track state is owned by `docs/context/research_loop_state_current.json`. This method lock does not reopen FTK, TR-v0, W6, DISLOCATION, capital, or any stopped/parked family.
+
+---
+
+## 17. Constitution vs runtime closure (2026-08-12 truth)
+
+This file is a **LOCKED constitution**. It is **not** by itself a universal executable capability boundary.
+
+```text
+AI_NATIVE_RESEARCH_CONSTITUTION     = LOCKED
+AI_NATIVE_DECISION_SEMANTICS        = LOCKED
+AI_NATIVE_QUANT_RESEARCH_RUNTIME    = PARTIAL
+UNIVERSAL_PREFLIGHT_ENFORCEMENT     = NOT_IMPLEMENTED
+CROSS_FAMILY_RDV_ALLOCATOR          = NOT_IMPLEMENTED
+UNIVERSAL_OUTCOME_AUTHORITY_GATE    = NOT_IMPLEMENTED
+```
+
+Canonical audit / ranking of remaining Golden Questions:
+
+```text
+docs/architecture/ai_native_runtime_closure_audit_20260812.md
+docs/architecture/ai_native_runtime_status_v1.json
+```
+
+Primary remaining gap is **constitution → execution closure**, not strategy redesign. Narrow seams only: universal outcome gate, action-boundary authority packet, fail-closed risk provenance, fresh-checkout authority-closure test, L5 comparison-set receipt.
+
+Do not draft external audits that treat public `main` as authority or claim `AI_NATIVE_SCIENTIFIC_LOOP = NOT_IMPLEMENTED` without the constitution/runtime split above.

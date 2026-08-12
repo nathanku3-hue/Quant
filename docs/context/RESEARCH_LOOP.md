@@ -25,7 +25,9 @@ After lockbox: P1 RUN → P2 MATURE → P3 EVALUATE → P4 PROMOTE|KILL
 
 Method amendment=`docs/architecture/result_first_ai_research_loop_v1.md`; machine preflight=`docs/architecture/opportunity_kernel_scientific_preflight_v2.json`.
 
-**Every empirical RUN:** diagnose D1→D9 in order; route failure to **one** layer only.
+**Constitution vs runtime:** architecture is **YES constitutionally**; runtime is **PARTIAL**. Universal preflight enforcement, cross-family RDV allocator, and universal outcome-authority gate are **NOT_IMPLEMENTED**. Status machine=`docs/architecture/ai_native_runtime_status_v1.json`; closure audit=`docs/architecture/ai_native_runtime_closure_audit_20260812.md`. Do not claim “AI-native loop absent,” and do not rename scientific L5.
+
+**Every empirical RUN:** diagnose D1→D9 in order; route failure to **one** layer only. FTK implements first-fail locally; a universal D1–D9 runner is not yet global.
 
 ---
 
@@ -40,11 +42,16 @@ product                = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 financial_alpha        = 0
 FTK                     = STOPPED; D6_SELECTION failure banked; no FTK rescue
 TR-v0                   = HOLD_SOURCE / PARKED
+CRV1                    = E4 REPRESENTATION_CONTRACT_PASS / six-clock core frozen / method-L3 not complete / alpha=0 / debit=0
 next_worker_slice      = PARALLEL_FAMILY_WIP
-recommended            = CRV1_OR_SECTOR_ISOLATED_OR_IDLE
+recommended            = CRV1-E5-CLAIM-INTERPRETER-CONTRACT-PREFLIGHT-1 (not auto-opened)
 method                  = RESULT_FIRST_AI_RESEARCH_LOOP_v1 / FORWARD_ONLY
+ai_native_architecture  = YES_CONSTITUTIONALLY
+ai_native_runtime       = PARTIAL
 L4→L5                   = candidate only; no automatic authorization
 RDV                     = ordinal LOW/MED/HIGH; not Alpha evidence
+top_gq_now              = ENFORCEMENT_CLOSURE / RISK_PROVENANCE / ENDOGENOUS_OBSERVABILITY
+runtime_status          = docs/architecture/ai_native_runtime_status_v1.json
 ```
 
 ---
@@ -66,8 +73,8 @@ WHEN user asks phase / next / loop position:
 | Field | When to update |
 |---|---|
 | `process.loop_phase` | After each L* or P* transition |
-| `active_tracks[]` | Track status change |
-| `next_worker_slice` | After L7 decision |
+| `active_tracks[]` | Track status change, including family-local L2/L3/L4 freezes |
+| `next_worker_slice` | After L7 decision or an explicitly authorized parallel-family route change |
 | `last_empirical_diagnosis` | After every L6 |
 | `forbidden_now` / `allowed_now` | When gates change |
 

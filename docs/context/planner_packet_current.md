@@ -15,7 +15,15 @@ Limited Live: `CLOSED`
 - Future L3 uses additive R9 fabrication-tolerance + observability-selection diagnosis under the v2 preflight; historical receipts are not retroactively failed.
 - Execution feasibility enters only for action-bearing economic/D9/promotion/PAPER work. Hard risk is a veto; risk margins stay a vector; capturability state is summary only; telemetry calibration is policy-conditioned.
 - Shared infrastructure default=`>=2 real consumers`; safety/authority primitives may share earlier when duplication itself creates authority/safety risk. This is not generic-platform permission.
-- Current research route is unchanged by the method lock: FTK STOPPED; TR-v0 PARKED/HOLD_SOURCE; next WIP remains CRV1 or Sector isolated or idle; alpha=0; Clock #1 untouched.
+- Current research route is unchanged by the method lock: FTK STOPPED; TR-v0 PARKED/HOLD_SOURCE; CRV1 continues under own contracts (E4 representation PASS banked when present in SoT); Sector/PAPER/Clock parallel; alpha=0; Clock #1 untouched.
+
+## AI-native constitution vs runtime — current truth, 2026-08-12
+
+- Status machine=`docs/architecture/ai_native_runtime_status_v1.json`; audit=`docs/architecture/ai_native_runtime_closure_audit_20260812.md`.
+- Architecture=`YES_CONSTITUTIONALLY`; runtime=`PARTIAL`. Universal preflight enforcement, cross-family RDV allocator, and universal outcome-authority gate=`NOT_IMPLEMENTED`.
+- Do not plan from public main. Do not rename scientific L5. Do not treat “AI-native loop absent” as current truth.
+- Top planning GQs: constitutional enforcement closure (legacy outcome bypass); risk-state provenance (`UNRESOLVED` missing inputs); endogenous observability. Then authority reproducibility + L5 compare-set integrity.
+- Allowed engineering reopen is **narrow seams only**, not strategy/platform.
 
 ## Authority topology + OK-SBI-0 shadow — current truth, 2026-08-12
 

@@ -1,18 +1,19 @@
 # Alpha PIT Data API v1 — Narrow Internal Research Contract
 
-**Date:** 2026-08-09
-**Status:** `BUILD_SPEC / CLOCK_1_RELEASED / MECHANICS_IMPLEMENTED / CRV1_RISK_SET_BLOCKED`
-**Authority:** implementation contract for the first post-Clock Alpha Discovery Lane only
+**Date:** 2026-08-10
+**Status:** `BUILD_SPEC / CLOCK_1_RELEASED / MECHANICS_IMPLEMENTED / FAMILY_DATA_CONTRACT_RECUT_IMPLEMENTED / CRV1_NON_GROWTH_ADMISSION_FROZEN / CRV1_FUTURE_SHARED_RAW_ROUND_ONLY`
+**Authority:** narrow implementation contract for independent post-Clock Alpha-family research lanes; no capital authority
 **First consumer:** `CYCLE_RESONANCE_v1`
-**Current execution effect:** **MECHANICAL PRODUCER ACTIVE / NO CRV1 EMPIRICAL AUTHORITY YET** — the capability firewall, content-addressed artifacts, concrete CIQ structured adapter, SEC-claims adapter boundary, explicit missingness, and current-CIQ custody validation are implemented; the independent non-growth `CRV1_US_PRIMARY_COMMON_V1` risk-set source is not landed, CIQ expectations are not landed, and SEC claim bytes are not landed
+**Second consumer admitted:** `VOL_SQUEEZE_BREAKOUT_v1`; its family-specific source-admission, packet/feature/model/prediction-seal, and append-only prediction-tape mechanics are landed; actual provider/network capture and the first real prediction remain open
+**Current execution effect:** **MECHANICAL PRODUCER ACTIVE / FAMILY ISOLATION ACTIVE / CRV1 NON-GROWTH ADMISSION FROZEN / W9 ENGINEERING SLICE CLOSED / VSB PRE-EVALUATION CUSTODY MECHANICS ACTIVE / NO EMPIRICAL FAMILY AUTHORITY YET** — the capability firewall, content-addressed artifacts, concrete CRV1 CIQ structured adapter, SEC-claims adapter boundary, explicit missingness, and current-CIQ custody validation are implemented. CRV1 has a fail-closed no-network admission producer for separately captured broad CIQ identity + market custody. When a CRV1 risk set is active, its source receipt must bind the exact structured identity receipt used by observations; AOV-style receipts, `aov_109_reused`, growth screens, survivor back-projection, future-membership filters, legacy identity fallback, trading-item drift, and source-claimed 200-session counts that do not match the admitted market bytes are rejected. Missing independent fundamentals stay manifest-bound `MISSING_SOURCE` rather than falling back to AOV-109. The W9 engineering slice is now frozen: no more CRV1 adapter/platform work and no provider capture today. A future W3/W9 stock-data round may share the same raw CIQ identity/market bytes and raw receipts where legitimate, but W3 and W9 must compile independent family-specific risk-set authority from those bytes; shared raw hashes never imply shared risk-set authority. The six-field immutable `FamilyDataContract` remains family-bound with cross-family rejection and concurrent-session isolation. VSB remains separately isolated.
 **Schema family:** `alpha_pit_data_api_v1`
-**2026-08-09 strategic lock:** current v1 remains deliberately CRV1-first; when the second real Alpha Family opens, extract only a tiny immutable `FamilyDataContract` rather than cloning a platform or preserving CRV1 globals as shared authority (`docs/architecture/aov_strategic_direction_lock_20260809.md`)
+**2026-08-10 second-consumer recut:** Family #2 is `VOL_SQUEEZE_BREAKOUT_v1`. Only the tiny immutable `FamilyDataContract` was extracted; no registry, plugin system, feature store, provider ranking, or generic data platform was added (`docs/architecture/aov_strategic_direction_lock_20260809.md`, `docs/architecture/vol_squeeze_breakout_v1_spec.md`).
 
 ---
 
 # 0. Purpose
 
-Define one narrow, point-in-time internal research API that supplies exactly the information surfaces required by `CYCLE_RESONANCE_v1` without inheriting older planning/readiness APIs and without creating a generic provider platform.
+Define one narrow, point-in-time internal research API that supplies explicit family-bound information surfaces for `CYCLE_RESONANCE_v1` and `VOL_SQUEEZE_BREAKOUT_v1` without inheriting older planning/readiness APIs and without creating a generic provider or historical-feature platform.
 
 The API answers five questions:
 
@@ -48,7 +49,7 @@ Historical artifacts remain immutable evidence only.
 
 The final strategic lock authorizes multiple independent Alpha-family prediction clocks and parallel evidence qualification. This does **not** justify a generic data platform.
 
-When Family #2 actually opens, extract only the smallest shared family binding justified by real reuse:
+Family #2 opened on 2026-08-10 as `VOL_SQUEEZE_BREAKOUT_v1`, so the smallest shared family binding justified by real reuse is now implemented:
 
 ```text
 FamilyDataContract
@@ -60,9 +61,9 @@ FamilyDataContract
 - allowed claim surface
 ```
 
-Inject that immutable contract into session construction, artifact manifests and outcome binding. Add cross-family artifact/label/risk-set rejection and concurrent-session isolation tests. No dynamic registry, plugin system, feature store, provider ranking or universal schema platform is authorized.
+The immutable contract is injected into session construction, artifact manifests and outcome binding. Cross-family artifact/risk-set/label rejection and concurrent-session isolation tests are implemented. No dynamic registry, plugin system, feature store, provider ranking or universal schema platform is authorized.
 
-Until Family #2 exists, CRV1-specific constants remain valid v1 authority rather than being generalized speculatively.
+CRV1-specific aliases remain the incumbent v1 defaults for code identity; they are not shared-family authority. `VOL_SQUEEZE_BREAKOUT_v1` receives only its explicit contract (`VSB_US_PRIMARY_COMMON_DAILY_V1`, `VSB_RIGHT_TAIL_10D_TOP5_V1`, and the three market observation fields). Its 60-session transform history is closed by a family-specific source-bound market-history artifact plus `research/vol_squeeze_breakout_v1/pit_packet.py`; the generic `observations(...)` snapshot surface is intentionally not widened. `research/vol_squeeze_breakout_v1/source.py` now validates already-landed same-day CIQ risk-set/market receipts into that artifact without performing provider/network acquisition, and `ledger.py` supplies fail-closed append-only prediction custody. The remaining source step is the first real provider-bound capture, not another shared abstraction.
 
 ---
 
@@ -79,6 +80,7 @@ research/alpha_pit_v1/
   discovery_outcomes.py
   adapters/
     ciq_cycle_v1.py
+    ciq_crv1_source_v1.py
     sec_claims_v1.py
 ```
 
@@ -528,13 +530,21 @@ Provider unavailability is represented explicitly. The adapter may not silently 
 
 # 7. Provider adapter boundary
 
-Initial explicit adapters:
+Initial explicit adapters/producers:
 
 ```text
 CIQCycleV1Adapter
 → permanent identity
 → structured observations
 → consensus/estimate expectations
+→ hard binding between active CRV1 risk-set identity and the structured identity/market custody used downstream
+
+ciq_crv1_source_v1
+→ no-network admission of separately captured broad CIQ identity + market bytes
+→ frozen CRV1_US_PRIMARY_COMMON_V1 eligibility derivation
+→ exact 200-session history recomputation
+→ CRV1 structured identity/market receipts + risk-set source/receipt
+→ AOV-109/growth/survivor/future-membership/legacy-identity fail-closed guards
 
 SECAlphaClaimsV1Adapter
 → original public filing/exhibit source receipts
@@ -629,10 +639,14 @@ This document is **module/API design authority only**.
 ```text
 ACTIVE_PRODUCT_STATE = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 CLOCK_1_STARTED = TRUE
-ALPHA_PIT_DATA_API_V1 = MECHANICS_IMPLEMENTED / CURRENT_CIQ_STRUCTURED_CUSTODY_VERIFIED / CRV1_RISK_SET_BLOCKED
+ALPHA_PIT_DATA_API_V1 = MECHANICS_IMPLEMENTED / CURRENT_CIQ_STRUCTURED_CUSTODY_VERIFIED / CRV1_NON_GROWTH_ADMISSION_FROZEN / CRV1_FUTURE_SHARED_RAW_ROUND_ONLY
 CYCLE_RESONANCE_v1 = PREREGISTERED / INPUT_PACKET_AND_MANIFEST_MECHANICS_IMPLEMENTED / EMPIRICAL_CANDIDATE_NOT_FROZEN
 financial_alpha_evidence = 0
 LIVE = CLOSED
 ```
 
-Clock #1 released implementation of this API under the post-Clock domain-WIP law. The read/session firewall and concrete first-family producer adapters are now implemented mechanically. Real current CIQ custody verifies through the adapter without being backdated into historical PIT: 109 current identities are readable, five names explicitly lack 200-day history, `fund.gross_margin_q` and `fund.cash_from_ops_q` are source-level missing for all 109, all 981 requested expectation rows are source-level missing, and SEC claims are explicitly unlanded. The AOV growth-screen 109 is forbidden as a CRV1 risk set. A future CRV1 risk-set source must bind the frozen eligibility contract, prove no growth/current-survivor/future-membership filter, and bind an independent identity receipt. No empirical CRV1 candidate or financial-alpha evidence is created until the legitimate broad risk set and remaining required source surfaces cross the deterministic join.
+Clock #1 released implementation of this API under the post-Clock domain-WIP law. The read/session firewall and concrete first-family producer adapters are now implemented mechanically. The retained AOV current CIQ custody still verifies only as a mechanical current-cut source diagnostic: 109 current identities are readable there, five names explicitly lack 200-day history, `fund.gross_margin_q` and `fund.cash_from_ops_q` are source-level missing for all 109, all 981 requested expectation rows are source-level missing, and SEC claims are explicitly unlanded. Those bytes do **not** become CRV1 authority.
+
+W9 closes the semantic/admission gap without relabeling them. `ciq_crv1_source_v1.py` requires separately captured, hash-bound broad CIQ identity and market artifacts carrying the CRV1 non-growth capture contract. It derives only rows satisfying the frozen U.S. primary-common/active-tradable/unique-permanent-identity law and the source-derived minimum history. The resulting risk-set receipt is bound to the exact CRV1 structured identity receipt used by `CIQCycleV1Adapter`; market history counts and CIQSEC/trading-item/company mappings are reverified in the adapter. Structured receipts must carry CRV1-specific schemas and `structured_source_scope=CRV1_INDEPENDENT_NON_GROWTH_STRUCTURED_CUSTODY_V1`; `growth_screen_applied`, `current_survivor_filter_applied`, `future_membership_filter_applied`, `aov_109_reused`, and `legacy_identity_fallback_used` must all be false. If independent CRV1 fundamentals are not landed, requested fundamental rows remain explicit manifest-bound `MISSING_SOURCE` rather than using AOV-109.
+
+The W9 data-admission engineering slice is **closed and frozen**. No provider capture is authorized today and no further adapter/platform work is authorized. Reopen W9 only in the future shared stock-data round with W3, when fresh raw CIQ identity/market bytes are legitimately available. Those raw bytes may be shared at the custody layer, but authority remains separate: W3 compiles `PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1` with date-local availability/corporate-action law, while W9 independently compiles `CRV1_US_PRIMARY_COMMON_V1` with its non-growth and source-derived `>=200` complete-market-observation law. Neither family may consume the other family's risk-set artifact or admission receipt as authority. Independent CRV1 fundamentals, expectations, and SEC claims remain explicit `MISSING_SOURCE` until separately landed. No empirical CRV1 candidate or financial-alpha evidence follows from this freeze.

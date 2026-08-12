@@ -1,0 +1,75 @@
+{
+  "schema_version": "sector_rotation_alpha_v1_preregistration_evidence_v1",
+  "recorded_date": "2026-08-10",
+  "family_id": "SECTOR_ROTATION_ALPHA_v1",
+  "status": "PREREGISTERED_M0_ETF_FIRST_MECHANICS_IMPLEMENTED_NO_RESULT",
+  "risk_set_spec_id": "SRA_US_SELECT_SECTOR_ETF_11_V1",
+  "primary_label_spec_id": "SRA_RIGHT_TAIL_20D_TOP2_V1",
+  "secondary_label_spec_id": "SRA_RIGHT_TAIL_40D_TOP2_V1",
+  "implementation_id": "SRA_M0_RELSTR_20_60_DVP_5_20_EQUAL_RANK_v1",
+  "search_family_id": "SRA_M0_SEARCH_v1",
+  "prediction_ledger_scope": "SRA_V1_PREDICTION_LEDGER",
+  "trial_ledger_scope": "SRA_V1_TRIAL_LEDGER",
+  "trial_budget_max": 1,
+  "primary_horizon_sessions": 20,
+  "secondary_horizon_sessions": 40,
+  "frozen_sector_count": 11,
+  "etf_first": true,
+  "stock_sector_map_used": false,
+  "stock_breadth_used": false,
+  "underlying_stock_membership_used": false,
+  "etf_flow_vendor_used": false,
+  "provider_acquisition_performed": false,
+  "prediction_append_performed": false,
+  "outcome_accessed": false,
+  "financial_alpha_evidence": 0,
+  "capital_authority": "NONE",
+  "broker_orders": "FORBIDDEN",
+  "code_manifest_sha256": "f3875066dbbb9e22a0a367b00e163da981e55a8c735ba35eb24f8cf97fc4ebf3",
+  "test_file_sha256": "c98bcf106ebdd615b5daffcc9d4d5a2d94fe5fb8b8eb7ddd6a940a73e61ff58c",
+  "spec_sha256": "5074678b87736788b752a63cb435a477fc44d95dd18c7224b7976ab60e3fb5c5",
+  "validation": {
+    "w8_focused": {
+      "command": "./.venv/Scripts/python.exe -m pytest -q tests/sector_rotation_alpha_v1/test_sector_rotation_m0.py",
+      "result": "PASS",
+      "passed": 10,
+      "failed": 0
+    },
+    "cross_family": {
+      "command": "./.venv/Scripts/python.exe -m pytest -q tests/sector_rotation_alpha_v1 tests/vol_squeeze_breakout_v1 tests/alpha_pit_v1/test_session.py",
+      "result": "PASS",
+      "passed": 43,
+      "failed": 0
+    },
+    "compile": {
+      "command": "./.venv/Scripts/python.exe -m compileall -q research/sector_rotation_alpha_v1",
+      "result": "PASS"
+    },
+    "forbidden_dependency_scan": {
+      "result": "PASS",
+      "forbidden_imports_or_ticker_literals_found": 0
+    }
+  },
+  "implemented_mechanics": [
+    "exact source-bound 11-sector ETF risk set with CIQSEC and trading-item identity",
+    "benchmark-family membership receipt binding",
+    "date-local availability and no-survivor/no-alternate-listing/no-legacy-identity gates",
+    "corporate-action total-return authority flag",
+    "frozen 20d/60d ETF relative-strength plus 5d/20d ETF dollar-volume participation M0",
+    "explicit pre-label I versus I+X comparator",
+    "one-material-trial append-only Trial/Search ledger",
+    "exact executable code manifest reverified before prediction seal",
+    "strictly post-knowledge-cutoff prediction sealing",
+    "independent hash-chained exclusive-writer append-only Prediction Ledger"
+  ],
+  "not_claimed": [
+    "real CIQ W8 source capture",
+    "real W8 prediction",
+    "historical discovery result",
+    "untouched lockbox result",
+    "prospective performance result",
+    "financial alpha evidence",
+    "capital or broker authority"
+  ],
+  "next_legitimate_step": "On independent capacity only, acquire/admit source-bound ETF PIT bytes under the frozen W8 contract for historical ladder work or, after a completed close, append the first real W8 prediction; do not retune M0 and do not delay the stock path."
+}

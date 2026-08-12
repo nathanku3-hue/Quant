@@ -65,14 +65,26 @@ def _landed_custody(
         ]
     ).to_csv(master, index=False)
     master_receipt = tmp_path / "master.receipt.json"
-    _json(
-        master_receipt,
-        {
-            "source_id": "SPCIQPRO:PRIMARY_SECURITY_MASTER",
-            "retrieved_at": "2026-08-08T16:23:22Z",
-            "raw_object_sha256": _sha(master),
-        },
-    )
+    master_receipt_payload = {
+        "source_id": "SPCIQPRO:PRIMARY_SECURITY_MASTER",
+        "retrieved_at": "2026-08-08T16:23:22Z",
+        "raw_object_sha256": _sha(master),
+    }
+    if with_risk_set:
+        master_receipt_payload.update(
+            {
+                "schema_version": "alpha_pit_ciq_crv1_primary_security_master_receipt_v1",
+                "family_id": FAMILY_ID,
+                "risk_set_spec_id": "CRV1_US_PRIMARY_COMMON_V1",
+                "structured_source_scope": "CRV1_INDEPENDENT_NON_GROWTH_STRUCTURED_CUSTODY_V1",
+                "growth_screen_applied": False,
+                "current_survivor_filter_applied": False,
+                "future_membership_filter_applied": False,
+                "aov_109_reused": False,
+                "legacy_identity_fallback_used": False,
+            }
+        )
+    _json(master_receipt, master_receipt_payload)
 
     dates = pd.bdate_range(end="2026-08-07", periods=201)
     market_rows = []
@@ -95,15 +107,27 @@ def _landed_custody(
     market = tmp_path / "market.csv"
     pd.DataFrame(market_rows).to_csv(market, index=False)
     market_receipt = tmp_path / "market.receipt.json"
-    _json(
-        market_receipt,
-        {
-            "source_id": "SPCIQPRO:PRIMARY_SECURITY_MARKET_DATA",
-            "retrieved_at": "2026-08-08T19:39:21Z",
-            "decision_target_date": "2026-08-07",
-            "raw_object_sha256": _sha(market),
-        },
-    )
+    market_receipt_payload = {
+        "source_id": "SPCIQPRO:PRIMARY_SECURITY_MARKET_DATA",
+        "retrieved_at": "2026-08-08T19:39:21Z",
+        "decision_target_date": "2026-08-07",
+        "raw_object_sha256": _sha(market),
+    }
+    if with_risk_set:
+        market_receipt_payload.update(
+            {
+                "schema_version": "alpha_pit_ciq_crv1_primary_security_market_data_receipt_v1",
+                "family_id": FAMILY_ID,
+                "risk_set_spec_id": "CRV1_US_PRIMARY_COMMON_V1",
+                "structured_source_scope": "CRV1_INDEPENDENT_NON_GROWTH_STRUCTURED_CUSTODY_V1",
+                "growth_screen_applied": False,
+                "current_survivor_filter_applied": False,
+                "future_membership_filter_applied": False,
+                "aov_109_reused": False,
+                "legacy_identity_fallback_used": False,
+            }
+        )
+    _json(market_receipt, market_receipt_payload)
 
     fundamentals = tmp_path / "fundamentals.parquet"
     fundamental_rows = [
@@ -130,16 +154,28 @@ def _landed_custody(
         fundamental_rows = fundamental_rows[:1]
     pd.DataFrame(fundamental_rows).to_parquet(fundamentals, index=False)
     fundamental_receipt = tmp_path / "fundamentals.receipt.json"
-    _json(
-        fundamental_receipt,
-        {
-            "source_id": "SPCIQPRO:QUARTERLY_FUNDAMENTALS",
-            "retrieved_at": "2026-08-07T18:53:00Z",
-            "quarter_min": "2026-06-30",
-            "quarter_max": "2026-06-30",
-            "outputs": {"quarterly_panel": {"sha256": _sha(fundamentals)}},
-        },
-    )
+    fundamental_receipt_payload = {
+        "source_id": "SPCIQPRO:QUARTERLY_FUNDAMENTALS",
+        "retrieved_at": "2026-08-07T18:53:00Z",
+        "quarter_min": "2026-06-30",
+        "quarter_max": "2026-06-30",
+        "outputs": {"quarterly_panel": {"sha256": _sha(fundamentals)}},
+    }
+    if with_risk_set:
+        fundamental_receipt_payload.update(
+            {
+                "schema_version": "alpha_pit_ciq_crv1_quarterly_fundamentals_receipt_v1",
+                "family_id": FAMILY_ID,
+                "risk_set_spec_id": "CRV1_US_PRIMARY_COMMON_V1",
+                "structured_source_scope": "CRV1_INDEPENDENT_NON_GROWTH_STRUCTURED_CUSTODY_V1",
+                "growth_screen_applied": False,
+                "current_survivor_filter_applied": False,
+                "future_membership_filter_applied": False,
+                "aov_109_reused": False,
+                "legacy_identity_fallback_used": False,
+            }
+        )
+    _json(fundamental_receipt, fundamental_receipt_payload)
 
     paths = {
         "security_master_path": master,
@@ -150,16 +186,7 @@ def _landed_custody(
         "fundamental_receipt_path": fundamental_receipt,
     }
     if with_risk_set:
-        risk_identity_receipt = tmp_path / "risk_identity.receipt.json"
-        _json(
-            risk_identity_receipt,
-            {
-                "schema_version": "alpha_pit_ciq_crv1_identity_receipt_v1",
-                "source_id": "SPCIQPRO:CRV1_PRIMARY_SECURITY_MASTER",
-                "retrieved_at": "2026-08-08T19:30:00Z",
-            },
-        )
-        identity_receipt_sha256 = _sha(risk_identity_receipt)
+        identity_receipt_sha256 = _sha(master_receipt)
         risk_set = tmp_path / "risk_set.json"
         _json(
             risk_set,
@@ -175,6 +202,7 @@ def _landed_custody(
                 "growth_screen_applied": growth_screen,
                 "current_survivor_filter_applied": False,
                 "future_membership_filter_applied": False,
+                "aov_109_reused": False,
                 "exclusion_counts": {"INSUFFICIENT_200D_HISTORY": 0},
                 "rows": [
                     {
@@ -221,11 +249,12 @@ def _landed_custody(
                 "risk_set_spec_id": "CRV1_US_PRIMARY_COMMON_V1",
                 "eligibility_contract_id": RISK_SET_ELIGIBILITY_CONTRACT_ID,
                 "eligibility_contract_sha256": RISK_SET_ELIGIBILITY_CONTRACT_SHA256,
-                "identity_receipt_path": risk_identity_receipt.name,
+                "identity_receipt_path": master_receipt.name,
                 "identity_receipt_sha256": identity_receipt_sha256,
                 "growth_screen_applied": growth_screen,
                 "current_survivor_filter_applied": False,
                 "future_membership_filter_applied": False,
+                "aov_109_reused": False,
                 "retrieved_at": "2026-08-08T19:31:00Z",
                 "observed_range_start": "2026-08-08T20:00:00Z",
                 "observed_range_end": "2026-08-08T20:00:00Z",

@@ -8,9 +8,10 @@ from typing import Any, Mapping
 from core.gv_fs0_canonical import domain_hash
 from research.alpha_pit_v1.contracts import (
     API_SCHEMA_ID,
-    FAMILY_ID,
+    CRV1_FAMILY_DATA_CONTRACT,
     AlphaPITContractError,
     ArtifactRef,
+    FamilyDataContract,
     ResearchMode,
     validate_source_receipt_binding,
 )
@@ -61,8 +62,11 @@ def build_artifact_ref(
     risk_set_id: str | None = None,
     source_receipts: list[Mapping[str, Any]] | None = None,
     coverage_summary: Mapping[str, Any] | None = None,
+    family_contract: FamilyDataContract = CRV1_FAMILY_DATA_CONTRACT,
     fixture: bool = False,
 ) -> ArtifactRef:
+    if not isinstance(family_contract, FamilyDataContract):
+        raise AlphaPITContractError("alpha_pit_family_data_contract_required")
     created_at_text = _timestamp_text(created_at, field="created_at")
     created_at_dt = datetime.fromisoformat(created_at_text.replace("Z", "+00:00"))
     for binding in source_receipts or []:
@@ -77,7 +81,8 @@ def build_artifact_ref(
     manifest_body = {
         "api_schema_id": API_SCHEMA_ID,
         "artifact_type": artifact_type,
-        "family_id": FAMILY_ID,
+        "family_id": family_contract.family_id,
+        "family_data_contract": family_contract.as_dict(),
         "research_mode": _mode_value(research_mode),
         "request_canonical_json": request_value,
         "request_sha256": request_sha256,
@@ -103,11 +108,17 @@ def build_artifact_ref(
     )
 
 
-def verify_artifact_ref(ref: ArtifactRef) -> None:
+def verify_artifact_ref(
+    ref: ArtifactRef,
+    *,
+    family_contract: FamilyDataContract = CRV1_FAMILY_DATA_CONTRACT,
+) -> None:
     """Recompute an in-memory Alpha PIT artifact closure and fail on drift."""
 
     if not isinstance(ref, ArtifactRef):
         raise TypeError("alpha_pit_artifact_ref_required")
+    if not isinstance(family_contract, FamilyDataContract):
+        raise AlphaPITContractError("alpha_pit_family_data_contract_required")
     manifest = dict(ref.manifest)
     manifest_sha256 = str(manifest.pop("manifest_sha256", ""))
     expected_manifest = domain_hash("ALPHA_PIT_V1:MANIFEST", canonical_value(manifest))
@@ -118,7 +129,11 @@ def verify_artifact_ref(ref: ArtifactRef) -> None:
     )
     if ref.payload_sha256 != expected_payload or manifest.get("payload_sha256") != expected_payload:
         raise AlphaPITContractError("alpha_pit_payload_hash_mismatch")
-    if manifest.get("api_schema_id") != API_SCHEMA_ID or manifest.get("family_id") != FAMILY_ID:
+    if (
+        manifest.get("api_schema_id") != API_SCHEMA_ID
+        or manifest.get("family_id") != family_contract.family_id
+        or manifest.get("family_data_contract") != family_contract.as_dict()
+    ):
         raise AlphaPITContractError("alpha_pit_manifest_contract_invalid")
     if manifest.get("financial_alpha_evidence") != 0:
         raise AlphaPITContractError("alpha_pit_financial_alpha_evidence_must_be_zero")

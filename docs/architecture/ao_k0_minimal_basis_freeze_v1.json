@@ -1,0 +1,231 @@
+{
+  "schema_version": "ao_k0_minimal_basis_freeze_v1",
+  "constitution_id": "ASYMMETRIC_OPPORTUNITY_CONSTITUTION_v1",
+  "experiment_id": "AO_K0_BASIS_Q_M_QM_V1",
+  "frozen_on": "2026-08-11",
+  "status": "FROZEN_METHODOLOGY_AND_BASIS_ONLY_NO_RESULT_READ",
+  "financial_alpha_evidence": 0,
+  "capital_authority": "NONE",
+  "w6": "UNTOUCHED",
+  "opportunity_kernel_v1_required_fields": [
+    "kernel_id",
+    "entry_mode",
+    "observable_representation",
+    "target",
+    "horizon",
+    "rationale_class",
+    "simple_comparator",
+    "upside_channel",
+    "downside_failure_mode",
+    "hard_falsifier",
+    "applicability_abstention",
+    "pit_source_contract",
+    "search_cost_trial_identity"
+  ],
+  "entry_modes": {
+    "first_incumbent": "CONTINUATION",
+    "deferred": "DISLOCATION"
+  },
+  "risk_set": {
+    "id": "AO_BASIS_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "denominator": "full date-local U.S.-listed primary-common security population satisfying permanent identity, listing, availability and corporate-action truth at the knowledge cut",
+    "required_identity": [
+      "CIQSEC:<Capital IQ Security ID>",
+      "exact Trading Item"
+    ],
+    "forbidden_filters_or_repairs": [
+      "growth_filter",
+      "rule100_filter",
+      "quality_filter",
+      "momentum_filter",
+      "current_survivor_back_projection",
+      "current_primary_back_projection",
+      "future_membership_conditioning",
+      "ticker_fallback",
+      "entity_fallback",
+      "permno_fallback",
+      "alternate_listing_rescue"
+    ],
+    "missingness_law": "arm missingness is abstention and remains in denominator reporting",
+    "coverage_failure_law": "AOV-109, Lane-2 94, current Rule100 membership and survivor screens may not replace the broad denominator"
+  },
+  "decision_contract": {
+    "schedule": "last observed NYSE session of each calendar week",
+    "knowledge_cut": "after completed decision-session close and all admitted source availability times",
+    "primary_horizon_observed_sessions": 20,
+    "payoff_target": "primary-security total-return distribution over t+1 through t+20",
+    "winner_fraction": 0.05,
+    "catastrophic_fraction": 0.05,
+    "selection_k": "ceil(0.05 * abs(D_t))",
+    "final_tie_break": "security_id ASC after arm score DESC",
+    "execution_law": "canonical one-bar shift(1): target at t, executed exposure at t+1",
+    "turnover_cost_rate": 0.001
+  },
+  "arms": {
+    "Q": {
+      "kernel_class": "QUALITY_COMPOUNDING",
+      "entry_mode": "CONTINUATION",
+      "rationale_class": "ECONOMIC",
+      "primitives": {
+        "demand": "z_demand",
+        "inventory_supply": "z_inventory_quality_proxy",
+        "moat_pricing": "z_moat",
+        "capital_discipline": "capital_cycle_score"
+      },
+      "primitive_transform": "average-tie date-local percentile rank within D_t among lawfully observed values",
+      "minimum_observed_primitives": 3,
+      "score": "mean(observed primitive percentile ranks)",
+      "missing_fill": "NONE",
+      "selection": "top K_t by q_score",
+      "coverage_failure": "fewer than K_t Q-observable names"
+    },
+    "M": {
+      "kernel_class": "STATISTICAL_BEHAVIORAL_CONTINUATION",
+      "entry_mode": "CONTINUATION",
+      "rationale_class": "STATISTICAL",
+      "lookback_observed_sessions": 60,
+      "raw_formula": "product_{s=t-59..t}(1+r_i,s)-1",
+      "score": "average-tie date-local percentile rank of m_raw among M-observable names in D_t",
+      "forbidden_transforms": [
+        "benchmark_residualization",
+        "sector_neutralization",
+        "volatility_normalization",
+        "breakout_gate",
+        "volume_gate",
+        "fitted_coefficients",
+        "fitted_thresholds"
+      ],
+      "selection": "top K_t by m_score",
+      "coverage_failure": "fewer than K_t M-observable names"
+    },
+    "Q_PLUS_M": {
+      "kernel_class": "MARGINAL_COMPOSITION_BASIS",
+      "entry_mode": "CONTINUATION",
+      "rationale_class": "ECONOMIC_PLUS_STATISTICAL",
+      "observability": "Q and M both observable",
+      "score": "q_score * m_score",
+      "forbidden": [
+        "learned_weights",
+        "additive_coefficient_search",
+        "interaction_search",
+        "threshold_search",
+        "sector_adjustment",
+        "nonlinear_rescue"
+      ],
+      "selection": "top K_t by qm_score",
+      "coverage_failure": "fewer than K_t jointly observable names"
+    }
+  },
+  "asymmetry_evaluation_v1": {
+    "required_metrics": [
+      "coverage_rate",
+      "abstention_count",
+      "coverage_failure_dates",
+      "selected_count",
+      "winner_precision",
+      "winner_recall",
+      "right_tail_enrichment",
+      "false_winner_burden",
+      "catastrophic_left_tail_rate",
+      "catastrophic_left_tail_lift_vs_base",
+      "forward_return_p05",
+      "forward_return_p25",
+      "forward_return_median",
+      "forward_return_p75",
+      "forward_return_p95",
+      "cvar_05",
+      "winner_recognition_lead_sessions",
+      "shadow_gross_return",
+      "shadow_net_return",
+      "capital_time_security_sessions",
+      "turnover",
+      "transaction_cost"
+    ],
+    "definitions": {
+      "winner_precision": "selected_top5pct_count / selected_count",
+      "winner_recall": "selected_top5pct_count / abs(winner_set_t)",
+      "right_tail_enrichment": "winner_precision / (abs(winner_set_t) / abs(D_t))",
+      "false_winner_burden": "1 - winner_precision",
+      "catastrophic_left_tail_rate": "selected_bottom5pct_count / selected_count",
+      "catastrophic_left_tail_lift_vs_base": "catastrophic_left_tail_rate / (abs(catastrophic_set_t) / abs(D_t))",
+      "cvar_05": "mean(worst ceil(0.05 * selected_count) selected-name forward returns)",
+      "winner_recognition_lead_sessions": "observed-session lead from first legitimate selection in prior 20-session window through t; otherwise MISS"
+    },
+    "shadow_portfolio": {
+      "weights": "equal weight over selected K_t",
+      "risky_gross": 1.0,
+      "execution": "shift(1)",
+      "cost": "turnover * 0.0010",
+      "authority": "EVALUATION_ONLY_NO_CAPITAL_AUTHORITY"
+    },
+    "composition_question": "Q+M must improve marginal upside information versus both Q and M without material deterioration in catastrophic-left-tail burden"
+  },
+  "source_contract": {
+    "historical_fundamentals": "as-of + FilingVer=Original with field-level PIT availability/vintage proof",
+    "market": "canonical primary-security total-return bytes through each decision cut",
+    "corporate_actions": "date-local terminal-event authority",
+    "provider_capture_authorized_by_this_freeze": false
+  },
+  "trial_charge": {
+    "constitution_freeze_material_trials": 0,
+    "first_result_bearing_joint_basis_run_material_trials": 1,
+    "charge_timing": "after exact real source bytes and uninspected labels are hash-bound; immediately before first development result inspection",
+    "three_arms_are_one_joint_trial_package": true,
+    "post_visibility_change_requires_new_version_and_trial": [
+      "Q primitives",
+      "Q coverage rule",
+      "M lookback",
+      "Q+M composition law",
+      "decision schedule",
+      "risk-set law",
+      "K",
+      "horizon",
+      "winner/catastrophic label law",
+      "missingness/abstention law",
+      "execution boundary",
+      "cost law",
+      "primary asymmetry metrics"
+    ],
+    "predecessor_trial1_debt": "1/8 permanent and unchanged"
+  },
+  "existing_object_routing": {
+    "ECONPHYSICS_PREBREAKOUT_v1": "FUNDAMENTAL_TRANSITION_MECHANISTIC_SPECIALIZED_KERNEL",
+    "inventory_delta_mean_reversion": "FROZEN_FUTURE_FUNDAMENTAL_TRANSITION_CHALLENGER_DIAGNOSTIC_ONLY_TODAY",
+    "margin": "CANDIDATE_NOT_HARD_SURVIVOR",
+    "revenue": "PARK",
+    "Rule100_Rule40_style": "QUALITY_COMPOUNDING_CONTROL_OR_INCUMBENT_REPRESENTATION_NOT_PROVEN_ALPHA",
+    "momentum": "STANDALONE_CONTINUATION_OR_DOWNSTREAM_MARKET_RECOGNITION_WITH_SEPARATE_IDENTITY",
+    "VSB_CONFIRMATION_v1": "DOWNSTREAM_MARKET_RECOGNITION_ONLY",
+    "dislocation": "DEFERRED_ENTRY_MODE",
+    "rerating": "PAYOFF_REALIZATION_PATH_NOT_UNIVERSAL_MECHANISM"
+  },
+  "stop_lines": [
+    "new_provider_capture",
+    "new_w6_read",
+    "winner_label_inspection_before_basis_freeze",
+    "q_m_qm_empirical_result_read",
+    "new_inventory_margin_transforms",
+    "revenue_rescue",
+    "expectation_gap_build",
+    "dislocation_backtest",
+    "ticker_specific_CRDO_MU_SNDK_rule",
+    "generic_ai_swarm_platform",
+    "new_portfolio_optimizer",
+    "parent_child_mutation",
+    "a2_requery",
+    "clock1_outcome_open",
+    "capital_or_broker_authority_expansion"
+  ],
+  "exit_conditions": [
+    "OpportunityKernelV1 constitution frozen",
+    "CONTINUATION_DISLOCATION authority separated",
+    "AsymmetryEvaluationV1 frozen",
+    "existing ECONPHYSICS evidence rerouted without history rewrite",
+    "Q_M_QM exact basis frozen",
+    "broad PIT denominator/data requirements frozen",
+    "search/trial charge frozen",
+    "W6 untouched",
+    "financial_alpha_evidence=0"
+  ],
+  "next_action_after_source_custody": "run exact Q/M/Q+M joint package once on lawful development PIT, kill weak arms, freeze one survivor/version, then approach W6 once under a separately frozen untouched contract"
+}

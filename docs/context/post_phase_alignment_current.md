@@ -3,6 +3,13 @@
 Date: 2026-08-12
 Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; W3_REAL_AUTHORITY_COMPLETE; W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_ZERO_TRIAL_COST; ECONPHYSICS_PREBREAKOUT_V1_REAL_S0_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; OK_SBI_0_SHADOW_S0_DESIGN_LOCKED_RELEASE_BLOCKED; Q_SOURCE_BLOCKED; W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
 
+## 2026-08-12 AI-native runtime closure alignment
+
+- Architecture=`YES_CONSTITUTIONALLY`; runtime=`PARTIAL`. Status=`docs/architecture/ai_native_runtime_status_v1.json`; audit=`docs/architecture/ai_native_runtime_closure_audit_20260812.md`.
+- Universal preflight enforcement, cross-family RDV allocator, universal outcome-authority gate remain NOT_IMPLEMENTED. Legacy outcome paths may still bypass the new constitution until Rank-1 closure.
+- Scientific L namespace stays L0–L11/P1–P4; SCIENCE_S5 rename rejected. D1–D9 constitution LOCKED; FTK first-fail IMPLEMENTED; universal runner NOT_IMPLEMENTED.
+- Top-3 GQs: constitutional enforcement closure; action-boundary clock + risk provenance; endogenous observability. Narrow seams only—no strategy/platform reopen.
+
 ## 2026-08-12 result-first AI research-loop alignment
 
 - Canonical lock=`docs/architecture/result_first_ai_research_loop_v1.md`; preflight v2 + `ExecutionFeasibilityV1` are forward-only machine contracts.
@@ -11,7 +18,7 @@ Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMAT
 - Future L3 adds R9 numeric/temporal/threshold/missingness fabrication tolerance and report-only observability-selection diagnosis; historical L3 results are not retroactively requalified.
 - Capturability enters only on action-bearing economic/D9/promotion/PAPER paths. Hard risk remains veto authority; risk margins remain a vector; telemetry calibration is policy-conditioned.
 - Reuse defaults to two real consumers, with an earlier safety/authority exception only when duplication creates authority/safety risk.
-- No family/product/capital state changes: FTK remains stopped, TR-v0 parked, Clock #1 sealed, financial alpha=0.
+- No family/product/capital state changes from the method lock alone: FTK remains stopped, TR-v0 parked, Clock #1 sealed, financial alpha=0.
 
 ## 2026-08-12 authority topology / OK-SBI-0 shadow alignment
 

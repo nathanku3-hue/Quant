@@ -12,10 +12,10 @@ from typing import Any, Mapping, Sequence
 
 from research.alpha_pit_v1.contracts import (
     API_SCHEMA_ID,
-    EXPECTATION_MEASURES,
-    FAMILY_ID,
+    CRV1_FAMILY_DATA_CONTRACT,
     AlphaPITBackendV1,
     ArtifactRef,
+    FamilyDataContract,
     ResearchMode,
     utc_datetime,
     validate_observation_fields,
@@ -27,7 +27,7 @@ from research.alpha_pit_v1.manifests import verify_artifact_ref
 class AlphaPITReadAPIv1:
     """Provider-blind Alpha PIT read capability for one frozen research mode."""
 
-    __slots__ = ("_mode", "_family_id", "_decision_context_id", "_backend")
+    __slots__ = ("_mode", "_family_id", "_family_contract", "_decision_context_id", "_backend")
 
     def __init__(
         self,
@@ -36,6 +36,7 @@ class AlphaPITReadAPIv1:
         family_id: str,
         decision_context_id: str,
         backend: AlphaPITBackendV1,
+        family_contract: FamilyDataContract = CRV1_FAMILY_DATA_CONTRACT,
     ) -> None:
         normalized = ResearchMode(mode)
         if normalized is ResearchMode.DISCOVERY:
@@ -45,6 +46,7 @@ class AlphaPITReadAPIv1:
             family_id=family_id,
             decision_context_id=decision_context_id,
             backend=backend,
+            family_contract=family_contract,
         )
 
     def _initialize(
@@ -54,8 +56,11 @@ class AlphaPITReadAPIv1:
         family_id: str,
         decision_context_id: str,
         backend: AlphaPITBackendV1,
+        family_contract: FamilyDataContract = CRV1_FAMILY_DATA_CONTRACT,
     ) -> None:
-        if family_id != FAMILY_ID:
+        if not isinstance(family_contract, FamilyDataContract):
+            raise TypeError("alpha_pit_family_data_contract_required")
+        if family_id != family_contract.family_id:
             raise ValueError("alpha_pit_family_invalid")
         if not str(decision_context_id).strip():
             raise ValueError("alpha_pit_decision_context_required")
@@ -63,6 +68,7 @@ class AlphaPITReadAPIv1:
             raise TypeError("alpha_pit_backend_v1_required")
         self._mode = ResearchMode(mode)
         self._family_id = family_id
+        self._family_contract = family_contract
         self._decision_context_id = str(decision_context_id)
         self._backend = backend
 
@@ -75,16 +81,28 @@ class AlphaPITReadAPIv1:
         return self._family_id
 
     @property
+    def family_contract(self) -> FamilyDataContract:
+        return self._family_contract
+
+    @property
     def decision_context_id(self) -> str:
         return self._decision_context_id
 
     def risk_set(self, *, as_of: datetime) -> ArtifactRef:
         cutoff = utc_datetime(as_of)
         ref = self._backend.risk_set(as_of=cutoff, research_mode=self._mode)
-        _validate_ref(ref, artifact_type="RISK_SET", research_mode=self._mode, as_of=cutoff)
+        _validate_ref(
+            ref,
+            artifact_type="RISK_SET",
+            research_mode=self._mode,
+            as_of=cutoff,
+            family_contract=self._family_contract,
+        )
         payload = _mapping_payload(ref, artifact_type="RISK_SET")
-        if payload.get("family_id") != FAMILY_ID:
+        if payload.get("family_id") != self._family_contract.family_id:
             raise ValueError("alpha_pit_risk_set_family_invalid")
+        if payload.get("risk_set_spec_id") != self._family_contract.risk_set_spec_id:
+            raise ValueError("alpha_pit_risk_set_spec_invalid")
         rows = _rows(payload, artifact_type="RISK_SET")
         if int(payload.get("row_count", -1)) != len(rows):
             raise ValueError("alpha_pit_risk_set_row_count_invalid")
@@ -105,13 +123,22 @@ class AlphaPITReadAPIv1:
         cutoff = utc_datetime(as_of)
         security_ids = validate_security_ids(ids)
         field_ids = validate_observation_fields(fields)
+        disallowed = sorted(set(field_ids) - set(self._family_contract.allowed_observation_surface))
+        if disallowed:
+            raise ValueError("alpha_pit_observation_surface_forbidden:" + disallowed[0])
         ref = self._backend.observations(
             ids=security_ids,
             fields=field_ids,
             as_of=cutoff,
             research_mode=self._mode,
         )
-        _validate_ref(ref, artifact_type="OBSERVATIONS", research_mode=self._mode, as_of=cutoff)
+        _validate_ref(
+            ref,
+            artifact_type="OBSERVATIONS",
+            research_mode=self._mode,
+            as_of=cutoff,
+            family_contract=self._family_contract,
+        )
         payload = _mapping_payload(ref, artifact_type="OBSERVATIONS")
         rows = _rows(payload, artifact_type="OBSERVATIONS")
         _validate_row_availability(rows, as_of=cutoff)
@@ -142,6 +169,8 @@ class AlphaPITReadAPIv1:
         return ref
 
     def source_claims(self, *, ids: Sequence[str], as_of: datetime) -> ArtifactRef:
+        if not self._family_contract.allowed_claim_surface:
+            raise ValueError("alpha_pit_claim_surface_forbidden")
         cutoff = utc_datetime(as_of)
         security_ids = validate_security_ids(ids)
         ref = self._backend.source_claims(
@@ -149,7 +178,13 @@ class AlphaPITReadAPIv1:
             as_of=cutoff,
             research_mode=self._mode,
         )
-        _validate_ref(ref, artifact_type="SOURCE_CLAIMS", research_mode=self._mode, as_of=cutoff)
+        _validate_ref(
+            ref,
+            artifact_type="SOURCE_CLAIMS",
+            research_mode=self._mode,
+            as_of=cutoff,
+            family_contract=self._family_contract,
+        )
         payload = _mapping_payload(ref, artifact_type="SOURCE_CLAIMS")
         rows = _rows(payload, artifact_type="SOURCE_CLAIMS")
         _validate_row_availability(rows, as_of=cutoff)
@@ -160,9 +195,13 @@ class AlphaPITReadAPIv1:
                 raise ValueError("alpha_pit_source_claim_unrequested_security")
             if row.get("epistemic_class") != "OBSERVED_SOURCE_CLAIM":
                 raise ValueError("alpha_pit_source_claim_epistemic_class_invalid")
+            if str(row.get("claim_topic") or "") not in self._family_contract.allowed_claim_surface:
+                raise ValueError("alpha_pit_source_claim_topic_forbidden")
         return ref
 
     def expectations(self, *, ids: Sequence[str], as_of: datetime) -> ArtifactRef:
+        if not self._family_contract.allowed_expectation_surface:
+            raise ValueError("alpha_pit_expectation_surface_forbidden")
         cutoff = utc_datetime(as_of)
         security_ids = validate_security_ids(ids)
         ref = self._backend.expectations(
@@ -170,7 +209,13 @@ class AlphaPITReadAPIv1:
             as_of=cutoff,
             research_mode=self._mode,
         )
-        _validate_ref(ref, artifact_type="EXPECTATIONS", research_mode=self._mode, as_of=cutoff)
+        _validate_ref(
+            ref,
+            artifact_type="EXPECTATIONS",
+            research_mode=self._mode,
+            as_of=cutoff,
+            family_contract=self._family_contract,
+        )
         payload = _mapping_payload(ref, artifact_type="EXPECTATIONS")
         rows = _rows(payload, artifact_type="EXPECTATIONS")
         _validate_row_availability(rows, as_of=cutoff)
@@ -178,7 +223,7 @@ class AlphaPITReadAPIv1:
         expected_pairs = sorted(
             (security_id, measure)
             for security_id in security_ids
-            for measure in EXPECTATION_MEASURES
+            for measure in self._family_contract.allowed_expectation_surface
         )
         actual_pairs = sorted(
             (str(row.get("security_id") or ""), str(row.get("measure") or ""))
@@ -213,6 +258,7 @@ def open_alpha_pit_session(
     family_id: str,
     decision_context_id: str,
     backend: AlphaPITBackendV1,
+    family_contract: FamilyDataContract = CRV1_FAMILY_DATA_CONTRACT,
 ) -> AlphaPITReadAPIv1:
     normalized = ResearchMode(mode)
     if normalized is ResearchMode.DISCOVERY:
@@ -222,12 +268,14 @@ def open_alpha_pit_session(
             family_id=family_id,
             decision_context_id=decision_context_id,
             backend=backend,
+            family_contract=family_contract,
         )
     return AlphaPITReadAPIv1(
         mode=normalized,
         family_id=family_id,
         decision_context_id=decision_context_id,
         backend=backend,
+        family_contract=family_contract,
     )
 
 
@@ -250,16 +298,17 @@ def _validate_ref(
     artifact_type: str,
     research_mode: ResearchMode,
     as_of: datetime | None,
+    family_contract: FamilyDataContract,
 ) -> None:
     if not isinstance(ref, ArtifactRef):
         raise TypeError("alpha_pit_artifact_ref_required")
-    verify_artifact_ref(ref)
+    verify_artifact_ref(ref, family_contract=family_contract)
     if ref.artifact_type != artifact_type:
         raise ValueError("alpha_pit_artifact_type_mismatch")
     manifest = ref.manifest
     if manifest.get("api_schema_id") != API_SCHEMA_ID:
         raise ValueError("alpha_pit_api_schema_invalid")
-    if manifest.get("family_id") != FAMILY_ID:
+    if manifest.get("family_id") != family_contract.family_id:
         raise ValueError("alpha_pit_manifest_family_invalid")
     if manifest.get("research_mode") != research_mode.value:
         raise ValueError("alpha_pit_manifest_research_mode_invalid")

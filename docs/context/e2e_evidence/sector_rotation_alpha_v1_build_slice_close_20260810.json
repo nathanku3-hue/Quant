@@ -1,0 +1,69 @@
+{
+  "schema_version": "sector_rotation_alpha_v1_build_slice_close_v1",
+  "recorded_date": "2026-08-10",
+  "family_id": "SECTOR_ROTATION_ALPHA_v1",
+  "disposition": "CLOSE_BUILD_SLICE_PARK_UNTIL_INDEPENDENT_DATA_CAPACITY",
+  "status": "BUILD_SLICE_CLOSED_PARKED_CAPTURE_HOLD",
+  "m0_frozen": true,
+  "model_expansion_authorized": false,
+  "acquisition_request": {
+    "request_id": "SRA_ETF_11_CIQ_ACQUISITION_V1",
+    "request_sha256": "7d4a46c0fa2e0292ab42d0f88f90dc800bb25c5edebcd00bdd1a209a73915c0c",
+    "artifact_path": "docs/context/e2e_evidence/sector_rotation_alpha_v1_acquisition_request_20260810.json",
+    "artifact_file_sha256": "9aefbd2ceeefd0bc2e94f5472a43a09387fbb5c241a46214e193753a53960692",
+    "capture_state": "PARKED_CAPTURE_HOLD",
+    "provider_acquisition_allowed": false,
+    "provider_acquisition_performed": false,
+    "reopen_condition": "TRULY_INDEPENDENT_PROVIDER_CAPACITY_AVAILABLE_PLUS_NEW_EXPLICIT_AUTHORITY",
+    "exact_sector_count": 11,
+    "identity_provider_fields": ["SP_CIQ_ID", "SP_TRADING_ITEM_ID"],
+    "sector_key_membership_receipt_required": true,
+    "market_provider_fields": ["SP_TOTAL_RETURN", "SP_PRICE_CLOSE", "SP_VOLUME"],
+    "minimum_observed_sessions_per_security": 60,
+    "corporate_action_total_return_authority_required": true,
+    "unresolved_identity_action": "BLOCK"
+  },
+  "frozen_model": {
+    "primary_horizon_sessions": 20,
+    "secondary_horizon_sessions": 40,
+    "relative_strength_windows": [20, 60],
+    "dollar_volume_participation_windows": [5, 20],
+    "trial_budget_max": 1,
+    "comparator": "I_RELATIVE_STRENGTH_ONLY_VS_I_PLUS_X_DVP_PRE_LABEL",
+    "retune_allowed": false
+  },
+  "forbidden": {
+    "old_sector_map": true,
+    "stock_breadth": true,
+    "underlying_stock_membership": true,
+    "etf_flow_vendor": true,
+    "machine_learning": true,
+    "optimizer": true,
+    "ticker_identity_fallback": true,
+    "entity_identity_fallback": true,
+    "alternate_listing_backfill": true
+  },
+  "authority": {
+    "prediction_append_performed": false,
+    "outcome_accessed": false,
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE",
+    "broker_orders": "FORBIDDEN"
+  },
+  "custody": {
+    "m0_code_manifest_sha256": "f3875066dbbb9e22a0a367b00e163da981e55a8c735ba35eb24f8cf97fc4ebf3",
+    "acquisition_module_sha256": "11958ebf4bbef2ee8988c789225c0930a7c2ea3444a5315cdde88ee68bdc470c",
+    "package_init_sha256": "f8559984dca27ea7dc67ca41cbb2baa33a709edd0cacd8c87da2bdcbc94a7d48",
+    "test_file_sha256": "6129726d66e31cc3c1f41ff24dbc6c194ae977be5628e94b38dc9c212fc322cb",
+    "spec_sha256": "93880e5396461d98685f44c9f8c1f80ab84561aca2f93c431230adca87b2d481"
+  },
+  "validation": {
+    "focused_w8": {"result": "PASS", "passed": 11, "failed": 0},
+    "cross_family_w8_vsb_alpha_pit": {"result": "PASS", "passed": 44, "failed": 0},
+    "compile": {"result": "PASS"},
+    "frozen_acquisition_request_verification": {"result": "PASS"},
+    "no_acquisition_or_legacy_dependency_scan": {"result": "PASS", "matches": 0}
+  },
+  "worker_disposition": "RELEASE_AFTER_RECEIPT_WRITE",
+  "next_legitimate_action": "NONE WHILE PARKED. Reopen W8 only after truly independent provider capacity exists and new explicit authority lifts the capture hold; then execute the already-frozen acquisition request without retuning M0 or delaying the stock path."
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": "crv1_w9_non_growth_source_admission_status_v1",
+  "created_at_utc": "2026-08-10T12:41:41Z",
+  "workstream": "W9_CRV1",
+  "family_id": "CYCLE_RESONANCE_v1",
+  "primary_horizon_trading_days": 252,
+  "primary_horizon_changed": false,
+  "primary_risk_set_spec_id": "CRV1_US_PRIMARY_COMMON_V1",
+  "status": "NON_GROWTH_SOURCE_ADMISSION_READY_PROVIDER_CAPTURE_BLOCKED",
+  "authority_effect": "MECHANICS_ONLY_NO_EMPIRICAL_MODEL_AUTHORITY",
+  "source_policy": {
+    "aov_109_reused": false,
+    "aov_109_substitution_allowed": false,
+    "growth_screen_allowed": false,
+    "current_survivor_back_projection_allowed": false,
+    "future_membership_filter_allowed": false,
+    "legacy_identity_fallback_allowed": false,
+    "required_identity_namespace": "CIQSEC",
+    "required_trading_item_binding": true,
+    "minimum_prior_complete_market_observations": 200
+  },
+  "implemented_guards": [
+    "active CRV1 risk set requires CRV1-specific structured identity and market receipt schemas",
+    "risk-set identity receipt hash must equal the exact structured identity receipt used by observations",
+    "risk-set CIQSEC to trading-item and company mappings are rechecked against the admitted structured identity master",
+    "declared prior-market-observation counts are recomputed from admitted close/volume/total-return bytes through the decision cut",
+    "AOV-109 reuse flag must be false in structured, risk-set source, and risk-set receipt custody",
+    "growth/current-survivor/future-membership/legacy-identity flags fail closed",
+    "independent CRV1 fundamentals are optional only as manifest-bound MISSING_SOURCE; AOV-109 fundamentals are not a fallback",
+    "a confirmatory CRV1 input packet closes from independent non-growth identity/market custody while fundamentals, expectations, and SEC claims remain explicit missing-source artifacts and the read API exposes no outcome capability"
+  ],
+  "producer": {
+    "module": "research/alpha_pit_v1/adapters/ciq_crv1_source_v1.py",
+    "cli": "scripts/alpha_pit_admit_crv1_current_sources.py",
+    "network_acquisition_performed_by_producer": false,
+    "required_inputs": [
+      "fresh hash-bound broad CIQ identity capture receipt + normalized identity bytes",
+      "fresh matching hash-bound CIQ market capture receipt + daily market bytes"
+    ]
+  },
+  "future_raw_coordination_with_w3": {
+    "prebreakout_acquisition_manifest": "docs/architecture/prebreakout_pit_acquisition_manifest_v1.json",
+    "prebreakout_acquisition_manifest_sha256": "f3cac6961707fc653c00016ff715fb7250236ad443854051a387ab330473dc3f",
+    "shared_raw_identity_market_capture_allowed": true,
+    "share_only_when_provider_date_asof_listing_range_fields_are_identical": true,
+    "prebreakout_risk_set_admission_shared": false,
+    "crv1_risk_set_admission_shared": false,
+    "later_current_w9_identity_snapshot_valid_for_earlier_prebreakout_b_minus_1": false,
+    "w3_corporate_action_requirement_implied_for_crv1": false,
+    "aov_109_reuse_allowed": false
+  },
+  "existing_artifact_disposition": {
+    "aov_current_109": "DIAGNOSTIC_ONLY_NOT_CRV1_AUTHORITY",
+    "historical_2025_05_16_screen_selected_104": "FUNDING_SCREEN_SELECTED_NOT_CRV1_AUTHORITY",
+    "legitimate_broad_crv1_identity_market_capture_landed": false
+  },
+  "live_acquisition_preflight": {
+    "xpressapi_token_present": false,
+    "existing_ciq_cdp_session": "UNREACHABLE",
+    "provider_capture_attempted": false,
+    "provider_capture_claimed": false,
+    "blocker": "NO_AUTHENTICATED_PROVIDER_ACQUISITION_PATH_AVAILABLE_IN_SESSION"
+  },
+  "validation": {
+    "focused_alpha_pit_crv1_tests": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -m pytest tests/alpha_pit_v1/test_ciq_cycle_adapter.py tests/alpha_pit_v1/test_ciq_crv1_source_admission.py -q",
+      "result": "10_PASSED"
+    },
+    "alpha_pit_suite": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -m pytest tests/alpha_pit_v1 -q",
+      "result": "21_PASSED"
+    },
+    "cycle_resonance_suite": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -m pytest tests/cycle_resonance_v1 -q",
+      "result": "6_PASSED"
+    }
+  },
+  "code_sha256": {
+    "research/alpha_pit_v1/adapters/ciq_cycle_v1.py": "00937ba7644cb2ca8ed7eb7f0eee191a281c0c5bca5606f40d10942bd22fb6a1",
+    "research/alpha_pit_v1/adapters/ciq_crv1_source_v1.py": "87291d5f774cb266efb343238e0b494635a804f77078cd2d241c8d2815f26a9e",
+    "scripts/alpha_pit_admit_crv1_current_sources.py": "595fd3b1e18d4006046e2307725fe4af321cee52a61f926024cb9369ffbcd21f",
+    "tests/alpha_pit_v1/test_ciq_cycle_adapter.py": "3d50b0a1df489ded8779d35d3292c6ca54ae048197059fc4c6deef55cd276c17",
+    "tests/alpha_pit_v1/test_ciq_crv1_source_admission.py": "f7a327024875f36edd6fba8de7753f83870a97daebb96b83914a3687ef78cb55"
+  },
+  "outcomes_accessed": false,
+  "prediction_opened": false,
+  "financial_alpha_evidence": 0,
+  "broker_orders": 0,
+  "next_legitimate_step": "LAND_FRESH_BROAD_CIQ_IDENTITY_AND_MARKET_CAPTURE_THEN_RUN_ALPHA_PIT_ADMIT_CRV1_CURRENT_SOURCES"
+}

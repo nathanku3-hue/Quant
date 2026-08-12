@@ -1,0 +1,59 @@
+{
+  "schema_version": "vsb_source_prediction_tape_mechanics_receipt_v1",
+  "date": "2026-08-10",
+  "family_id": "VOL_SQUEEZE_BREAKOUT_v1",
+  "implementation_id": "VSB_M0_EQUAL_RANK_20_60_20_v1",
+  "risk_set_spec_id": "VSB_US_PRIMARY_COMMON_DAILY_V1",
+  "scope": "SOURCE_BOUND_BROAD_RISK_SET_MARKET_ADMISSION_AND_APPEND_ONLY_M0_PREDICTION_TAPE_MECHANICS",
+  "mechanics": {
+    "source_admission_module": "research/vol_squeeze_breakout_v1/source.py",
+    "prediction_tape_module": "research/vol_squeeze_breakout_v1/ledger.py",
+    "no_network_source_admission": true,
+    "same_day_prospective_membership_required": true,
+    "minimum_market_sessions": 60,
+    "forbidden_universe_shortcuts_fail_closed": true,
+    "strictly_post_cut_prediction_seal": true,
+    "one_prediction_batch_per_decision_date": true,
+    "hash_chained_jsonl": true,
+    "exclusive_writer_lock": true,
+    "existing_writer_lock_deleted_by_loser": false,
+    "post_append_full_chain_verification": true
+  },
+  "forbidden_actions": {
+    "provider_network_acquisition_performed": false,
+    "historical_membership_reconstruction_performed": false,
+    "aov_109_universe_reused": false,
+    "lane2_94_universe_reused": false,
+    "a2_requery_count": 0,
+    "clock_1_outcome_accessed": false,
+    "parent_child_mutated": false,
+    "broker_orders": false,
+    "financial_alpha_evidence": 0,
+    "capital_authority": "NONE"
+  },
+  "validation": {
+    "vsb_alpha_pit_crv1": "37/37 PASS",
+    "aov0": "166/166 PASS",
+    "selected_py_compile": "PASS",
+    "git_diff_check": "PASS",
+    "forbidden_runtime_token_hits": 0,
+    "provider_network_acquisition_token_hits": 0
+  },
+  "real_prediction": {
+    "sealed": false,
+    "reason": "NO_LEGITIMATE_SAME_DAY_COMPLETED_CLOSE_SOURCE_SNAPSHOT_ADMITTED_IN_THIS_ROUND"
+  },
+  "empirical_acceptance_gate": {
+    "evidence_source": "NEW_UNTOUCHED_PROSPECTIVE_TAPE_ONLY",
+    "minimum_matured_10d_decision_dates": 20,
+    "winner_recall_lift_10d_must_exceed": 1.0,
+    "moving_block_bootstrap_lower_bound_must_exceed": 1.0,
+    "moving_block_bootstrap_confidence": 0.8,
+    "moving_block_bootstrap_block_length_decision_dates": 10,
+    "moving_block_bootstrap_replicates": 10000,
+    "moving_block_bootstrap_seed": 20260810,
+    "a1_a2_acceptance_weight": 0,
+    "named_smoke_probe_acceptance_weight": 0
+  },
+  "report_content_hash": "cbff857ba946ecb8eae606a22572c450f3c319f27f34c465041fbedae82dfb60"
+}

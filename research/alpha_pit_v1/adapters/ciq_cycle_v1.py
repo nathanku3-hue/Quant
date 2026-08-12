@@ -67,6 +67,11 @@ RISK_SET_ELIGIBILITY_CONTRACT_SHA256 = domain_hash(
 MARKET_SOURCE_ID = "SPCIQPRO:PRIMARY_SECURITY_MARKET_DATA"
 FUNDAMENTAL_SOURCE_ID = "SPCIQPRO:QUARTERLY_FUNDAMENTALS"
 IDENTITY_SOURCE_ID = "SPCIQPRO:PRIMARY_SECURITY_MASTER"
+CRV1_IDENTITY_RECEIPT_SCHEMA = "alpha_pit_ciq_crv1_primary_security_master_receipt_v1"
+CRV1_MARKET_RECEIPT_SCHEMA = "alpha_pit_ciq_crv1_primary_security_market_data_receipt_v1"
+CRV1_FUNDAMENTAL_RECEIPT_SCHEMA = "alpha_pit_ciq_crv1_quarterly_fundamentals_receipt_v1"
+CRV1_STRUCTURED_SOURCE_SCOPE = "CRV1_INDEPENDENT_NON_GROWTH_STRUCTURED_CUSTODY_V1"
+CRV1_FUNDAMENTALS_MISSING_REASON = "CIQ_CRV1_FUNDAMENTALS_CAPTURE_NOT_LANDED"
 
 MARKET_FIELDS = {
     "market.close",
@@ -120,8 +125,8 @@ class CiqCycleV1Adapter:
         security_master_receipt_path: str | Path,
         market_history_path: str | Path,
         market_receipt_path: str | Path,
-        fundamental_panel_path: str | Path,
-        fundamental_receipt_path: str | Path,
+        fundamental_panel_path: str | Path | None = None,
+        fundamental_receipt_path: str | Path | None = None,
         risk_set_source_path: str | Path | None = None,
         risk_set_receipt_path: str | Path | None = None,
         expectations_source_path: str | Path | None = None,
@@ -130,7 +135,9 @@ class CiqCycleV1Adapter:
         self._parser_sha256 = _sha256_file(Path(__file__))
         self._security_master_path = Path(security_master_path)
         self._market_history_path = Path(market_history_path)
-        self._fundamental_panel_path = Path(fundamental_panel_path)
+        if (fundamental_panel_path is None) != (fundamental_receipt_path is None):
+            raise AlphaPITContractError("alpha_pit_ciq_fundamental_source_pair_required")
+        self._fundamental_panel_path = Path(fundamental_panel_path) if fundamental_panel_path is not None else None
 
         self._identity_receipt = self._load_current_receipt(
             path=Path(security_master_receipt_path),
@@ -144,17 +151,21 @@ class CiqCycleV1Adapter:
             observed_range=None,
             parser_id="CIQCycleV1Adapter:market_v1",
         )
-        self._fundamental_receipt = self._load_current_receipt(
-            path=Path(fundamental_receipt_path),
-            source_id=FUNDAMENTAL_SOURCE_ID,
-            observed_range=None,
-            parser_id="CIQCycleV1Adapter:fundamentals_v1",
+        self._fundamental_receipt = (
+            self._load_current_receipt(
+                path=Path(fundamental_receipt_path),
+                source_id=FUNDAMENTAL_SOURCE_ID,
+                observed_range=None,
+                parser_id="CIQCycleV1Adapter:fundamentals_v1",
+            )
+            if fundamental_receipt_path is not None
+            else None
         )
 
         self._verify_current_custody()
         self._master = self._load_master()
         self._market = self._load_market()
-        self._fundamentals = self._load_fundamentals()
+        self._fundamentals = self._load_fundamentals() if self._fundamental_panel_path is not None else None
 
         if (risk_set_source_path is None) != (risk_set_receipt_path is None):
             raise AlphaPITContractError("alpha_pit_ciq_risk_set_source_pair_required")
@@ -170,6 +181,23 @@ class CiqCycleV1Adapter:
             if risk_set_receipt_path is not None
             else None
         )
+        if self._risk_set_receipt is not None:
+            _validate_crv1_structured_receipt_contract(
+                self._identity_receipt.payload,
+                expected_schema=CRV1_IDENTITY_RECEIPT_SCHEMA,
+                label="identity",
+            )
+            _validate_crv1_structured_receipt_contract(
+                self._market_receipt.payload,
+                expected_schema=CRV1_MARKET_RECEIPT_SCHEMA,
+                label="market",
+            )
+            if self._fundamental_receipt is not None:
+                _validate_crv1_structured_receipt_contract(
+                    self._fundamental_receipt.payload,
+                    expected_schema=CRV1_FUNDAMENTAL_RECEIPT_SCHEMA,
+                    label="fundamentals",
+                )
 
         if (expectations_source_path is None) != (expectations_receipt_path is None):
             raise AlphaPITContractError("alpha_pit_ciq_expectations_source_pair_required")
@@ -194,7 +222,7 @@ class CiqCycleV1Adapter:
         return max(
             self._identity_receipt.retrieved_at,
             self._market_receipt.retrieved_at,
-            self._fundamental_receipt.retrieved_at,
+            *([self._fundamental_receipt.retrieved_at] if self._fundamental_receipt is not None else []),
             *([self._risk_set_receipt.retrieved_at] if self._risk_set_receipt is not None else []),
             *([self._expectations_receipt.retrieved_at] if self._expectations_receipt is not None else []),
         )
@@ -204,6 +232,8 @@ class CiqCycleV1Adapter:
         if self._risk_set_source_path is None or self._risk_set_receipt is None:
             raise AlphaPITContractError("alpha_pit_crv1_risk_set_source_not_landed")
 
+        self._require_current_cut_available(self._identity_receipt, cutoff, "identity")
+        self._require_current_cut_available(self._market_receipt, cutoff, "market")
         source = _load_json(self._risk_set_source_path)
         if source.get("schema_version") != RISK_SET_SOURCE_SCHEMA:
             raise AlphaPITContractError("alpha_pit_ciq_risk_set_source_schema_invalid")
@@ -221,6 +251,19 @@ class CiqCycleV1Adapter:
         identity_receipt_sha256 = str(self._risk_set_receipt.payload["identity_receipt_sha256"])
         if str(source.get("identity_receipt_sha256") or "") != identity_receipt_sha256:
             raise AlphaPITContractError("alpha_pit_ciq_risk_set_identity_receipt_binding_mismatch")
+        if identity_receipt_sha256 != self._identity_receipt.sha256:
+            raise AlphaPITContractError("alpha_pit_ciq_risk_set_not_bound_to_structured_identity_receipt")
+        master_by_security = self._master.set_index("security_id", drop=False)
+        market_available = self._market.loc[
+            self._market["date"].dt.date <= cutoff.date()
+        ].copy()
+        market_available["complete"] = market_available[["close", "volume", "total_return"]].notna().all(axis=1)
+        complete_history_counts = (
+            market_available.loc[market_available["complete"]]
+            .groupby("security_id")
+            .size()
+            .to_dict()
+        )
         rows: list[dict[str, Any]] = []
         security_ids: list[str] = []
         for raw in rows_raw:
@@ -228,6 +271,16 @@ class CiqCycleV1Adapter:
                 raise AlphaPITContractError("alpha_pit_ciq_risk_set_row_mapping_required")
             security_id = normalize_security_id(str(raw.get("security_id") or ""))
             security_ids.append(security_id)
+            if security_id not in master_by_security.index:
+                raise AlphaPITContractError("alpha_pit_ciq_risk_set_security_outside_structured_identity_source")
+            master_row = master_by_security.loc[security_id]
+            if str(raw.get("trading_item_id") or "").strip() != str(master_row["trading_item_id"]):
+                raise AlphaPITContractError("alpha_pit_ciq_risk_set_trading_item_not_bound_to_structured_identity")
+            company_id = _optional_text(raw.get("company_id"))
+            if company_id is not None:
+                normalized_company = company_id.removeprefix("COMPANY:")
+                if normalized_company != str(master_row["source_entity_id"]):
+                    raise AlphaPITContractError("alpha_pit_ciq_risk_set_company_not_bound_to_structured_identity")
             membership_effective = _parse_timestamp(
                 raw.get("membership_effective_at"), field="membership_effective_at"
             )
@@ -236,9 +289,13 @@ class CiqCycleV1Adapter:
             if not (membership_effective <= cutoff and observed <= available <= cutoff):
                 raise AlphaPITContractError("alpha_pit_ciq_risk_set_temporal_contract_invalid")
             _validate_risk_set_row_eligibility(raw)
+            declared_history_count = int(raw["prior_market_observation_count"])
+            actual_history_count = int(complete_history_counts.get(security_id, 0))
+            if declared_history_count != actual_history_count:
+                raise AlphaPITContractError("alpha_pit_ciq_risk_set_market_history_count_not_source_derived")
             row = {
                 "security_id": security_id,
-                "company_id": _optional_text(raw.get("company_id")),
+                "company_id": company_id,
                 "trading_item_id": _optional_text(raw.get("trading_item_id")),
                 "primary_listing_id": _optional_text(raw.get("primary_listing_id")),
                 "membership_effective_at": iso_utc(membership_effective),
@@ -315,12 +372,22 @@ class CiqCycleV1Adapter:
         uses_market = bool(set(requested_fields) & MARKET_FIELDS)
         uses_fundamentals = bool(set(requested_fields) & FUNDAMENTAL_FIELDS)
         receipts: list[_Receipt] = [self._identity_receipt]
+        missing_fundamental_binding: dict[str, Any] | None = None
         if uses_market:
             self._require_current_cut_available(self._market_receipt, cutoff, "market")
             receipts.append(self._market_receipt)
         if uses_fundamentals:
-            self._require_current_cut_available(self._fundamental_receipt, cutoff, "fundamentals")
-            receipts.append(self._fundamental_receipt)
+            if self._fundamental_receipt is not None:
+                self._require_current_cut_available(self._fundamental_receipt, cutoff, "fundamentals")
+                receipts.append(self._fundamental_receipt)
+            else:
+                missing_fundamental_binding = _missing_source_binding(
+                    source_id=FUNDAMENTAL_SOURCE_ID,
+                    reason=CRV1_FUNDAMENTALS_MISSING_REASON,
+                    retrieved_at=cutoff,
+                    parser_sha256=self._parser_sha256,
+                    parser_id="CIQCycleV1Adapter:fundamentals_missing_v1",
+                )
 
         rows: list[dict[str, Any]] = []
         missing_reasons: dict[str, int] = {}
@@ -329,7 +396,16 @@ class CiqCycleV1Adapter:
                 if field_id in MARKET_FIELDS:
                     row = self._market_observation(security_id=security_id, field_id=field_id, as_of=cutoff)
                 else:
-                    row = self._fundamental_observation(security_id=security_id, field_id=field_id, as_of=cutoff)
+                    row = self._fundamental_observation(
+                        security_id=security_id,
+                        field_id=field_id,
+                        as_of=cutoff,
+                        missing_receipt_sha256=(
+                            str(missing_fundamental_binding["raw_receipt_sha256"])
+                            if missing_fundamental_binding is not None
+                            else None
+                        ),
+                    )
                 rows.append(row)
                 if row["coverage_status"] != "PRESENT":
                     reason = str(row["missingness_reason"])
@@ -349,8 +425,15 @@ class CiqCycleV1Adapter:
             request={"ids": list(security_ids), "fields": list(requested_fields), "as_of": iso_utc(cutoff)},
             payload={"family_id": FAMILY_ID, "as_of": iso_utc(cutoff), "rows": rows, "row_count": len(rows)},
             as_of=cutoff,
-            created_at=_max_retrieved(receipts),
-            source_receipts=[receipt.binding for receipt in _dedupe_receipts(receipts)],
+            created_at=(
+                max(_max_retrieved(receipts), cutoff)
+                if missing_fundamental_binding is not None
+                else _max_retrieved(receipts)
+            ),
+            source_receipts=[
+                *[receipt.binding for receipt in _dedupe_receipts(receipts)],
+                *([missing_fundamental_binding] if missing_fundamental_binding is not None else []),
+            ],
             coverage_summary=coverage,
         )
 
@@ -543,9 +626,38 @@ class CiqCycleV1Adapter:
             missingness_reason=reason,
         )
 
-    def _fundamental_observation(self, *, security_id: str, field_id: str, as_of: datetime) -> dict[str, Any]:
+    def _fundamental_observation(
+        self,
+        *,
+        security_id: str,
+        field_id: str,
+        as_of: datetime,
+        missing_receipt_sha256: str | None = None,
+    ) -> dict[str, Any]:
         source = self._fundamental_receipt
         entity_id = self._security_to_entity[security_id]
+        if source is None or self._fundamentals is None:
+            return _observation_row(
+                security_id=security_id,
+                field_id=field_id,
+                value=None,
+                unit=_fundamental_unit(field_id),
+                period_end=None,
+                effective_at=None,
+                observed_at=as_of,
+                available_at=as_of,
+                source_id=FUNDAMENTAL_SOURCE_ID,
+                receipt_sha256=(
+                    missing_receipt_sha256
+                    if missing_receipt_sha256 is not None
+                    else domain_hash(
+                        "ALPHA_PIT_V1:CRV1:FUNDAMENTALS_MISSING",
+                        {"security_id": security_id, "as_of": iso_utc(as_of)},
+                    )
+                ),
+                coverage_status="MISSING_SOURCE",
+                missingness_reason=CRV1_FUNDAMENTALS_MISSING_REASON,
+            )
         if field_id in FUNDAMENTAL_GLOBAL_MISSING:
             return _observation_row(
                 security_id=security_id,
@@ -605,14 +717,16 @@ class CiqCycleV1Adapter:
     def _verify_current_custody(self) -> None:
         identity = self._identity_receipt.payload
         market = self._market_receipt.payload
-        fundamental = self._fundamental_receipt.payload
+        fundamental = self._fundamental_receipt.payload if self._fundamental_receipt is not None else None
         if _sha256_file(self._security_master_path) != str(identity.get("raw_object_sha256") or ""):
             raise AlphaPITContractError("alpha_pit_ciq_security_master_hash_mismatch")
         if _sha256_file(self._market_history_path) != str(market.get("raw_object_sha256") or ""):
             raise AlphaPITContractError("alpha_pit_ciq_market_history_hash_mismatch")
-        panel_meta = (fundamental.get("outputs") or {}).get("quarterly_panel") or {}
-        if _sha256_file(self._fundamental_panel_path) != str(panel_meta.get("sha256") or ""):
-            raise AlphaPITContractError("alpha_pit_ciq_fundamental_panel_hash_mismatch")
+        if fundamental is not None:
+            assert self._fundamental_panel_path is not None
+            panel_meta = (fundamental.get("outputs") or {}).get("quarterly_panel") or {}
+            if _sha256_file(self._fundamental_panel_path) != str(panel_meta.get("sha256") or ""):
+                raise AlphaPITContractError("alpha_pit_ciq_fundamental_panel_hash_mismatch")
 
     def _load_master(self) -> pd.DataFrame:
         frame = pd.read_csv(self._security_master_path, dtype=str)
@@ -794,6 +908,29 @@ class CiqCycleV1Adapter:
             raise AlphaPITContractError(f"alpha_pit_ciq_current_{label}_not_available_at_as_of")
 
 
+def _validate_crv1_structured_receipt_contract(
+    payload: Mapping[str, Any],
+    *,
+    expected_schema: str,
+    label: str,
+) -> None:
+    if payload.get("schema_version") != expected_schema:
+        raise AlphaPITContractError(f"alpha_pit_ciq_crv1_{label}_receipt_schema_invalid")
+    if payload.get("family_id") != FAMILY_ID or payload.get("risk_set_spec_id") != RISK_SET_SPEC_ID:
+        raise AlphaPITContractError(f"alpha_pit_ciq_crv1_{label}_receipt_family_contract_invalid")
+    if payload.get("structured_source_scope") != CRV1_STRUCTURED_SOURCE_SCOPE:
+        raise AlphaPITContractError(f"alpha_pit_ciq_crv1_{label}_receipt_source_scope_invalid")
+    for field in (
+        "growth_screen_applied",
+        "current_survivor_filter_applied",
+        "future_membership_filter_applied",
+        "aov_109_reused",
+        "legacy_identity_fallback_used",
+    ):
+        if payload.get(field) is not False:
+            raise AlphaPITContractError(f"alpha_pit_ciq_crv1_{label}_receipt_forbidden_flag:{field}")
+
+
 def _validate_risk_set_source_contract(source: Mapping[str, Any]) -> None:
     if source.get("eligibility_contract_id") != RISK_SET_ELIGIBILITY_CONTRACT_ID:
         raise AlphaPITContractError("alpha_pit_ciq_risk_set_eligibility_contract_id_invalid")
@@ -807,6 +944,8 @@ def _validate_risk_set_source_contract(source: Mapping[str, Any]) -> None:
         raise AlphaPITContractError("alpha_pit_ciq_current_survivor_filter_forbidden")
     if bool(source.get("future_membership_filter_applied")):
         raise AlphaPITContractError("alpha_pit_ciq_future_membership_filter_forbidden")
+    if source.get("aov_109_reused") is not False:
+        raise AlphaPITContractError("alpha_pit_ciq_aov_109_risk_set_forbidden")
 
 
 def _validate_risk_set_receipt_contract(payload: Mapping[str, Any], *, receipt_path: Path) -> None:
@@ -820,6 +959,8 @@ def _validate_risk_set_receipt_contract(payload: Mapping[str, Any], *, receipt_p
         raise AlphaPITContractError("alpha_pit_ciq_current_survivor_filter_forbidden")
     if bool(payload.get("future_membership_filter_applied")):
         raise AlphaPITContractError("alpha_pit_ciq_future_membership_filter_forbidden")
+    if payload.get("aov_109_reused") is not False:
+        raise AlphaPITContractError("alpha_pit_ciq_aov_109_risk_set_forbidden")
     identity_path_raw = str(payload.get("identity_receipt_path") or "").strip()
     identity_sha = str(payload.get("identity_receipt_sha256") or "").strip()
     if not identity_path_raw or len(identity_sha) != 64:

@@ -1,10 +1,10 @@
 # CYCLE_RESONANCE_v1 — Thin Build Specification
 
 **Date:** 2026-08-09
-**Status:** `BUILD_SPEC / PREREGISTERED / CLOCK_1_RELEASED / MECHANICS_PARTIAL`
+**Status:** `BUILD_SPEC / PREREGISTERED / CLOCK_1_RELEASED / MECHANICS_PARTIAL / NON_GROWTH_SOURCE_ADMISSION_READY / E4_REPRESENTATION_FROZEN`
 **Family ID:** `CYCLE_RESONANCE_v1`
 **First implementation authority:** **RELEASED AFTER CLOCK #1; INPUT-PACKET + IMPLEMENTATION-MANIFEST MECHANICS IMPLEMENTED**
-**Current execution effect:** **NO EMPIRICAL MODEL AUTHORITY YET** — provider-blind PIT packet closure and the explicit no-scientific-defaults implementation-manifest contract are implemented; clock/claim/resonance/model/runner mechanics and the legitimate broad CRV1 risk-set join remain open
+**Current execution effect:** **NO EMPIRICAL MODEL AUTHORITY YET / W9 DATA-ADMISSION ENGINEERING SLICE FROZEN / E3+E4 SCIENCE FROZEN** — provider-blind PIT packet closure, the explicit no-scientific-defaults implementation-manifest contract, fail-closed independent non-growth CRV1 source admission, the E3 clock/state-coordinate contract, and the E4 structured-clock representation/sequence contract are frozen. No further CRV1 adapter/platform work or provider capture is authorized today. Fresh broad raw CIQ identity/market bytes may be joined only in a future shared W3/W9 stock-data round, with independent family-specific admission; claim-interpreter, resonance implementation, model, and runner mechanics remain separate future CRV1 work
 **Data dependency:** `docs/architecture/alpha_pit_data_api_v1.md` only
 **Strategic role after 2026-08-09 lock:** `SLOW_BUSINESS_CYCLE_FAMILY / 252D_PRIMARY_UNCHANGED / NOT_SOLE_PROGRAMME_CLOCK`
 **Programme lock:** `docs/architecture/aov_strategic_direction_lock_20260809.md`
@@ -267,6 +267,19 @@ INFLECTION
 ORDERED_SEQUENCE
 ```
 
+For `CYCLE_RESONANCE_v1`, E4 now freezes the required six-clock core to exactly one primary node representation each:
+
+```text
+SUPPLY_CAPACITY_CLOCK     LEVEL
+INVENTORY_CLOCK           DELTA
+PRICING_CLOCK             INFLECTION
+UTILIZATION_MARGIN_CLOCK  INFLECTION
+EARNINGS_REVISIONS_CLOCK  DELTA
+EXPECTATION_GAP_CLOCK     INFLECTION
+```
+
+`ORDERED_SEQUENCE` is the single graph-level composite, not a competing per-clock transform. `DEMAND_CLOCK` remains corroborating only and `MARKET_CONFIRMATION_CLOCK` remains downstream `ACTION_EXECUTION`; E4 does not use either to repair the required core. Canonical E4 authority=`docs/architecture/cycle_resonance_v1_structured_clock_representation_v1.json`.
+
 ## `CycleClockEvidenceV1`
 
 ```text
@@ -388,18 +401,18 @@ SUPPLY_CAPACITY
 
 `DEMAND_CLOCK` and `MARKET_CONFIRMATION_CLOCK` are corroborating/state clocks and may be included in the frozen implementation without changing the family identity.
 
-The implementation manifest must define:
+The implementation manifest must bind, rather than redefine, the E4 representation/sequence law:
 
 ```text
-required edges
-allowed skipped edges
-maximum temporal lag between edges
-clock-specific inflection definition
-how contradictions are scored
-how missing clocks affect eligibility
+required edges = all five adjacent six-clock core edges
+allowed skipped edges = [] for ESTABLISHED
+maximum temporal lag between adjacent core events = 183 calendar days
+clock-specific representation = frozen by E4
+contradiction handling = frozen by E4
+missing core clock = PARTIAL sequence; never risk-set exclusion
 ```
 
-There are no code defaults for these scientific choices. Missing values in the manifest are a hard error.
+`core_event_at` is first lawful decision-time detection under `available_at <= cut`; same-cut adjacent events are allowed. No lag grid exists. The manifest must hash-bind the E4 contract and may not silently select an alternate LEVEL/DELTA/INFLECTION form or lag. There are no code defaults for scientific choices; missing bindings are a hard error.
 
 A future material reordering of the mechanism creates a new family/version.
 
@@ -879,9 +892,13 @@ This does **not** mean the Alpha Family has proven alpha.
 ACTIVE_PRODUCT_STATE = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 CLOCK_1_STARTED = TRUE
 CYCLE_RESONANCE_v1 = PREREGISTERED / INPUT_PACKET_AND_IMPLEMENTATION_MANIFEST_MECHANICS_IMPLEMENTED / EMPIRICAL_CANDIDATE_NOT_FROZEN
-ALPHA_PIT_DATA_API_V1 = MECHANICS_IMPLEMENTED / CURRENT_CIQ_STRUCTURED_CUSTODY_VERIFIED / CRV1_RISK_SET_BLOCKED
+ALPHA_PIT_DATA_API_V1 = MECHANICS_IMPLEMENTED / CURRENT_CIQ_STRUCTURED_CUSTODY_VERIFIED / CRV1_NON_GROWTH_ADMISSION_FROZEN / CRV1_FUTURE_SHARED_RAW_ROUND_ONLY
 financial_alpha_evidence = 0
 LIVE = CLOSED
 ```
 
-Clock #1 released the first confirmatory Alpha-family build slot. `pit_packet.py` now closes provider-blind Alpha PIT artifacts deterministically, and `implementation_manifest.py` requires every scientific choice explicitly before freeze: family/risk-set/label identity, observation/expectation/claim surfaces, coverage policy, transform hashes, claim interpreter, ordered-sequence law, falsifiers, model/hyperparameters, training/calibration/ranking rules, search-family budget, cost assumptions, and code-byte identity. Missing scientific parameters fail closed; search trials cannot exceed the preregistered budget; sealed manifest tampering fails hash verification. Clock/claim/resonance/model/runner mechanics remain open, discovery/outcome visibility remains quarantined, no empirical or prospective prediction is yet sealed for this family, and financial-alpha evidence remains `0`.
+Clock #1 released the first confirmatory Alpha-family build slot. `pit_packet.py` now closes provider-blind Alpha PIT artifacts deterministically, and `implementation_manifest.py` requires every scientific choice explicitly before freeze: family/risk-set/label identity, observation/expectation/claim surfaces, coverage policy, transform hashes, claim interpreter, ordered-sequence law, falsifiers, model/hyperparameters, training/calibration/ranking rules, search-family budget, cost assumptions, and code-byte identity. Missing scientific parameters fail closed; search trials cannot exceed the preregistered budget; sealed manifest tampering fails hash verification.
+
+W9 source hardening is now mechanical. `research/alpha_pit_v1/adapters/ciq_crv1_source_v1.py` admits only separately captured, hash-bound broad CIQ identity + market custody with the frozen non-growth risk-set law; `scripts/alpha_pit_admit_crv1_current_sources.py` writes the derived identity/market/risk-set receipts without provider acquisition. When a CRV1 risk set is present, `CIQCycleV1Adapter` rejects AOV-style structured receipts, requires `aov_109_reused=false`, binds the risk-set identity receipt to the exact structured identity master actually used by observations, rechecks CIQSEC→trading-item/company mapping, and recomputes the declared prior-market-observation count from the admitted market bytes. A missing independent CRV1 fundamentals capture is represented as manifest-bound `MISSING_SOURCE`; it cannot be filled by the old 109-company AOV fundamentals.
+
+The 252-trading-day primary horizon remains unchanged. W9 is now `ENGINEERING_SLICE_CLOSED / FUTURE_SHARED_RAW_ROUND_ONLY`. A future raw CIQ identity/market capture may be physically shared with W3 where legitimate, but W3's date-local PREBREAKOUT/corporate-action authority and W9's `CRV1_US_PRIMARY_COMMON_V1` non-growth `>=200`-complete-observation authority must be compiled and hash-bound separately; shared bytes never imply shared risk-set authority. AOV-109 remains impossible as a CRV1 substitute. Independent CRV1 fundamentals, expectations, and SEC claims remain explicit `MISSING_SOURCE` unless their own custody lands. Discovery/outcome visibility remains quarantined, no empirical or prospective prediction is yet sealed for this family, and financial-alpha evidence remains `0`.

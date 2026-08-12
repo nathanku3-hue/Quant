@@ -7,6 +7,7 @@
 **Runtime effect of this document alone:** `NONE` — implementation, tests and receipts still required  
 **financial_alpha_evidence:** `0`  
 **Strategy live capital:** `CLOSED`
+**Current readiness evidence:** `docs/architecture/paper0_readiness_evidence_20260810.md`
 
 ---
 
