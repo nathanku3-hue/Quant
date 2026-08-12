@@ -39,6 +39,27 @@ DecisionState: <PENDING|APPROVED|BLOCKED|DEFERRED>
 +--------------+----------------+------+----------------+-----------------+--------------+-----------------------+
 ```
 
+## Execution Feasibility (only when action-bearing)
+
+Do not blend heterogeneous risk/capturability evidence into one confidence score.
+
+```text
+HardGate: <ALLOW|BLOCK|UNRESOLVED|NOT_APPLICABLE>
+ReasonCode: <canonical risk reason code or none>
+RiskMargins:
+  var_margin: <value|NA>
+  sector_margin: <value|NA>
+  single_name_margin: <value|NA>
+  vix_margin: <value|NA>
+  other_reason_code_specific_margins: <map|NA>
+StressBlockRate: <value|UNRESOLVED|NA>
+CapturabilityState: <ROBUST|NEAR_BOUNDARY|FRAGILE|BLOCKED|UNRESOLVED|NA>
+SoftCostEnvelope: <policy-conditioned IS/slippage/latency/fill/capacity summary|UNRESOLVED|NA>
+TelemetryPolicyConditioning: <policy_id + order_type/TIF + participation/sizing + market regime|NA>
+```
+
+`CapturabilityState` is summary only. The underlying risk-margin vector remains visible authority. Fixture/client-order IDs are not risk ontology; use canonical reason codes.
+
 ## Findings
 
 ```text
@@ -60,6 +81,10 @@ StreamOrderRule: stream_order defines execution sequence; hold means no executio
 FindingRule: every material finding needs an owner, fix, status, and disposition before reconciliation can close.
 BuildVsBorrowRule: if the pre-route is not `EXPERT_PACKET` or `HUMAN_TASTE`, reconcile why expert judgment was still necessary or defer the packet.
 AuthorityRule: product, architecture, security, release, provider, and domain-authority changes cannot close with terminal outcome `SHIP`.
+HardRiskRule: an in-scope `HardGate=BLOCK` requires `OrchestratorDecision=BLOCK`; no scalar score or lambda penalty may override it.
+FeasibilitySummaryRule: `CapturabilityState` may summarize but may not replace the reason-code-specific risk-margin vector.
+TelemetryCalibrationRule: soft execution calibration must be policy-conditioned; cross-policy fill/IS reuse without an explicit bridge is forbidden.
+BlendedScoreRule: do not create one blended expert/risk/capturability confidence score.
 ```
 
 ## Decision

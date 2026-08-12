@@ -1,12 +1,13 @@
 # GodView Alpha-Organism Endgame — Current
 
-**Date:** 2026-08-11
+**Date:** 2026-08-12
 **Status:** `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0; LIVE CLOSED`
 **Canonical product maturity:** `70/100` (operability / custody / replay only)  
 **Portfolio-alpha evidence:** `0`  
 **Limited Live:** `CLOSED; NOT AUTHORIZED`  
 **Strategic lock:** `docs/architecture/aov_strategic_direction_lock_20260809.md`  
 **Roadmap / change authority:** `docs/architecture/aov_endgame_generalization_spec_current.md`  
+**Result-first research authority:** `docs/architecture/result_first_ai_research_loop_v1.md`
 **Runtime authority:** frozen executable contract + exact code bytes + admitted receipts (`docs/context/gv_endgame_authority_current.md`)
 
 ---
@@ -51,6 +52,21 @@ AO-K0A itself consumes zero new material trials. Numeric Q remains unbound until
 
 ---
 
+## Result-first AI research-loop amendment — 2026-08-12
+
+Canonical lock=`docs/architecture/result_first_ai_research_loop_v1.md`; machine preflight=`docs/architecture/opportunity_kernel_scientific_preflight_v2.json`; action-bearing feasibility=`docs/architecture/execution_feasibility_v1.json`.
+
+The strategic lock remains closed. This is a forward-only research-method recut, not a product/capital reopen.
+
+```text
+research unit of progress = decision changed or path killed
+not                         run completed / feature built / phase filled
+```
+
+Every material research slice preregisters its decision and PASS/FAIL/UNRESOLVED routes. Identical routes mean `DO_NOT_RUN`. L4 freeze creates only `READY_FOR_L5_CANDIDATE`; scarce L5 reads are allocated across families using **ordinal** RDV (`LOW/MED/HIGH`), and `READY_BUT_NOT_PRIORITY` is legal.
+
+Capturability moves earlier only for action-bearing work. Hard risk remains deterministic `ALLOW/BLOCK/UNRESOLVED`; margins remain a reason-code-specific vector, never a universal scalar. Execution telemetry calibration is policy-conditioned (policy ID, order type/TIF, participation/sizing regime, market regime). Realized fills are not Alpha features.
+
 ## Mission
 
 GodView is a point-in-time certified portfolio operating system whose scarce resource is **prospective learning time**, optimized for:
@@ -62,12 +78,20 @@ EVIDENCE_VELOCITY × ECONOMIC_RELEVANCE
 Endgame path:
 
 ```text
-immutable PIT reality
-→ multi-scale state estimation (context only)
+question worth asking
+→ cheapest source/semantic falsifier
+→ immutable PIT reality
+→ clock/state-coordinate declaration
+→ representation SNR + R9 fabrication tolerance
+→ observability-selection diagnosis
+→ smallest surviving freeze
+→ cross-family RDV / research-capital allocation
+→ one scarce authorized outcome read
+→ D1→D9 first-fail diagnosis
 → independent ex-ante Alpha-family forecasts
 → Prediction / Trial custody
 → marginal composition tests (I vs I+X)
-→ portfolio target
+→ action-bearing capturability preflight
 → one current capital-policy authority
 → execution / PAPER operational learning
 → matured deterministic review

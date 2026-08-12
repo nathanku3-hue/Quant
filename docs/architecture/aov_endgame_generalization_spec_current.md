@@ -13,7 +13,7 @@
 **Replication-readiness recut:** `START_NOW / QUARANTINED`
 **Alpha-family WIP:** `DEFAULT=2 / INITIAL_CEILING=3 UNTIL EXPLICIT_WIP_REVIEW`
 **Final re-audit ratings:** `STRATEGY=9.0 / SHIP_FAST=8.2 / IMMEDIATE_SIM_TO_PAPER=7.5; DIRECTION_PASS_AFTER_RECUT`
-**Documentation sync:** `PATCHED_2026-08-12_OK_SBI_0_AUTHORITY_TOPOLOGY_DELTA`
+**Documentation sync:** `PATCHED_2026-08-12_RESULT_FIRST_FORWARD_GATE_METHOD_LOCK + OK_SBI_0_AUTHORITY_TOPOLOGY_DELTA`
 **Authority type:** Approved roadmap/change authority with prior capital-path, evidence-clock, sim-to-real and Winner/Core-Alpha recuts retained; destructive v3 + real CIQ admission + the first immutable Clock-Start Receipt are now complete, while this velocity recut governs post-Clock construction topology
 **Implementation authority:** **MANDATORY RECUTS AUTHORIZED FOR EXECUTION** — preserve Clock #1; continue Alpha PIT + CRV1; preserve `OpportunityKernelV1` and the frozen AO-K0A full-W3 denominator/orthogonalization law; allow independent family clocks/evidence qualification within WIP; implement PAPER-0 behind minimum execution/restart/calendar gates; start quarantined replication readiness. **OK-SBI-0 is shadow research only** at `S0_DESIGN_LOCKED_RELEASE_BLOCKED` (not product tip; not fourth clock). Numeric Q is unbound until `QSourceContractV1 ∈ {Q_GF_BOUND, Q_AMENDED_BOUND}` (current=`Q_SOURCE_BLOCKED`). Legacy AO-K0B automatic `Q/M_perp/Q+M_perp` trophy next is **FORBIDDEN**. Runtime/evidence/capital authority still requires each deterministic join gate. Public main is non-authority until merge; authority lineage=`codex/pit-source-authority-1`.
 **Date:** 2026-08-12
@@ -21,6 +21,7 @@
 **PAPER-0 authority:** `docs/architecture/paper_0_authority.md`
 **Historical vintage gate:** `docs/architecture/historical_fundamental_vintage_authority.md`
 **Method endgame view:** `docs/architecture/alpha_organism_endgame_current.md`
+**Result-first research method:** `docs/architecture/result_first_ai_research_loop_v1.md` (`FORWARD_ONLY`; machine preflight v2; ordinal RDV; no automatic L4→L5)
 **Target mandate:** Multi-hour → multi-week systematic evidence engine, initially AOV / long-cash; true Long-Short only after PIT borrow/locate authority exists.
 
 ---
@@ -1623,9 +1624,17 @@ Portfolio promotion asks whether `Incumbent Portfolio + Right-Tail Family` adds 
 
 ```text
 Alpha / PM → DESIRED capital
+Capturability model → feasible economic transform
 CRO        → ALLOWABLE capital
 portfolio  → ACTUAL capital
+broker     → realized fills / account state
 ```
+
+Capturability may move earlier only as a separate evidence ledger; it never becomes D6 selection evidence by convenience. `ExecutionFeasibilityV1` is required for action-bearing economic freezes, D9, promotion/capital-policy preflight, and PAPER action proposals; it is not a mandatory gate on pure source/sensing slices.
+
+Hard risk remains a deterministic feasibility constraint. `BLOCK` cannot be softened by a lambda penalty or outweighed by expected return. Risk-distance authority remains a **vector** (`var_margin`, `sector_margin`, `single_name_margin`, `vix_margin`, plus reason-code-specific margins); `capturability_state` is summary only, never a universal scalar margin.
+
+Historical execution telemetry used for soft IS/slippage/latency/fill/capacity calibration must be policy-conditioned by policy ID, order type/TIF, participation/sizing regime, and market regime/declared conditioning state. Realized fills do not become universal Alpha features.
 
 Sizing should be fractional-growth-optimal in spirit and aggressively shrunk for model/probability/correlation/tail uncertainty. Track how quickly recommended capital collapses under plausible estimation error.
 
@@ -1644,19 +1653,43 @@ hedge basis fails
 
 VaR remains secondary to hard limits, reverse stress, liquidity, concentration, gap, and correlated-thesis-failure controls.
 
-## 13A.12 Research Option Value / PM speed metrics
+## 13A.12 Research Decision Value / PM speed metrics — result-first forward gate
 
-Prioritize research by expected decision-changing information, not activity volume. For major programs record:
+Canonical method lock=`docs/architecture/result_first_ai_research_loop_v1.md`; machine preflight=`docs/architecture/opportunity_kernel_scientific_preflight_v2.json`.
+
+Prioritize research by **decision-changing information**, not activity volume and not PnL as an inner-loop objective. Every material slice declares before implementation:
 
 ```text
-decision the experiment can change
-economic value if it changes
-probability it changes the decision
-independence / contrast of information learned
-calendar time
-data / analyst / AI / engineering cost
-untouched evidence consumed
+DECISION_TO_CHANGE
+CHEAPEST_DISCRIMINATING_TEST
+WHY_NO_CHEAPER_TEST_EXISTS
+PASS_ROUTE
+FAIL_ROUTE
+UNRESOLVED_ROUTE
 ```
+
+Hard killer:
+
+```text
+if PASS_ROUTE == FAIL_ROUTE == UNRESOLVED_ROUTE
+→ DECISION_VALUE = 0
+→ DO_NOT_RUN
+```
+
+Research Decision Value (`RDV`) is initially **ordinal only**. Do not invent a calibrated `P(route_changes)` or pseudo-mutual-information scalar:
+
+```text
+route_change_plausibility = LOW | MED | HIGH
+decision_materiality      = LOW | MED | HIGH
+information_independence  = LOW | MED | HIGH
+engineering_cost          = LOW | MED | HIGH
+untouched_evidence_cost   = LOW | MED | HIGH
+search_debt               = LOW | MED | HIGH
+```
+
+RDV is research-priority only: not Alpha evidence, not promotion evidence, not capital authority, and no future PnL/IC/Sharpe may enter confirmatory L0–L4 RDV.
+
+`L4 freeze → READY_FOR_L5_CANDIDATE`, not L5 entitlement. Before any scarce L5 read, compare all lawful READY candidates across families. `READY_BUT_NOT_PRIORITY` is legal and does not imply scientific failure.
 
 Program KPIs:
 
@@ -1664,9 +1697,18 @@ Program KPIs:
 TIME_TO_FIRST_SEALED_ALPHA_FAMILY
 AVOIDABLE_PROSPECTIVE_CLOCK_IDLE
 DISCOVERY_TO_FROZEN_HYPOTHESIS_TIME
+TIME_TO_TERMINAL_DECISION
+ROUTE_CHANGE_RATE_PER_SLICE
+OUTCOME_READS_AVOIDED
+SOURCE_FAILURES_CAUGHT_PRE_L3
+REPRESENTATION_FAILURES_CAUGHT_PRE_L5
+DECISION_CHANGING_INFO_PER_ENGINEERING_HOUR
+DECISION_CHANGING_INFO_PER_OUTCOME_READ
+SEARCH_DEBT_PER_SURVIVING_FAMILY
+TIME_SPENT_AFTER_FIRST_KNOWN_FATAL_BLOCKER
 ```
 
-Do not optimize number of Atlas companies, AI analyses, features, or models.
+Do not optimize number of Atlas companies, AI analyses, features, models, runs, commits, or completed phases.
 
 ## 13A.13 Reconstruction coverage and Alpha Half-Life
 
@@ -1685,7 +1727,7 @@ Every promoted family also measures `ALPHA_HALF_LIFE`: how quickly the expected 
 
 ## 13A.14 Second family and platform extraction
 
-`DURABLE_COMPOUNDER_v1` remains a **queued candidate family, not an active lane**. It may become the second real consumer after evidence justifies it. Only then should common primitives such as PIT Claim Ledger, Outcome Census, Risk Set, Logic Graph, Winner Thesis, Control Match, or shared document tooling be extracted into reusable infrastructure.
+`DURABLE_COMPOUNDER_v1` remains a **queued candidate family, not an active lane**. By default, common research abstractions are extracted only after at least two real consumers prove the same semantic need. Safety/authority primitives may be shared earlier when duplication itself creates safety or authority risk (for example immutable receipt/hash utilities, PIT timestamp validation, canonical risk reason codes, fail-closed authority checks). This exception is not permission to build a generic research/data/model platform.
 
 ---
 
@@ -1832,15 +1874,30 @@ FREEZE_NEW_RISK = TRUE
 
 Reducing/closing risk may remain separately authorized by owner/risk policy; new risk may not proceed on ambiguous account state.
 
-### 14.5F Dual ledgers — research economics and actual broker economics
+### 14.5F Three ledgers — scientific, capturability, actual broker economics
 
-The research CIQ total-return ledger and broker fill/account ledger remain separate authorities:
+Keep three authorities separate:
+
+```text
+SCIENTIFIC LEDGER
+  source/PIT + representation/R9 + selection/timing/hold evidence (D1–D8)
+
+CAPTURABILITY LEDGER
+  action feasibility + policy-conditioned IS/latency/fill/capacity stress (D9)
+
+ACTUAL BROKER LEDGER
+  realized fills + fees + cash + positions + open orders + account P&L
+```
+
+The research counterfactual and broker account remain distinct:
 
 ```text
 research counterfactual P&L
 ≠
 actual broker/account P&L
 ```
+
+No ledger overwrites another. Actual fills may calibrate future policy-conditioned capturability envelopes but never retroactively rewrite historical Alpha evidence.
 
 Bridge them explicitly through:
 

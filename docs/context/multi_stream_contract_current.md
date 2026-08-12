@@ -4,6 +4,14 @@ Date: 2026-08-12
 Gate: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_LOCKED / AO_K0A_ORTHOGONAL_BASIS_FROZEN / OK_SBI_0_SHADOW_S0 / MULTI_CLOCK_EVIDENCE / PAPER_0_AND_REPLICATION_RECUTS`
 Status: `CRV1 + SECTOR_ROTATION_ACTIVE_RESEARCH / VSB_CONFIRMATION_PARKED_NO_WORKER / PREBREAKOUT_AO_K0A_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ / OK_SBI_0_S0_RELEASE_BLOCKED_Q_SOURCE_BLOCKED / PARALLEL_EVIDENCE_QUALIFICATION / SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY / ONE_WRITER_PER_MUTABLE_AUTHORITY_SURFACE`
 
+## Result-first cross-stream law — 2026-08-12
+
+- Parallel lanes do not earn work merely because capacity exists. Every material slice must change a named decision and preregister concrete PASS/FAIL/UNRESOLVED routes; identical routes => `DO_NOT_RUN`.
+- L4 readiness is a candidate state only. Scarce L5 reads are a cross-family research-capital allocation problem under ordinal RDV; `READY_BUT_NOT_PRIORITY` is legal.
+- Pure source/sensing lanes do not inherit action-feasibility bureaucracy. `ExecutionFeasibilityV1` activates only when a proposed action/economic freeze/D9/promotion/PAPER path exists.
+- Capturability is a separate ledger between scientific evidence and broker realization. Hard risk remains veto authority; risk margins remain a vector; telemetry calibration is policy-conditioned.
+- Shared infrastructure defaults to two real semantic consumers. Safety/authority primitives may be shared earlier when duplicate implementations would themselves create authority/safety risk.
+
 ## Lane map
 
 | Lane | Current state | Blocking relationship |

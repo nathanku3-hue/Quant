@@ -43,6 +43,20 @@ SERIALIZE
 
 Initial active Alpha-family WIP is `2`; ceiling `3` until an explicit ownership/search-budget/risk-capacity WIP review. The ceiling is an operating limit, not a permanent constitution.
 
+### Forward-only result-first amendment — 2026-08-12
+
+This strategic lock now incorporates `docs/architecture/result_first_ai_research_loop_v1.md` without reopening broad architecture.
+
+```text
+phase completion ≠ next-phase entitlement
+L4 freeze → READY_FOR_L5_CANDIDATE only
+scarce L5 reads compete across families
+READY_BUT_NOT_PRIORITY is legal
+same PASS/FAIL/UNRESOLVED route → DO_NOT_RUN
+```
+
+Research Decision Value is ordinal (`LOW/MED/HIGH`) and cannot use future PnL in confirmatory L0–L4. Capturability may move earlier for action-bearing work, but hard CRO risk remains a deterministic veto, margins remain a vector, execution telemetry is policy-conditioned, and fills do not become Alpha features.
+
 ---
 
 ## 1. Ex-ante Prediction Constitution

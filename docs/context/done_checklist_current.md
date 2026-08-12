@@ -5,6 +5,19 @@ Active state: `STRATEGIC_DIRECTION_APPROVED_AND_LOCKED / PREBREAKOUT_TRIAL1_CLOS
 Canonical score: `70/100`
 Portfolio-alpha evidence: `0`
 
+## Result-first AI research-loop method lock — 2026-08-12
+
+- [x] Canonical forward-only amendment frozen at `docs/architecture/result_first_ai_research_loop_v1.md`.
+- [x] Machine preflight frozen at `docs/architecture/opportunity_kernel_scientific_preflight_v2.json`; future L3 default=`L3_R1_R9_V2`; historical L3 receipts remain valid under pinned versions.
+- [x] `DECISION_TO_CHANGE` + cheapest discriminating test + PASS/FAIL/UNRESOLVED routes are mandatory before material implementation; identical routes => `DO_NOT_RUN`.
+- [x] RDV is ordinal `LOW/MED/HIGH` only, research-priority only; no fake `P(route_changes)`, no pre-L5 future PnL/IC/Sharpe, no Alpha/promotion/capital authority.
+- [x] `L4 freeze → READY_FOR_L5_CANDIDATE`; `READY_BUT_NOT_PRIORITY` legal; cross-family research-capital allocation required before scarce L5.
+- [x] Action-bearing `ExecutionFeasibilityV1` frozen separately: hard-risk BLOCK infeasible; risk margins stay a vector; `capturability_state` summary only; policy-conditioned telemetry calibration required.
+- [x] Reuse default=`>=2 real consumers`; safety/authority primitives may share earlier when duplication itself creates safety/authority risk.
+- [x] Rejections locked: fills→Alpha, lambda-soft hard risk, blended expert score, E6.5 on pure sensing, RDV as Alpha evidence, outcome-trained stress-block rate, auto-DISLOCATION open.
+- [x] Forward-only effect: no FTK/TR-v0/W6/Clock #1/capital/evidence reopen.
+- [x] Thin SAW evidence=`docs/saw_reports/saw_result_first_ai_research_loop_method_lock_20260812.md`; closure-packet validator=`VALID`; SAW-block validator=`VALID`.
+
 ## AO-FTK-0 Transition Sparse Basis pre-open freeze close — 2026-08-12
 
 - [x] Slice `AO-FTK-0` closed at pre-open only: verdict=`READY_FOR_LATER_CHARGED_DEVELOPMENT_READ`.

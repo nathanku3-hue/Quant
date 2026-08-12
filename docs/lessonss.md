@@ -1,3 +1,14 @@
+## 2026-08-12 Round Entry (Research Progress Is a Decision Change, Not a Completed Run)
+
+- Date: 2026-08-12
+- Mistake or miss: prior roadmap slices could still be justified by phase order, infrastructure completeness, or the existence of an available run even when PASS/FAIL/UNRESOLVED would not change the next action. That burns engineering time, untouched evidence and search degrees of freedom while producing metrics instead of decisions.
+- Root cause: phase completion was too easy to confuse with authorization, and research prioritization lacked a hard pre-implementation test for whether the proposed experiment could actually change a route. Capturability also tended to arrive late as execution accounting, while the opposite overreaction—making fills/microstructure universal Alpha features or softening hard risk into optimizer penalties—would collapse evidence and authority boundaries.
+- Fix applied: lock `RESULT_FIRST_AI_RESEARCH_LOOP_v1` forward-only. Every material slice now preregisters `DECISION_TO_CHANGE`, cheapest discriminating test, why no cheaper test exists, and concrete PASS/FAIL/UNRESOLVED routes. Identical routes force `DO_NOT_RUN`. `L4` creates only `READY_FOR_L5_CANDIDATE`; scarce L5 reads are allocated across families by ordinal RDV and may return `READY_BUT_NOT_PRIORITY`.
+- Guardrail: RDV stays `LOW/MED/HIGH` and research-priority only—never fake calibrated `P(route_changes)`, future-PnL input pre-L5, Alpha evidence, promotion score or capital authority. The killer rule dominates the score.
+- Capturability guardrail: action-bearing work may use `ExecutionFeasibilityV1`, but hard risk remains a veto; reason-code-specific margins remain a vector; `capturability_state` is summary only; telemetry calibration must be policy-conditioned by policy/TIF/participation/regime. Fills remain post-action evidence/capturability calibration, not universal Alpha inputs.
+- Reuse guardrail: >=2 real semantic consumers remains the default for shared research infrastructure, but safety/authority primitives may share earlier when duplicate implementations create authority/safety risk. Do not use the exception to justify generic platforms.
+- Evidence: `docs/architecture/result_first_ai_research_loop_v1.md`, `docs/architecture/opportunity_kernel_scientific_preflight_v2.json`, `docs/architecture/execution_feasibility_v1.json`, `docs/architecture/alpha_scientific_method_v1.md`, `docs/architecture/ai_research_pipeline_v0_spec.md`, and current truth surfaces. No family/outcome/provider/capital action is created by this method lock.
+
 ## 2026-08-11 Round Entry (Missingness Belongs in the Opportunity Space; Do Not Turn Coverage Into an Admission Gate)
 
 - Date: 2026-08-11

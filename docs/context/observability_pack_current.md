@@ -1,8 +1,19 @@
 # Observability Pack — Current
 
-Date: 2026-08-11
+Date: 2026-08-12
 Gate: `BOARD_GO_WIP_3 / STRATEGIC_DIRECTION_LOCKED / PREBREAKOUT_TRIAL1_CLOSED_1_OF_8 / PREBREAKOUT_FAILURE_PACKET_V1_ZERO_TRIAL_COST / ECONPHYSICS_SPECIALIZED_KERNEL_RETAINED / AO_K0_OPPORTUNITY_CONSTITUTION_FROZEN / W6_UNTOUCHED / MULTI_CLOCK_EVIDENCE / PAPER_0 / LANE2_A1_A2_CLOSED`
 Status: `CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_W3_COMPLETE_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUPERSEDED_W5_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED; ECONPHYSICS_PREBREAKOUT_V1_REAL_S0_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
+
+## Result-first method sentinels — current
+
+- Every material future slice names `DECISION_TO_CHANGE`, cheapest discriminating test, and concrete PASS/FAIL/UNRESOLVED routes before implementation. Same route under all outcomes => `DO_NOT_RUN`.
+- `L4→READY_FOR_L5_CANDIDATE`; no automatic L5. Before any scarce result read, compare lawful READY families by ordinal RDV only. `READY_BUT_NOT_PRIORITY` is legal.
+- RDV scale is `LOW/MED/HIGH`; never convert it into Alpha/promotion evidence or fake calibrated `P(route_changes)`.
+- Future L3 default is R1–R9 v2; R9 is source-bound and outcome-blind. Observability-selection bias is report/route only, never candidate weighting or denominator relief.
+- E6.5/ExecutionFeasibility is action-triggered, not a pure sensing gate. `HardGate=BLOCK` is infeasible. Risk margins remain a vector; `capturability_state` is summary only.
+- Execution telemetry calibration must bind policy ID, order type/TIF, participation/sizing regime, and market regime/conditioning state; cross-policy silent reuse is forbidden.
+- Generic shared research infrastructure defaults to two real consumers; safety/authority primitives may share earlier only where duplication creates safety/authority risk.
+- Stop on fills→Alpha, lambda-soft hard risk, blended expert score, outcome-trained stress-block rate, or auto-DISLOCATION showcase opening.
 
 ## Strategic-lock sentinels — current
 

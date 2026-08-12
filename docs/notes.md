@@ -1,3 +1,18 @@
+## 2026-08-12 Result-First AI Research Loop / Capturability Contract Registry
+
+- Canonical method amendment=`docs/architecture/result_first_ai_research_loop_v1.md`; scientific preflight machine contract=`docs/architecture/opportunity_kernel_scientific_preflight_v2.json`; action-bearing feasibility=`docs/architecture/execution_feasibility_v1.json`.
+- Killer rule: `PASS_ROUTE == FAIL_ROUTE == UNRESOLVED_ROUTE => DECISION_VALUE=0 => DO_NOT_RUN`. Routes must be concrete legal next states/actions, not narrative synonyms.
+- RDV is deliberately ordinal, not a numeric formula: `route_change_plausibility / decision_materiality / information_independence / engineering_cost / untouched_evidence_cost / search_debt ∈ {LOW, MED, HIGH}`. No universal `P(route_changes)` is estimated; the killer rule has precedence over any ordinal ranking.
+- Forward-gate law: `L4_EMPIRICAL_FREEZE -> READY_FOR_L5_CANDIDATE`; `READY_FOR_L5_CANDIDATE != L5_AUTHORIZED`; cross-family research-capital allocation may return `READY_BUT_NOT_PRIORITY`.
+- Future L3 version=`L3_R1_R9_V2`: R9A numeric source tolerance; R9B source-bound temporal delay with cut crossing→`UNOBSERVED→ABSTAIN`; R9C local frozen threshold stress/no grid; R9D source-shaped missingness with immutable denominator. Observability-selection bias remains report/route only.
+- Execution feasibility trigger: action-bearing economic freeze / D9 / promotion-capital preflight / PAPER action only; pure source/custody/representation/sensing may declare `NOT_APPLICABLE`.
+- Hard-risk law: `G(s,a) ∈ {ALLOW, BLOCK, UNRESOLVED}` and `BLOCK` is infeasible. No lambda/expected-return compensation.
+- Risk-margin authority is a vector, not scalar: `{var_margin, sector_margin, single_name_margin, vix_margin, other_reason_code_specific_margins}`. `capturability_state` is a summary only.
+- Soft execution-calibration identity must bind at least `{policy_id, order_type, time_in_force, participation_regime_or_sizing_rule, market_regime_or_declared_conditioning_state}` plus instrument/venue/receipt/period when relevant. Cross-policy silent calibration reuse is forbidden.
+- Three ledgers: scientific=`L0–L8/R9/OSB/D1–D8`; capturability=`feasibility + policy-conditioned IS/latency/fill/capacity/D9`; actual broker=`realized fills/fees/cash/positions/open-orders/account P&L`. No ledger overwrites another.
+- Reuse law: shared research infrastructure defaults to >=2 real semantic consumers. Safety/authority primitives may share earlier only when duplication itself creates authority/safety risk; this does not authorize platform-first research.
+- Explicit rejections: fills→Alpha, lambda-soft hard risk, universal risk-margin scalar, blended expert score, E6.5 on pure sensing, RDV as Alpha evidence, outcome-trained stress-block rate, auto-DISLOCATION open, Sharpe-BO inner-loop privilege, automatic L4→L5, retroactive R9 failure.
+
 ## 2026-08-11 AO-K0A Orthogonal Basis Formula / Custody Registry
 
 - Active contract=`OrthogonalizationContractV1`; denominator=`PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1`. Missingness is persistent full-W3 state and never a coverage admission gate or eligibility rewrite.

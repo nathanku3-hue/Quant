@@ -1,4 +1,18 @@
 
+## 2026-08-12 — RESULT-FIRST AI RESEARCH LOOP / FORWARD-GATE METHOD LOCK
+
+- Owner approved the post-audit method revision as hard wording. Canonical lock=`docs/architecture/result_first_ai_research_loop_v1.md`; machine contracts=`opportunity_kernel_scientific_preflight_v2.json` + `execution_feasibility_v1.json`.
+- Research is **result-first**, where result means a changed scientific/operating route, not PnL. Every material slice declares `DECISION_TO_CHANGE`, cheapest discriminating test, `WHY_NO_CHEAPER_TEST_EXISTS`, and concrete PASS/FAIL/UNRESOLVED routes before implementation. If all routes are the same, `DECISION_VALUE=0` and the work is not run.
+- Phase progression is forward-gated only. `L4_EMPIRICAL_FREEZE → READY_FOR_L5_CANDIDATE`; it never self-authorizes L5. All lawful READY candidates compete across families for scarce result reads; `READY_BUT_NOT_PRIORITY` is a legal terminal.
+- RDV is ordinal only (`LOW/MED/HIGH`) across route-change plausibility, decision materiality, information independence and cost/search-debt dimensions. No fake `P(route_changes)`, pseudo-mutual-information scalar, pre-L5 future PnL/IC/Sharpe, Alpha evidence, promotion score or capital authority.
+- Future L3 default adds R9 fabrication tolerance (numeric/temporal/threshold/missingness) plus report-only observability-selection diagnosis. Historical L3 receipts remain valid under their pinned contract versions; there is no retroactive R9 failure.
+- `ExecutionFeasibilityV1` activates only for action-bearing economic freezes, D9, promotion/capital-policy preflight and PAPER actions; pure source/custody/sensing slices are exempt. Hard risk remains deterministic `ALLOW/BLOCK/UNRESOLVED`; BLOCK is infeasible and cannot be lambda-softened.
+- Risk margins remain a reason-code-specific vector (`var/sector/single-name/VIX/...`); `capturability_state` is summary only. Soft execution telemetry calibration must be policy-conditioned by policy ID, order type/TIF, participation/sizing regime and market regime/conditioning state. Cross-policy silent reuse is forbidden.
+- Three ledgers are separated: scientific (D1–D8), capturability (policy-conditioned feasibility/IS/latency/fill/capacity/D9), and actual broker realization. Fills do not become universal Alpha features and never retroactively rewrite Alpha evidence.
+- Shared research infrastructure defaults to at least two real semantic consumers; safety/authority primitives may be shared earlier when duplication itself creates authority/safety risk. This exception is not generic-platform permission.
+- Explicitly rejected: fills→Alpha, lambda-soft hard risk, blended expert score, E6.5 on pure sensing, RDV as Alpha evidence, outcome-trained stress-block rate, auto-DISLOCATION showcase open, Sharpe-BO privilege, automatic L4→L5.
+- Forward-only effect: FTK STOPPED, TR-v0 HOLD_SOURCE/PARKED, W6 untouched, Clock #1 unchanged, capital closed, `financial_alpha_evidence=0`.
+
 ## 2026-08-11 — AO-K0A DENOMINATOR ALIGNMENT / ORTHOGONAL BASIS PREFLIGHT FROZEN
 
 - Owner verdict=`GO AO-K0A`. Active basis authority is `OrthogonalizationContractV1`; exact denominator=`PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1`. The prior AO-K0 separate denominator, raw `Q×M`, and coverage PASS/FAIL treatment are superseded prospectively but retained as historical evidence.

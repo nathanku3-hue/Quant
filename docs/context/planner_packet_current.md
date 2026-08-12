@@ -7,6 +7,16 @@ Canonical product maturity: `70/100`
 Portfolio-alpha evidence: `0`
 Limited Live: `CLOSED`
 
+## Result-first AI research-loop lock — current truth, 2026-08-12
+
+- Canonical amendment=`docs/architecture/result_first_ai_research_loop_v1.md`; machine preflight=`docs/architecture/opportunity_kernel_scientific_preflight_v2.json`; action-bearing feasibility=`docs/architecture/execution_feasibility_v1.json`.
+- Planning unit is **decision changed / path killed**, not run completed. Every material slice must name `DECISION_TO_CHANGE`, cheapest discriminating test, and PASS/FAIL/UNRESOLVED routes. Identical routes => `DO_NOT_RUN`.
+- `L4 freeze → READY_FOR_L5_CANDIDATE`; scarce L5 reads are allocated across lawful READY families by **ordinal** RDV (`LOW/MED/HIGH`). No fake `P(route_changes)`; RDV is not Alpha evidence. `READY_BUT_NOT_PRIORITY` is legal.
+- Future L3 uses additive R9 fabrication-tolerance + observability-selection diagnosis under the v2 preflight; historical receipts are not retroactively failed.
+- Execution feasibility enters only for action-bearing economic/D9/promotion/PAPER work. Hard risk is a veto; risk margins stay a vector; capturability state is summary only; telemetry calibration is policy-conditioned.
+- Shared infrastructure default=`>=2 real consumers`; safety/authority primitives may share earlier when duplication itself creates authority/safety risk. This is not generic-platform permission.
+- Current research route is unchanged by the method lock: FTK STOPPED; TR-v0 PARKED/HOLD_SOURCE; next WIP remains CRV1 or Sector isolated or idle; alpha=0; Clock #1 untouched.
+
 ## Authority topology + OK-SBI-0 shadow — current truth, 2026-08-12
 
 Machine custody freeze=`docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json`. Docs mode=`DELTA_CURRENT_TRUTH_ONLY`; broad architecture reopen=`NO`.

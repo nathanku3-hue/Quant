@@ -458,6 +458,34 @@
       "claim financial_alpha_evidence > 0"
     ]
   },
+  "method_revision": {
+    "amendment_id": "RESULT_FIRST_AI_RESEARCH_LOOP_v1",
+    "effective_date": "2026-08-12",
+    "effect": "FORWARD_ONLY",
+    "scientific_preflight_contract": "docs/architecture/opportunity_kernel_scientific_preflight_v2.json",
+    "execution_feasibility_contract": "docs/architecture/execution_feasibility_v1.json",
+    "ai_research_loop_contract": "docs/architecture/result_first_ai_research_loop_v1.md",
+    "l3_contract_default_for_future_versions": "L3_R1_R9_V2",
+    "rdv_scale": ["LOW", "MED", "HIGH"],
+    "rdv_alpha_evidence": false,
+    "killer_rule": "SAME_PASS_FAIL_UNRESOLVED_ROUTE=>DO_NOT_RUN",
+    "l4_implies_l5_authorized": false,
+    "l5_allocation": "CROSS_FAMILY_READY_CANDIDATES_BY_ORDINAL_RDV",
+    "ready_but_not_priority_legal": true,
+    "risk_margin_scalar_forbidden": true,
+    "telemetry_calibration_policy_conditioned": true,
+    "reuse_default": "TWO_REAL_CONSUMERS",
+    "reuse_safety_authority_exception": true,
+    "explicit_rejections": [
+      "fills_to_alpha",
+      "lambda_soft_hard_risk",
+      "blended_expert_score",
+      "e6_5_on_pure_sensing",
+      "rdv_as_alpha_evidence",
+      "outcome_trained_stress_block_rate",
+      "auto_dislocation_open"
+    ]
+  },
   "process": {
     "diagnosis_layer_if_any": "D6_SELECTION",
     "failure_route_if_any": "HOLD_STOP_FTK_PRIMARY_NO_REPRESENTATION_REFINE",
@@ -466,7 +494,7 @@
     "loop_phase": "L7_STOP_STAMPED",
     "loop_phase_label": "FTK STOPPED; TR-v0 HOLD_SOURCE; stock-discovery primary free; alpha=0",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
-    "method_status": "LOCKED",
+    "method_status": "LOCKED_RESULT_FIRST_FORWARD_GATE_AMENDED_20260812",
     "next_phase": "PARALLEL_FAMILY_OR_PARK",
     "next_phase_note": "FTK STOPPED (D6 fail banked). TR-v0 L2 contract frozen; expectations source admit HOLD_SOURCE (G-S0 exact CIQ semantics unbound). Park TR-v0. No FTK rescue. No TR L5. Parallel CRV1/Sector/PAPER/Clock. alpha=0.",
     "representation_snr_gate_status": "PASS_AO_FTK_1_20260812_L5_SENSING_COMPLETE"

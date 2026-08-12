@@ -4,6 +4,19 @@ Date: 2026-08-12
 State: `CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED`
 Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; PREBREAKOUT_W3_REAL_AUTHORITY_COMPLETE; PREBREAKOUT_W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; PREBREAKOUT_W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_NO_FURTHER_EXTENSION; ECONPHYSICS_PREBREAKOUT_V1_S0_REAL_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; OK_SBI_0_SHADOW_S0_DESIGN_LOCKED_RELEASE_BLOCKED; Q_SOURCE_BLOCKED; PREBREAKOUT_W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PARALLEL_EVIDENCE_QUALIFICATION; SINGLE_CURRENT_CAPITAL_POLICY_AUTHORITY; FINANCIAL_ALPHA_EVIDENCE_0`
 
+## Result-first method impact — 2026-08-12
+
+This round changes future research-process authority, not product/capital authority. Canonical lock=`docs/architecture/result_first_ai_research_loop_v1.md`; machine preflight=`docs/architecture/opportunity_kernel_scientific_preflight_v2.json`; action-bearing feasibility=`docs/architecture/execution_feasibility_v1.json`.
+
+- Every material slice becomes decision/receipt-first; identical PASS/FAIL/UNRESOLVED routes are rejected before work.
+- L4 creates only `READY_FOR_L5_CANDIDATE`; cross-family ordinal RDV allocation precedes scarce L5; `READY_BUT_NOT_PRIORITY` is legal.
+- RDV stays `LOW/MED/HIGH`, has no future-PnL input pre-L5, and is never Alpha/promotion/capital evidence.
+- Future L3 adds R9 fabrication tolerance and report-only observability-selection diagnosis without retroactive judgment of historical receipts.
+- `ExecutionFeasibilityV1` is action-triggered only. Hard-risk BLOCK remains infeasible; risk margins remain a vector; policy-conditioned execution telemetry calibrates capturability only.
+- Explicit rejections remain fills→Alpha, lambda-soft hard risk, blended expert score, E6.5 on pure sensing, outcome-trained stress-block rate, and auto-DISLOCATION open.
+- Current family/product route is unchanged.
+- Owned method-lock surfaces: `alpha_scientific_method_v1.md`, `result_first_ai_research_loop_v1.md`, `opportunity_kernel_scientific_preflight_v2.json`, `execution_feasibility_v1.json`, `asymmetric_opportunity_constitution_v1.md`, `ai_research_pipeline_v0_spec.md`, endgame/strategic-lock docs, meta-harness decision/workcell/reconciliation templates, and current truth/spec/decision/notes/lessons surfaces. No runtime/provider/data file is owned by this revision.
+
 ## Authority topology + OK-SBI-0 shadow impact — 2026-08-12
 
 This delta does **not** open architecture, Alpha, or capital. It freezes authority **topology** so product and research cannot be confused:

@@ -1,0 +1,131 @@
+{
+  "schema_version": "opportunity_kernel_scientific_preflight_v2",
+  "status": "LOCKED_FORWARD_ONLY",
+  "effective_date": "2026-08-12",
+  "authority": "ALPHA_SCIENTIFIC_METHOD_v1_RESULT_FIRST_AMENDMENT",
+  "forward_only": true,
+  "historical_evidence_immutable": true,
+  "current_product_unchanged": true,
+  "decision_value_preflight": {
+    "required_fields": [
+      "decision_to_change",
+      "current_belief",
+      "cheapest_discriminating_test",
+      "why_no_cheaper_test_exists",
+      "pass_route",
+      "fail_route",
+      "unresolved_route",
+      "engineering_cost",
+      "untouched_evidence_cost",
+      "search_debt"
+    ],
+    "killer_rule": "IF_PASS_FAIL_UNRESOLVED_ROUTES_IDENTICAL_THEN_DECISION_VALUE_ZERO_AND_DO_NOT_RUN",
+    "routes_must_use_legal_state_vocabulary": true,
+    "receipt_first_engineering": true
+  },
+  "rdv": {
+    "authority": "RESEARCH_PRIORITY_ONLY",
+    "scale": ["LOW", "MED", "HIGH"],
+    "dimensions": [
+      "route_change_plausibility",
+      "decision_materiality",
+      "information_independence",
+      "engineering_cost",
+      "untouched_evidence_cost",
+      "search_debt"
+    ],
+    "numeric_probability_required": false,
+    "literal_mutual_information_required": false,
+    "future_outcomes_allowed_pre_l5": false,
+    "alpha_evidence": false,
+    "promotion_score": false,
+    "capital_authority": false,
+    "killer_rule_dominates_score": true
+  },
+  "forward_gate": {
+    "automatic_phase_progression": false,
+    "l4_terminal": "READY_FOR_L5_CANDIDATE",
+    "l4_implies_l5_authorized": false,
+    "ready_but_not_priority_legal": true,
+    "cross_family_trial_allocation_required_before_l5": true
+  },
+  "clock_state_coordinate": {
+    "declared_in": "L2",
+    "enforced_before": "L4",
+    "required_fields": [
+      "clock_type",
+      "role",
+      "why_this_clock",
+      "aliasing_risk",
+      "invariance_claim",
+      "falsifier"
+    ],
+    "role_allowlist": ["DATA_AVAILABILITY", "ECONOMIC_STATE", "ACTION_EXECUTION"],
+    "multi_clock_outcome_bakeoff_forbidden": true
+  },
+  "l3_contract": {
+    "version": "L3_R1_R9_V2",
+    "historical_v1_receipts_remain_valid": true,
+    "r9": {
+      "R9A_NUMERIC": "SOURCE_BOUND_MEASUREMENT_OR_QUANTIZATION_TOLERANCE_ONLY",
+      "R9B_TEMPORAL": "SOURCE_BOUND_AVAILABILITY_UNCERTAINTY_DELAY_ONLY_BY_DEFAULT; DECISION_CUT_CROSSING_TO_UNOBSERVED_ABSTAIN",
+      "R9C_THRESHOLD": "LOCAL_FROZEN_CUT_ONLY_NO_GRID_NO_OUTCOME_PICK",
+      "R9D_MISSINGNESS": "PRESENT_TO_UNOBSERVED_SOURCE_SHAPED_STRESS; DENOMINATOR_IMMUTABLE"
+    },
+    "global_hard_numeric_pass_wall": false,
+    "first_default": "REPORT_AND_ROUTE",
+    "outcomes_forbidden": true
+  },
+  "observability_selection_bias": {
+    "status": "REPORT_ONLY_DIAGNOSTIC",
+    "outcomes_forbidden": true,
+    "selector_feature": false,
+    "candidate_reweighting": false,
+    "propensity_fill": false,
+    "denominator_rewrite": false,
+    "allowed_routes": ["PASS_REPORT", "SIMPLIFY", "REVISE_WITHIN_FREEZE", "BLOCK"]
+  },
+  "activation_contract": {
+    "required_for_result_bearing_kernel": true,
+    "requirement_allowlist": ["NONE", "REQUIRED", "CONDITIONAL"],
+    "role_allowlist": ["CAUSAL_PRECONDITION", "ENTRY_CONFIRMATION", "NOT_APPLICABLE"],
+    "causal_precondition_must_exist_before_l4": true,
+    "entry_confirmation_may_rescue_d6_fail": false
+  },
+  "invariance_contract": {
+    "required_for_result_bearing_kernel": true,
+    "must_be_falsifiable": true,
+    "prose_only_works_across_regimes_forbidden": true
+  },
+  "falsifier_contract": {
+    "f0_required_when_thesis_integrity_is_causal": true,
+    "f0_states": ["INTACT", "DAMAGED", "UNRESOLVED"],
+    "unresolved_action": "ABSTAIN",
+    "absence_of_negative_evidence_implies_intact": false,
+    "f1_role": "DELAYED_THESIS_INVALIDATION_POST_ENTRY_ONLY",
+    "f1_may_rewrite_entry_knowledge": false,
+    "not_applicable_with_reason_allowed": true
+  },
+  "execution_feasibility": {
+    "contract": "docs/architecture/execution_feasibility_v1.json",
+    "required_for": [
+      "ACTION_BEARING_ECONOMIC_FREEZE",
+      "D9_ECONOMICS_COST_CAPACITY",
+      "PROMOTION_OR_CAPITAL_POLICY_PREFLIGHT",
+      "PAPER_ACTION_PROPOSAL"
+    ],
+    "not_mandatory_for": ["PURE_SOURCE", "PURE_CUSTODY", "PURE_REPRESENTATION", "PURE_SENSING"]
+  },
+  "explicit_rejections": [
+    "FILLS_TO_UNIVERSAL_ALPHA_FEATURE",
+    "LAMBDA_SOFT_HARD_RISK",
+    "BLENDED_EXPERT_SCORE",
+    "E6_5_ON_PURE_SENSING",
+    "RDV_AS_ALPHA_EVIDENCE",
+    "OUTCOME_TRAINED_STRESS_BLOCK_RATE",
+    "AUTO_DISLOCATION_OPEN",
+    "SHARPE_BAYESIAN_OPTIMIZATION_PRIVILEGE",
+    "AUTO_L4_TO_L5",
+    "RETROACTIVE_R9_FAILURE"
+  ]
+}

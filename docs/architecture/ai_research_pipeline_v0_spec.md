@@ -1,7 +1,8 @@
 # AI Research Pipeline v0 — Bounded Post-Clock Research Acceleration
 
 **Date:** 2026-08-08
-**Status:** `BUILD_SPEC / CLOCK_1_RELEASED / NOT_IMPLEMENTED`
+**Forward-only method amendment:** 2026-08-12
+**Status:** `BUILD_SPEC / CLOCK_1_RELEASED / NOT_IMPLEMENTED / RESULT_FIRST_FORWARD_GATE_LOCKED`
 **Authority:** research-workflow and provenance design; bounded tooling may start only under genuinely independent ownership and may not slow Future Truth, Historical Compression, the authorized fast-family clock, or PAPER-0 minimum closure
 **Current execution effect:** **SUPPORTING TOOLING LANE / NO FINANCIAL AUTHORITY** — Clock #1 is running; AI is not a critical-path substitute for measuring incumbent AOV economics
 **Financial-alpha evidence:** `0`
@@ -15,6 +16,22 @@ Define the smallest AI research layer that can accelerate discovery, source inte
 North star:
 
 > **AI allocates research attention and drafts scientific actions; deterministic systems own evidence, accounting, promotion, risk and capital.**
+
+Result-first method lock (2026-08-12): `docs/architecture/result_first_ai_research_loop_v1.md`.
+
+> **The primary AI research role is active hypothesis elimination and decision-producing experiment selection, not autonomous Alpha generation. The inner loop optimizes for the cheapest forward gate that can change a legal route.**
+
+Hard rules:
+
+```text
+DECISION_TO_CHANGE before implementation
+PASS_ROUTE / FAIL_ROUTE / UNRESOLVED_ROUTE before execution
+same terminal route under all outcomes → DECISION_VALUE=0 → DO_NOT_RUN
+L4 freeze → READY_FOR_L5_CANDIDATE, never automatic L5
+READY_BUT_NOT_PRIORITY is a legal terminal
+```
+
+L0–L4 confirmatory work remains outcome-blind. Historical Sharpe/MaxDD/IC optimization is not an AI-native inner-loop privilege.
 
 Canonical endgame:
 
@@ -109,6 +126,21 @@ A real outcome-informed mutation requires a matured valid ReviewPacket. It creat
 ## 2.7 `RESEARCH_CAPITAL_ALLOCATOR_AI`
 
 Long-run role only. It may rank experiments by decision-changing value, economic impact, information independence, power, calendar time, data/compute/human/AI cost, untouched evidence consumed and search debt. It may recommend research budgets; it never allocates portfolio weight, leverage, shorts, broker orders or live limits.
+
+The initial Research Decision Value (`RDV`) surface is **ordinal only**:
+
+```text
+route_change_plausibility = LOW | MED | HIGH
+decision_materiality      = LOW | MED | HIGH
+information_independence  = LOW | MED | HIGH
+engineering_cost          = LOW | MED | HIGH
+untouched_evidence_cost   = LOW | MED | HIGH
+search_debt               = LOW | MED | HIGH
+```
+
+Do not invent a calibrated `P(route_changes)` or pseudo-mutual-information scalar without a legitimate probability model. The deterministic killer rule dominates the score: if PASS/FAIL/UNRESOLVED all route to the same next action, the proposed test is rejected.
+
+Before any scarce L5 read, the allocator compares all lawful `READY_FOR_L5_CANDIDATE` families. A candidate may remain `READY_BUT_NOT_PRIORITY` indefinitely without being treated as failed.
 
 ---
 
@@ -234,6 +266,12 @@ search family
 search budget
 expected capital relevance
 measurable implication
+DECISION_TO_CHANGE
+CHEAPEST_DISCRIMINATING_TEST
+WHY_NO_CHEAPER_TEST_EXISTS
+PASS_ROUTE
+FAIL_ROUTE
+UNRESOLVED_ROUTE
 ```
 
 “Interesting pattern” or “LLM thinks bullish” is insufficient. Historical outcome-visible observations create hypotheses/search debt only. No historical rescue after prospective failure under the same version.
@@ -391,6 +429,10 @@ Alternatives become Challengers after observed incumbent deficiency. Do not simu
 
 Record model/token/compute/data/human-review/calendar cost. Every search family receives a preregistered budget. Prompt fishing, model swapping, feature-generation rounds and target/horizon search consume that budget. AI cannot grant itself more budget. Research Capital Allocator may later recommend changes; PM/governance admits them.
 
+Every proposed material work cell must be receipt-first and decision-bearing. If a cheaper lawful falsifier can terminate the path, later engineering is not opened. `TIME_SPENT_AFTER_FIRST_KNOWN_FATAL_BLOCKER` should converge toward zero.
+
+Bayesian optimization, active learning or agent iteration does not receive special exemption from search accounting. Using historical Sharpe/PnL as the adaptive inner-loop objective remains outcome-bearing search debt, not "AI efficiency."
+
 ---
 
 # 13. No-narrative-over-accounting law
@@ -452,6 +494,15 @@ AI process metrics are separate from portfolio-alpha evidence:
 TIME_TO_HYPOTHESIS
 HYPOTHESIS_TO_FROZEN_EXPERIMENT_TIME
 REVIEWPACKET_TO_NEXT_REGISTERED_TRIAL_TIME
+TIME_TO_TERMINAL_DECISION
+ROUTE_CHANGE_RATE_PER_SLICE
+OUTCOME_READS_AVOIDED
+SOURCE_FAILURES_CAUGHT_PRE_L3
+REPRESENTATION_FAILURES_CAUGHT_PRE_L5
+DECISION_CHANGING_INFO_PER_ENGINEERING_HOUR
+DECISION_CHANGING_INFO_PER_OUTCOME_READ
+SEARCH_DEBT_PER_SURVIVING_FAMILY
+TIME_SPENT_AFTER_FIRST_KNOWN_FATAL_BLOCKER
 HUMAN_RESEARCH_MINUTES_SAVED
 CONTRADICTION_DETECTION_RATE
 EVIDENCE_GAP_DISCOVERY
@@ -478,7 +529,8 @@ This lane may run beside `alpha_pit_data_api_v1`, `CYCLE_RESONANCE_v1`, and PAPE
 - it does not write another lane's authority objects;
 - integration occurs at deterministic join gates;
 - any consumer-visible model/prompt/procedure is versioned and hash-bound;
-- generic platform work is forbidden until a second real consumer proves reuse.
+- generic platform work is forbidden by default until a second real consumer proves the same semantic reuse;
+- safety/authority primitives may be shared earlier when duplication itself creates safety or authority risk (for example immutable receipt/hash utilities, PIT timestamp validation, canonical risk reason codes, fail-closed authority checks); this exception may not justify a generic research/data/model platform.
 
 **Parallelize engineering; serialize authority promotion.**
 
@@ -490,6 +542,9 @@ This lane may run beside `alpha_pit_data_api_v1`, `CYCLE_RESONANCE_v1`, and PAPE
 ACTIVE_PRODUCT_STATE = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
 CLOCK_1_STARTED = TRUE
 AI_RESEARCH_PIPELINE_V0 = SPECIFIED / TOOLING_LANE_RELEASED / NOT IMPLEMENTED
+RESEARCH_METHOD = RESULT_FIRST_AI_RESEARCH_LOOP_v1 / FORWARD_ONLY
+RDV = ORDINAL_LOW_MED_HIGH / RESEARCH_PRIORITY_ONLY
+AUTO_L4_TO_L5 = FORBIDDEN
 REAL_OUTCOME_INFORMED_AI = BLOCKED_UNTIL_MATURE_RECONCILED_REVIEWPACKET
 financial_alpha_evidence = 0
 LIVE = CLOSED

@@ -22,9 +22,19 @@ Before planning, state:
 Product result: <observable user outcome>
 Current journey state: <not run|partially run|complete>
 Primary action: <one nearest action>
+Decision to change: <exact decision this work can change>
+Pass route: <legal next state/action>
+Fail route: <legal next state/action>
+Unresolved route: <legal next state/action>
+Cheapest discriminating test: <test>
+Why no cheaper test exists: <one line>
 ```
 
-When the complete user journey has not run, permit at most one pre-execution audit/repair round, then execute the journey now. Do not split implementation, validation, integration, packaging, review, or closure into successor product slices merely because they are separate lifecycle stages.
+### Result-first killer rule
+
+If PASS / FAIL / UNRESOLVED all lead to the same next action, return `NO_BUILD` / `DO_NOT_RUN`. Completing a deliverable is not a result unless it changes a route. Receipt/terminal shape should be known before substantial engineering.
+
+When the complete user journey has not run, permit at most one pre-execution audit/repair round, then execute the journey now **only when the next forward gate is authorized and decision-useful**. Do not split implementation, validation, integration, packaging, review, or closure into successor product slices merely because they are separate lifecycle stages. Phase or gate completion never self-authorizes a later outcome-bearing or capital-bearing action.
 
 ## Blocking test
 

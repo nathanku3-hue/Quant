@@ -8,6 +8,12 @@ Purpose: delegate bounded noisy work to subagents without leaking context, secre
 ```json
 {
   "goal": "Implement Dirty Work Autopilot v0",
+  "decision_to_change": "<exact route/decision this work can change>",
+  "pass_route": "<legal next state/action>",
+  "fail_route": "<legal next state/action>",
+  "unresolved_route": "<legal next state/action>",
+  "cheapest_discriminating_test": "<test>",
+  "why_no_cheaper_test_exists": "<one line>",
   "owned_paths": [
     "bin/meta-harness.js",
     "templates/skills/dirty-work-autopilot.md",
@@ -37,6 +43,8 @@ Purpose: delegate bounded noisy work to subagents without leaking context, secre
 
 ## Work Routing
 
+- Reject the workcell before execution when PASS / FAIL / UNRESOLVED all route to the same next action.
+- Prefer receipt-first work: terminal routes and required evidence are fixed before substantial implementation.
 - Use subagents for read-heavy exploration, tests, logs, triage, and evidence collection.
 - Avoid parallel write-heavy work unless owned paths are disjoint.
 - Stop if a subagent needs outside-scope paths, credentials, provider access, runtime data, governed data, or broad repo dumps.

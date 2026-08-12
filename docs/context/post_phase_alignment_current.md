@@ -3,6 +3,16 @@
 Date: 2026-08-12
 Status: `BOARD_GO_WIP_3_REGISTERED; CRV1 + SECTOR_ROTATION_ACTIVE; VSB_CONFIRMATION_PARKED_NO_ACTIVE_ENGINEERING_NO_WORKER; PREBREAKOUT_TRIAL1_CLOSED_FAIL_PERMANENT_1_OF_8; W3_REAL_AUTHORITY_COMPLETE; W4_STATISTICAL_CLOSE_SEALED_SMOKE_SUBFIELD_SUPERSEDED; W5_DEVELOPMENT_FAIL; PREBREAKOUT_FAILURE_PACKET_V1_RETAINED_ZERO_TRIAL_COST; ECONPHYSICS_PREBREAKOUT_V1_REAL_S0_CORPUS_PERSISTENCE_FAIL_DYNAMICS_INVENTORY_MARGIN_SURVIVE_REVENUE_FAILS; AO_K0A_DENOMINATOR_ALIGNMENT_ORTHOGONAL_BASIS_PREFLIGHT_FROZEN_NO_RESULT_READ; OK_SBI_0_SHADOW_S0_DESIGN_LOCKED_RELEASE_BLOCKED; Q_SOURCE_BLOCKED; W6_UNTOUCHED; LANE2_A1_A2_CLOSED; PAPER_0_AUTHORIZED; OUTCOME_SEALED; FINANCIAL_ALPHA_EVIDENCE_0`
 
+## 2026-08-12 result-first AI research-loop alignment
+
+- Canonical lock=`docs/architecture/result_first_ai_research_loop_v1.md`; preflight v2 + `ExecutionFeasibilityV1` are forward-only machine contracts.
+- Research engineering is decision/receipt-first. Identical PASS/FAIL/UNRESOLVED routes are rejected; cheapest discriminating tests precede later machinery.
+- L4 creates `READY_FOR_L5_CANDIDATE` only. Cross-family ordinal RDV (`LOW/MED/HIGH`) decides scarce L5 priority; `READY_BUT_NOT_PRIORITY` is a legal terminal and not a failure.
+- Future L3 adds R9 numeric/temporal/threshold/missingness fabrication tolerance and report-only observability-selection diagnosis; historical L3 results are not retroactively requalified.
+- Capturability enters only on action-bearing economic/D9/promotion/PAPER paths. Hard risk remains veto authority; risk margins remain a vector; telemetry calibration is policy-conditioned.
+- Reuse defaults to two real consumers, with an earlier safety/authority exception only when duplication creates authority/safety risk.
+- No family/product/capital state changes: FTK remains stopped, TR-v0 parked, Clock #1 sealed, financial alpha=0.
+
 ## 2026-08-12 authority topology / OK-SBI-0 shadow alignment
 
 Docs mode=`DELTA_CURRENT_TRUTH_ONLY`. Custody freeze=`docs/context/e2e_evidence/ok_sbi_0_authority_custody_freeze_20260812.json`.

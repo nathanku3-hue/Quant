@@ -1,0 +1,93 @@
+{
+  "schema_version": "execution_feasibility_v1",
+  "status": "LOCKED_FORWARD_ONLY",
+  "effective_date": "2026-08-12",
+  "purpose": "EX_ANTE_CAPTURABILITY_AND_HARD_RISK_PREFLIGHT_WITHOUT_ALPHA_AUTHORITY",
+  "trigger": {
+    "required_for": [
+      "ACTION_BEARING_ECONOMIC_FREEZE",
+      "D9_ECONOMICS_COST_CAPACITY",
+      "PROMOTION_OR_CAPITAL_POLICY_PREFLIGHT",
+      "PAPER_ACTION_PROPOSAL"
+    ],
+    "not_required_for": ["PURE_SOURCE", "PURE_CUSTODY", "PURE_REPRESENTATION", "PURE_SENSING"]
+  },
+  "current_gate_allowlist": ["ALLOW", "BLOCK", "UNRESOLVED"],
+  "hard_risk": {
+    "constraint_semantics": "BLOCK_IS_INFEASIBLE",
+    "lambda_compensation_forbidden": true,
+    "canonical_reason_codes_include": [
+      "ok",
+      "vix_kill_switch",
+      "max_single_asset_weight",
+      "max_sector_weight",
+      "var_proxy",
+      "invalid_order_projection",
+      "risk_check_error"
+    ],
+    "fixture_client_order_ids_are_not_risk_ontology": true
+  },
+  "risk_margin_vector": {
+    "universal_scalar_forbidden": true,
+    "capturability_state_is_summary_only": true,
+    "fields": [
+      "var_margin",
+      "sector_margin",
+      "single_name_margin",
+      "vix_margin",
+      "other_reason_code_specific_margins"
+    ],
+    "capturability_state_allowlist": ["ROBUST", "NEAR_BOUNDARY", "FRAGILE", "BLOCKED", "UNRESOLVED"]
+  },
+  "stress": {
+    "stress_block_rate": "FREQUENCY_OVER_PREREGISTERED_LAWFUL_STRESS_SCENARIOS",
+    "future_outcome_training_forbidden": true,
+    "dominant_stress_reason_required_when_nonzero": true,
+    "hard_gate_block_overrides_summary": true
+  },
+  "soft_execution_cost_envelope": {
+    "optional": true,
+    "allowed_components": [
+      "implementation_shortfall",
+      "slippage",
+      "latency_cost",
+      "fill_probability",
+      "market_impact",
+      "participation_cost"
+    ],
+    "authority": "CAPTURABILITY_ECONOMICS_ONLY_NOT_D6_SELECTION"
+  },
+  "telemetry_calibration": {
+    "policy_conditioned": true,
+    "required_conditioning_keys": [
+      "policy_id",
+      "order_type",
+      "time_in_force",
+      "participation_regime_or_sizing_rule",
+      "market_regime_or_declared_conditioning_state"
+    ],
+    "additional_keys_when_relevant": ["instrument_id", "venue_id", "telemetry_source_receipt", "calibration_period"],
+    "cross_policy_silent_reuse_forbidden": true,
+    "realized_fills_are_universal_alpha_features": false
+  },
+  "ledgers": {
+    "scientific": "L0_L8_R9_OSB_D1_D8",
+    "capturability": "FEASIBILITY_POLICY_CONDITIONED_IS_LATENCY_FILL_CAPACITY_D9",
+    "actual_broker": "REALIZED_FILLS_FEES_CASH_POSITIONS_OPEN_ORDERS_ACCOUNT_PNL",
+    "ledger_overwrite_forbidden": true,
+    "broker_fills_may_rewrite_historical_alpha_evidence": false
+  },
+  "expert_reconciliation": {
+    "blended_confidence_score_forbidden": true,
+    "hard_gate_block_requires_block": true,
+    "allow_fragile_default_route": "DEFER_OR_SAFER_POLICY_UNDER_EXISTING_AUTHORITY",
+    "underlying_margin_vector_must_remain_visible": true
+  },
+  "explicit_rejections": [
+    "FILLS_TO_ALPHA",
+    "LAMBDA_SOFT_HARD_RISK",
+    "UNIVERSAL_RISK_MARGIN_SCALAR",
+    "OUTCOME_TRAINED_STRESS_BLOCK_RATE",
+    "ALPHA_CRO_BROKER_AUTHORITY_COLLAPSE"
+  ]
+}

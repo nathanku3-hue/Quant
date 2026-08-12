@@ -13,6 +13,23 @@ WORKTREE                 = E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e
 PUBLIC_MAIN              = NON_AUTHORITY_UNTIL_MERGE
 ```
 
+## Result-first research method lock — 2026-08-12
+
+```text
+METHOD_AMENDMENT        = RESULT_FIRST_AI_RESEARCH_LOOP_v1 / FORWARD_ONLY
+MACHINE_PREFLIGHT       = opportunity_kernel_scientific_preflight_v2
+ACTION_FEASIBILITY      = execution_feasibility_v1 (action-bearing only)
+RDV                     = LOW | MED | HIGH only
+KILLER_RULE             = same PASS/FAIL/UNRESOLVED route → DO_NOT_RUN
+L4_TO_L5                = READY_FOR_L5_CANDIDATE only; cross-family allocation required
+READY_BUT_NOT_PRIORITY  = legal terminal
+RISK_MARGIN             = vector only; capturability_state summary only
+TELEMETRY_CALIBRATION   = policy-conditioned
+REUSE_DEFAULT           = >=2 real consumers; safety/authority exception allowed
+```
+
+Still rejected: fills→Alpha, lambda-soft hard risk, blended expert score, E6.5 on pure sensing, RDV as Alpha evidence, outcome-trained stress-block rate, auto-DISLOCATION open. This changes future research authorization semantics only; current family/product state below is unchanged.
+
 ## Product vs research
 
 ```text
@@ -123,9 +140,9 @@ AOV-104 as Full-W3 / capital open / W6 open
 ```text
 HANDOVER_CLOSE = docs/handover/stream_handover_roadmap_alignment_dispatcher_close_20260812.md
 CLOSE_RECEIPT  = docs/context/e2e_evidence/stream_close_roadmap_alignment_dispatcher_20260812.json
-PRIMARY_WIP    = NONE (parallel families only)
+PRIMARY_WIP    = PARALLEL_FAMILY_WIP (CRV1_OR_SECTOR_ISOLATED_OR_IDLE)
 ```
 
 ## One-line constitution
 
-Owner stamped L7_ROUTE=STOP. Sensing banked PASS; economics banked D6_SELECTION FAIL; TR-v0 HOLD_SOURCE parked; alpha=0. No FTK-2, no L8, no rescue, no invent consensus, no re-run.
+Owner stamped L7_ROUTE=STOP. Sensing banked PASS; economics banked D6_SELECTION FAIL; TR-v0 HOLD_SOURCE parked; alpha=0. Future research is result-first / forward-gate-only: identical terminal routes => DO_NOT_RUN; L4 => candidate only; ordinal RDV allocates scarce L5. No FTK-2, no L8, no rescue, no invent consensus, no re-run.
