@@ -1,0 +1,113 @@
+{
+  "D2_PRECHECK": "GREEN",
+  "admit_receipt": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_custody_admit.json",
+  "admit_receipt_id": "AO_FTK_1_W3_MKT_ADMIT_1_CUSTODY_ADMIT",
+  "aov_104_as_full_w3": false,
+  "blockers": [],
+  "constitution": "Re-prove D2 on real Full-W3. Then one last economic trial. Same sensor, same binds, same return law both sides. L6 first-fail. L7 stop. No fakes, no slice 2.",
+  "coverage": {
+    "aov_104_used": false,
+    "coverage_rate_max": 0.996415770609319,
+    "coverage_rate_mean": 0.9932150267180483,
+    "coverage_rate_min": 0.9855513307984791,
+    "decision_dates_h63_calendar_complete": 282,
+    "imputation": false,
+    "last_complete_decision_date": "2026-05-06",
+    "last_exit_date": "2026-08-07",
+    "market_company_count": 5919,
+    "market_exact_listing_count": 6018,
+    "market_row_count": 1894207,
+    "method": "close_to_close_entry_and_exit_on_session_spine",
+    "missing_close_count_manifest": 0,
+    "missing_total_return_count_manifest": 177820,
+    "n_w3_eligible_sample_max": 5260,
+    "n_w3_eligible_sample_min": 4638,
+    "n_with_usable_market_path_for_H63_eval_max": 5184,
+    "n_with_usable_market_path_for_H63_eval_min": 4611,
+    "return_series": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE",
+    "row_deletion": false,
+    "sample_decision_date_count": 29,
+    "sample_stride_sessions": 10,
+    "session_date_max": "2026-08-07",
+    "session_date_min": "2025-03-24",
+    "session_spine_count": 346
+  },
+  "coverage_stats": {
+    "N_w3_eligible_range": [
+      4638,
+      5260
+    ],
+    "N_with_usable_market_path_for_H63_eval_range": [
+      4611,
+      5184
+    ],
+    "coverage_rate_min_mean_max": [
+      0.9855513307984791,
+      0.9932150267180483,
+      0.996415770609319
+    ],
+    "decision_dates_with_benchmark_computable_calendar": 282,
+    "decision_dates_with_ge_K_scorers_returns": "DIAGNOSTIC_ONLY_NOT_ELIGIBILITY_REWRITE; requires FTK scores at L5 open",
+    "missingness": {
+      "h63_path_missing_rate_approx": 0.006784973281951712,
+      "missing_close_manifest": 0,
+      "missing_total_return_manifest": 177820,
+      "policy": "abstain on missing path; never impute; never delete from denominator"
+    }
+  },
+  "debit_allowed": 1,
+  "debit_allowed_iff_green": true,
+  "debit_allowed_now": false,
+  "economic_l5_authorized": false,
+  "financial_alpha_evidence": 0,
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "full_w3_admitted": true,
+  "l5_ready_recommendation": true,
+  "material_trial_debit_this_turn": false,
+  "material_trials_remaining": 1,
+  "note": "D2 re-preflight at final L5 open. GREEN required before debit. AOV-104 not used. Missing path → abstain; no impute; no row-delete.",
+  "parent_econ_freeze": "AO-FTK-1-ECON-1",
+  "parent_program": "AO-FTK-1-20260812",
+  "preflight_at_utc": "2026-08-12T01:28:50Z",
+  "prior_d2_receipt": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_d2_preflight.json",
+  "prior_w3_admit_commit": "b32884e",
+  "receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_D2_REPREFLIGHT",
+  "recomputed": true,
+  "repreflight_at_utc": "2026-08-12T01:28:50Z",
+  "reverify_at_l5_open": true,
+  "sample_method": "every_Nth_decision_date_on_session_spine",
+  "schema_version": "ao_ftk_1_econ_1_l5_final_d2_repreflight_v1",
+  "stop_lines": [
+    "DEBIT_ON_D2_RED",
+    "AOV_104_AS_FULL_W3",
+    "SECOND_EVAL_OR_GRID",
+    "ASYMMETRIC_RETURN_LAW",
+    "CLAIM_DELTA_J0_AS_CAPITAL",
+    "CLAIM_ALPHA_GT_0",
+    "OPEN_AO_FTK_2",
+    "L8_THIS_SESSION",
+    "DOF_REWRITE",
+    "INVENT_D7",
+    "W6_CAPITAL"
+  ],
+  "stop_lines_hit": [],
+  "symmetry": {
+    "flag": "CLOSE_TO_CLOSE_NOT_DIVIDEND_COMPLETE",
+    "flag_on_both_legs": true,
+    "same_return_convention_ftk_and_w3": true,
+    "series_ftk": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE",
+    "series_w3": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE"
+  },
+  "terminal": "D2_REPREFLIGHT_GREEN",
+  "thresholds": {
+    "forbid_aov_proxy_as_full_w3": true,
+    "forbid_imputation": true,
+    "forbid_row_delete_denominator_rewrite": true,
+    "min_coverage_rate_usable_h63_close_path": 0.9,
+    "min_decision_dates_h63_calendar_complete": 60,
+    "min_n_w3_eligible_sample": 1000,
+    "min_security_count_for_full_w3_admit": 1000,
+    "require_same_return_convention_ftk_and_w3": true
+  },
+  "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1"
+}

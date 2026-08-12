@@ -1,0 +1,22 @@
+{
+  "after": {
+    "charged": 3,
+    "remaining": 0
+  },
+  "auth_receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_AUTHORIZATION",
+  "before": {
+    "charged": 2,
+    "remaining": 1
+  },
+  "constitution": "Re-prove D2 on real Full-W3. Then one last economic trial. Same sensor, same binds, same return law both sides. L6 first-fail. L7 stop. No fakes, no slice 2.",
+  "debit_units": 1,
+  "debited_at_utc": "2026-08-12T01:28:50Z",
+  "financial_alpha_evidence": 0,
+  "free_grid_as_uncharged_trials": false,
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "multi_debit": false,
+  "parent_program": "AO-FTK-1-20260812",
+  "receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_TRIAL_DEBIT",
+  "schema_version": "ao_ftk_1_econ_1_l5_final_trial_debit_v1",
+  "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1"
+}

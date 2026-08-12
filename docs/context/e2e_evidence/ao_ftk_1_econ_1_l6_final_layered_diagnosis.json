@@ -1,0 +1,128 @@
+{
+  "ao_ftk_2": "NOT_OPENED",
+  "auth_receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_AUTHORIZATION",
+  "capital_authority": false,
+  "constitution": "Re-prove D2 on real Full-W3. Then one last economic trial. Same sensor, same binds, same return law both sides. L6 first-fail. L7 stop. No fakes, no slice 2.",
+  "d9_screen": "NOT_REACHED",
+  "debit_receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_TRIAL_DEBIT",
+  "diagnosed_at_utc": "2026-08-12T01:29:06Z",
+  "failure_route": "HOLD_STOP_FTK_PRIMARY_NO_REPRESENTATION_REFINE",
+  "financial_alpha_evidence": 0,
+  "first_fail_layer": "D6_SELECTION",
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "information_gain": {
+    "d9_interpretation": "POSITIVE_NET_EDGE_SCREEN",
+    "delta_J": -0.1624671973798234,
+    "financial_alpha_evidence": 0,
+    "forbidden_to_change": [
+      "second evaluation without new owner auth",
+      "threshold/parameter/H/K grid",
+      "DOF collapse or third DOF",
+      "operator/feature rewrite under same freeze",
+      "claim financial_alpha_evidence > 0",
+      "open AO-FTK-2 / L8 / capital / W6",
+      "invent D7 confirmation rule",
+      "claim ΔJ>0 screen as capital authority"
+    ],
+    "summary": "Final economic one-shot on admitted Full-W3 under frozen 2-DOF FTK, H=63, K=20, 20bps RT, CLOSE_TO_CLOSE both legs. first_fail=D6_SELECTION; ΔJ=-0.1624671973798234; RT=0.09712475633528266; CAT=0.13114035087719297. alpha remains 0; capital closed.",
+    "what_was_learned": [
+      "Full-W3 market custody supports H=63 close-to-close economic estimand",
+      "Frozen dual-node equal-weight top-K=20 action map is executable without grid",
+      "D6 selection screen: FAIL",
+      "D8 hold/exit catastrophe screen: NOT_REACHED",
+      "D9 POSITIVE_NET_EDGE_SCREEN: NOT_REACHED"
+    ],
+    "what_was_not_learned": [
+      "Capital materiality (floor NOT_YET_GRANTED)",
+      "D7 confirmation (OUT_OF_SCOPE)",
+      "Dividend-complete total-return economic edge (flag on both legs)",
+      "Out-of-sample prospective live edge"
+    ],
+    "which_single_layer_may_change_next": "Owner L7 only: HOLD | STOP | CANDIDATE_PIPELINE_PREP | L8 only if earned. No AO-FTK-2. Trials remaining=0."
+  },
+  "join_receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_LABEL_JOIN",
+  "layers": [
+    {
+      "in_scope": true,
+      "layer": "D1_CUSTODY_PIT",
+      "notes": "Full-W3 market admitted (b32884e); operator pins dof=2; economic pack; symmetric CLOSE_TO_CLOSE both legs; no PIT rewrite.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D2_DATA_OBSERVABLE",
+      "notes": "D2 re-preflight GREEN; H=63 close paths observable on Full-W3; decision_dates=57; R_net materialized.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D3_MEASUREMENT_POWER",
+      "notes": "Scoring dual-node continuous surface on FTK decision dates with n_dates=57; K=20.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D4_REPRESENTATION_SNR",
+      "notes": "Continuous INV lag-1 + continuous M1 retained from frozen surface; no representation rewrite this trial.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D5_MECHANISM_SELF_TRANSITION",
+      "notes": "Historical sensing L5 mechanism PASS inherited; not re-adjudicated as primary economic claim; surface frozen.",
+      "status": "PASS",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D6_SELECTION",
+      "notes": "No fold-stable selection enrichment: gross_lift=-0.1604671973798234; RT rate=0.09712475633528266; fold_support=1.",
+      "status": "FAIL",
+      "stop_here": true
+    },
+    {
+      "in_scope": false,
+      "layer": "D7_CONFIRMATION",
+      "notes": "OUT_OF_SCOPE; no confirmation rule invented.",
+      "status": "NOT_IN_SCOPE",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D8_HOLD_EXIT",
+      "notes": "Not reached; stopped at D6.",
+      "status": "NOT_REACHED",
+      "stop_here": false
+    },
+    {
+      "in_scope": true,
+      "layer": "D9_ECONOMICS",
+      "notes": "Not reached; stopped at D6.",
+      "status": "NOT_REACHED",
+      "stop_here": false
+    }
+  ],
+  "mode": "TRANSITION_POSITION_ECONOMIC",
+  "parent_program": "AO-FTK-1-20260812",
+  "precommitted_routes_recorded": {
+    "D6_D8_D9_PASS_IN_SCOPE": "research candidate only; alpha still 0",
+    "D6_D8_PASS_D9_FAIL": "no positive net edge screen; bank; no capital",
+    "D6_FAIL": "HOLD/STOP FTK; no redesign carnival",
+    "D6_PASS_D8_FAIL": "safety fail",
+    "actual_route_this_run": "HOLD_STOP_FTK_PRIMARY_NO_REPRESENTATION_REFINE"
+  },
+  "receipt_id": "AO_FTK_1_ECON_1_L6_FINAL_LAYERED_DIAGNOSIS",
+  "run_id": "AO_FTK_1_ECON_1_L5_FINAL_ECONOMIC_RUN_1",
+  "schema_version": "ao_ftk_1_econ_1_l6_final_layered_diagnosis_v1",
+  "subclaims": {
+    "D6": "fixed-breadth K=20 improves payoff/RT vs Full-W3 — FAIL",
+    "D7": "NOT_IN_SCOPE",
+    "D8": "fixed-H=63 hold vs catastrophe — NOT_REACHED",
+    "D9": "ΔJ>0 POSITIVE_NET_EDGE_SCREEN — NOT_REACHED; capital floor not granted"
+  },
+  "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1"
+}

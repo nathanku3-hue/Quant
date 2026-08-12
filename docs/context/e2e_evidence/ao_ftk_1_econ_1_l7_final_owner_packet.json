@@ -1,0 +1,79 @@
+{
+  "D2_REPREFLIGHT": "GREEN",
+  "alpha": 0,
+  "ao_ftk_2": "NOT_OPENED",
+  "capital_authority": false,
+  "completed_at_utc": "2026-08-12T01:29:06Z",
+  "constitution": "Re-prove D2 on real Full-W3. Then one last economic trial. Same sensor, same binds, same return law both sides. L6 first-fail. L7 stop. No fakes, no slice 2.",
+  "d9_screen": "NOT_REACHED",
+  "debited": true,
+  "delta_J": -0.1624671973798234,
+  "economic_l5_authorized_spent": true,
+  "failure_route": "HOLD_STOP_FTK_PRIMARY_NO_REPRESENTATION_REFINE",
+  "financial_alpha_evidence": 0,
+  "first_fail_layer": "D6_SELECTION",
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "l8_this_session": "NOT_OPENED",
+  "layer_screens": {
+    "D6_SELECTION": "FAIL",
+    "D7_CONFIRMATION": "NOT_IN_SCOPE",
+    "D8_HOLD_EXIT": "PASS",
+    "D9_ECONOMICS": "FAIL"
+  },
+  "material_trials_charged": 3,
+  "material_trials_remaining": 0,
+  "next_owner_action": "L7 route only — HOLD | STOP",
+  "note": "Final material trial spent. No FTK-2. No second eval. ΔJ>0 is POSITIVE_NET_EDGE_SCREEN only, not capital.",
+  "owner_routes": [
+    "HOLD",
+    "STOP"
+  ],
+  "parent_program": "AO-FTK-1-20260812",
+  "payoff_summary": {
+    "d9_interpretation": "POSITIVE_NET_EDGE_SCREEN",
+    "d9_screen": "FAIL",
+    "delta_J": -0.1624671973798234,
+    "delta_J_required": 0.0,
+    "effect_sizes_recorded": true,
+    "gross_lift": -0.1604671973798234,
+    "n_decision_dates": 57,
+    "pit_ew_mean_gross": 0.20991882573303766,
+    "selected_cat_rate": 0.13114035087719297,
+    "selected_mean_gross": 0.04945162835321427,
+    "selected_mean_net": 0.047451628353214266,
+    "selected_rt_rate": 0.09712475633528266
+  },
+  "receipt_id": "AO_FTK_1_ECON_1_L7_FINAL_OWNER_PACKET",
+  "receipts": {
+    "auth": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_authorization.json",
+    "d2": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_d2_repreflight.json",
+    "debit": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_trial_debit.json",
+    "join": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_label_join.json",
+    "l6": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_final_layered_diagnosis.json",
+    "l7": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_final_owner_packet.json",
+    "run": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_run.json"
+  },
+  "runnable_evaluation": false,
+  "schema_version": "ao_ftk_1_econ_1_l7_final_owner_packet_v1",
+  "session": "C_FINAL_TRIAL_COMPLETE",
+  "stop_lines_honored": [
+    "DEBIT_ON_D2_RED",
+    "AOV_104_AS_FULL_W3",
+    "SECOND_EVAL_OR_GRID",
+    "ASYMMETRIC_RETURN_LAW",
+    "CLAIM_DELTA_J0_AS_CAPITAL",
+    "CLAIM_ALPHA_GT_0",
+    "OPEN_AO_FTK_2",
+    "L8_THIS_SESSION",
+    "DOF_REWRITE",
+    "INVENT_D7",
+    "W6_CAPITAL"
+  ],
+  "trials_after": {
+    "charged": 3,
+    "remaining": 0
+  },
+  "w6": "UNTOUCHED",
+  "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1",
+  "worker_did_not_select_next_slice": true
+}

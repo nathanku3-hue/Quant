@@ -17,81 +17,53 @@ PUBLIC_MAIN              = NON_AUTHORITY_UNTIL_MERGE
 
 ```text
 ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
-ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-ECON-1 / W3_MKT_ADMIT_PASS_D2_GREEN / WAIT_OWNER_L5_ECONOMIC_FINAL / NO_WORKER
+ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-ECON-1 / C_FINAL_TRIAL_COMPLETE / first_fail=D6_SELECTION / remaining=0 / NO_WORKER
 AO_FTK_0_STATUS          = CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER
-AO_FTK_1_STATUS          = ECON_1_W3_MKT_ADMIT_D2_GREEN_WAIT_OWNER_L5 / sensing PASS / charged=2 remaining=1 / NO_WORKER
-AO_FTK_1_ECON_1_STATUS   = W3 market admitted; D2 preflight GREEN; last trial unspent; alpha=0; NO_WORKER
+AO_FTK_1_STATUS          = ECON_1_FINAL / charged=3 remaining=0 / NO_WORKER
+AO_FTK_1_ECON_1_STATUS   = C_FINAL_TRIAL_COMPLETE; first_fail=D6_SELECTION; alpha=0; NO_WORKER
 OK_SBI_0_STATUS          = S0_DESIGN_LOCKED_RELEASE_BLOCKED + Q_SOURCE_BLOCKED_TERMINAL (PARKED)
 CAPITAL_ALPHA_PATH       = CLOSED
 FINANCIAL_ALPHA_EVIDENCE = 0
 ```
 
-## AO-FTK-1-W3-MKT-ADMIT-1 (2026-08-12) — PASS / D2 GREEN
+## AO-FTK-1-ECON-1 final trial (2026-08-12)
 
 ```text
-WORKER_STATUS         = CLOSED / NO_WORKER
-TERMINAL              = W3_MKT_ADMIT_PASS_D2_GREEN
-FULL_W3_ADMITTED      = true
-SECURITY_COUNT        = 5919 companies (date-local Full-W3 market corpus)
-RETURN_CONVENTION     = SP_PRICE_CLOSE_CLOSE_TO_CLOSE
-  flag                = CLOSE_TO_CLOSE_NOT_DIVIDEND_COMPLETE (BOTH legs)
-SYMMETRY_FTK_W3       = true
-D2_PRECHECK           = GREEN
-COVERAGE              ≈ 98.6–99.6% eligible names with H=63 close path (sampled)
-DECISION_DATES_H63    = 282 calendar-complete on market spine
-TRIALS                = charged=2 remaining=1 (UNSPENT this turn)
-DEBIT_THIS_TURN       = false
-L5_AUTHORIZED         = false
+WORK_ID               = AO-FTK-1-ECON-1-L5-FINAL-1
+SESSION               = C_FINAL_TRIAL_COMPLETE
+FIRST_FAIL_LAYER      = D6_SELECTION
+TRIALS                = charged=3 remaining=0
 ALPHA                 = 0
-NEXT                  = WAIT_OWNER_L5_ECONOMIC_FINAL (separate auth; re-verify D2 at open)
+AO_FTK_2              = NOT_OPENED
+NEXT                  = L7 owner route only
 ```
 
 ### Receipts
 
 ```text
-survey       = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_survey.json
-admit        = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_custody_admit.json
-d2_preflight = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_d2_preflight.json
-summary      = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_summary.md
-close        = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_close.json
-WORK_COMMIT  = b32884e
-```
-
-### Custody admitted
-
-```text
-source = prebreakout W3 date-local market corpus
-       data/prebreakout/raw/historical_corpus_20250324_20260807
-       data/prebreakout/raw/historical_corpus_20250401_20260807
-bound  = data/prebreakout/compiled/w3_real_authority_20250324_20260807/source_manifest.json
-NOT    = AOV-104 productquery market (explicitly NOT_FULL_W3; promotion forbidden)
-```
-
-## Prior Trial 2 context (historical)
-
-```text
-SESSION_PATH          = C_TRIAL2_COMPLETE (historical)
-FIRST_FAIL_LAYER      = D2_DATA_OBSERVABLE (Trial 2; probe saw only AOV-104)
-FAILURE_ROUTE         = HOLD_OR_ADMIT_FULL_W3… → ADMITTED this slice
+d2   = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_d2_repreflight.json
+auth = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_authorization.json
+debit= docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_trial_debit.json
+join = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_label_join.json
+run  = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_run.json
+l6   = docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_final_layered_diagnosis.json
+l7   = docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_final_owner_packet.json
 ```
 
 ## Do now
 
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
-2. `Q_SOURCE_BLOCKED_TERMINAL` — do **not** invent Q / open OK-SBI S2.
-3. **Owner may** issue separate `L5_AUTHORIZE_ECONOMIC_FINAL` after verifying D2 GREEN.
-4. Any L5 worker must **re-run D2 preflight** at session start; abort without debit if RED.
-5. **No auto L5. No debit here. No FTK-2. No L8. No capital. alpha=0.**
+2. Owner L7 route only on AO-FTK-1-ECON-1.
+3. **No FTK-2. No second eval. No capital. alpha=0.**
 
 ## Do not
 
 ```text
-auto economic L5 / debit last trial without new owner auth + D2 re-green
-AOV-104 as Full-W3 / invent prices-returns / impute / peer-fill
-denominator rewrite to match panel / asymmetric FTK vs W3 returns
-open AO-FTK-2 / L8 now / claim financial_alpha_evidence > 0 / capital open / W6 open
+open AO-FTK-2 / second economic eval / claim financial_alpha_evidence > 0
+capital open / W6 open / AOV-104 as Full-W3 / invent prices-returns
+asymmetric FTK vs W3 returns / L8 without owner earn
 ```
 
 ## One-line constitution
 
-Admit real Full-W3 market custody or HOLD. Prove D2 green before the last trial. Never fake W3. Never debit here.
+Re-prove D2 on real Full-W3. Then one last economic trial. Same sensor, same binds, same return law both sides. L6 first-fail. L7 stop. No fakes, no slice 2.

@@ -1,0 +1,29 @@
+{
+  "FORWARD_R_NET_materialized": true,
+  "auth_receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_AUTHORIZATION",
+  "content_address": "f95cc3bbca3bdec9256f4de5ad2a0c09adc7db2c121c536b05e6d497a765e1e0",
+  "debit_receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_TRIAL_DEBIT",
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "identity_sha256_pre": "9a5f75fffdcfc52ba2a24eb3d34283c497fcade6bfb6f0805da1c7b5ace17997",
+  "join_receipt_id": "AO_FTK_1_ECON_1_L5_FINAL_LABEL_JOIN",
+  "joined_at_utc": "2026-08-12T01:29:02Z",
+  "label_rows": 1,
+  "market_probe": {
+    "aov_104_used": false,
+    "coverage_rate_min": 0.9855513307984791,
+    "decision_dates_h63_calendar_complete": 282,
+    "flag": null,
+    "full_w3_close_to_close_admitted": true,
+    "full_w3_market_total_return_admitted": true,
+    "market_company_count": 5919,
+    "n_w3_eligible_sample_max": 5260,
+    "return_convention": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE",
+    "source_manifest": "data/prebreakout/compiled/w3_real_authority_20250324_20260807/source_manifest.json",
+    "w3_admit_commit": "b32884e",
+    "w3_authority_dir": "data/prebreakout/compiled/w3_real_authority_20250324_20260807"
+  },
+  "pack_scope": "ECON_ONLY",
+  "schema_version": "ao_ftk_1_econ_1_final_economic_label_joined_manifest_v1",
+  "sensing_pack_reuse": false,
+  "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1"
+}
