@@ -1,4 +1,5 @@
 {
+  "COMMIT": "eb7b876",
   "D2_REPREFLIGHT": "GREEN",
   "alpha": 0,
   "ao_ftk_2": "NOT_OPENED",
@@ -74,6 +75,7 @@
     "remaining": 0
   },
   "w6": "UNTOUCHED",
+  "work_commit": "eb7b876",
   "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1",
   "worker_did_not_select_next_slice": true
 }

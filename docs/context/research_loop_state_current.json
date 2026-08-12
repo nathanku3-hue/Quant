@@ -74,7 +74,8 @@
       "slice_id": "AO-FTK-1-20260812",
       "status": "ECON_1_FINAL_TRIAL_COMPLETE",
       "track_id": "AO-FTK-1",
-      "worker_status": "CLOSED / NO_WORKER"
+      "worker_status": "CLOSED / NO_WORKER",
+      "final_trial_work_commit": "eb7b876"
     },
     {
       "D2_PRECHECK": "GREEN",
@@ -136,9 +137,10 @@
       "w3_mkt_d2_preflight": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_d2_preflight.json",
       "w3_mkt_survey": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_survey.json",
       "w3_mkt_work_commit": "b32884e",
-      "work_commit": "PENDING_COMMIT",
+      "work_commit": "eb7b876",
       "worker_did_not_select_next_slice": true,
-      "worker_status": "CLOSED / NO_WORKER"
+      "worker_status": "CLOSED / NO_WORKER",
+      "final_trial_work_commit": "eb7b876"
     },
     {
       "next": "continue under own contract; do not merge into FTK/Q",
@@ -212,7 +214,7 @@
       "run": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_run.json"
     },
     "session": "C_FINAL_TRIAL_COMPLETE",
-    "work_commit": "PENDING_COMMIT",
+    "work_commit": "eb7b876",
     "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1"
   },
   "last_econ_freeze": {
