@@ -1,0 +1,58 @@
+{
+  "schema_version": "tr_v0_l2_observation_contract_receipt_v1",
+  "slice_id": "TR-v0-L2-OBSERVATION-CONTRACT-1",
+  "family_id": "TRANSITION_RECOGNITION_v0",
+  "date": "2026-08-12",
+  "role": "SHADOW_RESEARCH / OUTCOME_BLIND / NO_TRIAL",
+  "terminal_verdict": "L2_OBSERVATION_CONTRACT_FROZEN",
+  "status": "L2_CONTRACT_FROZEN_WAITING_RECOGNITION_SOURCE",
+  "machine_contract": "docs/architecture/transition_recognition_v0_l2_observation_contract.json",
+  "human_contract": "docs/architecture/transition_recognition_v0_l2_observation_contract.md",
+  "parent_admission": "docs/context/e2e_evidence/tr_v0_g0_g2_admission_1.json",
+  "parent_l0_l1": "docs/architecture/transition_recognition_v0_l0_l1_freeze.json",
+  "ftk_l7_stop": "docs/context/e2e_evidence/ao_ftk_1_l7_stop_close.json",
+  "gates_honored": {
+    "returns_join": false,
+    "label_join": false,
+    "timing_research": false,
+    "ftk_rescue": false,
+    "ao_ftk_2": false,
+    "h_k_threshold_grid": false,
+    "debit": 0,
+    "evals": 0,
+    "l5": false,
+    "provider_capture": false,
+    "invent_expectation_bytes": false
+  },
+  "reality_bind": {
+    "status": "BOUND_VIA_ADMITTED_S0_FTK_LINEAGE_AS_OBSERVATION_ONLY",
+    "primitives": ["IQ_PERIOD_END", "IQ_TOTAL_REV", "IQ_INVENTORY", "IQ_OPER_INC"],
+    "policy_reuse_forbidden": true
+  },
+  "recognition_bind": {
+    "api": "alpha_pit_data_api_v1.expectations",
+    "primary_measures": ["EPS_FY1", "EPS_FY1_REVISION_30D", "EPS_FY1_REVISION_90D"],
+    "surface_status": "CONTRACT_BOUND",
+    "source_bytes_status": "MISSING_SOURCE",
+    "source_reason": "CIQ_EXPECTATIONS_CAPTURE_NOT_LANDED",
+    "crv1_artifact_reuse": "FORBIDDEN"
+  },
+  "recognition_gap": {
+    "operator_forms_frozen": ["REV_LAG_AFTER_REALITY", "LEVEL_STALE_VS_REALITY"],
+    "materiality_cuts": "BLOCKED_UNSET_UNTIL_L3_L4",
+    "selection_contrast_preregistered": "Reality_only vs Reality_plus_Gap (later D6; not evaluated)"
+  },
+  "financial_alpha_evidence": 0,
+  "capital": false,
+  "runnable_evaluation": false,
+  "next": "TR-v0-SOURCE-ADMIT or HOLD_SOURCE until expectations bytes land; then L3_REPRESENTATION_SNR",
+  "not_next": [
+    "L5 economic trial",
+    "timing research",
+    "FTK rescue",
+    "threshold fit on residuals",
+    "returns join"
+  ],
+  "stop_lines_hit": [],
+  "constitution": "Freeze how Reality and Recognition are observed. Do not spend a trial. Do not invent consensus. Do not open timing or FTK rescue."
+}

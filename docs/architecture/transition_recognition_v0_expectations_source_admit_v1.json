@@ -1,0 +1,177 @@
+{
+  "schema_version": "transition_recognition_v0_expectations_source_admit_v1",
+  "slice_id": "TR-v0-L2B-EXPECTATIONS-SOURCE-ADMIT-1",
+  "family_id": "TRANSITION_RECOGNITION_v0",
+  "phase": "L2B_SOURCE_ADMISSION",
+  "role": "SOURCE_CUSTODY_ONLY / OUTCOME_BLIND / NO_TRIAL",
+  "date": "2026-08-12",
+  "entry": {
+    "ftk_primary": "STOPPED",
+    "g0_g2": "PASS",
+    "l2": "FROZEN",
+    "reality": "BOUND",
+    "recognition_contract": "BOUND",
+    "recognition_bytes": "MISSING_SOURCE",
+    "financial_alpha_evidence": 0
+  },
+  "mission": "Bind lawful PIT expectation bytes for EPS_FY1, EPS_FY1_REVISION_30D, and EPS_FY1_REVISION_90D, or return HOLD_SOURCE.",
+  "golden_question": "Can we obtain an exact, PIT-correct, independently sourced consensus history for the frozen recognition variables cheaply enough to justify continuing?",
+  "not_golden_question": "Can we make Recognition predictive?",
+  "source_semantics": {
+    "status": "UNBOUND",
+    "provider": "S&P Capital IQ Pro",
+    "required_exact_bindings": {
+      "EPS_FY1": [
+        "exact provider field/function",
+        "FY1 forecast-period law",
+        "historical/as-of semantics",
+        "publication/available_at law",
+        "CIQSEC identity law"
+      ],
+      "EPS_FY1_REVISION_30D": [
+        "exact provider-observed metric OR deterministic outcome-blind construction from lawful EPS_FY1 history"
+      ],
+      "EPS_FY1_REVISION_90D": [
+        "exact provider-observed metric OR deterministic outcome-blind construction from lawful EPS_FY1 history"
+      ]
+    },
+    "bounded_repo_scan": {
+      "authoritative_ciq_expectation_capture_mapping_found": false,
+      "landed_expectation_or_consensus_provider_custody_found": false,
+      "proved_ciq_runbook_expectation_mapping_found": false,
+      "existing_mechanical_schema_found": true,
+      "existing_mechanical_source_id": "SPCIQPRO:CRV1_EXPECTATIONS",
+      "existing_default_family": "CYCLE_RESONANCE_v1",
+      "finding": "The repository defines canonical expectation rows and a CRV1-bound adapter surface, but the bounded scan found no exact authoritative CIQ historical EPS-consensus field/function, vintage law, or landed source bytes for the three frozen TR-v0 measures."
+    },
+    "velocity_stop": {
+      "triggered": true,
+      "reason": "Resolving the missing provider field/function and historical-vintage semantics would require a new provider-semantic discovery round beyond the bounded source-admission gate.",
+      "action": "HOLD_SOURCE"
+    }
+  },
+  "family_authority_law": {
+    "raw_ciq_bytes_may_be_reused_if_semantics_match": true,
+    "crv1_artifact_authority_as_tr_authority": "FORBIDDEN",
+    "tr_source_id_on_admission": "SPCIQPRO:TR_V0_EXPECTATIONS",
+    "tr_family_data_contract": {
+      "family_id": "TRANSITION_RECOGNITION_v0",
+      "risk_set_spec_id": "TR_V0_USES_W3_DENOMINATOR_WHEN_EVALUATED_NOT_OWN_RISKSET_THIS_SLICE",
+      "primary_label_spec_id": "UNSET_THIS_SLICE_NO_OUTCOMES",
+      "allowed_observation_surface": [],
+      "allowed_expectation_surface": [
+        "EPS_FY1",
+        "EPS_FY1_REVISION_30D",
+        "EPS_FY1_REVISION_90D"
+      ],
+      "allowed_claim_surface": []
+    }
+  },
+  "capture_scope": {
+    "primary": [
+      "EPS_FY1",
+      "EPS_FY1_REVISION_30D"
+    ],
+    "secondary": [
+      "EPS_FY1_REVISION_90D"
+    ],
+    "parked_not_this_slice": [
+      "EPS_FY2",
+      "REVENUE_FY1",
+      "REVENUE_FY2",
+      "REVENUE_FY1_REVISION_30D",
+      "REVENUE_FY1_REVISION_90D",
+      "FORWARD_PE",
+      "momentum",
+      "price_confirmation",
+      "guidance_NLP"
+    ]
+  },
+  "canonical_admitted_row": [
+    "security_id",
+    "measure",
+    "value",
+    "forecast_period_end",
+    "observed_at",
+    "available_at",
+    "source_id",
+    "source_receipt_sha256",
+    "epistemic_class",
+    "coverage_status",
+    "missingness_reason"
+  ],
+  "deterministic_revision_option": {
+    "construction_id": "TR_V0_EPS_FY1_ABS_DELTA_SAME_FPE_LOOKBACK_V1",
+    "formula": "CURRENT_EPS_FY1_MINUS_LOOKBACK_EPS_FY1",
+    "lookbacks_calendar_days": [30, 90],
+    "forecast_period_alignment": "SAME_FORECAST_PERIOD_END",
+    "vintage_selection_law": "LATEST_PRESENT_AVAILABLE_AT_OR_BEFORE_LOOKBACK_CUTOFF",
+    "outcome_blind": true,
+    "status": "IMPLEMENTED_AS_ADMISSION_OPTION_BUT_NOT_EXECUTABLE_WITHOUT_EXACT_EPS_FY1_SOURCE_SEMANTICS"
+  },
+  "gates": {
+    "G-S0": {
+      "name": "SOURCE_SEMANTICS",
+      "pass_requires": "Exact CIQ field/function, forecast-period, historical/as-of, available_at, CIQSEC, and revision semantics bound.",
+      "fail_terminal": "HOLD_SOURCE"
+    },
+    "G-S1": {
+      "name": "CUSTODY",
+      "pass_requires": "Local raw bytes plus TR-v0-specific receipt, raw SHA-256, semantic SHA-256, license/retention metadata, and explicit no-CRV1-authority-reuse flag.",
+      "fail_terminal": "HOLD_SOURCE"
+    },
+    "G-S2": {
+      "name": "PIT_VALIDATION",
+      "pass_requires": [
+        "available_at <= decision_as_of",
+        "observed_at <= available_at",
+        "no future vintage",
+        "CIQSEC only; no ticker fallback",
+        "explicit missingness",
+        "deterministic identity",
+        "no duplicate (security, measure, available_at)",
+        "only the three frozen measures"
+      ],
+      "fail_terminal": "HOLD_SOURCE"
+    }
+  },
+  "gate_results": {
+    "G-S0": {
+      "status": "HOLD",
+      "reason": "EXACT_CIQ_SOURCE_SEMANTICS_UNBOUND"
+    },
+    "G-S1": {
+      "status": "NOT_RUN_FAIL_FAST",
+      "reason": "G-S0 did not pass"
+    },
+    "G-S2": {
+      "status": "NOT_RUN_FAIL_FAST",
+      "reason": "G-S0 did not pass"
+    }
+  },
+  "provider_bytes_landed": false,
+  "source_receipt_landed": false,
+  "terminal": "HOLD_SOURCE",
+  "terminal_reason": "Exact lawful CIQ consensus semantics are not already bound in repository authority; hard velocity stop prevents broad field/vintage discovery or invented bytes.",
+  "next": "PARK_TR_v0_AND_SPEND_RESEARCH_WIP_ON_ANOTHER_INDEPENDENT_FAMILY",
+  "next_if_future_source_semantics_are_explicitly_bound": "Re-run this same G-S0/G-S1/G-S2 gate; PASS_SOURCE_ADMITTED then permits TR-v0-L3-REPRESENTATION-SNR-1.",
+  "do_not": [
+    "change hypothesis",
+    "change gap operators",
+    "set materiality cuts",
+    "run L3 empirics",
+    "inspect returns",
+    "research timing",
+    "debit a trial",
+    "relabel CRV1 expectation artifact as TR-v0 authority",
+    "invent provider fields or consensus bytes",
+    "open a general expectations-data project"
+  ],
+  "returns_join": false,
+  "label_join": false,
+  "timing_research": false,
+  "debit": 0,
+  "evals": 0,
+  "financial_alpha_evidence": 0,
+  "capital": false
+}

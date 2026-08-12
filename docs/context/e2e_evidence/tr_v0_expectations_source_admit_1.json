@@ -1,0 +1,92 @@
+{
+  "schema_version": "tr_v0_expectations_source_admit_receipt_v1",
+  "slice_id": "TR-v0-L2B-EXPECTATIONS-SOURCE-ADMIT-1",
+  "family_id": "TRANSITION_RECOGNITION_v0",
+  "phase": "L2B_SOURCE_ADMISSION",
+  "date": "2026-08-12",
+  "role": "SOURCE_CUSTODY_ONLY / OUTCOME_BLIND / NO_TRIAL",
+  "parent_l2_contract": "docs/architecture/transition_recognition_v0_l2_observation_contract.json",
+  "machine_contract": "docs/architecture/transition_recognition_v0_expectations_source_admit_v1.json",
+  "human_contract": "docs/architecture/transition_recognition_v0_expectations_source_admit_v1.md",
+  "implementation": "research/transition_recognition_v0/expectations_source_admit.py",
+  "focused_tests": "tests/transition_recognition_v0/test_tr_v0_expectations_source_admit.py",
+  "golden_question": "Can we obtain an exact, PIT-correct, independently sourced consensus history for the frozen recognition variables cheaply enough to justify continuing?",
+  "bounded_scan": {
+    "scope": [
+      "docs",
+      "research",
+      "scripts",
+      "tests",
+      "data expectation/consensus/estimate/revision/EPS-like filenames",
+      "docs/context/ciq_provider_acquisition_findings_20260808.md"
+    ],
+    "canonical_expectation_schema_found": true,
+    "crv1_expectation_adapter_found": true,
+    "crv1_source_id": "SPCIQPRO:CRV1_EXPECTATIONS",
+    "crv1_default_family": "CYCLE_RESONANCE_v1",
+    "authoritative_ciq_eps_consensus_field_mapping_found": false,
+    "authoritative_historical_consensus_vintage_law_found": false,
+    "landed_provider_expectation_bytes_found": false,
+    "landed_provider_expectation_receipt_found": false,
+    "provider_runbook_expectation_semantics_found": false,
+    "finding": "The source schema is mechanical but the exact CIQ source-semantic bind required by G-S0 is absent from current repository authority/local custody."
+  },
+  "gate_results": {
+    "G-S0_SOURCE_SEMANTICS": {
+      "status": "HOLD",
+      "reason": "EXACT_CIQ_SOURCE_SEMANTICS_UNBOUND",
+      "velocity_stop_triggered": true
+    },
+    "G-S1_CUSTODY": {
+      "status": "NOT_RUN_FAIL_FAST",
+      "reason": "G-S0 did not pass"
+    },
+    "G-S2_PIT_VALIDATION": {
+      "status": "NOT_RUN_FAIL_FAST",
+      "reason": "G-S0 did not pass"
+    }
+  },
+  "family_boundary": {
+    "raw_byte_reuse_if_semantics_match": "ALLOWED",
+    "crv1_artifact_authority_reuse": "FORBIDDEN",
+    "tr_source_id": "SPCIQPRO:TR_V0_EXPECTATIONS",
+    "tr_family_authority_explicit": true
+  },
+  "implementation_guards": {
+    "source_semantics_exact_bind_required_before_custody": true,
+    "raw_hash_binding_required": true,
+    "semantic_hash_binding_required": true,
+    "available_at_le_decision_as_of": true,
+    "observed_at_le_available_at": true,
+    "ciqsec_only": true,
+    "ticker_fallback": false,
+    "duplicate_security_measure_available_at_rejected": true,
+    "explicit_missingness_required": true,
+    "parked_measures_rejected": true,
+    "crv1_receipt_relabel_rejected": true,
+    "deterministic_revision_option": "TR_V0_EPS_FY1_ABS_DELTA_SAME_FPE_LOOKBACK_V1"
+  },
+  "provider_bytes_landed": false,
+  "source_receipt_landed": false,
+  "data_custody_created": false,
+  "terminal": "HOLD_SOURCE",
+  "failed_gate": "G-S0",
+  "terminal_reason": "Exact lawful CIQ EPS-consensus source semantics are unavailable in current authority and resolving them would widen into a provider-semantic discovery round prohibited by the velocity stop.",
+  "next": "PARK_TR_v0_AND_SPEND_RESEARCH_WIP_ON_ANOTHER_INDEPENDENT_FAMILY",
+  "l3_opened": false,
+  "returns_join": false,
+  "label_join": false,
+  "timing_research": false,
+  "debit": 0,
+  "evals": 0,
+  "financial_alpha_evidence": 0,
+  "capital": false,
+  "validation": {
+    "focused_pytest": "PASS_12_OF_12",
+    "transition_recognition_v0_suite": "PASS_17_OF_17",
+    "compile": "PASS",
+    "forbidden_surface_scan": "PASS_NO_EXECUTABLE_OUTCOMES_RETURNS_OR_TIMING_REFERENCES",
+    "new_file_whitespace_check": "PASS_GIT_DIFF_NO_INDEX_CHECK",
+    "saw_governance": "BLOCK_HIERARCHY_CONFIRMATION_MISSING_AND_INDEPENDENT_REVIEWER_A_B_C_NOT_RUN"
+  }
+}

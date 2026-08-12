@@ -1,0 +1,99 @@
+{
+  "schema_version": "ao_ftk_1_l7_stop_close_v1",
+  "receipt_id": "AO_FTK_1_L7_STOP_CLOSE",
+  "slice_id": "AO-FTK-1-L7-CLOSE-1",
+  "name": "FTK_L7_STOP_STAMP",
+  "role": "HARNESS / ROADMAP_STAMP",
+  "mode": "RESUME_MUTATION_ONLY",
+  "date": "2026-08-12",
+  "L7_ROUTE": "STOP",
+  "owner_l7_route": "STOP",
+  "terminal_verdict": "FTK_ECON_PRIMARY_STOPPED",
+  "worker_status": "CLOSED / NO_WORKER",
+  "parent_program": "AO-FTK-1-20260812",
+  "freeze_id": "AO-FTK-1-ECON-1",
+  "prior_science": {
+    "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1",
+    "first_fail": "D6_SELECTION",
+    "route": "HOLD_STOP_FTK_PRIMARY_NO_REPRESENTATION_REFINE",
+    "alpha": 0,
+    "trials_remaining": 0,
+    "commits": {
+      "work_commit": "eb7b876",
+      "stamp_lineage": "b6802df"
+    }
+  },
+  "ftk_econ_primary": "STOPPED",
+  "banked_sensing": {
+    "status": "PASS",
+    "trial": 1,
+    "receipt": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json",
+    "surface_status": "BOTH_NODES_MEASURABLE_SIGNAL"
+  },
+  "banked_economics": {
+    "status": "FAIL",
+    "first_fail_layer": "D6_SELECTION",
+    "trial": "final_L5",
+    "work_id": "AO-FTK-1-ECON-1-L5-FINAL-1",
+    "l6": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_final_layered_diagnosis.json",
+    "l7_owner_packet": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_final_owner_packet.json",
+    "failure_route": "HOLD_STOP_FTK_PRIMARY_NO_REPRESENTATION_REFINE"
+  },
+  "financial_alpha_evidence": 0,
+  "material_trials_charged_to_date": 3,
+  "material_trials_remaining": 0,
+  "this_slice": {
+    "debit": 0,
+    "eval": 0,
+    "join": 0,
+    "material_trial_debit": false,
+    "evaluation_run": false,
+    "label_bytes_join": false,
+    "note": "Stamp-only; no science mutation"
+  },
+  "forbidden": {
+    "AO_FTK_2": "FORBIDDEN",
+    "L8": "FORBIDDEN",
+    "rescue": "FORBIDDEN",
+    "re_run_ftk_l5": "FORBIDDEN",
+    "reopen_economics": "FORBIDDEN",
+    "invent_new_ftk_science": "FORBIDDEN",
+    "second_eval": "FORBIDDEN",
+    "debit": "FORBIDDEN",
+    "capital_claim": "FORBIDDEN",
+    "alpha_claim_gt_0": "FORBIDDEN"
+  },
+  "optional_pointer": {
+    "track": "TR-v0",
+    "admission_exists": true,
+    "admission_receipt": "docs/context/e2e_evidence/tr_v0_g0_g2_admission_1.json",
+    "next": "L2_OBSERVATION_CONTRACT",
+    "note": "Pointer only; not FTK rescue; not opened by this stamp"
+  },
+  "artifacts": {
+    "sot": "docs/context/research_loop_state_current.json",
+    "active_brief": "docs/context/ACTIVE_BRIEF",
+    "prior_l7_final_owner_packet": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_final_owner_packet.json",
+    "prior_l6_final": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_final_layered_diagnosis.json",
+    "prior_l5_final_run": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_run.json",
+    "sensing_close": "docs/context/e2e_evidence/ao_ftk_1_20260812_l5_l6_l7_close.json"
+  },
+  "lineage": {
+    "work_commit": "eb7b876",
+    "prior_stamp_commit": "b6802df",
+    "authority_worktree": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e",
+    "lineage_branch": "codex/pit-source-authority-1"
+  },
+  "one_line": "Owner L7_ROUTE=STOP. FTK econ primary STOPPED. Sensing banked PASS; economics banked D6_SELECTION FAIL. alpha=0. AO-FTK-2/L8/rescue FORBIDDEN. No debit/eval/join this slice.",
+  "constitution": "Stamp STOP only. Do not re-run FTK L5. Do not reopen economics. Do not invent FTK science. No FTK-2. No second eval. No debit. No capital/alpha claim.",
+  "stop_lines_honored": true,
+  "phases_not_run_this_slice": [
+    "AO_FTK_2",
+    "L8",
+    "RESCUE",
+    "SECOND_EVAL",
+    "DEBIT",
+    "JOIN",
+    "CAPITAL"
+  ]
+}

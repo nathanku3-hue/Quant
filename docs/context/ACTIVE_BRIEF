@@ -17,30 +17,48 @@ PUBLIC_MAIN              = NON_AUTHORITY_UNTIL_MERGE
 
 ```text
 ACTIVE_PRODUCT_STATE     = CLOCK_1_RUNNING / PRE_EVALUATION / OUTCOME_SEALED
-ACTIVE_RESEARCH_SHADOW   = AO-FTK-1-ECON-1 / C_FINAL_TRIAL_COMPLETE / first_fail=D6_SELECTION / remaining=0 / NO_WORKER
+ACTIVE_RESEARCH_SHADOW   = AO-FTK-1 / L7_ROUTE=STOP / FTK_ECON_PRIMARY=STOPPED / NO_WORKER
 AO_FTK_0_STATUS          = CLOSED / READY_FOR_LATER_CHARGED_DEVELOPMENT_READ / NO_WORKER
-AO_FTK_1_STATUS          = ECON_1_FINAL / charged=3 remaining=0 / NO_WORKER
-AO_FTK_1_ECON_1_STATUS   = C_FINAL_TRIAL_COMPLETE; first_fail=D6_SELECTION; alpha=0; NO_WORKER
+AO_FTK_1_STATUS          = STOPPED / L7_STOP_STAMPED / charged=3 remaining=0 / NO_WORKER
+AO_FTK_1_ECON_1_STATUS   = STOPPED; banked_sensing=PASS; banked_economics=D6_SELECTION FAIL; alpha=0; NO_WORKER
 OK_SBI_0_STATUS          = S0_DESIGN_LOCKED_RELEASE_BLOCKED + Q_SOURCE_BLOCKED_TERMINAL (PARKED)
 CAPITAL_ALPHA_PATH       = CLOSED
 FINANCIAL_ALPHA_EVIDENCE = 0
 ```
 
-## AO-FTK-1-ECON-1 final trial (2026-08-12)
+## AO-FTK-1 L7 STOP (2026-08-12) — stamped
+
+```text
+SLICE_ID              = AO-FTK-1-L7-CLOSE-1
+NAME                  = FTK_L7_STOP_STAMP
+L7_ROUTE              = STOP
+FTK_ECON_PRIMARY      = STOPPED
+BANKED_SENSING        = PASS (Trial 1)
+BANKED_ECONOMICS      = D6_SELECTION FAIL (final L5)
+FINANCIAL_ALPHA       = 0
+AO_FTK_2 / L8 / RESCUE= FORBIDDEN
+DEBIT / EVAL / JOIN   = 0 this slice
+PRIOR_SCIENCE         = AO-FTK-1-ECON-1-L5-FINAL-1
+LINEAGE               = eb7b876 / b6802df
+STOP_CLOSE            = docs/context/e2e_evidence/ao_ftk_1_l7_stop_close.json
+```
+
+### Prior science (final economic trial — banked, not re-run)
 
 ```text
 WORK_ID               = AO-FTK-1-ECON-1-L5-FINAL-1
 SESSION               = C_FINAL_TRIAL_COMPLETE
 FIRST_FAIL_LAYER      = D6_SELECTION
+FAILURE_ROUTE         = HOLD_STOP_FTK_PRIMARY_NO_REPRESENTATION_REFINE
 TRIALS                = charged=3 remaining=0
 ALPHA                 = 0
-AO_FTK_2              = NOT_OPENED
-NEXT                  = L7 owner route only
+AO_FTK_2              = NOT_OPENED (now FORBIDDEN)
 ```
 
 ### Receipts
 
 ```text
+stop = docs/context/e2e_evidence/ao_ftk_1_l7_stop_close.json
 d2   = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_d2_repreflight.json
 auth = docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_authorization.json
 debit= docs/context/e2e_evidence/ao_ftk_1_econ_1_l5_final_trial_debit.json
@@ -50,20 +68,64 @@ l6   = docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_final_layered_diagnosis.json
 l7   = docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_final_owner_packet.json
 ```
 
+## TR-v0 L2 observation contract (2026-08-12) — done
+
+```text
+SLICE_ID              = TR-v0-L2-OBSERVATION-CONTRACT-1
+TERMINAL              = L2_OBSERVATION_CONTRACT_FROZEN
+STATUS                = WAITING_RECOGNITION_SOURCE (CIQ_EXPECTATIONS_CAPTURE_NOT_LANDED)
+REALITY_BIND          = admitted S0/FTK transition primitives as OBSERVATION only
+RECOGNITION_SURFACE   = expectations(): EPS_FY1 + REV_30D/90D (contract-bound)
+GAP_FORMS             = REV_LAG_AFTER_REALITY | LEVEL_STALE_VS_REALITY (cuts UNSET)
+DEBIT / EVAL / JOIN   = 0
+TIMING / FTK_RESCUE   = false
+ALPHA                 = 0
+CONTRACT              = docs/architecture/transition_recognition_v0_l2_observation_contract.json
+RECEIPT               = docs/context/e2e_evidence/tr_v0_l2_observation_contract_1.json
+```
+
+## TR-v0 L2B expectations source admission (2026-08-12) — HOLD / parked
+
+```text
+SLICE_ID              = TR-v0-L2B-EXPECTATIONS-SOURCE-ADMIT-1
+TERMINAL              = HOLD_SOURCE
+FAILED_GATE           = G-S0 SOURCE_SEMANTICS
+REASON                = exact lawful CIQ EPS-consensus semantics unbound; hard velocity stop
+PROVIDER_BYTES        = not landed
+TR_SOURCE_RECEIPT     = not landed
+CRV1_AUTHORITY_REUSE  = FORBIDDEN (raw-byte reuse only if semantics later match)
+DEBIT / EVAL / JOIN   = 0
+TIMING / RETURNS      = false
+ALPHA                 = 0
+CONTRACT              = docs/architecture/transition_recognition_v0_expectations_source_admit_v1.json
+RECEIPT               = docs/context/e2e_evidence/tr_v0_expectations_source_admit_1.json
+NEXT                   = park TR-v0; spend WIP on another independent family
+```
+
 ## Do now
 
 1. Preserve Clock #1; outcomes sealed until legitimate maturity.
-2. Owner L7 route only on AO-FTK-1-ECON-1.
-3. **No FTK-2. No second eval. No capital. alpha=0.**
+2. **FTK primary is STOPPED.** Do not re-open economics or re-run L5.
+3. **TR-v0 is PARKED at HOLD_SOURCE.** Do not open L3 unless a future bounded exact source-semantic bind passes the same G-S0/G-S1/G-S2 gate.
+4. Parallel families (CRV1 / Sector Rotation) continue under own contracts; spend research WIP on an independent family rather than broad CIQ expectation discovery.
 
 ## Do not
 
 ```text
-open AO-FTK-2 / second economic eval / claim financial_alpha_evidence > 0
-capital open / W6 open / AOV-104 as Full-W3 / invent prices-returns
-asymmetric FTK vs W3 returns / L8 without owner earn
+open AO-FTK-2 / L8 / rescue / re-run FTK L5
+TR-v0 L3/L5 / timing research / H-K-threshold grid while source terminal is HOLD_SOURCE
+invent expectation bytes / relabel CRV1 expectation authority / returns join / claim alpha
+AOV-104 as Full-W3 / capital open / W6 open
+```
+
+## Stream close pointers
+
+```text
+HANDOVER_CLOSE = docs/handover/stream_handover_roadmap_alignment_dispatcher_close_20260812.md
+CLOSE_RECEIPT  = docs/context/e2e_evidence/stream_close_roadmap_alignment_dispatcher_20260812.json
+PRIMARY_WIP    = NONE (parallel families only)
 ```
 
 ## One-line constitution
 
-Re-prove D2 on real Full-W3. Then one last economic trial. Same sensor, same binds, same return law both sides. L6 first-fail. L7 stop. No fakes, no slice 2.
+Owner stamped L7_ROUTE=STOP. Sensing banked PASS; economics banked D6_SELECTION FAIL; TR-v0 HOLD_SOURCE parked; alpha=0. No FTK-2, no L8, no rescue, no invent consensus, no re-run.

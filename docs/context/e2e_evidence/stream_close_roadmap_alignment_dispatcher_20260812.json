@@ -1,0 +1,46 @@
+{
+  "schema_version": "stream_close_roadmap_alignment_dispatcher_v1",
+  "receipt_id": "STREAM_CLOSE_ROADMAP_ALIGNMENT_DISPATCHER_20260812",
+  "date": "2026-08-12",
+  "roles": ["roadmap_alignment_owner", "worker_dispatcher"],
+  "authority_lineage": "codex/pit-source-authority-1",
+  "worktree": "E:/Code/Quant/.worktrees/devspace-053ca7a4f582fb3e",
+  "public_main": "NON_AUTHORITY_UNTIL_MERGE",
+  "terminal_verdict": "STREAM_CLOSED_PARK",
+  "ftk": {
+    "primary": "STOPPED",
+    "l7_route": "STOP",
+    "banked_sensing": "PASS",
+    "banked_economics": "D6_SELECTION_FAIL",
+    "material_trials_charged": 3,
+    "material_trials_remaining": 0,
+    "financial_alpha_evidence": 0,
+    "stop_close": "docs/context/e2e_evidence/ao_ftk_1_l7_stop_close.json",
+    "final_trial": "docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_final_layered_diagnosis.json"
+  },
+  "tr_v0": {
+    "g0_g2": "ALL_PASS_ADMIT_L1_FROZEN",
+    "l2_observation": "L2_OBSERVATION_CONTRACT_FROZEN",
+    "source_admit": "HOLD_SOURCE",
+    "failed_gate": "G-S0_EXACT_CIQ_SOURCE_SEMANTICS_UNBOUND",
+    "debit": 0,
+    "timing_research": false,
+    "next": "PARK_TR_v0_UNTIL_CIQ_CONSENSUS_SEMANTICS",
+    "admission": "docs/context/e2e_evidence/tr_v0_g0_g2_admission_1.json",
+    "l2_receipt": "docs/context/e2e_evidence/tr_v0_l2_observation_contract_1.json",
+    "source_admit_receipt": "docs/context/e2e_evidence/tr_v0_expectations_source_admit_1.json"
+  },
+  "stock_discovery_primary": "NONE_PARKED",
+  "parallel_ok": ["W-CLOCK", "W-CRV1", "W-SECTOR", "W-PAPER", "W-HARNESS"],
+  "forbidden": [
+    "FTK rescue",
+    "AO-FTK-2",
+    "L8 on FTK",
+    "TR-v0 L5 invent consensus",
+    "timing before selection bridge",
+    "capital",
+    "claim financial_alpha_evidence > 0"
+  ],
+  "handover_memo": "docs/handover/stream_handover_roadmap_alignment_dispatcher_close_20260812.md",
+  "constitution": "JSON wins over chat. Preserve Clock #1. FTK sensing banked; FTK economics stopped at D6. TR-v0 selection bridge parked at source semantics. Parallel families free."
+}

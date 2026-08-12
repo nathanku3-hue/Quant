@@ -1,0 +1,246 @@
+{
+  "schema_version": "transition_recognition_v0_l2_observation_contract_v1",
+  "slice_id": "TR-v0-L2-OBSERVATION-CONTRACT-1",
+  "family_id": "TRANSITION_RECOGNITION_v0",
+  "name": "TR_V0_L2_OBSERVATION_CONTRACT",
+  "date": "2026-08-12",
+  "role": "SHADOW_RESEARCH / OUTCOME_BLIND / NO_TRIAL",
+  "phase": "L2_OBSERVATION_CONTRACT",
+  "status": "L2_CONTRACT_FROZEN_WAITING_RECOGNITION_SOURCE",
+  "terminal_verdict": "L2_OBSERVATION_CONTRACT_FROZEN",
+  "parent_admission": "docs/context/e2e_evidence/tr_v0_g0_g2_admission_1.json",
+  "parent_l0_l1": "docs/architecture/transition_recognition_v0_l0_l1_freeze.json",
+  "ftk_primary": "STOPPED",
+  "ftk_rescue": false,
+  "timing_research": false,
+  "debit": 0,
+  "evals": 0,
+  "label_join": 0,
+  "returns_join": false,
+  "financial_alpha_evidence": 0,
+  "capital": false,
+  "runnable_evaluation": false,
+  "l5": "FORBIDDEN",
+  "ao_ftk_2": "FORBIDDEN",
+  "golden_question": "Among companies with a real operating transition, what independently observable PIT state distinguishes a merely real transition from an economically selectable, not-yet-recognized transition?",
+  "selection_vs_timing": {
+    "in_scope": "A_SELECTION_Reality_vs_Reality_plus_RecognitionGap",
+    "out_of_scope": "B_TIMING_entry_confirmation_D7",
+    "note": "Recognition gap is selection information first; timing only if selection bridge later passes economic test."
+  },
+  "reality_observation_contract": {
+    "node_id": "REALITY",
+    "semantic_class": "OPERATING_TRANSITION_OBSERVATION",
+    "not_policy": [
+      "FTK_K20_RANK_ACTION",
+      "FTK_H63_HOLD",
+      "FTK_ECONOMIC_SELECTION_POLICY"
+    ],
+    "identity_namespace": "CIQSEC",
+    "denominator_when_later_evaluated": "PREBREAKOUT_US_PRIMARY_COMMON_DATE_LOCAL_V1",
+    "missingness_action": "ABSTAIN",
+    "pit_law": "available_at <= decision_as_of; Original-filing / admitted S0 law; no future vintage",
+    "primitive_binds": [
+      {
+        "primitive_id": "TR_REALITY_IQ_PERIOD_END",
+        "field": "IQ_PERIOD_END",
+        "bind_status": "BOUND_VIA_ADMITTED_S0_FTK_LINEAGE",
+        "lineage": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#primitives"
+      },
+      {
+        "primitive_id": "TR_REALITY_IQ_TOTAL_REV",
+        "field": "IQ_TOTAL_REV",
+        "bind_status": "BOUND_VIA_ADMITTED_S0_FTK_LINEAGE",
+        "lineage": "docs/architecture/ao_ftk_0_transition_sparse_basis_v1.json#primitives"
+      },
+      {
+        "primitive_id": "TR_REALITY_IQ_INVENTORY",
+        "field": "IQ_INVENTORY",
+        "bind_status": "BOUND_VIA_ADMITTED_S0_FTK_LINEAGE",
+        "role": "inventory channel transition observation only"
+      },
+      {
+        "primitive_id": "TR_REALITY_IQ_OPER_INC",
+        "field": "IQ_OPER_INC",
+        "bind_status": "BOUND_VIA_ADMITTED_S0_FTK_LINEAGE",
+        "role": "operating-margin transition observation only"
+      }
+    ],
+    "derived_observation_levels": [
+      {
+        "level_id": "INVENTORY_ECONOMIC_LEVEL",
+        "formula": "-(IQ_INVENTORY / IQ_TOTAL_REV)",
+        "law": "same period; positive revenue; else UNOBSERVED→ABSTAIN"
+      },
+      {
+        "level_id": "OPERATING_MARGIN",
+        "formula": "IQ_OPER_INC / IQ_TOTAL_REV",
+        "law": "same period; positive revenue; else UNOBSERVED→ABSTAIN"
+      }
+    ],
+    "reality_true_definition_form": {
+      "form": "DOMAIN_LIMITED_TRANSITION_FLAG",
+      "description": "Reality=true when at least one domain-limited transition observation is APPLICABLE_OBSERVED and exhibits a preregistered non-null transition state under frozen operator family; exact materiality cuts deferred to L3/L4 and MUST NOT be fit on FTK residual outcomes.",
+      "forbidden": [
+        "define Reality from future returns",
+        "define Reality as FTK selected-set membership",
+        "threshold search on failed FTK economic dates"
+      ]
+    },
+    "ftk_score_reuse_as_reality": "FORBIDDEN",
+    "ftk_policy_reuse_as_reality": "FORBIDDEN"
+  },
+  "recognition_observation_contract": {
+    "node_id": "RECOGNITION_STATE",
+    "semantic_class": "CONSENSUS_EXPECTATION_OBSERVATION",
+    "api_surface": "alpha_pit_data_api_v1.expectations(ids, as_of)",
+    "api_doc": "docs/architecture/alpha_pit_data_api_v1.md#44-expectationsids-as_of",
+    "family_data_contract_id": "TRANSITION_RECOGNITION_v0_FAMILY_DATA_CONTRACT_V1",
+    "identity_namespace": "CIQSEC",
+    "identity_keys": [
+      "security_id",
+      "measure",
+      "forecast_period_end",
+      "observed_at",
+      "available_at",
+      "source_id",
+      "source_receipt_sha256"
+    ],
+    "as_of_lag_law": [
+      "decision as_of timezone-aware",
+      "available_at <= decision as_of",
+      "latest lawful vintage only",
+      "no backdating or future vintage",
+      "OBSERVED_CONSENSUS and INFERRED_MARKET_IMPLIED must remain explicitly labeled",
+      "inferred must never masquerade as observed consensus"
+    ],
+    "missingness_action": "ABSTAIN",
+    "coverage_statuses": [
+      "PRESENT",
+      "MISSING_HISTORY",
+      "MISSING_SOURCE",
+      "NOT_ENTITLED",
+      "NOT_APPLICABLE",
+      "STALE"
+    ],
+    "measures_primary_v0": [
+      {
+        "measure": "EPS_FY1",
+        "role": "PRIMARY_LEVEL_RECOGNITION",
+        "bind_status": "CONTRACT_BOUND_SURFACE",
+        "source_bytes_status": "MISSING_SOURCE"
+      },
+      {
+        "measure": "EPS_FY1_REVISION_30D",
+        "role": "PRIMARY_REVISION_RECOGNITION",
+        "bind_status": "CONTRACT_BOUND_SURFACE",
+        "source_bytes_status": "MISSING_SOURCE"
+      },
+      {
+        "measure": "EPS_FY1_REVISION_90D",
+        "role": "SECONDARY_REVISION_RECOGNITION",
+        "bind_status": "CONTRACT_BOUND_SURFACE",
+        "source_bytes_status": "MISSING_SOURCE"
+      }
+    ],
+    "measures_parked_not_decision_surface": [
+      "EPS_FY2",
+      "REVENUE_FY1",
+      "REVENUE_FY2",
+      "REVENUE_FY1_REVISION_30D",
+      "REVENUE_FY1_REVISION_90D",
+      "FORWARD_PE"
+    ],
+    "parked_reason": "Keep first recognition surface low-DOF; parked measures may enter only via new freeze slice, not free feature search.",
+    "source_bind": {
+      "status": "MISSING_SOURCE",
+      "reason": "CIQ_EXPECTATIONS_CAPTURE_NOT_LANDED",
+      "adapter_behavior": "research/alpha_pit_v1/adapters/ciq_cycle_v1.py returns MISSING_SOURCE sentinel rows when expectations source pair absent",
+      "crv1_family_artifact_reuse_as_tr_authority": "FORBIDDEN",
+      "provider_capture_this_slice": "FORBIDDEN",
+      "required_for_empirical_l3_or_later": true
+    }
+  },
+  "recognition_gap_contract": {
+    "node_id": "RECOGNITION_GAP",
+    "definition_form": "Given Reality=true, contemporaneous recognition has not incorporated the transition relative to a preregistered mapping from Reality observation to expected recognition response.",
+    "operator_family_v0": [
+      {
+        "operator_id": "REV_LAG_AFTER_REALITY",
+        "form": "Reality_true AND (EPS_FY1_REVISION_30D is null OR not material_up_revision under later L3/L4 frozen cut)",
+        "status": "FORM_FROZEN_CUTS_UNSET",
+        "materiality_cut": "BLOCKED_UNSET_UNTIL_L3_L4",
+        "forbidden": "fit cut on FTK residual outcomes or returns"
+      },
+      {
+        "operator_id": "LEVEL_STALE_VS_REALITY",
+        "form": "Reality_true AND EPS_FY1 present but recognition state classified not-yet-updated under later frozen rule",
+        "status": "FORM_FROZEN_CUTS_UNSET",
+        "materiality_cut": "BLOCKED_UNSET_UNTIL_L3_L4"
+      }
+    ],
+    "already_recognized_form": "Reality_true AND material concurrent upward revision / updated consensus under same frozen cuts",
+    "selection_contrast": {
+      "arm_A": "Reality_true only (ignore gap)",
+      "arm_B": "Reality_true AND RecognitionGap_true",
+      "later_test": "D6 selection enrichment B vs A under separate preregistered wager law",
+      "not_this_slice": true
+    },
+    "forbidden_definitions": [
+      "gap from future price/return reaction",
+      "gap from FTK K/H policy residuals",
+      "gap from failed FTK decision-date payoffs",
+      "threshold grid search this slice"
+    ]
+  },
+  "family_data_contract": {
+    "family_id": "TRANSITION_RECOGNITION_v0",
+    "risk_set_spec_id": "TR_V0_USES_W3_DENOMINATOR_WHEN_EVALUATED_NOT_OWN_RISKSET_THIS_SLICE",
+    "primary_label_spec_id": "UNSET_THIS_SLICE_NO_OUTCOMES",
+    "allowed_expectation_surface": [
+      "EPS_FY1",
+      "EPS_FY2",
+      "REVENUE_FY1",
+      "REVENUE_FY2",
+      "EPS_FY1_REVISION_30D",
+      "EPS_FY1_REVISION_90D",
+      "REVENUE_FY1_REVISION_30D",
+      "REVENUE_FY1_REVISION_90D",
+      "FORWARD_PE"
+    ],
+    "allowed_observation_surface_note": "Reality uses admitted S0/FTK transition primitives as observation only; not CRV1 risk-set authority.",
+    "outcomes_api": "FORBIDDEN_THIS_SLICE"
+  },
+  "falsifiers_still_live": {
+    "F1": "Recognition cannot be defined independently of future returns -> KILL",
+    "F2": "Recognition merely re-encodes Reality/FTK transition -> KILL",
+    "F3": "Materially identical to CRV1 -> MERGE",
+    "F4": "Defined from failed FTK dates/payoffs -> KILL",
+    "F5": "Requires H/K/threshold from economic residuals -> KILL"
+  },
+  "l2_exit": {
+    "contract_frozen": true,
+    "source_blocker": "CIQ_EXPECTATIONS_CAPTURE_NOT_LANDED",
+    "next_if_source_lands": "TR-v0-L2B-SOURCE-ADMIT or L3_REPRESENTATION_SNR under bound source",
+    "next_if_source_blocked_long": "HOLD_SOURCE — do not invent expectations; do not open L5",
+    "not_next": [
+      "L5 economic trial",
+      "timing research",
+      "FTK rescue",
+      "threshold fit",
+      "returns join"
+    ]
+  },
+  "stop_lines": [
+    "RETURNS_OR_LABEL_JOIN",
+    "TIMING_RESEARCH_D7",
+    "FTK_RESCUE",
+    "AO_FTK_2",
+    "H_K_THRESHOLD_GRID",
+    "DEBIT_OR_L5",
+    "PROVIDER_CAPTURE_WITHOUT_OWNER_SLICE",
+    "CRV1_ARTIFACT_AS_TR_AUTHORITY",
+    "CLAIM_ALPHA_OR_SELECTION_PASS",
+    "INVENT_EXPECTATION_BYTES"
+  ]
+}

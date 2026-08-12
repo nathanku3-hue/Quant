@@ -1,0 +1,113 @@
+{
+  "schema_version": "tr_v0_g0_g2_admission_v1",
+  "slice_id": "TR-v0-G0-G2-ADMISSION-1",
+  "family_id": "TRANSITION_RECOGNITION_v0",
+  "name": "RECOGNITION_GAP_SELECTION_FAILFAST_ADMISSION",
+  "role": "SHADOW_RESEARCH / OUTCOME_BLIND / NO_TRIAL",
+  "date": "2026-08-12",
+  "parallel_l7_close": "landed",
+  "g0": {
+    "status": "PASS",
+    "gate": "FAMILY_DISTINCTNESS_VS_CRV1",
+    "distinct_estimand": "Conditional on a real PIT-observable operating transition already being present, does contemporaneous recognition lag add selection information: Reality + RecognitionGap versus Reality alone?",
+    "success_metric_contract": "Later D6 selection enrichment for Reality + RecognitionGap versus Reality alone under a separately preregistered wager law; no metric is evaluated in this slice.",
+    "primary_horizon_contract": "UNSET_THIS_SLICE; inheriting CRV1's 252-trading-day primary horizon is forbidden and any later economic horizon must be frozen separately before result access.",
+    "crv1_boundary": "CYCLE_RESONANCE_v1 is a broad ordered-cycle family whose supply/capacity -> inventory -> pricing -> margin -> earnings-revisions -> expectation-gap chain targets a 252-trading-day right-tail winner. TR-v0 conditions on Reality already being present and studies recognition lag only as the missing selector.",
+    "decision": "Distinct causal family admission is warranted. If later work needs CRV1's broad ordered-cycle contract, 252d label, or resonance score to define TR-v0, route/merge to CRV1 rather than duplicate it."
+  },
+  "g1": {
+    "status": "PASS",
+    "gate": "PIT_RECOGNITION_WITHOUT_RETURNS",
+    "recognition_state": "The latest lawful point-in-time consensus/expectation state known at decision as_of for the permanent security identity, using source-bound expectation rows only.",
+    "recognition_gap": "Given Reality=true, the operating transition has moved farther than contemporaneous consensus recognition. Exact normalization/materiality operators remain L2 work and may not be derived from future returns, future prices, or failed FTK payoffs.",
+    "identity_keys": [
+      "security_id = CIQSEC:<Capital IQ Security ID>",
+      "measure",
+      "forecast_period_end",
+      "observed_at",
+      "available_at",
+      "source_id",
+      "source_receipt_sha256"
+    ],
+    "as_of_lag_law": [
+      "decision as_of is timezone-aware",
+      "available_at <= decision as_of",
+      "latest lawful vintage only; no backdating or future vintage",
+      "observed consensus and inferred market-implied state must remain explicitly labeled",
+      "missing/stale/not-entitled required recognition state maps to ABSTAIN"
+    ],
+    "missingness": "ABSTAIN; never infer recognition from missing data and never use missingness to create a favorable selector denominator.",
+    "candidate_measures": [
+      "EPS_FY1",
+      "EPS_FY2",
+      "REVENUE_FY1",
+      "REVENUE_FY2",
+      "EPS_FY1_REVISION_30D",
+      "EPS_FY1_REVISION_90D",
+      "REVENUE_FY1_REVISION_30D",
+      "REVENUE_FY1_REVISION_90D",
+      "FORWARD_PE"
+    ],
+    "source_feasibility": "PASS_IN_PRINCIPLE: alpha_pit_data_api_v1 already defines a PIT expectation surface with permanent identity, available_at, source receipt, epistemic class, and explicit missingness. L2 must bind a TR-v0-specific family/source contract before any empirical use; CRV1 family artifacts are not TR-v0 authority.",
+    "future_returns_used": false,
+    "future_prices_used": false,
+    "failed_ftk_payoffs_used": false
+  },
+  "g2": {
+    "status": "PASS",
+    "gate": "INCREMENTAL_TO_REALITY_NOT_FTK_REENCODING",
+    "reality_node": "PIT-observable operating-transition observation established independently of recognition. It may reuse lawful transition primitives, but it is not the failed FTK economic policy, K=20 rank/action map, H=63 hold law, or residual outcome state.",
+    "recognition_node": "Consensus/expectation state from a separate expectations surface.",
+    "incrementality": "RecognitionGap has independent economic meaning as 'transition occurring but not yet incorporated in contemporaneous expectations'. It is not another inventory/margin transition score.",
+    "forbidden_reencodings": [
+      "inventory transition score relabeled as recognition",
+      "margin transition score relabeled as recognition",
+      "FTK composite score/rank/selected-set membership",
+      "H/K/threshold chosen from FTK residual outcomes",
+      "price or return reaction used to define recognition"
+    ]
+  },
+  "terminal": "ALL_PASS_ADMIT_L1_FROZEN",
+  "next": "L2_OBSERVATION_CONTRACT",
+  "l0_l1_frozen": true,
+  "l0_question": "Conditional on a real PIT-observable operating transition, does an independently observable recognition/consensus gap identify which transitions are economically selectable (not-yet-recognized) versus already-recognized?",
+  "l1_chain": [
+    "REALITY",
+    "RECOGNITION_STATE",
+    "RECOGNITION_GAP",
+    "SUBSEQUENT_RECOGNITION_LATER_NOT_TIMING_RESEARCH",
+    "POTENTIAL_SELECTION_EDGE_D6_LATER_NOT_EVALUATED"
+  ],
+  "h1": "Among firms exhibiting a real operating transition, future economic selection enrichment under a later preregistered wager law is higher when contemporaneous consensus recognition materially lags the observed transition, versus transitions already recognized.",
+  "falsifiers": {
+    "F1": "Recognition cannot be defined independently of future returns -> KILL.",
+    "F2": "Recognition is merely another encoding of the same transition -> KILL / not incremental.",
+    "F3": "Hypothesis is materially identical to CRV1 -> MERGE/ROUTE.",
+    "F4": "Useful recognition state appears only after inspecting failed FTK dates/payoffs -> KILL.",
+    "F5": "Mechanism requires choosing H/K/threshold from prior economic residuals -> KILL."
+  },
+  "debit": 0,
+  "evals": 0,
+  "label_join": 0,
+  "financial_alpha_evidence": 0,
+  "capital": false,
+  "timing_research": false,
+  "ftk_rescue": false,
+  "ao_ftk_2": "FORBIDDEN",
+  "runnable_evaluation": false,
+  "return_or_label_join_performed": false,
+  "provider_access_performed": false,
+  "evidence_refs": [
+    "docs/context/e2e_evidence/ao_ftk_1_econ_1_l6_final_layered_diagnosis.json",
+    "docs/context/e2e_evidence/ao_ftk_1_econ_1_l7_final_owner_packet.json",
+    "docs/architecture/cycle_resonance_v1_build_spec.md",
+    "docs/architecture/alpha_pit_data_api_v1.md",
+    "research/alpha_pit_v1/contracts.py",
+    "research/alpha_pit_v1/adapters/ciq_cycle_v1.py"
+  ],
+  "artifacts": {
+    "human_packet": "docs/context/e2e_evidence/tr_v0_g0_g2_admission_1.md",
+    "causal_admission": "docs/architecture/transition_recognition_v0_causal_admission.md",
+    "l0_l1_freeze": "docs/architecture/transition_recognition_v0_l0_l1_freeze.json"
+  }
+}
