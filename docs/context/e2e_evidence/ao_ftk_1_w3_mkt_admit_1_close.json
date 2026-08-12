@@ -1,0 +1,39 @@
+{
+  "schema_version": "ao_ftk_1_w3_mkt_admit_1_close_v1",
+  "receipt_id": "AO_FTK_1_W3_MKT_ADMIT_1_CLOSE",
+  "work_id": "AO-FTK-1-W3-MKT-ADMIT-1",
+  "parent_program": "AO-FTK-1-20260812",
+  "parent_econ_freeze": "AO-FTK-1-ECON-1",
+  "closed_at_utc": "2026-08-12",
+  "worker_status": "CLOSED / NO_WORKER",
+  "terminal": "W3_MKT_ADMIT_PASS_D2_GREEN",
+  "D2_PRECHECK": "GREEN",
+  "full_w3_admitted": true,
+  "security_count": 5919,
+  "return_convention": "SP_PRICE_CLOSE_CLOSE_TO_CLOSE",
+  "symmetry_ftk_w3": true,
+  "material_trials_remaining": 1,
+  "debit_this_turn": false,
+  "economic_l5_authorized": false,
+  "financial_alpha_evidence": 0,
+  "work_commit": "b32884e",
+  "receipts": {
+    "survey": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_survey.json",
+    "admit": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_custody_admit.json",
+    "d2_preflight": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_d2_preflight.json",
+    "summary": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_summary.md"
+  },
+  "next_owner_action": "L5_AUTHORIZE_ECONOMIC_FINAL",
+  "next_phase": "WAIT_OWNER_L5_ECONOMIC_FINAL",
+  "forbidden_auto": [
+    "auto_L5",
+    "debit_without_auth",
+    "AO-FTK-2",
+    "L8",
+    "AOV_104_AS_FULL_W3",
+    "capital",
+    "alpha_claim"
+  ],
+  "constitution": "Admit real Full-W3 market custody or HOLD. Prove D2 green before the last trial. Never fake W3. Never debit here.",
+  "stop_lines_hit": []
+}

@@ -121,7 +121,9 @@
       "full_w3_market_admitted": true,
       "material_trial_debit_this_turn": false,
       "runnable_evaluation": false,
-      "note": "W3 market admitted; D2 preflight GREEN; last trial still 1; WAIT_OWNER_L5_ECONOMIC_FINAL; no auto L5"
+      "note": "W3 market admitted; D2 preflight GREEN; last trial still 1; WAIT_OWNER_L5_ECONOMIC_FINAL; no auto L5",
+      "w3_mkt_close_receipt": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_close.json",
+      "w3_mkt_work_commit": "b32884e"
     },
     {
       "next": "continue under own contract; do not merge into FTK/Q",
@@ -342,8 +344,8 @@
   "process": {
     "diagnosis_layer_if_any": "D2_DATA_OBSERVABLE_PREFLIGHT_GREEN",
     "failure_route_if_any": "NONE_PENDING_OWNER_L5",
-    "last_completed_note": "AO-FTK-1-W3-MKT-ADMIT-1: Full-W3 market custody ADMITTED (prebreakout historical corpus ~5919 companies); D2_PRECHECK=GREEN; trials remaining=1 unspent; no debit; no L5; alpha=0",
-    "last_completed_phase": "W3_MKT_ADMIT_D2_PREFLIGHT",
+    "last_completed_note": "AO-FTK-1-W3-MKT-ADMIT-1 CLOSED: terminal=W3_MKT_ADMIT_PASS_D2_GREEN; work_commit=b32884e; D2=GREEN; remaining=1; no debit; no L5; alpha=0; NO_WORKER",
+    "last_completed_phase": "W3_MKT_ADMIT_D2_PREFLIGHT_CLOSED",
     "loop_phase": "WAIT_OWNER_L5_ECONOMIC_FINAL",
     "loop_phase_label": "AO-FTK-1-ECON-1 W3 market admitted; D2 preflight GREEN; last trial still 1; WAIT_OWNER_L5_ECONOMIC_FINAL; no auto L5; alpha=0",
     "method_id": "ALPHA_SCIENTIFIC_METHOD_v1",
@@ -387,6 +389,9 @@
     "admit": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_custody_admit.json",
     "d2_preflight": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_d2_preflight.json",
     "summary": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_summary.md",
-    "next_owner_action": "L5_AUTHORIZE_ECONOMIC_FINAL"
+    "next_owner_action": "L5_AUTHORIZE_ECONOMIC_FINAL",
+    "close_receipt": "docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_close.json",
+    "work_commit": "b32884e",
+    "worker_status": "CLOSED / NO_WORKER"
   }
 }

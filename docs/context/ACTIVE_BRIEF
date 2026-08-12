@@ -53,6 +53,8 @@ survey       = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_survey.json
 admit        = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_custody_admit.json
 d2_preflight = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_d2_preflight.json
 summary      = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_summary.md
+close        = docs/context/e2e_evidence/ao_ftk_1_w3_mkt_admit_1_close.json
+WORK_COMMIT  = b32884e
 ```
 
 ### Custody admitted
